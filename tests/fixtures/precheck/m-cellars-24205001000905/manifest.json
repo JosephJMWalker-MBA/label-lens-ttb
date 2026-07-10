@@ -1,0 +1,101 @@
+{
+  "fixtureId": "m-cellars-24205001000905",
+  "schemaVersion": "label-fixture-manifest.v1",
+  "ttbId": "24205001000905",
+  "beverageCategory": "wine",
+  "source": {
+    "kind": "public-cola-certificate",
+    "reference": "TTB Public COLA Registry, printable COLA certificate for TTB ID 24205001000905",
+    "sourceBytesRetained": false,
+    "sourceSha256": null,
+    "note": "Public certificate is referenced only. Original certificate bytes are not retained in this repository, so no source-byte hash is claimed."
+  },
+  "derivative": {
+    "kind": "sanitized-label-crop",
+    "path": "label.png",
+    "mediaType": "image/png",
+    "sha256": "6829add3d99c61851028b2422bdd9672bb975183d198de5e280bc961f4a489e7",
+    "pixelWidth": 494,
+    "pixelHeight": 214,
+    "byteSize": 69983
+  },
+  "transformationChain": [
+    {
+      "order": 1,
+      "operation": "manual-rectangular-crop",
+      "performedIn": "outside-repository",
+      "performedBy": "human",
+      "description": "Manual rectangular crop of the rendered label artwork from the public printable COLA screenshot.",
+      "excludedRegions": [
+        "certificate-form-fields",
+        "applicant-contact-information",
+        "signature",
+        "qualification-text",
+        "footer-content",
+        "full-page-rendering"
+      ],
+      "verification": "human-approved-and-hash-verified"
+    }
+  ],
+  "privacyExclusions": [
+    {
+      "category": "certificate-form-fields",
+      "check": "excluded-region-during-manual-crop",
+      "result": "excluded",
+      "toolOrRuleVersion": "manual-crop@2026-07-10"
+    },
+    {
+      "category": "applicant-contact-information",
+      "check": "excluded-region-during-manual-crop",
+      "result": "excluded",
+      "toolOrRuleVersion": "manual-crop@2026-07-10"
+    },
+    {
+      "category": "signature",
+      "check": "excluded-region-during-manual-crop",
+      "result": "excluded",
+      "toolOrRuleVersion": "manual-crop@2026-07-10"
+    },
+    {
+      "category": "qualification-text",
+      "check": "excluded-region-during-manual-crop",
+      "result": "excluded",
+      "toolOrRuleVersion": "manual-crop@2026-07-10"
+    },
+    {
+      "category": "footer-content",
+      "check": "excluded-region-during-manual-crop",
+      "result": "excluded",
+      "toolOrRuleVersion": "manual-crop@2026-07-10"
+    },
+    {
+      "category": "full-page-certificate-rendering",
+      "check": "not-committed-to-repository",
+      "result": "excluded",
+      "toolOrRuleVersion": "fixture-policy@1.0.0"
+    },
+    {
+      "category": "whole-document-ocr",
+      "check": "not-generated-or-retained",
+      "result": "excluded",
+      "toolOrRuleVersion": "fixture-policy@1.0.0"
+    }
+  ],
+  "truthLabels": {
+    "brand": "M CELLARS",
+    "varietal": "Teroldego",
+    "appellation": "LAKE ERIE",
+    "vintage": "2023",
+    "alcoholStatement": "12.5% ALC./VOL.",
+    "netContents": "750ML",
+    "governmentWarning": "present"
+  },
+  "provenanceNotes": [
+    {
+      "topic": "alcohol-statement-transcription",
+      "earlierHumanTranscription": "13% ALC./VOL.",
+      "artifactVerifiedTruth": "12.5% ALC./VOL.",
+      "resolution": "artifact-controls"
+    }
+  ]
+}

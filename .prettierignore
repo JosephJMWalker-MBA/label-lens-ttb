@@ -8,3 +8,6 @@ package-lock.json
 
 # Markdown docs are authored by hand and versioned separately from code style.
 *.md
+
+# Binary fixture artifacts have no source formatting.
+tests/fixtures/**/*.png
