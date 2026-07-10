@@ -21,6 +21,18 @@ Label Lens is best understood as an **evidence-governance system embedded in a h
 
 The conceptual foundation is coherent and should remain. The next milestone must prioritize a narrow, falsifiable implementation over additional architectural expansion.
 
+## Visual architecture synthesis
+
+A visual synthesis of this checkpoint was generated to make the governing architecture legible at a glance. It captures five commitments that remain binding during implementation:
+
+1. **AI extracts; rules decide.** Models identify evidence; deterministic rules evaluate it.
+2. **Local-first with bounded fallback.** Local OCR runs first, with external escalation only when internal evidence is insufficient.
+3. **Human-in-the-loop authority.** The system may generate explainable findings, but final disposition remains with an authorized human reviewer.
+4. **Operator trust over isolated compute cost.** Success is measured by trustworthy task completion and reviewer throughput, not merely server expense.
+5. **The thin vertical slice.** One complete path from image upload to explainable report must work before broader architecture resumes.
+
+The visual artifact is explanatory, not normative. The ADRs, typed contracts, tests, and this review remain the authoritative engineering record.
+
 ## Findings
 
 ### 1. AI extracts; deterministic rules decide
@@ -92,6 +104,8 @@ PROVIDER_DISAGREEMENT
 HUMAN_REVIEW_REQUIRED
 ```
 
+Before external escalation, image-quality evidence should trigger concise capture coaching where practical: clean the lens, hold the camera steady, improve lighting, reduce glare, move closer, center the label, or hold the camera parallel to the label. A coached retake must remain bounded so the reviewer is not trapped in a retry loop.
+
 ### 4. Progressive enhancement must not destabilize active review
 
 **Verdict: HARDEN**
@@ -153,6 +167,32 @@ Suggested initial rules:
 2. Brand-name semantic normalization.
 3. ABV numeric comparison using an explicit tolerance policy.
 
+## Human comprehension gate
+
+The review process now includes a generated quiz derived from the source brief, debate, verdicts, architectural decisions, risks, and next actions.
+
+The architecture owner recommends—and this checkpoint adopts—a **100% passing score before implementation continues beyond the checkpoint**.
+
+This is the human-in-the-loop counterpart to automated machine testing:
+
+- machine tests verify that the software behaves as intended;
+- the comprehension quiz verifies that the responsible engineer understands what was built, why the boundaries exist, which tradeoffs were accepted, and what work is permitted next.
+
+A failed or incomplete quiz is not treated as punishment. It is evidence that the review has not yet transferred sufficient understanding to the person responsible for continuing the work. Incorrect answers should return the engineer to the relevant review material, after which the quiz may be retaken.
+
+The quiz must test substantive understanding rather than memorization, including:
+
+- why extraction providers cannot issue compliance verdicts;
+- how UI semantics can undermine human authority;
+- when and why bounded fallback may occur;
+- why background results cannot overwrite active human review;
+- what operator trust means operationally;
+- what is frozen by ADR 0009;
+- the exact required thin vertical slice;
+- which work is deferred until proof exists.
+
+The quiz result should be retained with the review record using only the minimum necessary information: review identifier, quiz version, date, score, and pass/fail status. It should not expose sensitive source material or private reasoning.
+
 ## Verdict table
 
 | Decision | Verdict | Reason |
@@ -164,15 +204,18 @@ Suggested initial rules:
 | Operator trust over isolated compute cost | Keep principle / Replace artifact | Strong principle; current accepted document is incomplete |
 | Five-second performance objective | Revisit after benchmark | Must distinguish first actionable result from optional enhanced evidence |
 | Current documentation breadth | Revisit | Working implementation must now become the primary source of evidence |
+| Human comprehension quiz | Keep / Require | Provides a human understanding test parallel to automated system tests |
 
 ## Decisions recorded
 
 - No further broad architecture expansion should precede the first working vertical slice unless it directly unblocks implementation.
 - Every new governance artifact should produce corresponding code, tests, or measurable acceptance criteria.
-- The next Rubber Duck Review should evaluate working behavior, test evidence, failure modes, and measured latency rather than additional design promises.
+- A generated comprehension quiz is part of the checkpoint evidence.
+- The responsible engineer should achieve 100% on the checkpoint quiz before continuing implementation beyond the approved next slice.
+- The next Rubber Duck Review should evaluate working behavior, test evidence, failure modes, measured latency, and retained comprehension evidence rather than additional design promises.
 
 ## Engineer reflection
 
 The review clarified that architecture deserves to survive only when implementation evidence supports it.
 
-The system's strongest insight remains the separation of evidence, rules, and human judgment. The next discipline is to encode that insight in types, interfaces, tests, and operator-facing behavior so that future contributors cannot accidentally bypass it.
+The system's strongest insight remains the separation of evidence, rules, and human judgment. The next discipline is to encode that insight in types, interfaces, tests, operator-facing behavior, and demonstrated human understanding so that future contributors cannot accidentally bypass it.
