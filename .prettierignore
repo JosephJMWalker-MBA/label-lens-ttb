@@ -1,0 +1,10 @@
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+package-lock.json
+
+# Markdown docs are authored by hand and versioned separately from code style.
+*.md
