@@ -1,25 +1,28 @@
-import type { VerificationStatus } from "./status";
+import type { FindingStatus, RuleExecutionStatus } from "@/domain/run/run-status";
+import type { AuthorityVersion } from "@/domain/run/version-manifest.types";
+
+import type { EvidenceReference } from "./evidence-reference";
 
 /**
- * The explainable result of evaluating one rule against one field.
+ * The explainable, reproducible result of one rule against one check.
  *
- * Every finding must carry enough to answer, in the UI and the exported report:
- * what was expected, what was observed, what normalization was applied, which
- * rule decided, and why the status was assigned.
+ * A finding copies the exact rule, profile, and authority versions that
+ * produced it, so it can be audited and reproduced without consulting the run.
+ * It carries no timestamps, timings, logs, disposition, or overall status —
+ * those are not deterministic evidence.
  */
 export interface VerificationFinding {
-  /** Field key or logical check name (e.g. "brandName", "governmentWarning"). */
-  field: string;
-  status: VerificationStatus;
-  /** Expected value as entered, or null when the field has no expected value. */
-  expected: string | null;
-  /** Observed value from the label, or null when nothing was recovered. */
-  observed: string | null;
-  /** Normalized forms actually compared, when normalization was applied. */
-  normalizedExpected?: string;
-  normalizedObserved?: string;
-  /** Identifier of the rule that produced this finding. */
   ruleId: string;
-  /** Plain-language explanation a non-technical reviewer can understand. */
-  reason: string;
+  ruleVersion: string;
+  profileId: string;
+  profileVersion: string;
+  /** Authority in the run-manifest convention: citation + snapshot/effective date. */
+  authority: AuthorityVersion;
+  findingStatus: FindingStatus;
+  ruleExecutionStatus: RuleExecutionStatus;
+  evidenceReferences: EvidenceReference[];
+  /** Deterministic explanation or reason code for a reviewer. */
+  message: string;
+  /** Required when execution is not_run_external_dependency: what is missing. */
+  externalEvidenceDependency?: string;
 }
