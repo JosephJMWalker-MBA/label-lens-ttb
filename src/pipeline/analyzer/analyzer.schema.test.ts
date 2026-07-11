@@ -28,6 +28,8 @@ function validResponse(): Record<string, unknown> {
       brandName: {
         state: "OBSERVED",
         value: "M CELLARS",
+        normalizedValue: "M CELLARS",
+        rawText: "M CELLARS",
         confidence: 0.98,
         geometry: geometry(),
         alternates: [],
@@ -35,6 +37,8 @@ function validResponse(): Record<string, unknown> {
       alcoholStatement: {
         state: "OBSERVED",
         value: "12.5% ALC./VOL.",
+        normalizedValue: "12.5% ALC./VOL.",
+        rawText: "12.5% ALC./VOL.",
         confidence: 0.9,
         geometry: geometry(),
         alternates: [],
@@ -61,6 +65,8 @@ describe("analyzer evidence — valid observations", () => {
       brandName: {
         state: "LOW_CONFIDENCE",
         value: "M CELLARS",
+        normalizedValue: "M CELLARS",
+        rawText: "M CELLARS",
         confidence: 0.12,
         geometry: geometry(),
         alternates: [],
@@ -76,6 +82,8 @@ describe("analyzer evidence — valid observations", () => {
     (response.fields as Record<string, unknown>).alcoholStatement = {
       state: "AMBIGUOUS",
       value: "12.5% ALC./VOL.",
+      normalizedValue: "12.5% ALC./VOL.",
+      rawText: "12.5% ALC./VOL.",
       confidence: 0.5,
       geometry: geometry(),
       alternates: [

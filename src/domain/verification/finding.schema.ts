@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { geometrySchema } from "@/domain/evidence/evidence.schema";
 import { FINDING_STATUSES, RULE_EXECUTION_STATUSES } from "@/domain/run/run-status";
 import type { FindingStatus, RuleExecutionStatus } from "@/domain/run/run-status";
 import { ANALYZER_OBSERVATION_STATES } from "@/pipeline/analyzer/analyzer.types";
@@ -33,18 +34,6 @@ const isoDate = z
   .string()
   .regex(ISO_DATE)
   .refine((v) => !Number.isNaN(Date.parse(v)), { message: "must be a valid ISO YYYY-MM-DD date" });
-
-const geometrySchema = z
-  .object({
-    imageIndex: z.number().int().nonnegative(),
-    x: z.number().finite().nonnegative(),
-    y: z.number().finite().nonnegative(),
-    width: z.number().finite().positive(),
-    height: z.number().finite().positive(),
-    imageWidth: z.number().finite().positive(),
-    imageHeight: z.number().finite().positive(),
-  })
-  .strict();
 
 const evidenceReferenceSchema = z
   .object({

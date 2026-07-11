@@ -1,14 +1,11 @@
 import { z } from "zod";
 
+import { observationSchema } from "@/domain/evidence/evidence.schema";
 import { EVIDENCE_STATUSES } from "@/domain/run/run-status";
 import { verificationFindingSchema } from "@/domain/verification/finding.schema";
-import { ANALYZER_OBSERVATION_STATES } from "@/pipeline/analyzer/analyzer.types";
 import { PRECHECK_CHECK_IDS } from "@/pipeline/precheck/precheck.types";
-import {
-  RESULT_DISPOSITION_DECISIONS,
-  RESULT_MODE,
-  RESULT_SCHEMA_VERSION,
-} from "@/pipeline/result/result.types";
+import { dispositionHistorySchema, refineResultSemantics } from "@/pipeline/result/result.schema";
+import { RESULT_MODE, RESULT_SCHEMA_VERSION } from "@/pipeline/result/result.types";
 import { err, ok, type Result } from "@/shared/result";
 
 import {
@@ -32,38 +29,6 @@ const isoDate = z
   .refine((v) => !Number.isNaN(Date.parse(v)), {
     message: "must be a valid ISO YYYY-MM-DD date",
   });
-
-const geometrySchema = z
-  .object({
-    imageIndex: z.number().int().nonnegative(),
-    x: z.number().finite().nonnegative(),
-    y: z.number().finite().nonnegative(),
-    width: z.number().finite().positive(),
-    height: z.number().finite().positive(),
-    imageWidth: z.number().finite().positive(),
-    imageHeight: z.number().finite().positive(),
-  })
-  .strict();
-
-const alternateSchema = z
-  .object({
-    value: z.string(),
-    confidence: z.number().finite().min(0).max(1),
-    geometry: geometrySchema.optional(),
-  })
-  .strict();
-
-const observationSchema = z
-  .object({
-    state: z.enum(ANALYZER_OBSERVATION_STATES),
-    value: z.string().nullable(),
-    normalizedValue: z.string().nullable().optional(),
-    rawText: z.string().optional(),
-    confidence: z.number().finite().min(0).max(1),
-    geometry: geometrySchema.optional(),
-    alternates: z.array(alternateSchema),
-  })
-  .strict();
 
 const ocrEngineSchema = z.union([
   z
@@ -147,46 +112,6 @@ const versionManifestSchema = z
   })
   .strict();
 
-const dispositionEntrySchema = z
-  .object({
-    dispositionId: z.string().min(1),
-    sequence: z.number().int().positive(),
-    actorId: z.string().min(1),
-    recordedAt: z.string().min(1),
-    decision: z.enum(RESULT_DISPOSITION_DECISIONS),
-    reasonCode: z.string().min(1),
-    note: z.string().min(1).optional(),
-    references: z
-      .object({
-        ruleIds: z.array(z.string().min(1)).optional(),
-        checkIds: z.array(z.string().min(1)).optional(),
-      })
-      .strict()
-      .optional(),
-  })
-  .strict();
-
-const dispositionHistorySchema = z.array(dispositionEntrySchema).superRefine((entries, ctx) => {
-  const ids = new Set<string>();
-  entries.forEach((entry, index) => {
-    if (entry.sequence !== index + 1) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: [index, "sequence"],
-        message: `Disposition sequence must be contiguous from 1; expected ${index + 1}.`,
-      });
-    }
-    if (ids.has(entry.dispositionId)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: [index, "dispositionId"],
-        message: `Duplicate dispositionId: ${entry.dispositionId}.`,
-      });
-    }
-    ids.add(entry.dispositionId);
-  });
-});
-
 export const precheckJsonExportSchema = z
   .object({
     exportSchemaVersion: z.literal(EXPORT_SCHEMA_VERSION),
@@ -253,7 +178,10 @@ export const precheckJsonExportSchema = z
       })
       .strict(),
   })
-  .strict();
+  .strict()
+  // The export wraps the same machine content as the result, so it enforces the
+  // identical cross-object semantic invariants — never fewer.
+  .superRefine(refineResultSemantics);
 
 export function validateJsonExportShape(
   candidate: unknown,

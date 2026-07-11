@@ -1,10 +1,10 @@
 import { z } from "zod";
 
+import { observationSchema } from "@/domain/evidence/evidence.schema";
 import { err, ok, type Result } from "@/shared/result";
 
 import {
   ANALYZER_EVIDENCE_SCHEMA_VERSION,
-  ANALYZER_OBSERVATION_STATES,
   type AnalyzerEvidenceResponse,
   type AnalyzerValidationError,
 } from "./analyzer.types";
@@ -85,63 +85,6 @@ function findForbiddenKey(value: unknown, path = "$"): { path: string; key: stri
   return null;
 }
 
-const confidence = z.number().finite().min(0).max(1);
-
-const geometrySchema = z
-  .object({
-    imageIndex: z.number().int().nonnegative(),
-    x: z.number().finite().nonnegative(),
-    y: z.number().finite().nonnegative(),
-    width: z.number().finite().positive(),
-    height: z.number().finite().positive(),
-    imageWidth: z.number().finite().positive(),
-    imageHeight: z.number().finite().positive(),
-  })
-  .strict();
-
-const alternateSchema = z
-  .object({
-    value: z.string().min(1),
-    confidence,
-    geometry: geometrySchema.optional(),
-  })
-  .strict();
-
-const fieldObservationSchema = z
-  .object({
-    state: z.enum(ANALYZER_OBSERVATION_STATES),
-    value: z.string().min(1).nullable(),
-    normalizedValue: z.string().min(1).nullable().optional(),
-    rawText: z.string().min(1).optional(),
-    confidence,
-    geometry: geometrySchema.optional(),
-    alternates: z.array(alternateSchema).default([]),
-  })
-  .strict()
-  .superRefine((obs, ctx) => {
-    if (obs.state === "NOT_OBSERVED" && obs.value !== null) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["value"],
-        message: "NOT_OBSERVED must not carry a value.",
-      });
-    }
-    if (obs.state !== "NOT_OBSERVED" && obs.value === null) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["value"],
-        message: `${obs.state} must preserve the observed value.`,
-      });
-    }
-    if (obs.state === "AMBIGUOUS" && obs.alternates.length === 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["alternates"],
-        message: "AMBIGUOUS must preserve at least one alternate candidate.",
-      });
-    }
-  });
-
 const ocrEngineSchema = z.discriminatedUnion("kind", [
   z
     .object({
@@ -178,8 +121,8 @@ export const analyzerEvidenceResponseSchema = z
     provenance: provenanceSchema,
     fields: z
       .object({
-        brandName: fieldObservationSchema,
-        alcoholStatement: fieldObservationSchema,
+        brandName: observationSchema,
+        alcoholStatement: observationSchema,
       })
       .strict(),
     limitations: z.array(z.string().min(1)).default([]),

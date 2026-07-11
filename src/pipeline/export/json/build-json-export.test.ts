@@ -156,12 +156,13 @@ describe("buildJsonExport — integrity", () => {
     if (!out.ok) expect(out.error.code).toBe("INTEGRITY_MISMATCH");
   });
 
-  it("rejects a reordered rule manifest", () => {
+  it("rejects a reordered rule manifest (finding order no longer matches)", () => {
     const out = parseMutated(exportOf(result()), (c) => {
       c.profile.ruleManifest = [...c.profile.ruleManifest].reverse();
     });
     expect(out.ok).toBe(false);
-    if (!out.ok) expect(out.error.code).toBe("INTEGRITY_MISMATCH");
+    // Caught by the shared semantic invariants before the checksum layer.
+    if (!out.ok) expect(out.error.code).toBe("INVALID_EXPORT_SHAPE");
   });
 
   it("rejects one-character tampering in the payload", () => {

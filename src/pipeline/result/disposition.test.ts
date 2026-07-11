@@ -130,4 +130,57 @@ describe("dispositionHistorySchema", () => {
     ];
     expect(dispositionHistorySchema.safeParse(bad).success).toBe(false);
   });
+
+  function validEntry(overrides: Record<string, unknown> = {}) {
+    return {
+      dispositionId: "a",
+      sequence: 1,
+      actorId: "reviewer-1",
+      recordedAt: "2026-07-11T00:00:00Z",
+      decision: "no_action",
+      reasonCode: "R1",
+      ...overrides,
+    };
+  }
+
+  it("accepts a single valid entry with an RFC3339 instant", () => {
+    expect(dispositionHistorySchema.safeParse([validEntry()]).success).toBe(true);
+  });
+
+  const badEntries: [string, Record<string, unknown>][] = [
+    ["a malformed timestamp", { recordedAt: "t" }],
+    ["an out-of-range calendar month", { recordedAt: "2026-13-01T00:00:00Z" }],
+    ["an impossible calendar day", { recordedAt: "2026-02-30T00:00:00Z" }],
+    ["an empty actor", { actorId: "" }],
+    ["a whitespace-only actor", { actorId: "   " }],
+    ["an empty reason", { reasonCode: "" }],
+    ["a whitespace-only reason", { reasonCode: "  " }],
+    ["an oversized note", { note: "x".repeat(8193) }],
+    ["a fractional sequence", { sequence: 1.5 }],
+    ["a zero sequence", { sequence: 0 }],
+  ];
+  it.each(badEntries)("rejects %s", (_label, patch) => {
+    expect(dispositionHistorySchema.safeParse([validEntry(patch)]).success).toBe(false);
+  });
+});
+
+describe("appendDisposition — reference existence", () => {
+  it("rejects references to a rule or check that is not in the result", () => {
+    const r = result();
+    expect(appendDisposition(r, entry({ references: { ruleIds: ["no-such-rule"] } })).ok).toBe(
+      false,
+    );
+    expect(appendDisposition(r, entry({ references: { checkIds: ["no-such-check"] } })).ok).toBe(
+      false,
+    );
+  });
+
+  it("accepts references to a rule and check that exist", () => {
+    const r = result();
+    const out = appendDisposition(
+      r,
+      entry({ references: { ruleIds: ["wine-alcohol-syntax"], checkIds: ["brand-name-check"] } }),
+    );
+    expect(out.ok).toBe(true);
+  });
 });

@@ -29,6 +29,24 @@ export function appendDisposition(
     });
   }
 
+  // References may only point at findings/checks that exist in this result, and
+  // never mutate them. This invariant is enforced here in the canonical append,
+  // independent of any calling boundary.
+  const knownRuleIds = new Set<string>(result.findings.map((f) => f.ruleId));
+  const knownCheckIds = new Set<string>(result.evidenceAssessments.map((a) => a.checkId));
+  const badRule = (input.references?.ruleIds ?? []).find((id) => !knownRuleIds.has(id));
+  const badCheck = (input.references?.checkIds ?? []).find((id) => !knownCheckIds.has(id));
+  if (badRule !== undefined || badCheck !== undefined) {
+    return err({
+      code: "INVALID_DISPOSITION",
+      message: "Disposition references a finding or check that does not exist in this result.",
+      issues: [
+        ...(badRule !== undefined ? [`unknown ruleId: ${badRule}`] : []),
+        ...(badCheck !== undefined ? [`unknown checkId: ${badCheck}`] : []),
+      ],
+    });
+  }
+
   const entry: DispositionEntry = {
     dispositionId: input.dispositionId,
     sequence: result.humanDispositionHistory.length + 1,

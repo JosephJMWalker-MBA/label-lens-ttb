@@ -27,11 +27,33 @@ const EXPECTED_MANIFEST = [
   { ruleId: "wine-alcohol-omission-eligibility", version: "1.0.0" },
 ];
 
+function geometry() {
+  return { imageIndex: 0, x: 10, y: 20, width: 100, height: 30, imageWidth: 494, imageHeight: 214 };
+}
+
+/**
+ * Build a valid observation for the shared canonical schema: present states
+ * retain value/normalizedValue/rawText/geometry; NOT_OBSERVED carries nothing
+ * but a null value and zero confidence.
+ */
 function obs(
   value: string | null,
   overrides: Partial<AnalyzerFieldObservation> = {},
 ): AnalyzerFieldObservation {
-  return { state: "OBSERVED", value, confidence: 0.95, alternates: [], ...overrides };
+  const state = overrides.state ?? (value === null ? "NOT_OBSERVED" : "OBSERVED");
+  if (state === "NOT_OBSERVED") {
+    return { state: "NOT_OBSERVED", value: null, confidence: 0, alternates: [] };
+  }
+  return {
+    state,
+    value,
+    normalizedValue: value,
+    rawText: value ?? undefined,
+    confidence: 0.95,
+    geometry: geometry(),
+    alternates: [],
+    ...overrides,
+  };
 }
 
 function fact(value: string): DeclaredFact {
