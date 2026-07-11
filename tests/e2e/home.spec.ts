@@ -1,4 +1,21 @@
+import { readFileSync } from "node:fs";
+
 import { expect, test } from "@playwright/test";
+
+// Committed export hashing logic, imported directly so the browser test verifies
+// the downloaded checksum with the same code the server used to produce it.
+import { payloadHash } from "../../src/pipeline/export/json/canonical-json";
+
+const REGISTRY_ORDER = [
+  "wine-alcohol-syntax",
+  "brand-name-canonical-comparison",
+  "wine-alcohol-declared-comparison",
+  "wine-alcohol-actual-content-tolerance",
+  "wine-alcohol-class-type-boundary",
+  "wine-alcohol-omission-eligibility",
+];
+
+const FIXTURE = "tests/fixtures/precheck/m-cellars-24205001000905/label-ocr-source.jpeg";
 
 test("home page shows the advisory pre-check with run disabled until inputs exist", async ({
   page,
@@ -7,36 +24,112 @@ test("home page shows the advisory pre-check with run disabled until inputs exis
   await expect(
     page.getByRole("heading", { level: 1, name: /wine label pre-check/i }),
   ).toBeVisible();
-  // Advisory boundary is visible and no government-approval language is present.
   await expect(page.getByText(/not a TTB approval/i).first()).toBeVisible();
-  // The upload run is disabled until an image and both application values exist.
   await expect(page.getByRole("button", { name: /^run pre-check$/i })).toBeDisabled();
 });
 
-test("bundled M Cellars sample runs through the real pipeline and renders bounded findings", async ({
+test("bundled M Cellars sample runs the real pipeline end-to-end and downloads a verifiable export", async ({
   page,
 }) => {
-  // Real OCR runs server-side; allow generous time for the first cold run.
   test.setTimeout(180_000);
   await page.goto("/");
 
+  // 2 · Advisory and privacy notices are visible.
+  await expect(page.getByText(/not a TTB approval/i).first()).toBeVisible();
+  await expect(page.getByText(/does not store it/i)).toBeVisible();
+
+  // 3 · Load the explicitly labeled bundled demonstration fixture.
+  await expect(page.getByText(/bundled demonstration fixture/i)).toBeVisible();
   await page.getByRole("button", { name: /load verified m cellars sample/i }).click();
 
+  // 4 · Declared sample values are populated.
+  await expect(page.getByLabel(/application brand name/i)).toHaveValue("M CELLARS");
+  await expect(page.getByLabel(/application alcohol value/i)).toHaveValue("12.5");
+
+  // 5 + 6 · Real server-side check runs and completion is announced.
   const result = page.getByRole("heading", { name: /pre-check result/i });
   await expect(result).toBeVisible({ timeout: 150_000 });
+  await expect(page.getByText(/pre-check complete/i)).toBeVisible();
 
-  // Independent evidence assessment section is shown.
-  await expect(page.getByRole("heading", { name: /evidence sufficiency/i })).toBeVisible();
+  // 7 · Both evidence assessments, shown independently.
+  await expect(page.getByText(/brand-name-check/)).toBeVisible();
+  await expect(page.getByText(/wine-alcohol-check/)).toBeVisible();
 
-  // Ordered findings render, including the deterministic first rule.
-  await expect(page.getByText(/wine-alcohol-syntax/).first()).toBeVisible();
-  await expect(page.getByText(/brand-name-canonical-comparison/).first()).toBeVisible();
+  // 8 · Brand and alcohol observations.
+  await expect(page.getByText("M CELLARS").first()).toBeVisible();
+  await expect(page.getByText(/12\.5% ALC\.\/VOL\./).first()).toBeVisible();
 
-  // Advisory notice within the result and a JSON download control.
-  await expect(page.getByRole("button", { name: /download json export/i })).toBeVisible();
+  // 9 · All six findings in exact registry order.
+  const findingOrder = await page.locator("ol li .font-medium").allInnerTexts();
+  const seen = REGISTRY_ORDER.map((id) => findingOrder.indexOf(id));
+  expect(seen).toEqual([...seen].sort((a, b) => a - b));
+  for (const id of REGISTRY_ORDER) expect(findingOrder).toContain(id);
+
+  // 10 · Authority and version information is visible.
+  await expect(page.getByText(/27 CFR/).first()).toBeVisible();
+
+  // 11 · All three external-dependency explanations are visible.
+  await expect(page.getByText(/External evidence required/i)).toHaveCount(3);
 
   // No overall status / compliance score is presented.
   await expect(page.getByText(/\b(Approved|Compliant|Noncompliant|Official result)\b/)).toHaveCount(
     0,
   );
+
+  // 12 + 13 · Download the JSON export and read its bytes in the test.
+  const filenameShown = (await page.locator("code").first().innerText()).trim();
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: /download json export/i }).click(),
+  ]);
+  const path = await download.path();
+  const downloadedText = readFileSync(path, "utf8");
+
+  // 14 · Parse and verify the export checksum using committed export logic.
+  const parsed = JSON.parse(downloadedText);
+  const { integrity, ...payload } = parsed;
+  expect(integrity.algorithm).toBe("SHA-256");
+  expect(payloadHash(payload)).toBe(integrity.value);
+
+  // 15 · Confirm the deterministic suggested filename.
+  expect(download.suggestedFilename()).toMatch(
+    /^label-lens-wine-precheck-precheck-result\.v1-[0-9a-f]{64}\.json$/,
+  );
+  expect(download.suggestedFilename()).toBe(filenameShown);
+});
+
+test("upload rerun with alcohol 13 flips only the declared-comparison outcome", async ({
+  page,
+}) => {
+  test.setTimeout(180_000);
+
+  async function runUpload(alcohol: string) {
+    await page.goto("/");
+    await page.getByLabel(/select one label image/i).setInputFiles(FIXTURE);
+    await page.getByLabel(/application brand name/i).fill("M CELLARS");
+    await page.getByLabel(/application alcohol value/i).fill(alcohol);
+    await page.getByRole("button", { name: /^run pre-check$/i }).click();
+    await expect(page.getByRole("heading", { name: /pre-check result/i })).toBeVisible({
+      timeout: 150_000,
+    });
+    // Map each finding rule id to its status token.
+    const statuses: Record<string, string> = {};
+    const items = page.locator("ol li");
+    const count = await items.count();
+    for (let i = 0; i < count; i++) {
+      const id = (await items.nth(i).locator(".font-medium").innerText()).trim();
+      const status = (await items.nth(i).locator(".font-mono").first().innerText()).trim();
+      statuses[id] = status;
+    }
+    return statuses;
+  }
+
+  const at125 = await runUpload("12.5");
+  const at13 = await runUpload("13");
+
+  // Executed deterministic checks: only the declared comparison changes.
+  expect(at13["brand-name-canonical-comparison"]).toBe(at125["brand-name-canonical-comparison"]);
+  expect(at13["wine-alcohol-syntax"]).toBe(at125["wine-alcohol-syntax"]);
+  expect(at125["wine-alcohol-declared-comparison"]).toBe("PASS");
+  expect(at13["wine-alcohol-declared-comparison"]).toBe("FAIL");
 });
