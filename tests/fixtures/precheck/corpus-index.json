@@ -1,0 +1,611 @@
+{
+  "schemaId": "label-fixture-corpus",
+  "schemaVersion": "label-fixture-corpus.v1",
+  "description": "Domestic-wine fixture corpus for measuring the current two-field (brand + alcohol) Slice 3 system. Evaluation-only: truth labels and expectations are never inputs to the extractor. Not statistically representative of all domestic-wine labels (see issue #15).",
+  "entries": [
+    {
+      "fixtureId": "m-cellars-24205001000905",
+      "displayName": "M Cellars (canonical baseline)",
+      "beverageCategory": "wine",
+      "sourceAuthority": "Alcohol and Tobacco Tax and Trade Bureau",
+      "publicRecordId": "24205001000905",
+      "role": "baseline",
+      "imageFilename": "label-ocr-source.jpeg",
+      "manifestFilename": "manifest.json",
+      "fixtureDir": "m-cellars-24205001000905",
+      "privacyReviewStatus": "screened-approved",
+      "availability": "available",
+      "unavailableReason": null,
+      "derivedFromFixtureId": null,
+      "testDimensions": [
+        "brand ambiguity behavior",
+        "direct alcohol-statement recovery",
+        "declared-comparison pass/fail",
+        "actual-content rules remain not run"
+      ],
+      "challengeTags": ["clean-front-label", "producer-brand-confusion", "alcohol-direct"],
+      "expectedSupportedObservations": ["brandName", "alcoholStatement"],
+      "knownAmbiguity": "The brand mark is not cleanly recoverable from the artwork; the only clean 'M CELLARS' is the excluded bottler line, so brand evidence is AMBIGUOUS.",
+      "unsupportedFieldsNote": "Varietal, appellation, vintage, net contents, and government-warning execution are not extracted or evaluated by the current two-field system.",
+      "enabledForRealOcr": true,
+      "domainOnlySynthetic": false,
+      "syntheticEvidence": null,
+      "expectations": {
+        "brandStateAllowed": ["AMBIGUOUS"],
+        "alcoholStateAllowed": ["OBSERVED"],
+        "alcoholParsedValue": "12.5% ALC./VOL.",
+        "requiredAlcoholTokens": ["12.5%"],
+        "permittedBrandCandidates": [],
+        "forbiddenBrandCandidates": [],
+        "sufficiency": {
+          "brandName": "sufficient",
+          "alcoholStatement": "sufficient"
+        },
+        "extractionOutcome": "success",
+        "declaredComparison": {
+          "passValues": ["12.5"],
+          "failValues": ["13"]
+        },
+        "notRunRuleIds": [
+          "wine-alcohol-actual-content-tolerance",
+          "wine-alcohol-class-type-boundary",
+          "wine-alcohol-omission-eligibility"
+        ]
+      },
+      "truthLabelProhibition": "Truth labels and expectations in this entry are for evaluation and regression only. They MUST NOT be passed to the extractor or production service as inputs; expected declared values may reach downstream deterministic rules only through the existing declared-facts contract."
+    },
+    {
+      "fixtureId": "m-cellars-lowres-24205001000905",
+      "displayName": "M Cellars (low-resolution degraded derivative)",
+      "beverageCategory": "wine",
+      "sourceAuthority": "repository-derived",
+      "publicRecordId": "24205001000905",
+      "role": "degraded",
+      "imageFilename": "label-lowres.png",
+      "manifestFilename": "manifest.json",
+      "fixtureDir": "m-cellars-lowres-24205001000905",
+      "privacyReviewStatus": "derived-from-screened-parent",
+      "availability": "available",
+      "unavailableReason": null,
+      "derivedFromFixtureId": "m-cellars-24205001000905",
+      "testDimensions": [
+        "extraction behavior on reduced-resolution evidence",
+        "image integrity of a degraded derivative"
+      ],
+      "challengeTags": ["low-resolution"],
+      "expectedSupportedObservations": ["alcoholStatement"],
+      "knownAmbiguity": "Real-OCR behavior on this downscale is not yet asserted (disabled pending a determinism-safe evaluation harness, issue #15).",
+      "unsupportedFieldsNote": "Varietal, appellation, vintage, net contents, and government-warning execution are not extracted or evaluated by the current two-field system.",
+      "enabledForRealOcr": false,
+      "domainOnlySynthetic": false,
+      "syntheticEvidence": null,
+      "expectations": {
+        "brandStateAllowed": ["AMBIGUOUS", "LOW_CONFIDENCE", "NOT_OBSERVED"],
+        "alcoholStateAllowed": ["OBSERVED", "LOW_CONFIDENCE", "NOT_OBSERVED"],
+        "alcoholParsedValue": null,
+        "requiredAlcoholTokens": [],
+        "permittedBrandCandidates": [],
+        "forbiddenBrandCandidates": [],
+        "sufficiency": {},
+        "extractionOutcome": "success",
+        "declaredComparison": {
+          "passValues": [],
+          "failValues": []
+        },
+        "notRunRuleIds": []
+      },
+      "truthLabelProhibition": "Truth labels and expectations in this entry are for evaluation and regression only. They MUST NOT be passed to the extractor or production service as inputs; expected declared values may reach downstream deterministic rules only through the existing declared-facts contract."
+    },
+    {
+      "fixtureId": "rainbow-hills-venom-19206001000867",
+      "displayName": "Rainbow Hills Winery / VENOM (adversarial, unavailable)",
+      "beverageCategory": "wine",
+      "sourceAuthority": "unavailable",
+      "publicRecordId": "19206001000867",
+      "role": "unavailable",
+      "imageFilename": null,
+      "manifestFilename": null,
+      "fixtureDir": null,
+      "privacyReviewStatus": "not-applicable-unavailable",
+      "availability": "unavailable",
+      "unavailableReason": "No privacy-safe label-artwork derivative with documented provenance could be obtained without network access or exposure of prohibited certificate content. No asset, manifest, or truth transcript is committed. Acquisition is a documented corpus gap: a screened artwork-only crop of TTB ID 19206001000867 with a full source-chain manifest is required before this fixture can be enabled.",
+      "derivedFromFixtureId": null,
+      "testDimensions": ["producer-versus-brand adversarial behavior (pending acquisition)"],
+      "challengeTags": [],
+      "expectedSupportedObservations": [],
+      "knownAmbiguity": null,
+      "unsupportedFieldsNote": "No evidence is committed for this fixture; nothing is evaluated until a screened artwork derivative and manifest exist.",
+      "enabledForRealOcr": false,
+      "domainOnlySynthetic": false,
+      "syntheticEvidence": null,
+      "expectations": {
+        "brandStateAllowed": ["OBSERVED", "LOW_CONFIDENCE", "AMBIGUOUS", "NOT_OBSERVED"],
+        "alcoholStateAllowed": ["OBSERVED", "LOW_CONFIDENCE", "AMBIGUOUS", "NOT_OBSERVED"],
+        "alcoholParsedValue": null,
+        "requiredAlcoholTokens": [],
+        "permittedBrandCandidates": [],
+        "forbiddenBrandCandidates": [],
+        "sufficiency": {},
+        "extractionOutcome": "success",
+        "declaredComparison": {
+          "passValues": [],
+          "failValues": []
+        },
+        "notRunRuleIds": []
+      },
+      "truthLabelProhibition": "Truth labels and expectations in this entry are for evaluation and regression only. They MUST NOT be passed to the extractor or production service as inputs; expected declared values may reach downstream deterministic rules only through the existing declared-facts contract."
+    },
+    {
+      "fixtureId": "synthetic-clean-front-label",
+      "displayName": "Synthetic clean front label (positive brand + alcohol)",
+      "beverageCategory": "wine",
+      "sourceAuthority": "synthetic",
+      "publicRecordId": null,
+      "role": "synthetic",
+      "imageFilename": null,
+      "manifestFilename": null,
+      "fixtureDir": null,
+      "privacyReviewStatus": "synthetic-no-personal-data",
+      "availability": "available",
+      "unavailableReason": null,
+      "derivedFromFixtureId": null,
+      "testDimensions": ["positive brand OBSERVED", "direct alcohol OBSERVED"],
+      "challengeTags": ["clean-front-label", "alcohol-direct"],
+      "expectedSupportedObservations": ["brandName", "alcoholStatement"],
+      "knownAmbiguity": null,
+      "unsupportedFieldsNote": "Varietal, appellation, vintage, net contents, and government-warning execution are not extracted or evaluated by the current two-field system.",
+      "enabledForRealOcr": false,
+      "domainOnlySynthetic": true,
+      "syntheticEvidence": {
+        "brandLines": [["STONEHILL", "ESTATE"]],
+        "alcoholLines": [["ALC.", "13.0%", "BY", "VOL."]]
+      },
+      "expectations": {
+        "brandStateAllowed": ["OBSERVED"],
+        "alcoholStateAllowed": ["OBSERVED"],
+        "alcoholParsedValue": "13.0% BY VOL.",
+        "requiredAlcoholTokens": ["13.0%"],
+        "permittedBrandCandidates": ["STONEHILL ESTATE"],
+        "forbiddenBrandCandidates": [],
+        "sufficiency": {
+          "brandName": "sufficient",
+          "alcoholStatement": "sufficient"
+        },
+        "extractionOutcome": "success",
+        "declaredComparison": {
+          "passValues": [],
+          "failValues": []
+        },
+        "notRunRuleIds": []
+      },
+      "truthLabelProhibition": "Truth labels and expectations in this entry are for evaluation and regression only. They MUST NOT be passed to the extractor or production service as inputs; expected declared values may reach downstream deterministic rules only through the existing declared-facts contract."
+    },
+    {
+      "fixtureId": "synthetic-producer-confusion",
+      "displayName": "Synthetic producer-line confusion",
+      "beverageCategory": "wine",
+      "sourceAuthority": "synthetic",
+      "publicRecordId": null,
+      "role": "synthetic",
+      "imageFilename": null,
+      "manifestFilename": null,
+      "fixtureDir": null,
+      "privacyReviewStatus": "synthetic-no-personal-data",
+      "availability": "available",
+      "unavailableReason": null,
+      "derivedFromFixtureId": null,
+      "testDimensions": ["producer/bottler line must not become brand"],
+      "challengeTags": ["producer-brand-confusion"],
+      "expectedSupportedObservations": [],
+      "knownAmbiguity": null,
+      "unsupportedFieldsNote": "Varietal, appellation, vintage, net contents, and government-warning execution are not extracted or evaluated by the current two-field system.",
+      "enabledForRealOcr": false,
+      "domainOnlySynthetic": true,
+      "syntheticEvidence": {
+        "brandLines": [["PRODUCED", "BY", "NORTHWIND", "WINERY"]],
+        "alcoholLines": []
+      },
+      "expectations": {
+        "brandStateAllowed": ["NOT_OBSERVED"],
+        "alcoholStateAllowed": ["NOT_OBSERVED"],
+        "alcoholParsedValue": null,
+        "requiredAlcoholTokens": [],
+        "permittedBrandCandidates": [],
+        "forbiddenBrandCandidates": ["NORTHWIND WINERY", "PRODUCED BY NORTHWIND WINERY"],
+        "sufficiency": {},
+        "extractionOutcome": "success",
+        "declaredComparison": {
+          "passValues": [],
+          "failValues": []
+        },
+        "notRunRuleIds": []
+      },
+      "truthLabelProhibition": "Truth labels and expectations in this entry are for evaluation and regression only. They MUST NOT be passed to the extractor or production service as inputs; expected declared values may reach downstream deterministic rules only through the existing declared-facts contract."
+    },
+    {
+      "fixtureId": "synthetic-varietal-confusion",
+      "displayName": "Synthetic varietal confusion",
+      "beverageCategory": "wine",
+      "sourceAuthority": "synthetic",
+      "publicRecordId": null,
+      "role": "synthetic",
+      "imageFilename": null,
+      "manifestFilename": null,
+      "fixtureDir": null,
+      "privacyReviewStatus": "synthetic-no-personal-data",
+      "availability": "available",
+      "unavailableReason": null,
+      "derivedFromFixtureId": null,
+      "testDimensions": ["recognized varietal must not become brand"],
+      "challengeTags": ["varietal-confusion"],
+      "expectedSupportedObservations": [],
+      "knownAmbiguity": null,
+      "unsupportedFieldsNote": "Varietal, appellation, vintage, net contents, and government-warning execution are not extracted or evaluated by the current two-field system.",
+      "enabledForRealOcr": false,
+      "domainOnlySynthetic": true,
+      "syntheticEvidence": {
+        "brandLines": [["CABERNET", "SAUVIGNON"]],
+        "alcoholLines": []
+      },
+      "expectations": {
+        "brandStateAllowed": ["NOT_OBSERVED"],
+        "alcoholStateAllowed": ["NOT_OBSERVED"],
+        "alcoholParsedValue": null,
+        "requiredAlcoholTokens": [],
+        "permittedBrandCandidates": [],
+        "forbiddenBrandCandidates": ["CABERNET SAUVIGNON"],
+        "sufficiency": {},
+        "extractionOutcome": "success",
+        "declaredComparison": {
+          "passValues": [],
+          "failValues": []
+        },
+        "notRunRuleIds": []
+      },
+      "truthLabelProhibition": "Truth labels and expectations in this entry are for evaluation and regression only. They MUST NOT be passed to the extractor or production service as inputs; expected declared values may reach downstream deterministic rules only through the existing declared-facts contract."
+    },
+    {
+      "fixtureId": "synthetic-slogan-confusion",
+      "displayName": "Synthetic slogan confusion",
+      "beverageCategory": "wine",
+      "sourceAuthority": "synthetic",
+      "publicRecordId": null,
+      "role": "synthetic",
+      "imageFilename": null,
+      "manifestFilename": null,
+      "fixtureDir": null,
+      "privacyReviewStatus": "synthetic-no-personal-data",
+      "availability": "available",
+      "unavailableReason": null,
+      "derivedFromFixtureId": null,
+      "testDimensions": ["marketing slogan must not become OBSERVED brand"],
+      "challengeTags": ["slogan-confusion"],
+      "expectedSupportedObservations": [],
+      "knownAmbiguity": null,
+      "unsupportedFieldsNote": "Varietal, appellation, vintage, net contents, and government-warning execution are not extracted or evaluated by the current two-field system.",
+      "enabledForRealOcr": false,
+      "domainOnlySynthetic": true,
+      "syntheticEvidence": {
+        "brandLines": [["LIVE", "BOLDLY"]],
+        "alcoholLines": []
+      },
+      "expectations": {
+        "brandStateAllowed": ["AMBIGUOUS"],
+        "alcoholStateAllowed": ["NOT_OBSERVED"],
+        "alcoholParsedValue": null,
+        "requiredAlcoholTokens": [],
+        "permittedBrandCandidates": [],
+        "forbiddenBrandCandidates": ["LIVE BOLDLY"],
+        "sufficiency": {},
+        "extractionOutcome": "success",
+        "declaredComparison": {
+          "passValues": [],
+          "failValues": []
+        },
+        "notRunRuleIds": []
+      },
+      "truthLabelProhibition": "Truth labels and expectations in this entry are for evaluation and regression only. They MUST NOT be passed to the extractor or production service as inputs; expected declared values may reach downstream deterministic rules only through the existing declared-facts contract."
+    },
+    {
+      "fixtureId": "synthetic-website-confusion",
+      "displayName": "Synthetic website confusion",
+      "beverageCategory": "wine",
+      "sourceAuthority": "synthetic",
+      "publicRecordId": null,
+      "role": "synthetic",
+      "imageFilename": null,
+      "manifestFilename": null,
+      "fixtureDir": null,
+      "privacyReviewStatus": "synthetic-no-personal-data",
+      "availability": "available",
+      "unavailableReason": null,
+      "derivedFromFixtureId": null,
+      "testDimensions": ["domain/URL syntax must not become brand"],
+      "challengeTags": ["website-confusion"],
+      "expectedSupportedObservations": [],
+      "knownAmbiguity": null,
+      "unsupportedFieldsNote": "Varietal, appellation, vintage, net contents, and government-warning execution are not extracted or evaluated by the current two-field system.",
+      "enabledForRealOcr": false,
+      "domainOnlySynthetic": true,
+      "syntheticEvidence": {
+        "brandLines": [["CRESTVIEW.COM"]],
+        "alcoholLines": []
+      },
+      "expectations": {
+        "brandStateAllowed": ["NOT_OBSERVED"],
+        "alcoholStateAllowed": ["NOT_OBSERVED"],
+        "alcoholParsedValue": null,
+        "requiredAlcoholTokens": [],
+        "permittedBrandCandidates": [],
+        "forbiddenBrandCandidates": ["CRESTVIEW.COM"],
+        "sufficiency": {},
+        "extractionOutcome": "success",
+        "declaredComparison": {
+          "passValues": [],
+          "failValues": []
+        },
+        "notRunRuleIds": []
+      },
+      "truthLabelProhibition": "Truth labels and expectations in this entry are for evaluation and regression only. They MUST NOT be passed to the extractor or production service as inputs; expected declared values may reach downstream deterministic rules only through the existing declared-facts contract."
+    },
+    {
+      "fixtureId": "synthetic-vintage-confusion",
+      "displayName": "Synthetic vintage-only confusion",
+      "beverageCategory": "wine",
+      "sourceAuthority": "synthetic",
+      "publicRecordId": null,
+      "role": "synthetic",
+      "imageFilename": null,
+      "manifestFilename": null,
+      "fixtureDir": null,
+      "privacyReviewStatus": "synthetic-no-personal-data",
+      "availability": "available",
+      "unavailableReason": null,
+      "derivedFromFixtureId": null,
+      "testDimensions": ["vintage-only text must not become brand"],
+      "challengeTags": ["vintage-confusion"],
+      "expectedSupportedObservations": [],
+      "knownAmbiguity": null,
+      "unsupportedFieldsNote": "Varietal, appellation, vintage, net contents, and government-warning execution are not extracted or evaluated by the current two-field system.",
+      "enabledForRealOcr": false,
+      "domainOnlySynthetic": true,
+      "syntheticEvidence": {
+        "brandLines": [["2019"]],
+        "alcoholLines": []
+      },
+      "expectations": {
+        "brandStateAllowed": ["NOT_OBSERVED"],
+        "alcoholStateAllowed": ["NOT_OBSERVED"],
+        "alcoholParsedValue": null,
+        "requiredAlcoholTokens": [],
+        "permittedBrandCandidates": [],
+        "forbiddenBrandCandidates": ["2019"],
+        "sufficiency": {},
+        "extractionOutcome": "success",
+        "declaredComparison": {
+          "passValues": [],
+          "failValues": []
+        },
+        "notRunRuleIds": []
+      },
+      "truthLabelProhibition": "Truth labels and expectations in this entry are for evaluation and regression only. They MUST NOT be passed to the extractor or production service as inputs; expected declared values may reach downstream deterministic rules only through the existing declared-facts contract."
+    },
+    {
+      "fixtureId": "synthetic-appellation-confusion",
+      "displayName": "Synthetic appellation confusion",
+      "beverageCategory": "wine",
+      "sourceAuthority": "synthetic",
+      "publicRecordId": null,
+      "role": "synthetic",
+      "imageFilename": null,
+      "manifestFilename": null,
+      "fixtureDir": null,
+      "privacyReviewStatus": "synthetic-no-personal-data",
+      "availability": "available",
+      "unavailableReason": null,
+      "derivedFromFixtureId": null,
+      "testDimensions": ["appellation-only text must not become OBSERVED brand"],
+      "challengeTags": ["appellation-confusion"],
+      "expectedSupportedObservations": [],
+      "knownAmbiguity": null,
+      "unsupportedFieldsNote": "Varietal, appellation, vintage, net contents, and government-warning execution are not extracted or evaluated by the current two-field system.",
+      "enabledForRealOcr": false,
+      "domainOnlySynthetic": true,
+      "syntheticEvidence": {
+        "brandLines": [["NAPA", "VALLEY"]],
+        "alcoholLines": []
+      },
+      "expectations": {
+        "brandStateAllowed": ["AMBIGUOUS"],
+        "alcoholStateAllowed": ["NOT_OBSERVED"],
+        "alcoholParsedValue": null,
+        "requiredAlcoholTokens": [],
+        "permittedBrandCandidates": [],
+        "forbiddenBrandCandidates": ["NAPA VALLEY"],
+        "sufficiency": {},
+        "extractionOutcome": "success",
+        "declaredComparison": {
+          "passValues": [],
+          "failValues": []
+        },
+        "notRunRuleIds": []
+      },
+      "truthLabelProhibition": "Truth labels and expectations in this entry are for evaluation and regression only. They MUST NOT be passed to the extractor or production service as inputs; expected declared values may reach downstream deterministic rules only through the existing declared-facts contract."
+    },
+    {
+      "fixtureId": "synthetic-alcohol-direct",
+      "displayName": "Synthetic direct alcohol statement",
+      "beverageCategory": "wine",
+      "sourceAuthority": "synthetic",
+      "publicRecordId": null,
+      "role": "synthetic",
+      "imageFilename": null,
+      "manifestFilename": null,
+      "fixtureDir": null,
+      "privacyReviewStatus": "synthetic-no-personal-data",
+      "availability": "available",
+      "unavailableReason": null,
+      "derivedFromFixtureId": null,
+      "testDimensions": ["direct alcohol statement recovered"],
+      "challengeTags": ["alcohol-direct"],
+      "expectedSupportedObservations": ["alcoholStatement"],
+      "knownAmbiguity": null,
+      "unsupportedFieldsNote": "Varietal, appellation, vintage, net contents, and government-warning execution are not extracted or evaluated by the current two-field system.",
+      "enabledForRealOcr": false,
+      "domainOnlySynthetic": true,
+      "syntheticEvidence": {
+        "brandLines": [],
+        "alcoholLines": [["750ML", "12.5%", "ALC./VOL."]]
+      },
+      "expectations": {
+        "brandStateAllowed": ["NOT_OBSERVED"],
+        "alcoholStateAllowed": ["OBSERVED"],
+        "alcoholParsedValue": "12.5% ALC./VOL.",
+        "requiredAlcoholTokens": ["12.5%"],
+        "permittedBrandCandidates": [],
+        "forbiddenBrandCandidates": [],
+        "sufficiency": {
+          "alcoholStatement": "sufficient"
+        },
+        "extractionOutcome": "success",
+        "declaredComparison": {
+          "passValues": [],
+          "failValues": []
+        },
+        "notRunRuleIds": []
+      },
+      "truthLabelProhibition": "Truth labels and expectations in this entry are for evaluation and regression only. They MUST NOT be passed to the extractor or production service as inputs; expected declared values may reach downstream deterministic rules only through the existing declared-facts contract."
+    },
+    {
+      "fixtureId": "synthetic-alcohol-range",
+      "displayName": "Synthetic supported alcohol range",
+      "beverageCategory": "wine",
+      "sourceAuthority": "synthetic",
+      "publicRecordId": null,
+      "role": "synthetic",
+      "imageFilename": null,
+      "manifestFilename": null,
+      "fixtureDir": null,
+      "privacyReviewStatus": "synthetic-no-personal-data",
+      "availability": "available",
+      "unavailableReason": null,
+      "derivedFromFixtureId": null,
+      "testDimensions": ["supported alcohol range recovered"],
+      "challengeTags": ["alcohol-range"],
+      "expectedSupportedObservations": ["alcoholStatement"],
+      "knownAmbiguity": null,
+      "unsupportedFieldsNote": "Varietal, appellation, vintage, net contents, and government-warning execution are not extracted or evaluated by the current two-field system.",
+      "enabledForRealOcr": false,
+      "domainOnlySynthetic": true,
+      "syntheticEvidence": {
+        "brandLines": [],
+        "alcoholLines": [["ALC.", "12.5%", "-", "13.5%", "BY", "VOL."]]
+      },
+      "expectations": {
+        "brandStateAllowed": ["NOT_OBSERVED"],
+        "alcoholStateAllowed": ["OBSERVED"],
+        "alcoholParsedValue": null,
+        "requiredAlcoholTokens": ["12.5%", "13.5%"],
+        "permittedBrandCandidates": [],
+        "forbiddenBrandCandidates": [],
+        "sufficiency": {
+          "alcoholStatement": "sufficient"
+        },
+        "extractionOutcome": "success",
+        "declaredComparison": {
+          "passValues": [],
+          "failValues": []
+        },
+        "notRunRuleIds": []
+      },
+      "truthLabelProhibition": "Truth labels and expectations in this entry are for evaluation and regression only. They MUST NOT be passed to the extractor or production service as inputs; expected declared values may reach downstream deterministic rules only through the existing declared-facts contract."
+    },
+    {
+      "fixtureId": "synthetic-alcohol-malformed",
+      "displayName": "Synthetic malformed alcohol (proof)",
+      "beverageCategory": "wine",
+      "sourceAuthority": "synthetic",
+      "publicRecordId": null,
+      "role": "synthetic",
+      "imageFilename": null,
+      "manifestFilename": null,
+      "fixtureDir": null,
+      "privacyReviewStatus": "synthetic-no-personal-data",
+      "availability": "available",
+      "unavailableReason": null,
+      "derivedFromFixtureId": null,
+      "testDimensions": ["proof/malformed alcohol prose is not observed"],
+      "challengeTags": ["alcohol-malformed"],
+      "expectedSupportedObservations": [],
+      "knownAmbiguity": null,
+      "unsupportedFieldsNote": "Varietal, appellation, vintage, net contents, and government-warning execution are not extracted or evaluated by the current two-field system.",
+      "enabledForRealOcr": false,
+      "domainOnlySynthetic": true,
+      "syntheticEvidence": {
+        "brandLines": [],
+        "alcoholLines": [["80%", "PROOF"]]
+      },
+      "expectations": {
+        "brandStateAllowed": ["NOT_OBSERVED"],
+        "alcoholStateAllowed": ["NOT_OBSERVED"],
+        "alcoholParsedValue": null,
+        "requiredAlcoholTokens": [],
+        "permittedBrandCandidates": [],
+        "forbiddenBrandCandidates": [],
+        "sufficiency": {},
+        "extractionOutcome": "success",
+        "declaredComparison": {
+          "passValues": [],
+          "failValues": []
+        },
+        "notRunRuleIds": []
+      },
+      "truthLabelProhibition": "Truth labels and expectations in this entry are for evaluation and regression only. They MUST NOT be passed to the extractor or production service as inputs; expected declared values may reach downstream deterministic rules only through the existing declared-facts contract."
+    },
+    {
+      "fixtureId": "synthetic-insufficient-evidence",
+      "displayName": "Synthetic insufficient evidence",
+      "beverageCategory": "wine",
+      "sourceAuthority": "synthetic",
+      "publicRecordId": null,
+      "role": "insufficient",
+      "imageFilename": null,
+      "manifestFilename": null,
+      "fixtureDir": null,
+      "privacyReviewStatus": "synthetic-no-personal-data",
+      "availability": "available",
+      "unavailableReason": null,
+      "derivedFromFixtureId": null,
+      "testDimensions": ["no supported evidence yields NOT_OBSERVED and insufficiency"],
+      "challengeTags": ["insufficient-evidence"],
+      "expectedSupportedObservations": [],
+      "knownAmbiguity": null,
+      "unsupportedFieldsNote": "Varietal, appellation, vintage, net contents, and government-warning execution are not extracted or evaluated by the current two-field system.",
+      "enabledForRealOcr": false,
+      "domainOnlySynthetic": true,
+      "syntheticEvidence": {
+        "brandLines": [],
+        "alcoholLines": []
+      },
+      "expectations": {
+        "brandStateAllowed": ["NOT_OBSERVED"],
+        "alcoholStateAllowed": ["NOT_OBSERVED"],
+        "alcoholParsedValue": null,
+        "requiredAlcoholTokens": [],
+        "permittedBrandCandidates": [],
+        "forbiddenBrandCandidates": [],
+        "sufficiency": {
+          "brandName": "insufficient",
+          "alcoholStatement": "insufficient"
+        },
+        "extractionOutcome": "success",
+        "declaredComparison": {
+          "passValues": [],
+          "failValues": []
+        },
+        "notRunRuleIds": []
+      },
+      "truthLabelProhibition": "Truth labels and expectations in this entry are for evaluation and regression only. They MUST NOT be passed to the extractor or production service as inputs; expected declared values may reach downstream deterministic rules only through the existing declared-facts contract."
+    }
+  ]
+}
