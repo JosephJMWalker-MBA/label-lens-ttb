@@ -1,0 +1,92 @@
+{
+  "fixtureId": "m-cellars-lowres-24205001000905",
+  "schemaVersion": "label-fixture-manifest.v2",
+  "ttbId": "24205001000905",
+  "beverageCategory": "wine",
+  "sourceChain": {
+    "externalSource": {
+      "authority": "Alcohol and Tobacco Tax and Trade Bureau",
+      "registry": "Public COLA Registry",
+      "ttbId": "24205001000905",
+      "applicationDetailUrl": "https://www.ttbonline.gov/colasonline/publicSearchColasBasic.do",
+      "printableLabelUrl": "unknown",
+      "retrievalMethod": "chat-browser-attachment-transfer",
+      "retrievedAt": "unknown",
+      "sourceMediaType": "unknown",
+      "sourceDimensions": "not_retained",
+      "sourceSha256": "not_retained",
+      "sourceBytesRetained": false,
+      "privacyReview": "This is a repository-generated downscale of the already privacy-screened M Cellars OCR-benchmark artwork; no new content is introduced. The same certificate form fields, applicant-contact blocks, signatures, qualification text, and footer content excluded from the parent remain excluded here. No excluded content is stored in the repository.",
+      "publicRecordLimitations": "The TTB Public COLA Registry exposes approved-label information located by TTB ID. The exact original design-source file and applicant-contact data are not part of this repository. This derivative is a downscale of a committed repository derivative, not the original design source.",
+      "availabilityCaveat": "Byte-for-byte regeneration is verified on the development environment only; libvips/PNG-encoder versions may differ across machines. The committed asset's recorded identity is authoritative for tests."
+    },
+    "derivatives": [
+      {
+        "derivativeId": "lowres-derivative-601x245",
+        "filename": "label-lowres.png",
+        "role": "degraded-derivative",
+        "mediaType": "image/png",
+        "pixelWidth": 601,
+        "pixelHeight": 245,
+        "byteSize": 65963,
+        "sha256": "53873507ecf241a355ed1f8a500c59ff3cec375298c52919e12f43d53571462f",
+        "parent": {
+          "kind": "external-source",
+          "ref": "external-source"
+        },
+        "transformationType": "resize",
+        "transformationSteps": [
+          {
+            "order": 1,
+            "operation": "deterministic-downscale",
+            "performedIn": "in-repository",
+            "performedBy": "tool",
+            "description": "Deterministic fixed-width downscale (targetWidth 601, cubic kernel, PNG compressionLevel 9) of the committed, privacy-screened parent derivative tests/fixtures/precheck/m-cellars-24205001000905/label-ocr-source.jpeg (sha256 0b0ccec13bf6c533ec7928b017b140a0213fb4555812fea81d71872adb453713). Produced by scripts/fixtures/generate-lowres-derivative.mjs. No cropping, no added noise, no manual pixel or text correction.",
+            "toolVersion": "sharp@0.35.3",
+            "excludedRegions": [
+              "certificate-form-fields",
+              "applicant-contact-information",
+              "signature",
+              "qualification-text",
+              "footer-content",
+              "full-page-rendering"
+            ],
+            "verification": "regeneration-hash-verified-on-development-environment"
+          }
+        ],
+        "manuallyCorrectedPixelsOrText": false,
+        "privacyExclusions": [
+          {
+            "category": "inherited-parent-exclusions",
+            "check": "downscale-introduces-no-new-content",
+            "result": "excluded",
+            "toolOrRuleVersion": "generate-lowres-derivative@1.0.0"
+          },
+          {
+            "category": "whole-document-ocr",
+            "check": "not-generated-or-retained",
+            "result": "excluded",
+            "toolOrRuleVersion": "fixture-policy@1.0.0"
+          }
+        ],
+        "intendedUse": "Low-resolution degraded derivative for measuring extraction behavior on reduced-resolution evidence. Disabled for real-OCR regression pending a determinism-safe evaluation harness."
+      }
+    ]
+  },
+  "truthLabels": {
+    "brand": "M CELLARS",
+    "varietal": "Teroldego",
+    "appellation": "LAKE ERIE",
+    "vintage": "2023",
+    "alcoholStatement": "12.5% ALC./VOL.",
+    "netContents": "750ML",
+    "governmentWarning": "present"
+  },
+  "provenanceNotes": [
+    {
+      "topic": "in-repository-parent-derivative",
+      "resolution": "artifact-controls",
+      "artifactVerifiedTruth": "Generated from committed derivative m-cellars-24205001000905/label-ocr-source.jpeg (sha256 0b0ccec13bf6c533ec7928b017b140a0213fb4555812fea81d71872adb453713) via scripts/fixtures/generate-lowres-derivative.mjs; the external-source parent kind records the ultimate public-record origin, while this note records the exact in-repository parent file."
+    }
+  ]
+}
