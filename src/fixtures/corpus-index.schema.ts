@@ -3,14 +3,21 @@ import { z } from "zod";
 import { err, ok, type Result } from "@/shared/result";
 
 import {
+  CORPUS_ANNOTATION_STATUS,
   CORPUS_AVAILABILITY_STATES,
   CORPUS_CHALLENGE_TAGS,
   CORPUS_FIXTURE_ROLES,
+  CORPUS_INDEPENDENCE,
+  CORPUS_MAPPING_STATUS,
+  CORPUS_MEASUREMENT_ELIGIBILITY,
   CORPUS_OBSERVATION_STATES,
   CORPUS_PRIVACY_REVIEW_STATES,
   CORPUS_SOURCE_AUTHORITIES,
+  CORPUS_SOURCE_STRATA,
+  CORPUS_SPLIT_STATUS,
   CORPUS_SUFFICIENCY_STATES,
   CORPUS_SUPPORTED_FIELDS,
+  CORPUS_WINE_COLORS,
   FIXTURE_CORPUS_SCHEMA_VERSION,
   TRUTH_LABEL_PROHIBITION,
   type FixtureCorpusError,
@@ -73,8 +80,23 @@ const entrySchema = z
     enabledForRealOcr: z.boolean(),
     domainOnlySynthetic: z.boolean(),
     syntheticEvidence: z.union([syntheticEvidenceSchema, z.null()]),
-    expectations: expectationsSchema,
+    // `null` only for an unannotated candidate (enforced in superRefine).
+    expectations: z.union([expectationsSchema, z.null()]),
     truthLabelProhibition: z.literal(TRUTH_LABEL_PROHIBITION),
+    // Optional candidate-stratum fields (required for `candidate`, forbidden
+    // elsewhere — enforced in superRefine).
+    wineColor: z.enum(CORPUS_WINE_COLORS).optional(),
+    sourceStratum: z.enum(CORPUS_SOURCE_STRATA).optional(),
+    independence: z.enum(CORPUS_INDEPENDENCE).optional(),
+    measurementEligibility: z.array(z.enum(CORPUS_MEASUREMENT_ELIGIBILITY)).min(1).optional(),
+    annotationStatus: z.enum(CORPUS_ANNOTATION_STATUS).optional(),
+    splitStatus: z.enum(CORPUS_SPLIT_STATUS).optional(),
+    multiPanelStatus: z.enum(CORPUS_MAPPING_STATUS).optional(),
+    decimalCommaStatus: z.enum(CORPUS_MAPPING_STATUS).optional(),
+    acquisitionDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "must be YYYY-MM-DD")
+      .optional(),
   })
   .strict();
 
@@ -147,6 +169,55 @@ export const fixtureCorpusIndexSchema = z
           ["entries", i, "enabledForRealOcr"],
           "a real-OCR fixture needs an image, manifest, and directory.",
         );
+      }
+
+      // Candidate-stratum discipline: an ingested-but-unannotated real label.
+      const candidateFields = [
+        e.wineColor,
+        e.sourceStratum,
+        e.independence,
+        e.measurementEligibility,
+        e.annotationStatus,
+        e.splitStatus,
+        e.multiPanelStatus,
+        e.decimalCommaStatus,
+        e.acquisitionDate,
+      ];
+      if (e.role === "candidate") {
+        if (e.expectations !== null) {
+          issue(["entries", i, "expectations"], "a candidate carries no invented expectations.");
+        }
+        if (e.annotationStatus !== "unannotated") {
+          issue(["entries", i, "annotationStatus"], "a candidate must be unannotated.");
+        }
+        if (e.enabledForRealOcr) {
+          issue(["entries", i, "enabledForRealOcr"], "a candidate cannot run mandatory real OCR.");
+        }
+        if (e.domainOnlySynthetic) {
+          issue(["entries", i, "domainOnlySynthetic"], "a candidate is not synthetic.");
+        }
+        if (e.availability !== "available") {
+          issue(["entries", i, "availability"], "a candidate must be available.");
+        }
+        if (!e.imageFilename || !e.fixtureDir) {
+          issue(["entries", i, "imageFilename"], "a candidate needs an image and directory.");
+        }
+        if (e.manifestFilename !== null) {
+          issue(
+            ["entries", i, "manifestFilename"],
+            "a candidate records provenance in the inventory, not a v2 manifest.",
+          );
+        }
+        if (candidateFields.some((f) => f === undefined)) {
+          issue(["entries", i, "wineColor"], "a candidate must record all stratum fields.");
+        }
+      } else {
+        if (e.expectations === null) {
+          issue(["entries", i, "expectations"], "only a candidate may omit expectations.");
+        }
+        if (candidateFields.some((f) => f !== undefined)) {
+          issue(["entries", i, "role"], "candidate-only fields are not allowed on this role.");
+        }
       }
     });
 

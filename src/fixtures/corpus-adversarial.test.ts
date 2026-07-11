@@ -81,9 +81,11 @@ describe("corpus adversarial regression (synthetic, domain-only)", () => {
 
   for (const entry of syntheticEntries(loadCorpusIndex())) {
     describe(entry.fixtureId, () => {
+      // Synthetic entries are always annotated (never null expectations).
+      const exp = entry.expectations!;
       it("brand observation state is within the allowed set", () => {
         const obs = brandOf(entry);
-        expect(entry.expectations.brandStateAllowed).toContain(obs.state);
+        expect(exp.brandStateAllowed).toContain(obs.state);
       });
 
       it("never selects a forbidden brand candidate", () => {
@@ -91,14 +93,11 @@ describe("corpus adversarial regression (synthetic, domain-only)", () => {
         const selected = [obs.value, ...obs.alternates.map((a) => a.value)].filter(
           (v): v is string => v !== null,
         );
-        for (const forbidden of entry.expectations.forbiddenBrandCandidates) {
+        for (const forbidden of exp.forbiddenBrandCandidates) {
           // A forbidden candidate may never be the OBSERVED value.
           if (obs.state === "OBSERVED") expect(obs.value).not.toBe(forbidden);
           // And a forbidden candidate excluded outright is not present at all.
-          if (
-            entry.expectations.brandStateAllowed.length === 1 &&
-            entry.expectations.brandStateAllowed[0] === "NOT_OBSERVED"
-          ) {
+          if (exp.brandStateAllowed.length === 1 && exp.brandStateAllowed[0] === "NOT_OBSERVED") {
             expect(selected).not.toContain(forbidden);
           }
         }
@@ -106,8 +105,8 @@ describe("corpus adversarial regression (synthetic, domain-only)", () => {
 
       it("selects only a permitted brand candidate when OBSERVED", () => {
         const obs = brandOf(entry);
-        if (obs.state === "OBSERVED" && entry.expectations.permittedBrandCandidates.length > 0) {
-          expect(entry.expectations.permittedBrandCandidates).toContain(obs.value);
+        if (obs.state === "OBSERVED" && exp.permittedBrandCandidates.length > 0) {
+          expect(exp.permittedBrandCandidates).toContain(obs.value);
         }
       });
 
@@ -121,16 +120,16 @@ describe("corpus adversarial regression (synthetic, domain-only)", () => {
 
       it("alcohol observation state is within the allowed set", () => {
         const obs = alcoholOf(entry);
-        expect(entry.expectations.alcoholStateAllowed).toContain(obs.state);
+        expect(exp.alcoholStateAllowed).toContain(obs.state);
       });
 
       it("recovers required alcohol tokens and any exact parsed value", () => {
         const obs = alcoholOf(entry);
-        for (const token of entry.expectations.requiredAlcoholTokens) {
+        for (const token of exp.requiredAlcoholTokens) {
           expect(obs.value ?? "").toContain(token);
         }
-        if (entry.expectations.alcoholParsedValue !== null) {
-          expect(obs.value).toBe(entry.expectations.alcoholParsedValue);
+        if (exp.alcoholParsedValue !== null) {
+          expect(obs.value).toBe(exp.alcoholParsedValue);
         }
       });
     });

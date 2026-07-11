@@ -39,7 +39,12 @@ export type CorpusSufficiencyState = (typeof CORPUS_SUFFICIENCY_STATES)[number];
 export const CORPUS_SUPPORTED_FIELDS = ["brandName", "alcoholStatement"] as const;
 export type CorpusSupportedField = (typeof CORPUS_SUPPORTED_FIELDS)[number];
 
-/** The role a fixture plays in the corpus. */
+/**
+ * The role a fixture plays in the corpus. `candidate` is an ingested,
+ * privacy/provenance-checked real-label record that is NOT yet annotated with
+ * expectations and is NOT enabled for real-OCR regression — corpus inventory
+ * awaiting annotation and an evaluation-split assignment.
+ */
 export const CORPUS_FIXTURE_ROLES = [
   "baseline",
   "adversarial",
@@ -47,6 +52,7 @@ export const CORPUS_FIXTURE_ROLES = [
   "synthetic",
   "insufficient",
   "unavailable",
+  "candidate",
 ] as const;
 export type CorpusFixtureRole = (typeof CORPUS_FIXTURE_ROLES)[number];
 
@@ -56,6 +62,9 @@ export const CORPUS_SOURCE_AUTHORITIES = [
   "repository-derived",
   "synthetic",
   "unavailable",
+  // Author-provided local corpus acquisition (e.g. a screenshot of previously
+  // approved artwork). Carries no independently reverified public-record claim.
+  "author-provided-local-acquisition",
 ] as const;
 export type CorpusSourceAuthority = (typeof CORPUS_SOURCE_AUTHORITIES)[number];
 
@@ -65,8 +74,43 @@ export const CORPUS_PRIVACY_REVIEW_STATES = [
   "synthetic-no-personal-data",
   "derived-from-screened-parent",
   "not-applicable-unavailable",
+  // Automated byte/metadata privacy screening passed; pixel-level visual
+  // screening relies on author attestation and awaits second-pass review.
+  "screenshot-metadata-screened-author-attested",
 ] as const;
 export type CorpusPrivacyReviewState = (typeof CORPUS_PRIVACY_REVIEW_STATES)[number];
+
+/** Wine color, when the fixture records it (bounded enum, not a free-text tag). */
+export const CORPUS_WINE_COLORS = ["red", "white"] as const;
+export type CorpusWineColor = (typeof CORPUS_WINE_COLORS)[number];
+
+/** The acquisition stratum a candidate belongs to. */
+export const CORPUS_SOURCE_STRATA = ["approved_artwork_screenshot"] as const;
+export type CorpusSourceStratum = (typeof CORPUS_SOURCE_STRATA)[number];
+
+/** Whether the record is an independent real label or a derived/synthetic case. */
+export const CORPUS_INDEPENDENCE = ["independent_real_label"] as const;
+export type CorpusIndependence = (typeof CORPUS_INDEPENDENCE)[number];
+
+/** Bounded measurement-eligibility markers for a candidate record. */
+export const CORPUS_MEASUREMENT_ELIGIBILITY = [
+  "corpus_inventory",
+  "future_ocr_evaluation_candidate",
+  "future_annotation_candidate",
+] as const;
+export type CorpusMeasurementEligibility = (typeof CORPUS_MEASUREMENT_ELIGIBILITY)[number];
+
+/** Annotation lifecycle of a candidate: no expected answers exist until annotated. */
+export const CORPUS_ANNOTATION_STATUS = ["unannotated", "annotated"] as const;
+export type CorpusAnnotationStatus = (typeof CORPUS_ANNOTATION_STATUS)[number];
+
+/** Evaluation-split assignment (development/validation/holdout) or unassigned. */
+export const CORPUS_SPLIT_STATUS = ["unassigned", "development", "validation", "holdout"] as const;
+export type CorpusSplitStatus = (typeof CORPUS_SPLIT_STATUS)[number];
+
+/** Mapping lifecycle for a per-record review-queue item. */
+export const CORPUS_MAPPING_STATUS = ["unmapped", "mapped", "not_applicable"] as const;
+export type CorpusMappingStatus = (typeof CORPUS_MAPPING_STATUS)[number];
 
 /** Whether a real, committed asset backs the fixture. */
 export const CORPUS_AVAILABILITY_STATES = ["available", "unavailable"] as const;
@@ -176,9 +220,33 @@ export interface CorpusEntry {
   domainOnlySynthetic: boolean;
   /** Synthetic OCR evidence, present only for domain-only synthetic entries. */
   syntheticEvidence: CorpusSyntheticEvidence | null;
-  expectations: CorpusExpectations;
+  /**
+   * Bounded evaluation expectations, or `null` for an unannotated `candidate`.
+   * A candidate carries NO invented expected answers until it is annotated.
+   */
+  expectations: CorpusExpectations | null;
   /** The explicit, unaltered truth-label prohibition. */
   truthLabelProhibition: typeof TRUTH_LABEL_PROHIBITION;
+
+  // --- Candidate-stratum fields (present on `candidate` entries) ---
+  /** Wine color, when recorded. */
+  wineColor?: CorpusWineColor;
+  /** Acquisition stratum for a candidate. */
+  sourceStratum?: CorpusSourceStratum;
+  /** Independence class for a candidate. */
+  independence?: CorpusIndependence;
+  /** Bounded measurement-eligibility markers. */
+  measurementEligibility?: CorpusMeasurementEligibility[];
+  /** Annotation lifecycle; `unannotated` means no expectations exist yet. */
+  annotationStatus?: CorpusAnnotationStatus;
+  /** Evaluation-split assignment. */
+  splitStatus?: CorpusSplitStatus;
+  /** Whether this record has been mapped as a multi-panel (front/back) example. */
+  multiPanelStatus?: CorpusMappingStatus;
+  /** Whether this record has been mapped as a decimal-comma alcohol example. */
+  decimalCommaStatus?: CorpusMappingStatus;
+  /** Ingestion date (YYYY-MM-DD), when recorded. */
+  acquisitionDate?: string;
 }
 
 export interface FixtureCorpusIndex {
