@@ -40,6 +40,8 @@ interface Candidate {
   geometry: EvidenceGeometry;
   words: OcrWord[];
   regionName: string;
+  /** Original-space text height; a typographic prominence proxy for brand art. */
+  prominence: number;
 }
 
 /** An observation plus the region the selected value came from (for provenance). */
@@ -172,13 +174,15 @@ export function selectAlcoholObservation(results: RegionOcrResult[]): FieldSelec
           const rawText = window.map((w) => w.text).join(" ");
           const parsed = parseWineAlcoholStatement(rawText);
           if (parsed.kind === "direct" || parsed.kind === "range") {
+            const geometry = geometryFor(window, result);
             candidates.push({
               value: rawText.replace(/\s+/g, " ").trim(),
               rawText,
               confidence: aggregateConfidence(window),
-              geometry: geometryFor(window, result),
+              geometry,
               words: window,
               regionName: result.regionName,
+              prominence: geometry.height,
             });
             break; // shortest accepted window for this start
           }
@@ -191,40 +195,137 @@ export function selectAlcoholObservation(results: RegionOcrResult[]): FieldSelec
 }
 
 // ---------------------------------------------------------------------------
-// Brand: the producer/bottler entity named after a generic "BOTTLED/PRODUCED BY"
-// anchor. This keys off the generic phrase, never the expected brand words.
+// Brand: the most prominent brand-facing artwork line on the front label.
+//
+// Producer/bottler identity ("PRODUCED & BOTTLED BY …") is deliberately NOT
+// treated as brand evidence — the bottler may differ from the label brand — so
+// any line naming a producer/bottler entity is excluded outright. Mandatory
+// regulatory text (alcohol, government warning, net contents, sulfites) is not
+// brand presentation and is likewise excluded. Selection reads only the pixels'
+// words and their typographic prominence; it never consults the expected/
+// declared brand, the fixture filename, TTB id, hash, or dimensions.
 // ---------------------------------------------------------------------------
 
-const PRODUCER_ANCHOR = /^(?:produced|bottled|made|vinted|cellared)$/i;
+/** Producer/bottler wording. A line pairing one of these with "by" is not brand. */
+const PRODUCER_WORD = /^(?:produced|bottled|made|vinted|cellared|grown|packed|blended)$/i;
+/** Non-brand mandatory/regulatory or measurement wording that cannot be a brand. */
+const NON_BRAND_LINE =
+  /\b(?:alcohol|alc|vol|volume|proof|government|warning|surgeon|general|pregnancy|contains|sulfites|net|contents|ml|milliliters?|liters?|litres?|imported|distributed|appellation)\b/i;
+/** The brand appears on the front-label artwork region, not the mandatory strip. */
+const BRAND_REGION = "full-image";
+/** Two candidates whose text height is within this ratio compete as ambiguous. */
+const BRAND_PROMINENCE_RATIO = 0.8;
+/** A brand mark is short; longer lines are prose/back-label copy, not a brand. */
+const MAX_BRAND_WORDS = 4;
+
+function stripWord(text: string): string {
+  return text.replace(/[^a-z]/gi, "");
+}
+
+/** A producer/bottler line ("… BOTTLED BY …") names an entity, not the brand. */
+function isProducerLine(line: OcrWord[]): boolean {
+  const hasProducerWord = line.some((w) => PRODUCER_WORD.test(stripWord(w.text)));
+  const hasBy = line.some((w) => /^by$/i.test(stripWord(w.text)));
+  return hasProducerWord && hasBy;
+}
 
 export function selectBrandObservation(results: RegionOcrResult[]): FieldSelection {
   const candidates: Candidate[] = [];
   for (const result of results) {
+    // Brand presentation lives on the front-label artwork, never the mandatory
+    // vertical strip; restricting the region keeps regulatory text out of brand.
+    if (result.regionName !== BRAND_REGION) continue;
     for (const line of lines(result.words)) {
-      const hasAnchor = line.some((w) => PRODUCER_ANCHOR.test(w.text.replace(/[^a-z]/gi, "")));
-      const byIndex = line.findIndex((w) => /^by$/i.test(w.text.replace(/[^a-z]/gi, "")));
-      if (!hasAnchor || byIndex < 0) continue;
-      const entity = line
-        .slice(byIndex + 1)
-        .filter((w) => /[a-z0-9]/i.test(w.text) && !/^[~•·.]+$/.test(w.text));
-      if (entity.length === 0) continue;
-      const rawText = entity.map((w) => w.text).join(" ");
+      if (isProducerLine(line)) continue;
+      const rawText = line.map((w) => w.text).join(" ");
+      if (NON_BRAND_LINE.test(rawText)) continue;
       const value = rawText
         .replace(/[^A-Za-z0-9 .&'-]/g, "")
         .replace(/\s+/g, " ")
         .trim();
-      if (value.length === 0) continue;
+      // Require at least one real letter so vintages/measurements are not brands.
+      if (value.length < 2 || !/[a-z]/i.test(value)) continue;
+      // A brand mark is short; longer lines are back-label prose, not a brand.
+      if (value.split(" ").length > MAX_BRAND_WORDS) continue;
+      const geometry = geometryFor(line, result);
       candidates.push({
         value,
         rawText,
-        confidence: aggregateConfidence(entity),
-        geometry: geometryFor(entity, result),
-        words: entity,
+        confidence: aggregateConfidence(line),
+        geometry,
+        words: line,
         regionName: result.regionName,
+        prominence: geometry.height,
       });
     }
   }
-  return dedupe(candidates, buildObservation);
+  return dedupeBy(candidates, buildBrandObservation);
+}
+
+/**
+ * Build a brand observation ranked by typographic prominence (largest artwork
+ * wins), then confidence. Two non-corroborating candidates of comparable
+ * prominence are AMBIGUOUS rather than a silent pick; none is NOT_OBSERVED.
+ */
+function buildBrandObservation(candidates: Candidate[]): FieldSelection {
+  if (candidates.length === 0) {
+    return {
+      observation: { state: "NOT_OBSERVED", value: null, confidence: 0, alternates: [] },
+      sourceRegion: null,
+    };
+  }
+
+  const ranked = [...candidates].sort(
+    (a, b) =>
+      b.prominence - a.prominence ||
+      b.confidence - a.confidence ||
+      key(a.value).localeCompare(key(b.value)),
+  );
+  const best = ranked[0];
+
+  const competing = ranked
+    .slice(1)
+    .filter(
+      (c) =>
+        !corroborates(best.value, c.value) &&
+        c.prominence >= best.prominence * BRAND_PROMINENCE_RATIO,
+    );
+
+  // A brand is AMBIGUOUS when another candidate rivals it in prominence, or when
+  // the leading candidate is only weakly recognized yet other candidates remain:
+  // a low-confidence lead among rivals is not a safe silent pick. This is what
+  // keeps noisy front-label OCR (no cleanly isolated brand mark) from fabricating
+  // a confident brand — a human decides instead.
+  const weakContestedLead = best.confidence < LOW_CONFIDENCE_THRESHOLD && ranked.length > 1;
+
+  if (competing.length > 0 || weakContestedLead) {
+    const alternates = (competing.length > 0 ? competing : ranked.slice(1)).map(alternateFrom);
+    return {
+      observation: {
+        state: "AMBIGUOUS",
+        value: best.value,
+        normalizedValue: best.value,
+        rawText: best.rawText,
+        confidence: best.confidence,
+        geometry: best.geometry,
+        alternates,
+      },
+      sourceRegion: best.regionName,
+    };
+  }
+
+  return {
+    observation: {
+      state: best.confidence < LOW_CONFIDENCE_THRESHOLD ? "LOW_CONFIDENCE" : "OBSERVED",
+      value: best.value,
+      normalizedValue: best.value,
+      rawText: best.rawText,
+      confidence: best.confidence,
+      geometry: best.geometry,
+      alternates: ranked.slice(1).map(alternateFrom),
+    },
+    sourceRegion: best.regionName,
+  };
 }
 
 /** Collapse duplicate candidate values, keeping the highest-confidence instance. */
@@ -232,11 +333,23 @@ function dedupe(
   candidates: Candidate[],
   build: (c: Candidate[], toAlt: (c: Candidate) => AnalyzerAlternate) => FieldSelection,
 ): FieldSelection {
+  return build(dedupeCandidates(candidates), alternateFrom);
+}
+
+/** As `dedupe`, for a builder that supplies its own alternate mapping. */
+function dedupeBy(
+  candidates: Candidate[],
+  build: (c: Candidate[]) => FieldSelection,
+): FieldSelection {
+  return build(dedupeCandidates(candidates));
+}
+
+function dedupeCandidates(candidates: Candidate[]): Candidate[] {
   const byKey = new Map<string, Candidate>();
   for (const c of candidates) {
     const k = key(c.value);
     const existing = byKey.get(k);
     if (!existing || c.confidence > existing.confidence) byKey.set(k, c);
   }
-  return build([...byKey.values()], alternateFrom);
+  return [...byKey.values()];
 }

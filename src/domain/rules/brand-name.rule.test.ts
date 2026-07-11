@@ -193,6 +193,28 @@ describe("brandNameRule outcomes", () => {
         .findingStatus,
     ).toBe("NEEDS_REVIEW");
   });
+
+  // Regression: a producer/bottler entity must never manufacture a brand PASS.
+  it("never passes the brand rule from a declared bottler name", () => {
+    // Honest ambiguous artwork (no clean brand mark) declaring the bottler.
+    const ambiguous = evaluate({
+      declared: "OTHER WINERY",
+      observation: obs("ACME RESERVE", {
+        state: "AMBIGUOUS",
+        alternates: [{ value: "OTHER LABEL", confidence: 0.7 }],
+      }),
+    });
+    expect(ambiguous.findingStatus).toBe("NEEDS_REVIEW");
+    expect(ambiguous.findingStatus).not.toBe("PASS");
+
+    // A cleanly observed brand-art value that differs from the declared bottler
+    // is a genuine mismatch, never a pass borrowed from the producer line.
+    const mismatch = evaluate({
+      declared: "OTHER WINERY",
+      observation: obs("ACME RESERVE"),
+    });
+    expect(mismatch.findingStatus).toBe("FAIL");
+  });
 });
 
 describe("brandNameRule finding contract", () => {

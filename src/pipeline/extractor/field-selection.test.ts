@@ -96,58 +96,125 @@ describe("selectAlcoholObservation", () => {
   });
 });
 
+// A tall brand-art line and, optionally, a short bottler line beneath it.
+function tallLine(texts: [string, number][], y: number, height: number): OcrWord[] {
+  cursor = 0;
+  return texts.map(([t, c]) => {
+    const x0 = cursor;
+    cursor += 20;
+    return { text: t, rawConfidence: c, bbox: { x0, y0: y, x1: x0 + 18, y1: y + height } };
+  });
+}
+
 describe("selectBrandObservation", () => {
-  it("extracts the entity after a generic BOTTLED/PRODUCED BY anchor", () => {
-    const words = line(
+  it("selects a prominent brand-facing line and never the BOTTLED BY producer entity", () => {
+    const brandArt = tallLine(
       [
-        ["PRODUCED", 90],
-        ["&", 90],
-        ["BOTTLED", 92],
-        ["BY", 92],
-        ["M", 92],
-        ["CELLARS", 94],
+        ["ACME", 92],
+        ["RESERVE", 93],
       ],
       10,
+      40,
     );
-    const { observation, sourceRegion } = selectBrandObservation([region(words)]);
-    expect(observation.state).toBe("OBSERVED");
-    expect(observation.value).toBe("M CELLARS");
-    expect(sourceRegion).toBe("full-image");
-  });
-
-  it("returns AMBIGUOUS with ordered alternates for two materially different entities", () => {
-    const a = line(
+    const bottler = tallLine(
       [
         ["BOTTLED", 90],
         ["BY", 90],
-        ["ALPHA", 90],
-        ["WINES", 90],
+        ["OTHER", 90],
+        ["WINERY", 90],
+      ],
+      120,
+      12,
+    );
+    const { observation, sourceRegion } = selectBrandObservation([
+      region([...brandArt, ...bottler]),
+    ]);
+    expect(observation.state).toBe("OBSERVED");
+    expect(observation.value).toBe("ACME RESERVE");
+    expect(sourceRegion).toBe("full-image");
+    // The bottler entity must never surface as the brand or an alternate value.
+    const allValues = [observation.value, ...observation.alternates.map((a) => a.value)];
+    expect(allValues).not.toContain("OTHER WINERY");
+  });
+
+  it("reads pixel words, not any answer key: a different brand line yields that brand", () => {
+    const words = tallLine(
+      [
+        ["ZEPHYR", 92],
+        ["HILLS", 92],
       ],
       10,
+      40,
     );
-    const b = line(
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("OBSERVED");
+    expect(observation.value).toBe("ZEPHYR HILLS");
+  });
+
+  it("keeps a single clean brand-region candidate selectable", () => {
+    const words = tallLine(
+      [
+        ["STONE'S", 90],
+        ["THROW", 91],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("OBSERVED");
+    expect(observation.value).toBe("STONE'S THROW");
+  });
+
+  it("returns NOT_OBSERVED for producer-only text with no readable brand", () => {
+    const words = tallLine(
       [
         ["PRODUCED", 90],
         ["BY", 90],
-        ["BETA", 90],
+        ["OTHER", 90],
+        ["WINERY", 90],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
+  });
+
+  it("is AMBIGUOUS when two brand-art lines rival each other in prominence", () => {
+    const a = tallLine(
+      [
+        ["ALPHA", 90],
         ["ESTATE", 90],
       ],
-      60,
+      10,
+      40,
+    );
+    const b = tallLine(
+      [
+        ["BETA", 90],
+        ["CELLARS", 90],
+      ],
+      120,
+      40,
     );
     const { observation } = selectBrandObservation([region([...a, ...b])]);
     expect(observation.state).toBe("AMBIGUOUS");
     expect(observation.alternates.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("returns NOT_OBSERVED when no producer anchor is present", () => {
-    const words = line(
+  it("ignores brand candidates outside the front-label region (mandatory strip)", () => {
+    const words = tallLine(
       [
-        ["LAKE", 95],
-        ["ERIE", 95],
+        ["ACME", 92],
+        ["RESERVE", 93],
       ],
       10,
+      40,
     );
-    const { observation } = selectBrandObservation([region(words)]);
+    const { observation } = selectBrandObservation([
+      region(words, "vertical-mandatory-strip-rot90"),
+    ]);
     expect(observation.state).toBe("NOT_OBSERVED");
   });
 });

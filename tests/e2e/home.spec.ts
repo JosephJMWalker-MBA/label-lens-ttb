@@ -55,9 +55,10 @@ test("bundled M Cellars sample runs the real pipeline end-to-end and downloads a
   await expect(page.getByText(/brand-name-check/)).toBeVisible();
   await expect(page.getByText(/wine-alcohol-check/)).toBeVisible();
 
-  // 8 · Brand and alcohol observations.
-  await expect(page.getByText("M CELLARS").first()).toBeVisible();
+  // 8 · Brand and alcohol observations. Alcohol is cleanly observed; the brand
+  // mark is not cleanly recoverable, so its observation is honestly ambiguous.
   await expect(page.getByText(/12\.5% ALC\.\/VOL\./).first()).toBeVisible();
+  await expect(page.getByText(/AMBIGUOUS/).first()).toBeVisible();
 
   // 9 · All six findings in exact registry order.
   const findingOrder = await page.locator("ol li .font-medium").allInnerTexts();

@@ -40,9 +40,13 @@ describe("runPrecheckService (real OCR)", () => {
       expect(out.ok).toBe(true);
       if (!out.ok) return;
       const res = out.value;
-      expect(res.observations.brandName.value).toBe("M CELLARS");
+      // Brand is not cleanly recoverable from the artwork (only the excluded
+      // bottler line reads "M CELLARS"), so brand evidence is honestly ambiguous.
+      expect(res.observations.brandName.state).toBe("AMBIGUOUS");
       expect(res.observations.alcoholStatement.value).toBe("12.5% ALC./VOL.");
-      expect(findingStatus(res, "brand-name-canonical-comparison").findingStatus).toBe("PASS");
+      expect(findingStatus(res, "brand-name-canonical-comparison").findingStatus).toBe(
+        "NEEDS_REVIEW",
+      );
       expect(findingStatus(res, "wine-alcohol-syntax").findingStatus).toBe("PASS");
       expect(findingStatus(res, "wine-alcohol-declared-comparison").findingStatus).toBe("PASS");
       // Registry order preserved.
@@ -102,7 +106,10 @@ describe("runPrecheckService (real OCR)", () => {
       expect(out.ok).toBe(true);
       if (out.ok) {
         expect(out.value.file.source).toBe("sample");
-        expect(out.value.observations.brandName.value).toBe("M CELLARS");
+        // The bundled sample runs the same real extractor: alcohol is observed,
+        // brand stays honestly ambiguous rather than fabricated.
+        expect(out.value.observations.alcoholStatement.value).toBe("12.5% ALC./VOL.");
+        expect(out.value.observations.brandName.state).toBe("AMBIGUOUS");
       }
     },
     OCR_TIMEOUT,

@@ -82,10 +82,13 @@ describe("Slice 3 acceptance — real M Cellars pipeline", () => {
   }, OCR_TIMEOUT);
 
   describe("Scenario A — exact declared values", () => {
-    it("processes the real extractor and observes brand and alcohol", () => {
-      expect(scenarioA.observations.brandName.state).toBe("OBSERVED");
-      expect(scenarioA.observations.brandName.value).toBe("M CELLARS");
+    it("processes the real extractor and observes alcohol; brand stays honestly ambiguous", () => {
+      // The alcohol statement is cleanly recoverable from the mandatory strip.
       expect(scenarioA.observations.alcoholStatement.value).toBe("12.5% ALC./VOL.");
+      // The stylized brand mark is not cleanly recoverable, and the only clean
+      // "M CELLARS" is the excluded bottler line, so brand evidence is AMBIGUOUS
+      // rather than a fabricated confident observation.
+      expect(scenarioA.observations.brandName.state).toBe("AMBIGUOUS");
     });
 
     it("shows both evidence assessments independently", () => {
@@ -97,8 +100,12 @@ describe("Slice 3 acceptance — real M Cellars pipeline", () => {
       }
     });
 
-    it("passes brand, alcohol syntax, and declared comparison", () => {
-      expect(findingOf(scenarioA, "brand-name-canonical-comparison").findingStatus).toBe("PASS");
+    it("passes alcohol syntax and declared comparison; defers ambiguous brand to review", () => {
+      // Honest brand evidence is ambiguous, so the rule returns NEEDS_REVIEW —
+      // never a fabricated PASS borrowed from the bottler line.
+      expect(findingOf(scenarioA, "brand-name-canonical-comparison").findingStatus).toBe(
+        "NEEDS_REVIEW",
+      );
       expect(findingOf(scenarioA, "wine-alcohol-syntax").findingStatus).toBe("PASS");
       expect(findingOf(scenarioA, "wine-alcohol-declared-comparison").findingStatus).toBe("PASS");
     });

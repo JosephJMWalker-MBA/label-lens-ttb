@@ -47,14 +47,24 @@ export function parseDeclaredAlcoholValue(raw: string): BasisPoints | null {
 
 // A recognized "by volume" marker justified by § 4.36. The bare word "alcohol"
 // alone is NOT a marker, so arbitrary prose containing a percentage is rejected.
-const VOL_MARKER = /alc\.?\s*\/\s*vol\.?|alc\.?\s+by\s+vol\.?|by\s+vol(?:ume)?\.?/;
-const PERCENT_TOKEN = /(\d+(?:\.\d+)?)\s*%/g;
-const RANGE_TOKENS = /(\d+(?:\.\d+)?)\s*%?\s*(?:to|through|-|–|—)\s*(\d+(?:\.\d+)?)\s*%/;
+const VOL_MARKER = String.raw`(?:alc\.?\s*/\s*vol\.?|alc\.?\s+by\s+vol\.?|by\s+vol(?:ume)?\.?)`;
+// An optional leading "alcohol"/"alc." label that lawfully precedes the number.
+const ALC_PREFIX = String.raw`(?:alcohol|alc\.?)\s+`;
+const PERCENT = String.raw`(\d+(?:\.\d+)?)\s*%`;
+const RANGE_PERCENTS = String.raw`(\d+(?:\.\d+)?)\s*%?\s*(?:to|through|-|–|—)\s*(\d+(?:\.\d+)?)\s*%`;
+
+// The COMPLETE normalized statement must be one permitted form, anchored at both
+// ends. Anchoring is what rejects unrelated leading, intervening, and trailing
+// prose (e.g. "contains 12.5% poison by volume", "12.5% alc./vol. extra"): a
+// lawful marker embedded in a sentence is not a lawful statement.
+const DIRECT_STATEMENT = new RegExp(`^(?:${ALC_PREFIX})?${PERCENT}\\s*${VOL_MARKER}$`);
+const RANGE_STATEMENT = new RegExp(`^(?:${ALC_PREFIX})?${RANGE_PERCENTS}\\s*${VOL_MARKER}$`);
 
 /**
  * Parse a wine alcohol statement into a bounded, deterministic form. Only the
  * direct-percentage and bounded-range forms with a permitted volume marker are
- * recognized; everything else is `proof` or `malformed`.
+ * recognized, and the whole statement must match with no surrounding prose;
+ * everything else is `proof` or `malformed`.
  */
 export function parseWineAlcoholStatement(raw: string): WineAlcoholParse {
   const norm = normalizeStatement(raw);
@@ -62,11 +72,7 @@ export function parseWineAlcoholStatement(raw: string): WineAlcoholParse {
   // Proof is a distilled-spirits construct and is never a valid wine statement.
   if (/\bproof\b/.test(norm)) return { kind: "proof" };
 
-  // A permitted "by volume" marker is mandatory: this rejects unitless numbers,
-  // unsupported abbreviations, and arbitrary prose containing a percentage.
-  if (!VOL_MARKER.test(norm)) return { kind: "malformed" };
-
-  const rangeMatch = norm.match(RANGE_TOKENS);
+  const rangeMatch = norm.match(RANGE_STATEMENT);
   if (rangeMatch) {
     const lower = decimalToBasisPoints(rangeMatch[1]);
     const upper = decimalToBasisPoints(rangeMatch[2]);
@@ -75,11 +81,12 @@ export function parseWineAlcoholStatement(raw: string): WineAlcoholParse {
     return { kind: "range", lowerBasisPoints: lower, upperBasisPoints: upper };
   }
 
-  // Direct form: exactly one percentage. Two or more is contradictory and is
-  // never an automatic pass.
-  const percents = [...norm.matchAll(PERCENT_TOKEN)];
-  if (percents.length !== 1) return { kind: "malformed" };
-  const basisPoints = decimalToBasisPoints(percents[0][1]);
-  if (basisPoints === null) return { kind: "malformed" };
-  return { kind: "direct", basisPoints };
+  const directMatch = norm.match(DIRECT_STATEMENT);
+  if (directMatch) {
+    const basisPoints = decimalToBasisPoints(directMatch[1]);
+    if (basisPoints === null) return { kind: "malformed" };
+    return { kind: "direct", basisPoints };
+  }
+
+  return { kind: "malformed" };
 }

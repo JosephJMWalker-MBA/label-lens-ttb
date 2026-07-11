@@ -108,8 +108,13 @@ describe("extractor → wine pre-check orchestrator (real OCR)", () => {
     return findings(declaredAlcohol).find((f) => f.ruleId === ruleId)!;
   }
 
-  it("passes the brand rule for declared M CELLARS on extractor output", () => {
-    expect(statusOf("12.5", "brand-name-canonical-comparison").findingStatus).toBe("PASS");
+  it("returns NEEDS_REVIEW for the brand rule when brand evidence is ambiguous, not a fabricated PASS", () => {
+    // The brand is not cleanly recoverable from the artwork (the only clean
+    // "M CELLARS" is the excluded bottler line), so the observation is AMBIGUOUS
+    // and the rule defers to a human rather than pass or fail on noise.
+    const f = statusOf("12.5", "brand-name-canonical-comparison");
+    expect(f.findingStatus).toBe("NEEDS_REVIEW");
+    expect(f.ruleExecutionStatus).toBe("executed");
   });
 
   it("passes alcohol syntax on the observed 12.5% ALC./VOL.", () => {

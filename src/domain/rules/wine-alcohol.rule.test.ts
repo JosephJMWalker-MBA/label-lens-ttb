@@ -125,6 +125,20 @@ describe("parseWineAlcoholStatement", () => {
       kind: "malformed",
     });
   });
+
+  // Regression: a lawful marker embedded in unrelated prose is not a lawful
+  // statement. The whole normalized string must match a permitted grammar.
+  it("rejects a valid marker embedded in surrounding prose (unanchored)", () => {
+    for (const s of [
+      "Contains 12.5% poison by volume",
+      "Alcohol 12.5% by volume definitely not wine",
+      "12.5% random words alc by vol",
+      "notice: 12.5% alc./vol. extra",
+      "This wine is 12.5% alc./vol. and delicious",
+    ]) {
+      expect(parseWineAlcoholStatement(s)).toEqual({ kind: "malformed" });
+    }
+  });
 });
 
 describe("wine-alcohol-syntax", () => {
@@ -151,6 +165,20 @@ describe("wine-alcohol-syntax", () => {
     expect(syntax({ observation: obs("12.5% v/v") }).findingStatus).toBe("FAIL");
     expect(syntax({ observation: obs("13% to 11% by volume") }).findingStatus).toBe("FAIL");
     expect(syntax({ observation: obs("12.x% by volume") }).findingStatus).toBe("FAIL");
+  });
+
+  // Regression: prose surrounding a valid marker must FAIL the syntax rule.
+  it("fails prose that merely embeds a valid alcohol marker", () => {
+    for (const s of [
+      "Contains 12.5% poison by volume",
+      "Alcohol 12.5% by volume definitely not wine",
+      "12.5% random words alc by vol",
+      "notice: 12.5% alc./vol. extra",
+    ]) {
+      const f = syntax({ observation: obs(s) });
+      expect(f.findingStatus).toBe("FAIL");
+      expect(f.message).toMatch(/WINE_ALC_SYNTAX_MALFORMED/);
+    }
   });
 
   it("returns not_run for insufficient evidence", () => {
