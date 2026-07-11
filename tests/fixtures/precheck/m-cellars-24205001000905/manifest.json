@@ -1,0 +1,195 @@
+{
+  "fixtureId": "m-cellars-24205001000905",
+  "schemaVersion": "label-fixture-manifest.v2",
+  "ttbId": "24205001000905",
+  "beverageCategory": "wine",
+  "sourceChain": {
+    "externalSource": {
+      "authority": "Alcohol and Tobacco Tax and Trade Bureau",
+      "registry": "Public COLA Registry",
+      "ttbId": "24205001000905",
+      "applicationDetailUrl": "https://www.ttbonline.gov/colasonline/publicSearchColasBasic.do",
+      "printableLabelUrl": "unknown",
+      "retrievalMethod": "chat-browser-attachment-transfer",
+      "retrievedAt": "unknown",
+      "sourceMediaType": "unknown",
+      "sourceDimensions": "not_retained",
+      "sourceSha256": "not_retained",
+      "sourceBytesRetained": false,
+      "privacyReview": "Certificate form fields, applicant-contact blocks, signatures, qualification text, and footer content were excluded before commit; only approved label artwork (including label-printed producer/address/proprietor text) is retained. No excluded content is stored in the repository.",
+      "publicRecordLimitations": "The TTB Public COLA Registry exposes approved-label information located by TTB ID. The exact original design-source file and applicant-contact data are not part of this repository.",
+      "availabilityCaveat": "Public registry availability and URL formats may change; a stable direct per-asset URL is not guaranteed. The record is located by TTB ID via the public registry, so no permanent asset URL is claimed."
+    },
+    "derivatives": [
+      {
+        "derivativeId": "reference-crop-494x214",
+        "filename": "label.png",
+        "role": "reference-crop",
+        "mediaType": "image/png",
+        "pixelWidth": 494,
+        "pixelHeight": 214,
+        "byteSize": 69983,
+        "sha256": "6829add3d99c61851028b2422bdd9672bb975183d198de5e280bc961f4a489e7",
+        "parent": {
+          "kind": "unknown",
+          "ref": "relationship_not_proven"
+        },
+        "transformationType": "unknown",
+        "transformationSteps": [
+          {
+            "order": 1,
+            "operation": "sanitized-reference-crop",
+            "performedIn": "outside-repository",
+            "performedBy": "human",
+            "description": "An earlier lower-resolution sanitized crop of the public approved M Cellars label artwork, retained as a reference derivative for deterministic domain tests. Its exact external source representation and its relationship to the OCR-benchmark JPEG are not proven by repository history, so its parent is recorded as unknown.",
+            "excludedRegions": [
+              "certificate-form-fields",
+              "applicant-contact-information",
+              "signature",
+              "qualification-text",
+              "footer-content",
+              "full-page-rendering"
+            ],
+            "verification": "human-approved-and-hash-verified"
+          }
+        ],
+        "manuallyCorrectedPixelsOrText": false,
+        "privacyExclusions": [
+          {
+            "category": "certificate-form-fields",
+            "check": "excluded-region-during-manual-crop",
+            "result": "excluded",
+            "toolOrRuleVersion": "manual-crop@2026-07-10"
+          },
+          {
+            "category": "applicant-contact-information",
+            "check": "excluded-region-during-manual-crop",
+            "result": "excluded",
+            "toolOrRuleVersion": "manual-crop@2026-07-10"
+          },
+          {
+            "category": "signature",
+            "check": "excluded-region-during-manual-crop",
+            "result": "excluded",
+            "toolOrRuleVersion": "manual-crop@2026-07-10"
+          },
+          {
+            "category": "qualification-text",
+            "check": "excluded-region-during-manual-crop",
+            "result": "excluded",
+            "toolOrRuleVersion": "manual-crop@2026-07-10"
+          },
+          {
+            "category": "footer-content",
+            "check": "excluded-region-during-manual-crop",
+            "result": "excluded",
+            "toolOrRuleVersion": "manual-crop@2026-07-10"
+          },
+          {
+            "category": "full-page-certificate-rendering",
+            "check": "not-committed-to-repository",
+            "result": "excluded",
+            "toolOrRuleVersion": "fixture-policy@1.0.0"
+          }
+        ],
+        "intendedUse": "Lower-resolution reference derivative for deterministic domain-layer tests; not the OCR benchmark."
+      },
+      {
+        "derivativeId": "ocr-benchmark-2404x979",
+        "filename": "label-ocr-source.jpeg",
+        "role": "ocr-benchmark",
+        "mediaType": "image/jpeg",
+        "pixelWidth": 2404,
+        "pixelHeight": 979,
+        "byteSize": 607442,
+        "sha256": "0b0ccec13bf6c533ec7928b017b140a0213fb4555812fea81d71872adb453713",
+        "parent": {
+          "kind": "external-source",
+          "ref": "external-source"
+        },
+        "transformationType": "crop",
+        "transformationSteps": [
+          {
+            "order": 1,
+            "operation": "manual-rectangular-crop",
+            "performedIn": "outside-repository",
+            "performedBy": "human",
+            "description": "Higher native-resolution sanitized representation of the public approved M Cellars label artwork obtained through the public TTB approved-label workflow, cropped to the approved artwork and excluding certificate regions. This is not the original design-source file; the SHA-256, dimensions, and byte size are this local file's exact verified identity.",
+            "excludedRegions": [
+              "certificate-form-fields",
+              "applicant-contact-information",
+              "signature",
+              "qualification-text",
+              "footer-content",
+              "full-page-rendering"
+            ],
+            "verification": "human-approved-and-hash-verified"
+          }
+        ],
+        "manuallyCorrectedPixelsOrText": false,
+        "privacyExclusions": [
+          {
+            "category": "certificate-form-fields",
+            "check": "excluded-region-during-manual-crop",
+            "result": "excluded",
+            "toolOrRuleVersion": "manual-crop@2026-07-10"
+          },
+          {
+            "category": "applicant-contact-information",
+            "check": "excluded-region-during-manual-crop",
+            "result": "excluded",
+            "toolOrRuleVersion": "manual-crop@2026-07-10"
+          },
+          {
+            "category": "signature",
+            "check": "excluded-region-during-manual-crop",
+            "result": "excluded",
+            "toolOrRuleVersion": "manual-crop@2026-07-10"
+          },
+          {
+            "category": "qualification-text",
+            "check": "excluded-region-during-manual-crop",
+            "result": "excluded",
+            "toolOrRuleVersion": "manual-crop@2026-07-10"
+          },
+          {
+            "category": "footer-content",
+            "check": "excluded-region-during-manual-crop",
+            "result": "excluded",
+            "toolOrRuleVersion": "manual-crop@2026-07-10"
+          },
+          {
+            "category": "full-page-certificate-rendering",
+            "check": "not-committed-to-repository",
+            "result": "excluded",
+            "toolOrRuleVersion": "fixture-policy@1.0.0"
+          },
+          {
+            "category": "whole-document-ocr",
+            "check": "not-generated-or-retained",
+            "result": "excluded",
+            "toolOrRuleVersion": "fixture-policy@1.0.0"
+          }
+        ],
+        "intendedUse": "Canonical OCR benchmark for the wine pre-check real-OCR tests."
+      }
+    ]
+  },
+  "truthLabels": {
+    "brand": "M CELLARS",
+    "varietal": "Teroldego",
+    "appellation": "LAKE ERIE",
+    "vintage": "2023",
+    "alcoholStatement": "12.5% ALC./VOL.",
+    "netContents": "750ML",
+    "governmentWarning": "present"
+  },
+  "provenanceNotes": [
+    {
+      "topic": "alcohol-statement-transcription",
+      "earlierHumanTranscription": "13% ALC./VOL.",
+      "artifactVerifiedTruth": "12.5% ALC./VOL.",
+      "resolution": "artifact-controls"
+    }
+  ]
+}

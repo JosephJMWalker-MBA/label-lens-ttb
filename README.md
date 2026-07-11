@@ -413,6 +413,12 @@ npm run build
 
 Environment-variable and analyzer-service instructions will be finalized with the working pipeline and deployment URL.
 
+The first completed vertical slice — a single wine label image processed
+end-to-end into an explainable, checksum-protected pre-check result — is
+documented, with exact offline-reproducibility requirements and the bundled
+demonstration-fixture identity, in
+[`docs/slice-3-acceptance.md`](docs/slice-3-acceptance.md).
+
 ## Submission Definition of Done
 
 The take-home is ready to submit when a reviewer can:

@@ -1,0 +1,212 @@
+# Slice 3 — Wine Pre-Check Acceptance & Offline Reproducibility
+
+This document records exactly how to reproduce the first completed vertical
+slice: a single wine label image processed end-to-end into an explainable,
+checksum-protected pre-check result.
+
+```text
+real label image bytes
+  → server-side integrity validation
+  → local-only OCR
+  → evidence-only analyzer response
+  → independent evidence sufficiency
+  → deterministic wine rules
+  → immutable result assembly
+  → checksum-protected JSON export
+  → accessible UI rendering and download
+```
+
+The slice is **advisory**. It is not a TTB approval, a legal opinion, or an
+official regulatory disposition, and it produces **no overall status,
+percentage, or compliance score**.
+
+## Runtime requirements
+
+- **Node.js ≥ 18.18** (developed and verified on Node 22.x).
+- **npm ≥ 10** (verified on npm 10.x).
+- No GPU, no external service, and no network access are required for the core
+  path.
+
+Install exactly the locked dependencies:
+
+```bash
+npm ci
+```
+
+### Local-only OCR — no runtime download
+
+- The Tesseract English language model is **vendored** in the repository at
+  `src/pipeline/extractor/assets/eng.traineddata` and loaded from disk.
+- The Tesseract WASM/core runtime is resolved from the locked `tesseract.js`
+  dependency installed by `npm ci`.
+- The pipeline performs **no runtime model download** and makes **no outbound
+  OCR or API call**. `sharp` and `tesseract.js` run server-side only and are
+  declared as external server packages so they are required from `node_modules`
+  at runtime rather than bundled.
+- OCR asset paths (vendored `eng.traineddata` and the Tesseract WASM core) are
+  resolved at runtime against the deployment application root, not a build-time
+  `import.meta.url`. The build emits a self-contained `standalone` server, and
+  the locked build packages the local OCR assets; a relocated production smoke
+  (`npm run smoke:relocation`) copies that output outside the checkout and
+  verifies asset resolution and real OCR on the tested Node/platform
+  environment. Cross-platform determinism and universal serverless
+  compatibility are not claimed beyond that tested environment.
+
+## Commands
+
+| Purpose | Command |
+|---|---|
+| Development server | `npm run dev` |
+| Unit / integration tests (Vitest) | `npm test` |
+| Playwright acceptance test | `npm run test:e2e` |
+| Production build | `npm run build` |
+| Relocated production OCR smoke | `npm run smoke:relocation` (after `npm run build`) |
+
+The Vitest suite includes the real-OCR acceptance and determinism proofs; the
+Playwright acceptance test drives the real server pipeline through the browser.
+
+## Resource limits (defensive, not regulatory)
+
+The pre-check enforces one canonical resource policy
+(`src/server/resource-policy.ts`). These are **defensive application/availability
+limits for this prototype — not TTB rules** and not regulatory maximums:
+
+- **Request bytes:** ≤ 20 MB total; a declared `Content-Length` above this is
+  rejected **before** the body is parsed.
+- **Image-file bytes:** ≤ 15 MB actual file bytes, enforced after buffering.
+- **Media types:** PNG or JPEG; the route also requires a `multipart/form-data`
+  content-type before parsing.
+- **Decoded image:** ≤ 10000 × 10000 and ≤ 40,000,000 pixels, single frame; an
+  oversized decoded workload is rejected before preprocessing/OCR so a small
+  compressed file cannot expand into a disproportionate pixel budget.
+- **Preprocessing/OCR:** a fixed, bounded set of OCR passes and bounded scale
+  multipliers; the Tesseract worker is created per request and always terminated
+  in a `finally` block on success and on failure.
+
+Honest limitations:
+
+- `Content-Length` rejection occurs **only when the header is present**. Next.js
+  `request.formData()` may still buffer a request when the header is absent or
+  false, so an upstream proxy/platform request-size limit remains recommended for
+  production.
+- Protection is **per-request only**: this prototype provides **no distributed
+  rate limiting** and no cross-instance concurrency control. A bounded OCR
+  timeout and an in-process concurrency semaphore are left as follow-ups.
+
+## Bundled demonstration fixture
+
+The bundled sample is **public approved-label artwork** (TTB Public COLA
+Registry, TTB ID 24205001000905) retained solely as an OCR benchmark. It is a
+demonstration fixture, not the fixture's truth labels injected as a result — the
+sample runs through the same real extractor as any upload.
+
+Expected identity of the OCR-benchmark image
+(`tests/fixtures/precheck/m-cellars-24205001000905/label-ocr-source.jpeg`):
+
+- **Dimensions:** 2404 × 979
+- **SHA-256:** `0b0ccec13bf6c533ec7928b017b140a0213fb4555812fea81d71872adb453713`
+
+The reference PNG (`label.png`, 494 × 214) is a separate, earlier lower-resolution
+derivative used only for deterministic domain-layer tests; its SHA-256 is
+`6829add3d99c61851028b2422bdd9672bb975183d198de5e280bc961f4a489e7`.
+
+### Source-chain provenance
+
+The fixture's `manifest.json` records a strict source chain
+(`label-fixture-manifest.v2`) so an independent reviewer can trace each
+derivative:
+
+- **Source:** the Alcohol and Tobacco Tax and Trade Bureau **Public COLA
+  Registry**, TTB ID **24205001000905**, located via the public registry.
+- **What is known:** each committed derivative's role, on-disk dimensions, byte
+  size, SHA-256, ordered transformation steps, privacy exclusions, and that **no
+  pixels or text were manually corrected**.
+- **What was not retained:** the exact external source file's bytes, media type,
+  dimensions, and retrieval timestamp are recorded explicitly as `not_retained`
+  or `unknown` — so the repository **cannot and does not claim original
+  design-source identity** or a source-byte digest. The relationship between the
+  two derivatives is recorded as `relationship_not_proven`.
+- **Verify the committed hashes:** `shasum -a 256
+  tests/fixtures/precheck/m-cellars-24205001000905/*.jpeg` (and `*.png`) must
+  match the digests above; `fixture-manifest.test.ts` cross-checks the manifest
+  against the files on disk.
+- **Availability:** public registry availability and URL formats may change; no
+  permanent direct asset URL is claimed.
+
+This fixture is one public approved-label example for demonstration; it is **not
+generally representative of all wine labels**. The asset-packaging tests fail
+clearly if the file, its identity, or the vendored language data is absent.
+
+## Privacy
+
+In this slice the application processes uploads **ephemerally**: image bytes are
+validated and analyzed in memory and are **not persisted**. No image bytes or
+declared facts are logged, and error responses are user-safe (no stack traces,
+absolute paths, environment values, or OCR internals).
+
+## Implemented scope (Slice 3)
+
+What this slice actually does today:
+
+- **Category:** domestic wine only.
+- **Extracted fields:** exactly two — the brand name and the alcohol statement.
+  The brand may be **AMBIGUOUS** (the M Cellars brand mark is not cleanly
+  recoverable), which the brand rule reports as **NEEDS_REVIEW**, not a pass.
+- **Rules:** bounded wine rules. Three actual-content-dependent rules remain
+  **not run** (they require actual alcohol content that label artwork cannot
+  supply) and are reported as `not_run_external_dependency`.
+- **Workflow:** human disposition (append-only) and a readable **HTML** report
+  export are implemented, alongside the checksum-verified JSON export.
+- **No overall compliance verdict, status, percentage, or score exists.**
+
+Explicitly **not** implemented (no misleading capability is claimed):
+
+- **Government-warning execution is not implemented.** There is no
+  government-warning validation rule and no statutory warning-text constant in
+  the codebase.
+- **No proof normalization** participates in the wine pre-check; proof is
+  rejected as an invalid wine alcohol form, never normalized to an ABV.
+- Also out of scope: PDF export, persistence/auth, batch processing, cloud/
+  external OCR fallback, additional extracted fields beyond the two above,
+  additional regulatory rules, and actual-alcohol-content ingestion.
+
+## Disposition append authorization
+
+Appending an operator disposition requires a **server-issued authorization
+token**. After a pre-check assembles a machine result, the server signs the
+result's machine-result id (HMAC-SHA256) and returns the resulting opaque token
+with the response. Every disposition append must present that token; the server
+recomputes the machine-result id from the submitted content through the
+committed parser and then verifies the token against it. This closes a gap the
+JSON integrity checksum cannot: the checksum only proves a record is
+self-consistent, **not** that this server produced it — a self-consistent record
+can be forged offline, but a valid append token cannot. The token is not a
+checksum and is never a substitute for the export integrity hash.
+
+Configuration:
+
+- **Production** requires an explicit `LABEL_LENS_APPEND_SIGNING_KEY` environment
+  secret of sufficient length; the append endpoint is unavailable without it. No
+  production secret is committed to the repository.
+- **Development** falls back to a process-local random secret when the
+  environment secret is absent. **Process-local development tokens do not survive
+  a server restart** — tokens issued before a restart stop verifying after it.
+- The signing secret never appears in JSON exports, readable reports, client
+  bundles, logs, or error messages.
+
+## Issue-scope reconciliation
+
+This branch implements the **two-field first vertical slice** (brand name and
+alcohol statement) with authenticated disposition append, conservative brand
+evidence, and safe JSON-body validation. It does **not** by itself satisfy the
+full GitHub issue #36 deliverables (for example designation/appellation, net
+contents, additional fixtures, additional rules, and broader report fields).
+Those broader deliverables must be **tracked separately** and issue #36 is **not**
+claimed as fully satisfied unless its GitHub scope is formally revised.
+
+## What this slice does not claim
+
+This is a bounded proof-of-concept. It does **not** claim FedRAMP
+authorization, production certification, official TTB integration, legal
+approval capability, or general OCR accuracy beyond the bounded demonstrated
+fixture.
