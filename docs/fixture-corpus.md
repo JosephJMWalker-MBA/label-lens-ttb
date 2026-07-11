@@ -94,7 +94,9 @@ verified by tests against the manifest and the corpus index.
   `domainOnlySynthetic`, never enabled for real OCR, and never claimed to be a
   public record.
 - **Candidate (acquisition inventory)**: an ingested independent real-label
-  **screenshot** with verified identity and provenance but **no expected
+  **public-registry screenshot or downloaded display derivative** (the delivered
+  PNG/JPEG format may differ from the original applicant-submitted file, which is
+  not committed) with verified identity and provenance but **no expected
   answers** yet. Marked `role: "candidate"`, `expectations: null`,
   `annotationStatus: "unannotated"`, `splitStatus: "unassigned"`, and disabled
   from real OCR. This is corpus inventory awaiting annotation and an

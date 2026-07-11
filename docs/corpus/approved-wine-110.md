@@ -24,21 +24,45 @@ corpus as governed **inventory**. It is provenance and identity only.
 
 ## Provenance
 
-Each record is an **author-provided screenshot of previously approved wine-label
-artwork. Original external source bytes and public-record metadata were not
-retained in this ingestion step. Approval status is author-reported and has not
-been independently reverified by the ingestion script.**
+The corpus claims **only** the following about each record:
 
-The corpus does **not** claim the screenshot is the original designer artwork,
-the original government-hosted asset, original resolution, domestic origin, a
-specific TTB identifier, or representativeness of all wine labels. `sourceAuthority`
-is `author-provided-local-acquisition`; `publicRecordId` is `null`.
+> Author-provided public-registry screenshot or downloaded display derivative of
+> previously approved wine-label artwork. The delivered PNG/JPEG format may
+> differ from the original applicant-submitted format.
 
-## Screenshot vs. source vs. synthetic
+Additionally: original external source bytes and public-record metadata were not
+retained in this ingestion step, and approval status is author-reported and has
+**not** been independently reverified by the ingestion script.
 
-- **Screenshot (this slice):** a real, independent approved label captured as a
-  screenshot — `sourceStratum: approved_artwork_screenshot`,
-  `independence: independent_real_label`.
+### Four distinct things (do not conflate)
+
+1. **Approved label record** — the fact, in the public registry, that a label
+   was approved. This is what "previously approved" refers to; it is
+   author-reported here and not independently reverified.
+2. **Public-registry screenshot / downloaded display derivative** — what is
+   actually committed: a rendered/displayed representation captured or downloaded
+   by the author. This is the artifact in the repository.
+3. **Original applicant-submitted file** — the file the applicant uploaded during
+   the application. It is **not** in this repository, and its format is unknown.
+   The delivered PNG/JPEG format here may differ from it. In particular, a
+   committed PNG is **not** evidence that PNG was an accepted applicant upload
+   format.
+4. **Original government-hosted source asset** — the exact bytes the registry
+   stores. Not retained here; no per-asset URL, digest, or resolution is claimed.
+
+The corpus does **not** claim the committed image is the original designer
+artwork, the original applicant-submitted file, the original government-hosted
+asset, original resolution, domestic origin, a specific TTB identifier, or
+representativeness of all wine labels. `sourceAuthority` is
+`author-provided-local-acquisition`; `publicRecordId` is `null`.
+
+## Screenshot/display-derivative vs. source vs. synthetic
+
+- **Candidate (this slice):** an independent, previously approved label as a
+  public-registry screenshot or downloaded display derivative —
+  `sourceStratum: approved_artwork_screenshot`,
+  `independence: independent_real_label`. Not the applicant file and not the
+  government-hosted source asset.
 - **Source asset / derivative** (M Cellars): a screened crop of a public record
   and its deterministic derivative.
 - **Synthetic** (existing): constructed OCR token lines, no image.

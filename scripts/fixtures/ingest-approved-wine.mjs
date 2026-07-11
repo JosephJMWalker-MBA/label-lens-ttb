@@ -41,7 +41,7 @@ const TRUTH_LABEL_PROHIBITION =
   "Truth labels and expectations in this entry are for evaluation and regression only. They MUST NOT be passed to the extractor or production service as inputs; expected declared values may reach downstream deterministic rules only through the existing declared-facts contract.";
 
 const PROVENANCE =
-  "Author-provided screenshot of previously approved wine-label artwork. Original external source bytes and public-record metadata were not retained in this ingestion step. Approval status is author-reported and has not been independently reverified by the ingestion script.";
+  "Author-provided public-registry screenshot or downloaded display derivative of previously approved wine-label artwork. The delivered PNG/JPEG format may differ from the original applicant-submitted format. Original external source bytes and public-record metadata were not retained in this ingestion step. Approval status is author-reported and has not been independently reverified by the ingestion script.";
 
 const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
 const PHONE = /(?:\+?1[\s.-])?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}/;
