@@ -1,7 +1,13 @@
 import type { DeclaredFact } from "@/domain/run/declared-facts.types";
 import type { VerificationFinding } from "@/domain/verification/finding.types";
 import type { EvidenceAssessment } from "@/pipeline/precheck/precheck.types";
-import type { AdvisoryNotice, ResultObservations } from "@/pipeline/result/result.types";
+import type {
+  AdvisoryNotice,
+  DispositionEntry,
+  DispositionReferences,
+  ResultDispositionDecision,
+  ResultObservations,
+} from "@/pipeline/result/result.types";
 
 /**
  * The bounded server request for one wine pre-check. The server derives all
@@ -34,11 +40,36 @@ export interface PrecheckServiceResponse {
   observations: ResultObservations;
   evidenceAssessments: EvidenceAssessment[];
   findings: VerificationFinding[];
+  /** Append-only operator disposition history; separate from machine findings. */
+  humanDispositionHistory: DispositionEntry[];
   /** Deterministic suggested filename for the JSON download. */
   suggestedFilename: string;
   /** Canonical JSON export text, checksum-verified server-side. */
   exportJson: string;
+  /** Deterministic, human-readable HTML report of the same validated result. */
+  report: { html: string; filename: string };
   /** Echoed display metadata for the selected file; not part of identity. */
+  file: { displayName: string; mediaType: string; byteSize: number; source: "upload" | "sample" };
+}
+
+/**
+ * Bounded request to append one operator disposition to an already-returned
+ * validated result. The client submits the canonical JSON export it received
+ * (re-validated server-side); it can never inject or mutate machine findings,
+ * observations, version manifests, or the machine-result id. `recordedAt` is
+ * supplied at the UI/server workflow boundary — never inside machine assembly.
+ */
+export interface PrecheckDispositionRequest {
+  /** The canonical JSON export text of the result being dispositioned. */
+  exportJson: string;
+  actorId: string;
+  decision: ResultDispositionDecision;
+  reasonCode: string;
+  note?: string;
+  references?: DispositionReferences;
+  /** ISO timestamp generated at the workflow boundary (human-action metadata). */
+  recordedAt: string;
+  /** Echoed, non-authoritative display metadata carried from the prior response. */
   file: { displayName: string; mediaType: string; byteSize: number; source: "upload" | "sample" };
 }
 
@@ -57,7 +88,11 @@ export type PrecheckServiceErrorCode =
   | "PROFILE_MISMATCH"
   | "ASSEMBLY_FAILED"
   | "EXPORT_CHECKSUM_FAILED"
-  | "SAMPLE_UNAVAILABLE";
+  | "SAMPLE_UNAVAILABLE"
+  | "INVALID_SUBMITTED_RESULT"
+  | "INVALID_DISPOSITION"
+  | "INVALID_DISPOSITION_REFERENCE"
+  | "REPORT_FAILED";
 
 /** A user-safe error: no stack traces, absolute paths, or environment data. */
 export interface PrecheckServiceError {

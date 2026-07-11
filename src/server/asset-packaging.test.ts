@@ -86,18 +86,37 @@ describe("single hardened processing route", () => {
     return found;
   }
 
-  it("exposes exactly one processing route: POST /api/precheck", () => {
-    const routes = routeFiles(apiDir);
-    expect(routes).toHaveLength(1);
-    expect(routes[0]).toBe(join(apiDir, "precheck", "route.ts"));
-    const source = readFileSync(routes[0], "utf8");
-    expect(source).toMatch(/export\s+async\s+function\s+POST/);
+  it("exposes exactly one OCR processing route plus the narrow disposition route", () => {
+    const routes = routeFiles(apiDir).sort();
+    expect(routes).toEqual([
+      join(apiDir, "precheck", "disposition", "route.ts"),
+      join(apiDir, "precheck", "route.ts"),
+    ]);
+    for (const route of routes) {
+      expect(readFileSync(route, "utf8")).toMatch(/export\s+async\s+function\s+POST/);
+    }
   });
 
-  it("declares the Node runtime and is not configured for Edge", () => {
-    const source = readFileSync(join(apiDir, "precheck", "route.ts"), "utf8");
-    expect(source).toMatch(/export\s+const\s+runtime\s*=\s*["']nodejs["']/);
-    expect(source).not.toMatch(/["']edge["']/);
+  it("keeps OCR/extraction in the single processing route; disposition never duplicates it", () => {
+    const ocrRoute = readFileSync(join(apiDir, "precheck", "route.ts"), "utf8");
+    expect(ocrRoute).toMatch(/@\/server\/precheck-service/);
+
+    const dispositionRoute = readFileSync(
+      join(apiDir, "precheck", "disposition", "route.ts"),
+      "utf8",
+    );
+    // The disposition route reuses the committed append/export path and adds no
+    // extractor, OCR engine, or image processing of its own.
+    expect(dispositionRoute).not.toMatch(/extractor|ocr-engine|tesseract|sharp/);
+    expect(dispositionRoute).toMatch(/appendDispositionToResult/);
+  });
+
+  it("declares the Node runtime and is not configured for Edge on both routes", () => {
+    for (const rel of ["precheck/route.ts", "precheck/disposition/route.ts"]) {
+      const source = readFileSync(join(apiDir, rel), "utf8");
+      expect(source).toMatch(/export\s+const\s+runtime\s*=\s*["']nodejs["']/);
+      expect(source).not.toMatch(/["']edge["']/);
+    }
   });
 });
 

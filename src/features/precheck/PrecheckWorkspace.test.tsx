@@ -125,6 +125,11 @@ const CANNED: PrecheckServiceResponse = {
   ] as PrecheckServiceResponse["findings"],
   suggestedFilename: "label-lens-wine-precheck-precheck-result.v1-" + "a".repeat(64) + ".json",
   exportJson: '{"exportType":"wine-precheck-result"}',
+  humanDispositionHistory: [],
+  report: {
+    html: "<!doctype html><html><body>report</body></html>",
+    filename: "label-lens-wine-precheck-precheck-result.v1-" + "a".repeat(64) + ".html",
+  },
   file: { displayName: "label.jpeg", mediaType: "image/jpeg", byteSize: 123, source: "upload" },
 };
 
@@ -192,8 +197,8 @@ describe("PrecheckWorkspace — run & results", () => {
     await screen.findByRole("heading", { name: /pre-check result/i });
 
     // Independent evidence assessments.
-    expect(screen.getByText(/brand-name-check/)).toBeInTheDocument();
-    expect(screen.getByText(/wine-alcohol-check/)).toBeInTheDocument();
+    expect(screen.getAllByText(/brand-name-check/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/wine-alcohol-check/).length).toBeGreaterThan(0);
 
     // Observation detail is shown.
     expect(screen.getAllByText(/12.5% ALC\.\/VOL\./).length).toBeGreaterThan(0);
@@ -302,5 +307,165 @@ describe("PrecheckWorkspace — demo fixture", () => {
     expect(body.get("source")).toBe("sample");
     expect(body.get("brand")).toBe("M CELLARS");
     expect(body.has("file")).toBe(false);
+  });
+});
+
+// A result carrying one appended disposition entry, as the disposition endpoint
+// would return it (machine findings unchanged; history + exports refreshed).
+const CANNED_WITH_HISTORY: PrecheckServiceResponse = {
+  ...CANNED,
+  humanDispositionHistory: [
+    {
+      dispositionId: "disposition-1",
+      sequence: 1,
+      actorId: "reviewer-9",
+      recordedAt: "2026-07-11T12:00:00Z",
+      decision: "escalated_for_human_review",
+      reasonCode: "NEEDS_SECOND_LOOK",
+      note: "Brand mark unclear.",
+    },
+  ],
+  report: {
+    html: "<!doctype html><html><body>report with history</body></html>",
+    filename: CANNED.report.filename,
+  },
+};
+
+/** Route fetch by URL: pre-check vs. disposition append. */
+function routedFetch() {
+  return vi.fn((url: string) => {
+    const data = String(url).includes("/disposition") ? CANNED_WITH_HISTORY : CANNED;
+    return Promise.resolve({ ok: true, json: async () => ({ ok: true, data }) } as Response);
+  });
+}
+
+async function runPrecheckToResult() {
+  selectFileAndFill();
+  fireEvent.click(screen.getByRole("button", { name: /run pre-check/i }));
+  await screen.findByRole("heading", { name: /pre-check result/i });
+}
+
+describe("PrecheckWorkspace — human disposition", () => {
+  it("shows no disposition form before a successful pre-check", () => {
+    render(<PrecheckWorkspace />);
+    expect(screen.queryByRole("heading", { name: /human disposition/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /record disposition/i })).toBeNull();
+  });
+
+  it("reveals a labeled, keyboard-operable disposition form after a pre-check", async () => {
+    vi.stubGlobal("fetch", routedFetch());
+    render(<PrecheckWorkspace />);
+    await runPrecheckToResult();
+
+    expect(screen.getByRole("heading", { name: /human disposition/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/operator identifier/i)).toBeInTheDocument();
+    const decision = screen.getByLabelText(/decision/i) as HTMLSelectElement;
+    expect(decision.tagName).toBe("SELECT");
+    expect(screen.getByLabelText(/reason code/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/note \(optional\)/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /record disposition/i })).toBeInTheDocument();
+    // Only bounded internal-workflow decisions are offered.
+    const options = within(decision)
+      .getAllByRole("option")
+      .map((o) => (o as HTMLOptionElement).value);
+    expect(options).toContain("escalated_for_human_review");
+    expect(options).not.toContain("approved");
+    expect(options).not.toContain("rejected");
+  });
+
+  it("appends a disposition through the disposition endpoint without rerunning OCR", async () => {
+    const fetchMock = routedFetch();
+    vi.stubGlobal("fetch", fetchMock);
+    render(<PrecheckWorkspace />);
+    await runPrecheckToResult();
+
+    fireEvent.change(screen.getByLabelText(/operator identifier/i), {
+      target: { value: "reviewer-9" },
+    });
+    fireEvent.change(screen.getByLabelText(/reason code/i), {
+      target: { value: "NEEDS_SECOND_LOOK" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /record disposition/i }));
+
+    // History entry appears; findings remain rendered unchanged.
+    const historyEntry = await screen.findByText(/Sequence 1:/i);
+    expect(historyEntry).toHaveTextContent(/escalated for human review/i);
+    expect(screen.getByText(/reviewer-9/)).toBeInTheDocument();
+    expect(screen.getAllByText(/wine-alcohol-syntax/).length).toBeGreaterThan(0);
+
+    // Success is announced and the append hit the disposition endpoint (not OCR).
+    expect(await screen.findByText(/disposition recorded/i)).toBeInTheDocument();
+    const urls = fetchMock.mock.calls.map((c) => String(c[0]));
+    expect(urls).toContain("/api/precheck/disposition");
+    const dispositionCall = fetchMock.mock.calls.find((c) =>
+      String(c[0]).includes("/disposition"),
+    ) as unknown as [string, RequestInit];
+    // The client submits the canonical export it received; no findings field.
+    const body = JSON.parse(dispositionCall[1].body as string);
+    expect(body.exportJson).toBe(CANNED.exportJson);
+    expect(body.findings).toBeUndefined();
+  });
+
+  it("offers distinct JSON and readable-report downloads with deterministic names", async () => {
+    vi.stubGlobal("fetch", routedFetch());
+    render(<PrecheckWorkspace />);
+    await runPrecheckToResult();
+
+    const jsonBtn = screen.getByRole("button", { name: /download json export/i });
+    const reportBtn = screen.getByRole("button", { name: /download readable report/i });
+    expect(jsonBtn).toBeInTheDocument();
+    expect(reportBtn).toBeInTheDocument();
+    expect(jsonBtn).not.toBe(reportBtn);
+    expect(screen.getByText(CANNED.report.filename)).toBeInTheDocument();
+    expect(screen.getByText(CANNED.suggestedFilename)).toBeInTheDocument();
+    expect(CANNED.report.filename).toMatch(/\.html$/);
+  });
+
+  it("has no edit or delete control and no approval/rejection language", async () => {
+    vi.stubGlobal("fetch", routedFetch());
+    render(<PrecheckWorkspace />);
+    await runPrecheckToResult();
+
+    expect(screen.queryByRole("button", { name: /edit|delete|remove/i })).toBeNull();
+    expect(
+      screen.queryByText(/\b(Approved|Rejected|Compliant|Noncompliant|Official decision)\b/),
+    ).toBeNull();
+    // The separation between machine findings and human disposition is stated.
+    expect(screen.getByText(/does not change the automated findings/i)).toBeInTheDocument();
+    expect(screen.getByText(/does not represent a TTB action/i)).toBeInTheDocument();
+  });
+
+  it("shows an accessible error and does not append on a server rejection", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((url: string) => {
+        if (String(url).includes("/disposition")) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => ({
+              ok: false,
+              error: { code: "INVALID_DISPOSITION", message: "Enter a reason code." },
+            }),
+          } as Response);
+        }
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ ok: true, data: CANNED }),
+        } as Response);
+      }),
+    );
+    render(<PrecheckWorkspace />);
+    await runPrecheckToResult();
+
+    fireEvent.change(screen.getByLabelText(/operator identifier/i), {
+      target: { value: "reviewer-9" },
+    });
+    fireEvent.change(screen.getByLabelText(/reason code/i), { target: { value: "R" } });
+    fireEvent.click(screen.getByRole("button", { name: /record disposition/i }));
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByText(/reason code/i)).toBeInTheDocument();
+    // No history entry was added.
+    expect(screen.queryByText(/Sequence 1:/i)).toBeNull();
   });
 });

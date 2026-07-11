@@ -36,6 +36,11 @@ const STATUS_BY_CODE: Record<PrecheckServiceError["code"], number> = {
   ASSEMBLY_FAILED: 422,
   EXPORT_CHECKSUM_FAILED: 500,
   SAMPLE_UNAVAILABLE: 404,
+  // Disposition-append codes never arise on this route, but the map is total.
+  INVALID_SUBMITTED_RESULT: 422,
+  INVALID_DISPOSITION: 400,
+  INVALID_DISPOSITION_REFERENCE: 400,
+  REPORT_FAILED: 500,
 };
 
 function errorResponse(code: PrecheckServiceError["code"], message: string): Response {

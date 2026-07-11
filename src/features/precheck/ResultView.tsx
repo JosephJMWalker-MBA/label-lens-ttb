@@ -13,8 +13,8 @@ const STATUS_NOTE: Record<string, string> = {
   not_run: "The rule did not run.",
 };
 
-function downloadJson(text: string, filename: string) {
-  const blob = new Blob([text], { type: "application/json" });
+function downloadFile(text: string, filename: string, mime: string) {
+  const blob = new Blob([text], { type: mime });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
@@ -154,17 +154,29 @@ export function ResultView({ response }: { response: PrecheckServiceResponse }) 
         <h3 id="download-heading" className="text-lg font-semibold">
           Download
         </h3>
-        <div>
+        <div className="flex flex-wrap gap-3">
           <Button
             type="button"
-            onClick={() => downloadJson(response.exportJson, response.suggestedFilename)}
+            onClick={() =>
+              downloadFile(response.exportJson, response.suggestedFilename, "application/json")
+            }
           >
             Download JSON export
           </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() =>
+              downloadFile(response.report.html, response.report.filename, "text/html")
+            }
+          >
+            Download readable report (HTML)
+          </Button>
         </div>
         <p className="text-xs text-muted-foreground">
-          Saves the exact server-produced, checksum-verified export as{" "}
-          <code>{response.suggestedFilename}</code>.
+          Saves the exact server-produced, checksum-verified JSON export as{" "}
+          <code>{response.suggestedFilename}</code>, and a readable HTML report as{" "}
+          <code>{response.report.filename}</code>. Both include the current disposition history.
         </p>
       </section>
     </div>

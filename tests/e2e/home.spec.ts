@@ -52,8 +52,8 @@ test("bundled M Cellars sample runs the real pipeline end-to-end and downloads a
   await expect(page.getByText(/pre-check complete/i)).toBeVisible();
 
   // 7 · Both evidence assessments, shown independently.
-  await expect(page.getByText(/brand-name-check/)).toBeVisible();
-  await expect(page.getByText(/wine-alcohol-check/)).toBeVisible();
+  await expect(page.getByText(/brand-name-check/).first()).toBeVisible();
+  await expect(page.getByText(/wine-alcohol-check/).first()).toBeVisible();
 
   // 8 · Brand and alcohol observations. Alcohol is cleanly observed; the brand
   // mark is not cleanly recoverable, so its observation is honestly ambiguous.
@@ -97,6 +97,73 @@ test("bundled M Cellars sample runs the real pipeline end-to-end and downloads a
     /^label-lens-wine-precheck-precheck-result\.v1-[0-9a-f]{64}\.json$/,
   );
   expect(download.suggestedFilename()).toBe(filenameShown);
+});
+
+test("operator can record a disposition and download an updated report from the real result", async ({
+  page,
+}) => {
+  test.setTimeout(180_000);
+  await page.goto("/");
+  await page.getByRole("button", { name: /load verified m cellars sample/i }).click();
+  await expect(page.getByRole("heading", { name: /pre-check result/i })).toBeVisible({
+    timeout: 150_000,
+  });
+
+  // Machine findings before disposition (must remain unchanged after append).
+  const findingIdsBefore = await page.locator("ol li .font-medium").allInnerTexts();
+  expect(findingIdsBefore).toContain("wine-alcohol-syntax");
+
+  // 2 · Record one bounded operator disposition.
+  await page.getByLabel(/operator identifier/i).fill("reviewer-e2e");
+  await page.getByLabel(/decision/i).selectOption("escalated_for_human_review");
+  await page.getByLabel(/reason code/i).fill("NEEDS_SECOND_LOOK");
+  await page.getByRole("button", { name: /record disposition/i }).click();
+
+  // 3 · History entry appears.
+  await expect(page.getByText(/Sequence 1:/i)).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByText(/reviewer-e2e/)).toBeVisible();
+
+  // 4 · Findings remain unchanged.
+  const findingIdsAfter = await page.locator("ol li .font-medium").allInnerTexts();
+  expect(findingIdsAfter).toEqual(
+    expect.arrayContaining(["wine-alcohol-syntax", "brand-name-canonical-comparison"]),
+  );
+
+  // 5 · Download updated JSON and verify the checksum includes the disposition.
+  const [jsonDownload] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: /download json export/i }).click(),
+  ]);
+  const jsonText = readFileSync(await jsonDownload.path(), "utf8");
+  const parsed = JSON.parse(jsonText);
+  const { integrity, ...payload } = parsed;
+  expect(payloadHash(payload)).toBe(integrity.value);
+  expect(parsed.humanDispositionHistory).toHaveLength(1);
+  expect(parsed.humanDispositionHistory[0].decision).toBe("escalated_for_human_review");
+
+  // 6 · Download the readable report.
+  const [reportDownload] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: /download readable report/i }).click(),
+  ]);
+  expect(reportDownload.suggestedFilename()).toMatch(
+    /^label-lens-wine-precheck-precheck-result\.v1-[0-9a-f]{64}\.html$/,
+  );
+  const reportHtml = readFileSync(await reportDownload.path(), "utf8");
+
+  // 7 · Inspect the report text.
+  expect(reportHtml).toMatch(/not a TTB approval/i);
+  expect(reportHtml).toMatch(/M CELLARS/);
+  expect(reportHtml).toMatch(/12\.5% ALC\.\/VOL\./);
+  for (const id of REGISTRY_ORDER) expect(reportHtml).toContain(id);
+  const positions = REGISTRY_ORDER.map((id) => reportHtml.indexOf(id));
+  expect(positions).toEqual([...positions].sort((a, b) => a - b));
+  expect(reportHtml).toMatch(/escalated_for_human_review/);
+  expect(reportHtml).toMatch(/reviewer-e2e/);
+  expect(reportHtml).toMatch(/External evidence required/);
+
+  // 8 · No overall approval/rejection language.
+  expect(reportHtml).not.toMatch(/\b(Approved|Rejected|Compliant|Noncompliant)\b/);
 });
 
 test("upload rerun with alcohol 13 flips only the declared-comparison outcome", async ({

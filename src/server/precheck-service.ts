@@ -9,14 +9,20 @@ import type { AnalyzerOcrEngine } from "@/pipeline/analyzer/analyzer.types";
 import { buildJsonExport, verifyExportIntegrity } from "@/pipeline/export/json/build-json-export";
 import { serializeExportCanonical } from "@/pipeline/export/json/canonical-json";
 import { suggestedExportFilename } from "@/pipeline/export/json/filename";
+import { parseJsonExport } from "@/pipeline/export/json/parse-json-export";
+import { buildReadableReport } from "@/pipeline/export/report/build-report";
 import { extractLabelEvidence } from "@/pipeline/extractor/extractor";
 import type { ExtractionInput } from "@/pipeline/extractor/extractor.types";
 import { runWinePrecheck } from "@/pipeline/precheck/orchestrator";
 import { winePrecheckRegistry } from "@/pipeline/precheck/wine-precheck.profile";
+import { appendDisposition } from "@/pipeline/result/disposition";
 import { assemblePrecheckResult } from "@/pipeline/result/assemble";
+import { validatePrecheckResult } from "@/pipeline/result/result.schema";
+import type { DispositionEntryInput, PrecheckResult } from "@/pipeline/result/result.types";
 import { err, ok, type Result } from "@/shared/result";
 
 import type {
+  PrecheckDispositionRequest,
   PrecheckServiceError,
   PrecheckServiceRequest,
   PrecheckServiceResponse,
@@ -208,8 +214,26 @@ export async function runPrecheckService(
     },
   });
   if (!assembled.ok) return fail("ASSEMBLY_FAILED", "The pre-check result could not be assembled.");
-  const result = assembled.value;
 
+  return buildResponse(assembled.value, {
+    displayName,
+    mediaType,
+    byteSize: bytes.length,
+    source: request.source,
+  });
+}
+
+/**
+ * Project a validated result into the bounded response: rebuild the canonical
+ * JSON export through the committed builder, verify its checksum, build the
+ * deterministic readable report against that same checksum, and derive the
+ * stable filenames. This is the single place both the pre-check and the
+ * disposition-append paths produce a response, so their exports never diverge.
+ */
+function buildResponse(
+  result: PrecheckResult,
+  file: PrecheckServiceResponse["file"],
+): Result<PrecheckServiceResponse, PrecheckServiceError> {
   const exportResult = buildJsonExport(result);
   if (!exportResult.ok)
     return fail("EXPORT_CHECKSUM_FAILED", "The JSON export could not be produced.");
@@ -221,6 +245,12 @@ export async function runPrecheckService(
   if (!filename.ok)
     return fail("EXPORT_CHECKSUM_FAILED", "The export filename could not be derived.");
 
+  const report = buildReadableReport({
+    result,
+    jsonChecksum: verified.value.integrity.value,
+  });
+  if (!report.ok) return fail("REPORT_FAILED", "The readable report could not be produced.");
+
   return ok({
     machineResultId: result.machineResultId,
     profile: { id: result.profile.id, version: result.profile.version },
@@ -229,8 +259,88 @@ export async function runPrecheckService(
     observations: result.observations,
     evidenceAssessments: result.evidenceAssessments,
     findings: result.findings,
+    humanDispositionHistory: result.humanDispositionHistory,
     suggestedFilename: filename.value,
     exportJson: serializeExportCanonical(verified.value),
-    file: { displayName, mediaType, byteSize: bytes.length, source: request.source },
+    report: { html: report.value.html, filename: report.value.filename },
+    file,
   });
+}
+
+/** Reconstruct a `PrecheckResult` from a parsed, checksum-validated JSON export. */
+function resultFromExport(exportJson: string): Result<PrecheckResult, PrecheckServiceError> {
+  const parsed = parseJsonExport(exportJson);
+  if (!parsed.ok)
+    return fail("INVALID_SUBMITTED_RESULT", "The submitted result could not be validated.");
+  const e = parsed.value;
+  const candidate = {
+    machineResultId: e.generatedFrom.machineResultId,
+    resultSchemaVersion: e.generatedFrom.resultSchemaVersion,
+    mode: e.mode,
+    profile: e.profile,
+    run: e.run,
+    declaredFacts: e.declaredFacts,
+    evidenceAssessments: e.evidenceAssessments,
+    observations: e.observations,
+    findings: e.findings,
+    versionManifest: e.versionManifest,
+    advisoryNotice: e.advisoryNotice,
+    ...(e.advisoryQuality !== undefined ? { advisoryQuality: e.advisoryQuality } : {}),
+    humanDispositionHistory: e.humanDispositionHistory,
+  };
+  const validated = validatePrecheckResult(candidate);
+  if (!validated.ok)
+    return fail("INVALID_SUBMITTED_RESULT", "The submitted result could not be validated.");
+  return ok(validated.value);
+}
+
+/**
+ * Append one operator disposition to an already-validated result and return the
+ * refreshed bounded response with rebuilt JSON and readable-report exports.
+ *
+ * Machine findings, observations, the version manifest, and the machine-result
+ * id are taken from the re-validated submitted export and never from any
+ * separate client field, so a caller cannot inject or mutate them. The
+ * disposition id and sequence are assigned server-side; `recordedAt` is supplied
+ * by the caller (generated at the workflow boundary).
+ */
+export function appendDispositionToResult(
+  request: PrecheckDispositionRequest,
+): Result<PrecheckServiceResponse, PrecheckServiceError> {
+  if (request.actorId.trim() === "")
+    return fail("INVALID_DISPOSITION", "Enter an operator identifier.");
+  if (request.reasonCode.trim() === "") return fail("INVALID_DISPOSITION", "Enter a reason code.");
+  if (request.recordedAt.trim() === "")
+    return fail("INVALID_DISPOSITION", "A recorded-at timestamp is required.");
+
+  const reconstructed = resultFromExport(request.exportJson);
+  if (!reconstructed.ok) return reconstructed;
+  const result = reconstructed.value;
+
+  // Reference validation: any referenced rule/check must exist in this result.
+  const knownRuleIds = new Set<string>(result.findings.map((f) => f.ruleId));
+  const knownCheckIds = new Set<string>(result.evidenceAssessments.map((a) => a.checkId));
+  for (const ruleId of request.references?.ruleIds ?? []) {
+    if (!knownRuleIds.has(ruleId))
+      return fail("INVALID_DISPOSITION_REFERENCE", "A referenced rule id is not in this result.");
+  }
+  for (const checkId of request.references?.checkIds ?? []) {
+    if (!knownCheckIds.has(checkId))
+      return fail("INVALID_DISPOSITION_REFERENCE", "A referenced check id is not in this result.");
+  }
+
+  const input: DispositionEntryInput = {
+    dispositionId: `disposition-${result.humanDispositionHistory.length + 1}`,
+    actorId: request.actorId,
+    recordedAt: request.recordedAt,
+    decision: request.decision,
+    reasonCode: request.reasonCode,
+    ...(request.note !== undefined && request.note.trim() !== "" ? { note: request.note } : {}),
+    ...(request.references !== undefined ? { references: request.references } : {}),
+  };
+
+  const appended = appendDisposition(result, input);
+  if (!appended.ok) return fail("INVALID_DISPOSITION", "The disposition could not be recorded.");
+
+  return buildResponse(appended.value, request.file);
 }

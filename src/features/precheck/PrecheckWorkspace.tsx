@@ -10,6 +10,7 @@ import type {
   PrecheckServiceResponse,
 } from "@/server/precheck-service.types";
 
+import { DispositionSection } from "./DispositionSection";
 import { ResultView } from "./ResultView";
 import { SAMPLE_DECLARED } from "./sample";
 
@@ -197,8 +198,9 @@ export function PrecheckWorkspace() {
       ) : null}
 
       {phase === "complete" && response ? (
-        <div ref={resultRef} tabIndex={-1}>
+        <div ref={resultRef} tabIndex={-1} className="flex flex-col gap-8">
           <ResultView response={response} />
+          <DispositionSection response={response} onAppended={setResponse} />
         </div>
       ) : null}
     </section>
