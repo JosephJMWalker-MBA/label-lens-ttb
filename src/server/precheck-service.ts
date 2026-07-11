@@ -21,6 +21,7 @@ import { validatePrecheckResult } from "@/pipeline/result/result.schema";
 import type { DispositionEntryInput, PrecheckResult } from "@/pipeline/result/result.types";
 import { err, ok, type Result } from "@/shared/result";
 
+import { issueAppendToken, verifyAppendToken } from "./append-token";
 import { ALLOWED_MEDIA_TYPES, MAX_IMAGE_BYTES } from "./resource-policy";
 import { getExecutableProvenance } from "./runtime-provenance";
 
@@ -260,8 +261,19 @@ function buildResponse(
   });
   if (!report.ok) return fail("REPORT_FAILED", "The readable report could not be produced.");
 
+  // Server-issued append authorization: proves this server assembled the machine
+  // result. The signing secret is never placed in the export, report, or client
+  // payload — only this opaque HMAC over the machine-result id is returned.
+  const token = issueAppendToken(result.machineResultId);
+  if (!token.ok)
+    return fail(
+      "APPEND_SIGNING_KEY_UNAVAILABLE",
+      "The append-authorization service is not configured.",
+    );
+
   return ok({
     machineResultId: result.machineResultId,
+    appendToken: token.token,
     profile: { id: result.profile.id, version: result.profile.version },
     advisoryNotice: result.advisoryNotice,
     declaredFacts: result.declaredFacts,
@@ -325,6 +337,21 @@ export function appendDispositionToResult(
   const reconstructed = resultFromExport(request.exportJson);
   if (!reconstructed.ok) return reconstructed;
   const result = reconstructed.value;
+
+  // Authenticate the append against the machine-result id the parser recomputed
+  // from the submitted content. Re-checksumming or forging a self-consistent
+  // record is not enough: the caller must also present a token this server
+  // signed for exactly this recomputed machine-result id.
+  const authorized = verifyAppendToken(request.appendToken, result.machineResultId);
+  if (!authorized.ok) {
+    const message =
+      authorized.error.code === "APPEND_SIGNING_KEY_UNAVAILABLE"
+        ? "The append-authorization service is not configured."
+        : authorized.error.code === "MISSING_APPEND_TOKEN"
+          ? "A server-issued append-authorization token is required."
+          : "The append-authorization token is not valid for this result.";
+    return fail(authorized.error.code, message);
+  }
 
   // Reference validation: any referenced rule/check must exist in this result.
   const knownRuleIds = new Set<string>(result.findings.map((f) => f.ruleId));

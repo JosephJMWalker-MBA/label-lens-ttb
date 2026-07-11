@@ -170,6 +170,40 @@ Explicitly **not** implemented (no misleading capability is claimed):
   external OCR fallback, additional extracted fields beyond the two above,
   additional regulatory rules, and actual-alcohol-content ingestion.
 
+## Disposition append authorization
+
+Appending an operator disposition requires a **server-issued authorization
+token**. After a pre-check assembles a machine result, the server signs the
+result's machine-result id (HMAC-SHA256) and returns the resulting opaque token
+with the response. Every disposition append must present that token; the server
+recomputes the machine-result id from the submitted content through the
+committed parser and then verifies the token against it. This closes a gap the
+JSON integrity checksum cannot: the checksum only proves a record is
+self-consistent, **not** that this server produced it — a self-consistent record
+can be forged offline, but a valid append token cannot. The token is not a
+checksum and is never a substitute for the export integrity hash.
+
+Configuration:
+
+- **Production** requires an explicit `LABEL_LENS_APPEND_SIGNING_KEY` environment
+  secret of sufficient length; the append endpoint is unavailable without it. No
+  production secret is committed to the repository.
+- **Development** falls back to a process-local random secret when the
+  environment secret is absent. **Process-local development tokens do not survive
+  a server restart** — tokens issued before a restart stop verifying after it.
+- The signing secret never appears in JSON exports, readable reports, client
+  bundles, logs, or error messages.
+
+## Issue-scope reconciliation
+
+This branch implements the **two-field first vertical slice** (brand name and
+alcohol statement) with authenticated disposition append, conservative brand
+evidence, and safe JSON-body validation. It does **not** by itself satisfy the
+full GitHub issue #36 deliverables (for example designation/appellation, net
+contents, additional fixtures, additional rules, and broader report fields).
+Those broader deliverables must be **tracked separately** and issue #36 is **not**
+claimed as fully satisfied unless its GitHub scope is formally revised.
+
 ## What this slice does not claim
 
 This is a bounded proof-of-concept. It does **not** claim FedRAMP

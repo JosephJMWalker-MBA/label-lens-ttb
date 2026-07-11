@@ -1,15 +1,26 @@
 // @vitest-environment node
-import { describe, expect, it } from "vitest";
+import { createHmac } from "node:crypto";
+
+import { beforeAll, describe, expect, it } from "vitest";
 
 import { buildJsonExport, verifyExportIntegrity } from "@/pipeline/export/json/build-json-export";
 import { payloadHash, serializeExportCanonical } from "@/pipeline/export/json/canonical-json";
 import { parseJsonExport } from "@/pipeline/export/json/parse-json-export";
 import { assemblePrecheckResult } from "@/pipeline/result/assemble";
 import { buildAssembleInput } from "@/pipeline/result/build.fixtures";
+import { deriveMachineResultId } from "@/pipeline/result/serialize";
+import { issueAppendToken } from "@/server/append-token";
 import { appendDispositionToResult } from "@/server/precheck-service";
 import type { PrecheckDispositionRequest } from "@/server/precheck-service.types";
 
 import { POST } from "./route";
+
+// Tests inject a fixed signing secret (production would require an explicit
+// LABEL_LENS_APPEND_SIGNING_KEY of sufficient length).
+const FIXED_SECRET = "test-fixed-append-signing-key-0123456789";
+beforeAll(() => {
+  process.env.LABEL_LENS_APPEND_SIGNING_KEY = FIXED_SECRET;
+});
 
 /** Canonical JSON export for a freshly assembled (empty-history) result. */
 function baseExportJson(): string {
@@ -22,6 +33,20 @@ function baseExportJson(): string {
   return serializeExportCanonical(verified.value);
 }
 
+/** The machine-result id the parser recomputes from a submitted export. */
+function machineIdOf(exportJson: string): string {
+  const parsed = parseJsonExport(exportJson);
+  if (!parsed.ok) throw new Error("parse failed");
+  return parsed.value.generatedFrom.machineResultId;
+}
+
+/** A valid server-issued append token for the given export's machine result. */
+function tokenFor(exportJson: string): string {
+  const issued = issueAppendToken(machineIdOf(exportJson));
+  if (!issued.ok) throw new Error("token issuance failed");
+  return issued.token;
+}
+
 const FILE = {
   displayName: "label.jpeg",
   mediaType: "image/jpeg",
@@ -30,8 +55,10 @@ const FILE = {
 };
 
 function req(overrides: Partial<PrecheckDispositionRequest> = {}): PrecheckDispositionRequest {
+  const exportJson = overrides.exportJson ?? baseExportJson();
   return {
-    exportJson: baseExportJson(),
+    exportJson,
+    appendToken: tokenFor(baseExportJson()),
     actorId: "reviewer-1",
     decision: "accepted_for_internal_use",
     reasonCode: "LOOKS_GOOD",
@@ -136,6 +163,130 @@ describe("appendDispositionToResult (service)", () => {
   });
 });
 
+describe("appendDispositionToResult (append authorization)", () => {
+  /** Rebuild a fully self-consistent export after a machine-content change: the
+   * canonical machine-result id AND the integrity checksum are both recomputed,
+   * exactly as a forger holding the committed parser (but not the signing secret)
+   * could. Such an export passes parsing and integrity — only the append token
+   * can distinguish it from a genuine one. */
+  function forgeSelfConsistentExport(mutate: (exp: Record<string, unknown>) => void): string {
+    const exp = JSON.parse(baseExportJson());
+    mutate(exp);
+    const machineContent = {
+      resultSchemaVersion: exp.generatedFrom.resultSchemaVersion,
+      mode: exp.mode,
+      profile: exp.profile,
+      run: exp.run,
+      declaredFacts: exp.declaredFacts,
+      evidenceAssessments: exp.evidenceAssessments,
+      observations: exp.observations,
+      findings: exp.findings,
+      versionManifest: exp.versionManifest,
+      advisoryNotice: exp.advisoryNotice,
+      humanDispositionHistory: exp.humanDispositionHistory,
+    };
+    const machineResultId = deriveMachineResultId(machineContent as never);
+    const built = buildJsonExport({ machineResultId, ...machineContent } as never);
+    if (!built.ok) throw new Error("rebuild failed");
+    const verified = verifyExportIntegrity(built.value);
+    if (!verified.ok) throw new Error("verify failed");
+    return serializeExportCanonical(verified.value);
+  }
+
+  it("permits an append with a valid server-issued token", () => {
+    const exportJson = baseExportJson();
+    const out = appendDispositionToResult(req({ exportJson, appendToken: tokenFor(exportJson) }));
+    expect(out.ok).toBe(true);
+  });
+
+  it("rejects a missing append token", () => {
+    const out = appendDispositionToResult(req({ appendToken: "" }));
+    expect(out.ok).toBe(false);
+    if (!out.ok) expect(out.error.code).toBe("MISSING_APPEND_TOKEN");
+  });
+
+  it("rejects altered machine content presented with the old token", () => {
+    const original = baseExportJson();
+    const oldToken = tokenFor(original);
+    // A self-consistent forgery: machine content changed, id + checksum rebuilt.
+    const forged = forgeSelfConsistentExport((exp) => {
+      (exp.observations as { brandName: { rawText: string } }).brandName.rawText = "FORGED MARK";
+    });
+    const out = appendDispositionToResult(req({ exportJson: forged, appendToken: oldToken }));
+    expect(out.ok).toBe(false);
+    // The token is for the original id; the recomputed id differs, so it fails.
+    if (!out.ok) expect(out.error.code).toBe("INVALID_APPEND_TOKEN");
+  });
+
+  it("rejects altered content even when its own id and checksum are recomputed", () => {
+    // The forgery is fully self-consistent: machine content changed, and both the
+    // machine-result id and the integrity checksum recomputed to match. It passes
+    // parsing/integrity but the attacker cannot sign a token for the new id.
+    const forged = forgeSelfConsistentExport((exp) => {
+      (exp.observations as { brandName: { rawText: string } }).brandName.rawText = "TAMPERED";
+    });
+    const attackerToken = createHmac("sha256", "attacker-key")
+      .update(`append-token.v1:${machineIdOf(forged)}`)
+      .digest("hex");
+    const attacked = appendDispositionToResult(
+      req({ exportJson: forged, appendToken: attackerToken }),
+    );
+    expect(attacked.ok).toBe(false);
+    if (!attacked.ok) expect(attacked.error.code).toBe("INVALID_APPEND_TOKEN");
+  });
+
+  it("rejects a token generated with a different signing key", () => {
+    const exportJson = baseExportJson();
+    const attackerToken = createHmac("sha256", "some-other-key")
+      .update(`append-token.v1:${machineIdOf(exportJson)}`)
+      .digest("hex");
+    const out = appendDispositionToResult(req({ exportJson, appendToken: attackerToken }));
+    expect(out.ok).toBe(false);
+    if (!out.ok) expect(out.error.code).toBe("INVALID_APPEND_TOKEN");
+  });
+
+  it("rejects a valid token issued for a different machine result", () => {
+    // A token for some other machine-result id must not authorize this one.
+    const foreignToken = issueAppendToken("precheck-result.v1-" + "0".repeat(64));
+    if (!foreignToken.ok) throw new Error("issue failed");
+    const out = appendDispositionToResult(
+      req({ exportJson: baseExportJson(), appendToken: foreignToken.token }),
+    );
+    expect(out.ok).toBe(false);
+    if (!out.ok) expect(out.error.code).toBe("INVALID_APPEND_TOKEN");
+  });
+
+  it("permits successive appends and keeps the machine id and findings unchanged", () => {
+    const exportJson = baseExportJson();
+    const first = appendDispositionToResult(req({ exportJson, appendToken: tokenFor(exportJson) }));
+    expect(first.ok).toBe(true);
+    if (!first.ok) return;
+    // The refreshed export carries the same machine id, so the same token still
+    // authorizes the next append.
+    const secondExport = first.value.exportJson;
+    expect(first.value.machineResultId).toBe(machineIdOf(exportJson));
+    const second = appendDispositionToResult(
+      req({ exportJson: secondExport, appendToken: first.value.appendToken }),
+    );
+    expect(second.ok).toBe(true);
+    if (!second.ok) return;
+    expect(second.value.humanDispositionHistory).toHaveLength(2);
+    expect(second.value.machineResultId).toBe(first.value.machineResultId);
+    expect(JSON.stringify(second.value.findings)).toBe(JSON.stringify(first.value.findings));
+  });
+
+  it("never leaks the signing secret or token in export or report output", () => {
+    const exportJson = baseExportJson();
+    const out = appendDispositionToResult(req({ exportJson, appendToken: tokenFor(exportJson) }));
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(out.value.exportJson).not.toContain(FIXED_SECRET);
+    expect(out.value.exportJson).not.toContain(out.value.appendToken);
+    expect(out.value.report.html).not.toContain(FIXED_SECRET);
+    expect(out.value.report.html).not.toContain(out.value.appendToken);
+  });
+});
+
 describe("POST /api/precheck/disposition", () => {
   function httpReq(body: unknown): Request {
     return new Request("http://localhost/api/precheck/disposition", {
@@ -146,9 +297,11 @@ describe("POST /api/precheck/disposition", () => {
   }
 
   it("appends a disposition and returns the refreshed result", async () => {
+    const exportJson = baseExportJson();
     const res = await POST(
       httpReq({
-        exportJson: baseExportJson(),
+        exportJson,
+        appendToken: tokenFor(exportJson),
         actorId: "reviewer-2",
         decision: "correction_requested",
         reasonCode: "FIX_TYPO",
@@ -161,6 +314,21 @@ describe("POST /api/precheck/disposition", () => {
     expect(body.data.humanDispositionHistory).toHaveLength(1);
     // recordedAt is generated server-side at the workflow boundary.
     expect(body.data.humanDispositionHistory[0].recordedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    // The refreshed response still carries an append token for the next append.
+    expect(typeof body.data.appendToken).toBe("string");
+    expect(body.data.appendToken.length).toBeGreaterThan(0);
+  });
+
+  it("rejects a non-object JSON body (null, array, primitives) with a safe 400", async () => {
+    for (const primitive of [null, [1, 2], "a string", 42, true]) {
+      const res = await POST(httpReq(primitive));
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.ok).toBe(false);
+      expect(body.error.code).toBe("INVALID_DISPOSITION");
+      // No stack trace or TypeError leaks from a non-object body.
+      expect(JSON.stringify(body)).not.toMatch(/TypeError|at Object|\/Users\//);
+    }
   });
 
   it("rejects a decision outside the bounded internal-workflow set", async () => {

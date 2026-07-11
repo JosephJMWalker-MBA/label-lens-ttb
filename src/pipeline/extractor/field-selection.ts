@@ -42,6 +42,13 @@ interface Candidate {
   regionName: string;
   /** Original-space text height; a typographic prominence proxy for brand art. */
   prominence: number;
+  /**
+   * Conservative brand classification of the line (brand selection only).
+   * "excluded" lines are never brand evidence; "positive" lines carry an
+   * explicit brand-presentation signal; "plausible" lines are front-facing but
+   * not positively distinguishable as a brand. Undefined for non-brand fields.
+   */
+  brandClass?: BrandClass;
 }
 
 /** An observation plus the region the selected value came from (for provenance). */
@@ -218,8 +225,116 @@ const BRAND_PROMINENCE_RATIO = 0.8;
 /** A brand mark is short; longer lines are prose/back-label copy, not a brand. */
 const MAX_BRAND_WORDS = 4;
 
+/**
+ * Conservative brand-line classification:
+ *  - "excluded": positively identifiable as NOT brand presentation (domain/URL
+ *    syntax, or a line that is entirely wine varietal/designation wording).
+ *  - "positive": carries an explicit brand-presentation signal (a possessive
+ *    mark or a recognized brand-entity designator).
+ *  - "plausible": a front-facing line that could be a brand but is not
+ *    positively distinguishable as one (a slogan, appellation, decorative or
+ *    otherwise unclassified short line).
+ */
+type BrandClass = "excluded" | "positive" | "plausible";
+
+/**
+ * Recognized wine varietal and designation wording. A line composed only of
+ * these tokens is a varietal/designation statement, not a brand presentation.
+ * (Recognition is used solely to withhold brand evidence — it never emits a
+ * varietal/designation finding, which is out of this slice's scope.)
+ */
+const VARIETAL_OR_DESIGNATION = new Set([
+  "cabernet",
+  "sauvignon",
+  "merlot",
+  "chardonnay",
+  "pinot",
+  "noir",
+  "grigio",
+  "gris",
+  "zinfandel",
+  "syrah",
+  "shiraz",
+  "malbec",
+  "riesling",
+  "semillon",
+  "tempranillo",
+  "sangiovese",
+  "nebbiolo",
+  "grenache",
+  "viognier",
+  "chenin",
+  "blanc",
+  "rose",
+  "moscato",
+  "muscat",
+  "gewurztraminer",
+  "blend",
+  "red",
+  "white",
+  "reserve",
+  "reserva",
+  "vintage",
+  "brut",
+  "rouge",
+  "wine",
+  "table",
+]);
+
+/**
+ * Recognized brand-entity designators. Their presence is an explicit positive
+ * signal that a short front-facing line is a brand presentation rather than a
+ * slogan, varietal, or decorative phrase.
+ */
+const BRAND_DESIGNATOR = new Set([
+  "cellars",
+  "cellar",
+  "estate",
+  "estates",
+  "vineyard",
+  "vineyards",
+  "winery",
+  "wineries",
+]);
+
 function stripWord(text: string): string {
   return text.replace(/[^a-z]/gi, "");
+}
+
+/** Word tokens of a cleaned brand value (letters/digits only), lowercased. */
+function brandTokens(value: string): string[] {
+  return value
+    .split(" ")
+    .map((t) => t.replace(/[^a-z0-9]/gi, "").toLowerCase())
+    .filter((t) => t.length > 0);
+}
+
+/** Obvious domain/URL syntax (e.g. ACME.COM, www.acme.wine) is never a brand. */
+function isDomainLike(value: string): boolean {
+  if (/^(?:https?:\/\/|www\.)/i.test(value.trim())) return true;
+  return value
+    .split(" ")
+    .some((token) => /^[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,}$/i.test(token.trim()));
+}
+
+/** A line whose every alphabetic token is varietal/designation wording. */
+function isPurelyVarietalOrDesignation(value: string): boolean {
+  const alpha = brandTokens(value).filter((t) => /[a-z]/.test(t));
+  return alpha.length > 0 && alpha.every((t) => VARIETAL_OR_DESIGNATION.has(t));
+}
+
+/** An explicit positive brand signal: a possessive mark or a brand designator. */
+function hasPositiveBrandSignal(value: string): boolean {
+  if (/[a-z]['’]s\b/i.test(value)) return true;
+  return brandTokens(value).some((t) => BRAND_DESIGNATOR.has(t));
+}
+
+/** Conservatively classify a cleaned brand-line value. */
+function classifyBrandLine(value: string): BrandClass {
+  if (isDomainLike(value)) return "excluded";
+  if (isPurelyVarietalOrDesignation(value)) return "excluded";
+  if (hasPositiveBrandSignal(value)) return "positive";
+  return "plausible";
 }
 
 /** A producer/bottler line ("… BOTTLED BY …") names an entity, not the brand. */
@@ -247,6 +362,10 @@ export function selectBrandObservation(results: RegionOcrResult[]): FieldSelecti
       if (value.length < 2 || !/[a-z]/i.test(value)) continue;
       // A brand mark is short; longer lines are back-label prose, not a brand.
       if (value.split(" ").length > MAX_BRAND_WORDS) continue;
+      // Positively-not-brand lines (domain syntax, pure varietal/designation)
+      // are never selectable brand evidence, not even as alternates.
+      const brandClass = classifyBrandLine(value);
+      if (brandClass === "excluded") continue;
       const geometry = geometryFor(line, result);
       candidates.push({
         value,
@@ -256,6 +375,7 @@ export function selectBrandObservation(results: RegionOcrResult[]): FieldSelecti
         words: line,
         regionName: result.regionName,
         prominence: geometry.height,
+        brandClass,
       });
     }
   }
@@ -314,9 +434,32 @@ function buildBrandObservation(candidates: Candidate[]): FieldSelection {
     };
   }
 
+  // Conservative authority gate: an uncontested leading candidate becomes
+  // authoritative OBSERVED brand evidence only when it carries an explicit
+  // positive brand signal and clears the confidence floor. A plausible but not
+  // positively distinguishable line (a slogan, appellation, or decorative
+  // phrase) stays AMBIGUOUS — its value, geometry, and alternates are preserved
+  // for a human, but it never silently drives a brand match.
+  const positivelyDistinguished =
+    best.brandClass === "positive" && best.confidence >= LOW_CONFIDENCE_THRESHOLD;
+  if (!positivelyDistinguished) {
+    return {
+      observation: {
+        state: "AMBIGUOUS",
+        value: best.value,
+        normalizedValue: best.value,
+        rawText: best.rawText,
+        confidence: best.confidence,
+        geometry: best.geometry,
+        alternates: ranked.slice(1).map(alternateFrom),
+      },
+      sourceRegion: best.regionName,
+    };
+  }
+
   return {
     observation: {
-      state: best.confidence < LOW_CONFIDENCE_THRESHOLD ? "LOW_CONFIDENCE" : "OBSERVED",
+      state: "OBSERVED",
       value: best.value,
       normalizedValue: best.value,
       rawText: best.rawText,

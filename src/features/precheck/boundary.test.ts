@@ -48,4 +48,16 @@ describe("browser component boundary", () => {
       );
     }
   });
+
+  it("contains no append-signing implementation or secret reference", () => {
+    for (const file of SOURCE_FILES) {
+      const source = sourceOf(file);
+      // The browser only carries the opaque token string through as
+      // `response.appendToken` — never any HMAC, secret, or signing module.
+      expect(source).not.toMatch(/createHmac|LABEL_LENS_APPEND_SIGNING_KEY|append-token/i);
+      for (const path of importsOf(source)) {
+        expect(path).not.toMatch(/append-token/);
+      }
+    }
+  });
 });

@@ -125,7 +125,16 @@ async function main() {
     const port = await freePort();
     child = spawn("node", ["server.js"], {
       cwd: relocated,
-      env: { ...process.env, PORT: String(port), HOSTNAME: "127.0.0.1", NODE_ENV: "production" },
+      env: {
+        ...process.env,
+        PORT: String(port),
+        HOSTNAME: "127.0.0.1",
+        NODE_ENV: "production",
+        // Production requires an explicit append-signing secret; a configured
+        // deployment supplies one. This is a throwaway smoke value, not a
+        // committed production secret.
+        LABEL_LENS_APPEND_SIGNING_KEY: "relocation-smoke-append-signing-key-value",
+      },
       stdio: ["ignore", "pipe", "pipe"],
     });
     let serverLog = "";
@@ -153,6 +162,13 @@ async function main() {
     const ocr = data.observations?.provenance?.ocrEngine;
     if (!ocr || ocr.engineId !== "tesseract.js")
       fail(`expected tesseract.js engine provenance, got ${JSON.stringify(ocr)}`);
+
+    // A server-issued append-authorization token accompanies the pre-check
+    // response, and no signing secret leaks into the payload.
+    if (typeof data.appendToken !== "string" || data.appendToken.length === 0)
+      fail("expected a server-issued append token in the response.");
+    if (res.text.includes("relocation-smoke-append-signing-key-value"))
+      fail("response leaks the append signing secret.");
 
     // 7. No checkout absolute path in the response or the server error log.
     if (res.text.includes(CHECKOUT_MARKER)) fail("response leaks the checkout OCR asset path.");

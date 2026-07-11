@@ -80,6 +80,9 @@ export function DispositionSection({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           exportJson: response.exportJson,
+          // Opaque server-issued token carried from the pre-check response; the
+          // browser never computes or stores any signing secret.
+          appendToken: response.appendToken,
           actorId,
           decision,
           reasonCode,

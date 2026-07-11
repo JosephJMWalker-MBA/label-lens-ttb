@@ -31,6 +31,13 @@ export interface PrecheckServiceRequest {
 /** Bounded, render-only projection of one field observation and its provenance. */
 export interface PrecheckServiceResponse {
   machineResultId: string;
+  /**
+   * Opaque server-issued authorization token that must accompany any later
+   * disposition append for this machine result. It is an HMAC over the
+   * machine-result id (never a checksum), carries no secret, and is stable
+   * across successive appends because the machine content is immutable.
+   */
+  appendToken: string;
   profile: { id: string; version: string };
   advisoryNotice: AdvisoryNotice;
   declaredFacts: {
@@ -62,6 +69,11 @@ export interface PrecheckServiceResponse {
 export interface PrecheckDispositionRequest {
   /** The canonical JSON export text of the result being dispositioned. */
   exportJson: string;
+  /**
+   * The server-issued append-authorization token returned with the original
+   * pre-check response for this machine result. Required for every append.
+   */
+  appendToken: string;
   actorId: string;
   decision: ResultDispositionDecision;
   reasonCode: string;
@@ -92,6 +104,9 @@ export type PrecheckServiceErrorCode =
   | "INVALID_SUBMITTED_RESULT"
   | "INVALID_DISPOSITION"
   | "INVALID_DISPOSITION_REFERENCE"
+  | "MISSING_APPEND_TOKEN"
+  | "INVALID_APPEND_TOKEN"
+  | "APPEND_SIGNING_KEY_UNAVAILABLE"
   | "REPORT_FAILED"
   // Bounded resource-control failures.
   | "REQUEST_TOO_LARGE"

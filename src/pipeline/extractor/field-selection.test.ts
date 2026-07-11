@@ -107,11 +107,11 @@ function tallLine(texts: [string, number][], y: number, height: number): OcrWord
 }
 
 describe("selectBrandObservation", () => {
-  it("selects a prominent brand-facing line and never the BOTTLED BY producer entity", () => {
+  it("selects a positively-signalled brand line and never the BOTTLED BY producer entity", () => {
     const brandArt = tallLine(
       [
         ["ACME", 92],
-        ["RESERVE", 93],
+        ["ESTATE", 93],
       ],
       10,
       40,
@@ -129,15 +129,17 @@ describe("selectBrandObservation", () => {
     const { observation, sourceRegion } = selectBrandObservation([
       region([...brandArt, ...bottler]),
     ]);
+    // "ESTATE" is an explicit brand-entity designator, so this line is
+    // positively distinguishable brand presentation.
     expect(observation.state).toBe("OBSERVED");
-    expect(observation.value).toBe("ACME RESERVE");
+    expect(observation.value).toBe("ACME ESTATE");
     expect(sourceRegion).toBe("full-image");
     // The bottler entity must never surface as the brand or an alternate value.
     const allValues = [observation.value, ...observation.alternates.map((a) => a.value)];
     expect(allValues).not.toContain("OTHER WINERY");
   });
 
-  it("reads pixel words, not any answer key: a different brand line yields that brand", () => {
+  it("reads pixel words, not any answer key: a different brand line yields that value", () => {
     const words = tallLine(
       [
         ["ZEPHYR", 92],
@@ -147,11 +149,13 @@ describe("selectBrandObservation", () => {
       40,
     );
     const { observation } = selectBrandObservation([region(words)]);
-    expect(observation.state).toBe("OBSERVED");
+    // No positive brand signal (no possessive or designator), so the value is
+    // preserved but the line is not authoritative brand evidence.
+    expect(observation.state).toBe("AMBIGUOUS");
     expect(observation.value).toBe("ZEPHYR HILLS");
   });
 
-  it("keeps a single clean brand-region candidate selectable", () => {
+  it("keeps a single clean possessive brand-region candidate selectable", () => {
     const words = tallLine(
       [
         ["STONE'S", 90],
@@ -161,8 +165,128 @@ describe("selectBrandObservation", () => {
       40,
     );
     const { observation } = selectBrandObservation([region(words)]);
+    // A possessive mark is an explicit positive brand-presentation signal.
     expect(observation.state).toBe("OBSERVED");
     expect(observation.value).toBe("STONE'S THROW");
+  });
+
+  it("does not turn a sole prominent wine varietal line into brand evidence", () => {
+    const words = tallLine(
+      [
+        ["CABERNET", 93],
+        ["SAUVIGNON", 92],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
+  });
+
+  it("does not turn a sole prominent marketing slogan into OBSERVED brand evidence", () => {
+    const words = tallLine(
+      [
+        ["LIVE", 93],
+        ["BOLDLY", 92],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    // A slogan is plausible but not positively distinguishable as a brand.
+    expect(observation.state).toBe("AMBIGUOUS");
+    expect(observation.value).toBe("LIVE BOLDLY");
+  });
+
+  it("does not turn a sole prominent website into brand evidence", () => {
+    const words = tallLine([["ACME.COM", 93]], 10, 40);
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
+  });
+
+  it("does not turn vintage-only text into brand evidence", () => {
+    const words = tallLine([["2019", 95]], 10, 40);
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
+  });
+
+  it("does not turn a sole prominent appellation line into OBSERVED brand evidence", () => {
+    const words = tallLine(
+      [
+        ["NAPA", 93],
+        ["VALLEY", 92],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("AMBIGUOUS");
+    expect(observation.value).toBe("NAPA VALLEY");
+  });
+
+  it("a marketing slogan cannot outrank a genuine positively-signalled brand", () => {
+    const slogan = tallLine(
+      [
+        ["LIVE", 90],
+        ["BOLDLY", 90],
+      ],
+      120,
+      18,
+    );
+    const brand = tallLine(
+      [
+        ["BETA", 92],
+        ["CELLARS", 92],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region([...brand, ...slogan])]);
+    expect(observation.state).toBe("OBSERVED");
+    expect(observation.value).toBe("BETA CELLARS");
+    expect(observation.value).not.toBe("LIVE BOLDLY");
+  });
+
+  it("a varietal line cannot outrank a genuine possessive brand", () => {
+    const varietal = tallLine(
+      [
+        ["CABERNET", 90],
+        ["SAUVIGNON", 90],
+      ],
+      120,
+      18,
+    );
+    const brand = tallLine(
+      [
+        ["STONE'S", 92],
+        ["THROW", 92],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region([...brand, ...varietal])]);
+    expect(observation.state).toBe("OBSERVED");
+    expect(observation.value).toBe("STONE'S THROW");
+  });
+
+  it("a website line cannot outrank a genuine designator brand", () => {
+    const site = tallLine([["ACME.COM", 90]], 120, 18);
+    const brand = tallLine(
+      [
+        ["ACME", 92],
+        ["ESTATE", 92],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region([...brand, ...site])]);
+    expect(observation.state).toBe("OBSERVED");
+    expect(observation.value).toBe("ACME ESTATE");
+    const allValues = [observation.value, ...observation.alternates.map((a) => a.value)];
+    expect(allValues).not.toContain("ACME.COM");
   });
 
   it("returns NOT_OBSERVED for producer-only text with no readable brand", () => {

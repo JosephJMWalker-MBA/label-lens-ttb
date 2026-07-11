@@ -13,9 +13,17 @@ const STATUS_BY_CODE: Partial<Record<PrecheckServiceError["code"], number>> = {
   INVALID_SUBMITTED_RESULT: 422,
   INVALID_DISPOSITION: 400,
   INVALID_DISPOSITION_REFERENCE: 400,
+  MISSING_APPEND_TOKEN: 401,
+  INVALID_APPEND_TOKEN: 403,
+  APPEND_SIGNING_KEY_UNAVAILABLE: 500,
   EXPORT_CHECKSUM_FAILED: 500,
   REPORT_FAILED: 500,
 };
+
+/** A parsed JSON body is usable only if it is a plain (non-null, non-array) object. */
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
 
 function errorResponse(code: PrecheckServiceError["code"], message: string): Response {
   return Response.json(
@@ -43,12 +51,18 @@ function asOptionalStringArray(value: unknown): string[] | undefined {
  * workflow boundary — never inside deterministic machine-result assembly.
  */
 export async function POST(request: Request): Promise<Response> {
-  let body: Record<string, unknown>;
+  let parsed: unknown;
   try {
-    body = (await request.json()) as Record<string, unknown>;
+    parsed = await request.json();
   } catch {
     return errorResponse("INVALID_DISPOSITION", "Send a JSON disposition request.");
   }
+  // Reject null, arrays, and JSON primitives before touching any field, so a
+  // non-object body can never dereference into an uncaught TypeError.
+  if (!isPlainObject(parsed)) {
+    return errorResponse("INVALID_DISPOSITION", "Send a JSON disposition object.");
+  }
+  const body = parsed;
 
   const decision = asString(body.decision);
   if (!RESULT_DISPOSITION_DECISIONS.includes(decision as never)) {
@@ -67,6 +81,7 @@ export async function POST(request: Request): Promise<Response> {
   const fileIn = (body.file as Record<string, unknown>) ?? {};
   const serviceRequest: PrecheckDispositionRequest = {
     exportJson: asString(body.exportJson),
+    appendToken: asString(body.appendToken),
     actorId: asString(body.actorId),
     decision: decision as PrecheckDispositionRequest["decision"],
     reasonCode: asString(body.reasonCode),

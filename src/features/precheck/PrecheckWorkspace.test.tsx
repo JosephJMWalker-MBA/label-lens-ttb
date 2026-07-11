@@ -27,6 +27,7 @@ function finding(
 
 const CANNED: PrecheckServiceResponse = {
   machineResultId: "precheck-result.v1-" + "a".repeat(64),
+  appendToken: "f".repeat(64),
   profile: { id: "wine-precheck", version: "1.0.0" },
   advisoryNotice: {
     noticeId: "precheck-advisory-notice",
@@ -403,6 +404,8 @@ describe("PrecheckWorkspace — human disposition", () => {
     // The client submits the canonical export it received; no findings field.
     const body = JSON.parse(dispositionCall[1].body as string);
     expect(body.exportJson).toBe(CANNED.exportJson);
+    // The client carries the opaque server-issued append token back verbatim.
+    expect(body.appendToken).toBe(CANNED.appendToken);
     expect(body.findings).toBeUndefined();
   });
 
