@@ -106,8 +106,36 @@ Expected identity of the OCR-benchmark image
 - **Dimensions:** 2404 × 979
 - **SHA-256:** `0b0ccec13bf6c533ec7928b017b140a0213fb4555812fea81d71872adb453713`
 
-The asset-packaging tests fail clearly if this file, its identity, or the
-vendored language data is absent.
+The reference PNG (`label.png`, 494 × 214) is a separate, earlier lower-resolution
+derivative used only for deterministic domain-layer tests; its SHA-256 is
+`6829add3d99c61851028b2422bdd9672bb975183d198de5e280bc961f4a489e7`.
+
+### Source-chain provenance
+
+The fixture's `manifest.json` records a strict source chain
+(`label-fixture-manifest.v2`) so an independent reviewer can trace each
+derivative:
+
+- **Source:** the Alcohol and Tobacco Tax and Trade Bureau **Public COLA
+  Registry**, TTB ID **24205001000905**, located via the public registry.
+- **What is known:** each committed derivative's role, on-disk dimensions, byte
+  size, SHA-256, ordered transformation steps, privacy exclusions, and that **no
+  pixels or text were manually corrected**.
+- **What was not retained:** the exact external source file's bytes, media type,
+  dimensions, and retrieval timestamp are recorded explicitly as `not_retained`
+  or `unknown` — so the repository **cannot and does not claim original
+  design-source identity** or a source-byte digest. The relationship between the
+  two derivatives is recorded as `relationship_not_proven`.
+- **Verify the committed hashes:** `shasum -a 256
+  tests/fixtures/precheck/m-cellars-24205001000905/*.jpeg` (and `*.png`) must
+  match the digests above; `fixture-manifest.test.ts` cross-checks the manifest
+  against the files on disk.
+- **Availability:** public registry availability and URL formats may change; no
+  permanent direct asset URL is claimed.
+
+This fixture is one public approved-label example for demonstration; it is **not
+generally representative of all wine labels**. The asset-packaging tests fail
+clearly if the file, its identity, or the vendored language data is absent.
 
 ## Privacy
 
@@ -116,16 +144,31 @@ validated and analyzed in memory and are **not persisted**. No image bytes or
 declared facts are logged, and error responses are user-safe (no stack traces,
 absolute paths, environment values, or OCR internals).
 
-## Deferred / out of scope for this slice
+## Implemented scope (Slice 3)
 
-- `src/domain/rules/warning-text.ts` holds the verbatim statutory
-  government-warning constant. It is currently **unreferenced** and retained as
-  deferred groundwork; government-warning execution is **not** implemented in
-  this slice and is intentionally not wired in.
+What this slice actually does today:
+
+- **Category:** domestic wine only.
+- **Extracted fields:** exactly two — the brand name and the alcohol statement.
+  The brand may be **AMBIGUOUS** (the M Cellars brand mark is not cleanly
+  recoverable), which the brand rule reports as **NEEDS_REVIEW**, not a pass.
+- **Rules:** bounded wine rules. Three actual-content-dependent rules remain
+  **not run** (they require actual alcohol content that label artwork cannot
+  supply) and are reported as `not_run_external_dependency`.
+- **Workflow:** human disposition (append-only) and a readable **HTML** report
+  export are implemented, alongside the checksum-verified JSON export.
+- **No overall compliance verdict, status, percentage, or score exists.**
+
+Explicitly **not** implemented (no misleading capability is claimed):
+
+- **Government-warning execution is not implemented.** There is no
+  government-warning validation rule and no statutory warning-text constant in
+  the codebase.
+- **No proof normalization** participates in the wine pre-check; proof is
+  rejected as an invalid wine alcohol form, never normalized to an ABV.
 - Also out of scope: PDF export, persistence/auth, batch processing, cloud/
-  external OCR fallback, additional extracted fields, additional regulatory
-  rules, actual-alcohol-content ingestion, and any overall compliance status or
-  score.
+  external OCR fallback, additional extracted fields beyond the two above,
+  additional regulatory rules, and actual-alcohol-content ingestion.
 
 ## What this slice does not claim
 

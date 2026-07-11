@@ -4,45 +4,51 @@ import { err, ok, type Result } from "@/shared/result";
 
 import {
   FIXTURE_MANIFEST_SCHEMA_VERSION,
+  NOT_RETAINED,
+  RELATIONSHIP_NOT_PROVEN,
+  UNKNOWN,
   type FixtureManifest,
   type FixtureManifestError,
 } from "./fixture-manifest.types";
 
 const SHA256 = /^[0-9a-f]{64}$/;
+const sha256 = z.string().regex(SHA256, "must be a 64-character hex SHA-256");
+const url = z.string().url();
+const instantOrUnknown = z.union([z.string().datetime({ offset: true }), z.literal(UNKNOWN)]);
 
-const sourceSchema = z
+const externalSourceSchema = z
   .object({
-    kind: z.literal("public-cola-certificate"),
-    reference: z.string().min(1),
+    authority: z.literal("Alcohol and Tobacco Tax and Trade Bureau"),
+    registry: z.literal("Public COLA Registry"),
+    ttbId: z.string().min(1),
+    applicationDetailUrl: url,
+    printableLabelUrl: z.union([url, z.literal(UNKNOWN)]),
+    retrievalMethod: z.enum([
+      "browser-download",
+      "public-printable-view",
+      "chat-browser-attachment-transfer",
+      UNKNOWN,
+    ]),
+    retrievedAt: instantOrUnknown,
+    sourceMediaType: z.union([z.string().min(1), z.literal(UNKNOWN)]),
+    sourceDimensions: z.union([
+      z
+        .object({ width: z.number().int().positive(), height: z.number().int().positive() })
+        .strict(),
+      z.literal(NOT_RETAINED),
+    ]),
+    sourceSha256: z.union([sha256, z.literal(NOT_RETAINED)]),
     sourceBytesRetained: z.boolean(),
-    sourceSha256: z.string().regex(SHA256).nullable(),
-    note: z.string().min(1),
-    retrievedAt: z.string().datetime({ offset: true }).optional(),
+    privacyReview: z.string().min(1),
+    publicRecordLimitations: z.string().min(1),
+    availabilityCaveat: z.string().min(1),
   })
   .strict();
 
-const derivativeSchema = z
+const parentSchema = z
   .object({
-    kind: z.literal("sanitized-label-crop"),
-    path: z.string().min(1),
-    mediaType: z.literal("image/png"),
-    sha256: z.string().regex(SHA256),
-    pixelWidth: z.number().int().positive(),
-    pixelHeight: z.number().int().positive(),
-    byteSize: z.number().int().positive(),
-  })
-  .strict();
-
-const ocrBenchmarkDerivativeSchema = z
-  .object({
-    kind: z.literal("higher-resolution-ocr-source"),
-    path: z.string().min(1),
-    mediaType: z.literal("image/jpeg"),
-    sha256: z.string().regex(SHA256),
-    pixelWidth: z.number().int().positive(),
-    pixelHeight: z.number().int().positive(),
-    byteSize: z.number().int().positive(),
-    note: z.string().min(1),
+    kind: z.enum(["external-source", "repository-derivative", UNKNOWN]),
+    ref: z.string().min(1),
   })
   .strict();
 
@@ -67,6 +73,32 @@ const privacyExclusionSchema = z
     check: z.string().min(1),
     result: z.enum(["excluded", "not-present"]),
     toolOrRuleVersion: z.string().min(1),
+  })
+  .strict();
+
+const derivativeSchema = z
+  .object({
+    derivativeId: z.string().min(1),
+    filename: z.string().min(1),
+    role: z.enum(["reference-crop", "ocr-benchmark"]),
+    mediaType: z.enum(["image/png", "image/jpeg"]),
+    pixelWidth: z.number().int().positive(),
+    pixelHeight: z.number().int().positive(),
+    byteSize: z.number().int().positive(),
+    sha256,
+    parent: parentSchema,
+    transformationType: z.enum([
+      "crop",
+      "resize",
+      "re-encode",
+      "browser-client-representation",
+      "unchanged-bytes",
+      UNKNOWN,
+    ]),
+    transformationSteps: z.array(transformationStepSchema).min(1),
+    manuallyCorrectedPixelsOrText: z.boolean(),
+    privacyExclusions: z.array(privacyExclusionSchema).min(1),
+    intendedUse: z.string().min(1),
   })
   .strict();
 
@@ -97,34 +129,90 @@ export const fixtureManifestSchema = z
     schemaVersion: z.literal(FIXTURE_MANIFEST_SCHEMA_VERSION),
     ttbId: z.string().min(1),
     beverageCategory: z.literal("wine"),
-    source: sourceSchema,
-    derivative: derivativeSchema,
-    ocrBenchmarkDerivative: ocrBenchmarkDerivativeSchema.optional(),
-    transformationChain: z.array(transformationStepSchema).min(1),
-    privacyExclusions: z.array(privacyExclusionSchema).min(1),
+    sourceChain: z
+      .object({
+        externalSource: externalSourceSchema,
+        derivatives: z.array(derivativeSchema).min(1),
+      })
+      .strict(),
     truthLabels: truthLabelsSchema,
     provenanceNotes: z.array(provenanceNoteSchema).default([]),
   })
   .strict()
   .superRefine((manifest, ctx) => {
-    // Honesty rule: a source-byte hash may not be claimed without retained bytes.
-    if (!manifest.source.sourceBytesRetained && manifest.source.sourceSha256 !== null) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["source", "sourceSha256"],
-        message: "sourceSha256 must be null unless the original certificate bytes are retained.",
-      });
+    const issue = (path: (string | number)[], message: string) =>
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path, message });
+
+    const src = manifest.sourceChain.externalSource;
+    // Honesty rule: a source digest/dimensions may not be claimed without bytes.
+    if (!src.sourceBytesRetained) {
+      if (src.sourceSha256 !== NOT_RETAINED) {
+        issue(
+          ["sourceChain", "externalSource", "sourceSha256"],
+          "must be not_retained when source bytes are not retained.",
+        );
+      }
+      if (src.sourceDimensions !== NOT_RETAINED) {
+        issue(
+          ["sourceChain", "externalSource", "sourceDimensions"],
+          "must be not_retained when source bytes are not retained.",
+        );
+      }
     }
 
-    // Transformation chain must be contiguous 1..n so no step is silently dropped.
-    manifest.transformationChain.forEach((step, index) => {
-      if (step.order !== index + 1) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["transformationChain", index, "order"],
-          message: `Transformation steps must be ordered contiguously from 1; expected ${index + 1}.`,
-        });
+    // Unique derivative ids and filenames.
+    const ids = new Set<string>();
+    const filenames = new Set<string>();
+    const derivatives = manifest.sourceChain.derivatives;
+    derivatives.forEach((d, i) => {
+      if (ids.has(d.derivativeId)) {
+        issue(["sourceChain", "derivatives", i, "derivativeId"], "duplicate derivative id.");
       }
+      ids.add(d.derivativeId);
+      if (filenames.has(d.filename)) {
+        issue(["sourceChain", "derivatives", i, "filename"], "duplicate derivative filename.");
+      }
+      filenames.add(d.filename);
+    });
+
+    // Parent relationship resolution and explicit-unknown discipline.
+    derivatives.forEach((d, i) => {
+      const p = d.parent;
+      if (p.kind === "repository-derivative") {
+        if (p.ref === d.derivativeId) {
+          issue(
+            ["sourceChain", "derivatives", i, "parent", "ref"],
+            "a derivative cannot be its own parent.",
+          );
+        } else if (!ids.has(p.ref)) {
+          issue(
+            ["sourceChain", "derivatives", i, "parent", "ref"],
+            `repository parent ${p.ref} does not resolve.`,
+          );
+        }
+      } else if (p.kind === "external-source") {
+        if (p.ref !== "external-source") {
+          issue(
+            ["sourceChain", "derivatives", i, "parent", "ref"],
+            "external-source parent ref must be 'external-source'.",
+          );
+        }
+      } else if (p.ref !== RELATIONSHIP_NOT_PROVEN) {
+        issue(
+          ["sourceChain", "derivatives", i, "parent", "ref"],
+          "unknown parent must use relationship_not_proven.",
+        );
+      }
+
+      // Transformation steps must be contiguous from 1.
+      d.transformationSteps.forEach((step, si) => {
+        if (step.order !== si + 1) {
+          issue(
+            ["sourceChain", "derivatives", i, "transformationSteps", si, "order"],
+            `steps must be ordered from 1; expected ${si + 1}.`,
+          );
+        }
+      });
     });
   });
 
@@ -135,6 +223,24 @@ void _typeCheck;
 export function validateFixtureManifest(
   candidate: unknown,
 ): Result<FixtureManifest, FixtureManifestError> {
+  // Reject an unsupported/old manifest version explicitly and clearly.
+  if (
+    candidate &&
+    typeof candidate === "object" &&
+    "schemaVersion" in candidate &&
+    (candidate as { schemaVersion: unknown }).schemaVersion !== FIXTURE_MANIFEST_SCHEMA_VERSION
+  ) {
+    return err({
+      code: "UNSUPPORTED_MANIFEST_VERSION",
+      message: "Fixture manifest schema version is not supported.",
+      issues: [
+        `expected ${FIXTURE_MANIFEST_SCHEMA_VERSION}, found ${String(
+          (candidate as { schemaVersion: unknown }).schemaVersion,
+        )}`,
+      ],
+    });
+  }
+
   const parsed = fixtureManifestSchema.safeParse(candidate);
   if (parsed.success) {
     return ok(parsed.data);

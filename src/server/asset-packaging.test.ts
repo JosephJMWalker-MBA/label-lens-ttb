@@ -37,11 +37,12 @@ describe("required runtime assets", () => {
 
   it("keeps the fixture manifest's OCR-benchmark identity in agreement with the file", () => {
     const manifest = JSON.parse(readFileSync(join(FIXTURE_DIR, "manifest.json"), "utf8"));
-    expect(manifest.ocrBenchmarkDerivative.sha256).toBe(EXPECTED_FIXTURE_SHA256);
-    expect(manifest.ocrBenchmarkDerivative.pixelWidth).toBe(EXPECTED_FIXTURE_DIMENSIONS.pixelWidth);
-    expect(manifest.ocrBenchmarkDerivative.pixelHeight).toBe(
-      EXPECTED_FIXTURE_DIMENSIONS.pixelHeight,
+    const benchmark = manifest.sourceChain.derivatives.find(
+      (d: { role: string }) => d.role === "ocr-benchmark",
     );
+    expect(benchmark.sha256).toBe(EXPECTED_FIXTURE_SHA256);
+    expect(benchmark.pixelWidth).toBe(EXPECTED_FIXTURE_DIMENSIONS.pixelWidth);
+    expect(benchmark.pixelHeight).toBe(EXPECTED_FIXTURE_DIMENSIONS.pixelHeight);
   });
 });
 
