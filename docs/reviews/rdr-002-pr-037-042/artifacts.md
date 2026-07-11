@@ -110,6 +110,39 @@ from the local Downloads folder (no conversion, recompression, rename, or edit).
 - **Generation notes:** rendered roadmap graphic; not regenerated or edited.
 - **Interpretation caution:** a presentation aid, not new engineering evidence.
 
+### `RDR-002_Architectural_Audit_Video_Transcript.txt`
+
+- **Format:** timestamped plain-text transcript
+- **Status:** Supplemental
+- **Purpose:** narration accompanying the visual RDR-002 architectural-audit
+  presentation.
+- **SHA-256:** `ecccfd8def64dafeea23e246260dd0f8fe62ce1ccff02088cb148dd28c713bdf`
+- **Byte size:** 7333
+- **Source:** author-supplied transcript of the YouTube presentation
+- **Video URL:** `https://www.youtube.com/watch?v=dnY1y2FUsDM`
+- **Generation notes:** copied verbatim into the repository (timestamps, wording,
+  and paragraph order preserved); **the transcript ends mid-sentence because that
+  is how the supplied transcript ended** — it was not completed or corrected.
+- **Interpretation cautions:** the transcript is presentation language that may
+  overstate the underlying engineering record. Specifically:
+  - "ready for production scaling" is presented as the Builder's claimed
+    position, **not an accepted repository conclusion**;
+  - the system is **advisory** and does not make official regulatory
+    determinations;
+  - "AI hallucinations" is rhetorical shorthand — the production path currently
+    uses **local OCR evidence extraction**, not an LLM decision-maker;
+  - the uncertainty defect returns a typed invalid-shape / `INVALID_RESPONSE`,
+    **not an uncontrolled process crash**;
+  - "proves absolutely nothing" is stronger than the written finding — the
+    precise conclusion is that **one independent real label cannot support
+    representative real-world accuracy claims**;
+  - 618 passing tests demonstrate **broad repository and contract coverage, not
+    statistical representativeness**;
+  - the fixture corpus's synthetic entries **remain useful semantic-regression
+    cases**;
+  - the pause applies to **feature expansion and representative baseline
+    claims**, not to targeted remediation or evidence acquisition.
+
 ## Interpretation cautions
 
 Read all supplemental artifacts with these bounds:

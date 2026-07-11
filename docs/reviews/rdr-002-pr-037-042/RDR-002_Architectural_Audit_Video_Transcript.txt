@@ -1,0 +1,65 @@
+RDR-002 Architectural Audit Video Transcript
+
+Source:
+https://www.youtube.com/watch?v=dnY1y2FUsDM
+
+Status:
+Supplemental generated presentation transcript. This is not the authoritative engineering review.
+
+Authority:
+Where this narration conflicts with source-brief.md, debate-script.md, verdict.md, or next-actions.md, the authoritative Markdown review controls.
+
+Transcript provenance:
+Author-supplied transcript copied verbatim into the repository.
+
+---
+
+0:00The label lens domestic wine pre-check pipeline has reached a critical milestone. The system successfully
+0:088 secondsaccepts an image input and utilizes a local tesseract OCR engine to extract and evaluate label evidence. The scale of this implementation is substantial.
+0:1919 secondsPull requests 37, 41, and 42 have been merged into the main branch, encompassing 128 changed files and over
+0:2929 seconds16,000 lines of new code. Based on the internal metrics, the builder claims the system is ready for production scaling.
+0:3737 secondsThe codebase currently reports 618 passing tests and enforces a rigorously locked fixture corpus contract. Despite
+0:4646 secondsthat flawless test suite, a formal architectural audit designated rubber duck review 002 has evaluated the system
+0:5454 secondsand issued a hard mandate to pause and expand. The audit directly contrasts the builder's verified test coverage against
+1:011 minute, 1 secondunresolved questions regarding the pipelines operational reality. The metrics prove internal consistency, but
+1:091 minute, 9 secondsthey lack the external validation required for deployment. This exposes a tension in software governance,
+1:161 minute, 16 secondsevaluating exactly how a highly tested, technically sound prototype can still be entirely unready to serve as a
+1:241 minute, 24 secondsmeasurement baseline. High unit test counts and strict schema boundaries guarantee that modules function in
+1:311 minute, 31 secondsisolation. Without independent real world evidence feeding into those modules, those identical metrics create
+1:381 minute, 38 secondsan illusion of system readiness. The foundational design pattern of the system relies on ADR00002.
+1:461 minute, 46 secondsThis directive requires a strict separation between probabilistic AI evidence extraction and deterministic regulatory conclusions. A label image
+1:561 minute, 56 secondsenters the local OCR engine for probabilistic processing. It feeds into an analyzer schema which only emits
+2:032 minutes, 3 secondsevidence states like observed or ambiguous, never regulatory conclusions.
+2:082 minutes, 8 secondsDownstream deterministic rules then evaluate this evidence to generate concrete findings isolated from human
+2:152 minutes, 15 secondsworkflows. By enforcing this rigid sequence, the architecture actively prevents probabilistic AI outputs from
+2:232 minutes, 23 secondsimpersonating human authority or fabricating a regulatory pass. This epistemological wall successfully
+2:302 minutes, 30 secondscontains AI hallucinations. However, a strict schema boundary remains dependent on the modules sharing an exact agreed upon vocabulary across every layer.
+2:412 minutes, 41 secondsRound one of the audit bypasses the 618 passing tests by exposing a critical cross-layer defect in that shared
+2:492 minutes, 49 secondsvocabulary. The target is the pipeline's conservative brand name selector. It defends against adversarial attacks by
+2:562 minutes, 56 secondsaggressively excluding unclassified strings from being labeled as authoritative brands. An unclassified string like Napa Valley enters the select brand observation function block.
+3:083 minutes, 8 secondsThe selector assigns it an ambiguous tag and passes it forward with an empty alternates array. It immediately hits a
+3:153 minutes, 15 secondsschema validation barrier which rejects the empty array requiring alternate candidates. The outcome is a hard stop.
+3:233 minutes, 23 secondsThe function attempts to validate the bad input immediately returns an invalid response and destroys what should have
+3:303 minutes, 30 secondsbeen usable system uncertainty. The engineering question is direct. How did a pipeline with over 600 passing tests
+3:383 minutes, 38 secondsallow a systemic failure in its primary data flow? The tests were comprehensive but isolated. The selector tests
+3:463 minutes, 46 secondspre-validated their output before asserting success, while the schema tests asserted their rules entirely separately from the selector's actual
+3:543 minutes, 54 secondsoutput. Adjacent thoroughly tested modules will compile seamlessly into a systemic failure if their shared vocabulary is not verified through
+4:024 minutes, 2 secondsintegration. Without composition tests, system uncertainty breaks the pipeline.
+4:074 minutes, 7 secondsThe builder attempts to lock the systems evaluation contract in PR42 by creating version one of the label fixture corpus.
+4:154 minutes, 15 secondsThis stacked chart breaks down the actual contents of the 14 entry evaluation index exposing a severe
+4:224 minutes, 22 secondsimbalance in the testing material. 11 of the entries highlight gray. These are purely synthetic cases constructed to
+4:304 minutes, 30 secondstest known semantic attacks. These synthetic cases bypass actual image pre-processing and the OCR engine
+4:374 minutes, 37 secondsentirely. They inject token lines directly into the downstream field selectors. Of the remaining three entries, one is an unavailable data set
+4:464 minutes, 46 secondsgap in red and one is a disabled lowresolution derivative in yellow. Only a single sliver remains green,
+4:534 minutes, 53 secondsrepresenting the one enabled real OCR fixture. The reviewer's critique targets issue number 15, the project's
+5:015 minutes, 1 secondmeasurement baseline. Executing a measurement baseline against this index will yield precise numbers, but weak external meaning. Advancing to a
+5:095 minutes, 9 secondsmeasurement baseline with one real label and 11 constructed inputs means the system only measures agreement with its own post OCR assumptions. It proves
+5:195 minutes, 19 secondsabsolutely nothing about real world accuracy. The audit synthesizes these findings into a clear engineering
+5:255 minutes, 25 secondsdirective. The isolated architecture of the system is technically sound, but the sequential project planning is flawed.
+5:335 minutes, 33 secondsThis graph shows the circular trap in the remaining work plan. Issues 39 and 40 treat extraction, policy, and
+5:405 minutes, 40 secondsactivation as indivisible gates creating a closed loop that halts progress. The reviewer requires a linear correction,
+5:495 minutes, 49 secondsdefine evidence, normalize, then activate rules. The final closing checkpoint verdict from RDR00002
+5:575 minutes, 57 secondsmandates a hard pause on any further feature expansion until independent real world evidence is acquired.
+6:046 minutes, 4 secondsAdditionally, the single candidate composition defect must be hardened and resolved before any aggregate thresholds are permitted in the pipeline. Treating
+6:116 minutes, 11 secondsan isolated architecture as ready based entirely on internal consistency tests represents a failure in engineering governance. Real independent evidence
+6:216 minutes, 21 secondsmust precede rule activation to validate the
