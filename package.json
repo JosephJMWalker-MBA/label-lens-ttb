@@ -13,7 +13,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "smoke:relocation": "node scripts/relocation-smoke.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",

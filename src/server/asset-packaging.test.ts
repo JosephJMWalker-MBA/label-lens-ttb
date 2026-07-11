@@ -60,6 +60,17 @@ describe("Next.js packaging configuration", () => {
     expect(config).toMatch(/src\/pipeline\/extractor\/assets/);
     expect(config).toMatch(/label-ocr-source\.jpeg/);
   });
+
+  it("traces the dynamically loaded Tesseract WASM core and worker script", () => {
+    // These are loaded at runtime (not statically imported), so static tracing
+    // misses them without an explicit include; a relocated build needs them.
+    expect(config).toMatch(/tesseract\.js-core\/\*\.wasm/);
+    expect(config).toMatch(/tesseract\.js\/src\/worker-script/);
+  });
+
+  it("emits a self-contained standalone server for relocatable deployment", () => {
+    expect(config).toMatch(/output:\s*["']standalone["']/);
+  });
 });
 
 describe("single hardened processing route", () => {

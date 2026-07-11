@@ -43,6 +43,14 @@ npm ci
   OCR or API call**. `sharp` and `tesseract.js` run server-side only and are
   declared as external server packages so they are required from `node_modules`
   at runtime rather than bundled.
+- OCR asset paths (vendored `eng.traineddata` and the Tesseract WASM core) are
+  resolved at runtime against the deployment application root, not a build-time
+  `import.meta.url`. The build emits a self-contained `standalone` server, and
+  the locked build packages the local OCR assets; a relocated production smoke
+  (`npm run smoke:relocation`) copies that output outside the checkout and
+  verifies asset resolution and real OCR on the tested Node/platform
+  environment. Cross-platform determinism and universal serverless
+  compatibility are not claimed beyond that tested environment.
 
 ## Commands
 
@@ -52,6 +60,7 @@ npm ci
 | Unit / integration tests (Vitest) | `npm test` |
 | Playwright acceptance test | `npm run test:e2e` |
 | Production build | `npm run build` |
+| Relocated production OCR smoke | `npm run smoke:relocation` (after `npm run build`) |
 
 The Vitest suite includes the real-OCR acceptance and determinism proofs; the
 Playwright acceptance test drives the real server pipeline through the browser.
