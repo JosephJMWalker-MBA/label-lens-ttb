@@ -15,6 +15,7 @@ import type { CorpusEntry, FixtureCorpusIndex } from "./corpus-index.types";
 export const CORPUS_DIR = join(process.cwd(), "tests/fixtures/precheck");
 export const CORPUS_INDEX_PATH = join(CORPUS_DIR, "corpus-index.json");
 export const APPROVED_WINE_INVENTORY_PATH = join(CORPUS_DIR, "approved-wine-110-inventory.json");
+export const SUPPLEMENTAL_INVENTORY_PATH = join(CORPUS_DIR, "supplemental-corpus-inventory.json");
 
 export function loadCorpusIndex(): FixtureCorpusIndex {
   const raw = readFileSync(CORPUS_INDEX_PATH, "utf8");
@@ -33,6 +34,45 @@ export function syntheticEntries(index: FixtureCorpusIndex): CorpusEntry[] {
 
 export function candidateEntries(index: FixtureCorpusIndex): CorpusEntry[] {
   return index.entries.filter((e) => e.role === "candidate");
+}
+
+export function wineMultiArtifactEntries(index: FixtureCorpusIndex): CorpusEntry[] {
+  return index.entries.filter((e) => e.role === "wine_multi_artifact_candidate");
+}
+
+export function categorySentinelEntries(index: FixtureCorpusIndex): CorpusEntry[] {
+  return index.entries.filter((e) => e.role === "category_sentinel");
+}
+
+/** One record in the supplemental (challenge + sentinel) inventory. */
+export interface SupplementalInventoryRecord {
+  fixtureId: string;
+  originalDownloadsFilename: string;
+  committedPath: string;
+  corpusGroup: "wine_multi_artifact_challenge" | "category_sentinel";
+  sentinelCategory: "agave_spirit" | "ale" | "single_malt_whiskey" | null;
+  sourceRepresentation: string;
+  signature: "png" | "jpeg";
+  mediaType: "image/png" | "image/jpeg";
+  sha256: string;
+  byteSize: number;
+  width: number;
+  height: number;
+  acquisitionDate: string;
+  annotationStatus: "unannotated" | "annotated";
+  evaluationStatus: string;
+}
+
+export interface SupplementalInventory {
+  schemaId: "supplemental-corpus-inventory";
+  schemaVersion: "supplemental-corpus-inventory.v1";
+  acquisitionDate: string;
+  description: string;
+  records: SupplementalInventoryRecord[];
+}
+
+export function loadSupplementalInventory(): SupplementalInventory {
+  return JSON.parse(readFileSync(SUPPLEMENTAL_INVENTORY_PATH, "utf8")) as SupplementalInventory;
 }
 
 /** One record in the approved-wine inventory (identity + provenance only). */

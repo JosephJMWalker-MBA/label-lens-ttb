@@ -5,6 +5,7 @@ import { err, ok, type Result } from "@/shared/result";
 import {
   CORPUS_ANNOTATION_STATUS,
   CORPUS_AVAILABILITY_STATES,
+  CORPUS_BEVERAGE_CATEGORIES,
   CORPUS_CHALLENGE_TAGS,
   CORPUS_FIXTURE_ROLES,
   CORPUS_INDEPENDENCE,
@@ -12,6 +13,7 @@ import {
   CORPUS_MEASUREMENT_ELIGIBILITY,
   CORPUS_OBSERVATION_STATES,
   CORPUS_PRIVACY_REVIEW_STATES,
+  CORPUS_SENTINEL_CATEGORIES,
   CORPUS_SOURCE_AUTHORITIES,
   CORPUS_SOURCE_STRATA,
   CORPUS_SPLIT_STATUS,
@@ -61,7 +63,8 @@ const entrySchema = z
   .object({
     fixtureId: z.string().min(1),
     displayName: z.string().min(1),
-    beverageCategory: z.literal("wine"),
+    // Constrained by role in superRefine: only a category_sentinel is non-wine.
+    beverageCategory: z.enum(CORPUS_BEVERAGE_CATEGORIES),
     sourceAuthority: z.enum(CORPUS_SOURCE_AUTHORITIES),
     publicRecordId: z.union([z.string().min(1), z.null()]),
     role: z.enum(CORPUS_FIXTURE_ROLES),
@@ -83,20 +86,23 @@ const entrySchema = z
     // `null` only for an unannotated candidate (enforced in superRefine).
     expectations: z.union([expectationsSchema, z.null()]),
     truthLabelProhibition: z.literal(TRUTH_LABEL_PROHIBITION),
-    // Optional candidate-stratum fields (required for `candidate`, forbidden
-    // elsewhere — enforced in superRefine).
-    wineColor: z.enum(CORPUS_WINE_COLORS).optional(),
+    // Optional inventory-stratum fields (required/forbidden per role in
+    // superRefine).
     sourceStratum: z.enum(CORPUS_SOURCE_STRATA).optional(),
     independence: z.enum(CORPUS_INDEPENDENCE).optional(),
     measurementEligibility: z.array(z.enum(CORPUS_MEASUREMENT_ELIGIBILITY)).min(1).optional(),
     annotationStatus: z.enum(CORPUS_ANNOTATION_STATUS).optional(),
     splitStatus: z.enum(CORPUS_SPLIT_STATUS).optional(),
-    multiPanelStatus: z.enum(CORPUS_MAPPING_STATUS).optional(),
-    decimalCommaStatus: z.enum(CORPUS_MAPPING_STATUS).optional(),
     acquisitionDate: z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, "must be YYYY-MM-DD")
       .optional(),
+    // Approved-wine `candidate` only.
+    wineColor: z.enum(CORPUS_WINE_COLORS).optional(),
+    multiPanelStatus: z.enum(CORPUS_MAPPING_STATUS).optional(),
+    decimalCommaStatus: z.enum(CORPUS_MAPPING_STATUS).optional(),
+    // `category_sentinel` only.
+    sentinelCategory: z.enum(CORPUS_SENTINEL_CATEGORIES).optional(),
   })
   .strict();
 
@@ -171,52 +177,98 @@ export const fixtureCorpusIndexSchema = z
         );
       }
 
-      // Candidate-stratum discipline: an ingested-but-unannotated real label.
-      const candidateFields = [
-        e.wineColor,
+      // The three inventory roles: ingested, provenance-checked, unannotated
+      // records with no invented answers.
+      const INVENTORY_ROLES = ["candidate", "wine_multi_artifact_candidate", "category_sentinel"];
+      const isInventory = INVENTORY_ROLES.includes(e.role);
+      // Fields common to every inventory role.
+      const commonInventoryFields = [
         e.sourceStratum,
         e.independence,
         e.measurementEligibility,
         e.annotationStatus,
         e.splitStatus,
-        e.multiPanelStatus,
-        e.decimalCommaStatus,
         e.acquisitionDate,
       ];
-      if (e.role === "candidate") {
+      // Fields that belong ONLY to the approved-wine `candidate` (the 110).
+      const approvedWineOnly = [e.wineColor, e.multiPanelStatus, e.decimalCommaStatus];
+
+      // Beverage-category discipline: only a sentinel may be non-wine.
+      if (e.role === "category_sentinel") {
+        if (e.beverageCategory === "wine") {
+          issue(["entries", i, "beverageCategory"], "a category sentinel must be non-wine.");
+        }
+        if (e.sentinelCategory === undefined) {
+          issue(["entries", i, "sentinelCategory"], "a sentinel must name its out-of-scope class.");
+        } else if (e.sentinelCategory !== e.beverageCategory) {
+          issue(
+            ["entries", i, "sentinelCategory"],
+            "sentinelCategory must match the beverageCategory.",
+          );
+        }
+      } else {
+        if (e.beverageCategory !== "wine") {
+          issue(["entries", i, "beverageCategory"], "only a category sentinel may be non-wine.");
+        }
+        if (e.sentinelCategory !== undefined) {
+          issue(["entries", i, "sentinelCategory"], "sentinelCategory is for sentinels only.");
+        }
+      }
+
+      if (isInventory) {
         if (e.expectations !== null) {
-          issue(["entries", i, "expectations"], "a candidate carries no invented expectations.");
+          issue(["entries", i, "expectations"], "an inventory record carries no expectations.");
         }
         if (e.annotationStatus !== "unannotated") {
-          issue(["entries", i, "annotationStatus"], "a candidate must be unannotated.");
+          issue(["entries", i, "annotationStatus"], "an inventory record must be unannotated.");
+        }
+        if (e.splitStatus !== "unassigned") {
+          issue(["entries", i, "splitStatus"], "an inventory record must be split-unassigned.");
         }
         if (e.enabledForRealOcr) {
-          issue(["entries", i, "enabledForRealOcr"], "a candidate cannot run mandatory real OCR.");
+          issue(["entries", i, "enabledForRealOcr"], "an inventory record cannot run real OCR.");
         }
-        if (e.domainOnlySynthetic) {
-          issue(["entries", i, "domainOnlySynthetic"], "a candidate is not synthetic.");
+        if (e.domainOnlySynthetic || e.syntheticEvidence !== null) {
+          issue(["entries", i, "domainOnlySynthetic"], "an inventory record is not synthetic.");
         }
         if (e.availability !== "available") {
-          issue(["entries", i, "availability"], "a candidate must be available.");
+          issue(["entries", i, "availability"], "an inventory record must be available.");
         }
         if (!e.imageFilename || !e.fixtureDir) {
-          issue(["entries", i, "imageFilename"], "a candidate needs an image and directory.");
+          issue(["entries", i, "imageFilename"], "an inventory record needs an image + directory.");
         }
         if (e.manifestFilename !== null) {
           issue(
             ["entries", i, "manifestFilename"],
-            "a candidate records provenance in the inventory, not a v2 manifest.",
+            "an inventory record records provenance in the inventory, not a v2 manifest.",
           );
         }
-        if (candidateFields.some((f) => f === undefined)) {
-          issue(["entries", i, "wineColor"], "a candidate must record all stratum fields.");
+        if (commonInventoryFields.some((f) => f === undefined)) {
+          issue(
+            ["entries", i, "sourceStratum"],
+            "an inventory record must record all stratum fields.",
+          );
+        }
+        // Approved-wine-only fields belong to `candidate` alone.
+        if (e.role === "candidate") {
+          if (approvedWineOnly.some((f) => f === undefined)) {
+            issue(
+              ["entries", i, "wineColor"],
+              "an approved-wine candidate must record color and mapping status.",
+            );
+          }
+        } else if (approvedWineOnly.some((f) => f !== undefined)) {
+          issue(
+            ["entries", i, "wineColor"],
+            "approved-wine-only fields are not allowed on this role.",
+          );
         }
       } else {
         if (e.expectations === null) {
-          issue(["entries", i, "expectations"], "only a candidate may omit expectations.");
+          issue(["entries", i, "expectations"], "only an inventory record may omit expectations.");
         }
-        if (candidateFields.some((f) => f !== undefined)) {
-          issue(["entries", i, "role"], "candidate-only fields are not allowed on this role.");
+        if ([...commonInventoryFields, ...approvedWineOnly].some((f) => f !== undefined)) {
+          issue(["entries", i, "role"], "inventory-only fields are not allowed on this role.");
         }
       }
     });
