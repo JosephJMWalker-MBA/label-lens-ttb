@@ -80,7 +80,7 @@ const derivativeSchema = z
   .object({
     derivativeId: z.string().min(1),
     filename: z.string().min(1),
-    role: z.enum(["reference-crop", "ocr-benchmark"]),
+    role: z.enum(["reference-crop", "ocr-benchmark", "degraded-derivative"]),
     mediaType: z.enum(["image/png", "image/jpeg"]),
     pixelWidth: z.number().int().positive(),
     pixelHeight: z.number().int().positive(),

@@ -58,7 +58,7 @@ export interface FixtureExternalSource {
   availabilityCaveat: string;
 }
 
-export type DerivativeRole = "reference-crop" | "ocr-benchmark";
+export type DerivativeRole = "reference-crop" | "ocr-benchmark" | "degraded-derivative";
 
 export type DerivativeParentKind = "external-source" | "repository-derivative" | typeof UNKNOWN;
 
