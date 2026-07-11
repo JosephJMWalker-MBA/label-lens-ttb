@@ -71,6 +71,18 @@ describe("fixture manifest — source and derivative integrity", () => {
     expect(height).toBe(manifest.derivative.pixelHeight);
   });
 
+  it("records the OCR benchmark derivative with its exact verified identity", () => {
+    const benchmark = manifest.ocrBenchmarkDerivative;
+    expect(benchmark).toBeDefined();
+    const path = join(FIXTURE_DIR, benchmark.path);
+    const bytes = readFileSync(path);
+    expect(sha256(bytes)).toBe(benchmark.sha256);
+    expect(statSync(path).size).toBe(benchmark.byteSize);
+    expect(benchmark.mediaType).toBe("image/jpeg");
+    // Honesty: the reference crop is preserved and distinct from the benchmark.
+    expect(benchmark.sha256).not.toBe(manifest.derivative.sha256);
+  });
+
   it("rejects a manifest that claims a source hash without retained bytes", () => {
     const tampered = JSON.parse(rawManifest);
     tampered.source.sourceSha256 = "a".repeat(64);
@@ -91,15 +103,24 @@ describe("fixture manifest — source and derivative integrity", () => {
 describe("fixture privacy controls", () => {
   const manifest = JSON.parse(rawManifest);
 
-  it("the fixture directory contains only the sanitized derivative and its manifest", () => {
-    expect(readdirSync(FIXTURE_DIR).sort()).toEqual(["label.png", "manifest.json"]);
+  it("contains only the two sanitized derivatives and the manifest", () => {
+    expect(readdirSync(FIXTURE_DIR).sort()).toEqual([
+      "label-ocr-source.jpeg",
+      "label.png",
+      "manifest.json",
+    ]);
   });
 
-  it("does not commit certificate bytes or a full-page rendering", () => {
-    // Only one image is present, and it is the sanitized label crop by hash.
-    const images = readdirSync(FIXTURE_DIR).filter((f) => /\.(png|jpe?g|tiff?|pdf)$/i.test(f));
-    expect(images).toEqual(["label.png"]);
+  it("commits only sanitized derivatives named in the manifest, by hash", () => {
+    // Both images present are sanitized derivatives whose hashes the manifest records.
+    const images = readdirSync(FIXTURE_DIR)
+      .filter((f) => /\.(png|jpe?g|tiff?|pdf)$/i.test(f))
+      .sort();
+    expect(images).toEqual(["label-ocr-source.jpeg", "label.png"]);
     expect(sha256(readFileSync(DERIVATIVE_PATH))).toBe(manifest.derivative.sha256);
+    expect(sha256(readFileSync(join(FIXTURE_DIR, "label-ocr-source.jpeg")))).toBe(
+      manifest.ocrBenchmarkDerivative.sha256,
+    );
   });
 
   it("does not retain whole-document OCR or text dumps", () => {

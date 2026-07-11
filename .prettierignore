@@ -11,3 +11,8 @@ package-lock.json
 
 # Binary fixture artifacts have no source formatting.
 tests/fixtures/**/*.png
+tests/fixtures/**/*.jpeg
+tests/fixtures/**/*.jpg
+
+# Vendored OCR language data (binary).
+src/pipeline/extractor/assets/*.traineddata

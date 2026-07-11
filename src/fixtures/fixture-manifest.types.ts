@@ -36,6 +36,26 @@ export interface FixtureDerivative {
   byteSize: number;
 }
 
+/**
+ * A higher-resolution sanitized derivative retained only as an OCR benchmark.
+ *
+ * It is a separate representation of the same public approved-label artwork at
+ * higher native resolution — never the original design-source file, and not
+ * byte-identical to any earlier chat-upload representation. Its exact local
+ * identity (SHA-256, dimensions, byte size) is recorded honestly.
+ */
+export interface FixtureOcrBenchmarkDerivative {
+  kind: "higher-resolution-ocr-source";
+  path: string;
+  mediaType: "image/jpeg";
+  sha256: string;
+  pixelWidth: number;
+  pixelHeight: number;
+  byteSize: number;
+  /** Honest provenance statement for this representation. */
+  note: string;
+}
+
 export interface FixtureTransformationStep {
   order: number;
   operation: string;
@@ -84,6 +104,8 @@ export interface FixtureManifest {
   beverageCategory: "wine";
   source: FixtureSourceReference;
   derivative: FixtureDerivative;
+  /** Optional higher-resolution sanitized derivative kept only for OCR benchmarking. */
+  ocrBenchmarkDerivative?: FixtureOcrBenchmarkDerivative;
   transformationChain: FixtureTransformationStep[];
   privacyExclusions: FixturePrivacyExclusion[];
   truthLabels: FixtureTruthLabels;

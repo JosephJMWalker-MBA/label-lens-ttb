@@ -19,6 +19,16 @@
     "pixelHeight": 214,
     "byteSize": 69983
   },
+  "ocrBenchmarkDerivative": {
+    "kind": "higher-resolution-ocr-source",
+    "path": "label-ocr-source.jpeg",
+    "mediaType": "image/jpeg",
+    "sha256": "0b0ccec13bf6c533ec7928b017b140a0213fb4555812fea81d71872adb453713",
+    "pixelWidth": 2404,
+    "pixelHeight": 979,
+    "byteSize": 607442,
+    "note": "Higher native-resolution sanitized representation of the public approved M Cellars label artwork for TTB ID 24205001000905, retained only as an OCR benchmark. Certificate form fields, applicant-contact blocks, signatures, qualification text, footer content, and full-page rendering are excluded; label-printed producer/address and proprietor text are retained as part of the approved artwork. This is not the original design-source file and is not byte-identical to any earlier chat-upload representation; the SHA-256, dimensions, and byte size above are this local file's exact verified identity."
+  },
   "transformationChain": [
     {
       "order": 1,
@@ -26,6 +36,22 @@
       "performedIn": "outside-repository",
       "performedBy": "human",
       "description": "Manual rectangular crop of the rendered label artwork from the public printable COLA screenshot.",
+      "excludedRegions": [
+        "certificate-form-fields",
+        "applicant-contact-information",
+        "signature",
+        "qualification-text",
+        "footer-content",
+        "full-page-rendering"
+      ],
+      "verification": "human-approved-and-hash-verified"
+    },
+    {
+      "order": 2,
+      "operation": "higher-resolution-ocr-source-acquisition",
+      "performedIn": "outside-repository",
+      "performedBy": "human",
+      "description": "Higher native-resolution sanitized label artwork obtained from the public approved-label asset and retained as a separate OCR benchmark derivative alongside the reference crop. Same privacy exclusions as the reference crop; label-printed producer/address and proprietor text retained as approved artwork.",
       "excludedRegions": [
         "certificate-form-fields",
         "applicant-contact-information",

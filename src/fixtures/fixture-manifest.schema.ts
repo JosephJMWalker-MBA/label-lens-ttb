@@ -33,6 +33,19 @@ const derivativeSchema = z
   })
   .strict();
 
+const ocrBenchmarkDerivativeSchema = z
+  .object({
+    kind: z.literal("higher-resolution-ocr-source"),
+    path: z.string().min(1),
+    mediaType: z.literal("image/jpeg"),
+    sha256: z.string().regex(SHA256),
+    pixelWidth: z.number().int().positive(),
+    pixelHeight: z.number().int().positive(),
+    byteSize: z.number().int().positive(),
+    note: z.string().min(1),
+  })
+  .strict();
+
 const transformationStepSchema = z
   .object({
     order: z.number().int().positive(),
@@ -86,6 +99,7 @@ export const fixtureManifestSchema = z
     beverageCategory: z.literal("wine"),
     source: sourceSchema,
     derivative: derivativeSchema,
+    ocrBenchmarkDerivative: ocrBenchmarkDerivativeSchema.optional(),
     transformationChain: z.array(transformationStepSchema).min(1),
     privacyExclusions: z.array(privacyExclusionSchema).min(1),
     truthLabels: truthLabelsSchema,
