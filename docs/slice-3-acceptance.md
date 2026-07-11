@@ -65,6 +65,34 @@ npm ci
 The Vitest suite includes the real-OCR acceptance and determinism proofs; the
 Playwright acceptance test drives the real server pipeline through the browser.
 
+## Resource limits (defensive, not regulatory)
+
+The pre-check enforces one canonical resource policy
+(`src/server/resource-policy.ts`). These are **defensive application/availability
+limits for this prototype — not TTB rules** and not regulatory maximums:
+
+- **Request bytes:** ≤ 20 MB total; a declared `Content-Length` above this is
+  rejected **before** the body is parsed.
+- **Image-file bytes:** ≤ 15 MB actual file bytes, enforced after buffering.
+- **Media types:** PNG or JPEG; the route also requires a `multipart/form-data`
+  content-type before parsing.
+- **Decoded image:** ≤ 10000 × 10000 and ≤ 40,000,000 pixels, single frame; an
+  oversized decoded workload is rejected before preprocessing/OCR so a small
+  compressed file cannot expand into a disproportionate pixel budget.
+- **Preprocessing/OCR:** a fixed, bounded set of OCR passes and bounded scale
+  multipliers; the Tesseract worker is created per request and always terminated
+  in a `finally` block on success and on failure.
+
+Honest limitations:
+
+- `Content-Length` rejection occurs **only when the header is present**. Next.js
+  `request.formData()` may still buffer a request when the header is absent or
+  false, so an upstream proxy/platform request-size limit remains recommended for
+  production.
+- Protection is **per-request only**: this prototype provides **no distributed
+  rate limiting** and no cross-instance concurrency control. A bounded OCR
+  timeout and an in-process concurrency semaphore are left as follow-ups.
+
 ## Bundled demonstration fixture
 
 The bundled sample is **public approved-label artwork** (TTB Public COLA

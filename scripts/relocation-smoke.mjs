@@ -33,7 +33,17 @@ function fail(msg) {
 
 function post(port, body) {
   return new Promise((resolve, reject) => {
-    const data = new URLSearchParams(body).toString();
+    // The route requires multipart/form-data; build a minimal multipart body
+    // (the sample source carries only form fields, no file).
+    const boundary = `----label-lens-smoke-${Date.now()}`;
+    const data = Buffer.from(
+      Object.entries(body)
+        .map(
+          ([k, v]) =>
+            `--${boundary}\r\nContent-Disposition: form-data; name="${k}"\r\n\r\n${v}\r\n`,
+        )
+        .join("") + `--${boundary}--\r\n`,
+    );
     const req = http.request(
       {
         host: "127.0.0.1",
@@ -41,8 +51,8 @@ function post(port, body) {
         path: "/api/precheck",
         method: "POST",
         headers: {
-          "content-type": "application/x-www-form-urlencoded",
-          "content-length": Buffer.byteLength(data),
+          "content-type": `multipart/form-data; boundary=${boundary}`,
+          "content-length": data.length,
         },
       },
       (res) => {

@@ -13,7 +13,7 @@ import { suggestedExportFilename } from "@/pipeline/export/json/filename";
 import { parseJsonExport } from "@/pipeline/export/json/parse-json-export";
 import { buildReadableReport } from "@/pipeline/export/report/build-report";
 import { extractLabelEvidence } from "@/pipeline/extractor/extractor";
-import type { ExtractionInput } from "@/pipeline/extractor/extractor.types";
+import type { ExtractionErrorCode, ExtractionInput } from "@/pipeline/extractor/extractor.types";
 import { runWinePrecheck } from "@/pipeline/precheck/orchestrator";
 import { appendDisposition } from "@/pipeline/result/disposition";
 import { assemblePrecheckResult } from "@/pipeline/result/assemble";
@@ -21,6 +21,7 @@ import { validatePrecheckResult } from "@/pipeline/result/result.schema";
 import type { DispositionEntryInput, PrecheckResult } from "@/pipeline/result/result.types";
 import { err, ok, type Result } from "@/shared/result";
 
+import { ALLOWED_MEDIA_TYPES, MAX_IMAGE_BYTES } from "./resource-policy";
 import { getExecutableProvenance } from "./runtime-provenance";
 
 import type {
@@ -38,8 +39,7 @@ import type {
  * identity itself. It duplicates no rule behavior and reads no fixture manifest.
  */
 
-const MAX_UPLOAD_BYTES = 15 * 1024 * 1024;
-const SUPPORTED_TYPES = new Set(["image/png", "image/jpeg"]);
+const SUPPORTED_TYPES = new Set<string>(ALLOWED_MEDIA_TYPES);
 
 // Fixed deterministic metadata: this advisory slice does not persist real
 // timestamps, so identity stays a function of content + committed versions.
@@ -51,6 +51,29 @@ function fail(
   message: string,
 ): Result<never, PrecheckServiceError> {
   return err({ code, message });
+}
+
+/** Map a typed extraction failure to a safe, user-facing service error. */
+function mapExtractionError(code: ExtractionErrorCode): Result<never, PrecheckServiceError> {
+  switch (code) {
+    case "UNSUPPORTED_FORMAT":
+      return fail("UNSUPPORTED_TYPE", "Unsupported image type. Use PNG or JPEG.");
+    case "IMAGE_DIMENSIONS_EXCEEDED":
+      return fail("IMAGE_DIMENSIONS_EXCEEDED", "The image is larger than the maximum dimensions.");
+    case "IMAGE_PIXEL_BUDGET_EXCEEDED":
+      return fail("IMAGE_PIXEL_BUDGET_EXCEEDED", "The image has too many pixels to process.");
+    case "MULTI_FRAME_IMAGE_UNSUPPORTED":
+      return fail(
+        "MULTI_FRAME_IMAGE_UNSUPPORTED",
+        "Animated or multi-page images are not supported.",
+      );
+    case "CORRUPT_IMAGE":
+    case "EMPTY_IMAGE":
+    case "DIMENSIONS_OUT_OF_BOUNDS":
+      return fail("CORRUPT_IMAGE", "The image could not be read for evidence extraction.");
+    default:
+      return fail("EXTRACTION_FAILED", "The image could not be read for evidence extraction.");
+  }
 }
 
 function operatorFact(value: string): DeclaredFact {
@@ -85,8 +108,10 @@ async function resolveBytes(
 
   const bytes = request.imageBytes;
   if (!bytes || bytes.length === 0) return fail("EMPTY_FILE", "The selected file is empty.");
-  if (bytes.length > MAX_UPLOAD_BYTES)
-    return fail("FILE_TOO_LARGE", "Image exceeds the 15 MB limit.");
+  // Post-buffer actual-byte guard: Content-Length may be absent or cover only
+  // multipart overhead, so the true file size is still enforced here.
+  if (bytes.length > MAX_IMAGE_BYTES)
+    return fail("FILE_TOO_LARGE", "Image exceeds the maximum allowed size.");
   const mediaType = request.mediaType ?? "";
   if (!SUPPORTED_TYPES.has(mediaType)) {
     return fail("UNSUPPORTED_TYPE", "Unsupported image type. Use PNG or JPEG.");
@@ -168,17 +193,7 @@ export async function runPrecheckService(
     parserVersion: prov.parserVersion,
   };
   const extraction = await extractLabelEvidence(extractorInput);
-  if (!extraction.ok) {
-    const code =
-      extraction.error.code === "UNSUPPORTED_FORMAT"
-        ? "UNSUPPORTED_TYPE"
-        : extraction.error.code === "CORRUPT_IMAGE" ||
-            extraction.error.code === "EMPTY_IMAGE" ||
-            extraction.error.code === "DIMENSIONS_OUT_OF_BOUNDS"
-          ? "CORRUPT_IMAGE"
-          : "EXTRACTION_FAILED";
-    return fail(code, "The image could not be read for evidence extraction.");
-  }
+  if (!extraction.ok) return mapExtractionError(extraction.error.code);
   const analyzer = extraction.value;
 
   const orchestration = runWinePrecheck({

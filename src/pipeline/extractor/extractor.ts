@@ -51,8 +51,22 @@ export async function extractLabelEvidence(
     );
     brand = selectBrandObservation(regions);
     alcohol = selectAlcoholObservation(regions);
+  } catch (cause) {
+    // A recognition or preprocessing failure after worker creation is a safe,
+    // typed failure — never an unhandled throw. The worker is still terminated
+    // in the finally below, so no OCR process leaks.
+    return err({
+      code: "OCR_FAILED",
+      message: "Local OCR could not process the image.",
+      issues: [cause instanceof Error ? cause.message : String(cause)],
+    });
   } finally {
-    await engine.terminate();
+    // Best-effort termination: cleanup never masks the result or throws onward.
+    try {
+      await engine.terminate();
+    } catch {
+      // The worker is being discarded regardless; a terminate error is ignored.
+    }
   }
 
   const limitations = provenanceLimitations(brand, alcohol);

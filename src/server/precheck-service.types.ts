@@ -92,7 +92,13 @@ export type PrecheckServiceErrorCode =
   | "INVALID_SUBMITTED_RESULT"
   | "INVALID_DISPOSITION"
   | "INVALID_DISPOSITION_REFERENCE"
-  | "REPORT_FAILED";
+  | "REPORT_FAILED"
+  // Bounded resource-control failures.
+  | "REQUEST_TOO_LARGE"
+  | "REQUEST_NOT_MULTIPART"
+  | "IMAGE_DIMENSIONS_EXCEEDED"
+  | "IMAGE_PIXEL_BUDGET_EXCEEDED"
+  | "MULTI_FRAME_IMAGE_UNSUPPORTED";
 
 /** A user-safe error: no stack traces, absolute paths, or environment data. */
 export interface PrecheckServiceError {

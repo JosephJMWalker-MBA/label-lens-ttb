@@ -1,5 +1,6 @@
 import { runPrecheckService } from "@/server/precheck-service";
 import type { PrecheckServiceError, PrecheckServiceRequest } from "@/server/precheck-service.types";
+import { MAX_REQUEST_BYTES } from "@/server/resource-policy";
 
 // Node runtime is required for sharp, tesseract.js, and the vendored assets.
 export const runtime = "nodejs";
@@ -41,6 +42,12 @@ const STATUS_BY_CODE: Record<PrecheckServiceError["code"], number> = {
   INVALID_DISPOSITION: 400,
   INVALID_DISPOSITION_REFERENCE: 400,
   REPORT_FAILED: 500,
+  // Bounded resource-control failures.
+  REQUEST_TOO_LARGE: 413,
+  REQUEST_NOT_MULTIPART: 415,
+  IMAGE_DIMENSIONS_EXCEEDED: 422,
+  IMAGE_PIXEL_BUDGET_EXCEEDED: 422,
+  MULTI_FRAME_IMAGE_UNSUPPORTED: 422,
 };
 
 function errorResponse(code: PrecheckServiceError["code"], message: string): Response {
@@ -53,6 +60,19 @@ function errorResponse(code: PrecheckServiceError["code"], message: string): Res
  * only render-safe data. No stack traces, paths, or environment values leak.
  */
 export async function POST(request: Request): Promise<Response> {
+  // Earliest guards, before any body buffering. A declared Content-Length above
+  // the request limit is rejected without calling formData(); a non-multipart
+  // request is refused before parsing. When the header is absent or false, the
+  // post-buffer file-byte guard in the service still applies.
+  const declaredLength = Number(request.headers.get("content-length") ?? "");
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_REQUEST_BYTES) {
+    return errorResponse("REQUEST_TOO_LARGE", "The request is larger than the allowed size.");
+  }
+  const contentType = request.headers.get("content-type") ?? "";
+  if (!contentType.toLowerCase().includes("multipart/form-data")) {
+    return errorResponse("REQUEST_NOT_MULTIPART", "Send the label image as multipart form data.");
+  }
+
   let form: FormData;
   try {
     form = await request.formData();

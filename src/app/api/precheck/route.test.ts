@@ -2,7 +2,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { POST } from "./route";
 
@@ -90,5 +90,62 @@ describe("POST /api/precheck", () => {
     expect(JSON.stringify(body)).not.toMatch(
       /\/Users\/|\/home\/|node_modules|at Object|process\.env/,
     );
+  });
+});
+
+describe("POST /api/precheck — early resource guards", () => {
+  /** A stub whose formData() throws, to prove header-level rejection happens first. */
+  function stubRequest(headers: Record<string, string>) {
+    const formData = vi.fn(() => {
+      throw new Error("formData must not be called for a header-level rejection");
+    });
+    return { headers: new Headers(headers), formData } as unknown as Request;
+  }
+
+  it("rejects a non-multipart content type before parsing the body", async () => {
+    const stub = stubRequest({ "content-type": "application/json" });
+    const res = await POST(stub);
+    expect(res.status).toBe(415);
+    const body = await res.json();
+    expect(body.error.code).toBe("REQUEST_NOT_MULTIPART");
+    expect(stub.formData as unknown as ReturnType<typeof vi.fn>).not.toHaveBeenCalled();
+  });
+
+  it("rejects an oversized declared Content-Length before parsing the body", async () => {
+    const stub = stubRequest({
+      "content-type": "multipart/form-data; boundary=x",
+      "content-length": String(64 * 1024 * 1024),
+    });
+    const res = await POST(stub);
+    expect(res.status).toBe(413);
+    const body = await res.json();
+    expect(body.error.code).toBe("REQUEST_TOO_LARGE");
+    expect(stub.formData as unknown as ReturnType<typeof vi.fn>).not.toHaveBeenCalled();
+  });
+
+  it("does not let a missing/malformed Content-Length bypass the post-parse file-byte limit", async () => {
+    const form = new FormData();
+    form.set("source", "upload");
+    form.set("brand", "M CELLARS");
+    form.set("alcohol", "12.5");
+    // 16 MB of bytes exceeds the file limit even though the request stays under
+    // the request-byte ceiling and no header guard fires.
+    form.set(
+      "file",
+      new File([new Uint8Array(16 * 1024 * 1024)], "big.png", { type: "image/png" }),
+    );
+    const res = await POST(request(form));
+    expect(res.status).toBe(413);
+    const body = await res.json();
+    expect(body.error.code).toBe("FILE_TOO_LARGE");
+  });
+
+  it("returns safe errors with no stack, path, or OCR asset path on a resource rejection", async () => {
+    const stub = stubRequest({ "content-type": "text/plain" });
+    const body = await (await POST(stub)).json();
+    expect(JSON.stringify(body)).not.toMatch(
+      /\/Users\/|\/home\/|node_modules|traineddata|at Object|\.ts:\d+/,
+    );
+    expect(body.data).toBeUndefined();
   });
 });

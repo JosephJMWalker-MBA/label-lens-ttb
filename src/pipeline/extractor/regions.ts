@@ -48,6 +48,20 @@ const REGION_SPECS: RegionSpec[] = [
   },
 ];
 
+/**
+ * Bounded region-strategy metrics, exported so the resource policy can assert
+ * the fixed pass count and scale multipliers stay within budget. The set is
+ * static, so these are compile-time-constant ceilings, not per-request values.
+ */
+export const REGION_COUNT = REGION_SPECS.length;
+export const MAX_REGION_SCALE = Math.max(...REGION_SPECS.map((s) => s.scale));
+/** Worst-case intermediate pixel count for a decoded image at the pixel budget. */
+export function worstCaseIntermediatePixels(maxDecodedPixels: number): number {
+  return Math.max(
+    ...REGION_SPECS.map((s) => s.crop[2] * s.crop[3] * maxDecodedPixels * s.scale * s.scale),
+  );
+}
+
 function toPixelCrop(
   [lf, tf, wf, hf]: [number, number, number, number],
   width: number,
