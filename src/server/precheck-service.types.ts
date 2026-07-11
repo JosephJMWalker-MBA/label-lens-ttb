@@ -1,0 +1,66 @@
+import type { DeclaredFact } from "@/domain/run/declared-facts.types";
+import type { VerificationFinding } from "@/domain/verification/finding.types";
+import type { EvidenceAssessment } from "@/pipeline/precheck/precheck.types";
+import type { AdvisoryNotice, ResultObservations } from "@/pipeline/result/result.types";
+
+/**
+ * The bounded server request for one wine pre-check. The server derives all
+ * deterministic identity (hash, dimensions, versions, ids, checksum) itself and
+ * never trusts client-supplied findings, statuses, or version metadata. The
+ * filename is non-authoritative display metadata only.
+ */
+export interface PrecheckServiceRequest {
+  /** "upload" carries user bytes; "sample" runs the bundled demo fixture. */
+  source: "upload" | "sample";
+  /** Raw image bytes for an upload; ignored for the sample source. */
+  imageBytes?: Uint8Array;
+  /** Non-authoritative display filename (never used for identity or paths). */
+  filename?: string;
+  /** Declared media type for an upload; validated against the decoded format. */
+  mediaType?: string;
+  declaredBrand: string;
+  declaredAlcohol: string;
+}
+
+/** Bounded, render-only projection of one field observation and its provenance. */
+export interface PrecheckServiceResponse {
+  machineResultId: string;
+  profile: { id: string; version: string };
+  advisoryNotice: AdvisoryNotice;
+  declaredFacts: {
+    applicationBrandName: DeclaredFact;
+    applicationAlcoholValue: DeclaredFact;
+  };
+  observations: ResultObservations;
+  evidenceAssessments: EvidenceAssessment[];
+  findings: VerificationFinding[];
+  /** Deterministic suggested filename for the JSON download. */
+  suggestedFilename: string;
+  /** Canonical JSON export text, checksum-verified server-side. */
+  exportJson: string;
+  /** Echoed display metadata for the selected file; not part of identity. */
+  file: { displayName: string; mediaType: string; byteSize: number; source: "upload" | "sample" };
+}
+
+export type PrecheckServiceErrorCode =
+  | "NO_IMAGE"
+  | "MULTIPLE_IMAGES"
+  | "UNSUPPORTED_TYPE"
+  | "EMPTY_FILE"
+  | "FILE_TOO_LARGE"
+  | "CORRUPT_IMAGE"
+  | "INVALID_DECLARED_VALUE"
+  | "UNDECLARED_FIELD"
+  | "UNSAFE_FILENAME"
+  | "CLIENT_INJECTED_FIELD"
+  | "EXTRACTION_FAILED"
+  | "PROFILE_MISMATCH"
+  | "ASSEMBLY_FAILED"
+  | "EXPORT_CHECKSUM_FAILED"
+  | "SAMPLE_UNAVAILABLE";
+
+/** A user-safe error: no stack traces, absolute paths, or environment data. */
+export interface PrecheckServiceError {
+  code: PrecheckServiceErrorCode;
+  message: string;
+}

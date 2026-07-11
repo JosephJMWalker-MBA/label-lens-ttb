@@ -1,6 +1,6 @@
 import { ShieldCheck } from "lucide-react";
 
-import { ReviewWorkspace } from "@/features/review/ReviewWorkspace";
+import { PrecheckWorkspace } from "@/features/precheck/PrecheckWorkspace";
 
 export default function HomePage() {
   return (
@@ -11,15 +11,16 @@ export default function HomePage() {
           <span className="text-sm font-medium uppercase tracking-wide">Label Lens TTB</span>
         </div>
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          Fast, explainable alcohol label verification
+          Wine label pre-check (advisory)
         </h1>
         <p className="text-muted-foreground">
-          Upload a label image and enter the expected application data. AI and OCR may extract
-          evidence; deterministic rules evaluate it; human reviewers remain authoritative.
+          Select one wine label image and enter the application brand and alcohol value. A local
+          extractor reads the artwork, deterministic rules evaluate it, and you can download the
+          result as JSON. This is a pre-submission aid, not a TTB approval.
         </p>
       </header>
 
-      <ReviewWorkspace />
+      <PrecheckWorkspace />
     </main>
   );
 }
