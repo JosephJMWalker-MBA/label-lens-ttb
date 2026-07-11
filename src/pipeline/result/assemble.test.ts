@@ -112,7 +112,7 @@ describe("assemblePrecheckResult — integrity rejection", () => {
     const orchestration = { ...input.orchestration, profileVersion: "9.9.9" };
     const result = assemblePrecheckResult({ ...input, orchestration });
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error.code).toBe("RUN_PROFILE_MISMATCH");
+    if (!result.ok) expect(result.error.code).toBe("PROFILE_VERSION_MISMATCH");
   });
 
   it("rejects a rule-manifest mismatch", () => {
@@ -123,7 +123,7 @@ describe("assemblePrecheckResult — integrity rejection", () => {
     };
     const result = assemblePrecheckResult({ ...input, orchestration });
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error.code).toBe("RULE_MANIFEST_MISMATCH");
+    if (!result.ok) expect(result.error.code).toBe("RULE_VERSION_MISMATCH");
   });
 
   it("rejects an artifact-hash mismatch", () => {
@@ -138,7 +138,7 @@ describe("assemblePrecheckResult — integrity rejection", () => {
     });
     const result = assemblePrecheckResult(input);
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error.code).toBe("ARTIFACT_IDENTITY_MISMATCH");
+    if (!result.ok) expect(result.error.code).toBe("DERIVATIVE_ARTIFACT_IDENTITY_MISMATCH");
   });
 
   it("rejects a declared-fact mismatch", () => {

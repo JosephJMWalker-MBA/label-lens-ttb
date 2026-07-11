@@ -150,6 +150,10 @@ const ocrEngineSchema = z.discriminatedUnion("kind", [
       engineVersion: z.string().min(1),
       modelId: z.string().min(1).optional(),
       modelVersion: z.string().min(1).optional(),
+      modelSha256: z
+        .string()
+        .regex(/^[0-9a-f]{64}$/)
+        .optional(),
     })
     .strict(),
   z.object({ kind: z.literal("not_applicable") }).strict(),

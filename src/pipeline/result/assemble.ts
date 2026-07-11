@@ -1,9 +1,17 @@
 import type { AnalysisRun } from "@/domain/run/analysis-run.types";
 import type { DeclaredFact } from "@/domain/run/declared-facts.types";
-import type { RuleVersionRef } from "@/domain/run/version-manifest.types";
+import type {
+  AuthorityVersion,
+  ExecutableProvenance,
+  OcrEngineVersion,
+  RuleVersionRef,
+} from "@/domain/run/version-manifest.types";
 import { validateVerificationFinding } from "@/domain/verification/finding.schema";
 import type { VerificationFinding } from "@/domain/verification/finding.types";
-import type { AnalyzerEvidenceResponse } from "@/pipeline/analyzer/analyzer.types";
+import type {
+  AnalyzerEvidenceResponse,
+  AnalyzerOcrEngine,
+} from "@/pipeline/analyzer/analyzer.types";
 import type {
   PrecheckAdvisoryQuality,
   PrecheckResult as OrchestrationResult,
@@ -29,6 +37,8 @@ export interface AssembleInput {
     applicationAlcoholValue: DeclaredFact;
   };
   advisoryQuality?: PrecheckAdvisoryQuality;
+  /** The single canonical executable provenance every layer must match exactly. */
+  expectedProvenance: ExecutableProvenance;
   /** Optional caller-supplied deterministic id; derived from content otherwise. */
   machineResultId?: string;
 }
@@ -48,6 +58,155 @@ function manifestsMatch(a: RuleVersionRef[], b: RuleVersionRef[]): boolean {
   );
 }
 
+function ocrModelKey(engine: OcrEngineVersion | AnalyzerOcrEngine): string {
+  if (engine.kind !== "ocr") return "not_applicable";
+  return `${engine.modelId ?? ""}|${engine.modelSha256 ?? ""}`;
+}
+
+function ocrEngineKey(engine: OcrEngineVersion | AnalyzerOcrEngine): string {
+  if (engine.kind !== "ocr") return "not_applicable";
+  return `${engine.engineId}@${engine.engineVersion}`;
+}
+
+function authorityKey(a: AuthorityVersion): string {
+  return `${a.citation}|${a.snapshotDate}|${a.effectiveDate ?? ""}`;
+}
+
+/**
+ * Reconcile every executable identity across the run manifest, the analyzer
+ * provenance, the orchestration output, and the findings against the single
+ * canonical expected provenance. Each mismatch returns a specific typed code and
+ * the exact differing values; nothing is silently copied to repair a mismatch.
+ */
+function reconcileProvenance(
+  expected: ExecutableProvenance,
+  manifest: AnalysisRun["versionManifest"],
+  analyzer: AnalyzerEvidenceResponse["provenance"],
+  orchestration: OrchestrationResult,
+  findings: VerificationFinding[],
+): Result<void, AssemblyError> {
+  const detail = (label: string, a: unknown, b: unknown): string[] => [
+    `${label}: ${JSON.stringify(a)} vs ${JSON.stringify(b)}`,
+  ];
+
+  // Extraction adapter — manifest and analyzer must both equal expected.
+  if (
+    manifest.extractionAdapterId !== expected.extractionAdapterId ||
+    manifest.extractionAdapterVersion !== expected.extractionAdapterVersion ||
+    analyzer.extractionAdapterId !== expected.extractionAdapterId ||
+    analyzer.extractionAdapterVersion !== expected.extractionAdapterVersion
+  ) {
+    return fail(
+      "EXTRACTION_ADAPTER_VERSION_MISMATCH",
+      "Extraction adapter identity differs across layers.",
+      detail(
+        "adapter",
+        `${expected.extractionAdapterId}@${expected.extractionAdapterVersion}`,
+        `manifest ${manifest.extractionAdapterId}@${manifest.extractionAdapterVersion}, analyzer ${analyzer.extractionAdapterId}@${analyzer.extractionAdapterVersion}`,
+      ),
+    );
+  }
+
+  // OCR engine id/version.
+  const expectedEngine = ocrEngineKey(expected.ocrEngine);
+  if (
+    ocrEngineKey(manifest.ocrEngine) !== expectedEngine ||
+    ocrEngineKey(analyzer.ocrEngine) !== expectedEngine
+  ) {
+    return fail(
+      "OCR_ENGINE_VERSION_MISMATCH",
+      "OCR engine identity differs across layers.",
+      detail(
+        "ocrEngine",
+        expectedEngine,
+        `manifest ${ocrEngineKey(manifest.ocrEngine)}, analyzer ${ocrEngineKey(analyzer.ocrEngine)}`,
+      ),
+    );
+  }
+
+  // OCR model id + asset digest.
+  const expectedModel = ocrModelKey(expected.ocrEngine);
+  if (
+    ocrModelKey(manifest.ocrEngine) !== expectedModel ||
+    ocrModelKey(analyzer.ocrEngine) !== expectedModel
+  ) {
+    return fail(
+      "OCR_MODEL_IDENTITY_MISMATCH",
+      "OCR model identity (id or asset digest) differs across layers.",
+      detail(
+        "ocrModel",
+        expectedModel,
+        `manifest ${ocrModelKey(manifest.ocrEngine)}, analyzer ${ocrModelKey(analyzer.ocrEngine)}`,
+      ),
+    );
+  }
+
+  // Parser.
+  if (
+    manifest.parserId !== expected.parserId ||
+    manifest.parserVersion !== expected.parserVersion ||
+    analyzer.parserId !== expected.parserId ||
+    analyzer.parserVersion !== expected.parserVersion
+  ) {
+    return fail("PARSER_VERSION_MISMATCH", "Parser identity differs across layers.");
+  }
+
+  // Profile — expected, manifest, and orchestration.
+  if (
+    manifest.ruleProfileId !== expected.ruleProfileId ||
+    manifest.ruleProfileVersion !== expected.ruleProfileVersion ||
+    orchestration.profileId !== expected.ruleProfileId ||
+    orchestration.profileVersion !== expected.ruleProfileVersion
+  ) {
+    return fail("PROFILE_VERSION_MISMATCH", "Profile identity differs across layers.");
+  }
+
+  // Exact ordered rule manifest — expected, manifest, and orchestration.
+  if (
+    !manifestsMatch(manifest.rules, expected.rules) ||
+    !manifestsMatch(orchestration.ruleManifest, expected.rules)
+  ) {
+    return fail("RULE_VERSION_MISMATCH", "Ordered rule manifest differs across layers.");
+  }
+
+  // Authorities — manifest set must equal expected, and every finding authority
+  // must be one of the expected authorities.
+  const expectedAuthorities = new Set(expected.authorities.map(authorityKey));
+  const manifestAuthorities = new Set(manifest.authorities.map(authorityKey));
+  if (
+    expectedAuthorities.size !== manifestAuthorities.size ||
+    [...expectedAuthorities].some((k) => !manifestAuthorities.has(k))
+  ) {
+    return fail(
+      "AUTHORITY_VERSION_MISMATCH",
+      "Authority citations/dates differ from the canonical set.",
+    );
+  }
+  for (const finding of findings) {
+    if (!expectedAuthorities.has(authorityKey(finding.authority))) {
+      return fail(
+        "AUTHORITY_VERSION_MISMATCH",
+        `Finding ${finding.ruleId} cites an authority outside the canonical set.`,
+        detail("authority", finding.authority, [...expectedAuthorities]),
+      );
+    }
+  }
+
+  // Application build identity.
+  if (
+    manifest.applicationBuild.packageVersion !== expected.applicationBuild.packageVersion ||
+    manifest.applicationBuild.gitCommitSha !== expected.applicationBuild.gitCommitSha ||
+    manifest.applicationBuild.commitProvenance !== expected.applicationBuild.commitProvenance
+  ) {
+    return fail(
+      "APPLICATION_BUILD_IDENTITY_MISMATCH",
+      "Application build identity differs from the canonical build.",
+    );
+  }
+
+  return ok(undefined);
+}
+
 /**
  * Assemble the immutable machine pre-check result from an immutable run, the
  * validated orchestration output, and the validated analyzer evidence. Every
@@ -56,32 +215,52 @@ function manifestsMatch(a: RuleVersionRef[], b: RuleVersionRef[]): boolean {
 export function assemblePrecheckResult(
   input: AssembleInput,
 ): Result<PrecheckResult, AssemblyError> {
-  const { run, orchestration, analyzer } = input;
+  const { run, orchestration, analyzer, expectedProvenance } = input;
 
-  // 1. Run/profile identity must match the orchestration profile.
-  if (
-    run.versionManifest.ruleProfileId !== orchestration.profileId ||
-    run.versionManifest.ruleProfileVersion !== orchestration.profileVersion
-  ) {
-    return fail("RUN_PROFILE_MISMATCH", "Run profile does not match the orchestration profile.", [
-      `run ${run.versionManifest.ruleProfileId}@${run.versionManifest.ruleProfileVersion} vs orchestration ${orchestration.profileId}@${orchestration.profileVersion}`,
-    ]);
-  }
+  // 1. Reconcile every executable identity across all layers against the single
+  //    canonical provenance (adapter, OCR engine, OCR model digest, parser,
+  //    profile, ordered rules, authorities, application build).
+  const reconciled = reconcileProvenance(
+    expectedProvenance,
+    run.versionManifest,
+    analyzer.provenance,
+    orchestration,
+    orchestration.findings,
+  );
+  if (!reconciled.ok) return reconciled;
 
-  // 2. Ordered rule manifests must match exactly.
-  if (!manifestsMatch(run.versionManifest.rules, orchestration.ruleManifest)) {
-    return fail("RULE_MANIFEST_MISMATCH", "Run and orchestration rule manifests differ.");
-  }
-
-  // 3. Artifact identity must match across run, manifest, and analyzer evidence.
+  // 2. Derivative artifact identity must match across run, manifest, and analyzer.
   const derivativeSha = run.sanitizedDerivative.sha256;
   if (
     run.versionManifest.sanitizedDerivativeSha256 !== derivativeSha ||
     analyzer.provenance.derivativeSha256 !== derivativeSha
   ) {
     return fail(
-      "ARTIFACT_IDENTITY_MISMATCH",
+      "DERIVATIVE_ARTIFACT_IDENTITY_MISMATCH",
       "Derivative hash differs across run, manifest, or analyzer.",
+      [
+        `run ${derivativeSha}, manifest ${run.versionManifest.sanitizedDerivativeSha256}, analyzer ${analyzer.provenance.derivativeSha256}`,
+      ],
+    );
+  }
+
+  // 3. Source artifact identity must be consistent between the run and manifest.
+  //    A "same_bytes" derivative must carry the same source hash (never null).
+  if (run.sourceArtifact.sha256 !== run.versionManifest.sourceArtifactSha256) {
+    return fail(
+      "SOURCE_ARTIFACT_IDENTITY_MISMATCH",
+      "Source artifact hash differs between the run and its manifest.",
+      [`run ${run.sourceArtifact.sha256}, manifest ${run.versionManifest.sourceArtifactSha256}`],
+    );
+  }
+  if (
+    run.versionManifest.derivativeRelationship === "same_bytes" &&
+    run.versionManifest.sourceArtifactSha256 !== derivativeSha
+  ) {
+    return fail(
+      "SOURCE_ARTIFACT_IDENTITY_MISMATCH",
+      "A same-bytes derivative must record the source hash equal to the derivative hash.",
+      [`source ${run.versionManifest.sourceArtifactSha256}, derivative ${derivativeSha}`],
     );
   }
 

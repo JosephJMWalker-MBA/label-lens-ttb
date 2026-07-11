@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 
 import { buildJsonExport, verifyExportIntegrity } from "@/pipeline/export/json/build-json-export";
-import { serializeExportCanonical } from "@/pipeline/export/json/canonical-json";
+import { payloadHash, serializeExportCanonical } from "@/pipeline/export/json/canonical-json";
 import { parseJsonExport } from "@/pipeline/export/json/parse-json-export";
 import { assemblePrecheckResult } from "@/pipeline/result/assemble";
 import { buildAssembleInput } from "@/pipeline/result/build.fixtures";
@@ -120,6 +120,17 @@ describe("appendDispositionToResult (service)", () => {
     const tampered = baseExportJson().replace("wine-alcohol-syntax", "wine-alcohol-INJECTED");
     expect(tampered).not.toBe(baseExportJson());
     const out = appendDispositionToResult(req({ exportJson: tampered }));
+    expect(out.ok).toBe(false);
+    if (!out.ok) expect(out.error.code).toBe("INVALID_SUBMITTED_RESULT");
+  });
+
+  it("rejects a re-checksummed payload that kept a stale machine-result id", () => {
+    const exp = JSON.parse(baseExportJson());
+    // Change a machine field and re-checksum the payload, but keep the old id.
+    exp.declaredFacts.applicationAlcoholValue.value = "13";
+    const { integrity, ...payload } = exp;
+    exp.integrity = { ...integrity, value: payloadHash(payload) };
+    const out = appendDispositionToResult(req({ exportJson: JSON.stringify(exp) }));
     expect(out.ok).toBe(false);
     if (!out.ok) expect(out.error.code).toBe("INVALID_SUBMITTED_RESULT");
   });

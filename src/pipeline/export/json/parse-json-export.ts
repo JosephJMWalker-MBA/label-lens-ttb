@@ -1,6 +1,6 @@
 import { err, ok, type Result } from "@/shared/result";
 
-import { verifyExportIntegrity } from "./build-json-export";
+import { recomputeExportMachineResultId, verifyExportIntegrity } from "./build-json-export";
 import { validateJsonExportShape } from "./json-export.schema";
 import {
   EXPORT_SCHEMA_VERSION,
@@ -56,6 +56,19 @@ export function parseJsonExport(
 
   const integrity = verifyExportIntegrity(shape.value);
   if (!integrity.ok) return integrity;
+
+  // The checksum only proves payload self-consistency. Recompute the canonical
+  // machine-result id from the export's machine content and reject any export
+  // whose embedded identity no longer matches its (possibly re-checksummed)
+  // machine fields. This invariant holds unconditionally, without a caller hint.
+  const recomputedId = recomputeExportMachineResultId(shape.value);
+  if (recomputedId !== shape.value.generatedFrom.machineResultId) {
+    return err({
+      code: "MACHINE_RESULT_ID_MISMATCH",
+      message: "Export machine-result id does not match its machine content.",
+      issues: [`recomputed ${recomputedId}, embedded ${shape.value.generatedFrom.machineResultId}`],
+    });
+  }
 
   if (
     options.expectedMachineResultId !== undefined &&

@@ -1,4 +1,5 @@
 import type { PrecheckResult } from "@/pipeline/result/result.types";
+import { deriveMachineResultId } from "@/pipeline/result/serialize";
 import { err, ok, type Result } from "@/shared/result";
 
 import { payloadHash } from "./canonical-json";
@@ -62,6 +63,34 @@ export function recomputeExportHash(exportObject: PrecheckJsonExport): string {
   const { integrity: _integrity, ...payload } = exportObject;
   void _integrity;
   return payloadHash(payload);
+}
+
+/**
+ * Reconstruct the machine-result content an export represents and recompute its
+ * canonical machine-result id, using the exact same derivation as result
+ * assembly (disposition history and the id field itself excluded). This detects
+ * an export whose payload was changed and re-checksummed while keeping a stale
+ * `generatedFrom.machineResultId`.
+ */
+export function recomputeExportMachineResultId(exportObject: PrecheckJsonExport): string {
+  const machineContent: Omit<PrecheckResult, "machineResultId"> = {
+    resultSchemaVersion: exportObject.generatedFrom
+      .resultSchemaVersion as PrecheckResult["resultSchemaVersion"],
+    mode: exportObject.mode,
+    profile: exportObject.profile,
+    run: exportObject.run,
+    declaredFacts: exportObject.declaredFacts,
+    evidenceAssessments: exportObject.evidenceAssessments,
+    observations: exportObject.observations,
+    findings: exportObject.findings,
+    versionManifest: exportObject.versionManifest,
+    advisoryNotice: exportObject.advisoryNotice,
+    ...(exportObject.advisoryQuality !== undefined
+      ? { advisoryQuality: exportObject.advisoryQuality }
+      : {}),
+    humanDispositionHistory: exportObject.humanDispositionHistory,
+  };
+  return deriveMachineResultId(machineContent);
 }
 
 /** Verify an export's integrity checksum against its canonical payload. */

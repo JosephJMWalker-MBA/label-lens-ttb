@@ -72,6 +72,7 @@ export type AnalyzerOcrEngine =
       engineVersion: string;
       modelId?: string;
       modelVersion?: string;
+      modelSha256?: string;
     }
   | { kind: "not_applicable" };
 

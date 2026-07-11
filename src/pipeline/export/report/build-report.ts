@@ -1,3 +1,7 @@
+import type {
+  ApplicationBuildVersion,
+  OcrEngineVersion,
+} from "@/domain/run/version-manifest.types";
 import type { AnalyzerFieldObservation } from "@/pipeline/analyzer/analyzer.types";
 import type { DispositionEntry, PrecheckResult } from "@/pipeline/result/result.types";
 import { err, ok, type Result } from "@/shared/result";
@@ -37,6 +41,25 @@ function esc(value: string): string {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+function ocrEngineText(engine: OcrEngineVersion): string {
+  return engine.kind === "ocr"
+    ? `${engine.engineId}@${engine.engineVersion}${engine.modelId ? ` (model ${engine.modelId})` : ""}`
+    : "not applicable";
+}
+
+function ocrModelText(engine: OcrEngineVersion): string {
+  return engine.kind === "ocr" && engine.modelSha256 ? engine.modelSha256 : "—";
+}
+
+function applicationBuildText(build: ApplicationBuildVersion): string {
+  const commit = build.gitCommitSha
+    ? `commit ${build.gitCommitSha}`
+    : build.commitProvenance === "unavailable-development-fallback"
+      ? "development build (no deployed commit)"
+      : "commit unavailable";
+  return `${build.packageVersion} · ${commit}`;
 }
 
 function observationRows(label: string, obs: AnalyzerFieldObservation): string {
@@ -155,7 +178,24 @@ export function buildReadableReport(
     <tr><th scope="row">Canonical JSON checksum (SHA-256)</th><td><code>${esc(input.jsonChecksum)}</code></td></tr>
   </tbody></table>
   <p>This report is generated from the already-validated machine result; no rules were re-executed.
-     Verify the corresponding canonical JSON export against the checksum above.</p>
+     The checksum above is an integrity checksum for corruption/change detection — not a
+     signature or proof of authenticity. Verify the corresponding canonical JSON export against
+     it.</p>
+</section>
+
+<section aria-label="Provenance">
+  <h2>Provenance</h2>
+  <table class="kv"><tbody>
+    <tr><th scope="row">Source artifact SHA-256</th><td><code>${esc(r.versionManifest.sourceArtifactSha256 ?? "—")}</code></td></tr>
+    <tr><th scope="row">Sanitized derivative SHA-256</th><td><code>${esc(r.versionManifest.sanitizedDerivativeSha256)}</code></td></tr>
+    <tr><th scope="row">Source ↔ derivative</th><td>${esc(r.versionManifest.derivativeRelationship ?? "—")}</td></tr>
+    <tr><th scope="row">Extraction adapter</th><td>${esc(r.versionManifest.extractionAdapterId)}@${esc(r.versionManifest.extractionAdapterVersion)}</td></tr>
+    <tr><th scope="row">OCR engine</th><td>${esc(ocrEngineText(r.versionManifest.ocrEngine))}</td></tr>
+    <tr><th scope="row">OCR model digest</th><td><code>${esc(ocrModelText(r.versionManifest.ocrEngine))}</code></td></tr>
+    <tr><th scope="row">Parser</th><td>${esc(r.versionManifest.parserId)}@${esc(r.versionManifest.parserVersion)}</td></tr>
+    <tr><th scope="row">Profile</th><td>${esc(r.versionManifest.ruleProfileId)}@${esc(r.versionManifest.ruleProfileVersion)}</td></tr>
+    <tr><th scope="row">Application build</th><td>${esc(applicationBuildText(r.versionManifest.applicationBuild))}</td></tr>
+  </tbody></table>
 </section>
 
 <section aria-label="Application values">

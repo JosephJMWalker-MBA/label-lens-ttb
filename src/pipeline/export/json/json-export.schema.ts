@@ -73,6 +73,7 @@ const ocrEngineSchema = z.union([
       engineVersion: z.string().min(1),
       modelId: z.string().min(1).optional(),
       modelVersion: z.string().min(1).optional(),
+      modelSha256: sha256.optional(),
     })
     .strict(),
   z.object({ kind: z.literal("not_applicable") }).strict(),
@@ -134,8 +135,15 @@ const versionManifestSchema = z
     rules: z.array(ruleRefSchema).min(1),
     authorities: z.array(authoritySchema).min(1),
     applicationBuild: z
-      .object({ packageVersion: semver, gitCommitSha: z.string().optional() })
+      .object({
+        packageVersion: semver,
+        gitCommitSha: z.string().min(1).optional(),
+        commitProvenance: z
+          .enum(["build-environment", "unavailable-development-fallback"])
+          .optional(),
+      })
       .strict(),
+    derivativeRelationship: z.enum(["same_bytes", "transformed"]).optional(),
   })
   .strict();
 

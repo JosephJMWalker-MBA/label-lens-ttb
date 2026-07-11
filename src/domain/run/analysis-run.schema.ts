@@ -33,6 +33,7 @@ const ocrEngineSchema = z.discriminatedUnion("kind", [
       engineVersion: z.string().min(1),
       modelId: z.string().min(1).optional(),
       modelVersion: z.string().min(1).optional(),
+      modelSha256: sha256.optional(),
     })
     .strict(),
   z.object({ kind: z.literal("not_applicable") }).strict(),
@@ -55,8 +56,12 @@ const versionManifestSchema = z
       .object({
         packageVersion: version,
         gitCommitSha: z.string().regex(GIT_SHA).optional(),
+        commitProvenance: z
+          .enum(["build-environment", "unavailable-development-fallback"])
+          .optional(),
       })
       .strict(),
+    derivativeRelationship: z.enum(["same_bytes", "transformed"]).optional(),
   })
   .strict();
 

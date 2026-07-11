@@ -133,7 +133,19 @@ export type AssemblyErrorCode =
   | "DECLARED_FACT_MISMATCH"
   | "UNRESOLVED_EVIDENCE_REFERENCE"
   | "INVALID_FINDING"
-  | "INVALID_RESULT_SHAPE";
+  | "INVALID_RESULT_SHAPE"
+  // Cross-layer executable-provenance reconciliation failures. Each identifies
+  // the exact mismatched identity rather than silently repairing it.
+  | "EXTRACTION_ADAPTER_VERSION_MISMATCH"
+  | "OCR_ENGINE_VERSION_MISMATCH"
+  | "OCR_MODEL_IDENTITY_MISMATCH"
+  | "PARSER_VERSION_MISMATCH"
+  | "PROFILE_VERSION_MISMATCH"
+  | "RULE_VERSION_MISMATCH"
+  | "AUTHORITY_VERSION_MISMATCH"
+  | "APPLICATION_BUILD_IDENTITY_MISMATCH"
+  | "SOURCE_ARTIFACT_IDENTITY_MISMATCH"
+  | "DERIVATIVE_ARTIFACT_IDENTITY_MISMATCH";
 
 export interface AssemblyError {
   code: AssemblyErrorCode;

@@ -1,6 +1,7 @@
 import { createAnalysisRun } from "@/domain/run/analysis-run";
 import type { AnalysisRun, AnalysisRunCreationInput } from "@/domain/run/analysis-run.types";
 import type { DeclaredFact } from "@/domain/run/declared-facts.types";
+import type { ExecutableProvenance } from "@/domain/run/version-manifest.types";
 import type {
   AnalyzerEvidenceResponse,
   AnalyzerFieldObservation,
@@ -14,10 +15,40 @@ import type { AssembleInput } from "./assemble";
 /**
  * Deterministic builders for result-assembly tests. They produce a genuine
  * orchestration output (via the committed orchestrator) from a synthetic
- * analyzer response, so assembly is exercised without invoking OCR.
+ * analyzer response, so assembly is exercised without invoking OCR. Every layer
+ * derives its executable identity from one canonical fixture provenance, mirror-
+ * ing the real single-source runtime provenance.
  */
 
 export const SHA = "6829add3d99c61851028b2422bdd9672bb975183d198de5e280bc961f4a489e7";
+/** A fixed, syntactically valid model digest for fixtures (not a real file hash). */
+export const FIXTURE_MODEL_SHA = "a".repeat(64);
+
+/** The one canonical executable provenance the fixtures reconcile against. */
+export const EXPECTED_PROVENANCE: ExecutableProvenance = {
+  extractionAdapterId: "local-two-field-extractor",
+  extractionAdapterVersion: "1.0.0",
+  ocrEngine: {
+    kind: "ocr",
+    engineId: "tesseract.js",
+    engineVersion: "7.0.0",
+    modelId: "eng",
+    modelSha256: FIXTURE_MODEL_SHA,
+  },
+  parserId: "wine-alcohol-parse",
+  parserVersion: "1.0.0",
+  ruleProfileId: "wine-precheck",
+  ruleProfileVersion: "1.0.0",
+  rules: winePrecheckRegistry.ruleManifest(),
+  authorities: [
+    { citation: "27 CFR 4.32; 27 CFR 4.33", snapshotDate: "2026-07-10" },
+    { citation: "27 CFR 4.36", snapshotDate: "2026-07-10" },
+  ],
+  applicationBuild: {
+    packageVersion: "0.1.0",
+    commitProvenance: "unavailable-development-fallback",
+  },
+};
 
 export function fact(value: string): DeclaredFact {
   return {
@@ -59,7 +90,7 @@ export function buildAnalyzer(): AnalyzerEvidenceResponse {
       derivativeSha256: SHA,
       extractionAdapterId: "local-two-field-extractor",
       extractionAdapterVersion: "1.0.0",
-      ocrEngine: { kind: "ocr", engineId: "tesseract.js", engineVersion: "7.0.0", modelId: "eng" },
+      ocrEngine: EXPECTED_PROVENANCE.ocrEngine,
       parserId: "wine-alcohol-parse",
       parserVersion: "1.0.0",
       processedAt: "2026-07-10T00:00:00Z",
@@ -74,25 +105,14 @@ export function buildRunInput(): AnalysisRunCreationInput {
     runId: "run-result-1",
     createdAt: "2026-07-10T00:00:00Z",
     product: { productId: "prod-1", revisionId: "rev-1" },
-    sourceArtifact: { artifactId: "m-cellars-24205001000905", sha256: null },
+    sourceArtifact: { artifactId: "m-cellars-24205001000905", sha256: SHA },
     sanitizedDerivative: { derivativeId: "deriv-1", path: "label.png", sha256: SHA },
     declaredFacts: { brandName: fact("M CELLARS"), alcoholValue: fact("12.5") },
     versionManifest: {
-      sourceArtifactSha256: null,
+      ...EXPECTED_PROVENANCE,
+      sourceArtifactSha256: SHA,
       sanitizedDerivativeSha256: SHA,
-      extractionAdapterId: "local-two-field-extractor",
-      extractionAdapterVersion: "1.0.0",
-      ocrEngine: { kind: "ocr", engineId: "tesseract.js", engineVersion: "7.0.0" },
-      parserId: "wine-alcohol-parse",
-      parserVersion: "1.0.0",
-      ruleProfileId: "wine-precheck",
-      ruleProfileVersion: "1.0.0",
-      rules: winePrecheckRegistry.ruleManifest(),
-      authorities: [
-        { citation: "27 CFR 4.32; 27 CFR 4.33", snapshotDate: "2026-07-10" },
-        { citation: "27 CFR 4.36", snapshotDate: "2026-07-10" },
-      ],
-      applicationBuild: { packageVersion: "0.1.0" },
+      derivativeRelationship: "same_bytes",
     },
     checkIds: ["brand-name-check", "wine-alcohol-check"],
   };
@@ -130,6 +150,7 @@ export function buildAssembleInput(overrides: Partial<AssembleInput> = {}): Asse
       applicationBrandName: fact("M CELLARS"),
       applicationAlcoholValue: fact("12.5"),
     },
+    expectedProvenance: overrides.expectedProvenance ?? EXPECTED_PROVENANCE,
     ...(overrides.advisoryQuality !== undefined
       ? { advisoryQuality: overrides.advisoryQuality }
       : {}),

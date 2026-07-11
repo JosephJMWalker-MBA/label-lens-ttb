@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { createAnalysisRun } from "@/domain/run/analysis-run";
 import type { AnalysisRunCreationInput } from "@/domain/run/analysis-run.types";
 import type { DeclaredFact } from "@/domain/run/declared-facts.types";
+import type { ExecutableProvenance } from "@/domain/run/version-manifest.types";
 import type { AnalyzerOcrEngine } from "@/pipeline/analyzer/analyzer.types";
 import { buildJsonExport, verifyExportIntegrity } from "@/pipeline/export/json/build-json-export";
 import { serializeExportCanonical } from "@/pipeline/export/json/canonical-json";
@@ -14,12 +15,13 @@ import { buildReadableReport } from "@/pipeline/export/report/build-report";
 import { extractLabelEvidence } from "@/pipeline/extractor/extractor";
 import type { ExtractionInput } from "@/pipeline/extractor/extractor.types";
 import { runWinePrecheck } from "@/pipeline/precheck/orchestrator";
-import { winePrecheckRegistry } from "@/pipeline/precheck/wine-precheck.profile";
 import { appendDisposition } from "@/pipeline/result/disposition";
 import { assemblePrecheckResult } from "@/pipeline/result/assemble";
 import { validatePrecheckResult } from "@/pipeline/result/result.schema";
 import type { DispositionEntryInput, PrecheckResult } from "@/pipeline/result/result.types";
 import { err, ok, type Result } from "@/shared/result";
+
+import { getExecutableProvenance } from "./runtime-provenance";
 
 import type {
   PrecheckDispositionRequest,
@@ -42,17 +44,6 @@ const SUPPORTED_TYPES = new Set(["image/png", "image/jpeg"]);
 // Fixed deterministic metadata: this advisory slice does not persist real
 // timestamps, so identity stays a function of content + committed versions.
 const FIXED_TIMESTAMP = "2026-07-10T00:00:00Z";
-const ADAPTER_ID = "local-two-field-extractor";
-const ADAPTER_VERSION = "1.0.0";
-const PARSER_ID = "wine-alcohol-parse";
-const PARSER_VERSION = "1.0.0";
-const OCR_ENGINE: AnalyzerOcrEngine = {
-  kind: "ocr",
-  engineId: "tesseract.js",
-  engineVersion: "7.0.0",
-  modelId: "eng",
-};
-const APP_PACKAGE_VERSION = "0.1.0";
 const SAMPLE_FIXTURE = "tests/fixtures/precheck/m-cellars-24205001000905/label-ocr-source.jpeg";
 
 function fail(
@@ -103,7 +94,16 @@ async function resolveBytes(
   return ok({ bytes, mediaType, displayName: request.filename?.trim() || "label image" });
 }
 
+/**
+ * Build the immutable run creation input from the single canonical provenance.
+ *
+ * For this one-image workflow the uploaded bytes are both the source artifact
+ * and the sanitized derivative used for OCR, so the same SHA is recorded in both
+ * roles with an explicit `same_bytes` relationship — the roles stay distinct and
+ * no transformation is implied. The source hash is never left null.
+ */
 function runInput(
+  prov: ExecutableProvenance,
   sha: string,
   path: string,
   declaredBrand: string,
@@ -113,28 +113,17 @@ function runInput(
     runId: `run-${sha}`,
     createdAt: FIXED_TIMESTAMP,
     product: { productId: "wine-precheck", revisionId: sha },
-    sourceArtifact: { artifactId: `artifact-${sha}`, sha256: null },
+    sourceArtifact: { artifactId: `artifact-${sha}`, sha256: sha },
     sanitizedDerivative: { derivativeId: `deriv-${sha}`, path, sha256: sha },
     declaredFacts: {
       brandName: operatorFact(declaredBrand),
       alcoholValue: operatorFact(declaredAlcohol),
     },
     versionManifest: {
-      sourceArtifactSha256: null,
+      ...prov,
+      sourceArtifactSha256: sha,
       sanitizedDerivativeSha256: sha,
-      extractionAdapterId: ADAPTER_ID,
-      extractionAdapterVersion: ADAPTER_VERSION,
-      ocrEngine: { kind: "ocr", engineId: "tesseract.js", engineVersion: "7.0.0" },
-      parserId: PARSER_ID,
-      parserVersion: PARSER_VERSION,
-      ruleProfileId: winePrecheckRegistry.profileId,
-      ruleProfileVersion: winePrecheckRegistry.profileVersion,
-      rules: winePrecheckRegistry.ruleManifest(),
-      authorities: [
-        { citation: "27 CFR 4.32; 27 CFR 4.33", snapshotDate: "2026-07-10" },
-        { citation: "27 CFR 4.36", snapshotDate: "2026-07-10" },
-      ],
-      applicationBuild: { packageVersion: APP_PACKAGE_VERSION },
+      derivativeRelationship: "same_bytes",
     },
     checkIds: ["brand-name-check", "wine-alcohol-check"],
   };
@@ -157,8 +146,12 @@ export async function runPrecheckService(
   const sha = createHash("sha256").update(bytes).digest("hex");
   const path = `${sha}.${extensionFor(mediaType)}`;
 
+  // One canonical provenance drives the run, extractor, orchestration, and
+  // assembly, so every executable identity is identical across all layers.
+  const prov = await getExecutableProvenance();
+
   const runResult = createAnalysisRun(
-    runInput(sha, path, request.declaredBrand, request.declaredAlcohol),
+    runInput(prov, sha, path, request.declaredBrand, request.declaredAlcohol),
   );
   if (!runResult.ok) return fail("ASSEMBLY_FAILED", "Could not initialize the analysis run.");
   const run = runResult.value;
@@ -168,11 +161,11 @@ export async function runPrecheckService(
     artifactRef: run.sourceArtifact.artifactId,
     derivativeSha256: sha,
     processedAt: FIXED_TIMESTAMP,
-    extractionAdapterId: ADAPTER_ID,
-    extractionAdapterVersion: ADAPTER_VERSION,
-    ocrEngine: OCR_ENGINE,
-    parserId: PARSER_ID,
-    parserVersion: PARSER_VERSION,
+    extractionAdapterId: prov.extractionAdapterId,
+    extractionAdapterVersion: prov.extractionAdapterVersion,
+    ocrEngine: prov.ocrEngine as AnalyzerOcrEngine,
+    parserId: prov.parserId,
+    parserVersion: prov.parserVersion,
   };
   const extraction = await extractLabelEvidence(extractorInput);
   if (!extraction.ok) {
@@ -189,7 +182,7 @@ export async function runPrecheckService(
   const analyzer = extraction.value;
 
   const orchestration = runWinePrecheck({
-    run: runInput(sha, path, request.declaredBrand, request.declaredAlcohol),
+    run: runInput(prov, sha, path, request.declaredBrand, request.declaredAlcohol),
     sanitizedDerivativeSha256: sha,
     declaredFacts: {
       applicationBrandName: operatorFact(request.declaredBrand),
@@ -212,6 +205,7 @@ export async function runPrecheckService(
       applicationBrandName: operatorFact(request.declaredBrand),
       applicationAlcoholValue: operatorFact(request.declaredAlcohol),
     },
+    expectedProvenance: prov,
   });
   if (!assembled.ok) return fail("ASSEMBLY_FAILED", "The pre-check result could not be assembled.");
 
