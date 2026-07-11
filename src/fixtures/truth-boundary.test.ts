@@ -33,7 +33,7 @@ function importsOf(source: string): string[] {
   return [...source.matchAll(/from\s+["']([^"']+)["']/g)].map((m) => m[1]);
 }
 
-const TRUTH_MODULE = /corpus-index|fixture-manifest/;
+const TRUTH_MODULE = /corpus-index|fixture-manifest|approved-wine.*inventory/;
 
 describe("truth-label boundary — production code never imports fixture truth", () => {
   const productionFiles = ALL.filter((f) => !isTest(f) && !isFixtureTooling(f));

@@ -53,6 +53,8 @@ describe("corpus real-OCR regression", () => {
         (d) => d.filename === entry.imageFilename,
       )!;
       const bytes = new Uint8Array(readFileSync(join(dir, entry.imageFilename!)));
+      // Real-OCR entries are always annotated (never null expectations).
+      const exp = entry.expectations!;
 
       it(
         "extracts bounded observations that match the corpus expectations",
@@ -61,12 +63,12 @@ describe("corpus real-OCR regression", () => {
             extractionInput(bytes, entry, derivative.sha256),
           );
           // Expected extraction outcome (success vs a typed failure code).
-          if (entry.expectations.extractionOutcome === "success") {
+          if (exp.extractionOutcome === "success") {
             expect(result.ok).toBe(true);
           } else {
             expect(result.ok).toBe(false);
             if (!result.ok) {
-              expect(result.error.code).toBe(entry.expectations.extractionOutcome.failureCode);
+              expect(result.error.code).toBe(exp.extractionOutcome.failureCode);
             }
             return;
           }
@@ -74,19 +76,19 @@ describe("corpus real-OCR regression", () => {
           const { brandName, alcoholStatement } = result.value.fields;
 
           // Observation states belong to the allowed bounded sets.
-          expect(entry.expectations.brandStateAllowed).toContain(brandName.state);
-          expect(entry.expectations.alcoholStateAllowed).toContain(alcoholStatement.state);
+          expect(exp.brandStateAllowed).toContain(brandName.state);
+          expect(exp.alcoholStateAllowed).toContain(alcoholStatement.state);
 
           // Required alcohol tokens and any exact parsed value are recovered.
-          for (const token of entry.expectations.requiredAlcoholTokens) {
+          for (const token of exp.requiredAlcoholTokens) {
             expect(alcoholStatement.value ?? "").toContain(token);
           }
-          if (entry.expectations.alcoholParsedValue !== null) {
-            expect(alcoholStatement.value).toBe(entry.expectations.alcoholParsedValue);
+          if (exp.alcoholParsedValue !== null) {
+            expect(alcoholStatement.value).toBe(exp.alcoholParsedValue);
           }
 
           // Forbidden brand candidates are never selected as the value.
-          for (const forbidden of entry.expectations.forbiddenBrandCandidates) {
+          for (const forbidden of exp.forbiddenBrandCandidates) {
             expect(brandName.value).not.toBe(forbidden);
           }
 
