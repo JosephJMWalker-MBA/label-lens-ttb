@@ -87,15 +87,23 @@ describe("single hardened processing route", () => {
     return found;
   }
 
-  it("exposes exactly one OCR processing route plus the narrow disposition route", () => {
+  it("exposes exactly one OCR processing route, the narrow disposition route, and an inert health probe", () => {
     const routes = routeFiles(apiDir).sort();
+    const healthRoute = join(apiDir, "health", "route.ts");
     expect(routes).toEqual([
+      healthRoute,
       join(apiDir, "precheck", "disposition", "route.ts"),
       join(apiDir, "precheck", "route.ts"),
     ]);
+    // The two processing routes accept POST; the health probe is a GET-only
+    // liveness endpoint that performs no OCR and imports no processing service.
     for (const route of routes) {
+      if (route === healthRoute) continue;
       expect(readFileSync(route, "utf8")).toMatch(/export\s+async\s+function\s+POST/);
     }
+    const health = readFileSync(healthRoute, "utf8");
+    expect(health).toMatch(/export\s+function\s+GET/);
+    expect(health).not.toMatch(/POST|precheck-service|extractor|tesseract|sharp/);
   });
 
   it("keeps OCR/extraction in the single processing route; disposition never duplicates it", () => {
