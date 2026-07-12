@@ -432,7 +432,7 @@ The first completed vertical slice — a single wine label image processed
 end-to-end into an explainable, checksum-protected pre-check result — is
 documented, with exact offline-reproducibility requirements and the bundled
 demonstration-fixture identity, in
-[`docs/slice-3-acceptance.md`](docs/slice-3-acceptance.md).
+[`docs/slice-3-acceptance.md`](slice-3-acceptance.md).
 
 ## Submission Definition of Done
 
@@ -453,28 +453,28 @@ The broader coach, batch, retained-evidence, continuous-learning, and production
 
 Key design documents include:
 
-- [`docs/product-plan.md`](docs/product-plan.md)
-- [`docs/architecture.md`](docs/architecture.md)
-- [`docs/validation-rules.md`](docs/validation-rules.md)
-- [`docs/build-ethic.md`](docs/build-ethic.md)
-- [`docs/test-strategy.md`](docs/test-strategy.md)
-- [`docs/security-deployment-strategy.md`](docs/security-deployment-strategy.md)
-- [`docs/kaizen-evaluation-loop.md`](docs/kaizen-evaluation-loop.md)
-- [`docs/system-governance.md`](docs/system-governance.md)
-- [`docs/continuous-learning-governance.md`](docs/continuous-learning-governance.md)
-- [`docs/ocr-reliability-strategy.md`](docs/ocr-reliability-strategy.md)
-- [`docs/performance-and-adoption-criteria.md`](docs/performance-and-adoption-criteria.md)
-- [`docs/usability-accessibility-batch-workflow.md`](docs/usability-accessibility-batch-workflow.md)
-- [`docs/coach-progress-and-management-guidance.md`](docs/coach-progress-and-management-guidance.md)
-- [`docs/compliance-readiness.md`](docs/compliance-readiness.md)
-- [`docs/compliance-rule-taxonomy.md`](docs/compliance-rule-taxonomy.md)
-- [`docs/evidence-retention-and-auditability.md`](docs/evidence-retention-and-auditability.md)
-- [`docs/engineering-constitution.md`](docs/engineering-constitution.md)
-- [`docs/engineering-principles.md`](docs/engineering-principles.md)
-- [`docs/design-review-checklist.md`](docs/design-review-checklist.md)
-- [`docs/submission-scope-and-definition-of-done.md`](docs/submission-scope-and-definition-of-done.md)
-- [`docs/lean-code-architecture.md`](docs/lean-code-architecture.md)
-- [`docs/adr/`](docs/adr/)
+- [`docs/product-plan.md`](product-plan.md)
+- [`docs/architecture.md`](architecture.md)
+- [`docs/validation-rules.md`](validation-rules.md)
+- [`docs/build-ethic.md`](build-ethic.md)
+- [`docs/test-strategy.md`](test-strategy.md)
+- [`docs/security-deployment-strategy.md`](security-deployment-strategy.md)
+- [`docs/kaizen-evaluation-loop.md`](kaizen-evaluation-loop.md)
+- [`docs/system-governance.md`](system-governance.md)
+- [`docs/continuous-learning-governance.md`](continuous-learning-governance.md)
+- [`docs/ocr-reliability-strategy.md`](ocr-reliability-strategy.md)
+- [`docs/performance-and-adoption-criteria.md`](performance-and-adoption-criteria.md)
+- [`docs/usability-accessibility-batch-workflow.md`](usability-accessibility-batch-workflow.md)
+- [`docs/coach-progress-and-management-guidance.md`](coach-progress-and-management-guidance.md)
+- [`docs/compliance-readiness.md`](compliance-readiness.md)
+- [`docs/compliance-rule-taxonomy.md`](compliance-rule-taxonomy.md)
+- [`docs/evidence-retention-and-auditability.md`](evidence-retention-and-auditability.md)
+- [`docs/engineering-constitution.md`](engineering-constitution.md)
+- [`docs/engineering-principles.md`](engineering-principles.md)
+- [`docs/design-review-checklist.md`](design-review-checklist.md)
+- [`docs/submission-scope-and-definition-of-done.md`](submission-scope-and-definition-of-done.md)
+- [`docs/lean-code-architecture.md`](lean-code-architecture.md)
+- [`docs/adr/`](adr/)
 
 ## Build Ethic
 
