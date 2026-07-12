@@ -1,0 +1,20 @@
+# Keep the build context small and reproducible.
+.git
+.github
+node_modules
+.next
+npm-debug.log*
+*.log
+
+# Test, docs, and tooling that the production server does not need.
+tests/e2e
+playwright-report
+test-results
+coverage
+docs
+scripts/relocation-smoke.mjs
+
+# Local editor / OS noise
+.DS_Store
+.vscode
+.idea

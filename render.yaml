@@ -1,0 +1,39 @@
+# Render blueprint for the Label Lens TTB domestic-wine pre-check.
+#
+# This is the recommended path: a persistent Node web service that Render builds
+# and starts directly from GitHub, with automatic PR preview environments for
+# trusted testers and controlled redeploys of production on merges to `main`.
+#
+# The app needs a persistent Node 22 server with the native `sharp` and WebAssembly
+# Tesseract OCR runtime (all vendored/traced at build time — no network OCR). It
+# writes nothing to disk, so no persistent volume is required.
+#
+# REQUIRED secret (set in the Render dashboard, never committed):
+#   LABEL_LENS_APPEND_SIGNING_KEY  — >= 32 chars; the pre-check route issues an
+#   append-authorization token on every run, so production returns HTTP 500 until
+#   this is set. See docs/deployment.md.
+services:
+  - type: web
+    name: label-lens-ttb
+    runtime: node
+    plan: free # 512 MB; spins down when idle. Upgrade to `starter` for no spin-down.
+    region: oregon
+    branch: main # production tracks main; merges trigger a controlled redeploy
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start # `next start`; binds to Render's $PORT
+    healthCheckPath: /api/health
+    autoDeploy: true
+    previews:
+      generation: automatic # per-PR preview deployments for staging/tester use
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      # Required, secret. Set the value in the Render dashboard (Environment tab)
+      # or via `render secrets`. Not synced from this file.
+      - key: LABEL_LENS_APPEND_SIGNING_KEY
+        sync: false
+      # Optional: stamps the running commit into export provenance.
+      - key: LABEL_LENS_BUILD_COMMIT
+        sync: false
