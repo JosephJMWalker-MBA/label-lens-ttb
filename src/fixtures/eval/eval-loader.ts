@@ -65,11 +65,6 @@ function alcoholDetectionChallenge(record: IncludedEvalRecord): string | undefin
 }
 
 function toCompatCase(record: IncludedEvalRecord): EvalCase {
-  if (record.annotation.brand.presence !== "present") {
-    throw new Error(
-      `included record ${record.caseId} must expose a present brand for the v1 harness`,
-    );
-  }
   const imagePath = record.imagePath.replace(/^tests\/fixtures\/precheck\//, "");
   const segments = imagePath.split("/");
   const fixtureDir = segments.at(-2);
@@ -86,10 +81,18 @@ function toCompatCase(record: IncludedEvalRecord): EvalCase {
     usageStatus: record.source.usageStatus,
     strata: record.inspection.visualStrata,
     brand: {
-      acceptable: record.annotation.brand.acceptablePresentations,
+      present: record.annotation.brand.presence === "present",
+      acceptable:
+        record.annotation.brand.presence === "present"
+          ? record.annotation.brand.acceptablePresentations
+          : [],
       knownAmbiguous: record.annotation.brand.genuinelyAmbiguous,
       approxLocation: brandApproxLocation(record),
       forbidden: record.annotation.brand.forbiddenPresentations,
+      absenceReason:
+        record.annotation.brand.presence === "absent"
+          ? record.annotation.brand.absenceReason
+          : undefined,
     },
     alcohol: {
       present: record.annotation.alcohol.presence === "present",

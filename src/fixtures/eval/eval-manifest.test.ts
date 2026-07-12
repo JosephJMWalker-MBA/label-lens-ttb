@@ -7,8 +7,7 @@ import { EVAL_MANIFEST_PATH, loadEvalManifest } from "./eval-loader";
 
 /**
  * The corpus-scale manifest must reconcile the full committed image inventory
- * while preserving the seeded 15-case baseline as the currently included
- * evaluation slice.
+ * while carrying the completed full-wine-corpus annotation set for Issue #57.
  */
 
 const committed = JSON.parse(readFileSync(EVAL_MANIFEST_PATH, "utf8")) as unknown;
@@ -95,16 +94,30 @@ describe("committed evaluation manifest", () => {
     ).toBe("distilled-spirits");
   });
 
-  it("keeps only wine records in the currently included evaluation slice", () => {
+  it("keeps only wine records in the included evaluation slice", () => {
     const manifest = loadEvalManifest();
-    expect(manifest.cases).toHaveLength(24);
+    expect(manifest.cases).toHaveLength(115);
     expect(manifest.cases.some((record) => record.caseId === "luigi-giovanni-live")).toBe(true);
     expect(manifest.cases.some((record) => record.caseId === "approved-wine-020")).toBe(true);
+    expect(manifest.cases.some((record) => record.caseId === "approved-wine-110")).toBe(true);
     expect(
       manifest.records
         .filter((record) => record.status === "included")
         .every((record) => record.beverageCategory === "wine"),
     ).toBe(true);
+  });
+
+  it("leaves only the three placeholder-abv wine labels as uncertain truth", () => {
+    const manifest = loadEvalManifest();
+    const unresolved = manifest.records
+      .filter((record) => record.status === "excluded_uncertain_truth")
+      .map((record) => record.caseId)
+      .sort();
+    expect(unresolved).toEqual([
+      "approved-wine-029",
+      "approved-wine-030",
+      "approved-wine-036",
+    ]);
   });
 
   it("marks the M Cellars derivatives as duplicates of the canonical benchmark", () => {

@@ -50,6 +50,7 @@ export interface CaseReport {
   /** Present only when extraction returned a typed error. */
   extractionError: string | null;
   brand: FieldReport & {
+    present: boolean;
     acceptable: string[];
     knownAmbiguous: boolean;
     exactMatch: boolean;

@@ -97,6 +97,11 @@ export function brandInTopK(observed: ObservedField, acceptable: string[], k: nu
   return ranked.some((v) => brandNormalizedMatch(v, acceptable));
 }
 
+/** Brand detected = a present observation of any confidence (not NOT_OBSERVED). */
+export function brandDetected(observed: ObservedField): boolean {
+  return observed.state !== "NOT_OBSERVED" && observed.value !== null;
+}
+
 // ---------------------------------------------------------------------------
 // Alcohol parsing.
 // ---------------------------------------------------------------------------
@@ -131,6 +136,10 @@ export function classifyBrand(
   observed: ObservedField,
   diag: BrandDiagnostics,
 ): EvalFailureClass {
+  if (!truth.present) {
+    return brandDetected(observed) ? "false-certainty" : "correct";
+  }
+
   const selectedAcceptable =
     brandExactMatch(observed.value, truth.acceptable) ||
     brandNormalizedMatch(observed.value, truth.acceptable);
@@ -194,8 +203,10 @@ export interface FieldCaseScore {
   caseId: string;
   brandClass: EvalFailureClass;
   alcoholClass: EvalFailureClass;
+  brandPresent: boolean;
   brandKnownAmbiguous: boolean;
   alcoholPresent: boolean;
+  brandDetected: boolean;
   brandExact: boolean;
   brandNormalized: boolean;
   brandTop3: boolean;
@@ -208,9 +219,11 @@ export interface AggregateMetrics {
   caseCount: number;
   /** Denominator for brand accuracy = cases with a single correct brand. */
   determinateBrandCount: number;
+  absentBrandCount: number;
   brandExactMatchRate: number;
   brandNormalizedAcceptableRate: number;
   brandTop3Recall: number;
+  absentBrandFalsePositiveRate: number;
   presentAlcoholCount: number;
   alcoholDetectionRecall: number;
   alcoholParsedValueAccuracy: number;
@@ -253,8 +266,9 @@ function emptyClassCounts(): Record<EvalFailureClass, number> {
 }
 
 export function aggregate(scores: FieldCaseScore[]): AggregateMetrics {
-  const determinate = scores.filter((s) => !s.brandKnownAmbiguous);
-  const ambiguous = scores.filter((s) => s.brandKnownAmbiguous);
+  const determinate = scores.filter((s) => s.brandPresent && !s.brandKnownAmbiguous);
+  const absentBrand = scores.filter((s) => !s.brandPresent);
+  const ambiguous = scores.filter((s) => s.brandPresent && s.brandKnownAmbiguous);
   const present = scores.filter((s) => s.alcoholPresent);
   const absent = scores.filter((s) => !s.alcoholPresent);
 
@@ -270,12 +284,17 @@ export function aggregate(scores: FieldCaseScore[]): AggregateMetrics {
   return {
     caseCount: scores.length,
     determinateBrandCount: determinate.length,
+    absentBrandCount: absentBrand.length,
     brandExactMatchRate: rate(determinate.filter((s) => s.brandExact).length, determinate.length),
     brandNormalizedAcceptableRate: rate(
       determinate.filter((s) => s.brandNormalized).length,
       determinate.length,
     ),
     brandTop3Recall: rate(determinate.filter((s) => s.brandTop3).length, determinate.length),
+    absentBrandFalsePositiveRate: rate(
+      absentBrand.filter((s) => s.brandDetected).length,
+      absentBrand.length,
+    ),
     presentAlcoholCount: present.length,
     alcoholDetectionRecall: rate(present.filter((s) => s.alcoholDetected).length, present.length),
     alcoholParsedValueAccuracy: rate(

@@ -1,8 +1,10 @@
 import { createHash } from "node:crypto";
-import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import sharp from "sharp";
+
+import { FULL_CORPUS_RECORD_OVERRIDES } from "../../src/fixtures/eval/eval-full-corpus-overrides.mjs";
 
 const REPO_ROOT = process.cwd();
 const CORPUS_ROOT = path.join(REPO_ROOT, "tests/fixtures/precheck");
@@ -411,22 +413,13 @@ function seedRecord(discovered, seedCase) {
 }
 
 function manualIncludedRecord(discovered, override) {
-  return {
-    caseId: discovered.caseId,
-    imagePath: discovered.imagePath,
-    expectedSha256: discovered.expectedSha256,
-    image: discovered.image,
-    beverageCategory: discovered.beverageCategory,
-    source: discovered.source,
+  return manualOverrideRecord(discovered, {
+    status: "included",
     inspection: {
-      imageOrientation: orientation(discovered.image.width, discovered.image.height),
       visualStrata: override.visualStrata,
       reviewReasons: [],
       notes: override.notes,
     },
-    status: "included",
-    exclusionReason: null,
-    duplicateOfCaseId: null,
     annotation: {
       brand: {
         presence: "present",
@@ -446,13 +439,54 @@ function manualIncludedRecord(discovered, override) {
         orientation: override.alcohol.orientation,
       },
       confidence: { overall: "high", brand: "high", alcohol: "high" },
+      notes: override.notes,
+    },
+  });
+}
+
+function manualOverrideRecord(discovered, override) {
+  const base = {
+    caseId: discovered.caseId,
+    imagePath: discovered.imagePath,
+    expectedSha256: discovered.expectedSha256,
+    image: discovered.image,
+    beverageCategory: discovered.beverageCategory,
+    source: discovered.source,
+    inspection: {
+      imageOrientation: orientation(discovered.image.width, discovered.image.height),
+      visualStrata: override.inspection.visualStrata,
+      reviewReasons: override.inspection.reviewReasons,
+      notes: override.inspection.notes,
+    },
+  };
+
+  if (override.status !== "included") {
+    return {
+      ...base,
+      status: override.status,
+      exclusionReason: override.exclusionReason,
+      duplicateOfCaseId: null,
+      annotation: null,
+      qualityControl: null,
+    };
+  }
+
+  return {
+    ...base,
+    status: "included",
+    exclusionReason: null,
+    duplicateOfCaseId: null,
+    annotation: {
+      brand: override.annotation.brand,
+      alcohol: override.annotation.alcohol,
+      confidence: override.annotation.confidence,
       provenance: {
         annotatedBy: "Codex",
         annotatedOn: TODAY,
         method:
           "manual inspection of the committed fixture image aided by bounded local OCR preview",
       },
-      notes: override.notes,
+      notes: override.annotation.notes,
     },
     qualityControl: {
       reviewedBy: "Codex",
@@ -461,7 +495,7 @@ function manualIncludedRecord(discovered, override) {
       outcome: "confirmed",
       checks: QC_CHECKS,
       corrections: [],
-      notes: "Checkpoint inclusion added after direct image review and bounded OCR preview.",
+      notes: "Full-corpus annotation confirmed after direct image review and bounded OCR preview.",
     },
   };
 }
@@ -556,8 +590,10 @@ function inventorySummary(records) {
     byCategory,
     byStatus,
     includedWine: records.filter((record) => record.status === "included").length,
-    pendingWineAnnotation: records.filter((record) => record.status === "excluded_uncertain_truth")
-      .length,
+    excludedUncertainTruthWine: records.filter(
+      (record) =>
+        record.beverageCategory === "wine" && record.status === "excluded_uncertain_truth",
+    ).length,
     nonWine: records.filter((record) => record.beverageCategory !== "wine").length,
   };
 }
@@ -568,10 +604,10 @@ function writeInventoryReport(records) {
   writeFileSync(path.join(OUT_DIR, "inventory.json"), `${JSON.stringify(summary, null, 2)}\n`);
 
   const lines = [];
-  lines.push("# Full Corpus Inventory Checkpoint");
+  lines.push("# Full Corpus Evaluation Inventory");
   lines.push("");
   lines.push(
-    "This checkpoint reconciles every committed candidate image under `tests/fixtures/precheck` into the corpus-scale evaluation manifest.",
+    "This inventory reconciles every committed candidate image under `tests/fixtures/precheck` into the full Issue #57 evaluation manifest.",
   );
   lines.push("");
   lines.push(`- Discovered candidate images: **${summary.discoveredCandidateImages}**`);
@@ -580,8 +616,10 @@ function writeInventoryReport(records) {
   lines.push(
     `- Beer or malt beverage images: **${summary.byCategory["beer-or-malt-beverage"] ?? 0}**`,
   );
-  lines.push(`- Included baseline seed cases: **${summary.includedWine}**`);
-  lines.push(`- Wine images awaiting full annotation: **${summary.pendingWineAnnotation}**`);
+  lines.push(`- Included wine evaluation records: **${summary.includedWine}**`);
+  lines.push(
+    `- Wine records excluded as uncertain truth: **${summary.excludedUncertainTruthWine}**`,
+  );
   lines.push("");
   lines.push("## Visual corrections discovered during inventory");
   lines.push("");
@@ -604,6 +642,9 @@ function escapeXml(text) {
 async function writeContactSheets(records, slug) {
   const outDir = path.join(CONTACT_SHEET_DIR, slug);
   mkdirSync(outDir, { recursive: true });
+  for (const name of readdirSync(outDir).filter((entry) => entry.endsWith(".png"))) {
+    rmSync(path.join(outDir, name));
+  }
   const cols = 3;
   const rows = 4;
   const thumbW = 360;
@@ -671,6 +712,8 @@ async function main() {
     if (seedCase) return seedRecord(record, seedCase);
     const override = CHECKPOINT_INCLUDED.get(record.caseId);
     if (override) return manualIncludedRecord(record, override);
+    const fullCorpusOverride = FULL_CORPUS_RECORD_OVERRIDES[record.caseId];
+    if (fullCorpusOverride) return manualOverrideRecord(record, fullCorpusOverride);
     if (record.caseId === "m-cellars-reference-crop") {
       return duplicateRecord(
         record,
@@ -699,7 +742,7 @@ async function main() {
     schemaVersion: "extraction-eval-manifest.v2",
     corpusRoot: "tests/fixtures/precheck",
     description:
-      "Corpus-scale checkpoint manifest for Issue #57. Every committed candidate image is reconciled here; the seeded 15-case baseline remains included while the remaining wine corpus awaits full annotation expansion.",
+      "Corpus-scale evaluation manifest for Issue #57. Every committed candidate image is reconciled here, with the full wine corpus annotated except for the three labels whose alcohol truth remains indeterminate from the committed artwork.",
     records,
   };
 
@@ -719,7 +762,16 @@ async function main() {
     "non-wine",
   );
   await writeContactSheets(
-    records.filter((record) => record.inspection.reviewReasons.length > 0),
+    records.filter(
+      (record) =>
+        record.inspection.reviewReasons.length > 0 &&
+        [
+          "excluded_uncertain_truth",
+          "excluded_unreadable",
+          "excluded_usage_or_provenance_concern",
+          "excluded_other",
+        ].includes(record.status),
+    ),
     "human-review-queue",
   );
   console.log(`Wrote ${relRepo(OUT_MANIFEST)}`);
