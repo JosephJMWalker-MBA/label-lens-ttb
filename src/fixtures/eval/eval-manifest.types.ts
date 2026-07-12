@@ -337,10 +337,12 @@ export interface EvalManifest {
 // ---------------------------------------------------------------------------
 
 export interface EvalBrandTruth {
+  present: boolean;
   acceptable: string[];
   knownAmbiguous: boolean;
   approxLocation?: EvalFieldLocation;
   forbidden?: string[];
+  absenceReason?: string;
 }
 
 export interface EvalAlcoholTruth {

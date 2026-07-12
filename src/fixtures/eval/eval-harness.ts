@@ -222,6 +222,7 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
       extractionError: result.error.code,
       brand: {
         ...emptyFieldReport(empty),
+        present: evalCase.brand.present,
         acceptable: evalCase.brand.acceptable,
         knownAmbiguous: evalCase.brand.knownAmbiguous,
         exactMatch: false,
@@ -258,6 +259,7 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
       value: brandObs.value,
       confidence: brandObs.confidence,
       alternates: brandObs.alternates,
+      present: evalCase.brand.present,
       acceptable: evalCase.brand.acceptable,
       knownAmbiguous: evalCase.brand.knownAmbiguous,
       exactMatch: brandExactMatch(brandObs.value, evalCase.brand.acceptable),

@@ -13,8 +13,10 @@ function scoreOf(c: CaseReport): FieldCaseScore {
     caseId: c.caseId,
     brandClass: c.brand.failureClass,
     alcoholClass: c.alcohol.failureClass,
+    brandPresent: c.brand.present,
     brandKnownAmbiguous: c.brand.knownAmbiguous,
     alcoholPresent: c.alcohol.present,
+    brandDetected: c.brand.state !== "NOT_OBSERVED" && c.brand.value !== null,
     brandExact: c.brand.exactMatch,
     brandNormalized: c.brand.normalizedMatch,
     brandTop3: c.brand.top3Recall,
@@ -49,12 +51,12 @@ function classSummary(counts: Record<EvalFailureClass, number>): string {
 export function renderMarkdown(report: EvalReport): string {
   const a = report.aggregate;
   const lines: string[] = [];
-  lines.push("# Extraction accuracy baseline (Issue #57)");
+  lines.push("# Full-Corpus Extraction Evaluation (Issue #57)");
   lines.push("");
   lines.push(
     "Measured with the evaluation harness against the current production extractor " +
       `\`${report.extractorAdapter.id}@${report.extractorAdapter.version}\`. ` +
-      "This report is generated (`npm run eval:baseline`) and committed as a point-in-time baseline. " +
+      "This report is generated (`npm run eval:baseline`) and committed as a point-in-time full-corpus evaluation. " +
       "Latencies are environment-dependent; all other figures are deterministic given fixed OCR output.",
   );
   lines.push("");
@@ -72,13 +74,16 @@ export function renderMarkdown(report: EvalReport): string {
     `| Brand top-3 recall | ${pct(a.brandTop3Recall)} | ${a.determinateBrandCount} determinate |`,
   );
   lines.push(
+    `| Absent-brand false-positive rate | ${pct(a.absentBrandFalsePositiveRate)} | ${a.absentBrandCount} absent |`,
+  );
+  lines.push(
     `| Alcohol detection recall | ${pct(a.alcoholDetectionRecall)} | ${a.presentAlcoholCount} present |`,
   );
   lines.push(
     `| Alcohol parsed-value accuracy | ${pct(a.alcoholParsedValueAccuracy)} | ${a.presentAlcoholCount} present |`,
   );
   lines.push(
-    `| Absent-field false-positive rate | ${pct(a.absentFieldFalsePositiveRate)} | ${a.absentAlcoholCount} absent |`,
+    `| Absent-alcohol false-positive rate | ${pct(a.absentFieldFalsePositiveRate)} | ${a.absentAlcoholCount} absent |`,
   );
   lines.push(
     `| Ambiguity honesty (deferred when ambiguous) | ${pct(a.ambiguityHonestyRate)} | ${a.ambiguousBrandCount} ambiguous |`,

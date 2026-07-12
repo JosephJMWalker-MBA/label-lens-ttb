@@ -1,13 +1,13 @@
-# Full Corpus Inventory Checkpoint
+# Full Corpus Evaluation Inventory
 
-This checkpoint reconciles every committed candidate image under `tests/fixtures/precheck` into the corpus-scale evaluation manifest.
+This inventory reconciles every committed candidate image under `tests/fixtures/precheck` into the full Issue #57 evaluation manifest.
 
 - Discovered candidate images: **132**
 - Wine images: **120**
 - Distilled-spirits images: **9**
 - Beer or malt beverage images: **3**
-- Included baseline seed cases: **24**
-- Wine images awaiting full annotation: **94**
+- Included wine evaluation records: **115**
+- Wine records excluded as uncertain truth: **3**
 
 ## Visual corrections discovered during inventory
 
