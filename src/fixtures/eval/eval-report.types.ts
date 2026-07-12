@@ -68,10 +68,30 @@ export interface CaseReport {
   latencyMs: number;
 }
 
+export interface EvalAlcoholSliceMetrics {
+  key: string;
+  label: string;
+  presentCaseCount: number;
+  detectedCount: number;
+  parsedAccurateCount: number;
+  detectionRecall: number;
+  parsedAccuracy: number;
+}
+
+export interface EvalFailureDistributionBucket {
+  key: string;
+  label: string;
+  count: number;
+}
+
 export interface EvalReport {
-  schemaVersion: "extraction-baseline-report.v1";
+  schemaVersion: "extraction-baseline-report.v2";
   manifestSchemaVersion: string;
   extractorAdapter: { id: string; version: string };
   aggregate: AggregateMetrics;
+  breakdowns: {
+    alcoholSlices: EvalAlcoholSliceMetrics[];
+    failureDistribution: EvalFailureDistributionBucket[];
+  };
   cases: CaseReport[];
 }

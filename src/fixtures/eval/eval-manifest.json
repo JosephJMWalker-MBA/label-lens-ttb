@@ -41,32 +41,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Luigi & Giovanni"
-          ],
+          "acceptablePresentations": ["Luigi & Giovanni"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Pir",
-            "VANNI",
-            "TASTE OF ITALY",
-            "PRIMITIVO"
-          ],
+          "forbiddenPresentations": ["Pir", "VANNI", "TASTE OF ITALY", "PRIMITIVO"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            14
-          ],
-          "acceptableStatements": [
-            "14% ALC",
-            "14%"
-          ],
-          "characteristics": [
-            "rotated-or-vertical"
-          ],
+          "acceptablePercents": [14],
+          "acceptableStatements": ["14% ALC", "14%"],
+          "characteristics": ["rotated-or-vertical"],
           "approxGeometry": [],
           "orientation": "mixed"
         },
@@ -138,10 +124,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Alfredo's Wine",
-            "Alfredo's"
-          ],
+          "acceptablePresentations": ["Alfredo's Wine", "Alfredo's"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -150,13 +133,8 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            14
-          ],
-          "acceptableStatements": [
-            "14% ALC",
-            "14%"
-          ],
+          "acceptablePercents": [14],
+          "acceptableStatements": ["14% ALC", "14%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -229,9 +207,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "La Fattoria"
-          ],
+          "acceptablePresentations": ["La Fattoria"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -240,16 +216,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            14
-          ],
-          "acceptableStatements": [
-            "14% ALC",
-            "14%"
-          ],
-          "characteristics": [
-            "rotated-or-vertical"
-          ],
+          "acceptablePercents": [14],
+          "acceptableStatements": ["14% ALC", "14%"],
+          "characteristics": ["rotated-or-vertical"],
           "approxGeometry": [],
           "orientation": "mixed"
         },
@@ -321,9 +290,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "La Fattoria"
-          ],
+          "acceptablePresentations": ["La Fattoria"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -332,16 +299,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            14
-          ],
-          "acceptableStatements": [
-            "14% ALC",
-            "14%"
-          ],
-          "characteristics": [
-            "rotated-or-vertical"
-          ],
+          "acceptablePercents": [14],
+          "acceptableStatements": ["14% ALC", "14%"],
+          "characteristics": ["rotated-or-vertical"],
           "approxGeometry": [],
           "orientation": "mixed"
         },
@@ -413,9 +373,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "La Fattoria"
-          ],
+          "acceptablePresentations": ["La Fattoria"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -424,16 +382,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            14
-          ],
-          "acceptableStatements": [
-            "14% ALC",
-            "14%"
-          ],
-          "characteristics": [
-            "rotated-or-vertical"
-          ],
+          "acceptablePercents": [14],
+          "acceptableStatements": ["14% ALC", "14%"],
+          "characteristics": ["rotated-or-vertical"],
           "approxGeometry": [],
           "orientation": "mixed"
         },
@@ -505,9 +456,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Dark Horse"
-          ],
+          "acceptablePresentations": ["Dark Horse"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -516,16 +465,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "ALC. 13.5% BY VOL.",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["ALC. 13.5% BY VOL.", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -582,12 +524,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "low-contrast",
-          "split-alcohol-tokens",
-          "front-label"
-        ],
+        "visualStrata": ["multi-line-brand", "low-contrast", "split-alcohol-tokens", "front-label"],
         "reviewReasons": [],
         "notes": "Brand across the top over a faint rhinoceros engraving (low contrast). Alcohol shown as 'ALC. 14 BY VOL.' with no % sign."
       },
@@ -597,10 +534,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Casanova della Spinetta",
-            "Casanova Della Spinetta"
-          ],
+          "acceptablePresentations": ["Casanova della Spinetta", "Casanova Della Spinetta"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -609,17 +543,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            14
-          ],
-          "acceptableStatements": [
-            "ALC. 14 BY VOL.",
-            "14"
-          ],
-          "characteristics": [
-            "split-token",
-            "no-percent-sign"
-          ],
+          "acceptablePercents": [14],
+          "acceptableStatements": ["ALC. 14 BY VOL.", "14"],
+          "characteristics": ["split-token", "no-percent-sign"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -676,11 +602,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multiple-brand-like-phrases",
-          "front-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Vino Alpino export-style panel with producer text for Terre Sparse and a determinate 13% alcohol line near the upper center."
       },
@@ -690,28 +612,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Vino Alpino"
-          ],
+          "acceptablePresentations": ["Vino Alpino"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Terre Sparse",
-            "Vino Rosso",
-            "Red Wine"
-          ],
+          "forbiddenPresentations": ["Terre Sparse", "Vino Rosso", "Red Wine"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13
-          ],
-          "acceptableStatements": [
-            "alc 13% vol",
-            "13%"
-          ],
+          "acceptablePercents": [13],
+          "acceptableStatements": ["alc 13% vol", "13%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -769,11 +680,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multiple-brand-like-phrases",
-          "front-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Vino Alpino panel matching approved-wine-008, but with the alcohol shown as a comma-decimal 13,5% by volume."
       },
@@ -783,32 +690,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Vino Alpino"
-          ],
+          "acceptablePresentations": ["Vino Alpino"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Terre Sparse",
-            "Vino Rosso",
-            "Red Wine"
-          ],
+          "forbiddenPresentations": ["Terre Sparse", "Vino Rosso", "Red Wine"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "13,5% by vol",
-            "13.5%",
-            "13,5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["13,5% by vol", "13.5%", "13,5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -880,27 +773,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Domaine Follin-Arbelet"
-          ],
+          "acceptablePresentations": ["Domaine Follin-Arbelet"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Kermit Lynch",
-            "Kermit Lynch Wine Merchant"
-          ],
+          "forbiddenPresentations": ["Kermit Lynch", "Kermit Lynch Wine Merchant"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            14
-          ],
-          "acceptableStatements": [
-            "ALC. 14% BY VOL.",
-            "14%"
-          ],
+          "acceptablePercents": [14],
+          "acceptableStatements": ["ALC. 14% BY VOL.", "14%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -958,11 +841,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multiple-brand-like-phrases",
-          "front-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "MariaAntonietta / Coste della Sesia label with the house name dominating and a small 13.5% vol line at the lower-right corner."
       },
@@ -972,30 +851,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "MariaAntonietta"
-          ],
+          "acceptablePresentations": ["MariaAntonietta"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Coste della Sesia",
-            "Red Wine"
-          ],
+          "forbiddenPresentations": ["Coste della Sesia", "Red Wine"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "13.5% vol",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["13.5% vol", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -1052,11 +919,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "simple-centered-brand",
-          "front-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["simple-centered-brand", "front-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Cooley Bay Reserve Tempranillo label with a direct alcohol statement near the bottom."
       },
@@ -1066,9 +929,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Cooley Bay"
-          ],
+          "acceptablePresentations": ["Cooley Bay"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -1077,16 +938,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.8
-          ],
-          "acceptableStatements": [
-            "Alcohol 13.8% by Volume",
-            "13.8%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.8],
+          "acceptableStatements": ["Alcohol 13.8% by Volume", "13.8%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -1158,31 +1012,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Afflicted"
-          ],
+          "acceptablePresentations": ["Afflicted"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Player's Heart",
-            "Reserva",
-            "Cabernet"
-          ],
+          "forbiddenPresentations": ["Player's Heart", "Reserva", "Cabernet"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "13.5% ABV",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["13.5% ABV", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -1239,11 +1080,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Tre Cori text-heavy label with the alcohol statement printed above the net-contents line."
       },
@@ -1253,9 +1090,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Tre Cori"
-          ],
+          "acceptablePresentations": ["Tre Cori"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -1264,13 +1099,8 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            14
-          ],
-          "acceptableStatements": [
-            "14% ALC. BY VOL.",
-            "14%"
-          ],
+          "acceptablePercents": [14],
+          "acceptableStatements": ["14% ALC. BY VOL.", "14%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -1344,9 +1174,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Patricia Green Cellars"
-          ],
+          "acceptablePresentations": ["Patricia Green Cellars"],
           "genuinelyAmbiguous": true,
           "ambiguityReason": "The label is dense and the brand appears only through bottler-style text, so the artwork supports reviewer-facing uncertainty rather than a single clean brand mark.",
           "forbiddenPresentations": [],
@@ -1355,16 +1183,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.8
-          ],
-          "acceptableStatements": [
-            "ALC. 13.8% BY VOL.",
-            "13.8%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.8],
+          "acceptableStatements": ["ALC. 13.8% BY VOL.", "13.8%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -1421,11 +1242,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Marques de Navarro Malbec label with a bottom-row alcohol statement and producer text separated from the title block."
       },
@@ -1435,9 +1252,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Marques de Navarro"
-          ],
+          "acceptablePresentations": ["Marques de Navarro"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -1446,16 +1261,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "ALC. 13.5% BY VOL.",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["ALC. 13.5% BY VOL.", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -1512,11 +1320,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "simple-centered-brand",
-          "front-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["simple-centered-brand", "front-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "La Borde Noire back-facing export label with the wine name carried at top and a direct 12% by volume footer line."
       },
@@ -1526,27 +1330,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "La Borde Noire"
-          ],
+          "acceptablePresentations": ["La Borde Noire"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Grenache Noir",
-            "Syrah"
-          ],
+          "forbiddenPresentations": ["Grenache Noir", "Syrah"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12
-          ],
-          "acceptableStatements": [
-            "ALC. 12% BY VOL.",
-            "12%"
-          ],
+          "acceptablePercents": [12],
+          "acceptableStatements": ["ALC. 12% BY VOL.", "12%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -1604,12 +1398,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "front-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "front-label", "dense-text", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Poqr Krya indigenous-blend label with the alcohol statement stacked in the left information column."
       },
@@ -1619,10 +1408,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Poqr Krya",
-            "POQR KRYA"
-          ],
+          "acceptablePresentations": ["Poqr Krya", "POQR KRYA"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -1631,16 +1417,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "Alc. 13.5% by Vol.",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["Alc. 13.5% by Vol.", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -1697,11 +1476,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "simple-centered-brand",
-          "front-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["simple-centered-brand", "front-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Kyrios Malbec label with a clean title block and a direct alcohol statement on the lower edge."
       },
@@ -1711,9 +1486,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Kyrios"
-          ],
+          "acceptablePresentations": ["Kyrios"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -1722,16 +1495,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "Alc. 13.5 % by Vol.",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["Alc. 13.5 % by Vol.", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -1788,11 +1554,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "simple-centered-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["simple-centered-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Courtieu / Chateau Courtieu text label with a comma-decimal alcohol statement near the lower-left corner."
       },
@@ -1802,10 +1564,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Courtieu",
-            "Chateau Courtieu"
-          ],
+          "acceptablePresentations": ["Courtieu", "Chateau Courtieu"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -1814,17 +1573,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12.5
-          ],
-          "acceptableStatements": [
-            "ALC. 12,5% BY VOL",
-            "12.5%",
-            "12,5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [12.5],
+          "acceptableStatements": ["ALC. 12,5% BY VOL", "12.5%", "12,5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -1881,11 +1632,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "simple-centered-brand",
-          "low-contrast",
-          "front-label"
-        ],
+        "visualStrata": ["simple-centered-brand", "low-contrast", "front-label"],
         "reviewReasons": [],
         "notes": "Cream 'SAKER' centered on a near-black background (low contrast); alcohol at bottom-left."
       },
@@ -1895,9 +1642,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Saker"
-          ],
+          "acceptablePresentations": ["Saker"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -1906,16 +1651,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12.6
-          ],
-          "acceptableStatements": [
-            "12.6% ALC. BY VOL.",
-            "12.6%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [12.6],
+          "acceptableStatements": ["12.6% ALC. BY VOL.", "12.6%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -1972,10 +1710,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Pure regulatory back panel with a determinate 12% alcohol line but no distinct consumer-facing brand separate from the bottler statement."
       },
@@ -1989,22 +1724,14 @@
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "absenceReason": "The image shows only a producer statement and generic style text, not a distinct brand presentation.",
-          "forbiddenPresentations": [
-            "Marble Creek Acres",
-            "Concord"
-          ],
+          "forbiddenPresentations": ["Marble Creek Acres", "Concord"],
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12
-          ],
-          "acceptableStatements": [
-            "12% ALC BY VOL",
-            "12%"
-          ],
+          "acceptablePercents": [12],
+          "acceptableStatements": ["12% ALC BY VOL", "12%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -2062,11 +1789,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "decorative-or-script-brand",
-          "front-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["decorative-or-script-brand", "front-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Podere don Cataldo script header above the varietal and appellation, with a determinate 14% by volume footer line."
       },
@@ -2076,28 +1799,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Podere don Cataldo",
-            "Podere Don Cataldo"
-          ],
+          "acceptablePresentations": ["Podere don Cataldo", "Podere Don Cataldo"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Primitivo",
-            "Salento"
-          ],
+          "forbiddenPresentations": ["Primitivo", "Salento"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            14
-          ],
-          "acceptableStatements": [
-            "ALC. 14% BY VOL.",
-            "14%"
-          ],
+          "acceptablePercents": [14],
+          "acceptableStatements": ["ALC. 14% BY VOL.", "14%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -2155,11 +1867,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "missing-alcohol-statement"
-        ],
+        "visualStrata": ["back-label", "dense-text", "missing-alcohol-statement"],
         "reviewReasons": [],
         "notes": "Chateau de Laville back label with descriptive estate text and no alcohol statement visible anywhere on the committed image."
       },
@@ -2169,14 +1877,10 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Chateau de Laville"
-          ],
+          "acceptablePresentations": ["Chateau de Laville"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Cadillac Cotes de Bordeaux"
-          ],
+          "forbiddenPresentations": ["Cadillac Cotes de Bordeaux"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -2242,11 +1946,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "simple-centered-brand",
-          "alcohol-at-bottom",
-          "front-label"
-        ],
+        "visualStrata": ["simple-centered-brand", "alcohol-at-bottom", "front-label"],
         "reviewReasons": [],
         "notes": "Clean high-contrast 'NEBLA' at top-left; alcohol stated twice ('ALC. 13% BY VOL.' and '13% vol')."
       },
@@ -2256,9 +1956,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Nebla"
-          ],
+          "acceptablePresentations": ["Nebla"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -2267,14 +1965,8 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13
-          ],
-          "acceptableStatements": [
-            "ALC. 13% BY VOL.",
-            "13% vol",
-            "13%"
-          ],
+          "acceptablePercents": [13],
+          "acceptableStatements": ["ALC. 13% BY VOL.", "13% vol", "13%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -2332,11 +2024,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multiple-brand-like-phrases",
-          "front-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Principe Diphesa is the dominant title while Francesca Fiasco appears as a smaller producer line above it."
       },
@@ -2346,30 +2034,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Principe Diphesa"
-          ],
+          "acceptablePresentations": ["Principe Diphesa"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Francesca Fiasco",
-            "Paestum"
-          ],
+          "forbiddenPresentations": ["Francesca Fiasco", "Paestum"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "ALC. 13.5% BY VOL.",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["ALC. 13.5% BY VOL.", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -2441,30 +2117,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "The Golden Girls",
-            "Golden Girls"
-          ],
+          "acceptablePresentations": ["The Golden Girls", "Golden Girls"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Red Wine Blend"
-          ],
+          "forbiddenPresentations": ["Red Wine Blend"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "13.5% alc./vol",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["13.5% alc./vol", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -2521,11 +2185,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "simple-centered-brand",
-          "front-label",
-          "missing-alcohol-statement"
-        ],
+        "visualStrata": ["simple-centered-brand", "front-label", "missing-alcohol-statement"],
         "reviewReasons": [],
         "notes": "Field Vineyards descriptive panel with the brand carried at top and no alcohol statement present on the artwork."
       },
@@ -2535,15 +2195,10 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Field",
-            "Field Vineyards"
-          ],
+          "acceptablePresentations": ["Field", "Field Vineyards"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Red Wine Blend"
-          ],
+          "forbiddenPresentations": ["Red Wine Blend"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -2609,14 +2264,8 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
-        "reviewReasons": [
-          "other"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
+        "reviewReasons": ["other"],
         "notes": "The artwork shows a placeholder ABV range of '11-14% by vol.' rather than a determinate alcohol value, so exact alcohol truth cannot be assigned honestly."
       },
       "status": "excluded_uncertain_truth",
@@ -2647,14 +2296,8 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
-        "reviewReasons": [
-          "other"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
+        "reviewReasons": ["other"],
         "notes": "The artwork shows a placeholder ABV range of '11-14% by vol.' rather than a determinate alcohol value, so exact alcohol truth cannot be assigned honestly."
       },
       "status": "excluded_uncertain_truth",
@@ -2685,11 +2328,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "embeleso back label with the stylized house name at top and a determinate 13.5% by volume footer line."
       },
@@ -2699,30 +2338,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "embeleso"
-          ],
+          "acceptablePresentations": ["embeleso"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Crianza",
-            "Tempranillo"
-          ],
+          "forbiddenPresentations": ["Crianza", "Tempranillo"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "Alc. 13.5% by Vol",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["Alc. 13.5% by Vol", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -2779,11 +2406,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Travers Reserve Saint-Emilion panel with the brand line at top and a standard 14% by volume footer line."
       },
@@ -2793,26 +2416,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Travers Reserve"
-          ],
+          "acceptablePresentations": ["Travers Reserve"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Saint-Emilion"
-          ],
+          "forbiddenPresentations": ["Saint-Emilion"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            14
-          ],
-          "acceptableStatements": [
-            "ALC. 14% BY VOL",
-            "14%"
-          ],
+          "acceptablePercents": [14],
+          "acceptableStatements": ["ALC. 14% BY VOL", "14%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -2870,11 +2484,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Haywater Cove Night Swimming text label with the winery name repeated and a determinate 13.7% alcohol footer."
       },
@@ -2884,30 +2494,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Haywater Cove"
-          ],
+          "acceptablePresentations": ["Haywater Cove"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Night Swimming",
-            "Red Wine Blend"
-          ],
+          "forbiddenPresentations": ["Night Swimming", "Red Wine Blend"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.7
-          ],
-          "acceptableStatements": [
-            "13.7% Alc. by Vol.",
-            "13.7%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.7],
+          "acceptableStatements": ["13.7% Alc. by Vol.", "13.7%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -2964,11 +2562,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Nico back panel with the single-word house name at top and a small 13.5% by vol footer line below the description."
       },
@@ -2978,30 +2572,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Nico"
-          ],
+          "acceptablePresentations": ["Nico"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Malbec",
-            "Rosas Plant Selection"
-          ],
+          "forbiddenPresentations": ["Malbec", "Rosas Plant Selection"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "13.5% BY VOL",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["13.5% BY VOL", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -3058,11 +2640,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "decorative-or-script-brand",
-          "front-label",
-          "alcohol-at-side-or-rotated"
-        ],
+        "visualStrata": ["decorative-or-script-brand", "front-label", "alcohol-at-side-or-rotated"],
         "reviewReasons": [],
         "notes": "Hubert Lamy front label with the wine title centered and the 13.5% vol statement printed vertically in the right strip."
       },
@@ -3072,31 +2650,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Hubert Lamy"
-          ],
+          "acceptablePresentations": ["Hubert Lamy"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Chassagne-Montrachet",
-            "La Goujonne"
-          ],
+          "forbiddenPresentations": ["Chassagne-Montrachet", "La Goujonne"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "13.5% vol",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value",
-            "rotated-or-vertical"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["13.5% vol", "13.5%"],
+          "characteristics": ["decimal-value", "rotated-or-vertical"],
           "approxGeometry": [],
           "orientation": "mixed"
         },
@@ -3153,14 +2718,8 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
-        "reviewReasons": [
-          "other"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
+        "reviewReasons": ["other"],
         "notes": "The artwork shows a placeholder ABV range of '11-14% by vol.' rather than a determinate alcohol value, so exact alcohol truth cannot be assigned honestly."
       },
       "status": "excluded_uncertain_truth",
@@ -3191,11 +2750,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Touch Shiraz back panel with the stylized house name near the top and a determinate 13.0% by volume statement above the net-volume line."
       },
@@ -3205,27 +2760,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Touch"
-          ],
+          "acceptablePresentations": ["Touch"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Shiraz"
-          ],
+          "forbiddenPresentations": ["Shiraz"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13
-          ],
-          "acceptableStatements": [
-            "Alcohol 13.0 % by volume",
-            "13.0%",
-            "13%"
-          ],
+          "acceptablePercents": [13],
+          "acceptableStatements": ["Alcohol 13.0 % by volume", "13.0%", "13%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -3283,11 +2828,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Big Red Sunshine narrative label with the product name dominating and a direct 13.5% by vol footer line."
       },
@@ -3297,29 +2838,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Big Red Sunshine"
-          ],
+          "acceptablePresentations": ["Big Red Sunshine"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Primitivo"
-          ],
+          "forbiddenPresentations": ["Primitivo"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "ALC. 13.5% BY VOL.",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["ALC. 13.5% BY VOL.", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -3376,11 +2906,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Domaine Julien Auroux export label with Itineraire Bis as the cuvee line and a determinate 13.5% footer statement."
       },
@@ -3390,30 +2916,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Domaine Julien Auroux"
-          ],
+          "acceptablePresentations": ["Domaine Julien Auroux"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Itineraire Bis",
-            "Rouge"
-          ],
+          "forbiddenPresentations": ["Itineraire Bis", "Rouge"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "ALC. 13.5% BY VOL.",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["ALC. 13.5% BY VOL.", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -3470,12 +2984,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "brand-punctuation",
-          "multi-line-brand",
-          "low-contrast",
-          "front-label"
-        ],
+        "visualStrata": ["brand-punctuation", "multi-line-brand", "low-contrast", "front-label"],
         "reviewReasons": [],
         "notes": "Two-panel image; brand 'CHÂTEAU / BONNEAU' (accented) in cream on a dark front panel (low contrast)."
       },
@@ -3485,10 +2994,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Château Bonneau",
-            "Chateau Bonneau"
-          ],
+          "acceptablePresentations": ["Château Bonneau", "Chateau Bonneau"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -3497,14 +3003,8 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            14
-          ],
-          "acceptableStatements": [
-            "14% vol.",
-            "ALC. 14% BY VOL.",
-            "14%"
-          ],
+          "acceptablePercents": [14],
+          "acceptableStatements": ["14% vol.", "ALC. 14% BY VOL.", "14%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -3562,10 +3062,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Minimal Petite Nature label with the product name at top-left and a clean 13.0% alc/vol statement in the left text block."
       },
@@ -3575,28 +3072,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Petite Nature"
-          ],
+          "acceptablePresentations": ["Petite Nature"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Sorcieres",
-            "Red Wine"
-          ],
+          "forbiddenPresentations": ["Sorcieres", "Red Wine"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13
-          ],
-          "acceptableStatements": [
-            "13.0% alc/vol",
-            "13.0%",
-            "13%"
-          ],
+          "acceptablePercents": [13],
+          "acceptableStatements": ["13.0% alc/vol", "13.0%", "13%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -3654,11 +3140,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Domaine Quivy export panel for Chapelle Chambertin Grand Cru with a comma-decimal 13,5% by volume footer line."
       },
@@ -3668,31 +3150,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Domaine Quivy"
-          ],
+          "acceptablePresentations": ["Domaine Quivy"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Chapelle Chambertin Grand Cru",
-            "MISA"
-          ],
+          "forbiddenPresentations": ["Chapelle Chambertin Grand Cru", "MISA"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "ALC. 13,5% BY VOL.",
-            "13.5%",
-            "13,5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["ALC. 13,5% BY VOL.", "13.5%", "13,5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -3764,26 +3233,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Fulcrum"
-          ],
+          "acceptablePresentations": ["Fulcrum"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Pinot Noir"
-          ],
+          "forbiddenPresentations": ["Pinot Noir"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13
-          ],
-          "acceptableStatements": [
-            "ALC. 13% BY VOL.",
-            "13%"
-          ],
+          "acceptablePercents": [13],
+          "acceptableStatements": ["ALC. 13% BY VOL.", "13%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -3841,11 +3301,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Sweet Seduction back label with the house name large at top and a clear 13.5% by volume line near the footer."
       },
@@ -3855,29 +3311,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Sweet Seduction"
-          ],
+          "acceptablePresentations": ["Sweet Seduction"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Cabernet-Sauvignon"
-          ],
+          "forbiddenPresentations": ["Cabernet-Sauvignon"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "ALC. 13.5% BY VOL.",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["ALC. 13.5% BY VOL.", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -3934,11 +3379,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Meeting of the Minds narrative label with the title line above the descriptive copy and a 13.7% alc/vol footer line."
       },
@@ -3948,30 +3389,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Meeting of the Minds"
-          ],
+          "acceptablePresentations": ["Meeting of the Minds"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Folktale Winery",
-            "Red Wine Blend"
-          ],
+          "forbiddenPresentations": ["Folktale Winery", "Red Wine Blend"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.7
-          ],
-          "acceptableStatements": [
-            "13.7% ALC/VOL.",
-            "13.7%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.7],
+          "acceptableStatements": ["13.7% ALC/VOL.", "13.7%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -4028,11 +3457,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "missing-alcohol-statement"
-        ],
+        "visualStrata": ["back-label", "dense-text", "missing-alcohol-statement"],
         "reviewReasons": [],
         "notes": "Curious back label with the quoted cuvee title carried at the top and no alcohol statement visible on the panel."
       },
@@ -4042,15 +3467,10 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Curious"
-          ],
+          "acceptablePresentations": ["Curious"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Macchia",
-            "Red Wine Blend"
-          ],
+          "forbiddenPresentations": ["Macchia", "Red Wine Blend"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -4116,11 +3536,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "multiple-brand-like-phrases",
-          "front-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Etiris GX front panel with Art Laieta shown as the producer mark and a determinate 14% by volume statement in the right column."
       },
@@ -4130,27 +3546,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Etiris GX"
-          ],
+          "acceptablePresentations": ["Etiris GX"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Art Laieta",
-            "Garnatxa Negra"
-          ],
+          "forbiddenPresentations": ["Art Laieta", "Garnatxa Negra"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            14
-          ],
-          "acceptableStatements": [
-            "Alc. 14% by Vol.",
-            "14%"
-          ],
+          "acceptablePercents": [14],
+          "acceptableStatements": ["Alc. 14% by Vol.", "14%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -4208,11 +3614,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Pacha Carmenere narrative label with the brand large at top and a comma-decimal 14,0% alcohol statement above the barcode."
       },
@@ -4222,28 +3624,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Pacha"
-          ],
+          "acceptablePresentations": ["Pacha"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Carmenere",
-            "Andes Wine Imports"
-          ],
+          "forbiddenPresentations": ["Carmenere", "Andes Wine Imports"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            14
-          ],
-          "acceptableStatements": [
-            "Alc. 14,0% by Vol.",
-            "14.0%",
-            "14,0%"
-          ],
+          "acceptablePercents": [14],
+          "acceptableStatements": ["Alc. 14,0% by Vol.", "14.0%", "14,0%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -4301,11 +3692,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Caywood Vineyard sustainability panel with the vineyard name highlighted and a 13.2% by volume line at the bottom edge."
       },
@@ -4315,30 +3702,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Caywood Vineyard"
-          ],
+          "acceptablePresentations": ["Caywood Vineyard"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Damiani Wine Cellars",
-            "Cabernet Sauvignon"
-          ],
+          "forbiddenPresentations": ["Damiani Wine Cellars", "Cabernet Sauvignon"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.2
-          ],
-          "acceptableStatements": [
-            "Alc 13.2% by Vol",
-            "13.2%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.2],
+          "acceptableStatements": ["Alc 13.2% by Vol", "13.2%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -4395,11 +3770,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "simple-centered-brand",
-          "alcohol-at-bottom",
-          "front-label"
-        ],
+        "visualStrata": ["simple-centered-brand", "alcohol-at-bottom", "front-label"],
         "reviewReasons": [],
         "notes": "High-contrast serif brand at top; blend percentages nearby create a false-positive risk for alcohol."
       },
@@ -4409,10 +3780,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Le Temps des Fleurs",
-            "Le Temps Des Fleurs"
-          ],
+          "acceptablePresentations": ["Le Temps des Fleurs", "Le Temps Des Fleurs"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -4421,16 +3789,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            11.5
-          ],
-          "acceptableStatements": [
-            "ALC. 11.5% BY VOL.",
-            "11.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [11.5],
+          "acceptableStatements": ["ALC. 11.5% BY VOL.", "11.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -4487,11 +3848,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Pacheca Reserva Vinhas Velhas back label with the house name at top-left and a large 13.5% vol statement centered near the bottom."
       },
@@ -4501,30 +3858,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Pacheca"
-          ],
+          "acceptablePresentations": ["Pacheca"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Reserva Vinhas Velhas",
-            "Douro"
-          ],
+          "forbiddenPresentations": ["Reserva Vinhas Velhas", "Douro"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "Alc.13.5%vol",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["Alc.13.5%vol", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -4581,11 +3926,7 @@
       },
       "inspection": {
         "imageOrientation": "square",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "missing-alcohol-statement"
-        ],
+        "visualStrata": ["back-label", "dense-text", "missing-alcohol-statement"],
         "reviewReasons": [],
         "notes": "Mountain Valley Winery panel with the winery name prominent and no alcohol statement visible on the committed image."
       },
@@ -4595,14 +3936,10 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Mountain Valley Winery"
-          ],
+          "acceptablePresentations": ["Mountain Valley Winery"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Old Vine Zinfandel"
-          ],
+          "forbiddenPresentations": ["Old Vine Zinfandel"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -4682,31 +4019,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Golden Road Vineyards"
-          ],
+          "acceptablePresentations": ["Golden Road Vineyards"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Uisce Beatha",
-            "Traminette"
-          ],
+          "forbiddenPresentations": ["Uisce Beatha", "Traminette"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            11.5
-          ],
-          "acceptableStatements": [
-            "11.5% ALC/VOL",
-            "11.5%"
-          ],
-          "characteristics": [
-            "decimal-value",
-            "rotated-or-vertical"
-          ],
+          "acceptablePercents": [11.5],
+          "acceptableStatements": ["11.5% ALC/VOL", "11.5%"],
+          "characteristics": ["decimal-value", "rotated-or-vertical"],
           "approxGeometry": [],
           "orientation": "mixed"
         },
@@ -4763,11 +4087,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-side-or-rotated"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-side-or-rotated"],
         "reviewReasons": [],
         "notes": "Henri Dufreres export panel with the 12.5% alcohol statement printed vertically in the central rule block."
       },
@@ -4777,30 +4097,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Henri Dufreres"
-          ],
+          "acceptablePresentations": ["Henri Dufreres"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Coteaux Bourguignons"
-          ],
+          "forbiddenPresentations": ["Coteaux Bourguignons"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12.5
-          ],
-          "acceptableStatements": [
-            "12.5% Alc. by Vol",
-            "12.5%"
-          ],
-          "characteristics": [
-            "decimal-value",
-            "rotated-or-vertical"
-          ],
+          "acceptablePercents": [12.5],
+          "acceptableStatements": ["12.5% Alc. by Vol", "12.5%"],
+          "characteristics": ["decimal-value", "rotated-or-vertical"],
           "approxGeometry": [],
           "orientation": "mixed"
         },
@@ -4857,11 +4165,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Francois Villard export panel with the producer name above the cuvee line and a clean 13% by vol footer statement."
       },
@@ -4871,27 +4175,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Francois Villard"
-          ],
+          "acceptablePresentations": ["Francois Villard"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Gran Reflet",
-            "Saint Joseph"
-          ],
+          "forbiddenPresentations": ["Gran Reflet", "Saint Joseph"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13
-          ],
-          "acceptableStatements": [
-            "ALC.13% BY VOL",
-            "13%"
-          ],
+          "acceptablePercents": [13],
+          "acceptableStatements": ["ALC.13% BY VOL", "13%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -4949,12 +4243,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom",
-          "low-contrast"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom", "low-contrast"],
         "reviewReasons": [],
         "notes": "Washed-out Prinsi Camp d'Pietru label with the house name still legible and a determinate 13.5% by volume line."
       },
@@ -4964,29 +4253,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Prinsi"
-          ],
+          "acceptablePresentations": ["Prinsi"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Camp d'Pietru"
-          ],
+          "forbiddenPresentations": ["Camp d'Pietru"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "Alcohol 13.5% by Volume",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["Alcohol 13.5% by Volume", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -5043,11 +4321,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Prinsi Camp d'Pietru label with a clearer scan than approved-wine-056 and a determinate 13% by volume line."
       },
@@ -5057,26 +4331,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Prinsi"
-          ],
+          "acceptablePresentations": ["Prinsi"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Camp d'Pietru"
-          ],
+          "forbiddenPresentations": ["Camp d'Pietru"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13
-          ],
-          "acceptableStatements": [
-            "Alcohol 13% by Volume",
-            "13%"
-          ],
+          "acceptablePercents": [13],
+          "acceptableStatements": ["Alcohol 13% by Volume", "13%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -5134,11 +4399,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Generic Gruner Veltliner export label with a clear 12% alc/vol statement but no distinct brand separate from the producer and importer lines."
       },
@@ -5152,22 +4413,14 @@
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "absenceReason": "The image shows varietal and regional text plus producer details, but no distinct brand presentation.",
-          "forbiddenPresentations": [
-            "Gruner Veltliner",
-            "Lenz Moser"
-          ],
+          "forbiddenPresentations": ["Gruner Veltliner", "Lenz Moser"],
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12
-          ],
-          "acceptableStatements": [
-            "12% ALC./VOL.",
-            "12%"
-          ],
+          "acceptablePercents": [12],
+          "acceptableStatements": ["12% ALC./VOL.", "12%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -5225,11 +4478,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Roero Arneis label with a small Domenico Negro banner crest and a determinate 13.5% by vol footer line."
       },
@@ -5239,30 +4488,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Domenico Negro",
-            "Dominico Negro"
-          ],
+          "acceptablePresentations": ["Domenico Negro", "Dominico Negro"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Roero Arneis"
-          ],
+          "forbiddenPresentations": ["Roero Arneis"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "ALC 13,5% by vol.",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["ALC 13,5% by vol.", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -5319,11 +4556,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "missing-alcohol-statement",
-          "multiple-brand-like-phrases",
-          "front-label"
-        ],
+        "visualStrata": ["missing-alcohol-statement", "multiple-brand-like-phrases", "front-label"],
         "reviewReasons": [],
         "notes": "Prose back label with net contents and 'CONTAINS SULFITES' but no alcohol statement anywhere; NOT_OBSERVED is the correct, honest outcome."
       },
@@ -5333,9 +4566,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "3 Steves Winery"
-          ],
+          "acceptablePresentations": ["3 Steves Winery"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -5404,11 +4635,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "low-resolution",
-          "missing-alcohol-statement"
-        ],
+        "visualStrata": ["back-label", "low-resolution", "missing-alcohol-statement"],
         "reviewReasons": [],
         "notes": "Tiny Aphrodite dessert-wine panel centered in a large scan area; the brand is legible but no alcohol statement is visible."
       },
@@ -5418,14 +4645,10 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Aphrodite"
-          ],
+          "acceptablePresentations": ["Aphrodite"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Gewurztraminer"
-          ],
+          "forbiddenPresentations": ["Gewurztraminer"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -5491,11 +4714,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "low-resolution",
-          "missing-alcohol-statement"
-        ],
+        "visualStrata": ["back-label", "low-resolution", "missing-alcohol-statement"],
         "reviewReasons": [],
         "notes": "Very small Pinot Grigio descriptive label centered in a large scan area with no distinct brand or alcohol statement visible."
       },
@@ -5509,9 +4728,7 @@
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "absenceReason": "The committed image shows only generic varietal text and no distinct brand presentation.",
-          "forbiddenPresentations": [
-            "Pinot Grigio"
-          ],
+          "forbiddenPresentations": ["Pinot Grigio"],
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
@@ -5577,11 +4794,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Prinsi Tre Fichi back label with the house name at top and a determinate 13% by volume footer line."
       },
@@ -5591,27 +4804,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Prinsi"
-          ],
+          "acceptablePresentations": ["Prinsi"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Tre Fichi",
-            "Chardonnay"
-          ],
+          "forbiddenPresentations": ["Tre Fichi", "Chardonnay"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13
-          ],
-          "acceptableStatements": [
-            "ALC. 13% by VOL.",
-            "13%"
-          ],
+          "acceptablePercents": [13],
+          "acceptableStatements": ["ALC. 13% by VOL.", "13%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -5669,11 +4872,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Prinsi Il Nespolo back label with a determinate 13.5% by volume footer line."
       },
@@ -5683,30 +4882,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Prinsi"
-          ],
+          "acceptablePresentations": ["Prinsi"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Il Nespolo",
-            "Arneis"
-          ],
+          "forbiddenPresentations": ["Il Nespolo", "Arneis"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "ALC. 13.5% by VOL.",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["ALC. 13.5% by VOL.", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -5763,11 +4950,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Prinsi Campi d'Pietru Sauvignon label with the house name at top and a determinate 13% by volume footer line."
       },
@@ -5777,27 +4960,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Prinsi"
-          ],
+          "acceptablePresentations": ["Prinsi"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Campi d'Pietru",
-            "Sauvignon"
-          ],
+          "forbiddenPresentations": ["Campi d'Pietru", "Sauvignon"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13
-          ],
-          "acceptableStatements": [
-            "ALC. 13% by VOL.",
-            "13%"
-          ],
+          "acceptablePercents": [13],
+          "acceptableStatements": ["ALC. 13% by VOL.", "13%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -5855,11 +5028,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Domaine Juliette Avril Chateauneuf-du-Pape export panel with a direct 13% by vol statement near the top center."
       },
@@ -5869,26 +5038,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Domaine Juliette Avril"
-          ],
+          "acceptablePresentations": ["Domaine Juliette Avril"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Chateauneuf-du-Pape"
-          ],
+          "forbiddenPresentations": ["Chateauneuf-du-Pape"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13
-          ],
-          "acceptableStatements": [
-            "ALC. 13% BY VOL.",
-            "13%"
-          ],
+          "acceptablePercents": [13],
+          "acceptableStatements": ["ALC. 13% BY VOL.", "13%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -5946,11 +5106,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Domaine Juliette Avril Mediterranee white-wine panel with a direct 13% by vol statement near the top center."
       },
@@ -5960,27 +5116,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Domaine Juliette Avril"
-          ],
+          "acceptablePresentations": ["Domaine Juliette Avril"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Mediterranee",
-            "Viognier"
-          ],
+          "forbiddenPresentations": ["Mediterranee", "Viognier"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13
-          ],
-          "acceptableStatements": [
-            "ALC. 13% BY VOL.",
-            "13%"
-          ],
+          "acceptablePercents": [13],
+          "acceptableStatements": ["ALC. 13% BY VOL.", "13%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -6038,11 +5184,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Langhe Arneis label with SARA as the consumer-facing title and the producer names confined to the bottler statement."
       },
@@ -6052,28 +5194,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Sara"
-          ],
+          "acceptablePresentations": ["Sara"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Arneis",
-            "Carlo Giacosa",
-            "Giacosa Maria Grazia"
-          ],
+          "forbiddenPresentations": ["Arneis", "Carlo Giacosa", "Giacosa Maria Grazia"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13
-          ],
-          "acceptableStatements": [
-            "ALC. 13% BY VOL.",
-            "13%"
-          ],
+          "acceptablePercents": [13],
+          "acceptableStatements": ["ALC. 13% BY VOL.", "13%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -6131,12 +5262,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "low-contrast",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "low-contrast", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "AltaCima 4.090 Chardonnay Reserva panel in low-contrast gray-on-charcoal styling with a 13.5% alcohol footer."
       },
@@ -6146,31 +5272,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "AltaCima 4.090",
-            "AltaCima"
-          ],
+          "acceptablePresentations": ["AltaCima 4.090", "AltaCima"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Chardonnay",
-            "Reserva"
-          ],
+          "forbiddenPresentations": ["Chardonnay", "Reserva"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "13.5% Alc. by Vol.",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["13.5% Alc. by Vol.", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -6227,12 +5340,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "brand-punctuation",
-          "low-contrast",
-          "alcohol-at-bottom",
-          "front-label"
-        ],
+        "visualStrata": ["brand-punctuation", "low-contrast", "alcohol-at-bottom", "front-label"],
         "reviewReasons": [],
         "notes": "Brand 'AltaCima 4.090' (letters + digits + period) in white on grey (low contrast)."
       },
@@ -6242,10 +5350,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "AltaCima 4.090",
-            "AltaCima"
-          ],
+          "acceptablePresentations": ["AltaCima 4.090", "AltaCima"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -6254,16 +5359,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "13.5% Alc. by Vol.",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["13.5% Alc. by Vol.", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -6320,12 +5418,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "low-contrast",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "low-contrast", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "AltaCima 6.330 Late Harvest Gewurztraminer panel with a determinate 13.5% alcohol footer."
       },
@@ -6335,31 +5428,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "AltaCima 6.330",
-            "AltaCima"
-          ],
+          "acceptablePresentations": ["AltaCima 6.330", "AltaCima"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Late Harvest",
-            "Gewurztraminer"
-          ],
+          "forbiddenPresentations": ["Late Harvest", "Gewurztraminer"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "13.5% Alc. by Vol.",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["13.5% Alc. by Vol.", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -6431,15 +5511,10 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Ava Gardner"
-          ],
+          "acceptablePresentations": ["Ava Gardner"],
           "genuinelyAmbiguous": true,
           "ambiguityReason": "The thematic title 'Ava Gardner' dominates the artwork while the winery identity appears only in the producer text block.",
-          "forbiddenPresentations": [
-            "Hinnant Family Vineyards",
-            "Blanc du Bois"
-          ],
+          "forbiddenPresentations": ["Hinnant Family Vineyards", "Blanc du Bois"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -6505,11 +5580,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "missing-alcohol-statement"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "missing-alcohol-statement"],
         "reviewReasons": [],
         "notes": "Mike's Farm, Inc. contact-style panel with the business name prominent and no alcohol statement visible on the artwork."
       },
@@ -6519,15 +5590,10 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Mike's Farm, Inc.",
-            "Mike's Farm"
-          ],
+          "acceptablePresentations": ["Mike's Farm, Inc.", "Mike's Farm"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Hinnant Family Vineyard"
-          ],
+          "forbiddenPresentations": ["Hinnant Family Vineyard"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -6593,11 +5659,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "missing-alcohol-statement"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "missing-alcohol-statement"],
         "reviewReasons": [],
         "notes": "Second Mike's Farm, Inc. contact-style panel in orange with no alcohol statement visible on the committed image."
       },
@@ -6607,15 +5669,10 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Mike's Farm, Inc.",
-            "Mike's Farm"
-          ],
+          "acceptablePresentations": ["Mike's Farm, Inc.", "Mike's Farm"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Hinnant Vineyards"
-          ],
+          "forbiddenPresentations": ["Hinnant Vineyards"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -6681,11 +5738,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "missing-alcohol-statement"
-        ],
+        "visualStrata": ["back-label", "dense-text", "missing-alcohol-statement"],
         "reviewReasons": [],
         "notes": "Generic Sauvignon Blanc export panel with descriptive copy and no distinct brand or alcohol statement visible."
       },
@@ -6699,10 +5752,7 @@
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "absenceReason": "The image shows only generic varietal text and descriptive copy, not a distinct brand presentation.",
-          "forbiddenPresentations": [
-            "Sauvignon Blanc",
-            "La Baltana Vella"
-          ],
+          "forbiddenPresentations": ["Sauvignon Blanc", "La Baltana Vella"],
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
@@ -6768,11 +5818,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Etim Blanc back label with the house name at top and a comma-decimal 13,5% alc/vol statement near the footer."
       },
@@ -6782,30 +5828,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Etim"
-          ],
+          "acceptablePresentations": ["Etim"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Blanc"
-          ],
+          "forbiddenPresentations": ["Blanc"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "13,5% ALC./VOL.",
-            "13.5%",
-            "13,5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["13,5% ALC./VOL.", "13.5%", "13,5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -6862,11 +5896,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Valdinera Roero Arneis back label with a direct 13.5% by vol statement in the opening text block."
       },
@@ -6876,29 +5906,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Valdinera"
-          ],
+          "acceptablePresentations": ["Valdinera"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Roero Arneis"
-          ],
+          "forbiddenPresentations": ["Roero Arneis"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "ALC.13.5% BYVOL",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["ALC.13.5% BYVOL", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -6955,11 +5974,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "multiple-brand-like-phrases",
-          "front-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Pietta Chardonnay / Garda front-back composite panel with a direct 14% by volume line in the right information column."
       },
@@ -6969,27 +5984,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Pietta"
-          ],
+          "acceptablePresentations": ["Pietta"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Chardonnay",
-            "Garda"
-          ],
+          "forbiddenPresentations": ["Chardonnay", "Garda"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            14
-          ],
-          "acceptableStatements": [
-            "ALCOHOL 14% BY VOLUME",
-            "14%"
-          ],
+          "acceptablePercents": [14],
+          "acceptableStatements": ["ALCOHOL 14% BY VOLUME", "14%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -7047,11 +6052,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Le Caniette Offida Pecorino export label with the producer name repeated and a comma-decimal 13,5% by volume statement."
       },
@@ -7061,31 +6062,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Le Caniette"
-          ],
+          "acceptablePresentations": ["Le Caniette"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Offida",
-            "Pecorino"
-          ],
+          "forbiddenPresentations": ["Offida", "Pecorino"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "13,5 % BY VOLUME",
-            "13.5%",
-            "13,5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["13,5 % BY VOLUME", "13.5%", "13,5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -7157,9 +6145,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Le Caniette"
-          ],
+          "acceptablePresentations": ["Le Caniette"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -7168,18 +6154,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12.5
-          ],
-          "acceptableStatements": [
-            "12.5 % BY VOLUME",
-            "12.5%",
-            "12.5"
-          ],
-          "characteristics": [
-            "split-token",
-            "decimal-value"
-          ],
+          "acceptablePercents": [12.5],
+          "acceptableStatements": ["12.5 % BY VOLUME", "12.5%", "12.5"],
+          "characteristics": ["split-token", "decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -7236,11 +6213,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Corte Adagio text-only back label with a direct 12% by vol line above the net-contents statement."
       },
@@ -7250,26 +6223,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Corte Adagio"
-          ],
+          "acceptablePresentations": ["Corte Adagio"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Chardonnay"
-          ],
+          "forbiddenPresentations": ["Chardonnay"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12
-          ],
-          "acceptableStatements": [
-            "ALC 12 % BY VOL",
-            "12%"
-          ],
+          "acceptablePercents": [12],
+          "acceptableStatements": ["ALC 12 % BY VOL", "12%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -7327,12 +6291,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom",
-          "low-contrast"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom", "low-contrast"],
         "reviewReasons": [],
         "notes": "Low-contrast Chardonnay Livermore Valley label with no distinct title beyond the varietal and a determinate 14.0% by volume line."
       },
@@ -7346,23 +6305,14 @@
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "absenceReason": "The image presents only generic varietal and region text plus the producer statement, not a distinct brand presentation.",
-          "forbiddenPresentations": [
-            "Chardonnay",
-            "3 Steves Winery"
-          ],
+          "forbiddenPresentations": ["Chardonnay", "3 Steves Winery"],
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            14
-          ],
-          "acceptableStatements": [
-            "ALCOHOL 14.0% BY VOLUME",
-            "14.0%",
-            "14%"
-          ],
+          "acceptablePercents": [14],
+          "acceptableStatements": ["ALCOHOL 14.0% BY VOLUME", "14.0%", "14%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -7420,11 +6370,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "decorative-or-script-brand",
-          "front-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["decorative-or-script-brand", "front-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Barn Sill Wine Co. Christmas Hayride label with the winery name at top and a determinate 12% alc/vol line near the lower center."
       },
@@ -7434,28 +6380,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Barn Sill Wine Co.",
-            "Barn Sill Wine Co"
-          ],
+          "acceptablePresentations": ["Barn Sill Wine Co.", "Barn Sill Wine Co"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Christmas Hayride",
-            "North Carolina Muscadine Wine"
-          ],
+          "forbiddenPresentations": ["Christmas Hayride", "North Carolina Muscadine Wine"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12
-          ],
-          "acceptableStatements": [
-            "12% ALC./VOL.",
-            "12%"
-          ],
+          "acceptablePercents": [12],
+          "acceptableStatements": ["12% ALC./VOL.", "12%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -7513,11 +6448,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Filadoro Fiano di Avellino panel with the winery name prominent in the producer line and a determinate 13.5% by volume statement."
       },
@@ -7527,31 +6458,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Filadoro"
-          ],
+          "acceptablePresentations": ["Filadoro"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Fiano di Avellino",
-            "White Wine Vintage 2017"
-          ],
+          "forbiddenPresentations": ["Fiano di Avellino", "White Wine Vintage 2017"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "13,5% Alc. By Vol.",
-            "13.5%",
-            "13,5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["13,5% Alc. By Vol.", "13.5%", "13,5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -7608,11 +6526,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Mosaikon Grillo panel with the scripted house name at top and a comma-decimal 13,5% by vol line above the footer."
       },
@@ -7622,30 +6536,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Mosaikon"
-          ],
+          "acceptablePresentations": ["Mosaikon"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Grillo"
-          ],
+          "forbiddenPresentations": ["Grillo"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "Alc.13,5% by vol.",
-            "13.5%",
-            "13,5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["Alc.13,5% by vol.", "13.5%", "13,5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -7702,11 +6604,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "missing-alcohol-statement"
-        ],
+        "visualStrata": ["back-label", "dense-text", "missing-alcohol-statement"],
         "reviewReasons": [],
         "notes": "3 Steves Winery narrative panel for the Curious blend with no alcohol statement visible on the committed image."
       },
@@ -7716,14 +6614,10 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "3 Steves Winery"
-          ],
+          "acceptablePresentations": ["3 Steves Winery"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Curious"
-          ],
+          "forbiddenPresentations": ["Curious"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -7789,11 +6683,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Viridis Langhe Sauvignon panel with the cuvee name at top and a determinate 13.5% by volume footer line."
       },
@@ -7803,30 +6693,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Viridis"
-          ],
+          "acceptablePresentations": ["Viridis"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Langhe Sauvignon",
-            "Marina Burlotto"
-          ],
+          "forbiddenPresentations": ["Langhe Sauvignon", "Marina Burlotto"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "ALC. 13.5% BY VOL.",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["ALC. 13.5% BY VOL.", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -7883,11 +6761,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "La Mesma Yellow Label Gavi panel with the house name at top and a comma-decimal 12,5% alcohol statement."
       },
@@ -7897,31 +6771,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "La Mesma"
-          ],
+          "acceptablePresentations": ["La Mesma"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Yellow Label",
-            "Gavi"
-          ],
+          "forbiddenPresentations": ["Yellow Label", "Gavi"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12.5
-          ],
-          "acceptableStatements": [
-            "ALCOHOL 12,5% BY VOL",
-            "12.5%",
-            "12,5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [12.5],
+          "acceptableStatements": ["ALCOHOL 12,5% BY VOL", "12.5%", "12,5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -7978,11 +6839,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "La Mesma Black Label Gavi panel with the house name at top and a direct 13% by vol statement."
       },
@@ -7992,27 +6849,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "La Mesma"
-          ],
+          "acceptablePresentations": ["La Mesma"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Black Label",
-            "Gavi"
-          ],
+          "forbiddenPresentations": ["Black Label", "Gavi"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13
-          ],
-          "acceptableStatements": [
-            "ALCOHOL 13% BY VOL",
-            "13%"
-          ],
+          "acceptablePercents": [13],
+          "acceptableStatements": ["ALCOHOL 13% BY VOL", "13%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -8070,11 +6917,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "La Mesma Indi Gavi panel with the house name at top and a comma-decimal 12,5% alcohol statement."
       },
@@ -8084,31 +6927,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "La Mesma"
-          ],
+          "acceptablePresentations": ["La Mesma"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Indi",
-            "Gavi"
-          ],
+          "forbiddenPresentations": ["Indi", "Gavi"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12.5
-          ],
-          "acceptableStatements": [
-            "ALCOHOL 12,5% BY VOL",
-            "12.5%",
-            "12,5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [12.5],
+          "acceptableStatements": ["ALCOHOL 12,5% BY VOL", "12.5%", "12,5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -8165,11 +6995,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Rias Vermentino di Gallura panel with the cuvee name at top-left and a comma-decimal 13,5% by vol footer line."
       },
@@ -8179,31 +7005,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Rias"
-          ],
+          "acceptablePresentations": ["Rias"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Vermentino di Gallura",
-            "Tenute Gregu"
-          ],
+          "forbiddenPresentations": ["Vermentino di Gallura", "Tenute Gregu"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "ALC. 13,5% by vol.",
-            "13.5%",
-            "13,5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["ALC. 13,5% by vol.", "13.5%", "13,5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -8260,11 +7073,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Twin Suns white blend narrative label with the house name at left and a determinate 13.6% by vol footer line."
       },
@@ -8274,30 +7083,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Twin Suns"
-          ],
+          "acceptablePresentations": ["Twin Suns"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Paso Robles",
-            "Santa Barbara"
-          ],
+          "forbiddenPresentations": ["Paso Robles", "Santa Barbara"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.6
-          ],
-          "acceptableStatements": [
-            "ALC 13.6% by Vol",
-            "13.6%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.6],
+          "acceptableStatements": ["ALC 13.6% by Vol", "13.6%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -8354,11 +7151,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Fontanavecchia Taburno Falanghina panel with the house name at top and a comma-decimal 13,50% by vol statement."
       },
@@ -8368,31 +7161,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Fontanavecchia"
-          ],
+          "acceptablePresentations": ["Fontanavecchia"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Taburno",
-            "Falanghina del Sannio"
-          ],
+          "forbiddenPresentations": ["Taburno", "Falanghina del Sannio"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "ALC. 13,50% BY VOL.",
-            "13.5%",
-            "13,50%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["ALC. 13,50% BY VOL.", "13.5%", "13,50%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -8449,11 +7229,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Fontanavecchia Sannio Fiano panel with the house name at top and a comma-decimal 13,50% by vol statement."
       },
@@ -8463,31 +7239,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Fontanavecchia"
-          ],
+          "acceptablePresentations": ["Fontanavecchia"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Sannio",
-            "Fiano"
-          ],
+          "forbiddenPresentations": ["Sannio", "Fiano"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "ALC. 13,50% BY VOL.",
-            "13.5%",
-            "13,50%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["ALC. 13,50% BY VOL.", "13.5%", "13,50%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -8544,12 +7307,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom",
-          "low-resolution"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom", "low-resolution"],
         "reviewReasons": [],
         "notes": "Compact Etna Bianco export panel with a determinate 12% by volume line but no distinct brand separate from the producer statement."
       },
@@ -8563,22 +7321,14 @@
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "absenceReason": "The artwork shows generic appellation text and producer details, but no distinct brand presentation.",
-          "forbiddenPresentations": [
-            "Etna Bianco DOC",
-            "Tenute Bosco"
-          ],
+          "forbiddenPresentations": ["Etna Bianco DOC", "Tenute Bosco"],
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12
-          ],
-          "acceptableStatements": [
-            "ALC.12% BY VOL.",
-            "12%"
-          ],
+          "acceptablePercents": [12],
+          "acceptableStatements": ["ALC.12% BY VOL.", "12%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -8636,11 +7386,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Generic Delle Venezie Pinot Grigio export label with a determinate 12% by volume line but no distinct brand mark."
       },
@@ -8654,22 +7400,14 @@
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "absenceReason": "The artwork presents appellation and bottler information without a distinct brand presentation.",
-          "forbiddenPresentations": [
-            "Delle Venezie",
-            "Pinot Grigio"
-          ],
+          "forbiddenPresentations": ["Delle Venezie", "Pinot Grigio"],
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12
-          ],
-          "acceptableStatements": [
-            "ALC.12% BY VOL.",
-            "12%"
-          ],
+          "acceptablePercents": [12],
+          "acceptableStatements": ["ALC.12% BY VOL.", "12%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -8727,11 +7465,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Generic Chardonnay Veneto export label with a determinate 12% by volume line but no distinct brand mark."
       },
@@ -8745,22 +7479,14 @@
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "absenceReason": "The artwork presents varietal and bottler information without a distinct brand presentation.",
-          "forbiddenPresentations": [
-            "Chardonnay Veneto",
-            "Chardonnay"
-          ],
+          "forbiddenPresentations": ["Chardonnay Veneto", "Chardonnay"],
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12
-          ],
-          "acceptableStatements": [
-            "ALC.12% BY VOL.",
-            "12%"
-          ],
+          "acceptablePercents": [12],
+          "acceptableStatements": ["ALC.12% BY VOL.", "12%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -8818,11 +7544,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "back-label",
-          "low-resolution",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "low-resolution", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Low-resolution Ribolla Gialla export panel with a determinate 12.5% by volume line but no distinct brand presentation."
       },
@@ -8836,25 +7558,15 @@
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "absenceReason": "The committed image shows generic varietal text and a producer statement, not a distinct brand mark.",
-          "forbiddenPresentations": [
-            "Ribolla Gialla",
-            "Blazic"
-          ],
+          "forbiddenPresentations": ["Ribolla Gialla", "Blazic"],
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12.5
-          ],
-          "acceptableStatements": [
-            "ALC 12.5% BY VOL",
-            "12.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [12.5],
+          "acceptableStatements": ["ALC 12.5% BY VOL", "12.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -8911,11 +7623,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Fontanavecchia Sannio Greco panel with the house name at top and a comma-decimal 13,50% by vol statement."
       },
@@ -8925,31 +7633,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Fontanavecchia"
-          ],
+          "acceptablePresentations": ["Fontanavecchia"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Sannio",
-            "Greco"
-          ],
+          "forbiddenPresentations": ["Sannio", "Greco"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "ALC. 13,50% BY VOL.",
-            "13.5%",
-            "13,50%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["ALC. 13,50% BY VOL.", "13.5%", "13,50%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -9022,10 +7717,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Amuninni",
-            "Fabio Ferracane"
-          ],
+          "acceptablePresentations": ["Amuninni", "Fabio Ferracane"],
           "genuinelyAmbiguous": true,
           "ambiguityReason": "Competing prominent producer-style phrases remain materially plausible from the artwork alone.",
           "forbiddenPresentations": [],
@@ -9034,16 +7726,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12.5
-          ],
-          "acceptableStatements": [
-            "Alc. 12.5% By Vol.",
-            "12.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [12.5],
+          "acceptableStatements": ["Alc. 12.5% By Vol.", "12.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -9100,11 +7785,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "missing-alcohol-statement"
-        ],
+        "visualStrata": ["back-label", "dense-text", "missing-alcohol-statement"],
         "reviewReasons": [],
         "notes": "Generic Sauvignon Blanc descriptive back label with no named brand and no alcohol statement visible anywhere on the panel."
       },
@@ -9118,9 +7799,7 @@
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "absenceReason": "The artwork shows only varietal description and no distinct brand presentation.",
-          "forbiddenPresentations": [
-            "Sauvignon Blanc"
-          ],
+          "forbiddenPresentations": ["Sauvignon Blanc"],
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
@@ -9186,11 +7865,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "back-label",
-          "dense-text",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Twin Suns blend narrative panel with the house name at left and a determinate 13.4% by vol footer line."
       },
@@ -9200,30 +7875,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Twin Suns"
-          ],
+          "acceptablePresentations": ["Twin Suns"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Chardonnay",
-            "Viognier"
-          ],
+          "forbiddenPresentations": ["Chardonnay", "Viognier"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.4
-          ],
-          "acceptableStatements": [
-            "ALC 13.4% by Vol",
-            "13.4%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.4],
+          "acceptableStatements": ["ALC 13.4% by Vol", "13.4%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -9280,11 +7943,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multiple-brand-like-phrases",
-          "front-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Tenute Valso / Aphor Grillo panel with the winery name at top, the cuvee line below it, and a determinate 13% by volume statement."
       },
@@ -9294,27 +7953,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Tenute Valso"
-          ],
+          "acceptablePresentations": ["Tenute Valso"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Aphor",
-            "Grillo"
-          ],
+          "forbiddenPresentations": ["Aphor", "Grillo"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13
-          ],
-          "acceptableStatements": [
-            "Alc. 13% by VOL",
-            "13%"
-          ],
+          "acceptablePercents": [13],
+          "acceptableStatements": ["Alc. 13% by VOL", "13%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -9372,11 +8021,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multiple-brand-like-phrases",
-          "front-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Blazic Collio Chardonnay composite panel with the house name dominant and a 13% by vol statement on the right information block."
       },
@@ -9386,27 +8031,17 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Blazic"
-          ],
+          "acceptablePresentations": ["Blazic"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Collio",
-            "Chardonnay"
-          ],
+          "forbiddenPresentations": ["Collio", "Chardonnay"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13
-          ],
-          "acceptableStatements": [
-            "Alc.13% by vol",
-            "13%"
-          ],
+          "acceptablePercents": [13],
+          "acceptableStatements": ["Alc.13% by vol", "13%"],
           "characteristics": [],
           "approxGeometry": [],
           "orientation": "horizontal"
@@ -9479,30 +8114,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Luigi & Giovanni"
-          ],
+          "acceptablePresentations": ["Luigi & Giovanni"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Taste of Italy",
-            "Moscato"
-          ],
+          "forbiddenPresentations": ["Taste of Italy", "Moscato"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12.5
-          ],
-          "acceptableStatements": [
-            "12.5% ALC",
-            "12.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [12.5],
+          "acceptableStatements": ["12.5% ALC", "12.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -9574,30 +8197,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Alfredo's Wine",
-            "Alfredos Wine"
-          ],
+          "acceptablePresentations": ["Alfredo's Wine", "Alfredos Wine"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "White Wine"
-          ],
+          "forbiddenPresentations": ["White Wine"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12.5
-          ],
-          "acceptableStatements": [
-            "12.5% ALC",
-            "12.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [12.5],
+          "acceptableStatements": ["12.5% ALC", "12.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -9670,9 +8281,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "La Fattoria"
-          ],
+          "acceptablePresentations": ["La Fattoria"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -9681,17 +8290,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "13.5% ALC",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value",
-            "rotated-or-vertical"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["13.5% ALC", "13.5%"],
+          "characteristics": ["decimal-value", "rotated-or-vertical"],
           "approxGeometry": [],
           "orientation": "mixed"
         },
@@ -9764,9 +8365,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "La Fattoria"
-          ],
+          "acceptablePresentations": ["La Fattoria"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -9775,17 +8374,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12.5
-          ],
-          "acceptableStatements": [
-            "12.5% ALC",
-            "12.5%"
-          ],
-          "characteristics": [
-            "decimal-value",
-            "rotated-or-vertical"
-          ],
+          "acceptablePercents": [12.5],
+          "acceptableStatements": ["12.5% ALC", "12.5%"],
+          "characteristics": ["decimal-value", "rotated-or-vertical"],
           "approxGeometry": [],
           "orientation": "mixed"
         },
@@ -9842,11 +8433,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Sangouard-Chene Chablis export panel with a comma-decimal 12,5% by vol statement at the bottom-left."
       },
@@ -9856,30 +8443,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Sangouard-Chene"
-          ],
+          "acceptablePresentations": ["Sangouard-Chene"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Chablis"
-          ],
+          "forbiddenPresentations": ["Chablis"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12.5
-          ],
-          "acceptableStatements": [
-            "ALC. 12,5% BY VOL.",
-            "12.5%",
-            "12,5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [12.5],
+          "acceptableStatements": ["ALC. 12,5% BY VOL.", "12.5%", "12,5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -9936,11 +8511,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-line-brand",
-          "back-label",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Cooley Bay Barrel Aged Roussanne panel with the house name at top and a determinate 12.8% by volume statement near the footer."
       },
@@ -9950,29 +8521,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Cooley Bay"
-          ],
+          "acceptablePresentations": ["Cooley Bay"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Roussanne"
-          ],
+          "forbiddenPresentations": ["Roussanne"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12.8
-          ],
-          "acceptableStatements": [
-            "Alcohol 12.8% by Volume",
-            "12.8%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [12.8],
+          "acceptableStatements": ["Alcohol 12.8% by Volume", "12.8%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -10028,9 +8588,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "out-of-scope-category"
-        ],
+        "visualStrata": ["out-of-scope-category"],
         "reviewReasons": [],
         "notes": "Visually classified as a non-wine beverage label and therefore outside the current wine-extractor evaluation scope."
       },
@@ -10061,9 +8619,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "out-of-scope-category"
-        ],
+        "visualStrata": ["out-of-scope-category"],
         "reviewReasons": [],
         "notes": "Visually classified as a non-wine beverage label and therefore outside the current wine-extractor evaluation scope."
       },
@@ -10094,9 +8650,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "out-of-scope-category"
-        ],
+        "visualStrata": ["out-of-scope-category"],
         "reviewReasons": [],
         "notes": "Visually classified as a non-wine beverage label and therefore outside the current wine-extractor evaluation scope."
       },
@@ -10127,9 +8681,7 @@
       },
       "inspection": {
         "imageOrientation": "square",
-        "visualStrata": [
-          "out-of-scope-category"
-        ],
+        "visualStrata": ["out-of-scope-category"],
         "reviewReasons": [],
         "notes": "Visually classified as a non-wine beverage label and therefore outside the current wine-extractor evaluation scope."
       },
@@ -10160,9 +8712,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "out-of-scope-category"
-        ],
+        "visualStrata": ["out-of-scope-category"],
         "reviewReasons": [],
         "notes": "Visually classified as a non-wine beverage label and therefore outside the current wine-extractor evaluation scope."
       },
@@ -10193,9 +8743,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "out-of-scope-category"
-        ],
+        "visualStrata": ["out-of-scope-category"],
         "reviewReasons": [],
         "notes": "Visually classified as a non-wine beverage label and therefore outside the current wine-extractor evaluation scope."
       },
@@ -10226,9 +8774,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "out-of-scope-category"
-        ],
+        "visualStrata": ["out-of-scope-category"],
         "reviewReasons": [],
         "notes": "Visually classified as a non-wine beverage label and therefore outside the current wine-extractor evaluation scope."
       },
@@ -10259,9 +8805,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "out-of-scope-category"
-        ],
+        "visualStrata": ["out-of-scope-category"],
         "reviewReasons": [],
         "notes": "Visually classified as a non-wine beverage label and therefore outside the current wine-extractor evaluation scope."
       },
@@ -10292,9 +8836,7 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "out-of-scope-category"
-        ],
+        "visualStrata": ["out-of-scope-category"],
         "reviewReasons": [],
         "notes": "Visually classified as a non-wine beverage label and therefore outside the current wine-extractor evaluation scope."
       },
@@ -10318,9 +8860,7 @@
         "authority": "Alcohol and Tobacco Tax and Trade Bureau",
         "description": "Screened public-registry derivative of approved M Cellars label artwork.",
         "usageStatus": "screened-approved",
-        "provenanceRefs": [
-          "tests/fixtures/precheck/m-cellars-24205001000905/manifest.json"
-        ]
+        "provenanceRefs": ["tests/fixtures/precheck/m-cellars-24205001000905/manifest.json"]
       },
       "inspection": {
         "imageOrientation": "landscape",
@@ -10339,9 +8879,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "M Cellars"
-          ],
+          "acceptablePresentations": ["M Cellars"],
           "genuinelyAmbiguous": true,
           "ambiguityReason": "The only clean 'M CELLARS' is the excluded bottler line, so the artwork does not support a single determinate brand presentation.",
           "forbiddenPresentations": [],
@@ -10350,16 +8888,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12.5
-          ],
-          "acceptableStatements": [
-            "12.5% ALC./VOL.",
-            "12.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [12.5],
+          "acceptableStatements": ["12.5% ALC./VOL.", "12.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -10408,18 +8939,12 @@
         "authority": "Alcohol and Tobacco Tax and Trade Bureau",
         "description": "Screened public-registry derivative of approved M Cellars label artwork.",
         "usageStatus": "screened-approved",
-        "provenanceRefs": [
-          "tests/fixtures/precheck/m-cellars-24205001000905/manifest.json"
-        ]
+        "provenanceRefs": ["tests/fixtures/precheck/m-cellars-24205001000905/manifest.json"]
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "front-label"
-        ],
-        "reviewReasons": [
-          "possible-duplicate-artwork"
-        ],
+        "visualStrata": ["front-label"],
+        "reviewReasons": ["possible-duplicate-artwork"],
         "notes": "Reference crop of the same M Cellars artwork already scored as m-cellars-baseline."
       },
       "status": "excluded_duplicate",
@@ -10442,18 +8967,12 @@
         "authority": "Alcohol and Tobacco Tax and Trade Bureau",
         "description": "Repository-generated low-resolution derivative of the screened M Cellars OCR benchmark.",
         "usageStatus": "derived-from-screened-parent",
-        "provenanceRefs": [
-          "tests/fixtures/precheck/m-cellars-lowres-24205001000905/manifest.json"
-        ]
+        "provenanceRefs": ["tests/fixtures/precheck/m-cellars-lowres-24205001000905/manifest.json"]
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": [
-          "low-resolution"
-        ],
-        "reviewReasons": [
-          "possible-duplicate-artwork"
-        ],
+        "visualStrata": ["low-resolution"],
+        "reviewReasons": ["possible-duplicate-artwork"],
         "notes": "Deterministic low-resolution derivative of the same M Cellars artwork already scored as m-cellars-baseline."
       },
       "status": "excluded_duplicate",
@@ -10483,9 +9002,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "out-of-scope-category"
-        ],
+        "visualStrata": ["out-of-scope-category"],
         "reviewReasons": [],
         "notes": "Visually classified as a non-wine beverage label and therefore outside the current wine-extractor evaluation scope."
       },
@@ -10516,9 +9033,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "out-of-scope-category"
-        ],
+        "visualStrata": ["out-of-scope-category"],
         "reviewReasons": [],
         "notes": "Visually classified as a non-wine beverage label and therefore outside the current wine-extractor evaluation scope."
       },
@@ -10549,9 +9064,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "out-of-scope-category"
-        ],
+        "visualStrata": ["out-of-scope-category"],
         "reviewReasons": [],
         "notes": "Visually classified as a non-wine beverage label and therefore outside the current wine-extractor evaluation scope."
       },
@@ -10582,10 +9095,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-panel",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-panel", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Dry Cellar composite showing a front Sauvignon Blanc panel and a back text panel with a determinate 13.2% by volume statement."
       },
@@ -10595,29 +9105,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Dry Cellar"
-          ],
+          "acceptablePresentations": ["Dry Cellar"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Sauvignon Blanc"
-          ],
+          "forbiddenPresentations": ["Sauvignon Blanc"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.2
-          ],
-          "acceptableStatements": [
-            "Alc. 13.2% by Vol.",
-            "13.2%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.2],
+          "acceptableStatements": ["Alc. 13.2% by Vol.", "13.2%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -10673,10 +9172,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-panel",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-panel", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Blazic Collio Sauvignon composite with a separate back panel that preserves a determinate 13.5% alcohol statement."
       },
@@ -10686,30 +9182,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Blazic"
-          ],
+          "acceptablePresentations": ["Blazic"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Sauvignon",
-            "Collio"
-          ],
+          "forbiddenPresentations": ["Sauvignon", "Collio"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.5
-          ],
-          "acceptableStatements": [
-            "13.5% vol",
-            "13.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["13.5% vol", "13.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -10765,10 +9249,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-panel",
-          "alcohol-at-side-or-rotated"
-        ],
+        "visualStrata": ["multi-panel", "alcohol-at-side-or-rotated"],
         "reviewReasons": [],
         "notes": "Mauro Molino Livrot Langhe Chardonnay composite with the 13,4% alcohol printed vertically on the front label edge."
       },
@@ -10778,32 +9259,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Mauro Molino"
-          ],
+          "acceptablePresentations": ["Mauro Molino"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Livrot",
-            "Chardonnay"
-          ],
+          "forbiddenPresentations": ["Livrot", "Chardonnay"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            13.4
-          ],
-          "acceptableStatements": [
-            "Alc. 13,4% vol.",
-            "13.4%",
-            "13,4%"
-          ],
-          "characteristics": [
-            "decimal-value",
-            "rotated-or-vertical"
-          ],
+          "acceptablePercents": [13.4],
+          "acceptableStatements": ["Alc. 13,4% vol.", "13.4%", "13,4%"],
+          "characteristics": ["decimal-value", "rotated-or-vertical"],
           "approxGeometry": [],
           "orientation": "mixed"
         },
@@ -10859,10 +9326,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-panel",
-          "missing-alcohol-statement"
-        ],
+        "visualStrata": ["multi-panel", "missing-alcohol-statement"],
         "reviewReasons": [],
         "notes": "Mike's Farm Scuppernong White composite with a distinct front title panel but no alcohol statement visible on the committed composite."
       },
@@ -10872,10 +9336,7 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Mike's Farm",
-            "Mike's Farm, Inc."
-          ],
+          "acceptablePresentations": ["Mike's Farm", "Mike's Farm, Inc."],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
           "forbiddenPresentations": [],
@@ -10943,10 +9404,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-panel",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-panel", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Pindar Gewurztraminer composite with the front technical panel carrying a determinate 12.6% by volume statement."
       },
@@ -10956,29 +9414,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Pindar"
-          ],
+          "acceptablePresentations": ["Pindar"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Gewurztraminer"
-          ],
+          "forbiddenPresentations": ["Gewurztraminer"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12.6
-          ],
-          "acceptableStatements": [
-            "Alc. 12.6% by vol.",
-            "12.6%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [12.6],
+          "acceptableStatements": ["Alc. 12.6% by vol.", "12.6%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -11034,10 +9481,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-panel",
-          "alcohol-at-bottom"
-        ],
+        "visualStrata": ["multi-panel", "alcohol-at-bottom"],
         "reviewReasons": [],
         "notes": "Duck Walk Vineyards Chardonnay composite with the front label carrying a direct 12.5% by volume statement."
       },
@@ -11047,29 +9491,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Duck Walk Vineyards"
-          ],
+          "acceptablePresentations": ["Duck Walk Vineyards"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Chardonnay"
-          ],
+          "forbiddenPresentations": ["Chardonnay"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            12.5
-          ],
-          "acceptableStatements": [
-            "ALC. 12.5% BY VOL.",
-            "12.5%"
-          ],
-          "characteristics": [
-            "decimal-value"
-          ],
+          "acceptablePercents": [12.5],
+          "acceptableStatements": ["ALC. 12.5% BY VOL.", "12.5%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -11125,10 +9558,7 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": [
-          "multi-panel",
-          "alcohol-at-side-or-rotated"
-        ],
+        "visualStrata": ["multi-panel", "alcohol-at-side-or-rotated"],
         "reviewReasons": [],
         "notes": "Mauro Molino Roero Arneis composite with the 14% vol statement printed vertically on the front label edge."
       },
@@ -11138,29 +9568,18 @@
       "annotation": {
         "brand": {
           "presence": "present",
-          "acceptablePresentations": [
-            "Mauro Molino"
-          ],
+          "acceptablePresentations": ["Mauro Molino"],
           "genuinelyAmbiguous": false,
           "ambiguityReason": null,
-          "forbiddenPresentations": [
-            "Roero Arneis"
-          ],
+          "forbiddenPresentations": ["Roero Arneis"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [
-            14
-          ],
-          "acceptableStatements": [
-            "ALC. 14% vol.",
-            "14%"
-          ],
-          "characteristics": [
-            "rotated-or-vertical"
-          ],
+          "acceptablePercents": [14],
+          "acceptableStatements": ["ALC. 14% vol.", "14%"],
+          "characteristics": ["rotated-or-vertical"],
           "approxGeometry": [],
           "orientation": "mixed"
         },

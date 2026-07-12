@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "extraction-baseline-report.v1",
+  "schemaVersion": "extraction-baseline-report.v2",
   "manifestSchemaVersion": "extraction-eval-manifest.v2",
   "extractorAdapter": {
     "id": "local-two-field-extractor",
@@ -12,16 +12,24 @@
     "brandExactMatchRate": 0.12871287128712872,
     "brandNormalizedAcceptableRate": 0.15841584158415842,
     "brandTop3Recall": 0.26732673267326734,
+    "brandTop5Recall": 0.297029702970297,
+    "brandConfidentCorrectRate": 0.009900990099009901,
+    "brandUsefulButDeferredRate": 0.2871287128712871,
+    "brandUnnecessaryAmbiguityRate": 0.1485148514851485,
+    "brandFalseCertaintyRate": 0,
+    "brandNotObservedRate": 0,
     "absentBrandFalsePositiveRate": 1,
     "presentAlcoholCount": 101,
     "alcoholDetectionRecall": 0.36633663366336633,
     "alcoholParsedValueAccuracy": 0.3465346534653465,
+    "alcoholParserFailureRate": 0.019801980198019802,
     "absentAlcoholCount": 14,
     "absentFieldFalsePositiveRate": 0.07142857142857142,
+    "alcoholFalseCertaintyRate": 0.008695652173913044,
     "ambiguousBrandCount": 4,
     "ambiguityHonestyRate": 1,
-    "medianLatencyMs": 1142.71766699999,
-    "p95LatencyMs": 2467.336540999997,
+    "medianLatencyMs": 1149.3566249999858,
+    "p95LatencyMs": 2471.9573329999985,
     "brandFailureCounts": {
       "correct": 1,
       "correct-uncertainty": 19,
@@ -46,6 +54,135 @@
       "parser-failure": 2,
       "false-certainty": 1
     }
+  },
+  "breakdowns": {
+    "alcoholSlices": [
+      {
+        "key": "bottom",
+        "label": "Bottom-located alcohol statement",
+        "presentCaseCount": 87,
+        "detectedCount": 37,
+        "parsedAccurateCount": 35,
+        "detectionRecall": 0.42528735632183906,
+        "parsedAccuracy": 0.40229885057471265
+      },
+      {
+        "key": "side-or-rotated",
+        "label": "Side/rotated alcohol layout",
+        "presentCaseCount": 11,
+        "detectedCount": 0,
+        "parsedAccurateCount": 0,
+        "detectionRecall": 0,
+        "parsedAccuracy": 0
+      },
+      {
+        "key": "rotated-or-vertical",
+        "label": "Truth marked rotated or vertical",
+        "presentCaseCount": 11,
+        "detectedCount": 0,
+        "parsedAccurateCount": 0,
+        "detectionRecall": 0,
+        "parsedAccuracy": 0
+      },
+      {
+        "key": "vertical-strip",
+        "label": "Vertical mandatory strip layout",
+        "presentCaseCount": 5,
+        "detectedCount": 0,
+        "parsedAccurateCount": 0,
+        "detectionRecall": 0,
+        "parsedAccuracy": 0
+      },
+      {
+        "key": "split-token",
+        "label": "Split-token alcohol wording",
+        "presentCaseCount": 2,
+        "detectedCount": 0,
+        "parsedAccurateCount": 0,
+        "detectionRecall": 0,
+        "parsedAccuracy": 0
+      },
+      {
+        "key": "no-percent-sign",
+        "label": "Percent-less wording",
+        "presentCaseCount": 1,
+        "detectedCount": 0,
+        "parsedAccurateCount": 0,
+        "detectionRecall": 0,
+        "parsedAccuracy": 0
+      },
+      {
+        "key": "decimal-value",
+        "label": "Decimal-value alcohol wording",
+        "presentCaseCount": 62,
+        "detectedCount": 21,
+        "parsedAccurateCount": 20,
+        "detectionRecall": 0.3387096774193548,
+        "parsedAccuracy": 0.3225806451612903
+      }
+    ],
+    "failureDistribution": [
+      {
+        "key": "ocr-recognition",
+        "label": "OCR recognition",
+        "count": 49
+      },
+      {
+        "key": "region-coverage",
+        "label": "Region coverage",
+        "count": 0
+      },
+      {
+        "key": "orientation",
+        "label": "Orientation",
+        "count": 0
+      },
+      {
+        "key": "line-reconstruction",
+        "label": "Line reconstruction",
+        "count": 1
+      },
+      {
+        "key": "candidate-generation",
+        "label": "Candidate generation",
+        "count": 38
+      },
+      {
+        "key": "candidate-filtering",
+        "label": "Candidate filtering",
+        "count": 50
+      },
+      {
+        "key": "candidate-ranking",
+        "label": "Candidate ranking",
+        "count": 11
+      },
+      {
+        "key": "parser",
+        "label": "Parser",
+        "count": 2
+      },
+      {
+        "key": "unnecessary-ambiguity",
+        "label": "Unnecessary ambiguity",
+        "count": 15
+      },
+      {
+        "key": "false-certainty",
+        "label": "False certainty",
+        "count": 11
+      },
+      {
+        "key": "correct-uncertainty",
+        "label": "Correct uncertainty",
+        "count": 4
+      },
+      {
+        "key": "correct-result",
+        "label": "Correct result",
+        "count": 49
+      }
+    ]
   },
   "cases": [
     {
@@ -74,9 +211,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Luigi & Giovanni"
-        ],
+        "acceptable": ["Luigi & Giovanni"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -89,9 +224,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          14
-        ],
+        "acceptablePercents": [14],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -753,17 +886,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1099.61425
+      "latencyMs": 1129.458375
     },
     {
       "caseId": "alfredos-wine",
       "fixtureDir": "approved-wine-002",
-      "strata": [
-        "multi-line-brand",
-        "brand-punctuation",
-        "alcohol-at-bottom",
-        "front-label"
-      ],
+      "strata": ["multi-line-brand", "brand-punctuation", "alcohol-at-bottom", "front-label"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -780,10 +908,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Alfredo's Wine",
-          "Alfredo's"
-        ],
+        "acceptable": ["Alfredo's Wine", "Alfredo's"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -796,9 +921,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          14
-        ],
+        "acceptablePercents": [14],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -1401,7 +1524,7 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1000.9051249999998
+      "latencyMs": 1101.848458
     },
     {
       "caseId": "la-fattoria-rotated",
@@ -1584,9 +1707,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "La Fattoria"
-        ],
+        "acceptable": ["La Fattoria"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -1599,9 +1720,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          14
-        ],
+        "acceptablePercents": [14],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -1937,7 +2056,7 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1245.4964999999993
+      "latencyMs": 1297.144292
     },
     {
       "caseId": "approved-wine-004",
@@ -2160,9 +2279,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "La Fattoria"
-        ],
+        "acceptable": ["La Fattoria"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -2175,9 +2292,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          14
-        ],
+        "acceptablePercents": [14],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -2533,7 +2648,7 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1388.134458999999
+      "latencyMs": 1365.8257920000005
     },
     {
       "caseId": "approved-wine-005",
@@ -2608,9 +2723,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "La Fattoria"
-        ],
+        "acceptable": ["La Fattoria"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -2623,9 +2736,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          14
-        ],
+        "acceptablePercents": [14],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -2961,17 +3072,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 873.2399160000004
+      "latencyMs": 864.2609169999996
     },
     {
       "caseId": "approved-wine-006",
       "fixtureDir": "approved-wine-006",
-      "strata": [
-        "simple-centered-brand",
-        "low-contrast",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["simple-centered-brand", "low-contrast", "front-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -2984,9 +3090,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Dark Horse"
-        ],
+        "acceptable": ["Dark Horse"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -2999,9 +3103,7 @@
         "confidence": 0.6366666666666666,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": true,
         "parsedValue": 13.5,
         "parsedAccurate": true,
@@ -3295,17 +3397,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1736.377125000001
+      "latencyMs": 1732.120417
     },
     {
       "caseId": "casanova-della-spinetta",
       "fixtureDir": "approved-wine-007",
-      "strata": [
-        "multi-line-brand",
-        "low-contrast",
-        "split-alcohol-tokens",
-        "front-label"
-      ],
+      "strata": ["multi-line-brand", "low-contrast", "split-alcohol-tokens", "front-label"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -3318,10 +3415,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Casanova della Spinetta",
-          "Casanova Della Spinetta"
-        ],
+        "acceptable": ["Casanova della Spinetta", "Casanova Della Spinetta"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -3334,9 +3428,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          14
-        ],
+        "acceptablePercents": [14],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -4102,16 +4194,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1313.0880830000006
+      "latencyMs": 1274.0157919999983
     },
     {
       "caseId": "approved-wine-008",
       "fixtureDir": "approved-wine-008",
-      "strata": [
-        "multiple-brand-like-phrases",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -4172,9 +4260,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Vino Alpino"
-        ],
+        "acceptable": ["Vino Alpino"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -4187,9 +4273,7 @@
         "confidence": 0.96,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13
-        ],
+        "acceptablePercents": [13],
         "detected": true,
         "parsedValue": 13,
         "parsedAccurate": true,
@@ -4555,16 +4639,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1061.8029999999999
+      "latencyMs": 1054.7672910000001
     },
     {
       "caseId": "approved-wine-009",
       "fixtureDir": "approved-wine-009",
-      "strata": [
-        "multiple-brand-like-phrases",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -4621,9 +4701,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Vino Alpino"
-        ],
+        "acceptable": ["Vino Alpino"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -4636,9 +4714,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -5084,7 +5160,7 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1119.7381249999999
+      "latencyMs": 1106.818124999998
     },
     {
       "caseId": "domaine-follin-arbelet",
@@ -5111,9 +5187,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Domaine Follin-Arbelet"
-        ],
+        "acceptable": ["Domaine Follin-Arbelet"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -5126,9 +5200,7 @@
         "confidence": 0.94,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          14
-        ],
+        "acceptablePercents": [14],
         "detected": true,
         "parsedValue": 14,
         "parsedAccurate": true,
@@ -5744,16 +5816,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 928.1017500000016
+      "latencyMs": 924.8964580000029
     },
     {
       "caseId": "approved-wine-011",
       "fixtureDir": "approved-wine-011",
-      "strata": [
-        "multiple-brand-like-phrases",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -5770,9 +5838,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "MariaAntonietta"
-        ],
+        "acceptable": ["MariaAntonietta"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -5785,9 +5851,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -6583,16 +6647,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 992.9877499999966
+      "latencyMs": 985.1822089999987
     },
     {
       "caseId": "approved-wine-012",
       "fixtureDir": "approved-wine-012",
-      "strata": [
-        "simple-centered-brand",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["simple-centered-brand", "front-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -6617,9 +6677,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Cooley Bay"
-        ],
+        "acceptable": ["Cooley Bay"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -6632,9 +6690,7 @@
         "confidence": 0.9466666666666667,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.8
-        ],
+        "acceptablePercents": [13.8],
         "detected": true,
         "parsedValue": 13.8,
         "parsedAccurate": true,
@@ -7430,7 +7486,7 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1517.2705419999984
+      "latencyMs": 1507.1645839999983
     },
     {
       "caseId": "approved-wine-013",
@@ -7473,9 +7529,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Afflicted"
-        ],
+        "acceptable": ["Afflicted"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -7488,9 +7542,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -8286,16 +8338,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 2278.001583000001
+      "latencyMs": 2261.429959000001
     },
     {
       "caseId": "approved-wine-014",
       "fixtureDir": "approved-wine-014",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -8336,9 +8384,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Tre Cori"
-        ],
+        "acceptable": ["Tre Cori"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -8351,9 +8397,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          14
-        ],
+        "acceptablePercents": [14],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -9149,7 +9193,7 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 2181.7699580000044
+      "latencyMs": 2180.191166999997
     },
     {
       "caseId": "patricia-green-cellars",
@@ -9185,9 +9229,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Patricia Green Cellars"
-        ],
+        "acceptable": ["Patricia Green Cellars"],
         "knownAmbiguous": true,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -9200,9 +9242,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.8
-        ],
+        "acceptablePercents": [13.8],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -9998,16 +10038,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1169.2121659999975
+      "latencyMs": 1161.2398329999996
     },
     {
       "caseId": "approved-wine-016",
       "fixtureDir": "approved-wine-016",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -10020,9 +10056,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Marques de Navarro"
-        ],
+        "acceptable": ["Marques de Navarro"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -10035,9 +10069,7 @@
         "confidence": 0.92,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": true,
         "parsedValue": 13.5,
         "parsedAccurate": true,
@@ -10463,16 +10495,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 964.835874999997
+      "latencyMs": 958.7461249999978
     },
     {
       "caseId": "approved-wine-017",
       "fixtureDir": "approved-wine-017",
-      "strata": [
-        "simple-centered-brand",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["simple-centered-brand", "front-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -10505,9 +10533,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "La Borde Noire"
-        ],
+        "acceptable": ["La Borde Noire"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -10520,9 +10546,7 @@
         "confidence": 0.9366666666666666,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12
-        ],
+        "acceptablePercents": [12],
         "detected": true,
         "parsedValue": 12,
         "parsedAccurate": true,
@@ -11148,17 +11172,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 766.6532080000034
+      "latencyMs": 759.9229579999956
     },
     {
       "caseId": "approved-wine-018",
       "fixtureDir": "approved-wine-018",
-      "strata": [
-        "multi-line-brand",
-        "front-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "front-label", "dense-text", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -11191,10 +11210,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Poqr Krya",
-          "POQR KRYA"
-        ],
+        "acceptable": ["Poqr Krya", "POQR KRYA"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -11207,9 +11223,7 @@
         "confidence": 0.9566666666666667,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": true,
         "parsedValue": 3.5,
         "parsedAccurate": false,
@@ -12005,16 +12019,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1960.440208
+      "latencyMs": 1982.0875840000008
     },
     {
       "caseId": "approved-wine-019",
       "fixtureDir": "approved-wine-019",
-      "strata": [
-        "simple-centered-brand",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["simple-centered-brand", "front-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -12035,9 +12045,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Kyrios"
-        ],
+        "acceptable": ["Kyrios"],
         "knownAmbiguous": false,
         "exactMatch": true,
         "normalizedMatch": true,
@@ -12050,9 +12058,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -12848,16 +12854,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1462.633332999998
+      "latencyMs": 1463.9117079999996
     },
     {
       "caseId": "approved-wine-020",
       "fixtureDir": "approved-wine-020",
-      "strata": [
-        "simple-centered-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["simple-centered-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -12898,10 +12900,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Courtieu",
-          "Chateau Courtieu"
-        ],
+        "acceptable": ["Courtieu", "Chateau Courtieu"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -12914,9 +12913,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12.5
-        ],
+        "acceptablePercents": [12.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -13612,16 +13609,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1674.927791000002
+      "latencyMs": 1670.7622499999998
     },
     {
       "caseId": "saker",
       "fixtureDir": "approved-wine-021",
-      "strata": [
-        "simple-centered-brand",
-        "low-contrast",
-        "front-label"
-      ],
+      "strata": ["simple-centered-brand", "low-contrast", "front-label"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -13642,9 +13635,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Saker"
-        ],
+        "acceptable": ["Saker"],
         "knownAmbiguous": false,
         "exactMatch": true,
         "normalizedMatch": true,
@@ -13657,9 +13648,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12.6
-        ],
+        "acceptablePercents": [12.6],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -14335,15 +14324,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1232.4857090000005
+      "latencyMs": 1213.0432500000024
     },
     {
       "caseId": "approved-wine-022",
       "fixtureDir": "approved-wine-022",
-      "strata": [
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -14369,9 +14355,7 @@
         "confidence": 0.9575,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12
-        ],
+        "acceptablePercents": [12],
         "detected": true,
         "parsedValue": 12,
         "parsedAccurate": true,
@@ -14967,16 +14951,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 851.4079999999958
+      "latencyMs": 843.211457999998
     },
     {
       "caseId": "approved-wine-023",
       "fixtureDir": "approved-wine-023",
-      "strata": [
-        "decorative-or-script-brand",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["decorative-or-script-brand", "front-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -15009,10 +14989,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Podere don Cataldo",
-          "Podere Don Cataldo"
-        ],
+        "acceptable": ["Podere don Cataldo", "Podere Don Cataldo"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -15025,9 +15002,7 @@
         "confidence": 0.47333333333333333,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          14
-        ],
+        "acceptablePercents": [14],
         "detected": true,
         "parsedValue": 14,
         "parsedAccurate": true,
@@ -15803,16 +15778,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1544.7218340000036
+      "latencyMs": 1482.939416000001
     },
     {
       "caseId": "approved-wine-024",
       "fixtureDir": "approved-wine-024",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "missing-alcohol-statement"
-      ],
+      "strata": ["back-label", "dense-text", "missing-alcohol-statement"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -15837,9 +15808,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Chateau de Laville"
-        ],
+        "acceptable": ["Chateau de Laville"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -16568,16 +16537,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1928.2178330000024
+      "latencyMs": 1885.2315000000017
     },
     {
       "caseId": "nebla-mencia",
       "fixtureDir": "approved-wine-025",
-      "strata": [
-        "simple-centered-brand",
-        "alcohol-at-bottom",
-        "front-label"
-      ],
+      "strata": ["simple-centered-brand", "alcohol-at-bottom", "front-label"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -16590,9 +16555,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Nebla"
-        ],
+        "acceptable": ["Nebla"],
         "knownAmbiguous": false,
         "exactMatch": true,
         "normalizedMatch": true,
@@ -16605,9 +16568,7 @@
         "confidence": 0.9166666666666666,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13
-        ],
+        "acceptablePercents": [13],
         "detected": true,
         "parsedValue": 13,
         "parsedAccurate": true,
@@ -17403,16 +17364,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1520.0339999999997
+      "latencyMs": 1507.002750000007
     },
     {
       "caseId": "approved-wine-026",
       "fixtureDir": "approved-wine-026",
-      "strata": [
-        "multiple-brand-like-phrases",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -17473,9 +17430,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Principe Diphesa"
-        ],
+        "acceptable": ["Principe Diphesa"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": true,
@@ -17488,9 +17443,7 @@
         "confidence": 0.8733333333333334,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": true,
         "parsedValue": 13.5,
         "parsedAccurate": true,
@@ -18106,7 +18059,7 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1082.2640000000101
+      "latencyMs": 1058.099709000002
     },
     {
       "caseId": "approved-wine-027",
@@ -18149,10 +18102,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "The Golden Girls",
-          "Golden Girls"
-        ],
+        "acceptable": ["The Golden Girls", "Golden Girls"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -18165,9 +18115,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -18963,16 +18911,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1386.7292499999894
+      "latencyMs": 1384.9493749999965
     },
     {
       "caseId": "approved-wine-028",
       "fixtureDir": "approved-wine-028",
-      "strata": [
-        "simple-centered-brand",
-        "front-label",
-        "missing-alcohol-statement"
-      ],
+      "strata": ["simple-centered-brand", "front-label", "missing-alcohol-statement"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -18985,10 +18929,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Field",
-          "Field Vineyards"
-        ],
+        "acceptable": ["Field", "Field Vineyards"],
         "knownAmbiguous": false,
         "exactMatch": true,
         "normalizedMatch": true,
@@ -19347,16 +19288,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 912.8853329999984
+      "latencyMs": 909.429707999996
     },
     {
       "caseId": "approved-wine-031",
       "fixtureDir": "approved-wine-031",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -19409,9 +19346,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "embeleso"
-        ],
+        "acceptable": ["embeleso"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -19424,9 +19359,7 @@
         "confidence": 0.73,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": true,
         "parsedValue": 13.5,
         "parsedAccurate": true,
@@ -20132,16 +20065,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1380.221749999997
+      "latencyMs": 1392.211958999993
     },
     {
       "caseId": "approved-wine-032",
       "fixtureDir": "approved-wine-032",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -20154,9 +20083,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Travers Reserve"
-        ],
+        "acceptable": ["Travers Reserve"],
         "knownAmbiguous": false,
         "exactMatch": true,
         "normalizedMatch": true,
@@ -20169,9 +20096,7 @@
         "confidence": 0.9533333333333333,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          14
-        ],
+        "acceptablePercents": [14],
         "detected": true,
         "parsedValue": 14,
         "parsedAccurate": true,
@@ -20967,16 +20892,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 2190.973125000004
+      "latencyMs": 2180.5612910000054
     },
     {
       "caseId": "approved-wine-033",
       "fixtureDir": "approved-wine-033",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -21005,9 +20926,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Haywater Cove"
-        ],
+        "acceptable": ["Haywater Cove"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -21020,9 +20939,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.7
-        ],
+        "acceptablePercents": [13.7],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -21508,16 +21425,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1843.7509170000121
+      "latencyMs": 1837.1175419999927
     },
     {
       "caseId": "approved-wine-034",
       "fixtureDir": "approved-wine-034",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -21530,9 +21443,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Nico"
-        ],
+        "acceptable": ["Nico"],
         "knownAmbiguous": false,
         "exactMatch": true,
         "normalizedMatch": true,
@@ -21545,9 +21456,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -22343,16 +22252,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 2467.336540999997
+      "latencyMs": 2471.9573329999985
     },
     {
       "caseId": "approved-wine-035",
       "fixtureDir": "approved-wine-035",
-      "strata": [
-        "decorative-or-script-brand",
-        "front-label",
-        "alcohol-at-side-or-rotated"
-      ],
+      "strata": ["decorative-or-script-brand", "front-label", "alcohol-at-side-or-rotated"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -22377,9 +22282,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Hubert Lamy"
-        ],
+        "acceptable": ["Hubert Lamy"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -22392,9 +22295,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -22555,16 +22456,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 358.63383299999987
+      "latencyMs": 357.3566249999858
     },
     {
       "caseId": "approved-wine-037",
       "fixtureDir": "approved-wine-037",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -22577,9 +22474,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Touch"
-        ],
+        "acceptable": ["Touch"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -22592,9 +22487,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13
-        ],
+        "acceptablePercents": [13],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -23030,16 +22923,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1277.5167079999956
+      "latencyMs": 1269.1009170000034
     },
     {
       "caseId": "approved-wine-038",
       "fixtureDir": "approved-wine-038",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -23052,9 +22941,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Big Red Sunshine"
-        ],
+        "acceptable": ["Big Red Sunshine"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -23067,9 +22954,7 @@
         "confidence": 0.8866666666666667,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": true,
         "parsedValue": 13.5,
         "parsedAccurate": true,
@@ -23865,16 +23750,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1229.5935000000027
+      "latencyMs": 1219.4311249999882
     },
     {
       "caseId": "approved-wine-039",
       "fixtureDir": "approved-wine-039",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -23899,9 +23780,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Domaine Julien Auroux"
-        ],
+        "acceptable": ["Domaine Julien Auroux"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -23914,9 +23793,7 @@
         "confidence": 0.9566666666666667,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": true,
         "parsedValue": 13.5,
         "parsedAccurate": true,
@@ -24502,17 +24379,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1035.0629590000026
+      "latencyMs": 1032.5722499999974
     },
     {
       "caseId": "chateau-bonneau",
       "fixtureDir": "approved-wine-040",
-      "strata": [
-        "brand-punctuation",
-        "multi-line-brand",
-        "low-contrast",
-        "front-label"
-      ],
+      "strata": ["brand-punctuation", "multi-line-brand", "low-contrast", "front-label"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -24565,10 +24437,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Château Bonneau",
-          "Chateau Bonneau"
-        ],
+        "acceptable": ["Château Bonneau", "Chateau Bonneau"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -24581,9 +24450,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          14
-        ],
+        "acceptablePercents": [14],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -25379,15 +25246,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1271.3949999999895
+      "latencyMs": 1282.3077909999993
     },
     {
       "caseId": "approved-wine-041",
       "fixtureDir": "approved-wine-041",
-      "strata": [
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -25404,9 +25268,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Petite Nature"
-        ],
+        "acceptable": ["Petite Nature"],
         "knownAmbiguous": false,
         "exactMatch": true,
         "normalizedMatch": true,
@@ -25419,9 +25281,7 @@
         "confidence": 0.92,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13
-        ],
+        "acceptablePercents": [13],
         "detected": true,
         "parsedValue": 13,
         "parsedAccurate": true,
@@ -25947,16 +25807,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 995.8967089999933
+      "latencyMs": 993.5446669999947
     },
     {
       "caseId": "approved-wine-042",
       "fixtureDir": "approved-wine-042",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -25973,9 +25829,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Domaine Quivy"
-        ],
+        "acceptable": ["Domaine Quivy"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -25988,9 +25842,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -26776,17 +26628,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1199.2463340000104
+      "latencyMs": 1193.028542
     },
     {
       "caseId": "approved-wine-043",
       "fixtureDir": "approved-wine-043",
-      "strata": [
-        "simple-centered-brand",
-        "front-label",
-        "low-contrast",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["simple-centered-brand", "front-label", "low-contrast", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -26815,9 +26662,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Fulcrum"
-        ],
+        "acceptable": ["Fulcrum"],
         "knownAmbiguous": false,
         "exactMatch": true,
         "normalizedMatch": true,
@@ -26830,9 +26675,7 @@
         "confidence": 0.9233333333333332,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13
-        ],
+        "acceptablePercents": [13],
         "detected": true,
         "parsedValue": 13.8,
         "parsedAccurate": false,
@@ -27458,16 +27301,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 927.9279580000002
+      "latencyMs": 924.7537500000035
     },
     {
       "caseId": "approved-wine-044",
       "fixtureDir": "approved-wine-044",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -27504,9 +27343,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Sweet Seduction"
-        ],
+        "acceptable": ["Sweet Seduction"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -27519,9 +27356,7 @@
         "confidence": 0.9500000000000001,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": true,
         "parsedValue": 13.5,
         "parsedAccurate": true,
@@ -28317,16 +28152,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 2104.240625000006
+      "latencyMs": 2097.6140000000014
     },
     {
       "caseId": "approved-wine-045",
       "fixtureDir": "approved-wine-045",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -28339,9 +28170,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Meeting of the Minds"
-        ],
+        "acceptable": ["Meeting of the Minds"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -28354,9 +28183,7 @@
         "confidence": 0.91,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.7
-        ],
+        "acceptablePercents": [13.7],
         "detected": true,
         "parsedValue": 13.7,
         "parsedAccurate": true,
@@ -29152,16 +28979,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1428.5182910000003
+      "latencyMs": 1419.3554589999985
     },
     {
       "caseId": "approved-wine-046",
       "fixtureDir": "approved-wine-046",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "missing-alcohol-statement"
-      ],
+      "strata": ["back-label", "dense-text", "missing-alcohol-statement"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -29178,9 +29001,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Curious"
-        ],
+        "acceptable": ["Curious"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -29989,16 +29810,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1751.4574589999975
+      "latencyMs": 1736.414208000002
     },
     {
       "caseId": "approved-wine-047",
       "fixtureDir": "approved-wine-047",
-      "strata": [
-        "multiple-brand-like-phrases",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -30079,9 +29896,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Etiris GX"
-        ],
+        "acceptable": ["Etiris GX"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -30094,9 +29909,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          14
-        ],
+        "acceptablePercents": [14],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -30390,16 +30203,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1024.1294579999958
+      "latencyMs": 1019.9007500000007
     },
     {
       "caseId": "approved-wine-048",
       "fixtureDir": "approved-wine-048",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -30432,9 +30241,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Pacha"
-        ],
+        "acceptable": ["Pacha"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -30447,9 +30254,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          14
-        ],
+        "acceptablePercents": [14],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -31245,16 +31050,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1673.9138749999984
+      "latencyMs": 1661.1485000000102
     },
     {
       "caseId": "approved-wine-049",
       "fixtureDir": "approved-wine-049",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -31423,9 +31224,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Caywood Vineyard"
-        ],
+        "acceptable": ["Caywood Vineyard"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -31438,9 +31237,7 @@
         "confidence": 0.9433333333333334,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.2
-        ],
+        "acceptablePercents": [13.2],
         "detected": true,
         "parsedValue": 13.2,
         "parsedAccurate": true,
@@ -32236,16 +32033,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 3921.1145829999878
+      "latencyMs": 3894.248999999996
     },
     {
       "caseId": "le-temps-des-fleurs",
       "fixtureDir": "approved-wine-050",
-      "strata": [
-        "simple-centered-brand",
-        "alcohol-at-bottom",
-        "front-label"
-      ],
+      "strata": ["simple-centered-brand", "alcohol-at-bottom", "front-label"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -32262,10 +32055,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Le Temps des Fleurs",
-          "Le Temps Des Fleurs"
-        ],
+        "acceptable": ["Le Temps des Fleurs", "Le Temps Des Fleurs"],
         "knownAmbiguous": false,
         "exactMatch": true,
         "normalizedMatch": true,
@@ -32278,9 +32068,7 @@
         "confidence": 0.9366666666666666,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          11.5
-        ],
+        "acceptablePercents": [11.5],
         "detected": true,
         "parsedValue": 11.5,
         "parsedAccurate": true,
@@ -32786,16 +32574,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 914.9071670000121
+      "latencyMs": 910.7912500000093
     },
     {
       "caseId": "approved-wine-051",
       "fixtureDir": "approved-wine-051",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -32828,9 +32612,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Pacheca"
-        ],
+        "acceptable": ["Pacheca"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -32843,9 +32625,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -33551,16 +33331,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1457.4291669999948
+      "latencyMs": 1426.5047079999931
     },
     {
       "caseId": "approved-wine-052",
       "fixtureDir": "approved-wine-052",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "missing-alcohol-statement"
-      ],
+      "strata": ["back-label", "dense-text", "missing-alcohol-statement"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -33573,9 +33349,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Mountain Valley Winery"
-        ],
+        "acceptable": ["Mountain Valley Winery"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -34124,16 +33898,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 2766.4437920000055
+      "latencyMs": 2748.2073329999985
     },
     {
       "caseId": "approved-wine-053",
       "fixtureDir": "approved-wine-053",
-      "strata": [
-        "multiple-brand-like-phrases",
-        "front-label",
-        "alcohol-at-side-or-rotated"
-      ],
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-side-or-rotated"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -34146,9 +33916,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Golden Road Vineyards"
-        ],
+        "acceptable": ["Golden Road Vineyards"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -34161,9 +33929,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          11.5
-        ],
+        "acceptablePercents": [11.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -34599,16 +34365,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 887.3304580000113
+      "latencyMs": 881.0567080000183
     },
     {
       "caseId": "approved-wine-054",
       "fixtureDir": "approved-wine-054",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-side-or-rotated"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-side-or-rotated"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -34721,9 +34483,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Henri Dufreres"
-        ],
+        "acceptable": ["Henri Dufreres"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -34736,9 +34496,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12.5
-        ],
+        "acceptablePercents": [12.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -35254,16 +35012,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1000.5750829999743
+      "latencyMs": 997.0160840000026
     },
     {
       "caseId": "approved-wine-055",
       "fixtureDir": "approved-wine-055",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -35304,9 +35058,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Francois Villard"
-        ],
+        "acceptable": ["Francois Villard"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -35319,9 +35071,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13
-        ],
+        "acceptablePercents": [13],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -36067,17 +35817,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1039.5575839999947
+      "latencyMs": 1034.0332500000077
     },
     {
       "caseId": "approved-wine-056",
       "fixtureDir": "approved-wine-056",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom",
-        "low-contrast"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom", "low-contrast"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -36106,9 +35851,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Prinsi"
-        ],
+        "acceptable": ["Prinsi"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -36121,9 +35864,7 @@
         "confidence": 0.6566666666666667,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": true,
         "parsedValue": 13.5,
         "parsedAccurate": true,
@@ -36919,16 +36660,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 995.2187919999997
+      "latencyMs": 958.0442909999983
     },
     {
       "caseId": "approved-wine-057",
       "fixtureDir": "approved-wine-057",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -36969,9 +36706,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Prinsi"
-        ],
+        "acceptable": ["Prinsi"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -36984,9 +36719,7 @@
         "confidence": 0.7799999999999999,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13
-        ],
+        "acceptablePercents": [13],
         "detected": true,
         "parsedValue": 13,
         "parsedAccurate": true,
@@ -37642,16 +37375,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 917.3093749999825
+      "latencyMs": 913.6769579999964
     },
     {
       "caseId": "approved-wine-058",
       "fixtureDir": "approved-wine-058",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -37685,9 +37414,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12
-        ],
+        "acceptablePercents": [12],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -38483,16 +38210,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1335.5807090000017
+      "latencyMs": 1356.4202919999952
     },
     {
       "caseId": "approved-wine-059",
       "fixtureDir": "approved-wine-059",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -38513,10 +38236,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Domenico Negro",
-          "Dominico Negro"
-        ],
+        "acceptable": ["Domenico Negro", "Dominico Negro"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -38529,9 +38249,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -39237,16 +38955,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 876.7274580000085
+      "latencyMs": 872.299874999997
     },
     {
       "caseId": "three-steves-winery",
       "fixtureDir": "approved-wine-060",
-      "strata": [
-        "missing-alcohol-statement",
-        "multiple-brand-like-phrases",
-        "front-label"
-      ],
+      "strata": ["missing-alcohol-statement", "multiple-brand-like-phrases", "front-label"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -39259,9 +38973,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "3 Steves Winery"
-        ],
+        "acceptable": ["3 Steves Winery"],
         "knownAmbiguous": false,
         "exactMatch": true,
         "normalizedMatch": true,
@@ -40070,16 +39782,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 2176.6041250000126
+      "latencyMs": 2163.692832999979
     },
     {
       "caseId": "approved-wine-061",
       "fixtureDir": "approved-wine-061",
-      "strata": [
-        "back-label",
-        "low-resolution",
-        "missing-alcohol-statement"
-      ],
+      "strata": ["back-label", "low-resolution", "missing-alcohol-statement"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -40108,9 +39816,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Aphrodite"
-        ],
+        "acceptable": ["Aphrodite"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -40919,16 +40625,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1370.2926670000015
+      "latencyMs": 1360.357416999992
     },
     {
       "caseId": "approved-wine-062",
       "fixtureDir": "approved-wine-062",
-      "strata": [
-        "back-label",
-        "low-resolution",
-        "missing-alcohol-statement"
-      ],
+      "strata": ["back-label", "low-resolution", "missing-alcohol-statement"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -41794,16 +41496,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 3153.370209000015
+      "latencyMs": 3169.8547499999986
     },
     {
       "caseId": "approved-wine-063",
       "fixtureDir": "approved-wine-063",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -41816,9 +41514,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Prinsi"
-        ],
+        "acceptable": ["Prinsi"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -41831,9 +41527,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13
-        ],
+        "acceptablePercents": [13],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -42509,16 +42203,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 779.2028749999881
+      "latencyMs": 783.7688749999797
     },
     {
       "caseId": "approved-wine-064",
       "fixtureDir": "approved-wine-064",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -42559,9 +42249,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Prinsi"
-        ],
+        "acceptable": ["Prinsi"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -42574,9 +42262,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -43292,16 +42978,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 777.1938749999972
+      "latencyMs": 775.595834000007
     },
     {
       "caseId": "approved-wine-065",
       "fixtureDir": "approved-wine-065",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -43318,9 +43000,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Prinsi"
-        ],
+        "acceptable": ["Prinsi"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -43333,9 +43013,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13
-        ],
+        "acceptablePercents": [13],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -44101,16 +43779,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 850.0405000000028
+      "latencyMs": 848.8366660000174
     },
     {
       "caseId": "approved-wine-066",
       "fixtureDir": "approved-wine-066",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -44159,9 +43833,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Domaine Juliette Avril"
-        ],
+        "acceptable": ["Domaine Juliette Avril"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -44174,9 +43846,7 @@
         "confidence": 0.96,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13
-        ],
+        "acceptablePercents": [13],
         "detected": true,
         "parsedValue": 13,
         "parsedAccurate": true,
@@ -44912,16 +44582,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1212.047082999983
+      "latencyMs": 1207.57362499999
     },
     {
       "caseId": "approved-wine-067",
       "fixtureDir": "approved-wine-067",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -44966,9 +44632,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Domaine Juliette Avril"
-        ],
+        "acceptable": ["Domaine Juliette Avril"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -44981,9 +44645,7 @@
         "confidence": 0.9566666666666667,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13
-        ],
+        "acceptablePercents": [13],
         "detected": true,
         "parsedValue": 13,
         "parsedAccurate": true,
@@ -45699,16 +45361,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1204.57720900001
+      "latencyMs": 1178.221749999997
     },
     {
       "caseId": "approved-wine-068",
       "fixtureDir": "approved-wine-068",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -45745,9 +45403,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Sara"
-        ],
+        "acceptable": ["Sara"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -45760,9 +45416,7 @@
         "confidence": 0.9566666666666667,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13
-        ],
+        "acceptablePercents": [13],
         "detected": true,
         "parsedValue": 13,
         "parsedAccurate": true,
@@ -46518,17 +46172,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1142.71766699999
+      "latencyMs": 1147.7798340000154
     },
     {
       "caseId": "approved-wine-069",
       "fixtureDir": "approved-wine-069",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "low-contrast",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "low-contrast", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -46553,10 +46202,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "AltaCima 4.090",
-          "AltaCima"
-        ],
+        "acceptable": ["AltaCima 4.090", "AltaCima"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -46569,9 +46215,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -47367,17 +47011,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 2140.027334000013
+      "latencyMs": 2152.7604580000043
     },
     {
       "caseId": "altacima",
       "fixtureDir": "approved-wine-070",
-      "strata": [
-        "brand-punctuation",
-        "low-contrast",
-        "alcohol-at-bottom",
-        "front-label"
-      ],
+      "strata": ["brand-punctuation", "low-contrast", "alcohol-at-bottom", "front-label"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -47406,10 +47045,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "AltaCima 4.090",
-          "AltaCima"
-        ],
+        "acceptable": ["AltaCima 4.090", "AltaCima"],
         "knownAmbiguous": false,
         "exactMatch": true,
         "normalizedMatch": true,
@@ -47422,9 +47058,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -48220,17 +47854,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 2231.000417000003
+      "latencyMs": 2231.2070830000157
     },
     {
       "caseId": "approved-wine-071",
       "fixtureDir": "approved-wine-071",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "low-contrast",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "low-contrast", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -48243,10 +47872,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "AltaCima 6.330",
-          "AltaCima"
-        ],
+        "acceptable": ["AltaCima 6.330", "AltaCima"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -48259,9 +47885,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -49057,17 +48681,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 2704.033208000008
+      "latencyMs": 2752.518250000023
     },
     {
       "caseId": "approved-wine-072",
       "fixtureDir": "approved-wine-072",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "missing-alcohol-statement",
-        "genuinely-ambiguous"
-      ],
+      "strata": ["back-label", "dense-text", "missing-alcohol-statement", "genuinely-ambiguous"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -49092,9 +48711,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Ava Gardner"
-        ],
+        "acceptable": ["Ava Gardner"],
         "knownAmbiguous": true,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -49903,16 +49520,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 2540.275874999992
+      "latencyMs": 2536.278707999998
     },
     {
       "caseId": "approved-wine-073",
       "fixtureDir": "approved-wine-073",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "missing-alcohol-statement"
-      ],
+      "strata": ["multi-line-brand", "back-label", "missing-alcohol-statement"],
       "extractionError": null,
       "brand": {
         "state": "OBSERVED",
@@ -49937,10 +49550,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Mike's Farm, Inc.",
-          "Mike's Farm"
-        ],
+        "acceptable": ["Mike's Farm, Inc.", "Mike's Farm"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": true,
@@ -50749,16 +50359,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1194.9412920000032
+      "latencyMs": 1221.9982500000042
     },
     {
       "caseId": "approved-wine-074",
       "fixtureDir": "approved-wine-074",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "missing-alcohol-statement"
-      ],
+      "strata": ["multi-line-brand", "back-label", "missing-alcohol-statement"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -50779,10 +50385,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Mike's Farm, Inc.",
-          "Mike's Farm"
-        ],
+        "acceptable": ["Mike's Farm, Inc.", "Mike's Farm"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -51591,16 +51194,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1161.639708999981
+      "latencyMs": 1160.1647499999963
     },
     {
       "caseId": "approved-wine-075",
       "fixtureDir": "approved-wine-075",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "missing-alcohol-statement"
-      ],
+      "strata": ["back-label", "dense-text", "missing-alcohol-statement"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -52312,16 +51911,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1484.0613339999982
+      "latencyMs": 1500.3117500000226
     },
     {
       "caseId": "approved-wine-076",
       "fixtureDir": "approved-wine-076",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -52350,9 +51945,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Etim"
-        ],
+        "acceptable": ["Etim"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -52365,9 +51958,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -52833,16 +52424,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1020.9612500000221
+      "latencyMs": 1076.1390830000164
     },
     {
       "caseId": "approved-wine-077",
       "fixtureDir": "approved-wine-077",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -52855,9 +52442,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Valdinera"
-        ],
+        "acceptable": ["Valdinera"],
         "knownAmbiguous": false,
         "exactMatch": true,
         "normalizedMatch": true,
@@ -52870,9 +52455,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -53498,16 +53081,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 983.2108329999901
+      "latencyMs": 982.084583000018
     },
     {
       "caseId": "approved-wine-078",
       "fixtureDir": "approved-wine-078",
-      "strata": [
-        "multiple-brand-like-phrases",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -53536,9 +53115,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Pietta"
-        ],
+        "acceptable": ["Pietta"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -53551,9 +53128,7 @@
         "confidence": 0.9633333333333333,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          14
-        ],
+        "acceptablePercents": [14],
         "detected": true,
         "parsedValue": 14,
         "parsedAccurate": true,
@@ -54069,16 +53644,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 863.1172089999891
+      "latencyMs": 859.1782080000266
     },
     {
       "caseId": "approved-wine-079",
       "fixtureDir": "approved-wine-079",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -54095,9 +53666,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Le Caniette"
-        ],
+        "acceptable": ["Le Caniette"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -54110,9 +53679,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -54908,17 +54475,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1090.9129160000011
+      "latencyMs": 1055.6246669999964
     },
     {
       "caseId": "le-caniette",
       "fixtureDir": "approved-wine-080",
-      "strata": [
-        "multi-line-brand",
-        "split-alcohol-tokens",
-        "alcohol-at-bottom",
-        "front-label"
-      ],
+      "strata": ["multi-line-brand", "split-alcohol-tokens", "alcohol-at-bottom", "front-label"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -54951,9 +54513,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Le Caniette"
-        ],
+        "acceptable": ["Le Caniette"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -54966,9 +54526,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12.5
-        ],
+        "acceptablePercents": [12.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -55734,16 +55292,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1040.7955409999995
+      "latencyMs": 1037.2339159999974
     },
     {
       "caseId": "approved-wine-081",
       "fixtureDir": "approved-wine-081",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -55756,9 +55310,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Corte Adagio"
-        ],
+        "acceptable": ["Corte Adagio"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": true,
@@ -55771,9 +55323,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12
-        ],
+        "acceptablePercents": [12],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -56329,17 +55879,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 776.6534590000228
+      "latencyMs": 801.8087910000177
     },
     {
       "caseId": "approved-wine-082",
       "fixtureDir": "approved-wine-082",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom",
-        "low-contrast"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom", "low-contrast"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -56365,9 +55910,7 @@
         "confidence": 0.9500000000000001,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          14
-        ],
+        "acceptablePercents": [14],
         "detected": true,
         "parsedValue": 14,
         "parsedAccurate": true,
@@ -57053,16 +56596,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1317.679833000002
+      "latencyMs": 1311.374792000017
     },
     {
       "caseId": "approved-wine-083",
       "fixtureDir": "approved-wine-083",
-      "strata": [
-        "decorative-or-script-brand",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["decorative-or-script-brand", "front-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -57075,10 +56614,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Barn Sill Wine Co.",
-          "Barn Sill Wine Co"
-        ],
+        "acceptable": ["Barn Sill Wine Co.", "Barn Sill Wine Co"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -57091,9 +56627,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12
-        ],
+        "acceptablePercents": [12],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -57769,16 +57303,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 874.9962919999962
+      "latencyMs": 872.3926670000073
     },
     {
       "caseId": "approved-wine-084",
       "fixtureDir": "approved-wine-084",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -57827,9 +57357,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Filadoro"
-        ],
+        "acceptable": ["Filadoro"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -57842,9 +57370,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -58520,16 +58046,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1148.428042000014
+      "latencyMs": 1149.3566249999858
     },
     {
       "caseId": "approved-wine-085",
       "fixtureDir": "approved-wine-085",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -58554,9 +58076,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Mosaikon"
-        ],
+        "acceptable": ["Mosaikon"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -58569,9 +58089,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -59157,16 +58675,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 759.3797499999928
+      "latencyMs": 756.7845830000006
     },
     {
       "caseId": "approved-wine-086",
       "fixtureDir": "approved-wine-086",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "missing-alcohol-statement"
-      ],
+      "strata": ["back-label", "dense-text", "missing-alcohol-statement"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -59183,9 +58697,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "3 Steves Winery"
-        ],
+        "acceptable": ["3 Steves Winery"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -59934,16 +59446,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1725.568500000023
+      "latencyMs": 1715.0749159999832
     },
     {
       "caseId": "approved-wine-087",
       "fixtureDir": "approved-wine-087",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -60020,9 +59528,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Viridis"
-        ],
+        "acceptable": ["Viridis"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -60035,9 +59541,7 @@
         "confidence": 0.7133333333333334,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": true,
         "parsedValue": 13.5,
         "parsedAccurate": true,
@@ -60783,16 +60287,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 2319.1379590000142
+      "latencyMs": 2330.830249999999
     },
     {
       "caseId": "approved-wine-088",
       "fixtureDir": "approved-wine-088",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -60805,9 +60305,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "La Mesma"
-        ],
+        "acceptable": ["La Mesma"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -60820,9 +60318,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12.5
-        ],
+        "acceptablePercents": [12.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -61348,16 +60844,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 874.234375
+      "latencyMs": 860.7579170000099
     },
     {
       "caseId": "approved-wine-089",
       "fixtureDir": "approved-wine-089",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -61382,9 +60874,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "La Mesma"
-        ],
+        "acceptable": ["La Mesma"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -61397,9 +60887,7 @@
         "confidence": 0.9533333333333333,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13
-        ],
+        "acceptablePercents": [13],
         "detected": true,
         "parsedValue": 13,
         "parsedAccurate": true,
@@ -61935,16 +61423,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 786.2667080000101
+      "latencyMs": 832.2667920000094
     },
     {
       "caseId": "approved-wine-090",
       "fixtureDir": "approved-wine-090",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -61961,9 +61445,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "La Mesma"
-        ],
+        "acceptable": ["La Mesma"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -61976,9 +61458,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12.5
-        ],
+        "acceptablePercents": [12.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -62554,16 +62034,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 847.7630419999768
+      "latencyMs": 847.9384580000187
     },
     {
       "caseId": "approved-wine-091",
       "fixtureDir": "approved-wine-091",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -62576,9 +62052,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Rias"
-        ],
+        "acceptable": ["Rias"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -62591,9 +62065,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -63259,16 +62731,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 842.1893750000163
+      "latencyMs": 838.0222089999879
     },
     {
       "caseId": "approved-wine-092",
       "fixtureDir": "approved-wine-092",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -63293,9 +62761,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Twin Suns"
-        ],
+        "acceptable": ["Twin Suns"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -63308,9 +62774,7 @@
         "confidence": 0.9566666666666667,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.6
-        ],
+        "acceptablePercents": [13.6],
         "detected": true,
         "parsedValue": 13.6,
         "parsedAccurate": true,
@@ -64086,16 +63550,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1112.9995000000054
+      "latencyMs": 1161.0625830000208
     },
     {
       "caseId": "approved-wine-093",
       "fixtureDir": "approved-wine-093",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -64132,9 +63592,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Fontanavecchia"
-        ],
+        "acceptable": ["Fontanavecchia"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -64147,9 +63605,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -64735,16 +64191,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1086.811290999991
+      "latencyMs": 988.117041999998
     },
     {
       "caseId": "approved-wine-094",
       "fixtureDir": "approved-wine-094",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -64757,9 +64209,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Fontanavecchia"
-        ],
+        "acceptable": ["Fontanavecchia"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -64772,9 +64222,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -65320,17 +64768,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 958.2645419999899
+      "latencyMs": 956.8940000000002
     },
     {
       "caseId": "approved-wine-095",
       "fixtureDir": "approved-wine-095",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom",
-        "low-resolution"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom", "low-resolution"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -65356,9 +64799,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12
-        ],
+        "acceptablePercents": [12],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -65972,16 +65413,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 699.3084589999926
+      "latencyMs": 695.9779590000107
     },
     {
       "caseId": "approved-wine-096",
       "fixtureDir": "approved-wine-096",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -66015,9 +65452,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12
-        ],
+        "acceptablePercents": [12],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -66783,16 +66218,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1408.8648749999993
+      "latencyMs": 1336.3255000000063
     },
     {
       "caseId": "approved-wine-097",
       "fixtureDir": "approved-wine-097",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -66813,9 +66244,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12
-        ],
+        "acceptablePercents": [12],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -67581,16 +67010,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1197.019042
+      "latencyMs": 1190.4626250000147
     },
     {
       "caseId": "approved-wine-098",
       "fixtureDir": "approved-wine-098",
-      "strata": [
-        "back-label",
-        "low-resolution",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "low-resolution", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -67611,9 +67036,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12.5
-        ],
+        "acceptablePercents": [12.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -68117,16 +67540,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 539.1965410000121
+      "latencyMs": 538.0840420000022
     },
     {
       "caseId": "approved-wine-099",
       "fixtureDir": "approved-wine-099",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -68159,9 +67578,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Fontanavecchia"
-        ],
+        "acceptable": ["Fontanavecchia"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -68174,9 +67591,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -68722,7 +68137,7 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 930.0828749999928
+      "latencyMs": 927.6409999999742
     },
     {
       "caseId": "amuninni-ferracane",
@@ -68762,10 +68177,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Amuninni",
-          "Fabio Ferracane"
-        ],
+        "acceptable": ["Amuninni", "Fabio Ferracane"],
         "knownAmbiguous": true,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -68778,9 +68190,7 @@
         "confidence": 0.8999999999999999,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12.5
-        ],
+        "acceptablePercents": [12.5],
         "detected": true,
         "parsedValue": 12.5,
         "parsedAccurate": true,
@@ -69386,16 +68796,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 815.1659590000054
+      "latencyMs": 811.7164169999887
     },
     {
       "caseId": "approved-wine-101",
       "fixtureDir": "approved-wine-101",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "missing-alcohol-statement"
-      ],
+      "strata": ["back-label", "dense-text", "missing-alcohol-statement"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -70071,16 +69477,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1591.4307909999916
+      "latencyMs": 1675.2597090000054
     },
     {
       "caseId": "approved-wine-102",
       "fixtureDir": "approved-wine-102",
-      "strata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -70093,9 +69495,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Twin Suns"
-        ],
+        "acceptable": ["Twin Suns"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -70108,9 +69508,7 @@
         "confidence": 0.9466666666666667,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.4
-        ],
+        "acceptablePercents": [13.4],
         "detected": true,
         "parsedValue": 13.4,
         "parsedAccurate": true,
@@ -70906,16 +70304,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1061.8996669999906
+      "latencyMs": 1028.1804999999586
     },
     {
       "caseId": "approved-wine-103",
       "fixtureDir": "approved-wine-103",
-      "strata": [
-        "multiple-brand-like-phrases",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -70928,9 +70322,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Tenute Valso"
-        ],
+        "acceptable": ["Tenute Valso"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -70943,9 +70335,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13
-        ],
+        "acceptablePercents": [13],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -71621,16 +71011,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1044.7207920000073
+      "latencyMs": 1040.2145840000012
     },
     {
       "caseId": "approved-wine-104",
       "fixtureDir": "approved-wine-104",
-      "strata": [
-        "multiple-brand-like-phrases",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -71643,9 +71029,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Blazic"
-        ],
+        "acceptable": ["Blazic"],
         "knownAmbiguous": false,
         "exactMatch": true,
         "normalizedMatch": true,
@@ -71658,9 +71042,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13
-        ],
+        "acceptablePercents": [13],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -72456,7 +71838,7 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1344.2491659999941
+      "latencyMs": 1332.6975840000086
     },
     {
       "caseId": "approved-wine-105",
@@ -72483,9 +71865,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Luigi & Giovanni"
-        ],
+        "acceptable": ["Luigi & Giovanni"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -72498,9 +71878,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12.5
-        ],
+        "acceptablePercents": [12.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -73174,7 +72552,7 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1020.562042000005
+      "latencyMs": 1015.5439999999944
     },
     {
       "caseId": "approved-wine-106",
@@ -73205,10 +72583,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Alfredo's Wine",
-          "Alfredos Wine"
-        ],
+        "acceptable": ["Alfredo's Wine", "Alfredos Wine"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -73221,9 +72596,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12.5
-        ],
+        "acceptablePercents": [12.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -73889,7 +73262,7 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 958.6736249999958
+      "latencyMs": 958.0282499999739
     },
     {
       "caseId": "approved-wine-107",
@@ -74001,9 +73374,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "La Fattoria"
-        ],
+        "acceptable": ["La Fattoria"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -74016,9 +73387,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -74414,7 +73783,7 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1020.8358339999686
+      "latencyMs": 1014.8343749999767
     },
     {
       "caseId": "approved-wine-108",
@@ -74498,9 +73867,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "La Fattoria"
-        ],
+        "acceptable": ["La Fattoria"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -74513,9 +73880,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12.5
-        ],
+        "acceptablePercents": [12.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -74911,16 +74276,12 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 834.4733329999726
+      "latencyMs": 829.4469999999856
     },
     {
       "caseId": "approved-wine-109",
       "fixtureDir": "approved-wine-109",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -74933,9 +74294,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Sangouard-Chene"
-        ],
+        "acceptable": ["Sangouard-Chene"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -74948,9 +74307,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12.5
-        ],
+        "acceptablePercents": [12.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -75426,16 +74783,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 869.51800000004
+      "latencyMs": 862.9097920000204
     },
     {
       "caseId": "approved-wine-110",
       "fixtureDir": "approved-wine-110",
-      "strata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -75472,9 +74825,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Cooley Bay"
-        ],
+        "acceptable": ["Cooley Bay"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -75487,9 +74838,7 @@
         "confidence": 0.9499999999999998,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12.8
-        ],
+        "acceptablePercents": [12.8],
         "detected": true,
         "parsedValue": 12.8,
         "parsedAccurate": true,
@@ -76285,7 +75634,7 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1416.6885419999599
+      "latencyMs": 1406.7258750000037
     },
     {
       "caseId": "m-cellars-baseline",
@@ -76324,9 +75673,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "M Cellars"
-        ],
+        "acceptable": ["M Cellars"],
         "knownAmbiguous": true,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -76339,9 +75686,7 @@
         "confidence": 0.91,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12.5
-        ],
+        "acceptablePercents": [12.5],
         "detected": true,
         "parsedValue": 12.5,
         "parsedAccurate": true,
@@ -77087,15 +76432,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1325.777624999988
+      "latencyMs": 1331.4045409999671
     },
     {
       "caseId": "wine-multi-artifact-04",
       "fixtureDir": "wine-multi-artifact-04",
-      "strata": [
-        "multi-panel",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-panel", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -77112,9 +76454,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Dry Cellar"
-        ],
+        "acceptable": ["Dry Cellar"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -77127,9 +76467,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.2
-        ],
+        "acceptablePercents": [13.2],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -77775,15 +77113,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 1349.8973750000005
+      "latencyMs": 1347.804124999966
     },
     {
       "caseId": "wine-multi-artifact-05",
       "fixtureDir": "wine-multi-artifact-05",
-      "strata": [
-        "multi-panel",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-panel", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -77860,9 +77195,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Blazic"
-        ],
+        "acceptable": ["Blazic"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -77875,9 +77208,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.5
-        ],
+        "acceptablePercents": [13.5],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -78223,15 +77554,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1316.955208999978
+      "latencyMs": 1310.0721669999766
     },
     {
       "caseId": "wine-multi-artifact-06",
       "fixtureDir": "wine-multi-artifact-06",
-      "strata": [
-        "multi-panel",
-        "alcohol-at-side-or-rotated"
-      ],
+      "strata": ["multi-panel", "alcohol-at-side-or-rotated"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -78284,9 +77612,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Mauro Molino"
-        ],
+        "acceptable": ["Mauro Molino"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -78299,9 +77625,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          13.4
-        ],
+        "acceptablePercents": [13.4],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -78677,15 +78001,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 925.7902919999906
+      "latencyMs": 923.5909579999861
     },
     {
       "caseId": "wine-multi-artifact-07",
       "fixtureDir": "wine-multi-artifact-07",
-      "strata": [
-        "multi-panel",
-        "missing-alcohol-statement"
-      ],
+      "strata": ["multi-panel", "missing-alcohol-statement"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -78742,10 +78063,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Mike's Farm",
-          "Mike's Farm, Inc."
-        ],
+        "acceptable": ["Mike's Farm", "Mike's Farm, Inc."],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -79484,15 +78802,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 1290.4968339999905
+      "latencyMs": 1283.4802079999936
     },
     {
       "caseId": "wine-multi-artifact-08",
       "fixtureDir": "wine-multi-artifact-08",
-      "strata": [
-        "multi-panel",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-panel", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -79561,9 +78876,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Pindar"
-        ],
+        "acceptable": ["Pindar"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -79576,9 +78889,7 @@
         "confidence": 0.7133333333333334,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12.6
-        ],
+        "acceptablePercents": [12.6],
         "detected": true,
         "parsedValue": 12.6,
         "parsedAccurate": true,
@@ -79872,15 +79183,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 765.2301250000019
+      "latencyMs": 760.8246250000084
     },
     {
       "caseId": "wine-multi-artifact-09",
       "fixtureDir": "wine-multi-artifact-09",
-      "strata": [
-        "multi-panel",
-        "alcohol-at-bottom"
-      ],
+      "strata": ["multi-panel", "alcohol-at-bottom"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -79893,9 +79201,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Duck Walk Vineyards"
-        ],
+        "acceptable": ["Duck Walk Vineyards"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -79908,9 +79214,7 @@
         "confidence": 0.9233333333333333,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          12.5
-        ],
+        "acceptablePercents": [12.5],
         "detected": true,
         "parsedValue": 12.5,
         "parsedAccurate": true,
@@ -80246,15 +79550,12 @@
         "alcoholPercentInOcr": true,
         "alcoholNumberAndPercentSameLine": true
       },
-      "latencyMs": 819.4155829999945
+      "latencyMs": 812.4562910000095
     },
     {
       "caseId": "wine-multi-artifact-10",
       "fixtureDir": "wine-multi-artifact-10",
-      "strata": [
-        "multi-panel",
-        "alcohol-at-side-or-rotated"
-      ],
+      "strata": ["multi-panel", "alcohol-at-side-or-rotated"],
       "extractionError": null,
       "brand": {
         "state": "AMBIGUOUS",
@@ -80287,9 +79588,7 @@
           }
         ],
         "present": true,
-        "acceptable": [
-          "Mauro Molino"
-        ],
+        "acceptable": ["Mauro Molino"],
         "knownAmbiguous": false,
         "exactMatch": false,
         "normalizedMatch": false,
@@ -80302,9 +79601,7 @@
         "confidence": 0,
         "alternates": [],
         "present": true,
-        "acceptablePercents": [
-          14
-        ],
+        "acceptablePercents": [14],
         "detected": false,
         "parsedValue": null,
         "parsedAccurate": false,
@@ -80620,7 +79917,7 @@
         "alcoholPercentInOcr": false,
         "alcoholNumberAndPercentSameLine": false
       },
-      "latencyMs": 796.2893339999719
+      "latencyMs": 795.298582999967
     }
   ],
   "liveBaseline": {

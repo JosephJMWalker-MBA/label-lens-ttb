@@ -115,7 +115,6 @@ function exclude({
 const FRONT_SIMPLE = ["simple-centered-brand", "front-label"];
 const FRONT_SCRIPT = ["decorative-or-script-brand", "front-label"];
 const FRONT_COMPLEX = ["multiple-brand-like-phrases", "front-label"];
-const FRONT_TEXT = ["multi-line-brand", "front-label"];
 const BACK_SIMPLE = ["multi-line-brand", "back-label"];
 const BACK_DENSE = ["back-label", "dense-text"];
 const BACK_GENERIC = ["back-label"];
@@ -515,8 +514,7 @@ export const FULL_CORPUS_RECORD_OVERRIDES = {
   }),
   "approved-wine-064": include({
     strata: [...BACK_SIMPLE, "alcohol-at-bottom"],
-    notes:
-      "Prinsi Il Nespolo back label with a determinate 13.5% by volume footer line.",
+    notes: "Prinsi Il Nespolo back label with a determinate 13.5% by volume footer line.",
     brand: brandPresent(["Prinsi"], {
       forbiddenPresentations: ["Il Nespolo", "Arneis"],
     }),

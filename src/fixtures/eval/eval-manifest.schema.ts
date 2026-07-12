@@ -16,6 +16,7 @@ import {
   EVAL_VISUAL_STRATA,
   type EvalManifest,
   type EvalManifestError,
+  type EvalRecordStatus,
 } from "./eval-manifest.types";
 
 /** Strict validator for the corpus-scale evaluation inventory and annotations. */
@@ -340,9 +341,7 @@ const duplicateRecord = recordBase
   })
   .strict();
 
-function excludedRecord(
-  status: Exclude<z.infer<typeof recordStatus>, "included" | "excluded_duplicate">,
-) {
+function excludedRecord(status: Exclude<EvalRecordStatus, "included" | "excluded_duplicate">) {
   return recordBase
     .extend({
       status: z.literal(status),
@@ -353,16 +352,6 @@ function excludedRecord(
     })
     .strict();
 }
-
-const recordStatus = z.enum([
-  "included",
-  "excluded_duplicate",
-  "excluded_unreadable",
-  "excluded_outside_current_scope",
-  "excluded_uncertain_truth",
-  "excluded_usage_or_provenance_concern",
-  "excluded_other",
-]);
 
 const evalRecord = z.discriminatedUnion("status", [
   includedRecord,

@@ -141,12 +141,16 @@ describe("brand classification", () => {
   });
 
   it("absent brand correctly not observed is a success, while a fabricated brand is false-certainty", () => {
-    expect(classifyBrand(absent, obs({ state: "NOT_OBSERVED", value: null }), {
-      ocrContainsAcceptable: false,
-    })).toBe("correct");
-    expect(classifyBrand(absent, obs({ state: "OBSERVED", value: "Marble Creek Acres" }), {
-      ocrContainsAcceptable: false,
-    })).toBe("false-certainty");
+    expect(
+      classifyBrand(absent, obs({ state: "NOT_OBSERVED", value: null }), {
+        ocrContainsAcceptable: false,
+      }),
+    ).toBe("correct");
+    expect(
+      classifyBrand(absent, obs({ state: "OBSERVED", value: "Marble Creek Acres" }), {
+        ocrContainsAcceptable: false,
+      }),
+    ).toBe("false-certainty");
   });
 });
 
@@ -222,6 +226,7 @@ describe("aggregation and percentiles are deterministic", () => {
       brandExact: true,
       brandNormalized: true,
       brandTop3: true,
+      brandTop5: true,
       brandDetected: true,
       alcoholDetected: true,
       alcoholParsedAccurate: true,
@@ -230,6 +235,7 @@ describe("aggregation and percentiles are deterministic", () => {
     score("b", {
       brandClass: "false-certainty",
       brandPresent: false,
+      brandTop5: true,
       brandDetected: true,
       alcoholClass: "false-certainty",
       alcoholPresent: false,
@@ -261,6 +267,14 @@ describe("aggregation and percentiles are deterministic", () => {
     expect(a.absentAlcoholCount).toBe(1); // b
     expect(a.absentFieldFalsePositiveRate).toBe(1); // b detected while absent
     expect(a.brandExactMatchRate).toBe(1); // a of {a}
+    expect(a.brandTop5Recall).toBe(1); // a of {a}
+    expect(a.brandConfidentCorrectRate).toBe(1); // a of {a}
+    expect(a.brandUsefulButDeferredRate).toBe(0); // a is already confident-correct
+    expect(a.brandUnnecessaryAmbiguityRate).toBe(0); // no deferred determinate case
+    expect(a.brandFalseCertaintyRate).toBe(0); // absent-brand FP tracked separately
+    expect(a.brandNotObservedRate).toBe(0); // a observed
+    expect(a.alcoholParserFailureRate).toBe(0); // a + c have no parser failures
+    expect(a.alcoholFalseCertaintyRate).toBeCloseTo(1 / 3); // only b
   });
 
   it("nearest-rank percentile is stable", () => {
@@ -282,6 +296,7 @@ function score(caseId: string, over: Partial<FieldCaseScore>): FieldCaseScore {
     brandExact: false,
     brandNormalized: false,
     brandTop3: false,
+    brandTop5: false,
     alcoholDetected: false,
     alcoholParsedAccurate: false,
     latencyMs: 0,
