@@ -53,6 +53,7 @@ describe("extractor boundary", () => {
       expect(source).not.toMatch(/12\.5/);
       // No manifest/truth lookup and no artifact-hash constant.
       expect(source).not.toMatch(/truthLabels|manifest\.json|0b0ccec1/i);
+      expect(source).not.toMatch(/acceptablePresentations|declaredBrand|applicantDeclared/i);
     }
   });
 });

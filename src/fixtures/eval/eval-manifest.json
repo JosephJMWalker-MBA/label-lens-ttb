@@ -7,11 +7,7 @@
       "caseId": "luigi-giovanni-live",
       "imagePath": "tests/fixtures/precheck/approved-wine-001/label.png",
       "expectedSha256": "32b0fc57508fcc79cf37c33c402ecce5b9b3570e89da98dd487e1d91d338b579",
-      "image": {
-        "mediaType": "image/png",
-        "width": 975,
-        "height": 1500
-      },
+      "image": { "mediaType": "image/png", "width": 975, "height": 1500 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -56,11 +52,7 @@
           "approxGeometry": [],
           "orientation": "mixed"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Claude (extraction-baseline PR)",
           "annotatedOn": "2026-07-12",
@@ -91,11 +83,7 @@
       "caseId": "alfredos-wine",
       "imagePath": "tests/fixtures/precheck/approved-wine-002/label.png",
       "expectedSha256": "c3f0d11ce789f779be6985ec8d97c0a5ac2145e1805a3e0be1c05e25cc7afa14",
-      "image": {
-        "mediaType": "image/png",
-        "width": 975,
-        "height": 1500
-      },
+      "image": { "mediaType": "image/png", "width": 975, "height": 1500 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -139,11 +127,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Claude (extraction-baseline PR)",
           "annotatedOn": "2026-07-12",
@@ -174,11 +158,7 @@
       "caseId": "la-fattoria-rotated",
       "imagePath": "tests/fixtures/precheck/approved-wine-003/label.png",
       "expectedSha256": "78a45dc3df09a29615ebb19687803d4c0b9e50c0ffdcea833d6cc332bd3ee4e8",
-      "image": {
-        "mediaType": "image/png",
-        "width": 1350,
-        "height": 1650
-      },
+      "image": { "mediaType": "image/png", "width": 1350, "height": 1650 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -222,11 +202,7 @@
           "approxGeometry": [],
           "orientation": "mixed"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Claude (extraction-baseline PR)",
           "annotatedOn": "2026-07-12",
@@ -257,11 +233,7 @@
       "caseId": "approved-wine-004",
       "imagePath": "tests/fixtures/precheck/approved-wine-004/label.png",
       "expectedSha256": "02c272bc23e836befc6024a0c7fa1e3b448dc7d31b2e691cdff1f37457377aa5",
-      "image": {
-        "mediaType": "image/png",
-        "width": 1350,
-        "height": 1650
-      },
+      "image": { "mediaType": "image/png", "width": 1350, "height": 1650 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -305,11 +277,7 @@
           "approxGeometry": [],
           "orientation": "mixed"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -340,11 +308,7 @@
       "caseId": "approved-wine-005",
       "imagePath": "tests/fixtures/precheck/approved-wine-005/label.png",
       "expectedSha256": "4098ba3ddd706354a51ac55015aac04cd1a67a12aaa1947cfef59a523fd13ef9",
-      "image": {
-        "mediaType": "image/png",
-        "width": 1500,
-        "height": 1140
-      },
+      "image": { "mediaType": "image/png", "width": 1500, "height": 1140 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -388,11 +352,7 @@
           "approxGeometry": [],
           "orientation": "mixed"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -423,11 +383,7 @@
       "caseId": "approved-wine-006",
       "imagePath": "tests/fixtures/precheck/approved-wine-006/label.png",
       "expectedSha256": "ccc769bafa231ba823d0a13727da2c3f940c4974811c20e64c6d3dd03ffab270",
-      "image": {
-        "mediaType": "image/png",
-        "width": 1506,
-        "height": 865
-      },
+      "image": { "mediaType": "image/png", "width": 1506, "height": 865 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -471,11 +427,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -506,11 +458,7 @@
       "caseId": "casanova-della-spinetta",
       "imagePath": "tests/fixtures/precheck/approved-wine-007/label.jpeg",
       "expectedSha256": "6ead323c40f67fcdc261491828330c4f3f3d15fe40dc8b553bb59bebb8aa7e54",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 720,
-        "height": 1168
-      },
+      "image": { "mediaType": "image/jpeg", "width": 720, "height": 1168 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -549,11 +497,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Claude (extraction-baseline PR)",
           "annotatedOn": "2026-07-12",
@@ -584,11 +528,7 @@
       "caseId": "approved-wine-008",
       "imagePath": "tests/fixtures/precheck/approved-wine-008/label.png",
       "expectedSha256": "5aca28702c0621fbc4c45a63ad0828d3fac02fee089ba4702926f182d47580d1",
-      "image": {
-        "mediaType": "image/png",
-        "width": 1034,
-        "height": 1264
-      },
+      "image": { "mediaType": "image/png", "width": 1034, "height": 1264 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -627,11 +567,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -662,11 +598,7 @@
       "caseId": "approved-wine-009",
       "imagePath": "tests/fixtures/precheck/approved-wine-009/label.png",
       "expectedSha256": "a891cec4e2ed3645957859b421a127659b095646144c526bd237677a9e2907ea",
-      "image": {
-        "mediaType": "image/png",
-        "width": 1054,
-        "height": 1280
-      },
+      "image": { "mediaType": "image/png", "width": 1054, "height": 1280 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -705,11 +637,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -740,11 +668,7 @@
       "caseId": "domaine-follin-arbelet",
       "imagePath": "tests/fixtures/precheck/approved-wine-010/label.jpeg",
       "expectedSha256": "6187b67b93a895b2f0836f607e3eee7bf015f716b75c8d89b3664a5ca6026751",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 620,
-        "height": 704
-      },
+      "image": { "mediaType": "image/jpeg", "width": 620, "height": 704 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -788,11 +712,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Claude (extraction-baseline PR)",
           "annotatedOn": "2026-07-12",
@@ -823,11 +743,7 @@
       "caseId": "approved-wine-011",
       "imagePath": "tests/fixtures/precheck/approved-wine-011/label.png",
       "expectedSha256": "0c1adfbce9d94830a8e0473eb622491fbd500c4f8365584aa8fe163e0fbeacdf",
-      "image": {
-        "mediaType": "image/png",
-        "width": 790,
-        "height": 1080
-      },
+      "image": { "mediaType": "image/png", "width": 790, "height": 1080 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -866,11 +782,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -901,11 +813,7 @@
       "caseId": "approved-wine-012",
       "imagePath": "tests/fixtures/precheck/approved-wine-012/label.jpeg",
       "expectedSha256": "59d5a26169ac77d44cc3db8ec25402ff52f0622f3213d4db6d5361588b3a960f",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 900,
-        "height": 1200
-      },
+      "image": { "mediaType": "image/jpeg", "width": 900, "height": 1200 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -944,11 +852,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -979,11 +883,7 @@
       "caseId": "approved-wine-013",
       "imagePath": "tests/fixtures/precheck/approved-wine-013/label.jpeg",
       "expectedSha256": "7f0474a138a0a393f4088b7fbdadc9fd8bf2651b87a632ee9467dbf4a08cd3c1",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 1000,
-        "height": 1429
-      },
+      "image": { "mediaType": "image/jpeg", "width": 1000, "height": 1429 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -1027,11 +927,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -1062,11 +958,7 @@
       "caseId": "approved-wine-014",
       "imagePath": "tests/fixtures/precheck/approved-wine-014/label.jpeg",
       "expectedSha256": "4c2f4212c43b7f38f5e73f136caa28a9c65d393b22337339632d36a839c8efc8",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 1483,
-        "height": 1863
-      },
+      "image": { "mediaType": "image/jpeg", "width": 1483, "height": 1863 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -1105,11 +997,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -1140,11 +1028,7 @@
       "caseId": "patricia-green-cellars",
       "imagePath": "tests/fixtures/precheck/approved-wine-015/label.jpeg",
       "expectedSha256": "c79e78cc91b668a424b17ad2dfcd0598797eb40fcb2e362d99eeec9822b1f408",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 406,
-        "height": 400
-      },
+      "image": { "mediaType": "image/jpeg", "width": 406, "height": 400 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -1189,11 +1073,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "medium",
-          "brand": "medium",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "medium", "brand": "medium", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Claude (extraction-baseline PR)",
           "annotatedOn": "2026-07-12",
@@ -1224,11 +1104,7 @@
       "caseId": "approved-wine-016",
       "imagePath": "tests/fixtures/precheck/approved-wine-016/label.png",
       "expectedSha256": "7f5bfb5f1447f280a190928784b3ee047681ccc539046721e8a0e57792cd03e0",
-      "image": {
-        "mediaType": "image/png",
-        "width": 1157,
-        "height": 895
-      },
+      "image": { "mediaType": "image/png", "width": 1157, "height": 895 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -1267,11 +1143,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -1302,11 +1174,7 @@
       "caseId": "approved-wine-017",
       "imagePath": "tests/fixtures/precheck/approved-wine-017/label.png",
       "expectedSha256": "9dcb2a2068b7fcad720726cb08935962f0871d159b76ab7be4f77bdd58de826c",
-      "image": {
-        "mediaType": "image/png",
-        "width": 400,
-        "height": 539
-      },
+      "image": { "mediaType": "image/png", "width": 400, "height": 539 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -1345,11 +1213,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -1380,11 +1244,7 @@
       "caseId": "approved-wine-018",
       "imagePath": "tests/fixtures/precheck/approved-wine-018/label.png",
       "expectedSha256": "24ebcddb13916e0224191a08042702a471261a95e187b7f0ac736ff8a43658e7",
-      "image": {
-        "mediaType": "image/png",
-        "width": 1080,
-        "height": 1305
-      },
+      "image": { "mediaType": "image/png", "width": 1080, "height": 1305 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -1423,11 +1283,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -1458,11 +1314,7 @@
       "caseId": "approved-wine-019",
       "imagePath": "tests/fixtures/precheck/approved-wine-019/label.png",
       "expectedSha256": "7b06e68ad3026e33e6f1b8b12953570bfbc542ff3239b9b7d39d0b19e4e49391",
-      "image": {
-        "mediaType": "image/png",
-        "width": 820,
-        "height": 1104
-      },
+      "image": { "mediaType": "image/png", "width": 820, "height": 1104 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -1501,11 +1353,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -1536,11 +1384,7 @@
       "caseId": "approved-wine-020",
       "imagePath": "tests/fixtures/precheck/approved-wine-020/label.png",
       "expectedSha256": "a6880a833a6cb425d717998bd5bc31edbe4a1f719fe1856693e044c8f2296fe6",
-      "image": {
-        "mediaType": "image/png",
-        "width": 1017,
-        "height": 1160
-      },
+      "image": { "mediaType": "image/png", "width": 1017, "height": 1160 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -1579,11 +1423,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -1614,11 +1454,7 @@
       "caseId": "saker",
       "imagePath": "tests/fixtures/precheck/approved-wine-021/label.jpeg",
       "expectedSha256": "bbc9e83d13b3770fce80d51c90d5193d087fe07a9ce9ff4b5a70827621ba012b",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 900,
-        "height": 975
-      },
+      "image": { "mediaType": "image/jpeg", "width": 900, "height": 975 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -1657,11 +1493,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Claude (extraction-baseline PR)",
           "annotatedOn": "2026-07-12",
@@ -1692,11 +1524,7 @@
       "caseId": "approved-wine-022",
       "imagePath": "tests/fixtures/precheck/approved-wine-022/label.png",
       "expectedSha256": "4e12d8c395ca647939f874d8da1d31268863e151319159180360c98050182e33",
-      "image": {
-        "mediaType": "image/png",
-        "width": 555,
-        "height": 560
-      },
+      "image": { "mediaType": "image/png", "width": 555, "height": 560 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -1736,11 +1564,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -1771,11 +1595,7 @@
       "caseId": "approved-wine-023",
       "imagePath": "tests/fixtures/precheck/approved-wine-023/label.png",
       "expectedSha256": "ab9f888e0673afed9e08d6db30f6d5623c0c30a9bb69fc55e028ac82381fd010",
-      "image": {
-        "mediaType": "image/png",
-        "width": 988,
-        "height": 1253
-      },
+      "image": { "mediaType": "image/png", "width": 988, "height": 1253 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -1814,11 +1634,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -1849,11 +1665,7 @@
       "caseId": "approved-wine-024",
       "imagePath": "tests/fixtures/precheck/approved-wine-024/label.jpeg",
       "expectedSha256": "85942382ac1b5185be48b348fd02a624a973a45327ad765db6e827012cf1f5d3",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 1812,
-        "height": 1819
-      },
+      "image": { "mediaType": "image/jpeg", "width": 1812, "height": 1819 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -1893,11 +1705,7 @@
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -1928,11 +1736,7 @@
       "caseId": "nebla-mencia",
       "imagePath": "tests/fixtures/precheck/approved-wine-025/label.jpeg",
       "expectedSha256": "77e85396ddc8f80b7268fedc3ec050bb0f00c81c92d7494aac8b0dde2b616242",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 912,
-        "height": 1220
-      },
+      "image": { "mediaType": "image/jpeg", "width": 912, "height": 1220 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -1971,11 +1775,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Claude (extraction-baseline PR)",
           "annotatedOn": "2026-07-12",
@@ -2006,11 +1806,7 @@
       "caseId": "approved-wine-026",
       "imagePath": "tests/fixtures/precheck/approved-wine-026/label.png",
       "expectedSha256": "82f01a79197865261cbcf16dd64c752f83bf4c29b59044e1631f57e465239240",
-      "image": {
-        "mediaType": "image/png",
-        "width": 650,
-        "height": 1174
-      },
+      "image": { "mediaType": "image/png", "width": 650, "height": 1174 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -2049,11 +1845,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -2084,11 +1876,7 @@
       "caseId": "approved-wine-027",
       "imagePath": "tests/fixtures/precheck/approved-wine-027/label.jpeg",
       "expectedSha256": "76910b129a3b4e0d50892da3f9643ab699510ded8c0f61656afd2a0505a156fe",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 976,
-        "height": 1126
-      },
+      "image": { "mediaType": "image/jpeg", "width": 976, "height": 1126 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -2132,11 +1920,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -2167,11 +1951,7 @@
       "caseId": "approved-wine-028",
       "imagePath": "tests/fixtures/precheck/approved-wine-028/label.jpeg",
       "expectedSha256": "52ed32942e08ce40ca5de7fdfc7ebd5563fc15b0d215bc7287b19bb7760bf0e1",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 993,
-        "height": 828
-      },
+      "image": { "mediaType": "image/jpeg", "width": 993, "height": 828 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -2211,11 +1991,7 @@
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -2246,11 +2022,7 @@
       "caseId": "approved-wine-029",
       "imagePath": "tests/fixtures/precheck/approved-wine-029/label.jpeg",
       "expectedSha256": "c099706eb6eaf327c47d2cd44bc1acc5b274074216be17d4238e05187955d139",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 720,
-        "height": 932
-      },
+      "image": { "mediaType": "image/jpeg", "width": 720, "height": 932 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -2278,11 +2050,7 @@
       "caseId": "approved-wine-030",
       "imagePath": "tests/fixtures/precheck/approved-wine-030/label.jpeg",
       "expectedSha256": "40c4f676ed67e72a54f6e6da7a1152524ebbc0d47bbf4affadca53ae15c38858",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 720,
-        "height": 932
-      },
+      "image": { "mediaType": "image/jpeg", "width": 720, "height": 932 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -2310,11 +2078,7 @@
       "caseId": "approved-wine-031",
       "imagePath": "tests/fixtures/precheck/approved-wine-031/label.jpeg",
       "expectedSha256": "512afcf475b691396481d289dbcb461f6880cb81c03ec02e8db4a54faea6a4b2",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 646,
-        "height": 1171
-      },
+      "image": { "mediaType": "image/jpeg", "width": 646, "height": 1171 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -2353,11 +2117,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -2388,11 +2148,7 @@
       "caseId": "approved-wine-032",
       "imagePath": "tests/fixtures/precheck/approved-wine-032/label.jpeg",
       "expectedSha256": "4efa2ad223b7357669b6e05fcb6b3b09d1d1ef8556e37a410c57b70ecd1f8e7e",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 1888,
-        "height": 2200
-      },
+      "image": { "mediaType": "image/jpeg", "width": 1888, "height": 2200 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -2431,11 +2187,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -2466,11 +2218,7 @@
       "caseId": "approved-wine-033",
       "imagePath": "tests/fixtures/precheck/approved-wine-033/label.jpeg",
       "expectedSha256": "4d9f9004ac2898301936711cb01153bb4dcb4f74d731ae8222a1c78dd09a06f7",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 2475,
-        "height": 1200
-      },
+      "image": { "mediaType": "image/jpeg", "width": 2475, "height": 1200 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -2509,11 +2257,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -2544,11 +2288,7 @@
       "caseId": "approved-wine-034",
       "imagePath": "tests/fixtures/precheck/approved-wine-034/label.jpeg",
       "expectedSha256": "d4d881e8ffbb90dc96ed56e0f502a28525c203092d2e916739d28da719d6124f",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 1447,
-        "height": 2747
-      },
+      "image": { "mediaType": "image/jpeg", "width": 1447, "height": 2747 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -2587,11 +2327,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -2622,11 +2358,7 @@
       "caseId": "approved-wine-035",
       "imagePath": "tests/fixtures/precheck/approved-wine-035/label.png",
       "expectedSha256": "bf0d8e4ea936e1ddc67ce265345fde413cc29080f2a0b3ba42538912e30dd035",
-      "image": {
-        "mediaType": "image/png",
-        "width": 557,
-        "height": 471
-      },
+      "image": { "mediaType": "image/png", "width": 557, "height": 471 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -2665,11 +2397,7 @@
           "approxGeometry": [],
           "orientation": "mixed"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -2700,11 +2428,7 @@
       "caseId": "approved-wine-036",
       "imagePath": "tests/fixtures/precheck/approved-wine-036/label.jpeg",
       "expectedSha256": "15d7c7166634023db07646a000025d7c34c2f4eb319d57939011111cf42b510b",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 722,
-        "height": 960
-      },
+      "image": { "mediaType": "image/jpeg", "width": 722, "height": 960 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -2732,11 +2456,7 @@
       "caseId": "approved-wine-037",
       "imagePath": "tests/fixtures/precheck/approved-wine-037/label.jpeg",
       "expectedSha256": "843ad7bb486cef69d5dd4b145e4abe974f9f94848bb42e25cecc951d7f0fb23b",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 608,
-        "height": 1130
-      },
+      "image": { "mediaType": "image/jpeg", "width": 608, "height": 1130 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -2775,11 +2495,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -2810,11 +2526,7 @@
       "caseId": "approved-wine-038",
       "imagePath": "tests/fixtures/precheck/approved-wine-038/label.jpeg",
       "expectedSha256": "e376757648f94edb819b9713487c0f5972e8c2ac48e7a806882a0963648ae31d",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 591,
-        "height": 503
-      },
+      "image": { "mediaType": "image/jpeg", "width": 591, "height": 503 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -2853,11 +2565,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -2888,11 +2596,7 @@
       "caseId": "approved-wine-039",
       "imagePath": "tests/fixtures/precheck/approved-wine-039/label.png",
       "expectedSha256": "0814451112c0e60f1d83c06fd39a6ca96357864b531c2ffe981cf990b9d047c2",
-      "image": {
-        "mediaType": "image/png",
-        "width": 606,
-        "height": 768
-      },
+      "image": { "mediaType": "image/png", "width": 606, "height": 768 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -2931,11 +2635,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -2966,11 +2666,7 @@
       "caseId": "chateau-bonneau",
       "imagePath": "tests/fixtures/precheck/approved-wine-040/label.png",
       "expectedSha256": "d107a059f92c787fe61e706a323b7b6e1fd6d3d5efe154dd05e6437e04615edf",
-      "image": {
-        "mediaType": "image/png",
-        "width": 401,
-        "height": 717
-      },
+      "image": { "mediaType": "image/png", "width": 401, "height": 717 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -3009,11 +2705,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Claude (extraction-baseline PR)",
           "annotatedOn": "2026-07-12",
@@ -3044,11 +2736,7 @@
       "caseId": "approved-wine-041",
       "imagePath": "tests/fixtures/precheck/approved-wine-041/label.png",
       "expectedSha256": "53f3b49e627e75b415d4bec3c6440397300778b9b527ee2c2e118d1e482a7d86",
-      "image": {
-        "mediaType": "image/png",
-        "width": 1192,
-        "height": 1598
-      },
+      "image": { "mediaType": "image/png", "width": 1192, "height": 1598 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -3087,11 +2775,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -3122,11 +2806,7 @@
       "caseId": "approved-wine-042",
       "imagePath": "tests/fixtures/precheck/approved-wine-042/label.png",
       "expectedSha256": "58f9e12b698de57aedfa1de526de477d8a165552c20087827db344ba7c1020ba",
-      "image": {
-        "mediaType": "image/png",
-        "width": 1000,
-        "height": 700
-      },
+      "image": { "mediaType": "image/png", "width": 1000, "height": 700 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -3165,11 +2845,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -3200,11 +2876,7 @@
       "caseId": "approved-wine-043",
       "imagePath": "tests/fixtures/precheck/approved-wine-043/label.jpeg",
       "expectedSha256": "0669fbf34f02906dc4e9fe9050754650e612fe915c253fd21a909f18e1ba0d5c",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 825,
-        "height": 1050
-      },
+      "image": { "mediaType": "image/jpeg", "width": 825, "height": 1050 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -3248,11 +2920,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -3283,11 +2951,7 @@
       "caseId": "approved-wine-044",
       "imagePath": "tests/fixtures/precheck/approved-wine-044/label.jpeg",
       "expectedSha256": "13cce4f8c22c9bbcdd0c9b0c0e9276c02fe19e9bebb66d912201d30d132d80cc",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 1516,
-        "height": 2224
-      },
+      "image": { "mediaType": "image/jpeg", "width": 1516, "height": 2224 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -3326,11 +2990,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -3361,11 +3021,7 @@
       "caseId": "approved-wine-045",
       "imagePath": "tests/fixtures/precheck/approved-wine-045/label.jpeg",
       "expectedSha256": "4b2aa2abea5db906cf6a52d5d69bad88b50c0acef61134a15ef439db5f01c637",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 525,
-        "height": 600
-      },
+      "image": { "mediaType": "image/jpeg", "width": 525, "height": 600 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -3404,11 +3060,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -3439,11 +3091,7 @@
       "caseId": "approved-wine-046",
       "imagePath": "tests/fixtures/precheck/approved-wine-046/label.jpeg",
       "expectedSha256": "d5a4dcbf430141714cdaf7ec8dc857098b2d3c552e5e3fd5d15d974fdb42697d",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 714,
-        "height": 1295
-      },
+      "image": { "mediaType": "image/jpeg", "width": 714, "height": 1295 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -3483,11 +3131,7 @@
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -3518,11 +3162,7 @@
       "caseId": "approved-wine-047",
       "imagePath": "tests/fixtures/precheck/approved-wine-047/label.jpeg",
       "expectedSha256": "56436de64c0a811eb5dc2cf1ce83df2d5864aef13ac60d75dd4852d305b4f7c2",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 1831,
-        "height": 1200
-      },
+      "image": { "mediaType": "image/jpeg", "width": 1831, "height": 1200 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -3561,11 +3201,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "medium",
-          "brand": "medium",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "medium", "brand": "medium", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -3596,11 +3232,7 @@
       "caseId": "approved-wine-048",
       "imagePath": "tests/fixtures/precheck/approved-wine-048/label.png",
       "expectedSha256": "4b959267dd06123b4a8734e24d38acdaf7048ca4df6ded73765c6aa9cf37216e",
-      "image": {
-        "mediaType": "image/png",
-        "width": 822,
-        "height": 942
-      },
+      "image": { "mediaType": "image/png", "width": 822, "height": 942 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -3639,11 +3271,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -3674,11 +3302,7 @@
       "caseId": "approved-wine-049",
       "imagePath": "tests/fixtures/precheck/approved-wine-049/label.jpeg",
       "expectedSha256": "477fd260edf54a3e5c25887259e036a8dcede11dd72289bb1bf3228a0259a08c",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 1775,
-        "height": 2384
-      },
+      "image": { "mediaType": "image/jpeg", "width": 1775, "height": 2384 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -3717,11 +3341,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -3752,11 +3372,7 @@
       "caseId": "le-temps-des-fleurs",
       "imagePath": "tests/fixtures/precheck/approved-wine-050/label.jpeg",
       "expectedSha256": "48318d4539d109e715a643382a36e9ef88952147497b6f1bd7d07858a1f301ee",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 686,
-        "height": 889
-      },
+      "image": { "mediaType": "image/jpeg", "width": 686, "height": 889 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -3795,11 +3411,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Claude (extraction-baseline PR)",
           "annotatedOn": "2026-07-12",
@@ -3830,11 +3442,7 @@
       "caseId": "approved-wine-051",
       "imagePath": "tests/fixtures/precheck/approved-wine-051/label.jpeg",
       "expectedSha256": "ea51732542d8015c69fc7f4ca43da31bc61fbf8fe901aa9bc25a18fbd0121704",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 1236,
-        "height": 954
-      },
+      "image": { "mediaType": "image/jpeg", "width": 1236, "height": 954 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -3873,11 +3481,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -3908,11 +3512,7 @@
       "caseId": "approved-wine-052",
       "imagePath": "tests/fixtures/precheck/approved-wine-052/label.jpeg",
       "expectedSha256": "bdaefd9a1b5f333f5ba5375621c45afc441dc7c6730f17b75815cebd6b851bd7",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 2250,
-        "height": 2250
-      },
+      "image": { "mediaType": "image/jpeg", "width": 2250, "height": 2250 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -3952,11 +3552,7 @@
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -3987,11 +3583,7 @@
       "caseId": "approved-wine-053",
       "imagePath": "tests/fixtures/precheck/approved-wine-053/label.jpeg",
       "expectedSha256": "f6a083780b4135610ae39e1b0e3b66fcc3b1f57444fb60477e662f8f737c84ce",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 1252,
-        "height": 840
-      },
+      "image": { "mediaType": "image/jpeg", "width": 1252, "height": 840 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -4034,11 +3626,7 @@
           "approxGeometry": [],
           "orientation": "mixed"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -4069,11 +3657,7 @@
       "caseId": "approved-wine-054",
       "imagePath": "tests/fixtures/precheck/approved-wine-054/label.jpeg",
       "expectedSha256": "17219e52c3383f57a89ee94614a6ab9afa9976eb40cfb5c147541704175a9949",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 1016,
-        "height": 1078
-      },
+      "image": { "mediaType": "image/jpeg", "width": 1016, "height": 1078 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -4112,11 +3696,7 @@
           "approxGeometry": [],
           "orientation": "mixed"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -4147,11 +3727,7 @@
       "caseId": "approved-wine-055",
       "imagePath": "tests/fixtures/precheck/approved-wine-055/label.jpeg",
       "expectedSha256": "c50b9047abc76d46b0b0a3b1bf713f62bf6a787864ca2e8a044a83b5003ebefd",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 587,
-        "height": 839
-      },
+      "image": { "mediaType": "image/jpeg", "width": 587, "height": 839 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -4190,11 +3766,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -4225,11 +3797,7 @@
       "caseId": "approved-wine-056",
       "imagePath": "tests/fixtures/precheck/approved-wine-056/label.jpeg",
       "expectedSha256": "2dd812743e891d88b99e8de31e8c13edc5105757d558251ebe457b4a58c8ae52",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 493,
-        "height": 669
-      },
+      "image": { "mediaType": "image/jpeg", "width": 493, "height": 669 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -4268,11 +3836,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "medium",
-          "brand": "medium",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "medium", "brand": "medium", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -4303,11 +3867,7 @@
       "caseId": "approved-wine-057",
       "imagePath": "tests/fixtures/precheck/approved-wine-057/label.jpeg",
       "expectedSha256": "e10c843870da02a6ac9c59d6b077fe46cffb997ca54b4195e7dfcb7d808d5ee1",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 487,
-        "height": 664
-      },
+      "image": { "mediaType": "image/jpeg", "width": 487, "height": 664 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -4346,11 +3906,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -4381,11 +3937,7 @@
       "caseId": "approved-wine-058",
       "imagePath": "tests/fixtures/precheck/approved-wine-058/label.jpeg",
       "expectedSha256": "31f498d357e3484d39f8e069a1d8628c97592f7ea0138bdf419a5a901cf28474",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 908,
-        "height": 1064
-      },
+      "image": { "mediaType": "image/jpeg", "width": 908, "height": 1064 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -4425,11 +3977,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -4460,11 +4008,7 @@
       "caseId": "approved-wine-059",
       "imagePath": "tests/fixtures/precheck/approved-wine-059/label.jpeg",
       "expectedSha256": "063420e593998aea146360b944b4860973d350e340ef144e157d695bc90d5967",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 457,
-        "height": 588
-      },
+      "image": { "mediaType": "image/jpeg", "width": 457, "height": 588 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -4503,11 +4047,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "medium",
-          "brand": "medium",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "medium", "brand": "medium", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -4538,11 +4078,7 @@
       "caseId": "three-steves-winery",
       "imagePath": "tests/fixtures/precheck/approved-wine-060/label.jpeg",
       "expectedSha256": "0eb36380a43c9f3f6b27ebf846f038b2d866a331f581decdb9be974fbcaa7cc6",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 514,
-        "height": 551
-      },
+      "image": { "mediaType": "image/jpeg", "width": 514, "height": 551 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -4582,11 +4118,7 @@
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Claude (extraction-baseline PR)",
           "annotatedOn": "2026-07-12",
@@ -4617,11 +4149,7 @@
       "caseId": "approved-wine-061",
       "imagePath": "tests/fixtures/precheck/approved-wine-061/label.jpeg",
       "expectedSha256": "827b547b84b73601626a55c2cf7a5369ad529075b35890bd292abbb7054768f6",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 1700,
-        "height": 2200
-      },
+      "image": { "mediaType": "image/jpeg", "width": 1700, "height": 2200 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -4661,11 +4189,7 @@
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
-        "confidence": {
-          "overall": "medium",
-          "brand": "medium",
-          "alcohol": "medium"
-        },
+        "confidence": { "overall": "medium", "brand": "medium", "alcohol": "medium" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -4696,11 +4220,7 @@
       "caseId": "approved-wine-062",
       "imagePath": "tests/fixtures/precheck/approved-wine-062/label.jpeg",
       "expectedSha256": "7b88469d526d02ae5beab594865c7f99570bf254a4ddb6d6612825ff94415dea",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 2550,
-        "height": 3300
-      },
+      "image": { "mediaType": "image/jpeg", "width": 2550, "height": 3300 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -4741,11 +4261,7 @@
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
-        "confidence": {
-          "overall": "medium",
-          "brand": "medium",
-          "alcohol": "medium"
-        },
+        "confidence": { "overall": "medium", "brand": "medium", "alcohol": "medium" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -4776,11 +4292,7 @@
       "caseId": "approved-wine-063",
       "imagePath": "tests/fixtures/precheck/approved-wine-063/label.jpeg",
       "expectedSha256": "9ddce4fa2881511b369cea27248071b55ed112389f4d0bc5ed6362b0ec61a0d6",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 378,
-        "height": 497
-      },
+      "image": { "mediaType": "image/jpeg", "width": 378, "height": 497 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -4819,11 +4331,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -4854,11 +4362,7 @@
       "caseId": "approved-wine-064",
       "imagePath": "tests/fixtures/precheck/approved-wine-064/label.jpeg",
       "expectedSha256": "b271c1af798d1ff3aa7c17ecbe554041897de26cb82b5f3104f0b7382f32adaf",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 378,
-        "height": 497
-      },
+      "image": { "mediaType": "image/jpeg", "width": 378, "height": 497 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -4897,11 +4401,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -4932,11 +4432,7 @@
       "caseId": "approved-wine-065",
       "imagePath": "tests/fixtures/precheck/approved-wine-065/label.jpeg",
       "expectedSha256": "33d9440f5be731303258cd8857e1221bdf48135e7bd33b0fb1759a423f765083",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 378,
-        "height": 497
-      },
+      "image": { "mediaType": "image/jpeg", "width": 378, "height": 497 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -4975,11 +4471,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -5010,11 +4502,7 @@
       "caseId": "approved-wine-066",
       "imagePath": "tests/fixtures/precheck/approved-wine-066/label.jpeg",
       "expectedSha256": "3d544e7cf55c7f78090596f370e1ff5cdb59cfccc27802ab1d076068b6f6b209",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 709,
-        "height": 945
-      },
+      "image": { "mediaType": "image/jpeg", "width": 709, "height": 945 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -5053,11 +4541,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -5088,11 +4572,7 @@
       "caseId": "approved-wine-067",
       "imagePath": "tests/fixtures/precheck/approved-wine-067/label.jpeg",
       "expectedSha256": "3438e32c9c2fe76f5174fbca63001d02afe15ef4d8163e906c4e3acfeed70800",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 709,
-        "height": 945
-      },
+      "image": { "mediaType": "image/jpeg", "width": 709, "height": 945 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -5131,11 +4611,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -5166,11 +4642,7 @@
       "caseId": "approved-wine-068",
       "imagePath": "tests/fixtures/precheck/approved-wine-068/label.jpeg",
       "expectedSha256": "85b3a7a3823cda36c55c29ab8b0c4498a4bcc4725646d1a8e14e150d35ebb614",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 709,
-        "height": 945
-      },
+      "image": { "mediaType": "image/jpeg", "width": 709, "height": 945 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -5209,11 +4681,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -5244,11 +4712,7 @@
       "caseId": "approved-wine-069",
       "imagePath": "tests/fixtures/precheck/approved-wine-069/label.jpeg",
       "expectedSha256": "41d64cff195abec28eeb805f3a8b9cc9ca64196c50e6e86d71b486466bbdf0c5",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 822,
-        "height": 1110
-      },
+      "image": { "mediaType": "image/jpeg", "width": 822, "height": 1110 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -5287,11 +4751,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -5322,11 +4782,7 @@
       "caseId": "altacima",
       "imagePath": "tests/fixtures/precheck/approved-wine-070/label.jpeg",
       "expectedSha256": "feafd79824e046f75426744c581454838ce6058ee0bb6e69ca907eaa98a0a16a",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 797,
-        "height": 1683
-      },
+      "image": { "mediaType": "image/jpeg", "width": 797, "height": 1683 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -5365,11 +4821,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Claude (extraction-baseline PR)",
           "annotatedOn": "2026-07-12",
@@ -5400,11 +4852,7 @@
       "caseId": "approved-wine-071",
       "imagePath": "tests/fixtures/precheck/approved-wine-071/label.jpeg",
       "expectedSha256": "129e1e054e5d72688b26ef48c165dd7c35f32922907bc4c70db2bd69f86c637d",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 702,
-        "height": 1521
-      },
+      "image": { "mediaType": "image/jpeg", "width": 702, "height": 1521 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -5443,11 +4891,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -5478,11 +4922,7 @@
       "caseId": "approved-wine-072",
       "imagePath": "tests/fixtures/precheck/approved-wine-072/label.jpeg",
       "expectedSha256": "f0825d0f6a4e12fab451748580a921884b2a3bbd0578a65cbe2919cd68f86b81",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 677,
-        "height": 1392
-      },
+      "image": { "mediaType": "image/jpeg", "width": 677, "height": 1392 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -5527,11 +4967,7 @@
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
-        "confidence": {
-          "overall": "medium",
-          "brand": "medium",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "medium", "brand": "medium", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -5562,11 +4998,7 @@
       "caseId": "approved-wine-073",
       "imagePath": "tests/fixtures/precheck/approved-wine-073/label.jpeg",
       "expectedSha256": "05fcc9115414905e66b838a3b32acb481c02226a34412597a07d111831dd0902",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 670,
-        "height": 1385
-      },
+      "image": { "mediaType": "image/jpeg", "width": 670, "height": 1385 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -5606,11 +5038,7 @@
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -5641,11 +5069,7 @@
       "caseId": "approved-wine-074",
       "imagePath": "tests/fixtures/precheck/approved-wine-074/label.jpeg",
       "expectedSha256": "51cda786987a31778d33ed962af8e0b22a75fa1666534ca81af05ba7a45b3185",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 786,
-        "height": 1619
-      },
+      "image": { "mediaType": "image/jpeg", "width": 786, "height": 1619 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -5685,11 +5109,7 @@
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -5720,11 +5140,7 @@
       "caseId": "approved-wine-075",
       "imagePath": "tests/fixtures/precheck/approved-wine-075/label.jpeg",
       "expectedSha256": "f3f689b65bae9b458234c443201b341a430008615c26da48f4a99848c974c29c",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 879,
-        "height": 1409
-      },
+      "image": { "mediaType": "image/jpeg", "width": 879, "height": 1409 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -5765,11 +5181,7 @@
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -5800,11 +5212,7 @@
       "caseId": "approved-wine-076",
       "imagePath": "tests/fixtures/precheck/approved-wine-076/label.jpeg",
       "expectedSha256": "7260b52e004d8d310caa16643496624fd86c9683b27f8a9474cdeaf64ae9d3ce",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 503,
-        "height": 924
-      },
+      "image": { "mediaType": "image/jpeg", "width": 503, "height": 924 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -5843,11 +5251,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -5878,11 +5282,7 @@
       "caseId": "approved-wine-077",
       "imagePath": "tests/fixtures/precheck/approved-wine-077/label.jpeg",
       "expectedSha256": "648868ef9c26aa4c2ce17e82f4acc924eab02edbdbb144ee53cac9987b84da68",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 584,
-        "height": 437
-      },
+      "image": { "mediaType": "image/jpeg", "width": 584, "height": 437 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -5921,11 +5321,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -5956,11 +5352,7 @@
       "caseId": "approved-wine-078",
       "imagePath": "tests/fixtures/precheck/approved-wine-078/label.jpeg",
       "expectedSha256": "93212632b4415e322ac70393cfdbcf718ac8154d7f2822f79e3638afe1a777d7",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 727,
-        "height": 513
-      },
+      "image": { "mediaType": "image/jpeg", "width": 727, "height": 513 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -5999,11 +5391,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -6034,11 +5422,7 @@
       "caseId": "approved-wine-079",
       "imagePath": "tests/fixtures/precheck/approved-wine-079/label.jpeg",
       "expectedSha256": "7a2a1ce4ad3728559c9beef0e98187863dd581d2a7f0c8dcce67d71c1c7d773c",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 411,
-        "height": 593
-      },
+      "image": { "mediaType": "image/jpeg", "width": 411, "height": 593 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -6077,11 +5461,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -6112,11 +5492,7 @@
       "caseId": "le-caniette",
       "imagePath": "tests/fixtures/precheck/approved-wine-080/label.jpeg",
       "expectedSha256": "cf1fb8c8ae79aed14480df1e533320edfbdb20c878e79bbd8f3c09dc1139aff1",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 418,
-        "height": 594
-      },
+      "image": { "mediaType": "image/jpeg", "width": 418, "height": 594 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -6160,11 +5536,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Claude (extraction-baseline PR)",
           "annotatedOn": "2026-07-12",
@@ -6195,11 +5567,7 @@
       "caseId": "approved-wine-081",
       "imagePath": "tests/fixtures/precheck/approved-wine-081/label.jpeg",
       "expectedSha256": "868857eb88802609fee25e3cd50a6f44e26880f914eba69177aca1c84f2c1475",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 366,
-        "height": 454
-      },
+      "image": { "mediaType": "image/jpeg", "width": 366, "height": 454 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -6238,11 +5606,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -6273,11 +5637,7 @@
       "caseId": "approved-wine-082",
       "imagePath": "tests/fixtures/precheck/approved-wine-082/label.jpeg",
       "expectedSha256": "3ffdd716e0db6c40f07d478fd08374255e51b83bcc7ae0f2b8e931d78d5fb755",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 978,
-        "height": 1246
-      },
+      "image": { "mediaType": "image/jpeg", "width": 978, "height": 1246 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -6317,11 +5677,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -6352,11 +5708,7 @@
       "caseId": "approved-wine-083",
       "imagePath": "tests/fixtures/precheck/approved-wine-083/label.jpeg",
       "expectedSha256": "c535798ff76995ad464955dc3dd5cef0e1cf2601f1340b9f034b13830f56410c",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 447,
-        "height": 927
-      },
+      "image": { "mediaType": "image/jpeg", "width": 447, "height": 927 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -6395,11 +5747,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -6430,11 +5778,7 @@
       "caseId": "approved-wine-084",
       "imagePath": "tests/fixtures/precheck/approved-wine-084/label.jpeg",
       "expectedSha256": "2fd2256ba59854a67a6944b051dd99ed0acda76c5e48ba92966bc99cd61bf103",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 260,
-        "height": 679
-      },
+      "image": { "mediaType": "image/jpeg", "width": 260, "height": 679 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -6473,11 +5817,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "medium",
-          "brand": "medium",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "medium", "brand": "medium", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -6508,11 +5848,7 @@
       "caseId": "approved-wine-085",
       "imagePath": "tests/fixtures/precheck/approved-wine-085/label.jpeg",
       "expectedSha256": "e9c6de2e35a6f75bf1de128f8c1d2c2f0a824d52628e32fa6e003efb1bb758b6",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 414,
-        "height": 464
-      },
+      "image": { "mediaType": "image/jpeg", "width": 414, "height": 464 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -6551,11 +5887,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -6586,11 +5918,7 @@
       "caseId": "approved-wine-086",
       "imagePath": "tests/fixtures/precheck/approved-wine-086/label.jpeg",
       "expectedSha256": "c062b9d73f4a7b45cc73011bb1d7346219f7bbd503c0fd2188cdd2d5296a351c",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 385,
-        "height": 411
-      },
+      "image": { "mediaType": "image/jpeg", "width": 385, "height": 411 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -6630,11 +5958,7 @@
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -6665,11 +5989,7 @@
       "caseId": "approved-wine-087",
       "imagePath": "tests/fixtures/precheck/approved-wine-087/label.jpeg",
       "expectedSha256": "2aa667529ed475670edabac71a0fe0bbee342d1e194262abf77aa6ab5ea9b33d",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 1968,
-        "height": 2016
-      },
+      "image": { "mediaType": "image/jpeg", "width": 1968, "height": 2016 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -6708,11 +6028,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -6743,11 +6059,7 @@
       "caseId": "approved-wine-088",
       "imagePath": "tests/fixtures/precheck/approved-wine-088/label.jpeg",
       "expectedSha256": "b81efafbcb2622811e57d44a2065e08d9c65570abc74911f4f311588b18e3acc",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 521,
-        "height": 543
-      },
+      "image": { "mediaType": "image/jpeg", "width": 521, "height": 543 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -6786,11 +6098,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -6821,11 +6129,7 @@
       "caseId": "approved-wine-089",
       "imagePath": "tests/fixtures/precheck/approved-wine-089/label.jpeg",
       "expectedSha256": "833b2e2584d2ed2361aff0a4e6f13bf1a614989ce96065e67ae7939528a4b2ef",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 495,
-        "height": 517
-      },
+      "image": { "mediaType": "image/jpeg", "width": 495, "height": 517 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -6864,11 +6168,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -6899,11 +6199,7 @@
       "caseId": "approved-wine-090",
       "imagePath": "tests/fixtures/precheck/approved-wine-090/label.jpeg",
       "expectedSha256": "6db5edc250cf6644d4353df03c4542d7a3fbebef8940b0ba33d790d046449974",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 558,
-        "height": 531
-      },
+      "image": { "mediaType": "image/jpeg", "width": 558, "height": 531 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -6942,11 +6238,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -6977,11 +6269,7 @@
       "caseId": "approved-wine-091",
       "imagePath": "tests/fixtures/precheck/approved-wine-091/label.jpeg",
       "expectedSha256": "d3518e47880e39d38cf47d4692ad3a10d194a5b56e67690ab53c0b1d2306ab73",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 303,
-        "height": 598
-      },
+      "image": { "mediaType": "image/jpeg", "width": 303, "height": 598 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -7020,11 +6308,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -7055,11 +6339,7 @@
       "caseId": "approved-wine-092",
       "imagePath": "tests/fixtures/precheck/approved-wine-092/label.jpeg",
       "expectedSha256": "7e6e3b102a430e042a4e407a3b45397c9c754db2565154622ed2a8d33e634b19",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 370,
-        "height": 599
-      },
+      "image": { "mediaType": "image/jpeg", "width": 370, "height": 599 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -7098,11 +6378,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -7133,11 +6409,7 @@
       "caseId": "approved-wine-093",
       "imagePath": "tests/fixtures/precheck/approved-wine-093/label.jpeg",
       "expectedSha256": "54e1df770dcca0041258e323302fa8cd9e2916f8901b95f2573dbd0839d22fe3",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 674,
-        "height": 1122
-      },
+      "image": { "mediaType": "image/jpeg", "width": 674, "height": 1122 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -7176,11 +6448,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -7211,11 +6479,7 @@
       "caseId": "approved-wine-094",
       "imagePath": "tests/fixtures/precheck/approved-wine-094/label.jpeg",
       "expectedSha256": "a9e93c5074ae8a7efc0a734d7e10b388f335fa1340307e690d8eaf340323ced6",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 664,
-        "height": 1122
-      },
+      "image": { "mediaType": "image/jpeg", "width": 664, "height": 1122 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -7254,11 +6518,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -7289,11 +6549,7 @@
       "caseId": "approved-wine-095",
       "imagePath": "tests/fixtures/precheck/approved-wine-095/label.jpeg",
       "expectedSha256": "cbef11f3214d3763eceb50639b4da97f850e51591d71f29b76e9b9daf0b946e1",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 438,
-        "height": 324
-      },
+      "image": { "mediaType": "image/jpeg", "width": 438, "height": 324 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -7333,11 +6589,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "medium",
-          "brand": "medium",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "medium", "brand": "medium", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -7368,11 +6620,7 @@
       "caseId": "approved-wine-096",
       "imagePath": "tests/fixtures/precheck/approved-wine-096/label.jpeg",
       "expectedSha256": "a4bcc370b8b9825cd550272fdf4dc7c10bcbaae3d7c9cf768d9596e7339bd9fc",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 834,
-        "height": 1017
-      },
+      "image": { "mediaType": "image/jpeg", "width": 834, "height": 1017 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -7412,11 +6660,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -7447,11 +6691,7 @@
       "caseId": "approved-wine-097",
       "imagePath": "tests/fixtures/precheck/approved-wine-097/label.jpeg",
       "expectedSha256": "0435b2d064b3b09d7b26cb4876c3310798e6ad9f83584b50ebebd08e3a677ec3",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 835,
-        "height": 1016
-      },
+      "image": { "mediaType": "image/jpeg", "width": 835, "height": 1016 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -7491,11 +6731,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -7526,11 +6762,7 @@
       "caseId": "approved-wine-098",
       "imagePath": "tests/fixtures/precheck/approved-wine-098/label.jpeg",
       "expectedSha256": "e901a1becc58b32c2e1f4a5f52e36031ab92abfcf4a9556549cb0ceeeb4bc8e4",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 272,
-        "height": 228
-      },
+      "image": { "mediaType": "image/jpeg", "width": 272, "height": 228 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -7570,11 +6802,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "medium",
-          "brand": "medium",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "medium", "brand": "medium", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -7605,11 +6833,7 @@
       "caseId": "approved-wine-099",
       "imagePath": "tests/fixtures/precheck/approved-wine-099/label.jpeg",
       "expectedSha256": "0c6382c256454084eceb741a9c4360b51e77bfb96504938a66c218f910e459e0",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 665,
-        "height": 1122
-      },
+      "image": { "mediaType": "image/jpeg", "width": 665, "height": 1122 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -7648,11 +6872,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -7683,11 +6903,7 @@
       "caseId": "amuninni-ferracane",
       "imagePath": "tests/fixtures/precheck/approved-wine-100/label.jpeg",
       "expectedSha256": "164960edc12c29f8cbd22e08ebdc29e7d08d7eaeb7f1105a4121e766314da844",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 591,
-        "height": 946
-      },
+      "image": { "mediaType": "image/jpeg", "width": 591, "height": 946 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -7732,11 +6948,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "medium",
-          "brand": "medium",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "medium", "brand": "medium", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Claude (extraction-baseline PR)",
           "annotatedOn": "2026-07-12",
@@ -7767,11 +6979,7 @@
       "caseId": "approved-wine-101",
       "imagePath": "tests/fixtures/precheck/approved-wine-101/label.jpeg",
       "expectedSha256": "cfb3470e8acef3e34887bc9db9a9500956e9c918bd6cc769d3ed5b7f423ca19f",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 826,
-        "height": 901
-      },
+      "image": { "mediaType": "image/jpeg", "width": 826, "height": 901 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -7812,11 +7020,7 @@
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -7847,11 +7051,7 @@
       "caseId": "approved-wine-102",
       "imagePath": "tests/fixtures/precheck/approved-wine-102/label.jpeg",
       "expectedSha256": "6e17b7005859546f06bc40dbf757180daf6b27c998189ef96d132ff91a1ffcd2",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 377,
-        "height": 586
-      },
+      "image": { "mediaType": "image/jpeg", "width": 377, "height": 586 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -7890,11 +7090,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -7925,11 +7121,7 @@
       "caseId": "approved-wine-103",
       "imagePath": "tests/fixtures/precheck/approved-wine-103/label.jpeg",
       "expectedSha256": "d43254fd31f62350e5fa7aadd498613a4940f9d60822f215a8cfcac01b02d612",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 711,
-        "height": 1005
-      },
+      "image": { "mediaType": "image/jpeg", "width": 711, "height": 1005 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -7968,11 +7160,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "medium",
-          "brand": "medium",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "medium", "brand": "medium", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -8003,11 +7191,7 @@
       "caseId": "approved-wine-104",
       "imagePath": "tests/fixtures/precheck/approved-wine-104/label.jpeg",
       "expectedSha256": "9ba935bab31d38d2afb904754bf5a8775baeff145553a0da52bfcb8a884d6ed4",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 983,
-        "height": 1048
-      },
+      "image": { "mediaType": "image/jpeg", "width": 983, "height": 1048 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -8046,11 +7230,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -8081,11 +7261,7 @@
       "caseId": "approved-wine-105",
       "imagePath": "tests/fixtures/precheck/approved-wine-105/label.png",
       "expectedSha256": "15349de24bf2601dbb4debb80c664116b63aa7890bd6ba95ad7e260d8f460137",
-      "image": {
-        "mediaType": "image/png",
-        "width": 975,
-        "height": 1140
-      },
+      "image": { "mediaType": "image/png", "width": 975, "height": 1140 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -8129,11 +7305,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -8164,11 +7336,7 @@
       "caseId": "approved-wine-106",
       "imagePath": "tests/fixtures/precheck/approved-wine-106/label.png",
       "expectedSha256": "53512aeff23cd5988267b45e18667bc73321d3f31d6dbf46d5a167cf48f9b641",
-      "image": {
-        "mediaType": "image/png",
-        "width": 975,
-        "height": 1140
-      },
+      "image": { "mediaType": "image/png", "width": 975, "height": 1140 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -8212,11 +7380,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -8247,11 +7411,7 @@
       "caseId": "approved-wine-107",
       "imagePath": "tests/fixtures/precheck/approved-wine-107/label.png",
       "expectedSha256": "7128e5df5a998ce48b2a2e79a4b3cdbcdc30e7703f290220125569498132db23",
-      "image": {
-        "mediaType": "image/png",
-        "width": 1500,
-        "height": 1140
-      },
+      "image": { "mediaType": "image/png", "width": 1500, "height": 1140 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -8296,11 +7456,7 @@
           "approxGeometry": [],
           "orientation": "mixed"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -8331,11 +7487,7 @@
       "caseId": "approved-wine-108",
       "imagePath": "tests/fixtures/precheck/approved-wine-108/label.png",
       "expectedSha256": "9d9e490df12705103371d26f9da1832b2223fe54feb7505a875456f953b64d63",
-      "image": {
-        "mediaType": "image/png",
-        "width": 1500,
-        "height": 1140
-      },
+      "image": { "mediaType": "image/png", "width": 1500, "height": 1140 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -8380,11 +7532,7 @@
           "approxGeometry": [],
           "orientation": "mixed"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -8415,11 +7563,7 @@
       "caseId": "approved-wine-109",
       "imagePath": "tests/fixtures/precheck/approved-wine-109/label.png",
       "expectedSha256": "8d95ab6bcbaf380f14d0923c643bc8415971d27ad99e835f9babdfb900d7c9fe",
-      "image": {
-        "mediaType": "image/png",
-        "width": 543,
-        "height": 748
-      },
+      "image": { "mediaType": "image/png", "width": 543, "height": 748 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -8458,11 +7602,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -8493,11 +7633,7 @@
       "caseId": "approved-wine-110",
       "imagePath": "tests/fixtures/precheck/approved-wine-110/label.jpeg",
       "expectedSha256": "48138d8e6bd4ac11811be0faf2d228f0a12abd22111bfc9e55de256a3eb228fc",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 900,
-        "height": 1200
-      },
+      "image": { "mediaType": "image/jpeg", "width": 900, "height": 1200 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -8536,11 +7672,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -8571,11 +7703,7 @@
       "caseId": "category-sentinel-agave-spirit-01",
       "imagePath": "tests/fixtures/precheck/category-sentinel-agave-spirit-01/label.jpeg",
       "expectedSha256": "999705ded335909ec6e47d8755ba2b73a7f3f99c5a94d937472cf2444b81ca4b",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 2381,
-        "height": 2380
-      },
+      "image": { "mediaType": "image/jpeg", "width": 2381, "height": 2380 },
       "beverageCategory": "distilled-spirits",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -8602,11 +7730,7 @@
       "caseId": "category-sentinel-agave-spirit-02",
       "imagePath": "tests/fixtures/precheck/category-sentinel-agave-spirit-02/label.jpeg",
       "expectedSha256": "4ed44b7cdd5b5dda5a22d4cf9a5c7ce1474367bc9b6787699bce210f81b441b6",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 1920,
-        "height": 1506
-      },
+      "image": { "mediaType": "image/jpeg", "width": 1920, "height": 1506 },
       "beverageCategory": "distilled-spirits",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -8633,11 +7757,7 @@
       "caseId": "category-sentinel-agave-spirit-03",
       "imagePath": "tests/fixtures/precheck/category-sentinel-agave-spirit-03/label.jpeg",
       "expectedSha256": "f5fcd51c27003db0d9c2514f610b1d9513bc1cc4f1364525fa24066152ba0816",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 1800,
-        "height": 1200
-      },
+      "image": { "mediaType": "image/jpeg", "width": 1800, "height": 1200 },
       "beverageCategory": "distilled-spirits",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -8664,11 +7784,7 @@
       "caseId": "category-sentinel-ale-01",
       "imagePath": "tests/fixtures/precheck/category-sentinel-ale-01/label.jpeg",
       "expectedSha256": "ae81c82f8ece8cf83825fc342aff4d387fa808faad93b5852bdc11a79dad143c",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 3453,
-        "height": 3453
-      },
+      "image": { "mediaType": "image/jpeg", "width": 3453, "height": 3453 },
       "beverageCategory": "beer-or-malt-beverage",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -8695,11 +7811,7 @@
       "caseId": "category-sentinel-ale-02",
       "imagePath": "tests/fixtures/precheck/category-sentinel-ale-02/label.jpeg",
       "expectedSha256": "294a3249e3cb3de0a7933a3d89bcfe48c825d7fd31bf1827a218f873f21f9f2e",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 1163,
-        "height": 678
-      },
+      "image": { "mediaType": "image/jpeg", "width": 1163, "height": 678 },
       "beverageCategory": "beer-or-malt-beverage",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -8726,11 +7838,7 @@
       "caseId": "category-sentinel-ale-03",
       "imagePath": "tests/fixtures/precheck/category-sentinel-ale-03/label.jpeg",
       "expectedSha256": "7a7dbeeaf64cbc3ecf907675ea89317534957196e8a1684e17423837076a4a40",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 717,
-        "height": 753
-      },
+      "image": { "mediaType": "image/jpeg", "width": 717, "height": 753 },
       "beverageCategory": "beer-or-malt-beverage",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -8757,11 +7865,7 @@
       "caseId": "category-sentinel-single-malt-whiskey-01",
       "imagePath": "tests/fixtures/precheck/category-sentinel-single-malt-whiskey-01/label.jpeg",
       "expectedSha256": "f2a6375ff41d2c142cd364b4a962bc650b2aa234e7bdd41cd62c48f2fca8ac13",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 1033,
-        "height": 644
-      },
+      "image": { "mediaType": "image/jpeg", "width": 1033, "height": 644 },
       "beverageCategory": "distilled-spirits",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -8788,11 +7892,7 @@
       "caseId": "category-sentinel-single-malt-whiskey-02",
       "imagePath": "tests/fixtures/precheck/category-sentinel-single-malt-whiskey-02/label.png",
       "expectedSha256": "b28687b86c84424428f969a4a0ae869d10c4d2a963c360074acc83cfd33acbfc",
-      "image": {
-        "mediaType": "image/png",
-        "width": 944,
-        "height": 1444
-      },
+      "image": { "mediaType": "image/png", "width": 944, "height": 1444 },
       "beverageCategory": "distilled-spirits",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -8819,11 +7919,7 @@
       "caseId": "category-sentinel-single-malt-whiskey-03",
       "imagePath": "tests/fixtures/precheck/category-sentinel-single-malt-whiskey-03/label.jpeg",
       "expectedSha256": "fb0b64624dc63010e3c4392a8adef3cba116d3ee7511fc6714e657679000eeff",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 937,
-        "height": 593
-      },
+      "image": { "mediaType": "image/jpeg", "width": 937, "height": 593 },
       "beverageCategory": "distilled-spirits",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -8850,11 +7946,7 @@
       "caseId": "m-cellars-baseline",
       "imagePath": "tests/fixtures/precheck/m-cellars-24205001000905/label-ocr-source.jpeg",
       "expectedSha256": "0b0ccec13bf6c533ec7928b017b140a0213fb4555812fea81d71872adb453713",
-      "image": {
-        "mediaType": "image/jpeg",
-        "width": 2404,
-        "height": 979
-      },
+      "image": { "mediaType": "image/jpeg", "width": 2404, "height": 979 },
       "beverageCategory": "wine",
       "source": {
         "authority": "Alcohol and Tobacco Tax and Trade Bureau",
@@ -8894,11 +7986,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "medium",
-          "brand": "medium",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "medium", "brand": "medium", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Claude (extraction-baseline PR)",
           "annotatedOn": "2026-07-12",
@@ -8929,11 +8017,7 @@
       "caseId": "m-cellars-reference-crop",
       "imagePath": "tests/fixtures/precheck/m-cellars-24205001000905/label.png",
       "expectedSha256": "6829add3d99c61851028b2422bdd9672bb975183d198de5e280bc961f4a489e7",
-      "image": {
-        "mediaType": "image/png",
-        "width": 494,
-        "height": 214
-      },
+      "image": { "mediaType": "image/png", "width": 494, "height": 214 },
       "beverageCategory": "wine",
       "source": {
         "authority": "Alcohol and Tobacco Tax and Trade Bureau",
@@ -8957,11 +8041,7 @@
       "caseId": "m-cellars-lowres",
       "imagePath": "tests/fixtures/precheck/m-cellars-lowres-24205001000905/label-lowres.png",
       "expectedSha256": "53873507ecf241a355ed1f8a500c59ff3cec375298c52919e12f43d53571462f",
-      "image": {
-        "mediaType": "image/png",
-        "width": 601,
-        "height": 245
-      },
+      "image": { "mediaType": "image/png", "width": 601, "height": 245 },
       "beverageCategory": "wine",
       "source": {
         "authority": "Alcohol and Tobacco Tax and Trade Bureau",
@@ -8985,11 +8065,7 @@
       "caseId": "wine-multi-artifact-01",
       "imagePath": "tests/fixtures/precheck/wine-multi-artifact-01/label.png",
       "expectedSha256": "774b8d9552602151d1d737853c61366fca2eca64bd1f01db64a55d28b8aa17af",
-      "image": {
-        "mediaType": "image/png",
-        "width": 638,
-        "height": 1306
-      },
+      "image": { "mediaType": "image/png", "width": 638, "height": 1306 },
       "beverageCategory": "distilled-spirits",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -9016,11 +8092,7 @@
       "caseId": "wine-multi-artifact-02",
       "imagePath": "tests/fixtures/precheck/wine-multi-artifact-02/label.png",
       "expectedSha256": "e6662f665a8fe57753fa80a8680c168487911e2f8a3eea9d49c321a58b647fab",
-      "image": {
-        "mediaType": "image/png",
-        "width": 532,
-        "height": 1676
-      },
+      "image": { "mediaType": "image/png", "width": 532, "height": 1676 },
       "beverageCategory": "distilled-spirits",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -9047,11 +8119,7 @@
       "caseId": "wine-multi-artifact-03",
       "imagePath": "tests/fixtures/precheck/wine-multi-artifact-03/label.png",
       "expectedSha256": "8a10f57aeef9a4dbb3df31b15ec5528607be608cb6d8b19098a32e69c3b8b333",
-      "image": {
-        "mediaType": "image/png",
-        "width": 620,
-        "height": 1568
-      },
+      "image": { "mediaType": "image/png", "width": 620, "height": 1568 },
       "beverageCategory": "distilled-spirits",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -9078,11 +8146,7 @@
       "caseId": "wine-multi-artifact-04",
       "imagePath": "tests/fixtures/precheck/wine-multi-artifact-04/label.png",
       "expectedSha256": "445d39b8f73d04cd05bb35e03f9678f6ba9e81f6a6f01d5469306ec43c9c5887",
-      "image": {
-        "mediaType": "image/png",
-        "width": 674,
-        "height": 1522
-      },
+      "image": { "mediaType": "image/png", "width": 674, "height": 1522 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -9120,11 +8184,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -9155,11 +8215,7 @@
       "caseId": "wine-multi-artifact-05",
       "imagePath": "tests/fixtures/precheck/wine-multi-artifact-05/label.png",
       "expectedSha256": "5aaecc88b41d5c12d5551d7b5978165dbfe07c92568219d885f6c20afdfff992",
-      "image": {
-        "mediaType": "image/png",
-        "width": 1096,
-        "height": 1226
-      },
+      "image": { "mediaType": "image/png", "width": 1096, "height": 1226 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -9197,11 +8253,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -9232,11 +8284,7 @@
       "caseId": "wine-multi-artifact-06",
       "imagePath": "tests/fixtures/precheck/wine-multi-artifact-06/label.png",
       "expectedSha256": "4de6d23cc7d701836628b3f7ec2a116126a8d1fb6a6cfbba85bced4879811e49",
-      "image": {
-        "mediaType": "image/png",
-        "width": 816,
-        "height": 1276
-      },
+      "image": { "mediaType": "image/png", "width": 816, "height": 1276 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -9274,11 +8322,7 @@
           "approxGeometry": [],
           "orientation": "mixed"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -9309,11 +8353,7 @@
       "caseId": "wine-multi-artifact-07",
       "imagePath": "tests/fixtures/precheck/wine-multi-artifact-07/label.png",
       "expectedSha256": "6907f03956286e7f4f6ae6b6c6670deb044af072b6008000db221d3f337360b7",
-      "image": {
-        "mediaType": "image/png",
-        "width": 400,
-        "height": 1554
-      },
+      "image": { "mediaType": "image/png", "width": 400, "height": 1554 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -9352,11 +8392,7 @@
           "approxGeometry": [],
           "orientation": "not-applicable"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -9387,11 +8423,7 @@
       "caseId": "wine-multi-artifact-08",
       "imagePath": "tests/fixtures/precheck/wine-multi-artifact-08/label.png",
       "expectedSha256": "29cc7e0232fa796b046db41791da7272f5b3092933cc912869d9b3596105fd4d",
-      "image": {
-        "mediaType": "image/png",
-        "width": 610,
-        "height": 1224
-      },
+      "image": { "mediaType": "image/png", "width": 610, "height": 1224 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -9429,11 +8461,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -9464,11 +8492,7 @@
       "caseId": "wine-multi-artifact-09",
       "imagePath": "tests/fixtures/precheck/wine-multi-artifact-09/label.png",
       "expectedSha256": "02afffe0d861686f86f361f1c467820f58325d14a01c9c03bcd010bc8b7c8e44",
-      "image": {
-        "mediaType": "image/png",
-        "width": 660,
-        "height": 1330
-      },
+      "image": { "mediaType": "image/png", "width": 660, "height": 1330 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -9506,11 +8530,7 @@
           "approxGeometry": [],
           "orientation": "horizontal"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",
@@ -9541,11 +8561,7 @@
       "caseId": "wine-multi-artifact-10",
       "imagePath": "tests/fixtures/precheck/wine-multi-artifact-10/label.png",
       "expectedSha256": "209116cac5f9ede387e39dcc313a7ef30a68ddc249468cb2da79e0ada188b155",
-      "image": {
-        "mediaType": "image/png",
-        "width": 832,
-        "height": 1186
-      },
+      "image": { "mediaType": "image/png", "width": 832, "height": 1186 },
       "beverageCategory": "wine",
       "source": {
         "authority": "author-provided-local-acquisition",
@@ -9583,11 +8599,7 @@
           "approxGeometry": [],
           "orientation": "mixed"
         },
-        "confidence": {
-          "overall": "high",
-          "brand": "high",
-          "alcohol": "high"
-        },
+        "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
           "annotatedBy": "Codex",
           "annotatedOn": "2026-07-12",

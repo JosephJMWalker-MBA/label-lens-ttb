@@ -61,6 +61,7 @@ describe("evaluation harness OCR-backed safeguards", () => {
       expect(region.sampleWords.length).toBeLessThanOrEqual(25);
     }
     expect(report.diagnostics.brandLineTexts.length).toBeLessThanOrEqual(12);
+    expect(report.diagnostics.brandCandidateDecisions.length).toBeLessThanOrEqual(24);
   });
 
   it("leaks no absolute paths or raw image bytes into the report", () => {

@@ -1,5 +1,11 @@
 import type { AnalyzerObservationState } from "@/pipeline/analyzer/analyzer.types";
-import type { BrandAbstentionReason, BrandLineReason } from "@/pipeline/extractor/field-selection";
+import type {
+  BrandAbstentionReason,
+  BrandCandidateAssembly,
+  BrandCandidateDecision,
+  BrandCandidateScore,
+  BrandLineReason,
+} from "@/pipeline/extractor/field-selection";
 
 import type { AggregateMetrics } from "./metrics";
 import type { EvalFailureClass, EvalStratum } from "./eval-manifest.types";
@@ -29,6 +35,18 @@ export interface CaseDiagnostics {
   regions: RegionDiagnostics[];
   /** Reconstructed brand-region line texts (capped). */
   brandLineTexts: string[];
+  brandCandidateDecisions: {
+    rawText: string;
+    cleanedValue: string | null;
+    confidence: number;
+    prominence: number;
+    assembly: BrandCandidateAssembly;
+    lineIndexes: number[];
+    kept: boolean;
+    filterReason: BrandLineReason;
+    decision?: BrandCandidateDecision;
+    score?: BrandCandidateScore;
+  }[];
   brandLineDecisions: {
     rawText: string;
     cleanedValue: string | null;
@@ -39,6 +57,8 @@ export interface CaseDiagnostics {
   }[];
   brandAbstentionReason?: BrandAbstentionReason;
   brandOcrContainsAcceptable: boolean;
+  brandLineContainsAcceptable: boolean;
+  brandCandidateContainsAcceptable: boolean;
   alcoholNumberInOcr: boolean;
   alcoholPercentInOcr: boolean;
   alcoholNumberAndPercentSameLine: boolean;

@@ -2,6 +2,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
+import { format, resolveConfig } from "prettier";
 import { describe, expect, it } from "vitest";
 
 import { runCase } from "./eval-harness";
@@ -23,6 +24,16 @@ import { buildReport, renderMarkdown } from "./report";
 const RUN = process.env.EVAL_BASELINE === "1";
 const OUTPUT_DIR = join(process.cwd(), "docs/extraction-full-corpus");
 
+async function writeFormattedJson(filePath: string, value: unknown) {
+  const config = (await resolveConfig(filePath)) ?? {};
+  const formatted = await format(JSON.stringify(value), {
+    ...config,
+    filepath: filePath,
+    parser: "json",
+  });
+  writeFileSync(filePath, formatted);
+}
+
 (RUN ? describe : describe.skip)("full-corpus extraction evaluation generation", () => {
   it(
     "runs the real extractor on every included case and writes the full-corpus report",
@@ -36,10 +47,10 @@ const OUTPUT_DIR = join(process.cwd(), "docs/extraction-full-corpus");
       const report = buildReport(cases, manifest);
 
       mkdirSync(OUTPUT_DIR, { recursive: true });
-      writeFileSync(
-        join(OUTPUT_DIR, "extractor-report.json"),
-        `${JSON.stringify({ ...report, liveBaseline: LIVE_BASELINE }, null, 2)}\n`,
-      );
+      await writeFormattedJson(join(OUTPUT_DIR, "extractor-report.json"), {
+        ...report,
+        liveBaseline: LIVE_BASELINE,
+      });
       writeFileSync(
         join(OUTPUT_DIR, "extractor-report.md"),
         `${renderMarkdown(report).trimEnd()}\n`,

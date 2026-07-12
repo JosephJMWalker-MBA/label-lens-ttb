@@ -34,6 +34,7 @@ const LOW_CONFIDENCE_THRESHOLD = 0.6;
 const AMBIGUITY_MARGIN = 0.2;
 
 interface Candidate {
+  id?: string;
   value: string;
   rawText: string;
   confidence: number;
@@ -49,6 +50,13 @@ interface Candidate {
    * not positively distinguishable as a brand. Undefined for non-brand fields.
    */
   brandClass?: BrandClass;
+  assembly?: BrandCandidateAssembly;
+  lineIndexes?: number[];
+  imageWidth?: number;
+  imageHeight?: number;
+  alignment?: number;
+  lineProximity?: number;
+  score?: BrandCandidateScore;
 }
 
 /** An observation plus the region the selected value came from (for provenance). */
@@ -80,6 +88,16 @@ export const BRAND_LINE_REASONS = [
 ] as const;
 export type BrandLineReason = (typeof BRAND_LINE_REASONS)[number];
 
+export const BRAND_CANDIDATE_ASSEMBLIES = [
+  "whole-line",
+  "line-window",
+  "multi-line-merge",
+] as const;
+export type BrandCandidateAssembly = (typeof BRAND_CANDIDATE_ASSEMBLIES)[number];
+
+export const BRAND_CANDIDATE_DECISIONS = ["selected", "alternate", "ambiguous-rival"] as const;
+export type BrandCandidateDecision = (typeof BRAND_CANDIDATE_DECISIONS)[number];
+
 export interface BrandLineDiagnostic {
   rawText: string;
   cleanedValue: string | null;
@@ -90,8 +108,38 @@ export interface BrandLineDiagnostic {
   reason: BrandLineReason;
 }
 
+export interface BrandCandidateScore {
+  positiveSignal: number;
+  meaningfulChars: number;
+  structure: number;
+  confidence: number;
+  prominence: number;
+  area: number;
+  centrality: number;
+  alignment: number;
+  lineProximity: number;
+  lowInformationPenalty: number;
+  residualPenalty: number;
+  total: number;
+}
+
+export interface BrandCandidateDiagnostic {
+  rawText: string;
+  cleanedValue: string | null;
+  confidence: number;
+  prominence: number;
+  regionName: string;
+  assembly: BrandCandidateAssembly;
+  lineIndexes: number[];
+  kept: boolean;
+  filterReason: BrandLineReason;
+  decision?: BrandCandidateDecision;
+  score?: BrandCandidateScore;
+}
+
 export interface BrandSelectionDiagnostics {
   lines: BrandLineDiagnostic[];
+  candidates: BrandCandidateDiagnostic[];
   abstentionReason?: BrandAbstentionReason;
 }
 
@@ -255,13 +303,17 @@ export function selectAlcoholObservation(results: RegionOcrResult[]): FieldSelec
 const PRODUCER_WORD = /^(?:produced|bottled|made|vinted|cellared|grown|packed|blended)$/i;
 /** Non-brand mandatory/regulatory or measurement wording that cannot be a brand. */
 const NON_BRAND_LINE =
-  /\b(?:alcohol|alc|vol|volume|proof|government|warning|surgeon|general|pregnancy|contains|sulfites|net|contents|ml|milliliters?|liters?|litres?|imported|distributed|appellation|produced|bottled|cellared|grown|vinted|blended|packed|owned|operated|health|problems?|alcoholic|beverages?|consumption|impairs?|machinery|defects?|drink|women|should)\b/i;
+  /\b(?:alcohol|alc|vol|volume|proof|government|warning|surgeon|general|pregnancy|contains|sulfites|net|contents|ml|milliliters?|liters?|litres?|imported|distributed|appellation|produced|producer|bottled|cellared|grown|vinted|blended|packed|owned|operated|serving|temperature|health|problems?|alcoholic|beverages?|bebida|consumption|impairs?|machinery|defects?|drink|women|should|nacional|byvol)\b/i;
 /** The brand appears on the front-label artwork region, not the mandatory strip. */
 const BRAND_REGION = "full-image";
 /** Two candidates whose text height is within this ratio compete as ambiguous. */
 const BRAND_PROMINENCE_RATIO = 0.8;
+/** Only candidates near the strongest artwork prominence compete on score first. */
+const BRAND_SCORE_PROMINENCE_FLOOR_RATIO = 0.4;
 /** A brand mark is short; longer lines are prose/back-label copy, not a brand. */
 const MAX_BRAND_WORDS = 4;
+/** Nearby front-label lines may form a split brand mark. */
+const MAX_MULTI_LINE_SEEDS_PER_LINE = 3;
 
 /**
  * Negative-only vocabulary for generic wine/product wording. Used solely to
@@ -269,8 +321,11 @@ const MAX_BRAND_WORDS = 4;
  */
 const GENERIC_PRODUCT_TOKEN = new Set([
   "american",
+  "argentino",
+  "bebida",
   "blanco",
   "bianco",
+  "chile",
   "concord",
   "cupatge",
   "dry",
@@ -280,13 +335,17 @@ const GENERIC_PRODUCT_TOKEN = new Set([
   "gialla",
   "gruner",
   "grape",
+  "italia",
   "italy",
+  "nacional",
   "of",
   "per",
   "product",
   "producte",
   "ribolla",
+  "serving",
   "spain",
+  "temperature",
   "veltliner",
   "variedades",
   "vi",
@@ -303,9 +362,16 @@ const LOCATION_OR_APPELLATION_PHRASE = new Set([
   "delle venezie",
   "delray beach fl",
   "delray beach",
+  "fronton red table wine",
+  "gualtallary - uco valley",
   "livermore valley",
   "napa valley",
   "producte d'espanya",
+  "abbott claim vineyard",
+  "coast vineyard",
+  "roero arneis",
+  "vino d'italia",
+  "walala coast vineyard",
 ]);
 
 /** Connector words may be lowercase in a genuine brand line. */
@@ -332,6 +398,7 @@ const COMPACT_NON_BRAND_KEYWORD = [
   "according",
   "alcoholic",
   "beverages",
+  "byvol",
   "consumption",
   "defects",
   "government",
@@ -341,8 +408,11 @@ const COMPACT_NON_BRAND_KEYWORD = [
   "operate",
   "pregn",
   "pregnancy",
+  "producer",
   "problems",
+  "serving",
   "surgeon",
+  "temperature",
   "warning",
   "women",
 ] as const;
@@ -392,6 +462,9 @@ const VARIETAL_OR_DESIGNATION = new Set([
   "muscat",
   "gewurztraminer",
   "blend",
+  "arneis",
+  "negrette",
+  "pecorino",
   "red",
   "white",
   "reserve",
@@ -441,13 +514,13 @@ function isDomainLike(value: string): boolean {
 
 /** A line whose every alphabetic token is varietal/designation wording. */
 function isPurelyVarietalOrDesignation(value: string): boolean {
-  const alpha = brandTokens(value).filter((t) => /[a-z]/.test(t));
+  const alpha = brandTokens(value).filter((t) => /[a-z]/.test(t) && !BRAND_CONNECTOR.has(t));
   return alpha.length > 0 && alpha.every((t) => VARIETAL_OR_DESIGNATION.has(t));
 }
 
 /** A line composed only of generic wine/product wording is not a brand. */
 function isGenericProductLanguage(value: string): boolean {
-  const alpha = brandTokens(value).filter((t) => /[a-z]/.test(t));
+  const alpha = brandTokens(value).filter((t) => /[a-z]/.test(t) && !BRAND_CONNECTOR.has(t));
   return (
     alpha.length > 0 &&
     alpha.every((t) => VARIETAL_OR_DESIGNATION.has(t) || GENERIC_PRODUCT_TOKEN.has(t))
@@ -478,7 +551,7 @@ function isProducerLine(line: OcrWord[]): boolean {
 
 function cleanedBrandValue(rawText: string): string {
   return rawText
-    .replace(/[^A-Za-z0-9 .&'-]/g, "")
+    .replace(/[^A-Za-z0-9 ,.;&'-]/g, "")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -524,7 +597,7 @@ function isSentenceFragment(rawText: string, value: string): boolean {
   if (alphaWords[0] === alphaWords[0].toLowerCase() && lowercaseContentWords.length >= 1) {
     return true;
   }
-  return lowercaseContentWords.length >= 2 && !hasPositiveBrandSignal(value);
+  return lowercaseContentWords.length >= 2;
 }
 
 function hasNonBrandKeyword(rawText: string, value: string): boolean {
@@ -540,6 +613,38 @@ function foldPhrase(value: string): string {
 interface BrandLineAnalysis {
   candidate?: Candidate;
   diagnostic: BrandLineDiagnostic;
+}
+
+interface BrandSpan {
+  id: string;
+  words: OcrWord[];
+  rawText: string;
+  value: string;
+  confidence: number;
+  geometry: EvidenceGeometry;
+  regionName: string;
+  prominence: number;
+  assembly: BrandCandidateAssembly;
+  lineIndexes: number[];
+  imageWidth: number;
+  imageHeight: number;
+  alignment: number;
+  lineProximity: number;
+}
+
+interface BrandCandidateAnalysis {
+  candidate?: Candidate;
+  diagnostic: BrandCandidateDiagnosticInternal;
+}
+
+interface BrandCandidateDiagnosticInternal extends BrandCandidateDiagnostic {
+  id: string;
+}
+
+interface BrandSelectionDiagnosticsInternal {
+  lines: BrandLineDiagnostic[];
+  candidates: BrandCandidateDiagnosticInternal[];
+  abstentionReason?: BrandAbstentionReason;
 }
 
 function analyzeBrandLine(line: OcrWord[], result: RegionOcrResult): BrandLineAnalysis {
@@ -607,53 +712,525 @@ function analyzeBrandLine(line: OcrWord[], result: RegionOcrResult): BrandLineAn
   };
 }
 
+function geometryArea(geometry: EvidenceGeometry): number {
+  return Math.max(1, geometry.width * geometry.height);
+}
+
+function tokenHasAlphaNumeric(text: string): boolean {
+  return /[a-z0-9]/i.test(text);
+}
+
+function informativeAlphaTokenCount(value: string): number {
+  return brandTokens(value).filter((token) => token.length >= 3).length;
+}
+
+function lowInformationPenalty(value: string): number {
+  const alpha = brandTokens(value).filter((t) => /[a-z]/.test(t));
+  if (alpha.length === 0) return 1;
+  const short = alpha.filter((t) => t.length <= 2).length;
+  return Math.min(1, short / alpha.length);
+}
+
+function isVintageYearToken(text: string): boolean {
+  return /^(?:19|20)\d{2}$/.test(text.replace(/[^0-9]/g, ""));
+}
+
+function residualPenalty(words: OcrWord[]): number {
+  if (words.length === 0) return 0;
+  const suspicious = words.filter((w, index) => {
+    const stripped = stripWord(w.text);
+    const hasDigits = /\d/.test(w.text);
+    const normalizedConfidence = normalizeConfidence(w.rawConfidence);
+    const lower = w.text.toLowerCase();
+    return (
+      (index > 0 && isVintageYearToken(w.text)) ||
+      (!/[a-z0-9]/i.test(w.text) && !hasDigits) ||
+      (stripped.length > 0 && stripped.length <= 2) ||
+      (stripped.length > 0 && stripped.length <= 3 && normalizedConfidence < 0.5) ||
+      (/[a-z]/.test(w.text) &&
+        w.text === lower &&
+        !BRAND_CONNECTOR.has(lower) &&
+        normalizedConfidence < 0.8)
+    );
+  }).length;
+  return Math.min(1, suspicious / words.length);
+}
+
+function centralityScore(
+  geometry: EvidenceGeometry,
+  imageWidth: number,
+  imageHeight: number,
+): number {
+  if (imageWidth <= 0 || imageHeight <= 0) return 0.5;
+  const cx = geometry.x + geometry.width / 2;
+  const cy = geometry.y + geometry.height / 2;
+  const dx = Math.abs(cx - imageWidth / 2) / Math.max(1, imageWidth / 2);
+  const dy = Math.abs(cy - imageHeight / 2) / Math.max(1, imageHeight / 2);
+  return Math.max(0, 1 - (dx + dy) / 2);
+}
+
+function buildBrandSpan(
+  id: string,
+  words: OcrWord[],
+  result: RegionOcrResult,
+  assembly: BrandCandidateAssembly,
+  lineIndexes: number[],
+  alignment = 1,
+  lineProximity = 1,
+): BrandSpan {
+  const rawText = words.map((w) => w.text).join(" ");
+  const geometry = geometryFor(words, result);
+  return {
+    id,
+    words,
+    rawText,
+    value: cleanedBrandValue(rawText),
+    confidence: aggregateConfidence(words),
+    geometry,
+    regionName: result.regionName,
+    prominence: geometry.height,
+    assembly,
+    lineIndexes,
+    imageWidth: result.transform.originalWidth,
+    imageHeight: result.transform.originalHeight,
+    alignment,
+    lineProximity,
+  };
+}
+
+function analyzeBrandSpan(span: BrandSpan): BrandCandidateAnalysis {
+  const base = {
+    id: span.id,
+    rawText: span.rawText,
+    cleanedValue: span.value.length > 0 ? span.value : null,
+    confidence: span.confidence,
+    prominence: span.prominence,
+    regionName: span.regionName,
+    assembly: span.assembly,
+    lineIndexes: span.lineIndexes,
+  };
+
+  if (isProducerLine(span.words)) {
+    return {
+      diagnostic: {
+        ...base,
+        kept: false,
+        filterReason: "producer-line",
+      },
+    };
+  }
+  if (span.value.length < 2 || !/[a-z]/i.test(span.value)) {
+    return {
+      diagnostic: {
+        ...base,
+        kept: false,
+        filterReason: "no-letters-or-too-short",
+      },
+    };
+  }
+  if (hasNonBrandKeyword(span.rawText, span.value)) {
+    return {
+      diagnostic: {
+        ...base,
+        kept: false,
+        filterReason: "non-brand-keyword",
+      },
+    };
+  }
+  if (span.value.split(" ").length > MAX_BRAND_WORDS) {
+    return {
+      diagnostic: {
+        ...base,
+        kept: false,
+        filterReason: "too-many-words",
+      },
+    };
+  }
+  if (isDomainLike(span.value)) {
+    return {
+      diagnostic: {
+        ...base,
+        kept: false,
+        filterReason: "domain-like",
+      },
+    };
+  }
+  if (isPurelyVarietalOrDesignation(span.value)) {
+    return {
+      diagnostic: {
+        ...base,
+        kept: false,
+        filterReason: "varietal-or-designation",
+      },
+    };
+  }
+  if (isGenericProductLanguage(span.value)) {
+    return {
+      diagnostic: {
+        ...base,
+        kept: false,
+        filterReason: "generic-product-language",
+      },
+    };
+  }
+  if (isLocationOrAppellationLike(span.value)) {
+    return {
+      diagnostic: {
+        ...base,
+        kept: false,
+        filterReason: "location-or-appellation",
+      },
+    };
+  }
+  if (isLowInformationFragment(span.value)) {
+    return {
+      diagnostic: {
+        ...base,
+        kept: false,
+        filterReason: "low-information-fragment",
+      },
+    };
+  }
+  if (isSentenceFragment(span.rawText, span.value)) {
+    return {
+      diagnostic: {
+        ...base,
+        kept: false,
+        filterReason: "sentence-fragment",
+      },
+    };
+  }
+
+  const brandClass = classifyBrandLine(span.value);
+  const candidate: Candidate = {
+    id: span.id,
+    value: span.value,
+    rawText: span.rawText,
+    confidence: span.confidence,
+    geometry: span.geometry,
+    words: span.words,
+    regionName: span.regionName,
+    prominence: span.prominence,
+    brandClass,
+    assembly: span.assembly,
+    lineIndexes: span.lineIndexes,
+    imageWidth: span.imageWidth,
+    imageHeight: span.imageHeight,
+    alignment: span.alignment,
+    lineProximity: span.lineProximity,
+  };
+  return {
+    candidate,
+    diagnostic: {
+      ...base,
+      kept: true,
+      filterReason: brandClass === "positive" ? "candidate-positive" : "candidate-plausible",
+    },
+  };
+}
+
+function shouldTrimWholeLineCandidate(candidate: Candidate | undefined): boolean {
+  if (!candidate || candidate.brandClass !== "positive") return false;
+  return residualPenalty(candidate.words) > 0.25;
+}
+
+function lineWindows(line: OcrWord[]): OcrWord[][] {
+  const windows: OcrWord[][] = [];
+  for (let start = 0; start < line.length; start++) {
+    for (let end = start; end < Math.min(line.length, start + MAX_BRAND_WORDS); end++) {
+      const window = line.slice(start, end + 1);
+      if (window.length === line.length) continue;
+      if (!tokenHasAlphaNumeric(window[0].text) || !tokenHasAlphaNumeric(window.at(-1)!.text)) {
+        continue;
+      }
+      windows.push(window);
+    }
+  }
+  return windows;
+}
+
+function mergeSeedScore(candidate: Candidate): number {
+  const positive = candidate.brandClass === "positive" ? 2 : 0;
+  return (
+    positive +
+    informativeAlphaTokenCount(candidate.value) +
+    aggregateConfidence(candidate.words) +
+    candidate.prominence / 100
+  );
+}
+
+function candidateFamilyKey(candidate: Candidate): string {
+  if (candidate.assembly === "multi-line-merge") {
+    return `merge:${candidate.lineIndexes?.join("-") ?? candidate.id ?? key(candidate.value)}`;
+  }
+  if (candidate.lineIndexes?.length) return `line:${candidate.lineIndexes[0]}`;
+  return candidate.id ?? key(candidate.value);
+}
+
+function bestFamilyCandidates(candidates: Candidate[]): Candidate[] {
+  const byFamily = new Map<string, Candidate>();
+  for (const candidate of candidates) {
+    const familyKey = candidateFamilyKey(candidate);
+    const existing = byFamily.get(familyKey);
+    if (!existing) {
+      byFamily.set(familyKey, candidate);
+      continue;
+    }
+    const candidateScore = candidate.score?.total ?? candidate.confidence;
+    const existingScore = existing.score?.total ?? existing.confidence;
+    if (
+      candidateScore > existingScore ||
+      (candidateScore === existingScore && candidate.confidence > existing.confidence)
+    ) {
+      byFamily.set(familyKey, candidate);
+    }
+  }
+  return [...byFamily.values()];
+}
+
+function dedupeBestCandidates(candidates: Candidate[]): Candidate[] {
+  const byKey = new Map<string, Candidate>();
+  for (const candidate of candidates) {
+    const existing = byKey.get(key(candidate.value));
+    if (!existing) {
+      byKey.set(key(candidate.value), candidate);
+      continue;
+    }
+    const candidateScore = candidate.score?.total ?? candidate.confidence;
+    const existingScore = existing.score?.total ?? existing.confidence;
+    if (
+      candidateScore > existingScore ||
+      (candidateScore === existingScore && candidate.confidence > existing.confidence)
+    ) {
+      byKey.set(key(candidate.value), candidate);
+    }
+  }
+  return [...byKey.values()];
+}
+
+function mergeAlignment(a: Candidate, b: Candidate): number {
+  const aCenter = a.geometry.x + a.geometry.width / 2;
+  const bCenter = b.geometry.x + b.geometry.width / 2;
+  const maxWidth = Math.max(a.geometry.width, b.geometry.width, 1);
+  const overlap =
+    Math.max(
+      0,
+      Math.min(a.geometry.x + a.geometry.width, b.geometry.x + b.geometry.width) -
+        Math.max(a.geometry.x, b.geometry.x),
+    ) / Math.max(1, Math.min(a.geometry.width, b.geometry.width));
+  const centerOffset = Math.abs(aCenter - bCenter) / maxWidth;
+  return Math.max(0, Math.min(1, Math.max(overlap, 1 - centerOffset)));
+}
+
+function mergeLineProximity(a: Candidate, b: Candidate): number {
+  const gap = Math.max(0, b.geometry.y - (a.geometry.y + a.geometry.height));
+  const averageHeight = Math.max(1, (a.geometry.height + b.geometry.height) / 2);
+  return Math.max(0, Math.min(1, 1 - gap / (averageHeight * 1.5)));
+}
+
+function scoreBrandCandidate(
+  candidate: Candidate,
+  maxProminence: number,
+  maxArea: number,
+): BrandCandidateScore {
+  const alpha = brandTokens(candidate.value).filter((t) => /[a-z]/.test(t));
+  const meaningfulChars = Math.min(1, alpha.join("").length / 14);
+  const informative = informativeAlphaTokenCount(candidate.value);
+  const structure = Math.min(
+    1,
+    (informative + (alpha.length > 1 ? 1 : 0) + (candidate.brandClass === "positive" ? 1 : 0)) / 4,
+  );
+  const prominence = maxProminence <= 0 ? 0 : candidate.prominence / maxProminence;
+  const area = geometryArea(candidate.geometry) / Math.max(1, maxArea);
+  const centrality = centralityScore(
+    candidate.geometry,
+    candidate.imageWidth ?? candidate.geometry.width,
+    candidate.imageHeight ?? candidate.geometry.height,
+  );
+  const lowInformation = lowInformationPenalty(candidate.value);
+  const residual = residualPenalty(candidate.words);
+  const total =
+    (candidate.brandClass === "positive" ? 2 : 0) +
+    meaningfulChars * 1.6 +
+    structure * 1.2 +
+    candidate.confidence +
+    prominence * 0.8 +
+    area * 0.6 +
+    centrality * 0.3 +
+    (candidate.alignment ?? 1) * 0.25 +
+    (candidate.lineProximity ?? 1) * 0.2 -
+    lowInformation * 1.8 -
+    residual * 1.4;
+  return {
+    positiveSignal: candidate.brandClass === "positive" ? 1 : 0,
+    meaningfulChars,
+    structure,
+    confidence: candidate.confidence,
+    prominence,
+    area,
+    centrality,
+    alignment: candidate.alignment ?? 1,
+    lineProximity: candidate.lineProximity ?? 1,
+    lowInformationPenalty: lowInformation,
+    residualPenalty: residual,
+    total,
+  };
+}
+
 export function selectBrandObservation(results: RegionOcrResult[]): FieldSelection {
   const candidates: Candidate[] = [];
-  const diagnostics: BrandLineDiagnostic[] = [];
+  const lineDiagnostics: BrandLineDiagnostic[] = [];
+  const candidateDiagnostics: BrandCandidateDiagnosticInternal[] = [];
   let sawBrandRegionText = false;
+  let nextId = 0;
+  const nextCandidateId = () => `brand-candidate-${nextId++}`;
   for (const result of results) {
     // Brand presentation lives on the front-label artwork, never the mandatory
     // vertical strip; restricting the region keeps regulatory text out of brand.
     if (result.regionName !== BRAND_REGION) continue;
     if (result.words.length > 0) sawBrandRegionText = true;
-    for (const line of lines(result.words)) {
+    const groupedLines = lines(result.words);
+    const seedsByLine: Candidate[][] = groupedLines.map(() => []);
+    for (const [lineIndex, line] of groupedLines.entries()) {
       const analysis = analyzeBrandLine(line, result);
-      diagnostics.push(analysis.diagnostic);
-      if (analysis.candidate) candidates.push(analysis.candidate);
+      lineDiagnostics.push(analysis.diagnostic);
+
+      const wholeLine = analyzeBrandSpan(
+        buildBrandSpan(nextCandidateId(), line, result, "whole-line", [lineIndex]),
+      );
+      candidateDiagnostics.push(wholeLine.diagnostic);
+      if (wholeLine.candidate) {
+        candidates.push(wholeLine.candidate);
+        seedsByLine[lineIndex].push(wholeLine.candidate);
+      }
+
+      if (!shouldTrimWholeLineCandidate(wholeLine.candidate)) continue;
+      for (const window of lineWindows(line)) {
+        const windowAnalysis = analyzeBrandSpan(
+          buildBrandSpan(nextCandidateId(), window, result, "line-window", [lineIndex]),
+        );
+        candidateDiagnostics.push(windowAnalysis.diagnostic);
+        if (windowAnalysis.candidate) candidates.push(windowAnalysis.candidate);
+      }
+    }
+
+    for (let index = 0; index < seedsByLine.length - 1; index++) {
+      const upperSeeds = dedupeBestCandidates(seedsByLine[index])
+        .sort((a, b) => mergeSeedScore(b) - mergeSeedScore(a))
+        .slice(0, MAX_MULTI_LINE_SEEDS_PER_LINE);
+      const lowerSeeds = dedupeBestCandidates(seedsByLine[index + 1])
+        .sort((a, b) => mergeSeedScore(b) - mergeSeedScore(a))
+        .slice(0, MAX_MULTI_LINE_SEEDS_PER_LINE);
+
+      for (const upper of upperSeeds) {
+        for (const lower of lowerSeeds) {
+          if (upper.brandClass !== "positive" && lower.brandClass !== "positive") continue;
+          const alignment = mergeAlignment(upper, lower);
+          const proximity = mergeLineProximity(upper, lower);
+          if (alignment < 0.3 || proximity <= 0) continue;
+          const mergedWords = [...upper.words, ...lower.words];
+          if (mergedWords.length > MAX_BRAND_WORDS + 2) continue;
+          const mergedValue = cleanedBrandValue(mergedWords.map((word) => word.text).join(" "));
+          if (brandTokens(mergedValue).filter((token) => /[a-z]/.test(token)).length > 3) continue;
+          const merged = analyzeBrandSpan(
+            buildBrandSpan(
+              nextCandidateId(),
+              mergedWords,
+              result,
+              "multi-line-merge",
+              [index, index + 1],
+              alignment,
+              proximity,
+            ),
+          );
+          candidateDiagnostics.push(merged.diagnostic);
+          if (merged.candidate) candidates.push(merged.candidate);
+        }
+      }
     }
   }
-  return dedupeBy(candidates, (deduped) =>
-    buildBrandObservation(deduped, {
-      lines: diagnostics,
-      abstentionReason: sawBrandRegionText ? "unsupported-candidates-only" : "no-brand-region-text",
-    }),
-  );
+  return buildBrandObservation(candidates, {
+    lines: lineDiagnostics,
+    candidates: candidateDiagnostics,
+    abstentionReason: sawBrandRegionText ? "unsupported-candidates-only" : "no-brand-region-text",
+  });
 }
 
 /**
- * Build a brand observation ranked by typographic prominence (largest artwork
- * wins), then confidence. Two non-corroborating candidates of comparable
- * prominence are AMBIGUOUS rather than a silent pick; none is NOT_OBSERVED.
+ * Build a brand observation ranked by bounded score components rather than raw
+ * prominence alone. Coherent, positively-signalled multi-token candidates can
+ * now outrank short noise without weakening the abstention gate.
  */
 function buildBrandObservation(
   candidates: Candidate[],
-  diagnostics: BrandSelectionDiagnostics,
+  diagnostics: BrandSelectionDiagnosticsInternal,
 ): FieldSelection {
+  const publicDiagnostics = (): BrandSelectionDiagnostics => ({
+    lines: diagnostics.lines,
+    candidates: diagnostics.candidates.map((candidate) => ({
+      rawText: candidate.rawText,
+      cleanedValue: candidate.cleanedValue,
+      confidence: candidate.confidence,
+      prominence: candidate.prominence,
+      regionName: candidate.regionName,
+      assembly: candidate.assembly,
+      lineIndexes: candidate.lineIndexes,
+      kept: candidate.kept,
+      filterReason: candidate.filterReason,
+      decision: candidate.decision,
+      score: candidate.score,
+    })),
+    abstentionReason: diagnostics.abstentionReason,
+  });
+
   if (candidates.length === 0) {
     return {
       observation: { state: "NOT_OBSERVED", value: null, confidence: 0, alternates: [] },
       sourceRegion: null,
-      brandDiagnostics: diagnostics,
+      brandDiagnostics: publicDiagnostics(),
     };
   }
 
-  const ranked = [...candidates].sort(
-    (a, b) =>
+  const maxProminence = Math.max(...candidates.map((candidate) => candidate.prominence));
+  const maxArea = Math.max(...candidates.map((candidate) => geometryArea(candidate.geometry)));
+  const scored = candidates.map((candidate) => ({
+    ...candidate,
+    score: scoreBrandCandidate(candidate, maxProminence, maxArea),
+  }));
+  const diagnosticById = new Map(
+    diagnostics.candidates.map((candidate) => [candidate.id, candidate]),
+  );
+  for (const candidate of scored) {
+    if (!candidate.id) continue;
+    const diagnostic = diagnosticById.get(candidate.id);
+    if (diagnostic) diagnostic.score = candidate.score;
+  }
+
+  const ranked = dedupeBestCandidates(bestFamilyCandidates(scored)).sort((a, b) => {
+    const prominenceFloor = maxProminence * BRAND_SCORE_PROMINENCE_FLOOR_RATIO;
+    const aScoreEligible = a.prominence >= prominenceFloor ? 1 : 0;
+    const bScoreEligible = b.prominence >= prominenceFloor ? 1 : 0;
+    if (aScoreEligible !== bScoreEligible) return bScoreEligible - aScoreEligible;
+    if (aScoreEligible === 1 && bScoreEligible === 1) {
+      return (
+        (b.score?.total ?? 0) - (a.score?.total ?? 0) ||
+        b.prominence - a.prominence ||
+        b.confidence - a.confidence ||
+        key(a.value).localeCompare(key(b.value))
+      );
+    }
+    return (
       b.prominence - a.prominence ||
       b.confidence - a.confidence ||
-      key(a.value).localeCompare(key(b.value)),
-  );
+      (b.score?.total ?? 0) - (a.score?.total ?? 0) ||
+      key(a.value).localeCompare(key(b.value))
+    );
+  });
   const best = ranked[0];
+  const distinctAlternates = ranked
+    .slice(1)
+    .filter((candidate) => !corroborates(best.value, candidate.value))
+    .map(alternateFrom);
 
   const competing = ranked
     .slice(1)
@@ -663,15 +1240,26 @@ function buildBrandObservation(
         c.prominence >= best.prominence * BRAND_PROMINENCE_RATIO,
     );
 
+  for (const candidate of ranked) {
+    if (!candidate.id) continue;
+    const diagnostic = diagnosticById.get(candidate.id);
+    if (!diagnostic) continue;
+    if (candidate.id === best.id) diagnostic.decision = "selected";
+    else if (competing.some((rival) => rival.id === candidate.id))
+      diagnostic.decision = "ambiguous-rival";
+    else diagnostic.decision = "alternate";
+  }
+
   // A brand is AMBIGUOUS when another candidate rivals it in prominence, or when
   // the leading candidate is only weakly recognized yet other candidates remain:
   // a low-confidence lead among rivals is not a safe silent pick. This is what
   // keeps noisy front-label OCR (no cleanly isolated brand mark) from fabricating
   // a confident brand — a human decides instead.
-  const weakContestedLead = best.confidence < LOW_CONFIDENCE_THRESHOLD && ranked.length > 1;
+  const weakContestedLead =
+    best.confidence < LOW_CONFIDENCE_THRESHOLD &&
+    ranked.slice(1).some((candidate) => !corroborates(best.value, candidate.value));
 
   if (competing.length > 0 || weakContestedLead) {
-    const alternates = (competing.length > 0 ? competing : ranked.slice(1)).map(alternateFrom);
     return {
       observation: {
         state: "AMBIGUOUS",
@@ -680,11 +1268,11 @@ function buildBrandObservation(
         rawText: best.rawText,
         confidence: best.confidence,
         geometry: best.geometry,
-        alternates,
+        alternates: distinctAlternates,
         ambiguityReason: "competing_candidates",
       },
       sourceRegion: best.regionName,
-      brandDiagnostics: diagnostics,
+      brandDiagnostics: publicDiagnostics(),
     };
   }
 
@@ -709,11 +1297,11 @@ function buildBrandObservation(
         rawText: best.rawText,
         confidence: best.confidence,
         geometry: best.geometry,
-        alternates: ranked.slice(1).map(alternateFrom),
+        alternates: distinctAlternates,
         ambiguityReason: "single_unconfirmed_candidate",
       },
       sourceRegion: best.regionName,
-      brandDiagnostics: diagnostics,
+      brandDiagnostics: publicDiagnostics(),
     };
   }
 
@@ -725,10 +1313,10 @@ function buildBrandObservation(
       rawText: best.rawText,
       confidence: best.confidence,
       geometry: best.geometry,
-      alternates: ranked.slice(1).map(alternateFrom),
+      alternates: distinctAlternates,
     },
     sourceRegion: best.regionName,
-    brandDiagnostics: diagnostics,
+    brandDiagnostics: publicDiagnostics(),
   };
 }
 
@@ -738,14 +1326,6 @@ function dedupe(
   build: (c: Candidate[], toAlt: (c: Candidate) => AnalyzerAlternate) => FieldSelection,
 ): FieldSelection {
   return build(dedupeCandidates(candidates), alternateFrom);
-}
-
-/** As `dedupe`, for a builder that supplies its own alternate mapping. */
-function dedupeBy(
-  candidates: Candidate[],
-  build: (c: Candidate[]) => FieldSelection,
-): FieldSelection {
-  return build(dedupeCandidates(candidates));
 }
 
 function dedupeCandidates(candidates: Candidate[]): Candidate[] {

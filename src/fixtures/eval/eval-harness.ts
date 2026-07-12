@@ -51,9 +51,17 @@ const EVAL_PROCESSED_AT = "2026-07-12T00:00:00Z";
 /** Bounds on retained diagnostics so a report can never grow unbounded. */
 const MAX_SAMPLE_WORDS_PER_REGION = 25;
 const MAX_BRAND_LINES = 12;
+const MAX_BRAND_CANDIDATES = 24;
 const MAX_TEXT_LEN = 120;
 /** Vertical proximity (processed space) grouping words into a line; matches selector. */
 const LINE_Y_TOLERANCE = 20;
+
+function brandCandidatePriority(decision?: string): number {
+  if (decision === "selected") return 0;
+  if (decision === "ambiguous-rival") return 1;
+  if (decision === "alternate") return 2;
+  return 3;
+}
 
 function extractionInput(evalCase: EvalCase, sha256: string): ExtractionInput {
   return {
@@ -135,6 +143,9 @@ function diagnosticsFor(
         .slice(0, MAX_BRAND_LINES)
     : [];
   const brandSelection = selectBrandObservation(regions);
+  const candidateValues = (brandSelection.brandDiagnostics?.candidates ?? [])
+    .filter((candidate) => candidate.kept && candidate.cleanedValue)
+    .map((candidate) => candidate.cleanedValue!);
 
   let numberInOcr = false;
   let percentInOcr = false;
@@ -154,6 +165,30 @@ function diagnosticsFor(
   return {
     regions: sampleRegions,
     brandLineTexts: brandLines,
+    brandCandidateDecisions: [...(brandSelection.brandDiagnostics?.candidates ?? [])]
+      .sort((a, b) => {
+        const decisionDelta =
+          brandCandidatePriority(a.decision) - brandCandidatePriority(b.decision);
+        if (decisionDelta !== 0) return decisionDelta;
+        const scoreDelta =
+          (b.score?.total ?? Number.NEGATIVE_INFINITY) -
+          (a.score?.total ?? Number.NEGATIVE_INFINITY);
+        if (scoreDelta !== 0) return scoreDelta;
+        return b.prominence - a.prominence;
+      })
+      .slice(0, MAX_BRAND_CANDIDATES)
+      .map((candidate) => ({
+        rawText: truncate(candidate.rawText),
+        cleanedValue: candidate.cleanedValue ? truncate(candidate.cleanedValue) : null,
+        confidence: candidate.confidence,
+        prominence: candidate.prominence,
+        assembly: candidate.assembly,
+        lineIndexes: candidate.lineIndexes,
+        kept: candidate.kept,
+        filterReason: candidate.filterReason,
+        decision: candidate.decision,
+        score: candidate.score,
+      })),
     brandLineDecisions: (brandSelection.brandDiagnostics?.lines ?? [])
       .slice(0, MAX_BRAND_LINES)
       .map((line) => ({
@@ -169,6 +204,12 @@ function diagnosticsFor(
     // into a longer, later-filtered line)? Substring containment on the full,
     // uncapped region text distinguishes a filtering loss from an OCR miss.
     brandOcrContainsAcceptable: normalizedIncludes(brandRegionText, acceptableBrands),
+    brandLineContainsAcceptable: brandLines.some((line) =>
+      normalizedIncludes(line, acceptableBrands),
+    ),
+    brandCandidateContainsAcceptable: candidateValues.some((value) =>
+      acceptableBrands.some((acceptable) => brandNormalizedMatch(value, [acceptable])),
+    ),
     alcoholNumberInOcr: numberInOcr,
     alcoholPercentInOcr: percentInOcr,
     alcoholNumberAndPercentSameLine: numberAndPercentSameLine,
@@ -198,8 +239,11 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
   let diagnostics: CaseDiagnostics = {
     regions: [],
     brandLineTexts: [],
+    brandCandidateDecisions: [],
     brandLineDecisions: [],
     brandOcrContainsAcceptable: false,
+    brandLineContainsAcceptable: false,
+    brandCandidateContainsAcceptable: false,
     brandAbstentionReason: undefined,
     alcoholNumberInOcr: false,
     alcoholPercentInOcr: false,
@@ -249,6 +293,8 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
         top3Recall: false,
         failureClass: classifyBrand(evalCase.brand, empty, {
           ocrContainsAcceptable: diagnostics.brandOcrContainsAcceptable,
+          lineContainsAcceptable: diagnostics.brandLineContainsAcceptable,
+          candidateContainsAcceptable: diagnostics.brandCandidateContainsAcceptable,
           abstentionReason: diagnostics.brandAbstentionReason,
         }),
       },
@@ -287,6 +333,8 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
       top3Recall: brandInTopK(brandObs, evalCase.brand.acceptable, 3),
       failureClass: classifyBrand(evalCase.brand, brandObs, {
         ocrContainsAcceptable: diagnostics.brandOcrContainsAcceptable,
+        lineContainsAcceptable: diagnostics.brandLineContainsAcceptable,
+        candidateContainsAcceptable: diagnostics.brandCandidateContainsAcceptable,
         abstentionReason: diagnostics.brandAbstentionReason,
       }),
     },
