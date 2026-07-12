@@ -1,4 +1,4 @@
-import type { ClassifiedDoc, DocumentationDiagnostic } from "./types";
+import type { ClassifiedDoc, DocumentationDiagnostic } from "./types.ts";
 import {
   extractLinks,
   headingSlug,
@@ -8,7 +8,7 @@ import {
   isListItem,
   isTableRow,
   scanFences,
-} from "./markdown";
+} from "./markdown.ts";
 
 /**
  * Individual documentation-integrity checks. Each takes a classified document
@@ -271,7 +271,7 @@ export function checkLinks(doc: ClassifiedDoc, resolver: LinkResolver): Document
       if (anchor && !selfSlugs.has(anchor.toLowerCase())) {
         out.push({
           code: "LINK_ANCHOR_MISSING",
-          severity: "warning",
+          severity: "error",
           file: doc.file,
           line: link.line + 1,
           message: `In-page anchor "#${anchor}" has no matching heading.`,
@@ -297,7 +297,7 @@ export function checkLinks(doc: ClassifiedDoc, resolver: LinkResolver): Document
       if (slugs && !slugs.includes(anchor.toLowerCase())) {
         out.push({
           code: "LINK_ANCHOR_MISSING",
-          severity: "warning",
+          severity: "error",
           file: doc.file,
           line: link.line + 1,
           message: `Anchor "#${anchor}" not found in ${pathPart}.`,
@@ -421,6 +421,21 @@ function bulletMeta(text: string, key: string): string | null {
   return m ? m[1].replace(/[.*\s]+$/, "").trim() : null;
 }
 
+/**
+ * The document's declared status, normalized to lowercase, or null if none is
+ * declared. Reads the VALUE — a bare `## Status` heading with no value beneath it
+ * (or a bullet with no value) is treated as no declared status, never as
+ * "Accepted". Used to decide whether accepted-policy checks apply.
+ */
+export function readDeclaredStatus(text: string): string | null {
+  const ls = text.split("\n");
+  const { inFence } = scanFences(ls);
+  const found = extractAdrStatus(ls, inFence);
+  if (found === null) return null;
+  const value = found.value.trim().toLowerCase();
+  return value === "" ? null : value;
+}
+
 /** Status from either a `- Status:` bullet (any bold form) or a `## Status` section. */
 function extractAdrStatus(
   ls: string[],
@@ -433,8 +448,11 @@ function extractAdrStatus(
     if (/^ {0,3}#{1,6}\s+status\s*$/i.test(ls[i])) {
       for (let j = i + 1; j < ls.length; j++) {
         if (isBlank(ls[j])) continue;
+        // Another heading immediately below means the section carries no value.
+        if (isHeadingLine(ls[j])) return null;
         return { value: ls[j].replace(/^[*\s]+|[*.\s]+$/g, "").trim(), line: j };
       }
+      return null; // "## Status" at end of file with no value
     }
   }
   return null;
@@ -521,4 +539,71 @@ export function checkStructure(doc: ClassifiedDoc): DocumentationDiagnostic[] {
 function isSeparatorCandidate(line: string): boolean {
   const t = line.trim();
   return t.includes("|") && t.includes("-") && /^[|:\-\s]+$/.test(t);
+}
+
+// ---------------------------------------------------------------------------
+// Duplicate heading anchors (warning: only ambiguous when such anchors are linked)
+// ---------------------------------------------------------------------------
+
+export function checkDuplicateAnchors(doc: ClassifiedDoc): DocumentationDiagnostic[] {
+  const ls = lines(doc.text);
+  const { inFence } = scanFences(ls);
+  const seen = new Map<string, number>(); // slug -> first line (0-based)
+  const out: DocumentationDiagnostic[] = [];
+  for (const h of headings(ls, inFence)) {
+    const slug = headingSlug(h.text);
+    if (slug === "") continue;
+    const first = seen.get(slug);
+    if (first === undefined) {
+      seen.set(slug, h.line);
+    } else {
+      out.push({
+        code: "DOC_DUPLICATE_HEADING_ANCHOR",
+        severity: "warning",
+        file: doc.file,
+        line: h.line + 1,
+        message: `Heading anchor "#${slug}" is duplicated (first defined at line ${first + 1}); links to it are ambiguous.`,
+      });
+    }
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
+// Malformed inline link syntax
+// ---------------------------------------------------------------------------
+
+export function checkLinkSyntax(doc: ClassifiedDoc): DocumentationDiagnostic[] {
+  const ls = lines(doc.text);
+  const { inFence } = scanFences(ls);
+  const out: DocumentationDiagnostic[] = [];
+  for (let i = 0; i < ls.length; i++) {
+    if (inFence[i]) continue;
+    const line = ls[i];
+
+    // A bracketed label followed by "(" but no closing ")" on the same line.
+    if (/\][ \t]*\([^)]*$/.test(line) && !/^\s*\[[^\]]*\]:\s/.test(line)) {
+      out.push({
+        code: "LINK_MALFORMED",
+        severity: "error",
+        file: doc.file,
+        line: i + 1,
+        message: "Malformed link: an opening `](` has no closing `)` on this line.",
+        detail: line.trim().slice(0, 60),
+      });
+      continue;
+    }
+    // A space between the label and its destination: `[text] (url)`.
+    if (/\][ \t]+\(\S/.test(line)) {
+      out.push({
+        code: "LINK_MALFORMED",
+        severity: "error",
+        file: doc.file,
+        line: i + 1,
+        message: "Malformed link: whitespace between `]` and `(` breaks the link.",
+        detail: line.trim().slice(0, 60),
+      });
+    }
+  }
+  return out;
 }

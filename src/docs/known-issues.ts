@@ -1,4 +1,4 @@
-import type { DiagnosticCode } from "./types";
+import type { DiagnosticCode } from "./types.ts";
 
 /**
  * Known, pre-existing documentation defects on `main` that this validator (Issue

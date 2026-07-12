@@ -1,20 +1,41 @@
 // @vitest-environment node
-import { readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 
-import { checkAdrSet, checkFences, checkLinks, checkStructure, checkTruncation } from "./checks";
+import {
+  checkAdrSet,
+  checkDuplicateAnchors,
+  checkFences,
+  checkLinks,
+  checkLinkSyntax,
+  checkPolicy,
+  checkStructure,
+  checkTruncation,
+  readDeclaredStatus,
+} from "./checks";
 import { scanFences } from "./markdown";
 import { KNOWN_DOC_ISSUES, issueKey } from "./known-issues";
 import type { ClassifiedDoc, DocClass } from "./types";
-import { createResolver, errorsOnly, formatDiagnostics, validateDocumentation } from "./validate";
+import {
+  createResolver,
+  errorsOnly,
+  formatDiagnostics,
+  loadDocs,
+  trackedMarkdown,
+  validateDocumentation,
+} from "./validate";
 
-const FIXTURES = join(process.cwd(), "src/docs/__fixtures__");
+const FIXTURE_DIR = "src/docs/__fixtures__";
+const FIXTURES = join(process.cwd(), FIXTURE_DIR);
 
+/** A fixture as a classified doc, using its real repo path so links resolve. */
 function fixtureDoc(name: string, docClass: DocClass = "ordinary"): ClassifiedDoc {
   return {
-    file: `__fixtures__/${name}`,
+    file: `${FIXTURE_DIR}/${name}`,
     docClass,
     text: readFileSync(join(FIXTURES, name), "utf8"),
   };
@@ -203,5 +224,135 @@ describe("live documentation integrity", () => {
   it("runs the validator across the whole tracked doc set", () => {
     // Sanity: discovery actually found the documentation corpus.
     expect(validateDocumentation().length).toBeGreaterThanOrEqual(liveErrors.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Heading anchors, malformed links, duplicate anchors (Gap 3)
+// ---------------------------------------------------------------------------
+
+describe("heading-anchor links", () => {
+  const ds = checkLinks(fixtureDoc("anchor-links.md"), createResolver());
+
+  it("does not flag valid cross-file or in-page anchors", () => {
+    // #second-heading (cross-file) and #anchors (in-page) both resolve.
+    expect(ds.filter((d) => /second-heading|#anchors\b/.test(d.message))).toHaveLength(0);
+  });
+
+  it("flags a broken cross-file anchor as an error, not a warning", () => {
+    const bad = ds.find(
+      (d) => d.code === "LINK_ANCHOR_MISSING" && /missing-heading/.test(d.message),
+    );
+    expect(bad?.severity).toBe("error");
+  });
+
+  it("flags a broken in-page anchor as an error", () => {
+    const bad = ds.find((d) => d.code === "LINK_ANCHOR_MISSING" && /#nope/.test(d.message));
+    expect(bad?.severity).toBe("error");
+  });
+});
+
+describe("duplicate heading anchors", () => {
+  it("warns when two headings share a generated anchor", () => {
+    const ds = checkDuplicateAnchors(fixtureDoc("duplicate-anchors.md"));
+    expect(codes(ds)).toContain("DOC_DUPLICATE_HEADING_ANCHOR");
+    expect(ds[0].severity).toBe("warning");
+  });
+
+  it("does not warn when all anchors are unique", () => {
+    expect(checkDuplicateAnchors(fixtureDoc("anchor-target.md"))).toHaveLength(0);
+  });
+});
+
+describe("malformed link syntax", () => {
+  it("flags an unclosed link and a spaced destination", () => {
+    const ds = checkLinkSyntax(fixtureDoc("malformed-link.md"));
+    expect(ds.filter((d) => d.code === "LINK_MALFORMED").length).toBeGreaterThanOrEqual(2);
+    expect(ds.every((d) => d.severity === "error")).toBe(true);
+  });
+
+  it("does not flag well-formed links", () => {
+    expect(checkLinkSyntax(fixtureDoc("anchor-target.md"))).toHaveLength(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Accepted-policy structure and historical exemption (Gap 3 + Gap 4)
+// ---------------------------------------------------------------------------
+
+describe("accepted-policy structure", () => {
+  it("accepts a complete accepted policy", () => {
+    expect(checkPolicy(fixtureDoc("policy-valid.md", "policy"))).toHaveLength(0);
+  });
+
+  it("flags an accepted policy that has only a status and no section", () => {
+    expect(codes(checkPolicy(fixtureDoc("policy-missing-section.md", "policy")))).toContain(
+      "POLICY_SECTION_MISSING",
+    );
+  });
+
+  it("exempts a historical document from current-policy completeness", () => {
+    // Same content, classified historical: no policy checks apply.
+    expect(checkPolicy(fixtureDoc("policy-missing-section.md", "historical"))).toHaveLength(0);
+  });
+});
+
+describe("policy status parsing (Gap 4)", () => {
+  it("normalizes the declared status value under the heading or bullet", () => {
+    expect(readDeclaredStatus(readFixture("policy-valid.md"))).toBe("accepted");
+    expect(readDeclaredStatus(readFixture("policy-proposed.md"))).toBe("proposed");
+    expect(readDeclaredStatus(readFixture("policy-draft.md"))).toBe("draft");
+    // A "## Status" heading with no value beneath must not be read as Accepted.
+    expect(readDeclaredStatus(readFixture("policy-status-no-value.md"))).toBeNull();
+  });
+
+  it("classifies only Accepted documents as policies", () => {
+    const cls = (name: string) => loadDocs([`${FIXTURE_DIR}/${name}`])[0].docClass;
+    expect(cls("policy-valid.md")).toBe("policy");
+    expect(cls("policy-proposed.md")).toBe("ordinary");
+    expect(cls("policy-draft.md")).toBe("ordinary");
+    expect(cls("policy-status-no-value.md")).toBe("ordinary");
+  });
+});
+
+function readFixture(name: string): string {
+  return readFileSync(join(FIXTURES, name), "utf8");
+}
+
+// ---------------------------------------------------------------------------
+// Legitimate final table / code block (must NOT be flagged as truncation)
+// ---------------------------------------------------------------------------
+
+describe("legitimate non-prose endings", () => {
+  it("does not flag a document ending in a table row", () => {
+    expect(checkTruncation(fixtureDoc("ends-with-table.md"))).toHaveLength(0);
+  });
+
+  it("does not flag a document ending in a closed code block", () => {
+    expect(checkTruncation(fixtureDoc("ends-with-codeblock.md"))).toHaveLength(0);
+    expect(checkFences(fixtureDoc("ends-with-codeblock.md"))).toHaveLength(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Tracked-only discovery ignores untracked files (Gap 2)
+// ---------------------------------------------------------------------------
+
+describe("tracked discovery", () => {
+  const tmp = mkdtempSync(join(tmpdir(), "docs-track-"));
+  afterAll(() => rmSync(tmp, { recursive: true, force: true }));
+
+  it("returns tracked Markdown and ignores untracked scratch files", () => {
+    execFileSync("git", ["-C", tmp, "init", "-q"]);
+    execFileSync("git", ["-C", tmp, "config", "user.email", "t@t.t"]);
+    execFileSync("git", ["-C", tmp, "config", "user.name", "t"]);
+    writeFileSync(join(tmp, "tracked.md"), "# Tracked\n\nComplete.\n");
+    writeFileSync(join(tmp, "untracked-scratch.md"), "# Scratch\n\nLocal only.\n");
+    execFileSync("git", ["-C", tmp, "add", "tracked.md"]);
+    execFileSync("git", ["-C", tmp, "commit", "-qm", "add tracked"]);
+
+    const found = trackedMarkdown(tmp);
+    expect(found).toContain("tracked.md");
+    expect(found).not.toContain("untracked-scratch.md");
   });
 });

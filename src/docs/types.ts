@@ -13,7 +13,8 @@ export const DIAGNOSTIC_CODES = [
   // Link integrity
   "LINK_BROKEN", // repo-relative link target does not exist
   "LINK_EMPTY", // empty link/image target where not intentional
-  "LINK_ANCHOR_MISSING", // target file exists but the #anchor heading does not
+  "LINK_ANCHOR_MISSING", // internal #anchor has no matching heading (a broken internal link)
+  "LINK_MALFORMED", // malformed inline link syntax (unclosed, or space before "(")
   // Fenced code integrity
   "FENCE_UNCLOSED", // a fenced code block is never closed before EOF
   // ADR identity/metadata
@@ -36,6 +37,7 @@ export const DIAGNOSTIC_CODES = [
   // Structural sanity
   "HEADING_NO_SPACE", // '#' run with no following space (won't render as a heading)
   "TABLE_SEPARATOR_INVALID", // a table separator row is malformed
+  "DOC_DUPLICATE_HEADING_ANCHOR", // two headings produce the same anchor slug (warning)
 ] as const;
 
 export type DiagnosticCode = (typeof DIAGNOSTIC_CODES)[number];

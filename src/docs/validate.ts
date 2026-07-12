@@ -1,27 +1,36 @@
+import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, dirname, relative, posix, sep } from "node:path";
 
 import {
   checkAdrSet,
+  checkDuplicateAnchors,
   checkFences,
   checkLinks,
+  checkLinkSyntax,
   checkPolicy,
   checkStructure,
   checkTruncation,
+  readDeclaredStatus,
   type LinkResolver,
-} from "./checks";
-import { headingSlug, headings, scanFences } from "./markdown";
-import type { ClassifiedDoc, DocClass, DocumentationDiagnostic } from "./types";
+} from "./checks.ts";
+import { headingSlug, headings, scanFences } from "./markdown.ts";
+import type { ClassifiedDoc, DocClass, DocumentationDiagnostic } from "./types.ts";
 
 /**
  * Deterministic discovery + classification + orchestration for the documentation
- * validator. Filesystem-based (no git, no network); results are stable and
- * machine-testable.
+ * validator. Discovery uses the tracked Git file list (no untracked scratch
+ * files, no build output); results are stable and machine-testable. No network.
  */
 
 export const REPO_ROOT = join(process.cwd());
 
-/** Directories never scanned (build output, deps, generated, and test fixtures). */
+/** Paths never validated even though Git tracks them (intentionally broken fixtures). */
+function isExcludedFromValidation(file: string): boolean {
+  return file.includes("__fixtures__/") || file.startsWith("docs/extraction-full-corpus/");
+}
+
+/** Directories skipped by the filesystem fallback walk. */
 const EXCLUDED_DIRS = new Set([
   "node_modules",
   ".next",
@@ -32,8 +41,31 @@ const EXCLUDED_DIRS = new Set([
   "__fixtures__",
 ]);
 
-/** Recursively find tracked-style Markdown files under a root, sorted. */
-export function discoverMarkdown(root: string = REPO_ROOT): string[] {
+/**
+ * The tracked Markdown files, from `git ls-files -- '*.md'`: deterministic,
+ * sorted, repository-relative, and containing no untracked scratch files, build
+ * output, or dependencies. If Git metadata is unavailable (e.g. running outside a
+ * checkout), fall back to a bounded filesystem walk that excludes build/deps.
+ */
+export function trackedMarkdown(root: string = REPO_ROOT): string[] {
+  let files: string[];
+  try {
+    const stdout = execFileSync("git", ["-C", root, "ls-files", "-z", "--", "*.md"], {
+      encoding: "utf8",
+      maxBuffer: 16 * 1024 * 1024,
+    });
+    files = stdout.split("\0").filter((f) => f.length > 0);
+  } catch {
+    files = walkMarkdown(root); // bounded fallback: no Git available
+  }
+  return files
+    .map((f) => f.split(sep).join(posix.sep))
+    .filter((f) => !isExcludedFromValidation(f))
+    .sort();
+}
+
+/** Filesystem fallback used only when Git metadata is unavailable. */
+function walkMarkdown(root: string): string[] {
   const found: string[] = [];
   const walk = (dir: string) => {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -46,7 +78,7 @@ export function discoverMarkdown(root: string = REPO_ROOT): string[] {
     }
   };
   walk(root);
-  return found.sort();
+  return found;
 }
 
 function toPosixRel(root: string, abs: string): string {
@@ -63,19 +95,20 @@ export function classify(file: string): DocClass {
   return "ordinary";
 }
 
-/** Documents that self-declare an accepted governing status are policies. */
-function refineClass(file: string, text: string, base: DocClass): DocClass {
+/**
+ * Only a document whose declared status parses to `Accepted` is treated as an
+ * accepted policy. A bare `## Status` heading, a non-Accepted value (Proposed,
+ * Draft, …), or a missing value never makes a document a policy.
+ */
+function refineClass(text: string, base: DocClass): DocClass {
   if (base !== "ordinary") return base;
-  const hasStatus =
-    /^\s*-\s*(\*\*)?status(\*\*)?\s*:\s*accepted/im.test(text) ||
-    /^ {0,3}#{1,6}\s+status\s*$/im.test(text);
-  return hasStatus ? "policy" : "ordinary";
+  return readDeclaredStatus(text) === "accepted" ? "policy" : "ordinary";
 }
 
-export function loadDocs(root: string = REPO_ROOT): ClassifiedDoc[] {
-  return discoverMarkdown(root).map((file) => {
+export function loadDocs(files: string[], root: string = REPO_ROOT): ClassifiedDoc[] {
+  return files.map((file) => {
     const text = readFileSync(join(root, file), "utf8");
-    return { file, docClass: refineClass(file, text, classify(file)), text };
+    return { file, docClass: refineClass(text, classify(file)), text };
   });
 }
 
@@ -114,9 +147,21 @@ export function createResolver(root: string = REPO_ROOT): LinkResolver {
   };
 }
 
-/** Run every check over every discovered document. Deterministically ordered. */
-export function validateDocumentation(root: string = REPO_ROOT): DocumentationDiagnostic[] {
-  const docs = loadDocs(root);
+export interface ValidateOptions {
+  /** Repository root (default: process.cwd()). */
+  root?: string;
+  /**
+   * Explicit repo-relative file list to validate, injected for tests. When
+   * omitted, the tracked Git Markdown set is used.
+   */
+  files?: string[];
+}
+
+/** Run every check over every tracked document. Deterministically ordered. */
+export function validateDocumentation(options: ValidateOptions = {}): DocumentationDiagnostic[] {
+  const root = options.root ?? REPO_ROOT;
+  const files = options.files ?? trackedMarkdown(root);
+  const docs = loadDocs(files, root);
   const resolver = createResolver(root);
   const diagnostics: DocumentationDiagnostic[] = [];
 
@@ -124,8 +169,10 @@ export function validateDocumentation(root: string = REPO_ROOT): DocumentationDi
     diagnostics.push(...checkFences(doc));
     diagnostics.push(...checkTruncation(doc));
     diagnostics.push(...checkLinks(doc, resolver));
+    diagnostics.push(...checkLinkSyntax(doc));
     diagnostics.push(...checkPolicy(doc));
     diagnostics.push(...checkStructure(doc));
+    diagnostics.push(...checkDuplicateAnchors(doc));
   }
   diagnostics.push(...checkAdrSet(docs.filter((d) => d.docClass === "adr")));
 
