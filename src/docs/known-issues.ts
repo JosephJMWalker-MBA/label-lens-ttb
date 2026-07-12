@@ -36,11 +36,9 @@ export const KNOWN_DOC_ISSUES: readonly KnownIssue[] = [
     code: "TRUNC_DANGLING_WORD",
     note: 'Ends mid-sentence: "The pipeline must".',
   },
-  {
-    file: "docs/operator-trust-and-throughput.md",
-    code: "TRUNC_DANGLING_WORD",
-    note: 'The historically truncated operator-trust policy: ends on "…results, or".',
-  },
+  // docs/operator-trust-and-throughput.md was completed and re-Accepted in the
+  // operator-trust policy PR (Issue #27), so it no longer reproduces and its
+  // baseline entry was removed.
   {
     file: "docs/system-governance.md",
     code: "TRUNC_EMPTY_FINAL_HEADING",
