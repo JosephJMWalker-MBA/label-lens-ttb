@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { ThemeInitScript } from "./theme-init";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -9,8 +10,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body className="min-h-screen antialiased">{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-screen antialiased">
+        {/* Applies the persisted theme/size/motion before body content paints. */}
+        <ThemeInitScript />
+        {children}
+      </body>
     </html>
   );
 }
