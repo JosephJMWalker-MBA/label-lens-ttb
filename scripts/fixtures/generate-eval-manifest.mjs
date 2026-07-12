@@ -49,6 +49,154 @@ const BASELINE_AMBIGUITY_REASONS = new Map([
   ],
 ]);
 
+const CHECKPOINT_INCLUDED = new Map([
+  [
+    "approved-wine-004",
+    {
+      visualStrata: [
+        "decorative-or-script-brand",
+        "vertical-mandatory-strip",
+        "alcohol-at-side-or-rotated",
+        "front-label",
+      ],
+      notes:
+        "Wrap-style La Fattoria Cabernet Sauvignon label with the alcohol statement printed on the vertical side strip.",
+      brand: { acceptablePresentations: ["La Fattoria"] },
+      alcohol: {
+        acceptablePercents: [14],
+        acceptableStatements: ["14% ALC", "14%"],
+        characteristics: ["rotated-or-vertical"],
+        orientation: "mixed",
+      },
+    },
+  ],
+  [
+    "approved-wine-005",
+    {
+      visualStrata: [
+        "decorative-or-script-brand",
+        "vertical-mandatory-strip",
+        "alcohol-at-side-or-rotated",
+        "front-label",
+      ],
+      notes:
+        "Wrap-style La Fattoria Barbera label with the alcohol statement printed on the vertical side strip.",
+      brand: { acceptablePresentations: ["La Fattoria"] },
+      alcohol: {
+        acceptablePercents: [14],
+        acceptableStatements: ["14% ALC", "14%"],
+        characteristics: ["rotated-or-vertical"],
+        orientation: "mixed",
+      },
+    },
+  ],
+  [
+    "approved-wine-006",
+    {
+      visualStrata: ["simple-centered-brand", "low-contrast", "front-label", "alcohol-at-bottom"],
+      notes:
+        "Dark Horse Pinot Noir display panel with alcohol printed across the lower-right footer.",
+      brand: { acceptablePresentations: ["Dark Horse"] },
+      alcohol: {
+        acceptablePercents: [13.5],
+        acceptableStatements: ["ALC. 13.5% BY VOL.", "13.5%"],
+        characteristics: ["decimal-value"],
+        orientation: "horizontal",
+      },
+    },
+  ],
+  [
+    "approved-wine-012",
+    {
+      visualStrata: ["simple-centered-brand", "front-label", "alcohol-at-bottom"],
+      notes:
+        "Cooley Bay Reserve Tempranillo label with a direct alcohol statement near the bottom.",
+      brand: { acceptablePresentations: ["Cooley Bay"] },
+      alcohol: {
+        acceptablePercents: [13.8],
+        acceptableStatements: ["Alcohol 13.8% by Volume", "13.8%"],
+        characteristics: ["decimal-value"],
+        orientation: "horizontal",
+      },
+    },
+  ],
+  [
+    "approved-wine-014",
+    {
+      visualStrata: ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      notes:
+        "Tre Cori text-heavy label with the alcohol statement printed above the net-contents line.",
+      brand: { acceptablePresentations: ["Tre Cori"] },
+      alcohol: {
+        acceptablePercents: [14],
+        acceptableStatements: ["14% ALC. BY VOL.", "14%"],
+        characteristics: [],
+        orientation: "horizontal",
+      },
+    },
+  ],
+  [
+    "approved-wine-016",
+    {
+      visualStrata: ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      notes:
+        "Marques de Navarro Malbec label with a bottom-row alcohol statement and producer text separated from the title block.",
+      brand: { acceptablePresentations: ["Marques de Navarro"] },
+      alcohol: {
+        acceptablePercents: [13.5],
+        acceptableStatements: ["ALC. 13.5% BY VOL.", "13.5%"],
+        characteristics: ["decimal-value"],
+        orientation: "horizontal",
+      },
+    },
+  ],
+  [
+    "approved-wine-018",
+    {
+      visualStrata: ["multi-line-brand", "front-label", "dense-text", "alcohol-at-bottom"],
+      notes:
+        "Poqr Krya indigenous-blend label with the alcohol statement stacked in the left information column.",
+      brand: { acceptablePresentations: ["Poqr Krya", "POQR KRYA"] },
+      alcohol: {
+        acceptablePercents: [13.5],
+        acceptableStatements: ["Alc. 13.5% by Vol.", "13.5%"],
+        characteristics: ["decimal-value"],
+        orientation: "horizontal",
+      },
+    },
+  ],
+  [
+    "approved-wine-019",
+    {
+      visualStrata: ["simple-centered-brand", "front-label", "alcohol-at-bottom"],
+      notes:
+        "Kyrios Malbec label with a clean title block and a direct alcohol statement on the lower edge.",
+      brand: { acceptablePresentations: ["Kyrios"] },
+      alcohol: {
+        acceptablePercents: [13.5],
+        acceptableStatements: ["Alc. 13.5 % by Vol.", "13.5%"],
+        characteristics: ["decimal-value"],
+        orientation: "horizontal",
+      },
+    },
+  ],
+  [
+    "approved-wine-020",
+    {
+      visualStrata: ["simple-centered-brand", "back-label", "alcohol-at-bottom"],
+      notes:
+        "Courtieu / Chateau Courtieu text label with a comma-decimal alcohol statement near the lower-left corner.",
+      brand: { acceptablePresentations: ["Courtieu", "Chateau Courtieu"] },
+      alcohol: {
+        acceptablePercents: [12.5],
+        acceptableStatements: ["ALC. 12,5% BY VOL", "12.5%", "12,5%"],
+        characteristics: ["decimal-value"],
+        orientation: "horizontal",
+      },
+    },
+  ],
+]);
+
 function readJson(filePath) {
   return JSON.parse(readFileSync(filePath, "utf8"));
 }
@@ -262,6 +410,62 @@ function seedRecord(discovered, seedCase) {
   };
 }
 
+function manualIncludedRecord(discovered, override) {
+  return {
+    caseId: discovered.caseId,
+    imagePath: discovered.imagePath,
+    expectedSha256: discovered.expectedSha256,
+    image: discovered.image,
+    beverageCategory: discovered.beverageCategory,
+    source: discovered.source,
+    inspection: {
+      imageOrientation: orientation(discovered.image.width, discovered.image.height),
+      visualStrata: override.visualStrata,
+      reviewReasons: [],
+      notes: override.notes,
+    },
+    status: "included",
+    exclusionReason: null,
+    duplicateOfCaseId: null,
+    annotation: {
+      brand: {
+        presence: "present",
+        acceptablePresentations: override.brand.acceptablePresentations,
+        genuinelyAmbiguous: false,
+        ambiguityReason: null,
+        forbiddenPresentations: [],
+        approxGeometry: [],
+        orientation: "horizontal",
+      },
+      alcohol: {
+        presence: "present",
+        acceptablePercents: override.alcohol.acceptablePercents,
+        acceptableStatements: override.alcohol.acceptableStatements,
+        characteristics: override.alcohol.characteristics,
+        approxGeometry: [],
+        orientation: override.alcohol.orientation,
+      },
+      confidence: { overall: "high", brand: "high", alcohol: "high" },
+      provenance: {
+        annotatedBy: "Codex",
+        annotatedOn: TODAY,
+        method:
+          "manual inspection of the committed fixture image aided by bounded local OCR preview",
+      },
+      notes: override.notes,
+    },
+    qualityControl: {
+      reviewedBy: "Codex",
+      reviewedOn: TODAY,
+      method: "second-pass-visual-inspection",
+      outcome: "confirmed",
+      checks: QC_CHECKS,
+      corrections: [],
+      notes: "Checkpoint inclusion added after direct image review and bounded OCR preview.",
+    },
+  };
+}
+
 function duplicateRecord(discovered, duplicateOfCaseId, reason) {
   return {
     caseId: discovered.caseId,
@@ -465,6 +669,8 @@ async function main() {
   const records = discovered.map((record) => {
     const seedCase = seedByRelPath.get(record.imagePath);
     if (seedCase) return seedRecord(record, seedCase);
+    const override = CHECKPOINT_INCLUDED.get(record.caseId);
+    if (override) return manualIncludedRecord(record, override);
     if (record.caseId === "m-cellars-reference-crop") {
       return duplicateRecord(
         record,

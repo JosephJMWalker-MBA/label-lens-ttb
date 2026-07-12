@@ -275,15 +275,66 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": ["front-label"],
-        "reviewReasons": ["other"],
-        "notes": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet."
+        "visualStrata": [
+          "decorative-or-script-brand",
+          "vertical-mandatory-strip",
+          "alcohol-at-side-or-rotated",
+          "front-label"
+        ],
+        "reviewReasons": [],
+        "notes": "Wrap-style La Fattoria Cabernet Sauvignon label with the alcohol statement printed on the vertical side strip."
       },
-      "status": "excluded_uncertain_truth",
-      "exclusionReason": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet.",
+      "status": "included",
+      "exclusionReason": null,
       "duplicateOfCaseId": null,
-      "annotation": null,
-      "qualityControl": null
+      "annotation": {
+        "brand": {
+          "presence": "present",
+          "acceptablePresentations": ["La Fattoria"],
+          "genuinelyAmbiguous": false,
+          "ambiguityReason": null,
+          "forbiddenPresentations": [],
+          "approxGeometry": [],
+          "orientation": "horizontal"
+        },
+        "alcohol": {
+          "presence": "present",
+          "acceptablePercents": [14],
+          "acceptableStatements": ["14% ALC", "14%"],
+          "characteristics": ["rotated-or-vertical"],
+          "approxGeometry": [],
+          "orientation": "mixed"
+        },
+        "confidence": {
+          "overall": "high",
+          "brand": "high",
+          "alcohol": "high"
+        },
+        "provenance": {
+          "annotatedBy": "Codex",
+          "annotatedOn": "2026-07-12",
+          "method": "manual inspection of the committed fixture image aided by bounded local OCR preview"
+        },
+        "notes": "Wrap-style La Fattoria Cabernet Sauvignon label with the alcohol statement printed on the vertical side strip."
+      },
+      "qualityControl": {
+        "reviewedBy": "Codex",
+        "reviewedOn": "2026-07-12",
+        "method": "second-pass-visual-inspection",
+        "outcome": "confirmed",
+        "checks": [
+          "capitalization-and-punctuation",
+          "varietal-not-brand",
+          "producer-importer-bottler-not-brand",
+          "proof-not-alcohol-by-volume",
+          "rotated-or-vertical-alcohol",
+          "absent-field-annotations",
+          "genuine-ambiguity",
+          "duplicate-labels"
+        ],
+        "corrections": [],
+        "notes": "Checkpoint inclusion added after direct image review and bounded OCR preview."
+      }
     },
     {
       "caseId": "approved-wine-005",
@@ -307,15 +358,66 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": ["front-label"],
-        "reviewReasons": ["other"],
-        "notes": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet."
+        "visualStrata": [
+          "decorative-or-script-brand",
+          "vertical-mandatory-strip",
+          "alcohol-at-side-or-rotated",
+          "front-label"
+        ],
+        "reviewReasons": [],
+        "notes": "Wrap-style La Fattoria Barbera label with the alcohol statement printed on the vertical side strip."
       },
-      "status": "excluded_uncertain_truth",
-      "exclusionReason": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet.",
+      "status": "included",
+      "exclusionReason": null,
       "duplicateOfCaseId": null,
-      "annotation": null,
-      "qualityControl": null
+      "annotation": {
+        "brand": {
+          "presence": "present",
+          "acceptablePresentations": ["La Fattoria"],
+          "genuinelyAmbiguous": false,
+          "ambiguityReason": null,
+          "forbiddenPresentations": [],
+          "approxGeometry": [],
+          "orientation": "horizontal"
+        },
+        "alcohol": {
+          "presence": "present",
+          "acceptablePercents": [14],
+          "acceptableStatements": ["14% ALC", "14%"],
+          "characteristics": ["rotated-or-vertical"],
+          "approxGeometry": [],
+          "orientation": "mixed"
+        },
+        "confidence": {
+          "overall": "high",
+          "brand": "high",
+          "alcohol": "high"
+        },
+        "provenance": {
+          "annotatedBy": "Codex",
+          "annotatedOn": "2026-07-12",
+          "method": "manual inspection of the committed fixture image aided by bounded local OCR preview"
+        },
+        "notes": "Wrap-style La Fattoria Barbera label with the alcohol statement printed on the vertical side strip."
+      },
+      "qualityControl": {
+        "reviewedBy": "Codex",
+        "reviewedOn": "2026-07-12",
+        "method": "second-pass-visual-inspection",
+        "outcome": "confirmed",
+        "checks": [
+          "capitalization-and-punctuation",
+          "varietal-not-brand",
+          "producer-importer-bottler-not-brand",
+          "proof-not-alcohol-by-volume",
+          "rotated-or-vertical-alcohol",
+          "absent-field-annotations",
+          "genuine-ambiguity",
+          "duplicate-labels"
+        ],
+        "corrections": [],
+        "notes": "Checkpoint inclusion added after direct image review and bounded OCR preview."
+      }
     },
     {
       "caseId": "approved-wine-006",
@@ -339,15 +441,66 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": ["front-label"],
-        "reviewReasons": ["other"],
-        "notes": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet."
+        "visualStrata": [
+          "simple-centered-brand",
+          "low-contrast",
+          "front-label",
+          "alcohol-at-bottom"
+        ],
+        "reviewReasons": [],
+        "notes": "Dark Horse Pinot Noir display panel with alcohol printed across the lower-right footer."
       },
-      "status": "excluded_uncertain_truth",
-      "exclusionReason": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet.",
+      "status": "included",
+      "exclusionReason": null,
       "duplicateOfCaseId": null,
-      "annotation": null,
-      "qualityControl": null
+      "annotation": {
+        "brand": {
+          "presence": "present",
+          "acceptablePresentations": ["Dark Horse"],
+          "genuinelyAmbiguous": false,
+          "ambiguityReason": null,
+          "forbiddenPresentations": [],
+          "approxGeometry": [],
+          "orientation": "horizontal"
+        },
+        "alcohol": {
+          "presence": "present",
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["ALC. 13.5% BY VOL.", "13.5%"],
+          "characteristics": ["decimal-value"],
+          "approxGeometry": [],
+          "orientation": "horizontal"
+        },
+        "confidence": {
+          "overall": "high",
+          "brand": "high",
+          "alcohol": "high"
+        },
+        "provenance": {
+          "annotatedBy": "Codex",
+          "annotatedOn": "2026-07-12",
+          "method": "manual inspection of the committed fixture image aided by bounded local OCR preview"
+        },
+        "notes": "Dark Horse Pinot Noir display panel with alcohol printed across the lower-right footer."
+      },
+      "qualityControl": {
+        "reviewedBy": "Codex",
+        "reviewedOn": "2026-07-12",
+        "method": "second-pass-visual-inspection",
+        "outcome": "confirmed",
+        "checks": [
+          "capitalization-and-punctuation",
+          "varietal-not-brand",
+          "producer-importer-bottler-not-brand",
+          "proof-not-alcohol-by-volume",
+          "rotated-or-vertical-alcohol",
+          "absent-field-annotations",
+          "genuine-ambiguity",
+          "duplicate-labels"
+        ],
+        "corrections": [],
+        "notes": "Checkpoint inclusion added after direct image review and bounded OCR preview."
+      }
     },
     {
       "caseId": "casanova-della-spinetta",
@@ -628,15 +781,61 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": ["front-label"],
-        "reviewReasons": ["other"],
-        "notes": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet."
+        "visualStrata": ["simple-centered-brand", "front-label", "alcohol-at-bottom"],
+        "reviewReasons": [],
+        "notes": "Cooley Bay Reserve Tempranillo label with a direct alcohol statement near the bottom."
       },
-      "status": "excluded_uncertain_truth",
-      "exclusionReason": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet.",
+      "status": "included",
+      "exclusionReason": null,
       "duplicateOfCaseId": null,
-      "annotation": null,
-      "qualityControl": null
+      "annotation": {
+        "brand": {
+          "presence": "present",
+          "acceptablePresentations": ["Cooley Bay"],
+          "genuinelyAmbiguous": false,
+          "ambiguityReason": null,
+          "forbiddenPresentations": [],
+          "approxGeometry": [],
+          "orientation": "horizontal"
+        },
+        "alcohol": {
+          "presence": "present",
+          "acceptablePercents": [13.8],
+          "acceptableStatements": ["Alcohol 13.8% by Volume", "13.8%"],
+          "characteristics": ["decimal-value"],
+          "approxGeometry": [],
+          "orientation": "horizontal"
+        },
+        "confidence": {
+          "overall": "high",
+          "brand": "high",
+          "alcohol": "high"
+        },
+        "provenance": {
+          "annotatedBy": "Codex",
+          "annotatedOn": "2026-07-12",
+          "method": "manual inspection of the committed fixture image aided by bounded local OCR preview"
+        },
+        "notes": "Cooley Bay Reserve Tempranillo label with a direct alcohol statement near the bottom."
+      },
+      "qualityControl": {
+        "reviewedBy": "Codex",
+        "reviewedOn": "2026-07-12",
+        "method": "second-pass-visual-inspection",
+        "outcome": "confirmed",
+        "checks": [
+          "capitalization-and-punctuation",
+          "varietal-not-brand",
+          "producer-importer-bottler-not-brand",
+          "proof-not-alcohol-by-volume",
+          "rotated-or-vertical-alcohol",
+          "absent-field-annotations",
+          "genuine-ambiguity",
+          "duplicate-labels"
+        ],
+        "corrections": [],
+        "notes": "Checkpoint inclusion added after direct image review and bounded OCR preview."
+      }
     },
     {
       "caseId": "approved-wine-013",
@@ -692,15 +891,61 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": ["front-label"],
-        "reviewReasons": ["other"],
-        "notes": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet."
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+        "reviewReasons": [],
+        "notes": "Tre Cori text-heavy label with the alcohol statement printed above the net-contents line."
       },
-      "status": "excluded_uncertain_truth",
-      "exclusionReason": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet.",
+      "status": "included",
+      "exclusionReason": null,
       "duplicateOfCaseId": null,
-      "annotation": null,
-      "qualityControl": null
+      "annotation": {
+        "brand": {
+          "presence": "present",
+          "acceptablePresentations": ["Tre Cori"],
+          "genuinelyAmbiguous": false,
+          "ambiguityReason": null,
+          "forbiddenPresentations": [],
+          "approxGeometry": [],
+          "orientation": "horizontal"
+        },
+        "alcohol": {
+          "presence": "present",
+          "acceptablePercents": [14],
+          "acceptableStatements": ["14% ALC. BY VOL.", "14%"],
+          "characteristics": [],
+          "approxGeometry": [],
+          "orientation": "horizontal"
+        },
+        "confidence": {
+          "overall": "high",
+          "brand": "high",
+          "alcohol": "high"
+        },
+        "provenance": {
+          "annotatedBy": "Codex",
+          "annotatedOn": "2026-07-12",
+          "method": "manual inspection of the committed fixture image aided by bounded local OCR preview"
+        },
+        "notes": "Tre Cori text-heavy label with the alcohol statement printed above the net-contents line."
+      },
+      "qualityControl": {
+        "reviewedBy": "Codex",
+        "reviewedOn": "2026-07-12",
+        "method": "second-pass-visual-inspection",
+        "outcome": "confirmed",
+        "checks": [
+          "capitalization-and-punctuation",
+          "varietal-not-brand",
+          "producer-importer-bottler-not-brand",
+          "proof-not-alcohol-by-volume",
+          "rotated-or-vertical-alcohol",
+          "absent-field-annotations",
+          "genuine-ambiguity",
+          "duplicate-labels"
+        ],
+        "corrections": [],
+        "notes": "Checkpoint inclusion added after direct image review and bounded OCR preview."
+      }
     },
     {
       "caseId": "patricia-green-cellars",
@@ -808,15 +1053,61 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": ["front-label"],
-        "reviewReasons": ["other"],
-        "notes": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet."
+        "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+        "reviewReasons": [],
+        "notes": "Marques de Navarro Malbec label with a bottom-row alcohol statement and producer text separated from the title block."
       },
-      "status": "excluded_uncertain_truth",
-      "exclusionReason": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet.",
+      "status": "included",
+      "exclusionReason": null,
       "duplicateOfCaseId": null,
-      "annotation": null,
-      "qualityControl": null
+      "annotation": {
+        "brand": {
+          "presence": "present",
+          "acceptablePresentations": ["Marques de Navarro"],
+          "genuinelyAmbiguous": false,
+          "ambiguityReason": null,
+          "forbiddenPresentations": [],
+          "approxGeometry": [],
+          "orientation": "horizontal"
+        },
+        "alcohol": {
+          "presence": "present",
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["ALC. 13.5% BY VOL.", "13.5%"],
+          "characteristics": ["decimal-value"],
+          "approxGeometry": [],
+          "orientation": "horizontal"
+        },
+        "confidence": {
+          "overall": "high",
+          "brand": "high",
+          "alcohol": "high"
+        },
+        "provenance": {
+          "annotatedBy": "Codex",
+          "annotatedOn": "2026-07-12",
+          "method": "manual inspection of the committed fixture image aided by bounded local OCR preview"
+        },
+        "notes": "Marques de Navarro Malbec label with a bottom-row alcohol statement and producer text separated from the title block."
+      },
+      "qualityControl": {
+        "reviewedBy": "Codex",
+        "reviewedOn": "2026-07-12",
+        "method": "second-pass-visual-inspection",
+        "outcome": "confirmed",
+        "checks": [
+          "capitalization-and-punctuation",
+          "varietal-not-brand",
+          "producer-importer-bottler-not-brand",
+          "proof-not-alcohol-by-volume",
+          "rotated-or-vertical-alcohol",
+          "absent-field-annotations",
+          "genuine-ambiguity",
+          "duplicate-labels"
+        ],
+        "corrections": [],
+        "notes": "Checkpoint inclusion added after direct image review and bounded OCR preview."
+      }
     },
     {
       "caseId": "approved-wine-017",
@@ -872,15 +1163,61 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": ["front-label"],
-        "reviewReasons": ["other"],
-        "notes": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet."
+        "visualStrata": ["multi-line-brand", "front-label", "dense-text", "alcohol-at-bottom"],
+        "reviewReasons": [],
+        "notes": "Poqr Krya indigenous-blend label with the alcohol statement stacked in the left information column."
       },
-      "status": "excluded_uncertain_truth",
-      "exclusionReason": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet.",
+      "status": "included",
+      "exclusionReason": null,
       "duplicateOfCaseId": null,
-      "annotation": null,
-      "qualityControl": null
+      "annotation": {
+        "brand": {
+          "presence": "present",
+          "acceptablePresentations": ["Poqr Krya", "POQR KRYA"],
+          "genuinelyAmbiguous": false,
+          "ambiguityReason": null,
+          "forbiddenPresentations": [],
+          "approxGeometry": [],
+          "orientation": "horizontal"
+        },
+        "alcohol": {
+          "presence": "present",
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["Alc. 13.5% by Vol.", "13.5%"],
+          "characteristics": ["decimal-value"],
+          "approxGeometry": [],
+          "orientation": "horizontal"
+        },
+        "confidence": {
+          "overall": "high",
+          "brand": "high",
+          "alcohol": "high"
+        },
+        "provenance": {
+          "annotatedBy": "Codex",
+          "annotatedOn": "2026-07-12",
+          "method": "manual inspection of the committed fixture image aided by bounded local OCR preview"
+        },
+        "notes": "Poqr Krya indigenous-blend label with the alcohol statement stacked in the left information column."
+      },
+      "qualityControl": {
+        "reviewedBy": "Codex",
+        "reviewedOn": "2026-07-12",
+        "method": "second-pass-visual-inspection",
+        "outcome": "confirmed",
+        "checks": [
+          "capitalization-and-punctuation",
+          "varietal-not-brand",
+          "producer-importer-bottler-not-brand",
+          "proof-not-alcohol-by-volume",
+          "rotated-or-vertical-alcohol",
+          "absent-field-annotations",
+          "genuine-ambiguity",
+          "duplicate-labels"
+        ],
+        "corrections": [],
+        "notes": "Checkpoint inclusion added after direct image review and bounded OCR preview."
+      }
     },
     {
       "caseId": "approved-wine-019",
@@ -904,15 +1241,61 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": ["front-label"],
-        "reviewReasons": ["other"],
-        "notes": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet."
+        "visualStrata": ["simple-centered-brand", "front-label", "alcohol-at-bottom"],
+        "reviewReasons": [],
+        "notes": "Kyrios Malbec label with a clean title block and a direct alcohol statement on the lower edge."
       },
-      "status": "excluded_uncertain_truth",
-      "exclusionReason": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet.",
+      "status": "included",
+      "exclusionReason": null,
       "duplicateOfCaseId": null,
-      "annotation": null,
-      "qualityControl": null
+      "annotation": {
+        "brand": {
+          "presence": "present",
+          "acceptablePresentations": ["Kyrios"],
+          "genuinelyAmbiguous": false,
+          "ambiguityReason": null,
+          "forbiddenPresentations": [],
+          "approxGeometry": [],
+          "orientation": "horizontal"
+        },
+        "alcohol": {
+          "presence": "present",
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["Alc. 13.5 % by Vol.", "13.5%"],
+          "characteristics": ["decimal-value"],
+          "approxGeometry": [],
+          "orientation": "horizontal"
+        },
+        "confidence": {
+          "overall": "high",
+          "brand": "high",
+          "alcohol": "high"
+        },
+        "provenance": {
+          "annotatedBy": "Codex",
+          "annotatedOn": "2026-07-12",
+          "method": "manual inspection of the committed fixture image aided by bounded local OCR preview"
+        },
+        "notes": "Kyrios Malbec label with a clean title block and a direct alcohol statement on the lower edge."
+      },
+      "qualityControl": {
+        "reviewedBy": "Codex",
+        "reviewedOn": "2026-07-12",
+        "method": "second-pass-visual-inspection",
+        "outcome": "confirmed",
+        "checks": [
+          "capitalization-and-punctuation",
+          "varietal-not-brand",
+          "producer-importer-bottler-not-brand",
+          "proof-not-alcohol-by-volume",
+          "rotated-or-vertical-alcohol",
+          "absent-field-annotations",
+          "genuine-ambiguity",
+          "duplicate-labels"
+        ],
+        "corrections": [],
+        "notes": "Checkpoint inclusion added after direct image review and bounded OCR preview."
+      }
     },
     {
       "caseId": "approved-wine-020",
@@ -936,15 +1319,61 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": ["front-label"],
-        "reviewReasons": ["other"],
-        "notes": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet."
+        "visualStrata": ["simple-centered-brand", "back-label", "alcohol-at-bottom"],
+        "reviewReasons": [],
+        "notes": "Courtieu / Chateau Courtieu text label with a comma-decimal alcohol statement near the lower-left corner."
       },
-      "status": "excluded_uncertain_truth",
-      "exclusionReason": "Checkpoint inventory record only: full-corpus annotation has not been completed for this wine image yet.",
+      "status": "included",
+      "exclusionReason": null,
       "duplicateOfCaseId": null,
-      "annotation": null,
-      "qualityControl": null
+      "annotation": {
+        "brand": {
+          "presence": "present",
+          "acceptablePresentations": ["Courtieu", "Chateau Courtieu"],
+          "genuinelyAmbiguous": false,
+          "ambiguityReason": null,
+          "forbiddenPresentations": [],
+          "approxGeometry": [],
+          "orientation": "horizontal"
+        },
+        "alcohol": {
+          "presence": "present",
+          "acceptablePercents": [12.5],
+          "acceptableStatements": ["ALC. 12,5% BY VOL", "12.5%", "12,5%"],
+          "characteristics": ["decimal-value"],
+          "approxGeometry": [],
+          "orientation": "horizontal"
+        },
+        "confidence": {
+          "overall": "high",
+          "brand": "high",
+          "alcohol": "high"
+        },
+        "provenance": {
+          "annotatedBy": "Codex",
+          "annotatedOn": "2026-07-12",
+          "method": "manual inspection of the committed fixture image aided by bounded local OCR preview"
+        },
+        "notes": "Courtieu / Chateau Courtieu text label with a comma-decimal alcohol statement near the lower-left corner."
+      },
+      "qualityControl": {
+        "reviewedBy": "Codex",
+        "reviewedOn": "2026-07-12",
+        "method": "second-pass-visual-inspection",
+        "outcome": "confirmed",
+        "checks": [
+          "capitalization-and-punctuation",
+          "varietal-not-brand",
+          "producer-importer-bottler-not-brand",
+          "proof-not-alcohol-by-volume",
+          "rotated-or-vertical-alcohol",
+          "absent-field-annotations",
+          "genuine-ambiguity",
+          "duplicate-labels"
+        ],
+        "corrections": [],
+        "notes": "Checkpoint inclusion added after direct image review and bounded OCR preview."
+      }
     },
     {
       "caseId": "saker",
