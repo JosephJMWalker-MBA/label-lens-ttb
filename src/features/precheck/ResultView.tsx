@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Disclosure } from "@/components/ui/disclosure";
@@ -8,6 +8,7 @@ import type { AnalyzerFieldObservation } from "@/pipeline/analyzer/analyzer.type
 import type { VerificationFinding } from "@/domain/verification/finding.types";
 import type { PrecheckServiceResponse } from "@/server/precheck-service.types";
 
+import { triggerDownload } from "./download";
 import {
   countChecksNeedingReview,
   executedFindings,
@@ -27,17 +28,9 @@ const STATUS_NOTE: Record<string, string> = {
   not_run: "The rule did not run.",
 };
 
-function downloadFile(text: string, filename: string, mime: string) {
-  const blob = new Blob([text], { type: mime });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = filename;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-  URL.revokeObjectURL(url);
-}
+/** User-facing message when a download cannot begin. Never exposes content. */
+const DOWNLOAD_ERROR_MESSAGE =
+  "The report could not be downloaded. Try again or regenerate the result.";
 
 /** One concise field line in the summary: plain-language state + value. */
 function SummaryField({ label, state, value }: { label: string; state: string; value: string }) {
@@ -140,6 +133,21 @@ export function ResultView({
   const executed = executedFindings(findings);
   const notRun = notRunFindings(findings);
   const prov = observations.provenance;
+
+  const [downloadError, setDownloadError] = useState<string | null>(null);
+  const downloadErrorRef = useRef<HTMLDivElement>(null);
+
+  // Save exact server-produced content; on any failure to start the download,
+  // surface an accessible error rather than silently doing nothing.
+  function download(content: string, filename: string, mimeType: string) {
+    try {
+      triggerDownload({ content, filename, mimeType });
+      setDownloadError(null);
+    } catch {
+      setDownloadError(DOWNLOAD_ERROR_MESSAGE);
+      requestAnimationFrame(() => downloadErrorRef.current?.focus());
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -279,7 +287,7 @@ export function ResultView({
             <Button
               type="button"
               onClick={() =>
-                downloadFile(response.exportJson, response.suggestedFilename, "application/json")
+                download(response.exportJson, response.suggestedFilename, "application/json")
               }
             >
               Download JSON export
@@ -288,12 +296,22 @@ export function ResultView({
               type="button"
               variant="outline"
               onClick={() =>
-                downloadFile(response.report.html, response.report.filename, "text/html")
+                download(response.report.html, response.report.filename, "text/html;charset=utf-8")
               }
             >
               Download readable report (HTML)
             </Button>
           </div>
+          {downloadError ? (
+            <div
+              ref={downloadErrorRef}
+              tabIndex={-1}
+              role="alert"
+              className="rounded-md border border-border bg-muted/40 p-3 text-sm text-foreground"
+            >
+              {downloadError}
+            </div>
+          ) : null}
           <p className="text-xs text-muted-foreground">
             Saves the exact server-produced, checksum-verified JSON export as{" "}
             <code className="break-all">{response.suggestedFilename}</code>, and a readable HTML

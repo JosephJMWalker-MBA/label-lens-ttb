@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { PrecheckServiceResponse } from "@/server/precheck-service.types";
@@ -657,5 +657,59 @@ describe("PrecheckWorkspace — review-first layout", () => {
       expect(img.className).toMatch(/object-contain/);
     }
     unmount();
+  });
+});
+
+// -- Download error handling & retry --------------------------------------------
+
+describe("PrecheckWorkspace — download error handling", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("surfaces an accessible error when a download cannot begin, without corrupting the result", async () => {
+    vi.stubGlobal("fetch", routedFetch());
+    render(<PrecheckWorkspace />);
+    await runPrecheckToResult();
+
+    // Force object-URL creation to fail (e.g. a runtime that blocks blob URLs).
+    vi.stubGlobal("URL", {
+      ...URL,
+      createObjectURL: () => {
+        throw new Error("blocked");
+      },
+      revokeObjectURL: () => {},
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /download json export/i }));
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByText(/could not be downloaded/i)).toBeInTheDocument();
+    // The result state is intact (findings still rendered); no false success.
+    expect(screen.getAllByText(/wine-alcohol-syntax/).length).toBeGreaterThan(0);
+  });
+
+  it("clears the error and allows retry once the download can begin again", async () => {
+    vi.stubGlobal("fetch", routedFetch());
+    render(<PrecheckWorkspace />);
+    await runPrecheckToResult();
+
+    vi.stubGlobal("URL", {
+      ...URL,
+      createObjectURL: () => {
+        throw new Error("blocked");
+      },
+      revokeObjectURL: () => {},
+    });
+    fireEvent.click(screen.getByRole("button", { name: /download readable report/i }));
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+
+    // Recovery: a working object-URL implementation lets the retry succeed and
+    // the accessible error is cleared.
+    vi.stubGlobal("URL", {
+      ...URL,
+      createObjectURL: () => "blob:ok",
+      revokeObjectURL: () => {},
+    });
+    fireEvent.click(screen.getByRole("button", { name: /download readable report/i }));
+    await waitFor(() => expect(screen.queryByRole("alert")).toBeNull());
   });
 });
