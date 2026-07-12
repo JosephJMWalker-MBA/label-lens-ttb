@@ -15,6 +15,8 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "smoke:relocation": "node scripts/relocation-smoke.mjs",
+    "eval:inventory": "node scripts/fixtures/generate-eval-manifest.mjs",
+    "eval:inspect": "node scripts/fixtures/generate-ocr-inspection-summary.mjs",
     "eval:baseline": "EVAL_BASELINE=1 vitest run src/fixtures/eval/baseline-report.gen.test.ts"
   },
   "dependencies": {
