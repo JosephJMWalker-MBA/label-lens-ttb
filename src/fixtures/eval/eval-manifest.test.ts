@@ -95,10 +95,11 @@ describe("committed evaluation manifest", () => {
     ).toBe("distilled-spirits");
   });
 
-  it("keeps only wine records in the currently included seeded baseline", () => {
+  it("keeps only wine records in the currently included evaluation slice", () => {
     const manifest = loadEvalManifest();
-    expect(manifest.cases).toHaveLength(15);
+    expect(manifest.cases).toHaveLength(24);
     expect(manifest.cases.some((record) => record.caseId === "luigi-giovanni-live")).toBe(true);
+    expect(manifest.cases.some((record) => record.caseId === "approved-wine-020")).toBe(true);
     expect(
       manifest.records
         .filter((record) => record.status === "included")

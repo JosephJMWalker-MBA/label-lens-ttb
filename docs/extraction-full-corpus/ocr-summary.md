@@ -25,21 +25,21 @@ Bounded local OCR preview over every wine-classified image in the corpus-scale m
 
 ## approved-wine-004
 
-- Status: `excluded_uncertain_truth`
+- Status: `included`
 - Image: `tests/fixtures/precheck/approved-wine-004/label.png`
 - First lines: I>w 0009 —=m 20 | Ixcmm | Z0oMmZ2 m=" vm | A= 200 Iz | =H" o5 | z2 o%T | Fmz ©_0Z2 | (%lo] mAs
 - Alcohol-like lines: >0%00 <Z0O Sh
 
 ## approved-wine-005
 
-- Status: `excluded_uncertain_truth`
+- Status: `included`
 - Image: `tests/fixtures/precheck/approved-wine-005/label.png`
 - First lines: Lo— TC Zz — O | —— | NIV | oro ZEuw | <z | = EE] Eo<cw 7X] | 29 © 9 a¥c a no | $a a= <<
 - Alcohol-like lines: none
 
 ## approved-wine-006
 
-- Status: `excluded_uncertain_truth`
+- Status: `included`
 - Image: `tests/fixtures/precheck/approved-wine-006/label.png`
 - First lines: zpSew 82 gg 523 282 ARK HORSE | BEL TE=2= — PINOT NOIR WINE — | EokE SE S==3 =2 LUSCIOUS « VELVETY * CHERRY | 28s; 25 Sei E322 | Exias == S282 2&8 Here’s Dark Horses | S88L =osg 5 to everywhere. | Ss =5a2& SHEE = Our California Pinot Noir offers fresh | Qa< 52585 EE =3852 =5 notes of strawberry and red cherry
 - Alcohol-like lines: ® fc ALC.13.5% BY VOL
@@ -67,7 +67,7 @@ Bounded local OCR preview over every wine-classified image in the corpus-scale m
 
 ## approved-wine-012
 
-- Status: `excluded_uncertain_truth`
+- Status: `included`
 - Image: `tests/fixtures/precheck/approved-wine-012/label.jpeg`
 - First lines: Cool&y | Bay | RESERVE | TEMPRANILLO | This Tempranillo isn't trying to get too deep. | What it is is what it is: bold, earthy, and | beautifully crafted. Notes of dark cher | and tobacco linger like thoughts you don't
 - Alcohol-like lines: Alcohol 13.8% by Volume | women should not drink alcoholic beverages during pregnancy | because of the risk of birth defects. (2) Consumption of alcoholic
@@ -81,14 +81,14 @@ Bounded local OCR preview over every wine-classified image in the corpus-scale m
 
 ## approved-wine-014
 
-- Status: `excluded_uncertain_truth`
+- Status: `included`
 - Image: `tests/fixtures/precheck/approved-wine-014/label.jpeg`
 - First lines: Ay ) | TRE CORI 2023 | The Heartbeat of Those Who Love Yiine. | CANNONAU DI SARDEGNA | DENOMINAZIONE DI ORIGINE CONTROLLATA | * eo | “the heart of the land, where wines take roots | the heart of tradition, keeper of knowledge and memory;
 - Alcohol-like lines: 147% ALC. BY VOL | DRINK ALCOHOLIC BEVERAGES DURING PREGNANCY me OO | CONSUMPTION OF ALCOHOLIC BEVERAGES IMPAIRS — )
 
 ## approved-wine-016
 
-- Status: `excluded_uncertain_truth`
+- Status: `included`
 - Image: `tests/fixtures/precheck/approved-wine-016/label.png`
 - First lines: MARQUES 0: NAVARRO | MALBEC | Our Wine , Marques de Navarro Reflects with elegance the varietal character and the freshness | of carefully selected Young fruit. Expressive and unique, it is balanced in richness and delicacy. | GOVERNMENT WARNING: 1) ACCORDING TO THE SURGEON PRODUCED & ESTATE BOTTLED BY ~ | GENERAL, WOMEN SHOULD NOT DRINK ALCOHOLIC BEVERAGES BODEGA Y VINEDOS KORTA BUCAREY LTDA. Saas | DURING PREGNANCY BECAUSE OF THE RISK OF BIRTH DEFECTS. FUNDO SANTA ANA DE PETEROA | (2) CONSUMPTION OF ALCOHOLIC BEVERAGES IMPAIRS YOUR SAGRADA FAMILIA - CURICO - CHILE —
 - Alcohol-like lines: GENERAL, WOMEN SHOULD NOT DRINK ALCOHOLIC BEVERAGES BODEGA Y VINEDOS KORTA BUCAREY LTDA. Saas | (2) CONSUMPTION OF ALCOHOLIC BEVERAGES IMPAIRS YOUR SAGRADA FAMILIA - CURICO - CHILE — | CAUSE HEALTH PROBLEMS. —————1%) | PRODUCT OF CHILE - CURICO VALLEY ALC. 13.5% BY VOL 750ML RED WINE
@@ -102,21 +102,21 @@ Bounded local OCR preview over every wine-classified image in the corpus-scale m
 
 ## approved-wine-018
 
-- Status: `excluded_uncertain_truth`
+- Status: `included`
 - Image: `tests/fixtures/precheck/approved-wine-018/label.png`
 - First lines: ’ | Poqr Krya Red Still Wine 2022 Vayots Dzor | 3 Pogr krya is a joint venture of Krya wines and local | grape growing families from Vernashen, combining | craftmanship and passion. The wine is blend of the | 120) (0) 1¢ Armenian endemic grape varieties made of Areni, Sev | KRYA Kharji, Tozot and Movuz. | Indigenous blend
 - Alcohol-like lines: we13.5%wt Altitude: 1200-1500m above sea leve | Soil: Clay-sandy volcanic soill | ®@ ALCOHOLIC BEVERAGES DURING PREGNANCY | Z CONSUMPTION OF ALCOHOLIC BEVERAGES IMPAIRS
 
 ## approved-wine-019
 
-- Status: `excluded_uncertain_truth`
+- Status: `included`
 - Image: `tests/fixtures/precheck/approved-wine-019/label.png`
 - First lines: KYRIOS | MALBEC | Mendoza, Argentina | This wine 18 the clearest exponent of the Mendoz2 s terroir | Easy danlang with freshness palate Aromas of ape fruits make it | Pp ect as every day ne. Chee!!! | RED WINE PRODUCED AND BOTTLED BY BODEGA STAPHYLE B-72804 RUCIP | 01085, MALABIA 581, LUJAN DE CUYO, MENDOZA. ARGENTINA / PRODUCT OF
 - Alcohol-like lines: GENERAL, WOMEN SHOULD NOT DRINK ALCOHOLIC BEVERAGES | DEFECTS. (2) CONSUMPTION OF ALCOHOLIC BEVERAGES C—O
 
 ## approved-wine-020
 
-- Status: `excluded_uncertain_truth`
+- Status: `included`
 - Image: `tests/fixtures/precheck/approved-wine-020/label.png`
 - First lines: VIN DE BORDEAUX | COURTIEU | 2024 | MALBEC | APPELLATION D’ORIGINE PROTEGEE BORDEAUX | This red Bordeaux of Chateau Courtieu expresses the typical | qualities of Entre-Deux-Mers: ruby color, fruity bouquet, full | body and long finish. The wine pairs well with hearty meats and
 - Alcohol-like lines: NOT DRINK ALCOHOLIC BEVERAGES DURING PREGNANCY BECAUSE OF THE RISK OF | BIRTH DEFECTS. (2) CONSUMPTION OF ALCOHOLIC BEVERAGES IMPAIRS YOUR ABILITY | 125%BYVOL OW

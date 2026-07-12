@@ -6,12 +6,12 @@
     "beer-or-malt-beverage": 3
   },
   "byStatus": {
-    "included": 15,
-    "excluded_uncertain_truth": 103,
+    "included": 24,
+    "excluded_uncertain_truth": 94,
     "excluded_outside_current_scope": 12,
     "excluded_duplicate": 2
   },
-  "includedWine": 15,
-  "pendingWineAnnotation": 103,
+  "includedWine": 24,
+  "pendingWineAnnotation": 94,
   "nonWine": 12
 }

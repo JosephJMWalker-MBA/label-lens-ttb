@@ -6,8 +6,8 @@ This checkpoint reconciles every committed candidate image under `tests/fixtures
 - Wine images: **120**
 - Distilled-spirits images: **9**
 - Beer or malt beverage images: **3**
-- Included baseline seed cases: **15**
-- Wine images awaiting full annotation: **103**
+- Included baseline seed cases: **24**
+- Wine images awaiting full annotation: **94**
 
 ## Visual corrections discovered during inventory
 
