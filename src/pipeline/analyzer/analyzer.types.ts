@@ -27,6 +27,23 @@ export const ANALYZER_OBSERVATION_STATES = [
 ] as const;
 export type AnalyzerObservationState = (typeof ANALYZER_OBSERVATION_STATES)[number];
 
+/**
+ * Bounded reason an observation is AMBIGUOUS. It distinguishes the two honest
+ * uncertainty situations that both defer to a human:
+ *   - `competing_candidates`: two or more non-corroborating candidates of
+ *     comparable prominence rivalled each other (alternates carry the rivals);
+ *   - `single_unconfirmed_candidate`: exactly one plausible line was found but it
+ *     could not be positively distinguished as brand presentation, and there is
+ *     no second candidate — usable uncertainty, NOT a schema-invalidating gap.
+ * The reason is required when an AMBIGUOUS observation carries no alternate, so a
+ * lone unconfirmed candidate stays valid uncertainty instead of an invalid shape.
+ */
+export const ANALYZER_AMBIGUITY_REASONS = [
+  "competing_candidates",
+  "single_unconfirmed_candidate",
+] as const;
+export type AnalyzerAmbiguityReason = (typeof ANALYZER_AMBIGUITY_REASONS)[number];
+
 /** Bounded evidence region, with the reference frame needed to interpret it. */
 export interface EvidenceGeometry {
   /** Page or image index within the artifact. */
@@ -62,6 +79,11 @@ export interface AnalyzerFieldObservation {
   geometry?: EvidenceGeometry;
   /** Ordered alternate candidates; never promoted into a result. */
   alternates: AnalyzerAlternate[];
+  /**
+   * Why the observation is AMBIGUOUS. Required for an AMBIGUOUS observation that
+   * carries no alternate (a lone unconfirmed candidate); optional otherwise.
+   */
+  ambiguityReason?: AnalyzerAmbiguityReason;
 }
 
 /** OCR engine identity, or an explicit statement that none was used. */
