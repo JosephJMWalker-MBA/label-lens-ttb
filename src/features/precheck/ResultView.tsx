@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type ReactNode } from "react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Disclosure } from "@/components/ui/disclosure";
@@ -9,14 +9,13 @@ import type { VerificationFinding } from "@/domain/verification/finding.types";
 import type { PrecheckServiceResponse } from "@/server/precheck-service.types";
 
 import { triggerDownload } from "./download";
+import { EvidencePanel } from "./EvidencePanel";
 import {
   countChecksNeedingReview,
   executedFindings,
   nextAction,
   notRunFindings,
   observationStateLabel,
-  summarizeAlcohol,
-  summarizeBrand,
 } from "./observation-language";
 
 /** Plain-language note for each machine-finding token. These are rule outcomes. */
@@ -31,21 +30,6 @@ const STATUS_NOTE: Record<string, string> = {
 /** User-facing message when a download cannot begin. Never exposes content. */
 const DOWNLOAD_ERROR_MESSAGE =
   "The report could not be downloaded. Try again or regenerate the result.";
-
-/** One concise field line in the summary: plain-language state + value. */
-function SummaryField({ label, state, value }: { label: string; state: string; value: string }) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="text-base font-medium">
-        <span className="mr-2 inline-block rounded border border-border px-1.5 py-0.5 text-xs font-normal text-muted-foreground">
-          {state}
-        </span>
-        <span className="break-words">{value}</span>
-      </dd>
-    </div>
-  );
-}
 
 function ObservationCard({ field, obs }: { field: string; obs: AnalyzerFieldObservation }) {
   return (
@@ -126,10 +110,11 @@ function FindingCard({ f, showDependency }: { f: VerificationFinding; showDepend
 
 export function ResultView({
   response,
-  preview,
+  previewImage,
 }: {
   response: PrecheckServiceResponse;
-  preview?: ReactNode;
+  /** Local preview of the analyzed upload; null for the server-side sample. */
+  previewImage?: { url: string; name: string } | null;
 }) {
   const { observations, findings } = response;
   const reviewCount = countChecksNeedingReview(findings);
@@ -160,26 +145,15 @@ export function ResultView({
         {response.advisoryNotice.text}
       </p>
 
-      {/* Concise summary first: preview beside the plain-language result. */}
+      {/* Evidence-centered summary: the label with evidence regions overlaid,
+          beside concise Brand and Alcohol evidence cards. */}
       <section aria-labelledby="summary-heading" className="rounded-md border border-border p-4">
         <h3 id="summary-heading" className="text-lg font-semibold">
           Summary
         </h3>
-        <div className="mt-3 grid gap-4 md:grid-cols-2">
-          {preview ? <div className="min-w-0">{preview}</div> : null}
-          <div className="flex min-w-0 flex-col gap-3">
-            <dl className="flex flex-col gap-3">
-              <SummaryField
-                label="Detected brand"
-                state={observationStateLabel(observations.brandName.state)}
-                value={summarizeBrand(observations)}
-              />
-              <SummaryField
-                label="Detected alcohol"
-                state={observationStateLabel(observations.alcoholStatement.state)}
-                value={summarizeAlcohol(observations)}
-              />
-            </dl>
+        <div className="mt-3 flex flex-col gap-4">
+          <EvidencePanel observations={observations} previewImage={previewImage} />
+          <div className="flex flex-col gap-2 border-t border-border pt-3">
             <p className="text-sm">
               <span className="font-medium">{reviewCount}</span>{" "}
               {reviewCount === 1 ? "check needs" : "checks need"} human review.
@@ -191,6 +165,30 @@ export function ResultView({
           </div>
         </div>
       </section>
+
+      {/* Honest preview of the future seller-confirmation step. Nothing here is
+          active: no correction is stored, no report changes, nothing is sent. */}
+      <Disclosure title="What confirmation will do (preview)">
+        <div className="flex flex-col gap-3 text-sm">
+          <p>
+            A future step will ask the seller to{" "}
+            <strong>confirm how Label Lens interpreted the artwork before submitting</strong>. For
+            each detected field, that step will offer:
+          </p>
+          <ul className="list-disc pl-5 text-muted-foreground">
+            <li>Confirm this reading</li>
+            <li>Choose another detected reading</li>
+            <li>Enter a correction</li>
+            <li>Mark as not visible or unreadable</li>
+            <li>Replace the artwork</li>
+          </ul>
+          <p className="rounded-md border border-border bg-muted/40 p-3">
+            These actions are <strong>not yet active</strong>. Nothing on this page stores a
+            confirmation or correction, changes the machine evidence or reports, or sends anything
+            to TTB.
+          </p>
+        </div>
+      </Disclosure>
 
       <Disclosure title="Evidence details">
         <div className="flex flex-col gap-3">

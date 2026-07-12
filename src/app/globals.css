@@ -25,6 +25,11 @@
     --status-fail: 0 70% 42%;
     --status-review: 222 60% 42%;
     --status-not-run: 215 16% 40%;
+    /* Evidence-region overlays. Brand vs. alcohol also differ by border STYLE
+       (solid vs. dashed) and each carries a text chip — never color alone. */
+    --evidence-brand: 222 84% 45%;
+    --evidence-alcohol: 292 55% 40%;
+    --evidence-candidate: 215 16% 40%;
     --radius: 0.5rem;
   }
 
@@ -48,6 +53,9 @@
     --status-fail: 0 80% 72%;
     --status-review: 210 90% 74%;
     --status-not-run: 215 20% 72%;
+    --evidence-brand: 210 90% 70%;
+    --evidence-alcohol: 290 75% 78%;
+    --evidence-candidate: 215 20% 72%;
   }
 
   /* Bounded font-size preference. Scaling the root font-size scales the rem-based
@@ -115,6 +123,55 @@
   .status-badge[data-status="NEEDS_REVIEW"] {
     border-color: hsl(var(--status-review));
     color: hsl(var(--status-review));
+  }
+
+  /* Evidence-region overlays on the label preview. Positioned by percentage of
+     the server geometry's reference frame; fields are distinguished by border
+     style AND a text chip, so color is never the only channel. */
+  .evidence-overlay {
+    position: absolute;
+    display: block;
+    border-width: 2px;
+    border-radius: 2px;
+    padding: 0;
+    text-align: left;
+  }
+  .evidence-overlay:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+  .evidence-overlay[data-field="brand"] {
+    border-style: solid;
+    border-color: hsl(var(--evidence-brand));
+    background-color: hsl(var(--evidence-brand) / 0.12);
+  }
+  .evidence-overlay[data-field="alcohol"] {
+    border-style: dashed;
+    border-color: hsl(var(--evidence-alcohol));
+    background-color: hsl(var(--evidence-alcohol) / 0.12);
+  }
+  .evidence-overlay[data-field="candidate"] {
+    border-style: dotted;
+    border-color: hsl(var(--evidence-candidate));
+    background-color: hsl(var(--evidence-candidate) / 0.14);
+    pointer-events: none;
+  }
+  .evidence-overlay[data-active="true"] {
+    border-width: 3px;
+    box-shadow: 0 0 0 2px hsl(var(--background));
+  }
+  .evidence-chip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 0 0.25rem;
+    font-size: 0.625rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: hsl(var(--foreground));
+    background-color: hsl(var(--background) / 0.9);
+    border-bottom-right-radius: 2px;
+    white-space: nowrap;
   }
 
   /* A slow, non-essential spinner. Hidden entirely under reduced motion; the
