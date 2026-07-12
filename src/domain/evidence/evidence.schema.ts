@@ -1,6 +1,9 @@
 import { z } from "zod";
 
-import { ANALYZER_OBSERVATION_STATES } from "@/pipeline/analyzer/analyzer.types";
+import {
+  ANALYZER_AMBIGUITY_REASONS,
+  ANALYZER_OBSERVATION_STATES,
+} from "@/pipeline/analyzer/analyzer.types";
 
 /**
  * The single canonical runtime schema for evidence geometry, alternates, and
@@ -100,6 +103,7 @@ export const observationSchema = z
     confidence,
     geometry: geometrySchema.optional(),
     alternates: z.array(alternateSchema).default([]),
+    ambiguityReason: z.enum(ANALYZER_AMBIGUITY_REASONS).optional(),
   })
   .strict()
   .superRefine((obs, ctx) => {
@@ -152,7 +156,21 @@ export const observationSchema = z
       }
     }
 
+    // AMBIGUOUS uncertainty is honestly represented one of two ways: rival
+    // candidates carried as alternates, OR a single unconfirmed candidate marked
+    // with an explicit reason code. A zero-alternate AMBIGUOUS with no reason is
+    // still an invalid shape (it would lose why the evidence is uncertain).
     if (obs.state === "AMBIGUOUS" && obs.alternates.length < 1) {
-      issue(["alternates"], "AMBIGUOUS must preserve at least one distinct alternate candidate.");
+      if (obs.ambiguityReason !== "single_unconfirmed_candidate") {
+        issue(
+          ["alternates"],
+          "AMBIGUOUS with no alternate must set ambiguityReason 'single_unconfirmed_candidate'.",
+        );
+      }
+    }
+
+    // `ambiguityReason` describes AMBIGUOUS evidence only.
+    if (obs.ambiguityReason !== undefined && obs.state !== "AMBIGUOUS") {
+      issue(["ambiguityReason"], "ambiguityReason is only valid for an AMBIGUOUS observation.");
     }
   });

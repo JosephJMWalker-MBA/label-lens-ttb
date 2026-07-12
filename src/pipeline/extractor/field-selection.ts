@@ -429,6 +429,7 @@ function buildBrandObservation(candidates: Candidate[]): FieldSelection {
         confidence: best.confidence,
         geometry: best.geometry,
         alternates,
+        ambiguityReason: "competing_candidates",
       },
       sourceRegion: best.regionName,
     };
@@ -443,6 +444,10 @@ function buildBrandObservation(candidates: Candidate[]): FieldSelection {
   const positivelyDistinguished =
     best.brandClass === "positive" && best.confidence >= LOW_CONFIDENCE_THRESHOLD;
   if (!positivelyDistinguished) {
+    // A single plausible line that could not be positively distinguished as
+    // brand presentation. It may be the only candidate (no rival to list), so it
+    // is marked as a single unconfirmed candidate: usable, reviewable
+    // uncertainty that stays schema-valid and never a silent OBSERVED match.
     return {
       observation: {
         state: "AMBIGUOUS",
@@ -452,6 +457,7 @@ function buildBrandObservation(candidates: Candidate[]): FieldSelection {
         confidence: best.confidence,
         geometry: best.geometry,
         alternates: ranked.slice(1).map(alternateFrom),
+        ambiguityReason: "single_unconfirmed_candidate",
       },
       sourceRegion: best.regionName,
     };
