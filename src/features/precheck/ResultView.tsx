@@ -175,7 +175,7 @@ export function ResultView({
             </p>
             <p className="rounded-md bg-muted/50 p-3 text-sm">
               <span className="font-semibold">Suggested next step: </span>
-              {nextAction(observations, reviewCount)}
+              {nextAction(observations, findings)}
             </p>
           </div>
         </div>

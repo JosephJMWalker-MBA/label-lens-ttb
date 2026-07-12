@@ -12,12 +12,17 @@ import type { ResultObservations } from "@/pipeline/result/result.types";
  * overall pass/fail status.
  */
 
-/** Plain-language label for each machine observation state. */
+/**
+ * Plain-language label for each machine observation state. NOT_OBSERVED is
+ * "Not detected": the extractor produced no supported evidence, which does NOT
+ * prove the statement is absent from the artwork (see the Luigi & Giovanni
+ * case). The wording stays on the machine-performance side of that boundary.
+ */
 export const OBSERVATION_STATE_LABEL: Record<AnalyzerObservationState, string> = {
   OBSERVED: "Found",
   LOW_CONFIDENCE: "Found with low confidence",
   AMBIGUOUS: "Multiple possibilities",
-  NOT_OBSERVED: "Not found",
+  NOT_OBSERVED: "Not detected",
 };
 
 export function observationStateLabel(state: AnalyzerObservationState): string {
@@ -31,11 +36,15 @@ export function summarizeBrand(observations: ResultObservations): string {
   return brand.value;
 }
 
-/** Concise alcohol line: the extracted value, or an honest "not found". */
+/**
+ * Concise alcohol line: the extracted value, or an honest "not detected". The
+ * wording reports what the extractor did (no supported detection), never that
+ * the statement is definitively absent from the artwork.
+ */
 export function summarizeAlcohol(observations: ResultObservations): string {
   const alcohol = observations.alcoholStatement;
   if (alcohol.state === "NOT_OBSERVED" || alcohol.value === null) {
-    return "Not found on the submitted artwork";
+    return "Not detected in the submitted artwork";
   }
   return alcohol.value;
 }
@@ -66,27 +75,51 @@ export function notRunFindings(findings: VerificationFinding[]): VerificationFin
   return findings.filter((f) => f.ruleExecutionStatus !== "executed");
 }
 
+/** Stable rule ids the next-action logic keys on (never message-string parsing). */
+const ALCOHOL_REVIEW_RULE_IDS = ["wine-alcohol-syntax", "wine-alcohol-declared-comparison"];
+const BRAND_COMPARISON_RULE_ID = "brand-name-canonical-comparison";
+
+/** An executed finding that returned a non-clearing (reviewable) outcome. */
+function needsReview(f: VerificationFinding): boolean {
+  return (
+    f.ruleExecutionStatus === "executed" &&
+    (f.findingStatus === "NEEDS_REVIEW" || f.findingStatus === "FAIL" || f.findingStatus === "WARN")
+  );
+}
+
 /**
  * One plain-language next action, chosen from the observation states and the
- * review count. Deterministic and side-effect free; never a pass/fail verdict.
+ * actual executed findings that need review — never a bare review count, so the
+ * suggestion names the real unresolved issue (brand vs. alcohol vs. other).
+ * Deterministic and side-effect free; never a pass/fail verdict.
  */
-export function nextAction(observations: ResultObservations, reviewCount: number): string {
-  const brand = observations.brandName;
-  const alcohol = observations.alcoholStatement;
-  const brandMissing = brand.state === "NOT_OBSERVED" || brand.value === null;
-  const alcoholMissing = alcohol.state === "NOT_OBSERVED" || alcohol.value === null;
+export function nextAction(
+  observations: ResultObservations,
+  findings: VerificationFinding[],
+): string {
+  const reviewable = findings.filter(needsReview);
+  const reviewableIds = new Set(reviewable.map((f) => f.ruleId));
 
-  if (brandMissing && alcoholMissing) {
-    return "No supported evidence was found; provide clearer artwork or mark the field for human review.";
-  }
-  if (brand.state === "AMBIGUOUS") {
+  // 1. An ambiguous brand is the clearest actionable signal.
+  if (observations.brandName.state === "AMBIGUOUS") {
     return "Review the highlighted brand candidates.";
   }
-  if (alcoholMissing) {
+  // 2. No alcohol detected: point the reviewer at the statement's location.
+  if (observations.alcoholStatement.state === "NOT_OBSERVED") {
     return "Confirm where the alcohol statement appears.";
   }
-  if (reviewCount > 0) {
-    return "Review the highlighted brand candidates.";
+  // 3. An executed alcohol syntax or declared-comparison check needs review.
+  if (ALCOHOL_REVIEW_RULE_IDS.some((id) => reviewableIds.has(id))) {
+    return "Compare the alcohol evidence with the application facts.";
   }
+  // 4. An executed brand canonical-comparison check needs review.
+  if (reviewableIds.has(BRAND_COMPARISON_RULE_ID)) {
+    return "Compare the detected brand with the application brand.";
+  }
+  // 5. Some other executed check needs review.
+  if (reviewable.length > 0) {
+    return "Review the highlighted findings.";
+  }
+  // 6. Nothing executed needs review.
   return "Compare the extracted evidence with the application facts.";
 }
