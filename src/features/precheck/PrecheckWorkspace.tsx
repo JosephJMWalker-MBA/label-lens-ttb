@@ -175,6 +175,12 @@ export function PrecheckWorkspace() {
   }
 
   const previewNode = showPreview ? <LabelPreview file={file} url={previewUrl} /> : null;
+  // Structured preview reference for the result's evidence overlays. Null for the
+  // bundled sample (server-side only) or when no usable local preview exists.
+  const previewImage =
+    showPreview && file !== null && previewUrl !== null
+      ? { url: previewUrl, name: file.name }
+      : null;
 
   return (
     <section className="flex flex-col gap-8">
@@ -331,7 +337,7 @@ export function PrecheckWorkspace() {
 
       {phase === "complete" && response ? (
         <div ref={resultRef} tabIndex={-1} className="flex flex-col gap-6">
-          <ResultView response={response} preview={previewNode} />
+          <ResultView response={response} previewImage={previewImage} />
           <Disclosure title="Record internal disposition">
             <DispositionSection response={response} onAppended={setResponse} />
           </Disclosure>

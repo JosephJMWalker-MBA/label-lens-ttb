@@ -123,3 +123,27 @@ export function nextAction(
   // 6. Nothing executed needs review.
   return "Compare the extracted evidence with the application facts.";
 }
+
+/**
+ * One-sentence, seller-readable explanation of a field observation. Presentation
+ * only: it never turns AMBIGUOUS into failure, and it never claims NOT_OBSERVED
+ * proves the text is absent from the artwork.
+ */
+export function stateExplanation(
+  field: "brand" | "alcohol",
+  state: AnalyzerObservationState,
+): string {
+  const noun = field === "brand" ? "brand reading" : "alcohol statement";
+  switch (state) {
+    case "OBSERVED":
+      return `This ${noun} was found clearly on the artwork.`;
+    case "LOW_CONFIDENCE":
+      return `A ${noun} was found, but recognition was weak — verify it against the artwork.`;
+    case "AMBIGUOUS":
+      return `More than one plausible ${noun} was found; a person should choose between them.`;
+    case "NOT_OBSERVED":
+      return field === "brand"
+        ? "No brand reading could be identified safely. This does not prove the artwork lacks one."
+        : "No supported alcohol statement was detected. This does not prove the statement is absent.";
+  }
+}

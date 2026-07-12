@@ -772,3 +772,47 @@ describe("PrecheckWorkspace — processing accessibility", () => {
     await waitFor(() => expect(alert).toHaveFocus());
   });
 });
+
+// -- Confirmation preview honesty (evidence-centered result) --------------------
+
+describe("PrecheckWorkspace — confirmation preview", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("presents the future confirmation step as an inactive preview, not a live action", async () => {
+    vi.stubGlobal("fetch", mockFetch({ ok: true, data: CANNED }));
+    render(<PrecheckWorkspace />);
+    selectFileAndFill();
+    fireEvent.click(screen.getByRole("button", { name: /run pre-check/i }));
+    await screen.findByRole("heading", { name: /pre-check result/i });
+
+    // The preview panel exists, collapsed by default.
+    const details = screen
+      .getByText(/what confirmation will do \(preview\)/i)
+      .closest("details") as HTMLDetailsElement;
+    expect(details.open).toBe(false);
+
+    // Its future choices are explanatory text, not active controls.
+    expect(screen.getByText("Confirm this reading")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /confirm this reading/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /enter a correction/i })).toBeNull();
+
+    // It states plainly that nothing is stored or sent.
+    expect(screen.getByText(/not yet active/i)).toBeInTheDocument();
+    expect(screen.getByText(/sends anything to TTB/i)).toBeInTheDocument();
+  });
+
+  it("keeps machine evidence unchanged and downloads/disposition available in the new layout", async () => {
+    vi.stubGlobal("fetch", mockFetch({ ok: true, data: CANNED }));
+    render(<PrecheckWorkspace />);
+    selectFileAndFill();
+    fireEvent.click(screen.getByRole("button", { name: /run pre-check/i }));
+    await screen.findByRole("heading", { name: /pre-check result/i });
+
+    // The selected machine values render untouched.
+    expect(screen.getAllByText(/M CELLARS/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/12.5% ALC\.\/VOL\./).length).toBeGreaterThan(0);
+    // Downloads and the disposition disclosure remain reachable.
+    expect(screen.getByRole("button", { name: /download json export/i })).toBeInTheDocument();
+    expect(screen.getByText("Record internal disposition")).toBeInTheDocument();
+  });
+});
