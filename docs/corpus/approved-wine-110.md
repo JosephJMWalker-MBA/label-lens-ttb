@@ -84,20 +84,33 @@ null`. Production code never imports the corpus index or the inventory
 (`src/fixtures/truth-boundary.test.ts`). Any future expected values reach only
 downstream rules through the declared-facts contract — never the extractor.
 
+## Correction: all 110 are single-label examples
+
+**All 110 approved-wine records are single-label examples.** There are **no
+multi-artifact (front/back or divided-information) records inside the 110**. An
+earlier review-queue item assumed ~10 of the 110 were multi-panel; that
+assumption was incorrect and is now obsolete (see the review queue for the
+corrected note and the historical reason it existed). The `multiPanelStatus`
+field on these records therefore stays `unmapped` and is **not applicable** to
+the single-label benchmark.
+
+The 10 genuine wine multi-artifact screenshots are a **separate challenge
+corpus** (`wine-multi-artifact-01..10`), not part of these 110. See
+[`supplemental-challenge-and-sentinels.md`](supplemental-challenge-and-sentinels.md).
+
 ## Awaiting a later bounded slice
 
 - **Second-pass annotation**: assign per-record expected brand/alcohol
   observation states and required tokens (no answers are invented here).
 - **Split assignment**: `development` / `validation` / `holdout`
   (`splitStatus` is currently `unassigned` for all 110).
-- **Multi-panel mapping**: the author reports ~10 front/back / divided-information
-  screenshots; exact fixture ids are not yet supplied
-  (`multiPanelStatus: unmapped`). See the review queue.
 - **Decimal-comma mapping**: some labels use `13,0` instead of `13.0`; exact
   fixture ids are not yet supplied (`decimalCommaStatus: unmapped`). No parser
   change and no expected alcohol values are added here.
-- **Non-wine sentinels**: three non-wine samples are **explicitly excluded** from
-  this branch (their exact filenames were not provided).
+- **Non-wine sentinels**: non-wine samples are **not** part of this 110; the
+  agave-spirit, ale, and single-malt-whiskey category sentinels are governed
+  separately in
+  [`supplemental-challenge-and-sentinels.md`](supplemental-challenge-and-sentinels.md).
 
 ## Privacy screening
 

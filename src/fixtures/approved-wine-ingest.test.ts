@@ -206,16 +206,21 @@ describe("approved-wine ingestion — hygiene and scope", () => {
     }
   });
 
-  it("15. original M Cellars, synthetic, and unavailable entries remain unchanged", () => {
-    const preserved = index.entries.filter((e) => e.role !== "candidate").map((e) => e.fixtureId);
-    expect(preserved).toContain("m-cellars-24205001000905");
-    expect(preserved).toContain("m-cellars-lowres-24205001000905");
-    expect(preserved).toContain("rainbow-hills-venom-19206001000867");
-    // The 14 curated entries are still present and all carry expectations (or a
-    // documented unavailable/synthetic shape) — i.e. none was converted to a candidate.
-    expect(preserved.length).toBe(14);
+  it("15. original M Cellars, synthetic, and unavailable curated entries remain unchanged", () => {
+    const ids = index.entries.map((e) => e.fixtureId);
+    expect(ids).toContain("m-cellars-24205001000905");
+    expect(ids).toContain("m-cellars-lowres-24205001000905");
+    expect(ids).toContain("rainbow-hills-venom-19206001000867");
+    // The curated set is unchanged: 11 synthetic + 3 M Cellars/VENOM curated =
+    // 14 non-inventory entries (supplemental challenge/sentinel records are a
+    // separate inventory stratum, not curated entries and not candidates).
+    const INVENTORY_ROLES = ["candidate", "wine_multi_artifact_candidate", "category_sentinel"];
+    const curated = index.entries.filter((e) => !INVENTORY_ROLES.includes(e.role));
+    expect(curated.length).toBe(14);
     const synthetic = index.entries.filter((e) => e.domainOnlySynthetic);
     expect(synthetic.length).toBe(11);
+    // The approved-wine single-label candidate set stays exactly 110.
+    expect(index.entries.filter((e) => e.role === "candidate").length).toBe(110);
   });
 
   it("privacy: no email or formatted phone strings in inventory/index text", () => {

@@ -106,7 +106,23 @@ verified by tests against the manifest and the corpus index.
   each catalogued in `tests/fixtures/precheck/approved-wine-110-inventory.json`.
   A candidate carries no invented brand/alcohol answer, no TTB id, and no
   public-record claim; its `sourceAuthority` is
-  `author-provided-local-acquisition`.
+  `author-provided-local-acquisition`. **All 110 approved-wine candidates are
+  single-label examples — there are no multi-artifact records inside the 110.**
+- **Wine multi-artifact challenge**: a separate challenge stratum — one committed
+  screenshot showing multiple visible label panels / divided package information.
+  Marked `role: "wine_multi_artifact_candidate"`, `beverageCategory: wine`,
+  `measurementEligibility: [challenge_inventory]`, `expectations: null`, disabled
+  from real OCR. Never split, stitched, or treated as multiple uploaded files; no
+  multi-image production workflow is implemented.
+- **Category sentinel**: an out-of-scope, non-wine record (agave spirit, ale,
+  single-malt whiskey) for future scope-boundary testing. Marked
+  `role: "category_sentinel"` with a non-wine `beverageCategory` (constrained by
+  role so only sentinels may be non-wine), `measurementEligibility:
+  [sentinel_inventory]`, `expectations: null`, disabled from real OCR, and never
+  run through the wine rules. **No beverage category beyond wine is implemented**;
+  these are evaluation metadata only. Both new strata are governed in
+  [`docs/corpus/supplemental-challenge-and-sentinels.md`](corpus/supplemental-challenge-and-sentinels.md)
+  and catalogued in `tests/fixtures/precheck/supplemental-corpus-inventory.json`.
 
 ### Deterministic derivatives
 

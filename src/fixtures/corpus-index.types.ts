@@ -53,8 +53,33 @@ export const CORPUS_FIXTURE_ROLES = [
   "insufficient",
   "unavailable",
   "candidate",
+  // A separate wine challenge record: one committed screenshot that shows
+  // multiple visible label panels / divided package information. It is NOT part
+  // of the single-image approved-wine-110 benchmark and is never split or
+  // stitched. Unannotated, disabled from real OCR, no expectations.
+  "wine_multi_artifact_candidate",
+  // An out-of-scope, non-wine category sentinel. Inventory only, for future
+  // scope-boundary testing. Not evidence the category is implemented.
+  "category_sentinel",
 ] as const;
 export type CorpusFixtureRole = (typeof CORPUS_FIXTURE_ROLES)[number];
+
+/**
+ * Beverage category of a fixture. Ordinary fixtures are `wine`; only a
+ * `category_sentinel` may carry an out-of-scope non-wine class. This is
+ * evaluation metadata only and does NOT broaden production category support.
+ */
+export const CORPUS_BEVERAGE_CATEGORIES = [
+  "wine",
+  "agave_spirit",
+  "ale",
+  "single_malt_whiskey",
+] as const;
+export type CorpusBeverageCategory = (typeof CORPUS_BEVERAGE_CATEGORIES)[number];
+
+/** The out-of-scope classes a category sentinel may represent. */
+export const CORPUS_SENTINEL_CATEGORIES = ["agave_spirit", "ale", "single_malt_whiskey"] as const;
+export type CorpusSentinelCategory = (typeof CORPUS_SENTINEL_CATEGORIES)[number];
 
 /** Where a fixture's evidence ultimately comes from. */
 export const CORPUS_SOURCE_AUTHORITIES = [
@@ -92,11 +117,16 @@ export type CorpusSourceStratum = (typeof CORPUS_SOURCE_STRATA)[number];
 export const CORPUS_INDEPENDENCE = ["independent_real_label"] as const;
 export type CorpusIndependence = (typeof CORPUS_INDEPENDENCE)[number];
 
-/** Bounded measurement-eligibility markers for a candidate record. */
+/** Bounded measurement-eligibility markers for an inventory record. */
 export const CORPUS_MEASUREMENT_ELIGIBILITY = [
   "corpus_inventory",
   "future_ocr_evaluation_candidate",
   "future_annotation_candidate",
+  // Wine multi-artifact challenge records: challenge inventory only, never part
+  // of the single-image benchmark.
+  "challenge_inventory",
+  // Non-wine category sentinels: sentinel inventory only, never a wine record.
+  "sentinel_inventory",
 ] as const;
 export type CorpusMeasurementEligibility = (typeof CORPUS_MEASUREMENT_ELIGIBILITY)[number];
 
@@ -188,7 +218,12 @@ export interface CorpusEntry {
   fixtureId: string;
   /** Display-safe name; carries no personal data. */
   displayName: string;
-  beverageCategory: "wine";
+  /**
+   * `wine` for every fixture except a `category_sentinel`, which carries its
+   * out-of-scope non-wine class. Constrained by role in the schema so ordinary
+   * wine fixtures cannot become non-wine and sentinels cannot pretend to be wine.
+   */
+  beverageCategory: CorpusBeverageCategory;
   sourceAuthority: CorpusSourceAuthority;
   /** Public record id (e.g. TTB ID) where applicable, else null. */
   publicRecordId: string | null;
@@ -228,12 +263,13 @@ export interface CorpusEntry {
   /** The explicit, unaltered truth-label prohibition. */
   truthLabelProhibition: typeof TRUTH_LABEL_PROHIBITION;
 
-  // --- Candidate-stratum fields (present on `candidate` entries) ---
-  /** Wine color, when recorded. */
-  wineColor?: CorpusWineColor;
-  /** Acquisition stratum for a candidate. */
+  // --- Inventory-stratum fields ---
+  // Common to the three inventory roles (`candidate`,
+  // `wine_multi_artifact_candidate`, `category_sentinel`); absent on curated
+  // roles. Presence is enforced per role in the schema.
+  /** Acquisition stratum. */
   sourceStratum?: CorpusSourceStratum;
-  /** Independence class for a candidate. */
+  /** Independence class. */
   independence?: CorpusIndependence;
   /** Bounded measurement-eligibility markers. */
   measurementEligibility?: CorpusMeasurementEligibility[];
@@ -241,12 +277,20 @@ export interface CorpusEntry {
   annotationStatus?: CorpusAnnotationStatus;
   /** Evaluation-split assignment. */
   splitStatus?: CorpusSplitStatus;
-  /** Whether this record has been mapped as a multi-panel (front/back) example. */
-  multiPanelStatus?: CorpusMappingStatus;
-  /** Whether this record has been mapped as a decimal-comma alcohol example. */
-  decimalCommaStatus?: CorpusMappingStatus;
   /** Ingestion date (YYYY-MM-DD), when recorded. */
   acquisitionDate?: string;
+
+  // Approved-wine-110 `candidate` only:
+  /** Wine color (single-label approved-wine candidates only). */
+  wineColor?: CorpusWineColor;
+  /** Multi-panel mapping lifecycle (approved-wine candidates only). */
+  multiPanelStatus?: CorpusMappingStatus;
+  /** Decimal-comma mapping lifecycle (approved-wine candidates only). */
+  decimalCommaStatus?: CorpusMappingStatus;
+
+  // `category_sentinel` only:
+  /** The out-of-scope non-wine class this sentinel represents. */
+  sentinelCategory?: CorpusSentinelCategory;
 }
 
 export interface FixtureCorpusIndex {
