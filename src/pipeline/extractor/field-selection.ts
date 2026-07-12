@@ -55,6 +55,44 @@ interface Candidate {
 export interface FieldSelection {
   observation: AnalyzerFieldObservation;
   sourceRegion: string | null;
+  brandDiagnostics?: BrandSelectionDiagnostics;
+}
+
+export const BRAND_ABSTENTION_REASONS = [
+  "no-brand-region-text",
+  "unsupported-candidates-only",
+] as const;
+export type BrandAbstentionReason = (typeof BRAND_ABSTENTION_REASONS)[number];
+
+export const BRAND_LINE_REASONS = [
+  "no-letters-or-too-short",
+  "producer-line",
+  "non-brand-keyword",
+  "too-many-words",
+  "domain-like",
+  "varietal-or-designation",
+  "generic-product-language",
+  "location-or-appellation",
+  "low-information-fragment",
+  "sentence-fragment",
+  "candidate-positive",
+  "candidate-plausible",
+] as const;
+export type BrandLineReason = (typeof BRAND_LINE_REASONS)[number];
+
+export interface BrandLineDiagnostic {
+  rawText: string;
+  cleanedValue: string | null;
+  confidence: number;
+  prominence: number;
+  regionName: string;
+  kept: boolean;
+  reason: BrandLineReason;
+}
+
+export interface BrandSelectionDiagnostics {
+  lines: BrandLineDiagnostic[];
+  abstentionReason?: BrandAbstentionReason;
 }
 
 /** Normalized comparison key; used to decide if two candidates materially differ. */
@@ -217,13 +255,97 @@ export function selectAlcoholObservation(results: RegionOcrResult[]): FieldSelec
 const PRODUCER_WORD = /^(?:produced|bottled|made|vinted|cellared|grown|packed|blended)$/i;
 /** Non-brand mandatory/regulatory or measurement wording that cannot be a brand. */
 const NON_BRAND_LINE =
-  /\b(?:alcohol|alc|vol|volume|proof|government|warning|surgeon|general|pregnancy|contains|sulfites|net|contents|ml|milliliters?|liters?|litres?|imported|distributed|appellation)\b/i;
+  /\b(?:alcohol|alc|vol|volume|proof|government|warning|surgeon|general|pregnancy|contains|sulfites|net|contents|ml|milliliters?|liters?|litres?|imported|distributed|appellation|produced|bottled|cellared|grown|vinted|blended|packed|owned|operated|health|problems?|alcoholic|beverages?|consumption|impairs?|machinery|defects?|drink|women|should)\b/i;
 /** The brand appears on the front-label artwork region, not the mandatory strip. */
 const BRAND_REGION = "full-image";
 /** Two candidates whose text height is within this ratio compete as ambiguous. */
 const BRAND_PROMINENCE_RATIO = 0.8;
 /** A brand mark is short; longer lines are prose/back-label copy, not a brand. */
 const MAX_BRAND_WORDS = 4;
+
+/**
+ * Negative-only vocabulary for generic wine/product wording. Used solely to
+ * withhold unsupported brand evidence; never to emit any new field.
+ */
+const GENERIC_PRODUCT_TOKEN = new Set([
+  "american",
+  "blanco",
+  "bianco",
+  "concord",
+  "cupatge",
+  "dry",
+  "elaborat",
+  "embotellat",
+  "espanya",
+  "gialla",
+  "gruner",
+  "grape",
+  "italy",
+  "of",
+  "per",
+  "product",
+  "producte",
+  "ribolla",
+  "spain",
+  "veltliner",
+  "variedades",
+  "vi",
+  "vino",
+]);
+
+/**
+ * Bounded location/appellation phrases observed in the corpus that repeatedly
+ * surfaced as false brand candidates. This set only blocks unsupported brand
+ * evidence; it never manufactures one.
+ */
+const LOCATION_OR_APPELLATION_PHRASE = new Set([
+  "boca raton",
+  "delle venezie",
+  "delray beach fl",
+  "delray beach",
+  "livermore valley",
+  "napa valley",
+  "producte d'espanya",
+]);
+
+/** Connector words may be lowercase in a genuine brand line. */
+const BRAND_CONNECTOR = new Set([
+  "a",
+  "an",
+  "and",
+  "d",
+  "de",
+  "del",
+  "des",
+  "di",
+  "du",
+  "et",
+  "l",
+  "la",
+  "le",
+  "les",
+  "of",
+  "the",
+]);
+
+const COMPACT_NON_BRAND_KEYWORD = [
+  "according",
+  "alcoholic",
+  "beverages",
+  "consumption",
+  "defects",
+  "government",
+  "health",
+  "impairs",
+  "machinery",
+  "operate",
+  "pregn",
+  "pregnancy",
+  "problems",
+  "surgeon",
+  "warning",
+  "women",
+] as const;
 
 /**
  * Conservative brand-line classification:
@@ -323,6 +445,15 @@ function isPurelyVarietalOrDesignation(value: string): boolean {
   return alpha.length > 0 && alpha.every((t) => VARIETAL_OR_DESIGNATION.has(t));
 }
 
+/** A line composed only of generic wine/product wording is not a brand. */
+function isGenericProductLanguage(value: string): boolean {
+  const alpha = brandTokens(value).filter((t) => /[a-z]/.test(t));
+  return (
+    alpha.length > 0 &&
+    alpha.every((t) => VARIETAL_OR_DESIGNATION.has(t) || GENERIC_PRODUCT_TOKEN.has(t))
+  );
+}
+
 /** An explicit positive brand signal: a possessive mark or a brand designator. */
 function hasPositiveBrandSignal(value: string): boolean {
   if (/[a-z]['’]s\b/i.test(value)) return true;
@@ -333,6 +464,7 @@ function hasPositiveBrandSignal(value: string): boolean {
 function classifyBrandLine(value: string): BrandClass {
   if (isDomainLike(value)) return "excluded";
   if (isPurelyVarietalOrDesignation(value)) return "excluded";
+  if (isGenericProductLanguage(value)) return "excluded";
   if (hasPositiveBrandSignal(value)) return "positive";
   return "plausible";
 }
@@ -344,42 +476,158 @@ function isProducerLine(line: OcrWord[]): boolean {
   return hasProducerWord && hasBy;
 }
 
+function cleanedBrandValue(rawText: string): string {
+  return rawText
+    .replace(/[^A-Za-z0-9 .&'-]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function endsWithSentencePunctuation(rawText: string): boolean {
+  return /[.,;:!?]\s*$/.test(rawText.trim());
+}
+
+function isLowInformationFragment(value: string): boolean {
+  const alpha = brandTokens(value).filter((t) => /[a-z]/.test(t));
+  if (alpha.length === 0) return true;
+  const compact = alpha.join("");
+  return compact.length < 4 || alpha.every((t) => t.length <= 2);
+}
+
+function isLocationOrAppellationLike(value: string): boolean {
+  if (LOCATION_OR_APPELLATION_PHRASE.has(foldPhrase(value))) return true;
+  const alpha = brandTokens(value).filter((t) => /[a-z]/.test(t));
+  if (alpha.length < 2) return false;
+  const trailingCountry = new Set([
+    "argentina",
+    "austria",
+    "chile",
+    "france",
+    "italy",
+    "italia",
+    "spain",
+  ]);
+  return trailingCountry.has(alpha.at(-1)!) && /[-,]/.test(value);
+}
+
+function isSentenceFragment(rawText: string, value: string): boolean {
+  if (endsWithSentencePunctuation(rawText) && !hasPositiveBrandSignal(value)) return true;
+  const alphaWords = rawText
+    .split(/\s+/)
+    .map((word) => word.replace(/[^A-Za-z'-]/g, ""))
+    .filter((word) => word.length > 0);
+  if (alphaWords.length === 0) return false;
+  const lowercaseContentWords = alphaWords.filter((word) => {
+    const lower = word.toLowerCase();
+    return word === lower && !BRAND_CONNECTOR.has(lower);
+  });
+  if (alphaWords[0] === alphaWords[0].toLowerCase() && lowercaseContentWords.length >= 1) {
+    return true;
+  }
+  return lowercaseContentWords.length >= 2 && !hasPositiveBrandSignal(value);
+}
+
+function hasNonBrandKeyword(rawText: string, value: string): boolean {
+  if (NON_BRAND_LINE.test(rawText)) return true;
+  const compact = value.toLowerCase().replace(/[^a-z]/g, "");
+  return COMPACT_NON_BRAND_KEYWORD.some((keyword) => compact.includes(keyword));
+}
+
+function foldPhrase(value: string): string {
+  return value.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+interface BrandLineAnalysis {
+  candidate?: Candidate;
+  diagnostic: BrandLineDiagnostic;
+}
+
+function analyzeBrandLine(line: OcrWord[], result: RegionOcrResult): BrandLineAnalysis {
+  const rawText = line.map((w) => w.text).join(" ");
+  const value = cleanedBrandValue(rawText);
+  const geometry = geometryFor(line, result);
+  const confidence = aggregateConfidence(line);
+  const base = {
+    rawText,
+    cleanedValue: value.length > 0 ? value : null,
+    confidence,
+    prominence: geometry.height,
+    regionName: result.regionName,
+  };
+
+  if (isProducerLine(line)) {
+    return { diagnostic: { ...base, kept: false, reason: "producer-line" } };
+  }
+  if (value.length < 2 || !/[a-z]/i.test(value)) {
+    return { diagnostic: { ...base, kept: false, reason: "no-letters-or-too-short" } };
+  }
+  if (hasNonBrandKeyword(rawText, value)) {
+    return { diagnostic: { ...base, kept: false, reason: "non-brand-keyword" } };
+  }
+  if (value.split(" ").length > MAX_BRAND_WORDS) {
+    return { diagnostic: { ...base, kept: false, reason: "too-many-words" } };
+  }
+  if (isDomainLike(value)) {
+    return { diagnostic: { ...base, kept: false, reason: "domain-like" } };
+  }
+  if (isPurelyVarietalOrDesignation(value)) {
+    return { diagnostic: { ...base, kept: false, reason: "varietal-or-designation" } };
+  }
+  if (isGenericProductLanguage(value)) {
+    return { diagnostic: { ...base, kept: false, reason: "generic-product-language" } };
+  }
+  if (isLocationOrAppellationLike(value)) {
+    return { diagnostic: { ...base, kept: false, reason: "location-or-appellation" } };
+  }
+  if (isLowInformationFragment(value)) {
+    return { diagnostic: { ...base, kept: false, reason: "low-information-fragment" } };
+  }
+  if (isSentenceFragment(rawText, value)) {
+    return { diagnostic: { ...base, kept: false, reason: "sentence-fragment" } };
+  }
+
+  const brandClass = classifyBrandLine(value);
+  const candidate: Candidate = {
+    value,
+    rawText,
+    confidence,
+    geometry,
+    words: line,
+    regionName: result.regionName,
+    prominence: geometry.height,
+    brandClass,
+  };
+  return {
+    candidate,
+    diagnostic: {
+      ...base,
+      kept: true,
+      reason: brandClass === "positive" ? "candidate-positive" : "candidate-plausible",
+    },
+  };
+}
+
 export function selectBrandObservation(results: RegionOcrResult[]): FieldSelection {
   const candidates: Candidate[] = [];
+  const diagnostics: BrandLineDiagnostic[] = [];
+  let sawBrandRegionText = false;
   for (const result of results) {
     // Brand presentation lives on the front-label artwork, never the mandatory
     // vertical strip; restricting the region keeps regulatory text out of brand.
     if (result.regionName !== BRAND_REGION) continue;
+    if (result.words.length > 0) sawBrandRegionText = true;
     for (const line of lines(result.words)) {
-      if (isProducerLine(line)) continue;
-      const rawText = line.map((w) => w.text).join(" ");
-      if (NON_BRAND_LINE.test(rawText)) continue;
-      const value = rawText
-        .replace(/[^A-Za-z0-9 .&'-]/g, "")
-        .replace(/\s+/g, " ")
-        .trim();
-      // Require at least one real letter so vintages/measurements are not brands.
-      if (value.length < 2 || !/[a-z]/i.test(value)) continue;
-      // A brand mark is short; longer lines are back-label prose, not a brand.
-      if (value.split(" ").length > MAX_BRAND_WORDS) continue;
-      // Positively-not-brand lines (domain syntax, pure varietal/designation)
-      // are never selectable brand evidence, not even as alternates.
-      const brandClass = classifyBrandLine(value);
-      if (brandClass === "excluded") continue;
-      const geometry = geometryFor(line, result);
-      candidates.push({
-        value,
-        rawText,
-        confidence: aggregateConfidence(line),
-        geometry,
-        words: line,
-        regionName: result.regionName,
-        prominence: geometry.height,
-        brandClass,
-      });
+      const analysis = analyzeBrandLine(line, result);
+      diagnostics.push(analysis.diagnostic);
+      if (analysis.candidate) candidates.push(analysis.candidate);
     }
   }
-  return dedupeBy(candidates, buildBrandObservation);
+  return dedupeBy(candidates, (deduped) =>
+    buildBrandObservation(deduped, {
+      lines: diagnostics,
+      abstentionReason: sawBrandRegionText ? "unsupported-candidates-only" : "no-brand-region-text",
+    }),
+  );
 }
 
 /**
@@ -387,11 +635,15 @@ export function selectBrandObservation(results: RegionOcrResult[]): FieldSelecti
  * wins), then confidence. Two non-corroborating candidates of comparable
  * prominence are AMBIGUOUS rather than a silent pick; none is NOT_OBSERVED.
  */
-function buildBrandObservation(candidates: Candidate[]): FieldSelection {
+function buildBrandObservation(
+  candidates: Candidate[],
+  diagnostics: BrandSelectionDiagnostics,
+): FieldSelection {
   if (candidates.length === 0) {
     return {
       observation: { state: "NOT_OBSERVED", value: null, confidence: 0, alternates: [] },
       sourceRegion: null,
+      brandDiagnostics: diagnostics,
     };
   }
 
@@ -432,6 +684,7 @@ function buildBrandObservation(candidates: Candidate[]): FieldSelection {
         ambiguityReason: "competing_candidates",
       },
       sourceRegion: best.regionName,
+      brandDiagnostics: diagnostics,
     };
   }
 
@@ -460,6 +713,7 @@ function buildBrandObservation(candidates: Candidate[]): FieldSelection {
         ambiguityReason: "single_unconfirmed_candidate",
       },
       sourceRegion: best.regionName,
+      brandDiagnostics: diagnostics,
     };
   }
 
@@ -474,6 +728,7 @@ function buildBrandObservation(candidates: Candidate[]): FieldSelection {
       alternates: ranked.slice(1).map(alternateFrom),
     },
     sourceRegion: best.regionName,
+    brandDiagnostics: diagnostics,
   };
 }
 

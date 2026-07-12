@@ -416,7 +416,7 @@
         "alcoholLines": []
       },
       "expectations": {
-        "brandStateAllowed": ["AMBIGUOUS"],
+        "brandStateAllowed": ["NOT_OBSERVED"],
         "alcoholStateAllowed": ["NOT_OBSERVED"],
         "alcoholParsedValue": null,
         "requiredAlcoholTokens": [],

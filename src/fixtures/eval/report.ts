@@ -252,6 +252,14 @@ function classSummary(counts: Record<EvalFailureClass, number>): string {
   return entries.length === 0 ? "—" : entries.map(([k, n]) => `${k}: ${n}`).join(", ");
 }
 
+function removedCandidateSummary(c: CaseReport): string {
+  const removed = c.diagnostics.brandLineDecisions
+    .filter((line) => !line.kept && line.cleanedValue)
+    .slice(0, 4)
+    .map((line) => `"${line.cleanedValue}" [${line.reason}]`);
+  return removed.length === 0 ? "—" : removed.join(", ");
+}
+
 export function renderMarkdown(report: EvalReport): string {
   const a = report.aggregate;
   const lines: string[] = [];
@@ -298,7 +306,13 @@ export function renderMarkdown(report: EvalReport): string {
     `| Determinate false-certainty rate | ${pct(a.brandFalseCertaintyRate)} | ${a.determinateBrandCount} determinate |`,
   );
   lines.push(
+    `| False abstention rate | ${pct(a.brandFalseAbstentionRate)} | ${a.determinateBrandCount} determinate |`,
+  );
+  lines.push(
     `| Determinate NOT_OBSERVED rate | ${pct(a.brandNotObservedRate)} | ${a.determinateBrandCount} determinate |`,
+  );
+  lines.push(
+    `| Correct abstention rate | ${pct(a.brandCorrectAbstentionRate)} | ${a.absentBrandCount} absent |`,
   );
   lines.push(
     `| Genuine ambiguity honesty | ${pct(a.ambiguityHonestyRate)} | ${a.ambiguousBrandCount} ambiguous |`,
@@ -360,6 +374,16 @@ export function renderMarkdown(report: EvalReport): string {
   lines.push("");
   lines.push(`| Median latency | ${a.medianLatencyMs.toFixed(0)} ms | ${a.caseCount} cases |`);
   lines.push(`| p95 latency | ${a.p95LatencyMs.toFixed(0)} ms | ${a.caseCount} cases |`);
+  lines.push("");
+  lines.push("## Brand abstentions");
+  lines.push("");
+  lines.push("| Case | Truth | Abstention reason | Removed candidates |");
+  lines.push("| --- | --- | --- | --- |");
+  for (const c of report.cases.filter((c) => c.brand.state === "NOT_OBSERVED")) {
+    lines.push(
+      `| ${c.caseId} | ${c.brand.present ? "present" : "absent"} | ${c.diagnostics.brandAbstentionReason ?? "—"} | ${removedCandidateSummary(c)} |`,
+    );
+  }
   lines.push("");
   lines.push("## Per-case results");
   lines.push("");
