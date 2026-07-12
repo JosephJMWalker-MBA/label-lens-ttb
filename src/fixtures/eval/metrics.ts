@@ -37,8 +37,20 @@ export interface AlcoholDiagnostics {
   numberInOcr: boolean;
   /** A "%" token appears somewhere in the OCR text. */
   percentInOcr: boolean;
-  /** The number and a "%" were recognized on the same reconstructed line. */
-  numberAndPercentSameLine: boolean;
+  /** An explicit alcohol marker (ALC/ALCOHOL) appears somewhere in OCR. */
+  alcoholMarkerInOcr: boolean;
+  /** An explicit volume marker (VOL/BY VOL/ALC/VOL) appears somewhere in OCR. */
+  volumeMarkerInOcr: boolean;
+  /** A bounded same-line alcohol-like window was generated from OCR tokens. */
+  sameLineEvidenceCluster: boolean;
+  /** A bounded adjacent-line alcohol-like window was generated from OCR tokens. */
+  adjacentLineEvidenceCluster: boolean;
+  /** At least one alcohol-like candidate was assembled then rejected pre-parser. */
+  filterRejectedCandidate: boolean;
+  /** At least one normalized candidate reached the parser and still failed. */
+  parserRejectedCandidate: boolean;
+  /** At least one supported alcohol candidate survived selection. */
+  candidateAccepted: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -195,11 +207,16 @@ export function classifyAlcohol(
       : "parser-failure";
   }
 
+  if (diag.parserRejectedCandidate) return "parser-failure";
+  if (diag.filterRejectedCandidate) return "candidate-filtering-failure";
+  if (diag.adjacentLineEvidenceCluster) return "line-reconstruction-failure";
+  if (diag.sameLineEvidenceCluster || diag.candidateAccepted) return "candidate-generation-failure";
+
   // Present on the label but NOT_OBSERVED: locate where detection was lost.
   if (!diag.numberInOcr) return "ocr-recognition-failure";
-  if (diag.percentInOcr && !diag.numberAndPercentSameLine) return "line-reconstruction-failure";
-  // Number recognized (with "%" absent or on the same line as a separate token),
-  // yet no candidate formed — the digit-and-"%"-in-one-token gate rejected it.
+  if (!diag.percentInOcr && !diag.alcoholMarkerInOcr && !diag.volumeMarkerInOcr) {
+    return "ocr-recognition-failure";
+  }
   return "candidate-generation-failure";
 }
 

@@ -64,6 +64,7 @@ export interface FieldSelection {
   observation: AnalyzerFieldObservation;
   sourceRegion: string | null;
   brandDiagnostics?: BrandSelectionDiagnostics;
+  alcoholDiagnostics?: AlcoholSelectionDiagnostics;
 }
 
 export const BRAND_ABSTENTION_REASONS = [
@@ -143,6 +144,85 @@ export interface BrandSelectionDiagnostics {
   abstentionReason?: BrandAbstentionReason;
 }
 
+export const ALCOHOL_ABSTENTION_REASONS = [
+  "no-alcohol-like-text",
+  "unsupported-candidates-only",
+] as const;
+export type AlcoholAbstentionReason = (typeof ALCOHOL_ABSTENTION_REASONS)[number];
+
+export const ALCOHOL_CANDIDATE_ASSEMBLIES = ["same-line-window", "adjacent-line-window"] as const;
+export type AlcoholCandidateAssembly = (typeof ALCOHOL_CANDIDATE_ASSEMBLIES)[number];
+
+export const ALCOHOL_CANDIDATE_DECISIONS = ["selected", "alternate", "ambiguous-rival"] as const;
+export type AlcoholCandidateDecision = (typeof ALCOHOL_CANDIDATE_DECISIONS)[number];
+
+export const ALCOHOL_ACCEPTANCE_REASONS = [
+  "explicit-percent-by-volume",
+  "explicit-percent-alc-vol",
+  "explicit-percentless-alcohol-by-volume",
+] as const;
+export type AlcoholAcceptanceReason = (typeof ALCOHOL_ACCEPTANCE_REASONS)[number];
+
+export const ALCOHOL_NORMALIZATION_OPERATIONS = [
+  "comma-decimal",
+  "split-decimal-merge",
+  "implicit-decimal-recovery",
+  "ocr-zero-normalized",
+  "ocr-one-normalized",
+  "marker-ocr-normalized",
+  "split-fused-alcohol-prefix",
+  "split-percent-by",
+  "split-byvol",
+  "collapse-marker-slash",
+  "percent-before-number-reordered",
+] as const;
+export type AlcoholNormalizationOperation = (typeof ALCOHOL_NORMALIZATION_OPERATIONS)[number];
+
+export const ALCOHOL_REJECTION_REASONS = [
+  "proof-only",
+  "no-supported-number",
+  "missing-volume-marker",
+  "missing-explicit-alcohol-marker",
+  "bare-volume-marker-too-weak",
+  "unsupported-pattern",
+  "parser-rejected",
+] as const;
+export type AlcoholRejectionReason = (typeof ALCOHOL_REJECTION_REASONS)[number];
+
+export interface AlcoholCandidateDiagnostic {
+  rawText: string;
+  normalizedValue: string | null;
+  normalizedParsingText: string | null;
+  confidence: number;
+  prominence: number;
+  regionName: string;
+  assembly: AlcoholCandidateAssembly;
+  lineIndexes: number[];
+  sourceTokens: string[];
+  sourceBoxes: { x0: number; y0: number; x1: number; y1: number }[];
+  kept: boolean;
+  acceptanceReason?: AlcoholAcceptanceReason;
+  positiveMarkers: string[];
+  normalizationOperations: AlcoholNormalizationOperation[];
+  parsedPercent: number | null;
+  rejectionReason?: AlcoholRejectionReason;
+  decision?: AlcoholCandidateDecision;
+}
+
+export interface AlcoholSelectionDiagnostics {
+  candidates: AlcoholCandidateDiagnostic[];
+  abstentionReason?: AlcoholAbstentionReason;
+  numberInOcr: boolean;
+  percentInOcr: boolean;
+  alcoholMarkerInOcr: boolean;
+  volumeMarkerInOcr: boolean;
+  sameLineEvidenceCluster: boolean;
+  adjacentLineEvidenceCluster: boolean;
+  filterRejectedCandidate: boolean;
+  parserRejectedCandidate: boolean;
+  candidateAccepted: boolean;
+}
+
 /** Normalized comparison key; used to decide if two candidates materially differ. */
 function key(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -185,34 +265,565 @@ function geometryFor(words: OcrWord[], result: RegionOcrResult): EvidenceGeometr
   return unionGeometry(words.map((w) => mapBoxToOriginalGeometry(w.bbox, result.transform)));
 }
 
-/**
- * Rank candidates and build an observation. A single clear candidate is
- * OBSERVED (or LOW_CONFIDENCE when weak); two materially different candidates of
- * comparable confidence are AMBIGUOUS with ordered alternates; no candidate over
- * processed regions is NOT_OBSERVED.
- */
-function buildObservation(
+function alternateFrom(c: Candidate): AnalyzerAlternate {
+  return { value: c.value, confidence: c.confidence, geometry: c.geometry };
+}
+
+// ---------------------------------------------------------------------------
+// Alcohol statement: assemble bounded OCR windows into explicit alcohol-by-
+// volume candidates. This supports split percent markers, adjacent-line
+// assembly, percent-less "ALCOHOL 14 BY VOLUME" wording, and narrow OCR
+// normalization (e.g. V0L, comma decimals, fused ALC135%) without using any
+// declared/application value.
+// ---------------------------------------------------------------------------
+
+const MAX_ALCOHOL_WINDOW_WORDS = 7;
+const MAX_ALCOHOL_ADJACENT_LINE_GAP_RATIO = 1.8;
+const MAX_ALCOHOL_ADJACENT_CENTER_OFFSET = 0.9;
+
+interface AlcoholCandidateDiagnosticInternal extends AlcoholCandidateDiagnostic {
+  id: string;
+}
+
+interface AlcoholSelectionDiagnosticsInternal {
+  candidates: AlcoholCandidateDiagnosticInternal[];
+  abstentionReason: AlcoholAbstentionReason;
+  numberInOcr: boolean;
+  percentInOcr: boolean;
+  alcoholMarkerInOcr: boolean;
+  volumeMarkerInOcr: boolean;
+  sameLineEvidenceCluster: boolean;
+  adjacentLineEvidenceCluster: boolean;
+  filterRejectedCandidate: boolean;
+  parserRejectedCandidate: boolean;
+  candidateAccepted: boolean;
+}
+
+interface AlcoholWindow {
+  id: string;
+  words: OcrWord[];
+  result: RegionOcrResult;
+  assembly: AlcoholCandidateAssembly;
+  lineIndexes: number[];
+}
+
+interface AlcoholMatch {
+  normalizedText: string;
+  normalizedValue: string;
+  parsedPercent: number | null;
+  acceptanceReason: AlcoholAcceptanceReason;
+  positiveMarkers: string[];
+  normalizationOperations: AlcoholNormalizationOperation[];
+}
+
+const ALCOHOL_NUMBER = String.raw`([0-9oOil]{1,4}(?:\.[0-9oOil]{1,2})?)`;
+const ALCOHOL_RANGE = String.raw`([0-9oOil]{1,4}(?:\.[0-9oOil]{1,2})?)\s*%?\s*(?:to|through|-|–|—)\s*([0-9oOil]{1,4}(?:\.[0-9oOil]{1,2})?)\s*%`;
+const BY_VOLUME_RE = new RegExp(`^${ALCOHOL_NUMBER}\\s*%\\s+by\\s+vol(?:ume)?\\.?$`);
+const ALC_BY_VOLUME_RE = new RegExp(
+  `^(?:alcohol|alc\\.?)\\s+${ALCOHOL_NUMBER}\\s*%\\s+by\\s+vol(?:ume)?\\.?$`,
+);
+const REORDERED_PERCENT_RE = new RegExp(
+  `^(?:alcohol|alc\\.?)\\s+%\\s+${ALCOHOL_NUMBER}\\s+by\\s+vol(?:ume)?\\.?$`,
+);
+const ALC_SLASH_VOL_RE = new RegExp(
+  `^${ALCOHOL_NUMBER}\\s*%\\s+alc\\.?\\s*(?:\\/|by)\\s*vol(?:ume)?\\.?$`,
+);
+const PREFIX_ALC_VOL_RE = new RegExp(
+  `^(?:alcohol|alc\\.?)\\s+${ALCOHOL_NUMBER}\\s*%\\s+vol(?:ume)?\\.?$`,
+);
+const PERCENTLESS_BY_VOLUME_RE = new RegExp(
+  `^(?:alcohol|alc\\.?)\\s+${ALCOHOL_NUMBER}\\s+by\\s+vol(?:ume)?\\.?$`,
+);
+const PERCENTLESS_BARE_VOL_RE = new RegExp(
+  `^(?:alcohol|alc\\.?)\\s+${ALCOHOL_NUMBER}\\s+vol(?:ume)?\\.?$`,
+);
+const RANGE_BY_VOLUME_RE = new RegExp(`^${ALCOHOL_RANGE}\\s+by\\s+vol(?:ume)?\\.?$`);
+const RANGE_ALC_BY_VOLUME_RE = new RegExp(
+  `^(?:alcohol|alc\\.?)\\s+${ALCOHOL_RANGE}\\s+by\\s+vol(?:ume)?\\.?$`,
+);
+
+function pushUniqueOp(
+  ops: AlcoholNormalizationOperation[],
+  op: AlcoholNormalizationOperation,
+): AlcoholNormalizationOperation[] {
+  if (!ops.includes(op)) ops.push(op);
+  return ops;
+}
+
+function alcoholMarkerToken(text: string): boolean {
+  return /\b(?:alcohol|a[l1i]c)(?=\b|\d)/i.test(text);
+}
+
+function alcoholVolumeToken(text: string): boolean {
+  return (
+    /\b(?:by\s*)?v[o0][l1i](?:ume)?\b/i.test(text) ||
+    /\ba[l1i]c[./]*\s*\/\s*v[o0][l1i]/i.test(text) ||
+    /\ba[l1i]c[./]*v[o0][l1i]/i.test(text)
+  );
+}
+
+function alcoholProofToken(text: string): boolean {
+  return /\bproof\b/i.test(text);
+}
+
+function alcoholHasDigits(text: string): boolean {
+  return /\d/.test(text);
+}
+
+function alcoholSignalWindow(words: OcrWord[]): boolean {
+  const text = words.map((word) => word.text).join(" ");
+  const hasNumber = words.some((word) => alcoholHasDigits(word.text));
+  const hasMarker =
+    text.includes("%") ||
+    alcoholMarkerToken(text) ||
+    alcoholVolumeToken(text) ||
+    alcoholProofToken(text);
+  return hasNumber && hasMarker;
+}
+
+function lineCenterY(words: OcrWord[]): number {
+  const top = Math.min(...words.map((word) => word.bbox.y0));
+  const bottom = Math.max(...words.map((word) => word.bbox.y1));
+  return (top + bottom) / 2;
+}
+
+function lineHeight(words: OcrWord[]): number {
+  return Math.max(
+    1,
+    Math.max(...words.map((word) => word.bbox.y1)) - Math.min(...words.map((word) => word.bbox.y0)),
+  );
+}
+
+function lineCenterX(words: OcrWord[]): number {
+  const left = Math.min(...words.map((word) => word.bbox.x0));
+  const right = Math.max(...words.map((word) => word.bbox.x1));
+  return (left + right) / 2;
+}
+
+function canMergeAlcoholLines(upper: OcrWord[], lower: OcrWord[]): boolean {
+  const gap = Math.max(
+    0,
+    Math.min(...lower.map((word) => word.bbox.y0)) - Math.max(...upper.map((word) => word.bbox.y1)),
+  );
+  const averageHeight = (lineHeight(upper) + lineHeight(lower)) / 2;
+  const centerOffset =
+    Math.abs(lineCenterX(upper) - lineCenterX(lower)) / Math.max(1, averageHeight * 6);
+  return (
+    gap <= averageHeight * MAX_ALCOHOL_ADJACENT_LINE_GAP_RATIO &&
+    centerOffset <= MAX_ALCOHOL_ADJACENT_CENTER_OFFSET
+  );
+}
+
+function canonicalizeAlcoholWindowText(rawText: string): {
+  text: string;
+  ops: AlcoholNormalizationOperation[];
+} {
+  let text = rawText.normalize("NFC").toLowerCase().replace(/\s+/g, " ").trim();
+  const ops: AlcoholNormalizationOperation[] = [];
+  const apply = (next: string, op: AlcoholNormalizationOperation) => {
+    if (next !== text) {
+      text = next;
+      pushUniqueOp(ops, op);
+    }
+  };
+
+  apply(text.replace(/\ba[1il]c(?=[0-9oOil])/g, "alc "), "split-fused-alcohol-prefix");
+  apply(text.replace(/\ba[1il]c(?=\b|\d)/g, "alc"), "marker-ocr-normalized");
+  apply(text.replace(/\bv[o0][l1i]ume\b/g, "volume"), "marker-ocr-normalized");
+  apply(text.replace(/\bv[o0][l1i]\b/g, "vol"), "marker-ocr-normalized");
+  apply(text.replace(/%\s*by\b/g, "% by"), "split-percent-by");
+  apply(
+    text.replace(/\bbyvol(?:ume)?\b/g, (value) => (value.includes("ume") ? "by volume" : "by vol")),
+    "split-byvol",
+  );
+  apply(
+    text.replace(/\balc\s*[.]*\s*\/\s*vol(?:ume)?\.?\b/g, "alc / vol"),
+    "collapse-marker-slash",
+  );
+
+  const commaOrSplitDecimal = /(\d{1,3})\s*,\s*(\d{1,2})/g;
+  if (commaOrSplitDecimal.test(text)) {
+    text = text.replace(commaOrSplitDecimal, "$1.$2");
+    pushUniqueOp(ops, "comma-decimal");
+    pushUniqueOp(ops, "split-decimal-merge");
+  }
+
+  const splitDotDecimal = /(\d{1,3})\s*\.\s*(\d{1,2})/g;
+  if (splitDotDecimal.test(text)) {
+    text = text.replace(splitDotDecimal, "$1.$2");
+    pushUniqueOp(ops, "split-decimal-merge");
+  }
+
+  text = text.replace(/\s+/g, " ").trim();
+  return { text, ops };
+}
+
+function canonicalizeAlcoholNumber(
+  rawNumber: string,
+  allowImplicitDecimal: boolean,
+): { value: string | null; ops: AlcoholNormalizationOperation[] } {
+  if (!/^[0-9oOil.,]+$/i.test(rawNumber.trim())) return { value: null, ops: [] };
+
+  let value = rawNumber.trim();
+  const ops: AlcoholNormalizationOperation[] = [];
+
+  if (/[o]/i.test(value)) {
+    value = value.replace(/[o]/gi, "0");
+    pushUniqueOp(ops, "ocr-zero-normalized");
+  }
+  if (/[il]/i.test(value)) {
+    value = value.replace(/[il]/gi, "1");
+    pushUniqueOp(ops, "ocr-one-normalized");
+  }
+  if (value.includes(",")) {
+    value = value.replace(/,/g, ".");
+    pushUniqueOp(ops, "comma-decimal");
+  }
+
+  if (/^\d{1,2}(?:\.\d{1,2})?$/.test(value)) return { value, ops };
+  if (allowImplicitDecimal && /^\d{3}$/.test(value)) {
+    value = `${value.slice(0, -1)}.${value.slice(-1)}`;
+    pushUniqueOp(ops, "implicit-decimal-recovery");
+    return { value, ops };
+  }
+
+  return { value: null, ops: [] };
+}
+
+function alcoholParsedPercent(normalizedText: string): number | null {
+  const parsed = parseWineAlcoholStatement(normalizedText);
+  if (parsed.kind === "direct") return parsed.basisPoints / 100;
+  if (parsed.kind === "range") return parsed.lowerBasisPoints / 100;
+  return null;
+}
+
+function alcoholSemanticKey(value: string): string {
+  const parsed = parseWineAlcoholStatement(value);
+  if (parsed.kind === "direct") return `direct:${parsed.basisPoints}`;
+  if (parsed.kind === "range") {
+    return `range:${parsed.lowerBasisPoints}-${parsed.upperBasisPoints}`;
+  }
+  return key(value);
+}
+
+function alcoholCorroborates(a: string, b: string): boolean {
+  return alcoholSemanticKey(a) === alcoholSemanticKey(b) || corroborates(a, b);
+}
+
+function alcoholCanonicalPreference(candidate: Candidate): number {
+  if (candidate.value.includes("ALC./VOL.")) return 2;
+  if (candidate.value.includes("BY VOL.")) return 1;
+  return 0;
+}
+
+function dedupeAlcoholCandidates(candidates: Candidate[]): Candidate[] {
+  const byKey = new Map<string, Candidate>();
+  for (const candidate of candidates) {
+    const semanticKey = alcoholSemanticKey(candidate.value);
+    const existing = byKey.get(semanticKey);
+    if (!existing) {
+      byKey.set(semanticKey, candidate);
+      continue;
+    }
+    const existingPreference = alcoholCanonicalPreference(existing);
+    const candidatePreference = alcoholCanonicalPreference(candidate);
+    if (
+      candidate.confidence > existing.confidence ||
+      (candidate.confidence === existing.confidence &&
+        (candidatePreference > existingPreference ||
+          (candidatePreference === existingPreference &&
+            key(candidate.value).localeCompare(key(existing.value)) < 0)))
+    ) {
+      byKey.set(semanticKey, candidate);
+    }
+  }
+  return [...byKey.values()];
+}
+
+function alcoholPositiveMarkers(
+  hasPercent: boolean,
+  hasAlcoholMarker: boolean,
+  hasByVolume: boolean,
+  usesAlcVol: boolean,
+): string[] {
+  const markers: string[] = [];
+  if (hasPercent) markers.push("percent");
+  if (hasAlcoholMarker) markers.push("alcohol-marker");
+  if (hasByVolume) markers.push("by-volume-marker");
+  if (usesAlcVol) markers.push("alc-vol-marker");
+  return markers;
+}
+
+function matchAlcoholWindow(rawText: string): AlcoholMatch | { rejection: AlcoholRejectionReason } {
+  const { text, ops } = canonicalizeAlcoholWindowText(rawText);
+  const hasProof = /\bproof\b/.test(text);
+  const hasNumber = /[0-9oOil]/i.test(text);
+  const hasPercent = text.includes("%");
+  const hasAlcohol = /\b(?:alcohol|alc)\b/.test(text);
+  const hasByVolume = /\bby\s+vol(?:ume)?\b/.test(text);
+  const hasAlcVol = /\balc\s*(?:\/|by)\s*vol(?:ume)?\b/.test(text);
+  const hasBareVol = /\bvol(?:ume)?\b/.test(text);
+
+  if (!hasNumber) return { rejection: "no-supported-number" };
+  if (hasProof && !hasByVolume && !hasAlcVol && !hasBareVol) return { rejection: "proof-only" };
+  if (!hasByVolume && !hasAlcVol && !hasBareVol) return { rejection: "missing-volume-marker" };
+
+  const tryMatch = (
+    regex: RegExp,
+    acceptanceReason: AlcoholAcceptanceReason,
+    buildValue: (number: string) => string,
+    options?: {
+      percentBeforeNumber?: boolean;
+      allowImplicitDecimal?: boolean;
+      percentless?: boolean;
+    },
+  ): AlcoholMatch | null => {
+    const match = text.match(regex);
+    if (!match) return null;
+    const number = canonicalizeAlcoholNumber(match[1], options?.allowImplicitDecimal ?? true);
+    if (!number.value) return null;
+    const normalizedOps = [...ops];
+    for (const op of number.ops) pushUniqueOp(normalizedOps, op);
+    if (options?.percentBeforeNumber)
+      pushUniqueOp(normalizedOps, "percent-before-number-reordered");
+    const normalizedText = buildValue(number.value);
+    const parsed = parseWineAlcoholStatement(normalizedText);
+    if (parsed.kind !== "direct" && parsed.kind !== "range") {
+      return {
+        normalizedText,
+        normalizedValue: normalizedText,
+        parsedPercent: null,
+        acceptanceReason,
+        positiveMarkers: [],
+        normalizationOperations: [...normalizedOps, "percent-before-number-reordered"].filter(
+          (value, index, all) =>
+            value !== "percent-before-number-reordered" || all.indexOf(value) === index,
+        ) as AlcoholNormalizationOperation[],
+      };
+    }
+    return {
+      normalizedText,
+      normalizedValue: normalizedText,
+      parsedPercent: alcoholParsedPercent(normalizedText),
+      acceptanceReason,
+      positiveMarkers: alcoholPositiveMarkers(
+        !options?.percentless,
+        acceptanceReason !== "explicit-percent-by-volume" || hasAlcohol,
+        normalizedText.includes("BY VOL"),
+        normalizedText.includes("ALC./VOL."),
+      ),
+      normalizationOperations: normalizedOps,
+    };
+  };
+
+  const tryRangeMatch = (
+    regex: RegExp,
+    acceptanceReason: AlcoholAcceptanceReason,
+  ): AlcoholMatch | null => {
+    const match = text.match(regex);
+    if (!match) return null;
+    const lower = canonicalizeAlcoholNumber(match[1], true);
+    const upper = canonicalizeAlcoholNumber(match[2], true);
+    if (!lower.value || !upper.value) return null;
+    const normalizedOps = [...ops];
+    for (const op of [...lower.ops, ...upper.ops]) pushUniqueOp(normalizedOps, op);
+    const normalizedText = `${lower.value}% - ${upper.value}% BY VOL.`;
+    const parsed = parseWineAlcoholStatement(normalizedText);
+    if (parsed.kind !== "range") return null;
+    return {
+      normalizedText,
+      normalizedValue: normalizedText,
+      parsedPercent: alcoholParsedPercent(normalizedText),
+      acceptanceReason,
+      positiveMarkers: alcoholPositiveMarkers(true, hasAlcohol, true, false),
+      normalizationOperations: normalizedOps,
+    };
+  };
+
+  const byVol =
+    tryRangeMatch(RANGE_ALC_BY_VOLUME_RE, "explicit-percent-by-volume") ??
+    tryRangeMatch(RANGE_BY_VOLUME_RE, "explicit-percent-by-volume") ??
+    tryMatch(BY_VOLUME_RE, "explicit-percent-by-volume", (number) => `${number}% BY VOL.`) ??
+    tryMatch(ALC_BY_VOLUME_RE, "explicit-percent-alc-vol", (number) => `${number}% ALC./VOL.`) ??
+    tryMatch(REORDERED_PERCENT_RE, "explicit-percent-alc-vol", (number) => `${number}% ALC./VOL.`, {
+      percentBeforeNumber: true,
+    }) ??
+    tryMatch(ALC_SLASH_VOL_RE, "explicit-percent-alc-vol", (number) => `${number}% ALC./VOL.`) ??
+    tryMatch(PREFIX_ALC_VOL_RE, "explicit-percent-alc-vol", (number) => `${number}% ALC./VOL.`) ??
+    tryMatch(
+      PERCENTLESS_BY_VOLUME_RE,
+      "explicit-percentless-alcohol-by-volume",
+      (number) => `ALCOHOL ${number} BY VOLUME`,
+      { percentless: true },
+    ) ??
+    tryMatch(
+      PERCENTLESS_BARE_VOL_RE,
+      "explicit-percentless-alcohol-by-volume",
+      (number) => `ALCOHOL ${number} BY VOLUME`,
+      { percentless: true },
+    );
+
+  if (byVol) {
+    const parsed = parseWineAlcoholStatement(byVol.normalizedText);
+    if (parsed.kind === "direct" || parsed.kind === "range") return byVol;
+    return { rejection: parsed.kind === "proof" ? "proof-only" : "parser-rejected" };
+  }
+
+  if (hasProof) return { rejection: "proof-only" };
+  if (!hasPercent && !hasAlcohol) return { rejection: "missing-explicit-alcohol-marker" };
+  if (hasBareVol && !hasByVolume && !hasAlcVol && !hasAlcohol) {
+    return { rejection: "bare-volume-marker-too-weak" };
+  }
+  return { rejection: "unsupported-pattern" };
+}
+
+function analyzeAlcoholWindow(window: AlcoholWindow): {
+  candidate?: Candidate;
+  diagnostic: AlcoholCandidateDiagnosticInternal;
+  filterRejected: boolean;
+  parserRejected: boolean;
+} {
+  const rawText = window.words.map((word) => word.text).join(" ");
+  const geometry = geometryFor(window.words, window.result);
+  const match = matchAlcoholWindow(rawText);
+  const diagnostic: AlcoholCandidateDiagnosticInternal = {
+    id: window.id,
+    rawText,
+    normalizedValue: "normalizedValue" in match ? match.normalizedValue : null,
+    normalizedParsingText: "normalizedText" in match ? match.normalizedText : null,
+    confidence: aggregateConfidence(window.words),
+    prominence: geometry.height,
+    regionName: window.result.regionName,
+    assembly: window.assembly,
+    lineIndexes: window.lineIndexes,
+    sourceTokens: window.words.map((word) => word.text),
+    sourceBoxes: window.words.map((word) => word.bbox),
+    kept: false,
+    acceptanceReason: "acceptanceReason" in match ? match.acceptanceReason : undefined,
+    positiveMarkers: "positiveMarkers" in match ? match.positiveMarkers : [],
+    normalizationOperations:
+      "normalizationOperations" in match ? match.normalizationOperations : [],
+    parsedPercent: "parsedPercent" in match ? match.parsedPercent : null,
+    rejectionReason: "rejection" in match ? match.rejection : undefined,
+  };
+
+  if (!("normalizedText" in match)) {
+    return {
+      diagnostic,
+      filterRejected: match.rejection !== "parser-rejected",
+      parserRejected: match.rejection === "parser-rejected",
+    };
+  }
+
+  diagnostic.kept = true;
+  const candidate: Candidate = {
+    id: window.id,
+    value: match.normalizedValue,
+    rawText,
+    confidence: aggregateConfidence(window.words),
+    geometry,
+    words: window.words,
+    regionName: window.result.regionName,
+    prominence: geometry.height,
+  };
+  return { candidate, diagnostic, filterRejected: false, parserRejected: false };
+}
+
+function alcoholWindowsForWords(
+  words: OcrWord[],
+  result: RegionOcrResult,
+  assembly: AlcoholCandidateAssembly,
+  lineIndexes: number[],
+  nextId: () => string,
+): AlcoholWindow[] {
+  const windows: AlcoholWindow[] = [];
+  for (let start = 0; start < words.length; start++) {
+    for (
+      let end = start + 1;
+      end < Math.min(words.length, start + MAX_ALCOHOL_WINDOW_WORDS);
+      end++
+    ) {
+      const slice = words.slice(start, end + 1);
+      if (!alcoholSignalWindow(slice)) continue;
+      windows.push({
+        id: nextId(),
+        words: slice,
+        result,
+        assembly,
+        lineIndexes,
+      });
+    }
+  }
+  return windows;
+}
+
+function buildAlcoholObservation(
   candidates: Candidate[],
-  toAlternate: (c: Candidate) => AnalyzerAlternate,
+  diagnostics: AlcoholSelectionDiagnosticsInternal,
 ): FieldSelection {
+  const publicDiagnostics = (): AlcoholSelectionDiagnostics => ({
+    candidates: diagnostics.candidates.map((candidate) => ({
+      rawText: candidate.rawText,
+      normalizedValue: candidate.normalizedValue,
+      normalizedParsingText: candidate.normalizedParsingText,
+      confidence: candidate.confidence,
+      prominence: candidate.prominence,
+      regionName: candidate.regionName,
+      assembly: candidate.assembly,
+      lineIndexes: candidate.lineIndexes,
+      sourceTokens: candidate.sourceTokens,
+      sourceBoxes: candidate.sourceBoxes,
+      kept: candidate.kept,
+      acceptanceReason: candidate.acceptanceReason,
+      positiveMarkers: candidate.positiveMarkers,
+      normalizationOperations: candidate.normalizationOperations,
+      parsedPercent: candidate.parsedPercent,
+      rejectionReason: candidate.rejectionReason,
+      decision: candidate.decision,
+    })),
+    abstentionReason: diagnostics.abstentionReason,
+    numberInOcr: diagnostics.numberInOcr,
+    percentInOcr: diagnostics.percentInOcr,
+    alcoholMarkerInOcr: diagnostics.alcoholMarkerInOcr,
+    volumeMarkerInOcr: diagnostics.volumeMarkerInOcr,
+    sameLineEvidenceCluster: diagnostics.sameLineEvidenceCluster,
+    adjacentLineEvidenceCluster: diagnostics.adjacentLineEvidenceCluster,
+    filterRejectedCandidate: diagnostics.filterRejectedCandidate,
+    parserRejectedCandidate: diagnostics.parserRejectedCandidate,
+    candidateAccepted: diagnostics.candidateAccepted,
+  });
+
   if (candidates.length === 0) {
     return {
       observation: { state: "NOT_OBSERVED", value: null, confidence: 0, alternates: [] },
       sourceRegion: null,
+      alcoholDiagnostics: publicDiagnostics(),
     };
   }
 
-  const ranked = [...candidates].sort(
+  const ranked = dedupeAlcoholCandidates(candidates).sort(
     (a, b) => b.confidence - a.confidence || key(a.value).localeCompare(key(b.value)),
   );
   const best = ranked[0];
-
   const competing = ranked
     .slice(1)
     .filter(
-      (c) =>
-        !corroborates(best.value, c.value) && best.confidence - c.confidence <= AMBIGUITY_MARGIN,
+      (candidate) =>
+        !alcoholCorroborates(best.value, candidate.value) &&
+        best.confidence - candidate.confidence <= AMBIGUITY_MARGIN,
     );
+  const diagnosticById = new Map(
+    diagnostics.candidates.map((candidate) => [candidate.id, candidate]),
+  );
+  for (const candidate of ranked) {
+    if (!candidate.id) continue;
+    const diagnostic = diagnosticById.get(candidate.id);
+    if (!diagnostic) continue;
+    if (candidate.id === best.id) diagnostic.decision = "selected";
+    else if (competing.some((rival) => rival.id === candidate.id))
+      diagnostic.decision = "ambiguous-rival";
+    else diagnostic.decision = "alternate";
+  }
 
   if (competing.length > 0) {
     return {
@@ -223,15 +834,14 @@ function buildObservation(
         rawText: best.rawText,
         confidence: best.confidence,
         geometry: best.geometry,
-        alternates: competing.map(toAlternate),
+        alternates: competing.map(alternateFrom),
+        ambiguityReason: "competing_candidates",
       },
       sourceRegion: best.regionName,
+      alcoholDiagnostics: publicDiagnostics(),
     };
   }
 
-  // Any remaining non-competing candidates (e.g. corroborating substrings) are
-  // preserved as ordered alternates without changing the selected value.
-  const alternates = ranked.slice(1).map(toAlternate);
   return {
     observation: {
       state: best.confidence < LOW_CONFIDENCE_THRESHOLD ? "LOW_CONFIDENCE" : "OBSERVED",
@@ -240,51 +850,117 @@ function buildObservation(
       rawText: best.rawText,
       confidence: best.confidence,
       geometry: best.geometry,
-      alternates,
+      alternates: ranked
+        .slice(1)
+        .filter((candidate) => !alcoholCorroborates(best.value, candidate.value))
+        .map(alternateFrom),
     },
     sourceRegion: best.regionName,
+    alcoholDiagnostics: publicDiagnostics(),
   };
 }
 
-function alternateFrom(c: Candidate): AnalyzerAlternate {
-  return { value: c.value, confidence: c.confidence, geometry: c.geometry };
-}
-
-// ---------------------------------------------------------------------------
-// Alcohol statement: a percentage token plus adjacent volume-marker tokens that
-// the committed wine-alcohol parser accepts. Proof is recognized and discarded.
-// ---------------------------------------------------------------------------
-
 export function selectAlcoholObservation(results: RegionOcrResult[]): FieldSelection {
   const candidates: Candidate[] = [];
+  const candidateDiagnostics: AlcoholCandidateDiagnosticInternal[] = [];
+  let numberInOcr = false;
+  let percentInOcr = false;
+  let alcoholMarkerInOcr = false;
+  let volumeMarkerInOcr = false;
+  let sameLineEvidenceCluster = false;
+  let adjacentLineEvidenceCluster = false;
+  let filterRejectedCandidate = false;
+  let parserRejectedCandidate = false;
+  let sawAlcoholLikeText = false;
+  let nextIdCounter = 0;
+  const nextId = () => `alcohol-candidate-${nextIdCounter++}`;
+
   for (const result of results) {
-    for (const line of lines(result.words)) {
-      for (let i = 0; i < line.length; i++) {
-        if (!/\d/.test(line[i].text) || !line[i].text.includes("%")) continue;
-        // Grow the window rightward until the parser accepts a supported form.
-        for (let j = i; j < Math.min(line.length, i + 5); j++) {
-          const window = line.slice(i, j + 1);
-          const rawText = window.map((w) => w.text).join(" ");
-          const parsed = parseWineAlcoholStatement(rawText);
-          if (parsed.kind === "direct" || parsed.kind === "range") {
-            const geometry = geometryFor(window, result);
-            candidates.push({
-              value: rawText.replace(/\s+/g, " ").trim(),
-              rawText,
-              confidence: aggregateConfidence(window),
-              geometry,
-              words: window,
-              regionName: result.regionName,
-              prominence: geometry.height,
-            });
-            break; // shortest accepted window for this start
-          }
-          // proof (or still-malformed) never becomes a returned value
+    for (const word of result.words) {
+      if (alcoholHasDigits(word.text)) numberInOcr = true;
+      if (word.text.includes("%")) percentInOcr = true;
+      if (alcoholMarkerToken(word.text)) alcoholMarkerInOcr = true;
+      if (alcoholVolumeToken(word.text)) volumeMarkerInOcr = true;
+      if (
+        alcoholHasDigits(word.text) ||
+        word.text.includes("%") ||
+        alcoholMarkerToken(word.text) ||
+        alcoholVolumeToken(word.text) ||
+        alcoholProofToken(word.text)
+      ) {
+        sawAlcoholLikeText = true;
+      }
+    }
+
+    const groupedLines = lines(result.words);
+    for (const [lineIndex, line] of groupedLines.entries()) {
+      const windows = alcoholWindowsForWords(line, result, "same-line-window", [lineIndex], nextId);
+      if (windows.length > 0) sameLineEvidenceCluster = true;
+      for (const window of windows) {
+        const analyzed = analyzeAlcoholWindow(window);
+        candidateDiagnostics.push(analyzed.diagnostic);
+        if (analyzed.candidate) {
+          candidates.push(analyzed.candidate);
+        } else {
+          filterRejectedCandidate ||= analyzed.filterRejected;
+          parserRejectedCandidate ||= analyzed.parserRejected;
+        }
+      }
+    }
+
+    for (let lineIndex = 0; lineIndex < groupedLines.length - 1; lineIndex++) {
+      const upper = groupedLines[lineIndex];
+      const lower = groupedLines[lineIndex + 1];
+      if (!canMergeAlcoholLines(upper, lower)) continue;
+      const mergedWords = [...upper, ...lower].sort((a, b) => {
+        const ay = lineCenterY([a]);
+        const by = lineCenterY([b]);
+        if (Math.abs(ay - by) > 20) return ay - by;
+        return a.bbox.x0 - b.bbox.x0;
+      });
+      const windows = alcoholWindowsForWords(
+        mergedWords,
+        result,
+        "adjacent-line-window",
+        [lineIndex, lineIndex + 1],
+        nextId,
+      );
+      if (windows.length > 0) adjacentLineEvidenceCluster = true;
+      for (const window of windows) {
+        const analyzed = analyzeAlcoholWindow(window);
+        candidateDiagnostics.push(analyzed.diagnostic);
+        if (analyzed.candidate) {
+          candidates.push(analyzed.candidate);
+        } else {
+          filterRejectedCandidate ||= analyzed.filterRejected;
+          parserRejectedCandidate ||= analyzed.parserRejected;
         }
       }
     }
   }
-  return dedupe(candidates, buildObservation);
+
+  const keptIds = new Set(
+    dedupeAlcoholCandidates(candidates)
+      .map((candidate) => candidate.id)
+      .filter(Boolean),
+  );
+  for (const candidate of candidateDiagnostics) {
+    if (candidate.id && keptIds.has(candidate.id) && candidate.kept) candidate.kept = true;
+  }
+
+  return buildAlcoholObservation(candidates, {
+    candidates: candidateDiagnostics,
+    abstentionReason: sawAlcoholLikeText ? "unsupported-candidates-only" : "no-alcohol-like-text",
+    numberInOcr,
+    percentInOcr,
+    alcoholMarkerInOcr,
+    volumeMarkerInOcr,
+    sameLineEvidenceCluster,
+    adjacentLineEvidenceCluster,
+    filterRejectedCandidate,
+    parserRejectedCandidate,
+    candidateAccepted: candidates.length > 0,
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -1318,22 +1994,4 @@ function buildBrandObservation(
     sourceRegion: best.regionName,
     brandDiagnostics: publicDiagnostics(),
   };
-}
-
-/** Collapse duplicate candidate values, keeping the highest-confidence instance. */
-function dedupe(
-  candidates: Candidate[],
-  build: (c: Candidate[], toAlt: (c: Candidate) => AnalyzerAlternate) => FieldSelection,
-): FieldSelection {
-  return build(dedupeCandidates(candidates), alternateFrom);
-}
-
-function dedupeCandidates(candidates: Candidate[]): Candidate[] {
-  const byKey = new Map<string, Candidate>();
-  for (const c of candidates) {
-    const k = key(c.value);
-    const existing = byKey.get(k);
-    if (!existing || c.confidence > existing.confidence) byKey.set(k, c);
-  }
-  return [...byKey.values()];
 }

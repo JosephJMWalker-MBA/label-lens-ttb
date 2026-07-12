@@ -274,10 +274,10 @@ export function renderMarkdown(report: EvalReport): string {
   lines.push("");
   lines.push(
     "This report is not evidence that the current extractor is production-ready. " +
-      "In particular, the absent-brand false-positive rate and the determinate-brand miss/defer rates remain gating defects.",
+      "Brand selection quality, alcohol recall/accuracy, and any remaining false-certainty cases remain gating defects.",
   );
   lines.push(
-    "Per-candidate reconstruction and ranking diagnostics are preserved in the committed JSON artifact; the markdown stays compact and highlights only the aggregate and per-case outcomes.",
+    "Per-candidate reconstruction, ranking, and alcohol-assembly diagnostics are preserved in the committed JSON artifact; the markdown stays compact and highlights only the aggregate and per-case outcomes.",
   );
   lines.push("");
   lines.push("## Brand metrics");

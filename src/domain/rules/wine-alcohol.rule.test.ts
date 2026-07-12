@@ -91,9 +91,13 @@ describe("decimalToBasisPoints", () => {
     expect(decimalToBasisPoints("-1")).toBeNull();
     expect(decimalToBasisPoints("101")).toBeNull();
     expect(decimalToBasisPoints("12.345")).toBeNull();
-    expect(decimalToBasisPoints("12,5")).toBeNull(); // comma decimals not supported
     expect(decimalToBasisPoints("abc")).toBeNull();
     expect(decimalToBasisPoints("NaN")).toBeNull();
+  });
+
+  it("accepts comma decimals exactly", () => {
+    expect(decimalToBasisPoints("12,5")).toBe(1250);
+    expect(decimalToBasisPoints("13,25")).toBe(1325);
   });
 });
 
@@ -102,6 +106,22 @@ describe("parseWineAlcoholStatement", () => {
     for (const s of ["12.5% ALC./VOL.", "Alcohol 12.5% by volume", "12.5% alc by vol"]) {
       expect(parseWineAlcoholStatement(s)).toEqual({ kind: "direct", basisPoints: 1250 });
     }
+    expect(parseWineAlcoholStatement("13.5% by vol.")).toEqual({
+      kind: "direct",
+      basisPoints: 1350,
+    });
+    expect(parseWineAlcoholStatement("ALCOHOL 13.5 BY VOLUME")).toEqual({
+      kind: "direct",
+      basisPoints: 1350,
+    });
+    expect(parseWineAlcoholStatement("ALC 14 BY VOL")).toEqual({
+      kind: "direct",
+      basisPoints: 1400,
+    });
+    expect(parseWineAlcoholStatement("ALC 13,5% VOL")).toEqual({
+      kind: "direct",
+      basisPoints: 1350,
+    });
   });
 
   it("parses a bounded range", () => {
@@ -112,11 +132,13 @@ describe("parseWineAlcoholStatement", () => {
     });
   });
 
-  it("rejects proof, unitless, unsupported abbreviations, reversed ranges, and prose", () => {
+  it("rejects proof, unitless, unsupported abbreviations, reversed ranges, weak bare vol, and prose", () => {
     expect(parseWineAlcoholStatement("80 proof")).toEqual({ kind: "proof" });
     expect(parseWineAlcoholStatement("40 proof alc./vol.")).toEqual({ kind: "proof" });
     expect(parseWineAlcoholStatement("12.5")).toEqual({ kind: "malformed" }); // unitless
     expect(parseWineAlcoholStatement("12.5% v/v")).toEqual({ kind: "malformed" }); // unsupported abbr
+    expect(parseWineAlcoholStatement("13% vol")).toEqual({ kind: "malformed" });
+    expect(parseWineAlcoholStatement("13 by volume")).toEqual({ kind: "malformed" });
     expect(parseWineAlcoholStatement("Alcohol 13% to 11% by volume")).toEqual({
       kind: "malformed",
     });
@@ -151,6 +173,8 @@ describe("wine-alcohol-syntax", () => {
   it("passes permitted direct wording variants", () => {
     expect(syntax({ observation: obs("Alcohol 12.5% by volume") }).findingStatus).toBe("PASS");
     expect(syntax({ observation: obs("12.5% alc by vol") }).findingStatus).toBe("PASS");
+    expect(syntax({ observation: obs("13.5% by vol.") }).findingStatus).toBe("PASS");
+    expect(syntax({ observation: obs("ALCOHOL 13.5 BY VOLUME") }).findingStatus).toBe("PASS");
   });
 
   it("passes a range statement with a distinct reason", () => {
@@ -163,6 +187,7 @@ describe("wine-alcohol-syntax", () => {
     expect(syntax({ observation: obs("80 proof") }).findingStatus).toBe("FAIL");
     expect(syntax({ observation: obs("12.5") }).findingStatus).toBe("FAIL");
     expect(syntax({ observation: obs("12.5% v/v") }).findingStatus).toBe("FAIL");
+    expect(syntax({ observation: obs("13% vol") }).findingStatus).toBe("FAIL");
     expect(syntax({ observation: obs("13% to 11% by volume") }).findingStatus).toBe("FAIL");
     expect(syntax({ observation: obs("12.x% by volume") }).findingStatus).toBe("FAIL");
   });

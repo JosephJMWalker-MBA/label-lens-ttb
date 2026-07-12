@@ -29,8 +29,8 @@ function normalizeStatement(raw: string): string {
  */
 export function decimalToBasisPoints(raw: string): BasisPoints | null {
   const trimmed = raw.trim();
-  if (!/^\d+(\.\d+)?$/.test(trimmed)) return null;
-  const [intPart, fracPart = ""] = trimmed.split(".");
+  if (!/^\d+([.,]\d+)?$/.test(trimmed)) return null;
+  const [intPart, fracPart = ""] = trimmed.replace(",", ".").split(".");
   if (fracPart.length > 2) return null; // refuse to silently round finer precision
   const frac2 = (fracPart + "00").slice(0, 2);
   const basisPoints = Number(intPart) * 100 + Number(frac2);
@@ -45,20 +45,31 @@ export function parseDeclaredAlcoholValue(raw: string): BasisPoints | null {
   return decimalToBasisPoints(stripped);
 }
 
-// A recognized "by volume" marker justified by § 4.36. The bare word "alcohol"
-// alone is NOT a marker, so arbitrary prose containing a percentage is rejected.
-const VOL_MARKER = String.raw`(?:alc\.?\s*/\s*vol\.?|alc\.?\s+by\s+vol\.?|by\s+vol(?:ume)?\.?)`;
-// An optional leading "alcohol"/"alc." label that lawfully precedes the number.
+const VOL_WORD = String.raw`vol(?:ume)?\.?`;
 const ALC_PREFIX = String.raw`(?:alcohol|alc\.?)\s+`;
-const PERCENT = String.raw`(\d+(?:\.\d+)?)\s*%`;
-const RANGE_PERCENTS = String.raw`(\d+(?:\.\d+)?)\s*%?\s*(?:to|through|-|–|—)\s*(\d+(?:\.\d+)?)\s*%`;
+const NUMBER = String.raw`(\d+(?:[.,]\d+)?)`;
+const PERCENT = `${NUMBER}\\s*%`;
+const RANGE_PERCENTS = String.raw`(\d+(?:[.,]\d+)?)\s*%?\s*(?:to|through|-|–|—)\s*(\d+(?:[.,]\d+)?)\s*%`;
+const VOL_MARKER_BY = String.raw`by\s+${VOL_WORD}`;
+const VOL_MARKER_ALC_SLASH = String.raw`alc\.?\s*/\s*${VOL_WORD}`;
+const VOL_MARKER_ALC_BY = String.raw`alc\.?\s+by\s+${VOL_WORD}`;
 
-// The COMPLETE normalized statement must be one permitted form, anchored at both
-// ends. Anchoring is what rejects unrelated leading, intervening, and trailing
-// prose (e.g. "contains 12.5% poison by volume", "12.5% alc./vol. extra"): a
-// lawful marker embedded in a sentence is not a lawful statement.
-const DIRECT_STATEMENT = new RegExp(`^(?:${ALC_PREFIX})?${PERCENT}\\s*${VOL_MARKER}$`);
-const RANGE_STATEMENT = new RegExp(`^(?:${ALC_PREFIX})?${RANGE_PERCENTS}\\s*${VOL_MARKER}$`);
+// The COMPLETE normalized statement must be one permitted form, anchored at
+// both ends. This keeps lawful markers from being accepted when embedded in
+// unrelated prose and lets the extractor normalize only the narrow supported
+// alcohol-by-volume forms it can justify from OCR evidence.
+const DIRECT_STATEMENTS = [
+  new RegExp(`^${PERCENT}\\s*${VOL_MARKER_BY}$`),
+  new RegExp(`^${PERCENT}\\s*${VOL_MARKER_ALC_SLASH}$`),
+  new RegExp(`^${PERCENT}\\s*${VOL_MARKER_ALC_BY}$`),
+  new RegExp(`^${ALC_PREFIX}${PERCENT}\\s*${VOL_MARKER_BY}$`),
+  new RegExp(`^${ALC_PREFIX}${PERCENT}\\s*${VOL_WORD}$`),
+  new RegExp(`^${ALC_PREFIX}${NUMBER}\\s*${VOL_MARKER_BY}$`),
+  new RegExp(`^${ALC_PREFIX}${NUMBER}\\s*${VOL_WORD}$`),
+] as const;
+const RANGE_STATEMENT = new RegExp(
+  `^(?:${ALC_PREFIX})?${RANGE_PERCENTS}\\s*(?:${VOL_MARKER_ALC_SLASH}|${VOL_MARKER_ALC_BY}|${VOL_MARKER_BY})$`,
+);
 
 /**
  * Parse a wine alcohol statement into a bounded, deterministic form. Only the
@@ -81,8 +92,9 @@ export function parseWineAlcoholStatement(raw: string): WineAlcoholParse {
     return { kind: "range", lowerBasisPoints: lower, upperBasisPoints: upper };
   }
 
-  const directMatch = norm.match(DIRECT_STATEMENT);
-  if (directMatch) {
+  for (const directStatement of DIRECT_STATEMENTS) {
+    const directMatch = norm.match(directStatement);
+    if (!directMatch) continue;
     const basisPoints = decimalToBasisPoints(directMatch[1]);
     if (basisPoints === null) return { kind: "malformed" };
     return { kind: "direct", basisPoints };

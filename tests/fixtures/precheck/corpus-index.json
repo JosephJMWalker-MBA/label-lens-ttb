@@ -163,7 +163,7 @@
       "expectations": {
         "brandStateAllowed": ["OBSERVED"],
         "alcoholStateAllowed": ["OBSERVED"],
-        "alcoholParsedValue": "13.0% BY VOL.",
+        "alcoholParsedValue": "13.0% ALC./VOL.",
         "requiredAlcoholTokens": ["13.0%"],
         "permittedBrandCandidates": ["STONEHILL ESTATE"],
         "forbiddenBrandCandidates": [],
