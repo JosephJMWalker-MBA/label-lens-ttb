@@ -16,3 +16,6 @@ tests/fixtures/**/*.jpg
 
 # Vendored OCR language data (binary).
 src/pipeline/extractor/assets/*.traineddata
+
+# Generated evaluation baseline report (produced by `npm run eval:baseline`).
+docs/extraction-baseline/
