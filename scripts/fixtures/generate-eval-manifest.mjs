@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
+import { format, resolveConfig } from "prettier";
 import sharp from "sharp";
 
 import { FULL_CORPUS_RECORD_OVERRIDES } from "../../src/fixtures/eval/eval-full-corpus-overrides.mjs";
@@ -201,6 +202,16 @@ const CHECKPOINT_INCLUDED = new Map([
 
 function readJson(filePath) {
   return JSON.parse(readFileSync(filePath, "utf8"));
+}
+
+async function writeFormattedJson(filePath, value) {
+  const config = (await resolveConfig(filePath)) ?? {};
+  const formatted = await format(JSON.stringify(value), {
+    ...config,
+    filepath: filePath,
+    parser: "json",
+  });
+  writeFileSync(filePath, formatted);
 }
 
 function sha256Hex(bytes) {
@@ -598,10 +609,10 @@ function inventorySummary(records) {
   };
 }
 
-function writeInventoryReport(records) {
+async function writeInventoryReport(records) {
   const summary = inventorySummary(records);
   mkdirSync(OUT_DIR, { recursive: true });
-  writeFileSync(path.join(OUT_DIR, "inventory.json"), `${JSON.stringify(summary, null, 2)}\n`);
+  await writeFormattedJson(path.join(OUT_DIR, "inventory.json"), summary);
 
   const lines = [];
   lines.push("# Full Corpus Evaluation Inventory");
@@ -747,8 +758,8 @@ async function main() {
   };
 
   mkdirSync(path.dirname(OUT_MANIFEST), { recursive: true });
-  writeFileSync(OUT_MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);
-  writeInventoryReport(records);
+  await writeFormattedJson(OUT_MANIFEST, manifest);
+  await writeInventoryReport(records);
   await writeContactSheets(
     records.filter((record) => record.status === "included"),
     "included-wine",

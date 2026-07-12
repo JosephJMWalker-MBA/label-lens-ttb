@@ -1,10 +1,6 @@
 {
   "discoveredCandidateImages": 132,
-  "byCategory": {
-    "wine": 120,
-    "distilled-spirits": 9,
-    "beer-or-malt-beverage": 3
-  },
+  "byCategory": { "wine": 120, "distilled-spirits": 9, "beer-or-malt-beverage": 3 },
   "byStatus": {
     "included": 115,
     "excluded_uncertain_truth": 3,

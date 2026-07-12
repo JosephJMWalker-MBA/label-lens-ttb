@@ -12,6 +12,7 @@ import {
   parseObservedPercent,
   percentile,
   type AlcoholDiagnostics,
+  type BrandDiagnostics,
   type FieldCaseScore,
   type ObservedField,
 } from "./metrics";
@@ -85,21 +86,23 @@ describe("brand classification", () => {
     knownAmbiguous: false,
     absenceReason: "No distinct brand appears on the label.",
   };
+  const brandDiag = (over: Partial<BrandDiagnostics> = {}) => ({
+    ocrContainsAcceptable: false,
+    lineContainsAcceptable: false,
+    candidateContainsAcceptable: false,
+    ...over,
+  });
 
   it("correct when the selected brand is acceptable", () => {
-    expect(
-      classifyBrand(determinate, obs({ value: "LUIGI & GIOVANNI" }), {
-        ocrContainsAcceptable: true,
-      }),
-    ).toBe("correct");
+    expect(classifyBrand(determinate, obs({ value: "LUIGI & GIOVANNI" }), brandDiag())).toBe(
+      "correct",
+    );
   });
 
   it("false-certainty when confidently wrong", () => {
-    expect(
-      classifyBrand(determinate, obs({ state: "OBSERVED", value: "Pir" }), {
-        ocrContainsAcceptable: true,
-      }),
-    ).toBe("false-certainty");
+    expect(classifyBrand(determinate, obs({ state: "OBSERVED", value: "Pir" }), brandDiag())).toBe(
+      "false-certainty",
+    );
   });
 
   it("ranking failure when the correct brand is a non-selected alternate", () => {
@@ -108,48 +111,60 @@ describe("brand classification", () => {
       value: "Pir",
       alternates: [{ value: "Luigi & Giovanni", confidence: 0.3 }],
     });
-    expect(classifyBrand(determinate, o, { ocrContainsAcceptable: true })).toBe(
+    expect(classifyBrand(determinate, o, brandDiag({ candidateContainsAcceptable: true }))).toBe(
       "candidate-ranking-failure",
     );
   });
 
-  it("filtering failure when OCR saw the brand but it never became a candidate", () => {
+  it("ranking failure when the correct brand survived assembly but fell below top-3", () => {
+    const o = obs({
+      state: "AMBIGUOUS",
+      value: "Pir",
+      alternates: [
+        { value: "Also Wrong", confidence: 0.4 },
+        { value: "Still Wrong", confidence: 0.3 },
+        { value: "Yet Wrong", confidence: 0.2 },
+      ],
+    });
+    expect(classifyBrand(determinate, o, brandDiag({ candidateContainsAcceptable: true }))).toBe(
+      "candidate-ranking-failure",
+    );
+  });
+
+  it("filtering failure when a line contained the brand but no acceptable candidate survived", () => {
     const o = obs({ state: "AMBIGUOUS", value: "Something", alternates: [] });
-    expect(classifyBrand(determinate, o, { ocrContainsAcceptable: true })).toBe(
+    expect(classifyBrand(determinate, o, brandDiag({ lineContainsAcceptable: true }))).toBe(
       "candidate-filtering-failure",
+    );
+  });
+
+  it("line-reconstruction failure when OCR saw the brand only before line assembly", () => {
+    const o = obs({ state: "AMBIGUOUS", value: "Something", alternates: [] });
+    expect(classifyBrand(determinate, o, brandDiag({ ocrContainsAcceptable: true }))).toBe(
+      "line-reconstruction-failure",
     );
   });
 
   it("ocr-recognition failure when OCR never read the brand", () => {
     const o = obs({ state: "AMBIGUOUS", value: "Something", alternates: [] });
-    expect(classifyBrand(determinate, o, { ocrContainsAcceptable: false })).toBe(
-      "ocr-recognition-failure",
-    );
+    expect(classifyBrand(determinate, o, brandDiag())).toBe("ocr-recognition-failure");
   });
 
   it("genuine ambiguity: honest deferral is correct-uncertainty, confident pick is false-certainty", () => {
     expect(
-      classifyBrand(ambiguous, obs({ state: "AMBIGUOUS", value: "Amuninni" }), {
-        ocrContainsAcceptable: true,
-      }),
+      classifyBrand(ambiguous, obs({ state: "AMBIGUOUS", value: "Amuninni" }), brandDiag()),
     ).toBe("correct-uncertainty");
     expect(
-      classifyBrand(ambiguous, obs({ state: "OBSERVED", value: "Amuninni" }), {
-        ocrContainsAcceptable: true,
-      }),
+      classifyBrand(ambiguous, obs({ state: "OBSERVED", value: "Amuninni" }), brandDiag()),
     ).toBe("false-certainty");
   });
 
   it("absent brand correctly not observed is a success, while a fabricated brand is false-certainty", () => {
+    expect(classifyBrand(absent, obs({ state: "NOT_OBSERVED", value: null }), brandDiag())).toBe(
+      "correct",
+    );
     expect(
-      classifyBrand(absent, obs({ state: "NOT_OBSERVED", value: null }), {
-        ocrContainsAcceptable: false,
-      }),
-    ).toBe("correct");
-    expect(
-      classifyBrand(absent, obs({ state: "OBSERVED", value: "Marble Creek Acres" }), {
-        ocrContainsAcceptable: false,
-      }),
+      classifyBrand(absent, obs({ state: "OBSERVED", value: "Marble Creek Acres" }), brandDiag()),
     ).toBe("false-certainty");
   });
 });

@@ -191,7 +191,80 @@ describe("selectBrandObservation", () => {
     );
     const { observation } = selectBrandObservation([region([...brand, ...backLabelNoise])]);
     expect(observation.state).toBe("OBSERVED");
-    expect(observation.value).toBe("Mike's Farm Inc.");
+    expect(observation.value).toBe("Mike's Farm, Inc.");
+  });
+
+  it("promotes a coherent brand window over short surviving noise", () => {
+    const noise = tallLine(
+      [
+        ["Pan", 32],
+        ["J", 62],
+        ["1", 27],
+        ["ON", 31],
+      ],
+      10,
+      36,
+    );
+    const brand = tallLine(
+      [
+        ["CAYWOOD", 59],
+        ["VINEYARD", 96],
+        [">", 56],
+        ["usc", 0],
+      ],
+      120,
+      60,
+    );
+    const { observation, brandDiagnostics } = selectBrandObservation([
+      region([...noise, ...brand]),
+    ]);
+    expect(observation.state).toBe("OBSERVED");
+    expect(observation.value).toBe("CAYWOOD VINEYARD");
+    const selected = brandDiagnostics?.candidates.find(
+      (c) => c.cleanedValue === "CAYWOOD VINEYARD",
+    );
+    const demotedNoise = brandDiagnostics?.candidates.find((c) => c.cleanedValue === "Pan J 1 ON");
+    expect(selected?.assembly).toBe("line-window");
+    expect(selected?.decision).toBe("selected");
+    expect(demotedNoise?.decision).toBe("alternate");
+    expect((selected?.score?.total ?? 0) > (demotedNoise?.score?.total ?? 0)).toBe(true);
+  });
+
+  it("assembles a split multi-line brand and keeps it selected", () => {
+    const upper = tallLine(
+      [
+        ["DUCK", 92],
+        ["WALK", 93],
+      ],
+      10,
+      40,
+    );
+    const lower = tallLine([["VINEYARDS", 94]], 65, 40);
+    const { observation, brandDiagnostics } = selectBrandObservation([
+      region([...upper, ...lower]),
+    ]);
+    expect(observation.state).toBe("OBSERVED");
+    expect(observation.value).toBe("DUCK WALK VINEYARDS");
+    const merged = brandDiagnostics?.candidates.find(
+      (c) => c.cleanedValue === "DUCK WALK VINEYARDS",
+    );
+    expect(merged?.assembly).toBe("multi-line-merge");
+    expect(merged?.decision).toBe("selected");
+  });
+
+  it("keeps a positively-signalled brand when the selected reconstruction ends with a period", () => {
+    const words = tallLine(
+      [
+        ["STONE'S", 92],
+        ["THROW.", 92],
+        ["2021", 40],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("OBSERVED");
+    expect(observation.value).toBe("STONE'S THROW.");
   });
 
   it("does not turn a sole prominent wine varietal line into brand evidence", () => {
@@ -395,6 +468,80 @@ describe("selectBrandObservation", () => {
       [
         ["PRODUCTE", 95],
         ["D'ESPANYA", 95],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
+  });
+
+  it("returns NOT_OBSERVED for connector-linked generic product wording", () => {
+    const words = tallLine(
+      [
+        ["VINO", 95],
+        ["D'ITALIA", 95],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
+  });
+
+  it("returns NOT_OBSERVED for serving-temperature prose", () => {
+    const words = tallLine(
+      [
+        ["Serving", 95],
+        ["temperature:", 95],
+        ["52-54°F", 95],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
+  });
+
+  it("returns NOT_OBSERVED for appellation-varietal wording with no defensible brand", () => {
+    const words = tallLine(
+      [
+        ["ROERO", 95],
+        ["ARNEIS", 95],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
+  });
+
+  it("returns NOT_OBSERVED for blend-composition varietal wording", () => {
+    const words = tallLine(
+      [
+        ["80", 95],
+        ["NEGRETTE,", 95],
+        ["20", 95],
+        ["CABERNET", 95],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
+  });
+
+  it("returns NOT_OBSERVED for a vineyard-site phrase with no defensible brand", () => {
+    const words = tallLine(
+      [
+        ["ABBOTT", 95],
+        ["CLAIM", 95],
+        ["VINEYARD", 95],
       ],
       10,
       40,

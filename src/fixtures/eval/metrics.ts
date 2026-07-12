@@ -24,6 +24,10 @@ export interface ObservedField {
 export interface BrandDiagnostics {
   /** An acceptable brand string appears in the raw OCR text of the brand region. */
   ocrContainsAcceptable: boolean;
+  /** An acceptable brand string appears on one reconstructed brand-region line. */
+  lineContainsAcceptable: boolean;
+  /** An acceptable brand string survived candidate assembly exactly/normalized. */
+  candidateContainsAcceptable: boolean;
   /** When brand abstained, the selector's bounded reason code. */
   abstentionReason?: string;
 }
@@ -168,7 +172,9 @@ export function classifyBrand(
 
   // Wrong (or deferred) primary: locate where the correct answer was lost.
   if (brandInTopK(observed, truth.acceptable, 3)) return "candidate-ranking-failure";
-  if (diag.ocrContainsAcceptable) return "candidate-filtering-failure";
+  if (diag.candidateContainsAcceptable) return "candidate-ranking-failure";
+  if (diag.lineContainsAcceptable) return "candidate-filtering-failure";
+  if (diag.ocrContainsAcceptable) return "line-reconstruction-failure";
   if (observed.state === "NOT_OBSERVED") return "candidate-generation-failure";
   return "ocr-recognition-failure";
 }
