@@ -33,7 +33,7 @@ const OUTPUT_DIR = join(process.cwd(), "docs/extraction-full-corpus");
         // Sequential: bound peak memory and keep OCR workers from contending.
         cases.push(await runCase(evalCase));
       }
-      const report = buildReport(cases, manifest.schemaVersion);
+      const report = buildReport(cases, manifest);
 
       mkdirSync(OUTPUT_DIR, { recursive: true });
       writeFileSync(

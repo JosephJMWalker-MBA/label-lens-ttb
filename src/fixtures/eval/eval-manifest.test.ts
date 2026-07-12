@@ -113,11 +113,7 @@ describe("committed evaluation manifest", () => {
       .filter((record) => record.status === "excluded_uncertain_truth")
       .map((record) => record.caseId)
       .sort();
-    expect(unresolved).toEqual([
-      "approved-wine-029",
-      "approved-wine-030",
-      "approved-wine-036",
-    ]);
+    expect(unresolved).toEqual(["approved-wine-029", "approved-wine-030", "approved-wine-036"]);
   });
 
   it("marks the M Cellars derivatives as duplicates of the canonical benchmark", () => {

@@ -210,6 +210,7 @@ export interface FieldCaseScore {
   brandExact: boolean;
   brandNormalized: boolean;
   brandTop3: boolean;
+  brandTop5: boolean;
   alcoholDetected: boolean;
   alcoholParsedAccurate: boolean;
   latencyMs: number;
@@ -223,12 +224,20 @@ export interface AggregateMetrics {
   brandExactMatchRate: number;
   brandNormalizedAcceptableRate: number;
   brandTop3Recall: number;
+  brandTop5Recall: number;
+  brandConfidentCorrectRate: number;
+  brandUsefulButDeferredRate: number;
+  brandUnnecessaryAmbiguityRate: number;
+  brandFalseCertaintyRate: number;
+  brandNotObservedRate: number;
   absentBrandFalsePositiveRate: number;
   presentAlcoholCount: number;
   alcoholDetectionRecall: number;
   alcoholParsedValueAccuracy: number;
+  alcoholParserFailureRate: number;
   absentAlcoholCount: number;
   absentFieldFalsePositiveRate: number;
+  alcoholFalseCertaintyRate: number;
   ambiguousBrandCount: number;
   /** Of genuinely-ambiguous labels, the share the extractor honestly deferred. */
   ambiguityHonestyRate: number;
@@ -291,6 +300,27 @@ export function aggregate(scores: FieldCaseScore[]): AggregateMetrics {
       determinate.length,
     ),
     brandTop3Recall: rate(determinate.filter((s) => s.brandTop3).length, determinate.length),
+    brandTop5Recall: rate(determinate.filter((s) => s.brandTop5).length, determinate.length),
+    brandConfidentCorrectRate: rate(
+      determinate.filter((s) => s.brandClass === "correct").length,
+      determinate.length,
+    ),
+    brandUsefulButDeferredRate: rate(
+      determinate.filter((s) => s.brandTop5 && s.brandClass !== "correct").length,
+      determinate.length,
+    ),
+    brandUnnecessaryAmbiguityRate: rate(
+      determinate.filter((s) => s.brandClass === "correct-uncertainty").length,
+      determinate.length,
+    ),
+    brandFalseCertaintyRate: rate(
+      determinate.filter((s) => s.brandClass === "false-certainty").length,
+      determinate.length,
+    ),
+    brandNotObservedRate: rate(
+      determinate.filter((s) => !s.brandDetected).length,
+      determinate.length,
+    ),
     absentBrandFalsePositiveRate: rate(
       absentBrand.filter((s) => s.brandDetected).length,
       absentBrand.length,
@@ -301,10 +331,18 @@ export function aggregate(scores: FieldCaseScore[]): AggregateMetrics {
       present.filter((s) => s.alcoholParsedAccurate).length,
       present.length,
     ),
+    alcoholParserFailureRate: rate(
+      present.filter((s) => s.alcoholClass === "parser-failure").length,
+      present.length,
+    ),
     absentAlcoholCount: absent.length,
     absentFieldFalsePositiveRate: rate(
       absent.filter((s) => s.alcoholDetected).length,
       absent.length,
+    ),
+    alcoholFalseCertaintyRate: rate(
+      scores.filter((s) => s.alcoholClass === "false-certainty").length,
+      scores.length,
     ),
     ambiguousBrandCount: ambiguous.length,
     ambiguityHonestyRate: rate(
