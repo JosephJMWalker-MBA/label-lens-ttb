@@ -1,0 +1,421 @@
+{
+  "schemaVersion": "extraction-eval-manifest.v1",
+  "description": "Versioned evaluation set for measuring the current two-field (brand + alcohol) extractor (Issue #57). Truth here is evaluation-only and is never an input to the extractor. Acceptable answers reflect what a reviewer would judge useful evidence; genuinely-ambiguous cases treat an honest AMBIGUOUS observation as a success. Annotations were set by manual inspection of the committed fixture image only.",
+  "cases": [
+    {
+      "caseId": "m-cellars-baseline",
+      "fixtureDir": "m-cellars-24205001000905",
+      "imageFilename": "label-ocr-source.jpeg",
+      "expectedSha256": "0b0ccec13bf6c533ec7928b017b140a0213fb4555812fea81d71872adb453713",
+      "source": "Alcohol and Tobacco Tax and Trade Bureau approved COLA (public record 24205001000905)",
+      "usageStatus": "screened-approved",
+      "strata": ["multiple-brand-like-phrases", "alcohol-at-bottom", "genuinely-ambiguous"],
+      "brand": {
+        "acceptable": ["M Cellars"],
+        "knownAmbiguous": true,
+        "approxLocation": "top"
+      },
+      "alcohol": {
+        "present": true,
+        "acceptablePercents": [12.5],
+        "acceptableText": ["12.5% ALC./VOL.", "12.5%"],
+        "approxLocation": "bottom"
+      },
+      "annotation": {
+        "annotatedBy": "Claude (extraction-baseline PR)",
+        "annotatedOn": "2026-07-12",
+        "method": "existing corpus baseline confirmed by fixture inspection",
+        "notes": "The only clean 'M CELLARS' is the excluded bottler line, so brand from artwork is genuinely ambiguous."
+      }
+    },
+    {
+      "caseId": "luigi-giovanni-live",
+      "fixtureDir": "approved-wine-001",
+      "imageFilename": "label.png",
+      "expectedSha256": "32b0fc57508fcc79cf37c33c402ecce5b9b3570e89da98dd487e1d91d338b579",
+      "source": "Red Brick Winery synthetic COLA-style mockup (approved fixture); the live production-failure label",
+      "usageStatus": "screened-approved",
+      "strata": [
+        "decorative-or-script-brand",
+        "brand-punctuation",
+        "multiple-brand-like-phrases",
+        "alcohol-at-side-or-rotated"
+      ],
+      "brand": {
+        "acceptable": ["Luigi & Giovanni"],
+        "knownAmbiguous": false,
+        "approxLocation": "top",
+        "forbidden": ["Pir", "VANNI", "TASTE OF ITALY", "PRIMITIVO"]
+      },
+      "alcohol": {
+        "present": true,
+        "acceptablePercents": [14],
+        "acceptableText": ["14% ALC", "14%"],
+        "approxLocation": "side"
+      },
+      "annotation": {
+        "annotatedBy": "Claude (extraction-baseline PR)",
+        "annotatedOn": "2026-07-12",
+        "method": "manual inspection of the committed fixture image",
+        "notes": "Script 'Luigi &' over 'GIOVANNI' artwork; the documented live run selected the fragment 'Pir'. Alcohol '14% ALC' sits small at bottom-right."
+      }
+    },
+    {
+      "caseId": "alfredos-wine",
+      "fixtureDir": "approved-wine-002",
+      "imageFilename": "label.png",
+      "expectedSha256": "c3f0d11ce789f779be6985ec8d97c0a5ac2145e1805a3e0be1c05e25cc7afa14",
+      "source": "Red Brick Winery synthetic COLA-style mockup (approved fixture)",
+      "usageStatus": "screened-approved",
+      "strata": ["multi-line-brand", "brand-punctuation", "alcohol-at-bottom"],
+      "brand": {
+        "acceptable": ["Alfredo's Wine", "Alfredo's"],
+        "knownAmbiguous": false,
+        "approxLocation": "top"
+      },
+      "alcohol": {
+        "present": true,
+        "acceptablePercents": [14],
+        "acceptableText": ["14% ALC", "14%"],
+        "approxLocation": "bottom"
+      },
+      "annotation": {
+        "annotatedBy": "Claude (extraction-baseline PR)",
+        "annotatedOn": "2026-07-12",
+        "method": "manual inspection of the committed fixture image",
+        "notes": "Brand set on two lines ('ALFREDO'S' / 'WINE') with an apostrophe."
+      }
+    },
+    {
+      "caseId": "la-fattoria-rotated",
+      "fixtureDir": "approved-wine-003",
+      "imageFilename": "label.png",
+      "expectedSha256": "78a45dc3df09a29615ebb19687803d4c0b9e50c0ffdcea833d6cc332bd3ee4e8",
+      "source": "Red Brick Winery synthetic wrap-around COLA-style mockup (approved fixture)",
+      "usageStatus": "screened-approved",
+      "strata": [
+        "decorative-or-script-brand",
+        "vertical-mandatory-strip",
+        "alcohol-at-side-or-rotated"
+      ],
+      "brand": {
+        "acceptable": ["La Fattoria"],
+        "knownAmbiguous": false,
+        "approxLocation": "center"
+      },
+      "alcohol": {
+        "present": true,
+        "acceptablePercents": [14],
+        "acceptableText": ["14% ALC", "14%"],
+        "approxLocation": "rotated",
+        "detectionChallenge": "the alcohol statement is printed vertically on the rotated left side strip"
+      },
+      "annotation": {
+        "annotatedBy": "Claude (extraction-baseline PR)",
+        "annotatedOn": "2026-07-12",
+        "method": "manual inspection of the committed fixture image",
+        "notes": "Landscape wrap label; script 'La' over 'FATTORIA'; mandatory text (incl. '14% ALC') runs vertically on the side panels."
+      }
+    },
+    {
+      "caseId": "casanova-della-spinetta",
+      "fixtureDir": "approved-wine-007",
+      "imageFilename": "label.jpeg",
+      "expectedSha256": "6ead323c40f67fcdc261491828330c4f3f3d15fe40dc8b553bb59bebb8aa7e54",
+      "source": "Public-domain style producer back label (approved fixture)",
+      "usageStatus": "screened-approved",
+      "strata": ["multi-line-brand", "low-contrast", "split-alcohol-tokens"],
+      "brand": {
+        "acceptable": ["Casanova della Spinetta", "Casanova Della Spinetta"],
+        "knownAmbiguous": false,
+        "approxLocation": "top"
+      },
+      "alcohol": {
+        "present": true,
+        "acceptablePercents": [14],
+        "acceptableText": ["ALC. 14 BY VOL.", "14"],
+        "approxLocation": "center",
+        "detectionChallenge": "the printed statement omits the percent sign ('ALC. 14 BY VOL.'), so no single OCR token carries both a digit and '%'"
+      },
+      "annotation": {
+        "annotatedBy": "Claude (extraction-baseline PR)",
+        "annotatedOn": "2026-07-12",
+        "method": "manual inspection of the committed fixture image",
+        "notes": "Brand across the top over a faint rhinoceros engraving (low contrast). Alcohol shown as 'ALC. 14 BY VOL.' with no % sign."
+      }
+    },
+    {
+      "caseId": "domaine-follin-arbelet",
+      "fixtureDir": "approved-wine-010",
+      "imageFilename": "label.jpeg",
+      "expectedSha256": "6187b67b93a895b2f0836f607e3eee7bf015f716b75c8d89b3664a5ca6026751",
+      "source": "Public-domain style producer back label (approved fixture)",
+      "usageStatus": "screened-approved",
+      "strata": ["brand-punctuation", "multiple-brand-like-phrases", "alcohol-at-bottom"],
+      "brand": {
+        "acceptable": ["Domaine Follin-Arbelet"],
+        "knownAmbiguous": false,
+        "approxLocation": "top",
+        "forbidden": ["Kermit Lynch", "Kermit Lynch Wine Merchant"]
+      },
+      "alcohol": {
+        "present": true,
+        "acceptablePercents": [14],
+        "acceptableText": ["ALC. 14% BY VOL.", "14%"],
+        "approxLocation": "center"
+      },
+      "annotation": {
+        "annotatedBy": "Claude (extraction-baseline PR)",
+        "annotatedOn": "2026-07-12",
+        "method": "manual inspection of the committed fixture image",
+        "notes": "Hyphenated brand at top; the bold importer block 'KERMIT LYNCH WINE MERCHANT' competes visually but is not the brand."
+      }
+    },
+    {
+      "caseId": "patricia-green-cellars",
+      "fixtureDir": "approved-wine-015",
+      "imageFilename": "label.jpeg",
+      "expectedSha256": "c79e78cc91b668a424b17ad2dfcd0598797eb40fcb2e362d99eeec9822b1f408",
+      "source": "Public-domain style producer back label (approved fixture)",
+      "usageStatus": "screened-approved",
+      "strata": [
+        "low-contrast",
+        "multiple-brand-like-phrases",
+        "genuinely-ambiguous",
+        "alcohol-at-bottom"
+      ],
+      "brand": {
+        "acceptable": ["Patricia Green Cellars"],
+        "knownAmbiguous": true,
+        "approxLocation": "center"
+      },
+      "alcohol": {
+        "present": true,
+        "acceptablePercents": [13.8],
+        "acceptableText": ["ALC. 13.8% BY VOL.", "13.8%"],
+        "approxLocation": "bottom"
+      },
+      "annotation": {
+        "annotatedBy": "Claude (extraction-baseline PR)",
+        "annotatedOn": "2026-07-12",
+        "method": "manual inspection of the committed fixture image",
+        "notes": "Small, dense back label; the brand appears only in the excluded 'PRODUCED & BOTTLED BY' line and the website, so brand from artwork is genuinely ambiguous."
+      }
+    },
+    {
+      "caseId": "saker",
+      "fixtureDir": "approved-wine-021",
+      "imageFilename": "label.jpeg",
+      "expectedSha256": "bbc9e83d13b3770fce80d51c90d5193d087fe07a9ce9ff4b5a70827621ba012b",
+      "source": "Public-domain style producer back label (approved fixture)",
+      "usageStatus": "screened-approved",
+      "strata": ["simple-centered-brand", "low-contrast"],
+      "brand": {
+        "acceptable": ["Saker"],
+        "knownAmbiguous": false,
+        "approxLocation": "top"
+      },
+      "alcohol": {
+        "present": true,
+        "acceptablePercents": [12.6],
+        "acceptableText": ["12.6% ALC. BY VOL.", "12.6%"],
+        "approxLocation": "bottom"
+      },
+      "annotation": {
+        "annotatedBy": "Claude (extraction-baseline PR)",
+        "annotatedOn": "2026-07-12",
+        "method": "manual inspection of the committed fixture image",
+        "notes": "Cream 'SAKER' centered on a near-black background (low contrast); alcohol at bottom-left."
+      }
+    },
+    {
+      "caseId": "nebla-mencia",
+      "fixtureDir": "approved-wine-025",
+      "imageFilename": "label.jpeg",
+      "expectedSha256": "77e85396ddc8f80b7268fedc3ec050bb0f00c81c92d7494aac8b0dde2b616242",
+      "source": "Public-domain style producer back label (approved fixture)",
+      "usageStatus": "screened-approved",
+      "strata": ["simple-centered-brand", "alcohol-at-bottom"],
+      "brand": {
+        "acceptable": ["Nebla"],
+        "knownAmbiguous": false,
+        "approxLocation": "top"
+      },
+      "alcohol": {
+        "present": true,
+        "acceptablePercents": [13],
+        "acceptableText": ["ALC. 13% BY VOL.", "13% vol", "13%"],
+        "approxLocation": "bottom"
+      },
+      "annotation": {
+        "annotatedBy": "Claude (extraction-baseline PR)",
+        "annotatedOn": "2026-07-12",
+        "method": "manual inspection of the committed fixture image",
+        "notes": "Clean high-contrast 'NEBLA' at top-left; alcohol stated twice ('ALC. 13% BY VOL.' and '13% vol')."
+      }
+    },
+    {
+      "caseId": "chateau-bonneau",
+      "fixtureDir": "approved-wine-040",
+      "imageFilename": "label.png",
+      "expectedSha256": "d107a059f92c787fe61e706a323b7b6e1fd6d3d5efe154dd05e6437e04615edf",
+      "source": "Public-domain style producer label, front + back panels (approved fixture)",
+      "usageStatus": "screened-approved",
+      "strata": ["brand-punctuation", "multi-line-brand", "low-contrast"],
+      "brand": {
+        "acceptable": ["Château Bonneau", "Chateau Bonneau"],
+        "knownAmbiguous": false,
+        "approxLocation": "top"
+      },
+      "alcohol": {
+        "present": true,
+        "acceptablePercents": [14],
+        "acceptableText": ["14% vol.", "ALC. 14% BY VOL.", "14%"],
+        "approxLocation": "bottom"
+      },
+      "annotation": {
+        "annotatedBy": "Claude (extraction-baseline PR)",
+        "annotatedOn": "2026-07-12",
+        "method": "manual inspection of the committed fixture image",
+        "notes": "Two-panel image; brand 'CHÂTEAU / BONNEAU' (accented) in cream on a dark front panel (low contrast)."
+      }
+    },
+    {
+      "caseId": "le-temps-des-fleurs",
+      "fixtureDir": "approved-wine-050",
+      "imageFilename": "label.jpeg",
+      "expectedSha256": "48318d4539d109e715a643382a36e9ef88952147497b6f1bd7d07858a1f301ee",
+      "source": "Public-domain style producer back label (approved fixture)",
+      "usageStatus": "screened-approved",
+      "strata": ["simple-centered-brand", "alcohol-at-bottom"],
+      "brand": {
+        "acceptable": ["Le Temps des Fleurs", "Le Temps Des Fleurs"],
+        "knownAmbiguous": false,
+        "approxLocation": "top"
+      },
+      "alcohol": {
+        "present": true,
+        "acceptablePercents": [11.5],
+        "acceptableText": ["ALC. 11.5% BY VOL.", "11.5%"],
+        "approxLocation": "center",
+        "detectionChallenge": "decoy blend percentages ('80% NEGRETTE, 20% CABERNET') appear above the real 11.5% statement and must not be selected"
+      },
+      "annotation": {
+        "annotatedBy": "Claude (extraction-baseline PR)",
+        "annotatedOn": "2026-07-12",
+        "method": "manual inspection of the committed fixture image",
+        "notes": "High-contrast serif brand at top; blend percentages nearby create a false-positive risk for alcohol."
+      }
+    },
+    {
+      "caseId": "three-steves-winery",
+      "fixtureDir": "approved-wine-060",
+      "imageFilename": "label.jpeg",
+      "expectedSha256": "0eb36380a43c9f3f6b27ebf846f038b2d866a331f581decdb9be974fbcaa7cc6",
+      "source": "Public-domain style producer back label (approved fixture)",
+      "usageStatus": "screened-approved",
+      "strata": ["missing-alcohol-statement", "multiple-brand-like-phrases"],
+      "brand": {
+        "acceptable": ["3 Steves Winery"],
+        "knownAmbiguous": false,
+        "approxLocation": "top"
+      },
+      "alcohol": {
+        "present": false,
+        "acceptablePercents": [],
+        "acceptableText": [],
+        "approxLocation": "bottom"
+      },
+      "annotation": {
+        "annotatedBy": "Claude (extraction-baseline PR)",
+        "annotatedOn": "2026-07-12",
+        "method": "manual inspection of the committed fixture image",
+        "notes": "Prose back label with net contents and 'CONTAINS SULFITES' but no alcohol statement anywhere; NOT_OBSERVED is the correct, honest outcome."
+      }
+    },
+    {
+      "caseId": "altacima",
+      "fixtureDir": "approved-wine-070",
+      "imageFilename": "label.jpeg",
+      "expectedSha256": "feafd79824e046f75426744c581454838ce6058ee0bb6e69ca907eaa98a0a16a",
+      "source": "Public-domain style producer back label (approved fixture)",
+      "usageStatus": "screened-approved",
+      "strata": ["brand-punctuation", "low-contrast", "alcohol-at-bottom"],
+      "brand": {
+        "acceptable": ["AltaCima 4.090", "AltaCima"],
+        "knownAmbiguous": false,
+        "approxLocation": "top"
+      },
+      "alcohol": {
+        "present": true,
+        "acceptablePercents": [13.5],
+        "acceptableText": ["13.5% Alc. by Vol.", "13.5%"],
+        "approxLocation": "bottom"
+      },
+      "annotation": {
+        "annotatedBy": "Claude (extraction-baseline PR)",
+        "annotatedOn": "2026-07-12",
+        "method": "manual inspection of the committed fixture image",
+        "notes": "Brand 'AltaCima 4.090' (letters + digits + period) in white on grey (low contrast)."
+      }
+    },
+    {
+      "caseId": "le-caniette",
+      "fixtureDir": "approved-wine-080",
+      "imageFilename": "label.jpeg",
+      "expectedSha256": "cf1fb8c8ae79aed14480df1e533320edfbdb20c878e79bbd8f3c09dc1139aff1",
+      "source": "Public-domain style producer back label (approved fixture)",
+      "usageStatus": "screened-approved",
+      "strata": ["multi-line-brand", "split-alcohol-tokens", "alcohol-at-bottom"],
+      "brand": {
+        "acceptable": ["Le Caniette"],
+        "knownAmbiguous": false,
+        "approxLocation": "top"
+      },
+      "alcohol": {
+        "present": true,
+        "acceptablePercents": [12.5],
+        "acceptableText": ["12.5 % BY VOLUME", "12.5%", "12.5"],
+        "approxLocation": "center",
+        "detectionChallenge": "the percent sign is a separate OCR token from the number ('12.5' then '%')"
+      },
+      "annotation": {
+        "annotatedBy": "Claude (extraction-baseline PR)",
+        "annotatedOn": "2026-07-12",
+        "method": "manual inspection of the committed fixture image",
+        "notes": "Alcohol printed as '12.5 % BY VOLUME' with a space before the percent sign."
+      }
+    },
+    {
+      "caseId": "amuninni-ferracane",
+      "fixtureDir": "approved-wine-100",
+      "imageFilename": "label.jpeg",
+      "expectedSha256": "164960edc12c29f8cbd22e08ebdc29e7d08d7eaeb7f1105a4121e766314da844",
+      "source": "Public-domain style producer front label (approved fixture)",
+      "usageStatus": "screened-approved",
+      "strata": [
+        "decorative-or-script-brand",
+        "multiple-brand-like-phrases",
+        "genuinely-ambiguous",
+        "alcohol-at-bottom"
+      ],
+      "brand": {
+        "acceptable": ["Amuninni", "Fabio Ferracane"],
+        "knownAmbiguous": true,
+        "approxLocation": "top"
+      },
+      "alcohol": {
+        "present": true,
+        "acceptablePercents": [12.5],
+        "acceptableText": ["Alc. 12.5% By Vol.", "12.5%"],
+        "approxLocation": "center"
+      },
+      "annotation": {
+        "annotatedBy": "Claude (extraction-baseline PR)",
+        "annotatedOn": "2026-07-12",
+        "method": "manual inspection of the committed fixture image",
+        "notes": "The huge striped 'AMU NINNI' (importer brand) competes with the script 'Fabio Ferracane' (producer); either is a defensible brand, so this is genuinely ambiguous."
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "discoveredCandidateImages": 132,
+  "byCategory": {
+    "wine": 120,
+    "distilled-spirits": 9,
+    "beer-or-malt-beverage": 3
+  },
+  "byStatus": {
+    "included": 115,
+    "excluded_uncertain_truth": 3,
+    "excluded_outside_current_scope": 12,
+    "excluded_duplicate": 2
+  },
+  "includedWine": 115,
+  "excludedUncertainTruthWine": 3,
+  "nonWine": 12
+}

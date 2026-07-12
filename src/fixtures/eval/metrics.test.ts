@@ -69,10 +69,21 @@ describe("alcohol parsing", () => {
 });
 
 describe("brand classification", () => {
-  const determinate: EvalBrandTruth = { acceptable: ["Luigi & Giovanni"], knownAmbiguous: false };
+  const determinate: EvalBrandTruth = {
+    present: true,
+    acceptable: ["Luigi & Giovanni"],
+    knownAmbiguous: false,
+  };
   const ambiguous: EvalBrandTruth = {
+    present: true,
     acceptable: ["Amuninni", "Fabio Ferracane"],
     knownAmbiguous: true,
+  };
+  const absent: EvalBrandTruth = {
+    present: false,
+    acceptable: [],
+    knownAmbiguous: false,
+    absenceReason: "No distinct brand appears on the label.",
   };
 
   it("correct when the selected brand is acceptable", () => {
@@ -125,6 +136,19 @@ describe("brand classification", () => {
     expect(
       classifyBrand(ambiguous, obs({ state: "OBSERVED", value: "Amuninni" }), {
         ocrContainsAcceptable: true,
+      }),
+    ).toBe("false-certainty");
+  });
+
+  it("absent brand correctly not observed is a success, while a fabricated brand is false-certainty", () => {
+    expect(
+      classifyBrand(absent, obs({ state: "NOT_OBSERVED", value: null }), {
+        ocrContainsAcceptable: false,
+      }),
+    ).toBe("correct");
+    expect(
+      classifyBrand(absent, obs({ state: "OBSERVED", value: "Marble Creek Acres" }), {
+        ocrContainsAcceptable: false,
       }),
     ).toBe("false-certainty");
   });
@@ -198,15 +222,21 @@ describe("aggregation and percentiles are deterministic", () => {
   const scores: FieldCaseScore[] = [
     score("a", {
       brandClass: "correct",
+      brandPresent: true,
       brandExact: true,
       brandNormalized: true,
       brandTop3: true,
+      brandTop5: true,
+      brandDetected: true,
       alcoholDetected: true,
       alcoholParsedAccurate: true,
       latencyMs: 100,
     }),
     score("b", {
       brandClass: "false-certainty",
+      brandPresent: false,
+      brandTop5: true,
+      brandDetected: true,
       alcoholClass: "false-certainty",
       alcoholPresent: false,
       alcoholDetected: true,
@@ -214,7 +244,9 @@ describe("aggregation and percentiles are deterministic", () => {
     }),
     score("c", {
       brandClass: "correct-uncertainty",
+      brandPresent: true,
       brandKnownAmbiguous: true,
+      brandDetected: true,
       alcoholPresent: true,
       alcoholDetected: false,
       latencyMs: 200,
@@ -228,11 +260,21 @@ describe("aggregation and percentiles are deterministic", () => {
   it("computes denominators and rates from the right subsets", () => {
     const a = aggregate(scores);
     expect(a.caseCount).toBe(3);
-    expect(a.determinateBrandCount).toBe(2); // a, b
+    expect(a.determinateBrandCount).toBe(1); // a
+    expect(a.absentBrandCount).toBe(1); // b
     expect(a.ambiguousBrandCount).toBe(1); // c
+    expect(a.absentBrandFalsePositiveRate).toBe(1); // b detected while absent
     expect(a.absentAlcoholCount).toBe(1); // b
     expect(a.absentFieldFalsePositiveRate).toBe(1); // b detected while absent
-    expect(a.brandExactMatchRate).toBe(0.5); // a of {a,b}
+    expect(a.brandExactMatchRate).toBe(1); // a of {a}
+    expect(a.brandTop5Recall).toBe(1); // a of {a}
+    expect(a.brandConfidentCorrectRate).toBe(1); // a of {a}
+    expect(a.brandUsefulButDeferredRate).toBe(0); // a is already confident-correct
+    expect(a.brandUnnecessaryAmbiguityRate).toBe(0); // no deferred determinate case
+    expect(a.brandFalseCertaintyRate).toBe(0); // absent-brand FP tracked separately
+    expect(a.brandNotObservedRate).toBe(0); // a observed
+    expect(a.alcoholParserFailureRate).toBe(0); // a + c have no parser failures
+    expect(a.alcoholFalseCertaintyRate).toBeCloseTo(1 / 3); // only b
   });
 
   it("nearest-rank percentile is stable", () => {
@@ -247,11 +289,14 @@ function score(caseId: string, over: Partial<FieldCaseScore>): FieldCaseScore {
     caseId,
     brandClass: "correct",
     alcoholClass: "correct",
+    brandPresent: true,
     brandKnownAmbiguous: false,
     alcoholPresent: true,
+    brandDetected: false,
     brandExact: false,
     brandNormalized: false,
     brandTop3: false,
+    brandTop5: false,
     alcoholDetected: false,
     alcoholParsedAccurate: false,
     latencyMs: 0,
