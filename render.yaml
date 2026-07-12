@@ -19,7 +19,12 @@ services:
     plan: free # 512 MB; spins down when idle. Upgrade to `starter` for no spin-down.
     region: oregon
     branch: main # production tracks main; merges trigger a controlled redeploy
-    buildCommand: npm ci && npm run build
+    # NODE_ENV=production (below) makes npm omit devDependencies by default, but
+    # the build toolchain (TypeScript, Next's type/alias plumbing, etc.) lives in
+    # devDependencies. Without them `next build` cannot consume the tsconfig path
+    # aliases and every `@/...` import fails to resolve. `--include=dev` forces the
+    # build dependencies to install; NODE_ENV stays production for the runtime.
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm run start # `next start`; binds to Render's $PORT
     healthCheckPath: /api/health
     autoDeploy: true
