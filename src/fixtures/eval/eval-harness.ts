@@ -3,7 +3,12 @@ import type {
   AnalyzerOcrEngine,
 } from "@/pipeline/analyzer/analyzer.types";
 import { extractLabelEvidence } from "@/pipeline/extractor/extractor";
-import type { ExtractionInput, OcrWord } from "@/pipeline/extractor/extractor.types";
+import { selectBrandObservation } from "@/pipeline/extractor/field-selection";
+import type {
+  ExtractionInput,
+  OcrWord,
+  RegionOcrResult,
+} from "@/pipeline/extractor/extractor.types";
 import { verifyAndDecode } from "@/pipeline/extractor/image-integrity";
 import { createLocalOcrEngine } from "@/pipeline/extractor/ocr-engine";
 import { runRegionOcr } from "@/pipeline/extractor/regions";
@@ -107,7 +112,7 @@ function tokenHasNumber(text: string, forms: string[]): boolean {
 }
 
 function diagnosticsFor(
-  regions: { regionName: string; words: OcrWord[] }[],
+  regions: RegionOcrResult[],
   numberFormList: string[],
   acceptableBrands: string[],
 ): CaseDiagnostics {
@@ -129,6 +134,7 @@ function diagnosticsFor(
         .filter((t) => t.trim().length > 0)
         .slice(0, MAX_BRAND_LINES)
     : [];
+  const brandSelection = selectBrandObservation(regions);
 
   let numberInOcr = false;
   let percentInOcr = false;
@@ -148,6 +154,17 @@ function diagnosticsFor(
   return {
     regions: sampleRegions,
     brandLineTexts: brandLines,
+    brandLineDecisions: (brandSelection.brandDiagnostics?.lines ?? [])
+      .slice(0, MAX_BRAND_LINES)
+      .map((line) => ({
+        rawText: truncate(line.rawText),
+        cleanedValue: line.cleanedValue ? truncate(line.cleanedValue) : null,
+        confidence: line.confidence,
+        prominence: line.prominence,
+        kept: line.kept,
+        reason: line.reason,
+      })),
+    brandAbstentionReason: brandSelection.brandDiagnostics?.abstentionReason,
     // Did OCR read an acceptable brand anywhere in the brand region (even merged
     // into a longer, later-filtered line)? Substring containment on the full,
     // uncapped region text distinguishes a filtering loss from an OCR miss.
@@ -181,7 +198,9 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
   let diagnostics: CaseDiagnostics = {
     regions: [],
     brandLineTexts: [],
+    brandLineDecisions: [],
     brandOcrContainsAcceptable: false,
+    brandAbstentionReason: undefined,
     alcoholNumberInOcr: false,
     alcoholPercentInOcr: false,
     alcoholNumberAndPercentSameLine: false,
@@ -230,6 +249,7 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
         top3Recall: false,
         failureClass: classifyBrand(evalCase.brand, empty, {
           ocrContainsAcceptable: diagnostics.brandOcrContainsAcceptable,
+          abstentionReason: diagnostics.brandAbstentionReason,
         }),
       },
       alcohol: {
@@ -267,6 +287,7 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
       top3Recall: brandInTopK(brandObs, evalCase.brand.acceptable, 3),
       failureClass: classifyBrand(evalCase.brand, brandObs, {
         ocrContainsAcceptable: diagnostics.brandOcrContainsAcceptable,
+        abstentionReason: diagnostics.brandAbstentionReason,
       }),
     },
     alcohol: {

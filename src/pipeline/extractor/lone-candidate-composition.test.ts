@@ -90,10 +90,7 @@ function ruleCtx(observation: AnalyzerFieldObservation): RuleContext {
 }
 
 describe("lone-candidate brand uncertainty composition", () => {
-  for (const tokens of [
-    ["LIVE", "BOLDLY"],
-    ["NAPA", "VALLEY"],
-  ]) {
+  for (const tokens of [["LIVE", "BOLDLY"]]) {
     const label = tokens.join(" ");
     describe(label, () => {
       const obs = brandOf(tokens);
@@ -145,10 +142,7 @@ describe("lone-candidate brand uncertainty composition", () => {
   }
 
   it("no AMBIGUOUS observation carries an empty hidden value", () => {
-    for (const tokens of [
-      ["LIVE", "BOLDLY"],
-      ["NAPA", "VALLEY"],
-    ]) {
+    for (const tokens of [["LIVE", "BOLDLY"]]) {
       const obs = brandOf(tokens);
       expect(obs.value).not.toBe("");
       expect(obs.value).not.toBeNull();
@@ -175,13 +169,15 @@ describe("lone-candidate fix preserves existing guards", () => {
   });
 
   it("slogan and appellation lone lines stay AMBIGUOUS uncertainty, schema-valid", () => {
-    for (const tokens of [
-      ["LIVE", "BOLDLY"],
-      ["NAPA", "VALLEY"],
-    ]) {
-      const obs = brandOf(tokens);
-      expect(obs.state).toBe("AMBIGUOUS");
-      expect(observationSchema.safeParse(obs).success).toBe(true);
-    }
+    const obs = brandOf(["LIVE", "BOLDLY"]);
+    expect(obs.state).toBe("AMBIGUOUS");
+    expect(observationSchema.safeParse(obs).success).toBe(true);
+  });
+
+  it("appellation-only lone lines now abstain rather than surfacing as reviewable brand evidence", () => {
+    const obs = brandOf(["NAPA", "VALLEY"]);
+    expect(obs.state).toBe("NOT_OBSERVED");
+    expect(obs.value).toBeNull();
+    expect(observationSchema.safeParse(obs).success).toBe(true);
   });
 });

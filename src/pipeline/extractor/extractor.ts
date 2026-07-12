@@ -113,6 +113,15 @@ function provenanceLimitations(brand: FieldSelection, alcohol: FieldSelection): 
     notes.push(
       `brandName selected from region ${brand.sourceRegion} via [${regionPreprocessing(brand.sourceRegion).join(", ")}]`,
     );
+  } else if (brand.brandDiagnostics?.abstentionReason) {
+    notes.push(`brandName abstained: ${brand.brandDiagnostics.abstentionReason}`);
+    const rejected = brand.brandDiagnostics.lines
+      .filter((line) => !line.kept && line.cleanedValue)
+      .slice(0, 3)
+      .map((line) => `"${line.cleanedValue}" [${line.reason}]`);
+    if (rejected.length > 0) {
+      notes.push(`brandName rejected candidates: ${rejected.join(", ")}`);
+    }
   }
   if (alcohol.sourceRegion) {
     notes.push(

@@ -170,6 +170,30 @@ describe("selectBrandObservation", () => {
     expect(observation.value).toBe("STONE'S THROW");
   });
 
+  it("does not reject a positively-signalled brand just because it ends with punctuation", () => {
+    const brand = tallLine(
+      [
+        ["Mike's", 96],
+        ["Farm,", 80],
+        ["Inc.", 95],
+      ],
+      10,
+      40,
+    );
+    const backLabelNoise = tallLine(
+      [
+        ["HINNANT", 92],
+        ["FARMS", 96],
+        ["VINEYARD", 96],
+      ],
+      120,
+      18,
+    );
+    const { observation } = selectBrandObservation([region([...brand, ...backLabelNoise])]);
+    expect(observation.state).toBe("OBSERVED");
+    expect(observation.value).toBe("Mike's Farm Inc.");
+  });
+
   it("does not turn a sole prominent wine varietal line into brand evidence", () => {
     const words = tallLine(
       [
@@ -223,8 +247,8 @@ describe("selectBrandObservation", () => {
       40,
     );
     const { observation } = selectBrandObservation([region(words)]);
-    expect(observation.state).toBe("AMBIGUOUS");
-    expect(observation.value).toBe("NAPA VALLEY");
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
   });
 
   it("a marketing slogan cannot outrank a genuine positively-signalled brand", () => {
@@ -296,6 +320,127 @@ describe("selectBrandObservation", () => {
         ["BY", 90],
         ["OTHER", 90],
         ["WINERY", 90],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
+  });
+
+  it("returns NOT_OBSERVED for a location/address line with no defensible brand", () => {
+    const words = tallLine(
+      [
+        ["DELRAY", 95],
+        ["BEACH", 95],
+        ["FL", 95],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
+  });
+
+  it("returns NOT_OBSERVED for a country-suffixed location line", () => {
+    const words = tallLine(
+      [
+        ["FONT-RUBI", 95],
+        ["-", 95],
+        ["SPAIN", 95],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
+  });
+
+  it("returns NOT_OBSERVED for generic wine/product wording with no defensible brand", () => {
+    const words = tallLine(
+      [
+        ["AMERICAN", 95],
+        ["GRAPE", 95],
+        ["WINE", 95],
+        ["CONCORD", 95],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
+  });
+
+  it("returns NOT_OBSERVED for generic translated product wording", () => {
+    const words = tallLine(
+      [
+        ["VARIEDADES", 95],
+        ["CUPATGE", 95],
+        ["BLEND", 95],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
+  });
+
+  it("returns NOT_OBSERVED for a translated product-of-country line", () => {
+    const words = tallLine(
+      [
+        ["PRODUCTE", 95],
+        ["D'ESPANYA", 95],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
+  });
+
+  it("returns NOT_OBSERVED for low-information OCR fragments", () => {
+    const words = tallLine(
+      [
+        ["JI", 75],
+        ["II", 74],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
+  });
+
+  it("returns NOT_OBSERVED for split government-warning fragments", () => {
+    const words = tallLine(
+      [
+        ["BE", 95],
+        ["VERAGES", 95],
+        ["IM", 95],
+        ["PAIRS", 95],
+      ],
+      10,
+      40,
+    );
+    const { observation } = selectBrandObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(observation.value).toBeNull();
+  });
+
+  it("returns NOT_OBSERVED for split pregnancy-warning fragments", () => {
+    const words = tallLine(
+      [
+        ["NG", 95],
+        ["PREGN", 95],
+        ["ANC", 95],
+        ["OT", 95],
       ],
       10,
       40,

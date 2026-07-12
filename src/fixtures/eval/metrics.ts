@@ -24,6 +24,8 @@ export interface ObservedField {
 export interface BrandDiagnostics {
   /** An acceptable brand string appears in the raw OCR text of the brand region. */
   ocrContainsAcceptable: boolean;
+  /** When brand abstained, the selector's bounded reason code. */
+  abstentionReason?: string;
 }
 
 export interface AlcoholDiagnostics {
@@ -229,7 +231,9 @@ export interface AggregateMetrics {
   brandUsefulButDeferredRate: number;
   brandUnnecessaryAmbiguityRate: number;
   brandFalseCertaintyRate: number;
+  brandFalseAbstentionRate: number;
   brandNotObservedRate: number;
+  brandCorrectAbstentionRate: number;
   absentBrandFalsePositiveRate: number;
   presentAlcoholCount: number;
   alcoholDetectionRecall: number;
@@ -317,9 +321,17 @@ export function aggregate(scores: FieldCaseScore[]): AggregateMetrics {
       determinate.filter((s) => s.brandClass === "false-certainty").length,
       determinate.length,
     ),
+    brandFalseAbstentionRate: rate(
+      determinate.filter((s) => !s.brandDetected).length,
+      determinate.length,
+    ),
     brandNotObservedRate: rate(
       determinate.filter((s) => !s.brandDetected).length,
       determinate.length,
+    ),
+    brandCorrectAbstentionRate: rate(
+      absentBrand.filter((s) => !s.brandDetected).length,
+      absentBrand.length,
     ),
     absentBrandFalsePositiveRate: rate(
       absentBrand.filter((s) => s.brandDetected).length,
