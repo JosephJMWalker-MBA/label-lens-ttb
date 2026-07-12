@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { PrecheckServiceResponse } from "@/server/precheck-service.types";
@@ -162,9 +162,10 @@ describe("PrecheckWorkspace — form & accessibility", () => {
     expect(screen.getByLabelText(/application alcohol value/i)).toBeRequired();
   });
 
-  it("shows the advisory boundary and no government-approval language", () => {
+  it("clarifies application facts are not OCR and shows no government-approval language", () => {
     render(<PrecheckWorkspace />);
-    expect(screen.getByText(/not a TTB approval/i)).toBeInTheDocument();
+    // The application facts are explained as operator-entered, not extracted.
+    expect(screen.getByText(/not read from the image by OCR/i)).toBeInTheDocument();
     expect(
       screen.queryByText(/\bApproved\b|\bRejected\b|\bCompliant\b|Official result|Certification/),
     ).toBeNull();
@@ -221,10 +222,18 @@ describe("PrecheckWorkspace — run & results", () => {
     ].map((id) => order.findIndex((t) => t === id));
     expect(firstOccurrence).toEqual([...firstOccurrence].sort((a, b) => a - b));
 
-    // Authority + versions visible; external dependency explained.
+    // Authority + versions visible (in the technical/checks disclosures, still in DOM).
     expect(screen.getAllByText(/27 CFR 4\.36/).length).toBeGreaterThan(0);
+    // Not-run checks are grouped under a single shared explanation, not repeated
+    // per rule, but each specific dependency is preserved.
+    expect(screen.getByText(/cannot be established from label artwork alone/i)).toBeInTheDocument();
     expect(screen.getByText(/actual alcohol content with provenance/)).toBeInTheDocument();
-    expect(screen.getAllByText(/External evidence required/i).length).toBe(3);
+    expect(screen.getByText(/class\/type or taxable-boundary evidence/)).toBeInTheDocument();
+    expect(screen.getByText(/table\/light-wine designation evidence/)).toBeInTheDocument();
+    // The three not-run rules are grouped under the shared heading.
+    expect(
+      screen.getByRole("heading", { name: /additional evidence-dependent checks/i }),
+    ).toBeInTheDocument();
 
     // No government-approval verdicts or aggregate score are shown.
     expect(screen.queryByText(/\b(Approved|Compliant|Noncompliant|Official result)\b/)).toBeNull();
@@ -438,6 +447,21 @@ describe("PrecheckWorkspace — human disposition", () => {
     expect(screen.getByText(/does not represent a TTB action/i)).toBeInTheDocument();
   });
 
+  it("collapses the disposition form by default beneath a disclosure", async () => {
+    vi.stubGlobal("fetch", routedFetch());
+    render(<PrecheckWorkspace />);
+    await runPrecheckToResult();
+
+    // The full operator form is inside a collapsed disclosure, not directly under
+    // the first summary. Its content stays in the DOM (reachable).
+    const dispositionDetails = screen
+      .getByText("Record internal disposition")
+      .closest("details") as HTMLDetailsElement;
+    expect(dispositionDetails.open).toBe(false);
+    expect(screen.getByRole("heading", { name: /human disposition/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/operator identifier/i)).toBeInTheDocument();
+  });
+
   it("shows an accessible error and does not append on a server rejection", async () => {
     vi.stubGlobal(
       "fetch",
@@ -470,5 +494,222 @@ describe("PrecheckWorkspace — human disposition", () => {
     expect(within(alert).getByText(/reason code/i)).toBeInTheDocument();
     // No history entry was added.
     expect(screen.queryByText(/Sequence 1:/i)).toBeNull();
+  });
+});
+
+// -- Image preview (local object URL lifecycle) ---------------------------------
+
+function stubObjectUrls() {
+  const created: string[] = [];
+  const revoked: string[] = [];
+  let n = 0;
+  vi.stubGlobal("URL", {
+    ...URL,
+    createObjectURL: vi.fn(() => {
+      const url = `blob:preview-${++n}`;
+      created.push(url);
+      return url;
+    }),
+    revokeObjectURL: vi.fn((url: string) => revoked.push(url)),
+  });
+  return { created, revoked };
+}
+
+function selectImage(name = "label.jpeg", type = "image/jpeg") {
+  const file = new File([new Uint8Array([1, 2, 3])], name, { type });
+  const input = screen.getByLabelText(/select one label image/i) as HTMLInputElement;
+  fireEvent.change(input, { target: { files: [file] } });
+  return file;
+}
+
+describe("PrecheckWorkspace — image preview", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("shows a local preview with filename, type, and size after selecting a file", async () => {
+    const { created } = stubObjectUrls();
+    render(<PrecheckWorkspace />);
+    selectImage("my-label.png", "image/png");
+
+    const img = await screen.findByAltText(/preview of the selected label image: my-label\.png/i);
+    expect(img).toHaveAttribute("src", created[0]);
+    expect(screen.getByText("my-label.png")).toBeInTheDocument();
+    expect(screen.getByText(/image\/png/)).toBeInTheDocument();
+    // No automatic upload was triggered by selecting the file.
+    expect(screen.queryByRole("heading", { name: /pre-check result/i })).toBeNull();
+  });
+
+  it("replaces the preview and revokes the previous object URL when the file changes", async () => {
+    const { created, revoked } = stubObjectUrls();
+    render(<PrecheckWorkspace />);
+    selectImage("first.jpeg");
+    await screen.findByAltText(/first\.jpeg/i);
+    selectImage("second.jpeg");
+    await screen.findByAltText(/second\.jpeg/i);
+
+    expect(created).toHaveLength(2);
+    expect(revoked).toContain(created[0]);
+    expect(screen.queryByAltText(/first\.jpeg/i)).toBeNull();
+  });
+
+  it("clears the preview and revokes its object URL on Clear image", async () => {
+    const { created, revoked } = stubObjectUrls();
+    render(<PrecheckWorkspace />);
+    selectImage("gone.jpeg");
+    await screen.findByAltText(/gone\.jpeg/i);
+
+    fireEvent.click(screen.getByRole("button", { name: /clear image/i }));
+    expect(screen.queryByAltText(/gone\.jpeg/i)).toBeNull();
+    expect(revoked).toContain(created[0]);
+  });
+
+  it("revokes the object URL on unmount (no leak)", async () => {
+    const { created, revoked } = stubObjectUrls();
+    const { unmount } = render(<PrecheckWorkspace />);
+    selectImage("leak.jpeg");
+    await screen.findByAltText(/leak\.jpeg/i);
+    act(() => unmount());
+    expect(revoked).toContain(created[0]);
+  });
+});
+
+// -- Review-first layout & progressive disclosure -------------------------------
+
+async function runToResultWithFile() {
+  vi.stubGlobal("fetch", routedFetch());
+  render(<PrecheckWorkspace />);
+  selectFileAndFill();
+  fireEvent.click(screen.getByRole("button", { name: /run pre-check/i }));
+  await screen.findByRole("heading", { name: /pre-check result/i });
+}
+
+describe("PrecheckWorkspace — review-first layout", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("shows the concise summary before the technical detail sections", async () => {
+    await runToResultWithFile();
+    const summary = screen.getByRole("heading", { name: /^summary$/i });
+    const evidence = screen.getByText("Evidence details");
+    // Summary appears earlier in document order than Evidence details.
+    expect(
+      summary.compareDocumentPosition(evidence) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    // Plain-language reading + extracted value are in the summary.
+    expect(screen.getAllByText("Found").length).toBeGreaterThan(0);
+    expect(screen.getByText(/detected brand/i)).toBeInTheDocument();
+    expect(screen.getByText(/detected alcohol/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/checks need human review|check needs human review/i),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps the machine state available inside the details", async () => {
+    await runToResultWithFile();
+    // The plain label is shown, and the exact machine state remains reachable.
+    expect(screen.getAllByText(/machine state: OBSERVED/).length).toBeGreaterThan(0);
+  });
+
+  it("collapses technical detail sections by default (CANNED has no reviews)", async () => {
+    await runToResultWithFile();
+    // Technical detail and the full record stay collapsed initially. Regulatory
+    // checks is collapsed here because the canned result has nothing needing
+    // review (it auto-opens only when a review is required).
+    for (const title of ["Evidence details", "Technical provenance", "Regulatory checks"]) {
+      const details = screen.getByText(title).closest("details") as HTMLDetailsElement;
+      expect(details, `${title} should be collapsed`).toBeTruthy();
+      expect(details.open, `${title} should be collapsed`).toBe(false);
+    }
+    // Downloads is a primary action and is open by default.
+    const downloads = screen.getByText("Downloads").closest("details") as HTMLDetailsElement;
+    expect(downloads.open).toBe(true);
+  });
+
+  it("opens a disclosure when its summary is activated (keyboard-operable native details)", async () => {
+    await runToResultWithFile();
+    const summaryEl = screen.getByText("Technical provenance").closest("summary") as HTMLElement;
+    const details = summaryEl.closest("details") as HTMLDetailsElement;
+    expect(summaryEl.tagName).toBe("SUMMARY"); // inherently keyboard-operable
+    expect(details.open).toBe(false);
+    fireEvent.click(summaryEl);
+    expect(details.open).toBe(true);
+  });
+
+  it("keeps all underlying data reachable regardless of collapsed state", async () => {
+    await runToResultWithFile();
+    // Raw coordinate detail, authority, and independent evidence assessments all
+    // remain present in the DOM even though their sections are collapsed.
+    expect(screen.getAllByText(/2404×979/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/27 CFR 4\.36/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/brand-name-check/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/wine-alcohol-check/).length).toBeGreaterThan(0);
+  });
+
+  it("uses responsive, non-overflowing preview styling", async () => {
+    const { unmount } = (() => {
+      vi.stubGlobal("fetch", routedFetch());
+      return render(<PrecheckWorkspace />);
+    })();
+    selectFileAndFill();
+    fireEvent.click(screen.getByRole("button", { name: /run pre-check/i }));
+    await screen.findByRole("heading", { name: /pre-check result/i });
+    // The preview image is fluid (width-bounded) rather than a fixed overflow width.
+    for (const img of screen.getAllByAltText(/preview of the selected label image/i)) {
+      expect(img.className).toMatch(/w-full/);
+      expect(img.className).toMatch(/object-contain/);
+    }
+    unmount();
+  });
+});
+
+// -- Download error handling & retry --------------------------------------------
+
+describe("PrecheckWorkspace — download error handling", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("surfaces an accessible error when a download cannot begin, without corrupting the result", async () => {
+    vi.stubGlobal("fetch", routedFetch());
+    render(<PrecheckWorkspace />);
+    await runPrecheckToResult();
+
+    // Force object-URL creation to fail (e.g. a runtime that blocks blob URLs).
+    vi.stubGlobal("URL", {
+      ...URL,
+      createObjectURL: () => {
+        throw new Error("blocked");
+      },
+      revokeObjectURL: () => {},
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /download json export/i }));
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByText(/could not be downloaded/i)).toBeInTheDocument();
+    // The result state is intact (findings still rendered); no false success.
+    expect(screen.getAllByText(/wine-alcohol-syntax/).length).toBeGreaterThan(0);
+  });
+
+  it("clears the error and allows retry once the download can begin again", async () => {
+    vi.stubGlobal("fetch", routedFetch());
+    render(<PrecheckWorkspace />);
+    await runPrecheckToResult();
+
+    vi.stubGlobal("URL", {
+      ...URL,
+      createObjectURL: () => {
+        throw new Error("blocked");
+      },
+      revokeObjectURL: () => {},
+    });
+    fireEvent.click(screen.getByRole("button", { name: /download readable report/i }));
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+
+    // Recovery: a working object-URL implementation lets the retry succeed and
+    // the accessible error is cleared.
+    vi.stubGlobal("URL", {
+      ...URL,
+      createObjectURL: () => "blob:ok",
+      revokeObjectURL: () => {},
+    });
+    fireEvent.click(screen.getByRole("button", { name: /download readable report/i }));
+    await waitFor(() => expect(screen.queryByRole("alert")).toBeNull());
   });
 });
