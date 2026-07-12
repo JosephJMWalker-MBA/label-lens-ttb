@@ -3,17 +3,25 @@
  *
  * It saves exact text (or bytes) supplied by the server response — it never
  * reconstructs content from visible fields. The object URL is revoked only after
- * a delay, so the browser has time to begin the download before the blob is
- * released; revoking synchronously in the same tick as the click races the
- * download and makes it silently do nothing in some browsers/runtimes.
+ * a short delay, so it outlives the synchronous click task before the blob is
+ * released. Revoking synchronously in the same tick as the click is a
+ * standards-consistent race that can cancel the download in some browsers; that
+ * race is the strongest identified cause of the reported "downloads do nothing"
+ * symptom, though it was not reproduced in headless Chromium.
  *
- * A failure to start the download throws, so the caller can surface an
- * accessible error instead of claiming success. Nothing here logs report
- * contents or any sensitive data.
+ * Only synchronous failures are observable here: if the object URL cannot be
+ * created or the click throws, this throws so the caller can surface an
+ * accessible error. A browser or embedded webview may still silently ignore an
+ * otherwise-successful click — that cannot be reliably detected. Nothing here
+ * logs report contents or any sensitive data.
  */
 
-/** How long the object URL stays alive after the click, so the download starts. */
-export const OBJECT_URL_REVOKE_DELAY_MS = 40_000;
+/**
+ * How long the object URL stays alive after the click. One second comfortably
+ * outlives the initiating click task without retaining report blobs for long
+ * during repeated downloads.
+ */
+export const OBJECT_URL_REVOKE_DELAY_MS = 1_000;
 
 export interface DownloadRequest {
   /** Exact bytes/text from the server response. */
@@ -56,7 +64,7 @@ export function triggerDownload({ content, filename, mimeType }: DownloadRequest
     throw cause;
   }
 
-  // Defer revocation so the browser can start reading the blob first. setTimeout
-  // is used (not a sync call) specifically to outlive the click's task.
+  // Defer revocation so it outlives the synchronous click task and the browser
+  // can start reading the blob first (not a sync call in the click's tick).
   setTimeout(() => URL.revokeObjectURL(url), OBJECT_URL_REVOKE_DELAY_MS);
 }
