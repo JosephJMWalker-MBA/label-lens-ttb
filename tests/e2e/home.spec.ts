@@ -223,3 +223,82 @@ test("upload rerun with alcohol 13 flips only the declared-comparison outcome", 
   expect(at125["wine-alcohol-declared-comparison"]).toBe("PASS");
   expect(at13["wine-alcohol-declared-comparison"]).toBe("FAIL");
 });
+
+test("downloads produce real browser files: JSON, HTML, a repeat, and a disposition-updated report", async ({
+  page,
+}) => {
+  test.setTimeout(180_000);
+  await page.goto("/");
+
+  // 1–2 · Complete a real precheck and wait for the result.
+  await page.getByRole("button", { name: /load verified m cellars sample/i }).click();
+  await expect(page.getByRole("heading", { name: /pre-check result/i })).toBeVisible({
+    timeout: 150_000,
+  });
+  await openSection(page, "Downloads");
+
+  // 3–8 · JSON download: capture the browser download event, verify filename,
+  // read the file, parse JSON, and verify the checksum-bearing schema.
+  const [jsonDownload] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: /download json export/i }).click(),
+  ]);
+  expect(jsonDownload.suggestedFilename()).toMatch(
+    /^label-lens-wine-precheck-precheck-result\.v1-[0-9a-f]{64}\.json$/,
+  );
+  const jsonText = readFileSync(await jsonDownload.path(), "utf8");
+  const parsed = JSON.parse(jsonText);
+  const { integrity, ...payload } = parsed;
+  expect(integrity.algorithm).toBe("SHA-256");
+  expect(payloadHash(payload)).toBe(integrity.value);
+  expect(parsed.exportType).toBe("wine-precheck-result");
+  // No absolute server/local paths leak into the exported content.
+  expect(jsonText).not.toMatch(/\/Users\/|\/home\/|\/var\/folders\//);
+
+  // 9–13 · HTML download: capture the event, verify filename, and confirm the
+  // file is real, well-formed HTML.
+  const [htmlDownload] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: /download readable report/i }).click(),
+  ]);
+  expect(htmlDownload.suggestedFilename()).toMatch(
+    /^label-lens-wine-precheck-precheck-result\.v1-[0-9a-f]{64}\.html$/,
+  );
+  const htmlText = readFileSync(await htmlDownload.path(), "utf8");
+  expect(htmlText).toMatch(/^<!doctype html>/i);
+  expect(htmlText).toMatch(/<\/html>\s*$/i);
+  expect(htmlText).toMatch(/M CELLARS/);
+  for (const id of REGISTRY_ORDER) expect(htmlText).toContain(id);
+
+  // 14 · Repeat a download — it must work again (no premature URL revocation).
+  const [jsonAgain] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: /download json export/i }).click(),
+  ]);
+  expect(readFileSync(await jsonAgain.path(), "utf8")).toBe(jsonText);
+
+  // 15 · Record a disposition, then a freshly downloaded report includes it.
+  await openSection(page, "Record internal disposition");
+  await page.getByLabel(/operator identifier/i).fill("reviewer-dl");
+  await page.getByLabel(/decision/i).selectOption("escalated_for_human_review");
+  await page.getByLabel(/reason code/i).fill("NEEDS_SECOND_LOOK");
+  await page.getByRole("button", { name: /record disposition/i }).click();
+  await expect(page.getByText(/Sequence 1:/i)).toBeVisible({ timeout: 60_000 });
+
+  await openSection(page, "Downloads");
+  const [jsonWithDisposition] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: /download json export/i }).click(),
+  ]);
+  const updated = JSON.parse(readFileSync(await jsonWithDisposition.path(), "utf8"));
+  expect(updated.humanDispositionHistory).toHaveLength(1);
+  expect(updated.humanDispositionHistory[0].decision).toBe("escalated_for_human_review");
+
+  const [htmlWithDisposition] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: /download readable report/i }).click(),
+  ]);
+  const updatedHtml = readFileSync(await htmlWithDisposition.path(), "utf8");
+  expect(updatedHtml).toMatch(/escalated_for_human_review/);
+  expect(updatedHtml).toMatch(/reviewer-dl/);
+});
