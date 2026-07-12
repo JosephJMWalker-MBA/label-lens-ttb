@@ -1,0 +1,3 @@
+# Thin Policy
+
+- Status: Accepted

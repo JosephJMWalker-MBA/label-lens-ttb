@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 // Committed export hashing logic, imported directly so the browser test verifies
 // the downloaded checksum with the same code the server used to produce it.
@@ -17,14 +17,25 @@ const REGISTRY_ORDER = [
 
 const FIXTURE = "tests/fixtures/precheck/m-cellars-24205001000905/label-ocr-source.jpeg";
 
+/**
+ * Expand a progressive-disclosure section by its summary text. Idempotent: it
+ * sets `open` directly so calling it on an already-open section is harmless.
+ */
+async function openSection(page: Page, title: string) {
+  await page.evaluate((t) => {
+    const summaries = Array.from(document.querySelectorAll("details > summary"));
+    const summary = summaries.find((el) => el.textContent?.includes(t));
+    if (summary) (summary.parentElement as HTMLDetailsElement).open = true;
+  }, title);
+}
+
 test("home page shows the advisory pre-check with run disabled until inputs exist", async ({
   page,
 }) => {
   await page.goto("/");
-  await expect(
-    page.getByRole("heading", { level: 1, name: /wine label pre-check/i }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: /label lens ttb/i })).toBeVisible();
   await expect(page.getByText(/not a TTB approval/i).first()).toBeVisible();
+  await expect(page.getByText(/prescreen a wine label before formal review/i)).toBeVisible();
   await expect(page.getByRole("button", { name: /^run pre-check$/i })).toBeDisabled();
 });
 
@@ -51,33 +62,40 @@ test("bundled M Cellars sample runs the real pipeline end-to-end and downloads a
   await expect(result).toBeVisible({ timeout: 150_000 });
   await expect(page.getByText(/pre-check complete/i)).toBeVisible();
 
-  // 7 · Both evidence assessments, shown independently.
+  // 7 · The concise summary presents the brand reading in plain language. The
+  // brand mark is not cleanly recoverable, so it reads as "Multiple possibilities".
+  await expect(page.getByText(/detected brand/i)).toBeVisible();
+  await expect(page.getByText(/Multiple possibilities/i).first()).toBeVisible();
+  await expect(page.getByText(/12\.5% ALC\.\/VOL\./).first()).toBeVisible();
+
+  // 8 · Independent evidence assessments live under Technical provenance.
+  await openSection(page, "Technical provenance");
   await expect(page.getByText(/brand-name-check/).first()).toBeVisible();
   await expect(page.getByText(/wine-alcohol-check/).first()).toBeVisible();
 
-  // 8 · Brand and alcohol observations. Alcohol is cleanly observed; the brand
-  // mark is not cleanly recoverable, so its observation is honestly ambiguous.
-  await expect(page.getByText(/12\.5% ALC\.\/VOL\./).first()).toBeVisible();
-  await expect(page.getByText(/AMBIGUOUS/).first()).toBeVisible();
-
-  // 9 · All six findings in exact registry order.
+  // 9 · Expand Regulatory checks; all six findings appear in registry order.
+  await openSection(page, "Regulatory checks");
   const findingOrder = await page.locator("ol li .font-medium").allInnerTexts();
   const seen = REGISTRY_ORDER.map((id) => findingOrder.indexOf(id));
   expect(seen).toEqual([...seen].sort((a, b) => a - b));
   for (const id of REGISTRY_ORDER) expect(findingOrder).toContain(id);
 
-  // 10 · Authority and version information is visible.
+  // 10 · Authority information is visible.
   await expect(page.getByText(/27 CFR/).first()).toBeVisible();
 
-  // 11 · All three external-dependency explanations are visible.
-  await expect(page.getByText(/External evidence required/i)).toHaveCount(3);
+  // 11 · Not-run checks are grouped under one shared explanation, with each
+  // specific dependency preserved (no per-rule repetition).
+  await expect(page.getByText(/cannot be established from label artwork alone/i)).toBeVisible();
+  await expect(page.getByText(/actual alcohol content with provenance/).first()).toBeVisible();
+  await expect(page.getByText(/class\/type or taxable-boundary evidence/).first()).toBeVisible();
+  await expect(page.getByText(/table\/light-wine designation evidence/).first()).toBeVisible();
 
   // No overall status / compliance score is presented.
   await expect(page.getByText(/\b(Approved|Compliant|Noncompliant|Official result)\b/)).toHaveCount(
     0,
   );
 
-  // 12 + 13 · Download the JSON export and read its bytes in the test.
+  // 12 + 13 · Download the JSON export (Downloads is open by default) and read it.
   const filenameShown = (await page.locator("code").first().innerText()).trim();
   const [download] = await Promise.all([
     page.waitForEvent("download"),
@@ -110,10 +128,12 @@ test("operator can record a disposition and download an updated report from the 
   });
 
   // Machine findings before disposition (must remain unchanged after append).
+  await openSection(page, "Regulatory checks");
   const findingIdsBefore = await page.locator("ol li .font-medium").allInnerTexts();
   expect(findingIdsBefore).toContain("wine-alcohol-syntax");
 
-  // 2 · Record one bounded operator disposition.
+  // 2 · Expand and record one bounded operator disposition.
+  await openSection(page, "Record internal disposition");
   await page.getByLabel(/operator identifier/i).fill("reviewer-e2e");
   await page.getByLabel(/decision/i).selectOption("escalated_for_human_review");
   await page.getByLabel(/reason code/i).fill("NEEDS_SECOND_LOOK");
@@ -124,6 +144,7 @@ test("operator can record a disposition and download an updated report from the 
   await expect(page.getByText(/reviewer-e2e/)).toBeVisible();
 
   // 4 · Findings remain unchanged.
+  await openSection(page, "Regulatory checks");
   const findingIdsAfter = await page.locator("ol li .font-medium").allInnerTexts();
   expect(findingIdsAfter).toEqual(
     expect.arrayContaining(["wine-alcohol-syntax", "brand-name-canonical-comparison"]),
@@ -151,7 +172,7 @@ test("operator can record a disposition and download an updated report from the 
   );
   const reportHtml = readFileSync(await reportDownload.path(), "utf8");
 
-  // 7 · Inspect the report text.
+  // 7 · Inspect the report text (server-produced; unchanged by this UI PR).
   expect(reportHtml).toMatch(/not a TTB approval/i);
   expect(reportHtml).toMatch(/M CELLARS/);
   expect(reportHtml).toMatch(/12\.5% ALC\.\/VOL\./);
@@ -180,6 +201,7 @@ test("upload rerun with alcohol 13 flips only the declared-comparison outcome", 
     await expect(page.getByRole("heading", { name: /pre-check result/i })).toBeVisible({
       timeout: 150_000,
     });
+    await openSection(page, "Regulatory checks");
     // Map each finding rule id to its status token.
     const statuses: Record<string, string> = {};
     const items = page.locator("ol li");
@@ -200,4 +222,83 @@ test("upload rerun with alcohol 13 flips only the declared-comparison outcome", 
   expect(at13["wine-alcohol-syntax"]).toBe(at125["wine-alcohol-syntax"]);
   expect(at125["wine-alcohol-declared-comparison"]).toBe("PASS");
   expect(at13["wine-alcohol-declared-comparison"]).toBe("FAIL");
+});
+
+test("downloads produce real browser files: JSON, HTML, a repeat, and a disposition-updated report", async ({
+  page,
+}) => {
+  test.setTimeout(180_000);
+  await page.goto("/");
+
+  // 1–2 · Complete a real precheck and wait for the result.
+  await page.getByRole("button", { name: /load verified m cellars sample/i }).click();
+  await expect(page.getByRole("heading", { name: /pre-check result/i })).toBeVisible({
+    timeout: 150_000,
+  });
+  await openSection(page, "Downloads");
+
+  // 3–8 · JSON download: capture the browser download event, verify filename,
+  // read the file, parse JSON, and verify the checksum-bearing schema.
+  const [jsonDownload] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: /download json export/i }).click(),
+  ]);
+  expect(jsonDownload.suggestedFilename()).toMatch(
+    /^label-lens-wine-precheck-precheck-result\.v1-[0-9a-f]{64}\.json$/,
+  );
+  const jsonText = readFileSync(await jsonDownload.path(), "utf8");
+  const parsed = JSON.parse(jsonText);
+  const { integrity, ...payload } = parsed;
+  expect(integrity.algorithm).toBe("SHA-256");
+  expect(payloadHash(payload)).toBe(integrity.value);
+  expect(parsed.exportType).toBe("wine-precheck-result");
+  // No absolute server/local paths leak into the exported content.
+  expect(jsonText).not.toMatch(/\/Users\/|\/home\/|\/var\/folders\//);
+
+  // 9–13 · HTML download: capture the event, verify filename, and confirm the
+  // file is real, well-formed HTML.
+  const [htmlDownload] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: /download readable report/i }).click(),
+  ]);
+  expect(htmlDownload.suggestedFilename()).toMatch(
+    /^label-lens-wine-precheck-precheck-result\.v1-[0-9a-f]{64}\.html$/,
+  );
+  const htmlText = readFileSync(await htmlDownload.path(), "utf8");
+  expect(htmlText).toMatch(/^<!doctype html>/i);
+  expect(htmlText).toMatch(/<\/html>\s*$/i);
+  expect(htmlText).toMatch(/M CELLARS/);
+  for (const id of REGISTRY_ORDER) expect(htmlText).toContain(id);
+
+  // 14 · Repeat a download — it must work again (no premature URL revocation).
+  const [jsonAgain] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: /download json export/i }).click(),
+  ]);
+  expect(readFileSync(await jsonAgain.path(), "utf8")).toBe(jsonText);
+
+  // 15 · Record a disposition, then a freshly downloaded report includes it.
+  await openSection(page, "Record internal disposition");
+  await page.getByLabel(/operator identifier/i).fill("reviewer-dl");
+  await page.getByLabel(/decision/i).selectOption("escalated_for_human_review");
+  await page.getByLabel(/reason code/i).fill("NEEDS_SECOND_LOOK");
+  await page.getByRole("button", { name: /record disposition/i }).click();
+  await expect(page.getByText(/Sequence 1:/i)).toBeVisible({ timeout: 60_000 });
+
+  await openSection(page, "Downloads");
+  const [jsonWithDisposition] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: /download json export/i }).click(),
+  ]);
+  const updated = JSON.parse(readFileSync(await jsonWithDisposition.path(), "utf8"));
+  expect(updated.humanDispositionHistory).toHaveLength(1);
+  expect(updated.humanDispositionHistory[0].decision).toBe("escalated_for_human_review");
+
+  const [htmlWithDisposition] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: /download readable report/i }).click(),
+  ]);
+  const updatedHtml = readFileSync(await htmlWithDisposition.path(), "utf8");
+  expect(updatedHtml).toMatch(/escalated_for_human_review/);
+  expect(updatedHtml).toMatch(/reviewer-dl/);
 });
