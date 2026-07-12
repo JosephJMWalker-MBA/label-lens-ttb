@@ -1,35 +1,51 @@
 import { readFileSync } from "node:fs";
+
 import { describe, expect, it } from "vitest";
 
 import { validateEvalManifest } from "./eval-manifest.schema";
-import { EVAL_STRATA } from "./eval-manifest.types";
 import { EVAL_MANIFEST_PATH, loadEvalManifest } from "./eval-loader";
 
 /**
- * Manifest integrity: the committed evaluation set validates, covers the
- * required strata at the required size, and the schema rejects malformed
- * annotations (a silently-broken case would produce a dishonest baseline).
+ * The corpus-scale manifest must reconcile the full committed image inventory
+ * while carrying the completed full-wine-corpus annotation set for Issue #57.
  */
 
 const committed = JSON.parse(readFileSync(EVAL_MANIFEST_PATH, "utf8")) as unknown;
 
-function goodCase() {
+function goodRecord() {
   return {
-    caseId: "c1",
-    fixtureDir: "approved-wine-001",
-    imageFilename: "label.png",
+    caseId: "approved-wine-001",
+    imagePath: "tests/fixtures/precheck/approved-wine-001/label.png",
     expectedSha256: "a".repeat(64),
-    source: "approved fixture",
-    usageStatus: "screened-approved",
-    strata: ["simple-centered-brand"],
-    brand: { acceptable: ["Brand"], knownAmbiguous: false },
-    alcohol: { present: true, acceptablePercents: [14], acceptableText: ["14%"] },
-    annotation: { annotatedBy: "x", annotatedOn: "2026-07-12", method: "inspection" },
+    image: { mediaType: "image/png", width: 975, height: 1500 },
+    beverageCategory: "wine",
+    source: {
+      authority: "author-provided-local-acquisition",
+      description: "approved wine fixture",
+      usageStatus: "screenshot-metadata-screened-author-attested",
+      provenanceRefs: ["tests/fixtures/precheck/approved-wine-110-inventory.json"],
+    },
+    inspection: {
+      imageOrientation: "portrait",
+      visualStrata: ["front-label"],
+      reviewReasons: ["other"],
+      notes: "Single-image front label candidate.",
+    },
+    status: "excluded_uncertain_truth",
+    exclusionReason: "Checkpoint inventory record only pending full annotation.",
+    duplicateOfCaseId: null,
+    annotation: null,
+    qualityControl: null,
   };
 }
 
-function manifestWith(caseObj: unknown) {
-  return { schemaVersion: "extraction-eval-manifest.v1", description: "d", cases: [caseObj] };
+function manifestWith(records: unknown[]) {
+  return {
+    schemaVersion: "extraction-eval-manifest.v2",
+    corpusRoot: "tests/fixtures/precheck",
+    description: "checkpoint",
+    records,
+  };
 }
 
 describe("committed evaluation manifest", () => {
@@ -37,74 +53,167 @@ describe("committed evaluation manifest", () => {
     expect(validateEvalManifest(committed).ok).toBe(true);
   });
 
-  it("holds 12–20 cases", () => {
-    const m = loadEvalManifest();
-    expect(m.cases.length).toBeGreaterThanOrEqual(12);
-    expect(m.cases.length).toBeLessThanOrEqual(20);
+  it("reconciles every discovered candidate image under tests/fixtures/precheck", () => {
+    const manifest = loadEvalManifest();
+    expect(manifest.records).toHaveLength(132);
+    const paths = new Set(manifest.records.map((record) => record.imagePath));
+    expect(paths.size).toBe(manifest.records.length);
+    expect(paths).toContain(
+      "tests/fixtures/precheck/m-cellars-24205001000905/label-ocr-source.jpeg",
+    );
+    expect(paths).toContain("tests/fixtures/precheck/m-cellars-24205001000905/label.png");
+    expect(paths).toContain(
+      "tests/fixtures/precheck/m-cellars-lowres-24205001000905/label-lowres.png",
+    );
+    expect(paths).toContain("tests/fixtures/precheck/wine-multi-artifact-10/label.png");
+    expect(paths).toContain(
+      "tests/fixtures/precheck/category-sentinel-single-malt-whiskey-03/label.jpeg",
+    );
   });
 
-  it("covers every required stratum at least once", () => {
-    const m = loadEvalManifest();
-    const covered = new Set(m.cases.flatMap((c) => c.strata));
-    for (const stratum of EVAL_STRATA) {
-      expect(covered, `stratum ${stratum} is uncovered`).toContain(stratum);
-    }
+  it("captures the visually corrected beverage-category counts", () => {
+    const manifest = loadEvalManifest();
+    const counts = manifest.records.reduce<Record<string, number>>((acc, record) => {
+      acc[record.beverageCategory] = (acc[record.beverageCategory] ?? 0) + 1;
+      return acc;
+    }, {});
+    expect(counts["wine"]).toBe(120);
+    expect(counts["distilled-spirits"]).toBe(9);
+    expect(counts["beer-or-malt-beverage"]).toBe(3);
+    expect(
+      manifest.records.find((record) => record.caseId === "wine-multi-artifact-01")
+        ?.beverageCategory,
+    ).toBe("distilled-spirits");
+    expect(
+      manifest.records.find((record) => record.caseId === "wine-multi-artifact-02")
+        ?.beverageCategory,
+    ).toBe("distilled-spirits");
+    expect(
+      manifest.records.find((record) => record.caseId === "wine-multi-artifact-03")
+        ?.beverageCategory,
+    ).toBe("distilled-spirits");
   });
 
-  it("includes the documented live case and at least one genuinely-ambiguous case", () => {
-    const m = loadEvalManifest();
-    expect(m.cases.some((c) => c.caseId === "luigi-giovanni-live")).toBe(true);
-    expect(m.cases.some((c) => c.brand.knownAmbiguous)).toBe(true);
-    expect(m.cases.some((c) => !c.alcohol.present)).toBe(true);
+  it("keeps only wine records in the included evaluation slice", () => {
+    const manifest = loadEvalManifest();
+    expect(manifest.cases).toHaveLength(115);
+    expect(manifest.cases.some((record) => record.caseId === "luigi-giovanni-live")).toBe(true);
+    expect(manifest.cases.some((record) => record.caseId === "approved-wine-020")).toBe(true);
+    expect(manifest.cases.some((record) => record.caseId === "approved-wine-110")).toBe(true);
+    expect(
+      manifest.records
+        .filter((record) => record.status === "included")
+        .every((record) => record.beverageCategory === "wine"),
+    ).toBe(true);
+  });
+
+  it("leaves only the three placeholder-abv wine labels as uncertain truth", () => {
+    const manifest = loadEvalManifest();
+    const unresolved = manifest.records
+      .filter((record) => record.status === "excluded_uncertain_truth")
+      .map((record) => record.caseId)
+      .sort();
+    expect(unresolved).toEqual(["approved-wine-029", "approved-wine-030", "approved-wine-036"]);
+  });
+
+  it("marks the M Cellars derivatives as duplicates of the canonical benchmark", () => {
+    const manifest = loadEvalManifest();
+    const referenceCrop = manifest.records.find(
+      (record) => record.caseId === "m-cellars-reference-crop",
+    );
+    const lowres = manifest.records.find((record) => record.caseId === "m-cellars-lowres");
+    expect(referenceCrop?.status).toBe("excluded_duplicate");
+    expect(referenceCrop?.duplicateOfCaseId).toBe("m-cellars-baseline");
+    expect(lowres?.status).toBe("excluded_duplicate");
+    expect(lowres?.duplicateOfCaseId).toBe("m-cellars-baseline");
   });
 });
 
-describe("manifest validation rejects malformed annotations", () => {
-  it("accepts a well-formed case", () => {
-    expect(validateEvalManifest(manifestWith(goodCase())).ok).toBe(true);
+describe("manifest validation rejects malformed corpus records", () => {
+  it("accepts a well-formed excluded record", () => {
+    expect(validateEvalManifest(manifestWith([goodRecord()])).ok).toBe(true);
   });
 
-  it("rejects an empty acceptable-brand list", () => {
-    const c = goodCase();
-    c.brand.acceptable = [];
-    expect(validateEvalManifest(manifestWith(c)).ok).toBe(false);
+  it("rejects a missing beverage category", () => {
+    const record = { ...goodRecord() } as Record<string, unknown>;
+    delete record.beverageCategory;
+    expect(validateEvalManifest(manifestWith([record])).ok).toBe(false);
   });
 
-  it("rejects present alcohol with no acceptable percents", () => {
-    const c = goodCase();
-    c.alcohol = { present: true, acceptablePercents: [], acceptableText: [] };
-    expect(validateEvalManifest(manifestWith(c)).ok).toBe(false);
-  });
-
-  it("rejects absent alcohol that still carries percents", () => {
-    const c = goodCase();
-    c.alcohol = { present: false, acceptablePercents: [13], acceptableText: [] };
-    expect(validateEvalManifest(manifestWith(c)).ok).toBe(false);
-  });
-
-  it("rejects a malformed sha256", () => {
-    const c = goodCase();
-    c.expectedSha256 = "not-a-hash";
-    expect(validateEvalManifest(manifestWith(c)).ok).toBe(false);
-  });
-
-  it("rejects an unknown stratum", () => {
-    const c = goodCase();
-    c.strata = ["not-a-real-stratum"] as unknown as typeof c.strata;
-    expect(validateEvalManifest(manifestWith(c)).ok).toBe(false);
-  });
-
-  it("rejects an unknown extra field (strict)", () => {
-    const c = { ...goodCase(), surprise: true };
-    expect(validateEvalManifest(manifestWith(c)).ok).toBe(false);
-  });
-
-  it("rejects duplicate case ids", () => {
-    const m = {
-      schemaVersion: "extraction-eval-manifest.v1",
-      description: "d",
-      cases: [goodCase(), goodCase()],
+  it("rejects an included non-wine record", () => {
+    const record = {
+      ...goodRecord(),
+      beverageCategory: "distilled-spirits",
+      status: "included",
+      exclusionReason: null,
+      annotation: {
+        brand: {
+          presence: "present",
+          acceptablePresentations: ["Blue Flag"],
+          genuinelyAmbiguous: false,
+          ambiguityReason: null,
+          forbiddenPresentations: [],
+          approxGeometry: [],
+          orientation: "horizontal",
+        },
+        alcohol: {
+          presence: "present",
+          acceptablePercents: [45],
+          acceptableStatements: ["45%"],
+          characteristics: [],
+          approxGeometry: [],
+          orientation: "horizontal",
+        },
+        confidence: { overall: "high", brand: "high", alcohol: "high" },
+        provenance: { annotatedBy: "x", annotatedOn: "2026-07-12", method: "manual inspection" },
+        notes: "bad record",
+      },
+      qualityControl: {
+        reviewedBy: "x",
+        reviewedOn: "2026-07-12",
+        method: "second-pass-visual-inspection",
+        outcome: "confirmed",
+        checks: [
+          "capitalization-and-punctuation",
+          "varietal-not-brand",
+          "producer-importer-bottler-not-brand",
+          "proof-not-alcohol-by-volume",
+          "rotated-or-vertical-alcohol",
+          "absent-field-annotations",
+          "genuine-ambiguity",
+          "duplicate-labels",
+        ],
+        corrections: [],
+        notes: "bad record",
+      },
+      inspection: {
+        imageOrientation: "portrait",
+        visualStrata: ["front-label"],
+        reviewReasons: [],
+        notes: "bad record",
+      },
     };
-    expect(validateEvalManifest(m).ok).toBe(false);
+    expect(validateEvalManifest(manifestWith([record])).ok).toBe(false);
+  });
+
+  it("rejects outside-scope wine records", () => {
+    const record = {
+      ...goodRecord(),
+      status: "excluded_outside_current_scope",
+      inspection: {
+        imageOrientation: "portrait",
+        visualStrata: ["front-label"],
+        reviewReasons: [],
+        notes: "bad record",
+      },
+    };
+    expect(validateEvalManifest(manifestWith([record])).ok).toBe(false);
+  });
+
+  it("rejects duplicate image paths", () => {
+    const record = goodRecord();
+    expect(
+      validateEvalManifest(manifestWith([record, { ...record, caseId: "approved-wine-002" }])).ok,
+    ).toBe(false);
   });
 });
