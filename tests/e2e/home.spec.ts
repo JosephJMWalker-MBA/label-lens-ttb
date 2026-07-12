@@ -17,6 +17,19 @@ const REGISTRY_ORDER = [
 
 const FIXTURE = "tests/fixtures/precheck/m-cellars-24205001000905/label-ocr-source.jpeg";
 
+// The first-use onboarding modal overlays the page; mark it seen before each
+// navigation so the core-workflow tests exercise the page directly. A dedicated
+// test below covers the onboarding experience itself.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    try {
+      window.localStorage.setItem("label-lens.onboarding.seen.v1", "true");
+    } catch {
+      /* storage unavailable */
+    }
+  });
+});
+
 /**
  * Expand a progressive-disclosure section by its summary text. Idempotent: it
  * sets `open` directly so calling it on an already-open section is harmless.

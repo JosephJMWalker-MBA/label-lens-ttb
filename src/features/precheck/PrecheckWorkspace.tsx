@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { useOnboarding } from "@/components/onboarding/onboarding-context";
 import { Button } from "@/components/ui/button";
 import { Disclosure } from "@/components/ui/disclosure";
 import { Input } from "@/components/ui/input";
@@ -65,9 +66,34 @@ export function PrecheckWorkspace() {
   const [response, setResponse] = useState<PrecheckServiceResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
+  const startedAtRef = useRef(0);
+
+  // Onboarding must yield to a running or ready result — capture its close via a
+  // ref so it can be called on phase changes without re-subscribing effects.
+  const onboarding = useOnboarding();
+  const closeOnboardingRef = useRef(onboarding.close);
+  closeOnboardingRef.current = onboarding.close;
+
+  // A late-arriving or in-progress result must never be hidden behind the intro.
+  useEffect(() => {
+    if (phase === "processing" || phase === "complete") closeOnboardingRef.current();
+  }, [phase]);
+
+  // Honest elapsed-time counter while processing (no fake percentage or ETA).
+  useEffect(() => {
+    if (phase !== "processing") return;
+    startedAtRef.current = Date.now();
+    setElapsedSeconds(0);
+    const id = window.setInterval(() => {
+      setElapsedSeconds(Math.floor((Date.now() - startedAtRef.current) / 1000));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [phase]);
 
   // Create a local object URL for the preview and revoke it when the file
   // changes or the component unmounts, so no object URL is ever leaked.
@@ -97,6 +123,9 @@ export function PrecheckWorkspace() {
     (file.type === "image/png" || file.type === "image/jpeg");
 
   async function submit(body: FormData) {
+    // Guard against a duplicate in-flight request (belt-and-braces with the
+    // disabled controls) so a double activation never launches two pre-checks.
+    if (phase === "processing") return;
     setPhase("processing");
     setError(null);
     setResponse(null);
@@ -152,7 +181,7 @@ export function PrecheckWorkspace() {
       <div className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold">1 · Label image</h2>
         <Label htmlFor="label-image">Select one label image (PNG or JPEG)</Label>
-        <p className="text-xs text-muted-foreground">
+        <p id="label-image-help" className="text-xs text-muted-foreground">
           The image is processed for this check only and the tool does not store it.
         </p>
         <Input
@@ -160,6 +189,7 @@ export function PrecheckWorkspace() {
           ref={fileInputRef}
           type="file"
           accept={ACCEPTED}
+          aria-describedby="label-image-help"
           onChange={(event) => {
             setFile(event.target.files?.[0] ?? null);
             setPhase("ready");
@@ -211,7 +241,7 @@ export function PrecheckWorkspace() {
       >
         <fieldset className="flex flex-col gap-4 border-0 p-0">
           <legend className="text-lg font-semibold">2 · Application facts</legend>
-          <p className="text-sm text-muted-foreground">
+          <p id="facts-help" className="text-sm text-muted-foreground">
             Enter the values stated in the application so the tool can compare them with the
             evidence found on the artwork. These are not read from the image by OCR.
           </p>
@@ -224,6 +254,7 @@ export function PrecheckWorkspace() {
               value={brand}
               required
               aria-required="true"
+              aria-describedby="facts-help"
               onChange={(event) => setBrand(event.target.value)}
             />
           </div>
@@ -237,6 +268,7 @@ export function PrecheckWorkspace() {
               value={alcohol}
               required
               aria-required="true"
+              aria-describedby="facts-help"
               onChange={(event) => setAlcohol(event.target.value)}
             />
           </div>
@@ -245,31 +277,52 @@ export function PrecheckWorkspace() {
         <div className="flex flex-col gap-2">
           <h2 className="text-lg font-semibold">3 · Run prescreen</h2>
           <div>
-            <Button type="submit" disabled={!canRunUpload || phase === "processing"}>
-              Run pre-check
+            <Button
+              type="submit"
+              disabled={!canRunUpload || phase === "processing"}
+              aria-describedby={!canRunUpload ? "run-help" : undefined}
+            >
+              {phase === "processing" ? "Running…" : "Run pre-check"}
             </Button>
           </div>
           {!canRunUpload ? (
-            <p className="text-sm text-muted-foreground">
+            <p id="run-help" className="text-sm text-muted-foreground">
               Select one image and enter both application facts to run a check, or load the sample.
             </p>
           ) : null}
         </div>
       </form>
 
-      <div aria-live="polite" role="status" className="text-sm">
+      {/* A persistent live region announces stable status text once per change.
+          The ticking elapsed time lives outside it so screen readers are not
+          interrupted every second. */}
+      <div role="status" aria-live="polite" aria-busy={phase === "processing"} className="text-sm">
         {phase === "processing" ? (
-          <p className="text-muted-foreground">Extracting evidence and evaluating checks…</p>
+          <span className="inline-flex items-center gap-2 text-muted-foreground">
+            <span
+              aria-hidden="true"
+              className="processing-spinner inline-block h-4 w-4 shrink-0 rounded-full border-2 border-muted-foreground/40 border-t-muted-foreground"
+            />
+            Analyzing label evidence…
+          </span>
         ) : null}
-        {phase === "complete" ? <p className="text-muted-foreground">Pre-check complete.</p> : null}
+        {phase === "complete" ? (
+          <span className="text-muted-foreground">Pre-check complete.</span>
+        ) : null}
       </div>
+      {phase === "processing" ? (
+        <p aria-hidden="true" className="text-xs text-muted-foreground">
+          Working for {elapsedSeconds}s. A first run can take longer while the image is analyzed;
+          nothing is stuck.
+        </p>
+      ) : null}
 
       {phase === "failed" && error ? (
         <div
           ref={errorRef}
           tabIndex={-1}
           role="alert"
-          className="rounded-md border border-border bg-muted/40 p-4 text-sm text-foreground"
+          className="rounded-md border border-alert-foreground/30 bg-alert p-4 text-sm text-alert-foreground"
         >
           <h2 className="font-semibold">Pre-check could not complete</h2>
           <p className="mt-1">{error}</p>

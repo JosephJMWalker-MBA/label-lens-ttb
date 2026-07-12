@@ -91,7 +91,10 @@ function FindingCard({ f, showDependency }: { f: VerificationFinding; showDepend
     <li className="rounded-md border border-border p-3 text-sm">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <span className="font-medium">{f.ruleId}</span>
-        <span className="rounded border border-border px-2 py-0.5 font-mono">
+        <span
+          data-status={f.findingStatus}
+          className="status-badge rounded border px-2 py-0.5 font-mono font-semibold"
+        >
           {f.findingStatus}
         </span>
       </div>

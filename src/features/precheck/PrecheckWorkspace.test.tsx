@@ -191,9 +191,7 @@ describe("PrecheckWorkspace — run & results", () => {
     fireEvent.click(screen.getByRole("button", { name: /run pre-check/i }));
 
     // Processing announced via a live region while the request is in flight.
-    expect(
-      await screen.findByText(/extracting evidence and evaluating checks/i),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/analyzing label evidence/i)).toBeInTheDocument();
 
     resolveFetch(undefined);
     await screen.findByRole("heading", { name: /pre-check result/i });
@@ -711,5 +709,66 @@ describe("PrecheckWorkspace — download error handling", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: /download readable report/i }));
     await waitFor(() => expect(screen.queryByRole("alert")).toBeNull());
+  });
+});
+
+// -- Processing-state accessibility (#53) ---------------------------------------
+
+describe("PrecheckWorkspace — processing accessibility", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("shows immediate honest status, marks the region busy, and prevents duplicate submits", () => {
+    // A never-resolving fetch keeps the workspace in the processing phase.
+    const fetchMock = vi.fn().mockReturnValue(new Promise(() => {}));
+    vi.stubGlobal("fetch", fetchMock);
+    render(<PrecheckWorkspace />);
+    selectFileAndFill();
+
+    fireEvent.click(screen.getByRole("button", { name: /run pre-check/i }));
+
+    // Status appears immediately and honestly (no fake percentage or ETA).
+    expect(screen.getByText(/analyzing label evidence/i)).toBeInTheDocument();
+    expect(screen.queryByText(/%/)).toBeNull();
+    const status = screen.getByRole("status");
+    expect(status).toHaveAttribute("aria-busy", "true");
+
+    // The submit control is disabled and announces the running state.
+    const running = screen.getByRole("button", { name: /running/i });
+    expect(running).toBeDisabled();
+
+    // A second activation launches no duplicate request.
+    fireEvent.click(running);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("moves focus to the result region and announces completion on success", async () => {
+    vi.stubGlobal("fetch", mockFetch({ ok: true, data: CANNED }));
+    render(<PrecheckWorkspace />);
+    selectFileAndFill();
+    fireEvent.click(screen.getByRole("button", { name: /run pre-check/i }));
+
+    await screen.findByRole("heading", { name: /pre-check result/i });
+    expect(screen.getByText(/pre-check complete/i)).toBeInTheDocument();
+    await waitFor(() => {
+      const heading = screen.getByRole("heading", { name: /pre-check result/i });
+      expect(document.activeElement).not.toBeNull();
+      expect(document.activeElement?.contains(heading)).toBe(true);
+    });
+  });
+
+  it("moves focus to the error alert on failure", async () => {
+    vi.stubGlobal(
+      "fetch",
+      mockFetch({
+        ok: false,
+        error: { code: "CORRUPT_IMAGE", message: "The image could not be read." },
+      }),
+    );
+    render(<PrecheckWorkspace />);
+    selectFileAndFill();
+    fireEvent.click(screen.getByRole("button", { name: /run pre-check/i }));
+
+    const alert = await screen.findByRole("alert");
+    await waitFor(() => expect(alert).toHaveFocus());
   });
 });

@@ -3,16 +3,63 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  /* Light theme (also the default when no explicit choice is resolved). */
+  :root,
+  :root[data-theme="light"] {
     --background: 0 0% 100%;
     --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
     --primary: 222 47% 11%;
     --primary-foreground: 0 0% 98%;
     --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --border: 214 32% 91%;
-    --ring: 222 47% 11%;
+    --muted-foreground: 215 16% 40%;
+    --input: 0 0% 100%;
+    --border: 214 32% 88%;
+    --ring: 222 84% 40%;
+    --alert: 40 90% 96%;
+    --alert-foreground: 25 60% 22%;
+    /* Status accents pair with the always-present text label (never color alone). */
+    --status-pass: 142 55% 30%;
+    --status-warn: 35 85% 32%;
+    --status-fail: 0 70% 42%;
+    --status-review: 222 60% 42%;
+    --status-not-run: 215 16% 40%;
     --radius: 0.5rem;
+  }
+
+  /* Dark theme (contrast-checked against WCAG AA for body and muted text). */
+  :root[data-theme="dark"] {
+    --background: 222 47% 8%;
+    --foreground: 210 40% 96%;
+    --card: 222 40% 12%;
+    --card-foreground: 210 40% 96%;
+    --primary: 210 40% 96%;
+    --primary-foreground: 222 47% 11%;
+    --muted: 217 33% 18%;
+    --muted-foreground: 215 20% 72%;
+    --input: 222 40% 14%;
+    --border: 217 33% 26%;
+    --ring: 210 90% 66%;
+    --alert: 30 40% 16%;
+    --alert-foreground: 40 90% 85%;
+    --status-pass: 142 55% 62%;
+    --status-warn: 40 90% 66%;
+    --status-fail: 0 80% 72%;
+    --status-review: 210 90% 74%;
+    --status-not-run: 215 20% 72%;
+  }
+
+  /* Bounded font-size preference. Scaling the root font-size scales the rem-based
+     layout proportionally without unbounded growth. */
+  :root {
+    font-size: 100%;
+  }
+  :root[data-font-scale="small"] {
+    font-size: 87.5%;
+  }
+  :root[data-font-scale="large"] {
+    font-size: 112.5%;
   }
 
   * {
@@ -22,5 +69,71 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+  }
+
+  /* Reduced motion: honor the OS setting and an explicit local override. Essential
+     information never depends on animation, so near-zero durations are safe. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+  :root[data-motion="reduce"] *,
+  :root[data-motion="reduce"] *::before,
+  :root[data-motion="reduce"] *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer components {
+  /* Finding-status badge: a text label plus a redundant color accent. The text is
+     always present, so status is never communicated by color alone. */
+  .status-badge {
+    border-color: hsl(var(--status-not-run));
+    color: hsl(var(--status-not-run));
+  }
+  .status-badge[data-status="PASS"] {
+    border-color: hsl(var(--status-pass));
+    color: hsl(var(--status-pass));
+  }
+  .status-badge[data-status="WARN"] {
+    border-color: hsl(var(--status-warn));
+    color: hsl(var(--status-warn));
+  }
+  .status-badge[data-status="FAIL"] {
+    border-color: hsl(var(--status-fail));
+    color: hsl(var(--status-fail));
+  }
+  .status-badge[data-status="NEEDS_REVIEW"] {
+    border-color: hsl(var(--status-review));
+    color: hsl(var(--status-review));
+  }
+
+  /* A slow, non-essential spinner. Hidden entirely under reduced motion; the
+     textual status remains the source of truth in every case. */
+  .processing-spinner {
+    animation: ll-spin 1s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .processing-spinner {
+      display: none;
+    }
+  }
+  :root[data-motion="reduce"] .processing-spinner {
+    display: none;
+  }
+}
+
+@keyframes ll-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
