@@ -60,6 +60,12 @@ describe("evaluation harness OCR-backed safeguards", () => {
     for (const region of report.diagnostics.regions) {
       expect(region.sampleWords.length).toBeLessThanOrEqual(25);
     }
+    expect(report.diagnostics.recoveryPasses).toHaveLength(2);
+    for (const pass of report.diagnostics.recoveryPasses) {
+      expect(pass.passOrder).toBeGreaterThan(0);
+      expect(pass.executionTimeMs).toBeGreaterThanOrEqual(0);
+      expect(pass.cumulativeCostMs).toBeGreaterThanOrEqual(pass.executionTimeMs);
+    }
     expect(report.diagnostics.brandLineTexts.length).toBeLessThanOrEqual(12);
     expect(report.diagnostics.brandCandidateDecisions.length).toBeLessThanOrEqual(24);
   });

@@ -22,7 +22,11 @@ import type {
 } from "@/pipeline/extractor/extractor.types";
 
 import type { AggregateMetrics } from "./metrics";
-import type { EvalFailureClass, EvalStratum } from "./eval-manifest.types";
+import type {
+  EvalCandidateFilteringSubtype,
+  EvalFailureClass,
+  EvalStratum,
+} from "./eval-manifest.types";
 
 /**
  * Machine-readable evaluation report shapes. The report is deterministic given
@@ -72,9 +76,32 @@ export interface CasePerformanceDiagnostics {
   extraPassesWithNoUsableEvidence: number;
 }
 
+export type EvalFieldKey = "brand" | "alcohol";
+
+export interface RecoveryPassContribution {
+  passId: string;
+  passOrder: number;
+  passKind: OcrPassKind;
+  triggerReasons: OcrPassTriggerReason[];
+  executionTimeMs: number;
+  cumulativeCostMs: number;
+  newOcrTokens: boolean;
+  newOcrTokenCount: number;
+  newFieldLikeEvidence: boolean;
+  newFieldLikeEvidenceFields: EvalFieldKey[];
+  acceptedCandidate: boolean;
+  acceptedCandidateFields: EvalFieldKey[];
+  changedSelectedField: boolean;
+  changedSelectedFields: EvalFieldKey[];
+  correctSelectedField: boolean;
+  correctSelectedFields: EvalFieldKey[];
+  noMeasuredValue: boolean;
+}
+
 export interface CaseDiagnostics {
   regions: RegionDiagnostics[];
   performance: CasePerformanceDiagnostics;
+  recoveryPasses: RecoveryPassContribution[];
   primarySelections: {
     brandState: AnalyzerObservationState;
     brandValue: string | null;
@@ -173,6 +200,7 @@ export interface FieldReport {
   confidence: number;
   alternates: { value: string; confidence: number }[];
   failureClass: EvalFailureClass;
+  candidateFilteringSubtype: EvalCandidateFilteringSubtype | null;
 }
 
 export interface CaseReport {
@@ -248,8 +276,30 @@ export interface EvalFailureDistributionBucket {
   count: number;
 }
 
+export interface EvalCandidateFilteringSubtypeBucket {
+  key: EvalCandidateFilteringSubtype;
+  label: string;
+  field: EvalFieldKey;
+  count: number;
+}
+
+export interface EvalRecoveryPassContributionBucket {
+  key: OcrPassKind;
+  label: string;
+  passCount: number;
+  caseCount: number;
+  newOcrTokensCount: number;
+  newFieldLikeEvidenceCount: number;
+  acceptedCandidateCount: number;
+  changedSelectedFieldCount: number;
+  correctSelectedFieldCount: number;
+  noMeasuredValueCount: number;
+  totalExecutionTimeMs: number;
+  maxCumulativeCostMs: number;
+}
+
 export interface EvalReport {
-  schemaVersion: "extraction-baseline-report.v2";
+  schemaVersion: "extraction-baseline-report.v3";
   manifestSchemaVersion: string;
   extractorAdapter: { id: string; version: string };
   aggregate: AggregateMetrics;
@@ -257,6 +307,8 @@ export interface EvalReport {
     alcoholSlices: EvalAlcoholSliceMetrics[];
     orientationSlices: EvalOrientationSliceMetrics[];
     failureDistribution: EvalFailureDistributionBucket[];
+    candidateFilteringSubtypes: EvalCandidateFilteringSubtypeBucket[];
+    recoveryPassContributions: EvalRecoveryPassContributionBucket[];
     performance: EvalPerformanceBreakdown;
   };
   cases: CaseReport[];
