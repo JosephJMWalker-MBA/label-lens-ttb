@@ -101,6 +101,7 @@ describe("shared invariants across result and export", () => {
       state: "NOT_OBSERVED",
       value: "SNEAKED IN",
       confidence: 0,
+      ocrEvidenceScore: 0,
       alternates: [],
     };
     const { integrity, ...payload } = tampered;

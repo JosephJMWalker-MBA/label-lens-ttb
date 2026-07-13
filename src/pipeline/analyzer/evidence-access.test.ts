@@ -4,12 +4,49 @@ import type { AnalyzerFieldObservation } from "./analyzer.types";
 import { readObservation } from "./evidence-access";
 
 function observation(overrides: Partial<AnalyzerFieldObservation>): AnalyzerFieldObservation {
+  const ocrEvidenceScore = overrides.ocrEvidenceScore ?? overrides.confidence ?? 0.95;
   return {
     state: "OBSERVED",
     value: "M CELLARS",
-    confidence: 0.95,
+    confidence: ocrEvidenceScore,
+    ocrEvidenceScore,
     alternates: [],
     ...overrides,
+  };
+}
+
+function alt(value: string, score: number): AnalyzerFieldObservation["alternates"][number] {
+  return {
+    value,
+    confidence: score,
+    ocrEvidenceScore: score,
+    ocrConfidence: {
+      aggregation: "mean",
+      rawScale: "0-100",
+      rawTokenConfidences: [Math.round(score * 100)],
+      rawMean: Math.round(score * 100),
+      rawMin: Math.round(score * 100),
+      rawMax: Math.round(score * 100),
+      missingTokenCount: 0,
+    },
+    candidateProvenance: {
+      passId: `pass-${value}`,
+      passKind: "full-image-primary",
+      triggerReasons: ["primary-pass"],
+      preprocessing: ["grayscale"],
+      regionName: "alcohol",
+      supportingPassIds: [`pass-${value}`],
+      supportingPassKinds: ["full-image-primary"],
+      recoveryPassUsed: false,
+    },
+    ranking: {
+      strategy: "alcohol-ocr-evidence-comparator",
+      orderingMode: "ocr-evidence-first",
+      comparator: [
+        { id: "ocr-evidence-score", direction: "desc", value: score },
+        { id: "normalized-value-key", direction: "asc", value: value.toLowerCase() },
+      ],
+    },
   };
 }
 
@@ -19,6 +56,7 @@ describe("readObservation", () => {
     expect(access).toEqual({
       value: "M CELLARS",
       state: "OBSERVED",
+      ocrEvidenceScore: 0.95,
       confidence: 0.95,
       isPresent: true,
     });
@@ -38,7 +76,7 @@ describe("readObservation", () => {
       observation({
         state: "AMBIGUOUS",
         value: "12.5% ALC./VOL.",
-        alternates: [{ value: "13% ALC./VOL.", confidence: 0.4 }],
+        alternates: [alt("13% ALC./VOL.", 0.4)],
       }),
     );
     expect(access.value).toBe("12.5% ALC./VOL.");

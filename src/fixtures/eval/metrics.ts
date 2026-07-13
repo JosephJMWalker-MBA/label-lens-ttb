@@ -17,7 +17,8 @@ export interface ObservedField {
   state: AnalyzerObservationState;
   value: string | null;
   confidence: number;
-  alternates: { value: string; confidence: number }[];
+  ocrEvidenceScore: number;
+  alternates: { value: string; confidence: number; ocrEvidenceScore: number }[];
 }
 
 /** Bounded, OCR-derived signals used only to locate where evidence was lost. */

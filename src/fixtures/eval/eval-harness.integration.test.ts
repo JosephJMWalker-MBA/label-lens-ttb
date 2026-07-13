@@ -74,8 +74,10 @@ describe("evaluation harness OCR-backed safeguards", () => {
     const serialized = JSON.stringify(report);
     expect(serialized).not.toContain(process.cwd());
     expect(serialized).not.toContain("tests/fixtures");
-    // A base64/byte blob would be far larger than bounded diagnostics allow.
-    expect(serialized.length).toBeLessThan(60_000);
+    expect(report.diagnostics.calibrationCandidates.length).toBeLessThanOrEqual(48);
+    // Calibration records duplicate bounded candidate semantics, but raw bytes or
+    // unbounded OCR logs would still exceed this capped single-case size.
+    expect(serialized.length).toBeLessThan(250_000);
   });
 
   it("classifies both fields into the declared taxonomy", () => {

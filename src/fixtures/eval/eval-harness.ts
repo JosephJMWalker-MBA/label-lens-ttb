@@ -33,10 +33,12 @@ import {
   type ObservedField,
 } from "./metrics";
 import type {
+  CandidateCalibrationRecord,
   CaseDiagnostics,
   CaseReport,
   DiagnosticWord,
   EvalFieldKey,
+  FieldReport,
   RecoveryPassContribution,
 } from "./eval-report.types";
 
@@ -404,16 +406,20 @@ function diagnosticsFor(debug: ExtractionDebug, evalCase: EvalCase): CaseDiagnos
         rawText: truncate(candidate.rawText),
         cleanedValue: candidate.cleanedValue ? truncate(candidate.cleanedValue) : null,
         confidence: candidate.confidence,
+        ocrEvidenceScore: candidate.ocrEvidenceScore,
+        ocrConfidence: candidate.ocrConfidence,
         prominence: candidate.prominence,
         passId: candidate.passId,
         passKind: candidate.passKind,
         supportPassIds: candidate.supportPassIds,
+        candidateProvenance: candidate.candidateProvenance,
         assembly: candidate.assembly,
         lineIndexes: candidate.lineIndexes,
         kept: candidate.kept,
         filterReason: candidate.filterReason,
         decision: candidate.decision,
         score: candidate.score,
+        ranking: candidate.ranking,
       })),
     brandLineDecisions: (brandSelection.brandDiagnostics?.lines ?? [])
       .slice(0, MAX_BRAND_LINES)
@@ -480,10 +486,13 @@ function diagnosticsFor(debug: ExtractionDebug, evalCase: EvalCase): CaseDiagnos
           ? truncate(candidate.normalizedParsingText)
           : null,
         confidence: candidate.confidence,
+        ocrEvidenceScore: candidate.ocrEvidenceScore,
+        ocrConfidence: candidate.ocrConfidence,
         prominence: candidate.prominence,
         passId: candidate.passId,
         passKind: candidate.passKind,
         supportPassIds: candidate.supportPassIds,
+        candidateProvenance: candidate.candidateProvenance,
         assembly: candidate.assembly,
         lineIndexes: candidate.lineIndexes,
         sourceTokens: candidate.sourceTokens.map(truncate),
@@ -496,6 +505,7 @@ function diagnosticsFor(debug: ExtractionDebug, evalCase: EvalCase): CaseDiagnos
         parsedPercent: candidate.parsedPercent,
         rejectionReason: candidate.rejectionReason,
         decision: candidate.decision,
+        ranking: candidate.ranking,
       })),
     alcoholAbstentionReason: alcoholSelection.alcoholDiagnostics?.abstentionReason,
     alcoholNumberInOcr: /\d/.test(primaryAlcoholText) || /\d/.test(recoveryAlcoholText),
@@ -545,6 +555,7 @@ function diagnosticsFor(debug: ExtractionDebug, evalCase: EvalCase): CaseDiagnos
     alcoholParserRejectedCandidate:
       alcoholSelection.alcoholDiagnostics?.parserRejectedCandidate ?? false,
     alcoholCandidateAccepted: alcoholSelection.alcoholDiagnostics?.candidateAccepted ?? false,
+    calibrationCandidates: [],
   };
 }
 
@@ -607,6 +618,7 @@ function emptyDiagnostics(): CaseDiagnostics {
     alcoholFilterRejectedCandidate: false,
     alcoholParserRejectedCandidate: false,
     alcoholCandidateAccepted: false,
+    calibrationCandidates: [],
   };
 }
 
@@ -615,11 +627,136 @@ function toObserved(field: AnalyzerFieldObservation): ObservedField {
     state: field.state,
     value: field.value,
     confidence: field.confidence,
+    ocrEvidenceScore: field.ocrEvidenceScore,
     alternates: field.alternates.map((alternate) => ({
       value: alternate.value,
       confidence: alternate.confidence,
+      ocrEvidenceScore: alternate.ocrEvidenceScore,
     })),
   };
+}
+
+function fieldReportOf(
+  field: AnalyzerFieldObservation,
+): Omit<FieldReport, "failureClass" | "candidateFilteringSubtype"> {
+  return {
+    state: field.state,
+    value: field.value,
+    confidence: field.confidence,
+    ocrEvidenceScore: field.ocrEvidenceScore,
+    ocrConfidence: field.ocrConfidence,
+    candidateProvenance: field.candidateProvenance,
+    ranking: field.ranking,
+    alternates: field.alternates.map((alternate) => ({
+      value: alternate.value,
+      confidence: alternate.confidence,
+      ocrEvidenceScore: alternate.ocrEvidenceScore,
+      ocrConfidence: alternate.ocrConfidence,
+      candidateProvenance: alternate.candidateProvenance,
+      ranking: alternate.ranking,
+    })),
+  };
+}
+
+function calibrationStatus(
+  decision: string | undefined,
+  kept: boolean,
+): CandidateCalibrationRecord["candidateStatus"] {
+  if (decision === "selected" || decision === "alternate" || decision === "ambiguous-rival") {
+    return decision;
+  }
+  return kept ? "alternate" : "rejected";
+}
+
+function brandCalibrationCandidates(
+  evalCase: EvalCase,
+  diagnostics: CaseDiagnostics,
+): CandidateCalibrationRecord[] {
+  return diagnostics.brandCandidateDecisions.map((candidate, index) => {
+    const candidateStatus = calibrationStatus(candidate.decision, candidate.kept);
+    const comparableValue = candidate.cleanedValue ?? candidate.rawText;
+    const exactMatch = evalCase.brand.present
+      ? brandExactMatch(comparableValue, evalCase.brand.acceptable)
+      : false;
+    const normalizedMatch = evalCase.brand.present
+      ? brandNormalizedMatch(comparableValue, evalCase.brand.acceptable)
+      : false;
+    return {
+      caseId: evalCase.caseId,
+      field: "brand",
+      candidateId: `brand-candidate-${index}`,
+      candidateStatus,
+      selected: candidateStatus === "selected",
+      inference: {
+        rawText: candidate.rawText,
+        normalizedValue: candidate.cleanedValue,
+        ocrEvidenceScore: candidate.ocrEvidenceScore,
+        ocrConfidence: candidate.ocrConfidence,
+        candidateProvenance: candidate.candidateProvenance,
+        ranking: candidate.ranking,
+        prominence: candidate.prominence,
+        passId: candidate.passId,
+        passKind: candidate.passKind,
+        supportPassIds: candidate.supportPassIds,
+        kept: candidate.kept,
+      },
+      evaluation: {
+        truthPresent: evalCase.brand.present,
+        acceptable: exactMatch || normalizedMatch,
+        exactMatch,
+        normalizedMatch,
+      },
+    };
+  });
+}
+
+function alcoholCalibrationCandidates(
+  evalCase: EvalCase,
+  diagnostics: CaseDiagnostics,
+): CandidateCalibrationRecord[] {
+  return diagnostics.alcoholCandidateDecisions.map((candidate, index) => {
+    const candidateStatus = calibrationStatus(candidate.decision, candidate.kept);
+    const comparableValue =
+      candidate.normalizedValue ?? candidate.normalizedParsingText ?? candidate.rawText;
+    const parsedAccurate = evalCase.alcohol.present
+      ? alcoholParsedAccurate(comparableValue, evalCase.alcohol.acceptablePercents)
+      : false;
+    return {
+      caseId: evalCase.caseId,
+      field: "alcohol",
+      candidateId: `alcohol-candidate-${index}`,
+      candidateStatus,
+      selected: candidateStatus === "selected",
+      inference: {
+        rawText: candidate.rawText,
+        normalizedValue: candidate.normalizedValue,
+        ocrEvidenceScore: candidate.ocrEvidenceScore,
+        ocrConfidence: candidate.ocrConfidence,
+        candidateProvenance: candidate.candidateProvenance,
+        ranking: candidate.ranking,
+        prominence: candidate.prominence,
+        passId: candidate.passId,
+        passKind: candidate.passKind,
+        supportPassIds: candidate.supportPassIds,
+        kept: candidate.kept,
+      },
+      evaluation: {
+        truthPresent: evalCase.alcohol.present,
+        acceptable: parsedAccurate,
+        parsedAccurate,
+      },
+    };
+  });
+}
+
+function buildCalibrationCandidates(
+  evalCase: EvalCase,
+  diagnostics: CaseDiagnostics,
+): CandidateCalibrationRecord[] {
+  return [
+    ...brandCalibrationCandidates(evalCase, diagnostics),
+    ...alcoholCalibrationCandidates(evalCase, diagnostics),
+  ];
 }
 
 export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
@@ -631,7 +768,10 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
   const latencyMs = performance.now() - start;
 
   let diagnostics = emptyDiagnostics();
-  if (result.ok) diagnostics = diagnosticsFor(result.value.debug, evalCase);
+  if (result.ok) {
+    diagnostics = diagnosticsFor(result.value.debug, evalCase);
+    diagnostics.calibrationCandidates = buildCalibrationCandidates(evalCase, diagnostics);
+  }
 
   const alcoholDiag: AlcoholDiagnostics = {
     numberInOcr: diagnostics.alcoholNumberInOcr,
@@ -658,6 +798,7 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
       state: "NOT_OBSERVED",
       value: null,
       confidence: 0,
+      ocrEvidenceScore: 0,
       alternates: [],
     };
     const brandFailureClass = classifyBrand(evalCase.brand, empty, {
@@ -732,10 +873,7 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
     strata: evalCase.strata,
     extractionError: null,
     brand: {
-      state: brandObs.state,
-      value: brandObs.value,
-      confidence: brandObs.confidence,
-      alternates: brandObs.alternates,
+      ...fieldReportOf(result.value.response.fields.brandName),
       present: evalCase.brand.present,
       acceptable: evalCase.brand.acceptable,
       knownAmbiguous: evalCase.brand.knownAmbiguous,
@@ -749,10 +887,7 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
           : null,
     },
     alcohol: {
-      state: alcoholObs.state,
-      value: alcoholObs.value,
-      confidence: alcoholObs.confidence,
-      alternates: alcoholObs.alternates,
+      ...fieldReportOf(result.value.response.fields.alcoholStatement),
       present: evalCase.alcohol.present,
       acceptablePercents: evalCase.alcohol.acceptablePercents,
       detected: alcoholDetected(alcoholObs),
@@ -769,11 +904,14 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
   };
 }
 
-function emptyFieldReport(empty: ObservedField) {
+function emptyFieldReport(
+  empty: ObservedField,
+): Omit<FieldReport, "failureClass" | "candidateFilteringSubtype"> {
   return {
     state: empty.state,
     value: empty.value,
     confidence: empty.confidence,
-    alternates: empty.alternates,
+    ocrEvidenceScore: empty.ocrEvidenceScore,
+    alternates: [],
   };
 }

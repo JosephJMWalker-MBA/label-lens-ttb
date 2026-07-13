@@ -2,7 +2,13 @@ import { z } from "zod";
 
 import {
   ANALYZER_AMBIGUITY_REASONS,
+  ANALYZER_CANDIDATE_RANKING_MODES,
+  ANALYZER_CANDIDATE_RANKING_STRATEGIES,
   ANALYZER_OBSERVATION_STATES,
+  ANALYZER_RANKING_COMPARATOR_IDS,
+  ANALYZER_RANKING_DIRECTIONS,
+  ANALYZER_RANKING_SCORE_FACTOR_DIRECTIONS,
+  ANALYZER_RANKING_SCORE_FACTOR_IDS,
 } from "@/pipeline/analyzer/analyzer.types";
 
 /**
@@ -75,13 +81,90 @@ export const geometrySchema = z
 
 const boundedNonEmpty = z.string().min(1).max(MAX_EVIDENCE_STRING);
 
+const ocrRawConfidence = z.number().finite().min(0).max(100).nullable();
+
+const ocrConfidenceSchema = z
+  .object({
+    aggregation: z.literal("mean"),
+    rawScale: z.literal("0-100"),
+    rawTokenConfidences: z.array(ocrRawConfidence),
+    rawMean: ocrRawConfidence,
+    rawMin: ocrRawConfidence,
+    rawMax: ocrRawConfidence,
+    missingTokenCount: safeNonNegativeInt,
+  })
+  .strict()
+  .superRefine((ocr, ctx) => {
+    const missingCount = ocr.rawTokenConfidences.filter((value) => value === null).length;
+    if (missingCount !== ocr.missingTokenCount) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["missingTokenCount"],
+        message: "missingTokenCount must match null rawTokenConfidences.",
+      });
+    }
+  });
+
+const candidateProvenanceSchema = z
+  .object({
+    passId: z.string().min(1),
+    passKind: z.string().min(1),
+    triggerReasons: z.array(z.string().min(1)),
+    preprocessing: z.array(z.string().min(1)),
+    regionName: z.string().min(1),
+    supportingPassIds: z.array(z.string().min(1)).min(1),
+    supportingPassKinds: z.array(z.string().min(1)).min(1),
+    recoveryPassUsed: z.boolean(),
+  })
+  .strict();
+
+const rankingComparatorEntrySchema = z
+  .object({
+    id: z.enum(ANALYZER_RANKING_COMPARATOR_IDS),
+    direction: z.enum(ANALYZER_RANKING_DIRECTIONS),
+    value: z.union([z.number().finite(), z.string(), z.boolean()]),
+  })
+  .strict();
+
+const rankingScoreFactorSchema = z
+  .object({
+    id: z.enum(ANALYZER_RANKING_SCORE_FACTOR_IDS),
+    value: z.number().finite(),
+    contribution: z.number().finite(),
+    direction: z.enum(ANALYZER_RANKING_SCORE_FACTOR_DIRECTIONS),
+  })
+  .strict();
+
+const rankingSchema = z
+  .object({
+    strategy: z.enum(ANALYZER_CANDIDATE_RANKING_STRATEGIES),
+    orderingMode: z.enum(ANALYZER_CANDIDATE_RANKING_MODES),
+    comparator: z.array(rankingComparatorEntrySchema).min(1),
+    rankingScore: z.number().finite().optional(),
+    scoreFactors: z.array(rankingScoreFactorSchema).optional(),
+  })
+  .strict();
+
 export const alternateSchema = z
   .object({
     value: boundedNonEmpty,
     confidence,
+    ocrEvidenceScore: confidence,
+    ocrConfidence: ocrConfidenceSchema,
+    candidateProvenance: candidateProvenanceSchema,
+    ranking: rankingSchema,
     geometry: geometrySchema.optional(),
   })
-  .strict();
+  .strict()
+  .superRefine((alternate, ctx) => {
+    if (Math.abs(alternate.confidence - alternate.ocrEvidenceScore) > 1e-9) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["confidence"],
+        message: "confidence must match ocrEvidenceScore exactly.",
+      });
+    }
+  });
 
 /** NFC-normalized value + serialized geometry: the key for alternate uniqueness. */
 function alternateKey(a: z.infer<typeof alternateSchema>): string {
@@ -101,6 +184,10 @@ export const observationSchema = z
     normalizedValue: boundedNonEmpty.nullable().optional(),
     rawText: boundedNonEmpty.optional(),
     confidence,
+    ocrEvidenceScore: confidence,
+    ocrConfidence: ocrConfidenceSchema.optional(),
+    candidateProvenance: candidateProvenanceSchema.optional(),
+    ranking: rankingSchema.optional(),
     geometry: geometrySchema.optional(),
     alternates: z.array(alternateSchema).default([]),
     ambiguityReason: z.enum(ANALYZER_AMBIGUITY_REASONS).optional(),
@@ -124,10 +211,26 @@ export const observationSchema = z
       if (obs.confidence !== 0) {
         issue(["confidence"], "NOT_OBSERVED confidence must be exactly 0.");
       }
+      if (obs.ocrEvidenceScore !== 0) {
+        issue(["ocrEvidenceScore"], "NOT_OBSERVED ocrEvidenceScore must be exactly 0.");
+      }
       if (obs.alternates.length !== 0) {
         issue(["alternates"], "NOT_OBSERVED must not carry alternates.");
       }
+      if (obs.ocrConfidence !== undefined) {
+        issue(["ocrConfidence"], "NOT_OBSERVED must not carry OCR confidence detail.");
+      }
+      if (obs.candidateProvenance !== undefined) {
+        issue(["candidateProvenance"], "NOT_OBSERVED must not carry candidate provenance.");
+      }
+      if (obs.ranking !== undefined) {
+        issue(["ranking"], "NOT_OBSERVED must not carry ranking semantics.");
+      }
       return;
+    }
+
+    if (Math.abs(obs.confidence - obs.ocrEvidenceScore) > 1e-9) {
+      issue(["confidence"], "confidence must match ocrEvidenceScore exactly.");
     }
 
     // Present states (OBSERVED, LOW_CONFIDENCE, AMBIGUOUS) must retain evidence.
@@ -140,6 +243,15 @@ export const observationSchema = z
     }
     if (obs.geometry === undefined) {
       issue(["geometry"], `${obs.state} must preserve the source geometry.`);
+    }
+    if (obs.ocrConfidence === undefined) {
+      issue(["ocrConfidence"], `${obs.state} must preserve OCR confidence detail.`);
+    }
+    if (obs.candidateProvenance === undefined) {
+      issue(["candidateProvenance"], `${obs.state} must preserve candidate provenance.`);
+    }
+    if (obs.ranking === undefined) {
+      issue(["ranking"], `${obs.state} must preserve ranking semantics.`);
     }
 
     // Alternates: unique, ordered as given, and never echoing the selection.

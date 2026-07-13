@@ -8,7 +8,109 @@ import { validateAnalyzerEvidenceResponse } from "./analyzer.schema";
 const DERIVATIVE_SHA = "6829add3d99c61851028b2422bdd9672bb975183d198de5e280bc961f4a489e7";
 
 function geometry() {
-  return { imageIndex: 0, x: 10, y: 20, width: 100, height: 30, imageWidth: 494, imageHeight: 214 };
+  return {
+    imageIndex: 0,
+    x: 10,
+    y: 20,
+    width: 100,
+    height: 30,
+    imageWidth: 494,
+    imageHeight: 214,
+  };
+}
+
+function ocrConfidence(score: number) {
+  const raw = Math.round(score * 100);
+  return {
+    aggregation: "mean",
+    rawScale: "0-100",
+    rawTokenConfidences: [raw],
+    rawMean: raw,
+    rawMin: raw,
+    rawMax: raw,
+    missingTokenCount: 0,
+  };
+}
+
+function candidateProvenance(regionName: string) {
+  return {
+    passId: `pass-${regionName}`,
+    passKind: "full-image-primary",
+    triggerReasons: ["primary-pass"],
+    preprocessing: ["grayscale"],
+    regionName,
+    supportingPassIds: [`pass-${regionName}`],
+    supportingPassKinds: ["full-image-primary"],
+    recoveryPassUsed: false,
+  };
+}
+
+function ranking(score: number, key: string, strategy: "brand" | "alcohol") {
+  if (strategy === "alcohol") {
+    return {
+      strategy: "alcohol-ocr-evidence-comparator",
+      orderingMode: "ocr-evidence-first",
+      comparator: [
+        { id: "ocr-evidence-score", direction: "desc", value: score },
+        { id: "normalized-value-key", direction: "asc", value: key },
+      ],
+    };
+  }
+  return {
+    strategy: "brand-mixed-prominence-score",
+    orderingMode: "score-first",
+    comparator: [
+      { id: "score-eligibility", direction: "desc", value: true },
+      { id: "ranking-score", direction: "desc", value: 5.2 },
+      { id: "prominence", direction: "desc", value: 30 },
+      { id: "ocr-evidence-score", direction: "desc", value: score },
+      { id: "normalized-value-key", direction: "asc", value: key },
+    ],
+    rankingScore: 5.2,
+    scoreFactors: [
+      { id: "positive-signal", value: 1, contribution: 2, direction: "benefit" },
+      { id: "ocr-evidence-score", value: score, contribution: score, direction: "benefit" },
+    ],
+  };
+}
+
+function observedField(
+  value: string,
+  score: number,
+  regionName: string,
+  strategy: "brand" | "alcohol",
+) {
+  return {
+    state: "OBSERVED",
+    value,
+    normalizedValue: value,
+    rawText: value,
+    confidence: score,
+    ocrEvidenceScore: score,
+    ocrConfidence: ocrConfidence(score),
+    candidateProvenance: candidateProvenance(regionName),
+    ranking: ranking(score, regionName === "brand" ? "mcellars" : "125alcvol", strategy),
+    geometry: geometry(),
+    alternates: [],
+  };
+}
+
+function alternate(value: string, score: number, key: string) {
+  return {
+    value,
+    confidence: score,
+    ocrEvidenceScore: score,
+    ocrConfidence: ocrConfidence(score),
+    candidateProvenance: candidateProvenance("alcohol"),
+    ranking: {
+      strategy: "alcohol-ocr-evidence-comparator",
+      orderingMode: "ocr-evidence-first",
+      comparator: [
+        { id: "ocr-evidence-score", direction: "desc", value: score },
+        { id: "normalized-value-key", direction: "asc", value: key },
+      ],
+    },
+  };
 }
 
 function validResponse(): Record<string, unknown> {
@@ -25,24 +127,8 @@ function validResponse(): Record<string, unknown> {
       processedAt: "2026-07-10T00:00:00Z",
     },
     fields: {
-      brandName: {
-        state: "OBSERVED",
-        value: "M CELLARS",
-        normalizedValue: "M CELLARS",
-        rawText: "M CELLARS",
-        confidence: 0.98,
-        geometry: geometry(),
-        alternates: [],
-      },
-      alcoholStatement: {
-        state: "OBSERVED",
-        value: "12.5% ALC./VOL.",
-        normalizedValue: "12.5% ALC./VOL.",
-        rawText: "12.5% ALC./VOL.",
-        confidence: 0.9,
-        geometry: geometry(),
-        alternates: [],
-      },
+      brandName: observedField("M CELLARS", 0.98, "brand", "brand"),
+      alcoholStatement: observedField("12.5% ALC./VOL.", 0.9, "alcohol", "alcohol"),
     },
     limitations: [],
   };
@@ -68,6 +154,10 @@ describe("analyzer evidence — valid observations", () => {
         normalizedValue: "M CELLARS",
         rawText: "M CELLARS",
         confidence: 0.12,
+        ocrEvidenceScore: 0.12,
+        ocrConfidence: ocrConfidence(0.12),
+        candidateProvenance: candidateProvenance("brand"),
+        ranking: ranking(0.12, "mcellars", "brand"),
         geometry: geometry(),
         alternates: [],
       },
@@ -85,10 +175,14 @@ describe("analyzer evidence — valid observations", () => {
       normalizedValue: "12.5% ALC./VOL.",
       rawText: "12.5% ALC./VOL.",
       confidence: 0.5,
+      ocrEvidenceScore: 0.5,
+      ocrConfidence: ocrConfidence(0.5),
+      candidateProvenance: candidateProvenance("alcohol"),
+      ranking: ranking(0.5, "125alcvol", "alcohol"),
       geometry: geometry(),
       alternates: [
-        { value: "12.5% ALC./VOL", confidence: 0.5 },
-        { value: "13% ALC./VOL.", confidence: 0.4 },
+        alternate("12.5% ALC./VOL", 0.5, "125alcvol"),
+        alternate("13% ALC./VOL.", 0.4, "13alcvol"),
       ],
     };
     const result = validateAnalyzerEvidenceResponse(response);
@@ -121,6 +215,7 @@ describe("analyzer evidence — NOT_OBSERVED semantics", () => {
       state: "NOT_OBSERVED",
       value: null,
       confidence: 0,
+      ocrEvidenceScore: 0,
       alternates: [],
     };
     expect(validateAnalyzerEvidenceResponse(response).ok).toBe(true);
@@ -132,6 +227,7 @@ describe("analyzer evidence — NOT_OBSERVED semantics", () => {
       state: "LOW_CONFIDENCE",
       value: null,
       confidence: 0.1,
+      ocrEvidenceScore: 0.1,
       alternates: [],
     };
     const result = validateAnalyzerEvidenceResponse(response);
@@ -145,6 +241,7 @@ describe("analyzer evidence — NOT_OBSERVED semantics", () => {
       state: "AMBIGUOUS",
       value: "12.5% ALC./VOL.",
       confidence: 0.5,
+      ocrEvidenceScore: 0.5,
       geometry: geometry(),
       alternates: [],
     };
@@ -166,6 +263,13 @@ describe("analyzer evidence — structural rejections", () => {
   it("rejects confidence outside [0, 1]", () => {
     const response = validResponse();
     (response.fields as Record<string, { confidence: number }>).brandName.confidence = 1.5;
+    expect(validateAnalyzerEvidenceResponse(response).ok).toBe(false);
+  });
+
+  it("rejects mismatched confidence aliases", () => {
+    const response = validResponse();
+    (response.fields as Record<string, { ocrEvidenceScore: number }>).brandName.ocrEvidenceScore =
+      0.1;
     expect(validateAnalyzerEvidenceResponse(response).ok).toBe(false);
   });
 

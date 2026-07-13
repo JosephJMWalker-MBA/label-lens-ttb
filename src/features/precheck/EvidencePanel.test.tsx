@@ -16,11 +16,58 @@ const geometry = (x: number, y: number, w: number, h: number) => ({
   imageHeight: 500,
 });
 
+const candidate = (
+  value: string,
+  score: number,
+  geometryOverride?: ReturnType<typeof geometry>,
+): AnalyzerFieldObservation["alternates"][number] => ({
+  value,
+  confidence: score,
+  ocrEvidenceScore: score,
+  ocrConfidence: {
+    aggregation: "mean",
+    rawScale: "0-100",
+    rawTokenConfidences: [Math.round(score * 100)],
+    rawMean: Math.round(score * 100),
+    rawMin: Math.round(score * 100),
+    rawMax: Math.round(score * 100),
+    missingTokenCount: 0,
+  },
+  candidateProvenance: {
+    passId: `pass-${value}`,
+    passKind: "full-image-primary",
+    triggerReasons: ["primary-pass"],
+    preprocessing: ["grayscale"],
+    regionName: "brand",
+    supportingPassIds: [`pass-${value}`],
+    supportingPassKinds: ["full-image-primary"],
+    recoveryPassUsed: false,
+  },
+  ranking: {
+    strategy: "brand-mixed-prominence-score",
+    orderingMode: "score-first",
+    comparator: [
+      { id: "score-eligibility", direction: "desc", value: true },
+      { id: "ranking-score", direction: "desc", value: 5 },
+      { id: "prominence", direction: "desc", value: 30 },
+      { id: "ocr-evidence-score", direction: "desc", value: score },
+      { id: "normalized-value-key", direction: "asc", value: value.toLowerCase() },
+    ],
+    rankingScore: 5,
+    scoreFactors: [
+      { id: "positive-signal", value: 1, contribution: 2, direction: "benefit" },
+      { id: "ocr-evidence-score", value: score, contribution: score, direction: "benefit" },
+    ],
+  },
+  ...(geometryOverride ? { geometry: geometryOverride } : {}),
+});
+
 const obs = (over: Partial<AnalyzerFieldObservation> = {}): AnalyzerFieldObservation => ({
   state: "OBSERVED",
   value: "VALUE",
   rawText: "VALUE",
   confidence: 0.9,
+  ocrEvidenceScore: 0.9,
   alternates: [],
   ...over,
 });
@@ -52,13 +99,13 @@ const BRAND = obs({
   value: "STONE HOUSE",
   geometry: geometry(100, 50, 200, 100),
   alternates: [
-    { value: "STONE", confidence: 0.7, geometry: geometry(120, 60, 80, 40) },
-    { value: "HOUSE RED", confidence: 0.55 },
-    { value: "ALT-3", confidence: 0.5 },
-    { value: "ALT-4", confidence: 0.45 },
-    { value: "ALT-5", confidence: 0.4 },
-    { value: "ALT-6", confidence: 0.35 },
-    { value: "ALT-7", confidence: 0.3 },
+    candidate("STONE", 0.7, geometry(120, 60, 80, 40)),
+    candidate("HOUSE RED", 0.55),
+    candidate("ALT-3", 0.5),
+    candidate("ALT-4", 0.45),
+    candidate("ALT-5", 0.4),
+    candidate("ALT-6", 0.35),
+    candidate("ALT-7", 0.3),
   ],
 });
 const ALCOHOL = obs({ value: "12.5% ALC./VOL.", geometry: geometry(600, 400, 300, 50) });
@@ -142,12 +189,12 @@ describe("honest fallbacks", () => {
 });
 
 describe("alternates are inspect-only", () => {
-  it("presents bounded candidate rows behind a disclosure with confidences", () => {
+  it("presents bounded candidate rows behind a disclosure with OCR evidence scores", () => {
     render(<EvidencePanel observations={observations(BRAND, ALCOHOL)} previewImage={PREVIEW} />);
     const summary = screen.getByText(/7 other candidate readings/i);
     fireEvent.click(summary);
     expect(screen.getByText("STONE")).toBeInTheDocument();
-    expect(screen.getByText(/confidence 0.70/i)).toBeInTheDocument();
+    expect(screen.getByText(/OCR evidence 0.70/i)).toBeInTheDocument();
     // Bounded: only the first five rows visible until "Show all".
     expect(screen.queryByText("ALT-6")).toBeNull();
     const showAll = screen.getByRole("button", { name: /show all 7 candidates/i });
