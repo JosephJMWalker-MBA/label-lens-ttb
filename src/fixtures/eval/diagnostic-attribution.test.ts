@@ -68,6 +68,21 @@ describe("candidate-filtering subtype attribution", () => {
     ).toBe("brand-kept-overextended-candidate");
   });
 
+  it("uses a neutral terminal brand subtype when diagnostics cannot isolate the exact filter path", () => {
+    const truth: EvalBrandTruth = {
+      present: true,
+      acceptable: ["North Ridge"],
+      knownAmbiguous: false,
+    };
+
+    expect(
+      brandCandidateFilteringSubtype(truth, {
+        brandCandidateDecisions: [],
+        brandLineDecisions: [],
+      }),
+    ).toBe("brand-filtering-cause-unattributed");
+  });
+
   it("chooses the best alcohol rejection subtype from rejected candidates", () => {
     const truth: EvalAlcoholTruth = {
       present: true,

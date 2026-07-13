@@ -16,6 +16,7 @@ import type {
   CaseReport,
   EvalAlcoholSliceMetrics,
   EvalCandidateFilteringSubtypeBucket,
+  EvalFieldKey,
   EvalFailureDistributionBucket,
   EvalOrientationSliceMetrics,
   EvalPerformanceBreakdown,
@@ -82,6 +83,8 @@ function candidateFilteringSubtypeLabel(subtype: EvalCandidateFilteringSubtype):
       return "Brand kept: overextended candidate";
     case "brand-kept-partial-candidate":
       return "Brand kept: partial candidate";
+    case "brand-filtering-cause-unattributed":
+      return "Brand filtering cause: unattributed";
     case "alcohol-rejected-proof-only":
       return "Alcohol rejected: proof-only";
     case "alcohol-rejected-no-supported-number":
@@ -456,6 +459,112 @@ function buildCandidateFilteringSubtypeDistribution(
   );
 }
 
+export interface CandidateFilteringSubtypeCoverageSummary {
+  byField: Record<
+    EvalFieldKey,
+    {
+      candidateFilteringFailureCount: number;
+      caseSubtypeCount: number;
+      aggregateSubtypeCount: number;
+      nonCandidateFilteringSubtypeCount: number;
+    }
+  >;
+}
+
+export function candidateFilteringSubtypeCoverageSummary(
+  cases: CaseReport[],
+  buckets: EvalCandidateFilteringSubtypeBucket[],
+): CandidateFilteringSubtypeCoverageSummary {
+  const summary: CandidateFilteringSubtypeCoverageSummary = {
+    byField: {
+      brand: {
+        candidateFilteringFailureCount: 0,
+        caseSubtypeCount: 0,
+        aggregateSubtypeCount: 0,
+        nonCandidateFilteringSubtypeCount: 0,
+      },
+      alcohol: {
+        candidateFilteringFailureCount: 0,
+        caseSubtypeCount: 0,
+        aggregateSubtypeCount: 0,
+        nonCandidateFilteringSubtypeCount: 0,
+      },
+    },
+  };
+
+  for (const caseReport of cases) {
+    for (const field of ["brand", "alcohol"] as const) {
+      const fieldReport = caseReport[field];
+      const hasSubtype = fieldReport.candidateFilteringSubtype !== null;
+      const isCandidateFilteringFailure =
+        fieldReport.failureClass === "candidate-filtering-failure";
+
+      if (isCandidateFilteringFailure) {
+        summary.byField[field].candidateFilteringFailureCount += 1;
+      }
+      if (hasSubtype) {
+        summary.byField[field].caseSubtypeCount += 1;
+        if (!isCandidateFilteringFailure) {
+          summary.byField[field].nonCandidateFilteringSubtypeCount += 1;
+        }
+      }
+    }
+  }
+
+  for (const bucket of buckets) {
+    summary.byField[bucket.field].aggregateSubtypeCount += bucket.count;
+  }
+
+  return summary;
+}
+
+export function assertCandidateFilteringSubtypeCoverage(
+  cases: CaseReport[],
+  buckets: EvalCandidateFilteringSubtypeBucket[],
+): CandidateFilteringSubtypeCoverageSummary {
+  const summary = candidateFilteringSubtypeCoverageSummary(cases, buckets);
+
+  for (const caseReport of cases) {
+    for (const field of ["brand", "alcohol"] as const) {
+      const fieldReport = caseReport[field];
+      const hasSubtype = fieldReport.candidateFilteringSubtype !== null;
+      const isCandidateFilteringFailure =
+        fieldReport.failureClass === "candidate-filtering-failure";
+      if (isCandidateFilteringFailure && !hasSubtype) {
+        throw new Error(
+          `${caseReport.caseId}: ${field} candidate-filtering failure is missing a subtype`,
+        );
+      }
+      if (!isCandidateFilteringFailure && hasSubtype) {
+        throw new Error(
+          `${caseReport.caseId}: ${field} ${fieldReport.failureClass} must not receive candidate-filtering subtype ${fieldReport.candidateFilteringSubtype}`,
+        );
+      }
+    }
+  }
+
+  for (const field of ["brand", "alcohol"] as const) {
+    const fieldSummary = summary.byField[field];
+    if (fieldSummary.nonCandidateFilteringSubtypeCount !== 0) {
+      throw new Error(
+        `${field}: ${fieldSummary.nonCandidateFilteringSubtypeCount} non-candidate-filtering cases received a subtype`,
+      );
+    }
+    if (fieldSummary.caseSubtypeCount !== fieldSummary.candidateFilteringFailureCount) {
+      throw new Error(
+        `${field}: ${fieldSummary.caseSubtypeCount} case subtypes do not cover ${fieldSummary.candidateFilteringFailureCount} candidate-filtering failures`,
+      );
+    }
+    if (fieldSummary.aggregateSubtypeCount !== fieldSummary.candidateFilteringFailureCount) {
+      throw new Error(
+        `${field}: aggregate subtype count ${fieldSummary.aggregateSubtypeCount} does not match ${fieldSummary.candidateFilteringFailureCount} candidate-filtering failures`,
+      );
+    }
+  }
+
+  return summary;
+}
+
 function buildRecoveryPassContributionBreakdown(
   cases: CaseReport[],
 ): EvalRecoveryPassContributionBucket[] {
@@ -553,6 +662,8 @@ export function buildReport(cases: CaseReport[], manifest: LoadedEvalManifest): 
   const scoreByCaseId = new Map(scores.map((score) => [score.caseId, score]));
   const casesById = new Map(cases.map((caseReport) => [caseReport.caseId, caseReport]));
   const records = includedRecords(manifest);
+  const candidateFilteringSubtypes = buildCandidateFilteringSubtypeDistribution(cases);
+  assertCandidateFilteringSubtypeCoverage(cases, candidateFilteringSubtypes);
   return {
     schemaVersion: "extraction-baseline-report.v3",
     manifestSchemaVersion: manifest.schemaVersion,
@@ -562,7 +673,7 @@ export function buildReport(cases: CaseReport[], manifest: LoadedEvalManifest): 
       alcoholSlices: buildAlcoholSlices(records, scoreByCaseId),
       orientationSlices: buildOrientationSlices(records, scoreByCaseId),
       failureDistribution: buildFailureDistribution(records, casesById),
-      candidateFilteringSubtypes: buildCandidateFilteringSubtypeDistribution(cases),
+      candidateFilteringSubtypes,
       recoveryPassContributions: buildRecoveryPassContributionBreakdown(cases),
       performance: buildPerformanceBreakdown(cases),
     },

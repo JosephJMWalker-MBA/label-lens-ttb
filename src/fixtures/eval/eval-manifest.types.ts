@@ -190,6 +190,7 @@ export const EVAL_CANDIDATE_FILTERING_SUBTYPES = [
   "brand-rejected-sentence-fragment",
   "brand-kept-overextended-candidate",
   "brand-kept-partial-candidate",
+  "brand-filtering-cause-unattributed",
   "alcohol-rejected-proof-only",
   "alcohol-rejected-no-supported-number",
   "alcohol-rejected-missing-volume-marker",

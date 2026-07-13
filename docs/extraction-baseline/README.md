@@ -63,6 +63,10 @@ now receives exactly one evaluation-only subtype:
   - the selector kept only an overextended or partial brand-like span, so the
     acceptable brand remained visible inside a larger kept candidate but never
     survived as an acceptable candidate on its own.
+  - if truth proves the loss reached candidate-filtering but the current
+    diagnostics cannot honestly identify which bounded brand path caused it,
+    evaluation records the neutral terminal subtype
+    `brand-filtering-cause-unattributed` instead of guessing a mechanism.
 - Alcohol subtypes exist because the selector already distinguishes several
   bounded pre-parser rejection paths, and those paths imply different later
   fixes:
@@ -75,6 +79,10 @@ now receives exactly one evaluation-only subtype:
 
 These subtypes are derived only inside evaluation from committed selector
 diagnostics plus fixture truth. They do not alter extraction or ranking.
+The report builder also enforces a corpus-level coverage invariant: per field,
+candidate-filtering subtype counts must sum exactly to the
+`candidate-filtering-failure` count, and no other failure class may carry a
+candidate-filtering subtype.
 
 ### Recovery-pass contribution measurement
 

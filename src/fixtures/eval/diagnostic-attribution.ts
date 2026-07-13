@@ -166,7 +166,7 @@ export function brandCandidateFilteringSubtype(
     }
   }
 
-  return bestLine?.subtype ?? null;
+  return bestLine?.subtype ?? "brand-filtering-cause-unattributed";
 }
 
 function alcoholPercentVariants(value: number): string[] {
