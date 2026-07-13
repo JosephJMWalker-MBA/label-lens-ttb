@@ -74,7 +74,7 @@ describe("Next.js packaging configuration", () => {
   });
 });
 
-describe("single hardened processing route", () => {
+describe("hardened processing routes", () => {
   const apiDir = join(ROOT, "src/app/api");
 
   function routeFiles(dir: string): string[] {
@@ -87,15 +87,17 @@ describe("single hardened processing route", () => {
     return found;
   }
 
-  it("exposes exactly one OCR processing route, the narrow disposition route, and an inert health probe", () => {
+  it("exposes exactly one OCR processing route, two bounded append routes, and an inert health probe", () => {
     const routes = routeFiles(apiDir).sort();
     const healthRoute = join(apiDir, "health", "route.ts");
+    const confirmationRoute = join(apiDir, "precheck", "confirmation", "route.ts");
     expect(routes).toEqual([
       healthRoute,
+      confirmationRoute,
       join(apiDir, "precheck", "disposition", "route.ts"),
       join(apiDir, "precheck", "route.ts"),
     ]);
-    // The two processing routes accept POST; the health probe is a GET-only
+    // The three mutable routes accept POST; the health probe is a GET-only
     // liveness endpoint that performs no OCR and imports no processing service.
     for (const route of routes) {
       if (route === healthRoute) continue;
@@ -106,7 +108,7 @@ describe("single hardened processing route", () => {
     expect(health).not.toMatch(/POST|precheck-service|extractor|tesseract|sharp/);
   });
 
-  it("keeps OCR/extraction in the single processing route; disposition never duplicates it", () => {
+  it("keeps OCR/extraction in the single processing route; append routes never duplicate it", () => {
     const ocrRoute = readFileSync(join(apiDir, "precheck", "route.ts"), "utf8");
     expect(ocrRoute).toMatch(/@\/server\/precheck-service/);
 
@@ -118,10 +120,21 @@ describe("single hardened processing route", () => {
     // extractor, OCR engine, or image processing of its own.
     expect(dispositionRoute).not.toMatch(/extractor|ocr-engine|tesseract|sharp/);
     expect(dispositionRoute).toMatch(/appendDispositionToResult/);
+
+    const confirmationRoute = readFileSync(
+      join(apiDir, "precheck", "confirmation", "route.ts"),
+      "utf8",
+    );
+    expect(confirmationRoute).not.toMatch(/extractor|ocr-engine|tesseract|sharp/);
+    expect(confirmationRoute).toMatch(/appendFieldConfirmationToResult/);
   });
 
-  it("declares the Node runtime and is not configured for Edge on both routes", () => {
-    for (const rel of ["precheck/route.ts", "precheck/disposition/route.ts"]) {
+  it("declares the Node runtime and is not configured for Edge on all mutable routes", () => {
+    for (const rel of [
+      "precheck/route.ts",
+      "precheck/disposition/route.ts",
+      "precheck/confirmation/route.ts",
+    ]) {
       const source = readFileSync(join(apiDir, rel), "utf8");
       expect(source).toMatch(/export\s+const\s+runtime\s*=\s*["']nodejs["']/);
       expect(source).not.toMatch(/["']edge["']/);

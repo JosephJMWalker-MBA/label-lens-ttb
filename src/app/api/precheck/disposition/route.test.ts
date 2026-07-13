@@ -10,7 +10,11 @@ import { assemblePrecheckResult } from "@/pipeline/result/assemble";
 import { buildAssembleInput } from "@/pipeline/result/build.fixtures";
 import { deriveMachineResultId } from "@/pipeline/result/serialize";
 import { issueAppendToken } from "@/server/append-token";
-import { appendDispositionToResult } from "@/server/precheck-service";
+import { rememberLatestAppendableExport } from "@/server/append-freshness";
+import {
+  appendDispositionToResult,
+  appendFieldConfirmationToResult,
+} from "@/server/precheck-service";
 import type { PrecheckDispositionRequest } from "@/server/precheck-service.types";
 
 import { POST } from "./route";
@@ -47,6 +51,15 @@ function tokenFor(exportJson: string): string {
   return issued.token;
 }
 
+function rememberHead(exportJson: string) {
+  const parsed = parseJsonExport(exportJson);
+  if (!parsed.ok) throw new Error("parse failed");
+  rememberLatestAppendableExport(
+    parsed.value.generatedFrom.machineResultId,
+    parsed.value.integrity.value,
+  );
+}
+
 const FILE = {
   displayName: "label.jpeg",
   mediaType: "image/jpeg",
@@ -56,9 +69,10 @@ const FILE = {
 
 function req(overrides: Partial<PrecheckDispositionRequest> = {}): PrecheckDispositionRequest {
   const exportJson = overrides.exportJson ?? baseExportJson();
+  const appendToken = overrides.appendToken ?? tokenFor(exportJson);
   return {
     exportJson,
-    appendToken: tokenFor(baseExportJson()),
+    appendToken,
     actorId: "reviewer-1",
     decision: "accepted_for_internal_use",
     reasonCode: "LOOKS_GOOD",
@@ -68,12 +82,20 @@ function req(overrides: Partial<PrecheckDispositionRequest> = {}): PrecheckDispo
   };
 }
 
+function primedReq(
+  overrides: Partial<PrecheckDispositionRequest> = {},
+): PrecheckDispositionRequest {
+  const exportJson = overrides.exportJson ?? baseExportJson();
+  rememberHead(exportJson);
+  return req({ ...overrides, exportJson });
+}
+
 describe("appendDispositionToResult (service)", () => {
   it("starts from an empty history and appends one contiguous entry", () => {
     const before = parseJsonExport(baseExportJson());
     expect(before.ok && before.value.humanDispositionHistory).toEqual([]);
 
-    const out = appendDispositionToResult(req());
+    const out = appendDispositionToResult(primedReq());
     expect(out.ok).toBe(true);
     if (!out.ok) return;
     expect(out.value.humanDispositionHistory).toHaveLength(1);
@@ -88,7 +110,7 @@ describe("appendDispositionToResult (service)", () => {
 
   it("leaves machine findings and the machine-result id unchanged byte-for-byte", () => {
     const base = parseJsonExport(baseExportJson());
-    const out = appendDispositionToResult(req());
+    const out = appendDispositionToResult(primedReq());
     expect(base.ok && out.ok).toBe(true);
     if (!base.ok || !out.ok) return;
     expect(out.value.machineResultId).toBe(base.value.generatedFrom.machineResultId);
@@ -97,7 +119,7 @@ describe("appendDispositionToResult (service)", () => {
   });
 
   it("rebuilds a checksum-verifying JSON export that includes the exact history", () => {
-    const out = appendDispositionToResult(req({ note: "ok", reasonCode: "R1" }));
+    const out = appendDispositionToResult(primedReq({ note: "ok", reasonCode: "R1" }));
     expect(out.ok).toBe(true);
     if (!out.ok) return;
     const parsed = parseJsonExport(out.value.exportJson);
@@ -108,7 +130,7 @@ describe("appendDispositionToResult (service)", () => {
   });
 
   it("produces a readable report containing the disposition history", () => {
-    const out = appendDispositionToResult(req({ actorId: "auditor-9" }));
+    const out = appendDispositionToResult(primedReq({ actorId: "auditor-9" }));
     expect(out.ok).toBe(true);
     if (!out.ok) return;
     expect(out.value.report.html).toMatch(/auditor-9/);
@@ -116,27 +138,31 @@ describe("appendDispositionToResult (service)", () => {
   });
 
   it("rejects an invalid decision, empty actor, and empty reason code", () => {
-    expect(appendDispositionToResult(req({ decision: "approved" as never })).ok).toBe(false);
-    const noActor = appendDispositionToResult(req({ actorId: "  " }));
+    expect(appendDispositionToResult(primedReq({ decision: "approved" as never })).ok).toBe(false);
+    const noActor = appendDispositionToResult(primedReq({ actorId: "  " }));
     expect(noActor.ok).toBe(false);
     if (!noActor.ok) expect(noActor.error.code).toBe("INVALID_DISPOSITION");
-    const noReason = appendDispositionToResult(req({ reasonCode: "" }));
+    const noReason = appendDispositionToResult(primedReq({ reasonCode: "" }));
     expect(noReason.ok).toBe(false);
   });
 
   it("rejects references to a rule or check that is not in this result", () => {
-    const badRule = appendDispositionToResult(req({ references: { ruleIds: ["no-such-rule"] } }));
+    const badRule = appendDispositionToResult(
+      primedReq({ references: { ruleIds: ["no-such-rule"] } }),
+    );
     expect(badRule.ok).toBe(false);
     if (!badRule.ok) expect(badRule.error.code).toBe("INVALID_DISPOSITION_REFERENCE");
     const badCheck = appendDispositionToResult(
-      req({ references: { checkIds: ["no-such-check"] } }),
+      primedReq({ references: { checkIds: ["no-such-check"] } }),
     );
     expect(badCheck.ok).toBe(false);
   });
 
   it("accepts references that exist in the result", () => {
     const out = appendDispositionToResult(
-      req({ references: { ruleIds: ["wine-alcohol-syntax"], checkIds: ["brand-name-check"] } }),
+      primedReq({
+        references: { ruleIds: ["wine-alcohol-syntax"], checkIds: ["brand-name-check"] },
+      }),
     );
     expect(out.ok).toBe(true);
   });
@@ -144,20 +170,26 @@ describe("appendDispositionToResult (service)", () => {
   it("rejects a tampered submitted result (client cannot inject findings)", () => {
     // Change machine content without recomputing the checksum: the server must
     // reject it rather than trust the client-supplied findings.
-    const tampered = baseExportJson().replace("wine-alcohol-syntax", "wine-alcohol-INJECTED");
+    const original = baseExportJson();
+    const tampered = original.replace("wine-alcohol-syntax", "wine-alcohol-INJECTED");
     expect(tampered).not.toBe(baseExportJson());
-    const out = appendDispositionToResult(req({ exportJson: tampered }));
+    const out = appendDispositionToResult(
+      req({ exportJson: tampered, appendToken: tokenFor(original) }),
+    );
     expect(out.ok).toBe(false);
     if (!out.ok) expect(out.error.code).toBe("INVALID_SUBMITTED_RESULT");
   });
 
   it("rejects a re-checksummed payload that kept a stale machine-result id", () => {
-    const exp = JSON.parse(baseExportJson());
+    const original = baseExportJson();
+    const exp = JSON.parse(original);
     // Change a machine field and re-checksum the payload, but keep the old id.
     exp.declaredFacts.applicationAlcoholValue.value = "13";
     const { integrity, ...payload } = exp;
     exp.integrity = { ...integrity, value: payloadHash(payload) };
-    const out = appendDispositionToResult(req({ exportJson: JSON.stringify(exp) }));
+    const out = appendDispositionToResult(
+      req({ exportJson: JSON.stringify(exp), appendToken: tokenFor(original) }),
+    );
     expect(out.ok).toBe(false);
     if (!out.ok) expect(out.error.code).toBe("INVALID_SUBMITTED_RESULT");
   });
@@ -169,38 +201,48 @@ describe("appendDispositionToResult (append authorization)", () => {
    * exactly as a forger holding the committed parser (but not the signing secret)
    * could. Such an export passes parsing and integrity — only the append token
    * can distinguish it from a genuine one. */
-  function forgeSelfConsistentExport(mutate: (exp: Record<string, unknown>) => void): string {
-    const exp = JSON.parse(baseExportJson());
-    mutate(exp);
-    const machineContent = {
-      resultSchemaVersion: exp.generatedFrom.resultSchemaVersion,
-      mode: exp.mode,
-      profile: exp.profile,
-      run: exp.run,
-      declaredFacts: exp.declaredFacts,
-      evidenceAssessments: exp.evidenceAssessments,
-      observations: exp.observations,
-      findings: exp.findings,
-      versionManifest: exp.versionManifest,
-      advisoryNotice: exp.advisoryNotice,
-      humanDispositionHistory: exp.humanDispositionHistory,
+  function forgeSelfConsistentExport(mutate: (result: Record<string, unknown>) => void): string {
+    const parsed = parseJsonExport(baseExportJson());
+    if (!parsed.ok) throw new Error("parse failed");
+    const forged = {
+      machineResultId: parsed.value.generatedFrom.machineResultId,
+      resultSchemaVersion: parsed.value.generatedFrom.resultSchemaVersion,
+      mode: parsed.value.mode,
+      profile: parsed.value.profile,
+      run: parsed.value.run,
+      declaredFacts: parsed.value.declaredFacts,
+      evidenceAssessments: parsed.value.evidenceAssessments,
+      observations: parsed.value.observations,
+      findings: parsed.value.findings,
+      versionManifest: parsed.value.versionManifest,
+      humanFieldConfirmationHistory: parsed.value.humanFieldConfirmationHistory,
+      advisoryNotice: parsed.value.advisoryNotice,
+      ...(parsed.value.advisoryQuality !== undefined
+        ? { advisoryQuality: parsed.value.advisoryQuality }
+        : {}),
+      humanDispositionHistory: parsed.value.humanDispositionHistory,
     };
+    mutate(forged);
+    const { machineResultId: _previousId, ...machineContent } = forged;
+    void _previousId;
     const machineResultId = deriveMachineResultId(machineContent as never);
-    const built = buildJsonExport({ machineResultId, ...machineContent } as never);
-    if (!built.ok) throw new Error("rebuild failed");
-    const verified = verifyExportIntegrity(built.value);
+    const rebuilt = buildJsonExport({ machineResultId, ...machineContent } as never);
+    if (!rebuilt.ok) throw new Error("rebuild failed");
+    const verified = verifyExportIntegrity(rebuilt.value);
     if (!verified.ok) throw new Error("verify failed");
     return serializeExportCanonical(verified.value);
   }
 
   it("permits an append with a valid server-issued token", () => {
     const exportJson = baseExportJson();
-    const out = appendDispositionToResult(req({ exportJson, appendToken: tokenFor(exportJson) }));
+    const out = appendDispositionToResult(
+      primedReq({ exportJson, appendToken: tokenFor(exportJson) }),
+    );
     expect(out.ok).toBe(true);
   });
 
   it("rejects a missing append token", () => {
-    const out = appendDispositionToResult(req({ appendToken: "" }));
+    const out = appendDispositionToResult(primedReq({ appendToken: "" }));
     expect(out.ok).toBe(false);
     if (!out.ok) expect(out.error.code).toBe("MISSING_APPEND_TOKEN");
   });
@@ -208,6 +250,7 @@ describe("appendDispositionToResult (append authorization)", () => {
   it("rejects altered machine content presented with the old token", () => {
     const original = baseExportJson();
     const oldToken = tokenFor(original);
+    rememberHead(original);
     // A self-consistent forgery: machine content changed, id + checksum rebuilt.
     const forged = forgeSelfConsistentExport((exp) => {
       (exp.observations as { brandName: { rawText: string } }).brandName.rawText = "FORGED MARK";
@@ -225,6 +268,7 @@ describe("appendDispositionToResult (append authorization)", () => {
     const forged = forgeSelfConsistentExport((exp) => {
       (exp.observations as { brandName: { rawText: string } }).brandName.rawText = "TAMPERED";
     });
+    rememberHead(baseExportJson());
     const attackerToken = createHmac("sha256", "attacker-key")
       .update(`append-token.v1:${machineIdOf(forged)}`)
       .digest("hex");
@@ -240,7 +284,7 @@ describe("appendDispositionToResult (append authorization)", () => {
     const attackerToken = createHmac("sha256", "some-other-key")
       .update(`append-token.v1:${machineIdOf(exportJson)}`)
       .digest("hex");
-    const out = appendDispositionToResult(req({ exportJson, appendToken: attackerToken }));
+    const out = appendDispositionToResult(primedReq({ exportJson, appendToken: attackerToken }));
     expect(out.ok).toBe(false);
     if (!out.ok) expect(out.error.code).toBe("INVALID_APPEND_TOKEN");
   });
@@ -250,7 +294,7 @@ describe("appendDispositionToResult (append authorization)", () => {
     const foreignToken = issueAppendToken("precheck-result.v1-" + "0".repeat(64));
     if (!foreignToken.ok) throw new Error("issue failed");
     const out = appendDispositionToResult(
-      req({ exportJson: baseExportJson(), appendToken: foreignToken.token }),
+      primedReq({ exportJson: baseExportJson(), appendToken: foreignToken.token }),
     );
     expect(out.ok).toBe(false);
     if (!out.ok) expect(out.error.code).toBe("INVALID_APPEND_TOKEN");
@@ -258,7 +302,9 @@ describe("appendDispositionToResult (append authorization)", () => {
 
   it("permits successive appends and keeps the machine id and findings unchanged", () => {
     const exportJson = baseExportJson();
-    const first = appendDispositionToResult(req({ exportJson, appendToken: tokenFor(exportJson) }));
+    const first = appendDispositionToResult(
+      primedReq({ exportJson, appendToken: tokenFor(exportJson) }),
+    );
     expect(first.ok).toBe(true);
     if (!first.ok) return;
     // The refreshed export carries the same machine id, so the same token still
@@ -277,13 +323,42 @@ describe("appendDispositionToResult (append authorization)", () => {
 
   it("never leaks the signing secret or token in export or report output", () => {
     const exportJson = baseExportJson();
-    const out = appendDispositionToResult(req({ exportJson, appendToken: tokenFor(exportJson) }));
+    const out = appendDispositionToResult(
+      primedReq({ exportJson, appendToken: tokenFor(exportJson) }),
+    );
     expect(out.ok).toBe(true);
     if (!out.ok) return;
     expect(out.value.exportJson).not.toContain(FIXED_SECRET);
     expect(out.value.exportJson).not.toContain(out.value.appendToken);
     expect(out.value.report.html).not.toContain(FIXED_SECRET);
     expect(out.value.report.html).not.toContain(out.value.appendToken);
+  });
+
+  it("rejects a stale disposition append after confirmation history has advanced", () => {
+    const exportJson = baseExportJson();
+    const appendToken = tokenFor(exportJson);
+    rememberHead(exportJson);
+
+    const confirmed = appendFieldConfirmationToResult({
+      exportJson,
+      appendToken,
+      fieldId: "brandName",
+      decisionType: "accepted-machine-reading",
+      recordedAt: "2026-07-13T10:00:00Z",
+      file: FILE,
+    });
+    expect(confirmed.ok).toBe(true);
+
+    const stale = appendDispositionToResult(
+      req({
+        exportJson,
+        appendToken,
+        actorId: "reviewer-2",
+        reasonCode: "STALE_REPLAY",
+      }),
+    );
+    expect(stale.ok).toBe(false);
+    if (!stale.ok) expect(stale.error.code).toBe("STALE_SUBMITTED_RESULT");
   });
 });
 
@@ -298,6 +373,7 @@ describe("POST /api/precheck/disposition", () => {
 
   it("appends a disposition and returns the refreshed result", async () => {
     const exportJson = baseExportJson();
+    rememberHead(exportJson);
     const res = await POST(
       httpReq({
         exportJson,
@@ -332,9 +408,12 @@ describe("POST /api/precheck/disposition", () => {
   });
 
   it("rejects a decision outside the bounded internal-workflow set", async () => {
+    const exportJson = baseExportJson();
+    rememberHead(exportJson);
     const res = await POST(
       httpReq({
-        exportJson: baseExportJson(),
+        exportJson,
+        appendToken: tokenFor(exportJson),
         actorId: "r",
         decision: "approved_by_ttb",
         reasonCode: "x",
@@ -347,6 +426,7 @@ describe("POST /api/precheck/disposition", () => {
   });
 
   it("returns user-safe errors with no stack, path, or environment data", async () => {
+    rememberHead(baseExportJson());
     const res = await POST(
       httpReq({
         exportJson: "not json",

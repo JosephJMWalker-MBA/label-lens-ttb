@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { appendHumanFieldConfirmation } from "@/pipeline/result/field-confirmation-history";
 import { appendDisposition } from "@/pipeline/result/disposition";
 import { assemblePrecheckResult } from "@/pipeline/result/assemble";
 import { buildAssembleInput } from "@/pipeline/result/build.fixtures";
@@ -26,6 +27,17 @@ function withDisposition(overrides: Partial<DispositionEntryInput> = {}): Preche
     ...overrides,
   });
   if (!appended.ok) throw new Error("append failed");
+  return appended.value;
+}
+
+function withFieldConfirmation(): PrecheckResult {
+  const appended = appendHumanFieldConfirmation(baseResult(), {
+    confirmationId: "field-confirmation-1",
+    fieldId: "brandName",
+    decisionType: "accepted-machine-reading",
+    recordedAt: "2026-07-13T10:00:00Z",
+  });
+  if (!appended.ok) throw new Error("field confirmation failed");
   return appended.value;
 }
 
@@ -58,6 +70,13 @@ describe("buildReadableReport", () => {
     expect(text).toMatch(/does not change the automated findings/i);
     expect(text).toMatch(REPORT_SCHEMA_VERSION);
     expect(text).toMatch(new RegExp(CHECKSUM));
+  });
+
+  it("renders a separate reviewed-confirmation section without rewriting machine evidence", () => {
+    const text = html(withFieldConfirmation());
+    expect(text).toMatch(/Reviewed confirmation/);
+    expect(text).toMatch(/Accepted machine reading/);
+    expect(text).toMatch(/Machine observation remains preserved exactly/i);
   });
 
   it("includes all six findings in exact registry order", () => {

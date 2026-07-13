@@ -34,6 +34,14 @@ describe("parseJsonExport", () => {
     if (out.ok) expect(out.value.integrity.value).toBe(e.integrity.value);
   });
 
+  it("accepts a Phase 5B export that predates field-confirmation history", () => {
+    const legacy = JSON.parse(canonical());
+    delete legacy.humanFieldConfirmationHistory;
+    const out = parseJsonExport(JSON.stringify(legacy));
+    expect(out.ok).toBe(true);
+    if (out.ok) expect(out.value.humanFieldConfirmationHistory).toEqual([]);
+  });
+
   it("returns INVALID_JSON for malformed JSON", () => {
     const out = parseJsonExport("{not json");
     expect(out.ok).toBe(false);

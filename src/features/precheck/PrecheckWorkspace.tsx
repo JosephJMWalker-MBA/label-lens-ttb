@@ -337,7 +337,7 @@ export function PrecheckWorkspace() {
 
       {phase === "complete" && response ? (
         <div ref={resultRef} tabIndex={-1} className="flex flex-col gap-6">
-          <ResultView response={response} previewImage={previewImage} />
+          <ResultView response={response} previewImage={previewImage} onConfirmed={setResponse} />
           <Disclosure title="Record internal disposition">
             <DispositionSection response={response} onAppended={setResponse} />
           </Disclosure>

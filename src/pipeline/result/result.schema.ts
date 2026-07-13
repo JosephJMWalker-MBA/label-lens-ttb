@@ -1,13 +1,28 @@
 import { z } from "zod";
 
-import { observationSchema } from "@/domain/evidence/evidence.schema";
+import { MAX_EVIDENCE_STRING, observationSchema } from "@/domain/evidence/evidence.schema";
 import { EVIDENCE_STATUSES } from "@/domain/run/run-status";
 import { verificationFindingSchema } from "@/domain/verification/finding.schema";
+import type { AnalyzerFieldObservation } from "@/pipeline/analyzer/analyzer.types";
 import { PRECHECK_CHECK_IDS } from "@/pipeline/precheck/precheck.types";
 import { err, ok, type Result } from "@/shared/result";
 
-import { RESULT_DISPOSITION_DECISIONS, RESULT_MODE, RESULT_SCHEMA_VERSION } from "./result.types";
-import type { AssemblyError, DispositionError, PrecheckResult } from "./result.types";
+import { resolveMachineAlternates } from "./field-confirmation";
+import {
+  HUMAN_FIELD_CONFIRMATION_DECISION_TYPES,
+  HUMAN_FIELD_CONFIRMATION_PROVENANCE,
+  HUMAN_FIELD_CONFIRMATION_SCHEMA_VERSION,
+  HUMAN_FIELD_GEOMETRY_PROVENANCES,
+  RESULT_DISPOSITION_DECISIONS,
+  RESULT_MODE,
+  RESULT_SCHEMA_VERSION,
+} from "./result.types";
+import type {
+  AssemblyError,
+  DispositionError,
+  HumanFieldConfirmationError,
+  PrecheckResult,
+} from "./result.types";
 
 const SHA256 = /^[0-9a-f]{64}$/;
 const SEMVER = /^\d+\.\d+\.\d+$/;
@@ -23,6 +38,7 @@ const REASON_MAX = 512;
 const ACTOR_MAX = 256;
 const NOTE_MAX = 8192;
 const INSTANT_MAX = 64;
+const MIN_NORMALIZED_REGION_DIMENSION = 0.005;
 
 const RFC3339 = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
 
@@ -53,6 +69,19 @@ const instant = z
   .string()
   .max(INSTANT_MAX)
   .refine(isValidInstant, { message: "must be a valid RFC3339 instant" });
+const unitFraction = z.number().finite().min(0).max(1);
+const safeNonNegativeInt = z
+  .number()
+  .int()
+  .nonnegative()
+  .refine((v) => Number.isSafeInteger(v), { message: "must be a safe integer" })
+  .refine((v) => !Object.is(v, -0), { message: "must not be negative zero" });
+const basisPoints = z
+  .number()
+  .int()
+  .nonnegative()
+  .max(10000)
+  .refine(Number.isSafeInteger, "unsafe integer");
 const isoDate = z
   .string()
   .regex(ISO_DATE)
@@ -161,6 +190,165 @@ export const dispositionEntrySchema = z
   })
   .strict();
 
+export const humanFieldGeometrySchema = z
+  .object({
+    unit: z.literal("normalized-image-relative"),
+    provenance: z.enum(HUMAN_FIELD_GEOMETRY_PROVENANCES),
+    imageIndex: safeNonNegativeInt,
+    x: unitFraction,
+    y: unitFraction,
+    width: unitFraction,
+    height: unitFraction,
+  })
+  .strict()
+  .superRefine((g, ctx) => {
+    if (g.width < MIN_NORMALIZED_REGION_DIMENSION) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["width"],
+        message: `width must be at least ${MIN_NORMALIZED_REGION_DIMENSION}.`,
+      });
+    }
+    if (g.height < MIN_NORMALIZED_REGION_DIMENSION) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["height"],
+        message: `height must be at least ${MIN_NORMALIZED_REGION_DIMENSION}.`,
+      });
+    }
+    if (g.x + g.width > 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["width"],
+        message: "x + width must stay within the normalized image frame.",
+      });
+    }
+    if (g.y + g.height > 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["height"],
+        message: "y + height must stay within the normalized image frame.",
+      });
+    }
+  });
+
+const correctedBrandValueSchema = z
+  .object({
+    fieldId: z.literal("brandName"),
+    rawValue: boundedText(MAX_EVIDENCE_STRING),
+    normalizedValue: boundedText(MAX_EVIDENCE_STRING),
+  })
+  .strict();
+
+const correctedAlcoholDirectValueSchema = z
+  .object({
+    fieldId: z.literal("alcoholStatement"),
+    rawValue: boundedText(MAX_EVIDENCE_STRING),
+    normalizedValue: boundedText(MAX_EVIDENCE_STRING),
+    parsed: z
+      .object({
+        kind: z.literal("direct"),
+        basisPoints,
+      })
+      .strict(),
+  })
+  .strict();
+
+const correctedAlcoholRangeValueSchema = z
+  .object({
+    fieldId: z.literal("alcoholStatement"),
+    rawValue: boundedText(MAX_EVIDENCE_STRING),
+    normalizedValue: boundedText(MAX_EVIDENCE_STRING),
+    parsed: z
+      .object({
+        kind: z.literal("range"),
+        lowerBasisPoints: basisPoints,
+        upperBasisPoints: basisPoints,
+      })
+      .strict()
+      .superRefine((parsed, ctx) => {
+        if (parsed.lowerBasisPoints > parsed.upperBasisPoints) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["lowerBasisPoints"],
+            message: "lowerBasisPoints must be less than or equal to upperBasisPoints.",
+          });
+        }
+      }),
+  })
+  .strict();
+
+const correctedFieldValueSchema = z.union([
+  correctedBrandValueSchema,
+  correctedAlcoholDirectValueSchema,
+  correctedAlcoholRangeValueSchema,
+]);
+
+const humanFieldConfirmationEntryBaseSchema = z.object({
+  confirmationId: boundedText(ID_MAX),
+  sequence: z.number().int().positive().refine(Number.isSafeInteger, "unsafe integer"),
+  schemaVersion: z.literal(HUMAN_FIELD_CONFIRMATION_SCHEMA_VERSION),
+  provenance: z.literal(HUMAN_FIELD_CONFIRMATION_PROVENANCE),
+  fieldId: z.enum(["brandName", "alcoholStatement"]),
+  recordedAt: instant,
+  note: boundedText(NOTE_MAX).optional(),
+  humanGeometry: humanFieldGeometrySchema.optional(),
+});
+
+export const humanFieldConfirmationEntrySchema = z.discriminatedUnion("decisionType", [
+  humanFieldConfirmationEntryBaseSchema
+    .extend({
+      decisionType: z.literal("accepted-machine-reading"),
+    })
+    .strict(),
+  humanFieldConfirmationEntryBaseSchema
+    .extend({
+      decisionType: z.literal("selected-alternate"),
+      alternateId: boundedText(ID_MAX),
+    })
+    .strict(),
+  humanFieldConfirmationEntryBaseSchema
+    .extend({
+      decisionType: z.literal("corrected-value"),
+      correctedValue: correctedFieldValueSchema,
+    })
+    .strict(),
+  humanFieldConfirmationEntryBaseSchema
+    .extend({
+      decisionType: z.literal("field-not-visible"),
+    })
+    .strict(),
+  humanFieldConfirmationEntryBaseSchema
+    .extend({
+      decisionType: z.literal("field-unreadable"),
+    })
+    .strict(),
+]);
+
+/** Append-only history: contiguous 1..n sequence, unique confirmation ids. */
+export const humanFieldConfirmationHistorySchema = z
+  .array(humanFieldConfirmationEntrySchema)
+  .superRefine((entries, ctx) => {
+    const ids = new Set<string>();
+    entries.forEach((entry, index) => {
+      if (entry.sequence !== index + 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [index, "sequence"],
+          message: `Confirmation sequence must be contiguous from 1; expected ${index + 1}.`,
+        });
+      }
+      if (ids.has(entry.confirmationId)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [index, "confirmationId"],
+          message: `Duplicate confirmationId: ${entry.confirmationId}.`,
+        });
+      }
+      ids.add(entry.confirmationId);
+    });
+  });
+
 /** Append-only history: contiguous 1..n sequence, unique disposition ids. */
 export const dispositionHistorySchema = z
   .array(dispositionEntrySchema)
@@ -195,7 +383,7 @@ export const dispositionHistorySchema = z
  */
 interface ResultSemanticShape {
   profile: { id: string; version: string; ruleManifest: { ruleId: string; version: string }[] };
-  observations: { brandName: { state: string }; alcoholStatement: { state: string } };
+  observations: { brandName: AnalyzerFieldObservation; alcoholStatement: AnalyzerFieldObservation };
   findings: {
     ruleId: string;
     ruleVersion: string;
@@ -210,6 +398,12 @@ interface ResultSemanticShape {
   }[];
   evidenceAssessments: { checkId: string }[];
   versionManifest: { sanitizedDerivativeSha256: string };
+  humanFieldConfirmationHistory: {
+    fieldId: "brandName" | "alcoholStatement";
+    decisionType: (typeof HUMAN_FIELD_CONFIRMATION_DECISION_TYPES)[number];
+    alternateId?: string;
+    correctedValue?: { fieldId: "brandName" | "alcoholStatement" };
+  }[];
   humanDispositionHistory: {
     references?: { ruleIds?: string[]; checkIds?: string[] };
   }[];
@@ -338,6 +532,43 @@ export function refineResultSemantics(result: ResultSemanticShape, ctx: z.Refine
       dupCheck.add(checkId);
     }
   });
+
+  const alternatesByField = {
+    brandName: resolveMachineAlternates("brandName", result.observations.brandName),
+    alcoholStatement: resolveMachineAlternates(
+      "alcoholStatement",
+      result.observations.alcoholStatement,
+    ),
+  };
+  result.humanFieldConfirmationHistory.forEach((entry, ei) => {
+    const observation = result.observations[entry.fieldId];
+    if (entry.decisionType === "accepted-machine-reading" && observation.value === null) {
+      issue(
+        ["humanFieldConfirmationHistory", ei, "decisionType"],
+        "accepted-machine-reading requires a machine-selected value to exist.",
+      );
+    }
+    if (entry.decisionType === "selected-alternate") {
+      const knownIds = new Set(
+        alternatesByField[entry.fieldId].map((alternate) => alternate.alternateId),
+      );
+      if (!entry.alternateId || !knownIds.has(entry.alternateId)) {
+        issue(
+          ["humanFieldConfirmationHistory", ei, "alternateId"],
+          "selected alternate must reference a real alternate from the same observation.",
+        );
+      }
+    }
+    if (
+      entry.decisionType === "corrected-value" &&
+      entry.correctedValue?.fieldId !== entry.fieldId
+    ) {
+      issue(
+        ["humanFieldConfirmationHistory", ei, "correctedValue", "fieldId"],
+        "corrected-value must match the field being confirmed.",
+      );
+    }
+  });
 }
 
 export const precheckResultSchema = z
@@ -391,6 +622,7 @@ export const precheckResultSchema = z
       })
       .strict()
       .optional(),
+    humanFieldConfirmationHistory: humanFieldConfirmationHistorySchema.default([]),
     humanDispositionHistory: dispositionHistorySchema,
   })
   .strict()
@@ -412,6 +644,18 @@ export function validateDispositionHistory(candidate: unknown): Result<void, Dis
   return err({
     code: "INVALID_DISPOSITION",
     message: "Disposition history failed validation.",
+    issues: issuesOf(parsed.error),
+  });
+}
+
+export function validateHumanFieldConfirmationHistory(
+  candidate: unknown,
+): Result<void, HumanFieldConfirmationError> {
+  const parsed = humanFieldConfirmationHistorySchema.safeParse(candidate);
+  if (parsed.success) return ok(undefined);
+  return err({
+    code: "INVALID_FIELD_CONFIRMATION",
+    message: "Field confirmation history failed validation.",
     issues: issuesOf(parsed.error),
   });
 }
