@@ -2,8 +2,8 @@ import { StrictMode } from "react";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { clearPrecheckTiming, getPrecheckTiming } from "./warm-timing";
-import { useSampleWarmup } from "./useSampleWarmup";
+import { clearPrecheckTiming, getPrecheckTiming } from "./precheck-timing";
+import { useVerifiedSampleRun } from "./useVerifiedSampleRun";
 
 beforeEach(() => clearPrecheckTiming());
 afterEach(() => {
@@ -24,22 +24,20 @@ function deferredFetch() {
   return {
     fetchMock,
     resolveOk: (data: unknown) => resolve({ json: async () => ({ ok: true, data }) }),
-    resolveError: (message: string) =>
-      resolve({ json: async () => ({ ok: false, error: { code: "X", message } }) }),
     reject: (reason?: unknown) => reject(reason),
   };
 }
 
-describe("useSampleWarmup", () => {
+describe("useVerifiedSampleRun", () => {
   it("does not request until active", () => {
     const { fetchMock } = deferredFetch();
-    renderHook(() => useSampleWarmup(false));
+    renderHook(() => useVerifiedSampleRun(false));
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("requests once when active, reaches ready, and records a cold timing", async () => {
+  it("requests once when active, reaches ready, and records sequence timings", async () => {
     const { fetchMock, resolveOk } = deferredFetch();
-    const { result } = renderHook(() => useSampleWarmup(true));
+    const { result } = renderHook(() => useVerifiedSampleRun(true));
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(result.current.state).toBe("analyzing");
@@ -50,13 +48,15 @@ describe("useSampleWarmup", () => {
     await act(async () => resolveOk({ id: "sample-1" }));
     await waitFor(() => expect(result.current.state).toBe("ready"));
     expect(result.current.response).toEqual({ id: "sample-1" });
-    expect(result.current.coldMs).not.toBeNull();
-    expect(getPrecheckTiming().coldMs).not.toBeNull();
+    expect(result.current.sampleRequestMs).not.toBeNull();
+    // Both observed-sequence measurements were recorded (no "warm" claim).
+    expect(getPrecheckTiming().sampleRequestMs).not.toBeNull();
+    expect(getPrecheckTiming().firstTrustworthyResultMs).not.toBeNull();
   });
 
   it("fires exactly one request under React Strict Mode's doubled effects", async () => {
     const { fetchMock } = deferredFetch();
-    renderHook(() => useSampleWarmup(true), { wrapper: StrictMode });
+    renderHook(() => useVerifiedSampleRun(true), { wrapper: StrictMode });
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     await new Promise((r) => setTimeout(r, 20));
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -65,7 +65,7 @@ describe("useSampleWarmup", () => {
   it("ignores a response that arrives after unmount (no unmounted-tree update)", async () => {
     const { resolveOk } = deferredFetch();
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    const { unmount } = renderHook(() => useSampleWarmup(true));
+    const { unmount } = renderHook(() => useVerifiedSampleRun(true));
     unmount();
     await act(async () => resolveOk({ id: "late" }));
     expect(errorSpy).not.toHaveBeenCalled();
@@ -73,13 +73,12 @@ describe("useSampleWarmup", () => {
 
   it("surfaces a failed run and allows a retry that supersedes it", async () => {
     const first = deferredFetch();
-    const { result } = renderHook(() => useSampleWarmup(true));
+    const { result } = renderHook(() => useVerifiedSampleRun(true));
     expect(first.fetchMock).toHaveBeenCalledTimes(1);
 
     await act(async () => first.reject(new Error("network")));
     await waitFor(() => expect(result.current.state).toBe("failed"));
 
-    // Retry issues a fresh request.
     const second = deferredFetch();
     act(() => result.current.start());
     expect(second.fetchMock).toHaveBeenCalledTimes(1);
@@ -90,7 +89,7 @@ describe("useSampleWarmup", () => {
 
   it("does not start a second request once already ready", async () => {
     const { fetchMock, resolveOk } = deferredFetch();
-    const { result } = renderHook(() => useSampleWarmup(true));
+    const { result } = renderHook(() => useVerifiedSampleRun(true));
     await act(async () => resolveOk({ id: "x" }));
     await waitFor(() => expect(result.current.state).toBe("ready"));
     act(() => result.current.start());

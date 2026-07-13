@@ -87,23 +87,32 @@ describe("single hardened processing route", () => {
     return found;
   }
 
-  it("exposes exactly one OCR processing route, the narrow disposition route, and an inert health probe", () => {
+  it("exposes exactly one OCR processing route, the narrow disposition route, an inert health probe, and a read-only sample image", () => {
     const routes = routeFiles(apiDir).sort();
     const healthRoute = join(apiDir, "health", "route.ts");
+    const sampleImageRoute = join(apiDir, "sample-image", "route.ts");
     expect(routes).toEqual([
       healthRoute,
       join(apiDir, "precheck", "disposition", "route.ts"),
       join(apiDir, "precheck", "route.ts"),
+      sampleImageRoute,
     ]);
-    // The two processing routes accept POST; the health probe is a GET-only
-    // liveness endpoint that performs no OCR and imports no processing service.
+    // The two processing routes accept POST; the health probe and the read-only
+    // sample-image endpoint are GET-only and perform no OCR / processing.
+    const getOnlyRoutes = new Set([healthRoute, sampleImageRoute]);
     for (const route of routes) {
-      if (route === healthRoute) continue;
+      if (getOnlyRoutes.has(route)) continue;
       expect(readFileSync(route, "utf8")).toMatch(/export\s+async\s+function\s+POST/);
     }
     const health = readFileSync(healthRoute, "utf8");
     expect(health).toMatch(/export\s+function\s+GET/);
     expect(health).not.toMatch(/POST|precheck-service|extractor|tesseract|sharp/);
+
+    // The sample-image route serves the bundled fixture bytes only: GET-only, no
+    // POST, and it imports no OCR/extraction/processing service.
+    const sampleImage = readFileSync(sampleImageRoute, "utf8");
+    expect(sampleImage).toMatch(/export\s+async\s+function\s+GET/);
+    expect(sampleImage).not.toMatch(/POST|precheck-service|extractor|ocr-engine|tesseract|sharp/);
   });
 
   it("keeps OCR/extraction in the single processing route; disposition never duplicates it", () => {
@@ -120,8 +129,8 @@ describe("single hardened processing route", () => {
     expect(dispositionRoute).toMatch(/appendDispositionToResult/);
   });
 
-  it("declares the Node runtime and is not configured for Edge on both routes", () => {
-    for (const rel of ["precheck/route.ts", "precheck/disposition/route.ts"]) {
+  it("declares the Node runtime and is not configured for Edge on the disk-reading routes", () => {
+    for (const rel of ["precheck/route.ts", "precheck/disposition/route.ts", "sample-image/route.ts"]) {
       const source = readFileSync(join(apiDir, rel), "utf8");
       expect(source).toMatch(/export\s+const\s+runtime\s*=\s*["']nodejs["']/);
       expect(source).not.toMatch(/["']edge["']/);

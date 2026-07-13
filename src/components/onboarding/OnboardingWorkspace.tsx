@@ -6,23 +6,31 @@ import { Button } from "@/components/ui/button";
 import { ResultView } from "@/features/precheck/ResultView";
 
 import { useOnboarding } from "./onboarding-context";
-import { useSampleWarmup, type SampleWarmupState } from "./useSampleWarmup";
+import { useVerifiedSampleRun, type VerifiedSampleRunState } from "./useVerifiedSampleRun";
 
 /**
  * Productive cold-start onboarding.
  *
  * The unavoidable first-visit initialization interval is spent running the real
- * verified sample once through `/api/precheck` (warming the server) while the
- * user reads the actual Label Lens workflow. The completed sample result is
- * revealed the moment it exists — never held back for tutorial copy — and
- * "Upload your label" is the obvious next step.
+ * verified sample once through `/api/precheck` while the user reads the actual
+ * Label Lens workflow. The completed sample result is revealed the moment it
+ * exists — never held back for tutorial copy — and "Upload your label" is the
+ * obvious next step. Running the sample is intended to create an opportunity for
+ * host process reuse where deployment permits; the client cannot prove that
+ * reuse happened, so nothing here claims the service is "warm" or faster.
  *
  * Honest status: two channels are kept deliberately separate.
  * - The STATUS log shows only states the client can prove. The API does not
  *   stream internal OCR stages, so we never invent candidate-filtering, rule, or
- *   report-assembly transitions while the request is pending.
+ *   report-assembly transitions while the request is pending. It is rebuilt
+ *   deterministically from the current sample state, so a replay reconstructs
+ *   the applicable milestones rather than showing an empty log.
  * - The WORKFLOW list is static teaching content, clearly labelled as such.
  */
+
+/** The exact bundled artwork the sample pre-check analyzes (byte-verified). */
+const SAMPLE_IMAGE_URL = "/api/sample-image";
+const SAMPLE_IMAGE_NAME = "M Cellars verified sample";
 
 /** Static teaching content — the real workflow, not live server state. */
 const WORKFLOW_STEPS: { title: string; body: string }[] = [
@@ -67,7 +75,7 @@ interface LogEntry {
 }
 
 /** Which milestones the client can honestly claim, given the run state. */
-function reachedMilestones(state: SampleWarmupState): MilestoneKey[] {
+function reachedMilestones(state: VerifiedSampleRunState): MilestoneKey[] {
   const reached: MilestoneKey[] = ["shell"];
   if (state === "requested" || state === "analyzing" || state === "ready" || state === "failed") {
     reached.push("requested");
@@ -89,30 +97,32 @@ const FOCUSABLE =
 
 export function OnboardingWorkspace() {
   const { isOpen, firstVisit, close } = useOnboarding();
-  const { state, response, error, coldMs, start } = useSampleWarmup(isOpen && firstVisit);
+  const { state, response, error, sampleRequestMs, start } = useVerifiedSampleRun(
+    isOpen && firstVisit,
+  );
 
   const [log, setLog] = useState<LogEntry[]>([]);
+  const [imageError, setImageError] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
 
-  // Append honest status milestones as they become provable, timestamped once
-  // and deduplicated by key so Strict Mode / re-renders never double-log.
+  // Reconstruct the truthful status log deterministically from the current
+  // sample state. Existing entries keep their original timestamps; new milestones
+  // are appended. Because this derives from state (rather than racing an append
+  // effect against a reset), a replay whose sample is already "ready" rebuilds the
+  // applicable milestones instead of showing an empty log.
   useEffect(() => {
     if (!isOpen) return;
     setLog((prev) => {
-      const seen = new Set(prev.map((e) => e.key));
-      const additions = reachedMilestones(state)
-        .filter((key) => !seen.has(key))
-        .map((key) => ({ key, text: STATUS_TEXT[key], at: clockTime() }));
-      return additions.length === 0 ? prev : [...prev, ...additions];
+      const byKey = new Map(prev.map((e) => [e.key, e] as const));
+      const next = reachedMilestones(state).map(
+        (key) => byKey.get(key) ?? { key, text: STATUS_TEXT[key], at: clockTime() },
+      );
+      const unchanged = next.length === prev.length && next.every((e, i) => e.key === prev[i]?.key);
+      return unchanged ? prev : next;
     });
   }, [isOpen, state]);
-
-  // Reset the log for a fresh onboarding session (open transition).
-  useEffect(() => {
-    if (isOpen) setLog([]);
-  }, [isOpen]);
 
   // Capture the element to restore focus to; move focus into the workspace on
   // open, and back out on close.
@@ -229,10 +239,12 @@ export function OnboardingWorkspace() {
                 </li>
               ))}
             </ol>
-            {coldMs !== null ? (
+            {sampleRequestMs !== null ? (
               <p className="mt-1 text-xs text-slate-500">
-                Verified sample completed in {(coldMs / 1000).toFixed(1)}s. Your first upload should
-                be faster now that the service is warm.
+                Verified sample request completed in {(sampleRequestMs / 1000).toFixed(1)}s. The
+                first upload after this sample will be measured separately. Running the sample is
+                intended to create an opportunity for faster startup where hosting permits; that is
+                not proven here.
               </p>
             ) : null}
           </div>
@@ -261,65 +273,97 @@ export function OnboardingWorkspace() {
           </div>
         </div>
 
-        {/* Right: the real sample result / run state, then the primary actions. */}
+        {/* Right: the real sample artwork + result / run state, then the actions. */}
         <div className="flex flex-col gap-4">
           <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
             {isReady ? (
               <div className="rounded-md bg-card p-4 text-card-foreground">
                 <p className="mb-3 text-sm font-medium">Verified sample result</p>
-                {/* The live pipeline output — server-side sample has no local preview. */}
-                <ResultView response={response} previewImage={null} />
-              </div>
-            ) : isFailed ? (
-              <div
-                role="alert"
-                className="rounded-md border border-red-400/40 bg-red-500/10 p-4 text-sm"
-              >
-                <p className="font-semibold text-red-200">The verified sample could not complete</p>
-                <p className="mt-1 text-slate-300">
-                  {error ?? "The sample run failed."} You can still upload your own label — the
-                  pre-check runs independently of this warm-up.
-                </p>
-                <div className="mt-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="border-slate-600 bg-transparent text-slate-100 hover:bg-slate-800"
-                    onClick={start}
-                  >
-                    Retry sample
-                  </Button>
-                </div>
-              </div>
-            ) : isRunning ? (
-              <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
-                <span
-                  aria-hidden="true"
-                  className="processing-spinner inline-block h-6 w-6 rounded-full border-2 border-slate-600 border-t-slate-200"
+                {/* The live pipeline output, with the exact analyzed artwork so
+                    evidence overlays appear where geometry exists. */}
+                <ResultView
+                  response={response}
+                  previewImage={{ url: SAMPLE_IMAGE_URL, name: SAMPLE_IMAGE_NAME }}
                 />
-                <p className="text-sm text-slate-300">
-                  Reading the verified sample through the real pre-check…
-                </p>
-                <p className="text-xs text-slate-500">
-                  The result appears here the moment it is ready — it is not held back for this
-                  walkthrough.
-                </p>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
-                <p className="text-sm text-slate-300">
-                  Run the bundled verified sample to see a real pre-check result.
-                </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="border-slate-600 bg-transparent text-slate-100 hover:bg-slate-800"
-                  onClick={start}
-                >
-                  Run verified sample
-                </Button>
+              <div className="flex flex-col gap-4">
+                {/* The exact bundled artwork being analyzed (shown before results). */}
+                <figure className="flex flex-col gap-2">
+                  {imageError ? (
+                    <div className="flex min-h-32 items-center justify-center rounded-md border border-dashed border-slate-700 bg-black/30 p-4 text-center text-xs text-slate-400">
+                      The bundled sample artwork could not be loaded. The pre-check still runs on
+                      the server-side sample.
+                    </div>
+                  ) : (
+                    // Served by our read-only endpoint; next/image must not optimize it.
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={SAMPLE_IMAGE_URL}
+                      alt="Bundled verified M Cellars sample label artwork"
+                      className="max-h-64 w-full rounded-md border border-slate-800 bg-black/30 object-contain"
+                      onError={() => setImageError(true)}
+                    />
+                  )}
+                  <figcaption className="text-xs text-slate-500">
+                    Bundled verified sample — the exact artwork being analyzed.
+                  </figcaption>
+                </figure>
+
+                {isFailed ? (
+                  <div
+                    role="alert"
+                    className="rounded-md border border-red-400/40 bg-red-500/10 p-4 text-sm"
+                  >
+                    <p className="font-semibold text-red-200">
+                      The verified sample could not complete
+                    </p>
+                    <p className="mt-1 text-slate-300">
+                      {error ?? "The sample run failed."} You can still upload your own label — the
+                      pre-check runs independently of this sample.
+                    </p>
+                    <div className="mt-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="border-slate-600 bg-transparent text-slate-100 hover:bg-slate-800"
+                        onClick={start}
+                      >
+                        Retry sample
+                      </Button>
+                    </div>
+                  </div>
+                ) : isRunning ? (
+                  <div className="flex flex-col items-center justify-center gap-3 py-6 text-center">
+                    <span
+                      aria-hidden="true"
+                      className="processing-spinner inline-block h-6 w-6 rounded-full border-2 border-slate-600 border-t-slate-200"
+                    />
+                    <p className="text-sm text-slate-300">
+                      Reading the verified sample through the real pre-check…
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      The result appears here the moment it is ready — it is not held back for this
+                      walkthrough.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center gap-3 py-6 text-center">
+                    <p className="text-sm text-slate-300">
+                      Run the bundled verified sample to see a real pre-check result.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="border-slate-600 bg-transparent text-slate-100 hover:bg-slate-800"
+                      onClick={start}
+                    >
+                      Run verified sample
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </div>

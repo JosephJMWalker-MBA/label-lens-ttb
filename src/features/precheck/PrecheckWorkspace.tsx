@@ -3,7 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 
 import { useOnboarding } from "@/components/onboarding/onboarding-context";
-import { isServiceWarm, nowMs, recordWarmMs } from "@/components/onboarding/warm-timing";
+import {
+  hasCompletedSampleRun,
+  nowMs,
+  recordFirstUploadAfterSampleMs,
+  recordFirstUploadWithoutSampleMs,
+} from "@/components/onboarding/precheck-timing";
 import { Button } from "@/components/ui/button";
 import { Disclosure } from "@/components/ui/disclosure";
 import { Input } from "@/components/ui/input";
@@ -68,9 +73,9 @@ export function PrecheckWorkspace() {
   const [error, setError] = useState<string | null>(null);
 
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  // Latency of a warm upload (one that followed the first-visit sample warm-up),
-  // surfaced honestly so the cold-start warm-up's benefit is visible.
-  const [warmRunMs, setWarmRunMs] = useState<number | null>(null);
+  // Latency of the first upload that followed a completed sample run, surfaced as
+  // an observed measurement only (no claim that the service is "warm" or faster).
+  const [postSampleUploadMs, setPostSampleUploadMs] = useState<number | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
@@ -133,20 +138,25 @@ export function PrecheckWorkspace() {
     setPhase("processing");
     setError(null);
     setResponse(null);
-    setWarmRunMs(null);
-    // Measure this run's request→result latency. If the first-visit sample
-    // already warmed the service, a real upload is recorded as the separate
-    // "warm" timing so cold and warm are never conflated.
+    setPostSampleUploadMs(null);
+    // Measure this upload's request→result latency and record it in the bucket
+    // that matches the observed sequence: an upload that followed a completed
+    // sample, or one with no sample beforehand. This is measurement only — it
+    // makes no claim about host state or that a later request is faster.
     const isUpload = body.get("source") !== "sample";
-    const wasWarm = isUpload && isServiceWarm();
+    const afterCompletedSample = isUpload && hasCompletedSampleRun();
     const startedAt = nowMs();
     try {
       const res = await fetch("/api/precheck", { method: "POST", body });
       const json = (await res.json()) as ApiSuccess | ApiFailure;
       if (json.ok) {
         const elapsed = nowMs() - startedAt;
-        if (isUpload) recordWarmMs(elapsed);
-        if (wasWarm) setWarmRunMs(elapsed);
+        if (isUpload && afterCompletedSample) {
+          recordFirstUploadAfterSampleMs(elapsed);
+          setPostSampleUploadMs(elapsed);
+        } else if (isUpload) {
+          recordFirstUploadWithoutSampleMs(elapsed);
+        }
         setResponse(json.data);
         setPhase("complete");
         requestAnimationFrame(() => resultRef.current?.focus());
@@ -329,8 +339,8 @@ export function PrecheckWorkspace() {
         {phase === "complete" ? (
           <span className="text-muted-foreground">
             Pre-check complete.
-            {warmRunMs !== null
-              ? ` First result in ${(warmRunMs / 1000).toFixed(1)}s on the warm service.`
+            {postSampleUploadMs !== null
+              ? ` First upload after the sample completed in ${(postSampleUploadMs / 1000).toFixed(1)}s.`
               : ""}
           </span>
         ) : null}

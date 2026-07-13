@@ -1,6 +1,4 @@
 import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 
 import { createAnalysisRun } from "@/domain/run/analysis-run";
 import type { AnalysisRunCreationInput } from "@/domain/run/analysis-run.types";
@@ -24,6 +22,11 @@ import { err, ok, type Result } from "@/shared/result";
 import { issueAppendToken, verifyAppendToken } from "./append-token";
 import { ALLOWED_MEDIA_TYPES, MAX_IMAGE_BYTES } from "./resource-policy";
 import { getExecutableProvenance } from "./runtime-provenance";
+import {
+  readBundledSampleImage,
+  SAMPLE_IMAGE_DISPLAY_NAME,
+  SAMPLE_IMAGE_MEDIA_TYPE,
+} from "./sample-image";
 
 import type {
   PrecheckDispositionRequest,
@@ -45,7 +48,6 @@ const SUPPORTED_TYPES = new Set<string>(ALLOWED_MEDIA_TYPES);
 // Fixed deterministic metadata: this advisory slice does not persist real
 // timestamps, so identity stays a function of content + committed versions.
 const FIXED_TIMESTAMP = "2026-07-10T00:00:00Z";
-const SAMPLE_FIXTURE = "tests/fixtures/precheck/m-cellars-24205001000905/label-ocr-source.jpeg";
 
 function fail(
   code: PrecheckServiceError["code"],
@@ -100,8 +102,14 @@ async function resolveBytes(
 > {
   if (request.source === "sample") {
     try {
-      const bytes = new Uint8Array(await readFile(join(process.cwd(), SAMPLE_FIXTURE)));
-      return ok({ bytes, mediaType: "image/jpeg", displayName: "M Cellars sample (bundled demo)" });
+      // The same authoritative bytes the read-only sample-image endpoint serves,
+      // so the onboarding preview corresponds exactly to the analyzed artwork.
+      const bytes = await readBundledSampleImage();
+      return ok({
+        bytes,
+        mediaType: SAMPLE_IMAGE_MEDIA_TYPE,
+        displayName: SAMPLE_IMAGE_DISPLAY_NAME,
+      });
     } catch {
       return fail("SAMPLE_UNAVAILABLE", "The bundled demonstration sample is unavailable.");
     }

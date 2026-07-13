@@ -1,33 +1,44 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { clearPrecheckTiming } from "./warm-timing";
-import { ONBOARDING_STORAGE_KEY, OnboardingProvider } from "./onboarding-context";
+import { clearPrecheckTiming } from "./precheck-timing";
+import { ONBOARDING_STORAGE_KEY, OnboardingProvider, useOnboarding } from "./onboarding-context";
 import { OnboardingWorkspace } from "./OnboardingWorkspace";
 
 // Stub ResultView so these tests exercise onboarding orchestration, not the full
-// result renderer. The stub echoes the response it was given, which lets us prove
-// the revealed result is the live pipeline response (not injected output).
+// result renderer. The stub echoes the response and the preview reference it was
+// given, which lets us prove the revealed result is the live pipeline response
+// (not injected) and that the analyzed sample artwork is passed through.
 vi.mock("@/features/precheck/ResultView", () => ({
   ResultView: ({
     response,
     previewImage,
   }: {
     response: { machineResultId?: string } | null;
-    previewImage: unknown;
+    previewImage: { url: string; name: string } | null;
   }) => (
-    <div data-testid="result-view" data-preview={String(previewImage)}>
+    <div data-testid="result-view" data-preview-url={previewImage?.url ?? "none"}>
       result:{response?.machineResultId ?? "none"}
     </div>
   ),
 }));
 
-/** A page stand-in: the real file input id plus a user application field. */
+function Replay() {
+  const { openIntro } = useOnboarding();
+  return (
+    <button type="button" onClick={openIntro}>
+      replay intro
+    </button>
+  );
+}
+
+/** A page stand-in: the real file input id, a user field, and a replay trigger. */
 function Shell() {
   return (
     <OnboardingProvider>
       <input id="label-image" type="file" aria-label="label image" />
       <input id="declared-brand" defaultValue="" aria-label="declared brand" />
+      <Replay />
       <OnboardingWorkspace />
     </OnboardingProvider>
   );
@@ -74,14 +85,23 @@ describe("productive cold-start onboarding", () => {
     expect((screen.getByLabelText("declared brand") as HTMLInputElement).value).toBe("");
   });
 
-  it("reveals the live sample result (integrity: it echoes the fetched response)", async () => {
+  it("shows the bundled sample artwork while the sample is still running", () => {
+    // A never-resolving fetch keeps the run in the analyzing state.
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
+    render(<Shell />);
+    const img = screen.getByAltText(/bundled verified m cellars sample label/i) as HTMLImageElement;
+    expect(img).toBeInTheDocument();
+    expect(img.getAttribute("src")).toBe("/api/sample-image");
+  });
+
+  it("reveals the live result and passes the analyzed sample artwork to ResultView", async () => {
     mockPrecheck({ machineResultId: "M-CELLARS-LIVE" });
     render(<Shell />);
     const result = await screen.findByTestId("result-view");
-    // The revealed result reflects the response the pipeline returned, and the
-    // server-side sample carries no local preview.
+    // Integrity: the revealed result echoes the fetched response, and the preview
+    // reference is the byte-verified sample-image endpoint (the analyzed artwork).
     expect(result).toHaveTextContent("result:M-CELLARS-LIVE");
-    expect(result).toHaveAttribute("data-preview", "null");
+    expect(result).toHaveAttribute("data-preview-url", "/api/sample-image");
   });
 
   it("logs only client-provable status states through to READY FOR YOUR LABEL", async () => {
@@ -90,8 +110,6 @@ describe("productive cold-start onboarding", () => {
     await screen.findByTestId("result-view");
     expect(screen.getByText("VERIFIED SAMPLE REQUESTED")).toBeInTheDocument();
     expect(screen.getByText("SAMPLE ANALYSIS IN PROGRESS")).toBeInTheDocument();
-    // The ready result renders a commit before its status line (a ready result is
-    // never held back for status text), so await the terminal log entries.
     expect(await screen.findByText("SAMPLE READY")).toBeInTheDocument();
     expect(await screen.findByText("READY FOR YOUR LABEL")).toBeInTheDocument();
     // No fabricated internal OCR sub-stage is ever presented as status.
@@ -100,11 +118,19 @@ describe("productive cold-start onboarding", () => {
     expect(screen.queryByText(/CANDIDATE FILTERING/i)).toBeNull();
   });
 
+  it("reports timing without claiming the service is warm or faster", async () => {
+    mockPrecheck();
+    render(<Shell />);
+    await screen.findByTestId("result-view");
+    expect(await screen.findByText(/verified sample request completed/i)).toBeInTheDocument();
+    expect(screen.queryByText(/service is warm/i)).toBeNull();
+    expect(screen.queryByText(/now.warm service/i)).toBeNull();
+  });
+
   it("teaches the workflow separately from the live status log", async () => {
     mockPrecheck();
     render(<Shell />);
     await screen.findByTestId("result-view");
-    // Static teaching content is present and clearly not a server status line.
     expect(screen.getByText(/the workflow you/i)).toBeInTheDocument();
     expect(screen.getByText(/your application facts stay separate/i)).toBeInTheDocument();
   });
@@ -112,7 +138,6 @@ describe("productive cold-start onboarding", () => {
   it("does not delay the ready result (it renders as soon as the response exists)", async () => {
     mockPrecheck();
     render(<Shell />);
-    // The result appears without any tutorial step being advanced first.
     expect(await screen.findByTestId("result-view")).toBeInTheDocument();
   });
 
@@ -138,7 +163,6 @@ describe("productive cold-start onboarding", () => {
     render(<Shell />);
     expect(await screen.findByText("SAMPLE FAILED")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /retry sample/i })).toBeInTheDocument();
-    // The primary path stays available despite the warm-up failure.
     expect(screen.getByRole("button", { name: /upload your label/i })).toBeInTheDocument();
   });
 
@@ -146,10 +170,38 @@ describe("productive cold-start onboarding", () => {
     localStorage.setItem(ONBOARDING_STORAGE_KEY, "true");
     const fetchMock = mockPrecheck();
     render(<Shell />);
-    // Give any effect a chance to (not) fire.
     await new Promise((r) => setTimeout(r, 20));
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("replays after a completed first visit without a new request, keeping status and result", async () => {
+    const fetchMock = mockPrecheck();
+    render(<Shell />);
+
+    // 1-2. First visit completes.
+    await screen.findByTestId("result-view");
+    await screen.findByText("READY FOR YOUR LABEL");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    // 3. Onboarding closes.
+    fireEvent.click(screen.getByRole("button", { name: /skip introduction/i }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+
+    // 4. Onboarding is replayed.
+    fireEvent.click(screen.getByRole("button", { name: /replay intro/i }));
+    await screen.findByRole("dialog", { name: /warming up on a verified sample/i });
+
+    // 5. No new fetch occurs on replay.
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    // 6. Status milestones and the existing result are visible (log not empty).
+    expect(screen.getByText("SAMPLE READY")).toBeInTheDocument();
+    expect(screen.getByText("READY FOR YOUR LABEL")).toBeInTheDocument();
+    expect(screen.getByTestId("result-view")).toBeInTheDocument();
+    // Tutorial content and the primary actions remain available.
+    expect(screen.getByText(/the workflow you/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /upload your label/i })).toBeInTheDocument();
   });
 
   it("exposes an accessible modal dialog with a heading", async () => {

@@ -1,7 +1,8 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
+import { nowMs, recordShellReadyMs } from "@/components/onboarding/precheck-timing";
 import { OnboardingProvider } from "@/components/onboarding/onboarding-context";
 import { OnboardingWorkspace } from "@/components/onboarding/OnboardingWorkspace";
 import { ReviewerDemoEntry } from "@/components/reviewer/ReviewerDemoEntry";
@@ -18,6 +19,12 @@ import { PreferencesProvider } from "./preferences";
  * secondary destination kept clearly separate from the primary seller workflow.
  */
 export function AppProviders({ children }: { children: ReactNode }) {
+  // Record navigation/hydration → meaningful shell once, as a bounded, observed
+  // measurement (no server transmission, no performance claim).
+  useEffect(() => {
+    recordShellReadyMs(nowMs());
+  }, []);
+
   return (
     <PreferencesProvider>
       <OnboardingProvider>

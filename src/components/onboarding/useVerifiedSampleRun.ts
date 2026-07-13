@@ -8,35 +8,33 @@ import type {
   PrecheckServiceResponse,
 } from "@/server/precheck-service.types";
 
-import { nowMs, recordColdMs } from "./warm-timing";
+import { nowMs, recordFirstTrustworthyResultMs, recordSampleRequestMs } from "./precheck-timing";
 
 /**
  * Runs the bundled verified M Cellars sample once through the real
- * `/api/precheck` path. This spends the unavoidable first-cold-start interval
+ * `/api/precheck` path. This spends the unavoidable first-visit interval
  * productively: the same request that produces the tutorial's real result also
- * warms the server pipeline for the user's first upload.
+ * exercises the server pipeline. Running it is intended to create an opportunity
+ * for host process reuse where deployment permits — but the client cannot prove
+ * that reuse happened, so nothing here claims the service is "warm" or faster.
  *
  * The state lives entirely inside the onboarding tree and is never written into
  * the user's PrecheckWorkspace form. Combined with the guards below, a sample
  * response can therefore never replace a newer user result.
  *
  * Concurrency guards:
- * - `inFlightRef` makes the fetch fire at most once at a time. This absorbs React
- *   Strict Mode's doubled effect invocation and any repeated `start()`.
- * - `seqRef` gives each attempt an identity; a response whose id is stale (a retry
+ * - `inFlightRef` makes the fetch fire at most once at a time (absorbs React
+ *   Strict Mode's doubled effect invocation and any repeated `start()`).
+ * - `seqRef` identifies each attempt; a response whose id is stale (a retry
  *   superseded it) is dropped.
- * - `mountedRef` drops any response that resolves after the workspace unmounts
- *   (e.g. the user pressed "Upload your label" while the sample was still in
- *   flight), so no state update lands on an unmounted tree.
+ * - `mountedRef` drops a response that resolves after the workspace unmounts.
  *
  * We deliberately let the single request run to completion rather than aborting
- * it on cleanup: under Strict Mode the cleanup fires between the doubled setups,
- * so aborting there would cancel the only request we start. Ignoring a late
- * response is the Strict-Mode-safe equivalent and still lets the request warm the
- * server.
+ * on cleanup: under Strict Mode the cleanup fires between the doubled setups, so
+ * aborting there would cancel the only request we start.
  */
 
-export type SampleWarmupState = "idle" | "requested" | "analyzing" | "ready" | "failed";
+export type VerifiedSampleRunState = "idle" | "requested" | "analyzing" | "ready" | "failed";
 
 interface ApiSuccess {
   ok: true;
@@ -47,12 +45,12 @@ interface ApiFailure {
   error: PrecheckServiceError;
 }
 
-export interface SampleWarmup {
-  state: SampleWarmupState;
+export interface VerifiedSampleRun {
+  state: VerifiedSampleRunState;
   response: PrecheckServiceResponse | null;
   error: string | null;
-  /** Measured request→result duration in ms, once complete. Null until then. */
-  coldMs: number | null;
+  /** Measured sample request→result duration in ms, once complete. */
+  sampleRequestMs: number | null;
   /** Start (or retry) the single sample run. A no-op while a run is in flight. */
   start: () => void;
 }
@@ -64,11 +62,11 @@ const GENERIC_FAILURE = "The verified sample could not be reached.";
  * visit). A replay passes `false` so it does not re-run a heavy sample; the user
  * can start it explicitly instead.
  */
-export function useSampleWarmup(active: boolean): SampleWarmup {
-  const [state, setState] = useState<SampleWarmupState>("idle");
+export function useVerifiedSampleRun(active: boolean): VerifiedSampleRun {
+  const [state, setState] = useState<VerifiedSampleRunState>("idle");
   const [response, setResponse] = useState<PrecheckServiceResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [coldMs, setColdMs] = useState<number | null>(null);
+  const [sampleRequestMs, setSampleRequestMs] = useState<number | null>(null);
 
   const inFlightRef = useRef(false);
   const seqRef = useRef(0);
@@ -105,14 +103,16 @@ export function useSampleWarmup(active: boolean): SampleWarmup {
       try {
         const res = await fetch("/api/precheck", { method: "POST", body });
         const json = (await res.json()) as ApiSuccess | ApiFailure;
-        const elapsed = nowMs() - startedAt;
+        const requestMs = nowMs() - startedAt;
+        const sinceNavigationMs = nowMs();
         settle(() => {
           if (json.ok) {
             completedRef.current = true;
             setResponse(json.data);
-            setColdMs(elapsed);
+            setSampleRequestMs(requestMs);
             setState("ready");
-            recordColdMs(elapsed);
+            recordSampleRequestMs(requestMs);
+            recordFirstTrustworthyResultMs(sinceNavigationMs);
           } else {
             setError(json.error.message);
             setState("failed");
@@ -124,8 +124,6 @@ export function useSampleWarmup(active: boolean): SampleWarmup {
           setState("failed");
         });
       } finally {
-        // Free the in-flight latch for a retry, but only for the live attempt so a
-        // stale settle cannot re-open it.
         if (seq === seqRef.current) inFlightRef.current = false;
       }
     })();
@@ -145,5 +143,5 @@ export function useSampleWarmup(active: boolean): SampleWarmup {
     };
   }, []);
 
-  return { state, response, error, coldMs, start };
+  return { state, response, error, sampleRequestMs, start };
 }
