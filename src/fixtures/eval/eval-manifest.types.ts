@@ -172,6 +172,33 @@ export const EVAL_FAILURE_CLASSES = [
 ] as const;
 export type EvalFailureClass = (typeof EVAL_FAILURE_CLASSES)[number];
 
+/**
+ * Evaluation-only diagnostic refinement for the broad candidate-filtering
+ * failure bucket. These never affect production selection; they only explain
+ * which bounded filter path the acceptable field was lost to.
+ */
+export const EVAL_CANDIDATE_FILTERING_SUBTYPES = [
+  "brand-rejected-no-letters-or-too-short",
+  "brand-rejected-producer-line",
+  "brand-rejected-non-brand-keyword",
+  "brand-rejected-too-many-words",
+  "brand-rejected-domain-like",
+  "brand-rejected-varietal-or-designation",
+  "brand-rejected-generic-product-language",
+  "brand-rejected-location-or-appellation",
+  "brand-rejected-low-information-fragment",
+  "brand-rejected-sentence-fragment",
+  "brand-kept-overextended-candidate",
+  "brand-kept-partial-candidate",
+  "alcohol-rejected-proof-only",
+  "alcohol-rejected-no-supported-number",
+  "alcohol-rejected-missing-volume-marker",
+  "alcohol-rejected-missing-explicit-alcohol-marker",
+  "alcohol-rejected-bare-volume-marker-too-weak",
+  "alcohol-rejected-unsupported-pattern",
+] as const;
+export type EvalCandidateFilteringSubtype = (typeof EVAL_CANDIDATE_FILTERING_SUBTYPES)[number];
+
 /** Approximate geometry normalized to the original image: every value is in [0, 1]. */
 export interface EvalNormalizedBox {
   x: number;

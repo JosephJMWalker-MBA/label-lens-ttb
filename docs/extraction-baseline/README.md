@@ -49,6 +49,67 @@ bucket: `ocr-recognition`, `region-coverage`, `line-reconstruction`,
 `candidate-generation`, `candidate-filtering`, `candidate-ranking`, `parser`,
 plus the two honest outcomes `correct` and `correct-uncertainty`.
 
+### Phase 5A diagnostic subclasses
+
+Phase 5A keeps the top-level stage taxonomy intact, but it no longer treats
+`candidate-filtering` as one opaque bucket. Every candidate-filtering failure
+now receives exactly one evaluation-only subtype:
+
+- Brand subtypes exist because the acceptable brand can be lost in two
+  materially different ways:
+  - the selector explicitly rejected a truth-containing span for a bounded
+    reason such as `producer-line`, `too-many-words`, `non-brand-keyword`, or
+    `domain-like`;
+  - the selector kept only an overextended or partial brand-like span, so the
+    acceptable brand remained visible inside a larger kept candidate but never
+    survived as an acceptable candidate on its own.
+- Alcohol subtypes exist because the selector already distinguishes several
+  bounded pre-parser rejection paths, and those paths imply different later
+  fixes:
+  - `missing-volume-marker`
+  - `missing-explicit-alcohol-marker`
+  - `bare-volume-marker-too-weak`
+  - `no-supported-number`
+  - `proof-only`
+  - `unsupported-pattern`
+
+These subtypes are derived only inside evaluation from committed selector
+diagnostics plus fixture truth. They do not alter extraction or ranking.
+
+### Recovery-pass contribution measurement
+
+Phase 5A also measures each recovery pass on five yes/no axes:
+
+- `newOcrTokens`: the pass introduced OCR token keys not seen in earlier passes;
+- `newFieldLikeEvidence`: the pass produced new brand/alcohol candidate
+  diagnostics, even if nothing was ultimately selected;
+- `acceptedCandidate`: at least one candidate from that pass survived filtering;
+- `changedSelectedField`: adding that pass changed the selected field state or
+  value versus the prior pass prefix;
+- `correctSelectedField`: adding that pass turned at least one selected field
+  into a truth-correct selection. This check is evaluation-only.
+
+Each recovery-pass record also carries pass order, trigger reasons, pass kind,
+execution time, and cumulative OCR cost through that pass. The report then
+identifies both:
+
+- passes with **no measured value** across all five axes;
+- pass kinds that **never improve outcomes** even if they still add OCR or
+  candidate evidence.
+
+### Why production behavior cannot change
+
+Phase 5A is intentionally confined to `src/fixtures/eval` and generated
+evaluation artifacts. It reads extractor debug output after the real production
+extractor has already run, then performs extra attribution and reporting in the
+harness. It does **not** modify:
+
+- OCR pass planning or execution;
+- candidate generation, filtering, or ranking;
+- selected field states or confidence;
+- analyzer response shape;
+- API/UI behavior.
+
 ## What the current baseline shows
 
 The headline numbers live in `report.md`. The decisive finding is the **failure

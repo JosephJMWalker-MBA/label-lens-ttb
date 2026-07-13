@@ -3,8 +3,19 @@ import type {
   AnalyzerOcrEngine,
 } from "@/pipeline/analyzer/analyzer.types";
 import { extractLabelEvidenceDetailed, type ExtractionDebug } from "@/pipeline/extractor/extractor";
+import {
+  selectAlcoholObservation,
+  selectBrandObservation,
+  type FieldSelection,
+} from "@/pipeline/extractor/field-selection";
 import type { ExtractionInput, OcrWord } from "@/pipeline/extractor/extractor.types";
 
+import {
+  alcoholCandidateFilteringSubtype,
+  alcoholSelectedFieldCorrect,
+  brandCandidateFilteringSubtype,
+  brandSelectedFieldCorrect,
+} from "./diagnostic-attribution";
 import { loadCaseImage } from "./eval-loader";
 import type { EvalCase } from "./eval-manifest.types";
 import {
@@ -15,12 +26,19 @@ import {
   brandNormalizedMatch,
   classifyAlcohol,
   classifyBrand,
+  normalizeKey,
   normalizedIncludes,
   parseObservedPercent,
   type AlcoholDiagnostics,
   type ObservedField,
 } from "./metrics";
-import type { CaseDiagnostics, CaseReport, DiagnosticWord } from "./eval-report.types";
+import type {
+  CaseDiagnostics,
+  CaseReport,
+  DiagnosticWord,
+  EvalFieldKey,
+  RecoveryPassContribution,
+} from "./eval-report.types";
 
 /**
  * The evaluation harness runs the REAL extractor once per case and reuses the
@@ -123,7 +141,137 @@ function candidateSupportsPrimary(
   return !!primaryPassId && supportPassIds.includes(primaryPassId);
 }
 
-function diagnosticsFor(debug: ExtractionDebug, acceptableBrands: string[]): CaseDiagnostics {
+function selectionForPasses(passes: ExtractionDebug["passes"]): {
+  brand: FieldSelection;
+  alcohol: FieldSelection;
+} {
+  return {
+    brand: selectBrandObservation(passes),
+    alcohol: selectAlcoholObservation(passes),
+  };
+}
+
+function observationChanged(previous: FieldSelection, current: FieldSelection): boolean {
+  return (
+    previous.observation.state !== current.observation.state ||
+    previous.observation.value !== current.observation.value
+  );
+}
+
+function fieldsForPass(
+  passId: string,
+  brandEntries: { passId: string }[],
+  alcoholEntries: { passId: string }[],
+): EvalFieldKey[] {
+  const fields: EvalFieldKey[] = [];
+  if (brandEntries.some((entry) => entry.passId === passId)) fields.push("brand");
+  if (alcoholEntries.some((entry) => entry.passId === passId)) fields.push("alcohol");
+  return fields;
+}
+
+function tokenKeys(words: OcrWord[]): Set<string> {
+  return new Set(words.map((word) => normalizeKey(word.text)).filter((key) => key.length > 0));
+}
+
+function contributionFields(
+  evalCase: EvalCase,
+  previous: { brand: FieldSelection; alcohol: FieldSelection },
+  current: { brand: FieldSelection; alcohol: FieldSelection },
+): EvalFieldKey[] {
+  const fields: EvalFieldKey[] = [];
+  if (
+    !brandSelectedFieldCorrect(evalCase.brand, toObserved(previous.brand.observation)) &&
+    brandSelectedFieldCorrect(evalCase.brand, toObserved(current.brand.observation))
+  ) {
+    fields.push("brand");
+  }
+  if (
+    !alcoholSelectedFieldCorrect(evalCase.alcohol, toObserved(previous.alcohol.observation)) &&
+    alcoholSelectedFieldCorrect(evalCase.alcohol, toObserved(current.alcohol.observation))
+  ) {
+    fields.push("alcohol");
+  }
+  return fields;
+}
+
+function recoveryPassDiagnostics(
+  debug: ExtractionDebug,
+  evalCase: EvalCase,
+): RecoveryPassContribution[] {
+  const passes = debug.passes;
+  if (passes.length <= 1) return [];
+
+  const prefixes = passes.map((_, index) => selectionForPasses(passes.slice(0, index + 1)));
+  const priorTokenSets: Set<string>[] = passes.map((_, index) =>
+    tokenKeys(passes.slice(0, index).flatMap((pass) => pass.words)),
+  );
+
+  let cumulativeCostMs = passes[0]?.timings.totalMs ?? 0;
+  return passes.slice(1).map((pass, recoveryIndex) => {
+    const passOrder = recoveryIndex + 1;
+    cumulativeCostMs += pass.timings.totalMs;
+
+    const previous = prefixes[passOrder - 1];
+    const current = prefixes[passOrder];
+
+    const newTokenCount = [...tokenKeys(pass.words)].filter(
+      (key) => !priorTokenSets[passOrder].has(key),
+    ).length;
+
+    const brandCandidateDecisions = current.brand.brandDiagnostics?.candidates ?? [];
+    const alcoholCandidateDecisions = current.alcohol.alcoholDiagnostics?.candidates ?? [];
+    const newFieldLikeEvidenceFields = fieldsForPass(
+      pass.passId,
+      brandCandidateDecisions,
+      alcoholCandidateDecisions,
+    );
+    const acceptedCandidateFields = fieldsForPass(
+      pass.passId,
+      brandCandidateDecisions.filter((candidate) => candidate.kept),
+      alcoholCandidateDecisions.filter((candidate) => candidate.kept),
+    );
+
+    const changedSelectedFields: EvalFieldKey[] = [];
+    if (observationChanged(previous.brand, current.brand)) changedSelectedFields.push("brand");
+    if (observationChanged(previous.alcohol, current.alcohol))
+      changedSelectedFields.push("alcohol");
+
+    const correctSelectedFields = contributionFields(evalCase, previous, current);
+
+    const newOcrTokens = newTokenCount > 0;
+    const newFieldLikeEvidence = newFieldLikeEvidenceFields.length > 0;
+    const acceptedCandidate = acceptedCandidateFields.length > 0;
+    const changedSelectedField = changedSelectedFields.length > 0;
+    const correctSelectedField = correctSelectedFields.length > 0;
+
+    return {
+      passId: pass.passId,
+      passOrder,
+      passKind: pass.passKind,
+      triggerReasons: pass.triggerReasons,
+      executionTimeMs: pass.timings.totalMs,
+      cumulativeCostMs,
+      newOcrTokens,
+      newOcrTokenCount: newTokenCount,
+      newFieldLikeEvidence,
+      newFieldLikeEvidenceFields,
+      acceptedCandidate,
+      acceptedCandidateFields,
+      changedSelectedField,
+      changedSelectedFields,
+      correctSelectedField,
+      correctSelectedFields,
+      noMeasuredValue:
+        !newOcrTokens &&
+        !newFieldLikeEvidence &&
+        !acceptedCandidate &&
+        !changedSelectedField &&
+        !correctSelectedField,
+    };
+  });
+}
+
+function diagnosticsFor(debug: ExtractionDebug, evalCase: EvalCase): CaseDiagnostics {
   const passes = debug.passes;
   const primaryPassId = passes[0]?.passId;
   const recoveryPassIds = new Set(passes.slice(1).map((pass) => pass.passId));
@@ -226,6 +374,7 @@ function diagnosticsFor(debug: ExtractionDebug, acceptableBrands: string[]): Cas
       ),
       extraPassesWithNoUsableEvidence,
     },
+    recoveryPasses: recoveryPassDiagnostics(debug, evalCase),
     primarySelections: {
       brandState: debug.primarySelections.brand.observation.state,
       brandValue: debug.primarySelections.brand.observation.value,
@@ -280,33 +429,39 @@ function diagnosticsFor(debug: ExtractionDebug, acceptableBrands: string[]): Cas
       })),
     brandAbstentionReason: brandSelection.brandDiagnostics?.abstentionReason,
     brandOcrContainsAcceptable:
-      normalizedIncludes(brandPrimaryText, acceptableBrands) ||
-      normalizedIncludes(brandRecoveryText, acceptableBrands),
+      normalizedIncludes(brandPrimaryText, evalCase.brand.acceptable) ||
+      normalizedIncludes(brandRecoveryText, evalCase.brand.acceptable),
     brandLineContainsAcceptable:
-      brandPrimaryLines.some((line) => normalizedIncludes(line, acceptableBrands)) ||
-      brandRecoveryLines.some((line) => normalizedIncludes(line, acceptableBrands)),
+      brandPrimaryLines.some((line) => normalizedIncludes(line, evalCase.brand.acceptable)) ||
+      brandRecoveryLines.some((line) => normalizedIncludes(line, evalCase.brand.acceptable)),
     brandCandidateContainsAcceptable: brandCandidateValues.some((value) =>
-      acceptableBrands.some((acceptable) => brandNormalizedMatch(value, [acceptable])),
+      evalCase.brand.acceptable.some((acceptable) => brandNormalizedMatch(value, [acceptable])),
     ),
-    brandPrimaryOcrContainsAcceptable: normalizedIncludes(brandPrimaryText, acceptableBrands),
-    brandRecoveryOcrContainsAcceptable: normalizedIncludes(brandRecoveryText, acceptableBrands),
+    brandPrimaryOcrContainsAcceptable: normalizedIncludes(
+      brandPrimaryText,
+      evalCase.brand.acceptable,
+    ),
+    brandRecoveryOcrContainsAcceptable: normalizedIncludes(
+      brandRecoveryText,
+      evalCase.brand.acceptable,
+    ),
     brandPrimaryLineContainsAcceptable: brandPrimaryLines.some((line) =>
-      normalizedIncludes(line, acceptableBrands),
+      normalizedIncludes(line, evalCase.brand.acceptable),
     ),
     brandRecoveryLineContainsAcceptable: brandRecoveryLines.some((line) =>
-      normalizedIncludes(line, acceptableBrands),
+      normalizedIncludes(line, evalCase.brand.acceptable),
     ),
     brandPrimaryCandidateContainsAcceptable: keptBrandCandidates.some(
       (candidate) =>
         candidateSupportsPrimary(candidate.supportPassIds, primaryPassId) &&
-        acceptableBrands.some((acceptable) =>
+        evalCase.brand.acceptable.some((acceptable) =>
           brandNormalizedMatch(candidate.cleanedValue ?? null, [acceptable]),
         ),
     ),
     brandRecoveryCandidateContainsAcceptable: keptBrandCandidates.some(
       (candidate) =>
         candidateSupportsRecovery(candidate.supportPassIds, recoveryPassIds) &&
-        acceptableBrands.some((acceptable) =>
+        evalCase.brand.acceptable.some((acceptable) =>
           brandNormalizedMatch(candidate.cleanedValue ?? null, [acceptable]),
         ),
     ),
@@ -407,6 +562,7 @@ function emptyDiagnostics(): CaseDiagnostics {
       totalInverseMappingDurationMs: 0,
       extraPassesWithNoUsableEvidence: 0,
     },
+    recoveryPasses: [],
     primarySelections: {
       brandState: "NOT_OBSERVED",
       brandValue: null,
@@ -475,7 +631,7 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
   const latencyMs = performance.now() - start;
 
   let diagnostics = emptyDiagnostics();
-  if (result.ok) diagnostics = diagnosticsFor(result.value.debug, evalCase.brand.acceptable);
+  if (result.ok) diagnostics = diagnosticsFor(result.value.debug, evalCase);
 
   const alcoholDiag: AlcoholDiagnostics = {
     numberInOcr: diagnostics.alcoholNumberInOcr,
@@ -504,6 +660,19 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
       confidence: 0,
       alternates: [],
     };
+    const brandFailureClass = classifyBrand(evalCase.brand, empty, {
+      ocrContainsAcceptable: diagnostics.brandOcrContainsAcceptable,
+      lineContainsAcceptable: diagnostics.brandLineContainsAcceptable,
+      candidateContainsAcceptable: diagnostics.brandCandidateContainsAcceptable,
+      primaryOcrContainsAcceptable: diagnostics.brandPrimaryOcrContainsAcceptable,
+      recoveryOcrContainsAcceptable: diagnostics.brandRecoveryOcrContainsAcceptable,
+      primaryLineContainsAcceptable: diagnostics.brandPrimaryLineContainsAcceptable,
+      recoveryLineContainsAcceptable: diagnostics.brandRecoveryLineContainsAcceptable,
+      primaryCandidateContainsAcceptable: diagnostics.brandPrimaryCandidateContainsAcceptable,
+      recoveryCandidateContainsAcceptable: diagnostics.brandRecoveryCandidateContainsAcceptable,
+      abstentionReason: diagnostics.brandAbstentionReason,
+    });
+    const alcoholFailureClass = classifyAlcohol(evalCase.alcohol, empty, alcoholDiag);
     return {
       caseId: evalCase.caseId,
       fixtureDir: evalCase.fixtureDir,
@@ -517,18 +686,11 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
         exactMatch: false,
         normalizedMatch: false,
         top3Recall: false,
-        failureClass: classifyBrand(evalCase.brand, empty, {
-          ocrContainsAcceptable: diagnostics.brandOcrContainsAcceptable,
-          lineContainsAcceptable: diagnostics.brandLineContainsAcceptable,
-          candidateContainsAcceptable: diagnostics.brandCandidateContainsAcceptable,
-          primaryOcrContainsAcceptable: diagnostics.brandPrimaryOcrContainsAcceptable,
-          recoveryOcrContainsAcceptable: diagnostics.brandRecoveryOcrContainsAcceptable,
-          primaryLineContainsAcceptable: diagnostics.brandPrimaryLineContainsAcceptable,
-          recoveryLineContainsAcceptable: diagnostics.brandRecoveryLineContainsAcceptable,
-          primaryCandidateContainsAcceptable: diagnostics.brandPrimaryCandidateContainsAcceptable,
-          recoveryCandidateContainsAcceptable: diagnostics.brandRecoveryCandidateContainsAcceptable,
-          abstentionReason: diagnostics.brandAbstentionReason,
-        }),
+        failureClass: brandFailureClass,
+        candidateFilteringSubtype:
+          brandFailureClass === "candidate-filtering-failure"
+            ? brandCandidateFilteringSubtype(evalCase.brand, diagnostics)
+            : null,
       },
       alcohol: {
         ...emptyFieldReport(empty),
@@ -537,7 +699,11 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
         detected: false,
         parsedValue: null,
         parsedAccurate: false,
-        failureClass: classifyAlcohol(evalCase.alcohol, empty, alcoholDiag),
+        failureClass: alcoholFailureClass,
+        candidateFilteringSubtype:
+          alcoholFailureClass === "candidate-filtering-failure"
+            ? alcoholCandidateFilteringSubtype(evalCase.alcohol, diagnostics)
+            : null,
       },
       diagnostics,
       latencyMs,
@@ -546,6 +712,19 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
 
   const brandObs = toObserved(result.value.response.fields.brandName);
   const alcoholObs = toObserved(result.value.response.fields.alcoholStatement);
+  const brandFailureClass = classifyBrand(evalCase.brand, brandObs, {
+    ocrContainsAcceptable: diagnostics.brandOcrContainsAcceptable,
+    lineContainsAcceptable: diagnostics.brandLineContainsAcceptable,
+    candidateContainsAcceptable: diagnostics.brandCandidateContainsAcceptable,
+    primaryOcrContainsAcceptable: diagnostics.brandPrimaryOcrContainsAcceptable,
+    recoveryOcrContainsAcceptable: diagnostics.brandRecoveryOcrContainsAcceptable,
+    primaryLineContainsAcceptable: diagnostics.brandPrimaryLineContainsAcceptable,
+    recoveryLineContainsAcceptable: diagnostics.brandRecoveryLineContainsAcceptable,
+    primaryCandidateContainsAcceptable: diagnostics.brandPrimaryCandidateContainsAcceptable,
+    recoveryCandidateContainsAcceptable: diagnostics.brandRecoveryCandidateContainsAcceptable,
+    abstentionReason: diagnostics.brandAbstentionReason,
+  });
+  const alcoholFailureClass = classifyAlcohol(evalCase.alcohol, alcoholObs, alcoholDiag);
 
   return {
     caseId: evalCase.caseId,
@@ -563,18 +742,11 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
       exactMatch: brandExactMatch(brandObs.value, evalCase.brand.acceptable),
       normalizedMatch: brandNormalizedMatch(brandObs.value, evalCase.brand.acceptable),
       top3Recall: brandInTopK(brandObs, evalCase.brand.acceptable, 3),
-      failureClass: classifyBrand(evalCase.brand, brandObs, {
-        ocrContainsAcceptable: diagnostics.brandOcrContainsAcceptable,
-        lineContainsAcceptable: diagnostics.brandLineContainsAcceptable,
-        candidateContainsAcceptable: diagnostics.brandCandidateContainsAcceptable,
-        primaryOcrContainsAcceptable: diagnostics.brandPrimaryOcrContainsAcceptable,
-        recoveryOcrContainsAcceptable: diagnostics.brandRecoveryOcrContainsAcceptable,
-        primaryLineContainsAcceptable: diagnostics.brandPrimaryLineContainsAcceptable,
-        recoveryLineContainsAcceptable: diagnostics.brandRecoveryLineContainsAcceptable,
-        primaryCandidateContainsAcceptable: diagnostics.brandPrimaryCandidateContainsAcceptable,
-        recoveryCandidateContainsAcceptable: diagnostics.brandRecoveryCandidateContainsAcceptable,
-        abstentionReason: diagnostics.brandAbstentionReason,
-      }),
+      failureClass: brandFailureClass,
+      candidateFilteringSubtype:
+        brandFailureClass === "candidate-filtering-failure"
+          ? brandCandidateFilteringSubtype(evalCase.brand, diagnostics)
+          : null,
     },
     alcohol: {
       state: alcoholObs.state,
@@ -586,7 +758,11 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
       detected: alcoholDetected(alcoholObs),
       parsedValue: parseObservedPercent(alcoholObs.value),
       parsedAccurate: alcoholParsedAccurate(alcoholObs.value, evalCase.alcohol.acceptablePercents),
-      failureClass: classifyAlcohol(evalCase.alcohol, alcoholObs, alcoholDiag),
+      failureClass: alcoholFailureClass,
+      candidateFilteringSubtype:
+        alcoholFailureClass === "candidate-filtering-failure"
+          ? alcoholCandidateFilteringSubtype(evalCase.alcohol, diagnostics)
+          : null,
     },
     diagnostics,
     latencyMs,

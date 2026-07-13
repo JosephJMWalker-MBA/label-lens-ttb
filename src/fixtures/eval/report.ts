@@ -6,6 +6,7 @@ import {
   type ObservedField,
 } from "./metrics";
 import type {
+  EvalCandidateFilteringSubtype,
   EvalFailureClass,
   EvalTextOrientation,
   IncludedEvalRecord,
@@ -14,9 +15,11 @@ import type {
 import type {
   CaseReport,
   EvalAlcoholSliceMetrics,
+  EvalCandidateFilteringSubtypeBucket,
   EvalFailureDistributionBucket,
   EvalOrientationSliceMetrics,
   EvalPerformanceBreakdown,
+  EvalRecoveryPassContributionBucket,
   EvalReport,
 } from "./eval-report.types";
 import { EVAL_ADAPTER } from "./eval-harness";
@@ -51,6 +54,66 @@ function scoreOf(caseReport: CaseReport): FieldCaseScore {
 
 function rate(numerator: number, denominator: number): number {
   return denominator === 0 ? 0 : numerator / denominator;
+}
+
+function candidateFilteringSubtypeLabel(subtype: EvalCandidateFilteringSubtype): string {
+  switch (subtype) {
+    case "brand-rejected-no-letters-or-too-short":
+      return "Brand rejected: no letters or too short";
+    case "brand-rejected-producer-line":
+      return "Brand rejected: producer line";
+    case "brand-rejected-non-brand-keyword":
+      return "Brand rejected: non-brand keyword";
+    case "brand-rejected-too-many-words":
+      return "Brand rejected: too many words";
+    case "brand-rejected-domain-like":
+      return "Brand rejected: domain-like text";
+    case "brand-rejected-varietal-or-designation":
+      return "Brand rejected: varietal or designation";
+    case "brand-rejected-generic-product-language":
+      return "Brand rejected: generic product language";
+    case "brand-rejected-location-or-appellation":
+      return "Brand rejected: location or appellation";
+    case "brand-rejected-low-information-fragment":
+      return "Brand rejected: low-information fragment";
+    case "brand-rejected-sentence-fragment":
+      return "Brand rejected: sentence fragment";
+    case "brand-kept-overextended-candidate":
+      return "Brand kept: overextended candidate";
+    case "brand-kept-partial-candidate":
+      return "Brand kept: partial candidate";
+    case "alcohol-rejected-proof-only":
+      return "Alcohol rejected: proof-only";
+    case "alcohol-rejected-no-supported-number":
+      return "Alcohol rejected: no supported number";
+    case "alcohol-rejected-missing-volume-marker":
+      return "Alcohol rejected: missing volume marker";
+    case "alcohol-rejected-missing-explicit-alcohol-marker":
+      return "Alcohol rejected: missing explicit alcohol marker";
+    case "alcohol-rejected-bare-volume-marker-too-weak":
+      return "Alcohol rejected: bare volume marker too weak";
+    case "alcohol-rejected-unsupported-pattern":
+      return "Alcohol rejected: unsupported pattern";
+  }
+}
+
+function recoveryPassKindLabel(kind: EvalRecoveryPassContributionBucket["key"]): string {
+  switch (kind) {
+    case "full-image-primary":
+      return "Primary full image";
+    case "full-image-rot180":
+      return "Full image 180°";
+    case "left-edge-strip-rot270":
+      return "Left edge strip 270°";
+    case "right-edge-strip-rot90":
+      return "Right edge strip 90°";
+    case "focus-crop":
+      return "Focus crop";
+    case "focus-edge-strip-rot270":
+      return "Focus left edge strip 270°";
+    case "focus-edge-strip-rot90":
+      return "Focus right edge strip 90°";
+  }
 }
 
 function includedRecords(manifest: LoadedEvalManifest): IncludedEvalRecord[] {
@@ -360,6 +423,79 @@ function buildFailureDistribution(
   return buckets;
 }
 
+function buildCandidateFilteringSubtypeDistribution(
+  cases: CaseReport[],
+): EvalCandidateFilteringSubtypeBucket[] {
+  const counts = new Map<string, EvalCandidateFilteringSubtypeBucket>();
+  const add = (
+    field: EvalCandidateFilteringSubtypeBucket["field"],
+    subtype: EvalCandidateFilteringSubtype | null,
+  ) => {
+    if (!subtype) return;
+    const key = `${field}:${subtype}`;
+    const existing = counts.get(key);
+    if (existing) {
+      existing.count += 1;
+      return;
+    }
+    counts.set(key, {
+      key: subtype,
+      label: candidateFilteringSubtypeLabel(subtype),
+      field,
+      count: 1,
+    });
+  };
+
+  for (const caseReport of cases) {
+    add("brand", caseReport.brand.candidateFilteringSubtype);
+    add("alcohol", caseReport.alcohol.candidateFilteringSubtype);
+  }
+
+  return [...counts.values()].sort(
+    (a, b) => b.count - a.count || a.field.localeCompare(b.field) || a.key.localeCompare(b.key),
+  );
+}
+
+function buildRecoveryPassContributionBreakdown(
+  cases: CaseReport[],
+): EvalRecoveryPassContributionBucket[] {
+  const buckets = new Map<string, EvalRecoveryPassContributionBucket & { caseIds: Set<string> }>();
+  for (const caseReport of cases) {
+    for (const pass of caseReport.diagnostics.recoveryPasses) {
+      const existing = buckets.get(pass.passKind) ?? {
+        key: pass.passKind,
+        label: recoveryPassKindLabel(pass.passKind),
+        passCount: 0,
+        caseCount: 0,
+        newOcrTokensCount: 0,
+        newFieldLikeEvidenceCount: 0,
+        acceptedCandidateCount: 0,
+        changedSelectedFieldCount: 0,
+        correctSelectedFieldCount: 0,
+        noMeasuredValueCount: 0,
+        totalExecutionTimeMs: 0,
+        maxCumulativeCostMs: 0,
+        caseIds: new Set<string>(),
+      };
+      existing.passCount += 1;
+      existing.caseIds.add(caseReport.caseId);
+      if (pass.newOcrTokens) existing.newOcrTokensCount += 1;
+      if (pass.newFieldLikeEvidence) existing.newFieldLikeEvidenceCount += 1;
+      if (pass.acceptedCandidate) existing.acceptedCandidateCount += 1;
+      if (pass.changedSelectedField) existing.changedSelectedFieldCount += 1;
+      if (pass.correctSelectedField) existing.correctSelectedFieldCount += 1;
+      if (pass.noMeasuredValue) existing.noMeasuredValueCount += 1;
+      existing.totalExecutionTimeMs += pass.executionTimeMs;
+      existing.maxCumulativeCostMs = Math.max(existing.maxCumulativeCostMs, pass.cumulativeCostMs);
+      buckets.set(pass.passKind, existing);
+    }
+  }
+
+  return [...buckets.values()]
+    .map(({ caseIds, ...bucket }) => ({ ...bucket, caseCount: caseIds.size }))
+    .sort((a, b) => b.passCount - a.passCount || a.key.localeCompare(b.key));
+}
+
 function buildPerformanceBreakdown(cases: CaseReport[]): EvalPerformanceBreakdown {
   const passCounts = cases.map((caseReport) => caseReport.diagnostics.performance.passCount);
   const recoveryDurations = cases.map(
@@ -418,7 +554,7 @@ export function buildReport(cases: CaseReport[], manifest: LoadedEvalManifest): 
   const casesById = new Map(cases.map((caseReport) => [caseReport.caseId, caseReport]));
   const records = includedRecords(manifest);
   return {
-    schemaVersion: "extraction-baseline-report.v2",
+    schemaVersion: "extraction-baseline-report.v3",
     manifestSchemaVersion: manifest.schemaVersion,
     extractorAdapter: { id: EVAL_ADAPTER.id, version: EVAL_ADAPTER.version },
     aggregate: aggregate(scores),
@@ -426,6 +562,8 @@ export function buildReport(cases: CaseReport[], manifest: LoadedEvalManifest): 
       alcoholSlices: buildAlcoholSlices(records, scoreByCaseId),
       orientationSlices: buildOrientationSlices(records, scoreByCaseId),
       failureDistribution: buildFailureDistribution(records, casesById),
+      candidateFilteringSubtypes: buildCandidateFilteringSubtypeDistribution(cases),
+      recoveryPassContributions: buildRecoveryPassContributionBreakdown(cases),
       performance: buildPerformanceBreakdown(cases),
     },
     cases,
@@ -451,6 +589,18 @@ function removedCandidateSummary(caseReport: CaseReport): string {
   return removed.length === 0 ? "—" : removed.join(", ");
 }
 
+function failureWithSubtype(
+  failureClass: EvalFailureClass,
+  subtype: EvalCandidateFilteringSubtype | null,
+): string {
+  if (!subtype) return failureClass;
+  return `${failureClass} / ${subtype}`;
+}
+
+function yesNo(value: boolean): string {
+  return value ? "yes" : "no";
+}
+
 export function renderMarkdown(report: EvalReport): string {
   const aggregateMetrics = report.aggregate;
   const performance = report.breakdowns.performance;
@@ -471,6 +621,9 @@ export function renderMarkdown(report: EvalReport): string {
   );
   lines.push(
     "Ambiguity honesty applies only to the genuinely ambiguous labels; it is not evidence of overall extractor usefulness.",
+  );
+  lines.push(
+    "Phase 5A adds evaluation-only attribution detail: candidate-filtering failures are subclassed from existing selector diagnostics, and recovery-pass contributions are measured from extractor debug traces without changing production OCR, ranking, confidence, or API output.",
   );
   lines.push("");
   lines.push("## Brand metrics");
@@ -571,6 +724,17 @@ export function renderMarkdown(report: EvalReport): string {
   lines.push("");
   lines.push(`**Alcohol failure classes:** ${classSummary(aggregateMetrics.alcoholFailureCounts)}`);
   lines.push("");
+  lines.push("### Candidate-Filtering Subtypes");
+  lines.push("");
+  lines.push("| Field | Subtype | Count |");
+  lines.push("| --- | --- | --- |");
+  for (const bucket of report.breakdowns.candidateFilteringSubtypes) {
+    lines.push(`| ${bucket.field} | ${bucket.label} | ${bucket.count} |`);
+  }
+  if (report.breakdowns.candidateFilteringSubtypes.length === 0) {
+    lines.push("| — | — | 0 |");
+  }
+  lines.push("");
   lines.push("## Pass Cost");
   lines.push("");
   lines.push("| Metric | Value |");
@@ -602,6 +766,54 @@ export function renderMarkdown(report: EvalReport): string {
     `| p95 latency | ${aggregateMetrics.p95LatencyMs.toFixed(0)} ms | ${aggregateMetrics.caseCount} cases |`,
   );
   lines.push("");
+  lines.push("## Recovery-Pass Contributions");
+  lines.push("");
+  lines.push(
+    "| Pass kind | Passes | Cases | New OCR | Field-like evidence | Accepted candidate | Changed selection | Correct selection | No measured value | Total ms | Max cumulative ms |",
+  );
+  lines.push("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |");
+  for (const bucket of report.breakdowns.recoveryPassContributions) {
+    lines.push(
+      `| ${bucket.label} | ${bucket.passCount} | ${bucket.caseCount} | ${bucket.newOcrTokensCount} | ${bucket.newFieldLikeEvidenceCount} | ${bucket.acceptedCandidateCount} | ${bucket.changedSelectedFieldCount} | ${bucket.correctSelectedFieldCount} | ${bucket.noMeasuredValueCount} | ${bucket.totalExecutionTimeMs.toFixed(0)} | ${bucket.maxCumulativeCostMs.toFixed(0)} |`,
+    );
+  }
+  if (report.breakdowns.recoveryPassContributions.length === 0) {
+    lines.push("| — | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |");
+  }
+  lines.push("");
+  lines.push("### Recovery passes that never improve outcomes");
+  lines.push("");
+  lines.push("| Pass kind | Passes | Cases | Changed selection | Correct selection | Total ms |");
+  lines.push("| --- | --- | --- | --- | --- | --- |");
+  const neverImproving = report.breakdowns.recoveryPassContributions.filter(
+    (bucket) => bucket.changedSelectedFieldCount === 0 && bucket.correctSelectedFieldCount === 0,
+  );
+  for (const bucket of neverImproving) {
+    lines.push(
+      `| ${bucket.label} | ${bucket.passCount} | ${bucket.caseCount} | ${bucket.changedSelectedFieldCount} | ${bucket.correctSelectedFieldCount} | ${bucket.totalExecutionTimeMs.toFixed(0)} |`,
+    );
+  }
+  if (neverImproving.length === 0) {
+    lines.push("| none | 0 | 0 | 0 | 0 | 0 |");
+  }
+  lines.push("");
+  lines.push("### Recovery pass instances");
+  lines.push("");
+  lines.push(
+    "| Case | Order | Pass kind | Trigger reasons | New OCR | Field-like evidence | Accepted candidate | Changed selection | Correct selection | No measured value | ms | cumulative ms |",
+  );
+  lines.push("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |");
+  for (const caseReport of report.cases) {
+    for (const pass of caseReport.diagnostics.recoveryPasses) {
+      lines.push(
+        `| ${caseReport.caseId} | ${pass.passOrder} | ${recoveryPassKindLabel(pass.passKind)} | ${pass.triggerReasons.join(", ")} | ${yesNo(pass.newOcrTokens)} | ${yesNo(pass.newFieldLikeEvidence)} | ${yesNo(pass.acceptedCandidate)} | ${yesNo(pass.changedSelectedField)} | ${yesNo(pass.correctSelectedField)} | ${yesNo(pass.noMeasuredValue)} | ${pass.executionTimeMs.toFixed(0)} | ${pass.cumulativeCostMs.toFixed(0)} |`,
+      );
+    }
+  }
+  if (report.cases.every((caseReport) => caseReport.diagnostics.recoveryPasses.length === 0)) {
+    lines.push("| — | 0 | — | — | no | no | no | no | no | no | 0 | 0 |");
+  }
+  lines.push("");
   lines.push("## Brand abstentions");
   lines.push("");
   lines.push("| Case | Truth | Abstention reason | Removed candidates |");
@@ -617,7 +829,7 @@ export function renderMarkdown(report: EvalReport): string {
   lines.push("## Per-case results");
   lines.push("");
   lines.push(
-    "| Case | Strata | Brand state → selected | Brand class | Alcohol state → value | Alcohol class | passes | ms |",
+    "| Case | Strata | Brand state → selected | Brand attribution | Alcohol state → value | Alcohol attribution | passes | ms |",
   );
   lines.push("| --- | --- | --- | --- | --- | --- | --- | --- |");
   for (const caseReport of report.cases) {
@@ -625,7 +837,7 @@ export function renderMarkdown(report: EvalReport): string {
     const alcoholSelection =
       caseReport.alcohol.value === null ? "∅" : `"${caseReport.alcohol.value}"`;
     lines.push(
-      `| ${caseReport.caseId} | ${caseReport.strata.join("; ")} | ${caseReport.brand.state} → ${brandSelection} | ${caseReport.brand.failureClass} | ${caseReport.alcohol.state} → ${alcoholSelection} | ${caseReport.alcohol.failureClass} | ${caseReport.diagnostics.performance.passCount} | ${caseReport.latencyMs.toFixed(0)} |`,
+      `| ${caseReport.caseId} | ${caseReport.strata.join("; ")} | ${caseReport.brand.state} → ${brandSelection} | ${failureWithSubtype(caseReport.brand.failureClass, caseReport.brand.candidateFilteringSubtype)} | ${caseReport.alcohol.state} → ${alcoholSelection} | ${failureWithSubtype(caseReport.alcohol.failureClass, caseReport.alcohol.candidateFilteringSubtype)} | ${caseReport.diagnostics.performance.passCount} | ${caseReport.latencyMs.toFixed(0)} |`,
     );
   }
   lines.push("");
