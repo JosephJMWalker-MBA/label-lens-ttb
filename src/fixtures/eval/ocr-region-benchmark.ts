@@ -48,7 +48,7 @@ import {
 } from "./ocr-region-benchmark.annotations";
 
 export const OCR_REGION_BENCHMARK_REPORT_SCHEMA_VERSION =
-  "ocr-region-isolation-benchmark-report.v2" as const;
+  "ocr-region-isolation-benchmark-report.v3" as const;
 
 export const OCR_REGION_BENCHMARK_PROCESSED_AT = "2026-07-13T00:00:00Z";
 
@@ -67,12 +67,16 @@ export type OcrRegionBenchmarkScenarioKey =
 
 export type OcrRegionBenchmarkDecisionLabel =
   | "ADDITIVE REGION SIGNAL SUPPORTED"
+  | "BOUNDED ADDITIVE BRAND SIGNAL SUPPORTED"
   | "REGION REPLACEMENT NOT SUPPORTED"
   | "RECOGNITION BOTTLENECK SUPPORTED"
   | "ROTATION STRATEGY NOT SUPPORTED"
   | "SCALE-SENSITIVE RESULT"
   | "MIXED RESULT"
   | "INSUFFICIENT EVIDENCE";
+
+export type BenchmarkScenarioFamilyKey =
+  "crop-only" | "rotated-crop-only" | "additive" | "rotated-additive";
 
 type BenchmarkSyntheticPassKind =
   "benchmark-targeted-crop" | "benchmark-canonical-rotated-targeted-crop";
@@ -144,6 +148,7 @@ export interface BenchmarkProductContribution {
   selectedStateChanged: boolean;
   correctResultRecovered: boolean;
   correctUncertaintyRecovered: boolean;
+  totalAcceptableRecovery: boolean;
   falseCertaintyIntroduced: boolean;
   falseCertaintyRemoved: boolean;
   absentFieldFalsePositiveIntroduced: boolean;
@@ -184,6 +189,7 @@ export interface BenchmarkHybridProvenance {
   supportingPassIds: string[];
   supportingPassKinds: BenchmarkPassKind[];
   usedTargetedEvidence: boolean;
+  targetedBecameSelectedSource: boolean;
   targetedOnlyCorroboratedExistingCandidate: boolean;
   targetedIntroducedNewCandidate: boolean;
   targetedChangedOrdering: boolean;
@@ -243,7 +249,7 @@ export interface BenchmarkFieldComparison {
     additiveTargetedCrop: BenchmarkScaleVariantMap;
     additiveCanonicalRotatedCrop: BenchmarkScaleVariantMap;
   };
-  bestScenario: {
+  diagnosticBestScenario: {
     scenario: OcrRegionBenchmarkScenarioKey;
     scale: OcrRegionBenchmarkScale | null;
   };
@@ -287,6 +293,7 @@ export interface OcrRegionBenchmarkScenarioAggregate {
   parsedAccurateCount: number;
   falseCertaintyCount: number;
   absentFieldFalsePositiveCount: number;
+  absentFieldFalsePositiveRate: number | null;
   parserFailureCount: number;
   expectedPhrasePresentCount: number;
   meanExpectedTokenCoverage: number;
@@ -312,11 +319,41 @@ export interface OcrRegionBenchmarkContributionAggregate {
   selectedValueChangedCount: number;
   correctResultRecoveredCount: number;
   correctUncertaintyRecoveredCount: number;
+  totalAcceptableRecoveryCount: number;
   falseCertaintyIntroducedCount: number;
   falseCertaintyRemovedCount: number;
   absentFieldFalsePositiveIntroducedCount: number;
   priorCorrectResultRegressedCount: number;
   noMeaningfulContributionCount: number;
+}
+
+export interface OcrRegionBenchmarkRecoverySummary {
+  family: BenchmarkScenarioFamilyKey;
+  scenario: OcrRegionBenchmarkScenarioKey;
+  scale: OcrRegionBenchmarkScale;
+  field: OcrRegionBenchmarkFieldKey;
+  applicableCaseCount: number;
+  exactRecoveryCount: number;
+  correctUncertaintyRecoveryCount: number;
+  totalAcceptableRecoveryCount: number;
+  recoveredCaseFields: string[];
+}
+
+export interface OcrRegionBenchmarkRecoveryEntry {
+  caseId: string;
+  field: OcrRegionBenchmarkFieldKey;
+  family: BenchmarkScenarioFamilyKey;
+  scenario: OcrRegionBenchmarkScenarioKey;
+  scale: OcrRegionBenchmarkScale;
+  recoveryKind: "correct-result" | "correct-uncertainty";
+  baselineFailureClass: EvalFailureClass;
+  scenarioFailureClass: EvalFailureClass;
+  targetedBecameSelectedSource: boolean | null;
+  duplicateCorroborated: boolean;
+  newCandidateIntroduced: boolean;
+  newAlternateIntroduced: boolean;
+  orderingChanged: boolean;
+  ambiguityChanged: boolean;
 }
 
 export interface OcrRegionBenchmarkChallengeSliceSummary {
@@ -331,6 +368,7 @@ export interface OcrRegionBenchmarkChallengeSliceSummary {
 export interface OcrRegionBenchmarkRegressionEntry {
   caseId: string;
   field: OcrRegionBenchmarkFieldKey;
+  family: BenchmarkScenarioFamilyKey;
   scenario: OcrRegionBenchmarkScenarioKey;
   scale: OcrRegionBenchmarkScale | null;
   baselineFailureClass: EvalFailureClass;
@@ -339,14 +377,40 @@ export interface OcrRegionBenchmarkRegressionEntry {
   scenarioValue: string | null;
 }
 
+export interface OcrRegionBenchmarkRegressionSummary {
+  family: BenchmarkScenarioFamilyKey;
+  scenario: OcrRegionBenchmarkScenarioKey;
+  scale: OcrRegionBenchmarkScale | null;
+  applicableCaseFieldCount: number;
+  scenarioScaleRegressionInstanceCount: number;
+  uniqueCaseFieldRegressionCount: number;
+  uniqueCaseFields: string[];
+}
+
 export interface OcrRegionBenchmarkLatencySummary {
   scenario: OcrRegionBenchmarkScenarioKey;
   scale: OcrRegionBenchmarkScale | null;
-  executedFieldCount: number;
-  medianLatencyMs: number;
-  p95LatencyMs: number;
-  medianOcrMs: number;
-  medianPreprocessMs: number;
+  field: OcrRegionBenchmarkFieldKey;
+  applicableCaseCount: number;
+  latencyInterpretation: "production-baseline" | "measured-targeted-pass" | "estimated-combined";
+  matchedBaselineMedianLatencyMs: number | null;
+  measuredTargetedIncrementalMedianLatencyMs: number | null;
+  estimatedCombinedMedianLatencyMs: number | null;
+  matchedMedianDeltaLatencyMs: number | null;
+}
+
+export interface OcrRegionBenchmarkScaleAnalysisSummary {
+  family: BenchmarkScenarioFamilyKey;
+  scenario: OcrRegionBenchmarkScenarioKey;
+  field: OcrRegionBenchmarkFieldKey;
+  applicableCaseFieldCount: number;
+  improvedWithScaleCount: number;
+  worsenedWithScaleCount: number;
+  failureClassChangedWithoutSelectedOutcomeImprovementCount: number;
+  unchangedCount: number;
+  improvedCaseFields: string[];
+  worsenedCaseFields: string[];
+  failureClassChangedCaseFields: string[];
 }
 
 export interface OcrRegionBenchmarkAnnotationCoverage {
@@ -373,11 +437,11 @@ export interface OcrRegionBenchmarkBoundaryProof {
 export interface OcrRegionBenchmarkConclusionSection {
   topic:
     | "replacement"
-    | "additive"
+    | "additive-brand"
+    | "additive-alcohol"
     | "rotation"
     | "scaling"
-    | "remaining-recognition-failures"
-    | "remaining-selection-failures";
+    | "remaining-bottlenecks";
   labels: OcrRegionBenchmarkDecisionLabel[];
   rationale: string;
   evidence: string[];
@@ -393,9 +457,13 @@ export interface OcrRegionBenchmarkReport {
   annotationCoverage: OcrRegionBenchmarkAnnotationCoverage;
   aggregateComparisons: OcrRegionBenchmarkScenarioAggregate[];
   contributionSummaries: OcrRegionBenchmarkContributionAggregate[];
+  recoverySummaries: OcrRegionBenchmarkRecoverySummary[];
+  recoveryLedger: OcrRegionBenchmarkRecoveryEntry[];
   challengeSliceComparisons: OcrRegionBenchmarkChallengeSliceSummary[];
   regressions: OcrRegionBenchmarkRegressionEntry[];
+  regressionSummaries: OcrRegionBenchmarkRegressionSummary[];
   latencyComparison: OcrRegionBenchmarkLatencySummary[];
+  scaleAnalysis: OcrRegionBenchmarkScaleAnalysisSummary[];
   conclusions: OcrRegionBenchmarkConclusionSection[];
   productionBoundaryProof: OcrRegionBenchmarkBoundaryProof;
 }
@@ -493,6 +561,65 @@ function scaleKey(scale: OcrRegionBenchmarkScale): OcrRegionBenchmarkScaleKey {
 
 function scaleLabel(scale: OcrRegionBenchmarkScale | null): string {
   return scale === null ? "baseline" : `${scaleKey(scale)}`;
+}
+
+function scenarioFamily(
+  scenario: OcrRegionBenchmarkScenarioKey,
+): BenchmarkScenarioFamilyKey | null {
+  switch (scenario) {
+    case "production-baseline":
+      return null;
+    case "human-targeted-crop":
+      return "crop-only";
+    case "canonically-rotated-targeted-crop":
+      return "rotated-crop-only";
+    case "baseline-plus-targeted-crop":
+      return "additive";
+    case "baseline-plus-canonically-rotated-targeted-crop":
+      return "rotated-additive";
+  }
+}
+
+function scenarioFamilyLabel(family: BenchmarkScenarioFamilyKey): string {
+  switch (family) {
+    case "crop-only":
+      return "Crop-only replacement";
+    case "rotated-crop-only":
+      return "Rotated crop-only replacement";
+    case "additive":
+      return "Additive targeted evidence";
+    case "rotated-additive":
+      return "Rotated additive targeted evidence";
+  }
+}
+
+function caseFieldKey(caseId: string, field: OcrRegionBenchmarkFieldKey): string {
+  return `${caseId}:${field}`;
+}
+
+function pctOrNA(numerator: number, denominator: number): string {
+  return denominator === 0 ? "N/A" : pct(numerator, denominator);
+}
+
+function rateOrNull(numerator: number, denominator: number): number | null {
+  return denominator === 0 ? null : numerator / denominator;
+}
+
+function msOrNA(value: number | null): string {
+  return value === null ? "N/A" : `${value.toFixed(0)} ms`;
+}
+
+function acceptableOutcome(failureClass: EvalFailureClass): boolean {
+  return failureClass === "correct" || failureClass === "correct-uncertainty";
+}
+
+function recoveryKind(
+  contribution: BenchmarkProductContribution | null,
+): "correct-result" | "correct-uncertainty" | null {
+  if (!contribution) return null;
+  if (contribution.correctResultRecovered) return "correct-result";
+  if (contribution.correctUncertaintyRecovered) return "correct-uncertainty";
+  return null;
 }
 
 function createScaleVariantMap(
@@ -1187,13 +1314,14 @@ function buildProductContribution(
   scenario: BenchmarkScenarioFieldResult,
 ): BenchmarkProductContribution {
   const truthPresent = field === "brand" ? baseline.truthPresent : baseline.truthPresent;
+  const baselineAcceptable = acceptableOutcome(baseline.failureClass);
   const selectedValueChanged = scenario.selectedValue !== baseline.selectedValue;
   const selectedStateChanged = scenario.selectedState !== baseline.selectedState;
   const correctResultRecovered =
     scenario.failureClass === "correct" && baseline.failureClass !== "correct";
   const correctUncertaintyRecovered =
-    scenario.failureClass === "correct-uncertainty" &&
-    baseline.failureClass !== "correct-uncertainty";
+    scenario.failureClass === "correct-uncertainty" && !baselineAcceptable;
+  const totalAcceptableRecovery = correctResultRecovered || correctUncertaintyRecovered;
   const falseCertaintyIntroduced =
     scenario.failureClass === "false-certainty" && baseline.failureClass !== "false-certainty";
   const falseCertaintyRemoved =
@@ -1211,6 +1339,7 @@ function buildProductContribution(
     selectedStateChanged,
     correctResultRecovered,
     correctUncertaintyRecovered,
+    totalAcceptableRecovery,
     falseCertaintyIntroduced,
     falseCertaintyRemoved,
     absentFieldFalsePositiveIntroduced,
@@ -1218,8 +1347,7 @@ function buildProductContribution(
     noMeaningfulContribution:
       !selectedValueChanged &&
       !selectedStateChanged &&
-      !correctResultRecovered &&
-      !correctUncertaintyRecovered &&
+      !totalAcceptableRecovery &&
       !falseCertaintyIntroduced &&
       !falseCertaintyRemoved &&
       !absentFieldFalsePositiveIntroduced &&
@@ -1267,6 +1395,7 @@ function buildHybridProvenance(
   const sourcePassId = selectedSourcePassId(field, scenarioReport);
   const usedTargetedEvidence =
     sourcePassId === targetedPass.passId || supportingPassIds.includes(targetedPass.passId);
+  const targetedBecameSelectedSource = sourcePassId === targetedPass.passId;
   return {
     productionPassIds: baselinePasses.map((pass) => pass.passId),
     productionPassKinds: baselinePasses.map((pass) => pass.passKind as BenchmarkPassKind),
@@ -1280,6 +1409,7 @@ function buildHybridProvenance(
     supportingPassIds,
     supportingPassKinds: supportPassKinds(supportingPassIds, passKinds),
     usedTargetedEvidence,
+    targetedBecameSelectedSource,
     targetedOnlyCorroboratedExistingCandidate:
       usedTargetedEvidence &&
       candidateContribution.duplicateCorroborated &&
@@ -1691,6 +1821,16 @@ function allScenarioResults(comparison: BenchmarkFieldComparison): BenchmarkScen
   ];
 }
 
+function findScenarioResult(
+  comparison: BenchmarkFieldComparison,
+  scenario: OcrRegionBenchmarkScenarioKey,
+  scale: OcrRegionBenchmarkScale | null,
+): BenchmarkScenarioFieldResult {
+  return allScenarioResults(comparison).find(
+    (result) => result.scenario === scenario && result.scale === scale,
+  )!;
+}
+
 function classifyFieldComparison(
   field: OcrRegionBenchmarkFieldKey,
   annotation: OcrRegionBenchmarkFieldAnnotation | undefined,
@@ -1709,7 +1849,7 @@ function classifyFieldComparison(
     additiveTargetedCrop,
     additiveCanonicalRotatedCrop,
     scaleVariants,
-    bestScenario: { scenario: "production-baseline", scale: null },
+    diagnosticBestScenario: { scenario: "production-baseline", scale: null },
     changedSelectedValue: false,
     correctedByCounterfactual: false,
     regressedByCounterfactual: false,
@@ -1718,7 +1858,7 @@ function classifyFieldComparison(
 
   const best = bestCounterfactual(comparison);
   if (best && outcomeScore(best) > outcomeScore(baseline)) {
-    comparison.bestScenario = { scenario: best.scenario, scale: best.scale };
+    comparison.diagnosticBestScenario = { scenario: best.scenario, scale: best.scale };
   }
   comparison.changedSelectedValue = !!best && best.selectedValue !== baseline.selectedValue;
   comparison.correctedByCounterfactual =
@@ -1839,19 +1979,34 @@ function scenarioSummary(): OcrRegionBenchmarkScenarioSummaryEntry[] {
   }));
 }
 
+function scenarioCaseFieldRows(
+  cases: OcrRegionBenchmarkCaseResult[],
+  field: OcrRegionBenchmarkFieldKey,
+  scenario: OcrRegionBenchmarkScenarioKey,
+  scale: OcrRegionBenchmarkScale | null,
+) {
+  return cases
+    .map((caseResult) => {
+      const comparison = caseResult.fields[field];
+      return {
+        caseId: caseResult.caseId,
+        comparison,
+        baseline: comparison.baseline,
+        result: findScenarioResult(comparison, scenario, scale),
+      };
+    })
+    .filter((row) => row.result.applicable);
+}
+
 function aggregateScenarioMetrics(
   cases: OcrRegionBenchmarkCaseResult[],
 ): OcrRegionBenchmarkScenarioAggregate[] {
   const rows: OcrRegionBenchmarkScenarioAggregate[] = [];
   for (const field of ["brand", "alcohol"] as const) {
     for (const row of scenarioRows()) {
-      const results = cases
-        .map((caseResult) =>
-          allScenarioResults(caseResult.fields[field]).find(
-            (result) => result.scenario === row.scenario && result.scale === row.scale,
-          )!,
-        )
-        .filter((result) => result.applicable);
+      const results = scenarioCaseFieldRows(cases, field, row.scenario, row.scale).map(
+        (entry) => entry.result,
+      );
       const present = results.filter((result) => result.truthPresent);
       const absent = results.filter((result) => !result.truthPresent);
       const similarities = present
@@ -1882,6 +2037,10 @@ function aggregateScenarioMetrics(
         absentFieldFalsePositiveCount: absent.filter(
           (result) => result.selectedState !== "NOT_OBSERVED",
         ).length,
+        absentFieldFalsePositiveRate: rateOrNull(
+          absent.filter((result) => result.selectedState !== "NOT_OBSERVED").length,
+          absent.length,
+        ),
         parserFailureCount: present.filter((result) => result.failureClass === "parser-failure")
           .length,
         expectedPhrasePresentCount: present.filter((result) => result.rawOcr?.expectedPhrasePresent)
@@ -1914,13 +2073,9 @@ function aggregateContributionMetrics(
       "baseline-plus-canonically-rotated-targeted-crop",
     ] as const) {
       for (const scale of TARGETED_SCALE_FACTORS) {
-        const results = cases
-          .map((caseResult) =>
-            allScenarioResults(caseResult.fields[field]).find(
-              (result) => result.scenario === scenario && result.scale === scale,
-            )!,
-          )
-          .filter((result) => result.applicable);
+        const results = scenarioCaseFieldRows(cases, field, scenario, scale).map(
+          (entry) => entry.result,
+        );
         const count = results.length;
         rows.push({
           scenario,
@@ -1967,6 +2122,9 @@ function aggregateContributionMetrics(
           correctUncertaintyRecoveredCount: results.filter(
             (result) => result.productContribution?.correctUncertaintyRecovered,
           ).length,
+          totalAcceptableRecoveryCount: results.filter(
+            (result) => result.productContribution?.totalAcceptableRecovery,
+          ).length,
           falseCertaintyIntroducedCount: results.filter(
             (result) => result.productContribution?.falseCertaintyIntroduced,
           ).length,
@@ -1982,6 +2140,82 @@ function aggregateContributionMetrics(
           noMeaningfulContributionCount: results.filter(
             (result) => result.productContribution?.noMeaningfulContribution,
           ).length,
+        });
+      }
+    }
+  }
+  return rows;
+}
+
+function recoveryLedger(cases: OcrRegionBenchmarkCaseResult[]): OcrRegionBenchmarkRecoveryEntry[] {
+  const rows: OcrRegionBenchmarkRecoveryEntry[] = [];
+  for (const caseResult of cases) {
+    for (const field of ["brand", "alcohol"] as const) {
+      for (const result of allScenarioResults(caseResult.fields[field])) {
+        if (
+          result.scenario === "production-baseline" ||
+          !result.applicable ||
+          result.scale === null
+        )
+          continue;
+        const kind = recoveryKind(result.productContribution);
+        if (!kind) continue;
+        rows.push({
+          caseId: caseResult.caseId,
+          field,
+          family: scenarioFamily(result.scenario)!,
+          scenario: result.scenario,
+          scale: result.scale,
+          recoveryKind: kind,
+          baselineFailureClass: caseResult.fields[field].baseline.failureClass,
+          scenarioFailureClass: result.failureClass,
+          targetedBecameSelectedSource:
+            result.hybridProvenance?.targetedBecameSelectedSource ??
+            result.selectedState !== "NOT_OBSERVED",
+          duplicateCorroborated: result.candidateContribution?.duplicateCorroborated ?? false,
+          newCandidateIntroduced: result.candidateContribution?.newCandidateIntroduced ?? false,
+          newAlternateIntroduced: result.candidateContribution?.newAlternateIntroduced ?? false,
+          orderingChanged: result.candidateContribution?.orderingChanged ?? false,
+          ambiguityChanged: result.candidateContribution?.ambiguityChanged ?? false,
+        });
+      }
+    }
+  }
+  return rows;
+}
+
+function recoverySummaries(
+  cases: OcrRegionBenchmarkCaseResult[],
+): OcrRegionBenchmarkRecoverySummary[] {
+  const ledger = recoveryLedger(cases);
+  const rows: OcrRegionBenchmarkRecoverySummary[] = [];
+  for (const field of ["brand", "alcohol"] as const) {
+    for (const scenario of [
+      "human-targeted-crop",
+      "canonically-rotated-targeted-crop",
+      "baseline-plus-targeted-crop",
+      "baseline-plus-canonically-rotated-targeted-crop",
+    ] as const) {
+      for (const scale of TARGETED_SCALE_FACTORS) {
+        const applicableCaseCount = scenarioCaseFieldRows(cases, field, scenario, scale).length;
+        const recoveries = ledger.filter(
+          (entry) => entry.field === field && entry.scenario === scenario && entry.scale === scale,
+        );
+        rows.push({
+          family: scenarioFamily(scenario)!,
+          scenario,
+          scale,
+          field,
+          applicableCaseCount,
+          exactRecoveryCount: recoveries.filter((entry) => entry.recoveryKind === "correct-result")
+            .length,
+          correctUncertaintyRecoveryCount: recoveries.filter(
+            (entry) => entry.recoveryKind === "correct-uncertainty",
+          ).length,
+          totalAcceptableRecoveryCount: recoveries.length,
+          recoveredCaseFields: [
+            ...new Set(recoveries.map((entry) => caseFieldKey(entry.caseId, field))),
+          ].sort(),
         });
       }
     }
@@ -2043,6 +2277,7 @@ function regressionLedger(
         rows.push({
           caseId: caseResult.caseId,
           field,
+          family: scenarioFamily(scenario.scenario)!,
           scenario: scenario.scenario,
           scale: scenario.scale,
           baselineFailureClass: comparison.baseline.failureClass,
@@ -2056,201 +2291,386 @@ function regressionLedger(
   return rows;
 }
 
+function regressionSummaries(
+  cases: OcrRegionBenchmarkCaseResult[],
+): OcrRegionBenchmarkRegressionSummary[] {
+  const ledger = regressionLedger(cases);
+  const rows: OcrRegionBenchmarkRegressionSummary[] = [];
+  for (const scenario of [
+    "human-targeted-crop",
+    "canonically-rotated-targeted-crop",
+    "baseline-plus-targeted-crop",
+    "baseline-plus-canonically-rotated-targeted-crop",
+  ] as const) {
+    const family = scenarioFamily(scenario)!;
+    const scenarioRows = ledger.filter((row) => row.scenario === scenario);
+    const applicableAllScales = new Set<string>();
+    for (const field of ["brand", "alcohol"] as const) {
+      for (const scale of TARGETED_SCALE_FACTORS) {
+        for (const entry of scenarioCaseFieldRows(cases, field, scenario, scale)) {
+          applicableAllScales.add(caseFieldKey(entry.caseId, field));
+        }
+      }
+    }
+    rows.push({
+      family,
+      scenario,
+      scale: null,
+      applicableCaseFieldCount: applicableAllScales.size,
+      scenarioScaleRegressionInstanceCount: scenarioRows.length,
+      uniqueCaseFieldRegressionCount: new Set(
+        scenarioRows.map((row) => caseFieldKey(row.caseId, row.field)),
+      ).size,
+      uniqueCaseFields: [
+        ...new Set(scenarioRows.map((row) => caseFieldKey(row.caseId, row.field))),
+      ].sort(),
+    });
+
+    for (const scale of TARGETED_SCALE_FACTORS) {
+      const applicableCaseFields = new Set<string>();
+      for (const field of ["brand", "alcohol"] as const) {
+        for (const entry of scenarioCaseFieldRows(cases, field, scenario, scale)) {
+          applicableCaseFields.add(caseFieldKey(entry.caseId, field));
+        }
+      }
+      const scaleRows = scenarioRows.filter((row) => row.scale === scale);
+      rows.push({
+        family,
+        scenario,
+        scale,
+        applicableCaseFieldCount: applicableCaseFields.size,
+        scenarioScaleRegressionInstanceCount: scaleRows.length,
+        uniqueCaseFieldRegressionCount: new Set(
+          scaleRows.map((row) => caseFieldKey(row.caseId, row.field)),
+        ).size,
+        uniqueCaseFields: [
+          ...new Set(scaleRows.map((row) => caseFieldKey(row.caseId, row.field))),
+        ].sort(),
+      });
+    }
+  }
+  return rows;
+}
+
+function scaleAnalysis(
+  cases: OcrRegionBenchmarkCaseResult[],
+): OcrRegionBenchmarkScaleAnalysisSummary[] {
+  const rows: OcrRegionBenchmarkScaleAnalysisSummary[] = [];
+  for (const scenario of [
+    "human-targeted-crop",
+    "canonically-rotated-targeted-crop",
+    "baseline-plus-targeted-crop",
+    "baseline-plus-canonically-rotated-targeted-crop",
+  ] as const) {
+    for (const field of ["brand", "alcohol"] as const) {
+      const improvedCaseFields: string[] = [];
+      const worsenedCaseFields: string[] = [];
+      const failureClassChangedCaseFields: string[] = [];
+      let applicableCaseFieldCount = 0;
+
+      for (const caseResult of cases) {
+        const comparison = caseResult.fields[field];
+        const reference = findScenarioResult(comparison, scenario, 1.5);
+        if (!reference.applicable) continue;
+        applicableCaseFieldCount += 1;
+        const comparisonKey = caseFieldKey(caseResult.caseId, field);
+        const others = TARGETED_SCALE_FACTORS.filter((scale) => scale !== 1.5).map((scale) =>
+          findScenarioResult(comparison, scenario, scale),
+        );
+        const improved = others.some((result) => outcomeScore(result) > outcomeScore(reference));
+        const worsened = others.some((result) => outcomeScore(result) < outcomeScore(reference));
+        const failureClassChangedWithoutSelectedOutcomeImprovement =
+          !improved &&
+          !worsened &&
+          others.some(
+            (result) =>
+              result.failureClass !== reference.failureClass ||
+              result.selectedState !== reference.selectedState ||
+              result.selectedValue !== reference.selectedValue,
+          );
+
+        if (improved) improvedCaseFields.push(comparisonKey);
+        if (worsened) worsenedCaseFields.push(comparisonKey);
+        if (failureClassChangedWithoutSelectedOutcomeImprovement) {
+          failureClassChangedCaseFields.push(comparisonKey);
+        }
+      }
+
+      rows.push({
+        family: scenarioFamily(scenario)!,
+        scenario,
+        field,
+        applicableCaseFieldCount,
+        improvedWithScaleCount: improvedCaseFields.length,
+        worsenedWithScaleCount: worsenedCaseFields.length,
+        failureClassChangedWithoutSelectedOutcomeImprovementCount:
+          failureClassChangedCaseFields.length,
+        unchangedCount:
+          applicableCaseFieldCount -
+          new Set([...improvedCaseFields, ...worsenedCaseFields, ...failureClassChangedCaseFields])
+            .size,
+        improvedCaseFields: [...new Set(improvedCaseFields)].sort(),
+        worsenedCaseFields: [...new Set(worsenedCaseFields)].sort(),
+        failureClassChangedCaseFields: [...new Set(failureClassChangedCaseFields)].sort(),
+      });
+    }
+  }
+  return rows;
+}
+
 function latencyComparison(
   cases: OcrRegionBenchmarkCaseResult[],
 ): OcrRegionBenchmarkLatencySummary[] {
   const rows: OcrRegionBenchmarkLatencySummary[] = [];
-  for (const row of scenarioRows()) {
-    const results = cases.flatMap((caseResult) =>
-      (["brand", "alcohol"] as const).map((field) =>
-        allScenarioResults(caseResult.fields[field]).find(
-          (result) => result.scenario === row.scenario && result.scale === row.scale,
-        )!,
-      ),
-    );
-    const executed = results.filter((result) => result.applicable);
-    const latencies = executed.map((result) => result.latencyMs);
-    const ocrMs = executed.map((result) => result.timings?.ocrMs ?? 0);
-    const preprocessMs = executed.map((result) => result.timings?.preprocessMs ?? 0);
+  for (const field of ["brand", "alcohol"] as const) {
+    const baselineRows = scenarioCaseFieldRows(cases, field, "production-baseline", null);
     rows.push({
-      scenario: row.scenario,
-      scale: row.scale,
-      executedFieldCount: executed.length,
-      medianLatencyMs: percentile(latencies, 50),
-      p95LatencyMs: percentile(latencies, 95),
-      medianOcrMs: percentile(ocrMs, 50),
-      medianPreprocessMs: percentile(preprocessMs, 50),
+      scenario: "production-baseline",
+      scale: null,
+      field,
+      applicableCaseCount: baselineRows.length,
+      latencyInterpretation: "production-baseline",
+      matchedBaselineMedianLatencyMs: percentile(
+        baselineRows.map((entry) => entry.result.latencyMs),
+        50,
+      ),
+      measuredTargetedIncrementalMedianLatencyMs: null,
+      estimatedCombinedMedianLatencyMs: null,
+      matchedMedianDeltaLatencyMs: null,
     });
+
+    for (const scale of TARGETED_SCALE_FACTORS) {
+      const measuredScenarios = [
+        "human-targeted-crop",
+        "canonically-rotated-targeted-crop",
+      ] as const;
+      for (const scenario of measuredScenarios) {
+        const scenarioRows = scenarioCaseFieldRows(cases, field, scenario, scale);
+        rows.push({
+          scenario,
+          scale,
+          field,
+          applicableCaseCount: scenarioRows.length,
+          latencyInterpretation: "measured-targeted-pass",
+          matchedBaselineMedianLatencyMs: percentile(
+            scenarioRows.map((entry) => entry.baseline.latencyMs),
+            50,
+          ),
+          measuredTargetedIncrementalMedianLatencyMs: percentile(
+            scenarioRows.map((entry) => entry.result.latencyMs),
+            50,
+          ),
+          estimatedCombinedMedianLatencyMs: null,
+          matchedMedianDeltaLatencyMs: null,
+        });
+      }
+
+      const additivePairs = [
+        {
+          additive: "baseline-plus-targeted-crop" as const,
+          targeted: "human-targeted-crop" as const,
+        },
+        {
+          additive: "baseline-plus-canonically-rotated-targeted-crop" as const,
+          targeted: "canonically-rotated-targeted-crop" as const,
+        },
+      ];
+      for (const pair of additivePairs) {
+        const scenarioRows = scenarioCaseFieldRows(cases, field, pair.additive, scale);
+        rows.push({
+          scenario: pair.additive,
+          scale,
+          field,
+          applicableCaseCount: scenarioRows.length,
+          latencyInterpretation: "estimated-combined",
+          matchedBaselineMedianLatencyMs: percentile(
+            scenarioRows.map((entry) => entry.baseline.latencyMs),
+            50,
+          ),
+          measuredTargetedIncrementalMedianLatencyMs: percentile(
+            scenarioRows.map(
+              (entry) => findScenarioResult(entry.comparison, pair.targeted, scale).latencyMs,
+            ),
+            50,
+          ),
+          estimatedCombinedMedianLatencyMs: percentile(
+            scenarioRows.map((entry) => entry.result.latencyMs),
+            50,
+          ),
+          matchedMedianDeltaLatencyMs: percentile(
+            scenarioRows.map((entry) => entry.result.latencyMs - entry.baseline.latencyMs),
+            50,
+          ),
+        });
+      }
+    }
   }
   return rows;
 }
 
 function conclusions(cases: OcrRegionBenchmarkCaseResult[]): OcrRegionBenchmarkConclusionSection[] {
-  const cropOnlyImproved = cases
-    .flatMap((caseResult) =>
-      (["brand", "alcohol"] as const).map((field) => caseResult.fields[field].targetedCrop),
-    )
-    .filter((result) => result.productContribution?.correctResultRecovered).length;
-  const additiveImproved = cases
-    .flatMap((caseResult) =>
-      (["brand", "alcohol"] as const).map((field) => caseResult.fields[field].additiveTargetedCrop),
-    )
-    .filter(
-      (result) =>
-        result.productContribution?.correctResultRecovered ||
-        result.productContribution?.correctUncertaintyRecovered,
-    ).length;
-  const rotatedImproved = cases
-    .flatMap((caseResult) =>
-      (["brand", "alcohol"] as const).flatMap((field) => [
-        caseResult.fields[field].canonicalRotatedCrop,
-        caseResult.fields[field].additiveCanonicalRotatedCrop,
-      ]),
-    )
-    .filter(
-      (result) =>
-        result.productContribution?.correctResultRecovered ||
-        result.productContribution?.correctUncertaintyRecovered,
-    ).length;
-  const residualRecognition = cases
-    .flatMap((caseResult) =>
-      (["brand", "alcohol"] as const).map((field) => {
-        const best =
-          bestCounterfactual(caseResult.fields[field]) ?? caseResult.fields[field].baseline;
-        return best.failureClass;
-      }),
-    )
-    .filter((failureClass) =>
-      [
-        "ocr-recognition-failure",
-        "region-coverage-failure",
-        "line-reconstruction-failure",
-        "candidate-generation-failure",
-      ].includes(failureClass),
-    ).length;
-  const residualSelection = cases
-    .flatMap((caseResult) =>
-      (["brand", "alcohol"] as const).map((field) => {
-        const best =
-          bestCounterfactual(caseResult.fields[field]) ?? caseResult.fields[field].baseline;
-        return best.failureClass;
-      }),
-    )
-    .filter((failureClass) =>
-      ["candidate-filtering-failure", "candidate-ranking-failure", "parser-failure"].includes(
-        failureClass,
-      ),
-    ).length;
-  const scaleSensitive = cases.some((caseResult) =>
-    (["brand", "alcohol"] as const).some((field) => {
-      const comparison = caseResult.fields[field];
-      const uprightScores = TARGETED_SCALE_FACTORS.map((scale) =>
-        outcomeScore(comparison.scaleVariants.targetedCrop[scaleKey(scale)]),
-      );
-      const additiveScores = TARGETED_SCALE_FACTORS.map((scale) =>
-        outcomeScore(comparison.scaleVariants.additiveTargetedCrop[scaleKey(scale)]),
-      );
-      return new Set([...uprightScores, ...additiveScores]).size > 1;
-    }),
+  const recoveries = recoveryLedger(cases);
+  const regressionSummary = regressionSummaries(cases);
+  const scaling = scaleAnalysis(cases);
+  const contributionSummary = aggregateContributionMetrics(cases);
+  const brandAdditiveRecoveries15 = recoveries.filter(
+    (entry) =>
+      entry.scenario === "baseline-plus-targeted-crop" &&
+      entry.field === "brand" &&
+      entry.scale === 1.5,
   );
+  const cropOnlyRecoveries = recoveries.filter((entry) => entry.family === "crop-only");
+  const cropOnlyUniqueRecoveries = [
+    ...new Set(cropOnlyRecoveries.map((entry) => caseFieldKey(entry.caseId, entry.field))),
+  ].sort();
+  const cropOnlyRegressionTotal = regressionSummary.find(
+    (row) => row.scenario === "human-targeted-crop" && row.scale === null,
+  )!;
+  const additiveAlcoholRecoveryCount = recoveries.filter(
+    (entry) => entry.scenario === "baseline-plus-targeted-crop" && entry.field === "alcohol",
+  ).length;
+  const rotatedApplicable = scenarioCaseFieldRows(
+    cases,
+    "alcohol",
+    "canonically-rotated-targeted-crop",
+    1.5,
+  ).length;
+  const rotatedSelectedOutcomeRecoveries = recoveries.filter(
+    (entry) =>
+      entry.scenario === "canonically-rotated-targeted-crop" ||
+      entry.scenario === "baseline-plus-canonically-rotated-targeted-crop",
+  ).length;
+  const additiveBrandContribution15 = contributionSummary.find(
+    (row) =>
+      row.scenario === "baseline-plus-targeted-crop" && row.scale === 1.5 && row.field === "brand",
+  )!;
+  const additiveAlcoholContribution15 = contributionSummary.find(
+    (row) =>
+      row.scenario === "baseline-plus-targeted-crop" &&
+      row.scale === 1.5 &&
+      row.field === "alcohol",
+  )!;
+  const bottleneckCounts = {
+    recognitionOrReconstruction: 0,
+    candidateGeneration: 0,
+    candidateFiltering: 0,
+    candidateRanking: 0,
+    parser: 0,
+  };
+  for (const caseResult of cases) {
+    for (const field of ["brand", "alcohol"] as const) {
+      const best =
+        bestCounterfactual(caseResult.fields[field]) ?? caseResult.fields[field].baseline;
+      switch (best.failureClass) {
+        case "ocr-recognition-failure":
+        case "line-reconstruction-failure":
+        case "region-coverage-failure":
+          bottleneckCounts.recognitionOrReconstruction += 1;
+          break;
+        case "candidate-generation-failure":
+          bottleneckCounts.candidateGeneration += 1;
+          break;
+        case "candidate-filtering-failure":
+          bottleneckCounts.candidateFiltering += 1;
+          break;
+        case "candidate-ranking-failure":
+          bottleneckCounts.candidateRanking += 1;
+          break;
+        case "parser-failure":
+          bottleneckCounts.parser += 1;
+          break;
+      }
+    }
+  }
 
   return [
     {
       topic: "replacement",
-      labels: [cropOnlyImproved === 0 ? "REGION REPLACEMENT NOT SUPPORTED" : "MIXED RESULT"],
+      labels: ["REGION REPLACEMENT NOT SUPPORTED"],
       rationale:
-        cropOnlyImproved === 0
-          ? "Crop-only replacement did not deliver a reliable outcome recovery once full-image context was removed."
-          : "Some crop-only cases improve, but replacement remains inconsistent and carries regressions.",
+        "Limited crop-only correct-uncertainty recoveries occurred, but replacement is not supported as a reliable strategy because it removes full-image context and produces substantially more regressions than recoveries.",
       evidence: [
-        `crop-only correct recoveries: ${cropOnlyImproved}`,
-        `crop-only regressions: ${
-          regressionLedger(cases).filter(
-            (row) =>
-              row.scenario === "human-targeted-crop" ||
-              row.scenario === "canonically-rotated-targeted-crop",
-          ).length
-        }`,
+        `crop-only exact recoveries: ${cropOnlyRecoveries.filter((entry) => entry.recoveryKind === "correct-result").length} scenario-scale, ${new Set(cropOnlyRecoveries.filter((entry) => entry.recoveryKind === "correct-result").map((entry) => caseFieldKey(entry.caseId, entry.field))).size} unique case-fields`,
+        `crop-only correct-uncertainty recoveries: ${cropOnlyRecoveries.filter((entry) => entry.recoveryKind === "correct-uncertainty").length} scenario-scale, ${new Set(cropOnlyRecoveries.filter((entry) => entry.recoveryKind === "correct-uncertainty").map((entry) => caseFieldKey(entry.caseId, entry.field))).size} unique case-fields (${cropOnlyUniqueRecoveries.join(", ")})`,
+        `crop-only scenario-scale regression instances: ${cropOnlyRegressionTotal.scenarioScaleRegressionInstanceCount}`,
+        `crop-only unique case-field regressions: ${cropOnlyRegressionTotal.uniqueCaseFieldRegressionCount}`,
       ],
     },
     {
-      topic: "additive",
-      labels: [additiveImproved > 0 ? "ADDITIVE REGION SIGNAL SUPPORTED" : "INSUFFICIENT EVIDENCE"],
+      topic: "additive-brand",
+      labels: [
+        brandAdditiveRecoveries15.length > 0
+          ? "BOUNDED ADDITIVE BRAND SIGNAL SUPPORTED"
+          : "INSUFFICIENT EVIDENCE",
+      ],
       rationale:
-        additiveImproved > 0
-          ? "Appending targeted evidence recovers a bounded set of outcomes without changing production extraction or selection rules."
-          : "Appending targeted evidence did not recover outcomes on this bounded benchmark slice.",
+        brandAdditiveRecoveries15.length > 0
+          ? "Bounded additive brand signal is supported on this adjudicated slice: two brand case-fields recover to correct uncertainty at 1.5x without any prior-correct brand regression."
+          : "No additive brand selected-outcome recovery was observed on this adjudicated slice.",
       evidence: [
-        `additive recoveries: ${additiveImproved}`,
-        `additive false-certainty introductions: ${aggregateContributionMetrics(cases)
-          .filter((row) => row.scenario === "baseline-plus-targeted-crop")
-          .reduce((sum, row) => sum + row.falseCertaintyIntroducedCount, 0)}`,
+        `1.5x additive brand recoveries: ${additiveBrandContribution15.correctResultRecoveredCount} exact, ${additiveBrandContribution15.correctUncertaintyRecoveredCount} correct-uncertainty, ${additiveBrandContribution15.totalAcceptableRecoveryCount} total acceptable`,
+        `recovered case-fields: ${brandAdditiveRecoveries15.map((entry) => caseFieldKey(entry.caseId, entry.field)).join(", ")}`,
+        ...brandAdditiveRecoveries15.map(
+          (entry) =>
+            `${caseFieldKey(entry.caseId, entry.field)} => targeted selected source: ${entry.targetedBecameSelectedSource ? "yes" : "no"}; duplicate corroborated: ${entry.duplicateCorroborated ? "yes" : "no"}; new candidate: ${entry.newCandidateIntroduced ? "yes" : "no"}; new alternate: ${entry.newAlternateIntroduced ? "yes" : "no"}; ranking changed: ${entry.orderingChanged ? "yes" : "no"}; ambiguity changed: ${entry.ambiguityChanged ? "yes" : "no"}`,
+        ),
+      ],
+    },
+    {
+      topic: "additive-alcohol",
+      labels: [additiveAlcoholRecoveryCount === 0 ? "INSUFFICIENT EVIDENCE" : "MIXED RESULT"],
+      rationale:
+        "No additive alcohol selected-outcome recovery was observed on this adjudicated slice.",
+      evidence: [
+        `1.5x additive alcohol recoveries: ${additiveAlcoholContribution15.correctResultRecoveredCount} exact, ${additiveAlcoholContribution15.correctUncertaintyRecoveredCount} correct-uncertainty, ${additiveAlcoholContribution15.totalAcceptableRecoveryCount} total acceptable`,
+        `additive alcohol prior-correct regressions: ${contributionSummary
+          .filter(
+            (row) => row.scenario === "baseline-plus-targeted-crop" && row.field === "alcohol",
+          )
+          .reduce((sum, row) => sum + row.priorCorrectResultRegressedCount, 0)} scenario-scale`,
       ],
     },
     {
       topic: "rotation",
-      labels: [rotatedImproved === 0 ? "ROTATION STRATEGY NOT SUPPORTED" : "MIXED RESULT"],
+      labels: [rotatedSelectedOutcomeRecoveries === 0 ? "INSUFFICIENT EVIDENCE" : "MIXED RESULT"],
       rationale:
-        rotatedImproved === 0
-          ? "Explicit canonical rotation did not recover outcomes beyond the non-rotated targeted variants."
-          : "Canonical rotation helps only on a bounded subset and is not uniformly stronger than non-rotated targeted evidence.",
-      evidence: [`rotation-assisted recoveries: ${rotatedImproved}`],
+        "Canonical rotation did not recover a selected outcome in the two applicable alcohol fields at any tested scale. The evidence remains too small for a broad universal claim.",
+      evidence: [
+        `rotated crop-only applicable alcohol case-fields at 1.5x: ${rotatedApplicable}`,
+        `rotated selected-outcome recoveries across crop-only and additive families: ${rotatedSelectedOutcomeRecoveries}`,
+      ],
     },
     {
       topic: "scaling",
-      labels: [scaleSensitive ? "SCALE-SENSITIVE RESULT" : "INSUFFICIENT EVIDENCE"],
-      rationale: scaleSensitive
-        ? "Scenario outcomes change across 1.5x, 2x, and 3x, so scale effects are measurable even though this report makes no production recommendation."
-        : "The tested scales do not separate clearly enough to support a stronger conclusion on this corpus slice.",
-      evidence: [`scale-sensitive cases observed: ${scaleSensitive ? "yes" : "no"}`],
-    },
-    {
-      topic: "remaining-recognition-failures",
-      labels: [
-        residualRecognition > 0 ? "RECOGNITION BOTTLENECK SUPPORTED" : "INSUFFICIENT EVIDENCE",
-      ],
+      labels: ["MIXED RESULT"],
       rationale:
-        residualRecognition > 0
-          ? "Even with targeted evidence, several cases still fail before a usable candidate can be selected, indicating a remaining recognition or reconstruction bottleneck."
-          : "Recognition failures were not dominant after the tested targeted scenarios.",
+        "Scale changes affect a bounded subset of case-fields. The report separates beneficial, harmful, and failure-class-only movements relative to the original 1.5x benchmark without recommending a production scale.",
       evidence: [
-        `best-scenario recognition/reconstruction failures remaining: ${residualRecognition}`,
+        ...scaling.map(
+          (row) =>
+            `${scenarioFamilyLabel(row.family)} / ${row.field}: improved ${row.improvedWithScaleCount}, worsened ${row.worsenedWithScaleCount}, failure-class changes without selected-outcome improvement ${row.failureClassChangedWithoutSelectedOutcomeImprovementCount}, unchanged ${row.unchangedCount}`,
+        ),
       ],
     },
     {
-      topic: "remaining-selection-failures",
-      labels: [residualSelection > 0 ? "MIXED RESULT" : "INSUFFICIENT EVIDENCE"],
+      topic: "remaining-bottlenecks",
+      labels: [
+        bottleneckCounts.recognitionOrReconstruction > 0
+          ? "RECOGNITION BOTTLENECK SUPPORTED"
+          : "INSUFFICIENT EVIDENCE",
+        "MIXED RESULT",
+      ],
       rationale:
-        residualSelection > 0
-          ? "Candidate filtering, ranking, or alcohol parsing defects still remain after the best tested targeted scenarios."
-          : "The remaining failures were not dominated by filtering, ranking, or parsing on this bounded slice.",
-      evidence: [`best-scenario selection/parsing failures remaining: ${residualSelection}`],
+        "After the diagnostic-best targeted scenarios, remaining failures still separate into recognition/reconstruction, candidate-generation, filtering, ranking, and parser categories.",
+      evidence: [
+        `recognition/reconstruction failures remaining: ${bottleneckCounts.recognitionOrReconstruction}`,
+        `candidate-generation failures remaining: ${bottleneckCounts.candidateGeneration}`,
+        `candidate-filtering failures remaining: ${bottleneckCounts.candidateFiltering}`,
+        `candidate-ranking failures remaining: ${bottleneckCounts.candidateRanking}`,
+        `parser failures remaining: ${bottleneckCounts.parser}`,
+      ],
     },
   ];
-}
-
-function contributionSummaryLabel(result: BenchmarkScenarioFieldResult): string {
-  const contributions: string[] = [];
-  if (result.productContribution?.correctResultRecovered)
-    contributions.push("correct result recovered");
-  if (result.productContribution?.correctUncertaintyRecovered)
-    contributions.push("correct uncertainty recovered");
-  if (result.productContribution?.falseCertaintyRemoved)
-    contributions.push("false certainty removed");
-  if (result.candidateContribution?.duplicateCorroborated)
-    contributions.push("duplicate corroborated");
-  if (result.candidateContribution?.newAlternateIntroduced)
-    contributions.push("new alternate introduced");
-  if (
-    result.rawContribution &&
-    result.rawContribution.expectedPhrasePresent &&
-    !result.productContribution?.correctResultRecovered &&
-    !result.productContribution?.correctUncertaintyRecovered
-  ) {
-    contributions.push("raw phrase present only");
-  }
-  if (contributions.length === 0) return "no meaningful contribution";
-  return contributions.join(", ");
 }
 
 function scenarioOutcomeLabel(result: BenchmarkScenarioFieldResult): string {
@@ -2579,9 +2999,13 @@ export async function runOcrRegionBenchmark(options?: {
       annotationCoverage: annotationCoverage(cases),
       aggregateComparisons: aggregateScenarioMetrics(results),
       contributionSummaries: aggregateContributionMetrics(results),
+      recoverySummaries: recoverySummaries(results),
+      recoveryLedger: recoveryLedger(results),
       challengeSliceComparisons: challengeSliceComparisons(results),
       regressions: regressionLedger(results),
+      regressionSummaries: regressionSummaries(results),
       latencyComparison: latencyComparison(results),
+      scaleAnalysis: scaleAnalysis(results),
       conclusions: conclusions(results),
       productionBoundaryProof: {
         benchmarkModules: [
@@ -2613,7 +3037,35 @@ function metricInterpretationLines(): string[] {
     "- Dice/bigram similarity measures approximate character overlap only; higher similarity is not by itself phrase recovery.",
     "- Candidate generation/retention and selected-field correctness are reported separately from raw OCR similarity.",
     "- Partial fragments are not counted as phrase recovery unless the full normalized phrase is present.",
+    "- Targeted absent-field false-positive safety is not experimentally exercised when no adjudicated absent-field target geometry exists; those rows render N/A and inherit safety from unchanged production behavior.",
   ];
+}
+
+function familyOutcomeStateLabel(
+  baseline: BenchmarkScenarioFieldResult,
+  familyBest: BenchmarkScenarioFieldResult,
+): string {
+  if (!familyBest.applicable) return "not-applicable";
+  if (familyBest.productContribution?.correctResultRecovered) return "exact recovery";
+  if (familyBest.productContribution?.correctUncertaintyRecovered)
+    return "correct-uncertainty recovery";
+  if (familyBest.productContribution?.priorCorrectResultRegressed) return "regression";
+  if (outcomeScore(familyBest) > outcomeScore(baseline))
+    return "changed without acceptable recovery";
+  return "unchanged";
+}
+
+function latencyInterpretationLabel(
+  interpretation: OcrRegionBenchmarkLatencySummary["latencyInterpretation"],
+): string {
+  switch (interpretation) {
+    case "production-baseline":
+      return "measured production baseline";
+    case "measured-targeted-pass":
+      return "measured targeted pass only";
+    case "estimated-combined":
+      return "estimated combined latency";
+  }
 }
 
 export function renderOcrRegionBenchmarkMarkdown(report: OcrRegionBenchmarkReport): string {
@@ -2640,21 +3092,65 @@ export function renderOcrRegionBenchmarkMarkdown(report: OcrRegionBenchmarkRepor
   );
   for (const row of report.aggregateComparisons) {
     lines.push(
-      `| ${scenarioLabel(row.scenario, row.scale)} | ${row.field} | ${row.presentCaseCount} | ${row.absentCaseCount} | ${pct(row.exactMatchCount, row.presentCaseCount)} | ${pct(row.normalizedMatchCount, row.presentCaseCount)} | ${pct(row.top3Count, row.presentCaseCount)} | ${pct(row.top5Count, row.presentCaseCount)} | ${pct(row.detectedCount, row.presentCaseCount)} | ${pct(row.parsedAccurateCount, row.presentCaseCount)} | ${pct(row.falseCertaintyCount, row.presentCaseCount + row.absentCaseCount)} | ${pct(row.absentFieldFalsePositiveCount, row.absentCaseCount)} | ${pct(row.expectedPhrasePresentCount, row.presentCaseCount)} | ${row.meanExpectedTokenCoverage.toFixed(2)} | ${row.meanNormalizedPhraseSimilarity.toFixed(2)} | ${row.medianLatencyMs.toFixed(0)} ms |`,
+      `| ${scenarioLabel(row.scenario, row.scale)} | ${row.field} | ${row.presentCaseCount} | ${row.absentCaseCount} | ${pct(row.exactMatchCount, row.presentCaseCount)} | ${pct(row.normalizedMatchCount, row.presentCaseCount)} | ${pct(row.top3Count, row.presentCaseCount)} | ${pct(row.top5Count, row.presentCaseCount)} | ${pct(row.detectedCount, row.presentCaseCount)} | ${pct(row.parsedAccurateCount, row.presentCaseCount)} | ${pctOrNA(row.falseCertaintyCount, row.presentCaseCount + row.absentCaseCount)} | ${pctOrNA(row.absentFieldFalsePositiveCount, row.absentCaseCount)} | ${pct(row.expectedPhrasePresentCount, row.presentCaseCount)} | ${row.meanExpectedTokenCoverage.toFixed(2)} | ${row.meanNormalizedPhraseSimilarity.toFixed(2)} | ${row.medianLatencyMs.toFixed(0)} ms |`,
     );
   }
+  lines.push("");
+  lines.push(
+    "- `Absent FP` renders `N/A` when the targeted scenario has no applicable absent-field denominator. That safety is inherited from unchanged production behavior rather than demonstrated by the targeted benchmark.",
+  );
   lines.push("");
   lines.push("## Contribution Summary");
   lines.push("");
   lines.push(
-    "| Scenario | Field | Cases | Mean new words | Phrase present | Candidate generated | Candidate kept | Duplicate corroborated | New candidate | New alternate | Ordering changed | Ambiguity changed | Correct result recovered | Correct uncertainty recovered | Regressed prior correct | No meaningful contribution |",
+    "| Scenario | Field | Cases | Mean new words | Phrase present | Candidate generated | Candidate kept | Duplicate corroborated | New candidate | New alternate | Ordering changed | Ambiguity changed | Correct result recovered | Correct uncertainty recovered | Total acceptable recoveries | Regressed prior correct | No meaningful contribution |",
   );
   lines.push(
-    "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
   );
   for (const row of report.contributionSummaries) {
     lines.push(
-      `| ${scenarioLabel(row.scenario, row.scale)} | ${row.field} | ${row.applicableCaseCount} | ${row.meanNewWordCount.toFixed(2)} | ${row.exactPhrasePresentCount} | ${row.matchingCandidateGeneratedCount} | ${row.matchingCandidateKeptCount} | ${row.duplicateCorroboratedCount} | ${row.newCandidateIntroducedCount} | ${row.newAlternateIntroducedCount} | ${row.orderingChangedCount} | ${row.ambiguityChangedCount} | ${row.correctResultRecoveredCount} | ${row.correctUncertaintyRecoveredCount} | ${row.priorCorrectResultRegressedCount} | ${row.noMeaningfulContributionCount} |`,
+      `| ${scenarioLabel(row.scenario, row.scale)} | ${row.field} | ${row.applicableCaseCount} | ${row.meanNewWordCount.toFixed(2)} | ${row.exactPhrasePresentCount} | ${row.matchingCandidateGeneratedCount} | ${row.matchingCandidateKeptCount} | ${row.duplicateCorroboratedCount} | ${row.newCandidateIntroducedCount} | ${row.newAlternateIntroducedCount} | ${row.orderingChangedCount} | ${row.ambiguityChangedCount} | ${row.correctResultRecoveredCount} | ${row.correctUncertaintyRecoveredCount} | ${row.totalAcceptableRecoveryCount} | ${row.priorCorrectResultRegressedCount} | ${row.noMeaningfulContributionCount} |`,
+    );
+  }
+  lines.push("");
+  lines.push("## Recovery Summary");
+  lines.push("");
+  lines.push(
+    "| Family | Field | Scale | Applicable case-fields | Exact recoveries | Correct-uncertainty recoveries | Total acceptable recoveries | Recovered case-fields |",
+  );
+  lines.push("| --- | --- | --- | --- | --- | --- | --- | --- |");
+  for (const row of report.recoverySummaries) {
+    lines.push(
+      `| ${scenarioFamilyLabel(row.family)} | ${row.field} | ${scaleLabel(row.scale)} | ${row.applicableCaseCount} | ${row.exactRecoveryCount} | ${row.correctUncertaintyRecoveryCount} | ${row.totalAcceptableRecoveryCount} | ${row.recoveredCaseFields.length === 0 ? "—" : row.recoveredCaseFields.join(", ")} |`,
+    );
+  }
+  lines.push("");
+  lines.push("## Recovery Ledger");
+  lines.push("");
+  if (report.recoveryLedger.length === 0) {
+    lines.push("No targeted scenario produced an acceptable recovery on this benchmark slice.");
+  } else {
+    lines.push(
+      "| Family | Scale | Case-field | Recovery kind | Targeted selected source | Duplicate corroborated | New candidate | New alternate | Ranking changed | Ambiguity changed |",
+    );
+    lines.push("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |");
+    for (const row of report.recoveryLedger) {
+      lines.push(
+        `| ${scenarioFamilyLabel(row.family)} | ${scaleLabel(row.scale)} | ${caseFieldKey(row.caseId, row.field)} | ${row.recoveryKind} | ${row.targetedBecameSelectedSource === null ? "N/A" : row.targetedBecameSelectedSource ? "yes" : "no"} | ${row.duplicateCorroborated ? "yes" : "no"} | ${row.newCandidateIntroduced ? "yes" : "no"} | ${row.newAlternateIntroduced ? "yes" : "no"} | ${row.orderingChanged ? "yes" : "no"} | ${row.ambiguityChanged ? "yes" : "no"} |`,
+      );
+    }
+  }
+  lines.push("");
+  lines.push("## Regression Summary");
+  lines.push("");
+  lines.push(
+    "| Family | Scale | Applicable case-fields | Scenario-scale regression instances | Unique case-field regressions | Unique case-fields |",
+  );
+  lines.push("| --- | --- | --- | --- | --- | --- |");
+  for (const row of report.regressionSummaries) {
+    lines.push(
+      `| ${scenarioFamilyLabel(row.family)} | ${row.scale === null ? "all-scales" : scaleLabel(row.scale)} | ${row.applicableCaseFieldCount} | ${row.scenarioScaleRegressionInstanceCount} | ${row.uniqueCaseFieldRegressionCount} | ${row.uniqueCaseFields.length === 0 ? "—" : row.uniqueCaseFields.join(", ")} |`,
     );
   }
   lines.push("");
@@ -2675,22 +3171,22 @@ export function renderOcrRegionBenchmarkMarkdown(report: OcrRegionBenchmarkRepor
   lines.push("## Case Ledger");
   lines.push("");
   lines.push(
-    "| Case | Field | Baseline | B crop-only | C rotated crop-only | D additive | E rotated additive | Best outcome | Contribution | Classifications |",
+    "| Case | Field | Baseline | Best crop-only | Crop state | Best additive | Additive state | Best rotated crop-only | Rotated crop state | Best rotated additive | Rotated additive state | Diagnostic best outcome (non-prescriptive) | Classifications |",
   );
-  lines.push("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |");
+  lines.push("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |");
   for (const caseResult of report.cases) {
     for (const field of ["brand", "alcohol"] as const) {
       const comparison = caseResult.fields[field];
-      const best =
-        comparison.bestScenario.scenario === "production-baseline"
+      const diagnosticBest =
+        comparison.diagnosticBestScenario.scenario === "production-baseline"
           ? comparison.baseline
           : (familySummaryResults(comparison).find(
               (result) =>
-                result.scenario === comparison.bestScenario.scenario &&
-                result.scale === comparison.bestScenario.scale,
+                result.scenario === comparison.diagnosticBestScenario.scenario &&
+                result.scale === comparison.diagnosticBestScenario.scale,
             ) ?? comparison.baseline);
       lines.push(
-        `| ${caseResult.caseId} | ${field} | ${scenarioOutcomeLabel(comparison.baseline)} | ${scenarioOutcomeLabel(comparison.targetedCrop)} | ${scenarioOutcomeLabel(comparison.canonicalRotatedCrop)} | ${scenarioOutcomeLabel(comparison.additiveTargetedCrop)} | ${scenarioOutcomeLabel(comparison.additiveCanonicalRotatedCrop)} | ${scenarioLabel(best.scenario, best.scale)} | ${contributionSummaryLabel(best)} | ${comparison.classifications.join(", ")} |`,
+        `| ${caseResult.caseId} | ${field} | ${scenarioOutcomeLabel(comparison.baseline)} | ${scenarioOutcomeLabel(comparison.targetedCrop)} | ${familyOutcomeStateLabel(comparison.baseline, comparison.targetedCrop)} | ${scenarioOutcomeLabel(comparison.additiveTargetedCrop)} | ${familyOutcomeStateLabel(comparison.baseline, comparison.additiveTargetedCrop)} | ${scenarioOutcomeLabel(comparison.canonicalRotatedCrop)} | ${familyOutcomeStateLabel(comparison.baseline, comparison.canonicalRotatedCrop)} | ${scenarioOutcomeLabel(comparison.additiveCanonicalRotatedCrop)} | ${familyOutcomeStateLabel(comparison.baseline, comparison.additiveCanonicalRotatedCrop)} | ${scenarioLabel(diagnosticBest.scenario, diagnosticBest.scale)} | ${comparison.classifications.join(", ")} |`,
       );
     }
   }
@@ -2714,12 +3210,28 @@ export function renderOcrRegionBenchmarkMarkdown(report: OcrRegionBenchmarkRepor
   lines.push("## Latency");
   lines.push("");
   lines.push(
-    "| Scenario | Executed fields | Median latency | p95 latency | Median OCR | Median preprocess |",
+    "| Scenario | Field | Applicable case-fields | Matched baseline latency | Measured targeted-pass incremental latency | Estimated combined latency | Matched additive delta | Interpretation |",
   );
-  lines.push("| --- | --- | --- | --- | --- | --- |");
+  lines.push("| --- | --- | --- | --- | --- | --- | --- | --- |");
   for (const row of report.latencyComparison) {
     lines.push(
-      `| ${scenarioLabel(row.scenario, row.scale)} | ${row.executedFieldCount} | ${row.medianLatencyMs.toFixed(0)} ms | ${row.p95LatencyMs.toFixed(0)} ms | ${row.medianOcrMs.toFixed(0)} ms | ${row.medianPreprocessMs.toFixed(0)} ms |`,
+      `| ${scenarioLabel(row.scenario, row.scale)} | ${row.field} | ${row.applicableCaseCount} | ${msOrNA(row.matchedBaselineMedianLatencyMs)} | ${msOrNA(row.measuredTargetedIncrementalMedianLatencyMs)} | ${msOrNA(row.estimatedCombinedMedianLatencyMs)} | ${msOrNA(row.matchedMedianDeltaLatencyMs)} | ${latencyInterpretationLabel(row.latencyInterpretation)} |`,
+    );
+  }
+  lines.push("");
+  lines.push(
+    "- `Estimated combined latency` is derived from matched baseline latency plus one targeted pass. It is not a directly measured end-to-end production workflow.",
+  );
+  lines.push("");
+  lines.push("## Scale Analysis");
+  lines.push("");
+  lines.push(
+    "| Family | Field | Applicable case-fields | Improved vs 1.5x | Worsened vs 1.5x | Failure-class changes without selected-outcome improvement | Unchanged |",
+  );
+  lines.push("| --- | --- | --- | --- | --- | --- | --- |");
+  for (const row of report.scaleAnalysis) {
+    lines.push(
+      `| ${scenarioFamilyLabel(row.family)} | ${row.field} | ${row.applicableCaseFieldCount} | ${row.improvedWithScaleCount} | ${row.worsenedWithScaleCount} | ${row.failureClassChangedWithoutSelectedOutcomeImprovementCount} | ${row.unchangedCount} |`,
     );
   }
   lines.push("");

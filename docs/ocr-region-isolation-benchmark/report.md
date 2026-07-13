@@ -22,61 +22,130 @@ Bounded evaluation-only benchmark over 13 adjudicated cases using the committed 
 
 | Scenario | Field | Present | Absent | Exact | Normalized | Top-3 | Top-5 | Detected | Parsed accurate | False certainty | Absent FP | Phrase present | Token coverage | Mean similarity | Median latency |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A. Production baseline | brand | 11 | 2 | 18% | 18% | 27% | 27% | 100% | 0% | 0% | 0% | 91% | 0.95 | 0.04 | 2075 ms |
-| B. Human-targeted crop (1.5x) | brand | 11 | 0 | 18% | 18% | 18% | 18% | 73% | 0% | 0% | 0% | 18% | 0.35 | 0.41 | 145 ms |
-| C. Canonically rotated targeted crop (1.5x) | brand | 0 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0.00 | 0.00 | 0 ms |
-| D. Baseline plus targeted crop (1.5x) | brand | 11 | 0 | 36% | 36% | 36% | 36% | 100% | 0% | 0% | 0% | 91% | 0.95 | 0.04 | 2671 ms |
-| E. Baseline plus rotated targeted crop (1.5x) | brand | 0 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0.00 | 0.00 | 0 ms |
-| B. Human-targeted crop (2x) | brand | 11 | 0 | 18% | 18% | 18% | 18% | 73% | 0% | 0% | 0% | 18% | 0.35 | 0.42 | 172 ms |
-| C. Canonically rotated targeted crop (2x) | brand | 0 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0.00 | 0.00 | 0 ms |
-| D. Baseline plus targeted crop (2x) | brand | 11 | 0 | 36% | 36% | 36% | 36% | 100% | 0% | 0% | 0% | 91% | 0.95 | 0.04 | 2776 ms |
-| E. Baseline plus rotated targeted crop (2x) | brand | 0 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0.00 | 0.00 | 0 ms |
-| B. Human-targeted crop (3x) | brand | 11 | 0 | 18% | 18% | 18% | 18% | 64% | 0% | 0% | 0% | 18% | 0.35 | 0.41 | 326 ms |
-| C. Canonically rotated targeted crop (3x) | brand | 0 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0.00 | 0.00 | 0 ms |
-| D. Baseline plus targeted crop (3x) | brand | 11 | 0 | 36% | 36% | 36% | 36% | 100% | 0% | 0% | 0% | 91% | 0.95 | 0.04 | 3042 ms |
-| E. Baseline plus rotated targeted crop (3x) | brand | 0 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0.00 | 0.00 | 0 ms |
-| A. Production baseline | alcohol | 12 | 1 | 0% | 0% | 25% | 25% | 25% | 25% | 0% | 0% | 83% | 0.81 | 0.02 | 2075 ms |
-| B. Human-targeted crop (1.5x) | alcohol | 12 | 0 | 0% | 0% | 8% | 8% | 8% | 8% | 0% | 0% | 25% | 0.25 | 0.12 | 123 ms |
-| C. Canonically rotated targeted crop (1.5x) | alcohol | 2 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0.00 | 0.00 | 57 ms |
-| D. Baseline plus targeted crop (1.5x) | alcohol | 12 | 0 | 0% | 0% | 25% | 25% | 25% | 25% | 0% | 0% | 83% | 0.81 | 0.02 | 1918 ms |
-| E. Baseline plus rotated targeted crop (1.5x) | alcohol | 2 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 50% | 0.50 | 0.01 | 980 ms |
-| B. Human-targeted crop (2x) | alcohol | 12 | 0 | 0% | 0% | 8% | 8% | 8% | 8% | 0% | 0% | 25% | 0.25 | 0.12 | 189 ms |
-| C. Canonically rotated targeted crop (2x) | alcohol | 2 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0.00 | 0.00 | 64 ms |
-| D. Baseline plus targeted crop (2x) | alcohol | 12 | 0 | 0% | 0% | 25% | 25% | 25% | 25% | 0% | 0% | 83% | 0.81 | 0.02 | 1962 ms |
-| E. Baseline plus rotated targeted crop (2x) | alcohol | 2 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 50% | 0.50 | 0.01 | 994 ms |
-| B. Human-targeted crop (3x) | alcohol | 12 | 0 | 0% | 0% | 0% | 0% | 8% | 0% | 0% | 0% | 17% | 0.23 | 0.10 | 368 ms |
-| C. Canonically rotated targeted crop (3x) | alcohol | 2 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0.00 | 0.00 | 141 ms |
-| D. Baseline plus targeted crop (3x) | alcohol | 12 | 0 | 0% | 0% | 25% | 25% | 25% | 17% | 0% | 0% | 83% | 0.81 | 0.02 | 2112 ms |
-| E. Baseline plus rotated targeted crop (3x) | alcohol | 2 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 50% | 0.50 | 0.01 | 1076 ms |
+| A. Production baseline | brand | 11 | 2 | 18% | 18% | 27% | 27% | 100% | 0% | 0% | 0% | 91% | 0.95 | 0.04 | 2198 ms |
+| B. Human-targeted crop (1.5x) | brand | 11 | 0 | 18% | 18% | 18% | 18% | 73% | 0% | 0% | N/A | 18% | 0.35 | 0.41 | 141 ms |
+| C. Canonically rotated targeted crop (1.5x) | brand | 0 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | N/A | N/A | 0% | 0.00 | 0.00 | 0 ms |
+| D. Baseline plus targeted crop (1.5x) | brand | 11 | 0 | 36% | 36% | 36% | 36% | 100% | 0% | 0% | N/A | 91% | 0.95 | 0.04 | 3162 ms |
+| E. Baseline plus rotated targeted crop (1.5x) | brand | 0 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | N/A | N/A | 0% | 0.00 | 0.00 | 0 ms |
+| B. Human-targeted crop (2x) | brand | 11 | 0 | 18% | 18% | 18% | 18% | 73% | 0% | 0% | N/A | 18% | 0.35 | 0.42 | 178 ms |
+| C. Canonically rotated targeted crop (2x) | brand | 0 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | N/A | N/A | 0% | 0.00 | 0.00 | 0 ms |
+| D. Baseline plus targeted crop (2x) | brand | 11 | 0 | 36% | 36% | 36% | 36% | 100% | 0% | 0% | N/A | 91% | 0.95 | 0.04 | 3276 ms |
+| E. Baseline plus rotated targeted crop (2x) | brand | 0 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | N/A | N/A | 0% | 0.00 | 0.00 | 0 ms |
+| B. Human-targeted crop (3x) | brand | 11 | 0 | 18% | 18% | 18% | 18% | 64% | 0% | 0% | N/A | 18% | 0.35 | 0.41 | 329 ms |
+| C. Canonically rotated targeted crop (3x) | brand | 0 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | N/A | N/A | 0% | 0.00 | 0.00 | 0 ms |
+| D. Baseline plus targeted crop (3x) | brand | 11 | 0 | 36% | 36% | 36% | 36% | 100% | 0% | 0% | N/A | 91% | 0.95 | 0.04 | 3422 ms |
+| E. Baseline plus rotated targeted crop (3x) | brand | 0 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | N/A | N/A | 0% | 0.00 | 0.00 | 0 ms |
+| A. Production baseline | alcohol | 12 | 1 | 0% | 0% | 25% | 25% | 25% | 25% | 0% | 0% | 83% | 0.81 | 0.02 | 2198 ms |
+| B. Human-targeted crop (1.5x) | alcohol | 12 | 0 | 0% | 0% | 8% | 8% | 8% | 8% | 0% | N/A | 25% | 0.25 | 0.12 | 127 ms |
+| C. Canonically rotated targeted crop (1.5x) | alcohol | 2 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | N/A | 0% | 0.00 | 0.00 | 55 ms |
+| D. Baseline plus targeted crop (1.5x) | alcohol | 12 | 0 | 0% | 0% | 25% | 25% | 25% | 25% | 0% | N/A | 83% | 0.81 | 0.02 | 2322 ms |
+| E. Baseline plus rotated targeted crop (1.5x) | alcohol | 2 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | N/A | 50% | 0.50 | 0.01 | 1348 ms |
+| B. Human-targeted crop (2x) | alcohol | 12 | 0 | 0% | 0% | 8% | 8% | 8% | 8% | 0% | N/A | 25% | 0.25 | 0.12 | 185 ms |
+| C. Canonically rotated targeted crop (2x) | alcohol | 2 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | N/A | 0% | 0.00 | 0.00 | 67 ms |
+| D. Baseline plus targeted crop (2x) | alcohol | 12 | 0 | 0% | 0% | 25% | 25% | 25% | 25% | 0% | N/A | 83% | 0.81 | 0.02 | 2378 ms |
+| E. Baseline plus rotated targeted crop (2x) | alcohol | 2 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | N/A | 50% | 0.50 | 0.01 | 1359 ms |
+| B. Human-targeted crop (3x) | alcohol | 12 | 0 | 0% | 0% | 0% | 0% | 8% | 0% | 0% | N/A | 17% | 0.23 | 0.10 | 373 ms |
+| C. Canonically rotated targeted crop (3x) | alcohol | 2 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | N/A | 0% | 0.00 | 0.00 | 102 ms |
+| D. Baseline plus targeted crop (3x) | alcohol | 12 | 0 | 0% | 0% | 25% | 25% | 25% | 17% | 0% | N/A | 83% | 0.81 | 0.02 | 2517 ms |
+| E. Baseline plus rotated targeted crop (3x) | alcohol | 2 | 0 | 0% | 0% | 0% | 0% | 0% | 0% | 0% | N/A | 50% | 0.50 | 0.01 | 1381 ms |
+
+- `Absent FP` renders `N/A` when the targeted scenario has no applicable absent-field denominator. That safety is inherited from unchanged production behavior rather than demonstrated by the targeted benchmark.
 
 ## Contribution Summary
 
-| Scenario | Field | Cases | Mean new words | Phrase present | Candidate generated | Candidate kept | Duplicate corroborated | New candidate | New alternate | Ordering changed | Ambiguity changed | Correct result recovered | Correct uncertainty recovered | Regressed prior correct | No meaningful contribution |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| B. Human-targeted crop (1.5x) | brand | 11 | 2.73 | 2 | 5 | 5 | 1 | 11 | 5 | 11 | 5 | 0 | 2 | 3 | 0 |
-| B. Human-targeted crop (2x) | brand | 11 | 2.64 | 2 | 5 | 5 | 1 | 11 | 5 | 11 | 5 | 0 | 2 | 3 | 0 |
-| B. Human-targeted crop (3x) | brand | 11 | 2.64 | 2 | 5 | 5 | 1 | 11 | 5 | 11 | 6 | 0 | 2 | 3 | 0 |
-| C. Canonically rotated targeted crop (1.5x) | brand | 0 | 0.00 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| C. Canonically rotated targeted crop (2x) | brand | 0 | 0.00 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| C. Canonically rotated targeted crop (3x) | brand | 0 | 0.00 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| D. Baseline plus targeted crop (1.5x) | brand | 11 | 2.73 | 2 | 10 | 6 | 1 | 9 | 6 | 9 | 0 | 0 | 2 | 0 | 6 |
-| D. Baseline plus targeted crop (2x) | brand | 11 | 2.64 | 2 | 10 | 6 | 1 | 9 | 6 | 9 | 0 | 0 | 2 | 0 | 7 |
-| D. Baseline plus targeted crop (3x) | brand | 11 | 2.64 | 2 | 10 | 6 | 1 | 9 | 4 | 9 | 0 | 0 | 2 | 0 | 6 |
-| E. Baseline plus rotated targeted crop (1.5x) | brand | 0 | 0.00 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| E. Baseline plus rotated targeted crop (2x) | brand | 0 | 0.00 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| E. Baseline plus rotated targeted crop (3x) | brand | 0 | 0.00 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| B. Human-targeted crop (1.5x) | alcohol | 12 | 2.33 | 3 | 3 | 1 | 1 | 2 | 0 | 10 | 0 | 0 | 0 | 2 | 10 |
-| B. Human-targeted crop (2x) | alcohol | 12 | 2.17 | 3 | 3 | 1 | 1 | 2 | 0 | 10 | 0 | 0 | 0 | 2 | 10 |
-| B. Human-targeted crop (3x) | alcohol | 12 | 2.42 | 2 | 2 | 0 | 0 | 3 | 0 | 10 | 0 | 0 | 0 | 3 | 9 |
-| C. Canonically rotated targeted crop (1.5x) | alcohol | 2 | 3.50 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 2 |
-| C. Canonically rotated targeted crop (2x) | alcohol | 2 | 3.50 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 2 |
-| C. Canonically rotated targeted crop (3x) | alcohol | 2 | 3.50 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 2 |
-| D. Baseline plus targeted crop (1.5x) | alcohol | 12 | 2.33 | 3 | 10 | 3 | 1 | 2 | 0 | 3 | 0 | 0 | 0 | 0 | 12 |
-| D. Baseline plus targeted crop (2x) | alcohol | 12 | 2.17 | 3 | 10 | 3 | 1 | 2 | 0 | 3 | 0 | 0 | 0 | 0 | 12 |
-| D. Baseline plus targeted crop (3x) | alcohol | 12 | 2.42 | 2 | 10 | 3 | 0 | 3 | 1 | 3 | 0 | 0 | 0 | 1 | 11 |
-| E. Baseline plus rotated targeted crop (1.5x) | alcohol | 2 | 3.50 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 |
-| E. Baseline plus rotated targeted crop (2x) | alcohol | 2 | 3.50 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 |
-| E. Baseline plus rotated targeted crop (3x) | alcohol | 2 | 3.50 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 |
+| Scenario | Field | Cases | Mean new words | Phrase present | Candidate generated | Candidate kept | Duplicate corroborated | New candidate | New alternate | Ordering changed | Ambiguity changed | Correct result recovered | Correct uncertainty recovered | Total acceptable recoveries | Regressed prior correct | No meaningful contribution |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| B. Human-targeted crop (1.5x) | brand | 11 | 2.73 | 2 | 5 | 5 | 1 | 11 | 5 | 11 | 5 | 0 | 2 | 2 | 3 | 0 |
+| B. Human-targeted crop (2x) | brand | 11 | 2.64 | 2 | 5 | 5 | 1 | 11 | 5 | 11 | 5 | 0 | 2 | 2 | 3 | 0 |
+| B. Human-targeted crop (3x) | brand | 11 | 2.64 | 2 | 5 | 5 | 1 | 11 | 5 | 11 | 6 | 0 | 2 | 2 | 3 | 0 |
+| C. Canonically rotated targeted crop (1.5x) | brand | 0 | 0.00 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| C. Canonically rotated targeted crop (2x) | brand | 0 | 0.00 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| C. Canonically rotated targeted crop (3x) | brand | 0 | 0.00 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| D. Baseline plus targeted crop (1.5x) | brand | 11 | 2.73 | 2 | 10 | 6 | 1 | 9 | 6 | 9 | 0 | 0 | 2 | 2 | 0 | 6 |
+| D. Baseline plus targeted crop (2x) | brand | 11 | 2.64 | 2 | 10 | 6 | 1 | 9 | 6 | 9 | 0 | 0 | 2 | 2 | 0 | 7 |
+| D. Baseline plus targeted crop (3x) | brand | 11 | 2.64 | 2 | 10 | 6 | 1 | 9 | 4 | 9 | 0 | 0 | 2 | 2 | 0 | 6 |
+| E. Baseline plus rotated targeted crop (1.5x) | brand | 0 | 0.00 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| E. Baseline plus rotated targeted crop (2x) | brand | 0 | 0.00 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| E. Baseline plus rotated targeted crop (3x) | brand | 0 | 0.00 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| B. Human-targeted crop (1.5x) | alcohol | 12 | 2.33 | 3 | 3 | 1 | 1 | 2 | 0 | 10 | 0 | 0 | 0 | 0 | 2 | 10 |
+| B. Human-targeted crop (2x) | alcohol | 12 | 2.17 | 3 | 3 | 1 | 1 | 2 | 0 | 10 | 0 | 0 | 0 | 0 | 2 | 10 |
+| B. Human-targeted crop (3x) | alcohol | 12 | 2.42 | 2 | 2 | 0 | 0 | 3 | 0 | 10 | 0 | 0 | 0 | 0 | 3 | 9 |
+| C. Canonically rotated targeted crop (1.5x) | alcohol | 2 | 3.50 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 2 |
+| C. Canonically rotated targeted crop (2x) | alcohol | 2 | 3.50 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 2 |
+| C. Canonically rotated targeted crop (3x) | alcohol | 2 | 3.50 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 2 |
+| D. Baseline plus targeted crop (1.5x) | alcohol | 12 | 2.33 | 3 | 10 | 3 | 1 | 2 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 12 |
+| D. Baseline plus targeted crop (2x) | alcohol | 12 | 2.17 | 3 | 10 | 3 | 1 | 2 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 12 |
+| D. Baseline plus targeted crop (3x) | alcohol | 12 | 2.42 | 2 | 10 | 3 | 0 | 3 | 1 | 3 | 0 | 0 | 0 | 0 | 1 | 11 |
+| E. Baseline plus rotated targeted crop (1.5x) | alcohol | 2 | 3.50 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 |
+| E. Baseline plus rotated targeted crop (2x) | alcohol | 2 | 3.50 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 |
+| E. Baseline plus rotated targeted crop (3x) | alcohol | 2 | 3.50 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 |
+
+## Recovery Summary
+
+| Family | Field | Scale | Applicable case-fields | Exact recoveries | Correct-uncertainty recoveries | Total acceptable recoveries | Recovered case-fields |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Crop-only replacement | brand | 1.5x | 11 | 0 | 2 | 2 | approved-wine-013:brand, approved-wine-054:brand |
+| Crop-only replacement | brand | 2x | 11 | 0 | 2 | 2 | approved-wine-013:brand, approved-wine-054:brand |
+| Crop-only replacement | brand | 3x | 11 | 0 | 2 | 2 | approved-wine-013:brand, approved-wine-054:brand |
+| Rotated crop-only replacement | brand | 1.5x | 0 | 0 | 0 | 0 | — |
+| Rotated crop-only replacement | brand | 2x | 0 | 0 | 0 | 0 | — |
+| Rotated crop-only replacement | brand | 3x | 0 | 0 | 0 | 0 | — |
+| Additive targeted evidence | brand | 1.5x | 11 | 0 | 2 | 2 | approved-wine-013:brand, approved-wine-054:brand |
+| Additive targeted evidence | brand | 2x | 11 | 0 | 2 | 2 | approved-wine-013:brand, approved-wine-054:brand |
+| Additive targeted evidence | brand | 3x | 11 | 0 | 2 | 2 | approved-wine-013:brand, approved-wine-054:brand |
+| Rotated additive targeted evidence | brand | 1.5x | 0 | 0 | 0 | 0 | — |
+| Rotated additive targeted evidence | brand | 2x | 0 | 0 | 0 | 0 | — |
+| Rotated additive targeted evidence | brand | 3x | 0 | 0 | 0 | 0 | — |
+| Crop-only replacement | alcohol | 1.5x | 12 | 0 | 0 | 0 | — |
+| Crop-only replacement | alcohol | 2x | 12 | 0 | 0 | 0 | — |
+| Crop-only replacement | alcohol | 3x | 12 | 0 | 0 | 0 | — |
+| Rotated crop-only replacement | alcohol | 1.5x | 2 | 0 | 0 | 0 | — |
+| Rotated crop-only replacement | alcohol | 2x | 2 | 0 | 0 | 0 | — |
+| Rotated crop-only replacement | alcohol | 3x | 2 | 0 | 0 | 0 | — |
+| Additive targeted evidence | alcohol | 1.5x | 12 | 0 | 0 | 0 | — |
+| Additive targeted evidence | alcohol | 2x | 12 | 0 | 0 | 0 | — |
+| Additive targeted evidence | alcohol | 3x | 12 | 0 | 0 | 0 | — |
+| Rotated additive targeted evidence | alcohol | 1.5x | 2 | 0 | 0 | 0 | — |
+| Rotated additive targeted evidence | alcohol | 2x | 2 | 0 | 0 | 0 | — |
+| Rotated additive targeted evidence | alcohol | 3x | 2 | 0 | 0 | 0 | — |
+
+## Recovery Ledger
+
+| Family | Scale | Case-field | Recovery kind | Targeted selected source | Duplicate corroborated | New candidate | New alternate | Ranking changed | Ambiguity changed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Crop-only replacement | 1.5x | approved-wine-013:brand | correct-uncertainty | yes | yes | yes | yes | yes | no |
+| Crop-only replacement | 2x | approved-wine-013:brand | correct-uncertainty | yes | yes | yes | yes | yes | no |
+| Crop-only replacement | 3x | approved-wine-013:brand | correct-uncertainty | yes | yes | yes | yes | yes | no |
+| Additive targeted evidence | 1.5x | approved-wine-013:brand | correct-uncertainty | yes | yes | yes | yes | yes | no |
+| Additive targeted evidence | 2x | approved-wine-013:brand | correct-uncertainty | yes | yes | yes | yes | yes | no |
+| Additive targeted evidence | 3x | approved-wine-013:brand | correct-uncertainty | yes | yes | yes | yes | yes | no |
+| Crop-only replacement | 1.5x | approved-wine-054:brand | correct-uncertainty | yes | no | yes | yes | yes | no |
+| Crop-only replacement | 2x | approved-wine-054:brand | correct-uncertainty | yes | no | yes | yes | yes | no |
+| Crop-only replacement | 3x | approved-wine-054:brand | correct-uncertainty | yes | no | yes | yes | yes | no |
+| Additive targeted evidence | 1.5x | approved-wine-054:brand | correct-uncertainty | yes | no | yes | yes | yes | no |
+| Additive targeted evidence | 2x | approved-wine-054:brand | correct-uncertainty | yes | no | yes | yes | yes | no |
+| Additive targeted evidence | 3x | approved-wine-054:brand | correct-uncertainty | yes | no | yes | yes | yes | no |
+
+## Regression Summary
+
+| Family | Scale | Applicable case-fields | Scenario-scale regression instances | Unique case-field regressions | Unique case-fields |
+| --- | --- | --- | --- | --- | --- |
+| Crop-only replacement | all-scales | 23 | 43 | 15 | alfredos-wine:alcohol, alfredos-wine:brand, approved-wine-006:alcohol, approved-wine-006:brand, approved-wine-013:alcohol, approved-wine-022:alcohol, approved-wine-095:alcohol, la-fattoria-rotated:alcohol, luigi-giovanni-live:brand, patricia-green-cellars:alcohol, patricia-green-cellars:brand, three-steves-winery:brand, wine-multi-artifact-04:alcohol, wine-multi-artifact-09:alcohol, wine-multi-artifact-09:brand |
+| Crop-only replacement | 1.5x | 23 | 14 | 14 | alfredos-wine:alcohol, alfredos-wine:brand, approved-wine-006:brand, approved-wine-013:alcohol, approved-wine-022:alcohol, approved-wine-095:alcohol, la-fattoria-rotated:alcohol, luigi-giovanni-live:brand, patricia-green-cellars:alcohol, patricia-green-cellars:brand, three-steves-winery:brand, wine-multi-artifact-04:alcohol, wine-multi-artifact-09:alcohol, wine-multi-artifact-09:brand |
+| Crop-only replacement | 2x | 23 | 14 | 14 | alfredos-wine:alcohol, alfredos-wine:brand, approved-wine-006:brand, approved-wine-013:alcohol, approved-wine-022:alcohol, approved-wine-095:alcohol, la-fattoria-rotated:alcohol, luigi-giovanni-live:brand, patricia-green-cellars:alcohol, patricia-green-cellars:brand, three-steves-winery:brand, wine-multi-artifact-04:alcohol, wine-multi-artifact-09:alcohol, wine-multi-artifact-09:brand |
+| Crop-only replacement | 3x | 23 | 15 | 15 | alfredos-wine:alcohol, alfredos-wine:brand, approved-wine-006:alcohol, approved-wine-006:brand, approved-wine-013:alcohol, approved-wine-022:alcohol, approved-wine-095:alcohol, la-fattoria-rotated:alcohol, luigi-giovanni-live:brand, patricia-green-cellars:alcohol, patricia-green-cellars:brand, three-steves-winery:brand, wine-multi-artifact-04:alcohol, wine-multi-artifact-09:alcohol, wine-multi-artifact-09:brand |
+| Rotated crop-only replacement | all-scales | 2 | 3 | 1 | la-fattoria-rotated:alcohol |
+| Rotated crop-only replacement | 1.5x | 2 | 1 | 1 | la-fattoria-rotated:alcohol |
+| Rotated crop-only replacement | 2x | 2 | 1 | 1 | la-fattoria-rotated:alcohol |
+| Rotated crop-only replacement | 3x | 2 | 1 | 1 | la-fattoria-rotated:alcohol |
+| Additive targeted evidence | all-scales | 23 | 1 | 1 | approved-wine-006:alcohol |
+| Additive targeted evidence | 1.5x | 23 | 0 | 0 | — |
+| Additive targeted evidence | 2x | 23 | 0 | 0 | — |
+| Additive targeted evidence | 3x | 23 | 1 | 1 | approved-wine-006:alcohol |
+| Rotated additive targeted evidence | all-scales | 2 | 0 | 0 | — |
+| Rotated additive targeted evidence | 1.5x | 2 | 0 | 0 | — |
+| Rotated additive targeted evidence | 2x | 2 | 0 | 0 | — |
+| Rotated additive targeted evidence | 3x | 2 | 0 | 0 | — |
 
 ## Metric Interpretation
 
@@ -85,6 +154,7 @@ Bounded evaluation-only benchmark over 13 adjudicated cases using the committed 
 - Dice/bigram similarity measures approximate character overlap only; higher similarity is not by itself phrase recovery.
 - Candidate generation/retention and selected-field correctness are reported separately from raw OCR similarity.
 - Partial fragments are not counted as phrase recovery unless the full normalized phrase is present.
+- Targeted absent-field false-positive safety is not experimentally exercised when no adjudicated absent-field target geometry exists; those rows render N/A and inherit safety from unchanged production behavior.
 
 ## Challenge Slices
 
@@ -263,34 +333,34 @@ Bounded evaluation-only benchmark over 13 adjudicated cases using the committed 
 
 ## Case Ledger
 
-| Case | Field | Baseline | B crop-only | C rotated crop-only | D additive | E rotated additive | Best outcome | Contribution | Classifications |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| wine-multi-artifact-09 | brand | correct | ocr-recognition-failure @ 1.5x | not-applicable | correct @ 1.5x | not-applicable | A. Production baseline | no meaningful contribution | no improvement, regressions observed |
-| wine-multi-artifact-09 | alcohol | correct | ocr-recognition-failure @ 1.5x | not-applicable | correct @ 1.5x | not-applicable | A. Production baseline | no meaningful contribution | no improvement, regressions observed |
-| approved-wine-022 | brand | correct | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no meaningful contribution | no improvement |
-| approved-wine-022 | alcohol | correct | candidate-filtering-failure @ 1.5x | not-applicable | correct @ 1.5x | not-applicable | A. Production baseline | no meaningful contribution | no improvement, regressions observed |
-| three-steves-winery | brand | correct | ocr-recognition-failure @ 1.5x | not-applicable | correct @ 1.5x | not-applicable | A. Production baseline | no meaningful contribution | no improvement, regressions observed |
-| three-steves-winery | alcohol | correct | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no meaningful contribution | no improvement |
-| approved-wine-006 | brand | candidate-filtering-failure | candidate-generation-failure @ 3x | not-applicable | candidate-filtering-failure @ 1.5x | not-applicable | A. Production baseline | no meaningful contribution | no improvement |
-| approved-wine-006 | alcohol | correct | correct @ 1.5x | not-applicable | correct @ 1.5x | not-applicable | A. Production baseline | no meaningful contribution | no improvement, regressions observed |
-| alfredos-wine | brand | candidate-filtering-failure | ocr-recognition-failure @ 2x | not-applicable | candidate-filtering-failure @ 1.5x | not-applicable | A. Production baseline | no meaningful contribution | no improvement |
-| alfredos-wine | alcohol | candidate-filtering-failure | ocr-recognition-failure @ 2x | not-applicable | candidate-filtering-failure @ 2x | not-applicable | A. Production baseline | no meaningful contribution | no improvement |
-| luigi-giovanni-live | brand | candidate-filtering-failure | ocr-recognition-failure @ 3x | not-applicable | candidate-filtering-failure @ 1.5x | not-applicable | A. Production baseline | no meaningful contribution | no improvement |
-| luigi-giovanni-live | alcohol | candidate-filtering-failure | candidate-filtering-failure @ 1.5x | not-applicable | candidate-filtering-failure @ 1.5x | not-applicable | A. Production baseline | no meaningful contribution | no improvement |
-| approved-wine-013 | brand | candidate-ranking-failure | correct-uncertainty @ 3x | not-applicable | correct-uncertainty @ 3x | not-applicable | B. Human-targeted crop (3x) | correct uncertainty recovered, duplicate corroborated, new alternate introduced | scale sensitivity, ranking recovery |
-| approved-wine-013 | alcohol | candidate-filtering-failure | region-coverage-failure @ 1.5x | not-applicable | candidate-filtering-failure @ 1.5x | not-applicable | A. Production baseline | no meaningful contribution | no improvement |
-| approved-wine-035 | brand | ocr-recognition-failure | ocr-recognition-failure @ 1.5x | not-applicable | ocr-recognition-failure @ 3x | not-applicable | A. Production baseline | no meaningful contribution | no improvement |
-| approved-wine-035 | alcohol | ocr-recognition-failure | ocr-recognition-failure @ 1.5x | region-coverage-failure @ 1.5x | ocr-recognition-failure @ 1.5x | ocr-recognition-failure @ 2x | A. Production baseline | no meaningful contribution | no improvement |
-| la-fattoria-rotated | brand | ocr-recognition-failure | ocr-recognition-failure @ 3x | not-applicable | ocr-recognition-failure @ 3x | not-applicable | A. Production baseline | no meaningful contribution | no improvement |
-| la-fattoria-rotated | alcohol | candidate-filtering-failure | region-coverage-failure @ 1.5x | ocr-recognition-failure @ 1.5x | candidate-filtering-failure @ 3x | candidate-filtering-failure @ 1.5x | A. Production baseline | no meaningful contribution | no improvement |
-| approved-wine-054 | brand | candidate-filtering-failure | correct-uncertainty @ 1.5x | not-applicable | correct-uncertainty @ 1.5x | not-applicable | B. Human-targeted crop (1.5x) | correct uncertainty recovered, new alternate introduced | annotation uncertainty, filtering recovery |
-| approved-wine-054 | alcohol | ocr-recognition-failure | ocr-recognition-failure @ 1.5x | not-applicable | ocr-recognition-failure @ 2x | not-applicable | A. Production baseline | no meaningful contribution | annotation uncertainty, no improvement |
-| patricia-green-cellars | brand | correct-uncertainty | candidate-generation-failure @ 1.5x | not-applicable | correct-uncertainty @ 1.5x | not-applicable | A. Production baseline | no meaningful contribution | annotation uncertainty, no improvement, regressions observed |
-| patricia-green-cellars | alcohol | candidate-filtering-failure | region-coverage-failure @ 1.5x | not-applicable | candidate-filtering-failure @ 2x | not-applicable | A. Production baseline | no meaningful contribution | annotation uncertainty, no improvement |
-| wine-multi-artifact-04 | brand | ocr-recognition-failure | candidate-generation-failure @ 1.5x | not-applicable | ocr-recognition-failure @ 1.5x | not-applicable | A. Production baseline | no meaningful contribution | no improvement |
-| wine-multi-artifact-04 | alcohol | candidate-filtering-failure | ocr-recognition-failure @ 1.5x | not-applicable | candidate-filtering-failure @ 1.5x | not-applicable | A. Production baseline | no meaningful contribution | no improvement |
-| approved-wine-095 | brand | correct | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no meaningful contribution | no improvement |
-| approved-wine-095 | alcohol | candidate-filtering-failure | region-coverage-failure @ 1.5x | not-applicable | candidate-filtering-failure @ 1.5x | not-applicable | A. Production baseline | no meaningful contribution | annotation uncertainty, no improvement |
+| Case | Field | Baseline | Best crop-only | Crop state | Best additive | Additive state | Best rotated crop-only | Rotated crop state | Best rotated additive | Rotated additive state | Diagnostic best outcome (non-prescriptive) | Classifications |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| wine-multi-artifact-09 | brand | correct | ocr-recognition-failure @ 1.5x | regression | correct @ 1.5x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement, regressions observed |
+| wine-multi-artifact-09 | alcohol | correct | ocr-recognition-failure @ 1.5x | regression | correct @ 1.5x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement, regressions observed |
+| approved-wine-022 | brand | correct | not-applicable | not-applicable | not-applicable | not-applicable | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement |
+| approved-wine-022 | alcohol | correct | candidate-filtering-failure @ 1.5x | regression | correct @ 1.5x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement, regressions observed |
+| three-steves-winery | brand | correct | ocr-recognition-failure @ 1.5x | regression | correct @ 1.5x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement, regressions observed |
+| three-steves-winery | alcohol | correct | not-applicable | not-applicable | not-applicable | not-applicable | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement |
+| approved-wine-006 | brand | candidate-filtering-failure | candidate-generation-failure @ 3x | unchanged | candidate-filtering-failure @ 1.5x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement |
+| approved-wine-006 | alcohol | correct | correct @ 1.5x | unchanged | correct @ 1.5x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement, regressions observed |
+| alfredos-wine | brand | candidate-filtering-failure | ocr-recognition-failure @ 2x | unchanged | candidate-filtering-failure @ 1.5x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement |
+| alfredos-wine | alcohol | candidate-filtering-failure | ocr-recognition-failure @ 2x | unchanged | candidate-filtering-failure @ 2x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement |
+| luigi-giovanni-live | brand | candidate-filtering-failure | ocr-recognition-failure @ 3x | unchanged | candidate-filtering-failure @ 1.5x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement |
+| luigi-giovanni-live | alcohol | candidate-filtering-failure | candidate-filtering-failure @ 1.5x | unchanged | candidate-filtering-failure @ 1.5x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement |
+| approved-wine-013 | brand | candidate-ranking-failure | correct-uncertainty @ 3x | correct-uncertainty recovery | correct-uncertainty @ 3x | correct-uncertainty recovery | not-applicable | not-applicable | not-applicable | not-applicable | B. Human-targeted crop (3x) | scale sensitivity, ranking recovery |
+| approved-wine-013 | alcohol | candidate-filtering-failure | region-coverage-failure @ 1.5x | unchanged | candidate-filtering-failure @ 1.5x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement |
+| approved-wine-035 | brand | ocr-recognition-failure | ocr-recognition-failure @ 1.5x | unchanged | ocr-recognition-failure @ 3x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement |
+| approved-wine-035 | alcohol | ocr-recognition-failure | ocr-recognition-failure @ 1.5x | unchanged | ocr-recognition-failure @ 1.5x | unchanged | region-coverage-failure @ 1.5x | unchanged | ocr-recognition-failure @ 2x | unchanged | A. Production baseline | no improvement |
+| la-fattoria-rotated | brand | ocr-recognition-failure | ocr-recognition-failure @ 3x | unchanged | ocr-recognition-failure @ 3x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement |
+| la-fattoria-rotated | alcohol | candidate-filtering-failure | region-coverage-failure @ 1.5x | unchanged | candidate-filtering-failure @ 3x | unchanged | ocr-recognition-failure @ 1.5x | unchanged | candidate-filtering-failure @ 1.5x | unchanged | A. Production baseline | no improvement |
+| approved-wine-054 | brand | candidate-filtering-failure | correct-uncertainty @ 1.5x | correct-uncertainty recovery | correct-uncertainty @ 1.5x | correct-uncertainty recovery | not-applicable | not-applicable | not-applicable | not-applicable | B. Human-targeted crop (1.5x) | annotation uncertainty, filtering recovery |
+| approved-wine-054 | alcohol | ocr-recognition-failure | ocr-recognition-failure @ 1.5x | unchanged | ocr-recognition-failure @ 2x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | annotation uncertainty, no improvement |
+| patricia-green-cellars | brand | correct-uncertainty | candidate-generation-failure @ 1.5x | regression | correct-uncertainty @ 1.5x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | annotation uncertainty, no improvement, regressions observed |
+| patricia-green-cellars | alcohol | candidate-filtering-failure | region-coverage-failure @ 1.5x | unchanged | candidate-filtering-failure @ 2x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | annotation uncertainty, no improvement |
+| wine-multi-artifact-04 | brand | ocr-recognition-failure | candidate-generation-failure @ 1.5x | unchanged | ocr-recognition-failure @ 1.5x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement |
+| wine-multi-artifact-04 | alcohol | candidate-filtering-failure | ocr-recognition-failure @ 1.5x | unchanged | candidate-filtering-failure @ 1.5x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement |
+| approved-wine-095 | brand | correct | not-applicable | not-applicable | not-applicable | not-applicable | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | no improvement |
+| approved-wine-095 | alcohol | candidate-filtering-failure | region-coverage-failure @ 1.5x | unchanged | candidate-filtering-failure @ 1.5x | unchanged | not-applicable | not-applicable | not-applicable | not-applicable | A. Production baseline | annotation uncertainty, no improvement |
 
 ## Regressions
 
@@ -346,61 +416,106 @@ Bounded evaluation-only benchmark over 13 adjudicated cases using the committed 
 
 ## Latency
 
-| Scenario | Executed fields | Median latency | p95 latency | Median OCR | Median preprocess |
-| --- | --- | --- | --- | --- | --- |
-| A. Production baseline | 26 | 2075 ms | 4003 ms | 1603 ms | 178 ms |
-| B. Human-targeted crop (1.5x) | 23 | 128 ms | 365 ms | 111 ms | 40 ms |
-| C. Canonically rotated targeted crop (1.5x) | 2 | 57 ms | 110 ms | 30 ms | 12 ms |
-| D. Baseline plus targeted crop (1.5x) | 23 | 2315 ms | 4091 ms | 1807 ms | 338 ms |
-| E. Baseline plus rotated targeted crop (1.5x) | 2 | 980 ms | 3361 ms | 703 ms | 190 ms |
-| B. Human-targeted crop (2x) | 23 | 174 ms | 590 ms | 131 ms | 57 ms |
-| C. Canonically rotated targeted crop (2x) | 2 | 64 ms | 124 ms | 34 ms | 13 ms |
-| D. Baseline plus targeted crop (2x) | 23 | 2376 ms | 4177 ms | 1840 ms | 346 ms |
-| E. Baseline plus rotated targeted crop (2x) | 2 | 994 ms | 3367 ms | 715 ms | 191 ms |
-| B. Human-targeted crop (3x) | 23 | 340 ms | 1245 ms | 224 ms | 115 ms |
-| C. Canonically rotated targeted crop (3x) | 2 | 141 ms | 206 ms | 89 ms | 29 ms |
-| D. Baseline plus targeted crop (3x) | 23 | 2716 ms | 4697 ms | 2024 ms | 368 ms |
-| E. Baseline plus rotated targeted crop (3x) | 2 | 1076 ms | 3445 ms | 782 ms | 207 ms |
+| Scenario | Field | Applicable case-fields | Matched baseline latency | Measured targeted-pass incremental latency | Estimated combined latency | Matched additive delta | Interpretation |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| A. Production baseline | brand | 13 | 2198 ms | N/A | N/A | N/A | measured production baseline |
+| B. Human-targeted crop (1.5x) | brand | 11 | 2997 ms | 141 ms | N/A | N/A | measured targeted pass only |
+| C. Canonically rotated targeted crop (1.5x) | brand | 0 | 0 ms | 0 ms | N/A | N/A | measured targeted pass only |
+| D. Baseline plus targeted crop (1.5x) | brand | 11 | 2997 ms | 141 ms | 3162 ms | 141 ms | estimated combined latency |
+| E. Baseline plus rotated targeted crop (1.5x) | brand | 0 | 0 ms | 0 ms | 0 ms | 0 ms | estimated combined latency |
+| B. Human-targeted crop (2x) | brand | 11 | 2997 ms | 178 ms | N/A | N/A | measured targeted pass only |
+| C. Canonically rotated targeted crop (2x) | brand | 0 | 0 ms | 0 ms | N/A | N/A | measured targeted pass only |
+| D. Baseline plus targeted crop (2x) | brand | 11 | 2997 ms | 178 ms | 3276 ms | 178 ms | estimated combined latency |
+| E. Baseline plus rotated targeted crop (2x) | brand | 0 | 0 ms | 0 ms | 0 ms | 0 ms | estimated combined latency |
+| B. Human-targeted crop (3x) | brand | 11 | 2997 ms | 329 ms | N/A | N/A | measured targeted pass only |
+| C. Canonically rotated targeted crop (3x) | brand | 0 | 0 ms | 0 ms | N/A | N/A | measured targeted pass only |
+| D. Baseline plus targeted crop (3x) | brand | 11 | 2997 ms | 329 ms | 3422 ms | 329 ms | estimated combined latency |
+| E. Baseline plus rotated targeted crop (3x) | brand | 0 | 0 ms | 0 ms | 0 ms | 0 ms | estimated combined latency |
+| A. Production baseline | alcohol | 13 | 2198 ms | N/A | N/A | N/A | measured production baseline |
+| B. Human-targeted crop (1.5x) | alcohol | 12 | 2126 ms | 127 ms | N/A | N/A | measured targeted pass only |
+| C. Canonically rotated targeted crop (1.5x) | alcohol | 2 | 1234 ms | 55 ms | N/A | N/A | measured targeted pass only |
+| D. Baseline plus targeted crop (1.5x) | alcohol | 12 | 2126 ms | 127 ms | 2322 ms | 127 ms | estimated combined latency |
+| E. Baseline plus rotated targeted crop (1.5x) | alcohol | 2 | 1234 ms | 55 ms | 1348 ms | 55 ms | estimated combined latency |
+| B. Human-targeted crop (2x) | alcohol | 12 | 2126 ms | 185 ms | N/A | N/A | measured targeted pass only |
+| C. Canonically rotated targeted crop (2x) | alcohol | 2 | 1234 ms | 67 ms | N/A | N/A | measured targeted pass only |
+| D. Baseline plus targeted crop (2x) | alcohol | 12 | 2126 ms | 185 ms | 2378 ms | 185 ms | estimated combined latency |
+| E. Baseline plus rotated targeted crop (2x) | alcohol | 2 | 1234 ms | 67 ms | 1359 ms | 67 ms | estimated combined latency |
+| B. Human-targeted crop (3x) | alcohol | 12 | 2126 ms | 373 ms | N/A | N/A | measured targeted pass only |
+| C. Canonically rotated targeted crop (3x) | alcohol | 2 | 1234 ms | 102 ms | N/A | N/A | measured targeted pass only |
+| D. Baseline plus targeted crop (3x) | alcohol | 12 | 2126 ms | 373 ms | 2517 ms | 373 ms | estimated combined latency |
+| E. Baseline plus rotated targeted crop (3x) | alcohol | 2 | 1234 ms | 102 ms | 1381 ms | 102 ms | estimated combined latency |
+
+- `Estimated combined latency` is derived from matched baseline latency plus one targeted pass. It is not a directly measured end-to-end production workflow.
+
+## Scale Analysis
+
+| Family | Field | Applicable case-fields | Improved vs 1.5x | Worsened vs 1.5x | Failure-class changes without selected-outcome improvement | Unchanged |
+| --- | --- | --- | --- | --- | --- | --- |
+| Crop-only replacement | brand | 11 | 0 | 0 | 4 | 7 |
+| Crop-only replacement | alcohol | 12 | 0 | 1 | 2 | 9 |
+| Rotated crop-only replacement | brand | 0 | 0 | 0 | 0 | 0 |
+| Rotated crop-only replacement | alcohol | 2 | 0 | 0 | 0 | 2 |
+| Additive targeted evidence | brand | 11 | 0 | 0 | 3 | 8 |
+| Additive targeted evidence | alcohol | 12 | 0 | 1 | 0 | 11 |
+| Rotated additive targeted evidence | brand | 0 | 0 | 0 | 0 | 0 |
+| Rotated additive targeted evidence | alcohol | 2 | 0 | 0 | 0 | 2 |
 
 ## Conclusions
 
 ### replacement
 
 - Labels: REGION REPLACEMENT NOT SUPPORTED
-- Rationale: Crop-only replacement did not deliver a reliable outcome recovery once full-image context was removed.
-- Evidence: crop-only correct recoveries: 0
-- Evidence: crop-only regressions: 46
+- Rationale: Limited crop-only correct-uncertainty recoveries occurred, but replacement is not supported as a reliable strategy because it removes full-image context and produces substantially more regressions than recoveries.
+- Evidence: crop-only exact recoveries: 0 scenario-scale, 0 unique case-fields
+- Evidence: crop-only correct-uncertainty recoveries: 6 scenario-scale, 2 unique case-fields (approved-wine-013:brand, approved-wine-054:brand)
+- Evidence: crop-only scenario-scale regression instances: 43
+- Evidence: crop-only unique case-field regressions: 15
 
-### additive
+### additive-brand
 
-- Labels: ADDITIVE REGION SIGNAL SUPPORTED
-- Rationale: Appending targeted evidence recovers a bounded set of outcomes without changing production extraction or selection rules.
-- Evidence: additive recoveries: 2
-- Evidence: additive false-certainty introductions: 0
+- Labels: BOUNDED ADDITIVE BRAND SIGNAL SUPPORTED
+- Rationale: Bounded additive brand signal is supported on this adjudicated slice: two brand case-fields recover to correct uncertainty at 1.5x without any prior-correct brand regression.
+- Evidence: 1.5x additive brand recoveries: 0 exact, 2 correct-uncertainty, 2 total acceptable
+- Evidence: recovered case-fields: approved-wine-013:brand, approved-wine-054:brand
+- Evidence: approved-wine-013:brand => targeted selected source: yes; duplicate corroborated: yes; new candidate: yes; new alternate: yes; ranking changed: yes; ambiguity changed: no
+- Evidence: approved-wine-054:brand => targeted selected source: yes; duplicate corroborated: no; new candidate: yes; new alternate: yes; ranking changed: yes; ambiguity changed: no
+
+### additive-alcohol
+
+- Labels: INSUFFICIENT EVIDENCE
+- Rationale: No additive alcohol selected-outcome recovery was observed on this adjudicated slice.
+- Evidence: 1.5x additive alcohol recoveries: 0 exact, 0 correct-uncertainty, 0 total acceptable
+- Evidence: additive alcohol prior-correct regressions: 1 scenario-scale
 
 ### rotation
 
-- Labels: ROTATION STRATEGY NOT SUPPORTED
-- Rationale: Explicit canonical rotation did not recover outcomes beyond the non-rotated targeted variants.
-- Evidence: rotation-assisted recoveries: 0
+- Labels: INSUFFICIENT EVIDENCE
+- Rationale: Canonical rotation did not recover a selected outcome in the two applicable alcohol fields at any tested scale. The evidence remains too small for a broad universal claim.
+- Evidence: rotated crop-only applicable alcohol case-fields at 1.5x: 2
+- Evidence: rotated selected-outcome recoveries across crop-only and additive families: 0
 
 ### scaling
 
-- Labels: SCALE-SENSITIVE RESULT
-- Rationale: Scenario outcomes change across 1.5x, 2x, and 3x, so scale effects are measurable even though this report makes no production recommendation.
-- Evidence: scale-sensitive cases observed: yes
-
-### remaining-recognition-failures
-
-- Labels: RECOGNITION BOTTLENECK SUPPORTED
-- Rationale: Even with targeted evidence, several cases still fail before a usable candidate can be selected, indicating a remaining recognition or reconstruction bottleneck.
-- Evidence: best-scenario recognition/reconstruction failures remaining: 5
-
-### remaining-selection-failures
-
 - Labels: MIXED RESULT
-- Rationale: Candidate filtering, ranking, or alcohol parsing defects still remain after the best tested targeted scenarios.
-- Evidence: best-scenario selection/parsing failures remaining: 10
+- Rationale: Scale changes affect a bounded subset of case-fields. The report separates beneficial, harmful, and failure-class-only movements relative to the original 1.5x benchmark without recommending a production scale.
+- Evidence: Crop-only replacement / brand: improved 0, worsened 0, failure-class changes without selected-outcome improvement 4, unchanged 7
+- Evidence: Crop-only replacement / alcohol: improved 0, worsened 1, failure-class changes without selected-outcome improvement 2, unchanged 9
+- Evidence: Rotated crop-only replacement / brand: improved 0, worsened 0, failure-class changes without selected-outcome improvement 0, unchanged 0
+- Evidence: Rotated crop-only replacement / alcohol: improved 0, worsened 0, failure-class changes without selected-outcome improvement 0, unchanged 2
+- Evidence: Additive targeted evidence / brand: improved 0, worsened 0, failure-class changes without selected-outcome improvement 3, unchanged 8
+- Evidence: Additive targeted evidence / alcohol: improved 0, worsened 1, failure-class changes without selected-outcome improvement 0, unchanged 11
+- Evidence: Rotated additive targeted evidence / brand: improved 0, worsened 0, failure-class changes without selected-outcome improvement 0, unchanged 0
+- Evidence: Rotated additive targeted evidence / alcohol: improved 0, worsened 0, failure-class changes without selected-outcome improvement 0, unchanged 2
+
+### remaining-bottlenecks
+
+- Labels: RECOGNITION BOTTLENECK SUPPORTED. MIXED RESULT
+- Rationale: After the diagnostic-best targeted scenarios, remaining failures still separate into recognition/reconstruction, candidate-generation, filtering, ranking, and parser categories.
+- Evidence: recognition/reconstruction failures remaining: 5
+- Evidence: candidate-generation failures remaining: 0
+- Evidence: candidate-filtering failures remaining: 10
+- Evidence: candidate-ranking failures remaining: 0
+- Evidence: parser failures remaining: 0
 
 ## Production Boundary
 
