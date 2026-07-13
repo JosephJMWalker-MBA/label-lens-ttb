@@ -11,6 +11,7 @@ export const dynamic = "force-dynamic";
 
 const STATUS_BY_CODE: Partial<Record<PrecheckServiceError["code"], number>> = {
   INVALID_SUBMITTED_RESULT: 422,
+  STALE_SUBMITTED_RESULT: 409,
   INVALID_DISPOSITION: 400,
   INVALID_DISPOSITION_REFERENCE: 400,
   MISSING_APPEND_TOKEN: 401,

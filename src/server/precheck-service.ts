@@ -28,6 +28,7 @@ import type {
 import { err, ok, type Result } from "@/shared/result";
 
 import { issueAppendToken, verifyAppendToken } from "./append-token";
+import { rememberLatestAppendableExport, verifyLatestAppendableExport } from "./append-freshness";
 import { ALLOWED_MEDIA_TYPES, MAX_IMAGE_BYTES } from "./resource-policy";
 import { getExecutableProvenance } from "./runtime-provenance";
 
@@ -278,6 +279,8 @@ function buildResponse(
       "The append-authorization service is not configured.",
     );
 
+  rememberLatestAppendableExport(result.machineResultId, verified.value.integrity.value);
+
   return ok({
     machineResultId: result.machineResultId,
     appendToken: token.token,
@@ -296,8 +299,15 @@ function buildResponse(
   });
 }
 
+interface ReconstructedSubmittedResult {
+  result: PrecheckResult;
+  exportIntegrity: string;
+}
+
 /** Reconstruct a `PrecheckResult` from a parsed, checksum-validated JSON export. */
-function resultFromExport(exportJson: string): Result<PrecheckResult, PrecheckServiceError> {
+function resultFromExport(
+  exportJson: string,
+): Result<ReconstructedSubmittedResult, PrecheckServiceError> {
   const parsed = parseJsonExport(exportJson);
   if (!parsed.ok)
     return fail("INVALID_SUBMITTED_RESULT", "The submitted result could not be validated.");
@@ -321,7 +331,7 @@ function resultFromExport(exportJson: string): Result<PrecheckResult, PrecheckSe
   const validated = validatePrecheckResult(candidate);
   if (!validated.ok)
     return fail("INVALID_SUBMITTED_RESULT", "The submitted result could not be validated.");
-  return ok(validated.value);
+  return ok({ result: validated.value, exportIntegrity: e.integrity.value });
 }
 
 /**
@@ -345,7 +355,7 @@ export function appendDispositionToResult(
 
   const reconstructed = resultFromExport(request.exportJson);
   if (!reconstructed.ok) return reconstructed;
-  const result = reconstructed.value;
+  const { result, exportIntegrity } = reconstructed.value;
 
   // Authenticate the append against the machine-result id the parser recomputed
   // from the submitted content. Re-checksumming or forging a self-consistent
@@ -361,6 +371,9 @@ export function appendDispositionToResult(
           : "The append-authorization token is not valid for this result.";
     return fail(authorized.error.code, message);
   }
+
+  const freshness = verifyLatestAppendableExport(result.machineResultId, exportIntegrity);
+  if (!freshness.ok) return freshness;
 
   // Reference validation: any referenced rule/check must exist in this result.
   const knownRuleIds = new Set<string>(result.findings.map((f) => f.ruleId));
@@ -403,7 +416,7 @@ export function appendFieldConfirmationToResult(
 
   const reconstructed = resultFromExport(request.exportJson);
   if (!reconstructed.ok) return reconstructed;
-  const result = reconstructed.value;
+  const { result, exportIntegrity } = reconstructed.value;
 
   const authorized = verifyAppendToken(request.appendToken, result.machineResultId);
   if (!authorized.ok) {
@@ -415,6 +428,9 @@ export function appendFieldConfirmationToResult(
           : "The append-authorization token is not valid for this result.";
     return fail(authorized.error.code, message);
   }
+
+  const freshness = verifyLatestAppendableExport(result.machineResultId, exportIntegrity);
+  if (!freshness.ok) return freshness;
 
   let input: HumanFieldConfirmationEntryInput;
   switch (request.decisionType) {

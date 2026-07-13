@@ -9,6 +9,7 @@ import { buildAssembleInput } from "@/pipeline/result/build.fixtures";
 import { deriveMachineResultId } from "@/pipeline/result/serialize";
 import type { PrecheckResult } from "@/pipeline/result/result.types";
 import { issueAppendToken } from "@/server/append-token";
+import { rememberLatestAppendableExport } from "@/server/append-freshness";
 import { appendFieldConfirmationToResult } from "@/server/precheck-service";
 import type { PrecheckFieldConfirmationRequest } from "@/server/precheck-service.types";
 
@@ -54,6 +55,15 @@ function tokenFor(exportJson: string): string {
   const issued = issueAppendToken(machineIdOf(exportJson));
   if (!issued.ok) throw new Error("token issuance failed");
   return issued.token;
+}
+
+function rememberHead(exportJson: string) {
+  const parsed = parseJsonExport(exportJson);
+  if (!parsed.ok) throw new Error("parse failed");
+  rememberLatestAppendableExport(
+    parsed.value.generatedFrom.machineResultId,
+    parsed.value.integrity.value,
+  );
 }
 
 function resultWithBrandAlternates(): PrecheckResult {
@@ -112,9 +122,10 @@ function req(
   overrides: Partial<PrecheckFieldConfirmationRequest> = {},
 ): PrecheckFieldConfirmationRequest {
   const exportJson = overrides.exportJson ?? baseExportJson();
+  const appendToken = overrides.appendToken ?? tokenFor(exportJson);
   return {
     exportJson,
-    appendToken: tokenFor(exportJson),
+    appendToken,
     fieldId: "brandName",
     decisionType: "accepted-machine-reading",
     recordedAt: "2026-07-13T10:00:00Z",
@@ -123,10 +134,18 @@ function req(
   };
 }
 
+function primedReq(
+  overrides: Partial<PrecheckFieldConfirmationRequest> = {},
+): PrecheckFieldConfirmationRequest {
+  const exportJson = overrides.exportJson ?? baseExportJson();
+  rememberHead(exportJson);
+  return req({ ...overrides, exportJson });
+}
+
 describe("appendFieldConfirmationToResult (service)", () => {
   it("appends one confirmation without changing machine observations", () => {
     const before = parseJsonExport(baseExportJson());
-    const out = appendFieldConfirmationToResult(req());
+    const out = appendFieldConfirmationToResult(primedReq());
     expect(before.ok && out.ok).toBe(true);
     if (!before.ok || !out.ok) return;
     expect(out.value.humanFieldConfirmationHistory).toHaveLength(1);
@@ -139,7 +158,7 @@ describe("appendFieldConfirmationToResult (service)", () => {
   it("rejects a stale alternate identifier", () => {
     const exportJson = canonicalExportOf(resultWithBrandAlternates());
     const out = appendFieldConfirmationToResult(
-      req({
+      primedReq({
         exportJson,
         appendToken: tokenFor(exportJson),
         fieldId: "brandName",
@@ -153,7 +172,7 @@ describe("appendFieldConfirmationToResult (service)", () => {
 
   it("rebuilds export and report after a human correction", () => {
     const out = appendFieldConfirmationToResult(
-      req({
+      primedReq({
         fieldId: "alcoholStatement",
         decisionType: "corrected-value",
         correctedValue: "12.5% alc./vol.",
@@ -166,6 +185,33 @@ describe("appendFieldConfirmationToResult (service)", () => {
     if (!parsed.ok) return;
     expect(parsed.value.humanFieldConfirmationHistory[0].decisionType).toBe("corrected-value");
     expect(out.value.report.html).toMatch(/Human-corrected value/);
+  });
+
+  it("rejects a stale export after a newer confirmation history has been issued", () => {
+    const exportJson = baseExportJson();
+    const appendToken = tokenFor(exportJson);
+    rememberHead(exportJson);
+
+    const first = appendFieldConfirmationToResult(
+      req({
+        exportJson,
+        appendToken,
+        fieldId: "brandName",
+        decisionType: "accepted-machine-reading",
+      }),
+    );
+    expect(first.ok).toBe(true);
+
+    const stale = appendFieldConfirmationToResult(
+      req({
+        exportJson,
+        appendToken,
+        fieldId: "alcoholStatement",
+        decisionType: "field-unreadable",
+      }),
+    );
+    expect(stale.ok).toBe(false);
+    if (!stale.ok) expect(stale.error.code).toBe("STALE_SUBMITTED_RESULT");
   });
 });
 
@@ -180,6 +226,7 @@ describe("POST /api/precheck/confirmation", () => {
 
   it("records a confirmation with a server-generated timestamp", async () => {
     const exportJson = baseExportJson();
+    rememberHead(exportJson);
     const res = await POST(
       requestFor({
         exportJson,
@@ -196,10 +243,12 @@ describe("POST /api/precheck/confirmation", () => {
   });
 
   it("rejects an unsupported field id", async () => {
+    const exportJson = baseExportJson();
+    rememberHead(exportJson);
     const res = await POST(
       requestFor({
-        exportJson: baseExportJson(),
-        appendToken: tokenFor(baseExportJson()),
+        exportJson,
+        appendToken: tokenFor(exportJson),
         fieldId: "producerStatement",
         decisionType: "accepted-machine-reading",
         file: FILE,
@@ -208,5 +257,34 @@ describe("POST /api/precheck/confirmation", () => {
     expect(res.status).toBe(400);
     const body = await res.json();
     expect(body.error.code).toBe("INVALID_FIELD_CONFIRMATION");
+  });
+
+  it("returns 409 when a stale confirmation export is replayed after a newer append", async () => {
+    const exportJson = baseExportJson();
+    const appendToken = tokenFor(exportJson);
+    rememberHead(exportJson);
+
+    const first = appendFieldConfirmationToResult(
+      req({
+        exportJson,
+        appendToken,
+        fieldId: "brandName",
+        decisionType: "accepted-machine-reading",
+      }),
+    );
+    expect(first.ok).toBe(true);
+
+    const res = await POST(
+      requestFor({
+        exportJson,
+        appendToken,
+        fieldId: "alcoholStatement",
+        decisionType: "field-unreadable",
+        file: FILE,
+      }),
+    );
+    expect(res.status).toBe(409);
+    const body = await res.json();
+    expect(body.error.code).toBe("STALE_SUBMITTED_RESULT");
   });
 });
