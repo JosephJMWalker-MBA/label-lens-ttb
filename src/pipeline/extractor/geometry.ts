@@ -1,6 +1,6 @@
 import type { EvidenceGeometry } from "@/pipeline/analyzer/analyzer.types";
 
-import type { OcrWord, RegionTransform } from "./extractor.types";
+import type { OcrWord, RegionTransform, RotationDegrees } from "./extractor.types";
 
 /**
  * Map an OCR box from preprocessed (rotated + scaled) crop space back to the
@@ -14,7 +14,7 @@ import type { OcrWord, RegionTransform } from "./extractor.types";
 function invRotate(
   rx: number,
   ry: number,
-  rotate: 0 | 90 | 270,
+  rotate: RotationDegrees,
   cropWidth: number,
   cropHeight: number,
 ): { cx: number; cy: number } {
@@ -24,6 +24,9 @@ function invRotate(
     // sharp rotate(90) is clockwise: crop (cx,cy) -> rotated (Hc-cy, cx).
     case 90:
       return { cx: ry, cy: cropHeight - rx };
+    // sharp rotate(180) is the usual 180° clockwise rotation.
+    case 180:
+      return { cx: cropWidth - rx, cy: cropHeight - ry };
     // rotate(270) is 90° counter-clockwise: crop (cx,cy) -> rotated (cy, Wc-cx).
     case 270:
       return { cx: cropWidth - ry, cy: rx };
@@ -34,8 +37,20 @@ export function mapBoxToOriginalGeometry(
   box: OcrWord["bbox"],
   transform: RegionTransform,
   imageIndex = 0,
-): EvidenceGeometry {
+): EvidenceGeometry | null {
   const { crop, rotate, scale } = transform;
+  if (
+    !Number.isFinite(box.x0) ||
+    !Number.isFinite(box.y0) ||
+    !Number.isFinite(box.x1) ||
+    !Number.isFinite(box.y1) ||
+    box.x1 <= box.x0 ||
+    box.y1 <= box.y0 ||
+    !Number.isFinite(scale) ||
+    scale <= 0
+  ) {
+    return null;
+  }
 
   // 1. Undo the uniform scale to return to rotated-crop space.
   const rx0 = box.x0 / scale;
@@ -52,12 +67,25 @@ export function mapBoxToOriginalGeometry(
   const right = crop.left + Math.max(a.cx, b.cx);
   const top = crop.top + Math.min(a.cy, b.cy);
   const bottom = crop.top + Math.max(a.cy, b.cy);
+  if (
+    !Number.isFinite(left) ||
+    !Number.isFinite(right) ||
+    !Number.isFinite(top) ||
+    !Number.isFinite(bottom) ||
+    right <= left ||
+    bottom <= top
+  ) {
+    return null;
+  }
 
-  // 4. Clamp to the image and guarantee a positive area (schema requires it).
+  // 4. Clamp to the image frame and reject any fully out-of-frame/degenerate box.
   const x = clamp(Math.round(left), 0, transform.originalWidth - 1);
   const y = clamp(Math.round(top), 0, transform.originalHeight - 1);
-  const width = clamp(Math.round(right - left), 1, transform.originalWidth - x);
-  const height = clamp(Math.round(bottom - top), 1, transform.originalHeight - y);
+  const clippedRight = clamp(Math.round(right), x + 1, transform.originalWidth);
+  const clippedBottom = clamp(Math.round(bottom), y + 1, transform.originalHeight);
+  const width = clippedRight - x;
+  const height = clippedBottom - y;
+  if (width <= 0 || height <= 0) return null;
 
   return {
     imageIndex,

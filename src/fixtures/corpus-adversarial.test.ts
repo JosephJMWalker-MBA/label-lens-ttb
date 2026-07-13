@@ -36,6 +36,15 @@ function lineWords(tokens: string[], y: number, height: number): OcrWord[] {
       text,
       rawConfidence: 92,
       bbox: { x0: x, y0: y, x1: x + 30, y1: y + height },
+      originalGeometry: {
+        imageIndex: 0,
+        x,
+        y,
+        width: 30,
+        height,
+        imageWidth: 400,
+        imageHeight: 400,
+      },
     };
     x += 34;
     return word;
@@ -45,7 +54,21 @@ function lineWords(tokens: string[], y: number, height: number): OcrWord[] {
 /** Turn synthetic token lines into a single front-image region. */
 function region(lines: string[][], height: number): RegionOcrResult {
   const words = lines.flatMap((tokens, i) => lineWords(tokens, 10 + i * 80, height));
-  return { regionName: "full-image", transform: TRANSFORM, words };
+  return {
+    passId: "pass-full-image",
+    regionName: "full-image",
+    passKind: "full-image-primary",
+    triggerReasons: ["primary-pass"],
+    preprocessing: ["grayscale", "normalise", "scale:1.5"],
+    fieldEligibility: { brand: true, alcohol: true },
+    transform: TRANSFORM,
+    transformedSize: { width: 400, height: 400 },
+    pageSegMode: 11,
+    rawWordCount: words.length,
+    discardedWordCount: 0,
+    timings: { preprocessMs: 0, ocrMs: 0, inverseMappingMs: 0, totalMs: 0 },
+    words,
+  };
 }
 
 function brandOf(entry: CorpusEntry) {

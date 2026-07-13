@@ -69,7 +69,7 @@ const CHECKPOINT_INCLUDED = new Map([
         acceptablePercents: [14],
         acceptableStatements: ["14% ALC", "14%"],
         characteristics: ["rotated-or-vertical"],
-        orientation: "mixed",
+        orientation: "vertical-clockwise",
       },
     },
   ],
@@ -89,7 +89,7 @@ const CHECKPOINT_INCLUDED = new Map([
         acceptablePercents: [14],
         acceptableStatements: ["14% ALC", "14%"],
         characteristics: ["rotated-or-vertical"],
-        orientation: "mixed",
+        orientation: "vertical-clockwise",
       },
     },
   ],
@@ -325,7 +325,15 @@ function seedBrand(seedCase) {
 
 function alcoholCharacteristics(seedCase) {
   const out = new Set();
-  if (seedCase.alcohol.approxLocation === "side" || seedCase.alcohol.approxLocation === "rotated") {
+  if (
+    [
+      "vertical-clockwise",
+      "vertical-counterclockwise",
+      "vertical-stacked",
+      "rotated-180",
+      "mixed",
+    ].includes(seedAlcoholOrientation(seedCase))
+  ) {
     out.add("rotated-or-vertical");
   }
   if (seedCase.strata.includes("split-alcohol-tokens")) out.add("split-token");
@@ -339,6 +347,14 @@ function alcoholCharacteristics(seedCase) {
     out.add("decimal-value");
   }
   return [...out];
+}
+
+function seedAlcoholOrientation(seedCase) {
+  if (seedCase.caseId === "luigi-giovanni-live") return "horizontal";
+  if (seedCase.caseId === "la-fattoria-rotated") return "vertical-clockwise";
+  return seedCase.alcohol.approxLocation === "side" || seedCase.alcohol.approxLocation === "rotated"
+    ? "mixed"
+    : "horizontal";
 }
 
 function seedAlcohol(seedCase) {
@@ -359,10 +375,7 @@ function seedAlcohol(seedCase) {
     acceptableStatements: seedCase.alcohol.acceptableText,
     characteristics: alcoholCharacteristics(seedCase),
     approxGeometry: [],
-    orientation:
-      seedCase.alcohol.approxLocation === "side" || seedCase.alcohol.approxLocation === "rotated"
-        ? "mixed"
-        : "horizontal",
+    orientation: seedAlcoholOrientation(seedCase),
   };
 }
 

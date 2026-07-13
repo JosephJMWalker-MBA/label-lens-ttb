@@ -5,8 +5,14 @@ import type {
   EvidenceGeometry,
 } from "@/pipeline/analyzer/analyzer.types";
 
-import type { OcrWord, RegionOcrResult } from "./extractor.types";
-import { mapBoxToOriginalGeometry, unionGeometry } from "./geometry";
+import type {
+  OcrPassKind,
+  OcrPassTriggerReason,
+  OcrWord,
+  RegionOcrResult,
+  SelectionProvenance,
+} from "./extractor.types";
+import { unionGeometry } from "./geometry";
 
 /**
  * Deterministic candidate selection for the two supported fields. Confidence is
@@ -40,6 +46,12 @@ interface Candidate {
   confidence: number;
   geometry: EvidenceGeometry;
   words: OcrWord[];
+  passId: string;
+  passKind: OcrPassKind;
+  triggerReasons: OcrPassTriggerReason[];
+  preprocessing: string[];
+  supportPassIds: string[];
+  supportPassKinds: OcrPassKind[];
   regionName: string;
   /** Original-space text height; a typographic prominence proxy for brand art. */
   prominence: number;
@@ -63,6 +75,9 @@ interface Candidate {
 export interface FieldSelection {
   observation: AnalyzerFieldObservation;
   sourceRegion: string | null;
+  source: SelectionProvenance | null;
+  supportingPassIds: string[];
+  recoveryPassUsed: boolean;
   brandDiagnostics?: BrandSelectionDiagnostics;
   alcoholDiagnostics?: AlcoholSelectionDiagnostics;
 }
@@ -105,6 +120,8 @@ export interface BrandLineDiagnostic {
   confidence: number;
   prominence: number;
   regionName: string;
+  passId: string;
+  passKind: OcrPassKind;
   kept: boolean;
   reason: BrandLineReason;
 }
@@ -130,6 +147,9 @@ export interface BrandCandidateDiagnostic {
   confidence: number;
   prominence: number;
   regionName: string;
+  passId: string;
+  passKind: OcrPassKind;
+  supportPassIds: string[];
   assembly: BrandCandidateAssembly;
   lineIndexes: number[];
   kept: boolean;
@@ -196,10 +216,14 @@ export interface AlcoholCandidateDiagnostic {
   confidence: number;
   prominence: number;
   regionName: string;
+  passId: string;
+  passKind: OcrPassKind;
+  supportPassIds: string[];
   assembly: AlcoholCandidateAssembly;
   lineIndexes: number[];
   sourceTokens: string[];
   sourceBoxes: { x0: number; y0: number; x1: number; y1: number }[];
+  sourceOriginalBoxes: EvidenceGeometry[];
   kept: boolean;
   acceptanceReason?: AlcoholAcceptanceReason;
   positiveMarkers: string[];
@@ -261,12 +285,48 @@ function lines(words: OcrWord[]): OcrWord[][] {
   return out.map((l) => [...l].sort((a, b) => a.bbox.x0 - b.bbox.x0));
 }
 
-function geometryFor(words: OcrWord[], result: RegionOcrResult): EvidenceGeometry {
-  return unionGeometry(words.map((w) => mapBoxToOriginalGeometry(w.bbox, result.transform)));
+function geometryFor(words: OcrWord[]): EvidenceGeometry {
+  const geometries = words
+    .map((word) => word.originalGeometry)
+    .filter((geometry): geometry is EvidenceGeometry => geometry !== undefined);
+  if (geometries.length === 0) {
+    throw new Error("geometryFor requires words with original-frame geometry");
+  }
+  return unionGeometry(geometries);
+}
+
+function originalGeometryOf(word: OcrWord): EvidenceGeometry {
+  if (!word.originalGeometry) {
+    throw new Error("missing original-frame OCR geometry");
+  }
+  return word.originalGeometry;
 }
 
 function alternateFrom(c: Candidate): AnalyzerAlternate {
   return { value: c.value, confidence: c.confidence, geometry: c.geometry };
+}
+
+function provenanceOf(candidate: Candidate): SelectionProvenance {
+  return {
+    passId: candidate.passId,
+    passKind: candidate.passKind,
+    regionName: candidate.regionName,
+    triggerReasons: candidate.triggerReasons,
+    preprocessing: candidate.preprocessing,
+    geometry: candidate.geometry,
+  };
+}
+
+function mergeDistinct<T>(left: T[], right: T[]): T[] {
+  return [...new Set([...left, ...right])];
+}
+
+function mergeCandidateSupport(preferred: Candidate, duplicate: Candidate): Candidate {
+  return {
+    ...preferred,
+    supportPassIds: mergeDistinct(preferred.supportPassIds, duplicate.supportPassIds),
+    supportPassKinds: mergeDistinct(preferred.supportPassKinds, duplicate.supportPassKinds),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -534,7 +594,9 @@ function dedupeAlcoholCandidates(candidates: Candidate[]): Candidate[] {
           (candidatePreference === existingPreference &&
             key(candidate.value).localeCompare(key(existing.value)) < 0)))
     ) {
-      byKey.set(semanticKey, candidate);
+      byKey.set(semanticKey, mergeCandidateSupport(candidate, existing));
+    } else {
+      byKey.set(semanticKey, mergeCandidateSupport(existing, candidate));
     }
   }
   return [...byKey.values()];
@@ -684,7 +746,7 @@ function analyzeAlcoholWindow(window: AlcoholWindow): {
   parserRejected: boolean;
 } {
   const rawText = window.words.map((word) => word.text).join(" ");
-  const geometry = geometryFor(window.words, window.result);
+  const geometry = geometryFor(window.words);
   const match = matchAlcoholWindow(rawText);
   const diagnostic: AlcoholCandidateDiagnosticInternal = {
     id: window.id,
@@ -694,10 +756,14 @@ function analyzeAlcoholWindow(window: AlcoholWindow): {
     confidence: aggregateConfidence(window.words),
     prominence: geometry.height,
     regionName: window.result.regionName,
+    passId: window.result.passId,
+    passKind: window.result.passKind,
+    supportPassIds: [window.result.passId],
     assembly: window.assembly,
     lineIndexes: window.lineIndexes,
     sourceTokens: window.words.map((word) => word.text),
     sourceBoxes: window.words.map((word) => word.bbox),
+    sourceOriginalBoxes: window.words.map((word) => originalGeometryOf(word)),
     kept: false,
     acceptanceReason: "acceptanceReason" in match ? match.acceptanceReason : undefined,
     positiveMarkers: "positiveMarkers" in match ? match.positiveMarkers : [],
@@ -723,6 +789,12 @@ function analyzeAlcoholWindow(window: AlcoholWindow): {
     confidence: aggregateConfidence(window.words),
     geometry,
     words: window.words,
+    passId: window.result.passId,
+    passKind: window.result.passKind,
+    triggerReasons: window.result.triggerReasons,
+    preprocessing: window.result.preprocessing,
+    supportPassIds: [window.result.passId],
+    supportPassKinds: [window.result.passKind],
     regionName: window.result.regionName,
     prominence: geometry.height,
   };
@@ -769,10 +841,14 @@ function buildAlcoholObservation(
       confidence: candidate.confidence,
       prominence: candidate.prominence,
       regionName: candidate.regionName,
+      passId: candidate.passId,
+      passKind: candidate.passKind,
+      supportPassIds: candidate.supportPassIds,
       assembly: candidate.assembly,
       lineIndexes: candidate.lineIndexes,
       sourceTokens: candidate.sourceTokens,
       sourceBoxes: candidate.sourceBoxes,
+      sourceOriginalBoxes: candidate.sourceOriginalBoxes,
       kept: candidate.kept,
       acceptanceReason: candidate.acceptanceReason,
       positiveMarkers: candidate.positiveMarkers,
@@ -797,6 +873,9 @@ function buildAlcoholObservation(
     return {
       observation: { state: "NOT_OBSERVED", value: null, confidence: 0, alternates: [] },
       sourceRegion: null,
+      source: null,
+      supportingPassIds: [],
+      recoveryPassUsed: false,
       alcoholDiagnostics: publicDiagnostics(),
     };
   }
@@ -838,6 +917,9 @@ function buildAlcoholObservation(
         ambiguityReason: "competing_candidates",
       },
       sourceRegion: best.regionName,
+      source: provenanceOf(best),
+      supportingPassIds: best.supportPassIds,
+      recoveryPassUsed: best.passKind !== "full-image-primary",
       alcoholDiagnostics: publicDiagnostics(),
     };
   }
@@ -856,6 +938,9 @@ function buildAlcoholObservation(
         .map(alternateFrom),
     },
     sourceRegion: best.regionName,
+    source: provenanceOf(best),
+    supportingPassIds: best.supportPassIds,
+    recoveryPassUsed: best.passKind !== "full-image-primary",
     alcoholDiagnostics: publicDiagnostics(),
   };
 }
@@ -876,6 +961,7 @@ export function selectAlcoholObservation(results: RegionOcrResult[]): FieldSelec
   const nextId = () => `alcohol-candidate-${nextIdCounter++}`;
 
   for (const result of results) {
+    if (!result.fieldEligibility.alcohol) continue;
     for (const word of result.words) {
       if (alcoholHasDigits(word.text)) numberInOcr = true;
       if (word.text.includes("%")) percentInOcr = true;
@@ -980,12 +1066,12 @@ const PRODUCER_WORD = /^(?:produced|bottled|made|vinted|cellared|grown|packed|bl
 /** Non-brand mandatory/regulatory or measurement wording that cannot be a brand. */
 const NON_BRAND_LINE =
   /\b(?:alcohol|alc|vol|volume|proof|government|warning|surgeon|general|pregnancy|contains|sulfites|net|contents|ml|milliliters?|liters?|litres?|imported|distributed|appellation|produced|producer|bottled|cellared|grown|vinted|blended|packed|owned|operated|serving|temperature|health|problems?|alcoholic|beverages?|bebida|consumption|impairs?|machinery|defects?|drink|women|should|nacional|byvol)\b/i;
-/** The brand appears on the front-label artwork region, not the mandatory strip. */
-const BRAND_REGION = "full-image";
 /** Two candidates whose text height is within this ratio compete as ambiguous. */
 const BRAND_PROMINENCE_RATIO = 0.8;
 /** Only candidates near the strongest artwork prominence compete on score first. */
 const BRAND_SCORE_PROMINENCE_FLOOR_RATIO = 0.4;
+/** One-pixel inverse-mapping jitter must not flip low-prominence text into score-first ranking. */
+const BRAND_SCORE_PROMINENCE_BUFFER_PX = 1;
 /** A brand mark is short; longer lines are prose/back-label copy, not a brand. */
 const MAX_BRAND_WORDS = 4;
 /** Nearby front-label lines may form a split brand mark. */
@@ -1298,6 +1384,10 @@ interface BrandSpan {
   value: string;
   confidence: number;
   geometry: EvidenceGeometry;
+  passId: string;
+  passKind: OcrPassKind;
+  triggerReasons: OcrPassTriggerReason[];
+  preprocessing: string[];
   regionName: string;
   prominence: number;
   assembly: BrandCandidateAssembly;
@@ -1326,7 +1416,7 @@ interface BrandSelectionDiagnosticsInternal {
 function analyzeBrandLine(line: OcrWord[], result: RegionOcrResult): BrandLineAnalysis {
   const rawText = line.map((w) => w.text).join(" ");
   const value = cleanedBrandValue(rawText);
-  const geometry = geometryFor(line, result);
+  const geometry = geometryFor(line);
   const confidence = aggregateConfidence(line);
   const base = {
     rawText,
@@ -1334,6 +1424,8 @@ function analyzeBrandLine(line: OcrWord[], result: RegionOcrResult): BrandLineAn
     confidence,
     prominence: geometry.height,
     regionName: result.regionName,
+    passId: result.passId,
+    passKind: result.passKind,
   };
 
   if (isProducerLine(line)) {
@@ -1374,6 +1466,12 @@ function analyzeBrandLine(line: OcrWord[], result: RegionOcrResult): BrandLineAn
     confidence,
     geometry,
     words: line,
+    passId: result.passId,
+    passKind: result.passKind,
+    triggerReasons: result.triggerReasons,
+    preprocessing: result.preprocessing,
+    supportPassIds: [result.passId],
+    supportPassKinds: [result.passKind],
     regionName: result.regionName,
     prominence: geometry.height,
     brandClass,
@@ -1455,7 +1553,7 @@ function buildBrandSpan(
   lineProximity = 1,
 ): BrandSpan {
   const rawText = words.map((w) => w.text).join(" ");
-  const geometry = geometryFor(words, result);
+  const geometry = geometryFor(words);
   return {
     id,
     words,
@@ -1463,6 +1561,10 @@ function buildBrandSpan(
     value: cleanedBrandValue(rawText),
     confidence: aggregateConfidence(words),
     geometry,
+    passId: result.passId,
+    passKind: result.passKind,
+    triggerReasons: result.triggerReasons,
+    preprocessing: result.preprocessing,
     regionName: result.regionName,
     prominence: geometry.height,
     assembly,
@@ -1482,6 +1584,9 @@ function analyzeBrandSpan(span: BrandSpan): BrandCandidateAnalysis {
     confidence: span.confidence,
     prominence: span.prominence,
     regionName: span.regionName,
+    passId: span.passId,
+    passKind: span.passKind,
+    supportPassIds: [span.passId],
     assembly: span.assembly,
     lineIndexes: span.lineIndexes,
   };
@@ -1585,6 +1690,12 @@ function analyzeBrandSpan(span: BrandSpan): BrandCandidateAnalysis {
     confidence: span.confidence,
     geometry: span.geometry,
     words: span.words,
+    passId: span.passId,
+    passKind: span.passKind,
+    triggerReasons: span.triggerReasons,
+    preprocessing: span.preprocessing,
+    supportPassIds: [span.passId],
+    supportPassKinds: [span.passKind],
     regionName: span.regionName,
     prominence: span.prominence,
     brandClass,
@@ -1678,7 +1789,9 @@ function dedupeBestCandidates(candidates: Candidate[]): Candidate[] {
       candidateScore > existingScore ||
       (candidateScore === existingScore && candidate.confidence > existing.confidence)
     ) {
-      byKey.set(key(candidate.value), candidate);
+      byKey.set(key(candidate.value), mergeCandidateSupport(candidate, existing));
+    } else {
+      byKey.set(key(candidate.value), mergeCandidateSupport(existing, candidate));
     }
   }
   return [...byKey.values()];
@@ -1761,9 +1874,7 @@ export function selectBrandObservation(results: RegionOcrResult[]): FieldSelecti
   let nextId = 0;
   const nextCandidateId = () => `brand-candidate-${nextId++}`;
   for (const result of results) {
-    // Brand presentation lives on the front-label artwork, never the mandatory
-    // vertical strip; restricting the region keeps regulatory text out of brand.
-    if (result.regionName !== BRAND_REGION) continue;
+    if (!result.fieldEligibility.brand) continue;
     if (result.words.length > 0) sawBrandRegionText = true;
     const groupedLines = lines(result.words);
     const seedsByLine: Candidate[][] = groupedLines.map(() => []);
@@ -1849,6 +1960,9 @@ function buildBrandObservation(
       confidence: candidate.confidence,
       prominence: candidate.prominence,
       regionName: candidate.regionName,
+      passId: candidate.passId,
+      passKind: candidate.passKind,
+      supportPassIds: candidate.supportPassIds,
       assembly: candidate.assembly,
       lineIndexes: candidate.lineIndexes,
       kept: candidate.kept,
@@ -1863,6 +1977,9 @@ function buildBrandObservation(
     return {
       observation: { state: "NOT_OBSERVED", value: null, confidence: 0, alternates: [] },
       sourceRegion: null,
+      source: null,
+      supportingPassIds: [],
+      recoveryPassUsed: false,
       brandDiagnostics: publicDiagnostics(),
     };
   }
@@ -1884,8 +2001,10 @@ function buildBrandObservation(
 
   const ranked = dedupeBestCandidates(bestFamilyCandidates(scored)).sort((a, b) => {
     const prominenceFloor = maxProminence * BRAND_SCORE_PROMINENCE_FLOOR_RATIO;
-    const aScoreEligible = a.prominence >= prominenceFloor ? 1 : 0;
-    const bScoreEligible = b.prominence >= prominenceFloor ? 1 : 0;
+    const aScoreEligible =
+      a.prominence > prominenceFloor + BRAND_SCORE_PROMINENCE_BUFFER_PX ? 1 : 0;
+    const bScoreEligible =
+      b.prominence > prominenceFloor + BRAND_SCORE_PROMINENCE_BUFFER_PX ? 1 : 0;
     if (aScoreEligible !== bScoreEligible) return bScoreEligible - aScoreEligible;
     if (aScoreEligible === 1 && bScoreEligible === 1) {
       return (
@@ -1948,6 +2067,9 @@ function buildBrandObservation(
         ambiguityReason: "competing_candidates",
       },
       sourceRegion: best.regionName,
+      source: provenanceOf(best),
+      supportingPassIds: best.supportPassIds,
+      recoveryPassUsed: best.passKind !== "full-image-primary",
       brandDiagnostics: publicDiagnostics(),
     };
   }
@@ -1977,6 +2099,9 @@ function buildBrandObservation(
         ambiguityReason: "single_unconfirmed_candidate",
       },
       sourceRegion: best.regionName,
+      source: provenanceOf(best),
+      supportingPassIds: best.supportPassIds,
+      recoveryPassUsed: best.passKind !== "full-image-primary",
       brandDiagnostics: publicDiagnostics(),
     };
   }
@@ -1992,6 +2117,9 @@ function buildBrandObservation(
       alternates: distinctAlternates,
     },
     sourceRegion: best.regionName,
+    source: provenanceOf(best),
+    supportingPassIds: best.supportPassIds,
+    recoveryPassUsed: best.passKind !== "full-image-primary",
     brandDiagnostics: publicDiagnostics(),
   };
 }

@@ -13,7 +13,19 @@ import {
 } from "./field-selection";
 import { verifyAndDecode } from "./image-integrity";
 import { createLocalOcrEngine } from "./ocr-engine";
-import { regionPreprocessing, runRegionOcr } from "./regions";
+import { planPrimaryOcrPass, planRecoveryOcrPasses, runOcrPass } from "./regions";
+
+export interface ExtractionDebug {
+  decoded: { width: number; height: number; format: string };
+  passes: Awaited<ReturnType<typeof runOcrPass>>[];
+  primarySelections: { brand: FieldSelection; alcohol: FieldSelection };
+  finalSelections: { brand: FieldSelection; alcohol: FieldSelection };
+}
+
+export interface DetailedExtractionResult {
+  response: AnalyzerEvidenceResponse;
+  debug: ExtractionDebug;
+}
 
 /**
  * The local two-field extractor: image bytes → integrity check → deterministic
@@ -26,6 +38,13 @@ import { regionPreprocessing, runRegionOcr } from "./regions";
 export async function extractLabelEvidence(
   input: ExtractionInput,
 ): Promise<Result<AnalyzerEvidenceResponse, ExtractionError>> {
+  const detailed = await extractLabelEvidenceDetailed(input);
+  return detailed.ok ? ok(detailed.value.response) : detailed;
+}
+
+export async function extractLabelEvidenceDetailed(
+  input: ExtractionInput,
+): Promise<Result<DetailedExtractionResult, ExtractionError>> {
   const decoded = await verifyAndDecode(input.imageBytes, input.derivativeSha256);
   if (!decoded.ok) return decoded;
 
@@ -42,15 +61,34 @@ export async function extractLabelEvidence(
 
   let brand: FieldSelection;
   let alcohol: FieldSelection;
+  let primaryBrand: FieldSelection;
+  let primaryAlcohol: FieldSelection;
+  let passes: Awaited<ReturnType<typeof runOcrPass>>[] = [];
   try {
-    const regions = await runRegionOcr(
+    const primaryPass = await runOcrPass(
       input.imageBytes,
-      decoded.value.width,
-      decoded.value.height,
+      planPrimaryOcrPass(decoded.value.width, decoded.value.height),
       engine,
     );
-    brand = selectBrandObservation(regions);
-    alcohol = selectAlcoholObservation(regions);
+    primaryBrand = selectBrandObservation([primaryPass]);
+    primaryAlcohol = selectAlcoholObservation([primaryPass]);
+
+    passes = [primaryPass];
+    const recoveryPasses = planRecoveryOcrPasses({
+      primary: primaryPass,
+      needsBrandRecovery: primaryBrand.observation.state === "NOT_OBSERVED",
+      needsAlcoholRecovery: primaryAlcohol.observation.state === "NOT_OBSERVED",
+    });
+    for (const pass of recoveryPasses) {
+      passes.push(await runOcrPass(input.imageBytes, pass, engine));
+    }
+
+    brand =
+      primaryBrand.observation.state === "OBSERVED" ? primaryBrand : selectBrandObservation(passes);
+    alcohol =
+      primaryAlcohol.observation.state === "NOT_OBSERVED"
+        ? selectAlcoholObservation(passes)
+        : primaryAlcohol;
   } catch (cause) {
     // A recognition or preprocessing failure after worker creation is a safe,
     // typed failure — never an unhandled throw. The worker is still terminated
@@ -98,7 +136,15 @@ export async function extractLabelEvidence(
       issues: validated.error.issues,
     });
   }
-  return ok(validated.value);
+  return ok({
+    response: validated.value,
+    debug: {
+      decoded: decoded.value,
+      passes,
+      primarySelections: { brand: primaryBrand, alcohol: primaryAlcohol },
+      finalSelections: { brand, alcohol },
+    },
+  });
 }
 
 /**
@@ -109,9 +155,9 @@ export async function extractLabelEvidence(
  */
 function provenanceLimitations(brand: FieldSelection, alcohol: FieldSelection): string[] {
   const notes: string[] = [];
-  if (brand.sourceRegion) {
+  if (brand.source) {
     notes.push(
-      `brandName selected from region ${brand.sourceRegion} via [${regionPreprocessing(brand.sourceRegion).join(", ")}]`,
+      `brandName selected from region ${brand.source.regionName} via [${brand.source.preprocessing.join(", ")}]`,
     );
   } else if (brand.brandDiagnostics?.abstentionReason) {
     notes.push(`brandName abstained: ${brand.brandDiagnostics.abstentionReason}`);
@@ -123,9 +169,9 @@ function provenanceLimitations(brand: FieldSelection, alcohol: FieldSelection): 
       notes.push(`brandName rejected candidates: ${rejected.join(", ")}`);
     }
   }
-  if (alcohol.sourceRegion) {
+  if (alcohol.source) {
     notes.push(
-      `alcoholStatement selected from region ${alcohol.sourceRegion} via [${regionPreprocessing(alcohol.sourceRegion).join(", ")}]`,
+      `alcoholStatement selected from region ${alcohol.source.regionName} via [${alcohol.source.preprocessing.join(", ")}]`,
     );
   }
   return notes;
