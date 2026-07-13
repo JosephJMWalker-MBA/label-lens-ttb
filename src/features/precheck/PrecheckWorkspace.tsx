@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { useOnboarding } from "@/components/onboarding/onboarding-context";
+import { isServiceWarm, nowMs, recordWarmMs } from "@/components/onboarding/warm-timing";
 import { Button } from "@/components/ui/button";
 import { Disclosure } from "@/components/ui/disclosure";
 import { Input } from "@/components/ui/input";
@@ -67,6 +68,9 @@ export function PrecheckWorkspace() {
   const [error, setError] = useState<string | null>(null);
 
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  // Latency of a warm upload (one that followed the first-visit sample warm-up),
+  // surfaced honestly so the cold-start warm-up's benefit is visible.
+  const [warmRunMs, setWarmRunMs] = useState<number | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
@@ -129,10 +133,20 @@ export function PrecheckWorkspace() {
     setPhase("processing");
     setError(null);
     setResponse(null);
+    setWarmRunMs(null);
+    // Measure this run's request→result latency. If the first-visit sample
+    // already warmed the service, a real upload is recorded as the separate
+    // "warm" timing so cold and warm are never conflated.
+    const isUpload = body.get("source") !== "sample";
+    const wasWarm = isUpload && isServiceWarm();
+    const startedAt = nowMs();
     try {
       const res = await fetch("/api/precheck", { method: "POST", body });
       const json = (await res.json()) as ApiSuccess | ApiFailure;
       if (json.ok) {
+        const elapsed = nowMs() - startedAt;
+        if (isUpload) recordWarmMs(elapsed);
+        if (wasWarm) setWarmRunMs(elapsed);
         setResponse(json.data);
         setPhase("complete");
         requestAnimationFrame(() => resultRef.current?.focus());
@@ -313,7 +327,12 @@ export function PrecheckWorkspace() {
           </span>
         ) : null}
         {phase === "complete" ? (
-          <span className="text-muted-foreground">Pre-check complete.</span>
+          <span className="text-muted-foreground">
+            Pre-check complete.
+            {warmRunMs !== null
+              ? ` First result in ${(warmRunMs / 1000).toFixed(1)}s on the warm service.`
+              : ""}
+          </span>
         ) : null}
       </div>
       {phase === "processing" ? (

@@ -19,6 +19,10 @@
     --ring: 222 84% 40%;
     --alert: 40 90% 96%;
     --alert-foreground: 25 60% 22%;
+    /* Reviewer/admin secondary action: a deliberate purple accent, distinct from
+       the navy primary seller action so it reads as a separate destination. */
+    --reviewer: 271 68% 44%;
+    --reviewer-foreground: 0 0% 100%;
     /* Status accents pair with the always-present text label (never color alone). */
     --status-pass: 142 55% 30%;
     --status-warn: 35 85% 32%;
@@ -48,6 +52,8 @@
     --ring: 210 90% 66%;
     --alert: 30 40% 16%;
     --alert-foreground: 40 90% 85%;
+    --reviewer: 270 85% 76%;
+    --reviewer-foreground: 271 60% 12%;
     --status-pass: 142 55% 62%;
     --status-warn: 40 90% 66%;
     --status-fail: 0 80% 72%;

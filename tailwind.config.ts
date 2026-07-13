@@ -25,6 +25,10 @@ const config: Config = {
           DEFAULT: "hsl(var(--alert))",
           foreground: "hsl(var(--alert-foreground))",
         },
+        reviewer: {
+          DEFAULT: "hsl(var(--reviewer))",
+          foreground: "hsl(var(--reviewer-foreground))",
+        },
         ring: "hsl(var(--ring))",
       },
       borderRadius: {

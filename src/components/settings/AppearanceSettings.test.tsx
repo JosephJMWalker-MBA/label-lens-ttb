@@ -2,22 +2,22 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { PreferencesProvider } from "@/app/preferences";
-import { OnboardingDialog } from "@/components/onboarding/OnboardingDialog";
 import {
   ONBOARDING_STORAGE_KEY,
   OnboardingProvider,
 } from "@/components/onboarding/onboarding-context";
+import { OnboardingWorkspace } from "@/components/onboarding/OnboardingWorkspace";
 
 import { AppearanceSettings } from "./AppearanceSettings";
 
 function renderSettings() {
-  // Mark onboarding seen so its dialog is not auto-open during these tests.
+  // Mark onboarding seen so the workspace is not auto-open during these tests.
   localStorage.setItem(ONBOARDING_STORAGE_KEY, "true");
   return render(
     <PreferencesProvider>
       <OnboardingProvider>
         <AppearanceSettings />
-        <OnboardingDialog />
+        <OnboardingWorkspace />
       </OnboardingProvider>
     </PreferencesProvider>,
   );
@@ -71,11 +71,13 @@ describe("AppearanceSettings surface", () => {
 
   it("replays the introduction from the settings surface", async () => {
     renderSettings();
-    expect(screen.queryByRole("dialog", { name: /upload a wine label/i })).toBeNull();
+    expect(screen.queryByRole("dialog", { name: /warming up on a verified sample/i })).toBeNull();
     openPanel();
     fireEvent.click(screen.getByRole("button", { name: /view introduction again/i }));
     await waitFor(() =>
-      expect(screen.getByRole("dialog", { name: /upload a wine label/i })).toBeInTheDocument(),
+      expect(
+        screen.getByRole("dialog", { name: /warming up on a verified sample/i }),
+      ).toBeInTheDocument(),
     );
   });
 

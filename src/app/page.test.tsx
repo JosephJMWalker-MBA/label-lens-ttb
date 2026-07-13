@@ -1,9 +1,15 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import { ONBOARDING_STORAGE_KEY } from "@/components/onboarding/onboarding-context";
 
 import HomePage from "./page";
 
 describe("HomePage", () => {
+  // Mark onboarding seen so the productive cold-start overlay does not auto-open
+  // (and auto-run the sample) during these page-structure tests.
+  beforeEach(() => localStorage.setItem(ONBOARDING_STORAGE_KEY, "true"));
+
   it("renders the Label Lens TTB title, purpose, and workspace", () => {
     render(<HomePage />);
     expect(screen.getByRole("heading", { level: 1, name: /label lens ttb/i })).toBeInTheDocument();
