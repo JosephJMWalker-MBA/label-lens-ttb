@@ -57,6 +57,109 @@ describe("selectAlcoholObservation", () => {
     expect(observation.value).toBe("12.5% ALC./VOL.");
   });
 
+  it("assembles a split percent marker on one line", () => {
+    const words = line(
+      [
+        ["13.5", 94],
+        ["%", 94],
+        ["BY", 93],
+        ["VOL", 92],
+      ],
+      10,
+    );
+    const { observation, alcoholDiagnostics } = selectAlcoholObservation([region(words)]);
+    expect(observation.state).toBe("OBSERVED");
+    expect(observation.value).toBe("13.5% BY VOL.");
+    expect(alcoholDiagnostics?.candidates.some((candidate) => candidate.kept)).toBe(true);
+  });
+
+  it("assembles explicit percent-less alcohol-by-volume wording", () => {
+    const words = line(
+      [
+        ["ALC", 93],
+        ["14", 93],
+        ["BY", 93],
+        ["VOL", 92],
+      ],
+      10,
+    );
+    const { observation, alcoholDiagnostics } = selectAlcoholObservation([region(words)]);
+    expect(observation.state).toBe("OBSERVED");
+    expect(observation.value).toBe("ALCOHOL 14 BY VOLUME");
+    expect(
+      alcoholDiagnostics?.candidates.find((candidate) => candidate.kept)?.acceptanceReason,
+    ).toBe("explicit-percentless-alcohol-by-volume");
+  });
+
+  it("assembles alcohol wording across tightly adjacent lines", () => {
+    const upper = line(
+      [
+        ["ALC", 93],
+        ["%", 92],
+      ],
+      10,
+    );
+    const lower = line(
+      [
+        ["13,5", 93],
+        ["BY", 92],
+        ["VOL", 92],
+      ],
+      32,
+    );
+    const { observation, alcoholDiagnostics } = selectAlcoholObservation([
+      region([...upper, ...lower]),
+    ]);
+    expect(observation.state).toBe("OBSERVED");
+    expect(observation.value).toBe("13.5% ALC./VOL.");
+    expect(alcoholDiagnostics?.candidates.find((candidate) => candidate.kept)?.assembly).toBe(
+      "adjacent-line-window",
+    );
+  });
+
+  it("merges a split decimal across OCR tokens", () => {
+    const words = line(
+      [
+        ["13", 92],
+        [".", 92],
+        ["5", 92],
+        ["%", 92],
+        ["BY", 91],
+        ["VOL", 91],
+      ],
+      10,
+    );
+    const { observation, alcoholDiagnostics } = selectAlcoholObservation([region(words)]);
+    expect(observation.state).toBe("OBSERVED");
+    expect(observation.value).toBe("13.5% BY VOL.");
+    expect(
+      alcoholDiagnostics?.candidates.find((candidate) => candidate.kept)?.normalizationOperations,
+    ).toContain("split-decimal-merge");
+  });
+
+  it("normalizes fused OCR alcohol markers and missing decimal punctuation narrowly", () => {
+    const words = line(
+      [
+        ["A1C135%", 91],
+        ["BY", 90],
+        ["V0L", 90],
+      ],
+      10,
+    );
+    const { observation, alcoholDiagnostics } = selectAlcoholObservation([region(words)]);
+    expect(observation.state).toBe("OBSERVED");
+    expect(observation.value).toBe("13.5% ALC./VOL.");
+    expect(
+      alcoholDiagnostics?.candidates.find((candidate) => candidate.kept)?.normalizationOperations,
+    ).toEqual(
+      expect.arrayContaining([
+        "split-fused-alcohol-prefix",
+        "marker-ocr-normalized",
+        "implicit-decimal-recovery",
+      ]),
+    );
+  });
+
   it("preserves a low-confidence value rather than dropping it", () => {
     const words = line(
       [
@@ -73,14 +176,15 @@ describe("selectAlcoholObservation", () => {
   it("never returns a proof statement as a value", () => {
     const words = line(
       [
-        ["80%", 90],
+        ["80", 90],
         ["proof", 90],
       ],
       10,
     );
-    const { observation } = selectAlcoholObservation([region(words)]);
+    const { observation, alcoholDiagnostics } = selectAlcoholObservation([region(words)]);
     expect(observation.state).toBe("NOT_OBSERVED");
     expect(observation.value).toBeNull();
+    expect(alcoholDiagnostics?.candidates[0]?.rejectionReason).toBe("proof-only");
   });
 
   it("returns NOT_OBSERVED when a processed region has no supported candidate", () => {
@@ -93,6 +197,47 @@ describe("selectAlcoholObservation", () => {
     );
     const { observation } = selectAlcoholObservation([region(words)]);
     expect(observation.state).toBe("NOT_OBSERVED");
+  });
+
+  it("rejects a year-shaped number even with alcohol wording", () => {
+    const words = line(
+      [
+        ["ALCOHOL", 95],
+        ["2021", 95],
+        ["BY", 95],
+        ["VOLUME", 95],
+      ],
+      10,
+    );
+    const { observation, alcoholDiagnostics } = selectAlcoholObservation([region(words)]);
+    expect(observation.state).toBe("NOT_OBSERVED");
+    expect(
+      alcoholDiagnostics?.candidates.some(
+        (candidate) =>
+          candidate.rejectionReason === "unsupported-pattern" ||
+          candidate.rejectionReason === "no-supported-number",
+      ),
+    ).toBe(true);
+  });
+
+  it("preserves ambiguity when two plausible alcohol statements compete", () => {
+    const top = line(
+      [
+        ["12.5%", 92],
+        ["ALC./VOL.", 92],
+      ],
+      10,
+    );
+    const bottom = line(
+      [
+        ["13%", 91],
+        ["ALC./VOL.", 91],
+      ],
+      50,
+    );
+    const { observation } = selectAlcoholObservation([region([...top, ...bottom])]);
+    expect(observation.state).toBe("AMBIGUOUS");
+    expect(observation.alternates.length).toBeGreaterThan(0);
   });
 });
 

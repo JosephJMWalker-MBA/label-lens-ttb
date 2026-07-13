@@ -179,7 +179,13 @@ describe("alcohol classification", () => {
   const diag = (o: Partial<AlcoholDiagnostics>): AlcoholDiagnostics => ({
     numberInOcr: false,
     percentInOcr: false,
-    numberAndPercentSameLine: false,
+    alcoholMarkerInOcr: false,
+    volumeMarkerInOcr: false,
+    sameLineEvidenceCluster: false,
+    adjacentLineEvidenceCluster: false,
+    filterRejectedCandidate: false,
+    parserRejectedCandidate: false,
+    candidateAccepted: false,
     ...o,
   });
 
@@ -203,24 +209,36 @@ describe("alcohol classification", () => {
     );
   });
 
-  it("split tokens (number read, % separate/absent on same line) → candidate-generation failure", () => {
+  it("same-line alcohol evidence without a supported candidate → candidate-generation failure", () => {
     const missed = obs({ state: "NOT_OBSERVED", value: null });
     expect(
       classifyAlcohol(
         present,
         missed,
-        diag({ numberInOcr: true, percentInOcr: true, numberAndPercentSameLine: true }),
+        diag({
+          numberInOcr: true,
+          percentInOcr: true,
+          sameLineEvidenceCluster: true,
+          alcoholMarkerInOcr: true,
+          volumeMarkerInOcr: true,
+        }),
       ),
     ).toBe("candidate-generation-failure");
   });
 
-  it("number and % on different lines → line-reconstruction failure", () => {
+  it("adjacent-line alcohol evidence without a candidate → line-reconstruction failure", () => {
     const missed = obs({ state: "NOT_OBSERVED", value: null });
     expect(
       classifyAlcohol(
         present,
         missed,
-        diag({ numberInOcr: true, percentInOcr: true, numberAndPercentSameLine: false }),
+        diag({
+          numberInOcr: true,
+          percentInOcr: true,
+          adjacentLineEvidenceCluster: true,
+          alcoholMarkerInOcr: true,
+          volumeMarkerInOcr: true,
+        }),
       ),
     ).toBe("line-reconstruction-failure");
   });
@@ -230,6 +248,39 @@ describe("alcohol classification", () => {
     expect(classifyAlcohol(present, missed, diag({ numberInOcr: false }))).toBe(
       "ocr-recognition-failure",
     );
+  });
+
+  it("filter-rejected candidate paths stay distinct from generation failures", () => {
+    const missed = obs({ state: "NOT_OBSERVED", value: null });
+    expect(
+      classifyAlcohol(
+        present,
+        missed,
+        diag({
+          numberInOcr: true,
+          alcoholMarkerInOcr: true,
+          volumeMarkerInOcr: true,
+          filterRejectedCandidate: true,
+        }),
+      ),
+    ).toBe("candidate-filtering-failure");
+  });
+
+  it("parser-rejected candidates stay distinct from filtering failures", () => {
+    const missed = obs({ state: "NOT_OBSERVED", value: null });
+    expect(
+      classifyAlcohol(
+        present,
+        missed,
+        diag({
+          numberInOcr: true,
+          percentInOcr: true,
+          alcoholMarkerInOcr: true,
+          volumeMarkerInOcr: true,
+          parserRejectedCandidate: true,
+        }),
+      ),
+    ).toBe("parser-failure");
   });
 });
 

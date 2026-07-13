@@ -3,7 +3,10 @@ import type {
   AnalyzerOcrEngine,
 } from "@/pipeline/analyzer/analyzer.types";
 import { extractLabelEvidence } from "@/pipeline/extractor/extractor";
-import { selectBrandObservation } from "@/pipeline/extractor/field-selection";
+import {
+  selectAlcoholObservation,
+  selectBrandObservation,
+} from "@/pipeline/extractor/field-selection";
 import type {
   ExtractionInput,
   OcrWord,
@@ -52,6 +55,7 @@ const EVAL_PROCESSED_AT = "2026-07-12T00:00:00Z";
 const MAX_SAMPLE_WORDS_PER_REGION = 25;
 const MAX_BRAND_LINES = 12;
 const MAX_BRAND_CANDIDATES = 24;
+const MAX_ALCOHOL_CANDIDATES = 24;
 const MAX_TEXT_LEN = 120;
 /** Vertical proximity (processed space) grouping words into a line; matches selector. */
 const LINE_Y_TOLERANCE = 20;
@@ -99,31 +103,7 @@ function groupLines(words: OcrWord[]): OcrWord[][] {
   return out.map((l) => [...l].sort((a, b) => a.bbox.x0 - b.bbox.x0));
 }
 
-/** Digit-boundary forms of an acceptable percent (dot, comma, and bare integer). */
-function numberForms(percents: number[]): string[] {
-  const forms = new Set<string>();
-  for (const p of percents) {
-    forms.add(String(p));
-    forms.add(String(p).replace(".", ","));
-    forms.add(String(Math.trunc(p)));
-  }
-  return [...forms];
-}
-
-/** A token carries the alcohol number as a bounded numeric run (not a substring of a year). */
-function tokenHasNumber(text: string, forms: string[]): boolean {
-  const compact = text.replace(/\s+/g, "");
-  return forms.some((f) => {
-    const escaped = f.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    return new RegExp(`(^|[^0-9])${escaped}([^0-9]|$)`).test(compact);
-  });
-}
-
-function diagnosticsFor(
-  regions: RegionOcrResult[],
-  numberFormList: string[],
-  acceptableBrands: string[],
-): CaseDiagnostics {
+function diagnosticsFor(regions: RegionOcrResult[], acceptableBrands: string[]): CaseDiagnostics {
   const sampleRegions = regions.map((r) => ({
     regionName: r.regionName,
     wordCount: r.words.length,
@@ -143,24 +123,10 @@ function diagnosticsFor(
         .slice(0, MAX_BRAND_LINES)
     : [];
   const brandSelection = selectBrandObservation(regions);
+  const alcoholSelection = selectAlcoholObservation(regions);
   const candidateValues = (brandSelection.brandDiagnostics?.candidates ?? [])
     .filter((candidate) => candidate.kept && candidate.cleanedValue)
     .map((candidate) => candidate.cleanedValue!);
-
-  let numberInOcr = false;
-  let percentInOcr = false;
-  let numberAndPercentSameLine = false;
-  for (const r of regions) {
-    for (const w of r.words) {
-      if (tokenHasNumber(w.text, numberFormList)) numberInOcr = true;
-      if (w.text.includes("%")) percentInOcr = true;
-    }
-    for (const line of groupLines(r.words)) {
-      const hasNumber = line.some((w) => tokenHasNumber(w.text, numberFormList));
-      const hasPercent = line.some((w) => w.text.includes("%"));
-      if (hasNumber && hasPercent) numberAndPercentSameLine = true;
-    }
-  }
 
   return {
     regions: sampleRegions,
@@ -210,9 +176,48 @@ function diagnosticsFor(
     brandCandidateContainsAcceptable: candidateValues.some((value) =>
       acceptableBrands.some((acceptable) => brandNormalizedMatch(value, [acceptable])),
     ),
-    alcoholNumberInOcr: numberInOcr,
-    alcoholPercentInOcr: percentInOcr,
-    alcoholNumberAndPercentSameLine: numberAndPercentSameLine,
+    alcoholCandidateDecisions: [...(alcoholSelection.alcoholDiagnostics?.candidates ?? [])]
+      .sort((a, b) => {
+        const decisionDelta =
+          brandCandidatePriority(a.decision) - brandCandidatePriority(b.decision);
+        if (decisionDelta !== 0) return decisionDelta;
+        return b.confidence - a.confidence || b.prominence - a.prominence;
+      })
+      .slice(0, MAX_ALCOHOL_CANDIDATES)
+      .map((candidate) => ({
+        rawText: truncate(candidate.rawText),
+        normalizedValue: candidate.normalizedValue ? truncate(candidate.normalizedValue) : null,
+        normalizedParsingText: candidate.normalizedParsingText
+          ? truncate(candidate.normalizedParsingText)
+          : null,
+        confidence: candidate.confidence,
+        prominence: candidate.prominence,
+        assembly: candidate.assembly,
+        lineIndexes: candidate.lineIndexes,
+        sourceTokens: candidate.sourceTokens.map(truncate),
+        sourceBoxes: candidate.sourceBoxes,
+        kept: candidate.kept,
+        acceptanceReason: candidate.acceptanceReason,
+        positiveMarkers: candidate.positiveMarkers,
+        normalizationOperations: candidate.normalizationOperations,
+        parsedPercent: candidate.parsedPercent,
+        rejectionReason: candidate.rejectionReason,
+        decision: candidate.decision,
+      })),
+    alcoholAbstentionReason: alcoholSelection.alcoholDiagnostics?.abstentionReason,
+    alcoholNumberInOcr: alcoholSelection.alcoholDiagnostics?.numberInOcr ?? false,
+    alcoholPercentInOcr: alcoholSelection.alcoholDiagnostics?.percentInOcr ?? false,
+    alcoholAlcoholMarkerInOcr: alcoholSelection.alcoholDiagnostics?.alcoholMarkerInOcr ?? false,
+    alcoholVolumeMarkerInOcr: alcoholSelection.alcoholDiagnostics?.volumeMarkerInOcr ?? false,
+    alcoholSameLineEvidenceCluster:
+      alcoholSelection.alcoholDiagnostics?.sameLineEvidenceCluster ?? false,
+    alcoholAdjacentLineEvidenceCluster:
+      alcoholSelection.alcoholDiagnostics?.adjacentLineEvidenceCluster ?? false,
+    alcoholFilterRejectedCandidate:
+      alcoholSelection.alcoholDiagnostics?.filterRejectedCandidate ?? false,
+    alcoholParserRejectedCandidate:
+      alcoholSelection.alcoholDiagnostics?.parserRejectedCandidate ?? false,
+    alcoholCandidateAccepted: alcoholSelection.alcoholDiagnostics?.candidateAccepted ?? false,
   };
 }
 
@@ -235,7 +240,6 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
   const latencyMs = performance.now() - start;
 
   // Diagnostics pass (same deterministic primitives the extractor uses).
-  const numberFormList = numberForms(evalCase.alcohol.acceptablePercents);
   let diagnostics: CaseDiagnostics = {
     regions: [],
     brandLineTexts: [],
@@ -245,16 +249,24 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
     brandLineContainsAcceptable: false,
     brandCandidateContainsAcceptable: false,
     brandAbstentionReason: undefined,
+    alcoholCandidateDecisions: [],
+    alcoholAbstentionReason: undefined,
     alcoholNumberInOcr: false,
     alcoholPercentInOcr: false,
-    alcoholNumberAndPercentSameLine: false,
+    alcoholAlcoholMarkerInOcr: false,
+    alcoholVolumeMarkerInOcr: false,
+    alcoholSameLineEvidenceCluster: false,
+    alcoholAdjacentLineEvidenceCluster: false,
+    alcoholFilterRejectedCandidate: false,
+    alcoholParserRejectedCandidate: false,
+    alcoholCandidateAccepted: false,
   };
   const decoded = await verifyAndDecode(bytes, sha256);
   if (decoded.ok) {
     const engine = await createLocalOcrEngine();
     try {
       const regions = await runRegionOcr(bytes, decoded.value.width, decoded.value.height, engine);
-      diagnostics = diagnosticsFor(regions, numberFormList, evalCase.brand.acceptable);
+      diagnostics = diagnosticsFor(regions, evalCase.brand.acceptable);
     } finally {
       try {
         await engine.terminate();
@@ -267,7 +279,13 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
   const alcoholDiag: AlcoholDiagnostics = {
     numberInOcr: diagnostics.alcoholNumberInOcr,
     percentInOcr: diagnostics.alcoholPercentInOcr,
-    numberAndPercentSameLine: diagnostics.alcoholNumberAndPercentSameLine,
+    alcoholMarkerInOcr: diagnostics.alcoholAlcoholMarkerInOcr,
+    volumeMarkerInOcr: diagnostics.alcoholVolumeMarkerInOcr,
+    sameLineEvidenceCluster: diagnostics.alcoholSameLineEvidenceCluster,
+    adjacentLineEvidenceCluster: diagnostics.alcoholAdjacentLineEvidenceCluster,
+    filterRejectedCandidate: diagnostics.alcoholFilterRejectedCandidate,
+    parserRejectedCandidate: diagnostics.alcoholParserRejectedCandidate,
+    candidateAccepted: diagnostics.alcoholCandidateAccepted,
   };
 
   if (!result.ok) {

@@ -1,5 +1,11 @@
 import type { AnalyzerObservationState } from "@/pipeline/analyzer/analyzer.types";
 import type {
+  AlcoholAbstentionReason,
+  AlcoholAcceptanceReason,
+  AlcoholCandidateAssembly,
+  AlcoholCandidateDecision,
+  AlcoholNormalizationOperation,
+  AlcoholRejectionReason,
   BrandAbstentionReason,
   BrandCandidateAssembly,
   BrandCandidateDecision,
@@ -59,9 +65,34 @@ export interface CaseDiagnostics {
   brandOcrContainsAcceptable: boolean;
   brandLineContainsAcceptable: boolean;
   brandCandidateContainsAcceptable: boolean;
+  alcoholCandidateDecisions: {
+    rawText: string;
+    normalizedValue: string | null;
+    normalizedParsingText: string | null;
+    confidence: number;
+    prominence: number;
+    assembly: AlcoholCandidateAssembly;
+    lineIndexes: number[];
+    sourceTokens: string[];
+    sourceBoxes: { x0: number; y0: number; x1: number; y1: number }[];
+    kept: boolean;
+    acceptanceReason?: AlcoholAcceptanceReason;
+    positiveMarkers: string[];
+    normalizationOperations: AlcoholNormalizationOperation[];
+    parsedPercent: number | null;
+    rejectionReason?: AlcoholRejectionReason;
+    decision?: AlcoholCandidateDecision;
+  }[];
+  alcoholAbstentionReason?: AlcoholAbstentionReason;
   alcoholNumberInOcr: boolean;
   alcoholPercentInOcr: boolean;
-  alcoholNumberAndPercentSameLine: boolean;
+  alcoholAlcoholMarkerInOcr: boolean;
+  alcoholVolumeMarkerInOcr: boolean;
+  alcoholSameLineEvidenceCluster: boolean;
+  alcoholAdjacentLineEvidenceCluster: boolean;
+  alcoholFilterRejectedCandidate: boolean;
+  alcoholParserRejectedCandidate: boolean;
+  alcoholCandidateAccepted: boolean;
 }
 
 /** The extractor's projected view of one field, plus the harness verdicts. */
