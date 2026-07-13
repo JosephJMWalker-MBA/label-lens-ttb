@@ -63,12 +63,88 @@ export function fact(value: string): DeclaredFact {
 }
 
 function obs(value: string): AnalyzerFieldObservation {
+  const ocrEvidenceScore = 0.95;
   return {
     state: "OBSERVED",
     value,
     normalizedValue: value,
     rawText: value,
-    confidence: 0.95,
+    confidence: ocrEvidenceScore,
+    ocrEvidenceScore,
+    ocrConfidence: {
+      aggregation: "mean",
+      rawScale: "0-100",
+      rawTokenConfidences: [95],
+      rawMean: 95,
+      rawMin: 95,
+      rawMax: 95,
+      missingTokenCount: 0,
+    },
+    candidateProvenance: {
+      passId: "pass-0-full-image",
+      passKind: "full-image-primary",
+      triggerReasons: ["primary-pass"],
+      preprocessing: ["grayscale", "normalise", "scale:1.5"],
+      regionName: value === "12.5% ALC./VOL." ? "full-image-alcohol" : "full-image-brand",
+      supportingPassIds: ["pass-0-full-image"],
+      supportingPassKinds: ["full-image-primary"],
+      recoveryPassUsed: false,
+    },
+    ranking:
+      value === "12.5% ALC./VOL."
+        ? {
+            strategy: "alcohol-ocr-evidence-comparator",
+            orderingMode: "ocr-evidence-first",
+            comparator: [
+              { id: "ocr-evidence-score", direction: "desc", value: ocrEvidenceScore },
+              { id: "normalized-value-key", direction: "asc", value: "125alcvol" },
+            ],
+          }
+        : {
+            strategy: "brand-mixed-prominence-score",
+            orderingMode: "score-first",
+            comparator: [
+              { id: "score-eligibility", direction: "desc", value: true },
+              { id: "ranking-score", direction: "desc", value: 5.6 },
+              { id: "prominence", direction: "desc", value: 30 },
+              { id: "ocr-evidence-score", direction: "desc", value: ocrEvidenceScore },
+              { id: "normalized-value-key", direction: "asc", value: "mcellars" },
+            ],
+            rankingScore: 5.6,
+            scoreFactors: [
+              { id: "positive-signal", value: 1, contribution: 2, direction: "benefit" },
+              {
+                id: "meaningful-chars",
+                value: 0.64,
+                contribution: 1.024,
+                direction: "benefit",
+              },
+              { id: "structure", value: 1, contribution: 1.2, direction: "benefit" },
+              {
+                id: "ocr-evidence-score",
+                value: ocrEvidenceScore,
+                contribution: ocrEvidenceScore,
+                direction: "benefit",
+              },
+              { id: "prominence", value: 1, contribution: 0.8, direction: "benefit" },
+              { id: "area", value: 0.5, contribution: 0.3, direction: "benefit" },
+              { id: "centrality", value: 0.5, contribution: 0.15, direction: "benefit" },
+              { id: "alignment", value: 1, contribution: 0.25, direction: "benefit" },
+              {
+                id: "line-proximity",
+                value: 1,
+                contribution: 0.2,
+                direction: "benefit",
+              },
+              {
+                id: "low-information-penalty",
+                value: 0,
+                contribution: 0,
+                direction: "penalty",
+              },
+              { id: "residual-penalty", value: 0, contribution: 0, direction: "penalty" },
+            ],
+          },
     geometry: {
       imageIndex: 0,
       x: 10,

@@ -17,10 +17,17 @@ import {
   type ObservedField,
 } from "./metrics";
 
+const alt = (value: string, confidence: number): ObservedField["alternates"][number] => ({
+  value,
+  confidence,
+  ocrEvidenceScore: confidence,
+});
+
 const obs = (over: Partial<ObservedField> = {}): ObservedField => ({
   state: "OBSERVED",
   value: null,
   confidence: 0.9,
+  ocrEvidenceScore: 0.9,
   alternates: [],
   ...over,
 });
@@ -46,10 +53,7 @@ describe("brand matching (punctuation/diacritic tolerant)", () => {
   it("top-k scans selected value then alternates in order, with normalization", () => {
     const o = obs({
       value: "Pir",
-      alternates: [
-        { value: "VANNI", confidence: 0.9 },
-        { value: "chateau  bonneau", confidence: 0.8 },
-      ],
+      alternates: [alt("VANNI", 0.9), alt("chateau  bonneau", 0.8)],
     });
     expect(brandInTopK(o, ["Château Bonneau"], 3)).toBe(true);
     expect(brandInTopK(o, ["Château Bonneau"], 2)).toBe(false); // beyond top-2
@@ -115,7 +119,7 @@ describe("brand classification", () => {
     const o = obs({
       state: "AMBIGUOUS",
       value: "Pir",
-      alternates: [{ value: "Luigi & Giovanni", confidence: 0.3 }],
+      alternates: [alt("Luigi & Giovanni", 0.3)],
     });
     expect(classifyBrand(determinate, o, brandDiag({ candidateContainsAcceptable: true }))).toBe(
       "candidate-ranking-failure",
@@ -126,11 +130,7 @@ describe("brand classification", () => {
     const o = obs({
       state: "AMBIGUOUS",
       value: "Pir",
-      alternates: [
-        { value: "Also Wrong", confidence: 0.4 },
-        { value: "Still Wrong", confidence: 0.3 },
-        { value: "Yet Wrong", confidence: 0.2 },
-      ],
+      alternates: [alt("Also Wrong", 0.4), alt("Still Wrong", 0.3), alt("Yet Wrong", 0.2)],
     });
     expect(classifyBrand(determinate, o, brandDiag({ candidateContainsAcceptable: true }))).toBe(
       "candidate-ranking-failure",

@@ -28,7 +28,15 @@ const EXPECTED_MANIFEST = [
 ];
 
 function geometry() {
-  return { imageIndex: 0, x: 10, y: 20, width: 100, height: 30, imageWidth: 494, imageHeight: 214 };
+  return {
+    imageIndex: 0,
+    x: 10,
+    y: 20,
+    width: 100,
+    height: 30,
+    imageWidth: 494,
+    imageHeight: 214,
+  };
 }
 
 /**
@@ -42,17 +50,121 @@ function obs(
 ): AnalyzerFieldObservation {
   const state = overrides.state ?? (value === null ? "NOT_OBSERVED" : "OBSERVED");
   if (state === "NOT_OBSERVED") {
-    return { state: "NOT_OBSERVED", value: null, confidence: 0, alternates: [] };
+    return {
+      state: "NOT_OBSERVED",
+      value: null,
+      confidence: 0,
+      ocrEvidenceScore: 0,
+      alternates: [],
+    };
   }
+  const ocrEvidenceScore = overrides.ocrEvidenceScore ?? overrides.confidence ?? 0.95;
   return {
     state,
     value,
     normalizedValue: value,
     rawText: value ?? undefined,
-    confidence: 0.95,
+    confidence: ocrEvidenceScore,
+    ocrEvidenceScore,
+    ocrConfidence: {
+      aggregation: "mean",
+      rawScale: "0-100",
+      rawTokenConfidences: [Math.round(ocrEvidenceScore * 100)],
+      rawMean: Math.round(ocrEvidenceScore * 100),
+      rawMin: Math.round(ocrEvidenceScore * 100),
+      rawMax: Math.round(ocrEvidenceScore * 100),
+      missingTokenCount: 0,
+    },
+    candidateProvenance: {
+      passId: "pass-0-full-image",
+      passKind: "full-image-primary",
+      triggerReasons: ["primary-pass"],
+      preprocessing: ["grayscale"],
+      regionName: "full-image",
+      supportingPassIds: ["pass-0-full-image"],
+      supportingPassKinds: ["full-image-primary"],
+      recoveryPassUsed: false,
+    },
+    ranking: {
+      strategy:
+        value && value.includes("ALC")
+          ? "alcohol-ocr-evidence-comparator"
+          : "brand-mixed-prominence-score",
+      orderingMode: value && value.includes("ALC") ? "ocr-evidence-first" : "score-first",
+      comparator:
+        value && value.includes("ALC")
+          ? [
+              { id: "ocr-evidence-score", direction: "desc", value: ocrEvidenceScore },
+              { id: "normalized-value-key", direction: "asc", value: "alcohol" },
+            ]
+          : [
+              { id: "score-eligibility", direction: "desc", value: true },
+              { id: "ranking-score", direction: "desc", value: 5.1 },
+              { id: "prominence", direction: "desc", value: 30 },
+              { id: "ocr-evidence-score", direction: "desc", value: ocrEvidenceScore },
+              { id: "normalized-value-key", direction: "asc", value: "brand" },
+            ],
+      ...(value && value.includes("ALC")
+        ? {}
+        : {
+            rankingScore: 5.1,
+            scoreFactors: [
+              { id: "positive-signal", value: 1, contribution: 2, direction: "benefit" },
+              {
+                id: "ocr-evidence-score",
+                value: ocrEvidenceScore,
+                contribution: ocrEvidenceScore,
+                direction: "benefit",
+              },
+            ],
+          }),
+    },
     geometry: geometry(),
     alternates: [],
     ...overrides,
+  };
+}
+
+function alt(value: string, score: number): AnalyzerFieldObservation["alternates"][number] {
+  return {
+    value,
+    confidence: score,
+    ocrEvidenceScore: score,
+    ocrConfidence: {
+      aggregation: "mean",
+      rawScale: "0-100",
+      rawTokenConfidences: [Math.round(score * 100)],
+      rawMean: Math.round(score * 100),
+      rawMin: Math.round(score * 100),
+      rawMax: Math.round(score * 100),
+      missingTokenCount: 0,
+    },
+    candidateProvenance: {
+      passId: `pass-${value}`,
+      passKind: "full-image-primary",
+      triggerReasons: ["primary-pass"],
+      preprocessing: ["grayscale"],
+      regionName: "full-image",
+      supportingPassIds: [`pass-${value}`],
+      supportingPassKinds: ["full-image-primary"],
+      recoveryPassUsed: false,
+    },
+    ranking: {
+      strategy: "brand-mixed-prominence-score",
+      orderingMode: "score-first",
+      comparator: [
+        { id: "score-eligibility", direction: "desc", value: true },
+        { id: "ranking-score", direction: "desc", value: 4.2 },
+        { id: "prominence", direction: "desc", value: 24 },
+        { id: "ocr-evidence-score", direction: "desc", value: score },
+        { id: "normalized-value-key", direction: "asc", value: value.toLowerCase() },
+      ],
+      rankingScore: 4.2,
+      scoreFactors: [
+        { id: "positive-signal", value: 1, contribution: 2, direction: "benefit" },
+        { id: "ocr-evidence-score", value: score, contribution: score, direction: "benefit" },
+      ],
+    },
   };
 }
 
@@ -209,7 +321,7 @@ describe("per-check evidence sufficiency", () => {
     const amb = request({
       brand: obs("M CELLARS", {
         state: "AMBIGUOUS",
-        alternates: [{ value: "N CELLARS", confidence: 0.4 }],
+        alternates: [alt("N CELLARS", 0.4)],
       }),
     });
     expect(evidence(amb, "brand-name-check").evidenceStatus).toBe("sufficient");
@@ -310,7 +422,7 @@ describe("orchestrated execution", () => {
     const req = request({
       brand: obs("M CELLARS", {
         state: "AMBIGUOUS",
-        alternates: [{ value: "N CELLARS", confidence: 0.4 }],
+        alternates: [alt("N CELLARS", 0.4)],
       }),
     });
     expect(findingFor(req, "brand-name-canonical-comparison").findingStatus).toBe("NEEDS_REVIEW");

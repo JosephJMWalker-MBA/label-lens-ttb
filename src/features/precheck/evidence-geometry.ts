@@ -2,6 +2,7 @@ import type {
   AnalyzerFieldObservation,
   EvidenceGeometry,
 } from "@/pipeline/analyzer/analyzer.types";
+import type { HumanFieldGeometry } from "@/pipeline/result/result.types";
 
 /**
  * Pure presentation math for evidence-region overlays.
@@ -50,6 +51,20 @@ export function overlayStyle(geometry: EvidenceGeometry): OverlayStyle {
   // Clamp the far edge too so a slightly out-of-frame box never overflows the image.
   const right = clampPct(((geometry.x + geometry.width) / geometry.imageWidth) * 100);
   const bottom = clampPct(((geometry.y + geometry.height) / geometry.imageHeight) * 100);
+  return {
+    left: pct(left),
+    top: pct(top),
+    width: pct(Math.max(0, right - left)),
+    height: pct(Math.max(0, bottom - top)),
+  };
+}
+
+/** Percentage-based absolute-position style for normalized human-review geometry. */
+export function normalizedOverlayStyle(geometry: HumanFieldGeometry): OverlayStyle {
+  const left = clampPct(geometry.x * 100);
+  const top = clampPct(geometry.y * 100);
+  const right = clampPct((geometry.x + geometry.width) * 100);
+  const bottom = clampPct((geometry.y + geometry.height) * 100);
   return {
     left: pct(left),
     top: pct(top),

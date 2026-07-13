@@ -8,6 +8,32 @@ import {
 } from "./diagnostic-attribution";
 import type { EvalAlcoholTruth, EvalBrandTruth } from "./eval-manifest.types";
 
+function ocrConfidence(score: number) {
+  const raw = Math.round(score * 100);
+  return {
+    aggregation: "mean" as const,
+    rawScale: "0-100" as const,
+    rawTokenConfidences: [raw],
+    rawMean: raw,
+    rawMin: raw,
+    rawMax: raw,
+    missingTokenCount: 0,
+  };
+}
+
+function candidateProvenance(passKind: string) {
+  return {
+    passId: "pass-0-full-image",
+    passKind,
+    triggerReasons: ["primary-pass"],
+    preprocessing: [],
+    regionName: "brand",
+    supportingPassIds: ["pass-0-full-image"],
+    supportingPassKinds: [passKind],
+    recoveryPassUsed: false,
+  };
+}
+
 describe("candidate-filtering subtype attribution", () => {
   it("maps truth-containing rejected brand spans to their filter subtype", () => {
     const truth: EvalBrandTruth = {
@@ -23,10 +49,13 @@ describe("candidate-filtering subtype attribution", () => {
             rawText: "Samson and Delilah, this Meeting of the Minds is fire.",
             cleanedValue: "Samson and Delilah, this Meeting of the Minds is fire.",
             confidence: 0.8,
+            ocrEvidenceScore: 0.8,
+            ocrConfidence: ocrConfidence(0.8),
             prominence: 14,
             passId: "pass-0-full-image",
             passKind: "full-image-primary",
             supportPassIds: ["pass-0-full-image"],
+            candidateProvenance: candidateProvenance("full-image-primary"),
             assembly: "whole-line",
             lineIndexes: [0],
             kept: false,
@@ -52,10 +81,13 @@ describe("candidate-filtering subtype attribution", () => {
             rawText: "Vino Alpino LLC",
             cleanedValue: "Vino Alpino LLC",
             confidence: 0.9,
+            ocrEvidenceScore: 0.9,
+            ocrConfidence: ocrConfidence(0.9),
             prominence: 18,
             passId: "pass-0-full-image",
             passKind: "full-image-primary",
             supportPassIds: ["pass-0-full-image"],
+            candidateProvenance: candidateProvenance("full-image-primary"),
             assembly: "whole-line",
             lineIndexes: [2],
             kept: true,
@@ -98,10 +130,19 @@ describe("candidate-filtering subtype attribution", () => {
             normalizedValue: null,
             normalizedParsingText: null,
             confidence: 0.7,
+            ocrEvidenceScore: 0.7,
+            ocrConfidence: ocrConfidence(0.7),
             prominence: 10,
             passId: "pass-2-right-edge-strip-rot90",
             passKind: "right-edge-strip-rot90",
             supportPassIds: ["pass-2-right-edge-strip-rot90"],
+            candidateProvenance: {
+              ...candidateProvenance("right-edge-strip-rot90"),
+              passId: "pass-2-right-edge-strip-rot90",
+              regionName: "alcohol",
+              supportingPassIds: ["pass-2-right-edge-strip-rot90"],
+              supportingPassKinds: ["right-edge-strip-rot90"],
+            },
             assembly: "same-line-window",
             lineIndexes: [0],
             sourceTokens: ["13.5%"],
@@ -154,6 +195,7 @@ describe("selected-field correctness helpers", () => {
         state: "AMBIGUOUS",
         value: "CHATEAU BONNEAU",
         confidence: 0.4,
+        ocrEvidenceScore: 0.4,
         alternates: [],
       }),
     ).toBe(true);
@@ -171,6 +213,7 @@ describe("selected-field correctness helpers", () => {
         state: "OBSERVED",
         value: "12.5% BY VOL.",
         confidence: 0.8,
+        ocrEvidenceScore: 0.8,
         alternates: [],
       }),
     ).toBe(true);

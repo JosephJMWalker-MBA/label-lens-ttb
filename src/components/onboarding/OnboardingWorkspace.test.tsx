@@ -13,12 +13,33 @@ vi.mock("@/features/precheck/ResultView", () => ({
   ResultView: ({
     response,
     previewImage,
+    onConfirmed,
   }: {
-    response: { machineResultId?: string } | null;
+    response: { machineResultId?: string; humanFieldConfirmationHistory?: unknown[] } | null;
     previewImage: { url: string; name: string } | null;
+    onConfirmed: (
+      updated: { machineResultId?: string; humanFieldConfirmationHistory?: unknown[] } | null,
+    ) => void;
   }) => (
-    <div data-testid="result-view" data-preview-url={previewImage?.url ?? "none"}>
-      result:{response?.machineResultId ?? "none"}
+    <div>
+      <div data-testid="result-view" data-preview-url={previewImage?.url ?? "none"}>
+        result:{response?.machineResultId ?? "none"}
+      </div>
+      <div data-testid="confirmation-count">
+        {String(response?.humanFieldConfirmationHistory?.length ?? 0)}
+      </div>
+      <button
+        type="button"
+        onClick={() =>
+          onConfirmed({
+            ...response,
+            machineResultId: `${response?.machineResultId ?? "none"}-confirmed`,
+            humanFieldConfirmationHistory: [{ fieldId: "brandName" }],
+          })
+        }
+      >
+        confirm sample
+      </button>
     </div>
   ),
 }));
@@ -95,13 +116,14 @@ describe("productive cold-start onboarding", () => {
   });
 
   it("reveals the live result and passes the analyzed sample artwork to ResultView", async () => {
-    mockPrecheck({ machineResultId: "M-CELLARS-LIVE" });
+    mockPrecheck({ machineResultId: "M-CELLARS-LIVE", humanFieldConfirmationHistory: [] });
     render(<Shell />);
     const result = await screen.findByTestId("result-view");
     // Integrity: the revealed result echoes the fetched response, and the preview
     // reference is the byte-verified sample-image endpoint (the analyzed artwork).
     expect(result).toHaveTextContent("result:M-CELLARS-LIVE");
     expect(result).toHaveAttribute("data-preview-url", "/api/sample-image");
+    expect(screen.getByTestId("confirmation-count")).toHaveTextContent("0");
   });
 
   it("logs only client-provable status states through to READY FOR YOUR LABEL", async () => {
@@ -176,7 +198,10 @@ describe("productive cold-start onboarding", () => {
   });
 
   it("replays after a completed first visit without a new request, keeping status and result", async () => {
-    const fetchMock = mockPrecheck();
+    const fetchMock = mockPrecheck({
+      machineResultId: "M-CELLARS-LIVE",
+      humanFieldConfirmationHistory: [],
+    });
     render(<Shell />);
 
     // 1-2. First visit completes.
@@ -202,6 +227,31 @@ describe("productive cold-start onboarding", () => {
     // Tutorial content and the primary actions remain available.
     expect(screen.getByText(/the workflow you/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /upload your label/i })).toBeInTheDocument();
+  });
+
+  it("replay keeps sample-local confirmation state without a new sample request", async () => {
+    const fetchMock = mockPrecheck({
+      machineResultId: "M-CELLARS-LIVE",
+      humanFieldConfirmationHistory: [],
+    });
+    render(<Shell />);
+
+    await screen.findByTestId("result-view");
+    expect(screen.getByTestId("confirmation-count")).toHaveTextContent("0");
+
+    fireEvent.click(screen.getByRole("button", { name: /confirm sample/i }));
+    expect(screen.getByTestId("result-view")).toHaveTextContent("result:M-CELLARS-LIVE-confirmed");
+    expect(screen.getByTestId("confirmation-count")).toHaveTextContent("1");
+
+    fireEvent.click(screen.getByRole("button", { name: /skip introduction/i }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+
+    fireEvent.click(screen.getByRole("button", { name: /replay intro/i }));
+    await screen.findByRole("dialog", { name: /warming up on a verified sample/i });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("result-view")).toHaveTextContent("result:M-CELLARS-LIVE-confirmed");
+    expect(screen.getByTestId("confirmation-count")).toHaveTextContent("1");
   });
 
   it("exposes an accessible modal dialog with a heading", async () => {

@@ -19,6 +19,7 @@ const obs = (over: Partial<AnalyzerFieldObservation> = {}): AnalyzerFieldObserva
   state: "OBSERVED",
   value: "value",
   confidence: 0.9,
+  ocrEvidenceScore: 0.9,
   alternates: [],
   ...over,
 });
@@ -62,7 +63,7 @@ describe("plain-language observation states", () => {
   it("maps every machine state to a readable label", () => {
     expect(OBSERVATION_STATE_LABEL).toEqual({
       OBSERVED: "Found",
-      LOW_CONFIDENCE: "Found with low confidence",
+      LOW_CONFIDENCE: "Found with weak OCR evidence",
       AMBIGUOUS: "Multiple possibilities",
       NOT_OBSERVED: "Not detected",
     });

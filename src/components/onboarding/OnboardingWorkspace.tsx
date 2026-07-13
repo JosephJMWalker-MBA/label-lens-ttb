@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ResultView } from "@/features/precheck/ResultView";
+import type { PrecheckServiceResponse } from "@/server/precheck-service.types";
 
 import { useOnboarding } from "./onboarding-context";
 import { useVerifiedSampleRun, type VerifiedSampleRunState } from "./useVerifiedSampleRun";
@@ -100,6 +101,7 @@ export function OnboardingWorkspace() {
   const { state, response, error, sampleRequestMs, start } = useVerifiedSampleRun(
     isOpen && firstVisit,
   );
+  const [displayedResponse, setDisplayedResponse] = useState<PrecheckServiceResponse | null>(null);
 
   const [log, setLog] = useState<LogEntry[]>([]);
   const [imageError, setImageError] = useState(false);
@@ -134,6 +136,10 @@ export function OnboardingWorkspace() {
     returnFocusRef.current = (document.activeElement as HTMLElement) ?? null;
     requestAnimationFrame(() => headingRef.current?.focus());
   }, [isOpen]);
+
+  useEffect(() => {
+    if (response) setDisplayedResponse(response);
+  }, [response]);
 
   const onUploadYourLabel = useCallback(() => {
     close();
@@ -172,7 +178,7 @@ export function OnboardingWorkspace() {
 
   if (!isOpen) return null;
 
-  const isReady = state === "ready" && response !== null;
+  const isReady = state === "ready" && displayedResponse !== null;
   const isFailed = state === "failed";
   const isRunning = state === "requested" || state === "analyzing";
 
@@ -282,8 +288,9 @@ export function OnboardingWorkspace() {
                 {/* The live pipeline output, with the exact analyzed artwork so
                     evidence overlays appear where geometry exists. */}
                 <ResultView
-                  response={response}
+                  response={displayedResponse}
                   previewImage={{ url: SAMPLE_IMAGE_URL, name: SAMPLE_IMAGE_NAME }}
+                  onConfirmed={setDisplayedResponse}
                 />
               </div>
             ) : (

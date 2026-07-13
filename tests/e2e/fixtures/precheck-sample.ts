@@ -53,6 +53,7 @@ export const SAMPLE_RESPONSE: PrecheckServiceResponse = {
       value: "M CELLARS",
       rawText: "M CELLARS",
       confidence: 0.93,
+      ocrEvidenceScore: 0.93,
       geometry: {
         imageIndex: 0,
         x: 10,
@@ -69,6 +70,7 @@ export const SAMPLE_RESPONSE: PrecheckServiceResponse = {
       value: "12.5% ALC./VOL.",
       rawText: "12.5% ALC./VOL.",
       confidence: 0.91,
+      ocrEvidenceScore: 0.91,
       geometry: {
         imageIndex: 0,
         x: 30,
@@ -119,6 +121,7 @@ export const SAMPLE_RESPONSE: PrecheckServiceResponse = {
   ] as PrecheckServiceResponse["findings"],
   suggestedFilename: "label-lens-wine-precheck-precheck-result.v1-" + "a".repeat(64) + ".json",
   exportJson: '{"exportType":"wine-precheck-result"}',
+  humanFieldConfirmationHistory: [],
   humanDispositionHistory: [],
   report: {
     html: "<!doctype html><html><body>report</body></html>",

@@ -74,7 +74,9 @@ test("first visit runs the sample, shows the analyzed artwork, reveals it, and m
   // The real result is revealed, now with the analyzed artwork for overlays.
   await expect(page.getByText(/verified sample result/i)).toBeVisible();
   await expect(page.getByRole("heading", { name: /pre-check result/i })).toBeVisible();
-  await expect(page.getByAltText(/M Cellars verified sample/i)).toBeVisible();
+  await expect(
+    page.getByAltText(/preview of the selected label image: m cellars verified sample/i),
+  ).toBeVisible();
 
   // Timing lifecycle: shell, sample request, and first trustworthy result recorded.
   const t1 = await readTiming(page);

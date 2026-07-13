@@ -8,6 +8,7 @@ import type { AnalyzerFieldObservation } from "@/pipeline/analyzer/analyzer.type
 import type { VerificationFinding } from "@/domain/verification/finding.types";
 import type { PrecheckServiceResponse } from "@/server/precheck-service.types";
 
+import { ConfirmationSection } from "./ConfirmationSection";
 import { triggerDownload } from "./download";
 import { EvidencePanel } from "./EvidencePanel";
 import {
@@ -45,8 +46,8 @@ function ObservationCard({ field, obs }: { field: string; obs: AnalyzerFieldObse
         <dd className="break-words">{obs.value ?? "— none extracted —"}</dd>
         <dt className="text-muted-foreground">Raw OCR text</dt>
         <dd className="break-words">{obs.rawText ?? "—"}</dd>
-        <dt className="text-muted-foreground">Confidence</dt>
-        <dd>{obs.confidence?.toFixed(2) ?? "—"}</dd>
+        <dt className="text-muted-foreground">OCR evidence score</dt>
+        <dd>{obs.ocrEvidenceScore?.toFixed(2) ?? "—"}</dd>
       </dl>
       {obs.state === "NOT_OBSERVED" ? (
         <p className="mt-2 text-muted-foreground">
@@ -59,7 +60,7 @@ function ObservationCard({ field, obs }: { field: string; obs: AnalyzerFieldObse
           <ul className="list-disc pl-5">
             {obs.alternates.map((alt, i) => (
               <li key={i} className="break-words">
-                {alt.value} · {alt.confidence?.toFixed(2) ?? "—"}
+                {alt.value} · OCR evidence {alt.ocrEvidenceScore?.toFixed(2) ?? "—"}
               </li>
             ))}
           </ul>
@@ -111,10 +112,12 @@ function FindingCard({ f, showDependency }: { f: VerificationFinding; showDepend
 export function ResultView({
   response,
   previewImage,
+  onConfirmed,
 }: {
   response: PrecheckServiceResponse;
   /** Local preview of the analyzed upload; null for the server-side sample. */
   previewImage?: { url: string; name: string } | null;
+  onConfirmed: (updated: PrecheckServiceResponse) => void;
 }) {
   const { observations, findings } = response;
   const reviewCount = countChecksNeedingReview(findings);
@@ -166,29 +169,11 @@ export function ResultView({
         </div>
       </section>
 
-      {/* Honest preview of the future seller-confirmation step. Nothing here is
-          active: no correction is stored, no report changes, nothing is sent. */}
-      <Disclosure title="What confirmation will do (preview)">
-        <div className="flex flex-col gap-3 text-sm">
-          <p>
-            A future step will ask the seller to{" "}
-            <strong>confirm how Label Lens interpreted the artwork before submitting</strong>. For
-            each detected field, that step will offer:
-          </p>
-          <ul className="list-disc pl-5 text-muted-foreground">
-            <li>Confirm this reading</li>
-            <li>Choose another detected reading</li>
-            <li>Enter a correction</li>
-            <li>Mark as not visible or unreadable</li>
-            <li>Replace the artwork</li>
-          </ul>
-          <p className="rounded-md border border-border bg-muted/40 p-3">
-            These actions are <strong>not yet active</strong>. Nothing on this page stores a
-            confirmation or correction, changes the machine evidence or reports, or sends anything
-            to TTB.
-          </p>
-        </div>
-      </Disclosure>
+      <ConfirmationSection
+        response={response}
+        previewImage={previewImage}
+        onConfirmed={onConfirmed}
+      />
 
       <Disclosure title="Evidence details">
         <div className="flex flex-col gap-3">
@@ -317,7 +302,7 @@ export function ResultView({
             Saves the exact server-produced, checksum-verified JSON export as{" "}
             <code className="break-all">{response.suggestedFilename}</code>, and a readable HTML
             report as <code className="break-all">{response.report.filename}</code>. Both include
-            the current disposition history.
+            the current field-confirmation and disposition histories.
           </p>
         </div>
       </Disclosure>

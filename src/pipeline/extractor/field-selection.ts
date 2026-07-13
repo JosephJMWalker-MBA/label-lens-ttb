@@ -1,7 +1,10 @@
 import { parseWineAlcoholStatement } from "@/domain/rules/wine-alcohol-parse";
 import type {
   AnalyzerAlternate,
+  AnalyzerCandidateProvenance,
+  AnalyzerCandidateRanking,
   AnalyzerFieldObservation,
+  AnalyzerOcrConfidence,
   EvidenceGeometry,
 } from "@/pipeline/analyzer/analyzer.types";
 
@@ -22,16 +25,41 @@ import { unionGeometry } from "./geometry";
  */
 
 /** OCR confidence is on a 0–100 scale; normalize to the analyzer's [0,1]. */
-export function normalizeConfidence(rawConfidence: number): number {
-  if (!Number.isFinite(rawConfidence) || rawConfidence <= 0) return 0;
+export function normalizeConfidence(rawConfidence: number | null | undefined): number {
+  if (typeof rawConfidence !== "number" || !Number.isFinite(rawConfidence) || rawConfidence <= 0) {
+    return 0;
+  }
   return Math.min(1, rawConfidence / 100);
 }
 
-/** Mean of token confidences; the field confidence when several tokens combine. */
-function aggregateConfidence(words: OcrWord[]): number {
-  if (words.length === 0) return 0;
-  const sum = words.reduce((acc, w) => acc + normalizeConfidence(w.rawConfidence), 0);
-  return sum / words.length;
+function rawConfidenceOf(word: OcrWord): number | null {
+  return Number.isFinite(word.rawConfidence) ? word.rawConfidence : null;
+}
+
+function ocrConfidenceOf(words: OcrWord[]): AnalyzerOcrConfidence {
+  const rawTokenConfidences = words.map(rawConfidenceOf);
+  const observed = rawTokenConfidences.filter((value): value is number => value !== null);
+  const rawMean =
+    observed.length === 0
+      ? null
+      : observed.reduce((sum, value) => sum + value, 0) / observed.length;
+  return {
+    aggregation: "mean",
+    rawScale: "0-100",
+    rawTokenConfidences,
+    rawMean,
+    rawMin: observed.length === 0 ? null : Math.min(...observed),
+    rawMax: observed.length === 0 ? null : Math.max(...observed),
+    missingTokenCount: rawTokenConfidences.length - observed.length,
+  };
+}
+
+/** Mean of present token confidences; missing raw OCR confidence stays explicit. */
+function aggregateOcrEvidenceScore(words: OcrWord[]): number {
+  const observed = words.map(rawConfidenceOf).filter((value): value is number => value !== null);
+  if (observed.length === 0) return 0;
+  const sum = observed.reduce((acc, rawConfidence) => acc + normalizeConfidence(rawConfidence), 0);
+  return sum / observed.length;
 }
 
 /** Below this normalized confidence, a present value is LOW_CONFIDENCE, not absent. */
@@ -43,7 +71,8 @@ interface Candidate {
   id?: string;
   value: string;
   rawText: string;
-  confidence: number;
+  ocrEvidenceScore: number;
+  ocrConfidence: AnalyzerOcrConfidence;
   geometry: EvidenceGeometry;
   words: OcrWord[];
   passId: string;
@@ -69,6 +98,7 @@ interface Candidate {
   alignment?: number;
   lineProximity?: number;
   score?: BrandCandidateScore;
+  ranking?: AnalyzerCandidateRanking;
 }
 
 /** An observation plus the region the selected value came from (for provenance). */
@@ -130,7 +160,7 @@ export interface BrandCandidateScore {
   positiveSignal: number;
   meaningfulChars: number;
   structure: number;
-  confidence: number;
+  ocrEvidenceScore: number;
   prominence: number;
   area: number;
   centrality: number;
@@ -145,17 +175,21 @@ export interface BrandCandidateDiagnostic {
   rawText: string;
   cleanedValue: string | null;
   confidence: number;
+  ocrEvidenceScore: number;
+  ocrConfidence: AnalyzerOcrConfidence;
   prominence: number;
   regionName: string;
   passId: string;
   passKind: OcrPassKind;
   supportPassIds: string[];
+  candidateProvenance: AnalyzerCandidateProvenance;
   assembly: BrandCandidateAssembly;
   lineIndexes: number[];
   kept: boolean;
   filterReason: BrandLineReason;
   decision?: BrandCandidateDecision;
   score?: BrandCandidateScore;
+  ranking?: AnalyzerCandidateRanking;
 }
 
 export interface BrandSelectionDiagnostics {
@@ -214,11 +248,14 @@ export interface AlcoholCandidateDiagnostic {
   normalizedValue: string | null;
   normalizedParsingText: string | null;
   confidence: number;
+  ocrEvidenceScore: number;
+  ocrConfidence: AnalyzerOcrConfidence;
   prominence: number;
   regionName: string;
   passId: string;
   passKind: OcrPassKind;
   supportPassIds: string[];
+  candidateProvenance: AnalyzerCandidateProvenance;
   assembly: AlcoholCandidateAssembly;
   lineIndexes: number[];
   sourceTokens: string[];
@@ -231,6 +268,7 @@ export interface AlcoholCandidateDiagnostic {
   parsedPercent: number | null;
   rejectionReason?: AlcoholRejectionReason;
   decision?: AlcoholCandidateDecision;
+  ranking?: AnalyzerCandidateRanking;
 }
 
 export interface AlcoholSelectionDiagnostics {
@@ -302,8 +340,57 @@ function originalGeometryOf(word: OcrWord): EvidenceGeometry {
   return word.originalGeometry;
 }
 
+function candidateProvenanceOf(candidate: Candidate): AnalyzerCandidateProvenance {
+  return {
+    passId: candidate.passId,
+    passKind: candidate.passKind,
+    triggerReasons: candidate.triggerReasons,
+    preprocessing: candidate.preprocessing,
+    regionName: candidate.regionName,
+    supportingPassIds: candidate.supportPassIds,
+    supportingPassKinds: candidate.supportPassKinds,
+    recoveryPassUsed: candidate.passKind !== "full-image-primary",
+  };
+}
+
 function alternateFrom(c: Candidate): AnalyzerAlternate {
-  return { value: c.value, confidence: c.confidence, geometry: c.geometry };
+  if (!c.ranking) {
+    throw new Error("alternateFrom requires ranking semantics");
+  }
+  return {
+    value: c.value,
+    confidence: c.ocrEvidenceScore,
+    ocrEvidenceScore: c.ocrEvidenceScore,
+    ocrConfidence: c.ocrConfidence,
+    candidateProvenance: candidateProvenanceOf(c),
+    ranking: c.ranking,
+    geometry: c.geometry,
+  };
+}
+
+function observationFromCandidate(
+  candidate: Candidate,
+  state: AnalyzerFieldObservation["state"],
+  alternates: AnalyzerAlternate[],
+  ambiguityReason?: AnalyzerFieldObservation["ambiguityReason"],
+): AnalyzerFieldObservation {
+  if (!candidate.ranking) {
+    throw new Error("observationFromCandidate requires ranking semantics");
+  }
+  return {
+    state,
+    value: candidate.value,
+    normalizedValue: candidate.value,
+    rawText: candidate.rawText,
+    confidence: candidate.ocrEvidenceScore,
+    ocrEvidenceScore: candidate.ocrEvidenceScore,
+    ocrConfidence: candidate.ocrConfidence,
+    candidateProvenance: candidateProvenanceOf(candidate),
+    ranking: candidate.ranking,
+    geometry: candidate.geometry,
+    alternates,
+    ...(ambiguityReason ? { ambiguityReason } : {}),
+  };
 }
 
 function provenanceOf(candidate: Candidate): SelectionProvenance {
@@ -588,8 +675,8 @@ function dedupeAlcoholCandidates(candidates: Candidate[]): Candidate[] {
     const existingPreference = alcoholCanonicalPreference(existing);
     const candidatePreference = alcoholCanonicalPreference(candidate);
     if (
-      candidate.confidence > existing.confidence ||
-      (candidate.confidence === existing.confidence &&
+      candidate.ocrEvidenceScore > existing.ocrEvidenceScore ||
+      (candidate.ocrEvidenceScore === existing.ocrEvidenceScore &&
         (candidatePreference > existingPreference ||
           (candidatePreference === existingPreference &&
             key(candidate.value).localeCompare(key(existing.value)) < 0)))
@@ -753,12 +840,24 @@ function analyzeAlcoholWindow(window: AlcoholWindow): {
     rawText,
     normalizedValue: "normalizedValue" in match ? match.normalizedValue : null,
     normalizedParsingText: "normalizedText" in match ? match.normalizedText : null,
-    confidence: aggregateConfidence(window.words),
+    confidence: aggregateOcrEvidenceScore(window.words),
+    ocrEvidenceScore: aggregateOcrEvidenceScore(window.words),
+    ocrConfidence: ocrConfidenceOf(window.words),
     prominence: geometry.height,
     regionName: window.result.regionName,
     passId: window.result.passId,
     passKind: window.result.passKind,
     supportPassIds: [window.result.passId],
+    candidateProvenance: {
+      passId: window.result.passId,
+      passKind: window.result.passKind,
+      triggerReasons: window.result.triggerReasons,
+      preprocessing: window.result.preprocessing,
+      regionName: window.result.regionName,
+      supportingPassIds: [window.result.passId],
+      supportingPassKinds: [window.result.passKind],
+      recoveryPassUsed: window.result.passKind !== "full-image-primary",
+    },
     assembly: window.assembly,
     lineIndexes: window.lineIndexes,
     sourceTokens: window.words.map((word) => word.text),
@@ -786,7 +885,8 @@ function analyzeAlcoholWindow(window: AlcoholWindow): {
     id: window.id,
     value: match.normalizedValue,
     rawText,
-    confidence: aggregateConfidence(window.words),
+    ocrEvidenceScore: aggregateOcrEvidenceScore(window.words),
+    ocrConfidence: ocrConfidenceOf(window.words),
     geometry,
     words: window.words,
     passId: window.result.passId,
@@ -829,6 +929,88 @@ function alcoholWindowsForWords(
   return windows;
 }
 
+function compareRankingValue(
+  left: number | string | boolean,
+  right: number | string | boolean,
+  direction: "asc" | "desc",
+): number {
+  if (typeof left !== typeof right) {
+    throw new Error(
+      `compareRankingValue requires identical value types, got ${typeof left} and ${typeof right}`,
+    );
+  }
+  const base =
+    typeof left === "string"
+      ? left.localeCompare(right as string)
+      : typeof left === "boolean"
+        ? Number(left) - Number(right as boolean)
+        : left - (right as number);
+  return direction === "desc" ? -base : base;
+}
+
+export function compareCandidateRanking(left: Candidate, right: Candidate): number {
+  if (!left.ranking || !right.ranking) {
+    throw new Error("compareCandidateRanking requires ranking semantics");
+  }
+  if (left.ranking.strategy !== right.ranking.strategy) {
+    throw new Error(
+      `compareCandidateRanking requires matching strategies, got ${left.ranking.strategy} and ${right.ranking.strategy}`,
+    );
+  }
+  const [leftPrimary] = left.ranking.comparator;
+  const [rightPrimary] = right.ranking.comparator;
+  if (!leftPrimary || !rightPrimary) {
+    throw new Error("compareCandidateRanking requires at least one comparator entry");
+  }
+  if (leftPrimary.id !== rightPrimary.id || leftPrimary.direction !== rightPrimary.direction) {
+    throw new Error(
+      `compareCandidateRanking requires matching primary comparator semantics, got ${leftPrimary.id}/${leftPrimary.direction} and ${rightPrimary.id}/${rightPrimary.direction}`,
+    );
+  }
+  const primaryCompared = compareRankingValue(
+    leftPrimary.value,
+    rightPrimary.value,
+    leftPrimary.direction,
+  );
+  if (primaryCompared !== 0) return primaryCompared;
+
+  if (left.ranking.orderingMode !== right.ranking.orderingMode) {
+    throw new Error(
+      `compareCandidateRanking requires matching orderingMode once the primary comparator ties, got ${left.ranking.orderingMode} and ${right.ranking.orderingMode}`,
+    );
+  }
+  if (left.ranking.comparator.length !== right.ranking.comparator.length) {
+    throw new Error(
+      `compareCandidateRanking requires matching comparator lengths once the primary comparator ties, got ${left.ranking.comparator.length} and ${right.ranking.comparator.length}`,
+    );
+  }
+
+  for (let index = 1; index < left.ranking.comparator.length; index += 1) {
+    const leftEntry = left.ranking.comparator[index];
+    const rightEntry = right.ranking.comparator[index];
+    if (leftEntry.id !== rightEntry.id || leftEntry.direction !== rightEntry.direction) {
+      throw new Error(
+        `compareCandidateRanking requires matching comparator semantics at index ${index}, got ${leftEntry.id}/${leftEntry.direction} and ${rightEntry.id}/${rightEntry.direction}`,
+      );
+    }
+    const compared = compareRankingValue(leftEntry.value, rightEntry.value, leftEntry.direction);
+    if (compared !== 0) return compared;
+  }
+  return 0;
+}
+
+function alcoholRanking(candidate: Candidate): AnalyzerCandidateRanking {
+  const comparator: AnalyzerCandidateRanking["comparator"] = [
+    { id: "ocr-evidence-score", direction: "desc", value: candidate.ocrEvidenceScore },
+    { id: "normalized-value-key", direction: "asc", value: key(candidate.value) },
+  ];
+  return {
+    strategy: "alcohol-ocr-evidence-comparator",
+    orderingMode: "ocr-evidence-first",
+    comparator,
+  };
+}
+
 function buildAlcoholObservation(
   candidates: Candidate[],
   diagnostics: AlcoholSelectionDiagnosticsInternal,
@@ -839,11 +1021,14 @@ function buildAlcoholObservation(
       normalizedValue: candidate.normalizedValue,
       normalizedParsingText: candidate.normalizedParsingText,
       confidence: candidate.confidence,
+      ocrEvidenceScore: candidate.ocrEvidenceScore,
+      ocrConfidence: candidate.ocrConfidence,
       prominence: candidate.prominence,
       regionName: candidate.regionName,
       passId: candidate.passId,
       passKind: candidate.passKind,
       supportPassIds: candidate.supportPassIds,
+      candidateProvenance: candidate.candidateProvenance,
       assembly: candidate.assembly,
       lineIndexes: candidate.lineIndexes,
       sourceTokens: candidate.sourceTokens,
@@ -856,6 +1041,7 @@ function buildAlcoholObservation(
       parsedPercent: candidate.parsedPercent,
       rejectionReason: candidate.rejectionReason,
       decision: candidate.decision,
+      ranking: candidate.ranking,
     })),
     abstentionReason: diagnostics.abstentionReason,
     numberInOcr: diagnostics.numberInOcr,
@@ -871,7 +1057,13 @@ function buildAlcoholObservation(
 
   if (candidates.length === 0) {
     return {
-      observation: { state: "NOT_OBSERVED", value: null, confidence: 0, alternates: [] },
+      observation: {
+        state: "NOT_OBSERVED",
+        value: null,
+        confidence: 0,
+        ocrEvidenceScore: 0,
+        alternates: [],
+      },
       sourceRegion: null,
       source: null,
       supportingPassIds: [],
@@ -880,20 +1072,28 @@ function buildAlcoholObservation(
     };
   }
 
-  const ranked = dedupeAlcoholCandidates(candidates).sort(
-    (a, b) => b.confidence - a.confidence || key(a.value).localeCompare(key(b.value)),
+  const diagnosticById = new Map(
+    diagnostics.candidates.map((candidate) => [candidate.id, candidate]),
   );
+  const rankedInputs = candidates.map((candidate) => ({
+    ...candidate,
+    ranking: alcoholRanking(candidate),
+  }));
+  for (const candidate of rankedInputs) {
+    if (!candidate.id) continue;
+    const diagnostic = diagnosticById.get(candidate.id);
+    if (!diagnostic) continue;
+    diagnostic.ranking = candidate.ranking;
+  }
+  const ranked = dedupeAlcoholCandidates(rankedInputs).sort(compareCandidateRanking);
   const best = ranked[0];
   const competing = ranked
     .slice(1)
     .filter(
       (candidate) =>
         !alcoholCorroborates(best.value, candidate.value) &&
-        best.confidence - candidate.confidence <= AMBIGUITY_MARGIN,
+        best.ocrEvidenceScore - candidate.ocrEvidenceScore <= AMBIGUITY_MARGIN,
     );
-  const diagnosticById = new Map(
-    diagnostics.candidates.map((candidate) => [candidate.id, candidate]),
-  );
   for (const candidate of ranked) {
     if (!candidate.id) continue;
     const diagnostic = diagnosticById.get(candidate.id);
@@ -906,16 +1106,12 @@ function buildAlcoholObservation(
 
   if (competing.length > 0) {
     return {
-      observation: {
-        state: "AMBIGUOUS",
-        value: best.value,
-        normalizedValue: best.value,
-        rawText: best.rawText,
-        confidence: best.confidence,
-        geometry: best.geometry,
-        alternates: competing.map(alternateFrom),
-        ambiguityReason: "competing_candidates",
-      },
+      observation: observationFromCandidate(
+        best,
+        "AMBIGUOUS",
+        competing.map(alternateFrom),
+        "competing_candidates",
+      ),
       sourceRegion: best.regionName,
       source: provenanceOf(best),
       supportingPassIds: best.supportPassIds,
@@ -925,18 +1121,14 @@ function buildAlcoholObservation(
   }
 
   return {
-    observation: {
-      state: best.confidence < LOW_CONFIDENCE_THRESHOLD ? "LOW_CONFIDENCE" : "OBSERVED",
-      value: best.value,
-      normalizedValue: best.value,
-      rawText: best.rawText,
-      confidence: best.confidence,
-      geometry: best.geometry,
-      alternates: ranked
+    observation: observationFromCandidate(
+      best,
+      best.ocrEvidenceScore < LOW_CONFIDENCE_THRESHOLD ? "LOW_CONFIDENCE" : "OBSERVED",
+      ranked
         .slice(1)
         .filter((candidate) => !alcoholCorroborates(best.value, candidate.value))
         .map(alternateFrom),
-    },
+    ),
     sourceRegion: best.regionName,
     source: provenanceOf(best),
     supportingPassIds: best.supportPassIds,
@@ -1382,7 +1574,8 @@ interface BrandSpan {
   words: OcrWord[];
   rawText: string;
   value: string;
-  confidence: number;
+  ocrEvidenceScore: number;
+  ocrConfidence: AnalyzerOcrConfidence;
   geometry: EvidenceGeometry;
   passId: string;
   passKind: OcrPassKind;
@@ -1417,11 +1610,11 @@ function analyzeBrandLine(line: OcrWord[], result: RegionOcrResult): BrandLineAn
   const rawText = line.map((w) => w.text).join(" ");
   const value = cleanedBrandValue(rawText);
   const geometry = geometryFor(line);
-  const confidence = aggregateConfidence(line);
+  const ocrEvidenceScore = aggregateOcrEvidenceScore(line);
   const base = {
     rawText,
     cleanedValue: value.length > 0 ? value : null,
-    confidence,
+    confidence: ocrEvidenceScore,
     prominence: geometry.height,
     regionName: result.regionName,
     passId: result.passId,
@@ -1463,7 +1656,8 @@ function analyzeBrandLine(line: OcrWord[], result: RegionOcrResult): BrandLineAn
   const candidate: Candidate = {
     value,
     rawText,
-    confidence,
+    ocrEvidenceScore,
+    ocrConfidence: ocrConfidenceOf(line),
     geometry,
     words: line,
     passId: result.passId,
@@ -1559,7 +1753,8 @@ function buildBrandSpan(
     words,
     rawText,
     value: cleanedBrandValue(rawText),
-    confidence: aggregateConfidence(words),
+    ocrEvidenceScore: aggregateOcrEvidenceScore(words),
+    ocrConfidence: ocrConfidenceOf(words),
     geometry,
     passId: result.passId,
     passKind: result.passKind,
@@ -1581,12 +1776,24 @@ function analyzeBrandSpan(span: BrandSpan): BrandCandidateAnalysis {
     id: span.id,
     rawText: span.rawText,
     cleanedValue: span.value.length > 0 ? span.value : null,
-    confidence: span.confidence,
+    confidence: span.ocrEvidenceScore,
+    ocrEvidenceScore: span.ocrEvidenceScore,
+    ocrConfidence: span.ocrConfidence,
     prominence: span.prominence,
     regionName: span.regionName,
     passId: span.passId,
     passKind: span.passKind,
     supportPassIds: [span.passId],
+    candidateProvenance: {
+      passId: span.passId,
+      passKind: span.passKind,
+      triggerReasons: span.triggerReasons,
+      preprocessing: span.preprocessing,
+      regionName: span.regionName,
+      supportingPassIds: [span.passId],
+      supportingPassKinds: [span.passKind],
+      recoveryPassUsed: span.passKind !== "full-image-primary",
+    },
     assembly: span.assembly,
     lineIndexes: span.lineIndexes,
   };
@@ -1687,7 +1894,8 @@ function analyzeBrandSpan(span: BrandSpan): BrandCandidateAnalysis {
     id: span.id,
     value: span.value,
     rawText: span.rawText,
-    confidence: span.confidence,
+    ocrEvidenceScore: span.ocrEvidenceScore,
+    ocrConfidence: span.ocrConfidence,
     geometry: span.geometry,
     words: span.words,
     passId: span.passId,
@@ -1741,7 +1949,7 @@ function mergeSeedScore(candidate: Candidate): number {
   return (
     positive +
     informativeAlphaTokenCount(candidate.value) +
-    aggregateConfidence(candidate.words) +
+    candidate.ocrEvidenceScore +
     candidate.prominence / 100
   );
 }
@@ -1763,11 +1971,11 @@ function bestFamilyCandidates(candidates: Candidate[]): Candidate[] {
       byFamily.set(familyKey, candidate);
       continue;
     }
-    const candidateScore = candidate.score?.total ?? candidate.confidence;
-    const existingScore = existing.score?.total ?? existing.confidence;
+    const candidateScore = candidate.score?.total ?? candidate.ocrEvidenceScore;
+    const existingScore = existing.score?.total ?? existing.ocrEvidenceScore;
     if (
       candidateScore > existingScore ||
-      (candidateScore === existingScore && candidate.confidence > existing.confidence)
+      (candidateScore === existingScore && candidate.ocrEvidenceScore > existing.ocrEvidenceScore)
     ) {
       byFamily.set(familyKey, candidate);
     }
@@ -1783,11 +1991,11 @@ function dedupeBestCandidates(candidates: Candidate[]): Candidate[] {
       byKey.set(key(candidate.value), candidate);
       continue;
     }
-    const candidateScore = candidate.score?.total ?? candidate.confidence;
-    const existingScore = existing.score?.total ?? existing.confidence;
+    const candidateScore = candidate.score?.total ?? candidate.ocrEvidenceScore;
+    const existingScore = existing.score?.total ?? existing.ocrEvidenceScore;
     if (
       candidateScore > existingScore ||
-      (candidateScore === existingScore && candidate.confidence > existing.confidence)
+      (candidateScore === existingScore && candidate.ocrEvidenceScore > existing.ocrEvidenceScore)
     ) {
       byKey.set(key(candidate.value), mergeCandidateSupport(candidate, existing));
     } else {
@@ -1842,7 +2050,7 @@ function scoreBrandCandidate(
     (candidate.brandClass === "positive" ? 2 : 0) +
     meaningfulChars * 1.6 +
     structure * 1.2 +
-    candidate.confidence +
+    candidate.ocrEvidenceScore +
     prominence * 0.8 +
     area * 0.6 +
     centrality * 0.3 +
@@ -1854,7 +2062,7 @@ function scoreBrandCandidate(
     positiveSignal: candidate.brandClass === "positive" ? 1 : 0,
     meaningfulChars,
     structure,
-    confidence: candidate.confidence,
+    ocrEvidenceScore: candidate.ocrEvidenceScore,
     prominence,
     area,
     centrality,
@@ -1863,6 +2071,100 @@ function scoreBrandCandidate(
     lowInformationPenalty: lowInformation,
     residualPenalty: residual,
     total,
+  };
+}
+
+function brandRanking(
+  candidate: Candidate,
+  maxProminence: number,
+  maxArea: number,
+): AnalyzerCandidateRanking {
+  const score = candidate.score ?? scoreBrandCandidate(candidate, maxProminence, maxArea);
+  const prominenceFloor = maxProminence * BRAND_SCORE_PROMINENCE_FLOOR_RATIO;
+  const scoreEligible = candidate.prominence > prominenceFloor + BRAND_SCORE_PROMINENCE_BUFFER_PX;
+  const comparator: AnalyzerCandidateRanking["comparator"] = scoreEligible
+    ? [
+        { id: "score-eligibility", direction: "desc", value: scoreEligible },
+        { id: "ranking-score", direction: "desc", value: score.total },
+        { id: "prominence", direction: "desc", value: candidate.prominence },
+        { id: "ocr-evidence-score", direction: "desc", value: candidate.ocrEvidenceScore },
+        { id: "normalized-value-key", direction: "asc", value: key(candidate.value) },
+      ]
+    : [
+        { id: "score-eligibility", direction: "desc", value: scoreEligible },
+        { id: "prominence", direction: "desc", value: candidate.prominence },
+        { id: "ocr-evidence-score", direction: "desc", value: candidate.ocrEvidenceScore },
+        { id: "ranking-score", direction: "desc", value: score.total },
+        { id: "normalized-value-key", direction: "asc", value: key(candidate.value) },
+      ];
+  return {
+    strategy: "brand-mixed-prominence-score",
+    orderingMode: scoreEligible ? "score-first" : "prominence-first",
+    comparator,
+    rankingScore: score.total,
+    scoreFactors: [
+      {
+        id: "positive-signal",
+        value: score.positiveSignal,
+        contribution: candidate.brandClass === "positive" ? 2 : 0,
+        direction: "benefit",
+      },
+      {
+        id: "meaningful-chars",
+        value: score.meaningfulChars,
+        contribution: score.meaningfulChars * 1.6,
+        direction: "benefit",
+      },
+      {
+        id: "structure",
+        value: score.structure,
+        contribution: score.structure * 1.2,
+        direction: "benefit",
+      },
+      {
+        id: "ocr-evidence-score",
+        value: score.ocrEvidenceScore,
+        contribution: score.ocrEvidenceScore,
+        direction: "benefit",
+      },
+      {
+        id: "prominence",
+        value: score.prominence,
+        contribution: score.prominence * 0.8,
+        direction: "benefit",
+      },
+      { id: "area", value: score.area, contribution: score.area * 0.6, direction: "benefit" },
+      {
+        id: "centrality",
+        value: score.centrality,
+        contribution: score.centrality * 0.3,
+        direction: "benefit",
+      },
+      {
+        id: "alignment",
+        value: score.alignment,
+        contribution: score.alignment * 0.25,
+        direction: "benefit",
+      },
+      {
+        id: "line-proximity",
+        value: score.lineProximity,
+        contribution: score.lineProximity * 0.2,
+        direction: "benefit",
+      },
+      {
+        id: "low-information-penalty",
+        value: score.lowInformationPenalty,
+        contribution: score.lowInformationPenalty * 1.8,
+        direction: "penalty",
+      },
+      {
+        id: "residual-penalty",
+        value: score.residualPenalty,
+        contribution: score.residualPenalty * 1.4,
+        direction: "penalty",
+      },
+    ],
   };
 }
 
@@ -1958,24 +2260,34 @@ function buildBrandObservation(
       rawText: candidate.rawText,
       cleanedValue: candidate.cleanedValue,
       confidence: candidate.confidence,
+      ocrEvidenceScore: candidate.ocrEvidenceScore,
+      ocrConfidence: candidate.ocrConfidence,
       prominence: candidate.prominence,
       regionName: candidate.regionName,
       passId: candidate.passId,
       passKind: candidate.passKind,
       supportPassIds: candidate.supportPassIds,
+      candidateProvenance: candidate.candidateProvenance,
       assembly: candidate.assembly,
       lineIndexes: candidate.lineIndexes,
       kept: candidate.kept,
       filterReason: candidate.filterReason,
       decision: candidate.decision,
       score: candidate.score,
+      ranking: candidate.ranking,
     })),
     abstentionReason: diagnostics.abstentionReason,
   });
 
   if (candidates.length === 0) {
     return {
-      observation: { state: "NOT_OBSERVED", value: null, confidence: 0, alternates: [] },
+      observation: {
+        state: "NOT_OBSERVED",
+        value: null,
+        confidence: 0,
+        ocrEvidenceScore: 0,
+        alternates: [],
+      },
       sourceRegion: null,
       source: null,
       supportingPassIds: [],
@@ -1986,41 +2298,27 @@ function buildBrandObservation(
 
   const maxProminence = Math.max(...candidates.map((candidate) => candidate.prominence));
   const maxArea = Math.max(...candidates.map((candidate) => geometryArea(candidate.geometry)));
-  const scored = candidates.map((candidate) => ({
-    ...candidate,
-    score: scoreBrandCandidate(candidate, maxProminence, maxArea),
-  }));
+  const scored = candidates.map((candidate) => {
+    const score = scoreBrandCandidate(candidate, maxProminence, maxArea);
+    return {
+      ...candidate,
+      score,
+      ranking: brandRanking({ ...candidate, score }, maxProminence, maxArea),
+    };
+  });
   const diagnosticById = new Map(
     diagnostics.candidates.map((candidate) => [candidate.id, candidate]),
   );
   for (const candidate of scored) {
     if (!candidate.id) continue;
     const diagnostic = diagnosticById.get(candidate.id);
-    if (diagnostic) diagnostic.score = candidate.score;
+    if (diagnostic) {
+      diagnostic.score = candidate.score;
+      diagnostic.ranking = candidate.ranking;
+    }
   }
 
-  const ranked = dedupeBestCandidates(bestFamilyCandidates(scored)).sort((a, b) => {
-    const prominenceFloor = maxProminence * BRAND_SCORE_PROMINENCE_FLOOR_RATIO;
-    const aScoreEligible =
-      a.prominence > prominenceFloor + BRAND_SCORE_PROMINENCE_BUFFER_PX ? 1 : 0;
-    const bScoreEligible =
-      b.prominence > prominenceFloor + BRAND_SCORE_PROMINENCE_BUFFER_PX ? 1 : 0;
-    if (aScoreEligible !== bScoreEligible) return bScoreEligible - aScoreEligible;
-    if (aScoreEligible === 1 && bScoreEligible === 1) {
-      return (
-        (b.score?.total ?? 0) - (a.score?.total ?? 0) ||
-        b.prominence - a.prominence ||
-        b.confidence - a.confidence ||
-        key(a.value).localeCompare(key(b.value))
-      );
-    }
-    return (
-      b.prominence - a.prominence ||
-      b.confidence - a.confidence ||
-      (b.score?.total ?? 0) - (a.score?.total ?? 0) ||
-      key(a.value).localeCompare(key(b.value))
-    );
-  });
+  const ranked = dedupeBestCandidates(bestFamilyCandidates(scored)).sort(compareCandidateRanking);
   const best = ranked[0];
   const distinctAlternates = ranked
     .slice(1)
@@ -2051,21 +2349,17 @@ function buildBrandObservation(
   // keeps noisy front-label OCR (no cleanly isolated brand mark) from fabricating
   // a confident brand — a human decides instead.
   const weakContestedLead =
-    best.confidence < LOW_CONFIDENCE_THRESHOLD &&
+    best.ocrEvidenceScore < LOW_CONFIDENCE_THRESHOLD &&
     ranked.slice(1).some((candidate) => !corroborates(best.value, candidate.value));
 
   if (competing.length > 0 || weakContestedLead) {
     return {
-      observation: {
-        state: "AMBIGUOUS",
-        value: best.value,
-        normalizedValue: best.value,
-        rawText: best.rawText,
-        confidence: best.confidence,
-        geometry: best.geometry,
-        alternates: distinctAlternates,
-        ambiguityReason: "competing_candidates",
-      },
+      observation: observationFromCandidate(
+        best,
+        "AMBIGUOUS",
+        distinctAlternates,
+        "competing_candidates",
+      ),
       sourceRegion: best.regionName,
       source: provenanceOf(best),
       supportingPassIds: best.supportPassIds,
@@ -2081,23 +2375,19 @@ function buildBrandObservation(
   // phrase) stays AMBIGUOUS — its value, geometry, and alternates are preserved
   // for a human, but it never silently drives a brand match.
   const positivelyDistinguished =
-    best.brandClass === "positive" && best.confidence >= LOW_CONFIDENCE_THRESHOLD;
+    best.brandClass === "positive" && best.ocrEvidenceScore >= LOW_CONFIDENCE_THRESHOLD;
   if (!positivelyDistinguished) {
     // A single plausible line that could not be positively distinguished as
     // brand presentation. It may be the only candidate (no rival to list), so it
     // is marked as a single unconfirmed candidate: usable, reviewable
     // uncertainty that stays schema-valid and never a silent OBSERVED match.
     return {
-      observation: {
-        state: "AMBIGUOUS",
-        value: best.value,
-        normalizedValue: best.value,
-        rawText: best.rawText,
-        confidence: best.confidence,
-        geometry: best.geometry,
-        alternates: distinctAlternates,
-        ambiguityReason: "single_unconfirmed_candidate",
-      },
+      observation: observationFromCandidate(
+        best,
+        "AMBIGUOUS",
+        distinctAlternates,
+        "single_unconfirmed_candidate",
+      ),
       sourceRegion: best.regionName,
       source: provenanceOf(best),
       supportingPassIds: best.supportPassIds,
@@ -2107,15 +2397,7 @@ function buildBrandObservation(
   }
 
   return {
-    observation: {
-      state: "OBSERVED",
-      value: best.value,
-      normalizedValue: best.value,
-      rawText: best.rawText,
-      confidence: best.confidence,
-      geometry: best.geometry,
-      alternates: distinctAlternates,
-    },
+    observation: observationFromCandidate(best, "OBSERVED", distinctAlternates),
     sourceRegion: best.regionName,
     source: provenanceOf(best),
     supportingPassIds: best.supportPassIds,

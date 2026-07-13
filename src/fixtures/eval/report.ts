@@ -13,6 +13,8 @@ import type {
   LoadedEvalManifest,
 } from "./eval-manifest.types";
 import type {
+  EvalCalibrationCoverage,
+  EvalCalibrationCoverageField,
   CaseReport,
   EvalAlcoholSliceMetrics,
   EvalCandidateFilteringSubtypeBucket,
@@ -30,6 +32,7 @@ function brandObservedOf(caseReport: CaseReport): ObservedField {
     state: caseReport.brand.state,
     value: caseReport.brand.value,
     confidence: caseReport.brand.confidence,
+    ocrEvidenceScore: caseReport.brand.ocrEvidenceScore,
     alternates: caseReport.brand.alternates,
   };
 }
@@ -459,6 +462,76 @@ function buildCandidateFilteringSubtypeDistribution(
   );
 }
 
+function emptyCalibrationCoverageField(): EvalCalibrationCoverageField {
+  return {
+    recordCount: 0,
+    selectedCount: 0,
+    nonSelectedCount: 0,
+    rejectedCount: 0,
+    rankedCount: 0,
+    rawOcrConfidencePresentCount: 0,
+    rawOcrConfidenceMissingCount: 0,
+  };
+}
+
+function hasRawOcrConfidence(
+  record: CaseReport["diagnostics"]["calibrationCandidates"][number],
+): boolean {
+  return record.inference.ocrConfidence.rawMean !== null;
+}
+
+export function buildCalibrationCoverage(cases: CaseReport[]): EvalCalibrationCoverage {
+  const byField: EvalCalibrationCoverage["byField"] = {
+    brand: emptyCalibrationCoverageField(),
+    alcohol: emptyCalibrationCoverageField(),
+  };
+
+  let totalRecordCount = 0;
+  for (const caseReport of cases) {
+    for (const record of caseReport.diagnostics.calibrationCandidates) {
+      totalRecordCount += 1;
+      const bucket = byField[record.field];
+      bucket.recordCount += 1;
+      if (record.selected) bucket.selectedCount += 1;
+      else bucket.nonSelectedCount += 1;
+      if (record.candidateStatus === "rejected") bucket.rejectedCount += 1;
+      if (record.inference.ranking) bucket.rankedCount += 1;
+      if (hasRawOcrConfidence(record)) bucket.rawOcrConfidencePresentCount += 1;
+      else bucket.rawOcrConfidenceMissingCount += 1;
+    }
+  }
+
+  return { totalRecordCount, byField };
+}
+
+export function assertCalibrationCoverage(
+  cases: CaseReport[],
+  coverage: EvalCalibrationCoverage,
+): EvalCalibrationCoverage {
+  const expected = buildCalibrationCoverage(cases);
+  const fields: Array<keyof EvalCalibrationCoverage["byField"]> = ["brand", "alcohol"];
+
+  if (coverage.totalRecordCount !== expected.totalRecordCount) {
+    throw new Error(
+      `calibration coverage total ${coverage.totalRecordCount} does not match case-level total ${expected.totalRecordCount}`,
+    );
+  }
+
+  for (const field of fields) {
+    const actual = coverage.byField[field];
+    const anticipated = expected.byField[field];
+    for (const key of Object.keys(anticipated) as Array<keyof EvalCalibrationCoverageField>) {
+      if (actual[key] !== anticipated[key]) {
+        throw new Error(
+          `${field}: calibration coverage ${key}=${actual[key]} does not match case-level ${anticipated[key]}`,
+        );
+      }
+    }
+  }
+
+  return coverage;
+}
+
 export interface CandidateFilteringSubtypeCoverageSummary {
   byField: Record<
     EvalFieldKey,
@@ -663,9 +736,11 @@ export function buildReport(cases: CaseReport[], manifest: LoadedEvalManifest): 
   const casesById = new Map(cases.map((caseReport) => [caseReport.caseId, caseReport]));
   const records = includedRecords(manifest);
   const candidateFilteringSubtypes = buildCandidateFilteringSubtypeDistribution(cases);
+  const calibrationCoverage = buildCalibrationCoverage(cases);
   assertCandidateFilteringSubtypeCoverage(cases, candidateFilteringSubtypes);
+  assertCalibrationCoverage(cases, calibrationCoverage);
   return {
-    schemaVersion: "extraction-baseline-report.v3",
+    schemaVersion: "extraction-baseline-report.v4",
     manifestSchemaVersion: manifest.schemaVersion,
     extractorAdapter: { id: EVAL_ADAPTER.id, version: EVAL_ADAPTER.version },
     aggregate: aggregate(scores),
@@ -675,6 +750,7 @@ export function buildReport(cases: CaseReport[], manifest: LoadedEvalManifest): 
       failureDistribution: buildFailureDistribution(records, casesById),
       candidateFilteringSubtypes,
       recoveryPassContributions: buildRecoveryPassContributionBreakdown(cases),
+      calibrationCoverage,
       performance: buildPerformanceBreakdown(cases),
     },
     cases,
@@ -734,7 +810,10 @@ export function renderMarkdown(report: EvalReport): string {
     "Ambiguity honesty applies only to the genuinely ambiguous labels; it is not evidence of overall extractor usefulness.",
   );
   lines.push(
-    "Phase 5A adds evaluation-only attribution detail: candidate-filtering failures are subclassed from existing selector diagnostics, and recovery-pass contributions are measured from extractor debug traces without changing production OCR, ranking, confidence, or API output.",
+    "Phase 5B separates OCR-engine confidence from deterministic ranking semantics, exposes structured ranking explanations, and records evaluation-only calibration features without changing production selection, confidence behavior, or API workflow.",
+  );
+  lines.push(
+    "No field in this report is a calibrated correctness probability: OCR evidence is an OCR observation, ranking is Label Lens selection logic, and correctness labels remain evaluation-only.",
   );
   lines.push("");
   lines.push("## Brand metrics");
@@ -845,6 +924,22 @@ export function renderMarkdown(report: EvalReport): string {
   if (report.breakdowns.candidateFilteringSubtypes.length === 0) {
     lines.push("| — | — | 0 |");
   }
+  lines.push("");
+  lines.push("### Calibration Record Coverage");
+  lines.push("");
+  lines.push(
+    "| Field | Records | Selected | Non-selected | Rejected | Ranked | Raw OCR present | Raw OCR missing |",
+  );
+  lines.push("| --- | --- | --- | --- | --- | --- | --- | --- |");
+  for (const field of ["brand", "alcohol"] as const) {
+    const coverage = report.breakdowns.calibrationCoverage.byField[field];
+    lines.push(
+      `| ${field} | ${coverage.recordCount} | ${coverage.selectedCount} | ${coverage.nonSelectedCount} | ${coverage.rejectedCount} | ${coverage.rankedCount} | ${coverage.rawOcrConfidencePresentCount} | ${coverage.rawOcrConfidenceMissingCount} |`,
+    );
+  }
+  lines.push(
+    `| total | ${report.breakdowns.calibrationCoverage.totalRecordCount} | — | — | — | — | — | — |`,
+  );
   lines.push("");
   lines.push("## Pass Cost");
   lines.push("");

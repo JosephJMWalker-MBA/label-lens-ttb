@@ -5,6 +5,9 @@ import type {
   AdvisoryNotice,
   DispositionEntry,
   DispositionReferences,
+  HumanFieldConfirmationDecisionType,
+  HumanFieldGeometry,
+  ReviewableFieldId,
   ResultDispositionDecision,
   ResultObservations,
 } from "@/pipeline/result/result.types";
@@ -47,6 +50,8 @@ export interface PrecheckServiceResponse {
   observations: ResultObservations;
   evidenceAssessments: EvidenceAssessment[];
   findings: VerificationFinding[];
+  /** Append-only field confirmation history; separate from machine observations. */
+  humanFieldConfirmationHistory: import("@/pipeline/result/result.types").HumanFieldConfirmationEntry[];
   /** Append-only operator disposition history; separate from machine findings. */
   humanDispositionHistory: DispositionEntry[];
   /** Deterministic suggested filename for the JSON download. */
@@ -85,6 +90,26 @@ export interface PrecheckDispositionRequest {
   file: { displayName: string; mediaType: string; byteSize: number; source: "upload" | "sample" };
 }
 
+export interface PrecheckFieldConfirmationRequest {
+  /** The canonical JSON export text of the result being confirmed. */
+  exportJson: string;
+  /**
+   * The server-issued append-authorization token returned with the original
+   * pre-check response for this machine result. Required for every append.
+   */
+  appendToken: string;
+  fieldId: ReviewableFieldId;
+  decisionType: HumanFieldConfirmationDecisionType;
+  correctedValue?: string;
+  alternateId?: string;
+  note?: string;
+  humanGeometry?: HumanFieldGeometry;
+  /** ISO timestamp generated at the workflow boundary (human-action metadata). */
+  recordedAt: string;
+  /** Echoed, non-authoritative display metadata carried from the prior response. */
+  file: { displayName: string; mediaType: string; byteSize: number; source: "upload" | "sample" };
+}
+
 export type PrecheckServiceErrorCode =
   | "NO_IMAGE"
   | "MULTIPLE_IMAGES"
@@ -102,8 +127,10 @@ export type PrecheckServiceErrorCode =
   | "EXPORT_CHECKSUM_FAILED"
   | "SAMPLE_UNAVAILABLE"
   | "INVALID_SUBMITTED_RESULT"
+  | "STALE_SUBMITTED_RESULT"
   | "INVALID_DISPOSITION"
   | "INVALID_DISPOSITION_REFERENCE"
+  | "INVALID_FIELD_CONFIRMATION"
   | "MISSING_APPEND_TOKEN"
   | "INVALID_APPEND_TOKEN"
   | "APPEND_SIGNING_KEY_UNAVAILABLE"

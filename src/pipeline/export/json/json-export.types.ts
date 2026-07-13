@@ -8,6 +8,7 @@ import type {
 import type {
   AdvisoryNotice,
   DispositionEntry,
+  HumanFieldConfirmationEntry,
   ResultObservations,
   ResultProfile,
   ResultRunReference,
@@ -54,6 +55,7 @@ export interface PrecheckJsonExport {
   observations: ResultObservations;
   findings: VerificationFinding[];
   versionManifest: VersionManifest;
+  humanFieldConfirmationHistory: HumanFieldConfirmationEntry[];
   humanDispositionHistory: DispositionEntry[];
   advisoryNotice: AdvisoryNotice;
   advisoryQuality?: PrecheckAdvisoryQuality;

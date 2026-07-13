@@ -29,11 +29,11 @@ export interface ExpectedFields {
   countryOfOrigin?: string;
 }
 
-/** A single value the pipeline observed, with the confidence behind it. */
+/** A single value the pipeline observed, with OCR-derived evidence behind it. */
 export interface ExtractedField {
   /** Raw observed text, or null when nothing was recovered. */
   value: string | null;
-  /** Extraction confidence in the range 0..1. */
+  /** Legacy compatibility field for the OCR evidence score in the range 0..1. */
   confidence: number;
 }
 

@@ -109,7 +109,8 @@ test("sample run shows an honest no-preview state instead of overlays", async ({
 
   await expect(page.getByText(/no image preview for this run/i)).toBeVisible();
   await expect(page.getByRole("button", { name: /evidence region/i })).toHaveCount(0);
-  // The confirmation preview stays an inactive explanation.
-  await expect(page.getByText(/what confirmation will do \(preview\)/i)).toBeVisible();
-  await expect(page.getByRole("button", { name: /confirm this reading/i })).toHaveCount(0);
+  // Field confirmation is active even when the sample has no local preview.
+  await expect(page.getByRole("heading", { name: /review and confirm fields/i })).toBeVisible();
+  await expect(page.getByText(/no image review is available for this run/i)).toBeVisible();
+  await expect(page.getByRole("button", { name: /save confirmation/i })).toHaveCount(2);
 });

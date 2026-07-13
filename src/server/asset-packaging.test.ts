@@ -83,7 +83,7 @@ describe("Next.js packaging configuration", () => {
   });
 });
 
-describe("single hardened processing route", () => {
+describe("hardened processing routes", () => {
   const apiDir = join(ROOT, "src/app/api");
 
   function routeFiles(dir: string): string[] {
@@ -96,12 +96,14 @@ describe("single hardened processing route", () => {
     return found;
   }
 
-  it("exposes exactly one OCR processing route, the narrow disposition route, an inert health probe, and a read-only sample image", () => {
+  it("exposes exactly one OCR processing route, two bounded append routes, an inert health probe, and a read-only sample image", () => {
     const routes = routeFiles(apiDir).sort();
     const healthRoute = join(apiDir, "health", "route.ts");
+    const confirmationRoute = join(apiDir, "precheck", "confirmation", "route.ts");
     const sampleImageRoute = join(apiDir, "sample-image", "route.ts");
     expect(routes).toEqual([
       healthRoute,
+      confirmationRoute,
       join(apiDir, "precheck", "disposition", "route.ts"),
       join(apiDir, "precheck", "route.ts"),
       sampleImageRoute,
@@ -124,7 +126,7 @@ describe("single hardened processing route", () => {
     expect(sampleImage).not.toMatch(/POST|precheck-service|extractor|ocr-engine|tesseract|sharp/);
   });
 
-  it("keeps OCR/extraction in the single processing route; disposition never duplicates it", () => {
+  it("keeps OCR/extraction in the single processing route; append routes never duplicate it", () => {
     const ocrRoute = readFileSync(join(apiDir, "precheck", "route.ts"), "utf8");
     expect(ocrRoute).toMatch(/@\/server\/precheck-service/);
 
@@ -136,12 +138,20 @@ describe("single hardened processing route", () => {
     // extractor, OCR engine, or image processing of its own.
     expect(dispositionRoute).not.toMatch(/extractor|ocr-engine|tesseract|sharp/);
     expect(dispositionRoute).toMatch(/appendDispositionToResult/);
+
+    const confirmationRoute = readFileSync(
+      join(apiDir, "precheck", "confirmation", "route.ts"),
+      "utf8",
+    );
+    expect(confirmationRoute).not.toMatch(/extractor|ocr-engine|tesseract|sharp/);
+    expect(confirmationRoute).toMatch(/appendFieldConfirmationToResult/);
   });
 
-  it("declares the Node runtime and is not configured for Edge on the disk-reading routes", () => {
+  it("declares the Node runtime and is not configured for Edge on all mutable and disk-reading routes", () => {
     for (const rel of [
       "precheck/route.ts",
       "precheck/disposition/route.ts",
+      "precheck/confirmation/route.ts",
       "sample-image/route.ts",
     ]) {
       const source = readFileSync(join(apiDir, rel), "utf8");

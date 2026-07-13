@@ -26,8 +26,14 @@ export function stableStringify(value: unknown): string {
 
 /** The immutable machine portion, excluding disposition history and the id itself. */
 function machineContent(result: PrecheckResult): Record<string, unknown> {
-  const { machineResultId: _id, humanDispositionHistory: _history, ...machine } = result;
+  const {
+    machineResultId: _id,
+    humanFieldConfirmationHistory: _confirmations,
+    humanDispositionHistory: _history,
+    ...machine
+  } = result;
   void _id;
+  void _confirmations;
   void _history;
   return machine;
 }
@@ -38,7 +44,12 @@ function machineContent(result: PrecheckResult): Record<string, unknown> {
  * the same id and a later disposition append cannot change it.
  */
 export function deriveMachineResultId(result: Omit<PrecheckResult, "machineResultId">): string {
-  const { humanDispositionHistory: _history, ...machine } = result;
+  const {
+    humanFieldConfirmationHistory: _confirmations,
+    humanDispositionHistory: _history,
+    ...machine
+  } = result;
+  void _confirmations;
   void _history;
   const digest = createHash("sha256").update(stableStringify(machine)).digest("hex");
   return `precheck-result.v1-${digest}`;

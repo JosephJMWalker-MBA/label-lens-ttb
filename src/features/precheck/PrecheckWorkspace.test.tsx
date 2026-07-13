@@ -70,6 +70,7 @@ const CANNED: PrecheckServiceResponse = {
       value: "M CELLARS",
       rawText: "M CELLARS",
       confidence: 0.93,
+      ocrEvidenceScore: 0.93,
       geometry: {
         imageIndex: 0,
         x: 10,
@@ -86,6 +87,7 @@ const CANNED: PrecheckServiceResponse = {
       value: "12.5% ALC./VOL.",
       rawText: "12.5% ALC./VOL.",
       confidence: 0.91,
+      ocrEvidenceScore: 0.91,
       geometry: {
         imageIndex: 0,
         x: 30,
@@ -126,6 +128,7 @@ const CANNED: PrecheckServiceResponse = {
   ] as PrecheckServiceResponse["findings"],
   suggestedFilename: "label-lens-wine-precheck-precheck-result.v1-" + "a".repeat(64) + ".json",
   exportJson: '{"exportType":"wine-precheck-result"}',
+  humanFieldConfirmationHistory: [],
   humanDispositionHistory: [],
   report: {
     html: "<!doctype html><html><body>report</body></html>",
@@ -339,10 +342,33 @@ const CANNED_WITH_HISTORY: PrecheckServiceResponse = {
   },
 };
 
+const CANNED_WITH_CONFIRMATION: PrecheckServiceResponse = {
+  ...CANNED,
+  humanFieldConfirmationHistory: [
+    {
+      confirmationId: "field-confirmation-1",
+      sequence: 1,
+      schemaVersion: "human-field-confirmation.v1",
+      provenance: "human-confirmed",
+      fieldId: "brandName",
+      recordedAt: "2026-07-13T12:00:00Z",
+      decisionType: "accepted-machine-reading",
+    },
+  ],
+  report: {
+    html: "<!doctype html><html><body>report with confirmation</body></html>",
+    filename: CANNED.report.filename,
+  },
+};
+
 /** Route fetch by URL: pre-check vs. disposition append. */
 function routedFetch() {
   return vi.fn((url: string) => {
-    const data = String(url).includes("/disposition") ? CANNED_WITH_HISTORY : CANNED;
+    const data = String(url).includes("/disposition")
+      ? CANNED_WITH_HISTORY
+      : String(url).includes("/confirmation")
+        ? CANNED_WITH_CONFIRMATION
+        : CANNED;
     return Promise.resolve({ ok: true, json: async () => ({ ok: true, data }) } as Response);
   });
 }
@@ -365,13 +391,18 @@ describe("PrecheckWorkspace — human disposition", () => {
     render(<PrecheckWorkspace />);
     await runPrecheckToResult();
 
-    expect(screen.getByRole("heading", { name: /human disposition/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/operator identifier/i)).toBeInTheDocument();
-    const decision = screen.getByLabelText(/decision/i) as HTMLSelectElement;
+    const dispositionSection = screen
+      .getByRole("heading", { name: /human disposition/i })
+      .closest("section") as HTMLElement;
+    expect(dispositionSection).toBeInTheDocument();
+    expect(within(dispositionSection).getByLabelText(/operator identifier/i)).toBeInTheDocument();
+    const decision = within(dispositionSection).getByLabelText(/decision/i) as HTMLSelectElement;
     expect(decision.tagName).toBe("SELECT");
-    expect(screen.getByLabelText(/reason code/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/note \(optional\)/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /record disposition/i })).toBeInTheDocument();
+    expect(within(dispositionSection).getByLabelText(/reason code/i)).toBeInTheDocument();
+    expect(within(dispositionSection).getByLabelText(/note \(optional\)/i)).toBeInTheDocument();
+    expect(
+      within(dispositionSection).getByRole("button", { name: /record disposition/i }),
+    ).toBeInTheDocument();
     // Only bounded internal-workflow decisions are offered.
     const options = within(decision)
       .getAllByRole("option")
@@ -773,32 +804,25 @@ describe("PrecheckWorkspace — processing accessibility", () => {
   });
 });
 
-// -- Confirmation preview honesty (evidence-centered result) --------------------
+// -- Field confirmation workflow ------------------------------------------------
 
-describe("PrecheckWorkspace — confirmation preview", () => {
+describe("PrecheckWorkspace — field confirmation", () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it("presents the future confirmation step as an inactive preview, not a live action", async () => {
+  it("renders active confirmation controls instead of the old preview-only disclosure", async () => {
     vi.stubGlobal("fetch", mockFetch({ ok: true, data: CANNED }));
     render(<PrecheckWorkspace />);
     selectFileAndFill();
     fireEvent.click(screen.getByRole("button", { name: /run pre-check/i }));
     await screen.findByRole("heading", { name: /pre-check result/i });
 
-    // The preview panel exists, collapsed by default.
-    const details = screen
-      .getByText(/what confirmation will do \(preview\)/i)
-      .closest("details") as HTMLDetailsElement;
-    expect(details.open).toBe(false);
-
-    // Its future choices are explanatory text, not active controls.
-    expect(screen.getByText("Confirm this reading")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /confirm this reading/i })).toBeNull();
-    expect(screen.queryByRole("button", { name: /enter a correction/i })).toBeNull();
-
-    // It states plainly that nothing is stored or sent.
-    expect(screen.getByText(/not yet active/i)).toBeInTheDocument();
-    expect(screen.getByText(/sends anything to TTB/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /review and confirm fields/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/accept machine reading/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/select alternate candidate/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/correct value manually/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/mark not visible/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("button", { name: /save confirmation/i }).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/what confirmation will do \(preview\)/i)).toBeNull();
   });
 
   it("keeps machine evidence unchanged and downloads/disposition available in the new layout", async () => {
@@ -814,5 +838,27 @@ describe("PrecheckWorkspace — confirmation preview", () => {
     // Downloads and the disposition disclosure remain reachable.
     expect(screen.getByRole("button", { name: /download json export/i })).toBeInTheDocument();
     expect(screen.getByText("Record internal disposition")).toBeInTheDocument();
+  });
+
+  it("posts a field confirmation through the confirmation endpoint without rerunning OCR", async () => {
+    const fetchMock = routedFetch();
+    vi.stubGlobal("fetch", fetchMock);
+    render(<PrecheckWorkspace />);
+    await runPrecheckToResult();
+
+    const acceptRadio = screen.getAllByRole("radio", { name: /accept machine reading/i })[0];
+    fireEvent.click(acceptRadio);
+    fireEvent.click(screen.getAllByRole("button", { name: /save confirmation/i })[0]);
+
+    expect(await screen.findByText(/brand name confirmation saved/i)).toBeInTheDocument();
+    const urls = fetchMock.mock.calls.map((c) => String(c[0]));
+    expect(urls).toContain("/api/precheck/confirmation");
+    const confirmationCall = fetchMock.mock.calls.find((c) =>
+      String(c[0]).includes("/confirmation"),
+    ) as unknown as [string, RequestInit];
+    const body = JSON.parse(confirmationCall[1].body as string);
+    expect(body.exportJson).toBe(CANNED.exportJson);
+    expect(body.appendToken).toBe(CANNED.appendToken);
+    expect(body.findings).toBeUndefined();
   });
 });

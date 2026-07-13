@@ -3,6 +3,7 @@ import type {
   OcrEngineVersion,
 } from "@/domain/run/version-manifest.types";
 import type { AnalyzerFieldObservation } from "@/pipeline/analyzer/analyzer.types";
+import { resolveFieldReviews } from "@/pipeline/result/field-confirmation";
 import type { DispositionEntry, PrecheckResult } from "@/pipeline/result/result.types";
 import { err, ok, type Result } from "@/shared/result";
 
@@ -70,9 +71,90 @@ function observationRows(label: string, obs: AnalyzerFieldObservation): string {
     `<tr><th scope="row">${esc(label)} — state</th><td>${esc(obs.state)}</td></tr>`,
     `<tr><th scope="row">${esc(label)} — extracted value</th><td>${esc(obs.value ?? "— none extracted —")}</td></tr>`,
     `<tr><th scope="row">${esc(label)} — raw text</th><td>${esc(obs.rawText ?? "—")}</td></tr>`,
-    `<tr><th scope="row">${esc(label)} — confidence</th><td>${obs.confidence.toFixed(2)}</td></tr>`,
+    `<tr><th scope="row">${esc(label)} — OCR evidence score</th><td>${obs.ocrEvidenceScore.toFixed(2)}</td></tr>`,
     `<tr><th scope="row">${esc(label)} — source region</th><td>${esc(geometry)}</td></tr>`,
   ].join("");
+}
+
+function humanGeometryText(
+  geometry: PrecheckResult["humanFieldConfirmationHistory"][number]["humanGeometry"] | undefined,
+): string {
+  if (!geometry) return "—";
+  return `${geometry.provenance}; x ${Math.round(geometry.x * 1000) / 10}%, y ${
+    Math.round(geometry.y * 1000) / 10
+  }%, w ${Math.round(geometry.width * 1000) / 10}%, h ${Math.round(geometry.height * 1000) / 10}%`;
+}
+
+function confirmationDecisionText(
+  review: ReturnType<typeof resolveFieldReviews>["brandName"],
+): string {
+  if (!review.activeConfirmation) return "No human confirmation recorded";
+  switch (review.activeConfirmation.decisionType) {
+    case "accepted-machine-reading":
+      return "Accepted machine reading";
+    case "selected-alternate":
+      return `Selected alternate (${review.activeConfirmation.alternateId})`;
+    case "corrected-value":
+      return "Corrected value entered by a human reviewer";
+    case "field-not-visible":
+      return "Marked not visible";
+    case "field-unreadable":
+      return "Marked unreadable";
+  }
+}
+
+function effectiveSourceText(review: ReturnType<typeof resolveFieldReviews>["brandName"]): string {
+  switch (review.effective.source.kind) {
+    case "machine-observation":
+      return "Machine observation pending review";
+    case "accepted-machine-reading":
+      return "Human confirmed the machine-selected reading";
+    case "selected-alternate":
+      return `Human selected alternate ${review.effective.source.alternateId}`;
+    case "corrected-value":
+      return "Human-corrected value";
+    case "field-not-visible":
+      return "Human confirmed the field is not visible";
+    case "field-unreadable":
+      return "Human confirmed the field is unreadable";
+  }
+}
+
+function effectiveOcrText(review: ReturnType<typeof resolveFieldReviews>["brandName"]): string {
+  if (review.effective.source.kind === "corrected-value") {
+    return "not applicable — human-corrected value";
+  }
+  if (review.effective.ocrEvidenceScore === undefined) return "—";
+  return review.effective.ocrEvidenceScore.toFixed(2);
+}
+
+function confirmationRows(result: PrecheckResult): string {
+  const reviews = resolveFieldReviews(result);
+  return (
+    [
+      ["Brand name", reviews.brandName],
+      ["Alcohol statement", reviews.alcoholStatement],
+    ] as const
+  )
+    .map(
+      ([label, review]) => `<tr><th scope="row">${esc(label)} — human confirmation</th><td>${esc(
+        confirmationDecisionText(review),
+      )}</td></tr>
+    <tr><th scope="row">${esc(label)} — effective reviewed state</th><td>${esc(review.effective.state)}</td></tr>
+    <tr><th scope="row">${esc(label)} — effective reviewed value</th><td>${esc(
+      review.effective.value ?? "— none —",
+    )}</td></tr>
+    <tr><th scope="row">${esc(label)} — effective source</th><td>${esc(
+      effectiveSourceText(review),
+    )}</td></tr>
+    <tr><th scope="row">${esc(label)} — OCR evidence on effective value</th><td>${esc(
+      effectiveOcrText(review),
+    )}</td></tr>
+    <tr><th scope="row">${esc(label)} — human review region</th><td>${esc(
+      humanGeometryText(review.activeConfirmation?.humanGeometry),
+    )}</td></tr>`,
+    )
+    .join("");
 }
 
 function findingBlock(result: PrecheckResult): string {
@@ -211,6 +293,15 @@ export function buildReadableReport(
   <table class="kv"><tbody>
     ${observationRows("Brand name", r.observations.brandName)}
     ${observationRows("Alcohol statement", r.observations.alcoholStatement)}
+  </tbody></table>
+</section>
+
+<section aria-label="Reviewed confirmation">
+  <h2>Reviewed confirmation</h2>
+  <p>The machine observation remains preserved exactly. Any human confirmation below determines the
+     effective reviewed result without rewriting the OCR record.</p>
+  <table class="kv"><tbody>
+    ${confirmationRows(r)}
   </tbody></table>
 </section>
 

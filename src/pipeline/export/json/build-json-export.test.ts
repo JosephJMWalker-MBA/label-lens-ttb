@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { assemblePrecheckResult } from "@/pipeline/result/assemble";
 import { buildAssembleInput } from "@/pipeline/result/build.fixtures";
+import { appendHumanFieldConfirmation } from "@/pipeline/result/field-confirmation-history";
 import { appendDisposition } from "@/pipeline/result/disposition";
 import type { DispositionEntryInput, PrecheckResult } from "@/pipeline/result/result.types";
 
@@ -103,6 +104,20 @@ describe("buildJsonExport — build & fidelity", () => {
     const e = exportOf(withDisposition(result()));
     expect(e.humanDispositionHistory).toHaveLength(1);
     expect(e.humanDispositionHistory[0].decision).toBe("accepted_for_internal_use");
+  });
+
+  it("supports empty and nonempty field confirmation history", () => {
+    expect(exportOf(result()).humanFieldConfirmationHistory).toEqual([]);
+    const confirmed = appendHumanFieldConfirmation(result(), {
+      confirmationId: "field-confirmation-1",
+      fieldId: "brandName",
+      decisionType: "accepted-machine-reading",
+      recordedAt: "2026-07-13T10:00:00Z",
+    });
+    if (!confirmed.ok) throw new Error("field confirmation failed");
+    const e = exportOf(confirmed.value);
+    expect(e.humanFieldConfirmationHistory).toHaveLength(1);
+    expect(e.humanFieldConfirmationHistory[0].decisionType).toBe("accepted-machine-reading");
   });
 
   it("preserves authority citations and dates", () => {

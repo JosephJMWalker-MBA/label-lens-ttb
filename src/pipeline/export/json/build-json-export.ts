@@ -39,6 +39,7 @@ export function buildJsonExport(
     observations: result.observations,
     findings: result.findings,
     versionManifest: result.versionManifest,
+    humanFieldConfirmationHistory: result.humanFieldConfirmationHistory,
     humanDispositionHistory: result.humanDispositionHistory,
     advisoryNotice: result.advisoryNotice,
     ...(result.advisoryQuality !== undefined ? { advisoryQuality: result.advisoryQuality } : {}),
@@ -84,6 +85,7 @@ export function recomputeExportMachineResultId(exportObject: PrecheckJsonExport)
     observations: exportObject.observations,
     findings: exportObject.findings,
     versionManifest: exportObject.versionManifest,
+    humanFieldConfirmationHistory: exportObject.humanFieldConfirmationHistory,
     advisoryNotice: exportObject.advisoryNotice,
     ...(exportObject.advisoryQuality !== undefined
       ? { advisoryQuality: exportObject.advisoryQuality }

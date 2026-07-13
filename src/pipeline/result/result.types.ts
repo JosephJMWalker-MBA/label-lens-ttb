@@ -8,6 +8,9 @@ import type { RuleVersionRef, VersionManifest } from "@/domain/run/version-manif
 import type { VerificationFinding } from "@/domain/verification/finding.types";
 import type {
   AnalyzerFieldObservation,
+  AnalyzerAlternate,
+  AnalyzerObservationState,
+  AnalyzerOcrConfidence,
   AnalyzerProvenance,
 } from "@/pipeline/analyzer/analyzer.types";
 import type {
@@ -78,8 +81,186 @@ export interface PrecheckResult {
   advisoryNotice: AdvisoryNotice;
   /** Advisory-only quality metadata; never alters an evidence assessment. */
   advisoryQuality?: PrecheckAdvisoryQuality;
+  /** Append-only field confirmation history, separate from machine observations. */
+  humanFieldConfirmationHistory: HumanFieldConfirmationEntry[];
   /** Append-only human disposition, kept separate from machine findings. */
   humanDispositionHistory: DispositionEntry[];
+}
+
+// ---------------------------------------------------------------------------
+// Human field confirmation — seller/reviewer adjudication, never OCR.
+// ---------------------------------------------------------------------------
+
+export const REVIEWABLE_FIELD_IDS = ["brandName", "alcoholStatement"] as const;
+export type ReviewableFieldId = (typeof REVIEWABLE_FIELD_IDS)[number];
+
+export const HUMAN_FIELD_CONFIRMATION_SCHEMA_VERSION = "human-field-confirmation.v1" as const;
+export const HUMAN_FIELD_CONFIRMATION_PROVENANCE = "human-confirmed" as const;
+
+export const HUMAN_FIELD_CONFIRMATION_DECISION_TYPES = [
+  "accepted-machine-reading",
+  "selected-alternate",
+  "corrected-value",
+  "field-not-visible",
+  "field-unreadable",
+] as const;
+export type HumanFieldConfirmationDecisionType =
+  (typeof HUMAN_FIELD_CONFIRMATION_DECISION_TYPES)[number];
+
+export const HUMAN_FIELD_GEOMETRY_PROVENANCES = [
+  "human-confirmed-machine-region",
+  "human-selected-region",
+] as const;
+export type HumanFieldGeometryProvenance = (typeof HUMAN_FIELD_GEOMETRY_PROVENANCES)[number];
+
+/** Stable image-relative bounds, never viewport pixels. */
+export interface HumanFieldGeometry {
+  unit: "normalized-image-relative";
+  provenance: HumanFieldGeometryProvenance;
+  imageIndex: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface HumanBrandCorrectionValue {
+  fieldId: "brandName";
+  rawValue: string;
+  normalizedValue: string;
+}
+
+export interface HumanAlcoholCorrectionDirectValue {
+  fieldId: "alcoholStatement";
+  rawValue: string;
+  normalizedValue: string;
+  parsed: {
+    kind: "direct";
+    basisPoints: number;
+  };
+}
+
+export interface HumanAlcoholCorrectionRangeValue {
+  fieldId: "alcoholStatement";
+  rawValue: string;
+  normalizedValue: string;
+  parsed: {
+    kind: "range";
+    lowerBasisPoints: number;
+    upperBasisPoints: number;
+  };
+}
+
+export type HumanCorrectedFieldValue =
+  HumanBrandCorrectionValue | HumanAlcoholCorrectionDirectValue | HumanAlcoholCorrectionRangeValue;
+
+interface HumanFieldConfirmationEntryBase {
+  confirmationId: string;
+  /** Contiguous, monotonic from 1. Assigned on append. */
+  sequence: number;
+  schemaVersion: typeof HUMAN_FIELD_CONFIRMATION_SCHEMA_VERSION;
+  provenance: typeof HUMAN_FIELD_CONFIRMATION_PROVENANCE;
+  fieldId: ReviewableFieldId;
+  /** Supplied by the caller; never generated inside machine assembly. */
+  recordedAt: string;
+  note?: string;
+  humanGeometry?: HumanFieldGeometry;
+}
+
+export type HumanFieldConfirmationEntry =
+  | (HumanFieldConfirmationEntryBase & {
+      decisionType: "accepted-machine-reading";
+    })
+  | (HumanFieldConfirmationEntryBase & {
+      decisionType: "selected-alternate";
+      alternateId: string;
+    })
+  | (HumanFieldConfirmationEntryBase & {
+      decisionType: "corrected-value";
+      correctedValue: HumanCorrectedFieldValue;
+    })
+  | (HumanFieldConfirmationEntryBase & {
+      decisionType: "field-not-visible";
+    })
+  | (HumanFieldConfirmationEntryBase & {
+      decisionType: "field-unreadable";
+    });
+
+interface HumanFieldConfirmationEntryInputBase {
+  fieldId: ReviewableFieldId;
+  recordedAt: string;
+  note?: string;
+  humanGeometry?: HumanFieldGeometry;
+}
+
+export type HumanFieldConfirmationEntryInput =
+  | (HumanFieldConfirmationEntryInputBase & {
+      decisionType: "accepted-machine-reading";
+    })
+  | (HumanFieldConfirmationEntryInputBase & {
+      decisionType: "selected-alternate";
+      alternateId: string;
+    })
+  | (HumanFieldConfirmationEntryInputBase & {
+      decisionType: "corrected-value";
+      correctedValue: HumanCorrectedFieldValue;
+    })
+  | (HumanFieldConfirmationEntryInputBase & {
+      decisionType: "field-not-visible";
+    })
+  | (HumanFieldConfirmationEntryInputBase & {
+      decisionType: "field-unreadable";
+    });
+
+export const REVIEWED_FIELD_STATES = [
+  "NOT_OBSERVED",
+  "NOT_VISIBLE",
+  "UNREADABLE",
+  "AMBIGUOUS",
+  "OBSERVED",
+  "HUMAN_CONFIRMED",
+] as const;
+export type ReviewedFieldState = (typeof REVIEWED_FIELD_STATES)[number];
+
+export interface ResolvedMachineAlternate extends AnalyzerAlternate {
+  alternateId: string;
+}
+
+export type EffectiveReviewedFieldSource =
+  | { kind: "machine-observation" }
+  | { kind: "accepted-machine-reading" }
+  | { kind: "selected-alternate"; alternateId: string }
+  | { kind: "corrected-value" }
+  | { kind: "field-not-visible" }
+  | { kind: "field-unreadable" };
+
+export interface EffectiveReviewedField {
+  fieldId: ReviewableFieldId;
+  state: ReviewedFieldState;
+  source: EffectiveReviewedFieldSource;
+  value: string | null;
+  normalizedValue: string | null;
+  machineObservationState: AnalyzerObservationState;
+  machineObservationValue: string | null;
+  humanConfirmed: boolean;
+  ocrEvidenceScore?: number;
+  ocrConfidence?: AnalyzerOcrConfidence;
+  machineGeometryPresent: boolean;
+  humanGeometry?: HumanFieldGeometry;
+  correctedValue?: HumanCorrectedFieldValue;
+}
+
+export interface ResolvedFieldReview {
+  fieldId: ReviewableFieldId;
+  machineObservation: AnalyzerFieldObservation;
+  machineAlternates: ResolvedMachineAlternate[];
+  activeConfirmation: HumanFieldConfirmationEntry | null;
+  effective: EffectiveReviewedField;
+}
+
+export interface ResolvedFieldReviews {
+  brandName: ResolvedFieldReview;
+  alcoholStatement: ResolvedFieldReview;
 }
 
 // ---------------------------------------------------------------------------
@@ -149,6 +330,15 @@ export type AssemblyErrorCode =
 
 export interface AssemblyError {
   code: AssemblyErrorCode;
+  message: string;
+  issues: string[];
+}
+
+export type HumanFieldConfirmationErrorCode =
+  "DUPLICATE_FIELD_CONFIRMATION_ID" | "INVALID_FIELD_CONFIRMATION";
+
+export interface HumanFieldConfirmationError {
+  code: HumanFieldConfirmationErrorCode;
   message: string;
   issues: string[];
 }

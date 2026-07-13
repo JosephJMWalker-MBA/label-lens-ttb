@@ -316,6 +316,7 @@ export function assemblePrecheckResult(
     versionManifest: run.versionManifest,
     advisoryNotice: ADVISORY_NOTICE,
     ...(input.advisoryQuality !== undefined ? { advisoryQuality: input.advisoryQuality } : {}),
+    humanFieldConfirmationHistory: [] as PrecheckResult["humanFieldConfirmationHistory"],
     humanDispositionHistory: [] as PrecheckResult["humanDispositionHistory"],
   };
 

@@ -12,7 +12,50 @@ const SHA = "6829add3d99c61851028b2422bdd9672bb975183d198de5e280bc961f4a489e7";
 const AUTHORITY = { citation: "27 CFR 4.36", snapshotDate: "2026-07-10" };
 
 function geometry() {
-  return { imageIndex: 0, x: 10, y: 20, width: 100, height: 30, imageWidth: 494, imageHeight: 214 };
+  return {
+    imageIndex: 0,
+    x: 10,
+    y: 20,
+    width: 100,
+    height: 30,
+    imageWidth: 494,
+    imageHeight: 214,
+  };
+}
+
+function alt(value: string, score: number): AnalyzerFieldObservation["alternates"][number] {
+  return {
+    value,
+    confidence: score,
+    ocrEvidenceScore: score,
+    ocrConfidence: {
+      aggregation: "mean",
+      rawScale: "0-100",
+      rawTokenConfidences: [Math.round(score * 100)],
+      rawMean: Math.round(score * 100),
+      rawMin: Math.round(score * 100),
+      rawMax: Math.round(score * 100),
+      missingTokenCount: 0,
+    },
+    candidateProvenance: {
+      passId: `pass-${value}`,
+      passKind: "full-image-primary",
+      triggerReasons: ["primary-pass"],
+      preprocessing: ["grayscale"],
+      regionName: "alcohol",
+      supportingPassIds: [`pass-${value}`],
+      supportingPassKinds: ["full-image-primary"],
+      recoveryPassUsed: false,
+    },
+    ranking: {
+      strategy: "alcohol-ocr-evidence-comparator",
+      orderingMode: "ocr-evidence-first",
+      comparator: [
+        { id: "ocr-evidence-score", direction: "desc", value: score },
+        { id: "normalized-value-key", direction: "asc", value: value.toLowerCase() },
+      ],
+    },
+  };
 }
 
 function validFinding(): Record<string, unknown> {
@@ -29,6 +72,7 @@ function validFinding(): Record<string, unknown> {
         derivativeSha256: SHA,
         fieldId: "alcoholStatement",
         observationState: "OBSERVED",
+        ocrEvidenceScore: 0.9,
         confidence: 0.9,
         geometry: geometry(),
       },
@@ -79,6 +123,7 @@ describe("verification finding — evidence references", () => {
     expect(ref.derivativeSha256).toBe(SHA);
     expect(ref.fieldId).toBe("alcoholStatement");
     expect(ref.observationState).toBe("OBSERVED");
+    expect(ref.ocrEvidenceScore).toBe(0.9);
     expect(ref.confidence).toBe(0.9);
     expect(ref.geometry).toEqual(geometry());
   });
@@ -87,6 +132,7 @@ describe("verification finding — evidence references", () => {
     const finding = validFinding();
     (finding.evidenceReferences as Array<Record<string, unknown>>)[0].observationState =
       "LOW_CONFIDENCE";
+    (finding.evidenceReferences as Array<Record<string, unknown>>)[0].ocrEvidenceScore = 0.08;
     (finding.evidenceReferences as Array<Record<string, unknown>>)[0].confidence = 0.08;
     const result = validateVerificationFinding(finding);
     expect(result.ok).toBe(true);
@@ -104,14 +150,16 @@ describe("verification finding — evidence references", () => {
       state: "AMBIGUOUS",
       value: "12.5% ALC./VOL.",
       confidence: 0.5,
+      ocrEvidenceScore: 0.5,
       geometry: geometry(),
-      alternates: [{ value: "13% ALC./VOL.", confidence: 0.4 }],
+      alternates: [alt("13% ALC./VOL.", 0.4)],
     };
     const ref = evidenceReferenceFromObservation(SHA, "alcoholStatement", observation);
     expect(ref).toEqual({
       derivativeSha256: SHA,
       fieldId: "alcoholStatement",
       observationState: "AMBIGUOUS",
+      ocrEvidenceScore: 0.5,
       confidence: 0.5,
       geometry: geometry(),
     });

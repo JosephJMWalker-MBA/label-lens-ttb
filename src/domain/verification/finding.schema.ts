@@ -40,11 +40,21 @@ const evidenceReferenceSchema = z
     derivativeSha256: z.string().regex(SHA256, "must be a 64-character hex SHA-256"),
     fieldId: z.string().min(1),
     observationState: z.enum(ANALYZER_OBSERVATION_STATES),
+    ocrEvidenceScore: z.number().finite().min(0).max(1),
     confidence: z.number().finite().min(0).max(1),
     geometry: geometrySchema.optional(),
     alternateIndex: z.number().int().nonnegative().optional(),
   })
-  .strict();
+  .strict()
+  .superRefine((reference, ctx) => {
+    if (Math.abs(reference.confidence - reference.ocrEvidenceScore) > 1e-9) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["confidence"],
+        message: "confidence must match ocrEvidenceScore exactly.",
+      });
+    }
+  });
 
 const authoritySchema = z
   .object({

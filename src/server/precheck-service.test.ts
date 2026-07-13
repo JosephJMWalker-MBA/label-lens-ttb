@@ -110,6 +110,10 @@ describe("runPrecheckService (real OCR)", () => {
         // brand stays honestly ambiguous rather than fabricated.
         expect(out.value.observations.alcoholStatement.value).toBe("12.5% ALC./VOL.");
         expect(out.value.observations.brandName.state).toBe("AMBIGUOUS");
+        expect(out.value.humanFieldConfirmationHistory).toEqual([]);
+        expect(out.value.humanDispositionHistory).toEqual([]);
+        expect(out.value.appendToken).toMatch(/^[0-9a-f]{64}$/);
+        expect(parseJsonExport(out.value.exportJson).ok).toBe(true);
       }
     },
     OCR_TIMEOUT,
