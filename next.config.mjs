@@ -28,6 +28,12 @@ const nextConfig = {
       "./node_modules/tesseract.js-core/*.wasm.js",
       "./node_modules/tesseract.js/src/worker-script/**",
     ],
+    // The read-only sample-image endpoint reads the same bundled fixture at
+    // runtime, so a relocated/standalone build must package it for this route too
+    // or the onboarding artwork would 404 in production.
+    "/api/sample-image": [
+      "./tests/fixtures/precheck/m-cellars-24205001000905/label-ocr-source.jpeg",
+    ],
   },
 };
 

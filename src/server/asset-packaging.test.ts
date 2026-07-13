@@ -62,6 +62,15 @@ describe("Next.js packaging configuration", () => {
     expect(config).toMatch(/label-ocr-source\.jpeg/);
   });
 
+  it("traces the bundled fixture for the read-only sample-image route", () => {
+    // The sample-image endpoint reads the fixture at runtime; a standalone build
+    // must package it for this route too, or the onboarding artwork 404s once
+    // relocated. Assert the fixture is included under the sample-image entry.
+    expect(config).toMatch(/["']\/api\/sample-image["']/);
+    const sampleImageTrace = config.slice(config.indexOf("/api/sample-image"));
+    expect(sampleImageTrace).toMatch(/label-ocr-source\.jpeg/);
+  });
+
   it("traces the dynamically loaded Tesseract WASM core and worker script", () => {
     // These are loaded at runtime (not statically imported), so static tracing
     // misses them without an explicit include; a relocated build needs them.
@@ -130,7 +139,11 @@ describe("single hardened processing route", () => {
   });
 
   it("declares the Node runtime and is not configured for Edge on the disk-reading routes", () => {
-    for (const rel of ["precheck/route.ts", "precheck/disposition/route.ts", "sample-image/route.ts"]) {
+    for (const rel of [
+      "precheck/route.ts",
+      "precheck/disposition/route.ts",
+      "sample-image/route.ts",
+    ]) {
       const source = readFileSync(join(apiDir, rel), "utf8");
       expect(source).toMatch(/export\s+const\s+runtime\s*=\s*["']nodejs["']/);
       expect(source).not.toMatch(/["']edge["']/);
