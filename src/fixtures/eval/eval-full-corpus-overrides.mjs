@@ -221,13 +221,15 @@ export const FULL_CORPUS_RECORD_OVERRIDES = {
     alcohol: presentAlcohol([13.5], ["13.5% alc./vol", "13.5%"]),
   }),
   "approved-wine-028": include({
-    strata: [...FRONT_SIMPLE, "missing-alcohol-statement"],
+    strata: [...FRONT_SIMPLE, "alcohol-at-side-or-rotated"],
     notes:
-      "Field Vineyards descriptive panel with the brand carried at top and no alcohol statement present on the artwork.",
+      "Field Vineyards descriptive panel with the brand carried at top and a vertical 13.3% by volume statement printed in the right edge strip.",
     brand: brandPresent(["Field", "Field Vineyards"], {
       forbiddenPresentations: ["Red Wine Blend"],
     }),
-    alcohol: absentAlcohol("No alcohol statement appears on the committed label image."),
+    alcohol: presentAlcohol([13.3], ["ALC 13.3% BY VOL", "13.3% BY VOL", "13.3%"], {
+      orientation: "vertical-counterclockwise",
+    }),
   }),
   "approved-wine-029": exclude({
     strata: [...BACK_DENSE, "alcohol-at-bottom"],
@@ -282,7 +284,9 @@ export const FULL_CORPUS_RECORD_OVERRIDES = {
     brand: brandPresent(["Hubert Lamy"], {
       forbiddenPresentations: ["Chassagne-Montrachet", "La Goujonne"],
     }),
-    alcohol: presentAlcohol([13.5], ["13.5% vol", "13.5%"], { orientation: "mixed" }),
+    alcohol: presentAlcohol([13.5], ["13.5% vol", "13.5%"], {
+      orientation: "vertical-counterclockwise",
+    }),
   }),
   "approved-wine-036": exclude({
     strata: [...BACK_DENSE, "alcohol-at-bottom"],
@@ -423,7 +427,9 @@ export const FULL_CORPUS_RECORD_OVERRIDES = {
     brand: brandPresent(["Golden Road Vineyards"], {
       forbiddenPresentations: ["Uisce Beatha", "Traminette"],
     }),
-    alcohol: presentAlcohol([11.5], ["11.5% ALC/VOL", "11.5%"], { orientation: "mixed" }),
+    alcohol: presentAlcohol([11.5], ["11.5% ALC/VOL", "11.5%"], {
+      orientation: "vertical-counterclockwise",
+    }),
   }),
   "approved-wine-054": include({
     strata: [...BACK_SIMPLE, "alcohol-at-side-or-rotated"],
@@ -891,14 +897,18 @@ export const FULL_CORPUS_RECORD_OVERRIDES = {
     notes:
       "La Fattoria Chardonnay wrap label with the brand centered and the 13.5% ALC statement rotated into the left mandatory strip.",
     brand: brandPresent(["La Fattoria"]),
-    alcohol: presentAlcohol([13.5], ["13.5% ALC", "13.5%"], { orientation: "mixed" }),
+    alcohol: presentAlcohol([13.5], ["13.5% ALC", "13.5%"], {
+      orientation: "vertical-clockwise",
+    }),
   }),
   "approved-wine-108": include({
     strata: [...WRAP_SIDE],
     notes:
       "La Fattoria Vino Bianco wrap label with the brand centered and the 12.5% ALC statement rotated into the left mandatory strip.",
     brand: brandPresent(["La Fattoria"]),
-    alcohol: presentAlcohol([12.5], ["12.5% ALC", "12.5%"], { orientation: "mixed" }),
+    alcohol: presentAlcohol([12.5], ["12.5% ALC", "12.5%"], {
+      orientation: "vertical-clockwise",
+    }),
   }),
   "approved-wine-109": include({
     strata: [...BACK_SIMPLE, "alcohol-at-bottom"],

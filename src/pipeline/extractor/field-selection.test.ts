@@ -19,11 +19,38 @@ let cursor = 0;
 function word(text: string, conf: number, y = 10): OcrWord {
   const x0 = cursor;
   cursor += 20;
-  return { text, rawConfidence: conf, bbox: { x0, y0: y, x1: x0 + 18, y1: y + 12 } };
+  return {
+    text,
+    rawConfidence: conf,
+    bbox: { x0, y0: y, x1: x0 + 18, y1: y + 12 },
+    originalGeometry: {
+      imageIndex: 0,
+      x: x0,
+      y,
+      width: 18,
+      height: 12,
+      imageWidth: 200,
+      imageHeight: 200,
+    },
+  };
 }
 
 function region(words: OcrWord[], name = "full-image"): RegionOcrResult {
-  return { regionName: name, transform: TRANSFORM, words };
+  return {
+    passId: `pass-${name}`,
+    regionName: name,
+    passKind: "full-image-primary",
+    triggerReasons: ["primary-pass"],
+    preprocessing: ["grayscale", "normalise", "scale:1.5"],
+    fieldEligibility: { brand: true, alcohol: true },
+    transform: TRANSFORM,
+    transformedSize: { width: 200, height: 200 },
+    pageSegMode: 11,
+    rawWordCount: words.length,
+    discardedWordCount: 0,
+    timings: { preprocessMs: 0, ocrMs: 0, inverseMappingMs: 0, totalMs: 0 },
+    words,
+  };
 }
 
 function line(texts: [string, number][], y: number): OcrWord[] {
@@ -247,7 +274,20 @@ function tallLine(texts: [string, number][], y: number, height: number): OcrWord
   return texts.map(([t, c]) => {
     const x0 = cursor;
     cursor += 20;
-    return { text: t, rawConfidence: c, bbox: { x0, y0: y, x1: x0 + 18, y1: y + height } };
+    return {
+      text: t,
+      rawConfidence: c,
+      bbox: { x0, y0: y, x1: x0 + 18, y1: y + height },
+      originalGeometry: {
+        imageIndex: 0,
+        x: x0,
+        y,
+        width: 18,
+        height,
+        imageWidth: 200,
+        imageHeight: 200,
+      },
+    };
   });
 }
 
@@ -373,6 +413,31 @@ describe("selectBrandObservation", () => {
     expect(selected?.decision).toBe("selected");
     expect(demotedNoise?.decision).toBe("alternate");
     expect((selected?.score?.total ?? 0) > (demotedNoise?.score?.total ?? 0)).toBe(true);
+  });
+
+  it("does not let a low-prominence appellation outrank the dominant brand on one-pixel geometry jitter", () => {
+    const brand = tallLine([["BLAZIC", 91]], 10, 64);
+    const sideName = tallLine([["Collio", 91]], 90, 60);
+    const appellation = tallLine(
+      [
+        ["Denominazione", 91],
+        ["di", 91],
+        ["Origine", 91],
+        ["Controllata", 93],
+      ],
+      150,
+      26,
+    );
+    const { observation, brandDiagnostics } = selectBrandObservation([
+      region([...brand, ...sideName, ...appellation]),
+    ]);
+
+    expect(observation.state).toBe("AMBIGUOUS");
+    expect(observation.value).toBe("BLAZIC");
+    const selected = brandDiagnostics?.candidates.find(
+      (candidate) => candidate.decision === "selected",
+    );
+    expect(selected?.cleanedValue).toBe("BLAZIC");
   });
 
   it("assembles a split multi-line brand and keeps it selected", () => {
@@ -764,11 +829,11 @@ describe("selectBrandObservation", () => {
     expect(observation.alternates.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("ignores brand candidates outside the front-label region (mandatory strip)", () => {
+  it("does not fabricate a brand from rotated mandatory-strip text", () => {
     const words = tallLine(
       [
-        ["ACME", 92],
-        ["RESERVE", 93],
+        ["GOVERNMENT", 92],
+        ["WARNING", 93],
       ],
       10,
       40,

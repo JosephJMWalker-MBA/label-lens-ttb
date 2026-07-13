@@ -46,11 +46,34 @@ function region(tokens: string[], height = 40): RegionOcrResult {
       text,
       rawConfidence: 92,
       bbox: { x0: x, y0: 10, x1: x + 30, y1: 10 + height },
+      originalGeometry: {
+        imageIndex: 0,
+        x,
+        y: 10,
+        width: 30,
+        height,
+        imageWidth: 400,
+        imageHeight: 400,
+      },
     };
     x += 34;
     return w;
   });
-  return { regionName: "full-image", transform: TRANSFORM, words };
+  return {
+    passId: "pass-full-image",
+    regionName: "full-image",
+    passKind: "full-image-primary",
+    triggerReasons: ["primary-pass"],
+    preprocessing: ["grayscale", "normalise", "scale:1.5"],
+    fieldEligibility: { brand: true, alcohol: true },
+    transform: TRANSFORM,
+    transformedSize: { width: 400, height: 400 },
+    pageSegMode: 11,
+    rawWordCount: words.length,
+    discardedWordCount: 0,
+    timings: { preprocessMs: 0, ocrMs: 0, inverseMappingMs: 0, totalMs: 0 },
+    words,
+  };
 }
 
 function brandOf(tokens: string[]): AnalyzerFieldObservation {

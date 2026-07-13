@@ -28,6 +28,18 @@ export interface BrandDiagnostics {
   lineContainsAcceptable: boolean;
   /** An acceptable brand string survived candidate assembly exactly/normalized. */
   candidateContainsAcceptable: boolean;
+  /** The primary upright pass alone contained acceptable brand OCR. */
+  primaryOcrContainsAcceptable: boolean;
+  /** A recovery pass alone contained acceptable brand OCR. */
+  recoveryOcrContainsAcceptable: boolean;
+  /** The primary upright pass reconstructed a line containing an acceptable brand. */
+  primaryLineContainsAcceptable: boolean;
+  /** A recovery pass reconstructed a line containing an acceptable brand. */
+  recoveryLineContainsAcceptable: boolean;
+  /** The primary upright pass assembled an acceptable brand candidate. */
+  primaryCandidateContainsAcceptable: boolean;
+  /** A recovery pass assembled an acceptable brand candidate. */
+  recoveryCandidateContainsAcceptable: boolean;
   /** When brand abstained, the selector's bounded reason code. */
   abstentionReason?: string;
 }
@@ -51,6 +63,22 @@ export interface AlcoholDiagnostics {
   parserRejectedCandidate: boolean;
   /** At least one supported alcohol candidate survived selection. */
   candidateAccepted: boolean;
+  /** The primary upright pass recognized any alcohol-like number. */
+  primaryNumberInOcr: boolean;
+  /** A recovery pass recognized any alcohol-like number. */
+  recoveryNumberInOcr: boolean;
+  /** The primary upright pass produced a same-line evidence cluster. */
+  primarySameLineEvidenceCluster: boolean;
+  /** A recovery pass produced a same-line evidence cluster. */
+  recoverySameLineEvidenceCluster: boolean;
+  /** The primary upright pass produced an adjacent-line evidence cluster. */
+  primaryAdjacentLineEvidenceCluster: boolean;
+  /** A recovery pass produced an adjacent-line evidence cluster. */
+  recoveryAdjacentLineEvidenceCluster: boolean;
+  /** The primary upright pass accepted at least one supported candidate. */
+  primaryCandidateAccepted: boolean;
+  /** A recovery pass accepted at least one supported candidate. */
+  recoveryCandidateAccepted: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -186,6 +214,16 @@ export function classifyBrand(
   if (brandInTopK(observed, truth.acceptable, 3)) return "candidate-ranking-failure";
   if (diag.candidateContainsAcceptable) return "candidate-ranking-failure";
   if (diag.lineContainsAcceptable) return "candidate-filtering-failure";
+  if (
+    (diag.recoveryCandidateContainsAcceptable || diag.recoveryLineContainsAcceptable) &&
+    !diag.primaryCandidateContainsAcceptable &&
+    !diag.primaryLineContainsAcceptable
+  ) {
+    return "region-coverage-failure";
+  }
+  if (diag.recoveryOcrContainsAcceptable && !diag.primaryOcrContainsAcceptable) {
+    return "region-coverage-failure";
+  }
   if (diag.ocrContainsAcceptable) return "line-reconstruction-failure";
   if (observed.state === "NOT_OBSERVED") return "candidate-generation-failure";
   return "ocr-recognition-failure";
@@ -209,6 +247,17 @@ export function classifyAlcohol(
 
   if (diag.parserRejectedCandidate) return "parser-failure";
   if (diag.filterRejectedCandidate) return "candidate-filtering-failure";
+  if (
+    (diag.recoveryCandidateAccepted ||
+      diag.recoveryAdjacentLineEvidenceCluster ||
+      diag.recoverySameLineEvidenceCluster ||
+      (diag.recoveryNumberInOcr && !diag.primaryNumberInOcr)) &&
+    !diag.primaryCandidateAccepted &&
+    !diag.primaryAdjacentLineEvidenceCluster &&
+    !diag.primarySameLineEvidenceCluster
+  ) {
+    return "region-coverage-failure";
+  }
   if (diag.adjacentLineEvidenceCluster) return "line-reconstruction-failure";
   if (diag.sameLineEvidenceCluster || diag.candidateAccepted) return "candidate-generation-failure";
 

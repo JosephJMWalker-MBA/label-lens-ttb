@@ -48,9 +48,9 @@
           "presence": "present",
           "acceptablePercents": [14],
           "acceptableStatements": ["14% ALC", "14%"],
-          "characteristics": ["rotated-or-vertical"],
+          "characteristics": [],
           "approxGeometry": [],
-          "orientation": "mixed"
+          "orientation": "horizontal"
         },
         "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
@@ -200,7 +200,7 @@
           "acceptableStatements": ["14% ALC", "14%"],
           "characteristics": ["rotated-or-vertical"],
           "approxGeometry": [],
-          "orientation": "mixed"
+          "orientation": "vertical-clockwise"
         },
         "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
@@ -275,7 +275,7 @@
           "acceptableStatements": ["14% ALC", "14%"],
           "characteristics": ["rotated-or-vertical"],
           "approxGeometry": [],
-          "orientation": "mixed"
+          "orientation": "vertical-clockwise"
         },
         "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
@@ -350,7 +350,7 @@
           "acceptableStatements": ["14% ALC", "14%"],
           "characteristics": ["rotated-or-vertical"],
           "approxGeometry": [],
-          "orientation": "mixed"
+          "orientation": "vertical-clockwise"
         },
         "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
@@ -1965,9 +1965,9 @@
       },
       "inspection": {
         "imageOrientation": "landscape",
-        "visualStrata": ["simple-centered-brand", "front-label", "missing-alcohol-statement"],
+        "visualStrata": ["simple-centered-brand", "front-label", "alcohol-at-side-or-rotated"],
         "reviewReasons": [],
-        "notes": "Field Vineyards descriptive panel with the brand carried at top and no alcohol statement present on the artwork."
+        "notes": "Field Vineyards descriptive panel with the brand carried at top and a vertical 13.3% by volume statement printed in the right edge strip."
       },
       "status": "included",
       "exclusionReason": null,
@@ -1983,13 +1983,12 @@
           "orientation": "horizontal"
         },
         "alcohol": {
-          "presence": "absent",
-          "acceptablePercents": [],
-          "acceptableStatements": [],
-          "characteristics": [],
-          "absenceReason": "No alcohol statement appears on the committed label image.",
+          "presence": "present",
+          "acceptablePercents": [13.3],
+          "acceptableStatements": ["ALC 13.3% BY VOL", "13.3% BY VOL", "13.3%"],
+          "characteristics": ["decimal-value", "rotated-or-vertical"],
           "approxGeometry": [],
-          "orientation": "not-applicable"
+          "orientation": "vertical-counterclockwise"
         },
         "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
@@ -1997,7 +1996,7 @@
           "annotatedOn": "2026-07-12",
           "method": "manual inspection of the committed fixture image aided by bounded local OCR preview"
         },
-        "notes": "Field Vineyards descriptive panel with the brand carried at top and no alcohol statement present on the artwork."
+        "notes": "Field Vineyards descriptive panel with the brand carried at top and a vertical 13.3% by volume statement printed in the right edge strip."
       },
       "qualityControl": {
         "reviewedBy": "Codex",
@@ -2395,7 +2394,7 @@
           "acceptableStatements": ["13.5% vol", "13.5%"],
           "characteristics": ["decimal-value", "rotated-or-vertical"],
           "approxGeometry": [],
-          "orientation": "mixed"
+          "orientation": "vertical-counterclockwise"
         },
         "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
@@ -3624,7 +3623,7 @@
           "acceptableStatements": ["11.5% ALC/VOL", "11.5%"],
           "characteristics": ["decimal-value", "rotated-or-vertical"],
           "approxGeometry": [],
-          "orientation": "mixed"
+          "orientation": "vertical-counterclockwise"
         },
         "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
@@ -7454,7 +7453,7 @@
           "acceptableStatements": ["13.5% ALC", "13.5%"],
           "characteristics": ["decimal-value", "rotated-or-vertical"],
           "approxGeometry": [],
-          "orientation": "mixed"
+          "orientation": "vertical-clockwise"
         },
         "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
@@ -7530,7 +7529,7 @@
           "acceptableStatements": ["12.5% ALC", "12.5%"],
           "characteristics": ["decimal-value", "rotated-or-vertical"],
           "approxGeometry": [],
-          "orientation": "mixed"
+          "orientation": "vertical-clockwise"
         },
         "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {

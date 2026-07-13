@@ -90,6 +90,12 @@ describe("brand classification", () => {
     ocrContainsAcceptable: false,
     lineContainsAcceptable: false,
     candidateContainsAcceptable: false,
+    primaryOcrContainsAcceptable: false,
+    recoveryOcrContainsAcceptable: false,
+    primaryLineContainsAcceptable: false,
+    recoveryLineContainsAcceptable: false,
+    primaryCandidateContainsAcceptable: false,
+    recoveryCandidateContainsAcceptable: false,
     ...over,
   });
 
@@ -186,6 +192,14 @@ describe("alcohol classification", () => {
     filterRejectedCandidate: false,
     parserRejectedCandidate: false,
     candidateAccepted: false,
+    primaryNumberInOcr: false,
+    recoveryNumberInOcr: false,
+    primarySameLineEvidenceCluster: false,
+    recoverySameLineEvidenceCluster: false,
+    primaryAdjacentLineEvidenceCluster: false,
+    recoveryAdjacentLineEvidenceCluster: false,
+    primaryCandidateAccepted: false,
+    recoveryCandidateAccepted: false,
     ...o,
   });
 

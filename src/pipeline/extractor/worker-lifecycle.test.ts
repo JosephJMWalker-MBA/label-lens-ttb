@@ -47,6 +47,10 @@ function input() {
   };
 }
 
+function recognizedWord(text: string, x0: number, y0: number, x1: number, y1: number): OcrWord {
+  return { text, rawConfidence: 90, bbox: { x0, y0, x1, y1 } };
+}
+
 /** A fake worker whose termination is counted. */
 function fakeWorker(recognize: (png: Buffer, mode: number) => Promise<OcrWord[]>) {
   const terminate = vi.fn().mockResolvedValue(undefined);
@@ -58,7 +62,10 @@ function fakeWorker(recognize: (png: Buffer, mode: number) => Promise<OcrWord[]>
 
 describe("extractor worker lifecycle", () => {
   it("terminates the worker exactly once on success", async () => {
-    const { worker, terminate } = fakeWorker(async () => []);
+    const { worker, terminate } = fakeWorker(async () => [
+      recognizedWord("ACME", 4, 4, 28, 20),
+      recognizedWord("ESTATE", 32, 4, 60, 20),
+    ]);
     createLocalOcrEngine.mockResolvedValue(worker);
 
     const out = await extractLabelEvidence(input());
@@ -85,7 +92,8 @@ describe("extractor worker lifecycle", () => {
     // schema, so response validation fails AFTER the worker was created.
     const huge = "A".repeat(5000);
     const { worker, terminate } = fakeWorker(async () => [
-      { text: huge, rawConfidence: 90, bbox: { x0: 1, y0: 1, x1: 20, y1: 12 } },
+      recognizedWord(huge, 4, 4, 28, 20),
+      recognizedWord("ESTATE", 32, 4, 60, 20),
     ]);
     createLocalOcrEngine.mockResolvedValue(worker);
 
@@ -98,7 +106,10 @@ describe("extractor worker lifecycle", () => {
   it("creates and terminates one worker per call with no monotonic growth", async () => {
     const terminates: number[] = [];
     createLocalOcrEngine.mockImplementation(async () => {
-      const { worker, terminate } = fakeWorker(async () => []);
+      const { worker, terminate } = fakeWorker(async () => [
+        recognizedWord("ACME", 4, 4, 28, 20),
+        recognizedWord("ESTATE", 32, 4, 60, 20),
+      ]);
       terminate.mockImplementation(async () => {
         terminates.push(1);
       });

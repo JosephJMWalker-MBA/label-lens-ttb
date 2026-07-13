@@ -2,19 +2,8 @@ import type {
   AnalyzerFieldObservation,
   AnalyzerOcrEngine,
 } from "@/pipeline/analyzer/analyzer.types";
-import { extractLabelEvidence } from "@/pipeline/extractor/extractor";
-import {
-  selectAlcoholObservation,
-  selectBrandObservation,
-} from "@/pipeline/extractor/field-selection";
-import type {
-  ExtractionInput,
-  OcrWord,
-  RegionOcrResult,
-} from "@/pipeline/extractor/extractor.types";
-import { verifyAndDecode } from "@/pipeline/extractor/image-integrity";
-import { createLocalOcrEngine } from "@/pipeline/extractor/ocr-engine";
-import { runRegionOcr } from "@/pipeline/extractor/regions";
+import { extractLabelEvidenceDetailed, type ExtractionDebug } from "@/pipeline/extractor/extractor";
+import type { ExtractionInput, OcrWord } from "@/pipeline/extractor/extractor.types";
 
 import { loadCaseImage } from "./eval-loader";
 import type { EvalCase } from "./eval-manifest.types";
@@ -34,11 +23,9 @@ import {
 import type { CaseDiagnostics, CaseReport, DiagnosticWord } from "./eval-report.types";
 
 /**
- * The evaluation harness runs the REAL extractor (`extractLabelEvidence`) on
- * each case for the authoritative measurement, then makes one additional bounded
- * region-OCR pass to capture inspectable diagnostics (region names, sampled
- * words + geometry, reconstructed brand lines, and alcohol token signals). It
- * emits no image bytes, secrets, absolute paths, or unbounded OCR logs.
+ * The evaluation harness runs the REAL extractor once per case and reuses the
+ * extractor's actual OCR pass trace for diagnostics, failure attribution, and
+ * orientation/region cost measurement. No second OCR sweep is performed.
  */
 
 export const EVAL_ADAPTER = { id: "local-two-field-extractor", version: "1.0.0" } as const;
@@ -48,16 +35,13 @@ const EVAL_OCR_ENGINE: AnalyzerOcrEngine = {
   engineVersion: "7.0.0",
   modelId: "eng",
 };
-/** Fixed timestamp: extraction is deterministic in its inputs, never wall-clock. */
 const EVAL_PROCESSED_AT = "2026-07-12T00:00:00Z";
 
-/** Bounds on retained diagnostics so a report can never grow unbounded. */
 const MAX_SAMPLE_WORDS_PER_REGION = 25;
 const MAX_BRAND_LINES = 12;
 const MAX_BRAND_CANDIDATES = 24;
 const MAX_ALCOHOL_CANDIDATES = 24;
 const MAX_TEXT_LEN = 120;
-/** Vertical proximity (processed space) grouping words into a line; matches selector. */
 const LINE_Y_TOLERANCE = 20;
 
 function brandCandidatePriority(decision?: string): number {
@@ -69,7 +53,7 @@ function brandCandidatePriority(decision?: string): number {
 
 function extractionInput(evalCase: EvalCase, sha256: string): ExtractionInput {
   return {
-    imageBytes: new Uint8Array(), // replaced per call; see runCase
+    imageBytes: new Uint8Array(),
     artifactRef: evalCase.caseId,
     derivativeSha256: sha256,
     processedAt: EVAL_PROCESSED_AT,
@@ -85,7 +69,6 @@ function truncate(text: string): string {
   return text.length > MAX_TEXT_LEN ? `${text.slice(0, MAX_TEXT_LEN)}…` : text;
 }
 
-/** Group a region's words into reading lines by vertical proximity. */
 function groupLines(words: OcrWord[]): OcrWord[][] {
   const ordered = [...words].sort(
     (a, b) => (a.bbox.y0 + a.bbox.y1) / 2 - (b.bbox.y0 + b.bbox.y1) / 2,
@@ -103,35 +86,160 @@ function groupLines(words: OcrWord[]): OcrWord[][] {
   return out.map((l) => [...l].sort((a, b) => a.bbox.x0 - b.bbox.x0));
 }
 
-function diagnosticsFor(regions: RegionOcrResult[], acceptableBrands: string[]): CaseDiagnostics {
-  const sampleRegions = regions.map((r) => ({
-    regionName: r.regionName,
-    wordCount: r.words.length,
-    sampleWords: r.words.slice(0, MAX_SAMPLE_WORDS_PER_REGION).map((w): DiagnosticWord => ({
-      text: truncate(w.text),
-      confidence: w.rawConfidence,
-      bbox: w.bbox,
+function textOf(words: OcrWord[]): string {
+  return words.map((word) => word.text).join(" ");
+}
+
+function originalGeometryOf(word: OcrWord) {
+  if (!word.originalGeometry) {
+    throw new Error("expected mapped OCR geometry in extractor debug output");
+  }
+  return word.originalGeometry;
+}
+
+function containsAlcoholMarker(text: string): boolean {
+  return /\b(?:alcohol|a[l1i]c)(?=\b|\d)/i.test(text);
+}
+
+function containsVolumeMarker(text: string): boolean {
+  return (
+    /\b(?:by\s*)?v[o0][l1i](?:ume)?\b/i.test(text) ||
+    /\ba[l1i]c[./]*\s*\/\s*v[o0][l1i]/i.test(text) ||
+    /\ba[l1i]c[./]*v[o0][l1i]/i.test(text)
+  );
+}
+
+function candidateSupportsRecovery(
+  supportPassIds: string[],
+  recoveryPassIds: Set<string>,
+): boolean {
+  return supportPassIds.some((passId) => recoveryPassIds.has(passId));
+}
+
+function candidateSupportsPrimary(
+  supportPassIds: string[],
+  primaryPassId: string | undefined,
+): boolean {
+  return !!primaryPassId && supportPassIds.includes(primaryPassId);
+}
+
+function diagnosticsFor(debug: ExtractionDebug, acceptableBrands: string[]): CaseDiagnostics {
+  const passes = debug.passes;
+  const primaryPassId = passes[0]?.passId;
+  const recoveryPassIds = new Set(passes.slice(1).map((pass) => pass.passId));
+
+  const sampleRegions = passes.map((pass) => ({
+    passId: pass.passId,
+    regionName: pass.regionName,
+    passKind: pass.passKind,
+    triggerReasons: pass.triggerReasons,
+    rotate: pass.transform.rotate,
+    crop: pass.transform.crop,
+    transformedSize: pass.transformedSize,
+    wordCount: pass.words.length,
+    rawWordCount: pass.rawWordCount,
+    discardedWordCount: pass.discardedWordCount,
+    timings: pass.timings,
+    sampleWords: pass.words.slice(0, MAX_SAMPLE_WORDS_PER_REGION).map((word): DiagnosticWord => ({
+      text: truncate(word.text),
+      confidence: word.rawConfidence,
+      bbox: word.bbox,
+      originalGeometry: originalGeometryOf(word),
     })),
   }));
 
-  const brandRegion = regions.find((r) => r.regionName === "full-image");
-  const brandRegionText = brandRegion ? brandRegion.words.map((w) => w.text).join(" ") : "";
-  const brandLines = brandRegion
-    ? groupLines(brandRegion.words)
-        .map((l) => truncate(l.map((w) => w.text).join(" ")))
-        .filter((t) => t.trim().length > 0)
-        .slice(0, MAX_BRAND_LINES)
-    : [];
-  const brandSelection = selectBrandObservation(regions);
-  const alcoholSelection = selectAlcoholObservation(regions);
-  const candidateValues = (brandSelection.brandDiagnostics?.candidates ?? [])
-    .filter((candidate) => candidate.kept && candidate.cleanedValue)
-    .map((candidate) => candidate.cleanedValue!);
+  const primaryBrandPasses = passes.filter(
+    (pass) => pass.passKind === "full-image-primary" && pass.fieldEligibility.brand,
+  );
+  const recoveryBrandPasses = passes.filter(
+    (pass) => pass.passKind !== "full-image-primary" && pass.fieldEligibility.brand,
+  );
+  const brandLineTexts = passes
+    .filter((pass) => pass.fieldEligibility.brand)
+    .flatMap((pass) =>
+      groupLines(pass.words)
+        .map((line) => truncate(textOf(line)))
+        .filter((text) => text.trim().length > 0),
+    )
+    .slice(0, MAX_BRAND_LINES);
+
+  const brandSelection = debug.finalSelections.brand;
+  const brandCandidates = [...(brandSelection.brandDiagnostics?.candidates ?? [])];
+  const keptBrandCandidates = brandCandidates.filter(
+    (candidate) => candidate.kept && candidate.cleanedValue,
+  );
+  const brandCandidateValues = keptBrandCandidates.map((candidate) => candidate.cleanedValue!);
+  const brandPrimaryText = primaryBrandPasses.map((pass) => textOf(pass.words)).join(" ");
+  const brandRecoveryText = recoveryBrandPasses.map((pass) => textOf(pass.words)).join(" ");
+  const brandPrimaryLines = primaryBrandPasses.flatMap((pass) =>
+    groupLines(pass.words).map((line) => textOf(line)),
+  );
+  const brandRecoveryLines = recoveryBrandPasses.flatMap((pass) =>
+    groupLines(pass.words).map((line) => textOf(line)),
+  );
+
+  const alcoholSelection = debug.finalSelections.alcohol;
+  const alcoholCandidates = [...(alcoholSelection.alcoholDiagnostics?.candidates ?? [])];
+  const primaryAlcoholWords = primaryBrandPasses.flatMap((pass) => pass.words);
+  const recoveryAlcoholWords = passes
+    .filter((pass) => pass.passKind !== "full-image-primary" && pass.fieldEligibility.alcohol)
+    .flatMap((pass) => pass.words);
+  const primaryAlcoholText = textOf(primaryAlcoholWords);
+  const recoveryAlcoholText = textOf(recoveryAlcoholWords);
+
+  const usefulPassIds = new Set<string>([
+    ...debug.finalSelections.brand.supportingPassIds,
+    ...debug.finalSelections.alcohol.supportingPassIds,
+    ...keptBrandCandidates.flatMap((candidate) => candidate.supportPassIds),
+    ...alcoholCandidates
+      .filter((candidate) => candidate.kept)
+      .flatMap((candidate) => candidate.supportPassIds),
+  ]);
+  const extraPassesWithNoUsableEvidence = passes
+    .slice(1)
+    .filter((pass) => !usefulPassIds.has(pass.passId)).length;
 
   return {
     regions: sampleRegions,
-    brandLineTexts: brandLines,
-    brandCandidateDecisions: [...(brandSelection.brandDiagnostics?.candidates ?? [])]
+    performance: {
+      passCount: passes.length,
+      extraPassCount: Math.max(0, passes.length - 1),
+      primaryPassDurationMs: passes[0]?.timings.totalMs ?? 0,
+      transformedPassDurationMs: passes
+        .filter((pass) => pass.transform.rotate !== 0)
+        .reduce((sum, pass) => sum + pass.timings.totalMs, 0),
+      regionPassDurationMs: passes
+        .slice(1)
+        .filter(
+          (pass) =>
+            pass.transform.crop.left !== 0 ||
+            pass.transform.crop.top !== 0 ||
+            pass.transform.crop.width !== pass.transform.originalWidth ||
+            pass.transform.crop.height !== pass.transform.originalHeight,
+        )
+        .reduce((sum, pass) => sum + pass.timings.totalMs, 0),
+      totalOcrDurationMs: passes.reduce((sum, pass) => sum + pass.timings.ocrMs, 0),
+      totalRecoveryDurationMs: passes.slice(1).reduce((sum, pass) => sum + pass.timings.totalMs, 0),
+      totalInverseMappingDurationMs: passes.reduce(
+        (sum, pass) => sum + pass.timings.inverseMappingMs,
+        0,
+      ),
+      extraPassesWithNoUsableEvidence,
+    },
+    primarySelections: {
+      brandState: debug.primarySelections.brand.observation.state,
+      brandValue: debug.primarySelections.brand.observation.value,
+      alcoholState: debug.primarySelections.alcohol.observation.state,
+      alcoholValue: debug.primarySelections.alcohol.observation.value,
+    },
+    finalSelectionPasses: {
+      brandSourcePassId: debug.finalSelections.brand.source?.passId ?? null,
+      brandSupportingPassIds: debug.finalSelections.brand.supportingPassIds,
+      alcoholSourcePassId: debug.finalSelections.alcohol.source?.passId ?? null,
+      alcoholSupportingPassIds: debug.finalSelections.alcohol.supportingPassIds,
+    },
+    brandLineTexts,
+    brandCandidateDecisions: brandCandidates
       .sort((a, b) => {
         const decisionDelta =
           brandCandidatePriority(a.decision) - brandCandidatePriority(b.decision);
@@ -148,6 +256,9 @@ function diagnosticsFor(regions: RegionOcrResult[], acceptableBrands: string[]):
         cleanedValue: candidate.cleanedValue ? truncate(candidate.cleanedValue) : null,
         confidence: candidate.confidence,
         prominence: candidate.prominence,
+        passId: candidate.passId,
+        passKind: candidate.passKind,
+        supportPassIds: candidate.supportPassIds,
         assembly: candidate.assembly,
         lineIndexes: candidate.lineIndexes,
         kept: candidate.kept,
@@ -162,21 +273,44 @@ function diagnosticsFor(regions: RegionOcrResult[], acceptableBrands: string[]):
         cleanedValue: line.cleanedValue ? truncate(line.cleanedValue) : null,
         confidence: line.confidence,
         prominence: line.prominence,
+        passId: line.passId,
+        passKind: line.passKind,
         kept: line.kept,
         reason: line.reason,
       })),
     brandAbstentionReason: brandSelection.brandDiagnostics?.abstentionReason,
-    // Did OCR read an acceptable brand anywhere in the brand region (even merged
-    // into a longer, later-filtered line)? Substring containment on the full,
-    // uncapped region text distinguishes a filtering loss from an OCR miss.
-    brandOcrContainsAcceptable: normalizedIncludes(brandRegionText, acceptableBrands),
-    brandLineContainsAcceptable: brandLines.some((line) =>
-      normalizedIncludes(line, acceptableBrands),
-    ),
-    brandCandidateContainsAcceptable: candidateValues.some((value) =>
+    brandOcrContainsAcceptable:
+      normalizedIncludes(brandPrimaryText, acceptableBrands) ||
+      normalizedIncludes(brandRecoveryText, acceptableBrands),
+    brandLineContainsAcceptable:
+      brandPrimaryLines.some((line) => normalizedIncludes(line, acceptableBrands)) ||
+      brandRecoveryLines.some((line) => normalizedIncludes(line, acceptableBrands)),
+    brandCandidateContainsAcceptable: brandCandidateValues.some((value) =>
       acceptableBrands.some((acceptable) => brandNormalizedMatch(value, [acceptable])),
     ),
-    alcoholCandidateDecisions: [...(alcoholSelection.alcoholDiagnostics?.candidates ?? [])]
+    brandPrimaryOcrContainsAcceptable: normalizedIncludes(brandPrimaryText, acceptableBrands),
+    brandRecoveryOcrContainsAcceptable: normalizedIncludes(brandRecoveryText, acceptableBrands),
+    brandPrimaryLineContainsAcceptable: brandPrimaryLines.some((line) =>
+      normalizedIncludes(line, acceptableBrands),
+    ),
+    brandRecoveryLineContainsAcceptable: brandRecoveryLines.some((line) =>
+      normalizedIncludes(line, acceptableBrands),
+    ),
+    brandPrimaryCandidateContainsAcceptable: keptBrandCandidates.some(
+      (candidate) =>
+        candidateSupportsPrimary(candidate.supportPassIds, primaryPassId) &&
+        acceptableBrands.some((acceptable) =>
+          brandNormalizedMatch(candidate.cleanedValue ?? null, [acceptable]),
+        ),
+    ),
+    brandRecoveryCandidateContainsAcceptable: keptBrandCandidates.some(
+      (candidate) =>
+        candidateSupportsRecovery(candidate.supportPassIds, recoveryPassIds) &&
+        acceptableBrands.some((acceptable) =>
+          brandNormalizedMatch(candidate.cleanedValue ?? null, [acceptable]),
+        ),
+    ),
+    alcoholCandidateDecisions: alcoholCandidates
       .sort((a, b) => {
         const decisionDelta =
           brandCandidatePriority(a.decision) - brandCandidatePriority(b.decision);
@@ -192,10 +326,14 @@ function diagnosticsFor(regions: RegionOcrResult[], acceptableBrands: string[]):
           : null,
         confidence: candidate.confidence,
         prominence: candidate.prominence,
+        passId: candidate.passId,
+        passKind: candidate.passKind,
+        supportPassIds: candidate.supportPassIds,
         assembly: candidate.assembly,
         lineIndexes: candidate.lineIndexes,
         sourceTokens: candidate.sourceTokens.map(truncate),
         sourceBoxes: candidate.sourceBoxes,
+        sourceOriginalBoxes: candidate.sourceOriginalBoxes,
         kept: candidate.kept,
         acceptanceReason: candidate.acceptanceReason,
         positiveMarkers: candidate.positiveMarkers,
@@ -205,14 +343,48 @@ function diagnosticsFor(regions: RegionOcrResult[], acceptableBrands: string[]):
         decision: candidate.decision,
       })),
     alcoholAbstentionReason: alcoholSelection.alcoholDiagnostics?.abstentionReason,
-    alcoholNumberInOcr: alcoholSelection.alcoholDiagnostics?.numberInOcr ?? false,
-    alcoholPercentInOcr: alcoholSelection.alcoholDiagnostics?.percentInOcr ?? false,
-    alcoholAlcoholMarkerInOcr: alcoholSelection.alcoholDiagnostics?.alcoholMarkerInOcr ?? false,
-    alcoholVolumeMarkerInOcr: alcoholSelection.alcoholDiagnostics?.volumeMarkerInOcr ?? false,
-    alcoholSameLineEvidenceCluster:
-      alcoholSelection.alcoholDiagnostics?.sameLineEvidenceCluster ?? false,
-    alcoholAdjacentLineEvidenceCluster:
-      alcoholSelection.alcoholDiagnostics?.adjacentLineEvidenceCluster ?? false,
+    alcoholNumberInOcr: /\d/.test(primaryAlcoholText) || /\d/.test(recoveryAlcoholText),
+    alcoholPercentInOcr: primaryAlcoholText.includes("%") || recoveryAlcoholText.includes("%"),
+    alcoholAlcoholMarkerInOcr:
+      containsAlcoholMarker(primaryAlcoholText) || containsAlcoholMarker(recoveryAlcoholText),
+    alcoholVolumeMarkerInOcr:
+      containsVolumeMarker(primaryAlcoholText) || containsVolumeMarker(recoveryAlcoholText),
+    alcoholSameLineEvidenceCluster: alcoholCandidates.some(
+      (candidate) => candidate.assembly === "same-line-window",
+    ),
+    alcoholAdjacentLineEvidenceCluster: alcoholCandidates.some(
+      (candidate) => candidate.assembly === "adjacent-line-window",
+    ),
+    alcoholPrimaryNumberInOcr: /\d/.test(primaryAlcoholText),
+    alcoholRecoveryNumberInOcr: /\d/.test(recoveryAlcoholText),
+    alcoholPrimarySameLineEvidenceCluster: alcoholCandidates.some(
+      (candidate) =>
+        candidate.assembly === "same-line-window" &&
+        candidateSupportsPrimary(candidate.supportPassIds, primaryPassId),
+    ),
+    alcoholRecoverySameLineEvidenceCluster: alcoholCandidates.some(
+      (candidate) =>
+        candidate.assembly === "same-line-window" &&
+        candidateSupportsRecovery(candidate.supportPassIds, recoveryPassIds),
+    ),
+    alcoholPrimaryAdjacentLineEvidenceCluster: alcoholCandidates.some(
+      (candidate) =>
+        candidate.assembly === "adjacent-line-window" &&
+        candidateSupportsPrimary(candidate.supportPassIds, primaryPassId),
+    ),
+    alcoholRecoveryAdjacentLineEvidenceCluster: alcoholCandidates.some(
+      (candidate) =>
+        candidate.assembly === "adjacent-line-window" &&
+        candidateSupportsRecovery(candidate.supportPassIds, recoveryPassIds),
+    ),
+    alcoholPrimaryCandidateAccepted: alcoholCandidates.some(
+      (candidate) =>
+        candidate.kept && candidateSupportsPrimary(candidate.supportPassIds, primaryPassId),
+    ),
+    alcoholRecoveryCandidateAccepted: alcoholCandidates.some(
+      (candidate) =>
+        candidate.kept && candidateSupportsRecovery(candidate.supportPassIds, recoveryPassIds),
+    ),
     alcoholFilterRejectedCandidate:
       alcoholSelection.alcoholDiagnostics?.filterRejectedCandidate ?? false,
     alcoholParserRejectedCandidate:
@@ -221,33 +393,44 @@ function diagnosticsFor(regions: RegionOcrResult[], acceptableBrands: string[]):
   };
 }
 
-function toObserved(field: AnalyzerFieldObservation): ObservedField {
+function emptyDiagnostics(): CaseDiagnostics {
   return {
-    state: field.state,
-    value: field.value,
-    confidence: field.confidence,
-    alternates: field.alternates.map((a) => ({ value: a.value, confidence: a.confidence })),
-  };
-}
-
-/** Run one case end-to-end: real extraction + bounded diagnostics + verdicts. */
-export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
-  const { bytes, sha256 } = loadCaseImage(evalCase);
-  const input: ExtractionInput = { ...extractionInput(evalCase, sha256), imageBytes: bytes };
-
-  const start = performance.now();
-  const result = await extractLabelEvidence(input);
-  const latencyMs = performance.now() - start;
-
-  // Diagnostics pass (same deterministic primitives the extractor uses).
-  let diagnostics: CaseDiagnostics = {
     regions: [],
+    performance: {
+      passCount: 0,
+      extraPassCount: 0,
+      primaryPassDurationMs: 0,
+      transformedPassDurationMs: 0,
+      regionPassDurationMs: 0,
+      totalOcrDurationMs: 0,
+      totalRecoveryDurationMs: 0,
+      totalInverseMappingDurationMs: 0,
+      extraPassesWithNoUsableEvidence: 0,
+    },
+    primarySelections: {
+      brandState: "NOT_OBSERVED",
+      brandValue: null,
+      alcoholState: "NOT_OBSERVED",
+      alcoholValue: null,
+    },
+    finalSelectionPasses: {
+      brandSourcePassId: null,
+      brandSupportingPassIds: [],
+      alcoholSourcePassId: null,
+      alcoholSupportingPassIds: [],
+    },
     brandLineTexts: [],
     brandCandidateDecisions: [],
     brandLineDecisions: [],
     brandOcrContainsAcceptable: false,
     brandLineContainsAcceptable: false,
     brandCandidateContainsAcceptable: false,
+    brandPrimaryOcrContainsAcceptable: false,
+    brandRecoveryOcrContainsAcceptable: false,
+    brandPrimaryLineContainsAcceptable: false,
+    brandRecoveryLineContainsAcceptable: false,
+    brandPrimaryCandidateContainsAcceptable: false,
+    brandRecoveryCandidateContainsAcceptable: false,
     brandAbstentionReason: undefined,
     alcoholCandidateDecisions: [],
     alcoholAbstentionReason: undefined,
@@ -257,24 +440,42 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
     alcoholVolumeMarkerInOcr: false,
     alcoholSameLineEvidenceCluster: false,
     alcoholAdjacentLineEvidenceCluster: false,
+    alcoholPrimaryNumberInOcr: false,
+    alcoholRecoveryNumberInOcr: false,
+    alcoholPrimarySameLineEvidenceCluster: false,
+    alcoholRecoverySameLineEvidenceCluster: false,
+    alcoholPrimaryAdjacentLineEvidenceCluster: false,
+    alcoholRecoveryAdjacentLineEvidenceCluster: false,
+    alcoholPrimaryCandidateAccepted: false,
+    alcoholRecoveryCandidateAccepted: false,
     alcoholFilterRejectedCandidate: false,
     alcoholParserRejectedCandidate: false,
     alcoholCandidateAccepted: false,
   };
-  const decoded = await verifyAndDecode(bytes, sha256);
-  if (decoded.ok) {
-    const engine = await createLocalOcrEngine();
-    try {
-      const regions = await runRegionOcr(bytes, decoded.value.width, decoded.value.height, engine);
-      diagnostics = diagnosticsFor(regions, evalCase.brand.acceptable);
-    } finally {
-      try {
-        await engine.terminate();
-      } catch {
-        // discard: the diagnostics worker is being torn down regardless
-      }
-    }
-  }
+}
+
+function toObserved(field: AnalyzerFieldObservation): ObservedField {
+  return {
+    state: field.state,
+    value: field.value,
+    confidence: field.confidence,
+    alternates: field.alternates.map((alternate) => ({
+      value: alternate.value,
+      confidence: alternate.confidence,
+    })),
+  };
+}
+
+export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
+  const { bytes, sha256 } = loadCaseImage(evalCase);
+  const input: ExtractionInput = { ...extractionInput(evalCase, sha256), imageBytes: bytes };
+
+  const start = performance.now();
+  const result = await extractLabelEvidenceDetailed(input);
+  const latencyMs = performance.now() - start;
+
+  let diagnostics = emptyDiagnostics();
+  if (result.ok) diagnostics = diagnosticsFor(result.value.debug, evalCase.brand.acceptable);
 
   const alcoholDiag: AlcoholDiagnostics = {
     numberInOcr: diagnostics.alcoholNumberInOcr,
@@ -286,10 +487,17 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
     filterRejectedCandidate: diagnostics.alcoholFilterRejectedCandidate,
     parserRejectedCandidate: diagnostics.alcoholParserRejectedCandidate,
     candidateAccepted: diagnostics.alcoholCandidateAccepted,
+    primaryNumberInOcr: diagnostics.alcoholPrimaryNumberInOcr,
+    recoveryNumberInOcr: diagnostics.alcoholRecoveryNumberInOcr,
+    primarySameLineEvidenceCluster: diagnostics.alcoholPrimarySameLineEvidenceCluster,
+    recoverySameLineEvidenceCluster: diagnostics.alcoholRecoverySameLineEvidenceCluster,
+    primaryAdjacentLineEvidenceCluster: diagnostics.alcoholPrimaryAdjacentLineEvidenceCluster,
+    recoveryAdjacentLineEvidenceCluster: diagnostics.alcoholRecoveryAdjacentLineEvidenceCluster,
+    primaryCandidateAccepted: diagnostics.alcoholPrimaryCandidateAccepted,
+    recoveryCandidateAccepted: diagnostics.alcoholRecoveryCandidateAccepted,
   };
 
   if (!result.ok) {
-    // A typed extraction error: NOT_OBSERVED-equivalent for both fields.
     const empty: ObservedField = {
       state: "NOT_OBSERVED",
       value: null,
@@ -313,6 +521,12 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
           ocrContainsAcceptable: diagnostics.brandOcrContainsAcceptable,
           lineContainsAcceptable: diagnostics.brandLineContainsAcceptable,
           candidateContainsAcceptable: diagnostics.brandCandidateContainsAcceptable,
+          primaryOcrContainsAcceptable: diagnostics.brandPrimaryOcrContainsAcceptable,
+          recoveryOcrContainsAcceptable: diagnostics.brandRecoveryOcrContainsAcceptable,
+          primaryLineContainsAcceptable: diagnostics.brandPrimaryLineContainsAcceptable,
+          recoveryLineContainsAcceptable: diagnostics.brandRecoveryLineContainsAcceptable,
+          primaryCandidateContainsAcceptable: diagnostics.brandPrimaryCandidateContainsAcceptable,
+          recoveryCandidateContainsAcceptable: diagnostics.brandRecoveryCandidateContainsAcceptable,
           abstentionReason: diagnostics.brandAbstentionReason,
         }),
       },
@@ -330,8 +544,8 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
     };
   }
 
-  const brandObs = toObserved(result.value.fields.brandName);
-  const alcoholObs = toObserved(result.value.fields.alcoholStatement);
+  const brandObs = toObserved(result.value.response.fields.brandName);
+  const alcoholObs = toObserved(result.value.response.fields.alcoholStatement);
 
   return {
     caseId: evalCase.caseId,
@@ -353,6 +567,12 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
         ocrContainsAcceptable: diagnostics.brandOcrContainsAcceptable,
         lineContainsAcceptable: diagnostics.brandLineContainsAcceptable,
         candidateContainsAcceptable: diagnostics.brandCandidateContainsAcceptable,
+        primaryOcrContainsAcceptable: diagnostics.brandPrimaryOcrContainsAcceptable,
+        recoveryOcrContainsAcceptable: diagnostics.brandRecoveryOcrContainsAcceptable,
+        primaryLineContainsAcceptable: diagnostics.brandPrimaryLineContainsAcceptable,
+        recoveryLineContainsAcceptable: diagnostics.brandRecoveryLineContainsAcceptable,
+        primaryCandidateContainsAcceptable: diagnostics.brandPrimaryCandidateContainsAcceptable,
+        recoveryCandidateContainsAcceptable: diagnostics.brandRecoveryCandidateContainsAcceptable,
         abstentionReason: diagnostics.brandAbstentionReason,
       }),
     },

@@ -13,6 +13,7 @@ describe("mapBoxToOriginalGeometry", () => {
       originalHeight: 400,
     };
     const g = mapBoxToOriginalGeometry({ x0: 20, y0: 40, x1: 120, y1: 100 }, t);
+    if (!g) throw new Error("expected mapped geometry");
     expect(g).toMatchObject({
       x: 20,
       y: 40,
@@ -32,6 +33,7 @@ describe("mapBoxToOriginalGeometry", () => {
       originalHeight: 1000,
     };
     const g = mapBoxToOriginalGeometry({ x0: 400, y0: 20, x1: 600, y1: 60 }, t);
+    if (!g) throw new Error("expected mapped geometry");
     expect(g).toMatchObject({ x: 110, y: 700, width: 20, height: 100 });
   });
 
@@ -44,7 +46,21 @@ describe("mapBoxToOriginalGeometry", () => {
       originalHeight: 1000,
     };
     const g = mapBoxToOriginalGeometry({ x0: 100, y0: 5, x1: 300, y1: 25 }, t);
+    if (!g) throw new Error("expected mapped geometry");
     expect(g).toMatchObject({ x: 35, y: 100, width: 20, height: 200 });
+  });
+
+  it("maps a 180° rotated crop back to original coordinates", () => {
+    const t: RegionTransform = {
+      crop: { left: 50, top: 40, width: 100, height: 80 },
+      rotate: 180,
+      scale: 2,
+      originalWidth: 300,
+      originalHeight: 200,
+    };
+    const g = mapBoxToOriginalGeometry({ x0: 20, y0: 40, x1: 120, y1: 100 }, t);
+    if (!g) throw new Error("expected mapped geometry");
+    expect(g).toMatchObject({ x: 90, y: 70, width: 50, height: 30 });
   });
 
   it("keeps geometry within the original frame with positive area", () => {
@@ -56,9 +72,21 @@ describe("mapBoxToOriginalGeometry", () => {
       originalHeight: 100,
     };
     const g = mapBoxToOriginalGeometry({ x0: 98, y0: 98, x1: 99, y1: 99 }, t);
+    if (!g) throw new Error("expected mapped geometry");
     expect(g.x).toBeGreaterThanOrEqual(0);
     expect(g.width).toBeGreaterThanOrEqual(1);
     expect(g.x + g.width).toBeLessThanOrEqual(100);
+  });
+
+  it("rejects degenerate mapped boxes instead of forcing a fake area", () => {
+    const t: RegionTransform = {
+      crop: { left: 0, top: 0, width: 100, height: 100 },
+      rotate: 0,
+      scale: 1,
+      originalWidth: 100,
+      originalHeight: 100,
+    };
+    expect(mapBoxToOriginalGeometry({ x0: 10, y0: 10, x1: 10, y1: 20 }, t)).toBeNull();
   });
 });
 
