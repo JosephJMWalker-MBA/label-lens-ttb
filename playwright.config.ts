@@ -10,6 +10,12 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
+  // On a cold CI runner, Next dev compiles the client bundle on demand on the
+  // first page load. Give assertions headroom for that one-time compile, and cap
+  // worker contention in CI so the first parallel loads don't race the compile.
+  timeout: 90_000,
+  expect: { timeout: 30_000 },
+  workers: process.env.CI ? 2 : undefined,
   reporter: "list",
   use: {
     baseURL: BASE_URL,
