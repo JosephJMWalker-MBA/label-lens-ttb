@@ -292,7 +292,7 @@ function EvidenceCard({
                     <span className="min-w-0 break-words">{alt.value}</span>
                     <span className="flex shrink-0 items-center gap-2">
                       <span className="text-xs text-muted-foreground">
-                        confidence {alt.confidence.toFixed(2)}
+                        confidence {alt.confidence?.toFixed(2) ?? "—"}
                       </span>
                       {canInspect && alt.geometry ? (
                         <Button
@@ -325,7 +325,7 @@ function EvidenceCard({
         ) : null}
 
         <p className="text-xs text-muted-foreground">
-          Technical: machine state: {obs.state} · confidence {obs.confidence.toFixed(2)}
+          Technical: machine state: {obs.state} · confidence {obs.confidence?.toFixed(2) ?? "—"}
         </p>
       </dd>
     </div>

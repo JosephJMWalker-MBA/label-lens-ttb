@@ -46,7 +46,7 @@ function ObservationCard({ field, obs }: { field: string; obs: AnalyzerFieldObse
         <dt className="text-muted-foreground">Raw OCR text</dt>
         <dd className="break-words">{obs.rawText ?? "—"}</dd>
         <dt className="text-muted-foreground">Confidence</dt>
-        <dd>{obs.confidence.toFixed(2)}</dd>
+        <dd>{obs.confidence?.toFixed(2) ?? "—"}</dd>
       </dl>
       {obs.state === "NOT_OBSERVED" ? (
         <p className="mt-2 text-muted-foreground">
@@ -59,7 +59,7 @@ function ObservationCard({ field, obs }: { field: string; obs: AnalyzerFieldObse
           <ul className="list-disc pl-5">
             {obs.alternates.map((alt, i) => (
               <li key={i} className="break-words">
-                {alt.value} · {alt.confidence.toFixed(2)}
+                {alt.value} · {alt.confidence?.toFixed(2) ?? "—"}
               </li>
             ))}
           </ul>
