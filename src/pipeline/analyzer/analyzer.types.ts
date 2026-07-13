@@ -57,9 +57,101 @@ export interface EvidenceGeometry {
   imageHeight: number;
 }
 
+export interface AnalyzerOcrConfidence {
+  aggregation: "mean";
+  rawScale: "0-100";
+  rawTokenConfidences: Array<number | null>;
+  rawMean: number | null;
+  rawMin: number | null;
+  rawMax: number | null;
+  missingTokenCount: number;
+}
+
+export interface AnalyzerCandidateProvenance {
+  passId: string;
+  passKind: string;
+  triggerReasons: string[];
+  preprocessing: string[];
+  regionName: string;
+  supportingPassIds: string[];
+  supportingPassKinds: string[];
+  recoveryPassUsed: boolean;
+}
+
+export const ANALYZER_RANKING_DIRECTIONS = ["asc", "desc"] as const;
+export type AnalyzerRankingDirection = (typeof ANALYZER_RANKING_DIRECTIONS)[number];
+
+export const ANALYZER_CANDIDATE_RANKING_STRATEGIES = [
+  "alcohol-ocr-evidence-comparator",
+  "brand-mixed-prominence-score",
+] as const;
+export type AnalyzerCandidateRankingStrategy =
+  (typeof ANALYZER_CANDIDATE_RANKING_STRATEGIES)[number];
+
+export const ANALYZER_CANDIDATE_RANKING_MODES = [
+  "ocr-evidence-first",
+  "score-first",
+  "prominence-first",
+] as const;
+export type AnalyzerCandidateRankingMode = (typeof ANALYZER_CANDIDATE_RANKING_MODES)[number];
+
+export const ANALYZER_RANKING_COMPARATOR_IDS = [
+  "score-eligibility",
+  "ranking-score",
+  "prominence",
+  "ocr-evidence-score",
+  "normalized-value-key",
+] as const;
+export type AnalyzerRankingComparatorId = (typeof ANALYZER_RANKING_COMPARATOR_IDS)[number];
+
+export const ANALYZER_RANKING_SCORE_FACTOR_IDS = [
+  "positive-signal",
+  "meaningful-chars",
+  "structure",
+  "ocr-evidence-score",
+  "prominence",
+  "area",
+  "centrality",
+  "alignment",
+  "line-proximity",
+  "low-information-penalty",
+  "residual-penalty",
+] as const;
+export type AnalyzerRankingScoreFactorId = (typeof ANALYZER_RANKING_SCORE_FACTOR_IDS)[number];
+
+export const ANALYZER_RANKING_SCORE_FACTOR_DIRECTIONS = ["benefit", "penalty"] as const;
+export type AnalyzerRankingScoreFactorDirection =
+  (typeof ANALYZER_RANKING_SCORE_FACTOR_DIRECTIONS)[number];
+
+export interface AnalyzerRankingComparatorEntry {
+  id: AnalyzerRankingComparatorId;
+  direction: AnalyzerRankingDirection;
+  value: number | string | boolean;
+}
+
+export interface AnalyzerRankingScoreFactor {
+  id: AnalyzerRankingScoreFactorId;
+  value: number;
+  contribution: number;
+  direction: AnalyzerRankingScoreFactorDirection;
+}
+
+export interface AnalyzerCandidateRanking {
+  strategy: AnalyzerCandidateRankingStrategy;
+  orderingMode: AnalyzerCandidateRankingMode;
+  comparator: AnalyzerRankingComparatorEntry[];
+  rankingScore?: number;
+  scoreFactors?: AnalyzerRankingScoreFactor[];
+}
+
 export interface AnalyzerAlternate {
   value: string;
+  /** Compatibility alias for `ocrEvidenceScore`. */
   confidence: number;
+  ocrEvidenceScore: number;
+  ocrConfidence: AnalyzerOcrConfidence;
+  candidateProvenance: AnalyzerCandidateProvenance;
+  ranking: AnalyzerCandidateRanking;
   geometry?: EvidenceGeometry;
 }
 
@@ -74,8 +166,12 @@ export interface AnalyzerFieldObservation {
   value: string | null;
   normalizedValue?: string | null;
   rawText?: string;
-  /** Numeric evidence in [0, 1]. */
+  /** Compatibility alias for `ocrEvidenceScore`. */
   confidence: number;
+  ocrEvidenceScore: number;
+  ocrConfidence?: AnalyzerOcrConfidence;
+  candidateProvenance?: AnalyzerCandidateProvenance;
+  ranking?: AnalyzerCandidateRanking;
   geometry?: EvidenceGeometry;
   /** Ordered alternate candidates; never promoted into a result. */
   alternates: AnalyzerAlternate[];

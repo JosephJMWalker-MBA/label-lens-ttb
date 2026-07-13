@@ -70,7 +70,7 @@ function observationRows(label: string, obs: AnalyzerFieldObservation): string {
     `<tr><th scope="row">${esc(label)} — state</th><td>${esc(obs.state)}</td></tr>`,
     `<tr><th scope="row">${esc(label)} — extracted value</th><td>${esc(obs.value ?? "— none extracted —")}</td></tr>`,
     `<tr><th scope="row">${esc(label)} — raw text</th><td>${esc(obs.rawText ?? "—")}</td></tr>`,
-    `<tr><th scope="row">${esc(label)} — confidence</th><td>${obs.confidence.toFixed(2)}</td></tr>`,
+    `<tr><th scope="row">${esc(label)} — OCR evidence score</th><td>${obs.ocrEvidenceScore.toFixed(2)}</td></tr>`,
     `<tr><th scope="row">${esc(label)} — source region</th><td>${esc(geometry)}</td></tr>`,
   ].join("");
 }

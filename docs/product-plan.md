@@ -85,7 +85,7 @@ Product implications:
 - Extract observed fields using an AI vision route
 - Compare expected vs observed values
 - Show field-level findings
-- Show confidence scores
+- Show OCR evidence scores
 - Show overall status
 - Handle missing/uncertain results gracefully
 

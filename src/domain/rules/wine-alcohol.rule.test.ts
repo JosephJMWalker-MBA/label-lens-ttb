@@ -19,14 +19,93 @@ import {
 const SHA = "6829add3d99c61851028b2422bdd9672bb975183d198de5e280bc961f4a489e7";
 
 function geometry() {
-  return { imageIndex: 0, x: 10, y: 20, width: 100, height: 30, imageWidth: 494, imageHeight: 214 };
+  return {
+    imageIndex: 0,
+    x: 10,
+    y: 20,
+    width: 100,
+    height: 30,
+    imageWidth: 494,
+    imageHeight: 214,
+  };
 }
 
 function obs(
   value: string | null,
   overrides: Partial<AnalyzerFieldObservation> = {},
 ): AnalyzerFieldObservation {
-  return { state: "OBSERVED", value, confidence: 0.95, alternates: [], ...overrides };
+  const ocrEvidenceScore = overrides.ocrEvidenceScore ?? overrides.confidence ?? 0.95;
+  return {
+    state: "OBSERVED",
+    value,
+    confidence: ocrEvidenceScore,
+    ocrEvidenceScore,
+    ocrConfidence: {
+      aggregation: "mean",
+      rawScale: "0-100",
+      rawTokenConfidences: [Math.round(ocrEvidenceScore * 100)],
+      rawMean: Math.round(ocrEvidenceScore * 100),
+      rawMin: Math.round(ocrEvidenceScore * 100),
+      rawMax: Math.round(ocrEvidenceScore * 100),
+      missingTokenCount: 0,
+    },
+    candidateProvenance: {
+      passId: "pass-0-full-image",
+      passKind: "full-image-primary",
+      triggerReasons: ["primary-pass"],
+      preprocessing: ["grayscale"],
+      regionName: "alcohol",
+      supportingPassIds: ["pass-0-full-image"],
+      supportingPassKinds: ["full-image-primary"],
+      recoveryPassUsed: false,
+    },
+    ranking: {
+      strategy: "alcohol-ocr-evidence-comparator",
+      orderingMode: "ocr-evidence-first",
+      comparator: [
+        { id: "ocr-evidence-score", direction: "desc", value: ocrEvidenceScore },
+        { id: "normalized-value-key", direction: "asc", value: "alcohol" },
+      ],
+    },
+    alternates: [],
+    geometry: geometry(),
+    ...overrides,
+  };
+}
+
+function alt(value: string, score: number): AnalyzerFieldObservation["alternates"][number] {
+  return {
+    value,
+    confidence: score,
+    ocrEvidenceScore: score,
+    ocrConfidence: {
+      aggregation: "mean",
+      rawScale: "0-100",
+      rawTokenConfidences: [Math.round(score * 100)],
+      rawMean: Math.round(score * 100),
+      rawMin: Math.round(score * 100),
+      rawMax: Math.round(score * 100),
+      missingTokenCount: 0,
+    },
+    candidateProvenance: {
+      passId: `pass-${value}`,
+      passKind: "full-image-primary",
+      triggerReasons: ["primary-pass"],
+      preprocessing: ["grayscale"],
+      regionName: "alcohol",
+      supportingPassIds: [`pass-${value}`],
+      supportingPassKinds: ["full-image-primary"],
+      recoveryPassUsed: false,
+    },
+    ranking: {
+      strategy: "alcohol-ocr-evidence-comparator",
+      orderingMode: "ocr-evidence-first",
+      comparator: [
+        { id: "ocr-evidence-score", direction: "desc", value: score },
+        { id: "normalized-value-key", direction: "asc", value: value.toLowerCase() },
+      ],
+    },
+  };
 }
 
 function declaredFact(value: string) {
@@ -228,7 +307,7 @@ describe("wine-alcohol-syntax", () => {
     const f = syntax({
       observation: obs("12.5% ALC./VOL.", {
         state: "AMBIGUOUS",
-        alternates: [{ value: "13% ALC./VOL.", confidence: 0.4 }],
+        alternates: [alt("13% ALC./VOL.", 0.4)],
       }),
     });
     expect([f.ruleExecutionStatus, f.findingStatus]).toEqual(["executed", "NEEDS_REVIEW"]);
@@ -285,7 +364,7 @@ describe("wine-alcohol-declared-comparison", () => {
       declared: "12.5",
       observation: obs("12.5% ALC./VOL.", {
         state: "AMBIGUOUS",
-        alternates: [{ value: "13% ALC./VOL.", confidence: 0.4 }],
+        alternates: [alt("13% ALC./VOL.", 0.4)],
       }),
     });
     expect(f.findingStatus).toBe("NEEDS_REVIEW");

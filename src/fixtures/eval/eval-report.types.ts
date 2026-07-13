@@ -1,4 +1,7 @@
 import type {
+  AnalyzerCandidateProvenance,
+  AnalyzerCandidateRanking,
+  AnalyzerOcrConfidence,
   AnalyzerObservationState,
   EvidenceGeometry,
 } from "@/pipeline/analyzer/analyzer.types";
@@ -120,16 +123,20 @@ export interface CaseDiagnostics {
     rawText: string;
     cleanedValue: string | null;
     confidence: number;
+    ocrEvidenceScore: number;
+    ocrConfidence: AnalyzerOcrConfidence;
     prominence: number;
     passId: string;
     passKind: OcrPassKind;
     supportPassIds: string[];
+    candidateProvenance: AnalyzerCandidateProvenance;
     assembly: BrandCandidateAssembly;
     lineIndexes: number[];
     kept: boolean;
     filterReason: BrandLineReason;
     decision?: BrandCandidateDecision;
     score?: BrandCandidateScore;
+    ranking?: AnalyzerCandidateRanking;
   }[];
   brandLineDecisions: {
     rawText: string;
@@ -156,10 +163,13 @@ export interface CaseDiagnostics {
     normalizedValue: string | null;
     normalizedParsingText: string | null;
     confidence: number;
+    ocrEvidenceScore: number;
+    ocrConfidence: AnalyzerOcrConfidence;
     prominence: number;
     passId: string;
     passKind: OcrPassKind;
     supportPassIds: string[];
+    candidateProvenance: AnalyzerCandidateProvenance;
     assembly: AlcoholCandidateAssembly;
     lineIndexes: number[];
     sourceTokens: string[];
@@ -172,6 +182,7 @@ export interface CaseDiagnostics {
     parsedPercent: number | null;
     rejectionReason?: AlcoholRejectionReason;
     decision?: AlcoholCandidateDecision;
+    ranking?: AnalyzerCandidateRanking;
   }[];
   alcoholAbstentionReason?: AlcoholAbstentionReason;
   alcoholNumberInOcr: boolean;
@@ -191,6 +202,35 @@ export interface CaseDiagnostics {
   alcoholFilterRejectedCandidate: boolean;
   alcoholParserRejectedCandidate: boolean;
   alcoholCandidateAccepted: boolean;
+  calibrationCandidates: CandidateCalibrationRecord[];
+}
+
+export interface CandidateCalibrationRecord {
+  caseId: string;
+  field: EvalFieldKey;
+  candidateId: string;
+  candidateStatus: "selected" | "alternate" | "ambiguous-rival" | "rejected";
+  selected: boolean;
+  inference: {
+    rawText: string;
+    normalizedValue: string | null;
+    ocrEvidenceScore: number;
+    ocrConfidence: AnalyzerOcrConfidence;
+    candidateProvenance: AnalyzerCandidateProvenance;
+    ranking?: AnalyzerCandidateRanking;
+    prominence: number;
+    passId: string;
+    passKind: OcrPassKind;
+    supportPassIds: string[];
+    kept: boolean;
+  };
+  evaluation: {
+    truthPresent: boolean;
+    acceptable: boolean;
+    exactMatch?: boolean;
+    normalizedMatch?: boolean;
+    parsedAccurate?: boolean;
+  };
 }
 
 /** The extractor's projected view of one field, plus the harness verdicts. */
@@ -198,7 +238,18 @@ export interface FieldReport {
   state: AnalyzerObservationState;
   value: string | null;
   confidence: number;
-  alternates: { value: string; confidence: number }[];
+  ocrEvidenceScore: number;
+  ocrConfidence?: AnalyzerOcrConfidence;
+  candidateProvenance?: AnalyzerCandidateProvenance;
+  ranking?: AnalyzerCandidateRanking;
+  alternates: {
+    value: string;
+    confidence: number;
+    ocrEvidenceScore: number;
+    ocrConfidence: AnalyzerOcrConfidence;
+    candidateProvenance: AnalyzerCandidateProvenance;
+    ranking: AnalyzerCandidateRanking;
+  }[];
   failureClass: EvalFailureClass;
   candidateFilteringSubtype: EvalCandidateFilteringSubtype | null;
 }
@@ -298,8 +349,26 @@ export interface EvalRecoveryPassContributionBucket {
   maxCumulativeCostMs: number;
 }
 
+export interface EvalCalibrationCoverageField {
+  recordCount: number;
+  selectedCount: number;
+  nonSelectedCount: number;
+  rejectedCount: number;
+  rankedCount: number;
+  rawOcrConfidencePresentCount: number;
+  rawOcrConfidenceMissingCount: number;
+}
+
+export interface EvalCalibrationCoverage {
+  totalRecordCount: number;
+  byField: {
+    brand: EvalCalibrationCoverageField;
+    alcohol: EvalCalibrationCoverageField;
+  };
+}
+
 export interface EvalReport {
-  schemaVersion: "extraction-baseline-report.v3";
+  schemaVersion: "extraction-baseline-report.v4";
   manifestSchemaVersion: string;
   extractorAdapter: { id: string; version: string };
   aggregate: AggregateMetrics;
@@ -309,6 +378,7 @@ export interface EvalReport {
     failureDistribution: EvalFailureDistributionBucket[];
     candidateFilteringSubtypes: EvalCandidateFilteringSubtypeBucket[];
     recoveryPassContributions: EvalRecoveryPassContributionBucket[];
+    calibrationCoverage: EvalCalibrationCoverage;
     performance: EvalPerformanceBreakdown;
   };
   cases: CaseReport[];

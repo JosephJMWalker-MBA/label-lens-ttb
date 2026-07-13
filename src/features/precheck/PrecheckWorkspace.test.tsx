@@ -70,6 +70,7 @@ const CANNED: PrecheckServiceResponse = {
       value: "M CELLARS",
       rawText: "M CELLARS",
       confidence: 0.93,
+      ocrEvidenceScore: 0.93,
       geometry: {
         imageIndex: 0,
         x: 10,
@@ -86,6 +87,7 @@ const CANNED: PrecheckServiceResponse = {
       value: "12.5% ALC./VOL.",
       rawText: "12.5% ALC./VOL.",
       confidence: 0.91,
+      ocrEvidenceScore: 0.91,
       geometry: {
         imageIndex: 0,
         x: 30,

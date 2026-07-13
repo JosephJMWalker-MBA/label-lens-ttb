@@ -15,6 +15,9 @@ export interface EvidenceReference {
   derivativeSha256: string;
   fieldId: string;
   observationState: AnalyzerObservationState;
+  /** Explicit OCR-derived evidence score in [0,1]. */
+  ocrEvidenceScore: number;
+  /** Compatibility alias for `ocrEvidenceScore`. */
   confidence: number;
   geometry?: EvidenceGeometry;
   /** Index into the observation's alternates, when a finding cites one. */
@@ -31,7 +34,8 @@ export function evidenceReferenceFromObservation(
     derivativeSha256,
     fieldId,
     observationState: observation.state,
-    confidence: observation.confidence,
+    ocrEvidenceScore: observation.ocrEvidenceScore,
+    confidence: observation.ocrEvidenceScore,
     ...(observation.geometry ? { geometry: observation.geometry } : {}),
   };
 }

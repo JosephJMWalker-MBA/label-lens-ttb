@@ -13,14 +13,114 @@ import type { RuleContext } from "./rule.types";
 const SHA = "6829add3d99c61851028b2422bdd9672bb975183d198de5e280bc961f4a489e7";
 
 function geometry() {
-  return { imageIndex: 0, x: 10, y: 20, width: 100, height: 30, imageWidth: 494, imageHeight: 214 };
+  return {
+    imageIndex: 0,
+    x: 10,
+    y: 20,
+    width: 100,
+    height: 30,
+    imageWidth: 494,
+    imageHeight: 214,
+  };
 }
 
 function obs(
   value: string | null,
   overrides: Partial<AnalyzerFieldObservation> = {},
 ): AnalyzerFieldObservation {
-  return { state: "OBSERVED", value, confidence: 0.95, alternates: [], ...overrides };
+  const ocrEvidenceScore = overrides.ocrEvidenceScore ?? overrides.confidence ?? 0.95;
+  return {
+    state: "OBSERVED",
+    value,
+    confidence: ocrEvidenceScore,
+    ocrEvidenceScore,
+    ocrConfidence: {
+      aggregation: "mean",
+      rawScale: "0-100",
+      rawTokenConfidences: [Math.round(ocrEvidenceScore * 100)],
+      rawMean: Math.round(ocrEvidenceScore * 100),
+      rawMin: Math.round(ocrEvidenceScore * 100),
+      rawMax: Math.round(ocrEvidenceScore * 100),
+      missingTokenCount: 0,
+    },
+    candidateProvenance: {
+      passId: "pass-0-full-image",
+      passKind: "full-image-primary",
+      triggerReasons: ["primary-pass"],
+      preprocessing: ["grayscale"],
+      regionName: "brand",
+      supportingPassIds: ["pass-0-full-image"],
+      supportingPassKinds: ["full-image-primary"],
+      recoveryPassUsed: false,
+    },
+    ranking: {
+      strategy: "brand-mixed-prominence-score",
+      orderingMode: "score-first",
+      comparator: [
+        { id: "score-eligibility", direction: "desc", value: true },
+        { id: "ranking-score", direction: "desc", value: 5.1 },
+        { id: "prominence", direction: "desc", value: 30 },
+        { id: "ocr-evidence-score", direction: "desc", value: ocrEvidenceScore },
+        { id: "normalized-value-key", direction: "asc", value: "brand" },
+      ],
+      rankingScore: 5.1,
+      scoreFactors: [
+        { id: "positive-signal", value: 1, contribution: 2, direction: "benefit" },
+        {
+          id: "ocr-evidence-score",
+          value: ocrEvidenceScore,
+          contribution: ocrEvidenceScore,
+          direction: "benefit",
+        },
+      ],
+    },
+    alternates: [],
+    geometry: geometry(),
+    ...overrides,
+  };
+}
+
+function alt(value: string, score: number): AnalyzerFieldObservation["alternates"][number] {
+  return {
+    value,
+    confidence: score,
+    ocrEvidenceScore: score,
+    ocrConfidence: {
+      aggregation: "mean",
+      rawScale: "0-100",
+      rawTokenConfidences: [Math.round(score * 100)],
+      rawMean: Math.round(score * 100),
+      rawMin: Math.round(score * 100),
+      rawMax: Math.round(score * 100),
+      missingTokenCount: 0,
+    },
+    candidateProvenance: {
+      passId: `pass-${value}`,
+      passKind: "full-image-primary",
+      triggerReasons: ["primary-pass"],
+      preprocessing: ["grayscale"],
+      regionName: "brand",
+      supportingPassIds: [`pass-${value}`],
+      supportingPassKinds: ["full-image-primary"],
+      recoveryPassUsed: false,
+    },
+    ranking: {
+      strategy: "brand-mixed-prominence-score",
+      orderingMode: "score-first",
+      comparator: [
+        { id: "score-eligibility", direction: "desc", value: true },
+        { id: "ranking-score", direction: "desc", value: 4.2 },
+        { id: "prominence", direction: "desc", value: 24 },
+        { id: "ocr-evidence-score", direction: "desc", value: score },
+        { id: "normalized-value-key", direction: "asc", value: value.toLowerCase() },
+      ],
+      rankingScore: 4.2,
+      scoreFactors: [
+        { id: "positive-signal", value: 1, contribution: 2, direction: "benefit" },
+        { id: "ocr-evidence-score", value: score, contribution: score, direction: "benefit" },
+      ],
+    },
+  };
 }
 
 function ctx(opts: {
@@ -180,7 +280,7 @@ describe("brandNameRule outcomes", () => {
       declared: "M CELLARS",
       observation: obs("M CELLARS", {
         state: "AMBIGUOUS",
-        alternates: [{ value: "N CELLARS", confidence: 0.4 }],
+        alternates: [alt("N CELLARS", 0.4)],
       }),
     });
     expect([f.ruleExecutionStatus, f.findingStatus]).toEqual(["executed", "NEEDS_REVIEW"]);
@@ -201,7 +301,7 @@ describe("brandNameRule outcomes", () => {
       declared: "OTHER WINERY",
       observation: obs("ACME RESERVE", {
         state: "AMBIGUOUS",
-        alternates: [{ value: "OTHER LABEL", confidence: 0.7 }],
+        alternates: [alt("OTHER LABEL", 0.7)],
       }),
     });
     expect(ambiguous.findingStatus).toBe("NEEDS_REVIEW");

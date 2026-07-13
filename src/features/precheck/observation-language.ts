@@ -20,7 +20,7 @@ import type { ResultObservations } from "@/pipeline/result/result.types";
  */
 export const OBSERVATION_STATE_LABEL: Record<AnalyzerObservationState, string> = {
   OBSERVED: "Found",
-  LOW_CONFIDENCE: "Found with low confidence",
+  LOW_CONFIDENCE: "Found with weak OCR evidence",
   AMBIGUOUS: "Multiple possibilities",
   NOT_OBSERVED: "Not detected",
 };
@@ -138,7 +138,7 @@ export function stateExplanation(
     case "OBSERVED":
       return `This ${noun} was found clearly on the artwork.`;
     case "LOW_CONFIDENCE":
-      return `A ${noun} was found, but recognition was weak — verify it against the artwork.`;
+      return `A ${noun} was found, but the OCR evidence was weak — verify it against the artwork.`;
     case "AMBIGUOUS":
       return `More than one plausible ${noun} was found; a person should choose between them.`;
     case "NOT_OBSERVED":
