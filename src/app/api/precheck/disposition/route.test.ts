@@ -169,26 +169,34 @@ describe("appendDispositionToResult (append authorization)", () => {
    * exactly as a forger holding the committed parser (but not the signing secret)
    * could. Such an export passes parsing and integrity — only the append token
    * can distinguish it from a genuine one. */
-  function forgeSelfConsistentExport(mutate: (exp: Record<string, unknown>) => void): string {
-    const exp = JSON.parse(baseExportJson());
-    mutate(exp);
-    const machineContent = {
-      resultSchemaVersion: exp.generatedFrom.resultSchemaVersion,
-      mode: exp.mode,
-      profile: exp.profile,
-      run: exp.run,
-      declaredFacts: exp.declaredFacts,
-      evidenceAssessments: exp.evidenceAssessments,
-      observations: exp.observations,
-      findings: exp.findings,
-      versionManifest: exp.versionManifest,
-      advisoryNotice: exp.advisoryNotice,
-      humanDispositionHistory: exp.humanDispositionHistory,
+  function forgeSelfConsistentExport(mutate: (result: Record<string, unknown>) => void): string {
+    const parsed = parseJsonExport(baseExportJson());
+    if (!parsed.ok) throw new Error("parse failed");
+    const forged = {
+      machineResultId: parsed.value.generatedFrom.machineResultId,
+      resultSchemaVersion: parsed.value.generatedFrom.resultSchemaVersion,
+      mode: parsed.value.mode,
+      profile: parsed.value.profile,
+      run: parsed.value.run,
+      declaredFacts: parsed.value.declaredFacts,
+      evidenceAssessments: parsed.value.evidenceAssessments,
+      observations: parsed.value.observations,
+      findings: parsed.value.findings,
+      versionManifest: parsed.value.versionManifest,
+      humanFieldConfirmationHistory: parsed.value.humanFieldConfirmationHistory,
+      advisoryNotice: parsed.value.advisoryNotice,
+      ...(parsed.value.advisoryQuality !== undefined
+        ? { advisoryQuality: parsed.value.advisoryQuality }
+        : {}),
+      humanDispositionHistory: parsed.value.humanDispositionHistory,
     };
+    mutate(forged);
+    const { machineResultId: _previousId, ...machineContent } = forged;
+    void _previousId;
     const machineResultId = deriveMachineResultId(machineContent as never);
-    const built = buildJsonExport({ machineResultId, ...machineContent } as never);
-    if (!built.ok) throw new Error("rebuild failed");
-    const verified = verifyExportIntegrity(built.value);
+    const rebuilt = buildJsonExport({ machineResultId, ...machineContent } as never);
+    if (!rebuilt.ok) throw new Error("rebuild failed");
+    const verified = verifyExportIntegrity(rebuilt.value);
     if (!verified.ok) throw new Error("verify failed");
     return serializeExportCanonical(verified.value);
   }

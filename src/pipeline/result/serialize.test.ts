@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { assemblePrecheckResult } from "./assemble";
 import { buildAssembleInput } from "./build.fixtures";
+import { appendHumanFieldConfirmation } from "./field-confirmation-history";
 import { appendDisposition } from "./disposition";
 import type { DispositionEntryInput, PrecheckResult } from "./result.types";
 import { serializeMachineResult, serializePrecheckResult } from "./serialize";
@@ -40,6 +41,20 @@ describe("deterministic result identity and serialization", () => {
     const r1 = append(r0, ENTRY);
     expect(r1.machineResultId).toBe(r0.machineResultId);
     expect(serializeMachineResult(r1)).toBe(serializeMachineResult(r0));
+  });
+
+  it("keeps machine serialization stable across field confirmation append", () => {
+    const r0 = assembled();
+    const r1 = appendHumanFieldConfirmation(r0, {
+      confirmationId: "field-confirmation-1",
+      fieldId: "brandName",
+      decisionType: "accepted-machine-reading",
+      recordedAt: "2026-07-13T10:00:00Z",
+    });
+    expect(r1.ok).toBe(true);
+    if (!r1.ok) return;
+    expect(r1.value.machineResultId).toBe(r0.machineResultId);
+    expect(serializeMachineResult(r1.value)).toBe(serializeMachineResult(r0));
   });
 
   it("produces identical full serialization for identical disposition histories", () => {

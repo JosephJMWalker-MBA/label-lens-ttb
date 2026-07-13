@@ -4,7 +4,11 @@ import { observationSchema } from "@/domain/evidence/evidence.schema";
 import { EVIDENCE_STATUSES } from "@/domain/run/run-status";
 import { verificationFindingSchema } from "@/domain/verification/finding.schema";
 import { PRECHECK_CHECK_IDS } from "@/pipeline/precheck/precheck.types";
-import { dispositionHistorySchema, refineResultSemantics } from "@/pipeline/result/result.schema";
+import {
+  dispositionHistorySchema,
+  humanFieldConfirmationHistorySchema,
+  refineResultSemantics,
+} from "@/pipeline/result/result.schema";
 import { RESULT_MODE, RESULT_SCHEMA_VERSION } from "@/pipeline/result/result.types";
 import { err, ok, type Result } from "@/shared/result";
 
@@ -159,6 +163,7 @@ export const precheckJsonExportSchema = z
       .strict(),
     findings: z.array(verificationFindingSchema),
     versionManifest: versionManifestSchema,
+    humanFieldConfirmationHistory: humanFieldConfirmationHistorySchema.default([]),
     humanDispositionHistory: dispositionHistorySchema,
     advisoryNotice: z
       .object({ noticeId: z.string().min(1), noticeVersion: semver, text: z.string().min(1) })

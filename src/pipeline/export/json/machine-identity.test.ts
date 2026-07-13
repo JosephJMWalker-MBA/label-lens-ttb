@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { appendHumanFieldConfirmation } from "@/pipeline/result/field-confirmation-history";
 import { appendDisposition } from "@/pipeline/result/disposition";
 import { assemblePrecheckResult } from "@/pipeline/result/assemble";
 import { buildAssembleInput } from "@/pipeline/result/build.fixtures";
@@ -118,6 +119,23 @@ describe("export machine-result-id verification", () => {
     expect(after.integrity.value).not.toBe(before.integrity.value);
     expect(after.generatedFrom.machineResultId).toBe(before.generatedFrom.machineResultId);
     // The updated disposition export still parses and verifies.
+    expect(parseJsonExport(JSON.stringify(after)).ok).toBe(true);
+  });
+
+  it("appending field confirmation changes the checksum but not the machine-result id", () => {
+    const result = baseResult();
+    const before = exportOf(result);
+    const confirmed = appendHumanFieldConfirmation(result, {
+      confirmationId: "field-confirmation-1",
+      fieldId: "brandName",
+      decisionType: "accepted-machine-reading",
+      recordedAt: "2026-07-13T10:00:00Z",
+    });
+    if (!confirmed.ok) throw new Error("append failed");
+    const after = exportOf(confirmed.value);
+
+    expect(after.integrity.value).not.toBe(before.integrity.value);
+    expect(after.generatedFrom.machineResultId).toBe(before.generatedFrom.machineResultId);
     expect(parseJsonExport(JSON.stringify(after)).ok).toBe(true);
   });
 

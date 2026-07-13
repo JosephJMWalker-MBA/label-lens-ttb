@@ -15,10 +15,16 @@ import { buildReadableReport } from "@/pipeline/export/report/build-report";
 import { extractLabelEvidence } from "@/pipeline/extractor/extractor";
 import type { ExtractionErrorCode, ExtractionInput } from "@/pipeline/extractor/extractor.types";
 import { runWinePrecheck } from "@/pipeline/precheck/orchestrator";
+import { validateHumanCorrectedValue } from "@/pipeline/result/field-confirmation";
+import { appendHumanFieldConfirmation } from "@/pipeline/result/field-confirmation-history";
 import { appendDisposition } from "@/pipeline/result/disposition";
 import { assemblePrecheckResult } from "@/pipeline/result/assemble";
 import { validatePrecheckResult } from "@/pipeline/result/result.schema";
-import type { DispositionEntryInput, PrecheckResult } from "@/pipeline/result/result.types";
+import type {
+  DispositionEntryInput,
+  HumanFieldConfirmationEntryInput,
+  PrecheckResult,
+} from "@/pipeline/result/result.types";
 import { err, ok, type Result } from "@/shared/result";
 
 import { issueAppendToken, verifyAppendToken } from "./append-token";
@@ -27,6 +33,7 @@ import { getExecutableProvenance } from "./runtime-provenance";
 
 import type {
   PrecheckDispositionRequest,
+  PrecheckFieldConfirmationRequest,
   PrecheckServiceError,
   PrecheckServiceRequest,
   PrecheckServiceResponse,
@@ -280,6 +287,7 @@ function buildResponse(
     observations: result.observations,
     evidenceAssessments: result.evidenceAssessments,
     findings: result.findings,
+    humanFieldConfirmationHistory: result.humanFieldConfirmationHistory,
     humanDispositionHistory: result.humanDispositionHistory,
     suggestedFilename: filename.value,
     exportJson: serializeExportCanonical(verified.value),
@@ -305,6 +313,7 @@ function resultFromExport(exportJson: string): Result<PrecheckResult, PrecheckSe
     observations: e.observations,
     findings: e.findings,
     versionManifest: e.versionManifest,
+    humanFieldConfirmationHistory: e.humanFieldConfirmationHistory,
     advisoryNotice: e.advisoryNotice,
     ...(e.advisoryQuality !== undefined ? { advisoryQuality: e.advisoryQuality } : {}),
     humanDispositionHistory: e.humanDispositionHistory,
@@ -377,6 +386,111 @@ export function appendDispositionToResult(
 
   const appended = appendDisposition(result, input);
   if (!appended.ok) return fail("INVALID_DISPOSITION", "The disposition could not be recorded.");
+
+  return buildResponse(appended.value, request.file);
+}
+
+/**
+ * Append one human field confirmation to an already-validated result and return
+ * the refreshed bounded response with rebuilt JSON and readable-report exports.
+ */
+export function appendFieldConfirmationToResult(
+  request: PrecheckFieldConfirmationRequest,
+): Result<PrecheckServiceResponse, PrecheckServiceError> {
+  if (request.recordedAt.trim() === "") {
+    return fail("INVALID_FIELD_CONFIRMATION", "A recorded-at timestamp is required.");
+  }
+
+  const reconstructed = resultFromExport(request.exportJson);
+  if (!reconstructed.ok) return reconstructed;
+  const result = reconstructed.value;
+
+  const authorized = verifyAppendToken(request.appendToken, result.machineResultId);
+  if (!authorized.ok) {
+    const message =
+      authorized.error.code === "APPEND_SIGNING_KEY_UNAVAILABLE"
+        ? "The append-authorization service is not configured."
+        : authorized.error.code === "MISSING_APPEND_TOKEN"
+          ? "A server-issued append-authorization token is required."
+          : "The append-authorization token is not valid for this result.";
+    return fail(authorized.error.code, message);
+  }
+
+  let input: HumanFieldConfirmationEntryInput;
+  switch (request.decisionType) {
+    case "accepted-machine-reading":
+      input = {
+        fieldId: request.fieldId,
+        decisionType: "accepted-machine-reading",
+        recordedAt: request.recordedAt,
+        ...(request.note !== undefined && request.note.trim() !== "" ? { note: request.note } : {}),
+        ...(request.humanGeometry !== undefined ? { humanGeometry: request.humanGeometry } : {}),
+      };
+      break;
+    case "selected-alternate":
+      if (!request.alternateId || request.alternateId.trim() === "") {
+        return fail(
+          "INVALID_FIELD_CONFIRMATION",
+          "Select a valid alternate before confirming this field.",
+        );
+      }
+      input = {
+        fieldId: request.fieldId,
+        decisionType: "selected-alternate",
+        alternateId: request.alternateId,
+        recordedAt: request.recordedAt,
+        ...(request.note !== undefined && request.note.trim() !== "" ? { note: request.note } : {}),
+        ...(request.humanGeometry !== undefined ? { humanGeometry: request.humanGeometry } : {}),
+      };
+      break;
+    case "corrected-value": {
+      if (!request.correctedValue || request.correctedValue.trim() === "") {
+        return fail(
+          "INVALID_FIELD_CONFIRMATION",
+          "Enter a corrected value before confirming this field.",
+        );
+      }
+      const correctedValue = validateHumanCorrectedValue(request.fieldId, request.correctedValue);
+      if (!correctedValue.ok) {
+        return fail("INVALID_FIELD_CONFIRMATION", correctedValue.error.message);
+      }
+      input = {
+        fieldId: request.fieldId,
+        decisionType: "corrected-value",
+        correctedValue: correctedValue.value,
+        recordedAt: request.recordedAt,
+        ...(request.note !== undefined && request.note.trim() !== "" ? { note: request.note } : {}),
+        ...(request.humanGeometry !== undefined ? { humanGeometry: request.humanGeometry } : {}),
+      };
+      break;
+    }
+    case "field-not-visible":
+      input = {
+        fieldId: request.fieldId,
+        decisionType: "field-not-visible",
+        recordedAt: request.recordedAt,
+        ...(request.note !== undefined && request.note.trim() !== "" ? { note: request.note } : {}),
+        ...(request.humanGeometry !== undefined ? { humanGeometry: request.humanGeometry } : {}),
+      };
+      break;
+    case "field-unreadable":
+      input = {
+        fieldId: request.fieldId,
+        decisionType: "field-unreadable",
+        recordedAt: request.recordedAt,
+        ...(request.note !== undefined && request.note.trim() !== "" ? { note: request.note } : {}),
+        ...(request.humanGeometry !== undefined ? { humanGeometry: request.humanGeometry } : {}),
+      };
+      break;
+  }
+
+  const appended = appendHumanFieldConfirmation(result, {
+    confirmationId: `field-confirmation-${result.humanFieldConfirmationHistory.length + 1}`,
+    ...input,
+  });
+  if (!appended.ok) {
+    return fail("INVALID_FIELD_CONFIRMATION", "The field confirmation could not be recorded.");
+  }
 
   return buildResponse(appended.value, request.file);
 }
