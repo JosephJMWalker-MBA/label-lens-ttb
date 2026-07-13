@@ -2,13 +2,21 @@ import type {
   AnalyzerFieldObservation,
   AnalyzerOcrEngine,
 } from "@/pipeline/analyzer/analyzer.types";
-import { extractLabelEvidenceDetailed, type ExtractionDebug } from "@/pipeline/extractor/extractor";
+import {
+  extractLabelEvidenceDetailed,
+  type DetailedExtractionResult,
+  type ExtractionDebug,
+} from "@/pipeline/extractor/extractor";
 import {
   selectAlcoholObservation,
   selectBrandObservation,
   type FieldSelection,
 } from "@/pipeline/extractor/field-selection";
-import type { ExtractionInput, OcrWord } from "@/pipeline/extractor/extractor.types";
+import type {
+  ExtractionError,
+  ExtractionInput,
+  OcrWord,
+} from "@/pipeline/extractor/extractor.types";
 
 import {
   alcoholCandidateFilteringSubtype,
@@ -41,6 +49,7 @@ import type {
   FieldReport,
   RecoveryPassContribution,
 } from "./eval-report.types";
+import type { Result } from "@/shared/result";
 
 /**
  * The evaluation harness runs the REAL extractor once per case and reuses the
@@ -759,14 +768,11 @@ function buildCalibrationCandidates(
   ];
 }
 
-export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
-  const { bytes, sha256 } = loadCaseImage(evalCase);
-  const input: ExtractionInput = { ...extractionInput(evalCase, sha256), imageBytes: bytes };
-
-  const start = performance.now();
-  const result = await extractLabelEvidenceDetailed(input);
-  const latencyMs = performance.now() - start;
-
+export function buildCaseReport(
+  evalCase: EvalCase,
+  result: Result<DetailedExtractionResult, ExtractionError>,
+  latencyMs: number,
+): CaseReport {
   let diagnostics = emptyDiagnostics();
   if (result.ok) {
     diagnostics = diagnosticsFor(result.value.debug, evalCase);
@@ -902,6 +908,16 @@ export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
     diagnostics,
     latencyMs,
   };
+}
+
+export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
+  const { bytes, sha256 } = loadCaseImage(evalCase);
+  const input: ExtractionInput = { ...extractionInput(evalCase, sha256), imageBytes: bytes };
+
+  const start = performance.now();
+  const result = await extractLabelEvidenceDetailed(input);
+  const latencyMs = performance.now() - start;
+  return buildCaseReport(evalCase, result, latencyMs);
 }
 
 function emptyFieldReport(

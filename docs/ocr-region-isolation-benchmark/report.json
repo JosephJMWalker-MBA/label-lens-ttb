@@ -1,0 +1,4598 @@
+{
+  "schemaVersion": "ocr-region-isolation-benchmark-report.v1",
+  "annotationSchemaVersion": "ocr-region-benchmark-annotations.v1",
+  "manifestSchemaVersion": "extraction-eval-manifest.v2",
+  "benchmarkCaseCount": 13,
+  "cases": [
+    {
+      "caseId": "wine-multi-artifact-09",
+      "imagePath": "tests/fixtures/precheck/wine-multi-artifact-09/label.png",
+      "strata": ["multi-panel", "alcohol-at-bottom"],
+      "inclusionReasons": ["correct present-field control", "multi-artifact label"],
+      "challengeSlices": ["correct-control", "multi-artifact"],
+      "adjudicationNotes": "The top artifact contains both the brand presentation and alcohol line.",
+      "fields": {
+        "brand": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "OBSERVED",
+            "selectedValue": "DUCK WALK VINEYARDS",
+            "failureClass": "correct",
+            "exactMatch": true,
+            "normalizedMatch": true,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 96,
+              "rawConfidenceMean": 73.22916666666667,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 97,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.07191011235955057,
+              "expectedTokenCount": 3,
+              "expectedTokenPresenceCount": 3,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": true,
+              "rankingPosition": 1,
+              "top3Presence": true,
+              "top5Presence": true,
+              "ambiguityState": false,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 1160.8801669999998,
+            "timings": {
+              "preprocessMs": 97.356,
+              "ocrMs": 903.0227080000002,
+              "inverseMappingMs": 0.5392080000001442,
+              "totalMs": 1160.8801669999998
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "VINE",
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 4,
+              "rawConfidenceMean": 68.75,
+              "rawConfidenceMin": 34,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0.4,
+              "expectedTokenCount": 3,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["duck", "walk", "vineyards"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": true,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": true,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": {
+              "normalized": { "x": 0.12, "y": 0.05, "width": 0.24, "height": 0.11 },
+              "pixels": { "left": 79, "top": 66, "width": 159, "height": 147 },
+              "areaRatio": 0.026626794258373207
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 142.65012500000012,
+            "timings": {
+              "preprocessMs": 44.859958000000006,
+              "ocrMs": 97.74512499999992,
+              "inverseMappingMs": 0.01670800000010786,
+              "totalMs": 142.638958
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Top label title only; avoids the lower warning-only artifact."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "OBSERVED",
+            "selectedValue": "DUCK WALK VINEYARDS",
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": true,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": true,
+          "classifications": ["regression"]
+        },
+        "alcohol": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "OBSERVED",
+            "selectedValue": "12.5% BY VOL.",
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": true,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 96,
+              "rawConfidenceMean": 73.22916666666667,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 97,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.04555808656036447,
+              "expectedTokenCount": 4,
+              "expectedTokenPresenceCount": 4,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": true,
+              "rankingPosition": 1,
+              "top3Presence": true,
+              "top5Presence": true,
+              "ambiguityState": false,
+              "parserOutcome": "correct"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 1160.8801669999998,
+            "timings": {
+              "preprocessMs": 97.356,
+              "ocrMs": 903.0227080000002,
+              "inverseMappingMs": 0.5392080000001442,
+              "totalMs": 1160.8801669999998
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 6,
+              "rawConfidenceMean": 53.333333333333336,
+              "rawConfidenceMin": 11,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0,
+              "expectedTokenCount": 4,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["alc", "125", "by", "vol"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": {
+              "normalized": { "x": 0.2, "y": 0.37, "width": 0.15, "height": 0.06 },
+              "pixels": { "left": 132, "top": 492, "width": 99, "height": 80 },
+              "areaRatio": 0.009022556390977444
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 167.79529200000025,
+            "timings": {
+              "preprocessMs": 46.56812500000024,
+              "ocrMs": 121.18433400000004,
+              "inverseMappingMs": 0.015249999999923602,
+              "totalMs": 167.78129200000012
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Bottom line of the top label with ALC. 12.5% BY VOL."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "OBSERVED",
+            "selectedValue": "12.5% BY VOL.",
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": true,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": true,
+          "classifications": ["regression"]
+        }
+      }
+    },
+    {
+      "caseId": "approved-wine-022",
+      "imagePath": "tests/fixtures/precheck/approved-wine-022/label.png",
+      "strata": ["back-label", "alcohol-at-bottom"],
+      "inclusionReasons": ["correct absent-brand control", "bottom alcohol"],
+      "challengeSlices": ["correct-control", "absent-brand", "bottom-alcohol"],
+      "adjudicationNotes": "No separate brand presentation is visible; only the alcohol line is targeted.",
+      "fields": {
+        "brand": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": false,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 917.9265,
+            "timings": {
+              "preprocessMs": 41.35633400000006,
+              "ocrMs": 738.6534590000001,
+              "inverseMappingMs": 0.0887920000000122,
+              "totalMs": 917.9265
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": false,
+            "truthPresent": false,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["field absent in evaluation truth"]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": false,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": false,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": false,
+          "classifications": ["no improvement"]
+        },
+        "alcohol": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "OBSERVED",
+            "selectedValue": "12% ALC./VOL.",
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": true,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 80,
+              "rawConfidenceMean": 94.225,
+              "rawConfidenceMin": 24,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.04639175257731959,
+              "expectedTokenCount": 4,
+              "expectedTokenPresenceCount": 4,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": true,
+              "rankingPosition": 1,
+              "top3Presence": true,
+              "top5Presence": true,
+              "ambiguityState": false,
+              "parserOutcome": "correct"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 917.9265,
+            "timings": {
+              "preprocessMs": 41.35633400000006,
+              "ocrMs": 738.6534590000001,
+              "inverseMappingMs": 0.0887920000000122,
+              "totalMs": 917.9265
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker",
+            "rawOcr": {
+              "wordCount": 9,
+              "rawConfidenceMean": 75.66666666666667,
+              "rawConfidenceMin": 36,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.10526315789473684,
+              "expectedTokenCount": 1,
+              "expectedTokenPresenceCount": 1,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": {
+              "normalized": { "x": 0.57, "y": 0.24, "width": 0.34, "height": 0.12 },
+              "pixels": { "left": 316, "top": 134, "width": 190, "height": 68 },
+              "areaRatio": 0.04157014157014157
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 101.87604200000033,
+            "timings": {
+              "preprocessMs": 19.500708999999915,
+              "ocrMs": 82.32112499999994,
+              "inverseMappingMs": 0.02483299999994415,
+              "totalMs": 101.86320799999976
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Includes the 12% ALC BY VOL. line and its immediate context."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "OBSERVED",
+            "selectedValue": "12% ALC./VOL.",
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": true,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": true,
+          "classifications": ["regression"]
+        }
+      }
+    },
+    {
+      "caseId": "three-steves-winery",
+      "imagePath": "tests/fixtures/precheck/approved-wine-060/label.jpeg",
+      "strata": ["missing-alcohol-statement", "multiple-brand-like-phrases", "front-label"],
+      "inclusionReasons": ["correct absent-alcohol control", "multiple brand-like phrases"],
+      "challengeSlices": ["correct-control", "absent-alcohol", "multiple-brand-like-phrases"],
+      "adjudicationNotes": "The brand is clear at the top header; no alcohol statement is visible.",
+      "fields": {
+        "brand": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "OBSERVED",
+            "selectedValue": "3 STEVES WINERY",
+            "failureClass": "correct",
+            "exactMatch": true,
+            "normalizedMatch": true,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 438,
+              "rawConfidenceMean": 68.54566210045662,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 97,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.018113207547169812,
+              "expectedTokenCount": 3,
+              "expectedTokenPresenceCount": 3,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": true,
+              "rankingPosition": 1,
+              "top3Presence": true,
+              "top5Presence": true,
+              "ambiguityState": false,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 4671.680458,
+            "timings": {
+              "preprocessMs": 152.85541700000067,
+              "ocrMs": 4356.114874999999,
+              "inverseMappingMs": 0.4606240000002799,
+              "totalMs": 4671.680458
+            },
+            "passCount": 3,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "3 STEVES WINER",
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 3,
+              "rawConfidenceMean": 95.66666666666667,
+              "rawConfidenceMin": 95,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0.9565217391304348,
+              "expectedTokenCount": 3,
+              "expectedTokenPresenceCount": 2,
+              "missingExpectedTokens": ["winery"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": true,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": true,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": {
+              "normalized": { "x": 0.23, "y": 0.01, "width": 0.45, "height": 0.08 },
+              "pixels": { "left": 118, "top": 5, "width": 232, "height": 45 },
+              "areaRatio": 0.03686258447675609
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 95.18054200000097,
+            "timings": {
+              "preprocessMs": 16.415541999999732,
+              "ocrMs": 78.62833399999909,
+              "inverseMappingMs": 0.01187500000014552,
+              "totalMs": 95.07058300000062
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Top title only; excludes the explanatory paragraph and URL."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "OBSERVED",
+            "selectedValue": "3 STEVES WINERY",
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": true,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": true,
+          "classifications": ["regression"]
+        },
+        "alcohol": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": false,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 4671.680458,
+            "timings": {
+              "preprocessMs": 152.85541700000067,
+              "ocrMs": 4356.114874999999,
+              "inverseMappingMs": 0.4606240000002799,
+              "totalMs": 4671.680458
+            },
+            "passCount": 3,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": false,
+            "truthPresent": false,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["field absent in evaluation truth"]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": false,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": false,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": false,
+          "classifications": ["no improvement"]
+        }
+      }
+    },
+    {
+      "caseId": "approved-wine-006",
+      "imagePath": "tests/fixtures/precheck/approved-wine-006/label.png",
+      "strata": ["simple-centered-brand", "low-contrast", "front-label", "alcohol-at-bottom"],
+      "inclusionReasons": ["brand candidate-filtering failure", "low-contrast control"],
+      "challengeSlices": ["candidate-filtering", "low-contrast", "bottom-alcohol"],
+      "adjudicationNotes": "The target brand presentation is the top-right DARK HORSE heading rather than the narrative copy or domain.",
+      "fields": {
+        "brand": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "2 LRS3 aoc",
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": "brand-rejected-too-many-words",
+            "rawOcr": {
+              "wordCount": 159,
+              "rawConfidenceMean": 54.37106918238994,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.031683168316831684,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 2,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": true,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 2603.2822080000005,
+            "timings": {
+              "preprocessMs": 137.5248329999995,
+              "ocrMs": 2297.9272920000003,
+              "inverseMappingMs": 0.27491600000030303,
+              "totalMs": 2603.2822080000005
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-generation-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 7,
+              "rawConfidenceMean": 24.142857142857142,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 43,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0.09090909090909091,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["dark", "horse"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": {
+              "normalized": { "x": 0.7, "y": 0.08, "width": 0.25, "height": 0.12 },
+              "pixels": { "left": 1054, "top": 69, "width": 377, "height": 104 },
+              "areaRatio": 0.0300977208698923
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 285.58770800000093,
+            "timings": {
+              "preprocessMs": 57.2573339999999,
+              "ocrMs": 228.30025000000023,
+              "inverseMappingMs": 0.009000000000014552,
+              "totalMs": 285.57195799999863
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Tight crop on the DARK HORSE heading and wine line."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "2 LRS3 aoc",
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": true,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": true,
+          "classifications": ["regression"]
+        },
+        "alcohol": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "OBSERVED",
+            "selectedValue": "13.5% BY VOL.",
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": true,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 159,
+              "rawConfidenceMean": 54.37106918238994,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.03944773175542406,
+              "expectedTokenCount": 4,
+              "expectedTokenPresenceCount": 4,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": true,
+              "rankingPosition": 1,
+              "top3Presence": true,
+              "top5Presence": true,
+              "ambiguityState": false,
+              "parserOutcome": "correct"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 2603.2822080000005,
+            "timings": {
+              "preprocessMs": 137.5248329999995,
+              "ocrMs": 2297.9272920000003,
+              "inverseMappingMs": 0.27491600000030303,
+              "totalMs": 2603.2822080000005
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "OBSERVED",
+            "selectedValue": "13.5% BY VOL.",
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": true,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 4,
+              "rawConfidenceMean": 90.25,
+              "rawConfidenceMin": 85,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 1,
+              "expectedTokenCount": 4,
+              "expectedTokenPresenceCount": 4,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": true,
+              "rankingPosition": 1,
+              "top3Presence": true,
+              "top5Presence": true,
+              "ambiguityState": false,
+              "parserOutcome": "correct"
+            },
+            "crop": {
+              "normalized": { "x": 0.73, "y": 0.84, "width": 0.16, "height": 0.05 },
+              "pixels": { "left": 1099, "top": 726, "width": 242, "height": 44 },
+              "areaRatio": 0.008173855637181524
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 134.6099579999991,
+            "timings": {
+              "preprocessMs": 39.180333000000246,
+              "ocrMs": 95.4043330000004,
+              "inverseMappingMs": 0.011833000000478933,
+              "totalMs": 134.59912500000064
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Bottom-right ALC. 13.5% BY VOL. line only."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "OBSERVED",
+            "selectedValue": "13.5% BY VOL.",
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": false,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": false,
+          "classifications": ["no improvement"]
+        }
+      }
+    },
+    {
+      "caseId": "alfredos-wine",
+      "imagePath": "tests/fixtures/precheck/approved-wine-002/label.png",
+      "strata": ["multi-line-brand", "brand-punctuation", "alcohol-at-bottom", "front-label"],
+      "inclusionReasons": [
+        "brand candidate-filtering failure",
+        "alcohol candidate-filtering failure"
+      ],
+      "challengeSlices": ["candidate-filtering", "bottom-alcohol", "front-label"],
+      "adjudicationNotes": "The clear brand presentation is the top ALFREDO'S WINE heading rather than the producer block.",
+      "fields": {
+        "brand": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "HLTRE",
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": "brand-rejected-non-brand-keyword",
+            "rawOcr": {
+              "wordCount": 136,
+              "rawConfidenceMean": 62.56617647058823,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.04856512141280353,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 2,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": true,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 2425.115958999999,
+            "timings": {
+              "preprocessMs": 533.6949170000007,
+              "ocrMs": 1787.2632089999988,
+              "inverseMappingMs": 0.07712399999945774,
+              "totalMs": 2425.115958999999
+            },
+            "passCount": 3,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "ALT REDO 5",
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 6,
+              "rawConfidenceMean": 21.5,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 92,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0.45454545454545453,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["alfredos", "wine"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": true,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": {
+              "normalized": { "x": 0.22, "y": 0.18, "width": 0.58, "height": 0.13 },
+              "pixels": { "left": 214, "top": 270, "width": 566, "height": 195 },
+              "areaRatio": 0.07546666666666667
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 113.90862500000003,
+            "timings": {
+              "preprocessMs": 34.02208299999984,
+              "ocrMs": 79.86062499999935,
+              "inverseMappingMs": 0.012458999999580556,
+              "totalMs": 113.89766699999927
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Top title only; excludes RED WINE and NAPA VALLEY."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "HLTRE",
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": true,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": true,
+          "classifications": ["regression"]
+        },
+        "alcohol": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker",
+            "rawOcr": {
+              "wordCount": 136,
+              "rawConfidenceMean": 62.56617647058823,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.017937219730941704,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 2,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 2425.115958999999,
+            "timings": {
+              "preprocessMs": 533.6949170000007,
+              "ocrMs": 1787.2632089999988,
+              "inverseMappingMs": 0.07712399999945774,
+              "totalMs": 2425.115958999999
+            },
+            "passCount": 3,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 17,
+              "rawConfidenceMean": 61.588235294117645,
+              "rawConfidenceMin": 7,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0.03636363636363636,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["14", "alc"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": {
+              "normalized": { "x": 0.69, "y": 0.91, "width": 0.19, "height": 0.05 },
+              "pixels": { "left": 672, "top": 1365, "width": 186, "height": 75 },
+              "areaRatio": 0.009538461538461539
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 274.4416659999988,
+            "timings": {
+              "preprocessMs": 44.18775000000096,
+              "ocrMs": 230.23041700000067,
+              "inverseMappingMs": 0.01300000000082946,
+              "totalMs": 274.4327910000011
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Bottom-right 14% ALC line with minimal producer context."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": false,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": true,
+          "classifications": ["regression"]
+        }
+      }
+    },
+    {
+      "caseId": "luigi-giovanni-live",
+      "imagePath": "tests/fixtures/precheck/approved-wine-001/label.png",
+      "strata": [
+        "decorative-or-script-brand",
+        "brand-punctuation",
+        "multiple-brand-like-phrases",
+        "alcohol-at-side-or-rotated",
+        "front-label"
+      ],
+      "inclusionReasons": ["brand candidate-filtering failure", "alcohol side-region failure"],
+      "challengeSlices": [
+        "candidate-filtering",
+        "side-or-edge-alcohol",
+        "multiple-brand-like-phrases"
+      ],
+      "adjudicationNotes": "The centered brand mark is readable; the alcohol statement sits in the bottom-right producer block.",
+      "fields": {
+        "brand": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "VANNI",
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": "brand-rejected-non-brand-keyword",
+            "rawOcr": {
+              "wordCount": 141,
+              "rawConfidenceMean": 65.33333333333333,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.052060737527114966,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 2,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": true,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": true,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 2369.3613750000004,
+            "timings": {
+              "preprocessMs": 542.5708340000001,
+              "ocrMs": 1724.1532499999976,
+              "inverseMappingMs": 0.07820900000297115,
+              "totalMs": 2369.3613750000004
+            },
+            "passCount": 3,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "GIOQVANN",
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 3,
+              "rawConfidenceMean": 16.333333333333332,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 49,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0.5454545454545454,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["luigi", "giovanni"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": true,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": {
+              "normalized": { "x": 0.18, "y": 0.18, "width": 0.63, "height": 0.2 },
+              "pixels": { "left": 175, "top": 270, "width": 615, "height": 300 },
+              "areaRatio": 0.12615384615384614
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 182.11170799999672,
+            "timings": {
+              "preprocessMs": 46.012916000003315,
+              "ocrMs": 136.0480000000025,
+              "inverseMappingMs": 0.013209000000642845,
+              "totalMs": 182.09529199999815
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Covers the Luigi & Giovanni artwork only."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "VANNI",
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": true,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": true,
+          "classifications": ["regression"]
+        },
+        "alcohol": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker",
+            "rawOcr": {
+              "wordCount": 141,
+              "rawConfidenceMean": 65.33333333333333,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.017660044150110375,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 2,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 2369.3613750000004,
+            "timings": {
+              "preprocessMs": 542.5708340000001,
+              "ocrMs": 1724.1532499999976,
+              "inverseMappingMs": 0.07820900000297115,
+              "totalMs": 2369.3613750000004
+            },
+            "passCount": 3,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker",
+            "rawOcr": {
+              "wordCount": 13,
+              "rawConfidenceMean": 90.61538461538461,
+              "rawConfidenceMin": 67,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.13559322033898305,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 2,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": {
+              "normalized": { "x": 0.68, "y": 0.91, "width": 0.24, "height": 0.06 },
+              "pixels": { "left": 663, "top": 1365, "width": 234, "height": 90 },
+              "areaRatio": 0.0144
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 221.56708400000207,
+            "timings": {
+              "preprocessMs": 44.17908399999942,
+              "ocrMs": 177.3579580000005,
+              "inverseMappingMs": 0.012125000001105946,
+              "totalMs": 221.5510839999988
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Bottom-right producer block including 14% ALC."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": false,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": false,
+          "classifications": ["no improvement"]
+        }
+      }
+    },
+    {
+      "caseId": "approved-wine-013",
+      "imagePath": "tests/fixtures/precheck/approved-wine-013/label.jpeg",
+      "strata": [
+        "decorative-or-script-brand",
+        "front-label",
+        "multiple-brand-like-phrases",
+        "alcohol-at-bottom"
+      ],
+      "inclusionReasons": ["brand ranking failure", "alcohol candidate-filtering failure"],
+      "challengeSlices": [
+        "candidate-ranking",
+        "candidate-filtering",
+        "multiple-brand-like-phrases"
+      ],
+      "adjudicationNotes": "The large AFFLICTED heading is the brand presentation; the bottom-right ABV line is isolated separately.",
+      "fields": {
+        "brand": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "Play ers Heart",
+            "failureClass": "candidate-ranking-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 415,
+              "rawConfidenceMean": 60.144578313253014,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 97,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.013422818791946308,
+              "expectedTokenCount": 1,
+              "expectedTokenPresenceCount": 1,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": true,
+              "rankingPosition": 2,
+              "top3Presence": true,
+              "top5Presence": true,
+              "ambiguityState": true,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 4390.669916999999,
+            "timings": {
+              "preprocessMs": 501.39529299999776,
+              "ocrMs": 3778.0040009999975,
+              "inverseMappingMs": 0.20504200000141282,
+              "totalMs": 4390.669916999999
+            },
+            "passCount": 3,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "AFFLICTED",
+            "failureClass": "correct-uncertainty",
+            "exactMatch": true,
+            "normalizedMatch": true,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 5,
+              "rawConfidenceMean": 50.4,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 95,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.5517241379310345,
+              "expectedTokenCount": 1,
+              "expectedTokenPresenceCount": 1,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": true,
+              "rankingPosition": 1,
+              "top3Presence": true,
+              "top5Presence": true,
+              "ambiguityState": true,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": {
+              "normalized": { "x": 0.16, "y": 0.08, "width": 0.69, "height": 0.12 },
+              "pixels": { "left": 160, "top": 114, "width": 690, "height": 172 },
+              "areaRatio": 0.08305108467459763
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 157.9602500000001,
+            "timings": {
+              "preprocessMs": 21.10370800000237,
+              "ocrMs": 136.83645800000158,
+              "inverseMappingMs": 0.007708000001002802,
+              "totalMs": 157.95020899999872
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Upper AFFLICTED wordmark only; excludes RESERVA and product prose."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "Play ers Heart",
+            "failureClass": "candidate-ranking-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "human-targeted-crop",
+          "changedSelectedValue": true,
+          "correctedByCounterfactual": true,
+          "regressedByCounterfactual": false,
+          "classifications": [
+            "ranking recovery",
+            "full-image scaling loss",
+            "surrounding-text interference"
+          ]
+        },
+        "alcohol": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker",
+            "rawOcr": {
+              "wordCount": 415,
+              "rawConfidenceMean": 60.144578313253014,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 97,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.008410428931875526,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 2,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 4390.669916999999,
+            "timings": {
+              "preprocessMs": 501.39529299999776,
+              "ocrMs": 3778.0040009999975,
+              "inverseMappingMs": 0.20504200000141282,
+              "totalMs": 4390.669916999999
+            },
+            "passCount": 3,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "region-coverage-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 3,
+              "rawConfidenceMean": 80.33333333333333,
+              "rawConfidenceMin": 59,
+              "rawConfidenceMax": 93,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["135", "abv"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": {
+              "normalized": { "x": 0.69, "y": 0.79, "width": 0.2, "height": 0.05 },
+              "pixels": { "left": 690, "top": 1128, "width": 200, "height": 73 },
+              "areaRatio": 0.010216934919524143
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 95.41095800000039,
+            "timings": {
+              "preprocessMs": 40.39899999999761,
+              "ocrMs": 54.99970799999937,
+              "inverseMappingMs": 0.007250000002386514,
+              "totalMs": 95.40791700000045
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Bottom-right 13.5% ABV line."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": false,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": true,
+          "classifications": ["regression"]
+        }
+      }
+    },
+    {
+      "caseId": "approved-wine-035",
+      "imagePath": "tests/fixtures/precheck/approved-wine-035/label.png",
+      "strata": ["decorative-or-script-brand", "front-label", "alcohol-at-side-or-rotated"],
+      "inclusionReasons": [
+        "brand OCR-recognition failure",
+        "rotated alcohol OCR-recognition failure"
+      ],
+      "challengeSlices": ["ocr-recognition", "side-or-edge-alcohol", "rotated-text"],
+      "adjudicationNotes": "The brand is the script heading; alcohol is the right-edge vertical mandatory strip.",
+      "fields": {
+        "brand": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "CHASSAGNE-MONTRACHET",
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 43,
+              "rawConfidenceMean": 70.72093023255815,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.07929515418502203,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 2,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": true,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 957.9865420000024,
+            "timings": {
+              "preprocessMs": 195.4680829999961,
+              "ocrMs": 664.0727909999987,
+              "inverseMappingMs": 0.05162500000005821,
+              "totalMs": 957.9865420000024
+            },
+            "passCount": 3,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "C22 Gr",
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 2,
+              "rawConfidenceMean": 31.5,
+              "rawConfidenceMin": 14,
+              "rawConfidenceMax": 49,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["hubert", "lamy"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": true,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": {
+              "normalized": { "x": 0.12, "y": 0.04, "width": 0.62, "height": 0.14 },
+              "pixels": { "left": 66, "top": 18, "width": 347, "height": 67 },
+              "areaRatio": 0.08861927142296272
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 50.79729100000259,
+            "timings": {
+              "preprocessMs": 14.646083999999973,
+              "ocrMs": 36.139250000000175,
+              "inverseMappingMs": 0.00633400000151596,
+              "totalMs": 50.79387500000303
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Top Hubert Lamy script and Saint-Aubin subtitle."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "CHASSAGNE-MONTRACHET",
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": true,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": false,
+          "classifications": ["no improvement"]
+        },
+        "alcohol": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 43,
+              "rawConfidenceMean": 70.72093023255815,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0.008968609865470852,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["135", "vol"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 957.9865420000024,
+            "timings": {
+              "preprocessMs": 195.4680829999961,
+              "ocrMs": 664.0727909999987,
+              "inverseMappingMs": 0.05162500000005821,
+              "totalMs": 957.9865420000024
+            },
+            "passCount": 3,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 0,
+              "rawConfidenceMean": null,
+              "rawConfidenceMin": null,
+              "rawConfidenceMax": null,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["135", "vol"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": {
+              "normalized": { "x": 0.79, "y": 0.61, "width": 0.17, "height": 0.29 },
+              "pixels": { "left": 440, "top": 287, "width": 95, "height": 137 },
+              "areaRatio": 0.049609867846783076
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 139.2957499999975,
+            "timings": {
+              "preprocessMs": 65.15212500000052,
+              "ocrMs": 74.13737499999843,
+              "inverseMappingMs": 0.0005840000012540258,
+              "totalMs": 139.29279099999985
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Right-side vertical strip segment containing 13.5% vol."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "region-coverage-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 10,
+              "rawConfidenceMean": 61,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["135", "vol"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": {
+              "normalized": { "x": 0.79, "y": 0.61, "width": 0.17, "height": 0.29 },
+              "pixels": { "left": 440, "top": 287, "width": 95, "height": 137 },
+              "areaRatio": 0.049609867846783076
+            },
+            "rotationApplied": 90,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 125.992083000001,
+            "timings": {
+              "preprocessMs": 11.834167000000889,
+              "ocrMs": 114.14158400000088,
+              "inverseMappingMs": 0.009750000001076842,
+              "totalMs": 125.9880000000012
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Right-side vertical strip segment containing 13.5% vol."]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": false,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": false,
+          "classifications": ["no improvement"]
+        }
+      }
+    },
+    {
+      "caseId": "la-fattoria-rotated",
+      "imagePath": "tests/fixtures/precheck/approved-wine-003/label.png",
+      "strata": [
+        "decorative-or-script-brand",
+        "vertical-mandatory-strip",
+        "alcohol-at-side-or-rotated",
+        "front-label"
+      ],
+      "inclusionReasons": ["vertical mandatory strip", "orientation-specific alcohol failure"],
+      "challengeSlices": ["vertical-mandatory-strip", "side-or-edge-alcohol", "rotated-text"],
+      "adjudicationNotes": "Brand is centered; alcohol is the left-edge vertical producer strip.",
+      "fields": {
+        "brand": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "cCTIO",
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 175,
+              "rawConfidenceMean": 64.61142857142858,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.030821917808219176,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 2,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": ["fattoria"]
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": true,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 3359.4283339999965,
+            "timings": {
+              "preprocessMs": 815.6101670000025,
+              "ocrMs": 2441.0016670000005,
+              "inverseMappingMs": 0.0880410000027041,
+              "totalMs": 3359.4283339999965
+            },
+            "passCount": 3,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "FATTORIA",
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 3,
+              "rawConfidenceMean": 54.333333333333336,
+              "rawConfidenceMin": 33,
+              "rawConfidenceMax": 87,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0.6363636363636364,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 1,
+              "missingExpectedTokens": ["la"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": true,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": true,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": {
+              "normalized": { "x": 0.28, "y": 0.28, "width": 0.43, "height": 0.17 },
+              "pixels": { "left": 378, "top": 462, "width": 581, "height": 281 },
+              "areaRatio": 0.07329337822671156
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 281.6725409999999,
+            "timings": {
+              "preprocessMs": 77.11516699999993,
+              "ocrMs": 204.53441699999894,
+              "inverseMappingMs": 0.01333399999930407,
+              "totalMs": 281.666792
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["La Fattoria artwork only."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "cCTIO",
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": true,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": false,
+          "classifications": ["no improvement"]
+        },
+        "alcohol": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker",
+            "rawOcr": {
+              "wordCount": 175,
+              "rawConfidenceMean": 64.61142857142858,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.013816925734024179,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 2,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 3359.4283339999965,
+            "timings": {
+              "preprocessMs": 815.6101670000025,
+              "ocrMs": 2441.0016670000005,
+              "inverseMappingMs": 0.0880410000027041,
+              "totalMs": 3359.4283339999965
+            },
+            "passCount": 3,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "region-coverage-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 9,
+              "rawConfidenceMean": 60.888888888888886,
+              "rawConfidenceMin": 1,
+              "rawConfidenceMax": 90,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["14", "alc"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": {
+              "normalized": { "x": 0.01, "y": 0.73, "width": 0.15, "height": 0.23 },
+              "pixels": { "left": 13, "top": 1204, "width": 203, "height": 380 },
+              "areaRatio": 0.0346307519640853
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 599.465874999998,
+            "timings": {
+              "preprocessMs": 247.35525000000052,
+              "ocrMs": 352.0731659999983,
+              "inverseMappingMs": 0.02012500000273576,
+              "totalMs": 599.4619170000005
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Left vertical strip segment containing 14% ALC 750ml."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 6,
+              "rawConfidenceMean": 87.16666666666667,
+              "rawConfidenceMin": 63,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["14", "alc"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": {
+              "normalized": { "x": 0.01, "y": 0.73, "width": 0.15, "height": 0.23 },
+              "pixels": { "left": 13, "top": 1204, "width": 203, "height": 380 },
+              "areaRatio": 0.0346307519640853
+            },
+            "rotationApplied": 270,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 58.98845799999981,
+            "timings": {
+              "preprocessMs": 26.460833000001003,
+              "ocrMs": 32.51350000000093,
+              "inverseMappingMs": 0.00870799999756855,
+              "totalMs": 58.98512499999924
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Left vertical strip segment containing 14% ALC 750ml."]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": false,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": true,
+          "classifications": ["regression"]
+        }
+      }
+    },
+    {
+      "caseId": "approved-wine-054",
+      "imagePath": "tests/fixtures/precheck/approved-wine-054/label.jpeg",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-side-or-rotated"],
+      "inclusionReasons": [
+        "brand candidate-filtering failure",
+        "mixed-orientation alcohol OCR failure"
+      ],
+      "challengeSlices": [
+        "candidate-filtering",
+        "ocr-recognition",
+        "mixed-orientation",
+        "side-or-edge-alcohol"
+      ],
+      "adjudicationNotes": "The brand is the small top-right name; alcohol is the rotated center-left side strip.",
+      "fields": {
+        "brand": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "IA5 ME15",
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": "brand-kept-overextended-candidate",
+            "rawOcr": {
+              "wordCount": 256,
+              "rawConfidenceMean": 46.8671875,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.031914893617021274,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 2,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": true,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 3387.6382080000003,
+            "timings": {
+              "preprocessMs": 311.17866600000707,
+              "ocrMs": 2979.0416239999977,
+              "inverseMappingMs": 0.419250999999349,
+              "totalMs": 3387.6382080000003
+            },
+            "passCount": 4,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "Henri Dufreres",
+            "failureClass": "correct-uncertainty",
+            "exactMatch": true,
+            "normalizedMatch": true,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 4,
+              "rawConfidenceMean": 64,
+              "rawConfidenceMin": 2,
+              "rawConfidenceMax": 91,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.5581395348837209,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 2,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": true,
+              "rankingPosition": 1,
+              "top3Presence": true,
+              "top5Presence": true,
+              "ambiguityState": true,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": {
+              "normalized": { "x": 0.38, "y": 0.02, "width": 0.33, "height": 0.08 },
+              "pixels": { "left": 386, "top": 21, "width": 336, "height": 87 },
+              "areaRatio": 0.02668984558748338
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "medium",
+            "humanReadable": true,
+            "latencyMs": 121.67950000000201,
+            "timings": {
+              "preprocessMs": 20.497792000001937,
+              "ocrMs": 101.16233300000022,
+              "inverseMappingMs": 0.007042000001092674,
+              "totalMs": 121.6694580000003
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Top-right Henri Dufrères line and immediate subtitle."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "IA5 ME15",
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "human-targeted-crop",
+          "changedSelectedValue": true,
+          "correctedByCounterfactual": true,
+          "regressedByCounterfactual": false,
+          "classifications": [
+            "annotation uncertainty",
+            "filtering recovery",
+            "full-image scaling loss",
+            "surrounding-text interference",
+            "wrong-region coverage"
+          ]
+        },
+        "alcohol": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 256,
+              "rawConfidenceMean": 46.8671875,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0.013333333333333334,
+              "expectedTokenCount": 4,
+              "expectedTokenPresenceCount": 1,
+              "missingExpectedTokens": ["125", "alc", "vol"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 3387.6382080000003,
+            "timings": {
+              "preprocessMs": 311.17866600000707,
+              "ocrMs": 2979.0416239999977,
+              "inverseMappingMs": 0.419250999999349,
+              "totalMs": 3387.6382080000003
+            },
+            "passCount": 4,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 1,
+              "rawConfidenceMean": 0,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 0,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0,
+              "expectedTokenCount": 4,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["125", "alc", "by", "vol"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": {
+              "normalized": { "x": 0.28, "y": 0.3, "width": 0.1, "height": 0.31 },
+              "pixels": { "left": 284, "top": 323, "width": 103, "height": 335 },
+              "areaRatio": 0.03150428030911721
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "medium",
+            "humanReadable": true,
+            "latencyMs": 413.95658399999957,
+            "timings": {
+              "preprocessMs": 133.23633300000074,
+              "ocrMs": 280.7088330000006,
+              "inverseMappingMs": 0.0059579999979177956,
+              "totalMs": 413.95308300000033
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Center-left vertical strip containing 12.5% Alc. by Vol."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": false,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": false,
+          "classifications": ["annotation uncertainty", "no improvement"]
+        }
+      }
+    },
+    {
+      "caseId": "patricia-green-cellars",
+      "imagePath": "tests/fixtures/precheck/approved-wine-015/label.jpeg",
+      "strata": [
+        "low-contrast",
+        "multiple-brand-like-phrases",
+        "genuinely-ambiguous",
+        "alcohol-at-bottom",
+        "front-label"
+      ],
+      "inclusionReasons": [
+        "genuinely ambiguous brand control",
+        "alcohol candidate-filtering failure"
+      ],
+      "challengeSlices": ["genuinely-ambiguous", "candidate-filtering", "low-contrast"],
+      "adjudicationNotes": "The brand-like evidence is clustered in the domain and producer lines, which remain genuinely ambiguous even when isolated.",
+      "fields": {
+        "brand": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "ESTATE VINEYARD",
+            "failureClass": "correct-uncertainty",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 311,
+              "rawConfidenceMean": 70.56591639871382,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 97,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.032843560933448576,
+              "expectedTokenCount": 3,
+              "expectedTokenPresenceCount": 3,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": true,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 2085.6365000000005,
+            "timings": {
+              "preprocessMs": 95.7208329999994,
+              "ocrMs": 1878.1183339999952,
+              "inverseMappingMs": 0.19541599999865866,
+              "totalMs": 2085.6365000000005
+            },
+            "passCount": 3,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-generation-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 22,
+              "rawConfidenceMean": 88.27272727272727,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0.2620689655172414,
+              "expectedTokenCount": 3,
+              "expectedTokenPresenceCount": 2,
+              "missingExpectedTokens": ["cellars"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": {
+              "normalized": { "x": 0.18, "y": 0.48, "width": 0.6, "height": 0.17 },
+              "pixels": { "left": 73, "top": 192, "width": 244, "height": 68 },
+              "areaRatio": 0.10216748768472907
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "medium",
+            "humanReadable": true,
+            "latencyMs": 136.91912500000035,
+            "timings": {
+              "preprocessMs": 9.433916000001773,
+              "ocrMs": 127.45895799999562,
+              "inverseMappingMs": 0.01408399999490939,
+              "totalMs": 136.9150410000002
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": [
+              "Includes the domain line and produced-by line together to preserve the ambiguity honestly."
+            ]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "ESTATE VINEYARD",
+            "failureClass": "correct-uncertainty",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": true,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": true,
+          "classifications": ["annotation uncertainty", "regression"]
+        },
+        "alcohol": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker",
+            "rawOcr": {
+              "wordCount": 311,
+              "rawConfidenceMean": 70.56591639871382,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 97,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.017421602787456445,
+              "expectedTokenCount": 4,
+              "expectedTokenPresenceCount": 2,
+              "missingExpectedTokens": ["alc", "138"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 2085.6365000000005,
+            "timings": {
+              "preprocessMs": 95.7208329999994,
+              "ocrMs": 1878.1183339999952,
+              "inverseMappingMs": 0.19541599999865866,
+              "totalMs": 2085.6365000000005
+            },
+            "passCount": 3,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "region-coverage-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 7,
+              "rawConfidenceMean": 61,
+              "rawConfidenceMin": 19,
+              "rawConfidenceMax": 95,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0,
+              "expectedTokenCount": 4,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["alc", "138", "by", "vol"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": {
+              "normalized": { "x": 0.52, "y": 0.82, "width": 0.25, "height": 0.06 },
+              "pixels": { "left": 211, "top": 328, "width": 102, "height": 24 },
+              "areaRatio": 0.015073891625615763
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "medium",
+            "humanReadable": true,
+            "latencyMs": 66.58033299999806,
+            "timings": {
+              "preprocessMs": 8.404207999999926,
+              "ocrMs": 58.163291999997455,
+              "inverseMappingMs": 0.008165999999619089,
+              "totalMs": 66.57741600000008
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Bottom line segment containing ALC. 13.8% BY VOL."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": false,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": true,
+          "classifications": ["annotation uncertainty", "regression"]
+        }
+      }
+    },
+    {
+      "caseId": "wine-multi-artifact-04",
+      "imagePath": "tests/fixtures/precheck/wine-multi-artifact-04/label.png",
+      "strata": ["multi-panel", "alcohol-at-bottom"],
+      "inclusionReasons": ["multi-artifact failure", "brand OCR-recognition failure"],
+      "challengeSlices": ["multi-artifact", "ocr-recognition", "candidate-filtering"],
+      "adjudicationNotes": "The target field lives on the upper artifact only; the lower artifact is unrelated context.",
+      "fields": {
+        "brand": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "Donovan Visayas",
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 324,
+              "rawConfidenceMean": 75.51234567901234,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 97,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0.012708498808578236,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 1,
+              "missingExpectedTokens": ["cellar"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": true,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 3366.556083000003,
+            "timings": {
+              "preprocessMs": 566.9482079999943,
+              "ocrMs": 2689.486250000009,
+              "inverseMappingMs": 0.1677069999932428,
+              "totalMs": 3366.556083000003
+            },
+            "passCount": 4,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-generation-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 1,
+              "rawConfidenceMean": 33,
+              "rawConfidenceMin": 33,
+              "rawConfidenceMax": 33,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0,
+              "expectedTokenCount": 2,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["dry", "cellar"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": {
+              "normalized": { "x": 0.04, "y": 0.01, "width": 0.39, "height": 0.2 },
+              "pixels": { "left": 26, "top": 15, "width": 264, "height": 305 },
+              "areaRatio": 0.07849269078247036
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 212.5109169999996,
+            "timings": {
+              "preprocessMs": 61.765833999997994,
+              "ocrMs": 150.73395799999707,
+              "inverseMappingMs": 0.005708000004233327,
+              "totalMs": 212.50745800000004
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Upper Dry Cellar wordmark only."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "AMBIGUOUS",
+            "selectedValue": "Donovan Visayas",
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": true,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": false,
+          "classifications": ["no improvement"]
+        },
+        "alcohol": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker",
+            "rawOcr": {
+              "wordCount": 324,
+              "rawConfidenceMean": 75.51234567901234,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 97,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.0031923383878691143,
+              "expectedTokenCount": 1,
+              "expectedTokenPresenceCount": 1,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 3366.556083000003,
+            "timings": {
+              "preprocessMs": 566.9482079999943,
+              "ocrMs": 2689.486250000009,
+              "inverseMappingMs": 0.1677069999932428,
+              "totalMs": 3366.556083000003
+            },
+            "passCount": 4,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "ocr-recognition-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 7,
+              "rawConfidenceMean": 69.42857142857143,
+              "rawConfidenceMin": 25,
+              "rawConfidenceMax": 95,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0.043478260869565216,
+              "expectedTokenCount": 4,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["alc", "132", "by", "vol"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": {
+              "normalized": { "x": 0.1, "y": 0.42, "width": 0.24, "height": 0.05 },
+              "pixels": { "left": 67, "top": 639, "width": 163, "height": 77 },
+              "areaRatio": 0.012234994560491623
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "high",
+            "humanReadable": true,
+            "latencyMs": 187.2285419999971,
+            "timings": {
+              "preprocessMs": 44.94370899999922,
+              "ocrMs": 142.26991700000508,
+              "inverseMappingMs": 0.008625000002211891,
+              "totalMs": 187.22441699999763
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Bottom line of the upper artifact with Alc. 13.2% by Vol."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": false,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": true,
+          "classifications": ["regression"]
+        }
+      }
+    },
+    {
+      "caseId": "approved-wine-095",
+      "imagePath": "tests/fixtures/precheck/approved-wine-095/label.jpeg",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom", "low-resolution"],
+      "inclusionReasons": [
+        "low-resolution absent-brand control",
+        "alcohol candidate-filtering failure"
+      ],
+      "challengeSlices": [
+        "low-resolution",
+        "absent-brand",
+        "candidate-filtering",
+        "bottom-alcohol"
+      ],
+      "adjudicationNotes": "No brand presentation is visible; only the alcohol line is benchmarked.",
+      "fields": {
+        "brand": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": false,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-applicable"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 1632.5570000000007,
+            "timings": {
+              "preprocessMs": 72.88025000000926,
+              "ocrMs": 1459.6674580000035,
+              "inverseMappingMs": 0.15120899999601534,
+              "totalMs": 1632.5570000000007
+            },
+            "passCount": 4,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": false,
+            "truthPresent": false,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["field absent in evaluation truth"]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": false,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "correct",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": false,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": false,
+          "classifications": ["no improvement"]
+        },
+        "alcohol": {
+          "baseline": {
+            "scenario": "production-baseline",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": "alcohol-rejected-unsupported-pattern",
+            "rawOcr": {
+              "wordCount": 214,
+              "rawConfidenceMean": 74.09345794392523,
+              "rawConfidenceMin": 0,
+              "rawConfidenceMax": 96,
+              "expectedPhrasePresent": true,
+              "normalizedPhraseSimilarity": 0.02112676056338028,
+              "expectedTokenCount": 3,
+              "expectedTokenPresenceCount": 3,
+              "missingExpectedTokens": [],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": true,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 1632.5570000000007,
+            "timings": {
+              "preprocessMs": 72.88025000000926,
+              "ocrMs": 1459.6674580000035,
+              "inverseMappingMs": 0.15120899999601534,
+              "totalMs": 1632.5570000000007
+            },
+            "passCount": 4,
+            "extractionError": null,
+            "notes": []
+          },
+          "targetedCrop": {
+            "scenario": "human-targeted-crop",
+            "applicable": true,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "region-coverage-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": {
+              "wordCount": 4,
+              "rawConfidenceMean": 78.25,
+              "rawConfidenceMin": 55,
+              "rawConfidenceMax": 93,
+              "expectedPhrasePresent": false,
+              "normalizedPhraseSimilarity": 0.07407407407407407,
+              "expectedTokenCount": 3,
+              "expectedTokenPresenceCount": 0,
+              "missingExpectedTokens": ["alc12", "by", "vol"],
+              "fragmentedExpectedTokens": []
+            },
+            "pipeline": {
+              "matchingCandidateGenerated": false,
+              "matchingCandidateKept": false,
+              "rankingPosition": null,
+              "top3Presence": false,
+              "top5Presence": false,
+              "ambiguityState": false,
+              "parserOutcome": "not-observed"
+            },
+            "crop": {
+              "normalized": { "x": 0.54, "y": 0.44, "width": 0.29, "height": 0.09 },
+              "pixels": { "left": 236, "top": 142, "width": 128, "height": 30 },
+              "areaRatio": 0.027059022492812446
+            },
+            "rotationApplied": 0,
+            "annotationConfidence": "medium",
+            "humanReadable": true,
+            "latencyMs": 61.87879200000316,
+            "timings": {
+              "preprocessMs": 10.642249999997148,
+              "ocrMs": 51.22187500000291,
+              "inverseMappingMs": 0.008374999997613486,
+              "totalMs": 61.87487500000134
+            },
+            "passCount": 1,
+            "extractionError": null,
+            "notes": ["Includes the ALC. 12% BY VOL. segment on the low-resolution back label."]
+          },
+          "canonicalRotatedCrop": {
+            "scenario": "canonically-rotated-targeted-crop",
+            "applicable": false,
+            "truthPresent": true,
+            "selectedState": "NOT_OBSERVED",
+            "selectedValue": null,
+            "failureClass": "candidate-filtering-failure",
+            "exactMatch": false,
+            "normalizedMatch": false,
+            "parsedAccurate": false,
+            "candidateFilteringSubtype": null,
+            "rawOcr": null,
+            "pipeline": null,
+            "crop": null,
+            "rotationApplied": 0,
+            "annotationConfidence": null,
+            "humanReadable": null,
+            "latencyMs": 0,
+            "timings": null,
+            "passCount": 0,
+            "extractionError": null,
+            "notes": ["canonical rotation not applicable"]
+          },
+          "bestScenario": "production-baseline",
+          "changedSelectedValue": false,
+          "correctedByCounterfactual": false,
+          "regressedByCounterfactual": true,
+          "classifications": ["annotation uncertainty", "regression"]
+        }
+      }
+    }
+  ],
+  "annotationCoverage": {
+    "benchmarkCaseCount": 13,
+    "brandPresentCaseCount": 11,
+    "alcoholPresentCaseCount": 12,
+    "brandAnnotatedCaseCount": 11,
+    "alcoholAnnotatedCaseCount": 12,
+    "absentBrandCaseCount": 2,
+    "absentAlcoholCaseCount": 1,
+    "highConfidenceFieldCount": 18,
+    "mediumConfidenceFieldCount": 5,
+    "humanReadableFieldCount": 23,
+    "challengeSliceCounts": {
+      "correct-control": 3,
+      "multi-artifact": 2,
+      "absent-brand": 2,
+      "bottom-alcohol": 4,
+      "absent-alcohol": 1,
+      "multiple-brand-like-phrases": 3,
+      "candidate-filtering": 8,
+      "low-contrast": 2,
+      "front-label": 1,
+      "side-or-edge-alcohol": 4,
+      "candidate-ranking": 1,
+      "ocr-recognition": 3,
+      "rotated-text": 2,
+      "vertical-mandatory-strip": 1,
+      "mixed-orientation": 1,
+      "genuinely-ambiguous": 1,
+      "low-resolution": 1
+    }
+  },
+  "aggregateComparisons": [
+    {
+      "scenario": "production-baseline",
+      "field": "brand",
+      "presentCaseCount": 11,
+      "exactMatchCount": 2,
+      "normalizedMatchCount": 2,
+      "top3Count": 3,
+      "top5Count": 3,
+      "detectedCount": 11,
+      "parsedAccurateCount": 0,
+      "parserFailureCount": 0,
+      "expectedPhrasePresentCount": 10,
+      "meanNormalizedPhraseSimilarity": 0.03848538102797328
+    },
+    {
+      "scenario": "human-targeted-crop",
+      "field": "brand",
+      "presentCaseCount": 11,
+      "exactMatchCount": 2,
+      "normalizedMatchCount": 2,
+      "top3Count": 2,
+      "top5Count": 2,
+      "detectedCount": 8,
+      "parsedAccurateCount": 0,
+      "parserFailureCount": 0,
+      "expectedPhrasePresentCount": 2,
+      "meanNormalizedPhraseSimilarity": 0.405066100430469
+    },
+    {
+      "scenario": "canonically-rotated-targeted-crop",
+      "field": "brand",
+      "presentCaseCount": 0,
+      "exactMatchCount": 0,
+      "normalizedMatchCount": 0,
+      "top3Count": 0,
+      "top5Count": 0,
+      "detectedCount": 0,
+      "parsedAccurateCount": 0,
+      "parserFailureCount": 0,
+      "expectedPhrasePresentCount": 0,
+      "meanNormalizedPhraseSimilarity": 0
+    },
+    {
+      "scenario": "production-baseline",
+      "field": "alcohol",
+      "presentCaseCount": 12,
+      "exactMatchCount": 0,
+      "normalizedMatchCount": 0,
+      "top3Count": 3,
+      "top5Count": 3,
+      "detectedCount": 3,
+      "parsedAccurateCount": 3,
+      "parserFailureCount": 0,
+      "expectedPhrasePresentCount": 10,
+      "meanNormalizedPhraseSimilarity": 0.021105402864797496
+    },
+    {
+      "scenario": "human-targeted-crop",
+      "field": "alcohol",
+      "presentCaseCount": 12,
+      "exactMatchCount": 0,
+      "normalizedMatchCount": 0,
+      "top3Count": 1,
+      "top5Count": 1,
+      "detectedCount": 1,
+      "parsedAccurateCount": 1,
+      "parserFailureCount": 0,
+      "expectedPhrasePresentCount": 3,
+      "meanNormalizedPhraseSimilarity": 0.11623102912841628
+    },
+    {
+      "scenario": "canonically-rotated-targeted-crop",
+      "field": "alcohol",
+      "presentCaseCount": 2,
+      "exactMatchCount": 0,
+      "normalizedMatchCount": 0,
+      "top3Count": 0,
+      "top5Count": 0,
+      "detectedCount": 0,
+      "parsedAccurateCount": 0,
+      "parserFailureCount": 0,
+      "expectedPhrasePresentCount": 0,
+      "meanNormalizedPhraseSimilarity": 0
+    }
+  ],
+  "challengeSliceComparisons": [
+    {
+      "slice": "absent-alcohol",
+      "field": "brand",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 1,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "absent-alcohol",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "absent-alcohol",
+      "field": "brand",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "absent-alcohol",
+      "field": "alcohol",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "absent-alcohol",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "absent-alcohol",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "absent-brand",
+      "field": "brand",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "absent-brand",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "absent-brand",
+      "field": "brand",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "absent-brand",
+      "field": "alcohol",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 2,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 2
+    },
+    {
+      "slice": "absent-brand",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 2,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "absent-brand",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "bottom-alcohol",
+      "field": "brand",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 2,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 2
+    },
+    {
+      "slice": "bottom-alcohol",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 2,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "bottom-alcohol",
+      "field": "brand",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "bottom-alcohol",
+      "field": "alcohol",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 4,
+      "correctedCount": 2,
+      "expectedPhrasePresentCount": 4
+    },
+    {
+      "slice": "bottom-alcohol",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 4,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 2
+    },
+    {
+      "slice": "bottom-alcohol",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "candidate-filtering",
+      "field": "brand",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 7,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 6
+    },
+    {
+      "slice": "candidate-filtering",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 7,
+      "correctedCount": 2,
+      "expectedPhrasePresentCount": 2
+    },
+    {
+      "slice": "candidate-filtering",
+      "field": "brand",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "candidate-filtering",
+      "field": "alcohol",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 8,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 7
+    },
+    {
+      "slice": "candidate-filtering",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 8,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 2
+    },
+    {
+      "slice": "candidate-filtering",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "candidate-ranking",
+      "field": "brand",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "candidate-ranking",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 1,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "candidate-ranking",
+      "field": "brand",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "candidate-ranking",
+      "field": "alcohol",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "candidate-ranking",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "candidate-ranking",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "correct-control",
+      "field": "brand",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 2,
+      "correctedCount": 2,
+      "expectedPhrasePresentCount": 2
+    },
+    {
+      "slice": "correct-control",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 2,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "correct-control",
+      "field": "brand",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "correct-control",
+      "field": "alcohol",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 2,
+      "correctedCount": 2,
+      "expectedPhrasePresentCount": 2
+    },
+    {
+      "slice": "correct-control",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 2,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "correct-control",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "front-label",
+      "field": "brand",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "front-label",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "front-label",
+      "field": "brand",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "front-label",
+      "field": "alcohol",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "front-label",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "front-label",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "genuinely-ambiguous",
+      "field": "brand",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 1,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "genuinely-ambiguous",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "genuinely-ambiguous",
+      "field": "brand",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "genuinely-ambiguous",
+      "field": "alcohol",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "genuinely-ambiguous",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "genuinely-ambiguous",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "low-contrast",
+      "field": "brand",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 2,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 2
+    },
+    {
+      "slice": "low-contrast",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 2,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "low-contrast",
+      "field": "brand",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "low-contrast",
+      "field": "alcohol",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 2,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 2
+    },
+    {
+      "slice": "low-contrast",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 2,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "low-contrast",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "low-resolution",
+      "field": "brand",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "low-resolution",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "low-resolution",
+      "field": "brand",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "low-resolution",
+      "field": "alcohol",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "low-resolution",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "low-resolution",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "mixed-orientation",
+      "field": "brand",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "mixed-orientation",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 1,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "mixed-orientation",
+      "field": "brand",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "mixed-orientation",
+      "field": "alcohol",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "mixed-orientation",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "mixed-orientation",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "multi-artifact",
+      "field": "brand",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 2,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "multi-artifact",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 2,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "multi-artifact",
+      "field": "brand",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "multi-artifact",
+      "field": "alcohol",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 2,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 2
+    },
+    {
+      "slice": "multi-artifact",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 2,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "multi-artifact",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "multiple-brand-like-phrases",
+      "field": "brand",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 3,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 3
+    },
+    {
+      "slice": "multiple-brand-like-phrases",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 3,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "multiple-brand-like-phrases",
+      "field": "brand",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "multiple-brand-like-phrases",
+      "field": "alcohol",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 2,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 2
+    },
+    {
+      "slice": "multiple-brand-like-phrases",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 2,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "multiple-brand-like-phrases",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "ocr-recognition",
+      "field": "brand",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 3,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 2
+    },
+    {
+      "slice": "ocr-recognition",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 3,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "ocr-recognition",
+      "field": "brand",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "ocr-recognition",
+      "field": "alcohol",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 3,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "ocr-recognition",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 3,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "ocr-recognition",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "rotated-text",
+      "field": "brand",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 2,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 2
+    },
+    {
+      "slice": "rotated-text",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 2,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "rotated-text",
+      "field": "brand",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "rotated-text",
+      "field": "alcohol",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 2,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "rotated-text",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 2,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "rotated-text",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 2,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "side-or-edge-alcohol",
+      "field": "brand",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 4,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 4
+    },
+    {
+      "slice": "side-or-edge-alcohol",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 4,
+      "correctedCount": 1,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "side-or-edge-alcohol",
+      "field": "brand",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "side-or-edge-alcohol",
+      "field": "alcohol",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 4,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 2
+    },
+    {
+      "slice": "side-or-edge-alcohol",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 4,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "side-or-edge-alcohol",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 2,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "vertical-mandatory-strip",
+      "field": "brand",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "vertical-mandatory-strip",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "vertical-mandatory-strip",
+      "field": "brand",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 0,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "vertical-mandatory-strip",
+      "field": "alcohol",
+      "scenario": "production-baseline",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 1
+    },
+    {
+      "slice": "vertical-mandatory-strip",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    },
+    {
+      "slice": "vertical-mandatory-strip",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "applicableCaseCount": 1,
+      "correctedCount": 0,
+      "expectedPhrasePresentCount": 0
+    }
+  ],
+  "regressions": [
+    {
+      "caseId": "wine-multi-artifact-09",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "baselineFailureClass": "correct",
+      "scenarioFailureClass": "ocr-recognition-failure",
+      "baselineValue": "DUCK WALK VINEYARDS",
+      "scenarioValue": "VINE"
+    },
+    {
+      "caseId": "wine-multi-artifact-09",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "baselineFailureClass": "correct",
+      "scenarioFailureClass": "ocr-recognition-failure",
+      "baselineValue": "12.5% BY VOL.",
+      "scenarioValue": null
+    },
+    {
+      "caseId": "approved-wine-022",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "baselineFailureClass": "correct",
+      "scenarioFailureClass": "candidate-filtering-failure",
+      "baselineValue": "12% ALC./VOL.",
+      "scenarioValue": null
+    },
+    {
+      "caseId": "three-steves-winery",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "baselineFailureClass": "correct",
+      "scenarioFailureClass": "ocr-recognition-failure",
+      "baselineValue": "3 STEVES WINERY",
+      "scenarioValue": "3 STEVES WINER"
+    },
+    {
+      "caseId": "approved-wine-006",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "baselineFailureClass": "candidate-filtering-failure",
+      "scenarioFailureClass": "candidate-generation-failure",
+      "baselineValue": "2 LRS3 aoc",
+      "scenarioValue": null
+    },
+    {
+      "caseId": "alfredos-wine",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "baselineFailureClass": "candidate-filtering-failure",
+      "scenarioFailureClass": "ocr-recognition-failure",
+      "baselineValue": "HLTRE",
+      "scenarioValue": "ALT REDO 5"
+    },
+    {
+      "caseId": "alfredos-wine",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "baselineFailureClass": "candidate-filtering-failure",
+      "scenarioFailureClass": "ocr-recognition-failure",
+      "baselineValue": null,
+      "scenarioValue": null
+    },
+    {
+      "caseId": "luigi-giovanni-live",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "baselineFailureClass": "candidate-filtering-failure",
+      "scenarioFailureClass": "ocr-recognition-failure",
+      "baselineValue": "VANNI",
+      "scenarioValue": "GIOQVANN"
+    },
+    {
+      "caseId": "approved-wine-013",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "baselineFailureClass": "candidate-filtering-failure",
+      "scenarioFailureClass": "region-coverage-failure",
+      "baselineValue": null,
+      "scenarioValue": null
+    },
+    {
+      "caseId": "approved-wine-035",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "baselineFailureClass": "ocr-recognition-failure",
+      "scenarioFailureClass": "region-coverage-failure",
+      "baselineValue": null,
+      "scenarioValue": null
+    },
+    {
+      "caseId": "la-fattoria-rotated",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "baselineFailureClass": "candidate-filtering-failure",
+      "scenarioFailureClass": "region-coverage-failure",
+      "baselineValue": null,
+      "scenarioValue": null
+    },
+    {
+      "caseId": "la-fattoria-rotated",
+      "field": "alcohol",
+      "scenario": "canonically-rotated-targeted-crop",
+      "baselineFailureClass": "candidate-filtering-failure",
+      "scenarioFailureClass": "ocr-recognition-failure",
+      "baselineValue": null,
+      "scenarioValue": null
+    },
+    {
+      "caseId": "patricia-green-cellars",
+      "field": "brand",
+      "scenario": "human-targeted-crop",
+      "baselineFailureClass": "correct-uncertainty",
+      "scenarioFailureClass": "candidate-generation-failure",
+      "baselineValue": "ESTATE VINEYARD",
+      "scenarioValue": null
+    },
+    {
+      "caseId": "patricia-green-cellars",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "baselineFailureClass": "candidate-filtering-failure",
+      "scenarioFailureClass": "region-coverage-failure",
+      "baselineValue": null,
+      "scenarioValue": null
+    },
+    {
+      "caseId": "wine-multi-artifact-04",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "baselineFailureClass": "candidate-filtering-failure",
+      "scenarioFailureClass": "ocr-recognition-failure",
+      "baselineValue": null,
+      "scenarioValue": null
+    },
+    {
+      "caseId": "approved-wine-095",
+      "field": "alcohol",
+      "scenario": "human-targeted-crop",
+      "baselineFailureClass": "candidate-filtering-failure",
+      "scenarioFailureClass": "region-coverage-failure",
+      "baselineValue": null,
+      "scenarioValue": null
+    }
+  ],
+  "latencyComparison": [
+    {
+      "scenario": "production-baseline",
+      "executedFieldCount": 26,
+      "medianLatencyMs": 2425.115958999999,
+      "p95LatencyMs": 4671.680458,
+      "medianOcrMs": 1878.1183339999952,
+      "medianPreprocessMs": 195.4680829999961
+    },
+    {
+      "scenario": "human-targeted-crop",
+      "executedFieldCount": 23,
+      "medianLatencyMs": 142.65012500000012,
+      "p95LatencyMs": 413.95658399999957,
+      "medianOcrMs": 121.18433400000004,
+      "medianPreprocessMs": 44.17908399999942
+    },
+    {
+      "scenario": "canonically-rotated-targeted-crop",
+      "executedFieldCount": 2,
+      "medianLatencyMs": 58.98845799999981,
+      "p95LatencyMs": 125.992083000001,
+      "medianOcrMs": 32.51350000000093,
+      "medianPreprocessMs": 11.834167000000889
+    }
+  ],
+  "productionBoundaryProof": {
+    "benchmarkModules": [
+      "src/fixtures/eval/ocr-region-benchmark.annotations.ts",
+      "src/fixtures/eval/ocr-region-benchmark.ts"
+    ],
+    "guardTests": [
+      "src/fixtures/truth-boundary.test.ts",
+      "src/fixtures/eval/eval-boundary.test.ts"
+    ],
+    "productionBehaviorChangeAuthorized": false,
+    "proofNote": "All benchmark annotations and report code live under src/fixtures/eval and remain covered by the existing evaluation-only import guards."
+  },
+  "recommendation": {
+    "verdict": "MIXED RESULT",
+    "rationale": "Some benchmark cases improve with region isolation, but the gains are not uniform enough to treat crop isolation alone as the dominant bottleneck.",
+    "cropCorrectedFieldCount": 2,
+    "rotationOnlyCorrectedFieldCount": 0,
+    "rawPhraseRecoveryCount": 0
+  }
+}
