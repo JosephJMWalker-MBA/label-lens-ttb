@@ -934,22 +934,65 @@ function compareRankingValue(
   right: number | string | boolean,
   direction: "asc" | "desc",
 ): number {
+  if (typeof left !== typeof right) {
+    throw new Error(
+      `compareRankingValue requires identical value types, got ${typeof left} and ${typeof right}`,
+    );
+  }
   const base =
-    typeof left === "string" && typeof right === "string"
-      ? left.localeCompare(right)
-      : Number(typeof left === "boolean" ? Number(left) : left) -
-        Number(typeof right === "boolean" ? Number(right) : right);
+    typeof left === "string"
+      ? left.localeCompare(right as string)
+      : typeof left === "boolean"
+        ? Number(left) - Number(right as boolean)
+        : left - (right as number);
   return direction === "desc" ? -base : base;
 }
 
-function compareCandidateRanking(left: Candidate, right: Candidate): number {
+export function compareCandidateRanking(left: Candidate, right: Candidate): number {
   if (!left.ranking || !right.ranking) {
     throw new Error("compareCandidateRanking requires ranking semantics");
   }
-  const count = Math.min(left.ranking.comparator.length, right.ranking.comparator.length);
-  for (let index = 0; index < count; index += 1) {
+  if (left.ranking.strategy !== right.ranking.strategy) {
+    throw new Error(
+      `compareCandidateRanking requires matching strategies, got ${left.ranking.strategy} and ${right.ranking.strategy}`,
+    );
+  }
+  const [leftPrimary] = left.ranking.comparator;
+  const [rightPrimary] = right.ranking.comparator;
+  if (!leftPrimary || !rightPrimary) {
+    throw new Error("compareCandidateRanking requires at least one comparator entry");
+  }
+  if (leftPrimary.id !== rightPrimary.id || leftPrimary.direction !== rightPrimary.direction) {
+    throw new Error(
+      `compareCandidateRanking requires matching primary comparator semantics, got ${leftPrimary.id}/${leftPrimary.direction} and ${rightPrimary.id}/${rightPrimary.direction}`,
+    );
+  }
+  const primaryCompared = compareRankingValue(
+    leftPrimary.value,
+    rightPrimary.value,
+    leftPrimary.direction,
+  );
+  if (primaryCompared !== 0) return primaryCompared;
+
+  if (left.ranking.orderingMode !== right.ranking.orderingMode) {
+    throw new Error(
+      `compareCandidateRanking requires matching orderingMode once the primary comparator ties, got ${left.ranking.orderingMode} and ${right.ranking.orderingMode}`,
+    );
+  }
+  if (left.ranking.comparator.length !== right.ranking.comparator.length) {
+    throw new Error(
+      `compareCandidateRanking requires matching comparator lengths once the primary comparator ties, got ${left.ranking.comparator.length} and ${right.ranking.comparator.length}`,
+    );
+  }
+
+  for (let index = 1; index < left.ranking.comparator.length; index += 1) {
     const leftEntry = left.ranking.comparator[index];
     const rightEntry = right.ranking.comparator[index];
+    if (leftEntry.id !== rightEntry.id || leftEntry.direction !== rightEntry.direction) {
+      throw new Error(
+        `compareCandidateRanking requires matching comparator semantics at index ${index}, got ${leftEntry.id}/${leftEntry.direction} and ${rightEntry.id}/${rightEntry.direction}`,
+      );
+    }
     const compared = compareRankingValue(leftEntry.value, rightEntry.value, leftEntry.direction);
     if (compared !== 0) return compared;
   }

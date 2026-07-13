@@ -165,6 +165,45 @@ describe("observationSchema — state-dependent semantic invariants", () => {
     ).toBe(true);
   });
 
+  it("accepts explicit missing raw OCR confidence when every token is missing", () => {
+    expect(
+      observationSchema.safeParse(
+        observed({
+          ocrConfidence: {
+            aggregation: "mean",
+            rawScale: "0-100",
+            rawTokenConfidences: [null, null],
+            rawMean: null,
+            rawMin: null,
+            rawMax: null,
+            missingTokenCount: 2,
+          },
+        }),
+      ).success,
+    ).toBe(true);
+  });
+
+  it("accepts mixed missing and zero raw OCR confidence without collapsing them", () => {
+    const parsed = observationSchema.safeParse(
+      observed({
+        ocrConfidence: {
+          aggregation: "mean",
+          rawScale: "0-100",
+          rawTokenConfidences: [0, null, 50],
+          rawMean: 25,
+          rawMin: 0,
+          rawMax: 50,
+          missingTokenCount: 1,
+        },
+      }),
+    );
+
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    expect(parsed.data.ocrConfidence?.rawTokenConfidences).toEqual([0, null, 50]);
+    expect(parsed.data.ocrConfidence?.rawMin).toBe(0);
+  });
+
   const rejects: [string, Record<string, unknown>][] = [
     [
       "NOT_OBSERVED with a value",
@@ -420,6 +459,76 @@ describe("observationSchema — state-dependent semantic invariants", () => {
     ["confidence below 0", observed({ confidence: -0.1, ocrEvidenceScore: -0.1 })],
     ["confidence above 1", observed({ confidence: 1.1, ocrEvidenceScore: 1.1 })],
     ["confidence alias mismatch", observed({ confidence: 0.2, ocrEvidenceScore: 0.3 })],
+    [
+      "raw OCR missing-token count mismatch",
+      observed({
+        ocrConfidence: {
+          aggregation: "mean",
+          rawScale: "0-100",
+          rawTokenConfidences: [40, null],
+          rawMean: 40,
+          rawMin: 40,
+          rawMax: 40,
+          missingTokenCount: 0,
+        },
+      }),
+    ],
+    [
+      "raw OCR summaries must be null when all confidences are missing",
+      observed({
+        ocrConfidence: {
+          aggregation: "mean",
+          rawScale: "0-100",
+          rawTokenConfidences: [null, null],
+          rawMean: 0,
+          rawMin: 0,
+          rawMax: 0,
+          missingTokenCount: 2,
+        },
+      }),
+    ],
+    [
+      "raw OCR summaries must reconcile with observed confidences",
+      observed({
+        ocrConfidence: {
+          aggregation: "mean",
+          rawScale: "0-100",
+          rawTokenConfidences: [0, null, 50],
+          rawMean: 40,
+          rawMin: 0,
+          rawMax: 50,
+          missingTokenCount: 1,
+        },
+      }),
+    ],
+    [
+      "raw OCR confidence above the documented scale",
+      observed({
+        ocrConfidence: {
+          aggregation: "mean",
+          rawScale: "0-100",
+          rawTokenConfidences: [101],
+          rawMean: 101,
+          rawMin: 101,
+          rawMax: 101,
+          missingTokenCount: 0,
+        },
+      }),
+    ],
+    [
+      "raw OCR confidence must be finite",
+      observed({
+        ocrConfidence: {
+          aggregation: "mean",
+          rawScale: "0-100",
+          rawTokenConfidences: [Number.NaN],
+          rawMean: Number.NaN,
+          rawMin: Number.NaN,
+          rawMax: Number.NaN,
+          missingTokenCount: 0,
+        },
+      }),
+    ],
     ["out-of-bounds geometry", observed({ geometry: geometry({ x: 480, width: 100 }) })],
     ["oversized string", observed({ value: "M".repeat(MAX_EVIDENCE_STRING + 1) })],
     ["whitespace-only raw text is empty", observed({ rawText: "" })],

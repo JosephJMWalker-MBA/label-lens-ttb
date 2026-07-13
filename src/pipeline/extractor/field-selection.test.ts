@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { OcrWord, RegionOcrResult, RegionTransform } from "./extractor.types";
 import {
+  compareCandidateRanking,
   normalizeConfidence,
   selectAlcoholObservation,
   selectBrandObservation,
@@ -64,6 +65,105 @@ describe("normalizeConfidence", () => {
     expect(normalizeConfidence(0)).toBe(0);
     expect(normalizeConfidence(-5)).toBe(0);
     expect(normalizeConfidence(150)).toBe(1);
+  });
+});
+
+function rankedCandidate(ranking: Record<string, unknown>) {
+  return { ranking } as unknown as Parameters<typeof compareCandidateRanking>[0];
+}
+
+describe("compareCandidateRanking", () => {
+  it("lets the primary comparator decide before strategy-specific comparator order diverges", () => {
+    const scoreFirst = rankedCandidate({
+      strategy: "brand-mixed-prominence-score",
+      orderingMode: "score-first",
+      comparator: [
+        { id: "score-eligibility", direction: "desc", value: true },
+        { id: "ranking-score", direction: "desc", value: 5.2 },
+        { id: "prominence", direction: "desc", value: 30 },
+        { id: "ocr-evidence-score", direction: "desc", value: 0.8 },
+        { id: "normalized-value-key", direction: "asc", value: "alpha" },
+      ],
+    });
+    const prominenceFirst = rankedCandidate({
+      strategy: "brand-mixed-prominence-score",
+      orderingMode: "prominence-first",
+      comparator: [
+        { id: "score-eligibility", direction: "desc", value: false },
+        { id: "prominence", direction: "desc", value: 90 },
+        { id: "ocr-evidence-score", direction: "desc", value: 0.99 },
+        { id: "ranking-score", direction: "desc", value: 9.1 },
+        { id: "normalized-value-key", direction: "asc", value: "omega" },
+      ],
+    });
+
+    expect(compareCandidateRanking(scoreFirst, prominenceFirst)).toBeLessThan(0);
+  });
+
+  it("rejects comparator identifier drift once the primary comparator ties", () => {
+    const left = rankedCandidate({
+      strategy: "brand-mixed-prominence-score",
+      orderingMode: "score-first",
+      comparator: [
+        { id: "score-eligibility", direction: "desc", value: true },
+        { id: "ranking-score", direction: "desc", value: 5.2 },
+        { id: "prominence", direction: "desc", value: 30 },
+        { id: "ocr-evidence-score", direction: "desc", value: 0.8 },
+        { id: "normalized-value-key", direction: "asc", value: "alpha" },
+      ],
+    });
+    const right = rankedCandidate({
+      strategy: "brand-mixed-prominence-score",
+      orderingMode: "score-first",
+      comparator: [
+        { id: "score-eligibility", direction: "desc", value: true },
+        { id: "prominence", direction: "desc", value: 29 },
+        { id: "ranking-score", direction: "desc", value: 5.1 },
+        { id: "ocr-evidence-score", direction: "desc", value: 0.7 },
+        { id: "normalized-value-key", direction: "asc", value: "beta" },
+      ],
+    });
+
+    expect(() => compareCandidateRanking(left, right)).toThrow(/matching comparator semantics/);
+  });
+
+  it("rejects comparator length drift once the primary comparator ties", () => {
+    const left = rankedCandidate({
+      strategy: "alcohol-ocr-evidence-comparator",
+      orderingMode: "ocr-evidence-first",
+      comparator: [
+        { id: "ocr-evidence-score", direction: "desc", value: 0.8 },
+        { id: "normalized-value-key", direction: "asc", value: "125alcvol" },
+      ],
+    });
+    const right = rankedCandidate({
+      strategy: "alcohol-ocr-evidence-comparator",
+      orderingMode: "ocr-evidence-first",
+      comparator: [{ id: "ocr-evidence-score", direction: "desc", value: 0.8 }],
+    });
+
+    expect(() => compareCandidateRanking(left, right)).toThrow(/matching comparator lengths/);
+  });
+
+  it("rejects mixed comparator value types", () => {
+    const left = rankedCandidate({
+      strategy: "alcohol-ocr-evidence-comparator",
+      orderingMode: "ocr-evidence-first",
+      comparator: [
+        { id: "ocr-evidence-score", direction: "desc", value: 0.8 },
+        { id: "normalized-value-key", direction: "asc", value: "125alcvol" },
+      ],
+    });
+    const right = rankedCandidate({
+      strategy: "alcohol-ocr-evidence-comparator",
+      orderingMode: "ocr-evidence-first",
+      comparator: [
+        { id: "ocr-evidence-score", direction: "desc", value: 0.8 },
+        { id: "normalized-value-key", direction: "asc", value: 125 },
+      ],
+    });
+
+    expect(() => compareCandidateRanking(left, right)).toThrow(/identical value types/);
   });
 });
 

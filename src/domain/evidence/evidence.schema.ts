@@ -95,12 +95,62 @@ const ocrConfidenceSchema = z
   })
   .strict()
   .superRefine((ocr, ctx) => {
+    const observed = ocr.rawTokenConfidences.filter((value): value is number => value !== null);
     const missingCount = ocr.rawTokenConfidences.filter((value) => value === null).length;
     if (missingCount !== ocr.missingTokenCount) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["missingTokenCount"],
         message: "missingTokenCount must match null rawTokenConfidences.",
+      });
+    }
+    if (observed.length === 0) {
+      if (ocr.rawMean !== null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["rawMean"],
+          message: "rawMean must be null when no rawTokenConfidences are observed.",
+        });
+      }
+      if (ocr.rawMin !== null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["rawMin"],
+          message: "rawMin must be null when no rawTokenConfidences are observed.",
+        });
+      }
+      if (ocr.rawMax !== null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["rawMax"],
+          message: "rawMax must be null when no rawTokenConfidences are observed.",
+        });
+      }
+      return;
+    }
+
+    const expectedMean = observed.reduce((sum, value) => sum + value, 0) / observed.length;
+    const expectedMin = Math.min(...observed);
+    const expectedMax = Math.max(...observed);
+    if (ocr.rawMean === null || Math.abs(ocr.rawMean - expectedMean) > 1e-9) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["rawMean"],
+        message: "rawMean must equal the mean of observed rawTokenConfidences.",
+      });
+    }
+    if (ocr.rawMin === null || ocr.rawMin !== expectedMin) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["rawMin"],
+        message: "rawMin must equal the minimum observed rawTokenConfidence.",
+      });
+    }
+    if (ocr.rawMax === null || ocr.rawMax !== expectedMax) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["rawMax"],
+        message: "rawMax must equal the maximum observed rawTokenConfidence.",
       });
     }
   });
