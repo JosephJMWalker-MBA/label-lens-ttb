@@ -10,7 +10,7 @@ import {
   buildSingleProposalDecompositionResponseExample,
   runLocalVlmSingleProposalDecompositionDiagnostic,
   runSingleProposalDecompositionDiagnosticSequence,
-  SINGLE_PROPOSAL_DECOMPOSITION_DIAGNOSTIC_RUNGS,
+  SINGLE_PROPOSAL_DECOMPOSITION_FIELD_LADDER_RUNGS,
 } from "./single-proposal-decomposition-diagnostic";
 import {
   cleanupDir,
@@ -102,7 +102,6 @@ describe("single proposal decomposition diagnostic", () => {
       "PASS",
       "PASS",
       "FAIL",
-      "BLOCKED",
       "BLOCKED",
       "BLOCKED",
       "BLOCKED",
@@ -207,17 +206,24 @@ describe("single proposal decomposition diagnostic", () => {
       ...source,
     });
 
-    expect(report.rungs).toHaveLength(SINGLE_PROPOSAL_DECOMPOSITION_DIAGNOSTIC_RUNGS.length);
+    expect(report.rungs).toHaveLength(SINGLE_PROPOSAL_DECOMPOSITION_FIELD_LADDER_RUNGS.length);
     expect(report.firstFailingRung).toBeNull();
     expect(report.rungs.every((rung) => rung.status === "PASS")).toBe(true);
+    expect(report.guidanceLoadControl.status).toBe("PASS");
+    expect(report.guidanceLoadControl.blockedBy).toBeNull();
     expect(report.rungs.every((rung) => rung.evidence?.responseCompletedSuccessfully)).toBe(true);
+    expect(report.guidanceLoadControl.evidence?.responseCompletedSuccessfully).toBe(true);
     expect(JSON.parse(report.rungs[0]?.evidence?.outputPreviewEscaped ?? '""')).toContain(
       '"proposals":[]',
     );
     expect(JSON.parse(report.rungs.at(-1)?.evidence?.outputPreviewEscaped ?? '""')).toContain(
       '"proposalId":"proposal-1"',
     );
+    expect(JSON.parse(report.guidanceLoadControl.evidence?.outputPreviewEscaped ?? '""')).toContain(
+      '"proposalId":"proposal-1"',
+    );
     expect(report.rungs.every((rung) => rung.evidence?.cleanupCompleted === true)).toBe(true);
+    expect(report.guidanceLoadControl.evidence?.cleanupCompleted).toBe(true);
   });
 
   it("fails at the selected rung and blocks all downstream rungs", async () => {
@@ -243,7 +249,6 @@ describe("single proposal decomposition diagnostic", () => {
       "BLOCKED",
       "BLOCKED",
       "BLOCKED",
-      "BLOCKED",
     ]);
 
     const failed = report.rungs[4];
@@ -258,5 +263,39 @@ describe("single proposal decomposition diagnostic", () => {
     expect(failed?.evidence?.process?.forcedTermination).toBe(false);
     expect(failed?.evidence?.resources?.processTreeReleasedAfterTermination).toBe(true);
     expect(report.rungs[5]?.blockedBy).toBe("boundary-fields");
+    expect(report.guidanceLoadControl.status).toBe("PASS");
+    expect(report.guidanceLoadControl.blockedBy).toBeNull();
+    expect(report.guidanceLoadControl.evidence?.responseCompletedSuccessfully).toBe(true);
+  });
+
+  it("runs the guidance load control even when the field ladder fails earlier", async () => {
+    const config = await diagnosticConfig({
+      completionFailAtRung: "empty-proposal-object",
+      requestTimeoutMs: 200,
+    });
+    const source = await sourceFixture();
+
+    const report = await runLocalVlmSingleProposalDecompositionDiagnostic({
+      config,
+      scenarioId: "single-proposal-guidance-control",
+      ...source,
+    });
+
+    expect(report.firstFailingRung).toBe("empty-proposal-object");
+    expect(report.rungs.map((rung) => rung.status)).toEqual([
+      "PASS",
+      "FAIL",
+      "BLOCKED",
+      "BLOCKED",
+      "BLOCKED",
+      "BLOCKED",
+      "BLOCKED",
+      "BLOCKED",
+    ]);
+    expect(report.guidanceLoadControl.rung).toBe("guidance-load-control");
+    expect(report.guidanceLoadControl.status).toBe("PASS");
+    expect(report.guidanceLoadControl.blockedBy).toBeNull();
+    expect(report.guidanceLoadControl.evidence?.requestStartedAt).not.toBeNull();
+    expect(report.guidanceLoadControl.evidence?.responseCompletedSuccessfully).toBe(true);
   });
 });

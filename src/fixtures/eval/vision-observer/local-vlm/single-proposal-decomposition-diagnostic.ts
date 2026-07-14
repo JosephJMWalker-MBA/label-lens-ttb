@@ -34,7 +34,7 @@ export const SINGLE_PROPOSAL_DECOMPOSITION_DIAGNOSTIC_STATUSES = [
   "FAIL",
   "BLOCKED",
 ] as const;
-export const SINGLE_PROPOSAL_DECOMPOSITION_DIAGNOSTIC_RUNGS = [
+export const SINGLE_PROPOSAL_DECOMPOSITION_FIELD_LADDER_RUNGS = [
   "empty-envelope-control",
   "empty-proposal-object",
   "one-fixed-discriminator",
@@ -43,7 +43,13 @@ export const SINGLE_PROPOSAL_DECOMPOSITION_DIAGNOSTIC_RUNGS = [
   "visual-classification-fields",
   "reason-codes",
   "description",
+] as const;
+export const SINGLE_PROPOSAL_DECOMPOSITION_ORTHOGONAL_CONTROL_RUNGS = [
   "guidance-load-control",
+] as const;
+export const SINGLE_PROPOSAL_DECOMPOSITION_DIAGNOSTIC_RUNGS = [
+  ...SINGLE_PROPOSAL_DECOMPOSITION_FIELD_LADDER_RUNGS,
+  ...SINGLE_PROPOSAL_DECOMPOSITION_ORTHOGONAL_CONTROL_RUNGS,
 ] as const;
 
 const SINGLE_PROPOSAL_OBSERVATION_RUN_ID_PLACEHOLDER = "<provided-observation-run-id>";
@@ -55,6 +61,10 @@ const SINGLE_PROPOSAL_PREVIEW_CHARS = 240;
 
 export type SingleProposalDecompositionDiagnosticStatus =
   (typeof SINGLE_PROPOSAL_DECOMPOSITION_DIAGNOSTIC_STATUSES)[number];
+export type SingleProposalDecompositionFieldLadderRung =
+  (typeof SINGLE_PROPOSAL_DECOMPOSITION_FIELD_LADDER_RUNGS)[number];
+export type SingleProposalDecompositionOrthogonalControlRung =
+  (typeof SINGLE_PROPOSAL_DECOMPOSITION_ORTHOGONAL_CONTROL_RUNGS)[number];
 export type SingleProposalDecompositionDiagnosticRung =
   (typeof SINGLE_PROPOSAL_DECOMPOSITION_DIAGNOSTIC_RUNGS)[number];
 
@@ -134,8 +144,9 @@ export interface SingleProposalDecompositionDiagnosticReport {
     sourceWidth: number;
     sourceHeight: number;
   };
-  firstFailingRung: SingleProposalDecompositionDiagnosticRung | null;
+  firstFailingRung: SingleProposalDecompositionFieldLadderRung | null;
   rungs: readonly SingleProposalDecompositionRungReport[];
+  guidanceLoadControl: SingleProposalDecompositionRungReport;
 }
 
 export interface SingleProposalDecompositionResponseExample {
@@ -332,8 +343,8 @@ export function buildSingleProposalDecompositionRequestSpec(
 }
 
 function blockedRungReport(args: {
-  rung: SingleProposalDecompositionDiagnosticRung;
-  blockedBy: SingleProposalDecompositionDiagnosticRung;
+  rung: SingleProposalDecompositionFieldLadderRung;
+  blockedBy: SingleProposalDecompositionFieldLadderRung;
 }): SingleProposalDecompositionRungReport {
   return {
     rung: args.rung,
@@ -878,13 +889,13 @@ async function runOneDecompositionRung(args: {
 
 export async function runSingleProposalDecompositionDiagnosticSequence(args: {
   runRung: (
-    rung: SingleProposalDecompositionDiagnosticRung,
+    rung: SingleProposalDecompositionFieldLadderRung,
   ) => Promise<SingleProposalDecompositionRungReport>;
 }): Promise<readonly SingleProposalDecompositionRungReport[]> {
   const reports: SingleProposalDecompositionRungReport[] = [];
-  let blockedBy: SingleProposalDecompositionDiagnosticRung | null = null;
+  let blockedBy: SingleProposalDecompositionFieldLadderRung | null = null;
 
-  for (const rung of SINGLE_PROPOSAL_DECOMPOSITION_DIAGNOSTIC_RUNGS) {
+  for (const rung of SINGLE_PROPOSAL_DECOMPOSITION_FIELD_LADDER_RUNGS) {
     if (blockedBy !== null) {
       reports.push(blockedRungReport({ rung, blockedBy }));
       continue;
@@ -923,7 +934,20 @@ export async function runLocalVlmSingleProposalDecompositionDiagnostic(args: {
         sourceHeight: args.sourceHeight,
       }),
   });
-  const firstFailingRung = rungs.find((rung) => rung.status === "FAIL")?.rung ?? null;
+  const guidanceLoadControl = await runOneDecompositionRung({
+    config: args.config,
+    rung: "guidance-load-control",
+    observationRunId,
+    scenarioId: args.scenarioId,
+    sourceArtifactRef: args.sourceArtifactRef,
+    sourceBytes: args.sourceBytes,
+    sourceMediaType: args.sourceMediaType,
+    sourceWidth: args.sourceWidth,
+    sourceHeight: args.sourceHeight,
+  });
+  const firstFailingRung =
+    (rungs.find((rung) => rung.status === "FAIL")?.rung as
+      SingleProposalDecompositionFieldLadderRung | undefined) ?? null;
 
   return {
     schemaVersion: SINGLE_PROPOSAL_DECOMPOSITION_DIAGNOSTIC_SCHEMA_VERSION,
@@ -957,6 +981,7 @@ export async function runLocalVlmSingleProposalDecompositionDiagnostic(args: {
     },
     firstFailingRung,
     rungs,
+    guidanceLoadControl,
   };
 }
 
@@ -974,15 +999,25 @@ export async function writeSingleProposalDecompositionDiagnosticFiles(args: {
     `- Schema version: \`${args.report.schemaVersion}\``,
     `- Git commit: \`${args.report.gitCommit}\``,
     `- Runtime kind: \`${args.report.runtime.runtimeKind}\``,
-    `- First failing rung: ${args.report.firstFailingRung ?? "none"}`,
+    `- Field ladder first failing rung: ${args.report.firstFailingRung ?? "none"}`,
+    `- Guidance load control: ${args.report.guidanceLoadControl.status}`,
     "",
-    "## Rungs",
+    "## Field Ladder",
     "",
     ...args.report.rungs.map((rung) => {
       const preview = rung.evidence?.outputPreviewEscaped ?? "null";
       const finishReason = rung.evidence?.finishReason ?? "null";
       return `- ${rung.rung}: ${rung.status}; responseCompletedSuccessfully=${String(rung.evidence?.responseCompletedSuccessfully ?? false)}; finishReason=${finishReason}; timeoutStage=${rung.evidence?.timeoutStage ?? "null"}; responseBytes=${rung.evidence?.responseBytes ?? 0}; preview=${preview}`;
     }),
+    "",
+    "## Orthogonal Controls",
+    "",
+    (() => {
+      const rung = args.report.guidanceLoadControl;
+      const preview = rung.evidence?.outputPreviewEscaped ?? "null";
+      const finishReason = rung.evidence?.finishReason ?? "null";
+      return `- ${rung.rung}: ${rung.status}; responseCompletedSuccessfully=${String(rung.evidence?.responseCompletedSuccessfully ?? false)}; finishReason=${finishReason}; timeoutStage=${rung.evidence?.timeoutStage ?? "null"}; responseBytes=${rung.evidence?.responseBytes ?? 0}; preview=${preview}`;
+    })(),
   ].join("\n");
   await writeFile(jsonPath, `${JSON.stringify(args.report, null, 2)}\n`, "utf8");
   await writeFile(markdownPath, `${markdown}\n`, "utf8");
