@@ -21,6 +21,9 @@ test-results/
 npm-debug.log*
 *.log
 
+# Local evaluation artifacts
+.local-vlm/
+
 # OS / editor
 .DS_Store
 *.tsbuildinfo
