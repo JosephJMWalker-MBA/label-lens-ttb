@@ -1,3 +1,4 @@
+import type { ResolvedLabelRequirement } from "@/domain/requirements/requirement.types";
 import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
 
 import { PROJECT_FACT_IDS, type ProjectFacts } from "./facts";
@@ -16,10 +17,20 @@ import { buildRequirementsSummary } from "./requirements-summary";
  * facts live in the browser and this slice adds no API. It is the same algorithm
  * over the same canonical bytes.
  *
+ * **What the checksum is, and is not.** It is a plain SHA-256 over the canonical
+ * payload. It detects a file that was *changed without the checksum being
+ * recomputed* — an accidental edit, a truncated copy, a hand-tweaked field. It
+ * is **not** a signature, **not** tamper resistance, and **not** proof of
+ * authorship: anyone who edits the payload can recompute the hash with the same
+ * committed logic and produce a file that verifies. Nothing here should be
+ * described, in code or in UI, as making the artifact tamper-proof or attesting
+ * to who produced it.
+ *
  * The export keeps provenance separated, which is the whole point of it:
  *
  *   `declaredFacts`     — what the maker said. Assertions, not evidence.
- *   `citedRequirements` — what the merged registry states, with citations.
+ *   `citedRequirements` — what the merged registry states, with citations,
+ *                         each carrying how that citation entered the system.
  *
  * Nothing in this file evaluates a fact against a requirement. There is no
  * status, score, verdict, or readiness figure, and there never may be.
@@ -47,6 +58,29 @@ export interface ProjectFactsIntegrity {
   value: string;
 }
 
+/**
+ * How a citation entered the system, carried into the durable artifact.
+ *
+ * The registry distinguishes two fundamentally different paths to authority,
+ * and a bare citation flattens them into one. That distinction is the point of
+ * the whole design — **humans author authority** — so it must survive export.
+ *
+ * Today both seeded requirements are rule-derived, so nothing visible is lost
+ * yet. But this schema is `v1` and the artifact is durable: the moment a
+ * human-reviewed citation enters the registry, an export that recorded only the
+ * citation would discard **who reviewed it and when**. A downstream reader could
+ * no longer tell a citation a person put their name to from one derived
+ * mechanically. The registry refuses to let a citation exist without one of
+ * these provenances; the export must not quietly undo that.
+ *
+ * This is the export-safe projection: the human-authored variant carries the
+ * reviewer and the review date, not a nested authority block — the citation and
+ * snapshot date already sit on the requirement itself.
+ */
+export type ExportedAuthorityProvenance =
+  | { kind: "registered-rule-authority"; ruleId: string }
+  | { kind: "human-authored"; reviewedBy: string; reviewedAt: string };
+
 /** One cited requirement, copied from the registry. Never authored here. */
 export interface ExportedRequirement {
   requirementId: string;
@@ -54,6 +88,8 @@ export interface ExportedRequirement {
   fieldId: string;
   citation: string;
   snapshotDate: string;
+  /** Which path this citation entered the system by. Never flattened away. */
+  authorityProvenance: ExportedAuthorityProvenance;
   applicability: string;
   conditionExternalEvidence: string | null;
   checkedByRuleIds: string[];
@@ -102,6 +138,38 @@ async function sha256Hex(text: string): Promise<string> {
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+/**
+ * Project a registry requirement into its export-safe form.
+ *
+ * Exhaustive over the provenance union, so a new authority path cannot be added
+ * to the registry and silently vanish from the artifact: the compiler will
+ * demand a case for it here.
+ */
+export function toExportedRequirement(requirement: ResolvedLabelRequirement): ExportedRequirement {
+  const source = requirement.authorityProvenance;
+  const authorityProvenance: ExportedAuthorityProvenance =
+    source.kind === "registered-rule-authority"
+      ? { kind: "registered-rule-authority", ruleId: source.ruleId }
+      : {
+          kind: "human-authored",
+          reviewedBy: source.reviewedBy,
+          reviewedAt: source.reviewedAt,
+        };
+
+  return {
+    requirementId: requirement.requirementId,
+    version: requirement.version,
+    fieldId: requirement.fieldId,
+    citation: requirement.authority.citation,
+    snapshotDate: requirement.authority.snapshotDate,
+    authorityProvenance,
+    applicability: requirement.applicability,
+    conditionExternalEvidence: requirement.conditionExternalEvidence,
+    checkedByRuleIds: [...requirement.checkedByRuleIds],
+    evaluableFromArtwork: requirement.evaluableFromArtwork,
+  };
+}
+
 /** The payload, built deterministically. No timestamps, randomness, or environment. */
 export function buildProjectFactsPayload(facts: ProjectFacts): ProjectFactsPayload {
   const summary = buildRequirementsSummary(facts);
@@ -111,18 +179,8 @@ export function buildProjectFactsPayload(facts: ProjectFacts): ProjectFactsPaylo
 
   const citedRequirements: ExportedRequirement[] = summary.rows
     .map((row) => row.requirement)
-    .filter((requirement): requirement is NonNullable<typeof requirement> => requirement !== null)
-    .map((requirement) => ({
-      requirementId: requirement.requirementId,
-      version: requirement.version,
-      fieldId: requirement.fieldId,
-      citation: requirement.authority.citation,
-      snapshotDate: requirement.authority.snapshotDate,
-      applicability: requirement.applicability,
-      conditionExternalEvidence: requirement.conditionExternalEvidence,
-      checkedByRuleIds: [...requirement.checkedByRuleIds],
-      evaluableFromArtwork: requirement.evaluableFromArtwork,
-    }));
+    .filter((requirement): requirement is ResolvedLabelRequirement => requirement !== null)
+    .map(toExportedRequirement);
 
   return {
     exportType: PROJECT_FACTS_EXPORT_TYPE,
@@ -138,15 +196,19 @@ export function buildProjectFactsPayload(facts: ProjectFacts): ProjectFactsPaylo
   };
 }
 
-/** Canonical export text with its integrity block. */
-export async function buildProjectFactsExport(facts: ProjectFacts): Promise<string> {
-  const payload = buildProjectFactsPayload(facts);
+/** Seal a payload: canonical text plus its integrity block. */
+export async function sealProjectFactsExport(payload: ProjectFactsPayload): Promise<string> {
   const value = await sha256Hex(canonicalStringify(payload));
   const exported: ProjectFactsExport = {
     ...payload,
     integrity: { algorithm: HASH_ALGORITHM, scope: INTEGRITY_SCOPE, value },
   };
   return canonicalStringify(exported);
+}
+
+/** Canonical export text with its integrity block. */
+export async function buildProjectFactsExport(facts: ProjectFacts): Promise<string> {
+  return sealProjectFactsExport(buildProjectFactsPayload(facts));
 }
 
 /** Deterministic filename, derived from the checksum. Never from user text. */
@@ -163,8 +225,10 @@ function shapeError(message: string): ProjectFactsExportError {
  *
  * Every other key is preserved, including any this version does not know about,
  * so the checksum is recomputed over exactly what the file contains. Rebuilding
- * the payload from known keys only would silently ignore extra ones, which is
- * precisely what a checksum exists to catch.
+ * the payload from known keys only would leave an added key out of the hash, so
+ * a file carrying one would still verify — and the check would be weaker than it
+ * appears. This closes that gap for changes made *without* recomputing the
+ * checksum; it does not make the file tamper-proof.
  */
 function hashedPayload(exported: ProjectFactsExport): unknown {
   const clone: Record<string, unknown> = { ...exported };

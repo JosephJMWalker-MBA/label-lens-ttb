@@ -1,7 +1,11 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
 
+import { createLabelRequirementRegistry } from "@/domain/requirements/registry";
+import type { ResolvedLabelRequirement } from "@/domain/requirements/requirement.types";
 import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
+import { winePrecheckRegistry } from "@/pipeline/precheck/wine-precheck.profile";
+import { wineRequirementsRegistry } from "@/pipeline/precheck/wine-requirements.profile";
 
 import { emptyProjectFacts, WINE_BEVERAGE_TYPE } from "./facts";
 import {
@@ -9,6 +13,8 @@ import {
   buildProjectFactsPayload,
   parseProjectFactsExport,
   projectFactsFilename,
+  sealProjectFactsExport,
+  toExportedRequirement,
   PROJECT_FACTS_SCHEMA_VERSION,
 } from "./session-export";
 
@@ -66,13 +72,17 @@ describe("session export round-trip", () => {
     expect(parsed.error.code).toBe("INTEGRITY_MISMATCH");
   });
 
-  it("rejects a file that had a key added to it after export", async () => {
+  it("rejects a file that had a key added without the checksum being recomputed", async () => {
     // The checksum is recomputed over everything except the integrity block —
-    // including keys this version does not know about. Rebuilding the payload
-    // from known keys only would silently ignore a smuggled one, which is
-    // exactly what a checksum exists to catch.
+    // including keys this version does not know about. Hashing only the known
+    // keys would leave an added one out of the hash, so the file would still
+    // verify and the check would be weaker than it looks.
+    //
+    // This detects a change made *without* recomputing the checksum. It is not
+    // tamper resistance: anyone who edits the payload can recompute the hash
+    // with the same committed logic and produce a file that verifies.
     const parsed = JSON.parse(await buildProjectFactsExport(FACTS));
-    parsed.smuggledStatus = "APPROVED";
+    parsed.addedField = "APPROVED";
     const result = await parseProjectFactsExport(JSON.stringify(parsed));
     expect(result.ok).toBe(false);
     if (result.ok) return;
@@ -92,6 +102,123 @@ describe("session export round-trip", () => {
       `label-lens-project-facts-${PROJECT_FACTS_SCHEMA_VERSION}-${"a".repeat(64)}.json`,
     );
     expect(name).not.toMatch(/Cardinal/);
+  });
+});
+
+describe("authority provenance survives the durable artifact", () => {
+  it("round-trips a rule-derived citation, naming the rule it came from", async () => {
+    const parsed = await parseProjectFactsExport(await buildProjectFactsExport(FACTS));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+
+    const brand = parsed.value.citedRequirements.find((r) => r.fieldId === "brandName")!;
+    expect(brand.authorityProvenance).toEqual({
+      kind: "registered-rule-authority",
+      ruleId: "brand-name-canonical-comparison",
+    });
+  });
+
+  it("round-trips every seeded requirement's provenance, not just the first", async () => {
+    const parsed = await parseProjectFactsExport(await buildProjectFactsExport(FACTS));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+
+    for (const requirement of parsed.value.citedRequirements) {
+      const fromRegistry = wineRequirementsRegistry.get(requirement.requirementId)!;
+      expect(fromRegistry).toBeDefined();
+      expect(requirement.authorityProvenance.kind).toBe(fromRegistry.authorityProvenance.kind);
+    }
+  });
+
+  it("round-trips a human-authored citation, preserving the reviewer and the date", async () => {
+    // No human-authored requirement is seeded yet — by design, since no human has
+    // authored a citation beyond the two the rules already carry. But the schema
+    // is v1 and the artifact is durable: the day one arrives, the export must not
+    // discard who reviewed it and when. That is the whole "humans author
+    // authority" principle, and it has to hold before the case exists.
+    const humanAuthored: ResolvedLabelRequirement = {
+      requirementId: "wine-net-contents-required",
+      version: "1.0.0",
+      profileId: "wine-label-requirements",
+      profileVersion: "1.0.0",
+      fieldId: "brandName",
+      authority: { citation: "27 CFR 4.37", snapshotDate: "2026-07-10" },
+      authorityProvenance: {
+        kind: "human-authored",
+        authority: { citation: "27 CFR 4.37", snapshotDate: "2026-07-10" },
+        reviewedBy: "A Named Reviewer",
+        reviewedAt: "2026-07-14",
+      },
+      applicability: "always",
+      conditionExternalEvidence: null,
+      conditionSourceRuleId: null,
+      checkedByRuleIds: [],
+      evaluableFromArtwork: false,
+    };
+
+    const payload = {
+      ...buildProjectFactsPayload(FACTS),
+      citedRequirements: [toExportedRequirement(humanAuthored)],
+    };
+    const parsed = await parseProjectFactsExport(await sealProjectFactsExport(payload));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+
+    const [requirement] = parsed.value.citedRequirements;
+    expect(requirement.citation).toBe("27 CFR 4.37");
+    expect(requirement.snapshotDate).toBe("2026-07-10");
+    expect(requirement.authorityProvenance).toEqual({
+      kind: "human-authored",
+      reviewedBy: "A Named Reviewer",
+      reviewedAt: "2026-07-14",
+    });
+  });
+
+  it("does not flatten the two authority paths into a bare citation", async () => {
+    // A citation alone cannot tell a reader whether a person put their name to it
+    // or a rule carried it. The export must never reduce both to the same shape.
+    const parsed = await parseProjectFactsExport(await buildProjectFactsExport(FACTS));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    for (const requirement of parsed.value.citedRequirements) {
+      expect(requirement.authorityProvenance).toBeDefined();
+      expect(["registered-rule-authority", "human-authored"]).toContain(
+        requirement.authorityProvenance.kind,
+      );
+    }
+  });
+
+  it("keeps a human-authored citation out of the artifact when it has no reviewer", () => {
+    // Defence in depth: the registry already refuses to construct one. The export
+    // simply copies what the registry resolved, so an unattributed citation
+    // cannot reach the file — there is no path that produces one.
+    expect(() =>
+      createLabelRequirementRegistry(
+        {
+          profileId: "p",
+          profileVersion: "1.0.0",
+          ruleProfileId: winePrecheckRegistry.profileId,
+          ruleProfileVersion: winePrecheckRegistry.profileVersion,
+          requirements: [
+            {
+              requirementId: "unattributed",
+              version: "1.0.0",
+              profileId: "p",
+              profileVersion: "1.0.0",
+              fieldId: "brandName",
+              authoritySource: {
+                kind: "human-authored",
+                authority: { citation: "27 CFR 4.37", snapshotDate: "2026-07-10" },
+                reviewedBy: "",
+                reviewedAt: "2026-07-10",
+              },
+              applicability: "always",
+            },
+          ],
+        },
+        winePrecheckRegistry,
+      ),
+    ).toThrow(/MISSING_HUMAN_REVIEWER/);
   });
 });
 
