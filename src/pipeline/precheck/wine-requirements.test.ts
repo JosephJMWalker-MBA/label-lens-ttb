@@ -76,6 +76,26 @@ describe("wine label-requirements seed policy", () => {
     }
   });
 
+  it("derives each citation from a rule that actually concerns that field", () => {
+    // Existence of the source rule is not enough: a rule about another field
+    // would yield a citation that is valid, and about the wrong thing.
+    for (const requirement of requirements) {
+      if (requirement.authorityProvenance.kind !== "registered-rule-authority") continue;
+      const rule = winePrecheckRegistry.get(requirement.authorityProvenance.ruleId);
+      expect(rule).toBeDefined();
+      expect(rule!.requiredEvidenceFields).toContain(requirement.fieldId);
+    }
+  });
+
+  it("softens an obligation only by a condition under the same authority", () => {
+    for (const requirement of requirements) {
+      if (!requirement.conditionSourceRuleId) continue;
+      const conditionRule = winePrecheckRegistry.get(requirement.conditionSourceRuleId);
+      expect(conditionRule).toBeDefined();
+      expect(conditionRule!.authority).toEqual(requirement.authority);
+    }
+  });
+
   it("matches each requirement's citation to the rule it was derived from", () => {
     for (const requirement of requirements) {
       if (requirement.authorityProvenance.kind !== "registered-rule-authority") continue;

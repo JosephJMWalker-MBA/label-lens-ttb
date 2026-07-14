@@ -92,6 +92,11 @@ export const wineRequirementsRegistry: LabelRequirementRegistry = createLabelReq
   {
     profileId: WINE_REQUIREMENTS_PROFILE_ID,
     profileVersion: WINE_REQUIREMENTS_PROFILE_VERSION,
+    // Declared, not inferred: these requirements are only meaningful against the
+    // wine rule profile. Resolving them against another category's rules is
+    // rejected rather than silently deriving citations from the wrong rules.
+    ruleProfileId: WINE_PRECHECK_PROFILE_ID,
+    ruleProfileVersion: WINE_PRECHECK_PROFILE_VERSION,
     requirements: WINE_REQUIREMENTS,
   },
   winePrecheckRegistry,

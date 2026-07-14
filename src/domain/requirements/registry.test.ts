@@ -81,9 +81,27 @@ function definition(over: Partial<LabelRequirementDefinition> = {}): LabelRequir
   };
 }
 
-function build(defs: LabelRequirementDefinition[], list = [brandRule, externalRule]) {
+/** A rule reading a different field, for wrong-field authority controls. */
+const alcoholRule: VerificationRule = {
+  ...ruleBase("alcohol-check"),
+  category: "syntax-validation",
+  requiredEvidenceFields: ["alcoholStatement"],
+  evaluate: (): VerificationFinding => finding("alcohol-check"),
+};
+
+function build(
+  defs: LabelRequirementDefinition[],
+  list = [brandRule, alcoholRule, externalRule],
+  ruleProfile = { id: RULE_PROFILE_ID, version: RULE_PROFILE_VERSION },
+) {
   return createLabelRequirementRegistry(
-    { profileId: PROFILE_ID, profileVersion: PROFILE_VERSION, requirements: defs },
+    {
+      profileId: PROFILE_ID,
+      profileVersion: PROFILE_VERSION,
+      ruleProfileId: ruleProfile.id,
+      ruleProfileVersion: ruleProfile.version,
+      requirements: defs,
+    },
     rules(list),
   );
 }
@@ -115,11 +133,25 @@ describe("label requirement registry", () => {
   });
 
   it("reports an unchecked field truthfully rather than pretending it is checked", () => {
-    // A rule set with no rule reading brandName. The requirement still stands —
-    // "required, and not checked today" is a legitimate, honest state.
+    // "Required, and not checked today" is a legitimate, honest state — a field
+    // may be required by law and simply not extracted yet.
+    //
+    // Note that such a requirement must be human-authored: if no rule reads the
+    // field, no rule can be a relevant source of authority for it either. The
+    // relevance guard and the anti-invention guard meet here, and the only way
+    // through is a person putting their name to the citation. That is correct.
     const [requirement] = build(
-      [definition()],
-      [{ ...brandRule, requiredEvidenceFields: [] }, externalRule],
+      [
+        definition({
+          authoritySource: {
+            kind: "human-authored",
+            authority: { citation: "27 CFR 4.37", snapshotDate: "2026-07-10" },
+            reviewedBy: "A Reviewer",
+            reviewedAt: "2026-07-10",
+          },
+        }),
+      ],
+      [alcoholRule, externalRule],
     ).all();
     expect(requirement.checkedByRuleIds).toEqual([]);
     expect(requirement.evaluableFromArtwork).toBe(false);
@@ -133,6 +165,90 @@ describe("label requirement registry", () => {
       }),
     ]).all();
     expect(requirement.conditionSourceRuleId).toBe("external-condition");
+    expect(requirement.conditionExternalEvidence).toBe("designation evidence");
+  });
+});
+
+describe("an authority must be relevant to what it authorizes", () => {
+  it("refuses a citation derived from a rule about a different field", () => {
+    // The RDR's exact case: a brandName requirement citing the alcohol rule.
+    // The rule exists, so the citation resolves — and is valid for the wrong
+    // field. Existence is not relevance.
+    expect(() =>
+      build([
+        definition({
+          fieldId: "brandName",
+          authoritySource: { kind: "registered-rule-authority", ruleId: "alcohol-check" },
+        }),
+      ]),
+    ).toThrow(/AUTHORITY_RULE_FIELD_MISMATCH/);
+  });
+
+  it("names the mismatch precisely enough to be fixed", () => {
+    expect(() =>
+      build([
+        definition({
+          fieldId: "brandName",
+          authoritySource: { kind: "registered-rule-authority", ruleId: "alcohol-check" },
+        }),
+      ]),
+    ).toThrow(/valid for the wrong field/);
+  });
+
+  it("refuses a citation derived from a rule that declares no field domain at all", () => {
+    // External-evidence-dependent rules declare no evidence fields, so nothing
+    // about them can be checked for relevance. They cannot source authority.
+    expect(() =>
+      build([
+        definition({
+          authoritySource: { kind: "registered-rule-authority", ruleId: "external-condition" },
+        }),
+      ]),
+    ).toThrow(/AUTHORITY_RULE_FIELD_MISMATCH/);
+  });
+
+  it("accepts a citation from a rule that does declare the requirement's field", () => {
+    const [requirement] = build([
+      definition({
+        fieldId: "alcoholStatement",
+        authoritySource: { kind: "registered-rule-authority", ruleId: "alcohol-check" },
+      }),
+    ]).all();
+    expect(requirement.authority).toEqual(AUTHORITY);
+  });
+
+  it("refuses to resolve requirements against the wrong rule profile", () => {
+    // Right shape, wrong domain: another category's rules would yield citations
+    // from an unrelated body of rules.
+    expect(() =>
+      build([definition()], [brandRule, alcoholRule, externalRule], {
+        id: "some-other-profile",
+        version: "1.0.0",
+      }),
+    ).toThrow(/RULE_PROFILE_MISMATCH/);
+  });
+
+  it("refuses a condition arising under a different authority than the obligation", () => {
+    // The sibling of the field hole. An external rule declares no field domain,
+    // so relevance is checked on its authority instead: a §X obligation may not
+    // be softened by a §Y condition.
+    const foreignCondition: VerificationRule = {
+      ...externalRule,
+      id: "foreign-condition",
+      authority: { citation: "27 CFR 9.99", snapshotDate: "2026-07-10" },
+    };
+    expect(() =>
+      build(
+        [definition({ applicability: "conditional", conditionSourceRuleId: "foreign-condition" })],
+        [brandRule, alcoholRule, foreignCondition],
+      ),
+    ).toThrow(/CONDITION_AUTHORITY_MISMATCH/);
+  });
+
+  it("accepts a condition arising under the same authority as the obligation", () => {
+    const [requirement] = build([
+      definition({ applicability: "conditional", conditionSourceRuleId: "external-condition" }),
+    ]).all();
     expect(requirement.conditionExternalEvidence).toBe("designation evidence");
   });
 });

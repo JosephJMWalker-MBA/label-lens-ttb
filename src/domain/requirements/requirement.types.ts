@@ -145,11 +145,20 @@ export type RequirementRegistryErrorCode =
   | "DUPLICATE_REQUIREMENT_ID"
   | "DUPLICATE_REQUIREMENT_ID_VERSION"
   | "PROFILE_MISMATCH"
+  /** The requirements profile was resolved against the wrong rule profile. */
+  | "RULE_PROFILE_MISMATCH"
   | "UNKNOWN_AUTHORITY_RULE"
+  /**
+   * The authority rule exists, but concerns a different field. The citation
+   * would be valid — and about the wrong thing.
+   */
+  | "AUTHORITY_RULE_FIELD_MISMATCH"
   | "MISSING_CITATION"
   | "MISSING_SNAPSHOT_DATE"
   | "MISSING_HUMAN_REVIEWER"
   | "MISSING_CONDITION_SOURCE"
   | "UNKNOWN_CONDITION_RULE"
   | "CONDITION_RULE_NOT_EXTERNAL"
+  /** The condition arises under a different authority than the obligation. */
+  | "CONDITION_AUTHORITY_MISMATCH"
   | "UNEXPECTED_CONDITION_SOURCE";
