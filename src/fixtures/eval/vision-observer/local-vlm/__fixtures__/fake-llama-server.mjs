@@ -51,46 +51,78 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
     writeFileSync(join(workspaceDir, "spawned-child.pid"), `${child.pid ?? ""}\n`);
   }
 
-  const responseForMode = () => {
+  function refinementPayload() {
+    return {
+      observationRunId: "replace-me",
+      proposals: [
+        {
+          observationId: "refinement-1",
+          proposalId: "refinement-proposal-1",
+          observationType: "text-like-region",
+          source: "machine-observer",
+          authority: "non-authoritative",
+          purpose: "ocr-region-proposal",
+          gridRange: {
+            start: { column: "B", row: 2, columnIndex: 1, rowIndex: 1, id: "B2" },
+            end: { column: "D", row: 4, columnIndex: 3, rowIndex: 3, id: "D4" },
+            notation: "B2:D4",
+          },
+          observationRotation: 0,
+          apparentOrientation: "horizontal",
+          visibility: "full",
+          reasonCodes: ["high_salience", "multi_line"],
+          description: "generic text-like region near the center",
+        },
+      ],
+    };
+  }
+
+  function isRefinementRequest(payload) {
+    const system = String(payload?.messages?.[0]?.content ?? "");
+    return system.includes("overlaid 5x5 refinement grid");
+  }
+
+  const responseForMode = (payload) => {
+    const base = isRefinementRequest(payload) ? refinementPayload() : validPayload();
     switch (mode) {
       case "fenced-json":
-        return `\`\`\`json\n${JSON.stringify(validPayload())}\n\`\`\``;
+        return `\`\`\`json\n${JSON.stringify(base)}\n\`\`\``;
       case "prose-wrapped":
-        return `Here is the result:\n${JSON.stringify(validPayload())}`;
+        return `Here is the result:\n${JSON.stringify(base)}`;
       case "multiple-objects":
-        return `${JSON.stringify(validPayload())}\n${JSON.stringify(validPayload())}`;
+        return `${JSON.stringify(base)}\n${JSON.stringify(base)}`;
       case "malformed":
         return `{"observationRunId":`;
       case "prohibited-description":
         return JSON.stringify({
-          ...validPayload(),
+          ...base,
           proposals: [
             {
-              ...validPayload().proposals[0],
+              ...base.proposals[0],
               description: "approved brand text near the top edge",
             },
           ],
         });
       case "duplicate-proposal-id":
         return JSON.stringify({
-          ...validPayload(),
-          proposals: [validPayload().proposals[0], validPayload().proposals[0]],
+          ...base,
+          proposals: [base.proposals[0], base.proposals[0]],
         });
       case "too-many-proposals":
         return JSON.stringify({
-          ...validPayload(),
+          ...base,
           proposals: Array.from({ length: 13 }, (_, idx) => ({
-            ...validPayload().proposals[0],
+            ...base.proposals[0],
             proposalId: `proposal-${idx + 1}`,
             observationId: `obs-${idx + 1}`,
           })),
         });
       case "invalid-grid":
         return JSON.stringify({
-          ...validPayload(),
+          ...base,
           proposals: [
             {
-              ...validPayload().proposals[0],
+              ...base.proposals[0],
               gridRange: {
                 start: { column: "Z", row: 99, columnIndex: 25, rowIndex: 25, id: "Z99" },
                 end: { column: "Z", row: 99, columnIndex: 25, rowIndex: 25, id: "Z99" },
@@ -100,7 +132,7 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
           ],
         });
       default:
-        return JSON.stringify(validPayload());
+        return JSON.stringify(base);
     }
   };
 
@@ -166,7 +198,7 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
     const runId = runIdLine.split(": ")?.[1]?.trim() ?? "unknown";
     await new Promise((resolve) => setTimeout(resolve, requestDelayMs));
     writeFileSync(join(workspaceDir, "request.json"), body);
-    const content = responseForMode().replace('"replace-me"', JSON.stringify(runId));
+    const content = responseForMode(payload).replace('"replace-me"', JSON.stringify(runId));
     if (mode === "write-after-cancel") {
       setTimeout(() => {
         writeFileSync(join(workspaceDir, "after-cancel.txt"), "late-write\n");
