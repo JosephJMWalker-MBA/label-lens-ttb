@@ -8,7 +8,9 @@ import { expect, test } from "@playwright/test";
  */
 
 test("first-use onboarding appears, is skippable, and can be replayed", async ({ page }) => {
-  await page.goto("/");
+  // The introduction describes the pre-check workflow, so it greets a first-time
+  // visitor on the route that offers that workflow — not on the intent hub.
+  await page.goto("/review");
 
   const dialog = page.getByRole("dialog", { name: /upload a wine label/i });
   await expect(dialog).toBeVisible();
