@@ -15,9 +15,14 @@ function Replay() {
   );
 }
 
+/**
+ * The workflow route's provider tree: the introduction describes the pre-check,
+ * so that route opts a first-time visitor into it. The intent hub deliberately
+ * does not — see "auto-open is opt-in" below.
+ */
 function Shell() {
   return (
-    <OnboardingProvider>
+    <OnboardingProvider autoOpenOnFirstVisit>
       <Replay />
       <OnboardingDialog />
     </OnboardingProvider>
@@ -73,12 +78,38 @@ describe("first-use onboarding", () => {
   });
 });
 
+describe("auto-open is opt-in", () => {
+  it("does not greet a first-time visitor on a route that did not ask for it", () => {
+    // The intent hub mounts the provider so "view introduction again" stays a
+    // real control, but the introduction describes the pre-check workflow and
+    // must never be forced in front of someone who has not chosen it.
+    render(
+      <OnboardingProvider>
+        <Replay />
+        <OnboardingDialog />
+      </OnboardingProvider>,
+    );
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("still replays on demand where it does not auto-open", () => {
+    render(
+      <OnboardingProvider>
+        <Replay />
+        <OnboardingDialog />
+      </OnboardingProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: /view introduction again/i }));
+    expect(screen.getByRole("dialog", { name: /upload a wine label/i })).toBeInTheDocument();
+  });
+});
+
 describe("onboarding yields to the workflow", () => {
   it("closes automatically when a pre-check starts, so processing is never obscured", async () => {
     // A pending fetch keeps the workspace in the processing phase.
     vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
     render(
-      <OnboardingProvider>
+      <OnboardingProvider autoOpenOnFirstVisit>
         <OnboardingDialog />
         <PrecheckWorkspace />
       </OnboardingProvider>,

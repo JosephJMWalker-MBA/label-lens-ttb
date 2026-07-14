@@ -30,7 +30,22 @@ interface OnboardingContextValue {
 
 const OnboardingContext = createContext<OnboardingContextValue | null>(null);
 
-export function OnboardingProvider({ children }: { children: ReactNode }) {
+export function OnboardingProvider({
+  children,
+  /**
+   * Whether a first-time visitor is shown the introduction automatically.
+   *
+   * The introduction explains the pre-check workflow (upload, evidence,
+   * declared facts), so it auto-opens only on the route that offers that
+   * workflow. On other routes the provider is still mounted — so the "view
+   * introduction again" control remains a real, working control rather than a
+   * dead button — but nothing is forced in front of the visitor.
+   */
+  autoOpenOnFirstVisit = false,
+}: {
+  children: ReactNode;
+  autoOpenOnFirstVisit?: boolean;
+}) {
   const [hasSeen, setHasSeen] = useState(true); // assume seen until storage confirms otherwise
   const [isOpen, setIsOpen] = useState(false);
 
@@ -42,8 +57,8 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
       seen = false;
     }
     setHasSeen(seen);
-    setIsOpen(!seen);
-  }, []);
+    setIsOpen(autoOpenOnFirstVisit && !seen);
+  }, [autoOpenOnFirstVisit]);
 
   const persistSeen = useCallback(() => {
     setHasSeen(true);

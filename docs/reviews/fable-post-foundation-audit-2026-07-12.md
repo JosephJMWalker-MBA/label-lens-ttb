@@ -301,7 +301,8 @@ No WCAG conformance claim is made anywhere, which remains correct. (F-12, F-13.)
   honesty is unit-level; reduced-motion asserted as attribute + CSS existence.
 - **Implementation-coupled tests:** the core e2e reads finding rows via styling
   selectors (`.font-medium`, `.font-mono` in
-  [`home.spec.ts`](../../tests/e2e/home.spec.ts), still present) — a styling
+  [`review.spec.ts`](../../tests/e2e/review.spec.ts), still present; renamed
+  from `home.spec.ts` when the pre-check moved to `/review`) — a styling
   change already broke this once during PR #68. Semantic hooks would decouple.
   (F-08.)
 - **Missing integration checks:** with PR #76 merged, there are now measured

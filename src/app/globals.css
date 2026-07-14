@@ -3,22 +3,29 @@
 @tailwind utilities;
 
 @layer base {
-  /* Light theme (also the default when no explicit choice is resolved). */
+  /* Light theme (also the default when no explicit choice is resolved).
+     The surface is a press proof on a light table: warm paper stock and warm
+     ink, rather than the cool clinical grey of compliance software. Only the
+     neutral surface tokens are warmed — the status and evidence accents below
+     keep their contrast-tuned values. */
   :root,
   :root[data-theme="light"] {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --primary: 222 47% 11%;
-    --primary-foreground: 0 0% 98%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 40%;
-    --input: 0 0% 100%;
-    --border: 214 32% 88%;
+    --background: 40 33% 97%;
+    --foreground: 25 20% 14%;
+    --card: 42 45% 99%;
+    --card-foreground: 25 20% 14%;
+    --primary: 25 20% 14%;
+    --primary-foreground: 40 33% 98%;
+    --muted: 38 25% 93%;
+    --muted-foreground: 28 10% 38%;
+    --input: 42 45% 99%;
+    --border: 36 20% 85%;
     --ring: 222 84% 40%;
     --alert: 40 90% 96%;
     --alert-foreground: 25 60% 22%;
+    /* Print registration marks on a proof surface. Decorative only: no state,
+       status, or meaning is ever carried by them. */
+    --registration: 28 12% 62%;
     /* Status accents pair with the always-present text label (never color alone). */
     --status-pass: 142 55% 30%;
     --status-warn: 35 85% 32%;
@@ -33,21 +40,23 @@
     --radius: 0.5rem;
   }
 
-  /* Dark theme (contrast-checked against WCAG AA for body and muted text). */
+  /* Dark theme (contrast-checked against WCAG AA for body and muted text).
+     The same proof, viewed on a dimmed light table. */
   :root[data-theme="dark"] {
-    --background: 222 47% 8%;
-    --foreground: 210 40% 96%;
-    --card: 222 40% 12%;
-    --card-foreground: 210 40% 96%;
-    --primary: 210 40% 96%;
-    --primary-foreground: 222 47% 11%;
-    --muted: 217 33% 18%;
-    --muted-foreground: 215 20% 72%;
-    --input: 222 40% 14%;
-    --border: 217 33% 26%;
+    --background: 28 12% 9%;
+    --foreground: 40 25% 94%;
+    --card: 28 10% 13%;
+    --card-foreground: 40 25% 94%;
+    --primary: 40 25% 94%;
+    --primary-foreground: 28 12% 10%;
+    --muted: 28 8% 19%;
+    --muted-foreground: 35 12% 72%;
+    --input: 28 10% 15%;
+    --border: 28 8% 27%;
     --ring: 210 90% 66%;
     --alert: 30 40% 16%;
     --alert-foreground: 40 90% 85%;
+    --registration: 35 10% 45%;
     --status-pass: 142 55% 62%;
     --status-warn: 40 90% 66%;
     --status-fail: 0 80% 72%;
@@ -102,6 +111,49 @@
 }
 
 @layer components {
+  /* A panel on the proof surface: paper stock, a hairline edge, and near-zero
+     elevation. Corner registration ticks are drawn with pseudo-elements and are
+     purely decorative — they are aria-hidden by construction and never encode
+     status, availability, or any other meaning. */
+  .proof-card {
+    position: relative;
+    border-radius: var(--radius);
+    border: 1px solid hsl(var(--border));
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+  }
+  .proof-card::before,
+  .proof-card::after {
+    content: "";
+    position: absolute;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-color: hsl(var(--registration));
+    opacity: 0.75;
+    pointer-events: none;
+  }
+  .proof-card::before {
+    top: 0.375rem;
+    left: 0.375rem;
+    border-top: 1px solid;
+    border-left: 1px solid;
+  }
+  .proof-card::after {
+    right: 0.375rem;
+    bottom: 0.375rem;
+    border-right: 1px solid;
+    border-bottom: 1px solid;
+  }
+
+  /* A named-but-unavailable panel. It is recessed and its edge is broken, but
+     that is reinforcement only: every unavailable card also states "Not
+     available yet" in text, so the state is announced and survives a lost
+     stylesheet. It carries no interactive control of any kind. */
+  .proof-card--inert {
+    border-style: dashed;
+    background-color: hsl(var(--muted) / 0.5);
+  }
+
   /* Finding-status badge: a text label plus a redundant color accent. The text is
      always present, so status is never communicated by color alone. */
   .status-badge {
