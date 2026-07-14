@@ -99,6 +99,30 @@ describe("truth-label boundary — stateless observer modules never accept evalu
   });
 });
 
+describe("truth-label boundary — Slice 3 generation modules remain truth-free", () => {
+  const generationFiles = [
+    join(SRC, "fixtures", "eval", "vision-region-benchmark.generation.ts"),
+    join(SRC, "fixtures", "eval", "vision-region-refinement-derivative.ts"),
+    join(SRC, "fixtures", "eval", "vision-observer", "local-vlm", "observer-prompt.ts"),
+    join(SRC, "fixtures", "eval", "vision-observer", "observer-grid-renderer.ts"),
+    join(SRC, "fixtures", "eval", "vision-observer", "local-vlm", "llama-server-adapter.ts"),
+  ];
+
+  it("does not import annotations, benchmark truth geometry, or expected-answer vocabulary", () => {
+    for (const file of generationFiles) {
+      const source = readFileSync(file, "utf8");
+      expect(source, `${rel(file)} must stay truth-free`).not.toMatch(
+        /ocr-region-benchmark\.annotations|approxGeometry|acceptablePresentations|acceptableStatements|expectedBrand|expectedAlcohol|truth orientation|challengeSlices|eval-manifest/,
+      );
+      for (const path of importsOf(source)) {
+        expect(path, `${rel(file)} imports ${path}`).not.toMatch(
+          /ocr-region-benchmark\.annotations|eval-loader|eval-manifest|corpus-index/,
+        );
+      }
+    }
+  });
+});
+
 describe("truth-label boundary — the extractor signature carries no fixture truth", () => {
   it("ExtractionInput declares no expected-answer, id, hash-as-truth, or tag fields", () => {
     const types = readFileSync(join(SRC, "pipeline/extractor/extractor.types.ts"), "utf8");

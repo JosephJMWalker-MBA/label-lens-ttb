@@ -55,6 +55,40 @@ export function chatCompletionsUrl(config: LocalVlmResolvedConfig, port: number)
   return `${baseUrl(config.host, port)}${config.chatCompletionsPath}`;
 }
 
+export function buildObservationRequestBody(args: {
+  config: LocalVlmResolvedConfig;
+  input: VisionObserverInput;
+  overlayDataUrl: string;
+  promptText?: string;
+  instructionText?: string;
+}): Record<string, unknown> {
+  return {
+    model: args.config.modelDisplayId,
+    temperature: args.config.temperature,
+    seed: args.config.seed,
+    max_tokens: args.config.maxOutputTokens,
+    response_format: { type: "json_object" },
+    messages: [
+      { role: "system", content: args.promptText ?? LOCAL_VLM_PROMPT_TEXT },
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: args.instructionText ?? buildObservationInstruction(args.input.observationRunId),
+          },
+          {
+            type: "image_url",
+            image_url: {
+              url: args.overlayDataUrl,
+            },
+          },
+        ],
+      },
+    ],
+  };
+}
+
 export async function waitForReadiness(args: {
   config: LocalVlmResolvedConfig;
   port: number;
@@ -95,6 +129,8 @@ export async function sendObservationRequest(args: {
   port: number;
   input: VisionObserverInput;
   signal: AbortSignal;
+  promptText?: string;
+  instructionText?: string;
 }): Promise<{ text: string; bytes: number }> {
   const overlayBytes = await readFile(args.input.overlayArtifactPath);
   if (overlayBytes.byteLength > args.config.maxImageBytes) {
@@ -116,31 +152,15 @@ export async function sendObservationRequest(args: {
       method: "POST",
       headers: { "content-type": "application/json" },
       signal: requestSignal,
-      body: JSON.stringify({
-        model: args.config.modelDisplayId,
-        temperature: args.config.temperature,
-        seed: args.config.seed,
-        max_tokens: args.config.maxOutputTokens,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: LOCAL_VLM_PROMPT_TEXT },
-          {
-            role: "user",
-            content: [
-              {
-                type: "text",
-                text: buildObservationInstruction(args.input.observationRunId),
-              },
-              {
-                type: "image_url",
-                image_url: {
-                  url: `data:${args.input.overlayMediaType};base64,${overlayBytes.toString("base64")}`,
-                },
-              },
-            ],
-          },
-        ],
-      }),
+      body: JSON.stringify(
+        buildObservationRequestBody({
+          config: args.config,
+          input: args.input,
+          overlayDataUrl: `data:${args.input.overlayMediaType};base64,${overlayBytes.toString("base64")}`,
+          promptText: args.promptText,
+          instructionText: args.instructionText,
+        }),
+      ),
     });
   } catch (error) {
     if (requestSignal.aborted) {
