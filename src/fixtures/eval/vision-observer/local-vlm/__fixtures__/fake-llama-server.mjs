@@ -242,6 +242,104 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
     };
   }
 
+  function singleProposalPayload(rung) {
+    switch (rung) {
+      case "empty-envelope-control":
+        return {
+          observationRunId: "replace-me",
+          proposals: [],
+        };
+      case "empty-proposal-object":
+        return {
+          observationRunId: "replace-me",
+          proposals: [{}],
+        };
+      case "one-fixed-discriminator":
+        return {
+          observationRunId: "replace-me",
+          proposals: [{ observationType: "text-like-region" }],
+        };
+      case "identity-fields":
+        return {
+          observationRunId: "replace-me",
+          proposals: [
+            {
+              observationId: "observation-1",
+              proposalId: "proposal-1",
+              observationType: "text-like-region",
+            },
+          ],
+        };
+      case "boundary-fields":
+        return {
+          observationRunId: "replace-me",
+          proposals: [
+            {
+              observationId: "observation-1",
+              proposalId: "proposal-1",
+              observationType: "text-like-region",
+              source: "machine-observer",
+              authority: "non-authoritative",
+              purpose: "ocr-region-proposal",
+            },
+          ],
+        };
+      case "visual-classification-fields":
+        return {
+          observationRunId: "replace-me",
+          proposals: [
+            {
+              observationId: "observation-1",
+              proposalId: "proposal-1",
+              observationType: "text-like-region",
+              source: "machine-observer",
+              authority: "non-authoritative",
+              purpose: "ocr-region-proposal",
+              apparentOrientation: "horizontal",
+              visibility: "full",
+            },
+          ],
+        };
+      case "reason-codes":
+        return {
+          observationRunId: "replace-me",
+          proposals: [
+            {
+              observationId: "observation-1",
+              proposalId: "proposal-1",
+              observationType: "text-like-region",
+              source: "machine-observer",
+              authority: "non-authoritative",
+              purpose: "ocr-region-proposal",
+              apparentOrientation: "horizontal",
+              visibility: "full",
+              reasonCodes: ["high_salience"],
+            },
+          ],
+        };
+      case "description":
+      case "guidance-load-control":
+      default:
+        return {
+          observationRunId: "replace-me",
+          proposals: [
+            {
+              observationId: "observation-1",
+              proposalId: "proposal-1",
+              observationType: "text-like-region",
+              source: "machine-observer",
+              authority: "non-authoritative",
+              purpose: "ocr-region-proposal",
+              apparentOrientation: "horizontal",
+              visibility: "full",
+              reasonCodes: ["high_salience"],
+              description: "generic text-like region description",
+            },
+          ],
+        };
+    }
+  }
+
   function completionRung(payload) {
     const system = String(payload?.messages?.[0]?.content ?? "");
     if (system.includes("Return exactly one token: OK.")) return "one-token";
@@ -263,6 +361,35 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
       return "one-observation-with-one-grid-region";
     }
     return "full-observer-schema";
+  }
+
+  function singleProposalRung(payload) {
+    const system = String(payload?.messages?.[0]?.content ?? "");
+    if (system.includes("Return exactly this empty observer envelope and nothing else.")) {
+      return "empty-envelope-control";
+    }
+    if (system.includes("Use only these enum values:")) {
+      return "guidance-load-control";
+    }
+    if (system.includes('"description": "generic text-like region description"')) {
+      return "description";
+    }
+    if (system.includes('"reasonCodes": [')) {
+      return "reason-codes";
+    }
+    if (system.includes('"apparentOrientation": "horizontal"')) {
+      return "visual-classification-fields";
+    }
+    if (system.includes('"source": "machine-observer"')) {
+      return "boundary-fields";
+    }
+    if (system.includes('"observationId": "observation-1"')) {
+      return "identity-fields";
+    }
+    if (system.includes('"observationType": "text-like-region"')) {
+      return "one-fixed-discriminator";
+    }
+    return "empty-proposal-object";
   }
 
   async function completionResponseForRung(payload, runId) {
@@ -291,6 +418,13 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
       default:
         return JSON.stringify(validPayload()).replace('"replace-me"', JSON.stringify(runId));
     }
+  }
+
+  async function singleProposalResponseForRung(payload, runId) {
+    return JSON.stringify({
+      ...singleProposalPayload(singleProposalRung(payload)),
+      observationRunId: runId,
+    });
   }
 
   let healthy = false;
@@ -332,7 +466,9 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
     const content =
       mode === "completion-ladder"
         ? await completionResponseForRung(payload, runId)
-        : (await responseForMode(payload)).replace('"replace-me"', JSON.stringify(runId));
+        : mode === "single-proposal-decomposition"
+          ? await singleProposalResponseForRung(payload, runId)
+          : (await responseForMode(payload)).replace('"replace-me"', JSON.stringify(runId));
     if (mode === "write-after-cancel") {
       setTimeout(() => {
         writeFileSync(join(workspaceDir, "after-cancel.txt"), "late-write\n");
@@ -342,12 +478,18 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
     const transportPayload = JSON.stringify({
       choices: [{ message: { content }, finish_reason: "stop" }],
     });
-    if (mode === "completion-ladder" && completionFailAtRung === completionRung(payload)) {
+    const activeCompletionRung =
+      mode === "completion-ladder"
+        ? completionRung(payload)
+        : mode === "single-proposal-decomposition"
+          ? singleProposalRung(payload)
+          : null;
+    if (activeCompletionRung !== null && completionFailAtRung === activeCompletionRung) {
       const cutoff = Math.max(1, Math.floor(transportPayload.length / 2));
       res.write(transportPayload.slice(0, cutoff));
       return;
     }
-    if (mode === "completion-ladder" && completionErrorAtRung === completionRung(payload)) {
+    if (activeCompletionRung !== null && completionErrorAtRung === activeCompletionRung) {
       res.statusCode = 500;
       res.end(
         JSON.stringify({
