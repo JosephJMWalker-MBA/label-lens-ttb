@@ -1,58 +1,65 @@
-import type { IncludedEvalRecord } from "../eval-manifest.types";
+import { writeFile } from "node:fs/promises";
+import { join } from "node:path";
 
-import { DEFAULT_GRID_SPEC } from "./observer-grid";
-import { normalizedBoxToGridCellRange, unionNormalizedBoxes } from "./observer-grid-transform";
+import { FAKE_OBSERVER_SCENARIOS } from "./fake-observer-fixtures";
 import type {
-  GridSpec,
-  NormalizedBox,
-  ObserverFieldKey,
+  FakeObserverScenario,
   ObserverRegionProposal,
+  VisionObserverAdapter,
+  VisionObserverInput,
+  VisionObserverResult,
 } from "./observer-grid.types";
 
-export const FAKE_OBSERVER_ID = "fake-deterministic-observer.v1";
+export const FAKE_OBSERVER_ID = "fake-deterministic-observer.v2";
+export const FAKE_OBSERVER_VERSION = "2.0.0";
+export const FAKE_OBSERVER_PROMPT_ID = "slice1-grid-contract";
+export const FAKE_OBSERVER_PROMPT_VERSION = "2.0.0";
 
-function cloneNormalizedBoxes(boxes: readonly NormalizedBox[]) {
-  return boxes.map((box) => ({ ...box }));
+function cloneProposals(proposals: readonly ObserverRegionProposal[]): ObserverRegionProposal[] {
+  return structuredClone(proposals) as ObserverRegionProposal[];
 }
 
-export function fakeObserveField(args: {
-  caseId: string;
-  field: ObserverFieldKey;
-  truthGeometry: readonly NormalizedBox[];
-  gridSpec?: GridSpec;
-}): ObserverRegionProposal | null {
-  if (args.truthGeometry.length === 0) return null;
-  const gridSpec = args.gridSpec ?? DEFAULT_GRID_SPEC;
-  const union = unionNormalizedBoxes(args.truthGeometry);
-  const gridRange = normalizedBoxToGridCellRange(union, gridSpec);
-  return {
-    observerId: FAKE_OBSERVER_ID,
-    proposalId: `${args.caseId}:${args.field}:${gridRange.notation}`,
-    field: args.field,
-    gridRange,
-    rationale: `deterministic evaluation-only bridge from ${args.truthGeometry.length} annotated box(es)`,
-  };
+async function writeScenarioCanary(workspaceDir: string, scenarioId: string) {
+  await writeFile(join(workspaceDir, "adapter-canary.txt"), `${scenarioId}\n`, "utf8");
 }
 
-export function fakeObserveIncludedRecord(
-  record: IncludedEvalRecord,
-  field: ObserverFieldKey,
-  gridSpec: GridSpec = DEFAULT_GRID_SPEC,
-): ObserverRegionProposal | null {
-  if (field === "brand") {
-    if (record.annotation.brand.presence !== "present") return null;
-    return fakeObserveField({
-      caseId: record.caseId,
-      field,
-      truthGeometry: cloneNormalizedBoxes(record.annotation.brand.approxGeometry),
-      gridSpec,
-    });
+export class FakeVisionObserverAdapter implements VisionObserverAdapter {
+  readonly adapterId = FAKE_OBSERVER_ID;
+  readonly adapterVersion = FAKE_OBSERVER_VERSION;
+  readonly promptId = FAKE_OBSERVER_PROMPT_ID;
+  readonly promptVersion = FAKE_OBSERVER_PROMPT_VERSION;
+
+  #disposed = false;
+  #scenarios = new Map<string, FakeObserverScenario>();
+  #delayMs: number;
+
+  constructor(
+    scenarios: readonly FakeObserverScenario[] = FAKE_OBSERVER_SCENARIOS,
+    options: { delayMs?: number } = {},
+  ) {
+    for (const scenario of scenarios) this.#scenarios.set(scenario.scenarioId, scenario);
+    this.#delayMs = options.delayMs ?? 0;
   }
-  if (record.annotation.alcohol.presence !== "present") return null;
-  return fakeObserveField({
-    caseId: record.caseId,
-    field,
-    truthGeometry: cloneNormalizedBoxes(record.annotation.alcohol.approxGeometry),
-    gridSpec,
-  });
+
+  async observe(input: VisionObserverInput): Promise<VisionObserverResult> {
+    if (this.#disposed) throw new Error("fake observer adapter has been disposed");
+    const scenario = this.#scenarios.get(input.scenarioId);
+    if (!scenario) throw new Error(`unknown fake observer scenario ${input.scenarioId}`);
+    if (this.#delayMs > 0) {
+      await new Promise((resolve) => setTimeout(resolve, this.#delayMs));
+    }
+    await writeScenarioCanary(input.workspaceDir, input.scenarioId);
+    return {
+      observationRunId: input.observationRunId,
+      proposals: cloneProposals(scenario.proposals),
+    };
+  }
+
+  async reset(): Promise<void> {
+    if (this.#disposed) throw new Error("fake observer adapter has been disposed");
+  }
+
+  async dispose(): Promise<void> {
+    this.#disposed = true;
+  }
 }

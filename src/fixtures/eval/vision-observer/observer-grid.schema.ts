@@ -2,29 +2,92 @@ import { z } from "zod";
 
 import { err, ok, type Result } from "@/shared/result";
 
-import { DEFAULT_GRID_SPEC, gridCellId, gridCellRange } from "./observer-grid";
+import {
+  DEFAULT_GRID_SPEC,
+  DEFAULT_REFINEMENT_GRID_SPEC,
+  gridCellId,
+  gridCellRange,
+  refinementCellId,
+  refinementCellRange,
+} from "./observer-grid";
 import type {
   CanonicalRegionProposal,
   GridCell,
   GridCellRange,
   GridSpec,
+  HaloPolicyRecord,
+  LocalRefinementSelection,
   NormalizedBox,
+  ObservationRunMetadata,
   ObserverDerivative,
   ObserverGridValidationError,
   ObserverRegionProposal,
+  OcrInspectionHandoff,
   PaddingSpec,
   PixelBox,
+  RefinementCell,
+  RefinementCellRange,
+  RefinementGridSpec,
+  RegionGeometry,
   TransformRecord,
+  VisionObserverInput,
+  VisionObservationErrorRecord,
+  VisionObserverResult,
 } from "./observer-grid.types";
 import {
-  OBSERVER_DERIVATIVE_MEDIA_TYPE,
-  OBSERVER_FIELDS,
+  OBSERVER_APPARENT_ORIENTATIONS,
+  OBSERVER_AUTHORITIES,
   OBSERVER_GRID_COLUMNS,
   OBSERVER_GRID_ROWS,
   OBSERVER_GRID_SCHEMA_VERSION,
+  OBSERVER_HALO_POLICY_ID,
+  OBSERVER_OBSERVATION_TYPES,
+  OBSERVER_OVERLAY_ARTIFACT_KIND,
+  OBSERVER_OVERLAY_MEDIA_TYPE,
+  OBSERVER_PROPOSAL_SOURCES,
+  OBSERVER_PURPOSES,
+  OBSERVER_REASON_CODES,
+  OBSERVER_REFINEMENT_COLUMNS,
+  OBSERVER_REFINEMENT_ROWS,
+  OBSERVER_ROTATIONS,
+  OBSERVER_SOURCE_ARTIFACT_KIND,
+  OBSERVER_VISIBILITIES,
 } from "./observer-grid.types";
 
 const nonEmpty = z.string().trim().min(1);
+const absolutePath = nonEmpty.refine((value) => value.startsWith("/"), {
+  message: "must be an absolute path",
+});
+const sha256 = z.string().regex(/^[a-f0-9]{64}$/i, "must be a 64-character SHA-256 hex digest");
+const description = z
+  .string()
+  .trim()
+  .min(1)
+  .max(160, "description must be 160 characters or fewer");
+
+const prohibitedDescriptionPatterns = [
+  /\b(pass|fail|approved|rejected|compliant|noncompliant)\b/i,
+  /\b(regulatory|legal advice|legal)\b/i,
+  /\b(brand|alcohol|abv|warning)\b/i,
+  /\b(probability|confidence|correctness)\b/i,
+  /\b(previous image|same as before|compared to)\b/i,
+  /\b(expected text|transcription|verbatim)\b/i,
+  /%/,
+];
+
+function rejectProhibitedDescription(value: string, ctx: z.RefinementCtx) {
+  for (const pattern of prohibitedDescriptionPatterns) {
+    if (pattern.test(value)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "description includes prohibited authority, compliance, field, or transcription language",
+      });
+      return;
+    }
+  }
+}
+
 const gridColumn = z.enum(OBSERVER_GRID_COLUMNS);
 const gridRow = z.union(
   OBSERVER_GRID_ROWS.map((row) => z.literal(row)) as [
@@ -40,7 +103,16 @@ const gridRow = z.union(
     z.ZodLiteral<10>,
   ],
 );
-const observerField = z.enum(OBSERVER_FIELDS);
+const refinementColumn = z.enum(OBSERVER_REFINEMENT_COLUMNS);
+const refinementRow = z.union(
+  OBSERVER_REFINEMENT_ROWS.map((row) => z.literal(row)) as [
+    z.ZodLiteral<1>,
+    z.ZodLiteral<2>,
+    z.ZodLiteral<3>,
+    z.ZodLiteral<4>,
+    z.ZodLiteral<5>,
+  ],
+);
 
 export const normalizedBoxSchema = z
   .object({
@@ -94,13 +166,40 @@ export const pixelBoxSchema = z
     }
   });
 
+export const regionGeometrySchema = z
+  .object({
+    normalizedBox: normalizedBoxSchema,
+    pixelBox: pixelBoxSchema,
+  })
+  .strict();
+
+export const paddingSpecSchema = z
+  .object({
+    unit: z.literal("normalized"),
+    top: z.number().finite().nonnegative(),
+    right: z.number().finite().nonnegative(),
+    bottom: z.number().finite().nonnegative(),
+    left: z.number().finite().nonnegative(),
+    clampToImage: z.literal(true),
+  })
+  .strict();
+
+export const haloPolicySchema = z
+  .object({
+    paddingPolicyId: z.literal(OBSERVER_HALO_POLICY_ID),
+    paddingRatio: z.number().finite().positive(),
+    requestedPadding: paddingSpecSchema,
+    actualPadding: paddingSpecSchema,
+  })
+  .strict();
+
 export const gridSpecSchema = z
   .object({
     schemaVersion: z.literal(OBSERVER_GRID_SCHEMA_VERSION),
     columns: z.literal(10),
     rows: z.literal(10),
     columnLabels: z.tuple(
-      OBSERVER_GRID_COLUMNS.map((label) => z.literal(label)) as [
+      OBSERVER_GRID_COLUMNS.map((value) => z.literal(value)) as [
         z.ZodLiteral<"A">,
         z.ZodLiteral<"B">,
         z.ZodLiteral<"C">,
@@ -114,7 +213,7 @@ export const gridSpecSchema = z
       ],
     ),
     rowLabels: z.tuple(
-      OBSERVER_GRID_ROWS.map((row) => z.literal(row)) as [
+      OBSERVER_GRID_ROWS.map((value) => z.literal(value)) as [
         z.ZodLiteral<1>,
         z.ZodLiteral<2>,
         z.ZodLiteral<3>,
@@ -134,6 +233,36 @@ export const gridSpecSchema = z
   })
   .strict();
 
+export const refinementGridSpecSchema = z
+  .object({
+    schemaVersion: z.literal(OBSERVER_GRID_SCHEMA_VERSION),
+    columns: z.literal(5),
+    rows: z.literal(5),
+    columnLabels: z.tuple(
+      OBSERVER_REFINEMENT_COLUMNS.map((value) => z.literal(value)) as [
+        z.ZodLiteral<"A">,
+        z.ZodLiteral<"B">,
+        z.ZodLiteral<"C">,
+        z.ZodLiteral<"D">,
+        z.ZodLiteral<"E">,
+      ],
+    ),
+    rowLabels: z.tuple(
+      OBSERVER_REFINEMENT_ROWS.map((value) => z.literal(value)) as [
+        z.ZodLiteral<1>,
+        z.ZodLiteral<2>,
+        z.ZodLiteral<3>,
+        z.ZodLiteral<4>,
+        z.ZodLiteral<5>,
+      ],
+    ),
+    origin: z.literal("top-left"),
+    cellRangeNotation: z.literal("inclusive"),
+    sourceCrop: z.literal("none"),
+    parentFrame: z.literal("coarse-proposal"),
+  })
+  .strict();
+
 export const gridCellSchema = z
   .object({
     column: gridColumn,
@@ -144,8 +273,7 @@ export const gridCellSchema = z
   })
   .strict()
   .superRefine((cell, ctx) => {
-    const expected = gridCellId(cell.column, cell.row);
-    if (cell.id !== expected) {
+    if (cell.id !== gridCellId(cell.column, cell.row)) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["id"], message: "grid cell id mismatch" });
     }
     if (cell.columnIndex !== DEFAULT_GRID_SPEC.columnLabels.indexOf(cell.column)) {
@@ -160,6 +288,39 @@ export const gridCellSchema = z
         code: z.ZodIssueCode.custom,
         path: ["rowIndex"],
         message: "grid cell rowIndex mismatch",
+      });
+    }
+  });
+
+export const refinementCellSchema = z
+  .object({
+    column: refinementColumn,
+    row: refinementRow,
+    columnIndex: z.number().int().min(0).max(4),
+    rowIndex: z.number().int().min(0).max(4),
+    id: nonEmpty,
+  })
+  .strict()
+  .superRefine((cell, ctx) => {
+    if (cell.id !== refinementCellId(cell.column, cell.row)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["id"],
+        message: "refinement cell id mismatch",
+      });
+    }
+    if (cell.columnIndex !== DEFAULT_REFINEMENT_GRID_SPEC.columnLabels.indexOf(cell.column)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["columnIndex"],
+        message: "refinement cell columnIndex mismatch",
+      });
+    }
+    if (cell.rowIndex !== DEFAULT_REFINEMENT_GRID_SPEC.rowLabels.indexOf(cell.row)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["rowIndex"],
+        message: "refinement cell rowIndex mismatch",
       });
     }
   });
@@ -180,88 +341,191 @@ export const gridCellRangeSchema = z
         message: "grid range notation must be normalized and inclusive",
       });
     }
-    if (range.start.columnIndex !== normalized.start.columnIndex) {
+  });
+
+export const refinementCellRangeSchema = z
+  .object({
+    start: refinementCellSchema,
+    end: refinementCellSchema,
+    notation: nonEmpty,
+  })
+  .strict()
+  .superRefine((range, ctx) => {
+    const normalized = refinementCellRange(
+      range.start as RefinementCell,
+      range.end as RefinementCell,
+    );
+    if (range.notation !== normalized.notation) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["start", "columnIndex"],
-        message: "grid range start must be normalized to the upper-left cell",
-      });
-    }
-    if (range.start.rowIndex !== normalized.start.rowIndex) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["start", "rowIndex"],
-        message: "grid range start must be normalized to the upper-left cell",
-      });
-    }
-    if (range.end.columnIndex !== normalized.end.columnIndex) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["end", "columnIndex"],
-        message: "grid range end must be normalized to the lower-right cell",
-      });
-    }
-    if (range.end.rowIndex !== normalized.end.rowIndex) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["end", "rowIndex"],
-        message: "grid range end must be normalized to the lower-right cell",
+        path: ["notation"],
+        message: "refinement range notation must be normalized and inclusive",
       });
     }
   });
 
-export const paddingSpecSchema = z
+export const localRefinementSelectionSchema = z
   .object({
-    xCells: z.number().finite().min(0),
-    yCells: z.number().finite().min(0),
-    clampToImage: z.boolean(),
+    gridSpec: refinementGridSpecSchema,
+    range: refinementCellRangeSchema,
   })
   .strict();
 
 export const transformRecordSchema = z
   .object({
     schemaVersion: z.literal(OBSERVER_GRID_SCHEMA_VERSION),
-    mapping: z.literal("grid-cells-to-original-image"),
+    mapping: z.literal("observer-grid-to-original-image"),
+    coarseGridRange: nonEmpty,
+    refinementGridRange: z.union([nonEmpty, z.null()]),
+    observationRotation: z.union(
+      OBSERVER_ROTATIONS.map((value) => z.literal(value)) as [
+        z.ZodLiteral<0>,
+        z.ZodLiteral<90>,
+        z.ZodLiteral<180>,
+        z.ZodLiteral<270>,
+      ],
+    ),
     sourceImageWidth: z.number().int().positive(),
     sourceImageHeight: z.number().int().positive(),
-    derivativeImageWidth: z.number().int().positive(),
-    derivativeImageHeight: z.number().int().positive(),
+    observationFrameWidth: z.number().int().positive(),
+    observationFrameHeight: z.number().int().positive(),
     sourceCrop: z.literal("none"),
     overlayDeterministic: z.literal(true),
-    sourceAspectRatio: z.number().finite().positive(),
-    derivativeAspectRatio: z.number().finite().positive(),
-    padding: paddingSpecSchema,
   })
   .strict();
 
 export const observerDerivativeSchema = z
   .object({
     gridSpec: gridSpecSchema,
-    mediaType: z.literal(OBSERVER_DERIVATIVE_MEDIA_TYPE),
+    rotation: z.literal(0),
+    mediaType: z.literal(OBSERVER_OVERLAY_MEDIA_TYPE),
     width: z.number().int().positive(),
     height: z.number().int().positive(),
     sourceMediaType: nonEmpty,
-    sourceSha256: z.string().regex(/^[a-f0-9]{64}$/i, "sourceSha256 must be a 64-char hex digest"),
-    svg: nonEmpty,
+    sourceSha256: sha256,
+    overlaySha256: sha256,
+    bytes: z.instanceof(Uint8Array),
+    sourceArtifactPath: absolutePath,
+    overlayArtifactPath: absolutePath,
+    workspaceDir: absolutePath,
     transform: transformRecordSchema,
   })
   .strict();
 
-export const observerRegionProposalSchema = z
+const observerRegionProposalBaseSchema = z
   .object({
-    observerId: nonEmpty,
+    observationId: nonEmpty,
     proposalId: nonEmpty,
-    field: observerField,
+    observationType: z.enum(OBSERVER_OBSERVATION_TYPES),
+    source: z.enum(OBSERVER_PROPOSAL_SOURCES),
+    authority: z.enum(OBSERVER_AUTHORITIES),
+    purpose: z.enum(OBSERVER_PURPOSES),
     gridRange: gridCellRangeSchema,
-    rationale: nonEmpty,
+    localRefinement: z.union([localRefinementSelectionSchema, z.null()]),
+    observationRotation: z.union(
+      OBSERVER_ROTATIONS.map((value) => z.literal(value)) as [
+        z.ZodLiteral<0>,
+        z.ZodLiteral<90>,
+        z.ZodLiteral<180>,
+        z.ZodLiteral<270>,
+      ],
+    ),
+    apparentOrientation: z.enum(OBSERVER_APPARENT_ORIENTATIONS),
+    visibility: z.enum(OBSERVER_VISIBILITIES),
+    reasonCodes: z
+      .array(z.enum(OBSERVER_REASON_CODES))
+      .min(1)
+      .max(4)
+      .refine((codes) => new Set(codes).size === codes.length, {
+        message: "reason codes must be unique",
+      }),
+    description,
   })
   .strict();
 
-export const canonicalRegionProposalSchema = observerRegionProposalSchema
+export const observerRegionProposalSchema = observerRegionProposalBaseSchema.superRefine(
+  (proposal, ctx) => {
+    rejectProhibitedDescription(proposal.description, ctx);
+  },
+);
+
+export const ocrInspectionHandoffSchema = z
+  .object({
+    sourceArtifactKind: z.literal(OBSERVER_SOURCE_ARTIFACT_KIND),
+    sourceArtifactRef: absolutePath,
+    sourceImageSha256: sha256,
+    originalPixelRegion: pixelBoxSchema,
+    overlayArtifactKindRejected: z.literal(OBSERVER_OVERLAY_ARTIFACT_KIND),
+    overlayArtifactPathRejected: absolutePath,
+    overlaySha256Rejected: sha256,
+  })
+  .strict();
+
+export const canonicalRegionProposalSchema = observerRegionProposalBaseSchema
   .extend({
-    normalizedBox: normalizedBoxSchema,
-    pixelBox: pixelBoxSchema,
+    proposedRegion: regionGeometrySchema,
+    ocrInspectionRegion: regionGeometrySchema,
+    haloPolicy: haloPolicySchema,
     transform: transformRecordSchema,
+    ocrHandoff: ocrInspectionHandoffSchema,
+  })
+  .strict()
+  .superRefine((proposal, ctx) => {
+    rejectProhibitedDescription(proposal.description, ctx);
+  });
+
+export const observationRunMetadataSchema = z
+  .object({
+    observationRunId: nonEmpty,
+    adapterId: nonEmpty,
+    adapterVersion: nonEmpty,
+    promptId: nonEmpty,
+    promptVersion: nonEmpty,
+    sourceImageSha256: sha256,
+    overlaySha256: z.union([sha256, z.null()]),
+    startedAt: nonEmpty,
+    completedAt: nonEmpty,
+    cleanupCompleted: z.boolean(),
+  })
+  .strict();
+
+export const visionObserverInputSchema = z
+  .object({
+    observationRunId: nonEmpty,
+    scenarioId: nonEmpty,
+    workspaceDir: absolutePath,
+    overlayArtifactPath: absolutePath,
+    overlayMediaType: z.literal(OBSERVER_OVERLAY_MEDIA_TYPE),
+    overlaySha256: sha256,
+    overlayWidth: z.number().int().positive(),
+    overlayHeight: z.number().int().positive(),
+    sourceImageSha256: sha256,
+  })
+  .strict();
+
+export const visionObserverResultSchema = z
+  .object({
+    observationRunId: nonEmpty,
+    proposals: z.array(z.unknown()),
+  })
+  .strict();
+
+export const visionObservationErrorRecordSchema = z
+  .object({
+    immutable: z.literal(true),
+    code: z.enum([
+      "DERIVATIVE_DECODE_FAILED",
+      "DERIVATIVE_DIMENSION_MISMATCH",
+      "DERIVATIVE_RENDER_FAILED",
+      "OBSERVER_TIMEOUT",
+      "OBSERVER_EXCEPTION",
+      "INVALID_OBSERVER_OUTPUT",
+      "INVALID_PROPOSAL_GEOMETRY",
+      "INVALID_OCR_HANDOFF",
+    ]),
+    stage: z.enum(["derivative", "observe", "proposal-validate", "geometry", "ocr-handoff"]),
+    message: nonEmpty,
+    issues: z.array(nonEmpty),
   })
   .strict();
 
@@ -281,8 +545,17 @@ export function validateGridSpec(
 ): Result<GridSpec, ObserverGridValidationError> {
   const parsed = gridSpecSchema.safeParse(candidate);
   return parsed.success
-    ? ok(parsed.data)
+    ? ok(parsed.data as GridSpec)
     : fail("Grid spec failed schema validation.", parsed.error);
+}
+
+export function validateRefinementGridSpec(
+  candidate: unknown,
+): Result<RefinementGridSpec, ObserverGridValidationError> {
+  const parsed = refinementGridSpecSchema.safeParse(candidate);
+  return parsed.success
+    ? ok(parsed.data as RefinementGridSpec)
+    : fail("Refinement grid spec failed schema validation.", parsed.error);
 }
 
 export function validateGridCellRange(
@@ -292,6 +565,24 @@ export function validateGridCellRange(
   return parsed.success
     ? ok(parsed.data as GridCellRange)
     : fail("Grid cell range failed schema validation.", parsed.error);
+}
+
+export function validateRefinementCellRange(
+  candidate: unknown,
+): Result<RefinementCellRange, ObserverGridValidationError> {
+  const parsed = refinementCellRangeSchema.safeParse(candidate);
+  return parsed.success
+    ? ok(parsed.data as RefinementCellRange)
+    : fail("Refinement cell range failed schema validation.", parsed.error);
+}
+
+export function validateLocalRefinementSelection(
+  candidate: unknown,
+): Result<LocalRefinementSelection, ObserverGridValidationError> {
+  const parsed = localRefinementSelectionSchema.safeParse(candidate);
+  return parsed.success
+    ? ok(parsed.data as LocalRefinementSelection)
+    : fail("Local refinement selection failed schema validation.", parsed.error);
 }
 
 export function validateNormalizedBox(
@@ -312,6 +603,15 @@ export function validatePixelBox(
     : fail("Pixel box failed schema validation.", parsed.error);
 }
 
+export function validateRegionGeometry(
+  candidate: unknown,
+): Result<RegionGeometry, ObserverGridValidationError> {
+  const parsed = regionGeometrySchema.safeParse(candidate);
+  return parsed.success
+    ? ok(parsed.data as RegionGeometry)
+    : fail("Region geometry failed schema validation.", parsed.error);
+}
+
 export function validatePaddingSpec(
   candidate: unknown,
 ): Result<PaddingSpec, ObserverGridValidationError> {
@@ -319,6 +619,15 @@ export function validatePaddingSpec(
   return parsed.success
     ? ok(parsed.data as PaddingSpec)
     : fail("Padding spec failed schema validation.", parsed.error);
+}
+
+export function validateHaloPolicy(
+  candidate: unknown,
+): Result<HaloPolicyRecord, ObserverGridValidationError> {
+  const parsed = haloPolicySchema.safeParse(candidate);
+  return parsed.success
+    ? ok(parsed.data as HaloPolicyRecord)
+    : fail("Halo policy failed schema validation.", parsed.error);
 }
 
 export function validateTransformRecord(
@@ -348,6 +657,15 @@ export function validateObserverRegionProposal(
     : fail("Observer region proposal failed schema validation.", parsed.error);
 }
 
+export function validateOcrInspectionHandoff(
+  candidate: unknown,
+): Result<OcrInspectionHandoff, ObserverGridValidationError> {
+  const parsed = ocrInspectionHandoffSchema.safeParse(candidate);
+  return parsed.success
+    ? ok(parsed.data as OcrInspectionHandoff)
+    : fail("OCR inspection handoff failed schema validation.", parsed.error);
+}
+
 export function validateCanonicalRegionProposal(
   candidate: unknown,
 ): Result<CanonicalRegionProposal, ObserverGridValidationError> {
@@ -355,4 +673,40 @@ export function validateCanonicalRegionProposal(
   return parsed.success
     ? ok(parsed.data as CanonicalRegionProposal)
     : fail("Canonical region proposal failed schema validation.", parsed.error);
+}
+
+export function validateObservationRunMetadata(
+  candidate: unknown,
+): Result<ObservationRunMetadata, ObserverGridValidationError> {
+  const parsed = observationRunMetadataSchema.safeParse(candidate);
+  return parsed.success
+    ? ok(parsed.data as ObservationRunMetadata)
+    : fail("Observation run metadata failed schema validation.", parsed.error);
+}
+
+export function validateVisionObservationErrorRecord(
+  candidate: unknown,
+): Result<VisionObservationErrorRecord, ObserverGridValidationError> {
+  const parsed = visionObservationErrorRecordSchema.safeParse(candidate);
+  return parsed.success
+    ? ok(parsed.data as VisionObservationErrorRecord)
+    : fail("Vision observation error record failed schema validation.", parsed.error);
+}
+
+export function validateVisionObserverInput(
+  candidate: unknown,
+): Result<VisionObserverInput, ObserverGridValidationError> {
+  const parsed = visionObserverInputSchema.safeParse(candidate);
+  return parsed.success
+    ? ok(parsed.data as VisionObserverInput)
+    : fail("Vision observer input failed schema validation.", parsed.error);
+}
+
+export function validateVisionObserverResult(
+  candidate: unknown,
+): Result<VisionObserverResult, ObserverGridValidationError> {
+  const parsed = visionObserverResultSchema.safeParse(candidate);
+  return parsed.success
+    ? ok(parsed.data as VisionObserverResult)
+    : fail("Vision observer result failed schema validation.", parsed.error);
 }

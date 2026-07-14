@@ -1,0 +1,115 @@
+import { parseGridCellRange, parseRefinementCellRange } from "./observer-grid";
+import type { FakeObserverScenario } from "./observer-grid.types";
+
+export const FAKE_OBSERVER_SCENARIOS: readonly FakeObserverScenario[] = [
+  {
+    scenarioId: "upper-title-band",
+    proposals: [
+      {
+        observationId: "obs-upper-title-band",
+        proposalId: "upper-title-band-1",
+        observationType: "text-like-region",
+        source: "machine-observer",
+        authority: "non-authoritative",
+        purpose: "ocr-region-proposal",
+        gridRange: parseGridCellRange("B2:I3"),
+        localRefinement: {
+          gridSpec: {
+            schemaVersion: "observer-grid.v1",
+            columns: 5,
+            rows: 5,
+            columnLabels: ["A", "B", "C", "D", "E"],
+            rowLabels: [1, 2, 3, 4, 5],
+            origin: "top-left",
+            cellRangeNotation: "inclusive",
+            sourceCrop: "none",
+            parentFrame: "coarse-proposal",
+          },
+          range: parseRefinementCellRange("A2:E4"),
+        },
+        observationRotation: 0,
+        apparentOrientation: "horizontal",
+        visibility: "full",
+        reasonCodes: ["high_salience", "multi_line"],
+        description: "Large horizontal text-like region near the upper label center",
+      },
+    ],
+  },
+  {
+    scenarioId: "left-edge-vertical-strip",
+    proposals: [
+      {
+        observationId: "obs-left-edge-vertical-strip",
+        proposalId: "left-edge-strip-1",
+        observationType: "text-like-region",
+        source: "machine-observer",
+        authority: "non-authoritative",
+        purpose: "ocr-region-proposal",
+        gridRange: parseGridCellRange("A8:B10"),
+        localRefinement: {
+          gridSpec: {
+            schemaVersion: "observer-grid.v1",
+            columns: 5,
+            rows: 5,
+            columnLabels: ["A", "B", "C", "D", "E"],
+            rowLabels: [1, 2, 3, 4, 5],
+            origin: "top-left",
+            cellRangeNotation: "inclusive",
+            sourceCrop: "none",
+            parentFrame: "coarse-proposal",
+          },
+          range: parseRefinementCellRange("A1:D5"),
+        },
+        observationRotation: 0,
+        apparentOrientation: "vertical-clockwise",
+        visibility: "partial",
+        reasonCodes: ["small_text", "edge_proximity", "rotation"],
+        description: "Small vertically oriented text-like region near the left edge",
+      },
+    ],
+  },
+  {
+    scenarioId: "no-text-like-region",
+    proposals: [],
+  },
+  {
+    scenarioId: "aba-alpha",
+    proposals: [
+      {
+        observationId: "obs-aba-alpha",
+        proposalId: "aba-alpha-1",
+        observationType: "text-like-region",
+        source: "machine-observer",
+        authority: "non-authoritative",
+        purpose: "ocr-region-proposal",
+        gridRange: parseGridCellRange("H3:J7"),
+        localRefinement: null,
+        observationRotation: 0,
+        apparentOrientation: "horizontal",
+        visibility: "partial",
+        reasonCodes: ["dense_text", "high_salience"],
+        description: "Compact text-like cluster in the upper-right quadrant",
+      },
+    ],
+  },
+  {
+    scenarioId: "aba-beta",
+    proposals: [
+      {
+        observationId: "obs-aba-beta",
+        proposalId: "aba-beta-1",
+        observationType: "text-like-region",
+        source: "machine-observer",
+        authority: "non-authoritative",
+        purpose: "ocr-region-proposal",
+        gridRange: parseGridCellRange("A1:B2"),
+        localRefinement: null,
+        observationRotation: 0,
+        apparentOrientation: "horizontal",
+        visibility: "obscured",
+        reasonCodes: ["partial_visibility", "low_contrast"],
+        description: "Faint text-like patch near the upper-left corner",
+      },
+    ],
+  },
+] as const;
