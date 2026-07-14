@@ -110,8 +110,9 @@ describe("ocr region benchmark integration", () => {
       expect(additiveBrandLatency15?.matchedBaselineMedianLatencyMs).not.toBeNull();
       expect(additiveBrandLatency15?.measuredTargetedIncrementalMedianLatencyMs).not.toBeNull();
       expect(additiveBrandLatency15?.estimatedCombinedMedianLatencyMs).not.toBeNull();
-      expect(additiveBrandLatency15?.matchedMedianDeltaLatencyMs).toBe(
+      expect(additiveBrandLatency15?.matchedMedianDeltaLatencyMs).toBeCloseTo(
         additiveBrandLatency15?.measuredTargetedIncrementalMedianLatencyMs,
+        10,
       );
 
       const additiveAlcoholScale = report.scaleAnalysis.find(
