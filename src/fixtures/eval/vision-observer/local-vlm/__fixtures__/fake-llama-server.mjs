@@ -340,6 +340,17 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
     }
   }
 
+  function requestParityContract(payload) {
+    const system = String(payload?.messages?.[0]?.content ?? "");
+    if (system.includes('"observationId": "string"')) {
+      return "A";
+    }
+    if (system.includes("Use only these enum values:")) {
+      return "C";
+    }
+    return "B";
+  }
+
   function completionRung(payload) {
     const system = String(payload?.messages?.[0]?.content ?? "");
     if (system.includes("Return exactly one token: OK.")) return "one-token";
@@ -427,6 +438,19 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
     });
   }
 
+  async function requestParityResponseForContract(payload, runId) {
+    if (requestParityContract(payload) === "A") {
+      return JSON.stringify({
+        ...completionPayloadWithoutCoordinates(),
+        observationRunId: runId,
+      });
+    }
+    return JSON.stringify({
+      ...singleProposalPayload("description"),
+      observationRunId: runId,
+    });
+  }
+
   let healthy = false;
   setTimeout(() => {
     healthy = true;
@@ -468,7 +492,9 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
         ? await completionResponseForRung(payload, runId)
         : mode === "single-proposal-decomposition"
           ? await singleProposalResponseForRung(payload, runId)
-          : (await responseForMode(payload)).replace('"replace-me"', JSON.stringify(runId));
+          : mode === "request-parity-reproducibility"
+            ? await requestParityResponseForContract(payload, runId)
+            : (await responseForMode(payload)).replace('"replace-me"', JSON.stringify(runId));
     if (mode === "write-after-cancel") {
       setTimeout(() => {
         writeFileSync(join(workspaceDir, "after-cancel.txt"), "late-write\n");
@@ -483,7 +509,9 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
         ? completionRung(payload)
         : mode === "single-proposal-decomposition"
           ? singleProposalRung(payload)
-          : null;
+          : mode === "request-parity-reproducibility"
+            ? requestParityContract(payload)
+            : null;
     if (activeCompletionRung !== null && completionFailAtRung === activeCompletionRung) {
       const cutoff = Math.max(1, Math.floor(transportPayload.length / 2));
       res.write(transportPayload.slice(0, cutoff));
