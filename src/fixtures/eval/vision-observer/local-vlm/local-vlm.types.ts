@@ -14,7 +14,10 @@ export const LOCAL_VLM_DECISIONS = [
   "INSUFFICIENT EVIDENCE",
 ] as const;
 
+export const LOCAL_VLM_RUNTIME_KINDS = ["real-local-vlm", "fake-server"] as const;
+
 export type LocalVlmDecision = (typeof LOCAL_VLM_DECISIONS)[number];
+export type LocalVlmRuntimeKind = (typeof LOCAL_VLM_RUNTIME_KINDS)[number];
 
 export interface LocalVlmConfigInput {
   LLAMA_SERVER_BIN?: string;
@@ -224,7 +227,10 @@ export interface LocalVlmObservationFailureShape {
 }
 
 export interface LocalVlmRunReport {
+  scenarioId: string;
   observationRunId: string;
+  runtimeKind: LocalVlmRuntimeKind;
+  workspaceRef: string;
   sourceArtifactRef: string;
   sourceImageSha256: string;
   overlaySha256: string;
@@ -235,7 +241,13 @@ export interface LocalVlmRunReport {
   structuredResponseDigest: string | null;
   schemaValid: boolean;
   prohibitedClaimDetected: boolean;
+  observationIds: readonly string[];
+  proposalDescriptions: readonly string[];
   contaminationTokensDetected: readonly string[];
+  priorRunIdsDetected: readonly string[];
+  priorObservationIdsDetected: readonly string[];
+  copiedDescriptionsDetected: readonly string[];
+  comparisonLanguageDetected: readonly string[];
   cleanupCompleted: boolean;
   forcedTermination: boolean;
   transportSuccess: boolean;

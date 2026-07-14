@@ -209,6 +209,7 @@ export interface CanonicalRegionProposal extends ObserverRegionProposal {
 export interface VisionObserverInput {
   observationRunId: string;
   scenarioId: string;
+  sourceArtifactRef: string;
   workspaceDir: string;
   overlayArtifactPath: string;
   overlayMediaType: typeof OBSERVER_OVERLAY_MEDIA_TYPE;

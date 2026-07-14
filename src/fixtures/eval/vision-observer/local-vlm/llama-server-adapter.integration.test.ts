@@ -80,8 +80,10 @@ describe("llama-server adapter integration", () => {
     expect(result.run.cleanupCompleted).toBe(true);
     expect(result.canonicalProposals.length).toBe(1);
     expect(result.errorRecord).toBeNull();
+    expect(snapshot?.sourceArtifactRef).toBe(sourceArtifactRef);
     expect(snapshot?.process.exitedAt).not.toBeNull();
     expect(snapshot?.process.portReleased).toBe(true);
+    expect(existsSync(sourceArtifactRef)).toBe(true);
   });
 
   it("rejects malformed output without invoking OCR", async () => {

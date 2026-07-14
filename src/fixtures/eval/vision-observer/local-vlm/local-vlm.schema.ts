@@ -12,6 +12,7 @@ import {
   LOCAL_VLM_CONFIG_SCHEMA_VERSION,
   LOCAL_VLM_DECISIONS,
   LOCAL_VLM_REPORT_SCHEMA_VERSION,
+  LOCAL_VLM_RUNTIME_KINDS,
 } from "./local-vlm.types";
 
 const sha256 = z.string().regex(/^[a-f0-9]{64}$/i, "must be a 64-character SHA-256 hex digest");
@@ -87,7 +88,10 @@ export const localVlmResolvedConfigSchema = z
 
 const runReportSchema = z
   .object({
+    scenarioId: z.string().min(1),
     observationRunId: z.string().uuid(),
+    runtimeKind: z.enum(LOCAL_VLM_RUNTIME_KINDS),
+    workspaceRef: z.string().min(1),
     sourceArtifactRef: z.string().min(1),
     sourceImageSha256: sha256,
     overlaySha256: sha256,
@@ -152,7 +156,13 @@ const runReportSchema = z
     structuredResponseDigest: sha256.nullable(),
     schemaValid: z.boolean(),
     prohibitedClaimDetected: z.boolean(),
+    observationIds: z.array(z.string().min(1)),
+    proposalDescriptions: z.array(z.string().min(1)),
     contaminationTokensDetected: z.array(z.string().min(1)),
+    priorRunIdsDetected: z.array(z.string().min(1)),
+    priorObservationIdsDetected: z.array(z.string().min(1)),
+    copiedDescriptionsDetected: z.array(z.string().min(1)),
+    comparisonLanguageDetected: z.array(z.string().min(1)),
     cleanupCompleted: z.boolean(),
     forcedTermination: z.boolean(),
     transportSuccess: z.boolean(),

@@ -17,6 +17,7 @@ import type {
   LocalVlmExperimentReport,
   LocalVlmResolvedConfig,
   LocalVlmRunReport,
+  LocalVlmRuntimeKind,
 } from "./local-vlm.types";
 import {
   LOCAL_VLM_PROMPT_ID,
@@ -34,16 +35,222 @@ interface ObservationCaseInput {
   canaryTokens: readonly string[];
 }
 
+interface ObservationTraceContext {
+  observationRunId: string;
+  observationIds: readonly string[];
+  proposalDescriptions: readonly string[];
+  canaryTokens: readonly string[];
+}
+
+interface ContaminationSignalAnalysis {
+  contaminationTokensDetected: string[];
+  priorRunIdsDetected: string[];
+  priorObservationIdsDetected: string[];
+  copiedDescriptionsDetected: string[];
+  comparisonLanguageDetected: string[];
+}
+
+const REQUIRED_CONTAMINATION_SEQUENCE = [
+  "contamination-a",
+  "contamination-b",
+  "contamination-a",
+  "contamination-c",
+  "contamination-b",
+] as const;
+const MIN_REAL_RUNTIME_STRESS_SAMPLES = 10;
+const COMPARISON_LANGUAGE_PATTERNS = [
+  /\bPREVIOUS\b/g,
+  /\bBEFORE\b/g,
+  /\bCOMPARE\b/g,
+  /\bCOMPARISON\b/g,
+] as const;
+
 function normalizeText(value: string | null): string {
   return (value ?? "").replace(/\s+/g, " ").trim().toUpperCase();
+}
+
+function detectNormalizedMatches(args: {
+  normalizedText: string;
+  candidates: readonly string[];
+  excluded: ReadonlySet<string>;
+}): string[] {
+  const seen = new Set<string>();
+  const matches: string[] = [];
+  for (const candidate of args.candidates) {
+    const normalizedCandidate = normalizeText(candidate);
+    if (!normalizedCandidate || args.excluded.has(normalizedCandidate)) continue;
+    if (!args.normalizedText.includes(normalizedCandidate) || seen.has(normalizedCandidate))
+      continue;
+    seen.add(normalizedCandidate);
+    matches.push(candidate);
+  }
+  return matches;
+}
+
+function comparisonLanguageMatches(normalizedText: string): string[] {
+  return COMPARISON_LANGUAGE_PATTERNS.flatMap((pattern) => {
+    const matches = normalizedText.match(pattern);
+    return matches ? [matches[0]!] : [];
+  });
+}
+
+function errorCodeOf(run: LocalVlmRunReport): string | null {
+  const candidate = run.errorRecord;
+  if (!candidate || typeof candidate !== "object" || !("code" in candidate)) return null;
+  return typeof candidate.code === "string" ? candidate.code : null;
+}
+
+function isExplicitlyAccountedOutput(run: LocalVlmRunReport): boolean {
+  if (run.schemaValid) return true;
+  const code = errorCodeOf(run);
+  return code === "INVALID_OBSERVER_OUTPUT" || code === "RESPONSE_TOO_LARGE";
+}
+
+function hasLeakageSignals(run: LocalVlmRunReport): boolean {
+  return (
+    run.contaminationTokensDetected.length > 0 ||
+    run.priorRunIdsDetected.length > 0 ||
+    run.priorObservationIdsDetected.length > 0 ||
+    run.copiedDescriptionsDetected.length > 0 ||
+    run.comparisonLanguageDetected.length > 0
+  );
+}
+
+function hasConfirmedCleanupAndExit(run: LocalVlmRunReport): boolean {
+  return (
+    run.cleanupCompleted &&
+    run.process.portReleased === true &&
+    run.process.exitedAt !== null &&
+    run.process.pid !== null
+  );
+}
+
+function hasUniqueWorkspaceRefs(runs: readonly LocalVlmRunReport[]): boolean {
+  return new Set(runs.map((run) => run.workspaceRef)).size === runs.length;
+}
+
+function hasUniqueProcessLifetimes(runs: readonly LocalVlmRunReport[]): boolean {
+  const lifetimes = runs.map(
+    (run) => `${run.process.pid ?? "null"}:${run.process.spawnedAt ?? "null"}`,
+  );
+  return (
+    !lifetimes.some((value) => value.includes("null")) && new Set(lifetimes).size === runs.length
+  );
+}
+
+function usesRealRuntime(runs: readonly LocalVlmRunReport[]): boolean {
+  return runs.every((run) => run.runtimeKind === "real-local-vlm");
+}
+
+function isExpectedContaminationSequence(runs: readonly LocalVlmRunReport[]): boolean {
+  return (
+    runs.length === REQUIRED_CONTAMINATION_SEQUENCE.length &&
+    runs.every((run, index) => run.scenarioId === REQUIRED_CONTAMINATION_SEQUENCE[index])
+  );
+}
+
+function numericSeries(values: readonly (number | null | undefined)[]): number[] {
+  return values.filter((value): value is number => typeof value === "number");
+}
+
+function showsMonotonicGrowth(values: readonly number[]): boolean {
+  if (values.length < 3) return false;
+  let sawIncrease = false;
+  for (let index = 1; index < values.length; index += 1) {
+    const previous = values[index - 1]!;
+    const current = values[index]!;
+    if (current < previous) return false;
+    if (current > previous) sawIncrease = true;
+  }
+  return sawIncrease;
+}
+
+function classifyRuntimeKind(args: {
+  executablePath: string;
+  runtimeVersion: string | null;
+}): LocalVlmRuntimeKind {
+  const normalizedExecutable = args.executablePath.toLowerCase();
+  const normalizedVersion = args.runtimeVersion?.toLowerCase() ?? "";
+  if (normalizedExecutable.includes("fake-llama-server") || normalizedVersion.includes("fake")) {
+    return "fake-server";
+  }
+  return "real-local-vlm";
+}
+
+function observationIdsOf(report: LocalVlmRunReport): readonly string[] {
+  return report.observationIds;
+}
+
+function descriptionsOf(report: LocalVlmRunReport): readonly string[] {
+  return report.proposalDescriptions;
+}
+
+export function analyzeContaminationSignals(args: {
+  rawText: string | null;
+  current: ObservationTraceContext;
+  prior: readonly ObservationTraceContext[];
+}): ContaminationSignalAnalysis {
+  const normalized = normalizeText(args.rawText);
+  const excludedCanaries = new Set(args.current.canaryTokens.map((token) => normalizeText(token)));
+  const excludedRunIds = new Set([normalizeText(args.current.observationRunId)]);
+  const excludedObservationIds = new Set(
+    args.current.observationIds.map((observationId) => normalizeText(observationId)),
+  );
+  const excludedDescriptions = new Set(
+    args.current.proposalDescriptions.map((description) => normalizeText(description)),
+  );
+
+  const priorCanaries = args.prior.flatMap((entry) => entry.canaryTokens);
+  const priorRunIds = args.prior.map((entry) => entry.observationRunId);
+  const priorObservationIds = args.prior.flatMap((entry) => entry.observationIds);
+  const priorDescriptions = args.prior.flatMap((entry) => entry.proposalDescriptions);
+
+  return {
+    contaminationTokensDetected: detectNormalizedMatches({
+      normalizedText: normalized,
+      candidates: priorCanaries,
+      excluded: excludedCanaries,
+    }),
+    priorRunIdsDetected: detectNormalizedMatches({
+      normalizedText: normalized,
+      candidates: priorRunIds,
+      excluded: excludedRunIds,
+    }),
+    priorObservationIdsDetected: detectNormalizedMatches({
+      normalizedText: normalized,
+      candidates: priorObservationIds,
+      excluded: excludedObservationIds,
+    }),
+    copiedDescriptionsDetected: detectNormalizedMatches({
+      normalizedText: normalized,
+      candidates: priorDescriptions,
+      excluded: excludedDescriptions,
+    }),
+    comparisonLanguageDetected: comparisonLanguageMatches(normalized),
+  };
 }
 
 export function detectContaminationTokens(
   rawText: string | null,
   priorCanaries: readonly string[],
 ): string[] {
-  const normalized = normalizeText(rawText);
-  return priorCanaries.filter((token) => normalized.includes(token));
+  return analyzeContaminationSignals({
+    rawText,
+    current: {
+      observationRunId: "",
+      observationIds: [],
+      proposalDescriptions: [],
+      canaryTokens: [],
+    },
+    prior: [
+      {
+        observationRunId: "",
+        observationIds: [],
+        proposalDescriptions: [],
+        canaryTokens: priorCanaries,
+      },
+    ],
+  }).contaminationTokensDetected;
 }
 
 export function buildLocalVlmAggregateReport(
@@ -53,7 +260,7 @@ export function buildLocalVlmAggregateReport(
     runCount: runs.length,
     validResponseCount: runs.filter((run) => run.schemaValid).length,
     invalidResponseCount: runs.filter((run) => !run.schemaValid).length,
-    contaminationCount: runs.filter((run) => run.contaminationTokensDetected.length > 0).length,
+    contaminationCount: runs.filter(hasLeakageSignals).length,
     cleanupFailureCount: runs.filter((run) => !run.cleanupCompleted).length,
     forcedTerminationCount: runs.filter((run) => run.forcedTermination).length,
     prohibitedClaimCount: runs.filter((run) => run.prohibitedClaimDetected).length,
@@ -91,29 +298,53 @@ export function buildLocalVlmAggregateReport(
 
 export function decideLocalVlmContamination(runs: readonly LocalVlmRunReport[]): LocalVlmDecision {
   if (runs.length === 0) return "INSUFFICIENT EVIDENCE";
-  if (runs.some((run) => run.contaminationTokensDetected.length > 0)) {
+  if (!usesRealRuntime(runs)) return "INSUFFICIENT EVIDENCE";
+  if (!isExpectedContaminationSequence(runs)) return "MIXED RESULT";
+  if (
+    !runs.every(
+      (run) =>
+        isExplicitlyAccountedOutput(run) &&
+        !run.prohibitedClaimDetected &&
+        run.prohibitedLanguageSuccess,
+    )
+  ) {
+    return "MIXED RESULT";
+  }
+  if (runs.some(hasLeakageSignals)) {
     return "CONTEXT CONTAMINATION DETECTED";
   }
-  const allClean = runs.every(
-    (run) =>
-      run.cleanupCompleted &&
-      run.process.portReleased === true &&
-      run.process.exitedAt !== null &&
-      run.process.pid !== null,
-  );
-  return allClean ? "STATELESS OBSERVER BOUNDARY SUPPORTED" : "MIXED RESULT";
+  return runs.every(hasConfirmedCleanupAndExit) &&
+    hasUniqueWorkspaceRefs(runs) &&
+    hasUniqueProcessLifetimes(runs)
+    ? "STATELESS OBSERVER BOUNDARY SUPPORTED"
+    : "MIXED RESULT";
 }
 
 export function decideLocalVlmStress(runs: readonly LocalVlmRunReport[]): LocalVlmDecision {
   if (runs.length === 0) return "INSUFFICIENT EVIDENCE";
-  const anyLeak = runs.some(
+  if (!usesRealRuntime(runs)) return "INSUFFICIENT EVIDENCE";
+  if (runs.length < MIN_REAL_RUNTIME_STRESS_SAMPLES) return "INSUFFICIENT EVIDENCE";
+
+  const lifecycleFailure = runs.some(
     (run) =>
-      !run.cleanupCompleted ||
-      run.process.portReleased !== true ||
-      run.process.exitedAt === null ||
-      run.resources.sampleFailureCount > 0,
+      !hasConfirmedCleanupAndExit(run) ||
+      run.resources.sampleFailureCount > 0 ||
+      run.process.stdoutTruncated ||
+      run.process.stderrTruncated,
   );
-  return anyLeak ? "RESOURCE LIFECYCLE NOT BOUNDED" : "RESOURCE LIFECYCLE BOUNDED";
+  if (lifecycleFailure) return "RESOURCE LIFECYCLE NOT BOUNDED";
+
+  const rssGrowth = showsMonotonicGrowth(
+    numericSeries(
+      runs.map((run) => run.resources.peakProcessTreeRssBytes ?? run.resources.peakProcessRssBytes),
+    ),
+  );
+  const workspaceGrowth = showsMonotonicGrowth(
+    numericSeries(runs.map((run) => run.resources.workspacePeakBytes)),
+  );
+  return rssGrowth || workspaceGrowth
+    ? "RESOURCE LIFECYCLE NOT BOUNDED"
+    : "RESOURCE LIFECYCLE BOUNDED";
 }
 
 async function writePngTextImage(args: {
@@ -188,9 +419,24 @@ async function runOneObservation(args: {
   });
   const snapshot = adapter.getLastRunSnapshot();
   if (!snapshot) throw new Error("local VLM adapter did not capture a run snapshot");
+  const observationIds = (snapshot.observerResult?.proposals ?? []).flatMap((proposal) => {
+    if (!proposal || typeof proposal !== "object" || !("observationId" in proposal)) return [];
+    return typeof proposal.observationId === "string" ? [proposal.observationId] : [];
+  });
+  const proposalDescriptions = (snapshot.observerResult?.proposals ?? []).flatMap((proposal) => {
+    if (!proposal || typeof proposal !== "object" || !("description" in proposal)) return [];
+    return typeof proposal.description === "string" ? [proposal.description] : [];
+  });
+  const runtimeKind = classifyRuntimeKind({
+    executablePath: args.config.llamaServerBin,
+    runtimeVersion: snapshot.llamaVersionOutput,
+  });
 
   const report: LocalVlmRunReport = {
+    scenarioId: args.input.scenarioId,
     observationRunId: result.run.observationRunId,
+    runtimeKind,
+    workspaceRef: result.workspaceDir,
     sourceArtifactRef: args.input.sourceArtifactRef,
     sourceImageSha256: snapshot.sourceImageSha256,
     overlaySha256: snapshot.overlaySha256,
@@ -206,7 +452,13 @@ async function runOneObservation(args: {
     structuredResponseDigest: snapshot.output.structuredResponseDigest,
     schemaValid: snapshot.output.schemaValid,
     prohibitedClaimDetected: snapshot.output.prohibitedClaimDetected,
+    observationIds,
+    proposalDescriptions,
     contaminationTokensDetected: [],
+    priorRunIdsDetected: [],
+    priorObservationIdsDetected: [],
+    copiedDescriptionsDetected: [],
+    comparisonLanguageDetected: [],
     cleanupCompleted: result.run.cleanupCompleted,
     forcedTermination: snapshot.process.forcedTermination,
     transportSuccess: snapshot.validation.transportSuccess,
@@ -248,14 +500,36 @@ export async function runLocalVlmContaminationSequence(args: {
   ];
 
   const runs: LocalVlmRunReport[] = [];
-  const priorCanaries: string[] = [];
+  const prior: ObservationTraceContext[] = [];
   let runtimeVersion: string | null = null;
   for (const input of sequence) {
     const one = await runOneObservation({ config: args.config, input });
     runtimeVersion ??= one.runtimeVersion;
-    const contamination = detectContaminationTokens(one.rawResponseText, priorCanaries);
-    runs.push({ ...one.report, contaminationTokensDetected: contamination });
-    priorCanaries.push(...input.canaryTokens);
+    const analysis = analyzeContaminationSignals({
+      rawText: one.rawResponseText,
+      current: {
+        observationRunId: one.report.observationRunId,
+        observationIds: observationIdsOf(one.report),
+        proposalDescriptions: descriptionsOf(one.report),
+        canaryTokens: input.canaryTokens,
+      },
+      prior,
+    });
+    const report: LocalVlmRunReport = {
+      ...one.report,
+      contaminationTokensDetected: analysis.contaminationTokensDetected,
+      priorRunIdsDetected: analysis.priorRunIdsDetected,
+      priorObservationIdsDetected: analysis.priorObservationIdsDetected,
+      copiedDescriptionsDetected: analysis.copiedDescriptionsDetected,
+      comparisonLanguageDetected: analysis.comparisonLanguageDetected,
+    };
+    runs.push(report);
+    prior.push({
+      observationRunId: report.observationRunId,
+      observationIds: report.observationIds,
+      proposalDescriptions: report.proposalDescriptions,
+      canaryTokens: input.canaryTokens,
+    });
   }
 
   const report: LocalVlmExperimentReport = {

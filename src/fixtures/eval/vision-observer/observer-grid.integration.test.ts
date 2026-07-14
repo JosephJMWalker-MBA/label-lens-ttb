@@ -361,6 +361,7 @@ describe("observer lifecycle integration", () => {
         {
           observationRunId: "run-1",
           scenarioId: "upper-title-band",
+          sourceArtifactRef: join(workspace(), "dispose-source.png"),
           workspaceDir: workspace(),
           overlayArtifactPath: join(workspace(), "overlay.png"),
           overlayMediaType: "image/png",

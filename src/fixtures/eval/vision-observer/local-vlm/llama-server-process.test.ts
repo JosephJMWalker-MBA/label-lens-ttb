@@ -134,6 +134,7 @@ describe("llama-server process owner", () => {
         input: {
           observationRunId: "00000000-0000-4000-8000-000000000001",
           scenarioId: "hang",
+          sourceArtifactRef: join(dir, "source.png"),
           workspaceDir: dir,
           overlayArtifactPath: fakeOverlay(dir),
           overlayMediaType: "image/png",

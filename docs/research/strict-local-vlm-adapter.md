@@ -170,6 +170,12 @@ Slice 2 decisions are conservative:
 
 These decisions are local runtime findings, not universal proof and not production readiness claims.
 
+`STATELESS OBSERVER BOUNDARY SUPPORTED` is reserved for a real local-runtime A-B-A-C-B contamination sequence with accounted outputs, no prohibited claims, no cross-case leakage signals, unique workspaces and process lifetimes, confirmed exit and port release, and successful cleanup.
+
+`RESOURCE LIFECYCLE BOUNDED` is reserved for a completed real-runtime stress sequence with enough successful samples, no orphan processes, no cleanup failures, no unexplained monotonic RSS or workspace growth, bounded logs, and forced termination telemetry evaluated.
+
+Fake-server-only runs remain `INSUFFICIENT EVIDENCE` for both real-runtime decisions.
+
 ## Deferred work
 
 Deferred beyond Slice 2:

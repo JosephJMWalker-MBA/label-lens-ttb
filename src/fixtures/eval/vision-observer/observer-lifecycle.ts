@@ -117,6 +117,36 @@ function handoffErrorRecord(
 }
 
 function exceptionErrorRecord(error: unknown): VisionObservationErrorRecord {
+  if (error && typeof error === "object" && "code" in error && "message" in error) {
+    const code = typeof error.code === "string" ? error.code : null;
+    const message = typeof error.message === "string" ? error.message : String(error);
+    const issues =
+      "issues" in error && Array.isArray(error.issues)
+        ? error.issues.map((issue) => String(issue))
+        : [message];
+    if (code === "READINESS_TIMEOUT" || code === "REQUEST_TIMEOUT") {
+      return immutableErrorRecord({
+        code: "OBSERVER_TIMEOUT",
+        stage: "observe",
+        message,
+        issues,
+      });
+    }
+    if (code === "INVALID_OBSERVER_OUTPUT" || code === "RESPONSE_TOO_LARGE") {
+      return immutableErrorRecord({
+        code: "INVALID_OBSERVER_OUTPUT",
+        stage: "proposal-validate",
+        message,
+        issues,
+      });
+    }
+    return immutableErrorRecord({
+      code: "OBSERVER_EXCEPTION",
+      stage: "observe",
+      message,
+      issues,
+    });
+  }
   return immutableErrorRecord({
     code: "OBSERVER_EXCEPTION",
     stage: "observe",
@@ -221,6 +251,7 @@ export async function runVisionObserverLifecycle(
         {
           observationRunId,
           scenarioId: args.scenarioId,
+          sourceArtifactRef: args.sourceArtifactRef,
           workspaceDir,
           overlayArtifactPath: derivative.overlayArtifactPath,
           overlayMediaType: derivative.mediaType,
