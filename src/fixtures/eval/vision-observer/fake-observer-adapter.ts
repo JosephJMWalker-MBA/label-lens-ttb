@@ -19,6 +19,37 @@ function cloneProposals(proposals: readonly ObserverRegionProposal[]): ObserverR
   return structuredClone(proposals) as ObserverRegionProposal[];
 }
 
+function abortReason(signal: AbortSignal) {
+  return signal.reason instanceof Error ? signal.reason : new Error("vision observer aborted");
+}
+
+async function waitForDelay(delayMs: number, signal: AbortSignal) {
+  if (delayMs <= 0) {
+    if (signal.aborted) throw abortReason(signal);
+    return;
+  }
+
+  return new Promise<void>((resolve, reject) => {
+    if (signal.aborted) {
+      reject(abortReason(signal));
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      signal.removeEventListener("abort", onAbort);
+      resolve();
+    }, delayMs);
+
+    const onAbort = () => {
+      clearTimeout(timeoutId);
+      signal.removeEventListener("abort", onAbort);
+      reject(abortReason(signal));
+    };
+
+    signal.addEventListener("abort", onAbort, { once: true });
+  });
+}
+
 async function writeScenarioCanary(workspaceDir: string, scenarioId: string) {
   await writeFile(join(workspaceDir, "adapter-canary.txt"), `${scenarioId}\n`, "utf8");
 }
@@ -41,13 +72,13 @@ export class FakeVisionObserverAdapter implements VisionObserverAdapter {
     this.#delayMs = options.delayMs ?? 0;
   }
 
-  async observe(input: VisionObserverInput): Promise<VisionObserverResult> {
+  async observe(input: VisionObserverInput, signal: AbortSignal): Promise<VisionObserverResult> {
     if (this.#disposed) throw new Error("fake observer adapter has been disposed");
+    if (signal.aborted) throw abortReason(signal);
     const scenario = this.#scenarios.get(input.scenarioId);
     if (!scenario) throw new Error(`unknown fake observer scenario ${input.scenarioId}`);
-    if (this.#delayMs > 0) {
-      await new Promise((resolve) => setTimeout(resolve, this.#delayMs));
-    }
+    await waitForDelay(this.#delayMs, signal);
+    if (signal.aborted) throw abortReason(signal);
     await writeScenarioCanary(input.workspaceDir, input.scenarioId);
     return {
       observationRunId: input.observationRunId,

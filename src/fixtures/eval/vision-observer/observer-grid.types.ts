@@ -228,7 +228,7 @@ export interface VisionObserverAdapter {
   readonly adapterVersion: string;
   readonly promptId: string;
   readonly promptVersion: string;
-  observe(input: VisionObserverInput): Promise<VisionObserverResult>;
+  observe(input: VisionObserverInput, signal: AbortSignal): Promise<VisionObserverResult>;
   reset?(): Promise<void>;
   dispose(): Promise<void>;
 }

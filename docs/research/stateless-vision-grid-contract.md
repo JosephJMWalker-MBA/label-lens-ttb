@@ -36,7 +36,9 @@ The contract preserves separate SHA-256 digests for:
 - `sourceSha256`
 - `overlaySha256`
 
-OCR handoff may reference only the original source artifact and source digest. The overlay artifact path and overlay digest are preserved only as explicit rejections inside the handoff record.
+OCR handoff may reference only a caller-owned original source artifact reference and the original source digest. The overlay artifact path and overlay digest are preserved only as explicit rejections inside the handoff record.
+
+The workspace-local source copy exists only to support deterministic derivative generation and local integrity checks. It is not a durable OCR source reference and is deleted with the temporary workspace.
 
 ## Coordinate conversion
 
@@ -85,7 +87,7 @@ Each observation run creates an isolated temporary workspace and preserves:
 - `completedAt`
 - `cleanupCompleted`
 
-Workspace cleanup occurs in `finally` after success, invalid output, exceptions, timeouts, and derivative failures.
+Timeout uses an `AbortSignal` passed into the adapter. Cleanup occurs only after the observer has actually terminated or rejected, then the temporary workspace is removed in `finally`.
 
 ## Authority separation
 

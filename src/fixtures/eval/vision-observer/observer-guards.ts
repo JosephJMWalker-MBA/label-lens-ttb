@@ -1,3 +1,5 @@
+import { isAbsolute, relative } from "node:path";
+
 import { err, ok, type Result } from "@/shared/result";
 
 import { gridCellRange } from "./observer-grid";
@@ -32,6 +34,11 @@ function samePixelBox(left: PixelBox, right: PixelBox) {
     left.imageWidth === right.imageWidth &&
     left.imageHeight === right.imageHeight
   );
+}
+
+function isWithinWorkspace(candidatePath: string, workspaceDir: string) {
+  const relativePath = relative(workspaceDir, candidatePath);
+  return relativePath === "" || (!relativePath.startsWith("..") && !isAbsolute(relativePath));
 }
 
 export function guardObserverDerivativeContract(
@@ -111,9 +118,10 @@ export function guardOcrInspectionHandoff(args: {
   handoff: OcrInspectionHandoff;
   derivative: ObserverDerivative;
   inspectionPixelBox: PixelBox;
+  expectedSourceArtifactRef: string;
 }): Result<OcrInspectionHandoff, ObserverGuardError> {
   const issues: string[] = [];
-  if (args.handoff.sourceArtifactRef !== args.derivative.sourceArtifactPath) {
+  if (args.handoff.sourceArtifactRef !== args.expectedSourceArtifactRef) {
     issues.push("OCR handoff must reference the original source artifact");
   }
   if (args.handoff.sourceImageSha256 !== args.derivative.sourceSha256) {
@@ -127,6 +135,12 @@ export function guardOcrInspectionHandoff(args: {
   }
   if (args.handoff.overlaySha256Rejected !== args.derivative.overlaySha256) {
     issues.push("OCR handoff must explicitly reject the overlay digest");
+  }
+  if (
+    args.handoff.sourceArtifactRef === args.derivative.sourceArtifactPath ||
+    isWithinWorkspace(args.handoff.sourceArtifactRef, args.derivative.workspaceDir)
+  ) {
+    issues.push("OCR handoff cannot reference an ephemeral workspace artifact");
   }
   if (args.handoff.sourceArtifactRef === args.derivative.overlayArtifactPath) {
     issues.push("OCR handoff cannot hand off the overlay artifact");
@@ -143,6 +157,7 @@ export function guardOcrInspectionHandoff(args: {
 export function guardCanonicalProposal(args: {
   proposal: CanonicalRegionProposal;
   derivative: ObserverDerivative;
+  expectedSourceArtifactRef: string;
 }): Result<CanonicalRegionProposal, ObserverGuardError> {
   const validated = validateCanonicalRegionProposal(args.proposal);
   if (!validated.ok) return fail(validated.error.message, validated.error.issues);
@@ -182,6 +197,7 @@ export function guardCanonicalProposal(args: {
     handoff: args.proposal.ocrHandoff,
     derivative: args.derivative,
     inspectionPixelBox: args.proposal.ocrInspectionRegion.pixelBox,
+    expectedSourceArtifactRef: args.expectedSourceArtifactRef,
   });
   if (!handoffGuard.ok) {
     issues.push(...handoffGuard.error.issues);

@@ -28,6 +28,7 @@ function fail(
 export function adaptObserverProposal(args: {
   derivative: ObserverDerivative;
   proposal: ObserverRegionProposal;
+  sourceArtifactRef: string;
 }): Result<CanonicalRegionProposal, ObserverAdapterError> {
   const derivativeGuard = guardObserverDerivativeContract(args.derivative);
   if (!derivativeGuard.ok) {
@@ -66,7 +67,7 @@ export function adaptObserverProposal(args: {
     }),
     ocrHandoff: {
       sourceArtifactKind: "original-source",
-      sourceArtifactRef: args.derivative.sourceArtifactPath,
+      sourceArtifactRef: args.sourceArtifactRef,
       sourceImageSha256: args.derivative.sourceSha256,
       originalPixelRegion: inspectionRegion.pixelBox,
       overlayArtifactKindRejected: "observer-overlay",
@@ -78,6 +79,7 @@ export function adaptObserverProposal(args: {
   const canonicalGuard = guardCanonicalProposal({
     proposal: canonical,
     derivative: args.derivative,
+    expectedSourceArtifactRef: args.sourceArtifactRef,
   });
   if (!canonicalGuard.ok) {
     const code =
@@ -94,12 +96,14 @@ export function adaptObserverProposal(args: {
 export function adaptObserverProposals(args: {
   derivative: ObserverDerivative;
   proposals: readonly ObserverRegionProposal[];
+  sourceArtifactRef: string;
 }): Result<CanonicalRegionProposal[], ObserverAdapterError> {
   const out: CanonicalRegionProposal[] = [];
   for (const proposal of args.proposals) {
     const adapted = adaptObserverProposal({
       derivative: args.derivative,
       proposal,
+      sourceArtifactRef: args.sourceArtifactRef,
     });
     if (!adapted.ok) return adapted;
     out.push(adapted.value);

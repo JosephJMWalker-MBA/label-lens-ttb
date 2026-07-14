@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -48,6 +48,12 @@ function workspace() {
   const dir = mkdtempSync(join(tmpdir(), "vision-observer-test-"));
   CLEANUP.push(dir);
   return dir;
+}
+
+function writeSourceArtifact(sourceBytes: Uint8Array, filename = "source.png") {
+  const path = join(workspace(), filename);
+  writeFileSync(path, Buffer.from(sourceBytes));
+  return path;
 }
 
 async function solidPng(width: number, height: number, color = "#dde4f7") {
@@ -360,8 +366,9 @@ describe("observer derivative rendering and source-overlay guards", () => {
 
 describe("adapter and authority guards", () => {
   it("adapts proposals into distinct proposed and OCR inspection regions", async () => {
+    const sourceBytes = await solidPng(1000, 500);
     const derivative = await createObserverDerivative({
-      sourceBytes: await solidPng(1000, 500),
+      sourceBytes,
       sourceMediaType: "image/png",
       expectedSourceWidth: 1000,
       expectedSourceHeight: 500,
@@ -373,6 +380,7 @@ describe("adapter and authority guards", () => {
     const adapted = adaptObserverProposal({
       derivative: derivative.value,
       proposal: makeProposal(),
+      sourceArtifactRef: writeSourceArtifact(sourceBytes),
     });
     expect(adapted.ok).toBe(true);
     if (!adapted.ok) return;
@@ -386,7 +394,9 @@ describe("adapter and authority guards", () => {
     expect(adapted.value.ocrInspectionRegion.normalizedBox.width).toBeGreaterThan(
       adapted.value.proposedRegion.normalizedBox.width,
     );
-    expect(adapted.value.ocrHandoff.sourceArtifactRef).toBe(derivative.value.sourceArtifactPath);
+    expect(adapted.value.ocrHandoff.sourceArtifactRef).not.toBe(
+      derivative.value.sourceArtifactPath,
+    );
     expect(adapted.value.ocrHandoff.sourceImageSha256).toBe(derivative.value.sourceSha256);
     expect(adapted.value.ocrHandoff.overlayArtifactPathRejected).toBe(
       derivative.value.overlayArtifactPath,
@@ -396,13 +406,15 @@ describe("adapter and authority guards", () => {
         handoff: adapted.value.ocrHandoff,
         derivative: derivative.value,
         inspectionPixelBox: adapted.value.ocrInspectionRegion.pixelBox,
+        expectedSourceArtifactRef: adapted.value.ocrHandoff.sourceArtifactRef,
       }).ok,
     ).toBe(true);
   });
 
-  it("rejects OCR handoffs that try to reuse the overlay artifact or digest", async () => {
+  it("rejects OCR handoffs that try to reuse the overlay artifact, digest, or workspace source copy", async () => {
+    const sourceBytes = await solidPng(400, 200);
     const derivative = await createObserverDerivative({
-      sourceBytes: await solidPng(400, 200),
+      sourceBytes,
       sourceMediaType: "image/png",
       expectedSourceWidth: 400,
       expectedSourceHeight: 200,
@@ -414,6 +426,7 @@ describe("adapter and authority guards", () => {
     const adapted = adaptObserverProposal({
       derivative: derivative.value,
       proposal: makeProposal({ gridRange: parseGridCellRange("A1") }),
+      sourceArtifactRef: writeSourceArtifact(sourceBytes),
     });
     expect(adapted.ok).toBe(true);
     if (!adapted.ok) return;
@@ -426,8 +439,20 @@ describe("adapter and authority guards", () => {
       },
       derivative: derivative.value,
       inspectionPixelBox: adapted.value.ocrInspectionRegion.pixelBox,
+      expectedSourceArtifactRef: adapted.value.ocrHandoff.sourceArtifactRef,
     });
     expect(rejected.ok).toBe(false);
+
+    const workspaceSourceRejected = guardOcrInspectionHandoff({
+      handoff: {
+        ...adapted.value.ocrHandoff,
+        sourceArtifactRef: derivative.value.sourceArtifactPath,
+      },
+      derivative: derivative.value,
+      inspectionPixelBox: adapted.value.ocrInspectionRegion.pixelBox,
+      expectedSourceArtifactRef: derivative.value.sourceArtifactPath,
+    });
+    expect(workspaceSourceRejected.ok).toBe(false);
   });
 
   it("rejects prohibited descriptions and human/regulatory authority claims at runtime", () => {

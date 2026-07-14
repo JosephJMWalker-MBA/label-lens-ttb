@@ -22,6 +22,7 @@ import type {
 
 interface RunVisionObserverLifecycleArgs {
   scenarioId: string;
+  sourceArtifactRef: string;
   sourceBytes: Uint8Array;
   sourceMediaType: string;
   sourceWidth: number;
@@ -138,16 +139,27 @@ async function observeWithTimeout(
   input: Parameters<VisionObserverAdapter["observe"]>[0],
   timeoutMs: number,
 ): Promise<VisionObserverResult> {
-  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
-    return adapter.observe(input);
-  }
+  const controller = new AbortController();
+  const timeoutId =
+    Number.isFinite(timeoutMs) && timeoutMs > 0
+      ? setTimeout(() => {
+          controller.abort(new VisionObserverTimeoutError(timeoutMs));
+        }, timeoutMs)
+      : null;
 
-  return Promise.race<VisionObserverResult>([
-    adapter.observe(input),
-    new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new VisionObserverTimeoutError(timeoutMs)), timeoutMs);
-    }),
-  ]);
+  try {
+    return await adapter.observe(input, controller.signal);
+  } catch (error) {
+    if (
+      controller.signal.aborted &&
+      controller.signal.reason instanceof VisionObserverTimeoutError
+    ) {
+      throw controller.signal.reason;
+    }
+    throw error;
+  } finally {
+    if (timeoutId !== null) clearTimeout(timeoutId);
+  }
 }
 
 function buildRunMetadata(args: {
@@ -259,6 +271,7 @@ export async function runVisionObserverLifecycle(
           const adapted = adaptObserverProposals({
             derivative,
             proposals: validatedProposals,
+            sourceArtifactRef: args.sourceArtifactRef,
           });
           if (!adapted.ok) {
             errorRecord =
