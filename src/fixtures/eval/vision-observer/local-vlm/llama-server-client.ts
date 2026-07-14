@@ -55,27 +55,27 @@ export function chatCompletionsUrl(config: LocalVlmResolvedConfig, port: number)
   return `${baseUrl(config.host, port)}${config.chatCompletionsPath}`;
 }
 
-export function buildObservationRequestBody(args: {
+export function buildVisionChatRequestBody(args: {
   config: LocalVlmResolvedConfig;
-  input: VisionObserverInput;
   overlayDataUrl: string;
-  promptText?: string;
-  instructionText?: string;
+  systemPrompt: string;
+  userInstruction: string;
+  maxTokens?: number;
+  responseFormat?: Record<string, unknown>;
 }): Record<string, unknown> {
-  return {
+  const body: Record<string, unknown> = {
     model: args.config.modelDisplayId,
     temperature: args.config.temperature,
     seed: args.config.seed,
-    max_tokens: args.config.maxOutputTokens,
-    response_format: { type: "json_object" },
+    max_tokens: args.maxTokens ?? args.config.maxOutputTokens,
     messages: [
-      { role: "system", content: args.promptText ?? LOCAL_VLM_PROMPT_TEXT },
+      { role: "system", content: args.systemPrompt },
       {
         role: "user",
         content: [
           {
             type: "text",
-            text: args.instructionText ?? buildObservationInstruction(args.input.observationRunId),
+            text: args.userInstruction,
           },
           {
             type: "image_url",
@@ -87,6 +87,29 @@ export function buildObservationRequestBody(args: {
       },
     ],
   };
+
+  if (args.responseFormat) {
+    body.response_format = args.responseFormat;
+  }
+
+  return body;
+}
+
+export function buildObservationRequestBody(args: {
+  config: LocalVlmResolvedConfig;
+  input: VisionObserverInput;
+  overlayDataUrl: string;
+  promptText?: string;
+  instructionText?: string;
+}): Record<string, unknown> {
+  return buildVisionChatRequestBody({
+    config: args.config,
+    overlayDataUrl: args.overlayDataUrl,
+    systemPrompt: args.promptText ?? LOCAL_VLM_PROMPT_TEXT,
+    userInstruction:
+      args.instructionText ?? buildObservationInstruction(args.input.observationRunId),
+    responseFormat: { type: "json_object" },
+  });
 }
 
 export async function waitForReadiness(args: {

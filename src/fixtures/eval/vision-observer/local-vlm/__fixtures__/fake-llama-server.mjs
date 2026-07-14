@@ -38,6 +38,8 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
   const spawnChild = args.get("spawn-child") === "1";
   const ignoreTermOnce = args.get("ignore-term-once") === "1";
   const canary = args.get("canary") ?? "ALPHA ORCHID";
+  const completionFailAtRung = args.get("completion-fail-at-rung") ?? null;
+  const completionErrorAtRung = args.get("completion-error-at-rung") ?? null;
 
   mkdirSync(workspaceDir, { recursive: true });
   if (logBytes > 0) process.stderr.write("X".repeat(logBytes));
@@ -191,11 +193,112 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
     };
   }
 
+  function completionPayloadWithoutCoordinates() {
+    const base = validPayload().proposals[0];
+    return {
+      observationRunId: "replace-me",
+      proposals: [
+        {
+          observationId: base.observationId,
+          proposalId: base.proposalId,
+          observationType: base.observationType,
+          source: base.source,
+          authority: base.authority,
+          purpose: base.purpose,
+          apparentOrientation: base.apparentOrientation,
+          visibility: base.visibility,
+          reasonCodes: base.reasonCodes,
+          description: base.description,
+        },
+      ],
+    };
+  }
+
+  function completionPayloadWithOneGridRegion() {
+    const base = validPayload().proposals[0];
+    return {
+      observationRunId: "replace-me",
+      proposals: [
+        {
+          observationId: base.observationId,
+          proposalId: base.proposalId,
+          observationType: base.observationType,
+          source: base.source,
+          authority: base.authority,
+          purpose: base.purpose,
+          gridRange: {
+            start: { column: "A", row: 1, columnIndex: 0, rowIndex: 0, id: "A1" },
+            end: { column: "A", row: 1, columnIndex: 0, rowIndex: 0, id: "A1" },
+            notation: "A1",
+          },
+          localRefinement: null,
+          observationRotation: 0,
+          apparentOrientation: base.apparentOrientation,
+          visibility: base.visibility,
+          reasonCodes: ["high_salience"],
+          description: base.description,
+        },
+      ],
+    };
+  }
+
+  function completionRung(payload) {
+    const system = String(payload?.messages?.[0]?.content ?? "");
+    if (system.includes("Return exactly one token: OK.")) return "one-token";
+    if (system.includes("Return exactly one short sentence and nothing else.")) {
+      return "one-short-sentence";
+    }
+    if (system.includes('Return exactly this JSON object and nothing else: {"ok":true}')) {
+      return "minimal-json";
+    }
+    if (system.includes("Return exactly this empty observer envelope and nothing else.")) {
+      return "empty-observer-envelope";
+    }
+    if (
+      system.includes("Return exactly one observer proposal without any gridRange coordinates.")
+    ) {
+      return "one-observation-without-coordinates";
+    }
+    if (system.includes("Return exactly one observer proposal with exactly one gridRange.")) {
+      return "one-observation-with-one-grid-region";
+    }
+    return "full-observer-schema";
+  }
+
+  async function completionResponseForRung(payload, runId) {
+    switch (completionRung(payload)) {
+      case "one-token":
+        return "OK";
+      case "one-short-sentence":
+        return "Visible artwork is present.";
+      case "minimal-json":
+        return '{"ok":true}';
+      case "empty-observer-envelope":
+        return JSON.stringify({
+          observationRunId: runId,
+          proposals: [],
+        });
+      case "one-observation-without-coordinates":
+        return JSON.stringify({
+          ...completionPayloadWithoutCoordinates(),
+          observationRunId: runId,
+        });
+      case "one-observation-with-one-grid-region":
+        return JSON.stringify({
+          ...completionPayloadWithOneGridRegion(),
+          observationRunId: runId,
+        });
+      default:
+        return JSON.stringify(validPayload()).replace('"replace-me"', JSON.stringify(runId));
+    }
+  }
+
   let healthy = false;
   setTimeout(() => {
     healthy = true;
   }, readyDelayMs);
 
+  const sockets = new Set();
   const server = createServer(async (req, res) => {
     if (req.url === "/health") {
       if (mode === "exit-before-ready" || !healthy) {
@@ -226,18 +329,42 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
     const runId = runIdLine.split(": ")?.[1]?.trim() ?? "unknown";
     await new Promise((resolve) => setTimeout(resolve, requestDelayMs));
     writeFileSync(join(workspaceDir, "request.json"), body);
-    const content = (await responseForMode(payload)).replace('"replace-me"', JSON.stringify(runId));
+    const content =
+      mode === "completion-ladder"
+        ? await completionResponseForRung(payload, runId)
+        : (await responseForMode(payload)).replace('"replace-me"', JSON.stringify(runId));
     if (mode === "write-after-cancel") {
       setTimeout(() => {
         writeFileSync(join(workspaceDir, "after-cancel.txt"), "late-write\n");
       }, 50);
     }
     res.setHeader("content-type", "application/json");
-    res.end(
-      JSON.stringify({
-        choices: [{ message: { content } }],
-      }),
-    );
+    const transportPayload = JSON.stringify({
+      choices: [{ message: { content }, finish_reason: "stop" }],
+    });
+    if (mode === "completion-ladder" && completionFailAtRung === completionRung(payload)) {
+      const cutoff = Math.max(1, Math.floor(transportPayload.length / 2));
+      res.write(transportPayload.slice(0, cutoff));
+      return;
+    }
+    if (mode === "completion-ladder" && completionErrorAtRung === completionRung(payload)) {
+      res.statusCode = 500;
+      res.end(
+        JSON.stringify({
+          error: {
+            message: "simulated completion error",
+          },
+        }),
+      );
+      return;
+    }
+    res.end(transportPayload);
+  });
+  server.on("connection", (socket) => {
+    sockets.add(socket);
+    socket.on("close", () => {
+      sockets.delete(socket);
+    });
   });
 
   process.once("SIGTERM", () => {
@@ -245,9 +372,15 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
       ignoredTerm = true;
       return;
     }
+    for (const socket of sockets) {
+      socket.destroy();
+    }
     server.close(() => process.exit(0));
   });
   process.once("SIGINT", () => {
+    for (const socket of sockets) {
+      socket.destroy();
+    }
     server.close(() => process.exit(0));
   });
 

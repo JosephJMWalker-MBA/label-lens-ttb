@@ -61,6 +61,8 @@ export function writeFakeServerWrapper(
     spawnChild?: boolean;
     ignoreTermOnce?: boolean;
     canary?: string;
+    completionFailAtRung?: string;
+    completionErrorAtRung?: string;
   } = {},
 ): { path: string; sha256: string } {
   const path = join(dir, `fake-llama-server-${Date.now()}.mjs`);
@@ -76,6 +78,12 @@ export function writeFakeServerWrapper(
   if (options.spawnChild) extraArgs.push("--spawn-child", "1");
   if (options.ignoreTermOnce) extraArgs.push("--ignore-term-once", "1");
   if (options.canary) extraArgs.push("--canary", options.canary);
+  if (options.completionFailAtRung) {
+    extraArgs.push("--completion-fail-at-rung", options.completionFailAtRung);
+  }
+  if (options.completionErrorAtRung) {
+    extraArgs.push("--completion-error-at-rung", options.completionErrorAtRung);
+  }
 
   const spliceLine =
     extraArgs.length === 0
