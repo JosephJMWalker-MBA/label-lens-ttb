@@ -493,6 +493,7 @@ export const visionObserverInputSchema = z
   .object({
     observationRunId: nonEmpty,
     scenarioId: nonEmpty,
+    sourceArtifactRef: nonEmpty,
     workspaceDir: absolutePath,
     overlayArtifactPath: absolutePath,
     overlayMediaType: z.literal(OBSERVER_OVERLAY_MEDIA_TYPE),
