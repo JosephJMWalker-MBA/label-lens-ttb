@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 
 import type { LocalVlmResolvedConfig } from "./local-vlm.types";
 import { type Phase1DiagnosticReport } from "./phase1-diagnostic-types";
+import { sendVisionAttentionTransportRequest } from "./vision-attention-diagnostic";
 
 export interface ImageTransportWitness {
   requestContentType: string | null;
@@ -160,54 +160,11 @@ export function evaluateImageTransportWitness(args: {
   };
 }
 
-function buildTransportRequestBody(args: {
-  config: LocalVlmResolvedConfig;
-  imageMediaType: string;
-  imageBytes: Buffer;
-}) {
-  return {
-    model: args.config.modelDisplayId,
-    temperature: args.config.temperature,
-    seed: args.config.seed,
-    max_tokens: 8,
-    messages: [
-      {
-        role: "system",
-        content: "This is an image transport witness. Return OK.",
-      },
-      {
-        role: "user",
-        content: [
-          {
-            type: "text",
-            text: "run id: image-transport\nAcknowledge receipt with OK.",
-          },
-          {
-            type: "image_url",
-            image_url: {
-              url: `data:${args.imageMediaType};base64,${args.imageBytes.toString("base64")}`,
-            },
-          },
-        ],
-      },
-    ],
-  };
-}
-
 export async function runImageTransportDiagnostic(args: {
   config: LocalVlmResolvedConfig;
   imagePath: string;
   imageMediaType: string;
 }): Promise<ImageTransportDiagnosticReport> {
-  const imageBytes = await readFile(args.imagePath);
-  const body = JSON.stringify(
-    buildTransportRequestBody({
-      config: args.config,
-      imageMediaType: args.imageMediaType,
-      imageBytes,
-    }),
-  );
-
   const witness: ImageTransportWitness = {
     requestContentType: null,
     rawRequestBody: "",
@@ -247,11 +204,13 @@ export async function runImageTransportDiagnostic(args: {
       throw new Error("failed to allocate transport witness port");
     }
 
-    await fetch(`http://127.0.0.1:${address.port}/v1/chat/completions`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body,
+    await sendVisionAttentionTransportRequest({
+      config: args.config,
+      port: address.port,
       signal: AbortSignal.timeout(args.config.requestTimeoutMs),
+      imagePath: args.imagePath,
+      imageLabel: "BLACK",
+      imageMediaType: args.imageMediaType,
     });
   } catch (error) {
     return {

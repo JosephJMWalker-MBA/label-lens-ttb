@@ -13,6 +13,7 @@ import {
 } from "./phase1-diagnostic-types";
 import {
   runVisionAttentionDiagnostic,
+  VISION_ATTENTION_IMAGE_MEDIA_TYPE,
   writeVisionAttentionSentinelPair,
   type VisionAttentionDiagnosticReport,
 } from "./vision-attention-diagnostic";
@@ -60,7 +61,7 @@ export async function runLocalVlmPhase1Diagnostics(args: {
         runImageTransportDiagnostic({
           config: args.config,
           imagePath: blackImagePath,
-          imageMediaType: "image/png",
+          imageMediaType: VISION_ATTENTION_IMAGE_MEDIA_TYPE,
         }),
       runVisionAttention: () =>
         runVisionAttentionDiagnostic({

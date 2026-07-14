@@ -11,6 +11,7 @@ import type { LocalVlmResolvedConfig } from "./local-vlm.types";
 import { type Phase1DiagnosticReport } from "./phase1-diagnostic-types";
 
 export type VisionAttentionToken = "BLACK" | "WHITE";
+export const VISION_ATTENTION_IMAGE_MEDIA_TYPE = "image/png" as const;
 
 export interface VisionAttentionProbeEvidence {
   imageLabel: VisionAttentionToken;
@@ -86,13 +87,17 @@ function normalizeBinaryToken(text: string): VisionAttentionToken | null {
   return hasBlack ? "BLACK" : "WHITE";
 }
 
-async function sendVisionAttentionProbe(args: {
+export async function sendVisionAttentionTransportRequest(args: {
   config: LocalVlmResolvedConfig;
   port: number;
   signal: AbortSignal;
   imagePath: string;
   imageLabel: VisionAttentionToken;
-}): Promise<VisionAttentionProbeEvidence> {
+  imageMediaType?: string;
+}): Promise<{
+  text: string;
+  bytes: number;
+}> {
   const imageBytes = await readFile(args.imagePath);
   const response = await fetch(chatCompletionsUrl(args.config, args.port), {
     method: "POST",
@@ -118,7 +123,7 @@ async function sendVisionAttentionProbe(args: {
             {
               type: "image_url",
               image_url: {
-                url: `data:image/png;base64,${imageBytes.toString("base64")}`,
+                url: `data:${args.imageMediaType ?? VISION_ATTENTION_IMAGE_MEDIA_TYPE};base64,${imageBytes.toString("base64")}`,
               },
             },
           ],
@@ -137,9 +142,24 @@ async function sendVisionAttentionProbe(args: {
   }
 
   return {
+    text: rawOutput,
+    bytes: Buffer.byteLength(rawOutput),
+  };
+}
+
+async function sendVisionAttentionProbe(args: {
+  config: LocalVlmResolvedConfig;
+  port: number;
+  signal: AbortSignal;
+  imagePath: string;
+  imageLabel: VisionAttentionToken;
+}): Promise<VisionAttentionProbeEvidence> {
+  const transport = await sendVisionAttentionTransportRequest(args);
+
+  return {
     imageLabel: args.imageLabel,
-    rawOutput,
-    normalizedToken: normalizeBinaryToken(rawOutput),
+    rawOutput: transport.text,
+    normalizedToken: normalizeBinaryToken(transport.text),
   };
 }
 

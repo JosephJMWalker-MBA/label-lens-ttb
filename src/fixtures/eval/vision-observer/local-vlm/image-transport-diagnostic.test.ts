@@ -78,6 +78,24 @@ describe("image transport diagnostic", () => {
     expect(report.evidence.imageCount).toBe(1);
     expect(report.evidence.imageMimeTypes).toEqual(["image/png"]);
     expect(report.evidence.imageByteLengths[0]).toBe(bytes.byteLength);
+    const payload = JSON.parse(report.evidence.rawRequestBody) as {
+      max_tokens: number;
+      messages: Array<{ content: unknown }>;
+    };
+    expect(payload.max_tokens).toBe(8);
+    expect(payload.messages[0]?.content).toBe(
+      "You are running a vision attention diagnostic. Return exactly one token: BLACK or WHITE.",
+    );
+    expect(payload.messages[1]?.content).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: "text",
+          text: expect.stringMatching(
+            /run id: vision-attention-black[\s\S]*If the image is predominantly black, return BLACK\. If the image is predominantly white, return WHITE\. Return exactly one token\./,
+          ),
+        }),
+      ]),
+    );
   });
 
   it("rejects duplicate images in the witness body", async () => {
