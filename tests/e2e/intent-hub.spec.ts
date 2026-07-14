@@ -20,7 +20,7 @@ test("the hub asks what you want to do and offers the upload-or-build promise", 
   await expect(page.getByText(/not a TTB approval/i)).toBeVisible();
 });
 
-test("all five intents appear, and only review and learn are active", async ({ page }) => {
+test("all five intents appear, and create, review and learn are active", async ({ page }) => {
   await page.goto("/");
 
   for (const title of [
@@ -33,12 +33,12 @@ test("all five intents appear, and only review and learn are active", async ({ p
     await expect(page.getByText(title, { exact: true })).toBeVisible();
   }
 
-  // The intent list offers exactly two destinations.
+  // The intent list offers exactly three destinations.
   const intentLinks = page.getByRole("list").first().getByRole("link");
-  await expect(intentLinks).toHaveCount(2);
+  await expect(intentLinks).toHaveCount(3);
 
   // Unavailable paths state their absence in text and expose nothing to click.
-  await expect(page.getByText(/not available yet/i)).toHaveCount(3);
+  await expect(page.getByText(/not available yet/i)).toHaveCount(2);
   await expect(page.getByRole("list").first().getByRole("button")).toHaveCount(0);
 
   // No marketing substitutes for the missing capability.
@@ -123,5 +123,5 @@ test("the hub renders in dark mode with the intents intact", async ({ page }) =>
   await expect(
     page.getByRole("heading", { level: 1, name: /what would you like to do today\?/i }),
   ).toBeVisible();
-  await expect(page.getByText(/not available yet/i)).toHaveCount(3);
+  await expect(page.getByText(/not available yet/i)).toHaveCount(2);
 });

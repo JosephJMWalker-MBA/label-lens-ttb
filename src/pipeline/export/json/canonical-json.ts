@@ -1,28 +1,17 @@
 import { createHash } from "node:crypto";
 
+import { canonicalStringify } from "./canonical-stringify";
 import type { ExportPayload, PrecheckJsonExport } from "./json-export.types";
 
 /**
  * Canonical, deterministic serialization for the JSON export.
  *
- * Keys are sorted, arrays preserve order (findings, rule manifest, alternates,
- * disposition history), and no whitespace, current time, randomness, or
- * environment value is ever introduced. This is the single serialization used
- * for hashing and for the canonical export text.
+ * `canonicalStringify` now lives in `./canonical-stringify`, which carries no
+ * Node-only import, so the browser can share the identical serialization. It is
+ * re-exported here so every existing importer is unaffected. There is still
+ * exactly one canonical form — that is the whole point of moving it.
  */
-export function canonicalStringify(value: unknown): string {
-  if (Array.isArray(value)) {
-    return `[${value.map(canonicalStringify).join(",")}]`;
-  }
-  if (value && typeof value === "object") {
-    const entries = Object.entries(value as Record<string, unknown>)
-      .filter(([, v]) => v !== undefined)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([k, v]) => `${JSON.stringify(k)}:${canonicalStringify(v)}`);
-    return `{${entries.join(",")}}`;
-  }
-  return JSON.stringify(value) ?? "null";
-}
+export { canonicalStringify };
 
 /** SHA-256 (lowercase hex) over the canonical serialization of the payload. */
 export function payloadHash(payload: ExportPayload): string {

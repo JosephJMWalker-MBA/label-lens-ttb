@@ -24,13 +24,17 @@ describe("HomePage — intent hub", () => {
     }
   });
 
-  it("offers exactly two active paths: review and learn", () => {
+  it("offers exactly three active paths: create, review and learn", () => {
     render(<HomePage />);
     // The intent list is the only place intents are offered; the header's
     // navigation is a separate landmark and is not counted here.
     const list = screen.getByRole("list");
     const links = within(list).getAllByRole("link");
-    expect(links.map((a) => a.getAttribute("href")).sort()).toEqual(["/learn", "/review"]);
+    expect(links.map((a) => a.getAttribute("href")).sort()).toEqual([
+      "/create",
+      "/learn",
+      "/review",
+    ]);
   });
 
   it("gives unavailable paths no interactive control at all", () => {
@@ -44,8 +48,9 @@ describe("HomePage — intent hub", () => {
 
   it("states each unavailable path's absence in text, not by styling alone", () => {
     render(<HomePage />);
-    expect(screen.getAllByText(/not available yet/i)).toHaveLength(3);
-    expect(screen.getByText(/cannot create artwork/i)).toBeInTheDocument();
+    // "Create a new label" became a real path in UI Slice 2, so two remain
+    // unavailable — and they still say so in words, not by dimming.
+    expect(screen.getAllByText(/not available yet/i)).toHaveLength(2);
     expect(screen.getByText(/cannot edit artwork/i)).toBeInTheDocument();
     expect(screen.getByText(/there is no provider directory/i)).toBeInTheDocument();
   });

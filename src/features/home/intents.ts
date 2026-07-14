@@ -41,11 +41,11 @@ export const INTENTS: readonly Intent[] = [
   {
     id: "create",
     title: "Create a new label",
-    summary: "Start from your product facts, without any artwork.",
-    status: "unavailable",
-    absence:
-      "Label Lens cannot create artwork. There is no design canvas, no template scaffold, and no artwork generation in the product today.",
-    instead: "If you already have artwork from a designer, you can review it before submission.",
+    summary:
+      "Start from your product facts, without any artwork. See the requirements this system can cite, and take away a starter scaffold.",
+    status: "available",
+    href: "/create",
+    action: "Start from facts",
   },
   {
     id: "improve",
