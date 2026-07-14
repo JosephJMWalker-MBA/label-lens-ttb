@@ -191,7 +191,8 @@ async function observeWithTimeout(
   } catch (error) {
     if (
       controller.signal.aborted &&
-      controller.signal.reason instanceof VisionObserverTimeoutError
+      controller.signal.reason instanceof VisionObserverTimeoutError &&
+      (error === controller.signal.reason || error instanceof VisionObserverTimeoutError)
     ) {
       throw controller.signal.reason;
     }

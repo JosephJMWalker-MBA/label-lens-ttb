@@ -179,6 +179,46 @@ class TimeoutAwareAdapter implements VisionObserverAdapter {
   async dispose(): Promise<void> {}
 }
 
+class TimeoutThenTerminationFailureAdapter implements VisionObserverAdapter {
+  readonly adapterId = "timeout-then-termination-failure-adapter";
+  readonly adapterVersion = "1.0.0";
+  readonly promptId = "timeout-then-termination-failure";
+  readonly promptVersion = "1.0.0";
+
+  startedTermination = false;
+  terminationMarkerPath: string | null = null;
+
+  async observe(input: VisionObserverInput, signal: AbortSignal): Promise<VisionObserverResult> {
+    return new Promise<VisionObserverResult>((_, reject) => {
+      const failTermination = async () => {
+        this.startedTermination = true;
+        this.terminationMarkerPath = join(input.workspaceDir, "termination-failed.txt");
+        await writeFile(this.terminationMarkerPath, "termination failed\n", "utf8");
+        await new Promise((resolve) => setTimeout(resolve, 25));
+        reject({
+          code: "PROCESS_TERMINATION_FAILED",
+          message: "The local VLM child process did not exit after forced termination.",
+          issues: ["pid=synthetic-timeout"],
+        });
+      };
+
+      if (signal.aborted) {
+        void failTermination();
+        return;
+      }
+
+      const onAbort = () => {
+        signal.removeEventListener("abort", onAbort);
+        void failTermination();
+      };
+
+      signal.addEventListener("abort", onAbort, { once: true });
+    });
+  }
+
+  async dispose(): Promise<void> {}
+}
+
 describe("observer lifecycle integration", () => {
   it("runs the async lifecycle with a padded OCR inspection region and cleanup", async () => {
     const sourceBytes = await solidPng(1000, 600);
@@ -333,6 +373,33 @@ describe("observer lifecycle integration", () => {
     expect(result.run.cleanupCompleted).toBe(true);
     expect(existsSync(result.workspaceDir)).toBe(false);
     expect(adapter.terminationMarkerPath && existsSync(adapter.terminationMarkerPath)).toBe(false);
+  });
+
+  it("preserves termination failure precedence after the outer timeout fires", async () => {
+    const adapter = new TimeoutThenTerminationFailureAdapter();
+    const sourceBytes = await solidPng(500, 300);
+    const result = await runVisionObserverLifecycle({
+      scenarioId: "upper-title-band",
+      sourceArtifactRef: writeSourceArtifact(sourceBytes),
+      sourceBytes,
+      sourceMediaType: "image/png",
+      sourceWidth: 500,
+      sourceHeight: 300,
+      adapter,
+      timeoutMs: 5,
+    });
+
+    CLEANUP.push(result.workspaceDir);
+    expect(adapter.startedTermination).toBe(true);
+    expect(result.errorRecord?.code).toBe("OBSERVER_EXCEPTION");
+    expect(result.errorRecord?.message).toBe(
+      "The local VLM child process did not exit after forced termination.",
+    );
+    expect(result.canonicalProposals).toEqual([]);
+    expect(result.run.cleanupCompleted).toBe(false);
+    expect(existsSync(result.workspaceDir)).toBe(true);
+    expect(adapter.terminationMarkerPath).not.toBeNull();
+    expect(adapter.terminationMarkerPath && existsSync(adapter.terminationMarkerPath)).toBe(true);
   });
 
   it("cleans up after observer exceptions", async () => {
