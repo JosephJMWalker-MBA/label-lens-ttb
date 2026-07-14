@@ -40,6 +40,7 @@ async function pngBytes() {
 
 async function diagnosticConfig(args: {
   completionFailAtRung?: string;
+  completionErrorAtRung?: string;
   requestTimeoutMs?: number;
 }) {
   const dir = tempDir();
@@ -47,6 +48,7 @@ async function diagnosticConfig(args: {
   const executable = writeFakeServerWrapper(dir, {
     mode: "completion-ladder",
     completionFailAtRung: args.completionFailAtRung,
+    completionErrorAtRung: args.completionErrorAtRung,
   });
   const model = writeFakeModel(dir);
   const resolved = await resolveLocalVlmConfig(
@@ -129,6 +131,7 @@ describe("response completion diagnostic", () => {
     expect(report.rungs).toHaveLength(RESPONSE_COMPLETION_DIAGNOSTIC_RUNGS.length);
     expect(report.firstFailingRung).toBeNull();
     expect(report.rungs.every((rung) => rung.status === "PASS")).toBe(true);
+    expect(report.rungs.every((rung) => rung.evidence?.responseCompletedSuccessfully)).toBe(true);
     expect(report.rungs[0]?.evidence?.finishReason).toBe("stop");
     expect(report.rungs[0]?.evidence?.outputPreviewEscaped).toContain("OK");
     expect(report.rungs.at(-1)?.evidence?.outputPreviewEscaped).toContain("proposal-1");
@@ -160,7 +163,9 @@ describe("response completion diagnostic", () => {
     ]);
 
     const failed = report.rungs[2];
-    expect(failed?.evidence?.firstTokenAt).not.toBeNull();
+    expect(failed?.evidence?.firstResponseByteAt).not.toBeNull();
+    expect(failed?.evidence?.transportCompletedAt).toBeNull();
+    expect(failed?.evidence?.responseCompletedSuccessfully).toBe(false);
     expect(failed?.evidence?.completionAt).toBeNull();
     expect(failed?.evidence?.timeoutStage).toBe("response-body");
     expect(failed?.evidence?.responseBytes).toBeGreaterThan(0);
@@ -169,5 +174,41 @@ describe("response completion diagnostic", () => {
     expect(failed?.evidence?.process?.forcedTermination).toBe(false);
     expect(failed?.evidence?.resources?.processTreeReleasedAfterTermination).toBe(true);
     expect(report.rungs[3]?.blockedBy).toBe("minimal-json");
+  });
+
+  it("fails a rung when the HTTP response completes but does not complete successfully", async () => {
+    const config = await diagnosticConfig({
+      completionErrorAtRung: "minimal-json",
+      requestTimeoutMs: 200,
+    });
+    const source = await sourceFixture();
+
+    const report = await runLocalVlmResponseCompletionDiagnostic({
+      config,
+      scenarioId: "response-completion-http-error",
+      ...source,
+    });
+
+    expect(report.firstFailingRung).toBe("minimal-json");
+    expect(report.rungs.map((rung) => rung.status)).toEqual([
+      "PASS",
+      "PASS",
+      "FAIL",
+      "BLOCKED",
+      "BLOCKED",
+      "BLOCKED",
+      "BLOCKED",
+    ]);
+
+    const failed = report.rungs[2];
+    expect(failed?.evidence?.firstResponseByteAt).not.toBeNull();
+    expect(failed?.evidence?.transportCompletedAt).not.toBeNull();
+    expect(failed?.evidence?.transportCompletionLatencyMs).not.toBeNull();
+    expect(failed?.evidence?.responseCompletedSuccessfully).toBe(false);
+    expect(failed?.evidence?.completionAt).toBeNull();
+    expect(failed?.evidence?.timeoutStage).toBeNull();
+    expect(failed?.evidence?.outputPreviewEscaped).toContain("simulated completion error");
+    expect(failed?.evidence?.process?.forcedTermination).toBe(false);
+    expect(failed?.evidence?.resources?.processTreeReleasedAfterTermination).toBe(true);
   });
 });

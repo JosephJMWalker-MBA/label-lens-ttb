@@ -48,8 +48,11 @@ export type ResponseCompletionDiagnosticRung =
 
 export interface ResponseCompletionRungEvidence {
   requestStartedAt: string | null;
-  firstTokenAt: string | null;
-  firstTokenLatencyMs: number | null;
+  firstResponseByteAt: string | null;
+  firstResponseByteLatencyMs: number | null;
+  transportCompletedAt: string | null;
+  transportCompletionLatencyMs: number | null;
+  responseCompletedSuccessfully: boolean;
   completionAt: string | null;
   completionLatencyMs: number | null;
   responseBytes: number;
@@ -133,11 +136,15 @@ export interface ResponseCompletionRequestSpec {
 interface CompletionTransportSuccess {
   ok: true;
   responseBytes: number;
-  firstTokenAt: string | null;
-  firstTokenLatencyMs: number | null;
+  firstResponseByteAt: string | null;
+  firstResponseByteLatencyMs: number | null;
+  transportCompletedAt: string;
+  transportCompletionLatencyMs: number;
+  responseCompletedSuccessfully: true;
   completionAt: string;
   completionLatencyMs: number;
   finishReason: string | null;
+  timeoutStage: null;
   outputPreviewEscaped: string | null;
 }
 
@@ -145,11 +152,15 @@ interface CompletionTransportFailure {
   ok: false;
   failure: LocalVlmObservationFailureShape;
   responseBytes: number;
-  firstTokenAt: string | null;
-  firstTokenLatencyMs: number | null;
+  firstResponseByteAt: string | null;
+  firstResponseByteLatencyMs: number | null;
+  transportCompletedAt: string | null;
+  transportCompletionLatencyMs: number | null;
+  responseCompletedSuccessfully: false;
   completionAt: string | null;
   completionLatencyMs: number | null;
   timeoutStage: "request" | "response-body" | null;
+  finishReason: string | null;
   outputPreviewEscaped: string | null;
 }
 
@@ -336,27 +347,89 @@ function concatChunks(chunks: Uint8Array[], total: number): Uint8Array {
   return buffer;
 }
 
-function transportDetails(rawText: string): {
-  finishReason: string | null;
-  outputPreviewEscaped: string;
-} {
-  try {
-    const payload = JSON.parse(rawText) as {
-      choices?: Array<{ message?: { content?: unknown }; finish_reason?: unknown }>;
-    };
-    const choice = payload.choices?.[0];
-    const content = typeof choice?.message?.content === "string" ? choice.message.content : rawText;
-    const finishReason = typeof choice?.finish_reason === "string" ? choice.finish_reason : null;
+function invalidCompletionFailure(
+  message: string,
+  issues: readonly string[],
+): LocalVlmObservationFailureShape {
+  return {
+    code: "INVALID_OBSERVER_OUTPUT",
+    message,
+    issues,
+  };
+}
+
+function parseCompletedTransportEnvelope(args: { response: Response; rawText: string }):
+  | {
+      ok: true;
+      finishReason: string | null;
+      outputPreviewEscaped: string;
+    }
+  | {
+      ok: false;
+      failure: LocalVlmObservationFailureShape;
+      finishReason: string | null;
+      outputPreviewEscaped: string;
+    } {
+  if (!args.response.ok) {
     return {
-      finishReason,
-      outputPreviewEscaped: escapedPreview(content) ?? JSON.stringify(""),
-    };
-  } catch {
-    return {
+      ok: false,
+      failure: invalidCompletionFailure(
+        "The transport completed, but the server returned a non-success HTTP status.",
+        [`status=${args.response.status}`],
+      ),
       finishReason: null,
-      outputPreviewEscaped: escapedPreview(rawText) ?? JSON.stringify(""),
+      outputPreviewEscaped: escapedPreview(args.rawText) ?? JSON.stringify(""),
     };
   }
+
+  let payload: unknown;
+  try {
+    payload = JSON.parse(args.rawText);
+  } catch (error) {
+    return {
+      ok: false,
+      failure: invalidCompletionFailure("The llama-server transport payload was not valid JSON.", [
+        error instanceof Error ? error.message : String(error),
+      ]),
+      finishReason: null,
+      outputPreviewEscaped: escapedPreview(args.rawText) ?? JSON.stringify(""),
+    };
+  }
+
+  const choice = (
+    payload as { choices?: Array<{ message?: { content?: unknown }; finish_reason?: unknown }> }
+  )?.choices?.[0];
+  const finishReason = typeof choice?.finish_reason === "string" ? choice.finish_reason : null;
+  const rawContent = choice?.message?.content;
+  if (typeof rawContent !== "string") {
+    return {
+      ok: false,
+      failure: invalidCompletionFailure(
+        "The llama-server transport payload did not include a string assistant message.",
+        ["choices[0].message.content must be a string"],
+      ),
+      finishReason,
+      outputPreviewEscaped: escapedPreview(args.rawText) ?? JSON.stringify(""),
+    };
+  }
+
+  if (finishReason !== null && finishReason !== "stop") {
+    return {
+      ok: false,
+      failure: invalidCompletionFailure(
+        "The response transport completed, but the model did not finish successfully.",
+        [`finishReason=${finishReason}`],
+      ),
+      finishReason,
+      outputPreviewEscaped: escapedPreview(rawContent) ?? JSON.stringify(""),
+    };
+  }
+
+  return {
+    ok: true,
+    finishReason,
+    outputPreviewEscaped: escapedPreview(rawContent) ?? JSON.stringify(""),
+  };
 }
 
 function timeoutFailure(args: {
@@ -399,96 +472,118 @@ async function readTransportBody(args: {
   requestSignal: AbortSignal;
   startedAt: number;
 }): Promise<CompletionTransportSuccess | CompletionTransportFailure> {
-  if (!args.response.body) {
-    const completionAt = new Date().toISOString();
-    return {
-      ok: true,
-      responseBytes: 0,
-      firstTokenAt: null,
-      firstTokenLatencyMs: null,
-      completionAt,
-      completionLatencyMs: Math.max(0, performance.now() - args.startedAt),
-      finishReason: null,
-      outputPreviewEscaped: escapedPreview(""),
-    };
-  }
-
-  const reader = args.response.body.getReader();
   const chunks: Uint8Array[] = [];
   let total = 0;
-  let firstTokenAt: string | null = null;
-  let firstTokenLatencyMs: number | null = null;
+  let firstResponseByteAt: string | null = null;
+  let firstResponseByteLatencyMs: number | null = null;
 
-  try {
-    while (true) {
-      let next: ReadableStreamReadResult<Uint8Array>;
-      try {
-        next = await reader.read();
-      } catch (error) {
-        if (args.requestSignal.aborted) {
-          const partialText = Buffer.from(concatChunks(chunks, total)).toString("utf8");
+  if (args.response.body) {
+    const reader = args.response.body.getReader();
+    try {
+      while (true) {
+        let next: ReadableStreamReadResult<Uint8Array>;
+        try {
+          next = await reader.read();
+        } catch (error) {
+          if (args.requestSignal.aborted) {
+            const partialText = Buffer.from(concatChunks(chunks, total)).toString("utf8");
+            return {
+              ok: false,
+              failure: timeoutFailure({
+                config: args.config,
+                timeoutStage: "response-body",
+                partialText,
+              }),
+              responseBytes: total,
+              firstResponseByteAt,
+              firstResponseByteLatencyMs,
+              transportCompletedAt: null,
+              transportCompletionLatencyMs: null,
+              responseCompletedSuccessfully: false,
+              completionAt: null,
+              completionLatencyMs: null,
+              timeoutStage: "response-body",
+              finishReason: null,
+              outputPreviewEscaped: escapedPreview(partialText),
+            };
+          }
+          throw error;
+        }
+
+        if (next.done) break;
+        if (firstResponseByteAt === null) {
+          firstResponseByteAt = new Date().toISOString();
+          firstResponseByteLatencyMs = Math.max(0, performance.now() - args.startedAt);
+        }
+        total += next.value.byteLength;
+        if (total > args.config.responseBytesMax) {
+          const partialChunks = [...chunks, next.value];
+          const partialText = Buffer.from(concatChunks(partialChunks, total)).toString("utf8");
           return {
             ok: false,
-            failure: timeoutFailure({
+            failure: oversizedFailure({
               config: args.config,
-              timeoutStage: "response-body",
+              bytes: total,
               partialText,
             }),
             responseBytes: total,
-            firstTokenAt,
-            firstTokenLatencyMs,
+            firstResponseByteAt,
+            firstResponseByteLatencyMs,
+            transportCompletedAt: null,
+            transportCompletionLatencyMs: null,
+            responseCompletedSuccessfully: false,
             completionAt: null,
             completionLatencyMs: null,
-            timeoutStage: "response-body",
+            timeoutStage: null,
+            finishReason: null,
             outputPreviewEscaped: escapedPreview(partialText),
           };
         }
-        throw error;
+        chunks.push(next.value);
       }
-
-      if (next.done) break;
-      if (firstTokenAt === null) {
-        firstTokenAt = new Date().toISOString();
-        firstTokenLatencyMs = Math.max(0, performance.now() - args.startedAt);
-      }
-      total += next.value.byteLength;
-      if (total > args.config.responseBytesMax) {
-        const partialChunks = [...chunks, next.value];
-        const partialText = Buffer.from(concatChunks(partialChunks, total)).toString("utf8");
-        return {
-          ok: false,
-          failure: oversizedFailure({
-            config: args.config,
-            bytes: total,
-            partialText,
-          }),
-          responseBytes: total,
-          firstTokenAt,
-          firstTokenLatencyMs,
-          completionAt: null,
-          completionLatencyMs: null,
-          timeoutStage: null,
-          outputPreviewEscaped: escapedPreview(partialText),
-        };
-      }
-      chunks.push(next.value);
+    } finally {
+      reader.releaseLock();
     }
-  } finally {
-    reader.releaseLock();
   }
 
   const transportText = Buffer.from(concatChunks(chunks, total)).toString("utf8");
-  const details = transportDetails(transportText);
-  const completionAt = new Date().toISOString();
+  const transportCompletedAt = new Date().toISOString();
+  const transportCompletionLatencyMs = Math.max(0, performance.now() - args.startedAt);
+  const completedTransport = parseCompletedTransportEnvelope({
+    response: args.response,
+    rawText: transportText,
+  });
+  if (!completedTransport.ok) {
+    return {
+      ok: false,
+      failure: completedTransport.failure,
+      responseBytes: total,
+      firstResponseByteAt,
+      firstResponseByteLatencyMs,
+      transportCompletedAt,
+      transportCompletionLatencyMs,
+      responseCompletedSuccessfully: false,
+      completionAt: null,
+      completionLatencyMs: null,
+      timeoutStage: null,
+      finishReason: completedTransport.finishReason,
+      outputPreviewEscaped: completedTransport.outputPreviewEscaped,
+    };
+  }
+
   return {
     ok: true,
     responseBytes: total,
-    firstTokenAt,
-    firstTokenLatencyMs,
-    completionAt,
-    completionLatencyMs: Math.max(0, performance.now() - args.startedAt),
-    finishReason: details.finishReason,
-    outputPreviewEscaped: details.outputPreviewEscaped,
+    firstResponseByteAt,
+    firstResponseByteLatencyMs,
+    transportCompletedAt,
+    transportCompletionLatencyMs,
+    responseCompletedSuccessfully: true,
+    completionAt: transportCompletedAt,
+    completionLatencyMs: transportCompletionLatencyMs,
+    finishReason: completedTransport.finishReason,
+    timeoutStage: null,
+    outputPreviewEscaped: completedTransport.outputPreviewEscaped,
   };
 }
 
@@ -512,11 +607,15 @@ async function sendCompletionDiagnosticRequest(args: {
         issues: [`overlayBytes=${overlayBytes.byteLength}`, `limit=${args.config.maxImageBytes}`],
       },
       responseBytes: 0,
-      firstTokenAt: null,
-      firstTokenLatencyMs: null,
+      firstResponseByteAt: null,
+      firstResponseByteLatencyMs: null,
+      transportCompletedAt: null,
+      transportCompletionLatencyMs: null,
+      responseCompletedSuccessfully: false,
       completionAt: null,
       completionLatencyMs: null,
       timeoutStage: null,
+      finishReason: null,
       outputPreviewEscaped: null,
     };
   }
@@ -553,11 +652,15 @@ async function sendCompletionDiagnosticRequest(args: {
           partialText: null,
         }),
         responseBytes: 0,
-        firstTokenAt: null,
-        firstTokenLatencyMs: null,
+        firstResponseByteAt: null,
+        firstResponseByteLatencyMs: null,
+        transportCompletedAt: null,
+        transportCompletionLatencyMs: null,
+        responseCompletedSuccessfully: false,
         completionAt: null,
         completionLatencyMs: null,
         timeoutStage: "request",
+        finishReason: null,
         outputPreviewEscaped: null,
       };
     }
@@ -594,13 +697,16 @@ function evidenceFromRun(args: {
 }): ResponseCompletionRungEvidence {
   return {
     requestStartedAt: args.owner?.telemetry.requestStartedAt ?? null,
-    firstTokenAt: args.outcome?.firstTokenAt ?? null,
-    firstTokenLatencyMs: args.outcome?.firstTokenLatencyMs ?? null,
+    firstResponseByteAt: args.outcome?.firstResponseByteAt ?? null,
+    firstResponseByteLatencyMs: args.outcome?.firstResponseByteLatencyMs ?? null,
+    transportCompletedAt: args.outcome?.transportCompletedAt ?? null,
+    transportCompletionLatencyMs: args.outcome?.transportCompletionLatencyMs ?? null,
+    responseCompletedSuccessfully: args.outcome?.responseCompletedSuccessfully ?? false,
     completionAt: args.outcome?.ok ? args.outcome.completionAt : null,
     completionLatencyMs: args.outcome?.ok ? args.outcome.completionLatencyMs : null,
     responseBytes: args.outcome?.responseBytes ?? 0,
-    finishReason: args.outcome?.ok ? args.outcome.finishReason : null,
-    timeoutStage: args.outcome && !args.outcome.ok ? args.outcome.timeoutStage : null,
+    finishReason: args.outcome?.finishReason ?? null,
+    timeoutStage: args.outcome?.timeoutStage ?? null,
     outputPreviewEscaped: args.outcome?.outputPreviewEscaped ?? null,
     cleanupCompleted: args.cleanupCompleted,
     workspaceDir: args.workspaceDir,
@@ -694,8 +800,11 @@ async function runOneCompletionRung(args: {
         responseFormat: spec.responseFormat,
       });
 
-      if (outcome.ok) {
+      if (outcome.transportCompletedAt !== null) {
         owner.markRequestCompleted();
+      }
+
+      if (outcome.ok) {
         summary = "The rung completed within the configured timeout and byte budget.";
       } else {
         const failure = localVlmFailureFromUnknown(outcome.failure);
@@ -703,7 +812,9 @@ async function runOneCompletionRung(args: {
         summary =
           failure.code === "REQUEST_TIMEOUT"
             ? "The rung did not complete before the configured timeout."
-            : "The rung did not complete within the configured completion bounds.";
+            : outcome.transportCompletedAt !== null
+              ? "The transport completed, but the response did not complete successfully."
+              : "The rung did not complete within the configured completion bounds.";
       }
     }
   } catch (error) {
@@ -850,7 +961,7 @@ export async function writeResponseCompletionDiagnosticFiles(args: {
     ...args.report.rungs.map((rung) => {
       const preview = rung.evidence?.outputPreviewEscaped ?? "null";
       const finishReason = rung.evidence?.finishReason ?? "null";
-      return `- ${rung.rung}: ${rung.status}; finishReason=${finishReason}; timeoutStage=${rung.evidence?.timeoutStage ?? "null"}; responseBytes=${rung.evidence?.responseBytes ?? 0}; preview=${preview}`;
+      return `- ${rung.rung}: ${rung.status}; responseCompletedSuccessfully=${String(rung.evidence?.responseCompletedSuccessfully ?? false)}; finishReason=${finishReason}; timeoutStage=${rung.evidence?.timeoutStage ?? "null"}; responseBytes=${rung.evidence?.responseBytes ?? 0}; preview=${preview}`;
     }),
   ].join("\n");
   await writeFile(jsonPath, `${JSON.stringify(args.report, null, 2)}\n`, "utf8");

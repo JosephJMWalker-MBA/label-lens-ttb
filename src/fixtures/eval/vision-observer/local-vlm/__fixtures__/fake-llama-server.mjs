@@ -39,6 +39,7 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
   const ignoreTermOnce = args.get("ignore-term-once") === "1";
   const canary = args.get("canary") ?? "ALPHA ORCHID";
   const completionFailAtRung = args.get("completion-fail-at-rung") ?? null;
+  const completionErrorAtRung = args.get("completion-error-at-rung") ?? null;
 
   mkdirSync(workspaceDir, { recursive: true });
   if (logBytes > 0) process.stderr.write("X".repeat(logBytes));
@@ -344,6 +345,17 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
     if (mode === "completion-ladder" && completionFailAtRung === completionRung(payload)) {
       const cutoff = Math.max(1, Math.floor(transportPayload.length / 2));
       res.write(transportPayload.slice(0, cutoff));
+      return;
+    }
+    if (mode === "completion-ladder" && completionErrorAtRung === completionRung(payload)) {
+      res.statusCode = 500;
+      res.end(
+        JSON.stringify({
+          error: {
+            message: "simulated completion error",
+          },
+        }),
+      );
       return;
     }
     res.end(transportPayload);
