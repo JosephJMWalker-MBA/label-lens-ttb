@@ -4,6 +4,7 @@ import { createServer } from "node:http";
 import { spawn } from "node:child_process";
 import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
+import sharp from "sharp";
 
 const args = new Map();
 for (let index = 2; index < process.argv.length; index += 1) {
@@ -82,9 +83,36 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
     return system.includes("overlaid 5x5 refinement grid");
   }
 
-  const responseForMode = (payload) => {
+  function firstImageDataUrl(payload) {
+    const content = payload?.messages?.[1]?.content;
+    if (!Array.isArray(content)) return null;
+    for (const part of content) {
+      if (part?.type === "image_url" && typeof part?.image_url?.url === "string") {
+        return part.image_url.url;
+      }
+    }
+    return null;
+  }
+
+  async function classifyBrightness(payload) {
+    const imageDataUrl = firstImageDataUrl(payload);
+    if (typeof imageDataUrl !== "string") return "MISSING";
+    const match = /^data:[^;,]+;base64,([\s\S]+)$/u.exec(imageDataUrl);
+    if (!match) return "INVALID";
+    const imageBytes = Buffer.from(match[1] ?? "", "base64");
+    const stats = await sharp(imageBytes).stats();
+    const mean =
+      stats.channels.reduce((sum, channel) => sum + channel.mean, 0) / stats.channels.length;
+    return mean < 127.5 ? "BLACK" : "WHITE";
+  }
+
+  const responseForMode = async (payload) => {
     const base = isRefinementRequest(payload) ? refinementPayload() : validPayload();
     switch (mode) {
+      case "attention-by-brightness":
+        return await classifyBrightness(payload);
+      case "attention-constant":
+        return "BLACK";
       case "fenced-json":
         return `\`\`\`json\n${JSON.stringify(base)}\n\`\`\``;
       case "prose-wrapped":
@@ -198,7 +226,7 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
     const runId = runIdLine.split(": ")?.[1]?.trim() ?? "unknown";
     await new Promise((resolve) => setTimeout(resolve, requestDelayMs));
     writeFileSync(join(workspaceDir, "request.json"), body);
-    const content = responseForMode(payload).replace('"replace-me"', JSON.stringify(runId));
+    const content = (await responseForMode(payload)).replace('"replace-me"', JSON.stringify(runId));
     if (mode === "write-after-cancel") {
       setTimeout(() => {
         writeFileSync(join(workspaceDir, "after-cancel.txt"), "late-write\n");
