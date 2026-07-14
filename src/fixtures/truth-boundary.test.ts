@@ -78,6 +78,27 @@ describe("truth-label boundary — corpus truth is imported only by tests/evalua
   });
 });
 
+describe("truth-label boundary — stateless observer modules never accept evaluation truth", () => {
+  const observerFiles = [
+    join(SRC, "fixtures", "eval", "vision-observer", "fake-observer-adapter.ts"),
+    join(SRC, "fixtures", "eval", "vision-observer", "observer-lifecycle.ts"),
+  ];
+
+  it("observer adapter and lifecycle do not import annotations, benchmarks, or truth geometry", () => {
+    for (const file of observerFiles) {
+      const source = readFileSync(file, "utf8");
+      expect(source, `${rel(file)} must not import evaluation truth`).not.toMatch(
+        /truthGeometry|annotation|ocr-region-benchmark|eval-loader|IncludedEvalRecord|approxGeometry/,
+      );
+      for (const path of importsOf(source)) {
+        expect(path, `${rel(file)} imports ${path}`).not.toMatch(
+          /ocr-region-benchmark|eval-loader|corpus-index|fixture-manifest/,
+        );
+      }
+    }
+  });
+});
+
 describe("truth-label boundary — the extractor signature carries no fixture truth", () => {
   it("ExtractionInput declares no expected-answer, id, hash-as-truth, or tag fields", () => {
     const types = readFileSync(join(SRC, "pipeline/extractor/extractor.types.ts"), "utf8");
