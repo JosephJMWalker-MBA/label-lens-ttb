@@ -82,6 +82,103 @@ async function sourceFixture() {
   };
 }
 
+function fingerprintSnapshotFor(
+  fingerprints: Awaited<ReturnType<typeof buildRequestParityCanonicalFingerprints>>,
+  contract: "A" | "B" | "C",
+) {
+  const fingerprint = fingerprints.find((entry) => entry.contract === contract);
+  if (!fingerprint) {
+    throw new Error(`missing fingerprint for ${contract}`);
+  }
+  return {
+    contract: fingerprint.contract,
+    sourceBuilder: fingerprint.sourceBuilder,
+    systemPromptDigest: fingerprint.systemPromptDigest,
+    userInstructionDigest: fingerprint.userInstructionDigest,
+    responseFormatDigest: fingerprint.responseFormatDigest,
+    requestBodyDigest: fingerprint.requestBodyDigest,
+    requestBodyShapeDigest: fingerprint.requestBodyShapeDigest,
+    overlayImageDigest: fingerprint.overlayImageDigest,
+    overlayImageMediaType: fingerprint.overlayImageMediaType,
+    model: fingerprint.model,
+    seed: fingerprint.seed,
+    temperature: fingerprint.temperature,
+    tokenLimit: fingerprint.tokenLimit,
+  };
+}
+
+function verifiedFingerprint(
+  fingerprints: Awaited<ReturnType<typeof buildRequestParityCanonicalFingerprints>>,
+  contract: "A" | "B" | "C",
+) {
+  const snapshot = fingerprintSnapshotFor(fingerprints, contract);
+  return {
+    expected: snapshot,
+    measured: snapshot,
+    matchedFields: [
+      "systemPromptDigest",
+      "userInstructionDigest",
+      "responseFormatDigest",
+      "requestBodyDigest",
+      "requestBodyShapeDigest",
+      "overlayImageDigest",
+      "overlayImageMediaType",
+      "model",
+      "seed",
+      "temperature",
+      "tokenLimit",
+    ] as const,
+    mismatchedFields: [] as const,
+    allFieldsMatched: true,
+  };
+}
+
+function mismatchedFingerprint(
+  fingerprints: Awaited<ReturnType<typeof buildRequestParityCanonicalFingerprints>>,
+  contract: "A" | "B" | "C",
+) {
+  const snapshot = fingerprintSnapshotFor(fingerprints, contract);
+  return {
+    expected: snapshot,
+    measured: {
+      ...snapshot,
+      requestBodyDigest: `${snapshot.requestBodyDigest}-mismatch`,
+    },
+    matchedFields: [
+      "systemPromptDigest",
+      "userInstructionDigest",
+      "responseFormatDigest",
+      "requestBodyShapeDigest",
+      "overlayImageDigest",
+      "overlayImageMediaType",
+      "model",
+      "seed",
+      "temperature",
+      "tokenLimit",
+    ] as const,
+    mismatchedFields: ["requestBodyDigest"] as const,
+    allFieldsMatched: false,
+  };
+}
+
+function classificationTrials(args: {
+  fingerprints: Awaited<ReturnType<typeof buildRequestParityCanonicalFingerprints>>;
+  statusForTrial: (
+    trial: ReturnType<typeof buildRequestParitySchedule>[number],
+  ) => "PASS" | "FAIL" | "BLOCKED";
+  mismatchForTrial?: (trial: ReturnType<typeof buildRequestParitySchedule>[number]) => boolean;
+}) {
+  return buildRequestParitySchedule().map((trial) => ({
+    contract: trial.contract,
+    sequencePosition: trial.sequencePosition,
+    status: args.statusForTrial(trial),
+    requestFingerprint:
+      args.mismatchForTrial?.(trial) === true
+        ? mismatchedFingerprint(args.fingerprints, trial.contract)
+        : verifiedFingerprint(args.fingerprints, trial.contract),
+  }));
+}
+
 describe("request parity reproducibility diagnostic", () => {
   it("builds the exact A-B-A-C-B schedule across three repetitions", () => {
     const schedule = buildRequestParitySchedule();
@@ -172,9 +269,40 @@ describe("request parity reproducibility diagnostic", () => {
         (trial) => trial.evidence?.resources?.processTreeReleasedAfterTermination === true,
       ),
     ).toBe(true);
+    expect(report.trials.every((trial) => trial.requestFingerprint.allFieldsMatched)).toBe(true);
   }, 20_000);
 
-  it("classifies deterministic, intermittent, order-state, and insufficient outcomes without collapsing mixed results", async () => {
+  it("stops the schedule when a measured trial request diverges from preregistration", async () => {
+    const config = await diagnosticConfig({});
+    const source = await sourceFixture();
+
+    const report = await runLocalVlmRequestParityReproducibilityDiagnostic({
+      config,
+      scenarioId: "request-parity-provenance-mismatch",
+      ...source,
+      mutatePreparedTrialRequest: (trial, prepared) =>
+        trial.sequenceNumber === 1
+          ? {
+              ...prepared,
+              requestBody: {
+                ...prepared.requestBody,
+                temperature: 1,
+              },
+            }
+          : prepared,
+    });
+
+    expect(report.fatalStopReason).toBe("request fingerprint mismatch at sequence 1");
+    expect(report.trials[0]?.status).toBe("BLOCKED");
+    expect(report.trials[0]?.requestFingerprint.allFieldsMatched).toBe(false);
+    expect(report.trials[0]?.requestFingerprint.mismatchedFields).toContain("temperature");
+    expect(report.trials[0]?.requestFingerprint.expected.temperature).toBe("0");
+    expect(report.trials[0]?.requestFingerprint.measured?.temperature).toBe("1");
+    expect(report.trials.slice(1).every((trial) => trial.status === "BLOCKED")).toBe(true);
+    expect(report.classification.overall).toBe("INSUFFICIENT_EVIDENCE");
+  }, 20_000);
+
+  it("does not label a partial all-fail contract as deterministic", async () => {
     const config = await diagnosticConfig({});
     const overlayBytes = await pngBytes();
     const fingerprints = buildRequestParityCanonicalFingerprints({
@@ -183,135 +311,171 @@ describe("request parity reproducibility diagnostic", () => {
       overlayMediaType: "image/png",
       observationRunId: "classification-run-id",
     });
-    const fingerprintFor = (contract: "A" | "B" | "C") =>
-      fingerprints.find((entry) => entry.contract === contract)?.requestBodyDigest ?? "";
 
-    const deterministic = classifyRequestParityTrials({
+    const partialDeterministic = classifyRequestParityTrials({
       fingerprints,
       trials: [
         {
           contract: "A",
           sequencePosition: 1,
           status: "FAIL",
-          requestFingerprintDigest: fingerprintFor("A"),
+          requestFingerprint: verifiedFingerprint(fingerprints, "A"),
         },
         {
           contract: "A",
           sequencePosition: 3,
           status: "FAIL",
-          requestFingerprintDigest: fingerprintFor("A"),
-        },
-        {
-          contract: "B",
-          sequencePosition: 2,
-          status: "PASS",
-          requestFingerprintDigest: fingerprintFor("B"),
-        },
-        {
-          contract: "B",
-          sequencePosition: 5,
-          status: "PASS",
-          requestFingerprintDigest: fingerprintFor("B"),
-        },
-        {
-          contract: "C",
-          sequencePosition: 4,
-          status: "PASS",
-          requestFingerprintDigest: fingerprintFor("C"),
+          requestFingerprint: verifiedFingerprint(fingerprints, "A"),
         },
       ],
     });
     expect(
-      deterministic.contractFindings.find((finding) => finding.contract === "A")?.outcome,
-    ).toBe("DETERMINISTIC_FAILURE");
+      partialDeterministic.contractFindings.find((finding) => finding.contract === "A")?.outcome,
+    ).toBe("INSUFFICIENT_EVIDENCE");
+  });
 
-    const intermittent = classifyRequestParityTrials({
+  it("does not label an all-fail contract with blocked appearances as deterministic", async () => {
+    const config = await diagnosticConfig({});
+    const overlayBytes = await pngBytes();
+    const fingerprints = buildRequestParityCanonicalFingerprints({
+      config,
+      overlayBytes: new Uint8Array(overlayBytes),
+      overlayMediaType: "image/png",
+      observationRunId: "classification-run-id",
+    });
+
+    const blockedDeterministic = classifyRequestParityTrials({
+      fingerprints,
+      trials: buildRequestParitySchedule()
+        .filter((trial) => trial.contract === "A")
+        .map((trial, index) => ({
+          contract: trial.contract,
+          sequencePosition: trial.sequencePosition,
+          status: index < 4 ? "FAIL" : "BLOCKED",
+          requestFingerprint: verifiedFingerprint(fingerprints, "A"),
+        })),
+    });
+    expect(
+      blockedDeterministic.contractFindings.find((finding) => finding.contract === "A")?.outcome,
+    ).toBe("INSUFFICIENT_EVIDENCE");
+  });
+
+  it("does not attribute request-difference effects from incomplete evidence", async () => {
+    const config = await diagnosticConfig({});
+    const overlayBytes = await pngBytes();
+    const fingerprints = buildRequestParityCanonicalFingerprints({
+      config,
+      overlayBytes: new Uint8Array(overlayBytes),
+      overlayMediaType: "image/png",
+      observationRunId: "classification-run-id",
+    });
+
+    const incompleteDifference = classifyRequestParityTrials({
       fingerprints,
       trials: [
         {
           contract: "A",
           sequencePosition: 1,
           status: "FAIL",
-          requestFingerprintDigest: fingerprintFor("A"),
-        },
-        {
-          contract: "A",
-          sequencePosition: 1,
-          status: "PASS",
-          requestFingerprintDigest: fingerprintFor("A"),
-        },
-      ],
-    });
-    expect(intermittent.contractFindings.find((finding) => finding.contract === "A")?.outcome).toBe(
-      "INTERMITTENT_FAILURE",
-    );
-
-    const insufficient = classifyRequestParityTrials({
-      fingerprints,
-      trials: [
-        {
-          contract: "A",
-          sequencePosition: 1,
-          status: "PASS",
-          requestFingerprintDigest: fingerprintFor("A"),
+          requestFingerprint: verifiedFingerprint(fingerprints, "A"),
         },
         {
           contract: "A",
           sequencePosition: 3,
-          status: "PASS",
-          requestFingerprintDigest: fingerprintFor("A"),
+          status: "FAIL",
+          requestFingerprint: verifiedFingerprint(fingerprints, "A"),
         },
         {
           contract: "B",
           sequencePosition: 2,
           status: "PASS",
-          requestFingerprintDigest: fingerprintFor("B"),
+          requestFingerprint: verifiedFingerprint(fingerprints, "B"),
         },
         {
           contract: "B",
           sequencePosition: 5,
           status: "PASS",
-          requestFingerprintDigest: fingerprintFor("B"),
-        },
-        {
-          contract: "C",
-          sequencePosition: 4,
-          status: "PASS",
-          requestFingerprintDigest: fingerprintFor("C"),
+          requestFingerprint: verifiedFingerprint(fingerprints, "B"),
         },
       ],
     });
-    expect(insufficient.overall).toBe("INSUFFICIENT_EVIDENCE");
+    expect(
+      incompleteDifference.requestDifferenceFindings.find(
+        (finding) => finding.left === "A" && finding.right === "B",
+      )?.outcome,
+    ).toBe("INSUFFICIENT_EVIDENCE");
+    expect(incompleteDifference.overall).toBe("INSUFFICIENT_EVIDENCE");
+  });
 
-    const mixed = classifyRequestParityTrials({
-      fingerprints,
-      trials: [
-        {
-          contract: "A",
-          sequencePosition: 1,
-          status: "FAIL",
-          requestFingerprintDigest: fingerprintFor("A"),
-        },
-        {
-          contract: "A",
-          sequencePosition: 3,
-          status: "PASS",
-          requestFingerprintDigest: fingerprintFor("A"),
-        },
-        {
-          contract: "A",
-          sequencePosition: 1,
-          status: "FAIL",
-          requestFingerprintDigest: fingerprintFor("A"),
-        },
-        {
-          contract: "A",
-          sequencePosition: 3,
-          status: "PASS",
-          requestFingerprintDigest: fingerprintFor("A"),
-        },
-      ],
+  it("classifies complete fingerprint-verified schedules correctly", async () => {
+    const config = await diagnosticConfig({});
+    const overlayBytes = await pngBytes();
+    const fingerprints = buildRequestParityCanonicalFingerprints({
+      config,
+      overlayBytes: new Uint8Array(overlayBytes),
+      overlayMediaType: "image/png",
+      observationRunId: "classification-run-id",
     });
-    expect(mixed.overall).toBe("ORDER_OR_STATE_EFFECT");
+
+    const deterministicDifference = classifyRequestParityTrials({
+      fingerprints,
+      trials: classificationTrials({
+        fingerprints,
+        statusForTrial: (trial) => (trial.contract === "A" ? "FAIL" : "PASS"),
+      }),
+    });
+    expect(
+      deterministicDifference.contractFindings.find((finding) => finding.contract === "A")?.outcome,
+    ).toBe("DETERMINISTIC_FAILURE");
+    expect(
+      deterministicDifference.requestDifferenceFindings.find(
+        (finding) => finding.left === "A" && finding.right === "B",
+      )?.outcome,
+    ).toBe("REQUEST_DIFFERENCE_EFFECT");
+    expect(deterministicDifference.overall).toBe("REQUEST_DIFFERENCE_EFFECT");
+
+    const intermittent = classifyRequestParityTrials({
+      fingerprints,
+      trials: classificationTrials({
+        fingerprints,
+        statusForTrial: (trial) => {
+          if (trial.contract !== "A") return "PASS";
+          return trial.sequenceNumber === 1 ||
+            trial.sequenceNumber === 8 ||
+            trial.sequenceNumber === 11
+            ? "FAIL"
+            : "PASS";
+        },
+      }),
+    });
+    expect(intermittent.contractFindings.find((finding) => finding.contract === "A")?.outcome).toBe(
+      "INTERMITTENT_FAILURE",
+    );
+    expect(intermittent.overall).toBe("INTERMITTENT_FAILURE");
+
+    const orderState = classifyRequestParityTrials({
+      fingerprints,
+      trials: classificationTrials({
+        fingerprints,
+        statusForTrial: (trial) => {
+          if (trial.contract !== "A") return "PASS";
+          return trial.sequencePosition === 1 ? "FAIL" : "PASS";
+        },
+      }),
+    });
+    expect(orderState.contractFindings.find((finding) => finding.contract === "A")?.outcome).toBe(
+      "ORDER_OR_STATE_EFFECT",
+    );
+    expect(orderState.overall).toBe("ORDER_OR_STATE_EFFECT");
+
+    const fingerprintMismatch = classifyRequestParityTrials({
+      fingerprints,
+      trials: classificationTrials({
+        fingerprints,
+        statusForTrial: () => "PASS",
+        mismatchForTrial: (trial) => trial.sequenceNumber === 4,
+      }),
+    });
+    expect(fingerprintMismatch.overall).toBe("INSUFFICIENT_EVIDENCE");
   });
 });

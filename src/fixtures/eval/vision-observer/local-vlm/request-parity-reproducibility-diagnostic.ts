@@ -22,7 +22,7 @@ import { buildResponseCompletionRequestSpec } from "./response-completion-diagno
 import { buildSingleProposalDecompositionRequestSpec } from "./single-proposal-decomposition-diagnostic";
 
 export const REQUEST_PARITY_REPRODUCIBILITY_DIAGNOSTIC_SCHEMA_VERSION =
-  "local-vlm-request-parity-reproducibility-diagnostic.v1" as const;
+  "local-vlm-request-parity-reproducibility-diagnostic.v2" as const;
 export const REQUEST_PARITY_REPRODUCIBILITY_TRIAL_STATUSES = ["PASS", "FAIL", "BLOCKED"] as const;
 export const REQUEST_PARITY_REPRODUCIBILITY_CONTRACTS = ["A", "B", "C"] as const;
 export const REQUEST_PARITY_REPRODUCIBILITY_SEQUENCE = ["A", "B", "A", "C", "B"] as const;
@@ -30,13 +30,27 @@ export const REQUEST_PARITY_REPRODUCIBILITY_REPETITIONS = 3 as const;
 
 const FINGERPRINT_OBSERVATION_RUN_ID_PLACEHOLDER = "<normalized-observation-run-id>";
 const REQUEST_PARITY_PREVIEW_CHARS = 240;
+const REQUEST_PARITY_FINGERPRINT_FIELDS = [
+  "systemPromptDigest",
+  "userInstructionDigest",
+  "responseFormatDigest",
+  "requestBodyDigest",
+  "requestBodyShapeDigest",
+  "overlayImageDigest",
+  "overlayImageMediaType",
+  "model",
+  "seed",
+  "temperature",
+  "tokenLimit",
+] as const;
 
 export type RequestParityReproducibilityTrialStatus =
   (typeof REQUEST_PARITY_REPRODUCIBILITY_TRIAL_STATUSES)[number];
 export type RequestParityReproducibilityContract =
   (typeof REQUEST_PARITY_REPRODUCIBILITY_CONTRACTS)[number];
+type RequestParityFingerprintField = (typeof REQUEST_PARITY_FINGERPRINT_FIELDS)[number];
 
-interface RequestParitySpec {
+export interface RequestParitySpec {
   contract: RequestParityReproducibilityContract;
   sourceBuilder:
     | "phase4-one-observation-without-coordinates"
@@ -47,7 +61,7 @@ interface RequestParitySpec {
   responseFormat: Record<string, unknown> | null;
 }
 
-export interface RequestParityCanonicalFingerprint {
+export interface RequestParityFingerprintSnapshot {
   contract: RequestParityReproducibilityContract;
   sourceBuilder: RequestParitySpec["sourceBuilder"];
   systemPromptDigest: string;
@@ -58,9 +72,25 @@ export interface RequestParityCanonicalFingerprint {
   overlayImageDigest: string;
   overlayImageMediaType: string;
   model: string;
-  seed: number;
-  temperature: number;
-  tokenLimit: number;
+  seed: string;
+  temperature: string;
+  tokenLimit: string;
+}
+
+export interface RequestParityCanonicalFingerprint {
+  contract: RequestParityFingerprintSnapshot["contract"];
+  sourceBuilder: RequestParityFingerprintSnapshot["sourceBuilder"];
+  systemPromptDigest: RequestParityFingerprintSnapshot["systemPromptDigest"];
+  userInstructionDigest: RequestParityFingerprintSnapshot["userInstructionDigest"];
+  responseFormatDigest: RequestParityFingerprintSnapshot["responseFormatDigest"];
+  requestBodyDigest: RequestParityFingerprintSnapshot["requestBodyDigest"];
+  requestBodyShapeDigest: RequestParityFingerprintSnapshot["requestBodyShapeDigest"];
+  overlayImageDigest: RequestParityFingerprintSnapshot["overlayImageDigest"];
+  overlayImageMediaType: RequestParityFingerprintSnapshot["overlayImageMediaType"];
+  model: RequestParityFingerprintSnapshot["model"];
+  seed: RequestParityFingerprintSnapshot["seed"];
+  temperature: RequestParityFingerprintSnapshot["temperature"];
+  tokenLimit: RequestParityFingerprintSnapshot["tokenLimit"];
   normalizedSystemPromptText: string;
   normalizedUserInstructionText: string;
   normalizedResponseFormatJson: string;
@@ -139,7 +169,13 @@ export interface RequestParityTrialReport {
   sequencePosition: number;
   contract: RequestParityReproducibilityContract;
   sourceBuilder: RequestParitySpec["sourceBuilder"];
-  requestFingerprintDigest: string;
+  requestFingerprint: {
+    expected: RequestParityFingerprintSnapshot;
+    measured: RequestParityFingerprintSnapshot | null;
+    matchedFields: readonly RequestParityFingerprintField[];
+    mismatchedFields: readonly RequestParityFingerprintField[];
+    allFieldsMatched: boolean;
+  };
   status: RequestParityReproducibilityTrialStatus;
   summary: string;
   issues: readonly string[];
@@ -149,10 +185,14 @@ export interface RequestParityTrialReport {
 
 export interface RequestParityContractFinding {
   contract: RequestParityReproducibilityContract;
+  expectedAppearances: number;
   executedAppearances: number;
   passCount: number;
   failCount: number;
   blockedCount: number;
+  fingerprintVerifiedCount: number;
+  fingerprintMismatchCount: number;
+  completeEvidence: boolean;
   outcome:
     | "ALL_PASS"
     | "DETERMINISTIC_FAILURE"
@@ -254,6 +294,12 @@ interface ScheduledTrial {
   repetitionNumber: number;
   sequencePosition: number;
   contract: RequestParityReproducibilityContract;
+}
+
+export interface RequestParityPreparedTrialRequest {
+  observationRunId: string;
+  spec: RequestParitySpec;
+  requestBody: ReturnType<typeof buildVisionChatRequestBody>;
 }
 
 function currentGitCommit(): string {
@@ -392,56 +438,252 @@ function buildRequestParitySpec(
   }
 }
 
+function buildRequestParityRequestBody(args: {
+  config: LocalVlmResolvedConfig;
+  overlayBytes: Uint8Array;
+  overlayMediaType: string;
+  spec: RequestParitySpec;
+}) {
+  return buildVisionChatRequestBody({
+    config: args.config,
+    overlayDataUrl: `data:${args.overlayMediaType};base64,${Buffer.from(args.overlayBytes).toString("base64")}`,
+    systemPrompt: args.spec.promptText,
+    userInstruction: args.spec.instructionText,
+    responseFormat: args.spec.responseFormat ?? undefined,
+  });
+}
+
+function requestBodySystemPrompt(requestBody: Record<string, unknown>): string {
+  const messages = requestBody.messages;
+  if (!Array.isArray(messages)) return "<missing-system-prompt>";
+  const systemContent = (messages[0] as { content?: unknown } | undefined)?.content;
+  return typeof systemContent === "string" ? systemContent : "<missing-system-prompt>";
+}
+
+function requestBodyUserInstruction(requestBody: Record<string, unknown>): string {
+  const messages = requestBody.messages;
+  if (!Array.isArray(messages)) return "<missing-user-instruction>";
+  const content = (messages[1] as { content?: unknown } | undefined)?.content;
+  if (!Array.isArray(content)) return "<missing-user-instruction>";
+  const textPart = content.find(
+    (part) =>
+      typeof (part as { type?: unknown })?.type === "string" &&
+      (part as { type?: string }).type === "text",
+  ) as { text?: unknown } | undefined;
+  return typeof textPart?.text === "string" ? textPart.text : "<missing-user-instruction>";
+}
+
+function requestBodyOverlayDataUrl(requestBody: Record<string, unknown>): string | null {
+  const messages = requestBody.messages;
+  if (!Array.isArray(messages)) return null;
+  const content = (messages[1] as { content?: unknown } | undefined)?.content;
+  if (!Array.isArray(content)) return null;
+  const imagePart = content.find(
+    (part) =>
+      typeof (part as { type?: unknown })?.type === "string" &&
+      (part as { type?: string }).type === "image_url",
+  ) as { image_url?: { url?: unknown } } | undefined;
+  return typeof imagePart?.image_url?.url === "string" ? imagePart.image_url.url : null;
+}
+
+function parsedOverlayFromRequestBody(requestBody: Record<string, unknown>): {
+  mediaType: string;
+  digest: string;
+} {
+  const dataUrl = requestBodyOverlayDataUrl(requestBody);
+  if (typeof dataUrl !== "string") {
+    return {
+      mediaType: "<missing-overlay-image>",
+      digest: sha256Hex("<missing-overlay-image>"),
+    };
+  }
+  const match = /^data:([^;,]+);base64,([\s\S]+)$/u.exec(dataUrl);
+  if (!match) {
+    return {
+      mediaType: "<invalid-overlay-image>",
+      digest: sha256Hex(dataUrl),
+    };
+  }
+  return {
+    mediaType: match[1] ?? "<invalid-overlay-image>",
+    digest: sha256Hex(Buffer.from(match[2] ?? "", "base64")),
+  };
+}
+
+function requestBodyResponseFormat(requestBody: Record<string, unknown>): unknown {
+  return "response_format" in requestBody ? requestBody.response_format : null;
+}
+
+function stringifyRequestField(value: unknown, fallback: string): string {
+  if (typeof value === "string") return value;
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  return fallback;
+}
+
+function buildRequestParityFingerprintComputation(args: {
+  observationRunId: string;
+  contract: RequestParityReproducibilityContract;
+  sourceBuilder: RequestParitySpec["sourceBuilder"];
+  requestBody: ReturnType<typeof buildVisionChatRequestBody>;
+}): {
+  snapshot: RequestParityFingerprintSnapshot;
+  normalizedSystemPromptText: string;
+  normalizedUserInstructionText: string;
+  normalizedResponseFormatJson: string;
+  normalizedRedactedRequestBodyJson: string;
+  normalizedRequestBodyShapeJson: string;
+} {
+  const overlay = parsedOverlayFromRequestBody(args.requestBody);
+  const normalizedPromptText = replaceRunIdInText(
+    requestBodySystemPrompt(args.requestBody),
+    args.observationRunId,
+  );
+  const normalizedInstructionText = replaceRunIdInText(
+    requestBodyUserInstruction(args.requestBody),
+    args.observationRunId,
+  );
+  const normalizedResponseFormatJson = stableJsonStringify(
+    requestBodyResponseFormat(args.requestBody),
+  );
+  const normalizedRequestBody = normalizeRunIdDeep(args.requestBody, args.observationRunId);
+  const normalizedRequestBodyJson = stableJsonStringify(normalizedRequestBody);
+  const normalizedRedactedRequestBodyJson = stableJsonStringify(
+    redactOverlayDataUrlsDeep(normalizedRequestBody, overlay.digest),
+  );
+  const normalizedRequestBodyShapeJson = stableJsonStringify(jsonShape(normalizedRequestBody));
+
+  return {
+    snapshot: {
+      contract: args.contract,
+      sourceBuilder: args.sourceBuilder,
+      systemPromptDigest: sha256Hex(normalizedPromptText),
+      userInstructionDigest: sha256Hex(normalizedInstructionText),
+      responseFormatDigest: sha256Hex(normalizedResponseFormatJson),
+      requestBodyDigest: sha256Hex(normalizedRequestBodyJson),
+      requestBodyShapeDigest: sha256Hex(normalizedRequestBodyShapeJson),
+      overlayImageDigest: overlay.digest,
+      overlayImageMediaType: overlay.mediaType,
+      model: stringifyRequestField(args.requestBody.model, "<missing-model>"),
+      seed: stringifyRequestField(args.requestBody.seed, "<missing-seed>"),
+      temperature: stringifyRequestField(args.requestBody.temperature, "<missing-temperature>"),
+      tokenLimit: stringifyRequestField(args.requestBody.max_tokens, "<missing-max-tokens>"),
+    },
+    normalizedSystemPromptText: normalizedPromptText,
+    normalizedUserInstructionText: normalizedInstructionText,
+    normalizedResponseFormatJson,
+    normalizedRedactedRequestBodyJson,
+    normalizedRequestBodyShapeJson,
+  };
+}
+
+function buildRequestParityPreparedTrialRequest(args: {
+  config: LocalVlmResolvedConfig;
+  contract: RequestParityReproducibilityContract;
+  observationRunId: string;
+  overlayBytes: Uint8Array;
+  overlayMediaType: string;
+}): RequestParityPreparedTrialRequest {
+  const spec = buildRequestParitySpec(args.contract, args.observationRunId);
+  const requestBody = buildRequestParityRequestBody({
+    config: args.config,
+    overlayBytes: args.overlayBytes,
+    overlayMediaType: args.overlayMediaType,
+    spec,
+  });
+
+  return {
+    observationRunId: args.observationRunId,
+    spec,
+    requestBody,
+  };
+}
+
+function fingerprintSnapshotForContract(
+  fingerprints: readonly RequestParityCanonicalFingerprint[],
+  contract: RequestParityReproducibilityContract,
+): RequestParityFingerprintSnapshot {
+  const fingerprint = fingerprints.find((entry) => entry.contract === contract);
+  if (!fingerprint) {
+    throw new Error(`missing fingerprint for contract ${contract}`);
+  }
+  return {
+    contract: fingerprint.contract,
+    sourceBuilder: fingerprint.sourceBuilder,
+    systemPromptDigest: fingerprint.systemPromptDigest,
+    userInstructionDigest: fingerprint.userInstructionDigest,
+    responseFormatDigest: fingerprint.responseFormatDigest,
+    requestBodyDigest: fingerprint.requestBodyDigest,
+    requestBodyShapeDigest: fingerprint.requestBodyShapeDigest,
+    overlayImageDigest: fingerprint.overlayImageDigest,
+    overlayImageMediaType: fingerprint.overlayImageMediaType,
+    model: fingerprint.model,
+    seed: fingerprint.seed,
+    temperature: fingerprint.temperature,
+    tokenLimit: fingerprint.tokenLimit,
+  };
+}
+
+function compareRequestParityFingerprintSnapshots(args: {
+  expected: RequestParityFingerprintSnapshot;
+  measured: RequestParityFingerprintSnapshot | null;
+}): RequestParityTrialReport["requestFingerprint"] {
+  if (args.measured === null) {
+    return {
+      expected: args.expected,
+      measured: null,
+      matchedFields: [],
+      mismatchedFields: [...REQUEST_PARITY_FINGERPRINT_FIELDS],
+      allFieldsMatched: false,
+    };
+  }
+
+  const matchedFields: RequestParityFingerprintField[] = [];
+  const mismatchedFields: RequestParityFingerprintField[] = [];
+  for (const field of REQUEST_PARITY_FINGERPRINT_FIELDS) {
+    if (args.expected[field] === args.measured[field]) {
+      matchedFields.push(field);
+    } else {
+      mismatchedFields.push(field);
+    }
+  }
+
+  return {
+    expected: args.expected,
+    measured: args.measured,
+    matchedFields,
+    mismatchedFields,
+    allFieldsMatched: mismatchedFields.length === 0,
+  };
+}
+
 export function buildRequestParityCanonicalFingerprints(args: {
   config: LocalVlmResolvedConfig;
   overlayBytes: Uint8Array;
   overlayMediaType: string;
   observationRunId: string;
 }): readonly RequestParityCanonicalFingerprint[] {
-  const overlayImageDigest = sha256Hex(args.overlayBytes);
-  const overlayDataUrl = `data:${args.overlayMediaType};base64,${Buffer.from(args.overlayBytes).toString("base64")}`;
-
   return REQUEST_PARITY_REPRODUCIBILITY_CONTRACTS.map((contract) => {
     const spec = buildRequestParitySpec(contract, args.observationRunId);
-    const requestBody = buildVisionChatRequestBody({
+    const requestBody = buildRequestParityRequestBody({
       config: args.config,
-      overlayDataUrl,
-      systemPrompt: spec.promptText,
-      userInstruction: spec.instructionText,
-      responseFormat: spec.responseFormat ?? undefined,
+      overlayBytes: args.overlayBytes,
+      overlayMediaType: args.overlayMediaType,
+      spec,
     });
-    const normalizedPromptText = replaceRunIdInText(spec.promptText, args.observationRunId);
-    const normalizedInstructionText = replaceRunIdInText(
-      spec.instructionText,
-      args.observationRunId,
-    );
-    const normalizedResponseFormat = stableJsonStringify(spec.responseFormat);
-    const normalizedRequestBody = normalizeRunIdDeep(requestBody, args.observationRunId);
-    const normalizedRequestBodyJson = stableJsonStringify(normalizedRequestBody);
-    const normalizedRedactedRequestBodyJson = stableJsonStringify(
-      redactOverlayDataUrlsDeep(normalizedRequestBody, overlayImageDigest),
-    );
-    const normalizedRequestBodyShapeJson = stableJsonStringify(jsonShape(normalizedRequestBody));
-
-    return {
+    const fingerprint = buildRequestParityFingerprintComputation({
+      observationRunId: args.observationRunId,
       contract,
       sourceBuilder: spec.sourceBuilder,
-      systemPromptDigest: sha256Hex(normalizedPromptText),
-      userInstructionDigest: sha256Hex(normalizedInstructionText),
-      responseFormatDigest: sha256Hex(normalizedResponseFormat),
-      requestBodyDigest: sha256Hex(normalizedRequestBodyJson),
-      requestBodyShapeDigest: sha256Hex(normalizedRequestBodyShapeJson),
-      overlayImageDigest,
-      overlayImageMediaType: args.overlayMediaType,
-      model: args.config.modelDisplayId,
-      seed: args.config.seed,
-      temperature: args.config.temperature,
-      tokenLimit: args.config.maxOutputTokens,
-      normalizedSystemPromptText: normalizedPromptText,
-      normalizedUserInstructionText: normalizedInstructionText,
-      normalizedResponseFormatJson: normalizedResponseFormat,
-      normalizedRedactedRequestBodyJson,
-      normalizedRequestBodyShapeJson,
+      requestBody,
+    });
+
+    return {
+      ...fingerprint.snapshot,
+      normalizedSystemPromptText: fingerprint.normalizedSystemPromptText,
+      normalizedUserInstructionText: fingerprint.normalizedUserInstructionText,
+      normalizedResponseFormatJson: fingerprint.normalizedResponseFormatJson,
+      normalizedRedactedRequestBodyJson: fingerprint.normalizedRedactedRequestBodyJson,
+      normalizedRequestBodyShapeJson: fingerprint.normalizedRequestBodyShapeJson,
     } satisfies RequestParityCanonicalFingerprint;
   });
 }
@@ -518,27 +760,34 @@ export function buildRequestParitySchedule(): readonly ScheduledTrial[] {
   return trials;
 }
 
-function contractFingerprintDigest(
-  fingerprints: readonly RequestParityCanonicalFingerprint[],
-  contract: RequestParityReproducibilityContract,
-): string {
-  return (
-    fingerprints.find((fingerprint) => fingerprint.contract === contract)?.requestBodyDigest ?? ""
-  );
-}
-
-function consistentOutcome(trials: readonly RequestParityTrialReport[]) {
-  const executed = trials.filter((trial) => trial.status !== "BLOCKED");
-  if (executed.length === 0) return null;
-  if (executed.every((trial) => trial.status === "PASS")) return "PASS" as const;
-  if (executed.every((trial) => trial.status === "FAIL")) return "FAIL" as const;
-  return null;
-}
+const REQUEST_PARITY_EXPECTED_SCHEDULE = buildRequestParitySchedule();
+const REQUEST_PARITY_EXPECTED_APPEARANCES = Object.fromEntries(
+  REQUEST_PARITY_REPRODUCIBILITY_CONTRACTS.map((contract) => [
+    contract,
+    REQUEST_PARITY_EXPECTED_SCHEDULE.filter((trial) => trial.contract === contract).length,
+  ]),
+) as Record<RequestParityReproducibilityContract, number>;
+const REQUEST_PARITY_EXPECTED_POSITION_COUNTS = new Map<
+  RequestParityReproducibilityContract,
+  Map<number, number>
+>(
+  REQUEST_PARITY_REPRODUCIBILITY_CONTRACTS.map((contract) => {
+    const positionCounts = new Map<number, number>();
+    for (const trial of REQUEST_PARITY_EXPECTED_SCHEDULE) {
+      if (trial.contract !== contract) continue;
+      positionCounts.set(
+        trial.sequencePosition,
+        (positionCounts.get(trial.sequencePosition) ?? 0) + 1,
+      );
+    }
+    return [contract, positionCounts];
+  }),
+);
 
 export function classifyRequestParityTrials(args: {
   trials: readonly Pick<
     RequestParityTrialReport,
-    "contract" | "sequencePosition" | "status" | "requestFingerprintDigest"
+    "contract" | "sequencePosition" | "status" | "requestFingerprint"
   >[];
   fingerprints: readonly RequestParityCanonicalFingerprint[];
 }): RequestParityClassification {
@@ -548,51 +797,85 @@ export function classifyRequestParityTrials(args: {
     const passCount = executed.filter((trial) => trial.status === "PASS").length;
     const failCount = executed.filter((trial) => trial.status === "FAIL").length;
     const blockedCount = contractTrials.length - executed.length;
+    const expectedAppearances = REQUEST_PARITY_EXPECTED_APPEARANCES[contract];
+    const fingerprintVerifiedCount = contractTrials.filter(
+      (trial) => trial.requestFingerprint.allFieldsMatched,
+    ).length;
+    const fingerprintMismatchCount = contractTrials.length - fingerprintVerifiedCount;
+    const completeEvidence =
+      contractTrials.length === expectedAppearances &&
+      blockedCount === 0 &&
+      fingerprintMismatchCount === 0;
     const sequencePositions = Array.from(
       new Set(contractTrials.map((trial) => trial.sequencePosition)),
     ).sort((left, right) => left - right);
-
-    const positionOutcomeMap = new Map<number, Set<RequestParityReproducibilityTrialStatus>>();
-    for (const trial of executed) {
-      const statuses = positionOutcomeMap.get(trial.sequencePosition) ?? new Set();
-      statuses.add(trial.status);
-      positionOutcomeMap.set(trial.sequencePosition, statuses);
-    }
+    const expectedPositionCounts =
+      REQUEST_PARITY_EXPECTED_POSITION_COUNTS.get(contract) ?? new Map();
     const repeatedPositionPattern =
-      positionOutcomeMap.size > 1 &&
-      sequencePositions.every(
-        (position) => executed.filter((trial) => trial.sequencePosition === position).length > 1,
-      ) &&
-      Array.from(positionOutcomeMap.values()).every((statuses) => statuses.size === 1) &&
-      new Set(Array.from(positionOutcomeMap.values()).map((statuses) => Array.from(statuses)[0]))
-        .size > 1;
+      completeEvidence &&
+      expectedPositionCounts.size > 1 &&
+      Array.from(expectedPositionCounts.entries()).every(([position, expectedCount]) => {
+        const trialsAtPosition = executed.filter((trial) => trial.sequencePosition === position);
+        return (
+          trialsAtPosition.length === expectedCount &&
+          new Set(trialsAtPosition.map((trial) => trial.status)).size === 1
+        );
+      }) &&
+      new Set(
+        Array.from(expectedPositionCounts.keys()).map((position) => {
+          return executed.find((trial) => trial.sequencePosition === position)?.status ?? "BLOCKED";
+        }),
+      ).size > 1;
 
     const notes: string[] = [];
     let outcome: RequestParityContractFinding["outcome"] = "INSUFFICIENT_EVIDENCE";
-    if (executed.length > 0 && failCount === executed.length) {
+    if (!completeEvidence) {
+      if (contractTrials.length !== expectedAppearances) {
+        notes.push(
+          `Only ${contractTrials.length} of ${expectedAppearances} scheduled appearances were observed.`,
+        );
+      }
+      if (blockedCount > 0) {
+        notes.push(`${blockedCount} scheduled appearances were blocked.`);
+      }
+      if (fingerprintMismatchCount > 0) {
+        notes.push(
+          `${fingerprintMismatchCount} scheduled appearances failed fingerprint verification.`,
+        );
+      }
+      if (notes.length === 0) {
+        notes.push("Complete fingerprint-verified evidence was not established.");
+      }
+    } else if (failCount === expectedAppearances) {
       outcome = "DETERMINISTIC_FAILURE";
-      notes.push("Every executed appearance failed.");
-    } else if (executed.length > 0 && passCount === executed.length) {
+      notes.push("Every scheduled appearance failed with a verified matching fingerprint.");
+    } else if (passCount === expectedAppearances) {
       outcome = "ALL_PASS";
-      notes.push("Every executed appearance passed.");
+      notes.push("Every scheduled appearance passed with a verified matching fingerprint.");
     } else if (repeatedPositionPattern) {
       outcome = "ORDER_OR_STATE_EFFECT";
       notes.push(
-        "Sequence-position outcomes differed while remaining consistent within each position.",
+        "Sequence-position outcomes differed while remaining stable across all repeated positions.",
       );
     } else if (passCount > 0 && failCount > 0) {
       outcome = "INTERMITTENT_FAILURE";
-      notes.push("The same request fingerprint produced both PASS and FAIL outcomes.");
+      notes.push(
+        "The same verified request fingerprint produced both PASS and FAIL outcomes across the full schedule.",
+      );
     } else {
       notes.push("No deterministic or mixed pattern was established.");
     }
 
     return {
       contract,
+      expectedAppearances,
       executedAppearances: executed.length,
       passCount,
       failCount,
       blockedCount,
+      fingerprintVerifiedCount,
+      fingerprintMismatchCount,
+      completeEvidence,
       outcome,
       sequencePositions,
       notes,
@@ -608,13 +891,11 @@ export function classifyRequestParityTrials(args: {
     ) {
       const left = REQUEST_PARITY_REPRODUCIBILITY_CONTRACTS[index]!;
       const right = REQUEST_PARITY_REPRODUCIBILITY_CONTRACTS[nextIndex]!;
-      const leftTrials = args.trials.filter((trial) => trial.contract === left);
-      const rightTrials = args.trials.filter((trial) => trial.contract === right);
-      const leftOutcome = consistentOutcome(leftTrials as RequestParityTrialReport[]);
-      const rightOutcome = consistentOutcome(rightTrials as RequestParityTrialReport[]);
+      const leftFinding = contractFindings.find((finding) => finding.contract === left)!;
+      const rightFinding = contractFindings.find((finding) => finding.contract === right)!;
       const fingerprintsDiffer =
-        contractFingerprintDigest(args.fingerprints, left) !==
-        contractFingerprintDigest(args.fingerprints, right);
+        fingerprintSnapshotForContract(args.fingerprints, left).requestBodyDigest !==
+        fingerprintSnapshotForContract(args.fingerprints, right).requestBodyDigest;
 
       let outcome: RequestParityDifferenceFinding["outcome"] = "INSUFFICIENT_EVIDENCE";
       const notes: string[] = [];
@@ -623,17 +904,30 @@ export function classifyRequestParityTrials(args: {
         notes.push(
           "Canonical request fingerprints matched, so no request-difference attribution applies.",
         );
-      } else if (leftOutcome !== null && rightOutcome !== null && leftOutcome !== rightOutcome) {
+      } else if (!leftFinding.completeEvidence || !rightFinding.completeEvidence) {
+        notes.push(
+          "At least one contract lacked the complete fingerprint-verified schedule required for request-difference attribution.",
+        );
+      } else if (
+        (leftFinding.outcome === "ALL_PASS" || leftFinding.outcome === "DETERMINISTIC_FAILURE") &&
+        (rightFinding.outcome === "ALL_PASS" || rightFinding.outcome === "DETERMINISTIC_FAILURE") &&
+        leftFinding.outcome !== rightFinding.outcome
+      ) {
         outcome = "REQUEST_DIFFERENCE_EFFECT";
-        notes.push("Fingerprints differed and the two contracts behaved consistently differently.");
-      } else if (leftOutcome !== null && rightOutcome !== null && leftOutcome === rightOutcome) {
+        notes.push(
+          "Fingerprints differed and the two contracts behaved consistently differently across every scheduled appearance.",
+        );
+      } else if (
+        (leftFinding.outcome === "ALL_PASS" || leftFinding.outcome === "DETERMINISTIC_FAILURE") &&
+        leftFinding.outcome === rightFinding.outcome
+      ) {
         outcome = "NO_EFFECT";
         notes.push(
-          "Fingerprints differed, but the two contracts behaved the same across executed appearances.",
+          "Fingerprints differed, but the two contracts behaved the same across the complete schedule.",
         );
       } else {
         notes.push(
-          "At least one contract had mixed or blocked outcomes, so request-difference attribution is not established.",
+          "The compared contracts did not show a stable all-pass or all-fail contrast across the complete schedule.",
         );
       }
 
@@ -646,15 +940,24 @@ export function classifyRequestParityTrials(args: {
     }
   }
 
-  const overall = contractFindings.some((finding) => finding.outcome === "ORDER_OR_STATE_EFFECT")
-    ? "ORDER_OR_STATE_EFFECT"
-    : contractFindings.some((finding) => finding.outcome === "INTERMITTENT_FAILURE")
-      ? "INTERMITTENT_FAILURE"
-      : requestDifferenceFindings.some((finding) => finding.outcome === "REQUEST_DIFFERENCE_EFFECT")
-        ? "REQUEST_DIFFERENCE_EFFECT"
-        : contractFindings.some((finding) => finding.outcome === "DETERMINISTIC_FAILURE")
-          ? "DETERMINISTIC_CONTRACT_FAILURE"
-          : "INSUFFICIENT_EVIDENCE";
+  const scheduleCompleteAndVerified =
+    args.trials.length === REQUEST_PARITY_EXPECTED_SCHEDULE.length &&
+    args.trials.every(
+      (trial) => trial.status !== "BLOCKED" && trial.requestFingerprint.allFieldsMatched,
+    );
+  const overall = !scheduleCompleteAndVerified
+    ? "INSUFFICIENT_EVIDENCE"
+    : contractFindings.some((finding) => finding.outcome === "ORDER_OR_STATE_EFFECT")
+      ? "ORDER_OR_STATE_EFFECT"
+      : contractFindings.some((finding) => finding.outcome === "INTERMITTENT_FAILURE")
+        ? "INTERMITTENT_FAILURE"
+        : requestDifferenceFindings.some(
+              (finding) => finding.outcome === "REQUEST_DIFFERENCE_EFFECT",
+            )
+          ? "REQUEST_DIFFERENCE_EFFECT"
+          : contractFindings.some((finding) => finding.outcome === "DETERMINISTIC_FAILURE")
+            ? "DETERMINISTIC_CONTRACT_FAILURE"
+            : "INSUFFICIENT_EVIDENCE";
 
   return {
     overall,
@@ -927,33 +1230,8 @@ async function sendRequestParityRequest(args: {
   config: LocalVlmResolvedConfig;
   port: number;
   signal: AbortSignal;
-  overlayArtifactPath: string;
-  overlayMediaType: string;
-  spec: RequestParitySpec;
+  requestBody: ReturnType<typeof buildVisionChatRequestBody>;
 }): Promise<CompletionTransportSuccess | CompletionTransportFailure> {
-  const overlayBytes = await readFile(args.overlayArtifactPath);
-  if (overlayBytes.byteLength > args.config.maxImageBytes) {
-    return {
-      ok: false,
-      failure: {
-        code: "INVALID_OBSERVER_OUTPUT",
-        message: "Overlay image exceeds the configured input-byte budget.",
-        issues: [`overlayBytes=${overlayBytes.byteLength}`, `limit=${args.config.maxImageBytes}`],
-      },
-      responseBytes: 0,
-      firstResponseByteAt: null,
-      firstResponseByteLatencyMs: null,
-      transportCompletedAt: null,
-      transportCompletionLatencyMs: null,
-      responseCompletedSuccessfully: false,
-      completionAt: null,
-      completionLatencyMs: null,
-      timeoutStage: null,
-      finishReason: null,
-      outputPreviewEscaped: null,
-    };
-  }
-
   const requestSignal = AbortSignal.any([
     args.signal,
     AbortSignal.timeout(args.config.requestTimeoutMs),
@@ -966,15 +1244,7 @@ async function sendRequestParityRequest(args: {
       method: "POST",
       headers: { "content-type": "application/json" },
       signal: requestSignal,
-      body: JSON.stringify(
-        buildVisionChatRequestBody({
-          config: args.config,
-          overlayDataUrl: `data:${args.overlayMediaType};base64,${overlayBytes.toString("base64")}`,
-          systemPrompt: args.spec.promptText,
-          userInstruction: args.spec.instructionText,
-          responseFormat: args.spec.responseFormat ?? undefined,
-        }),
-      ),
+      body: JSON.stringify(args.requestBody),
     });
   } catch (error) {
     if (requestSignal.aborted) {
@@ -1079,16 +1349,23 @@ function blockedTrialReport(args: {
   blockedBySequenceNumber: number;
   reason: string;
 }): RequestParityTrialReport {
+  const expectedFingerprint = fingerprintSnapshotForContract(
+    args.fingerprints,
+    args.trial.contract,
+  );
   return {
     sequenceNumber: args.trial.sequenceNumber,
     repetitionNumber: args.trial.repetitionNumber,
     sequencePosition: args.trial.sequencePosition,
     contract: args.trial.contract,
     sourceBuilder: args.spec.sourceBuilder,
-    requestFingerprintDigest: contractFingerprintDigest(args.fingerprints, args.trial.contract),
+    requestFingerprint: compareRequestParityFingerprintSnapshots({
+      expected: expectedFingerprint,
+      measured: null,
+    }),
     status: "BLOCKED",
     summary:
-      "This trial was blocked because a prior runtime or cleanup failure stopped the schedule.",
+      "This trial was blocked because a prior runtime, cleanup, or provenance failure stopped the schedule.",
     issues: [`blocked by sequence ${args.blockedBySequenceNumber}: ${args.reason}`],
     blockedBySequenceNumber: args.blockedBySequenceNumber,
     evidence: null,
@@ -1131,16 +1408,29 @@ async function runOneRequestParityTrial(args: {
   sourceWidth: number;
   sourceHeight: number;
   fingerprints: readonly RequestParityCanonicalFingerprint[];
+  mutatePreparedTrialRequest?: (
+    prepared: RequestParityPreparedTrialRequest,
+  ) => RequestParityPreparedTrialRequest;
 }): Promise<{ report: RequestParityTrialReport; fatalStopReason: string | null }> {
   const workspaceDir = await mkdtemp(
     join(tmpdir(), `local-vlm-request-parity-${args.trial.sequenceNumber}-${args.trial.contract}-`),
   );
   const observationRunId = randomUUID();
-  const spec = buildRequestParitySpec(args.trial.contract, observationRunId);
+  const expectedFingerprint = fingerprintSnapshotForContract(
+    args.fingerprints,
+    args.trial.contract,
+  );
   let owner: Awaited<ReturnType<typeof spawnOwnedLlamaServerProcess>> | null = null;
   let cleanupCompleted = false;
   let resources: LocalVlmResourceTelemetry | null = null;
   let outcome: CompletionTransportSuccess | CompletionTransportFailure | null = null;
+  let measuredFingerprint: RequestParityFingerprintSnapshot | null = null;
+  let fingerprintComparison = compareRequestParityFingerprintSnapshots({
+    expected: expectedFingerprint,
+    measured: null,
+  });
+  let sourceBuilder = expectedFingerprint.sourceBuilder;
+  let status: RequestParityReproducibilityTrialStatus = "FAIL";
   let summary = "The trial failed before the request completed.";
   let issues: string[] = [];
   let fatalStopReason: string | null = null;
@@ -1157,50 +1447,113 @@ async function runOneRequestParityTrial(args: {
       issues = [derivative.error.message, ...derivative.error.issues];
       fatalStopReason = issues.join("; ");
     } else {
-      const launchSpec = buildLlamaServerLaunchSpec(args.config, 0);
-      owner = await spawnOwnedLlamaServerProcess({
-        launchSpec,
-        workspaceDir,
-        host: args.config.host,
-        stdoutBytesMax: args.config.stdoutBytesMax,
-        stderrBytesMax: args.config.stderrBytesMax,
-        resourceSampleIntervalMs: args.config.resourceSampleIntervalMs,
-        terminationTimeoutMs: args.config.terminationTimeoutMs,
-      });
-
-      const startedAt = performance.now();
-      await waitForReadiness({
-        config: args.config,
-        port: owner.telemetry.port,
-        signal: AbortSignal.timeout(args.config.startupTimeoutMs),
-        onAttempt: ({ ok, error }) => owner?.noteReadinessAttempt(ok, error, startedAt),
-      });
-
-      owner.markRequestStarted();
-      outcome = await sendRequestParityRequest({
-        config: args.config,
-        port: owner.telemetry.port,
-        signal: new AbortController().signal,
-        overlayArtifactPath: derivative.value.overlayArtifactPath,
-        overlayMediaType: derivative.value.mediaType,
-        spec,
-      });
-
-      if (outcome.transportCompletedAt !== null) {
-        owner.markRequestCompleted();
-      }
-
-      if (outcome.ok) {
-        summary = "The trial completed within the configured timeout and byte budget.";
+      const overlayBytes = await readFile(derivative.value.overlayArtifactPath);
+      if (overlayBytes.byteLength > args.config.maxImageBytes) {
+        outcome = {
+          ok: false,
+          failure: {
+            code: "INVALID_OBSERVER_OUTPUT",
+            message: "Overlay image exceeds the configured input-byte budget.",
+            issues: [
+              `overlayBytes=${overlayBytes.byteLength}`,
+              `limit=${args.config.maxImageBytes}`,
+            ],
+          },
+          responseBytes: 0,
+          firstResponseByteAt: null,
+          firstResponseByteLatencyMs: null,
+          transportCompletedAt: null,
+          transportCompletionLatencyMs: null,
+          responseCompletedSuccessfully: false,
+          completionAt: null,
+          completionLatencyMs: null,
+          timeoutStage: null,
+          finishReason: null,
+          outputPreviewEscaped: null,
+        };
       } else {
-        const failure = localVlmFailureFromUnknown(outcome.failure);
-        issues = [failure.message, ...failure.issues];
-        summary =
-          failure.code === "REQUEST_TIMEOUT"
-            ? "The trial did not complete before the configured timeout."
-            : outcome.transportCompletedAt !== null
-              ? "The transport completed, but the response did not complete successfully."
-              : "The trial did not complete within the configured completion bounds.";
+        let prepared = buildRequestParityPreparedTrialRequest({
+          config: args.config,
+          contract: args.trial.contract,
+          observationRunId,
+          overlayBytes: new Uint8Array(overlayBytes),
+          overlayMediaType: derivative.value.mediaType,
+        });
+        if (args.mutatePreparedTrialRequest) {
+          prepared = args.mutatePreparedTrialRequest(prepared);
+        }
+        measuredFingerprint = buildRequestParityFingerprintComputation({
+          observationRunId: prepared.observationRunId,
+          contract: args.trial.contract,
+          sourceBuilder: prepared.spec.sourceBuilder,
+          requestBody: prepared.requestBody,
+        }).snapshot;
+        fingerprintComparison = compareRequestParityFingerprintSnapshots({
+          expected: expectedFingerprint,
+          measured: measuredFingerprint,
+        });
+        sourceBuilder = prepared.spec.sourceBuilder;
+
+        if (!fingerprintComparison.allFieldsMatched) {
+          status = "BLOCKED";
+          summary =
+            "The actual trial request did not match the preregistered contract, so the request was not sent.";
+          issues = [
+            "Harness provenance failure: the measured trial fingerprint diverged from the preregistered fingerprint.",
+            `mismatchedFields=${fingerprintComparison.mismatchedFields.join(",")}`,
+            `expectedRequestBodyDigest=${expectedFingerprint.requestBodyDigest}`,
+            `measuredRequestBodyDigest=${measuredFingerprint.requestBodyDigest}`,
+            `expectedOverlayImageDigest=${expectedFingerprint.overlayImageDigest}`,
+            `measuredOverlayImageDigest=${measuredFingerprint.overlayImageDigest}`,
+          ];
+          fatalStopReason = `request fingerprint mismatch at sequence ${args.trial.sequenceNumber}`;
+        } else {
+          const launchSpec = buildLlamaServerLaunchSpec(args.config, 0);
+          owner = await spawnOwnedLlamaServerProcess({
+            launchSpec,
+            workspaceDir,
+            host: args.config.host,
+            stdoutBytesMax: args.config.stdoutBytesMax,
+            stderrBytesMax: args.config.stderrBytesMax,
+            resourceSampleIntervalMs: args.config.resourceSampleIntervalMs,
+            terminationTimeoutMs: args.config.terminationTimeoutMs,
+          });
+
+          const startedAt = performance.now();
+          await waitForReadiness({
+            config: args.config,
+            port: owner.telemetry.port,
+            signal: AbortSignal.timeout(args.config.startupTimeoutMs),
+            onAttempt: ({ ok, error }) => owner?.noteReadinessAttempt(ok, error, startedAt),
+          });
+
+          owner.markRequestStarted();
+          outcome = await sendRequestParityRequest({
+            config: args.config,
+            port: owner.telemetry.port,
+            signal: new AbortController().signal,
+            requestBody: prepared.requestBody,
+          });
+
+          if (outcome.transportCompletedAt !== null) {
+            owner.markRequestCompleted();
+          }
+
+          if (outcome.ok) {
+            status = "PASS";
+            summary = "The trial completed within the configured timeout and byte budget.";
+          } else {
+            status = "FAIL";
+            const failure = localVlmFailureFromUnknown(outcome.failure);
+            issues = [failure.message, ...failure.issues];
+            summary =
+              failure.code === "REQUEST_TIMEOUT"
+                ? "The trial did not complete before the configured timeout."
+                : outcome.transportCompletedAt !== null
+                  ? "The transport completed, but the response did not complete successfully."
+                  : "The trial did not complete within the configured completion bounds.";
+          }
+        }
       }
     }
   } catch (error) {
@@ -1240,9 +1593,9 @@ async function runOneRequestParityTrial(args: {
       repetitionNumber: args.trial.repetitionNumber,
       sequencePosition: args.trial.sequencePosition,
       contract: args.trial.contract,
-      sourceBuilder: spec.sourceBuilder,
-      requestFingerprintDigest: contractFingerprintDigest(args.fingerprints, args.trial.contract),
-      status: outcome?.ok ? "PASS" : "FAIL",
+      sourceBuilder,
+      requestFingerprint: fingerprintComparison,
+      status,
       summary,
       issues,
       blockedBySequenceNumber: null,
@@ -1266,6 +1619,10 @@ export async function runLocalVlmRequestParityReproducibilityDiagnostic(args: {
   sourceMediaType: string;
   sourceWidth: number;
   sourceHeight: number;
+  mutatePreparedTrialRequest?: (
+    trial: ScheduledTrial,
+    prepared: RequestParityPreparedTrialRequest,
+  ) => RequestParityPreparedTrialRequest;
 }): Promise<RequestParityReproducibilityDiagnosticReport> {
   const runtimeVersion = await readLlamaVersionOutput(args.config);
   const fingerprintOverlay = await buildFingerprintOverlay({
@@ -1308,6 +1665,10 @@ export async function runLocalVlmRequestParityReproducibilityDiagnostic(args: {
       sourceWidth: args.sourceWidth,
       sourceHeight: args.sourceHeight,
       fingerprints: requestFingerprints,
+      mutatePreparedTrialRequest:
+        args.mutatePreparedTrialRequest === undefined
+          ? undefined
+          : (prepared) => args.mutatePreparedTrialRequest!(trial, prepared),
     });
     trials.push(result.report);
     if (result.fatalStopReason !== null) {
@@ -1386,7 +1747,9 @@ export async function writeRequestParityReproducibilityDiagnosticFiles(args: {
     ...args.report.trials.map((trial) => {
       const preview = trial.evidence?.outputPreviewEscaped ?? "null";
       const finishReason = trial.evidence?.finishReason ?? "null";
-      return `- #${trial.sequenceNumber} rep${trial.repetitionNumber} pos${trial.sequencePosition} ${trial.contract}: ${trial.status}; fingerprint=${trial.requestFingerprintDigest}; responseCompletedSuccessfully=${String(trial.evidence?.responseCompletedSuccessfully ?? false)}; finishReason=${finishReason}; timeoutStage=${trial.evidence?.timeoutStage ?? "null"}; responseBytes=${trial.evidence?.responseBytes ?? 0}; preview=${preview}`;
+      const expected = trial.requestFingerprint.expected.requestBodyDigest;
+      const measured = trial.requestFingerprint.measured?.requestBodyDigest ?? "null";
+      return `- #${trial.sequenceNumber} rep${trial.repetitionNumber} pos${trial.sequencePosition} ${trial.contract}: ${trial.status}; expectedFingerprint=${expected}; measuredFingerprint=${measured}; fingerprintVerified=${String(trial.requestFingerprint.allFieldsMatched)}; responseCompletedSuccessfully=${String(trial.evidence?.responseCompletedSuccessfully ?? false)}; finishReason=${finishReason}; timeoutStage=${trial.evidence?.timeoutStage ?? "null"}; responseBytes=${trial.evidence?.responseBytes ?? 0}; preview=${preview}`;
     }),
   ].join("\n");
   await writeFile(jsonPath, `${JSON.stringify(args.report, null, 2)}\n`, "utf8");
