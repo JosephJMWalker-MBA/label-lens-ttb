@@ -22,9 +22,12 @@ Local execution requires explicit digest-pinned configuration:
 
 - `LLAMA_SERVER_BIN`
 - `LLAMA_SERVER_SHA256`
+- `VLM_RUNTIME_KIND`
 - `VLM_MODEL_PATH`
 - `VLM_MODEL_SHA256`
 - `VLM_MMPROJ_PATH` and `VLM_MMPROJ_SHA256` when the selected model/runtime requires a separate projector
+
+`VLM_RUNTIME_KIND` is explicit evaluation provenance. Slice 2 does not infer real-versus-fake evidence from executable names, version strings, or other heuristics.
 
 Only loopback hosts are accepted.
 
@@ -170,9 +173,9 @@ Slice 2 decisions are conservative:
 
 These decisions are local runtime findings, not universal proof and not production readiness claims.
 
-`STATELESS OBSERVER BOUNDARY SUPPORTED` is reserved for a real local-runtime A-B-A-C-B contamination sequence with accounted outputs, no prohibited claims, no cross-case leakage signals, unique workspaces and process lifetimes, confirmed exit and port release, and successful cleanup.
+`STATELESS OBSERVER BOUNDARY SUPPORTED` is reserved for an explicitly real local-runtime A-B-A-C-B contamination sequence with all five outputs schema-valid, no prohibited claims, no cross-case leakage signals, unique workspaces and process lifetimes, confirmed exit, process-tree release, and port release, and successful cleanup.
 
-`RESOURCE LIFECYCLE BOUNDED` is reserved for a completed real-runtime stress sequence with enough successful samples, no orphan processes, no cleanup failures, no unexplained monotonic RSS or workspace growth, bounded logs, and forced termination telemetry evaluated.
+`RESOURCE LIFECYCLE BOUNDED` is reserved for a completed explicitly real-runtime stress sequence with enough successful samples, confirmed process-tree release, no orphan processes, no cleanup failures, no forced termination, no unexplained monotonic RSS or workspace growth, bounded logs, and forced termination telemetry evaluated.
 
 Fake-server-only runs remain `INSUFFICIENT EVIDENCE` for both real-runtime decisions.
 

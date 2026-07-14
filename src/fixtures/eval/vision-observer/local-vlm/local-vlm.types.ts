@@ -22,6 +22,7 @@ export type LocalVlmRuntimeKind = (typeof LOCAL_VLM_RUNTIME_KINDS)[number];
 export interface LocalVlmConfigInput {
   LLAMA_SERVER_BIN?: string;
   LLAMA_SERVER_SHA256?: string;
+  VLM_RUNTIME_KIND?: string;
   VLM_MODEL_PATH?: string;
   VLM_MMPROJ_PATH?: string;
   VLM_MODEL_SHA256?: string;
@@ -41,6 +42,7 @@ export interface LocalVlmResolvedConfig {
   schemaVersion: typeof LOCAL_VLM_CONFIG_SCHEMA_VERSION;
   llamaServerBin: string;
   llamaExecutableSha256: string;
+  runtimeKind: LocalVlmRuntimeKind;
   llamaVersionArgs: readonly string[];
   modelPath: string;
   modelSha256: string;
@@ -79,6 +81,7 @@ export interface LocalVlmConfigError {
     | "INVALID_DIGEST"
     | "INVALID_HOST"
     | "INVALID_NUMBER"
+    | "INVALID_RUNTIME_KIND"
     | "UNSAFE_ARGUMENT";
   message: string;
   issues: readonly string[];
@@ -142,6 +145,8 @@ export interface LocalVlmResourceTelemetry {
   peakProcessRssBytes: number | null;
   peakProcessTreeRssBytes: number | null;
   processRssBytesAfterTermination: number | null;
+  processTreeRssBytesAfterTermination: number | null;
+  processTreeReleasedAfterTermination: boolean | null;
   sampleCount: number;
   sampleFailureCount: number;
   gpu: LocalVlmGpuTelemetry;
@@ -287,6 +292,7 @@ export interface LocalVlmExperimentReport {
   generatedAt: string;
   gitCommit: string;
   runtime: {
+    runtimeKind: LocalVlmRuntimeKind;
     executableDigest: string | null;
     runtimeVersion: string | null;
   };

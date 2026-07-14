@@ -150,6 +150,9 @@ function installAdapterMocks(failure: {
             peakProcessRssBytes: 100,
             peakProcessTreeRssBytes: 100,
             processRssBytesAfterTermination: null,
+            processTreeRssBytesAfterTermination: null,
+            processTreeReleasedAfterTermination:
+              failure.code === "PORT_RELEASE_FAILED" ? true : false,
             sampleCount: 1,
             sampleFailureCount: 0,
             gpu: {
@@ -188,6 +191,7 @@ const TEST_CONFIG: LocalVlmResolvedConfig = {
   schemaVersion: "local-vlm-config.v1",
   llamaServerBin: "/fake/llama-server",
   llamaExecutableSha256: "a".repeat(64),
+  runtimeKind: "fake-server",
   llamaVersionArgs: ["--version"],
   modelPath: "/fake/model.gguf",
   modelSha256: "b".repeat(64),
@@ -248,11 +252,15 @@ describe("llama-server adapter termination handling", () => {
       code: "PROCESS_TERMINATION_FAILED",
       message: "The local VLM child process did not exit after forced termination.",
       issues: ["pid=4321"],
+      expectedCleanupCompleted: false,
+      expectedWorkspaceExists: true,
     },
     {
       code: "PORT_RELEASE_FAILED",
       message: "The local VLM server port remained open after termination.",
       issues: ["port=43000"],
+      expectedCleanupCompleted: true,
+      expectedWorkspaceExists: false,
     },
   ] as const)(
     "returns a lifecycle error and no canonical proposals after $code",
@@ -280,8 +288,8 @@ describe("llama-server adapter termination handling", () => {
       expect(result.errorRecord?.message).toBe(failure.message);
       expect(result.observerResult).toBeNull();
       expect(result.canonicalProposals).toEqual([]);
-      expect(result.run.cleanupCompleted).toBe(true);
-      expect(existsSync(result.workspaceDir)).toBe(false);
+      expect(result.run.cleanupCompleted).toBe(failure.expectedCleanupCompleted);
+      expect(existsSync(result.workspaceDir)).toBe(failure.expectedWorkspaceExists);
       expect(existsSync(sourceArtifactRef)).toBe(true);
       expect(snapshot?.sourceArtifactRef).toBe(sourceArtifactRef);
       expect(snapshot?.errorRecord?.code).toBe("OBSERVER_EXCEPTION");

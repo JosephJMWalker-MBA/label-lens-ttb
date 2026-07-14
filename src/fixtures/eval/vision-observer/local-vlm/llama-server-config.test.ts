@@ -53,6 +53,24 @@ describe("llama-server config", () => {
     if (!result.ok) expect(result.error.code).toBe("INVALID_DIGEST");
   });
 
+  it("rejects an invalid explicit runtime provenance value", async () => {
+    const dir = tempDir();
+    CLEANUP.push(dir);
+    const executable = writeFakeServerWrapper(dir);
+    const model = writeFakeModel(dir);
+    const result = await resolveLocalVlmConfig({
+      ...localVlmEnv({
+        executablePath: executable.path,
+        executableSha256: executable.sha256,
+        modelPath: model.path,
+        modelSha256: model.sha256,
+      }),
+      VLM_RUNTIME_KIND: "shim-runtime",
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.code).toBe("INVALID_RUNTIME_KIND");
+  });
+
   it("rejects a wrong model digest", async () => {
     const dir = tempDir();
     CLEANUP.push(dir);
@@ -125,6 +143,7 @@ describe("llama-server config", () => {
     );
     expect(result.ok).toBe(true);
     if (result.ok) {
+      expect(result.value.runtimeKind).toBe("fake-server");
       expect(result.value.modelDisplayId).toContain("Q4_K_M");
       expect(result.value.mmprojSha256).toBe(projector.sha256);
       expect(result.value.host).toBe("127.0.0.1");

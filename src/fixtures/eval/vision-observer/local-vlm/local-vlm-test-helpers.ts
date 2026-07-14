@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
-import type { LocalVlmConfigInput } from "./local-vlm.types";
+import type { LocalVlmConfigInput, LocalVlmRuntimeKind } from "./local-vlm.types";
 
 const FIXTURE_SERVER_PATH = join(
   process.cwd(),
@@ -93,6 +93,7 @@ await import(${JSON.stringify(pathToFileURL(FIXTURE_SERVER_PATH).href)});
 export function localVlmEnv(args: {
   executablePath: string;
   executableSha256: string;
+  runtimeKind?: LocalVlmRuntimeKind;
   modelPath: string;
   modelSha256: string;
   mmprojPath?: string;
@@ -110,6 +111,7 @@ export function localVlmEnv(args: {
   return {
     LLAMA_SERVER_BIN: args.executablePath,
     LLAMA_SERVER_SHA256: args.executableSha256,
+    VLM_RUNTIME_KIND: args.runtimeKind ?? "fake-server",
     VLM_MODEL_PATH: args.modelPath,
     VLM_MODEL_SHA256: args.modelSha256,
     VLM_MMPROJ_PATH: args.mmprojPath,

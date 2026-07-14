@@ -164,6 +164,15 @@ function timeoutErrorRecord(timeoutMs: number): VisionObservationErrorRecord {
   });
 }
 
+function shouldSkipWorkspaceCleanup(error: unknown): boolean {
+  return Boolean(
+    error &&
+    typeof error === "object" &&
+    "code" in error &&
+    error.code === "PROCESS_TERMINATION_FAILED",
+  );
+}
+
 async function observeWithTimeout(
   adapter: VisionObserverAdapter,
   input: Parameters<VisionObserverAdapter["observe"]>[0],
@@ -229,6 +238,7 @@ export async function runVisionObserverLifecycle(
   let canonicalProposals: CanonicalRegionProposal[] = [];
   let errorRecord: VisionObservationErrorRecord | null = null;
   let cleanupCompleted = false;
+  let lifecycleError: unknown = null;
 
   try {
     const derivativeResult = await createObserverDerivative({
@@ -316,16 +326,21 @@ export async function runVisionObserverLifecycle(
       }
     }
   } catch (error) {
+    lifecycleError = error;
     errorRecord =
       error instanceof VisionObserverTimeoutError
         ? timeoutErrorRecord(args.timeoutMs ?? 0)
         : exceptionErrorRecord(error);
   } finally {
-    try {
-      await rm(workspaceDir, { recursive: true, force: true });
-      cleanupCompleted = true;
-    } catch {
+    if (shouldSkipWorkspaceCleanup(lifecycleError)) {
       cleanupCompleted = false;
+    } else {
+      try {
+        await rm(workspaceDir, { recursive: true, force: true });
+        cleanupCompleted = true;
+      } catch {
+        cleanupCompleted = false;
+      }
     }
   }
 

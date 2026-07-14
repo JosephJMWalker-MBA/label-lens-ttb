@@ -40,6 +40,7 @@ export const localVlmResolvedConfigSchema = z
     schemaVersion: z.literal(LOCAL_VLM_CONFIG_SCHEMA_VERSION),
     llamaServerBin: absPath,
     llamaExecutableSha256: sha256,
+    runtimeKind: z.enum(LOCAL_VLM_RUNTIME_KINDS),
     llamaVersionArgs: z.array(z.string().min(1)).min(1),
     modelPath: absPath,
     modelSha256: sha256,
@@ -134,6 +135,8 @@ const runReportSchema = z
       peakProcessRssBytes: z.number().int().nonnegative().nullable(),
       peakProcessTreeRssBytes: z.number().int().nonnegative().nullable(),
       processRssBytesAfterTermination: z.number().int().nonnegative().nullable(),
+      processTreeRssBytesAfterTermination: z.number().int().nonnegative().nullable(),
+      processTreeReleasedAfterTermination: z.boolean().nullable(),
       sampleCount: z.number().int().nonnegative(),
       sampleFailureCount: z.number().int().nonnegative(),
       gpu: z.object({
@@ -180,6 +183,7 @@ export const localVlmExperimentReportSchema = z
     generatedAt: z.string().datetime(),
     gitCommit: z.string().min(1),
     runtime: z.object({
+      runtimeKind: z.enum(LOCAL_VLM_RUNTIME_KINDS),
       executableDigest: sha256.nullable(),
       runtimeVersion: z.string().nullable(),
     }),
@@ -237,8 +241,11 @@ export function validateLocalVlmResolvedConfig(
 ): Result<LocalVlmResolvedConfig, LocalVlmConfigError> {
   const parsed = localVlmResolvedConfigSchema.safeParse(input);
   if (!parsed.success) {
+    const code = parsed.error.issues.some((issue) => issue.path[0] === "runtimeKind")
+      ? "INVALID_RUNTIME_KIND"
+      : "INVALID_NUMBER";
     return err({
-      code: "INVALID_NUMBER",
+      code,
       message: "Local VLM configuration is invalid.",
       issues: issuesOf(parsed.error),
     });

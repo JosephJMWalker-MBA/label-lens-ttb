@@ -201,6 +201,7 @@ describe("llama-server process owner", () => {
     await owner.terminate();
     const first = await owner.finalizeResources(0);
     const count = first.sampleCount;
+    expect(first.processTreeReleasedAfterTermination).toBe(true);
     await new Promise((resolve) => setTimeout(resolve, 60));
     expect(first.sampleCount).toBe(count);
   });

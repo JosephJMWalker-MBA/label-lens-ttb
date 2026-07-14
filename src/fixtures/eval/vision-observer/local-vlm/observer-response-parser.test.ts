@@ -8,6 +8,7 @@ const CONFIG: LocalVlmResolvedConfig = {
   schemaVersion: "local-vlm-config.v1",
   llamaServerBin: "/tmp/llama-server",
   llamaExecutableSha256: "1".repeat(64),
+  runtimeKind: "fake-server",
   llamaVersionArgs: ["--version"],
   modelPath: "/tmp/model.gguf",
   modelSha256: "2".repeat(64),

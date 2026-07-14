@@ -13,8 +13,9 @@ import type {
   LocalVlmConfigError,
   LocalVlmConfigInput,
   LocalVlmResolvedConfig,
+  LocalVlmRuntimeKind,
 } from "./local-vlm.types";
-import { LOCAL_VLM_CONFIG_SCHEMA_VERSION } from "./local-vlm.types";
+import { LOCAL_VLM_CONFIG_SCHEMA_VERSION, LOCAL_VLM_RUNTIME_KINDS } from "./local-vlm.types";
 
 const execFile = promisify(execFileCb);
 
@@ -88,6 +89,24 @@ function parseOptionalNonNegativeInt(
   return ok(parsed);
 }
 
+function parseRuntimeKind(
+  value: string | undefined,
+): Result<LocalVlmRuntimeKind, LocalVlmConfigError> {
+  const normalized = value?.trim();
+  if (!normalized) {
+    return invalid("MISSING_CONFIG", "Local VLM runtime provenance is absent.", [
+      "VLM_RUNTIME_KIND is required and must be set explicitly.",
+    ]);
+  }
+  if ((LOCAL_VLM_RUNTIME_KINDS as readonly string[]).includes(normalized)) {
+    return ok(normalized as LocalVlmRuntimeKind);
+  }
+  return invalid("INVALID_RUNTIME_KIND", "VLM_RUNTIME_KIND is invalid.", [
+    `VLM_RUNTIME_KIND=${normalized}`,
+    `expected one of: ${LOCAL_VLM_RUNTIME_KINDS.join(", ")}`,
+  ]);
+}
+
 function isLoopbackHost(host: string): boolean {
   if (host === "::1") return true;
   const parts = host.split(".");
@@ -141,6 +160,7 @@ export function localVlmConfigPresent(input: LocalVlmConfigInput): boolean {
   return Boolean(
     input.LLAMA_SERVER_BIN &&
     input.LLAMA_SERVER_SHA256 &&
+    input.VLM_RUNTIME_KIND &&
     input.VLM_MODEL_PATH &&
     input.VLM_MODEL_SHA256,
   );
@@ -151,7 +171,7 @@ export async function resolveLocalVlmConfig(
 ): Promise<Result<LocalVlmResolvedConfig, LocalVlmConfigError>> {
   if (!localVlmConfigPresent(input)) {
     return invalid("MISSING_CONFIG", "Local VLM configuration is absent.", [
-      "LLAMA_SERVER_BIN, LLAMA_SERVER_SHA256, VLM_MODEL_PATH, and VLM_MODEL_SHA256 are required for local execution.",
+      "LLAMA_SERVER_BIN, LLAMA_SERVER_SHA256, VLM_RUNTIME_KIND, VLM_MODEL_PATH, and VLM_MODEL_SHA256 are required for local execution.",
     ]);
   }
 
@@ -166,6 +186,8 @@ export async function resolveLocalVlmConfig(
   if (!modelPath.ok) return modelPath;
   const modelSha = rejectUnsafeArgumentValue(input.VLM_MODEL_SHA256!, "VLM_MODEL_SHA256");
   if (!modelSha.ok) return modelSha;
+  const runtimeKind = parseRuntimeKind(input.VLM_RUNTIME_KIND);
+  if (!runtimeKind.ok) return runtimeKind;
   const mmprojPath =
     input.VLM_MMPROJ_PATH === undefined || input.VLM_MMPROJ_PATH.trim() === ""
       ? ok<string | null>(null)
@@ -269,6 +291,7 @@ export async function resolveLocalVlmConfig(
       schemaVersion: LOCAL_VLM_CONFIG_SCHEMA_VERSION,
       llamaServerBin: bin.value,
       llamaExecutableSha256: actualExecutableSha,
+      runtimeKind: runtimeKind.value,
       llamaVersionArgs: ["--version"],
       modelPath: modelPath.value,
       modelSha256: actualModelSha,

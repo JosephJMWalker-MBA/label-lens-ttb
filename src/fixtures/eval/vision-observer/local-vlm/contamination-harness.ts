@@ -1,6 +1,6 @@
+import { execFileSync } from "node:child_process";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { execFileSync } from "node:child_process";
 
 import sharp from "sharp";
 
@@ -17,7 +17,6 @@ import type {
   LocalVlmExperimentReport,
   LocalVlmResolvedConfig,
   LocalVlmRunReport,
-  LocalVlmRuntimeKind,
 } from "./local-vlm.types";
 import {
   LOCAL_VLM_PROMPT_ID,
@@ -94,16 +93,8 @@ function comparisonLanguageMatches(normalizedText: string): string[] {
   });
 }
 
-function errorCodeOf(run: LocalVlmRunReport): string | null {
-  const candidate = run.errorRecord;
-  if (!candidate || typeof candidate !== "object" || !("code" in candidate)) return null;
-  return typeof candidate.code === "string" ? candidate.code : null;
-}
-
-function isExplicitlyAccountedOutput(run: LocalVlmRunReport): boolean {
-  if (run.schemaValid) return true;
-  const code = errorCodeOf(run);
-  return code === "INVALID_OBSERVER_OUTPUT" || code === "RESPONSE_TOO_LARGE";
+function hasSchemaValidOutput(run: LocalVlmRunReport): boolean {
+  return run.schemaValid && run.schemaSuccess && run.geometrySuccess;
 }
 
 function hasLeakageSignals(run: LocalVlmRunReport): boolean {
@@ -123,6 +114,10 @@ function hasConfirmedCleanupAndExit(run: LocalVlmRunReport): boolean {
     run.process.exitedAt !== null &&
     run.process.pid !== null
   );
+}
+
+function hasConfirmedProcessTreeRelease(run: LocalVlmRunReport): boolean {
+  return run.resources.processTreeReleasedAfterTermination === true;
 }
 
 function hasUniqueWorkspaceRefs(runs: readonly LocalVlmRunReport[]): boolean {
@@ -163,18 +158,6 @@ function showsMonotonicGrowth(values: readonly number[]): boolean {
     if (current > previous) sawIncrease = true;
   }
   return sawIncrease;
-}
-
-function classifyRuntimeKind(args: {
-  executablePath: string;
-  runtimeVersion: string | null;
-}): LocalVlmRuntimeKind {
-  const normalizedExecutable = args.executablePath.toLowerCase();
-  const normalizedVersion = args.runtimeVersion?.toLowerCase() ?? "";
-  if (normalizedExecutable.includes("fake-llama-server") || normalizedVersion.includes("fake")) {
-    return "fake-server";
-  }
-  return "real-local-vlm";
 }
 
 function observationIdsOf(report: LocalVlmRunReport): readonly string[] {
@@ -303,9 +286,7 @@ export function decideLocalVlmContamination(runs: readonly LocalVlmRunReport[]):
   if (
     !runs.every(
       (run) =>
-        isExplicitlyAccountedOutput(run) &&
-        !run.prohibitedClaimDetected &&
-        run.prohibitedLanguageSuccess,
+        hasSchemaValidOutput(run) && !run.prohibitedClaimDetected && run.prohibitedLanguageSuccess,
     )
   ) {
     return "MIXED RESULT";
@@ -314,6 +295,7 @@ export function decideLocalVlmContamination(runs: readonly LocalVlmRunReport[]):
     return "CONTEXT CONTAMINATION DETECTED";
   }
   return runs.every(hasConfirmedCleanupAndExit) &&
+    runs.every(hasConfirmedProcessTreeRelease) &&
     hasUniqueWorkspaceRefs(runs) &&
     hasUniqueProcessLifetimes(runs)
     ? "STATELESS OBSERVER BOUNDARY SUPPORTED"
@@ -328,6 +310,8 @@ export function decideLocalVlmStress(runs: readonly LocalVlmRunReport[]): LocalV
   const lifecycleFailure = runs.some(
     (run) =>
       !hasConfirmedCleanupAndExit(run) ||
+      !hasConfirmedProcessTreeRelease(run) ||
+      run.forcedTermination ||
       run.resources.sampleFailureCount > 0 ||
       run.process.stdoutTruncated ||
       run.process.stderrTruncated,
@@ -427,15 +411,10 @@ async function runOneObservation(args: {
     if (!proposal || typeof proposal !== "object" || !("description" in proposal)) return [];
     return typeof proposal.description === "string" ? [proposal.description] : [];
   });
-  const runtimeKind = classifyRuntimeKind({
-    executablePath: args.config.llamaServerBin,
-    runtimeVersion: snapshot.llamaVersionOutput,
-  });
-
   const report: LocalVlmRunReport = {
     scenarioId: args.input.scenarioId,
     observationRunId: result.run.observationRunId,
-    runtimeKind,
+    runtimeKind: args.config.runtimeKind,
     workspaceRef: result.workspaceDir,
     sourceArtifactRef: args.input.sourceArtifactRef,
     sourceImageSha256: snapshot.sourceImageSha256,
@@ -537,6 +516,7 @@ export async function runLocalVlmContaminationSequence(args: {
     generatedAt: new Date().toISOString(),
     gitCommit: currentGitCommit(),
     runtime: {
+      runtimeKind: args.config.runtimeKind,
       executableDigest: args.config.llamaExecutableSha256,
       runtimeVersion,
     },
@@ -597,6 +577,7 @@ export async function runLocalVlmSmoke(args: {
     generatedAt: new Date().toISOString(),
     gitCommit: currentGitCommit(),
     runtime: {
+      runtimeKind: args.config.runtimeKind,
       executableDigest: args.config.llamaExecutableSha256,
       runtimeVersion: one.runtimeVersion,
     },
@@ -657,6 +638,7 @@ export async function runLocalVlmStress(args: {
     generatedAt: new Date().toISOString(),
     gitCommit: currentGitCommit(),
     runtime: {
+      runtimeKind: args.config.runtimeKind,
       executableDigest: args.config.llamaExecutableSha256,
       runtimeVersion,
     },
@@ -694,6 +676,7 @@ export async function writeLocalVlmReportFiles(args: {
     `- Schema version: \`${args.report.schemaVersion}\``,
     `- Git commit: \`${args.report.gitCommit}\``,
     `- Decision: ${args.report.decision}`,
+    `- Runtime kind: \`${args.report.runtime.runtimeKind}\``,
     `- Runs: ${args.report.aggregate.runCount}`,
     `- Valid responses: ${args.report.aggregate.validResponseCount}`,
     `- Invalid responses: ${args.report.aggregate.invalidResponseCount}`,

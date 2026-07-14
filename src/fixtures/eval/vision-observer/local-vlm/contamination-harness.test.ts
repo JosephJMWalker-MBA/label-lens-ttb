@@ -75,6 +75,8 @@ function run(overrides: Partial<LocalVlmRunReport> = {}): LocalVlmRunReport {
       peakProcessRssBytes: 100,
       peakProcessTreeRssBytes: 100,
       processRssBytesAfterTermination: null,
+      processTreeRssBytesAfterTermination: null,
+      processTreeReleasedAfterTermination: true,
       sampleCount: 1,
       sampleFailureCount: 0,
       gpu: {
@@ -248,6 +250,34 @@ describe("contamination harness", () => {
     expect(aggregate.contaminationCount).toBe(0);
     expect(decideLocalVlmContamination(runs)).toBe("STATELESS OBSERVER BOUNDARY SUPPORTED");
     expect(
+      decideLocalVlmContamination(
+        runs.map((entry) => ({
+          ...entry,
+          schemaValid: false,
+          schemaSuccess: false,
+          geometrySuccess: false,
+          errorRecord: {
+            immutable: true,
+            code: "INVALID_OBSERVER_OUTPUT",
+            stage: "proposal-validate",
+            message: "malformed",
+            issues: ["synthetic malformed response"],
+          },
+        })),
+      ),
+    ).toBe("MIXED RESULT");
+    expect(
+      decideLocalVlmContamination(
+        runs.map((entry, index) => ({
+          ...entry,
+          resources: {
+            ...entry.resources,
+            processTreeReleasedAfterTermination: index === 0 ? false : true,
+          },
+        })),
+      ),
+    ).toBe("MIXED RESULT");
+    expect(
       decideLocalVlmContamination(runs.map((entry) => ({ ...entry, runtimeKind: "fake-server" }))),
     ).toBe("INSUFFICIENT EVIDENCE");
     expect(
@@ -293,6 +323,29 @@ describe("contamination harness", () => {
             ...entry.resources,
             peakProcessTreeRssBytes: 100 + index,
             workspacePeakBytes: 10 + index,
+          },
+        })),
+      ),
+    ).toBe("RESOURCE LIFECYCLE NOT BOUNDED");
+    expect(
+      decideLocalVlmStress(
+        realStressRuns.map((entry, index) => ({
+          ...entry,
+          forcedTermination: index === 0,
+          process: {
+            ...entry.process,
+            forcedTermination: index === 0,
+          },
+        })),
+      ),
+    ).toBe("RESOURCE LIFECYCLE NOT BOUNDED");
+    expect(
+      decideLocalVlmStress(
+        realStressRuns.map((entry, index) => ({
+          ...entry,
+          resources: {
+            ...entry.resources,
+            processTreeReleasedAfterTermination: index === 0 ? false : true,
           },
         })),
       ),
@@ -414,6 +467,8 @@ describe("contamination harness", () => {
               peakProcessRssBytes: 100,
               peakProcessTreeRssBytes: 100,
               processRssBytesAfterTermination: null,
+              processTreeRssBytesAfterTermination: null,
+              processTreeReleasedAfterTermination: true,
               sampleCount: 1,
               sampleFailureCount: 0,
               gpu: {
@@ -494,6 +549,7 @@ describe("contamination harness", () => {
       "contamination-b",
     ]);
     expect(report.runs.every((entry) => entry.runtimeKind === "fake-server")).toBe(true);
+    expect(report.runtime.runtimeKind).toBe("fake-server");
     expect(report.aggregate.contaminationCount).toBe(0);
     expect(report.decision).toBe("INSUFFICIENT EVIDENCE");
   });

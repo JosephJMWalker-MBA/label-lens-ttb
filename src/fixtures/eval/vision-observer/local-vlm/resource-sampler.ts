@@ -60,6 +60,19 @@ async function rssBytesForProcessGroup(processGroupId: number | null): Promise<n
   }
 }
 
+function processTreeReleasedAfterTermination(processGroupId: number | null): boolean | null {
+  if (processGroupId === null || process.platform === "win32") return null;
+  try {
+    process.kill(-processGroupId, 0);
+    return false;
+  } catch (error) {
+    if (error && typeof error === "object" && "code" in error && error.code === "ESRCH") {
+      return true;
+    }
+    return null;
+  }
+}
+
 function emptyGpuTelemetry(): LocalVlmGpuTelemetry {
   return {
     available: false,
@@ -88,6 +101,8 @@ export class ResourceSampler {
   #peakProcessRssBytes: number | null = null;
   #peakProcessTreeRssBytes: number | null = null;
   #processRssBytesAfterTermination: number | null = null;
+  #processTreeRssBytesAfterTermination: number | null = null;
+  #processTreeReleasedAfterTermination: boolean | null = null;
   #started = false;
 
   constructor(args: {
@@ -145,7 +160,13 @@ export class ResourceSampler {
       clearInterval(this.#timer);
       this.#timer = null;
     }
-    this.#processRssBytesAfterTermination = await rssBytesForPid(this.#pid);
+    const [processRssBytesAfterTermination, processTreeRssBytesAfterTermination] =
+      await Promise.all([rssBytesForPid(this.#pid), rssBytesForProcessGroup(this.#processGroupId)]);
+    this.#processRssBytesAfterTermination = processRssBytesAfterTermination;
+    this.#processTreeRssBytesAfterTermination = processTreeRssBytesAfterTermination;
+    this.#processTreeReleasedAfterTermination = processTreeReleasedAfterTermination(
+      this.#processGroupId,
+    );
     return {
       workspaceBytesBeforeStart: this.#workspaceBytesBeforeStart,
       workspacePeakBytes: this.#workspacePeakBytes,
@@ -158,6 +179,8 @@ export class ResourceSampler {
       peakProcessRssBytes: this.#peakProcessRssBytes,
       peakProcessTreeRssBytes: this.#peakProcessTreeRssBytes,
       processRssBytesAfterTermination: this.#processRssBytesAfterTermination,
+      processTreeRssBytesAfterTermination: this.#processTreeRssBytesAfterTermination,
+      processTreeReleasedAfterTermination: this.#processTreeReleasedAfterTermination,
       sampleCount: this.#sampleCount,
       sampleFailureCount: this.#sampleFailureCount,
       gpu: this.#gpu,
