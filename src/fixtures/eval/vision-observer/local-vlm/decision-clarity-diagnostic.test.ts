@@ -480,7 +480,7 @@ describe("decision clarity diagnostic", () => {
     expect(report.trials.slice(1).every((trial) => trial.status === "BLOCKED")).toBe(true);
   }, 30_000);
 
-  it("validates Contract B with the Phase 6 description contract instead of transport completion alone", async () => {
+  it("counts a valid Contract B response as timely valid", async () => {
     const config = await diagnosticConfig({});
     const source = await sourceFixture();
 
@@ -490,11 +490,26 @@ describe("decision clarity diagnostic", () => {
       ...source,
       serviceDeadlineMs: 30,
       hardCeilingMs: 90,
+      mutateLaunchSpec: (trial, launchSpec) =>
+        trial.contract === "B"
+          ? withLaunchArgs(
+              launchSpec,
+              decisionClarityBehaviorArgs({
+                responseDelayMs: 0,
+                reportedCompletionLatencyMs: 29,
+              }),
+            )
+          : launchSpec,
     });
     expect(valid.trials[2]?.contract).toBe("B");
     expect(valid.trials[2]?.completionState).toBe("TIMELY_VALID_COMPLETION");
     expect(valid.trials[2]?.status).toBe("PASS");
     expect(contractFindingFor(valid, "B").timelyValidCount).toBe(6);
+  }, 30_000);
+
+  it("rejects malformed Contract B content instead of treating transport completion as success", async () => {
+    const config = await diagnosticConfig({});
+    const source = await sourceFixture();
 
     const malformed = await runLocalVlmDecisionClarityDiagnostic({
       config,
@@ -513,6 +528,11 @@ describe("decision clarity diagnostic", () => {
     expect(malformed.trials[2]?.completionState).toBe("TIMELY_INVALID_COMPLETION");
     expect(malformed.trials[2]?.status).toBe("FAIL");
     expect(contractFindingFor(malformed, "B").timelyInvalidCount).toBe(1);
+  }, 30_000);
+
+  it("rejects contract-invalid Contract B content after successful transport", async () => {
+    const config = await diagnosticConfig({});
+    const source = await sourceFixture();
 
     const invalidContent = await runLocalVlmDecisionClarityDiagnostic({
       config,
@@ -531,6 +551,11 @@ describe("decision clarity diagnostic", () => {
     expect(invalidContent.trials[2]?.completionState).toBe("TIMELY_INVALID_COMPLETION");
     expect(invalidContent.trials[2]?.status).toBe("FAIL");
     expect(contractFindingFor(invalidContent, "B").timelyInvalidCount).toBe(1);
+  }, 30_000);
+
+  it("classifies Contract B transport failure separately from invalid content", async () => {
+    const config = await diagnosticConfig({});
+    const source = await sourceFixture();
 
     const transportFailure = await runLocalVlmDecisionClarityDiagnostic({
       config,
@@ -566,6 +591,8 @@ describe("decision clarity diagnostic", () => {
           ? withLaunchArgs(
               launchSpec,
               decisionClarityBehaviorArgs({
+                responseDelayMs: 0,
+                reportedCompletionLatencyMs: 29,
                 responseVariant: "invalid-grid",
               }),
             )
