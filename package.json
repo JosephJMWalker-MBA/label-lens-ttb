@@ -26,6 +26,7 @@
     "eval:local-vlm-response-completion": "npx vite-node --config vitest.config.ts scripts/eval/run-local-vlm-response-completion.ts",
     "eval:local-vlm-single-proposal-decomposition": "npx vite-node --config vitest.config.ts scripts/eval/run-local-vlm-single-proposal-decomposition.ts",
     "eval:local-vlm-request-parity-reproducibility": "npx vite-node --config vitest.config.ts scripts/eval/run-local-vlm-request-parity-reproducibility.ts",
+    "eval:local-vlm-decision-clarity": "npx vite-node --config vitest.config.ts scripts/eval/run-local-vlm-decision-clarity-diagnostic.ts",
     "docs:check": "node --experimental-strip-types --no-warnings scripts/check-docs.ts",
     "docs:check:test": "vitest run src/docs/documentation-validator.test.ts"
   },

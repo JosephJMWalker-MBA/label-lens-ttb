@@ -40,6 +40,25 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
   const canary = args.get("canary") ?? "ALPHA ORCHID";
   const completionFailAtRung = args.get("completion-fail-at-rung") ?? null;
   const completionErrorAtRung = args.get("completion-error-at-rung") ?? null;
+  const decisionClarityBehavior = (() => {
+    const raw = args.get("decision-clarity-behavior-json");
+    if (!raw) {
+      return {
+        responseVariant: "valid",
+        responseDelayMs: requestDelayMs,
+      };
+    }
+    const parsed = JSON.parse(raw);
+    return {
+      responseVariant: parsed?.responseVariant ?? "valid",
+      responseDelayMs:
+        typeof parsed?.responseDelayMs === "number" ? parsed.responseDelayMs : requestDelayMs,
+      reportedCompletionLatencyMs:
+        typeof parsed?.reportedCompletionLatencyMs === "number"
+          ? parsed.reportedCompletionLatencyMs
+          : null,
+    };
+  })();
 
   mkdirSync(workspaceDir, { recursive: true });
   if (logBytes > 0) process.stderr.write("X".repeat(logBytes));
@@ -351,6 +370,17 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
     return "B";
   }
 
+  function decisionClarityContract(payload) {
+    const system = String(payload?.messages?.[0]?.content ?? "");
+    if (system.includes("Choose the region using this priority order:")) {
+      return "A_PRIME";
+    }
+    if (system.includes('"observationId": "string"')) {
+      return "A";
+    }
+    return "B";
+  }
+
   function completionRung(payload) {
     const system = String(payload?.messages?.[0]?.content ?? "");
     if (system.includes("Return exactly one token: OK.")) return "one-token";
@@ -451,6 +481,39 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
     });
   }
 
+  async function decisionClarityResponseForContract(payload, runId) {
+    const contract = decisionClarityContract(payload);
+    const variant = decisionClarityBehavior.responseVariant;
+    if (variant === "transport-malformed-json") {
+      return '{"choices":';
+    }
+    if (variant === "assistant-malformed-json") {
+      return '{"observationRunId":';
+    }
+    if (variant === "invalid-grid") {
+      return JSON.stringify({
+        ...validPayload(),
+        observationRunId: runId,
+      });
+    }
+    if (variant === "a-prime-empty" && contract === "A_PRIME") {
+      return JSON.stringify({
+        observationRunId: runId,
+        proposals: [],
+      });
+    }
+    if (contract === "A" || contract === "A_PRIME") {
+      return JSON.stringify({
+        ...completionPayloadWithoutCoordinates(),
+        observationRunId: runId,
+      });
+    }
+    return JSON.stringify({
+      ...singleProposalPayload("description"),
+      observationRunId: runId,
+    });
+  }
+
   let healthy = false;
   setTimeout(() => {
     healthy = true;
@@ -485,7 +548,11 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
     const instruction = payload.messages?.[1]?.content?.[0]?.text ?? "";
     const runIdLine = String(instruction).split(/\r?\n/, 1)[0] ?? "";
     const runId = runIdLine.split(": ")?.[1]?.trim() ?? "unknown";
-    await new Promise((resolve) => setTimeout(resolve, requestDelayMs));
+    const activeDecisionClarityDelayMs =
+      mode === "decision-clarity-diagnostic"
+        ? decisionClarityBehavior.responseDelayMs
+        : requestDelayMs;
+    await new Promise((resolve) => setTimeout(resolve, activeDecisionClarityDelayMs));
     writeFileSync(join(workspaceDir, "request.json"), body);
     const content =
       mode === "completion-ladder"
@@ -494,13 +561,31 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
           ? await singleProposalResponseForRung(payload, runId)
           : mode === "request-parity-reproducibility"
             ? await requestParityResponseForContract(payload, runId)
-            : (await responseForMode(payload)).replace('"replace-me"', JSON.stringify(runId));
+            : mode === "decision-clarity-diagnostic"
+              ? await decisionClarityResponseForContract(payload, runId)
+              : (await responseForMode(payload)).replace('"replace-me"', JSON.stringify(runId));
     if (mode === "write-after-cancel") {
       setTimeout(() => {
         writeFileSync(join(workspaceDir, "after-cancel.txt"), "late-write\n");
       }, 50);
     }
+    if (mode === "decision-clarity-diagnostic") {
+      if (decisionClarityBehavior.responseVariant === "socket-failure") {
+        req.socket.destroy(new Error("simulated socket failure"));
+        return;
+      }
+      if (decisionClarityBehavior.responseVariant === "server-crash") {
+        req.socket.destroy(new Error("simulated server crash"));
+        process.exit(70);
+      }
+    }
     res.setHeader("content-type", "application/json");
+    if (typeof decisionClarityBehavior.reportedCompletionLatencyMs === "number") {
+      res.setHeader(
+        "x-fake-completion-latency-ms",
+        String(decisionClarityBehavior.reportedCompletionLatencyMs),
+      );
+    }
     const transportPayload = JSON.stringify({
       choices: [{ message: { content }, finish_reason: "stop" }],
     });
@@ -511,7 +596,9 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
           ? singleProposalRung(payload)
           : mode === "request-parity-reproducibility"
             ? requestParityContract(payload)
-            : null;
+            : mode === "decision-clarity-diagnostic"
+              ? decisionClarityContract(payload)
+              : null;
     if (activeCompletionRung !== null && completionFailAtRung === activeCompletionRung) {
       const cutoff = Math.max(1, Math.floor(transportPayload.length / 2));
       res.write(transportPayload.slice(0, cutoff));
@@ -526,6 +613,17 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
           },
         }),
       );
+      return;
+    }
+    if (
+      mode === "decision-clarity-diagnostic" &&
+      decisionClarityBehavior.responseVariant === "aborted-stream"
+    ) {
+      const cutoff = Math.max(1, Math.floor(transportPayload.length / 2));
+      res.write(transportPayload.slice(0, cutoff));
+      setTimeout(() => {
+        res.socket?.destroy(new Error("simulated aborted stream"));
+      }, 5);
       return;
     }
     res.end(transportPayload);

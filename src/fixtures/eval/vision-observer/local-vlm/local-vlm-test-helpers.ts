@@ -63,6 +63,7 @@ export function writeFakeServerWrapper(
     canary?: string;
     completionFailAtRung?: string;
     completionErrorAtRung?: string;
+    decisionClarityBehaviorJson?: string;
   } = {},
 ): { path: string; sha256: string } {
   const path = join(dir, `fake-llama-server-${Date.now()}.mjs`);
@@ -83,6 +84,9 @@ export function writeFakeServerWrapper(
   }
   if (options.completionErrorAtRung) {
     extraArgs.push("--completion-error-at-rung", options.completionErrorAtRung);
+  }
+  if (options.decisionClarityBehaviorJson) {
+    extraArgs.push("--decision-clarity-behavior-json", options.decisionClarityBehaviorJson);
   }
 
   const spliceLine =
