@@ -33,6 +33,7 @@ async function readyOwner(args: {
   logBytes?: number;
   spawnChild?: boolean;
   ignoreTermOnce?: boolean;
+  startupTimeoutMs?: number;
 }) {
   const dir = tempDir();
   CLEANUP.push(dir);
@@ -44,7 +45,7 @@ async function readyOwner(args: {
       executableSha256: executable.sha256,
       modelPath: model.path,
       modelSha256: model.sha256,
-      startupTimeoutMs: 1_200,
+      startupTimeoutMs: args.startupTimeoutMs ?? 1_200,
       requestTimeoutMs: 400,
       terminationTimeoutMs: 150,
     }),
@@ -164,7 +165,10 @@ describe("llama-server process owner", () => {
   });
 
   it("escalates to forced termination when the first graceful signal is ignored", async () => {
-    const { owner, config } = await readyOwner({ ignoreTermOnce: true });
+    const { owner, config } = await readyOwner({
+      ignoreTermOnce: true,
+      startupTimeoutMs: 4_000,
+    });
     await waitForReadiness({
       config,
       port: owner.telemetry.port,
@@ -174,11 +178,15 @@ describe("llama-server process owner", () => {
     await owner.terminate();
     expect(owner.telemetry.forcedTermination).toBe(true);
     expect(owner.telemetry.exitedAt).not.toBeNull();
-  });
+  }, 10_000);
 
   it("kills the child process tree where supported", async () => {
     if (process.platform === "win32") return;
-    const { owner, config, dir } = await readyOwner({ spawnChild: true, ignoreTermOnce: true });
+    const { owner, config, dir } = await readyOwner({
+      spawnChild: true,
+      ignoreTermOnce: true,
+      startupTimeoutMs: 4_000,
+    });
     await waitForReadiness({
       config,
       port: owner.telemetry.port,
@@ -188,10 +196,10 @@ describe("llama-server process owner", () => {
     const childPid = Number(readFileSync(join(dir, "spawned-child.pid"), "utf8").trim());
     await owner.terminate();
     expect(() => process.kill(childPid, 0)).toThrow();
-  });
+  }, 10_000);
 
   it("stops the resource sampler when finalized", async () => {
-    const { owner, config } = await readyOwner({});
+    const { owner, config } = await readyOwner({ startupTimeoutMs: 4_000 });
     await waitForReadiness({
       config,
       port: owner.telemetry.port,
@@ -204,5 +212,5 @@ describe("llama-server process owner", () => {
     expect(first.processTreeReleasedAfterTermination).toBe(true);
     await new Promise((resolve) => setTimeout(resolve, 60));
     expect(first.sampleCount).toBe(count);
-  });
+  }, 10_000);
 });

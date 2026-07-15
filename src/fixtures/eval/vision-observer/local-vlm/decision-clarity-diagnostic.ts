@@ -55,7 +55,7 @@ export const DECISION_CLARITY_SERVICE_DEADLINE_MS = 30_000 as const;
 export const DECISION_CLARITY_HARD_CEILING_MS = 90_000 as const;
 export const DECISION_CLARITY_MATERIAL_LATENCY_THRESHOLD_RATIO = 0.2 as const;
 
-const FINGERPRINT_OBSERVATION_RUN_ID_PLACEHOLDER = "<normalized-observation-run-id>";
+export const FINGERPRINT_OBSERVATION_RUN_ID_PLACEHOLDER = "<normalized-observation-run-id>";
 const DECISION_CLARITY_PREVIEW_CHARS = 240;
 const DECISION_CLARITY_FINGERPRINT_FIELDS = [
   "systemPromptDigest",
@@ -313,12 +313,14 @@ export interface DecisionClarityDiagnosticReport {
   fatalStopReason: string | null;
 }
 
-interface ScheduledTrial {
+export interface DecisionClarityScheduledTrial {
   sequenceNumber: number;
   repetitionNumber: number;
   sequencePosition: number;
   contract: DecisionClarityContract;
 }
+
+type ScheduledTrial = DecisionClarityScheduledTrial;
 
 interface DecisionClarityTransportCompleted {
   kind: "completed";
@@ -1418,7 +1420,7 @@ function evidenceFromRun(args: {
   };
 }
 
-function statusFromCompletionState(
+export function statusFromCompletionState(
   completionState: DecisionClarityCompletionState,
 ): DecisionClarityDiagnosticStatus {
   switch (completionState) {
@@ -1449,7 +1451,7 @@ async function ownerExitedSoon(
   ]);
 }
 
-function blockedTrialReport(args: {
+export function buildBlockedDecisionClarityTrialReport(args: {
   trial: ScheduledTrial;
   spec: DecisionClaritySpec;
   fingerprints: readonly DecisionClarityCanonicalFingerprint[];
@@ -1476,7 +1478,7 @@ function blockedTrialReport(args: {
   };
 }
 
-async function buildFingerprintOverlay(args: {
+export async function buildDecisionClarityFingerprintOverlay(args: {
   sourceBytes: Uint8Array;
   sourceMediaType: string;
   sourceWidth: number;
@@ -1928,7 +1930,7 @@ export function classifyDecisionClarityTrials(
   };
 }
 
-async function runOneDecisionClarityTrial(args: {
+export async function runOneDecisionClarityTrial(args: {
   config: LocalVlmResolvedConfig;
   trial: ScheduledTrial;
   sourceBytes: Uint8Array;
@@ -2239,7 +2241,7 @@ export async function runLocalVlmDecisionClarityDiagnostic(args: {
   }
 
   const runtimeVersion = await readLlamaVersionOutput(args.config);
-  const fingerprintOverlay = await buildFingerprintOverlay({
+  const fingerprintOverlay = await buildDecisionClarityFingerprintOverlay({
     sourceBytes: args.sourceBytes,
     sourceMediaType: args.sourceMediaType,
     sourceWidth: args.sourceWidth,
@@ -2259,7 +2261,7 @@ export async function runLocalVlmDecisionClarityDiagnostic(args: {
   for (const trial of schedule) {
     if (fatalStopReason !== null && blockedBySequenceNumber !== null) {
       trials.push(
-        blockedTrialReport({
+        buildBlockedDecisionClarityTrialReport({
           trial,
           spec: buildDecisionClaritySpec(
             trial.contract,
