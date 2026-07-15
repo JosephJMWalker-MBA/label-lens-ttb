@@ -487,6 +487,9 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
     if (variant === "transport-malformed-json") {
       return '{"choices":';
     }
+    if (variant === "assistant-malformed-json") {
+      return '{"observationRunId":';
+    }
     if (variant === "invalid-grid") {
       return JSON.stringify({
         ...validPayload(),
@@ -566,6 +569,16 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
         writeFileSync(join(workspaceDir, "after-cancel.txt"), "late-write\n");
       }, 50);
     }
+    if (mode === "decision-clarity-diagnostic") {
+      if (decisionClarityBehavior.responseVariant === "socket-failure") {
+        req.socket.destroy(new Error("simulated socket failure"));
+        return;
+      }
+      if (decisionClarityBehavior.responseVariant === "server-crash") {
+        req.socket.destroy(new Error("simulated server crash"));
+        process.exit(70);
+      }
+    }
     res.setHeader("content-type", "application/json");
     if (typeof decisionClarityBehavior.reportedCompletionLatencyMs === "number") {
       res.setHeader(
@@ -600,6 +613,17 @@ if (args.get("spawned-child") !== "1" && args.get("version") !== "1") {
           },
         }),
       );
+      return;
+    }
+    if (
+      mode === "decision-clarity-diagnostic" &&
+      decisionClarityBehavior.responseVariant === "aborted-stream"
+    ) {
+      const cutoff = Math.max(1, Math.floor(transportPayload.length / 2));
+      res.write(transportPayload.slice(0, cutoff));
+      setTimeout(() => {
+        res.socket?.destroy(new Error("simulated aborted stream"));
+      }, 5);
       return;
     }
     res.end(transportPayload);

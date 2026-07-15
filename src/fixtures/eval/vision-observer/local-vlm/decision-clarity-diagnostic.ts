@@ -42,6 +42,9 @@ export const DECISION_CLARITY_COMPLETION_STATES = [
   "LATE_VALID_COMPLETION",
   "LATE_INVALID_COMPLETION",
   "HARD_NON_COMPLETION",
+  "REQUEST_NOT_SENT",
+  "TRANSPORT_FAILURE",
+  "PROCESS_FAILURE",
   "PROVENANCE_FAILURE",
   "BLOCKED",
 ] as const;
@@ -231,6 +234,9 @@ export interface DecisionClarityContractFinding {
   lateValidCount: number;
   lateInvalidCount: number;
   hardNonCompletionCount: number;
+  requestNotSentCount: number;
+  transportFailureCount: number;
+  processFailureCount: number;
   provenanceFailureCount: number;
   blockedCount: number;
   fingerprintMismatchCount: number;
@@ -353,7 +359,27 @@ interface DecisionClarityTransportHardNonCompletion {
 }
 
 type DecisionClarityTransportOutcome =
-  DecisionClarityTransportCompleted | DecisionClarityTransportHardNonCompletion;
+  | DecisionClarityTransportCompleted
+  | DecisionClarityTransportHardNonCompletion
+  | {
+      kind: "runtime-failure";
+      requestStartedAt: string;
+      serviceDeadlineAt: string;
+      hardCeilingAt: string;
+      firstResponseByteAt: string | null;
+      firstResponseByteLatencyMs: number | null;
+      transportCompletedAt: null;
+      transportCompletionLatencyMs: null;
+      completionAt: null;
+      completionLatencyMs: null;
+      responseBytes: number;
+      finishReason: string | null;
+      timeoutStage: null;
+      outputPreviewEscaped: string | null;
+      issues: readonly string[];
+    };
+
+type OwnedDecisionClarityProcess = Awaited<ReturnType<typeof spawnOwnedLlamaServerProcess>>;
 
 function currentGitCommit(): string {
   return execFileSync("git", ["rev-parse", "HEAD"], {
@@ -923,15 +949,12 @@ function timeoutFailure(args: {
   };
 }
 
-function validateDecisionClarityAssistantContent(args: {
-  contract: DecisionClarityContract;
+function parseValidatedDecisionClarityEnvelope(args: {
   observationRunId: string;
   rawAssistantContent: string;
-}): { ok: true } | { ok: false; issues: readonly string[] } {
-  if (args.contract === "B") {
-    return { ok: true };
-  }
-
+}):
+  | { ok: true; data: z.infer<typeof decisionClarityEnvelopeSchema> }
+  | { ok: false; issues: readonly string[] } {
   const envelope = parseJsonEnvelope(args.rawAssistantContent);
   if (!envelope.ok) {
     return envelope;
@@ -966,14 +989,62 @@ function validateDecisionClarityAssistantContent(args: {
     };
   }
 
-  const proposalCount = validated.data.proposals.length;
-  if (args.contract === "A" && proposalCount !== 1) {
+  return {
+    ok: true,
+    data: validated.data,
+  };
+}
+
+function validateExactSingleProposalContract(args: {
+  contractLabel: string;
+  observationRunId: string;
+  rawAssistantContent: string;
+}): { ok: true } | { ok: false; issues: readonly string[] } {
+  const validated = parseValidatedDecisionClarityEnvelope(args);
+  if (!validated.ok) {
+    return validated;
+  }
+
+  if (validated.data.proposals.length !== 1) {
     return {
       ok: false,
-      issues: ["Contract A requires exactly one proposal."],
+      issues: [`${args.contractLabel} requires exactly one proposal.`],
     };
   }
-  if (args.contract === "A_PRIME" && proposalCount > 1) {
+
+  return { ok: true };
+}
+
+function validateDecisionClarityAssistantContent(args: {
+  contract: DecisionClarityContract;
+  observationRunId: string;
+  rawAssistantContent: string;
+}): { ok: true } | { ok: false; issues: readonly string[] } {
+  if (args.contract === "A") {
+    return validateExactSingleProposalContract({
+      contractLabel: "Contract A",
+      observationRunId: args.observationRunId,
+      rawAssistantContent: args.rawAssistantContent,
+    });
+  }
+
+  if (args.contract === "B") {
+    return validateExactSingleProposalContract({
+      contractLabel: "The Phase 6 description control",
+      observationRunId: args.observationRunId,
+      rawAssistantContent: args.rawAssistantContent,
+    });
+  }
+
+  const validated = parseValidatedDecisionClarityEnvelope({
+    observationRunId: args.observationRunId,
+    rawAssistantContent: args.rawAssistantContent,
+  });
+  if (!validated.ok) {
+    return validated;
+  }
+
+  if (validated.data.proposals.length > 1) {
     return {
       ok: false,
       issues: ["Contract A_PRIME allows at most one proposal."],
@@ -984,27 +1055,20 @@ function validateDecisionClarityAssistantContent(args: {
 }
 
 function completionStateFromOutcome(args: {
-  transport: DecisionClarityTransportOutcome;
+  transport: DecisionClarityTransportCompleted | DecisionClarityTransportHardNonCompletion;
   contract: DecisionClarityContract;
   observationRunId: string;
-}):
-  | {
-      completionState:
-        | "TIMELY_VALID_COMPLETION"
-        | "TIMELY_INVALID_COMPLETION"
-        | "LATE_VALID_COMPLETION"
-        | "LATE_INVALID_COMPLETION"
-        | "HARD_NON_COMPLETION";
-      issues: readonly string[];
-      serviceDeadlineMet: boolean;
-      postDeadlineDurationMs: number | null;
-    }
-  | {
-      completionState: "PROVENANCE_FAILURE";
-      issues: readonly string[];
-      serviceDeadlineMet: null;
-      postDeadlineDurationMs: null;
-    } {
+}): {
+  completionState:
+    | "TIMELY_VALID_COMPLETION"
+    | "TIMELY_INVALID_COMPLETION"
+    | "LATE_VALID_COMPLETION"
+    | "LATE_INVALID_COMPLETION"
+    | "HARD_NON_COMPLETION";
+  issues: readonly string[];
+  serviceDeadlineMet: boolean;
+  postDeadlineDurationMs: number | null;
+} {
   if (args.transport.kind === "hard-non-completion") {
     return {
       completionState: "HARD_NON_COMPLETION",
@@ -1106,7 +1170,25 @@ async function readDecisionClarityTransportBody(args: {
               ],
             };
           }
-          throw error;
+          const failure = localVlmFailureFromUnknown(error);
+          const partialText = Buffer.from(concatChunks(chunks, total)).toString("utf8");
+          return {
+            kind: "runtime-failure",
+            requestStartedAt: args.requestStartedAt,
+            serviceDeadlineAt: args.serviceDeadlineAt,
+            hardCeilingAt: args.hardCeilingAt,
+            firstResponseByteAt,
+            firstResponseByteLatencyMs,
+            transportCompletedAt: null,
+            transportCompletionLatencyMs: null,
+            completionAt: null,
+            completionLatencyMs: null,
+            responseBytes: total,
+            finishReason: null,
+            timeoutStage: null,
+            outputPreviewEscaped: escapedPreview(partialText),
+            issues: [failure.message, ...failure.issues],
+          };
         }
 
         if (next.done) break;
@@ -1257,7 +1339,24 @@ async function sendDecisionClarityRequest(args: {
           issues: [failure.message, ...failure.issues],
         };
       }
-      throw error;
+      const failure = localVlmFailureFromUnknown(error);
+      return {
+        kind: "runtime-failure",
+        requestStartedAt: args.requestStartedAt,
+        serviceDeadlineAt: args.serviceDeadlineAt,
+        hardCeilingAt: args.hardCeilingAt,
+        firstResponseByteAt: null,
+        firstResponseByteLatencyMs: null,
+        transportCompletedAt: null,
+        transportCompletionLatencyMs: null,
+        completionAt: null,
+        completionLatencyMs: null,
+        responseBytes: 0,
+        finishReason: null,
+        timeoutStage: null,
+        outputPreviewEscaped: null,
+        issues: [failure.message, ...failure.issues],
+      };
     }
 
     return await readDecisionClarityTransportBody({
@@ -1276,6 +1375,9 @@ async function sendDecisionClarityRequest(args: {
 }
 
 function evidenceFromRun(args: {
+  requestStartedAt: string | null;
+  serviceDeadlineAt: string | null;
+  hardCeilingAt: string | null;
   workspaceDir: string;
   cleanupCompleted: boolean;
   owner: {
@@ -1290,8 +1392,8 @@ function evidenceFromRun(args: {
   postDeadlineDurationMs: number | null;
 }): DecisionClarityTrialEvidence {
   return {
-    requestStartedAt: args.transport?.requestStartedAt ?? null,
-    serviceDeadlineAt: args.transport?.serviceDeadlineAt ?? null,
+    requestStartedAt: args.transport?.requestStartedAt ?? args.requestStartedAt,
+    serviceDeadlineAt: args.transport?.serviceDeadlineAt ?? args.serviceDeadlineAt,
     serviceDeadlineMet: args.serviceDeadlineMet,
     firstResponseByteAt: args.transport?.firstResponseByteAt ?? null,
     firstResponseByteLatencyMs: args.transport?.firstResponseByteLatencyMs ?? null,
@@ -1301,7 +1403,7 @@ function evidenceFromRun(args: {
       args.transport?.kind === "completed" ? args.transport.transportCompletionLatencyMs : null,
     completionAt: args.transport?.completionAt ?? null,
     completionLatencyMs: args.transport?.completionLatencyMs ?? null,
-    hardCeilingAt: args.transport?.hardCeilingAt ?? null,
+    hardCeilingAt: args.transport?.hardCeilingAt ?? args.hardCeilingAt,
     responseBytes: args.transport?.responseBytes ?? 0,
     finishReason: args.transport?.finishReason ?? null,
     timeoutStage: args.transport?.timeoutStage ?? null,
@@ -1327,6 +1429,24 @@ function statusFromCompletionState(
     default:
       return "FAIL";
   }
+}
+
+function isInfrastructureFailureState(state: DecisionClarityCompletionState): boolean {
+  return (
+    state === "REQUEST_NOT_SENT" || state === "TRANSPORT_FAILURE" || state === "PROCESS_FAILURE"
+  );
+}
+
+async function ownerExitedSoon(
+  owner: OwnedDecisionClarityProcess | null,
+  gracePeriodMs = 100,
+): Promise<boolean> {
+  if (owner === null) return false;
+  if (owner.exited) return true;
+  return await Promise.race([
+    owner.waitForExit().then(() => true),
+    new Promise<false>((resolve) => setTimeout(() => resolve(false), gracePeriodMs)),
+  ]);
 }
 
 function blockedTrialReport(args: {
@@ -1594,6 +1714,15 @@ export function classifyDecisionClarityTrials(
     const hardNonCompletionCount = contractTrials.filter(
       (trial) => trial.completionState === "HARD_NON_COMPLETION",
     ).length;
+    const requestNotSentCount = contractTrials.filter(
+      (trial) => trial.completionState === "REQUEST_NOT_SENT",
+    ).length;
+    const transportFailureCount = contractTrials.filter(
+      (trial) => trial.completionState === "TRANSPORT_FAILURE",
+    ).length;
+    const processFailureCount = contractTrials.filter(
+      (trial) => trial.completionState === "PROCESS_FAILURE",
+    ).length;
     const provenanceFailureCount = contractTrials.filter(
       (trial) => trial.completionState === "PROVENANCE_FAILURE",
     ).length;
@@ -1609,6 +1738,9 @@ export function classifyDecisionClarityTrials(
       contractTrials.length === DECISION_CLARITY_EXPECTED_APPEARANCES[contract] &&
       blockedCount === 0 &&
       fingerprintMismatchCount === 0 &&
+      requestNotSentCount === 0 &&
+      transportFailureCount === 0 &&
+      processFailureCount === 0 &&
       provenanceFailureCount === 0;
     const notes: string[] = [];
     if (!completeEvidence) {
@@ -1623,6 +1755,15 @@ export function classifyDecisionClarityTrials(
       if (provenanceFailureCount > 0) {
         notes.push(`${provenanceFailureCount} appearances ended with provenance failures.`);
       }
+      if (requestNotSentCount > 0) {
+        notes.push(`${requestNotSentCount} appearances never reached transmission.`);
+      }
+      if (transportFailureCount > 0) {
+        notes.push(`${transportFailureCount} appearances ended with transport failures.`);
+      }
+      if (processFailureCount > 0) {
+        notes.push(`${processFailureCount} appearances ended with process failures.`);
+      }
     }
     return {
       contract,
@@ -1633,6 +1774,9 @@ export function classifyDecisionClarityTrials(
       lateValidCount,
       lateInvalidCount,
       hardNonCompletionCount,
+      requestNotSentCount,
+      transportFailureCount,
+      processFailureCount,
       provenanceFailureCount,
       blockedCount,
       fingerprintMismatchCount,
@@ -1654,7 +1798,8 @@ export function classifyDecisionClarityTrials(
       (trial) =>
         trial.status !== "BLOCKED" &&
         trial.requestFingerprint.allFieldsMatched &&
-        trial.completionState !== "PROVENANCE_FAILURE",
+        trial.completionState !== "PROVENANCE_FAILURE" &&
+        !isInfrastructureFailureState(trial.completionState),
     );
 
   const notes: string[] = [];
@@ -1838,6 +1983,9 @@ async function runOneDecisionClarityTrial(args: {
   let serviceDeadlineMet: boolean | null = null;
   let postDeadlineDurationMs: number | null = null;
   let requestSent = false;
+  let requestStartedAt: string | null = null;
+  let serviceDeadlineAt: string | null = null;
+  let hardCeilingAt: string | null = null;
 
   try {
     const derivative = await createObserverDerivative({
@@ -1920,11 +2068,11 @@ async function runOneDecisionClarityTrial(args: {
           });
 
           owner.markRequestStarted();
-          const requestStartedAt = new Date().toISOString();
-          const serviceDeadlineAt = new Date(
+          requestStartedAt = new Date().toISOString();
+          serviceDeadlineAt = new Date(
             new Date(requestStartedAt).getTime() + args.serviceDeadlineMs,
           ).toISOString();
-          const hardCeilingAt = new Date(
+          hardCeilingAt = new Date(
             new Date(requestStartedAt).getTime() + args.hardCeilingMs,
           ).toISOString();
           args.inspectTransmittedRequestBody?.(args.trial, prepared.requestBody);
@@ -1945,33 +2093,61 @@ async function runOneDecisionClarityTrial(args: {
             owner.markRequestCompleted();
           }
 
-          const completion = completionStateFromOutcome({
-            transport,
-            contract: args.trial.contract,
-            observationRunId: prepared.observationRunId,
-          });
-          completionState = completion.completionState;
-          serviceDeadlineMet = completion.serviceDeadlineMet;
-          postDeadlineDurationMs = completion.postDeadlineDurationMs;
-          issues = [...completion.issues];
-          summary =
-            completionState === "TIMELY_VALID_COMPLETION"
-              ? "The trial completed within the 30-second service deadline and satisfied the diagnostic contract."
-              : completionState === "TIMELY_INVALID_COMPLETION"
-                ? "The trial completed within the service deadline, but the response was invalid for the diagnostic contract."
-                : completionState === "LATE_VALID_COMPLETION"
-                  ? "The trial missed the service deadline but completed with a valid response before the hard ceiling."
-                  : completionState === "LATE_INVALID_COMPLETION"
-                    ? "The trial missed the service deadline and completed with an invalid response before the hard ceiling."
-                    : "The trial did not complete before the hard diagnostic ceiling.";
+          if (transport.kind === "runtime-failure") {
+            completionState = (await ownerExitedSoon(owner))
+              ? "PROCESS_FAILURE"
+              : "TRANSPORT_FAILURE";
+            issues = [...transport.issues];
+            summary =
+              completionState === "PROCESS_FAILURE"
+                ? "The request was sent, but the diagnostic runtime exited before a terminal completion state was reached."
+                : "The request was sent, but the transport failed before a terminal completion state was reached.";
+          } else {
+            const completion = completionStateFromOutcome({
+              transport,
+              contract: args.trial.contract,
+              observationRunId: prepared.observationRunId,
+            });
+            completionState = completion.completionState;
+            serviceDeadlineMet = completion.serviceDeadlineMet;
+            postDeadlineDurationMs = completion.postDeadlineDurationMs;
+            issues = [...completion.issues];
+            summary =
+              completionState === "TIMELY_VALID_COMPLETION"
+                ? "The trial completed within the 30-second service deadline and satisfied the diagnostic contract."
+                : completionState === "TIMELY_INVALID_COMPLETION"
+                  ? "The trial completed within the service deadline, but the response was invalid for the diagnostic contract."
+                  : completionState === "LATE_VALID_COMPLETION"
+                    ? "The trial missed the service deadline but completed with a valid response before the hard ceiling."
+                    : completionState === "LATE_INVALID_COMPLETION"
+                      ? "The trial missed the service deadline and completed with an invalid response before the hard ceiling."
+                      : "The trial did not complete before the hard diagnostic ceiling.";
+          }
         }
       }
     }
   } catch (error) {
     const failure = localVlmFailureFromUnknown(error);
     issues = [failure.message, ...failure.issues];
-    completionState = requestSent ? "HARD_NON_COMPLETION" : "PROVENANCE_FAILURE";
-    fatalStopReason = requestSent ? null : [failure.message, ...failure.issues].join("; ");
+    if (!requestSent) {
+      completionState = "REQUEST_NOT_SENT";
+      summary =
+        owner?.telemetry.readiness.processExitedBeforeReady === true
+          ? "The request was never sent because the diagnostic runtime exited before readiness."
+          : "The request was never sent because the trial failed before transmission.";
+      fatalStopReason = [failure.message, ...failure.issues].join("; ");
+    } else if (failure.code === "REQUEST_TIMEOUT") {
+      completionState = "HARD_NON_COMPLETION";
+      summary = "The trial did not complete before the hard diagnostic ceiling.";
+      fatalStopReason = null;
+    } else {
+      completionState = (await ownerExitedSoon(owner)) ? "PROCESS_FAILURE" : "TRANSPORT_FAILURE";
+      summary =
+        completionState === "PROCESS_FAILURE"
+          ? "The request was sent, but the diagnostic runtime exited before a terminal completion state was reached."
+          : "The request was sent, but the transport failed before a terminal completion state was reached.";
+      fatalStopReason = null;
+    }
   } finally {
     let terminationFailure: unknown = null;
     if (owner !== null) {
@@ -2013,6 +2189,9 @@ async function runOneDecisionClarityTrial(args: {
       issues,
       blockedBySequenceNumber: null,
       evidence: evidenceFromRun({
+        requestStartedAt,
+        serviceDeadlineAt,
+        hardCeilingAt,
         workspaceDir,
         cleanupCompleted,
         owner,

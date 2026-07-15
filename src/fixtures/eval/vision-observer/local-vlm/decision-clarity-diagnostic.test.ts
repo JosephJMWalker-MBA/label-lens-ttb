@@ -103,6 +103,17 @@ function decisionClarityBehaviorArgs(behavior: {
   return ["--decision-clarity-behavior-json", JSON.stringify(behavior)];
 }
 
+function contractFindingFor(
+  report: Awaited<ReturnType<typeof runLocalVlmDecisionClarityDiagnostic>>,
+  contract: "A" | "A_PRIME" | "B",
+) {
+  const finding = report.contractFindings.find((entry) => entry.contract === contract);
+  if (!finding) {
+    throw new Error(`missing contract finding for ${contract}`);
+  }
+  return finding;
+}
+
 function fingerprintSnapshotFor(
   fingerprints: Awaited<ReturnType<typeof buildDecisionClarityCanonicalFingerprints>>,
   contract: "A" | "A_PRIME" | "B",
@@ -221,6 +232,9 @@ function statusFromCompletionState(
     | "LATE_VALID_COMPLETION"
     | "LATE_INVALID_COMPLETION"
     | "HARD_NON_COMPLETION"
+    | "REQUEST_NOT_SENT"
+    | "TRANSPORT_FAILURE"
+    | "PROCESS_FAILURE"
     | "PROVENANCE_FAILURE"
     | "BLOCKED",
 ): "PASS" | "FAIL" | "BLOCKED" {
@@ -237,6 +251,9 @@ function classificationTrials(args: {
     | "LATE_VALID_COMPLETION"
     | "LATE_INVALID_COMPLETION"
     | "HARD_NON_COMPLETION"
+    | "REQUEST_NOT_SENT"
+    | "TRANSPORT_FAILURE"
+    | "PROCESS_FAILURE"
     | "PROVENANCE_FAILURE"
     | "BLOCKED";
   completionLatencyForTrial: (
@@ -268,7 +285,11 @@ function classificationTrials(args: {
           ? mismatchedFingerprint(args.fingerprints, trial.contract)
           : verifiedFingerprint(args.fingerprints, trial.contract),
       evidence:
-        completionState === "BLOCKED" || completionState === "PROVENANCE_FAILURE"
+        completionState === "BLOCKED" ||
+        completionState === "PROVENANCE_FAILURE" ||
+        completionState === "REQUEST_NOT_SENT" ||
+        completionState === "TRANSPORT_FAILURE" ||
+        completionState === "PROCESS_FAILURE"
           ? null
           : minimalEvidence({
               completionLatencyMs: latency,
@@ -436,6 +457,100 @@ describe("decision clarity diagnostic", () => {
     expect(transmittedCount).toBe(0);
   }, 30_000);
 
+  it("classifies a runtime failure before transmission as request-not-sent", async () => {
+    const config = await diagnosticConfig({});
+    const source = await sourceFixture();
+
+    const report = await runLocalVlmDecisionClarityDiagnostic({
+      config,
+      scenarioId: "decision-clarity-request-not-sent",
+      ...source,
+      serviceDeadlineMs: 30,
+      hardCeilingMs: 90,
+      mutateLaunchSpec: (trial, launchSpec) =>
+        trial.sequenceNumber === 1
+          ? withLaunchArgs(launchSpec, ["--mode", "exit-before-ready"])
+          : launchSpec,
+    });
+
+    expect(report.fatalStopReason).not.toBeNull();
+    expect(report.trials[0]?.completionState).toBe("REQUEST_NOT_SENT");
+    expect(report.trials[0]?.status).toBe("FAIL");
+    expect(report.trials[0]?.evidence?.requestStartedAt).toBeNull();
+    expect(report.trials.slice(1).every((trial) => trial.status === "BLOCKED")).toBe(true);
+  }, 30_000);
+
+  it("validates Contract B with the Phase 6 description contract instead of transport completion alone", async () => {
+    const config = await diagnosticConfig({});
+    const source = await sourceFixture();
+
+    const valid = await runLocalVlmDecisionClarityDiagnostic({
+      config,
+      scenarioId: "decision-clarity-contract-b-valid",
+      ...source,
+      serviceDeadlineMs: 30,
+      hardCeilingMs: 90,
+    });
+    expect(valid.trials[2]?.contract).toBe("B");
+    expect(valid.trials[2]?.completionState).toBe("TIMELY_VALID_COMPLETION");
+    expect(valid.trials[2]?.status).toBe("PASS");
+    expect(contractFindingFor(valid, "B").timelyValidCount).toBe(6);
+
+    const malformed = await runLocalVlmDecisionClarityDiagnostic({
+      config,
+      scenarioId: "decision-clarity-contract-b-malformed",
+      ...source,
+      serviceDeadlineMs: 30,
+      hardCeilingMs: 90,
+      mutateLaunchSpec: (trial, launchSpec) =>
+        trial.sequenceNumber === 3
+          ? withLaunchArgs(
+              launchSpec,
+              decisionClarityBehaviorArgs({ responseVariant: "assistant-malformed-json" }),
+            )
+          : launchSpec,
+    });
+    expect(malformed.trials[2]?.completionState).toBe("TIMELY_INVALID_COMPLETION");
+    expect(malformed.trials[2]?.status).toBe("FAIL");
+    expect(contractFindingFor(malformed, "B").timelyInvalidCount).toBe(1);
+
+    const invalidContent = await runLocalVlmDecisionClarityDiagnostic({
+      config,
+      scenarioId: "decision-clarity-contract-b-invalid-content",
+      ...source,
+      serviceDeadlineMs: 30,
+      hardCeilingMs: 90,
+      mutateLaunchSpec: (trial, launchSpec) =>
+        trial.sequenceNumber === 3
+          ? withLaunchArgs(
+              launchSpec,
+              decisionClarityBehaviorArgs({ responseVariant: "invalid-grid" }),
+            )
+          : launchSpec,
+    });
+    expect(invalidContent.trials[2]?.completionState).toBe("TIMELY_INVALID_COMPLETION");
+    expect(invalidContent.trials[2]?.status).toBe("FAIL");
+    expect(contractFindingFor(invalidContent, "B").timelyInvalidCount).toBe(1);
+
+    const transportFailure = await runLocalVlmDecisionClarityDiagnostic({
+      config,
+      scenarioId: "decision-clarity-contract-b-transport-failure",
+      ...source,
+      serviceDeadlineMs: 30,
+      hardCeilingMs: 90,
+      mutateLaunchSpec: (trial, launchSpec) =>
+        trial.sequenceNumber === 3
+          ? withLaunchArgs(
+              launchSpec,
+              decisionClarityBehaviorArgs({ responseVariant: "socket-failure" }),
+            )
+          : launchSpec,
+    });
+    expect(transportFailure.trials[2]?.completionState).toBe("TRANSPORT_FAILURE");
+    expect(transportFailure.trials[2]?.status).toBe("FAIL");
+    expect(contractFindingFor(transportFailure, "B").transportFailureCount).toBe(1);
+  }, 30_000);
+
   it("continues the full schedule after an ordinary primary invalid completion and retains cleanup evidence", async () => {
     const config = await diagnosticConfig({});
     const source = await sourceFixture();
@@ -563,6 +678,103 @@ describe("decision clarity diagnostic", () => {
     expect(report.trials[0]?.evidence?.cleanupCompleted).toBe(true);
   }, 30_000);
 
+  it("distinguishes socket failures, server crashes, aborted streams, hard timeouts, and late completions", async () => {
+    const config = await diagnosticConfig({});
+    const source = await sourceFixture();
+
+    const socketFailure = await runLocalVlmDecisionClarityDiagnostic({
+      config,
+      scenarioId: "decision-clarity-socket-failure",
+      ...source,
+      serviceDeadlineMs: 30,
+      hardCeilingMs: 90,
+      mutateLaunchSpec: (trial, launchSpec) =>
+        trial.sequenceNumber === 1
+          ? withLaunchArgs(
+              launchSpec,
+              decisionClarityBehaviorArgs({ responseVariant: "socket-failure" }),
+            )
+          : launchSpec,
+    });
+    expect(socketFailure.trials[0]?.completionState).toBe("TRANSPORT_FAILURE");
+    expect(socketFailure.trials[0]?.evidence?.requestStartedAt).not.toBeNull();
+    expect(socketFailure.trials[0]?.evidence?.firstResponseByteAt).toBeNull();
+    expect(contractFindingFor(socketFailure, "A").transportFailureCount).toBe(1);
+
+    const serverCrash = await runLocalVlmDecisionClarityDiagnostic({
+      config,
+      scenarioId: "decision-clarity-server-crash",
+      ...source,
+      serviceDeadlineMs: 30,
+      hardCeilingMs: 90,
+      mutateLaunchSpec: (trial, launchSpec) =>
+        trial.sequenceNumber === 1
+          ? withLaunchArgs(
+              launchSpec,
+              decisionClarityBehaviorArgs({ responseVariant: "server-crash" }),
+            )
+          : launchSpec,
+    });
+    expect(serverCrash.trials[0]?.completionState).toBe("PROCESS_FAILURE");
+    expect(serverCrash.trials[0]?.evidence?.requestStartedAt).not.toBeNull();
+    expect(serverCrash.trials[0]?.evidence?.completionAt).toBeNull();
+    expect(contractFindingFor(serverCrash, "A").processFailureCount).toBe(1);
+
+    const abortedStream = await runLocalVlmDecisionClarityDiagnostic({
+      config,
+      scenarioId: "decision-clarity-aborted-stream",
+      ...source,
+      serviceDeadlineMs: 30,
+      hardCeilingMs: 90,
+      mutateLaunchSpec: (trial, launchSpec) =>
+        trial.sequenceNumber === 1
+          ? withLaunchArgs(
+              launchSpec,
+              decisionClarityBehaviorArgs({ responseVariant: "aborted-stream" }),
+            )
+          : launchSpec,
+    });
+    expect(abortedStream.trials[0]?.completionState).toBe("TRANSPORT_FAILURE");
+    expect(abortedStream.trials[0]?.evidence?.firstResponseByteAt).not.toBeNull();
+    expect(abortedStream.trials[0]?.evidence?.responseBytes).toBeGreaterThan(0);
+    expect(contractFindingFor(abortedStream, "A").transportFailureCount).toBe(1);
+
+    const hardTimeout = await runLocalVlmDecisionClarityDiagnostic({
+      config,
+      scenarioId: "decision-clarity-hard-timeout",
+      ...source,
+      serviceDeadlineMs: 30,
+      hardCeilingMs: 90,
+      mutateLaunchSpec: (trial, launchSpec) =>
+        trial.sequenceNumber === 1
+          ? withLaunchArgs(launchSpec, decisionClarityBehaviorArgs({ responseDelayMs: 120 }))
+          : launchSpec,
+    });
+    expect(hardTimeout.trials[0]?.completionState).toBe("HARD_NON_COMPLETION");
+    expect(hardTimeout.trials[0]?.evidence?.timeoutStage).toBe("request");
+
+    const lateCompletion = await runLocalVlmDecisionClarityDiagnostic({
+      config,
+      scenarioId: "decision-clarity-late-completion-state",
+      ...source,
+      serviceDeadlineMs: 30,
+      hardCeilingMs: 90,
+      mutateLaunchSpec: (trial, launchSpec) =>
+        trial.sequenceNumber === 1
+          ? withLaunchArgs(
+              launchSpec,
+              decisionClarityBehaviorArgs({
+                responseDelayMs: 31,
+                reportedCompletionLatencyMs: 31,
+              }),
+            )
+          : launchSpec,
+    });
+    expect(lateCompletion.trials[0]?.completionState).toBe("LATE_VALID_COMPLETION");
+    expect(lateCompletion.trials[0]?.evidence?.serviceDeadlineMet).toBe(false);
+    expect(lateCompletion.trials[0]?.evidence?.completionAt).not.toBeNull();
+  }, 30_000);
+
   it("classifies complete evidence according to repeated improvement, equivalence, and degradation rules", async () => {
     const config = await diagnosticConfig({});
     const overlayBytes = await pngBytes();
@@ -638,6 +850,16 @@ describe("decision clarity diagnostic", () => {
       }),
     );
     expect(fingerprintMismatch.classification.clarityEffect).toBe("INSUFFICIENT_EVIDENCE");
+
+    const infrastructureFailure = classifyDecisionClarityTrials(
+      classificationTrials({
+        fingerprints,
+        completionStateForTrial: (trial) =>
+          trial.sequenceNumber === 1 ? "TRANSPORT_FAILURE" : "TIMELY_VALID_COMPLETION",
+        completionLatencyForTrial: () => 100,
+      }),
+    );
+    expect(infrastructureFailure.classification.clarityEffect).toBe("INSUFFICIENT_EVIDENCE");
   });
 
   it("builds an instruction-audit prompt that forbids hidden-reasoning claims", () => {
