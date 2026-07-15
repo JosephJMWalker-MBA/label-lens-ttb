@@ -678,7 +678,7 @@ describe("decision clarity diagnostic", () => {
     expect(report.trials[0]?.evidence?.cleanupCompleted).toBe(true);
   }, 30_000);
 
-  it("distinguishes socket failures, server crashes, aborted streams, hard timeouts, and late completions", async () => {
+  it("classifies socket failure as transport failure", async () => {
     const config = await diagnosticConfig({});
     const source = await sourceFixture();
 
@@ -700,6 +700,11 @@ describe("decision clarity diagnostic", () => {
     expect(socketFailure.trials[0]?.evidence?.requestStartedAt).not.toBeNull();
     expect(socketFailure.trials[0]?.evidence?.firstResponseByteAt).toBeNull();
     expect(contractFindingFor(socketFailure, "A").transportFailureCount).toBe(1);
+  }, 30_000);
+
+  it("classifies server crash as process failure", async () => {
+    const config = await diagnosticConfig({});
+    const source = await sourceFixture();
 
     const serverCrash = await runLocalVlmDecisionClarityDiagnostic({
       config,
@@ -719,6 +724,11 @@ describe("decision clarity diagnostic", () => {
     expect(serverCrash.trials[0]?.evidence?.requestStartedAt).not.toBeNull();
     expect(serverCrash.trials[0]?.evidence?.completionAt).toBeNull();
     expect(contractFindingFor(serverCrash, "A").processFailureCount).toBe(1);
+  }, 30_000);
+
+  it("classifies aborted stream as transport failure", async () => {
+    const config = await diagnosticConfig({});
+    const source = await sourceFixture();
 
     const abortedStream = await runLocalVlmDecisionClarityDiagnostic({
       config,
@@ -738,6 +748,11 @@ describe("decision clarity diagnostic", () => {
     expect(abortedStream.trials[0]?.evidence?.firstResponseByteAt).not.toBeNull();
     expect(abortedStream.trials[0]?.evidence?.responseBytes).toBeGreaterThan(0);
     expect(contractFindingFor(abortedStream, "A").transportFailureCount).toBe(1);
+  }, 30_000);
+
+  it("classifies hard timeout as hard non-completion", async () => {
+    const config = await diagnosticConfig({});
+    const source = await sourceFixture();
 
     const hardTimeout = await runLocalVlmDecisionClarityDiagnostic({
       config,
@@ -752,6 +767,11 @@ describe("decision clarity diagnostic", () => {
     });
     expect(hardTimeout.trials[0]?.completionState).toBe("HARD_NON_COMPLETION");
     expect(hardTimeout.trials[0]?.evidence?.timeoutStage).toBe("request");
+  }, 30_000);
+
+  it("classifies successful late completion independently", async () => {
+    const config = await diagnosticConfig({});
+    const source = await sourceFixture();
 
     const lateCompletion = await runLocalVlmDecisionClarityDiagnostic({
       config,
