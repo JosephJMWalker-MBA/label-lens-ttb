@@ -1,8 +1,9 @@
 # Rubber Duck Review 004 — Vision Pipeline Diagnostic Governance
 
-- Status: Accepted review conclusion
+- Status: Accepted review conclusion, current-state revalidated
 - Date opened: 2026-07-16
 - Date completed: 2026-07-16
+- Date revalidated: 2026-07-16
 - Scope: Causal honesty, blinded evaluation boundaries, diagnostic attribution, human-proofing, and operational usefulness of the OCR/vision evidence pipeline
 - Planned review inputs: 6 rounds
 - Inputs received: 6 of 6
@@ -17,11 +18,13 @@ This review evaluates whether the diagnostic and evaluation instruments surround
 
 ## Authoritative review record
 
-- [`source-brief.md`](source-brief.md) — reconciled feedback and repository-verified facts.
-- [`verdict.md`](verdict.md) — accepted conclusions and withheld authorities.
-- [`next-actions.md`](next-actions.md) — bounded, ordered remediation and product gates.
+- [`final-revalidation.md`](final-revalidation.md) — current-state review of the review; classifies each finding as current, historical and fixed, partially fixed, open, or a continuing governing principle.
+- [`source-brief.md`](source-brief.md) — six-round synthesis and repository facts available when the original verdict was written.
+- [`verdict.md`](verdict.md) — accepted conclusions and withheld authorities before current-state revalidation.
+- [`next-actions.md`](next-actions.md) — bounded remediation and product gates, interpreted through the revalidation status.
+- [`../../../src/fixtures/eval/rdr-004-final-verification.test.ts`](../../../src/fixtures/eval/rdr-004-final-verification.test.ts) — executable checks separating repaired historical failures from findings that remain open.
 
-Where a numbered feedback artifact conflicts with these files, the authoritative review record controls.
+Where an earlier authoritative artifact or numbered feedback file conflicts with `final-revalidation.md`, the final revalidation controls for present-tense repository status. Historical artifacts remain preserved as evidence of why later safeguards were built.
 
 ## Feedback inputs
 
@@ -32,18 +35,20 @@ Where a numbered feedback artifact conflicts with these files, the authoritative
 5. [`feedback-05-architecture-versus-extraction-failure.md`](feedback-05-architecture-versus-extraction-failure.md) — whether scientific measurement is enabling targeted repair or becoming a shield around extraction failure.
 6. [`feedback-06-human-evaluation-and-operator-friction.md`](feedback-06-human-evaluation-and-operator-friction.md) — perception-layer blinding, causal-language discipline, and operator-friction acceptance criteria.
 
-## Repository-verified conclusions
+## Current-state conclusions after revalidation
 
-- The committed Phase 5A report uses the overbroad heading `Recovery passes that never improve outcomes`, while the underlying method measures fixed-order prefix-state marginal change.
-- The left-edge 270-degree pass produced new OCR tokens and field-like evidence but no immediate selected-field change; removal equivalence was not tested.
-- PR #114's proposed validator is not total over arbitrary runtime JSON and does not perform exact-key rejection at every governed object boundary.
-- PR #114 records `selectedBy` but does not bind annotator identity or enforce selector-versus-annotator independence in the frozen manifest.
-- The observation-quality protocol specifies 16 cases, 64 scored items, and one primary reviewer; this is calibration-grade, not decisive advancement evidence.
-- The committed Phase 5A candidate-filtering subtype table controls over conflicting narrated counts.
-- Evidence-producing architecture, deterministic evaluation, typed failures, provenance, and authorization as code are genuine strengths, but they do not prove saved human work.
+- The historical 100% absent-brand false-positive result is fixed in the committed baseline: 0/10 absent-brand false positives, 100% correct brand abstention, zero brand false certainty, and zero false abstention. Regression protection is now explicit.
+- Alcohol extraction and orientation handling are partially improved, not wholly fixed: current alcohol detection is approximately 61%, side/rotated recovery is nonzero, and vertical mandatory strips remain 0/5.
+- The generated Phase 5A report still uses the overbroad heading `Recovery passes that never improve outcomes`; removal equivalence remains untested.
+- Draft PR #114 still lacks a total, exact arbitrary-JSON validation boundary and still does not bind selector-versus-annotator provenance into the frozen manifest.
+- The observation-quality protocol remains a synthetic calibration design: 16 cases, 64 scored items, one primary reviewer, and real execution unauthorized.
+- Candidate-filtering primary subtype reconciliation is already an implemented and tested invariant. Contributing-factor telemetry is an optional diagnostic extension, not proof that current totals are invalid.
+- Evidence-producing architecture, deterministic evaluation, typed failures, provenance, and authorization as code are genuine strengths, but they still do not prove saved human work.
 
 ## Accepted governing principles
 
+- Historical metrics explain why safeguards were built; current committed metrics determine present status.
+- A claimed repair is not accepted merely because later prose says it happened; executable tests must demonstrate it.
 - Evidence generation, selection change, and counterfactual necessity are different measurements.
 - A blind is an empirical property of the review session, not merely the absence of an identifier field.
 - A primary attribution bucket supports accounting without necessarily proving singular causation.
@@ -52,13 +57,13 @@ Where a numbered feedback artifact conflicts with these files, the authoritative
 
 ## Authority treatment
 
-The verdict authorizes the ordered review and remediation work in `next-actions.md`. It does **not** authorize:
+The review authorizes bounded remediation and regression protection. It does **not** authorize:
 
 - pruning recovery passes;
 - changing the production prompt;
 - running the real observation-quality benchmark;
 - freezing a real corpus manifest;
 - advancing one research contract into production;
-- expanding fields, beverage categories, cloud fallback, or seller/regulator product surfaces.
+- expanding fields, beverage categories, cloud fallback, or seller/regulator product surfaces solely because architectural safeguards exist.
 
-Those actions remain gated by explicit evidence and authorization.
+Those actions remain gated by current evidence, relevant regression tests, and explicit authorization.
