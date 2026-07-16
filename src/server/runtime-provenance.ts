@@ -30,6 +30,8 @@ const TRAINEDDATA_FILE = "eng.traineddata";
 
 /** Environment variable carrying a real deployed build commit, when available. */
 const BUILD_COMMIT_ENV = "LABEL_LENS_BUILD_COMMIT";
+/** Render automatically supplies the deployed Git commit when available. */
+const RENDER_BUILD_COMMIT_ENV = "RENDER_GIT_COMMIT";
 
 const AUTHORITIES = [
   { citation: "27 CFR 4.32; 27 CFR 4.33", snapshotDate: "2026-07-10" },
@@ -46,7 +48,8 @@ async function trainedDataSha256(): Promise<string> {
 
 /** Honest application build identity: a real commit only when the env supplies one. */
 function applicationBuild(): ExecutableProvenance["applicationBuild"] {
-  const commit = process.env[BUILD_COMMIT_ENV]?.trim();
+  const commit =
+    resolveCommitFromEnv(BUILD_COMMIT_ENV) ?? resolveCommitFromEnv(RENDER_BUILD_COMMIT_ENV);
   if (commit && commit !== "") {
     return {
       packageVersion: PACKAGE_VERSION,
@@ -58,6 +61,11 @@ function applicationBuild(): ExecutableProvenance["applicationBuild"] {
     packageVersion: PACKAGE_VERSION,
     commitProvenance: "unavailable-development-fallback",
   };
+}
+
+function resolveCommitFromEnv(name: string): string | undefined {
+  const value = process.env[name]?.trim();
+  return value && value !== "" ? value : undefined;
 }
 
 /**

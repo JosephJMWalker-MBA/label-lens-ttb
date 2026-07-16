@@ -25,7 +25,8 @@ via vendored Tesseract WebAssembly).
 | `LABEL_LENS_APPEND_SIGNING_KEY` | **Yes (production)** | ≥ 32 chars, secret. The pre-check route issues an HMAC append-authorization token on **every** run, so **production returns HTTP 500 (`APPEND_SIGNING_KEY_UNAVAILABLE`) until this is set.** Generate with `openssl rand -hex 32`. Never commit it. |
 | `NODE_ENV` | Set by platform | Must be `production` in the live build. |
 | `PORT` | Set by platform | The server binds to it. |
-| `LABEL_LENS_BUILD_COMMIT` | Optional | Stamps the running commit into export provenance. |
+| `LABEL_LENS_BUILD_COMMIT` | Optional | Explicit higher-priority override for the running commit stamped into export provenance. |
+| `RENDER_GIT_COMMIT` | Automatic on Render | Used for export provenance when `LABEL_LENS_BUILD_COMMIT` is absent or blank. |
 | `LABEL_LENS_OCR_ASSET_DIR`, `LABEL_LENS_OCR_CORE_DIR` | Optional | Override OCR asset locations. Not needed — assets resolve deployment-relative by default. |
 
 **No secrets are committed to the repository.** Set the signing key only in the
@@ -62,7 +63,8 @@ creates **per-PR preview environments** (staging for testers), and health-checks
    the branch Render reads).
 2. In Render: **New → Blueprint**, connect the GitHub repo, select `render.yaml`.
 3. When prompted, set the secret **`LABEL_LENS_APPEND_SIGNING_KEY`** (paste an
-   `openssl rand -hex 32` value). Leave `LABEL_LENS_BUILD_COMMIT` blank or set it.
+   `openssl rand -hex 32` value). Leave `LABEL_LENS_BUILD_COMMIT` blank unless you
+   need an explicit override; Render supplies `RENDER_GIT_COMMIT` automatically.
 4. Create the service. First build runs `npm ci && npm run build`; it starts with
    `npm run start`.
 5. The `free` plan spins down when idle (slow first request). Upgrade the service

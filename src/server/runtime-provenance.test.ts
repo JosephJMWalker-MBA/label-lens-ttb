@@ -24,6 +24,7 @@ function committedTrainedDataSha(): string {
 
 afterEach(() => {
   delete process.env.LABEL_LENS_BUILD_COMMIT;
+  delete process.env.RENDER_GIT_COMMIT;
   resetExecutableProvenanceCache();
 });
 
@@ -49,16 +50,55 @@ describe("getExecutableProvenance — one canonical source", () => {
 
   it("labels the development fallback honestly and never fakes a deployed commit", async () => {
     delete process.env.LABEL_LENS_BUILD_COMMIT;
+    delete process.env.RENDER_GIT_COMMIT;
     resetExecutableProvenanceCache();
     const dev = await getExecutableProvenance();
     expect(dev.applicationBuild.gitCommitSha).toBeUndefined();
     expect(dev.applicationBuild.commitProvenance).toBe("unavailable-development-fallback");
+  });
 
+  it("prefers LABEL_LENS_BUILD_COMMIT over RENDER_GIT_COMMIT when both are set", async () => {
     process.env.LABEL_LENS_BUILD_COMMIT = "deadbeefcafef00d";
+    process.env.RENDER_GIT_COMMIT = "feedface12345678";
     resetExecutableProvenanceCache();
     const built = await getExecutableProvenance();
     expect(built.applicationBuild.gitCommitSha).toBe("deadbeefcafef00d");
     expect(built.applicationBuild.commitProvenance).toBe("build-environment");
+  });
+
+  it("uses RENDER_GIT_COMMIT when the explicit override is absent", async () => {
+    delete process.env.LABEL_LENS_BUILD_COMMIT;
+    process.env.RENDER_GIT_COMMIT = "feedface12345678";
+    resetExecutableProvenanceCache();
+    const built = await getExecutableProvenance();
+    expect(built.applicationBuild.gitCommitSha).toBe("feedface12345678");
+    expect(built.applicationBuild.commitProvenance).toBe("build-environment");
+  });
+
+  it("ignores whitespace-only commit variables", async () => {
+    process.env.LABEL_LENS_BUILD_COMMIT = "   ";
+    process.env.RENDER_GIT_COMMIT = "\n\t ";
+    resetExecutableProvenanceCache();
+    const built = await getExecutableProvenance();
+    expect(built.applicationBuild.gitCommitSha).toBeUndefined();
+    expect(built.applicationBuild.commitProvenance).toBe("unavailable-development-fallback");
+  });
+
+  it("re-reads the commit source only after the provenance cache is reset", async () => {
+    process.env.LABEL_LENS_BUILD_COMMIT = "deadbeefcafef00d";
+    const initial = await getExecutableProvenance();
+    expect(initial.applicationBuild.gitCommitSha).toBe("deadbeefcafef00d");
+
+    delete process.env.LABEL_LENS_BUILD_COMMIT;
+    process.env.RENDER_GIT_COMMIT = "feedface12345678";
+    const cached = await getExecutableProvenance();
+    expect(cached.applicationBuild.gitCommitSha).toBe("deadbeefcafef00d");
+    expect(JSON.stringify(cached)).toBe(JSON.stringify(initial));
+
+    resetExecutableProvenanceCache();
+    const refreshed = await getExecutableProvenance();
+    expect(refreshed.applicationBuild.gitCommitSha).toBe("feedface12345678");
+    expect(refreshed.applicationBuild.commitProvenance).toBe("build-environment");
   });
 });
 
