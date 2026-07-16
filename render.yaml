@@ -39,6 +39,7 @@ services:
       # or via `render secrets`. Not synced from this file.
       - key: LABEL_LENS_APPEND_SIGNING_KEY
         sync: false
-      # Optional: stamps the running commit into export provenance.
+      # Optional explicit override for export provenance. When omitted, Render's
+      # automatic RENDER_GIT_COMMIT environment variable is used if available.
       - key: LABEL_LENS_BUILD_COMMIT
         sync: false
