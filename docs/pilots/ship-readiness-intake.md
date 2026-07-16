@@ -28,7 +28,7 @@ machine result.
   raw/                      # byte-identical copies: pilot-wine-001.<ext> ...
   display-derivatives/      # only when orientation/format/scale requires it
   manifests/                # pilot-manifest.json, review-order.json, _objective-metadata.tsv
-  worksheets/               # per-case Phase A/B worksheet instances
+  worksheets/               # per-case order-aware First-pass/Second-pass instances
   reports/                  # PREPARATION-REPORT.md
   _inspection/              # source-map.private.tsv, thumbnails (local review aids)
 ```
@@ -64,9 +64,10 @@ node --experimental-strip-types --no-warnings scripts/pilots/pilot-intake.ts \
 node --experimental-strip-types --no-warnings scripts/pilots/pilot-intake.ts \
   counterbalance "$WS/manifests/pilot-manifest.json" 20260716 "$WS/manifests/review-order.json"
 
-# 4. emit per-case Phase A / Phase B worksheet instances
+# 4. emit per-case order-aware worksheet instances (first pass = each case's
+#    preregistered mode; second pass hidden until the first pass is saved)
 node --experimental-strip-types --no-warnings scripts/pilots/pilot-intake.ts \
-  worksheets "$WS/manifests/pilot-manifest.json" "$WS/manifests/review-order.json" "$WS/worksheets"
+  worksheets "$WS/manifests/review-order.json" "$WS/worksheets"
 ```
 
 ## Counterbalancing
@@ -77,6 +78,12 @@ sequence (all first passes, then all second passes). The block boundary is the
 washout; a case's two modes are therefore never adjacent. The order is fully
 reproducible from the recorded seed — do not re-roll the seed after seeing
 results.
+
+Worksheet generation is **order-aware**: each generated worksheet renders that
+case's assigned first-pass mode as the First pass and the opposite mode as the
+hidden Second pass, so a manual-first case is executed manual-first and an
+assisted-first case is executed assisted-first. There is no universal
+"manual always precedes assisted" rule.
 
 ## Boundary with #114 / #116
 

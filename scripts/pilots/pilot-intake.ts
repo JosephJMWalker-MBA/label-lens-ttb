@@ -10,7 +10,7 @@
  *   build         <objective-metadata.tsv> <dispositions.json> <out-manifest.json>
  *   validate      <manifest.json> <raw-dir> [derivatives-dir]
  *   counterbalance <manifest.json> <seed> <out-order.json>
- *   worksheets    <manifest.json> <order.json> <out-dir>
+ *   worksheets    <order.json> <out-dir>
  *
  * Run with: node --experimental-strip-types --no-warnings scripts/pilots/pilot-intake.ts <cmd> ...
  */
@@ -21,8 +21,11 @@ import { basename, join } from "node:path";
 import {
   PILOT_INTAKE_SCHEMA_VERSION,
   generateCounterbalancedOrder,
+  renderWorksheet,
   reviewOrderIsReproducible,
   validatePilotManifest,
+  worksheetTargetPilotIds,
+  type CounterbalancedOrder,
   type PilotCaseEntry,
   type PilotChallengeTag,
   type PilotManifest,
@@ -151,58 +154,17 @@ function counterbalance(manifestPath: string, seedArg: string, outPath: string):
   );
 }
 
-function worksheets(manifestPath: string, orderPath: string, outDir: string): void {
-  const manifest = readJson<PilotManifest>(manifestPath);
-  const order = readJson<{ sequence: { pilotId: string }[] }>(orderPath);
+function worksheets(orderPath: string, outDir: string): void {
+  const order = readJson<CounterbalancedOrder>(orderPath);
   mkdirSync(outDir, { recursive: true });
-  const included = new Set(order.sequence.map((s) => s.pilotId));
-  let count = 0;
-  for (const entry of manifest.cases) {
-    if (!included.has(entry.pilotId)) continue;
-    writeFileSync(join(outDir, `${entry.pilotId}.worksheet.md`), worksheetFor(entry.pilotId));
-    count += 1;
+  // Only the INCLUDED cases the order was built over receive a worksheet, each
+  // rendered in its preregistered first-pass mode. Excluded cases get none.
+  const targets = worksheetTargetPilotIds(order);
+  for (const pilotId of targets) {
+    const firstMode = order.firstModeByCase[pilotId];
+    writeFileSync(join(outDir, `${pilotId}.worksheet.md`), renderWorksheet(pilotId, firstMode));
   }
-  console.log(`wrote ${count} worksheet instances -> ${outDir}`);
-}
-
-function worksheetFor(pilotId: string): string {
-  return `# Reviewer worksheet — ${pilotId}
-
-> Phase B content is HIDDEN during Phase A. Complete Phase A fully, save, then reveal Phase B.
-
-## Phase A — manual baseline (no Label Lens)
-- reviewerId:
-- reviewOrderStep:
-- startTimestamp:
-- endTimestamp:
-- identifiedBrandEvidence:
-- identifiedAlcoholEvidence:
-- uncertaintyOrUnreadabilityNotes:
-- followUpOrReplacementImageNeeded:
-- escalationReadinessDisposition:
-- reviewerExplanation:
-
-<!-- ===== DO NOT READ BELOW UNTIL PHASE A IS SAVED ===== -->
-
-## Phase B — Label Lens assisted review
-- startTimestamp:
-- endTimestamp:
-- runCompletionState:
-- timeToFirstUsableOutput:
-- machineBrandObservationRef:
-- machineAlcoholObservationRef:
-- acceptedMachineReading:
-- alternateSelected:
-- manualCorrection:
-- notVisibleUnreadableOrAmbiguousDecision:
-- replacementImageNeeded:
-- falseCertaintyEvent:
-- technicalFailureOrTimeout:
-- totalAssistedHandlingTime:
-- helpedHarmedOrNoDifference:
-- escalationReadinessDisposition:
-- reviewerExplanation:
-`;
+  console.log(`wrote ${targets.length} order-aware worksheet instances -> ${outDir}`);
 }
 
 const [cmd, ...args] = process.argv.slice(2);
@@ -220,8 +182,8 @@ switch (cmd) {
     counterbalance(args[0], args[1], args[2]);
     break;
   case "worksheets":
-    if (args.length !== 3) fail("worksheets <manifest.json> <order.json> <out-dir>");
-    worksheets(args[0], args[1], args[2]);
+    if (args.length !== 2) fail("worksheets <order.json> <out-dir>");
+    worksheets(args[0], args[1]);
     break;
   default:
     fail(`unknown command ${cmd ?? "(none)"} — use build|validate|counterbalance|worksheets`);

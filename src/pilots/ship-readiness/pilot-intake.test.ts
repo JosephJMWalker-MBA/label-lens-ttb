@@ -2,12 +2,15 @@ import { describe, expect, it } from "vitest";
 
 import {
   PILOT_INTAKE_SCHEMA_VERSION,
+  WORKSHEET_HIDDEN_DIVIDER,
   expectedAnswersAuthorized,
   generateCounterbalancedOrder,
   realPilotExecutionAuthorized,
+  renderWorksheet,
   reviewOrderIsReproducible,
   scanCaseForForbiddenKeys,
   validatePilotManifest,
+  worksheetTargetPilotIds,
   type PilotCaseEntry,
   type PilotManifest,
 } from "./pilot-intake";
@@ -175,5 +178,76 @@ describe("counterbalanced review order", () => {
     expect(reviewOrderIsReproducible(a)).toBe(true);
     const different = generateCounterbalancedOrder(ids, 124);
     expect(JSON.stringify(different.sequence)).not.toBe(JSON.stringify(a.sequence));
+  });
+});
+
+describe("expectedCaseCount governance", () => {
+  it("fails when expectedCaseCount contradicts the represented firstId..lastId range", () => {
+    const contradictory = { ...manifest(), expectedCaseCount: 20 }; // range is 24
+    expect(validatePilotManifest(contradictory).issues.join("\n")).toMatch(
+      /expectedCaseCount 20 must equal the represented range count 24/,
+    );
+  });
+});
+
+describe("order-aware reviewer worksheets", () => {
+  const ids = Array.from({ length: 20 }, (_, i) => `pilot-wine-${String(i + 1).padStart(3, "0")}`);
+
+  /** Split a rendered worksheet into its first-pass and second-pass halves. */
+  function halves(sheet: string): { first: string; second: string } {
+    const cut = sheet.indexOf(WORKSHEET_HIDDEN_DIVIDER);
+    expect(cut).toBeGreaterThan(-1);
+    return { first: sheet.slice(0, cut), second: sheet.slice(cut) };
+  }
+
+  it("renders manual-first cases manual-first with assisted content only in the second pass", () => {
+    const { first, second } = halves(renderWorksheet("pilot-wine-001", "MANUAL_BASELINE"));
+    expect(first).toMatch(/## First pass — MANUAL_BASELINE/);
+    expect(first).toContain("identifiedBrandEvidence"); // manual-only field, first pass
+    expect(first).not.toContain("runCompletionState"); // assisted-only field, not first
+    expect(second).toMatch(/## Second pass — ASSISTED/);
+    expect(second).toContain("runCompletionState");
+  });
+
+  it("renders assisted-first cases assisted-first with manual content only in the second pass", () => {
+    const { first, second } = halves(renderWorksheet("pilot-wine-002", "ASSISTED"));
+    expect(first).toMatch(/## First pass — ASSISTED/);
+    expect(first).toContain("runCompletionState"); // assisted-only field, first pass
+    expect(first).not.toContain("identifiedBrandEvidence"); // manual-only field, not first
+    expect(second).toMatch(/## Second pass — MANUAL_BASELINE/);
+    expect(second).toContain("identifiedBrandEvidence");
+  });
+
+  it("separates second-pass content behind the hidden divider", () => {
+    for (const mode of ["MANUAL_BASELINE", "ASSISTED"] as const) {
+      const sheet = renderWorksheet("pilot-wine-003", mode);
+      expect(sheet.indexOf("## Second pass")).toBeGreaterThan(
+        sheet.indexOf(WORKSHEET_HIDDEN_DIVIDER),
+      );
+      expect(sheet.indexOf(WORKSHEET_HIDDEN_DIVIDER)).toBeGreaterThan(
+        sheet.indexOf("## First pass"),
+      );
+    }
+  });
+
+  it("agrees with the preregistered order for every included case, both seeds", () => {
+    for (const seed of [20260716, 20260717, 99]) {
+      const order = generateCounterbalancedOrder(ids, seed);
+      for (const id of ids) {
+        const firstMode = order.firstModeByCase[id];
+        const sheet = renderWorksheet(id, firstMode);
+        expect(sheet).toContain(`## First pass — ${firstMode}`);
+        expect(sheet).toContain(`First pass = ${firstMode}`);
+      }
+    }
+  });
+
+  it("gives no worksheet to excluded cases (targets are exactly the ordered/included set)", () => {
+    const includedIds = ids.filter((id) => id !== "pilot-wine-014" && id !== "pilot-wine-015");
+    const order = generateCounterbalancedOrder(includedIds, 20260717);
+    const targets = worksheetTargetPilotIds(order);
+    expect(targets).toEqual([...includedIds].sort());
+    expect(targets).not.toContain("pilot-wine-014");
+    expect(targets).not.toContain("pilot-wine-015");
   });
 });

@@ -244,11 +244,23 @@ export function validatePilotManifest(manifest: PilotManifest): ValidationResult
   }
 
   // Every number firstId..lastId represented exactly once.
+  if (
+    !Number.isSafeInteger(manifest.firstId) ||
+    !Number.isSafeInteger(manifest.lastId) ||
+    manifest.firstId > manifest.lastId
+  )
+    issues.push("firstId and lastId must be integers with firstId <= lastId");
+  const rangeCount = Math.max(0, manifest.lastId - manifest.firstId + 1);
   const expectedIds: string[] = [];
   for (let n = manifest.firstId; n <= manifest.lastId; n += 1)
     expectedIds.push(`pilot-wine-${String(n).padStart(3, "0")}`);
   if (manifest.cases.length !== expectedIds.length)
     issues.push(`expected ${expectedIds.length} cases, received ${manifest.cases.length}`);
+  // expectedCaseCount is governed: it must equal the represented firstId..lastId range.
+  if (manifest.expectedCaseCount !== rangeCount)
+    issues.push(
+      `expectedCaseCount ${manifest.expectedCaseCount} must equal the represented range count ${rangeCount}`,
+    );
 
   const seen = new Map<string, number>();
   manifest.cases.forEach((entry, index) => {
@@ -367,4 +379,93 @@ export function generateCounterbalancedOrder(
 export function reviewOrderIsReproducible(order: CounterbalancedOrder): boolean {
   const regenerated = generateCounterbalancedOrder(order.caseIds, order.seed);
   return JSON.stringify(regenerated.sequence) === JSON.stringify(order.sequence);
+}
+
+// ---- Order-aware reviewer worksheets -------------------------------------
+
+/**
+ * Divider after the first pass. The second pass is hidden below it and must not
+ * be read or completed until the first pass is saved. Tests assert that every
+ * second-pass field appears after this marker.
+ */
+export const WORKSHEET_HIDDEN_DIVIDER =
+  "<!-- ===== DO NOT READ OR COMPLETE THE SECOND PASS UNTIL THE FIRST PASS IS SAVED ===== -->";
+
+function reviewModeLabel(mode: ReviewMode): string {
+  return mode === "MANUAL_BASELINE"
+    ? "MANUAL_BASELINE — manual baseline, no Label Lens"
+    : "ASSISTED — Label Lens assisted review";
+}
+
+const MANUAL_FIELDS = [
+  "reviewerId",
+  "reviewOrderStep",
+  "startTimestamp",
+  "endTimestamp",
+  "identifiedBrandEvidence",
+  "identifiedAlcoholEvidence",
+  "uncertaintyOrUnreadabilityNotes",
+  "followUpOrReplacementImageNeeded",
+  "escalationReadinessDisposition",
+  "reviewerExplanation",
+] as const;
+
+const ASSISTED_FIELDS = [
+  "startTimestamp",
+  "endTimestamp",
+  "runCompletionState",
+  "timeToFirstUsableOutput",
+  "machineBrandObservationRef",
+  "machineAlcoholObservationRef",
+  "acceptedMachineReading",
+  "alternateSelected",
+  "manualCorrection",
+  "notVisibleUnreadableOrAmbiguousDecision",
+  "replacementImageNeeded",
+  "falseCertaintyEvent",
+  "technicalFailureOrTimeout",
+  "totalAssistedHandlingTime",
+  "helpedHarmedOrNoDifference",
+  "escalationReadinessDisposition",
+  "reviewerExplanation",
+] as const;
+
+function passBlock(mode: ReviewMode): string {
+  const fields = mode === "MANUAL_BASELINE" ? MANUAL_FIELDS : ASSISTED_FIELDS;
+  return fields.map((f) => `- ${f}:`).join("\n");
+}
+
+/**
+ * Render one case's worksheet in its **preregistered order**: the first pass is
+ * the case's assigned `firstMode`, the second pass is the opposite mode, hidden
+ * below the divider. Headings are neutral (First pass / Second pass) while each
+ * pass clearly records its assigned mode, so a manual-first case is executed
+ * manual-first and an assisted-first case is executed assisted-first.
+ */
+export function renderWorksheet(pilotId: string, firstMode: ReviewMode): string {
+  const secondMode: ReviewMode = firstMode === "MANUAL_BASELINE" ? "ASSISTED" : "MANUAL_BASELINE";
+  return `# Reviewer worksheet — ${pilotId}
+
+Preregistered assignment: First pass = ${firstMode}, Second pass = ${secondMode}.
+Complete and save the First pass before reading or completing the Second pass.
+
+## First pass — ${reviewModeLabel(firstMode)}
+- assignedMode: ${firstMode}
+${passBlock(firstMode)}
+
+${WORKSHEET_HIDDEN_DIVIDER}
+
+## Second pass — ${reviewModeLabel(secondMode)}
+- assignedMode: ${secondMode}
+${passBlock(secondMode)}
+`;
+}
+
+/**
+ * The pilot IDs that receive a worksheet: exactly the cases the preregistered
+ * order was built over (the INCLUDED set). Excluded cases are absent, so they
+ * never receive a worksheet.
+ */
+export function worksheetTargetPilotIds(order: CounterbalancedOrder): string[] {
+  return Object.keys(order.firstModeByCase).sort();
 }
