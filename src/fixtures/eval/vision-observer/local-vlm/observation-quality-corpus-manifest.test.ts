@@ -5,6 +5,8 @@ import {
   OBSERVATION_QUALITY_CASE_COUNT,
 } from "./observation-quality-benchmark-protocol";
 import {
+  OBSERVATION_QUALITY_CORPUS_ANNOTATION_SELECTION_INDEPENDENCE_POLICIES,
+  OBSERVATION_QUALITY_CORPUS_MANIFEST_DIGEST_SCOPE,
   OBSERVATION_QUALITY_CORPUS_ALLOWED_USAGE_STATUSES,
   OBSERVATION_QUALITY_CORPUS_MANIFEST_SCHEMA_VERSION,
   OBSERVATION_QUALITY_CORPUS_SLOT_CATEGORIES,
@@ -16,6 +18,8 @@ import {
   corpusSelectionAuthorized,
   evaluateObservationQualityCorpusCategoryCoverage,
   evaluateObservationQualityFrozenCorpusGate,
+  evaluateObservationQualityFrozenCorpusGatePayload,
+  ingestObservationQualityCorpusManifest,
   observationQualityCorpusSlotCategory,
   realCorpusManifestCreationAuthorized,
   realExecutionAuthorizedByCorpusSlice,
@@ -67,6 +71,14 @@ const HUMAN_VISUAL_SUPPORT: Record<
 
 function digestFor(seed: number): string {
   return seed.toString(16).padStart(64, "0");
+}
+
+function asRuntimePayload<T>(value: T): unknown {
+  return JSON.parse(JSON.stringify(value)) as unknown;
+}
+
+function asRuntimeObject<T extends object>(value: T): Record<string, unknown> {
+  return JSON.parse(JSON.stringify(value)) as Record<string, unknown>;
 }
 
 function challengeTagsFor(
@@ -159,6 +171,8 @@ function buildCaseEntry(
         : "OBSERVATION_OPPORTUNITY_PRESENT",
     observationOpportunityTags: opportunityTagsFor(category),
     nearDuplicateReview: humanReviewedSupport ? "REVIEWED_NOT_DUPLICATE" : "NOT_REQUIRED",
+    annotatedBy: "synthetic-reviewer",
+    annotatedAt: "2026-07-16T00:00:00Z",
     selectedBy: "synthetic-reviewer",
     selectedAt: "2026-07-16T00:00:00Z",
   };
@@ -210,6 +224,7 @@ function buildFrozenManifest(
     schemaVersion: OBSERVATION_QUALITY_CORPUS_MANIFEST_SCHEMA_VERSION,
     protocolVersion: OBSERVATION_QUALITY_BENCHMARK_PROTOCOL_VERSION,
     benchmarkCorpusId: "oqb-calibration-v1",
+    annotationSelectionIndependencePolicy: "NOT_REQUIRED",
     freezeState,
     sourceManifestRef: "src/fixtures/eval/eval-manifest.json",
     sourceManifestDigest,
@@ -281,6 +296,12 @@ expectCorpusCaseEntry({
 
 expectCorpusCaseEntry({
   ...validCaseEntry,
+  // @ts-expect-error raw output is outside the Slice 2 schema
+  rawOutput: "forbidden",
+});
+
+expectCorpusCaseEntry({
+  ...validCaseEntry,
   // @ts-expect-error OCR text is outside the Slice 2 schema
   ocrText: "forbidden",
 });
@@ -303,6 +324,12 @@ expectCorpusCaseEntry({
   humanScore: 2,
 });
 
+expectCorpusCaseEntry({
+  ...validCaseEntry,
+  // @ts-expect-error human scores are outside the Slice 2 schema
+  humanScores: [2],
+});
+
 describe("observation-quality corpus manifest", () => {
   describe("schema identity", () => {
     it("encodes the exact schema and authorization boundary", () => {
@@ -314,6 +341,35 @@ describe("observation-quality corpus manifest", () => {
       expect(realCorpusManifestCreationAuthorized).toBe(false);
       expect(realExecutionAuthorizedByCorpusSlice).toBe(false);
       expect(OBSERVATION_QUALITY_CASE_COUNT).toBe(16);
+      expect(OBSERVATION_QUALITY_CORPUS_ANNOTATION_SELECTION_INDEPENDENCE_POLICIES).toEqual([
+        "NOT_REQUIRED",
+        "REQUIRED",
+      ]);
+      expect(OBSERVATION_QUALITY_CORPUS_MANIFEST_DIGEST_SCOPE).toEqual({
+        digestField: "manifestDigest",
+        scope: "governed-corpus-content",
+        includedManifestFields: [
+          "schemaVersion",
+          "protocolVersion",
+          "benchmarkCorpusId",
+          "annotationSelectionIndependencePolicy",
+          "sourceManifestRef",
+          "sourceManifestDigest",
+          "createdAt",
+          "createdBy",
+          "cases",
+        ],
+        includedCaseProvenanceFields: ["annotatedBy", "annotatedAt", "selectedBy", "selectedAt"],
+        excludedLifecycleFields: [
+          "freezeState",
+          "frozenAt",
+          "frozenBy",
+          "manifestDigest",
+          "invalidationReason",
+          "invalidatedAt",
+          "invalidatedBy",
+        ],
+      });
     });
   });
 
@@ -373,6 +429,160 @@ describe("observation-quality corpus manifest", () => {
       expect(computeObservationQualityCorpusManifestDigest(invalidated)).toBe(
         computeObservationQualityCorpusManifestDigest(validManifest),
       );
+    });
+
+    it("changes the content digest when governed corpus content changes", () => {
+      const changedContent = replaceCase(validManifest, "CLEAN_SIMPLE_1", (entry) => ({
+        ...entry,
+        annotatedBy: "different-annotator",
+      }));
+
+      expect(computeObservationQualityCorpusManifestDigest(changedContent)).not.toBe(
+        computeObservationQualityCorpusManifestDigest(validManifest),
+      );
+    });
+  });
+
+  describe("runtime ingestion boundary", () => {
+    it("rejects non-object input and missing or non-array cases without throwing", () => {
+      const manifestWithoutCases = asRuntimeObject(validManifest);
+      delete manifestWithoutCases.cases;
+
+      expect(ingestObservationQualityCorpusManifest(null)).toEqual({
+        ok: false,
+        issues: ["root: must be an object"],
+      });
+
+      expect(ingestObservationQualityCorpusManifest(manifestWithoutCases)).toEqual({
+        ok: false,
+        issues: ["cases: is required"],
+      });
+
+      expect(
+        ingestObservationQualityCorpusManifest({
+          ...asRuntimeObject(validManifest),
+          cases: "forbidden",
+        }),
+      ).toEqual({
+        ok: false,
+        issues: ["cases: must be an array"],
+      });
+    });
+
+    it("rejects malformed nested case entries and slot-support payloads", () => {
+      expect(
+        ingestObservationQualityCorpusManifest({
+          ...asRuntimeObject(validManifest),
+          cases: [null],
+        }),
+      ).toEqual({
+        ok: false,
+        issues: ["cases[0]: must be an object"],
+      });
+
+      expect(
+        ingestObservationQualityCorpusManifest({
+          ...asRuntimeObject(validManifest),
+          cases: [
+            {
+              ...asRuntimeObject(validManifest.cases[0]),
+              slotSupport: "forbidden",
+            },
+          ],
+        }),
+      ).toEqual({
+        ok: false,
+        issues: ["cases[0].slotSupport: must be an object"],
+      });
+    });
+
+    it("rejects unknown root and nested properties, including leakage-bearing fields", () => {
+      expect(
+        ingestObservationQualityCorpusManifest({
+          ...asRuntimeObject(validManifest),
+          contract: "A_PRIME",
+        }),
+      ).toEqual({
+        ok: false,
+        issues: ["contract: is not allowed"],
+      });
+
+      const leakedFields = [
+        "contract",
+        "scores",
+        "modelOutput",
+        "rawOutput",
+        "ocrText",
+        "expectedValue",
+        "expectedValues",
+        "humanScore",
+        "humanScores",
+      ] as const;
+
+      for (const leakedField of leakedFields) {
+        expect(
+          ingestObservationQualityCorpusManifest({
+            ...asRuntimeObject(validManifest),
+            cases: [
+              {
+                ...asRuntimeObject(validManifest.cases[0]),
+                [leakedField]: "forbidden",
+              },
+            ],
+          }),
+        ).toEqual({
+          ok: false,
+          issues: [`cases[0].${leakedField}: is not allowed`],
+        });
+      }
+
+      expect(
+        ingestObservationQualityCorpusManifest({
+          ...asRuntimeObject(validManifest),
+          cases: [
+            {
+              ...asRuntimeObject(validManifest.cases[0]),
+              slotSupport: {
+                ...asRuntimeObject(validManifest.cases[0].slotSupport),
+                hiddenScore: 2,
+              },
+            },
+          ],
+        }),
+      ).toEqual({
+        ok: false,
+        issues: ["cases[0].slotSupport.hiddenScore: is not allowed"],
+      });
+    });
+
+    it("preserves selector and annotator provenance through runtime ingestion", () => {
+      const ingested = ingestObservationQualityCorpusManifest(asRuntimePayload(validManifest));
+      expect(ingested.ok).toBe(true);
+      if (!ingested.ok) return;
+
+      expect(ingested.manifest.cases[0]).toMatchObject({
+        annotatedBy: "synthetic-reviewer",
+        annotatedAt: "2026-07-16T00:00:00Z",
+        selectedBy: "synthetic-reviewer",
+        selectedAt: "2026-07-16T00:00:00Z",
+      });
+    });
+
+    it("prevents rejected runtime payloads from satisfying the frozen-corpus gate", () => {
+      expect(
+        evaluateObservationQualityFrozenCorpusGatePayload({
+          ...asRuntimeObject(validManifest),
+          cases: [
+            {
+              ...asRuntimeObject(validManifest.cases[0]),
+              contract: "A",
+            },
+          ],
+        }),
+      ).toEqual({
+        satisfied: false,
+        issues: ["cases[0].contract: is not allowed"],
+      });
     });
   });
 
@@ -640,6 +850,69 @@ describe("observation-quality corpus manifest", () => {
           })),
         ).issues,
       ).toContain("cases[0].selectionRationale: contains forbidden benchmark-result language");
+
+      expect(
+        validateObservationQualityCorpusManifest(
+          replaceCase(validManifest, "CLEAN_SIMPLE_1", (entry) => ({
+            ...entry,
+            annotatedBy: "",
+          })),
+        ).issues,
+      ).toContain("cases[0].annotatedBy: must be a non-empty string");
+
+      expect(
+        validateObservationQualityCorpusManifest(
+          replaceCase(validManifest, "CLEAN_SIMPLE_1", (entry) => ({
+            ...entry,
+            annotatedAt: "",
+          })),
+        ).issues,
+      ).toContain("cases[0].annotatedAt: must be a non-empty string");
+    });
+  });
+
+  describe("annotation provenance and independence policy", () => {
+    it("allows same-person synthetic provenance when independence is not required", () => {
+      expect(validateObservationQualityCorpusManifest(validManifest)).toEqual({
+        ok: true,
+        issues: [],
+      });
+    });
+
+    it("passes when independence is required and annotators differ from selectors", () => {
+      const independentManifest = buildFrozenManifest({
+        annotationSelectionIndependencePolicy: "REQUIRED",
+        cases: validManifest.cases.map((entry, index) => ({
+          ...entry,
+          annotatedBy: `annotator-${index + 1}`,
+        })),
+      });
+
+      expect(validateObservationQualityCorpusManifest(independentManifest)).toEqual({
+        ok: true,
+        issues: [],
+      });
+    });
+
+    it("fails when independence is required and a selector also appears as the annotator", () => {
+      expect(
+        validateObservationQualityCorpusManifest({
+          ...validManifest,
+          annotationSelectionIndependencePolicy: "REQUIRED",
+        }).issues,
+      ).toContain(
+        "cases[0].annotatedBy: must differ from selectedBy when annotationSelectionIndependencePolicy is REQUIRED",
+      );
+    });
+
+    it("rejects unsupported independence-policy values", () => {
+      expect(
+        validateObservationQualityCorpusManifest({
+          ...validManifest,
+          annotationSelectionIndependencePolicy:
+            "SOMETIMES" as unknown as ObservationQualityCorpusManifest["annotationSelectionIndependencePolicy"],
+        }).issues,
+      ).toContain("annotationSelectionIndependencePolicy: must be one of NOT_REQUIRED, REQUIRED");
     });
   });
 

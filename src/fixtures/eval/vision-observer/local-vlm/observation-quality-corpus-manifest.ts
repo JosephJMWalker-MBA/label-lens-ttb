@@ -107,6 +107,11 @@ export const OBSERVATION_QUALITY_CORPUS_NEAR_DUPLICATE_REVIEWS = [
   "INTENTIONAL_PAIR",
 ] as const;
 
+export const OBSERVATION_QUALITY_CORPUS_ANNOTATION_SELECTION_INDEPENDENCE_POLICIES = [
+  "NOT_REQUIRED",
+  "REQUIRED",
+] as const;
+
 export const OBSERVATION_QUALITY_CORPUS_CHALLENGE_TAGS = EVAL_VISUAL_STRATA;
 export const OBSERVATION_QUALITY_CORPUS_ALLOWED_USAGE_STATUSES = [
   "screened-approved",
@@ -128,6 +133,8 @@ export type ObservationQualityCorpusFreezeState =
   (typeof OBSERVATION_QUALITY_CORPUS_FREEZE_STATES)[number];
 export type ObservationQualityCorpusNearDuplicateReview =
   (typeof OBSERVATION_QUALITY_CORPUS_NEAR_DUPLICATE_REVIEWS)[number];
+export type ObservationQualityCorpusAnnotationSelectionIndependencePolicy =
+  (typeof OBSERVATION_QUALITY_CORPUS_ANNOTATION_SELECTION_INDEPENDENCE_POLICIES)[number];
 export type ObservationQualityCorpusChallengeTag = EvalVisualStratum;
 export type ObservationQualityCorpusAllowedUsageStatus = Exclude<
   EvalUsageStatus,
@@ -169,6 +176,8 @@ export interface ObservationQualityCorpusCaseEntry {
   readonly observationOpportunityState: ObservationQualityOpportunityState;
   readonly observationOpportunityTags: readonly ObservationQualityOpportunityTag[];
   readonly nearDuplicateReview: ObservationQualityCorpusNearDuplicateReview;
+  readonly annotatedBy: string;
+  readonly annotatedAt: string;
   readonly selectedBy: string;
   readonly selectedAt: string;
 }
@@ -177,6 +186,7 @@ export interface ObservationQualityCorpusManifest {
   readonly schemaVersion: typeof OBSERVATION_QUALITY_CORPUS_MANIFEST_SCHEMA_VERSION;
   readonly protocolVersion: typeof OBSERVATION_QUALITY_BENCHMARK_PROTOCOL_VERSION;
   readonly benchmarkCorpusId: string;
+  readonly annotationSelectionIndependencePolicy: ObservationQualityCorpusAnnotationSelectionIndependencePolicy;
   readonly freezeState: ObservationQualityCorpusFreezeState;
   readonly sourceManifestRef: string;
   readonly sourceManifestDigest: string | null;
@@ -204,6 +214,20 @@ export interface ObservationQualityCorpusValidationFailure {
 export type ObservationQualityCorpusValidationResult =
   ObservationQualityCorpusValidationSuccess | ObservationQualityCorpusValidationFailure;
 
+export interface ObservationQualityCorpusIngestionSuccess {
+  ok: true;
+  manifest: ObservationQualityCorpusManifest;
+  issues: readonly [];
+}
+
+export interface ObservationQualityCorpusIngestionFailure {
+  ok: false;
+  issues: readonly string[];
+}
+
+export type ObservationQualityCorpusIngestionResult =
+  ObservationQualityCorpusIngestionSuccess | ObservationQualityCorpusIngestionFailure;
+
 export interface ObservationQualityCorpusCategoryCoverageResult {
   readonly counts: Readonly<Record<ObservationQualityCorpusSlotCategory, number>>;
   readonly issues: readonly string[];
@@ -213,6 +237,32 @@ export interface ObservationQualityFrozenCorpusGateResult {
   readonly satisfied: boolean;
   readonly issues: readonly string[];
 }
+
+export const OBSERVATION_QUALITY_CORPUS_MANIFEST_DIGEST_SCOPE = {
+  digestField: "manifestDigest",
+  scope: "governed-corpus-content",
+  includedManifestFields: [
+    "schemaVersion",
+    "protocolVersion",
+    "benchmarkCorpusId",
+    "annotationSelectionIndependencePolicy",
+    "sourceManifestRef",
+    "sourceManifestDigest",
+    "createdAt",
+    "createdBy",
+    "cases",
+  ],
+  includedCaseProvenanceFields: ["annotatedBy", "annotatedAt", "selectedBy", "selectedAt"],
+  excludedLifecycleFields: [
+    "freezeState",
+    "frozenAt",
+    "frozenBy",
+    "manifestDigest",
+    "invalidationReason",
+    "invalidatedAt",
+    "invalidatedBy",
+  ],
+} as const;
 
 const SLOT_ORDER_INDEX = new Map(
   OBSERVATION_QUALITY_CORPUS_SLOT_IDS.map((slotId, index) => [slotId, index] as const),
@@ -228,6 +278,9 @@ const FREEZE_STATE_SET = new Set(OBSERVATION_QUALITY_CORPUS_FREEZE_STATES);
 const OPPORTUNITY_STATE_SET = new Set(OBSERVATION_QUALITY_OPPORTUNITY_STATES);
 const OPPORTUNITY_TAG_SET = new Set(OBSERVATION_QUALITY_OPPORTUNITY_TAGS);
 const NEAR_DUPLICATE_REVIEW_SET = new Set(OBSERVATION_QUALITY_CORPUS_NEAR_DUPLICATE_REVIEWS);
+const ANNOTATION_SELECTION_INDEPENDENCE_POLICY_SET = new Set(
+  OBSERVATION_QUALITY_CORPUS_ANNOTATION_SELECTION_INDEPENDENCE_POLICIES,
+);
 const SOURCE_CASE_IDENTIFIER = /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/;
 const BENCHMARK_CORPUS_IDENTIFIER = /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/;
 const SHA_256_HEX = /^[0-9a-f]{64}$/;
@@ -243,6 +296,53 @@ const FORBIDDEN_RATIONALE_PATTERNS = [
   /\bprompt comparison\b/i,
   /\bcontract preference\b/i,
 ] as const;
+const MANIFEST_RUNTIME_KEYS = [
+  "schemaVersion",
+  "protocolVersion",
+  "benchmarkCorpusId",
+  "annotationSelectionIndependencePolicy",
+  "freezeState",
+  "sourceManifestRef",
+  "sourceManifestDigest",
+  "createdAt",
+  "createdBy",
+  "frozenAt",
+  "frozenBy",
+  "manifestDigest",
+  "invalidationReason",
+  "invalidatedAt",
+  "invalidatedBy",
+  "cases",
+] as const;
+const CASE_ENTRY_RUNTIME_KEYS = [
+  "slotId",
+  "sourceCaseId",
+  "sourceArtifactRef",
+  "sourceManifestRecordDigest",
+  "sourceImageDigest",
+  "derivativeDigest",
+  "mediaType",
+  "width",
+  "height",
+  "beverageCategory",
+  "challengeTags",
+  "slotSupport",
+  "sourceProvenance",
+  "usageStatus",
+  "selectionRationale",
+  "annotationStatus",
+  "observationOpportunityState",
+  "observationOpportunityTags",
+  "nearDuplicateReview",
+  "annotatedBy",
+  "annotatedAt",
+  "selectedBy",
+  "selectedAt",
+] as const;
+const CHALLENGE_TAG_SLOT_SUPPORT_RUNTIME_KEYS = ["kind", "tag"] as const;
+const VISUAL_CHARACTERISTIC_SLOT_SUPPORT_RUNTIME_KEYS = ["kind", "characteristic", "note"] as const;
+
+type UnknownRecord = Record<string, unknown>;
 
 function success(): ObservationQualityCorpusValidationSuccess {
   return {
@@ -252,6 +352,23 @@ function success(): ObservationQualityCorpusValidationSuccess {
 }
 
 function failure(issues: string[]): ObservationQualityCorpusValidationFailure {
+  return {
+    ok: false,
+    issues,
+  };
+}
+
+function ingestionSuccess(
+  manifest: ObservationQualityCorpusManifest,
+): ObservationQualityCorpusIngestionSuccess {
+  return {
+    ok: true,
+    manifest,
+    issues: [],
+  };
+}
+
+function ingestionFailure(issues: string[]): ObservationQualityCorpusIngestionFailure {
   return {
     ok: false,
     issues,
@@ -331,12 +448,121 @@ function stableSortedStrings(values: readonly string[]): readonly string[] {
   return [...values].sort((left, right) => left.localeCompare(right));
 }
 
+function rootIssue(message: string): string {
+  return `root: ${message}`;
+}
+
 function manifestIssue(path: string, message: string): string {
   return `${path}: ${message}`;
 }
 
 function caseIssue(index: number, field: string, message: string): string {
   return `cases[${index}].${field}: ${message}`;
+}
+
+function isRecordObject(value: unknown): value is UnknownRecord {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function propertyPath(basePath: string, key: string): string {
+  return basePath.length === 0 ? key : `${basePath}.${key}`;
+}
+
+function pushUnexpectedPropertyIssues(
+  basePath: string,
+  record: UnknownRecord,
+  allowedKeys: readonly string[],
+  issues: string[],
+): void {
+  const allowedKeySet = new Set(allowedKeys);
+  const unexpectedKeys = Object.keys(record)
+    .filter((key) => !allowedKeySet.has(key))
+    .sort((left, right) => left.localeCompare(right));
+  for (const unexpectedKey of unexpectedKeys) {
+    issues.push(manifestIssue(propertyPath(basePath, unexpectedKey), "is not allowed"));
+  }
+}
+
+function readRequiredString(
+  record: UnknownRecord,
+  basePath: string,
+  key: string,
+  issues: string[],
+): string | undefined {
+  if (!(key in record)) {
+    issues.push(manifestIssue(propertyPath(basePath, key), "is required"));
+    return undefined;
+  }
+  const value = record[key];
+  if (typeof value !== "string") {
+    issues.push(manifestIssue(propertyPath(basePath, key), "must be a string"));
+    return undefined;
+  }
+  return value;
+}
+
+function readRequiredNullableString(
+  record: UnknownRecord,
+  basePath: string,
+  key: string,
+  issues: string[],
+): string | null | undefined {
+  if (!(key in record)) {
+    issues.push(manifestIssue(propertyPath(basePath, key), "is required"));
+    return undefined;
+  }
+  const value = record[key];
+  if (typeof value !== "string" && value !== null) {
+    issues.push(manifestIssue(propertyPath(basePath, key), "must be a string or null"));
+    return undefined;
+  }
+  return value;
+}
+
+function readRequiredNumber(
+  record: UnknownRecord,
+  basePath: string,
+  key: string,
+  issues: string[],
+): number | undefined {
+  if (!(key in record)) {
+    issues.push(manifestIssue(propertyPath(basePath, key), "is required"));
+    return undefined;
+  }
+  const value = record[key];
+  if (typeof value !== "number" || Number.isNaN(value)) {
+    issues.push(manifestIssue(propertyPath(basePath, key), "must be a number"));
+    return undefined;
+  }
+  return value;
+}
+
+function readRequiredStringArray(
+  record: UnknownRecord,
+  basePath: string,
+  key: string,
+  issues: string[],
+): string[] | undefined {
+  if (!(key in record)) {
+    issues.push(manifestIssue(propertyPath(basePath, key), "is required"));
+    return undefined;
+  }
+  const value = record[key];
+  if (!Array.isArray(value)) {
+    issues.push(manifestIssue(propertyPath(basePath, key), "must be an array"));
+    return undefined;
+  }
+  const items: string[] = [];
+  let invalidItem = false;
+  value.forEach((item, index) => {
+    if (typeof item !== "string") {
+      issues.push(manifestIssue(`${propertyPath(basePath, key)}[${index}]`, "must be a string"));
+      invalidItem = true;
+      return;
+    }
+    items.push(item);
+  });
+  return invalidItem ? undefined : items;
 }
 
 export function isObservationQualityCorpusSlotId(
@@ -391,6 +617,14 @@ export function isObservationQualityCorpusNearDuplicateReview(
   value: string,
 ): value is ObservationQualityCorpusNearDuplicateReview {
   return NEAR_DUPLICATE_REVIEW_SET.has(value as ObservationQualityCorpusNearDuplicateReview);
+}
+
+export function isObservationQualityCorpusAnnotationSelectionIndependencePolicy(
+  value: string,
+): value is ObservationQualityCorpusAnnotationSelectionIndependencePolicy {
+  return ANNOTATION_SELECTION_INDEPENDENCE_POLICY_SET.has(
+    value as ObservationQualityCorpusAnnotationSelectionIndependencePolicy,
+  );
 }
 
 export function observationQualityCorpusSlotCategory(
@@ -518,6 +752,296 @@ export function validateObservationQualityCorpusSlotSupport(
   }
 
   return issues.length === 0 ? success() : failure(issues);
+}
+
+function ingestObservationQualityCorpusSlotSupport(
+  value: unknown,
+  basePath: string,
+  issues: string[],
+): ObservationQualityCorpusSlotSupport | undefined {
+  if (!isRecordObject(value)) {
+    issues.push(manifestIssue(basePath, "must be an object"));
+    return undefined;
+  }
+
+  const kind = readRequiredString(value, basePath, "kind", issues);
+  if (kind === "CHALLENGE_TAG") {
+    const startCount = issues.length;
+    pushUnexpectedPropertyIssues(basePath, value, CHALLENGE_TAG_SLOT_SUPPORT_RUNTIME_KEYS, issues);
+    const tag = readRequiredString(value, basePath, "tag", issues);
+    if (issues.length !== startCount || tag === undefined) {
+      return undefined;
+    }
+    return {
+      kind: "CHALLENGE_TAG",
+      tag: tag as ObservationQualityCorpusChallengeTag,
+    };
+  }
+
+  if (kind === "HUMAN_REVIEWED_VISUAL_CHARACTERISTIC") {
+    const startCount = issues.length;
+    pushUnexpectedPropertyIssues(
+      basePath,
+      value,
+      VISUAL_CHARACTERISTIC_SLOT_SUPPORT_RUNTIME_KEYS,
+      issues,
+    );
+    const characteristic = readRequiredString(value, basePath, "characteristic", issues);
+    const note = readRequiredString(value, basePath, "note", issues);
+    if (issues.length !== startCount || characteristic === undefined || note === undefined) {
+      return undefined;
+    }
+    return {
+      kind: "HUMAN_REVIEWED_VISUAL_CHARACTERISTIC",
+      characteristic: characteristic as ObservationQualityCorpusVisualCharacteristic,
+      note,
+    };
+  }
+
+  pushUnexpectedPropertyIssues(basePath, value, ["kind"], issues);
+  if (kind !== undefined) {
+    issues.push(
+      manifestIssue(
+        `${basePath}.kind`,
+        "must be one of CHALLENGE_TAG, HUMAN_REVIEWED_VISUAL_CHARACTERISTIC",
+      ),
+    );
+  }
+  return undefined;
+}
+
+function ingestObservationQualityCorpusCaseEntry(
+  value: unknown,
+  index: number,
+  issues: string[],
+): ObservationQualityCorpusCaseEntry | undefined {
+  const basePath = `cases[${index}]`;
+  if (!isRecordObject(value)) {
+    issues.push(manifestIssue(basePath, "must be an object"));
+    return undefined;
+  }
+
+  const startCount = issues.length;
+  pushUnexpectedPropertyIssues(basePath, value, CASE_ENTRY_RUNTIME_KEYS, issues);
+
+  const slotId = readRequiredString(value, basePath, "slotId", issues);
+  const sourceCaseId = readRequiredString(value, basePath, "sourceCaseId", issues);
+  const sourceArtifactRef = readRequiredString(value, basePath, "sourceArtifactRef", issues);
+  const sourceManifestRecordDigest = readRequiredString(
+    value,
+    basePath,
+    "sourceManifestRecordDigest",
+    issues,
+  );
+  const sourceImageDigest = readRequiredString(value, basePath, "sourceImageDigest", issues);
+  const derivativeDigest = readRequiredString(value, basePath, "derivativeDigest", issues);
+  const mediaType = readRequiredString(value, basePath, "mediaType", issues);
+  const width = readRequiredNumber(value, basePath, "width", issues);
+  const height = readRequiredNumber(value, basePath, "height", issues);
+  const beverageCategory = readRequiredString(value, basePath, "beverageCategory", issues);
+  const challengeTags = readRequiredStringArray(value, basePath, "challengeTags", issues);
+  const slotSupport = ingestObservationQualityCorpusSlotSupport(
+    value.slotSupport,
+    `${basePath}.slotSupport`,
+    issues,
+  );
+  const sourceProvenance = readRequiredString(value, basePath, "sourceProvenance", issues);
+  const usageStatus = readRequiredString(value, basePath, "usageStatus", issues);
+  const selectionRationale = readRequiredString(value, basePath, "selectionRationale", issues);
+  const annotationStatus = readRequiredString(value, basePath, "annotationStatus", issues);
+  const observationOpportunityState = readRequiredString(
+    value,
+    basePath,
+    "observationOpportunityState",
+    issues,
+  );
+  const observationOpportunityTags = readRequiredStringArray(
+    value,
+    basePath,
+    "observationOpportunityTags",
+    issues,
+  );
+  const nearDuplicateReview = readRequiredString(value, basePath, "nearDuplicateReview", issues);
+  const annotatedBy = readRequiredString(value, basePath, "annotatedBy", issues);
+  const annotatedAt = readRequiredString(value, basePath, "annotatedAt", issues);
+  const selectedBy = readRequiredString(value, basePath, "selectedBy", issues);
+  const selectedAt = readRequiredString(value, basePath, "selectedAt", issues);
+
+  if (issues.length !== startCount) {
+    return undefined;
+  }
+  if (
+    slotId === undefined ||
+    sourceCaseId === undefined ||
+    sourceArtifactRef === undefined ||
+    sourceManifestRecordDigest === undefined ||
+    sourceImageDigest === undefined ||
+    derivativeDigest === undefined ||
+    mediaType === undefined ||
+    width === undefined ||
+    height === undefined ||
+    beverageCategory === undefined ||
+    challengeTags === undefined ||
+    slotSupport === undefined ||
+    sourceProvenance === undefined ||
+    usageStatus === undefined ||
+    selectionRationale === undefined ||
+    annotationStatus === undefined ||
+    observationOpportunityState === undefined ||
+    observationOpportunityTags === undefined ||
+    nearDuplicateReview === undefined ||
+    annotatedBy === undefined ||
+    annotatedAt === undefined ||
+    selectedBy === undefined ||
+    selectedAt === undefined
+  ) {
+    return undefined;
+  }
+
+  return {
+    slotId: slotId as ObservationQualityCorpusSlotId,
+    sourceCaseId,
+    sourceArtifactRef,
+    sourceManifestRecordDigest,
+    sourceImageDigest,
+    derivativeDigest,
+    mediaType: mediaType as EvalImageMediaType,
+    width,
+    height,
+    beverageCategory: beverageCategory as "wine",
+    challengeTags: challengeTags as readonly ObservationQualityCorpusChallengeTag[],
+    slotSupport,
+    sourceProvenance: sourceProvenance as ObservationQualityCorpusSourceProvenance,
+    usageStatus: usageStatus as ObservationQualityCorpusAllowedUsageStatus,
+    selectionRationale,
+    annotationStatus: annotationStatus as ObservationQualityCorpusAnnotationStatus,
+    observationOpportunityState: observationOpportunityState as ObservationQualityOpportunityState,
+    observationOpportunityTags:
+      observationOpportunityTags as readonly ObservationQualityOpportunityTag[],
+    nearDuplicateReview: nearDuplicateReview as ObservationQualityCorpusNearDuplicateReview,
+    annotatedBy,
+    annotatedAt,
+    selectedBy,
+    selectedAt,
+  };
+}
+
+function ingestObservationQualityCorpusManifestObject(
+  value: unknown,
+  issues: string[],
+): ObservationQualityCorpusManifest | undefined {
+  if (!isRecordObject(value)) {
+    issues.push(rootIssue("must be an object"));
+    return undefined;
+  }
+
+  const startCount = issues.length;
+  pushUnexpectedPropertyIssues("", value, MANIFEST_RUNTIME_KEYS, issues);
+
+  const schemaVersion = readRequiredString(value, "", "schemaVersion", issues);
+  const protocolVersion = readRequiredString(value, "", "protocolVersion", issues);
+  const benchmarkCorpusId = readRequiredString(value, "", "benchmarkCorpusId", issues);
+  const annotationSelectionIndependencePolicy = readRequiredString(
+    value,
+    "",
+    "annotationSelectionIndependencePolicy",
+    issues,
+  );
+  const freezeState = readRequiredString(value, "", "freezeState", issues);
+  const sourceManifestRef = readRequiredString(value, "", "sourceManifestRef", issues);
+  const sourceManifestDigest = readRequiredNullableString(
+    value,
+    "",
+    "sourceManifestDigest",
+    issues,
+  );
+  const createdAt = readRequiredString(value, "", "createdAt", issues);
+  const createdBy = readRequiredString(value, "", "createdBy", issues);
+  const frozenAt = readRequiredNullableString(value, "", "frozenAt", issues);
+  const frozenBy = readRequiredNullableString(value, "", "frozenBy", issues);
+  const manifestDigest = readRequiredNullableString(value, "", "manifestDigest", issues);
+  const invalidationReason = readRequiredNullableString(value, "", "invalidationReason", issues);
+  const invalidatedAt = readRequiredNullableString(value, "", "invalidatedAt", issues);
+  const invalidatedBy = readRequiredNullableString(value, "", "invalidatedBy", issues);
+
+  let cases: ObservationQualityCorpusCaseEntry[] | undefined;
+  if (!("cases" in value)) {
+    issues.push(manifestIssue("cases", "is required"));
+  } else if (!Array.isArray(value.cases)) {
+    issues.push(manifestIssue("cases", "must be an array"));
+  } else {
+    const parsedCases: ObservationQualityCorpusCaseEntry[] = [];
+    value.cases.forEach((entry, index) => {
+      const parsedEntry = ingestObservationQualityCorpusCaseEntry(entry, index, issues);
+      if (parsedEntry !== undefined) {
+        parsedCases.push(parsedEntry);
+      }
+    });
+    if (parsedCases.length === value.cases.length) {
+      cases = parsedCases;
+    }
+  }
+
+  if (issues.length !== startCount) {
+    return undefined;
+  }
+  if (
+    schemaVersion === undefined ||
+    protocolVersion === undefined ||
+    benchmarkCorpusId === undefined ||
+    annotationSelectionIndependencePolicy === undefined ||
+    freezeState === undefined ||
+    sourceManifestRef === undefined ||
+    sourceManifestDigest === undefined ||
+    createdAt === undefined ||
+    createdBy === undefined ||
+    frozenAt === undefined ||
+    frozenBy === undefined ||
+    manifestDigest === undefined ||
+    invalidationReason === undefined ||
+    invalidatedAt === undefined ||
+    invalidatedBy === undefined ||
+    cases === undefined
+  ) {
+    return undefined;
+  }
+
+  return {
+    schemaVersion: schemaVersion as typeof OBSERVATION_QUALITY_CORPUS_MANIFEST_SCHEMA_VERSION,
+    protocolVersion: protocolVersion as typeof OBSERVATION_QUALITY_BENCHMARK_PROTOCOL_VERSION,
+    benchmarkCorpusId,
+    annotationSelectionIndependencePolicy:
+      annotationSelectionIndependencePolicy as ObservationQualityCorpusAnnotationSelectionIndependencePolicy,
+    freezeState: freezeState as ObservationQualityCorpusFreezeState,
+    sourceManifestRef,
+    sourceManifestDigest,
+    createdAt,
+    createdBy,
+    frozenAt,
+    frozenBy,
+    manifestDigest,
+    invalidationReason,
+    invalidatedAt,
+    invalidatedBy,
+    cases,
+  };
+}
+
+export function ingestObservationQualityCorpusManifest(
+  value: unknown,
+): ObservationQualityCorpusIngestionResult {
+  const issues: string[] = [];
+  const manifest = ingestObservationQualityCorpusManifestObject(value, issues);
+  if (manifest === undefined) {
+    return ingestionFailure(issues);
+  }
+
+  const validation = validateObservationQualityCorpusManifest(manifest);
+  if (!validation.ok) {
+    return ingestionFailure([...validation.issues]);
+  }
+
+  return ingestionSuccess(manifest);
 }
 
 function validateObservationQualityCorpusCaseEntry(
@@ -690,6 +1214,12 @@ function validateObservationQualityCorpusCaseEntry(
       ),
     );
   }
+  if (!nonEmptyText(entry.annotatedBy)) {
+    issues.push(caseIssue(index, "annotatedBy", "must be a non-empty string"));
+  }
+  if (!nonEmptyText(entry.annotatedAt)) {
+    issues.push(caseIssue(index, "annotatedAt", "must be a non-empty string"));
+  }
   if (!nonEmptyText(entry.selectedBy)) {
     issues.push(caseIssue(index, "selectedBy", "must be a non-empty string"));
   }
@@ -730,6 +1260,10 @@ export function evaluateObservationQualityCorpusCategoryCoverage(
   };
 }
 
+/**
+ * Validates a trusted typed manifest object.
+ * Use ingestObservationQualityCorpusManifest for arbitrary runtime payloads.
+ */
 export function validateObservationQualityCorpusManifest(
   manifest: ObservationQualityCorpusManifest,
 ): ObservationQualityCorpusValidationResult {
@@ -757,6 +1291,18 @@ export function validateObservationQualityCorpusManifest(
       manifestIssue(
         "benchmarkCorpusId",
         "must be a non-empty bounded identifier using letters, digits, ., _, or -",
+      ),
+    );
+  }
+  if (
+    !isObservationQualityCorpusAnnotationSelectionIndependencePolicy(
+      manifest.annotationSelectionIndependencePolicy,
+    )
+  ) {
+    issues.push(
+      manifestIssue(
+        "annotationSelectionIndependencePolicy",
+        `must be one of ${OBSERVATION_QUALITY_CORPUS_ANNOTATION_SELECTION_INDEPENDENCE_POLICIES.join(", ")}`,
       ),
     );
   }
@@ -884,6 +1430,18 @@ export function validateObservationQualityCorpusManifest(
     if (!validation.ok) {
       issues.push(...validation.issues);
     }
+    if (
+      manifest.annotationSelectionIndependencePolicy === "REQUIRED" &&
+      entry.selectedBy === entry.annotatedBy
+    ) {
+      issues.push(
+        caseIssue(
+          index,
+          "annotatedBy",
+          "must differ from selectedBy when annotationSelectionIndependencePolicy is REQUIRED",
+        ),
+      );
+    }
   });
 
   const slotIds = manifest.cases
@@ -968,11 +1526,16 @@ function digestProjectionCase(entry: ObservationQualityCorpusCaseEntry): Record<
     observationOpportunityState: entry.observationOpportunityState,
     observationOpportunityTags: stableSortedStrings(entry.observationOpportunityTags),
     nearDuplicateReview: entry.nearDuplicateReview,
+    annotatedBy: entry.annotatedBy,
+    annotatedAt: entry.annotatedAt,
     selectedBy: entry.selectedBy,
     selectedAt: entry.selectedAt,
   };
 }
 
+/**
+ * manifestDigest binds governed corpus content and provenance, not lifecycle state.
+ */
 export function canonicalizeObservationQualityCorpusManifestForDigest(
   manifest: ObservationQualityCorpusManifest,
 ): string {
@@ -980,6 +1543,7 @@ export function canonicalizeObservationQualityCorpusManifestForDigest(
     schemaVersion: manifest.schemaVersion,
     protocolVersion: manifest.protocolVersion,
     benchmarkCorpusId: manifest.benchmarkCorpusId,
+    annotationSelectionIndependencePolicy: manifest.annotationSelectionIndependencePolicy,
     sourceManifestRef: manifest.sourceManifestRef,
     sourceManifestDigest: manifest.sourceManifestDigest,
     createdAt: manifest.createdAt,
@@ -1024,4 +1588,18 @@ export function evaluateObservationQualityFrozenCorpusGate(
     satisfied: issues.length === 0,
     issues,
   };
+}
+
+export function evaluateObservationQualityFrozenCorpusGatePayload(
+  value: unknown,
+): ObservationQualityFrozenCorpusGateResult {
+  const ingestion = ingestObservationQualityCorpusManifest(value);
+  if (!ingestion.ok) {
+    return {
+      satisfied: false,
+      issues: [...ingestion.issues],
+    };
+  }
+
+  return evaluateObservationQualityFrozenCorpusGate(ingestion.manifest);
 }
