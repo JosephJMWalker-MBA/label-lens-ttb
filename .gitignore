@@ -27,3 +27,6 @@ npm-debug.log*
 # OS / editor
 .DS_Store
 *.tsbuildinfo
+
+# Local pilot workspaces (raw photos, derivatives, source maps, human/machine results)
+.local/
