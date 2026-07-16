@@ -4,7 +4,7 @@
 - Date opened: 2026-07-16
 - Scope: Causal honesty, blinded evaluation boundaries, diagnostic attribution, and governance of the OCR/vision evidence pipeline
 - Planned review inputs: 6 rounds
-- Inputs received: 1 of 6
+- Inputs received: 2 of 6
 
 ## Purpose
 
@@ -29,11 +29,15 @@ Each feedback round is preserved as a bounded review artifact.
 ## Received feedback
 
 1. [`feedback-01-causal-honesty.md`](feedback-01-causal-honesty.md) — prefix-marginal causal language, strict runtime manifest validation, and primary-versus-contributing diagnostic attribution.
-2. Pending.
+2. [`feedback-02-evidence-producing-architecture.md`](feedback-02-evidence-producing-architecture.md) — evidence-producing role separation, honest abstention, stateless execution, blinding, authorization as code, and a preserved disagreement over recovery-pass causal claims.
 3. Pending.
 4. Pending.
 5. Pending.
 6. Pending.
+
+## Cross-round disagreement currently preserved
+
+Round 2 treats a pass with zero corrected selections under prefix-state marginal attribution as mathematically useless. Round 1 argues that the same measurement establishes only zero immediate selected-field change at that prefix, not counterfactual dispensability. The final review must determine what additional ablation, permutation, downstream-dependence, or operational-cost evidence is required before pruning language or action is justified.
 
 ## Planned final artifacts
 
