@@ -521,7 +521,10 @@ describe("decision clarity diagnostic", () => {
         trial.sequenceNumber === 3
           ? withLaunchArgs(
               launchSpec,
-              decisionClarityBehaviorArgs({ responseVariant: "assistant-malformed-json" }),
+              decisionClarityBehaviorArgs({
+                responseVariant: "assistant-malformed-json",
+                reportedCompletionLatencyMs: 29,
+              }),
             )
           : launchSpec,
     });
@@ -544,7 +547,10 @@ describe("decision clarity diagnostic", () => {
         trial.sequenceNumber === 3
           ? withLaunchArgs(
               launchSpec,
-              decisionClarityBehaviorArgs({ responseVariant: "invalid-grid" }),
+              decisionClarityBehaviorArgs({
+                responseVariant: "invalid-grid",
+                reportedCompletionLatencyMs: 29,
+              }),
             )
           : launchSpec,
     });
