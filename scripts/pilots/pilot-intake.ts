@@ -111,7 +111,10 @@ function validate(manifestPath: string, rawDir: string, derivDir?: string): void
   const issues = [...result.issues];
 
   for (const entry of manifest.cases) {
-    const rawPath = join(rawDir, `${entry.pilotId}.${entry.mediaType === "image/png" ? "png" : "jpeg"}`);
+    const rawPath = join(
+      rawDir,
+      `${entry.pilotId}.${entry.mediaType === "image/png" ? "png" : "jpeg"}`,
+    );
     if (!existsSync(rawPath)) {
       issues.push(`${entry.pilotId}: raw file missing at ${basename(rawPath)}`);
       continue;
@@ -128,7 +131,9 @@ function validate(manifestPath: string, rawDir: string, derivDir?: string): void
   }
 
   if (issues.length > 0) fail(`validation FAILED:\n${issues.join("\n")}`);
-  console.log(`validation PASSED: ${manifest.cases.length} cases, raw bytes unmodified, no expected values.`);
+  console.log(
+    `validation PASSED: ${manifest.cases.length} cases, raw bytes unmodified, no expected values.`,
+  );
 }
 
 function counterbalance(manifestPath: string, seedArg: string, outPath: string): void {

@@ -70,16 +70,23 @@ describe("pilot intake authorization + schema", () => {
   it("fails when a numbered ID is missing or duplicated", () => {
     const missing = manifest();
     const dropped = { ...missing, cases: missing.cases.slice(0, 23) };
-    expect(validatePilotManifest(dropped).issues.join("\n")).toMatch(/missing required pilotId pilot-wine-024/);
+    expect(validatePilotManifest(dropped).issues.join("\n")).toMatch(
+      /missing required pilotId pilot-wine-024/,
+    );
 
     const dup = manifest();
     const withDup = { ...dup, cases: [...dup.cases.slice(0, 23), caseEntry(1)] };
-    expect(validatePilotManifest(withDup).issues.join("\n")).toMatch(/duplicate pilotId pilot-wine-001/);
+    expect(validatePilotManifest(withDup).issues.join("\n")).toMatch(
+      /duplicate pilotId pilot-wine-001/,
+    );
   });
 
   it("flags duplicate source digests rather than accepting them silently", () => {
     const m = manifest();
-    const collided = { ...m, cases: [...m.cases.slice(0, 23), caseEntry(24, { sourceDigest: digest(1) })] };
+    const collided = {
+      ...m,
+      cases: [...m.cases.slice(0, 23), caseEntry(24, { sourceDigest: digest(1) })],
+    };
     expect(validatePilotManifest(collided).issues.join("\n")).toMatch(/duplicate sourceDigest/);
   });
 
@@ -92,7 +99,9 @@ describe("pilot intake authorization + schema", () => {
         ...m.cases.slice(1),
       ],
     };
-    expect(validatePilotManifest(bad).issues.join("\n")).toMatch(/EXCLUDED_WITH_REASON requires an explicit reason/);
+    expect(validatePilotManifest(bad).issues.join("\n")).toMatch(
+      /EXCLUDED_WITH_REASON requires an explicit reason/,
+    );
   });
 
   it("keeps excluded and pending cases represented in the denominator", () => {
@@ -100,8 +109,14 @@ describe("pilot intake authorization + schema", () => {
     const withDispositions = {
       ...m,
       cases: [
-        caseEntry(1, { intakeStatus: "EXCLUDED_WITH_REASON", exclusionOrPendingReason: "duplicate of pilot-wine-002" }),
-        caseEntry(2, { intakeStatus: "PENDING_HUMAN_DECISION", exclusionOrPendingReason: "beverage scope: cider" }),
+        caseEntry(1, {
+          intakeStatus: "EXCLUDED_WITH_REASON",
+          exclusionOrPendingReason: "duplicate of pilot-wine-002",
+        }),
+        caseEntry(2, {
+          intakeStatus: "PENDING_HUMAN_DECISION",
+          exclusionOrPendingReason: "beverage scope: cider",
+        }),
         ...m.cases.slice(2),
       ],
     };
@@ -114,8 +129,13 @@ describe("pilot intake authorization + schema", () => {
     const smuggled = { ...caseEntry(1), alcoholValue: "12.5", ocrText: "leaked" };
     expect(scanCaseForForbiddenKeys(smuggled, 0).length).toBeGreaterThanOrEqual(2);
     const m = manifest();
-    const contaminated = { ...m, cases: [smuggled as unknown as PilotCaseEntry, ...m.cases.slice(1)] };
-    expect(validatePilotManifest(contaminated).issues.join("\n")).toMatch(/forbidden expected-value/);
+    const contaminated = {
+      ...m,
+      cases: [smuggled as unknown as PilotCaseEntry, ...m.cases.slice(1)],
+    };
+    expect(validatePilotManifest(contaminated).issues.join("\n")).toMatch(
+      /forbidden expected-value/,
+    );
   });
 
   it("does not throw on a structurally malformed manifest", () => {

@@ -262,7 +262,10 @@ export function validatePilotManifest(manifest: PilotManifest): ValidationResult
   const digestOwners = new Map<string, string[]>();
   for (const entry of manifest.cases) {
     if (typeof entry.sourceDigest === "string" && SHA_256_HEX.test(entry.sourceDigest))
-      digestOwners.set(entry.sourceDigest, [...(digestOwners.get(entry.sourceDigest) ?? []), entry.pilotId]);
+      digestOwners.set(entry.sourceDigest, [
+        ...(digestOwners.get(entry.sourceDigest) ?? []),
+        entry.pilotId,
+      ]);
   }
   for (const [digest, owners] of digestOwners)
     if (owners.length > 1)
@@ -274,7 +277,10 @@ export function validatePilotManifest(manifest: PilotManifest): ValidationResult
   const derivativeRefs = new Map<string, number>();
   for (const entry of manifest.cases) {
     if (entry.derivative) {
-      derivativeRefs.set(entry.derivative.derivativeRef, (derivativeRefs.get(entry.derivative.derivativeRef) ?? 0) + 1);
+      derivativeRefs.set(
+        entry.derivative.derivativeRef,
+        (derivativeRefs.get(entry.derivative.derivativeRef) ?? 0) + 1,
+      );
     }
   }
   for (const [ref, count] of derivativeRefs)
@@ -337,7 +343,12 @@ export function generateCounterbalancedOrder(
     sequence.push({ step: sequence.length + 1, block: 1, pilotId: id, mode: firstModeByCase[id] }),
   );
   blockTwoOrder.forEach((id) =>
-    sequence.push({ step: sequence.length + 1, block: 2, pilotId: id, mode: opposite(firstModeByCase[id]) }),
+    sequence.push({
+      step: sequence.length + 1,
+      block: 2,
+      pilotId: id,
+      mode: opposite(firstModeByCase[id]),
+    }),
   );
 
   return {
