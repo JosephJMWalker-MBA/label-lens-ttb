@@ -19,7 +19,9 @@ is not implemented is stated explicitly below.
 
 ## 2. Live demo
 
-**<https://label-lens-ttb.onrender.com>**
+**<https://ttb-test.com>**
+
+Secondary deployment: <https://label-lens-ttb.onrender.com>
 
 On the deployed demo you can:
 
@@ -38,7 +40,7 @@ On the deployed demo you can:
 
 ## 3. Five-minute reviewer path
 
-1. Open the [live demo](https://label-lens-ttb.onrender.com).
+1. Open the [live demo](https://ttb-test.com).
 2. Click **Load verified M Cellars sample** (or upload a wine-label PNG/JPEG and enter brand + alcohol).
 3. Read the **concise summary**: detected brand, detected alcohol, count needing review, one suggested next step.
 4. Expand **Evidence details**, **Regulatory checks**, and **Technical provenance** to see raw values, findings, geometry, and versions.
@@ -174,7 +176,7 @@ Derived from the code (`src/server/append-token.ts`, `src/app/api/health/route.t
 | `LABEL_LENS_APPEND_SIGNING_KEY` | **Required in production** | Secret used to HMAC-sign the per-result append-authorization token | Optional — a process-local key is used automatically when unset (non-production) | Must be set to a ≥ 32-char secret (e.g. `openssl rand -hex 32`); otherwise pre-checks return HTTP 500. Set only in the platform secret store |
 | `NODE_ENV` | Set by platform | Selects production vs. development behavior (incl. the signing-key fallback) | Usually `development` | `production` |
 | `PORT` | Set by platform | Port the server binds to | Defaults to `3000` | Provided by the host |
-| `LABEL_LENS_BUILD_COMMIT` | Optional | Stamps the running commit into export provenance | Unset is fine | Optional |
+| `LABEL_LENS_BUILD_COMMIT` | **Required for auditable Hostinger exports** | Stamps the running commit into export provenance | Unset is fine | Set to the deployed commit SHA on Hostinger; Render can fall back to `RENDER_GIT_COMMIT` |
 | `LABEL_LENS_OCR_ASSET_DIR` | Optional | Override the OCR language-data directory | Not needed (resolves deployment-relative) | Not needed |
 | `LABEL_LENS_OCR_CORE_DIR` | Optional | Override the OCR WASM-core directory | Not needed (resolves deployment-relative) | Not needed |
 
@@ -182,14 +184,24 @@ Derived from the code (`src/server/append-token.ts`, `src/app/api/health/route.t
 
 ## 9. Deployment
 
-Deployed on **Render** (not Vercel) from the committed [`render.yaml`](render.yaml)
-blueprint; details in [`docs/deployment.md`](docs/deployment.md).
+The primary public deployment runs on **Hostinger Web Apps** at
+<https://ttb-test.com>, connected to the GitHub `main` branch with the Next.js
+preset and Node 22.x. Details and the full production checklist are in
+[`docs/deployment.md`](docs/deployment.md).
 
-- **Public demo:** <https://label-lens-ttb.onrender.com>
-- **Build / start:** `npm ci --include=dev && npm run build` then `npm run start`. (`--include=dev` is required because `NODE_ENV=production` otherwise omits the TypeScript/build toolchain that lives in `devDependencies`.)
+- **Primary public demo:** <https://ttb-test.com>
+- **Secondary Render demo:** <https://label-lens-ttb.onrender.com>
+- **Build / start:** `npm ci --include=dev && npm run build` then `npm run start`.
 - **Runtime:** a persistent Node 22 server with `output: "standalone"` (not static hosting, not short-lived serverless — OCR runs in a Node worker); ~512 MB RAM; glibc for `sharp`.
-- **Required config:** `LABEL_LENS_APPEND_SIGNING_KEY` (secret). `GET /api/health` reports `appendSigningKeyConfigured`.
+- **Required secret:** `LABEL_LENS_APPEND_SIGNING_KEY`. `GET /api/health` reports `appendSigningKeyConfigured`.
+- **Required Hostinger provenance:** `LABEL_LENS_BUILD_COMMIT` set to the deployed commit SHA.
 - **Ephemeral by design:** uploads are processed in memory and **never written to disk**; nothing is persisted between requests.
+
+A production smoke test on 2026-07-17 confirmed real server-side OCR, deterministic
+rule execution, honest `AMBIGUOUS` / `NEEDS_REVIEW` handling, and successful JSON
+and HTML downloads. It also exposed the missing deployed-commit provenance when
+`LABEL_LENS_BUILD_COMMIT` is unset; see the deployment document for the corrective
+configuration and remaining manual-upload test.
 
 The standalone build is exercised by `npm run smoke:relocation`, which relocates
 the standalone output outside the repo and drives a real OCR request — so the
@@ -233,7 +245,7 @@ The UI keeps these layers distinct:
 - **Preserving uncertainty** avoids false certainty but can **route more results to a human**, rather than auto-clearing them.
 - **Deterministic rules** are explainable and auditable but cover **only the implemented evidence slices** (brand + alcohol); most regulatory checks are intentionally `not_run`.
 - **A single-image prototype** proves the review contract but **not batch throughput** or queueing.
-- The **public demo differs from a secure government environment** (no auth, ephemeral, free tier that may cold-start).
+- The **public demo differs from a secure government environment** (no auth, ephemeral processing, public custom domain).
 - **Artwork alone cannot establish every regulatory fact** (actual alcohol content, class/type, omission eligibility) — these stay `not_run` by design.
 - **Browser downloads** were recently hardened ([PR #60](https://github.com/JosephJMWalker-MBA/label-lens-ttb/pull/60)); the Chromium path is covered by Playwright, but **cross-browser (Firefox/Safari) live verification is still recommended** since the original symptom was environment-dependent.
 
@@ -332,8 +344,8 @@ architectural boundaries, the production build, the standalone relocation smoke,
 and the real browser workflow. Exact pass counts are intentionally **not** hardcoded
 here, since they change as the suite grows — run the commands to see current results.
 
-The system is **live** at <https://label-lens-ttb.onrender.com>. This repository is
-a hiring-assignment submission; nothing here should be read as a formally accepted,
+The system is **live** at <https://ttb-test.com>. This repository is a
+hiring-assignment submission; nothing here should be read as a formally accepted,
 certified, or complete deliverable.
 
 > *"Let all things be done decently and in order." — 1 Corinthians 14:40*
