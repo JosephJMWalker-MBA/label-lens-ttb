@@ -76,12 +76,28 @@ export function resolveCorePath(): string {
   );
 }
 
-async function resolveWorkerPath(): Promise<string> {
+async function inspectWorkerPath(): Promise<void> {
   const mod = await import("tesseract.js/src/worker/node/defaultOptions.js");
   const options = (mod.default ?? mod) as { workerPath?: unknown };
   const workerPath = typeof options.workerPath === "string" ? options.workerPath : "";
-  if (workerPath && existsSync(workerPath)) return workerPath;
+  if (workerPath && existsSync(workerPath)) return;
   throw new Error("Local Tesseract worker script could not be resolved.");
+}
+
+async function inspectWorkerPathForDiagnostics(
+  diagnostics: PrecheckDiagnosticTrace,
+): Promise<void> {
+  try {
+    await inspectWorkerPath();
+    diagnostics.reach("ocr-worker-script-resolved", undefined, { once: true });
+  } catch (cause) {
+    // This observes Tesseract internals only. createWorker remains authoritative.
+    diagnostics.probeUnavailable("ocr-worker-script-resolved", {
+      layer: "ocr",
+      code: "OCR_WORKER_SCRIPT_PROBE_UNAVAILABLE",
+      issues: [cause instanceof Error ? cause.message : String(cause)],
+    });
+  }
 }
 
 export interface OcrEngine {
@@ -134,17 +150,7 @@ export async function createLocalOcrEngine(
   }
   diagnostics?.reach("ocr-core-resolved", undefined, { once: true });
 
-  try {
-    await resolveWorkerPath();
-  } catch (cause) {
-    diagnostics?.fail("ocr-worker-script-resolved", {
-      layer: "ocr",
-      code: "OCR_WORKER_SCRIPT_UNAVAILABLE",
-      issues: [cause instanceof Error ? cause.message : String(cause)],
-    });
-    throw cause;
-  }
-  diagnostics?.reach("ocr-worker-script-resolved", undefined, { once: true });
+  if (diagnostics) await inspectWorkerPathForDiagnostics(diagnostics);
 
   // OEM 1 = LSTM only. All asset paths are local; nothing is downloaded.
   let worker;

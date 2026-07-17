@@ -73,12 +73,42 @@ describe("pre-check diagnostic tracing", () => {
       "file:///private/tmp/work/input.jpeg",
       "C:\\private\\worker.js",
       "node_modules/tesseract.js/src/worker.js",
+      "Error: failed\n    at worker (/home/operator/project/worker.js:12:3)",
       ...Array.from({ length: 8 }, (_, index) => `${index}-${"x".repeat(300)}`),
     ];
 
     const sanitized = sanitizePrecheckDiagnosticIssues(issues);
     expect(sanitized).toHaveLength(8);
     expect(sanitized.join(" ")).not.toMatch(/\/private\/|node_modules|C:\\private/);
+    expect(sanitized.join(" ")).not.toMatch(/\/home\/|\n|\r|at worker/);
     expect(Math.max(...sanitized.map((issue) => issue.length))).toBeLessThanOrEqual(240);
+  });
+
+  it("never emits request declarations, image bytes, or unrelated secret values", () => {
+    process.env.LABEL_LENS_PRECHECK_DIAGNOSTICS = "1";
+    const writes: string[] = [];
+    vi.spyOn(process.stderr, "write").mockImplementation((chunk) => {
+      writes.push(String(chunk));
+      return true;
+    });
+
+    const declaredBrand = "DO-NOT-LOG-BRAND";
+    const declaredAlcohol = "DO-NOT-LOG-ALCOHOL";
+    const imageBytes = "DO-NOT-LOG-IMAGE-BYTES";
+    const secret = "DO-NOT-LOG-SECRET";
+    const trace = createPrecheckDiagnosticTrace();
+    trace?.recordSource({ sha256: "b".repeat(64), mediaType: "image/jpeg", byteSize: 99 });
+    trace?.probeUnavailable("ocr-worker-script-resolved", {
+      layer: "ocr",
+      code: "OCR_WORKER_SCRIPT_PROBE_UNAVAILABLE",
+      issues: ["bounded probe failure"],
+    });
+
+    const output = writes.join("\n");
+    expect(output).not.toContain(declaredBrand);
+    expect(output).not.toContain(declaredAlcohol);
+    expect(output).not.toContain(imageBytes);
+    expect(output).not.toContain(secret);
+    expect(output).not.toMatch(/\/Users\/|\/private\/|node_modules|\n\s+at\s/);
   });
 });

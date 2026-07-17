@@ -68,7 +68,7 @@ interface DiagnosticErrorInfo {
 interface DiagnosticEvent {
   kind: "precheck-diagnostic";
   runId: string;
-  status: "reached" | "failed";
+  status: "reached" | "failed" | "probe-unavailable";
   boundary: PrecheckDiagnosticBoundary;
   elapsedMs: number;
   source?: DiagnosticSourceIdentity;
@@ -92,6 +92,10 @@ export interface PrecheckDiagnosticTrace {
     boundary: PrecheckDiagnosticBoundary,
     error: { layer: PrecheckDiagnosticLayer; code: string; issues?: string[] },
     detail?: PrecheckDiagnosticDetail,
+  ): void;
+  probeUnavailable(
+    boundary: PrecheckDiagnosticBoundary,
+    error: { layer: PrecheckDiagnosticLayer; code: string; issues?: string[] },
   ): void;
 }
 
@@ -168,8 +172,23 @@ class DiagnosticTrace implements PrecheckDiagnosticTrace {
     });
   }
 
+  probeUnavailable(
+    boundary: PrecheckDiagnosticBoundary,
+    error: { layer: PrecheckDiagnosticLayer; code: string; issues?: string[] },
+  ): void {
+    this.emit({
+      status: "probe-unavailable",
+      boundary,
+      error: {
+        layer: error.layer,
+        code: error.code,
+        issues: sanitizeIssues(error.issues ?? []),
+      },
+    });
+  }
+
   private emit(input: {
-    status: "reached" | "failed";
+    status: "reached" | "failed" | "probe-unavailable";
     boundary: PrecheckDiagnosticBoundary;
     detail?: PrecheckDiagnosticDetail;
     error?: DiagnosticErrorInfo;
@@ -193,6 +212,7 @@ export function sanitizePrecheckDiagnosticIssues(issues: string[]): string[] {
   return issues
     .map((issue) =>
       issue
+        .replace(/\r?\n[\s\S]*$/, "")
         .replace(ABSOLUTE_PATH_RE, "<path>")
         .replace(NODE_MODULE_PATH_RE, "<path>")
         .replace(/\s+/g, " ")
