@@ -343,9 +343,6 @@ function isIsoTimestamp(v: unknown): v is string {
 function isNonNegNumber(v: unknown): v is number {
   return typeof v === "number" && Number.isFinite(v) && v >= 0;
 }
-function beforeIfSet(a: string, b: string | null): boolean {
-  return b === null || Date.parse(a) < Date.parse(b);
-}
 
 function checkUnknownKeys(
   obj: Record<string, unknown>,
@@ -503,13 +500,67 @@ function validateDeclaredValue(
   }
 }
 
+type LifecycleTimestamps = Pick<
+  DeclarationManifest,
+  "randomizationTimestamp" | "reviewerExposureTimestamp" | "machineExecutionTimestamp"
+>;
+
+/**
+ * The one governed declaration-intake timestamp chain, returned as issues so
+ * validation and the completeness predicate share a single source of truth:
+ *   intakeStartTimestamp <= intakeCompletionTimestamp <= recordedTimestamp
+ *   < every non-null lifecycle timestamp.
+ * Each rule only fires when the timestamps it compares are valid ISO strings;
+ * invalid lifecycle strings are reported separately at the manifest level.
+ */
+export function governedTimestampChainIssues(
+  entry: DeclarationEntry,
+  manifest: LifecycleTimestamps,
+): string[] {
+  const issues: string[] = [];
+  const start = entry.timing.intakeStartTimestamp;
+  const completion = entry.timing.intakeCompletionTimestamp;
+  const recorded = entry.recordedTimestamp;
+  if (
+    isIsoTimestamp(start) &&
+    isIsoTimestamp(completion) &&
+    Date.parse(completion) < Date.parse(start)
+  )
+    issues.push("timing.intakeCompletionTimestamp is before intakeStartTimestamp");
+  if (
+    isIsoTimestamp(completion) &&
+    isIsoTimestamp(recorded) &&
+    Date.parse(recorded) < Date.parse(completion)
+  )
+    issues.push("recordedTimestamp is before timing.intakeCompletionTimestamp");
+  for (const [name, ts] of [
+    ["randomizationTimestamp", manifest.randomizationTimestamp],
+    ["reviewerExposureTimestamp", manifest.reviewerExposureTimestamp],
+    ["machineExecutionTimestamp", manifest.machineExecutionTimestamp],
+  ] as const) {
+    if (!isIsoTimestamp(ts)) continue;
+    if (isIsoTimestamp(recorded) && !(Date.parse(recorded) < Date.parse(ts)))
+      issues.push(`recordedTimestamp must be before ${name}`);
+    if (isIsoTimestamp(completion) && !(Date.parse(completion) < Date.parse(ts)))
+      issues.push(`timing.intakeCompletionTimestamp must be before ${name}`);
+  }
+  return issues;
+}
+
+function isGovernedTimestampChainOk(
+  entry: DeclarationEntry,
+  manifest: LifecycleTimestamps,
+): boolean {
+  return governedTimestampChainIssues(entry, manifest).length === 0;
+}
+
 /**
  * One governed predicate for provenance-complete declarations. PRESENT values
  * alone are never enough — a complete declaration must carry traceable,
  * non-forbidden source provenance, recorded-by identity/role, all timestamps,
- * every component timing (explicit non-negative values, 0 allowed), and correct
- * ordering before randomization/reviewer/machine. Used by validation, primary
- * eligibility, and accounting so the three cannot disagree.
+ * every component timing (explicit non-negative values, 0 allowed), and the full
+ * governed timestamp chain (start <= completion <= recorded < each lifecycle).
+ * Used by validation, primary eligibility, and accounting so they cannot disagree.
  */
 export function isDeclarationProvenanceComplete(
   entry: DeclarationEntry,
@@ -543,9 +594,6 @@ export function isDeclarationProvenanceComplete(
   const t = entry.timing;
   if (!isIsoTimestamp(t.intakeStartTimestamp) || !isIsoTimestamp(t.intakeCompletionTimestamp))
     return false;
-  // Interval order: completion must not precede start (moved in so accounting
-  // and validation cannot disagree).
-  if (Date.parse(t.intakeCompletionTimestamp) < Date.parse(t.intakeStartTimestamp)) return false;
   if (
     !isNonNegNumber(t.sourceSearchMs) ||
     !isNonNegNumber(t.transcriptionMs) ||
@@ -556,10 +604,10 @@ export function isDeclarationProvenanceComplete(
   // Burden consistency: total must be at least the sum of the three governed
   // components (permitted overhead is allowed above the sum, never below it).
   if (t.totalIntakeBurdenMs < t.sourceSearchMs + t.transcriptionMs + t.verificationMs) return false;
-  if (!beforeIfSet(entry.recordedTimestamp, manifest.randomizationTimestamp)) return false;
-  if (!beforeIfSet(entry.recordedTimestamp, manifest.reviewerExposureTimestamp)) return false;
-  if (!beforeIfSet(entry.recordedTimestamp, manifest.machineExecutionTimestamp)) return false;
-  return true;
+  // One governed timestamp chain — used identically by validation, primary
+  // eligibility, and accounting so they cannot disagree:
+  //   start <= completion <= recorded < each non-null lifecycle timestamp.
+  return isGovernedTimestampChainOk(entry, manifest);
 }
 
 function validateEntry(entry: DeclarationEntry, manifest: DeclarationManifest): string[] {
@@ -627,12 +675,7 @@ function validateEntry(entry: DeclarationEntry, manifest: DeclarationManifest): 
     push("timing.intakeStartTimestamp invalid");
   if (t.intakeCompletionTimestamp !== null && !isIsoTimestamp(t.intakeCompletionTimestamp))
     push("timing.intakeCompletionTimestamp invalid");
-  if (
-    isIsoTimestamp(t.intakeStartTimestamp) &&
-    isIsoTimestamp(t.intakeCompletionTimestamp) &&
-    Date.parse(t.intakeCompletionTimestamp) < Date.parse(t.intakeStartTimestamp)
-  )
-    push("timing.intakeCompletionTimestamp is before intakeStartTimestamp");
+  // (interval order start<=completion is enforced by the governed chain below.)
   // Burden consistency: total must be at least the sum of the three components.
   if (
     isNonNegNumber(t.sourceSearchMs) &&
@@ -650,15 +693,9 @@ function validateEntry(entry: DeclarationEntry, manifest: DeclarationManifest): 
   if (entry.sourceAccessDate !== null && !isIsoTimestamp(entry.sourceAccessDate))
     push("sourceAccessDate invalid");
 
-  const stamp = entry.recordedTimestamp ?? entry.timing.intakeCompletionTimestamp;
-  if (isIsoTimestamp(stamp)) {
-    if (!beforeIfSet(stamp, manifest.randomizationTimestamp))
-      push("declaration timestamp must be before randomizationTimestamp");
-    if (!beforeIfSet(stamp, manifest.reviewerExposureTimestamp))
-      push("declaration timestamp must be before reviewerExposureTimestamp");
-    if (!beforeIfSet(stamp, manifest.machineExecutionTimestamp))
-      push("declaration timestamp must be before machineExecutionTimestamp");
-  }
+  // The one governed timestamp chain (start <= completion <= recorded < each
+  // lifecycle) — identical to the completeness predicate so they cannot disagree.
+  for (const chainIssue of governedTimestampChainIssues(entry, manifest)) push(chainIssue);
 
   if (entry.declarationSourceType !== null && !SOURCE_TYPE_SET.has(entry.declarationSourceType))
     push("declarationSourceType invalid");
@@ -755,6 +792,17 @@ export function validateDeclarationManifest(input: unknown): ValidationResult {
     issues.push(
       `entries length ${manifest.entries.length} must equal expectedCandidateCount ${manifest.expectedCandidateCount}`,
     );
+  // preparedAt and each non-null lifecycle timestamp must be actual timestamps.
+  if (!isIsoTimestamp(manifest.preparedAt)) issues.push("preparedAt must be a valid timestamp");
+  for (const name of [
+    "randomizationTimestamp",
+    "reviewerExposureTimestamp",
+    "machineExecutionTimestamp",
+  ] as const) {
+    const ts = manifest[name];
+    if (ts !== null && !isIsoTimestamp(ts))
+      issues.push(`${name} must be null or a valid timestamp`);
+  }
 
   for (const entry of manifest.entries) issues.push(...validateEntry(entry, manifest));
 
@@ -1081,4 +1129,28 @@ export function parseCandidateInputs(raw: unknown): CandidateParseResult {
       });
   });
   return { ok: issues.length === 0, issues, candidates };
+}
+
+// ---- Bounded JSON file reading (every CLI input path) ---------------------
+
+export type JsonReadResult = { ok: true; value: unknown } | { ok: false; error: string };
+
+/**
+ * Bounded file read + JSON parse: never emits an uncaught exception or stack.
+ * Missing/unreadable files and malformed JSON syntax return a concise governed
+ * error. Used for manifests, candidates, and trusted inventories alike.
+ */
+export function readJsonFile(path: string): JsonReadResult {
+  let text: string;
+  try {
+    text = readFileSync(path, "utf8");
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code ?? "READ_ERROR";
+    return { ok: false, error: `cannot read ${path} (${code})` };
+  }
+  try {
+    return { ok: true, value: JSON.parse(text) as unknown };
+  } catch (err) {
+    return { ok: false, error: `invalid JSON in ${path}: ${(err as Error).message}` };
+  }
 }

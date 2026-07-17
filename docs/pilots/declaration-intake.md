@@ -84,13 +84,15 @@ validation, primary-blind eligibility, **and** accounting. A declaration is
 counted `declarationsComplete` only when it has PRESENT brand+alcohol, a valid
 non-forbidden source type/reference, source access date, recorded-by
 identity/role, recorded timestamp, transcription method, independence statement,
-intake start+completion timestamps, all four non-negative component timings, and
-correct ordering before randomization/reviewer/machine. It also enforces **timing
-consistency inside the predicate itself** so validation and accounting cannot
-disagree: `intakeCompletionTimestamp` must not precede `intakeStartTimestamp`, and
-`totalIntakeBurdenMs` must be **at least** the sum of source-search + transcription
-+ verification (overhead above the sum is permitted; a total below the sum is
-rejected). PRESENT values without that provenance are never counted complete.
+intake start+completion timestamps, and all four non-negative component timings.
+It enforces one **governed timestamp chain** — `intakeStartTimestamp <=
+intakeCompletionTimestamp <= recordedTimestamp < every non-null lifecycle
+timestamp (randomization / reviewer exposure / machine execution)` — and
+`totalIntakeBurdenMs >=` the sum of source-search + transcription + verification
+(overhead above the sum is permitted; a total below is rejected). The identical
+chain (`governedTimestampChainIssues`) is used by validation and accounting, so a
+declaration cannot be counted complete after any lifecycle boundary. PRESENT
+values without that provenance are never counted complete.
 
 ## Validation rules (fail-closed over untrusted JSON)
 
@@ -100,25 +102,34 @@ independent of eligibility state**; rejects unknown keys at every governed objec
 level; rejects arrays-for-objects and objects-for-primitives; **recursively**
 rejects run-001 / reviewer-answer / OCR / machine-result / adjudicator /
 expected-value keys at any depth. `candidates.json` is parsed the same way
-(`parseCandidateInputs`) before any skeleton is built. Plus: schema version; source-type
-enum; 64-hex source digest; non-empty-or-explicit-missing values; **supported
-alcohol syntax without changing exact text (bare numeric accepted, see below)**;
-governed normalization (no uncontrolled normalization); valid timestamps;
-non-negative intake durations; declaration timestamp before
-randomization/reviewer/machine; provenance-complete primary candidates; no
-forbidden provenance sources; unique run-002 case IDs; unique primary source-image
-membership; exposed/excluded cases barred from the primary pool; deterministic
-canonical serialization; stable per-entry and dual manifest seals; and
-case-count/accounting checks.
+(`parseCandidateInputs`) before any skeleton is built, and **every JSON input path
+is read through one bounded reader (`readJsonFile`)** so a missing/unreadable file
+or malformed JSON syntax returns a concise governed error rather than an uncaught
+exception or stack trace. Plus: schema version; source-type enum; 64-hex source
+digest; non-empty-or-explicit-missing values; **supported alcohol syntax without
+changing exact text (bare numeric accepted, see below)**; governed normalization
+(no uncontrolled normalization); `preparedAt` and each non-null lifecycle
+timestamp must be valid timestamps; non-negative intake durations; the governed
+timestamp chain; provenance-complete primary candidates; no forbidden provenance
+sources; unique run-002 case IDs; unique primary source-image membership;
+exposed/excluded cases barred from the primary pool; deterministic canonical
+serialization; stable per-entry and dual manifest seals; and case-count/accounting
+checks.
 
-## Source-byte integrity
+## Source verification — two exact, separate claims (never conflated)
 
-`verify-sources` recomputes SHA-256 from the actual bytes and checks byte size and
-media type (from magic bytes), either against files under an authorized root
-(`..` traversal, **symlink escape via canonical-real-path containment**, and
-missing files all rejected — an in-root symlink to an outside file is refused and
-the outside file is never read) or against a trusted
-preservation inventory (digest + byte size). The report is bounded and contains
+- **`verify-source-bytes <manifest> <authorized-root-dir> <out>`** — reads the
+  **actual source bytes** under an authorized root, recomputes SHA-256, checks
+  byte size, and sniffs media type from magic bytes. `..` traversal and **symlink
+  escape** are rejected via canonical-real-path containment (an in-root symlink to
+  an outside file is refused and the outside file is never read). Report `mode`:
+  `AUTHORIZED_ROOT_BYTES`.
+- **`verify-inventory-membership <manifest> <trusted-inventory.json> <out>`** —
+  proves **digest + byte-size membership only** against a trusted preservation
+  inventory. It does **not** read or sniff source bytes and is never described as
+  source-byte integrity. Report `mode`: `TRUSTED_INVENTORY_MEMBERSHIP`.
+
+Each report carries an explicit `mode` and `verifies` description and contains
 only relative refs — never absolute private paths.
 
 ## Alcohol input compatibility
@@ -147,7 +158,10 @@ $R validate   declarations/declaration-manifest.json
 $R accounting declarations/declaration-manifest.json manifests/candidate-accounting.json
 $R no-leakage declarations/declaration-manifest.json validation/no-leakage-report.json
 # verify source bytes against a trusted preservation inventory (or an authorized root dir)
-$R verify-sources declarations/declaration-manifest.json <inventory.json | authorized-root-dir> validation/source-integrity-report.json
+# actual-byte verification under an authorized root (recomputes sha256/size/media)
+$R verify-source-bytes declarations/declaration-manifest.json <authorized-root-dir> validation/source-byte-verification-report.json
+# separate digest+size membership against a trusted inventory (no byte reading)
+$R verify-inventory-membership declarations/declaration-manifest.json <trusted-inventory.json> validation/inventory-membership-report.json
 ```
 
 ## Boundary

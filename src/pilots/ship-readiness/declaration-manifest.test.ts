@@ -16,6 +16,7 @@ import {
   computeFullManifestDigest,
   createAuthorizedRootReader,
   eligibleMembershipFreezeAuthorized,
+  governedTimestampChainIssues,
   isDeclarationProvenanceComplete,
   isSafeSourceRelRef,
   isSupportedDeclaredAlcohol,
@@ -23,6 +24,7 @@ import {
   normalizeDeclaredBrand,
   parseCandidateInputs,
   pilotExecutionAuthorized,
+  readJsonFile,
   sniffMediaType,
   validateDeclarationManifest,
   verifySourceBytes,
@@ -721,5 +723,81 @@ describe("timing interval + burden consistency (predicate and validation agree)"
     expect(issuesOf(manifest([overSum]))).toMatch(
       /totalIntakeBurdenMs must be at least the sum of source-search \+ transcription \+ verification/,
     );
+  });
+});
+
+describe("governed declaration-intake timestamp chain", () => {
+  it("rejects intake completion after randomization in predicate, validation, and accounting", () => {
+    const e = primaryEntry(1, {
+      primaryBlindEligibilityState: "NON_BLIND_OPERATIONAL",
+      exclusionOrNonBlindReason: "exposed",
+      recordedTimestamp: "2026-07-16T00:06:00Z",
+      timing: { ...FULL_TIMING, intakeCompletionTimestamp: "2026-07-16T00:12:00Z" },
+    });
+    const m = manifest([e], { randomizationTimestamp: "2026-07-16T00:08:00Z" });
+    expect(isDeclarationProvenanceComplete(e, m)).toBe(false);
+    expect(computeCandidateAccounting(m).declarationsComplete).toBe(0);
+    expect(issuesOf(m)).toMatch(/intakeCompletionTimestamp must be before randomizationTimestamp/);
+  });
+
+  it("rejects intake completion after reviewer exposure", () => {
+    const e = primaryEntry(1, {
+      primaryBlindEligibilityState: "NON_BLIND_OPERATIONAL",
+      exclusionOrNonBlindReason: "exposed",
+      recordedTimestamp: "2026-07-16T00:06:00Z",
+      timing: { ...FULL_TIMING, intakeCompletionTimestamp: "2026-07-16T00:12:00Z" },
+    });
+    const m = manifest([e], { reviewerExposureTimestamp: "2026-07-16T00:08:00Z" });
+    expect(isDeclarationProvenanceComplete(e, m)).toBe(false);
+    expect(issuesOf(m)).toMatch(
+      /intakeCompletionTimestamp must be before reviewerExposureTimestamp/,
+    );
+  });
+
+  it("rejects recordedTimestamp before intake completion", () => {
+    const e = primaryEntry(1, {
+      recordedTimestamp: "2026-07-16T00:06:00Z", // before completion 00:10
+    });
+    expect(isDeclarationProvenanceComplete(e, manifest([e]))).toBe(false);
+    expect(governedTimestampChainIssues(e, manifest([e])).join()).toMatch(
+      /recordedTimestamp is before timing.intakeCompletionTimestamp/,
+    );
+    expect(issuesOf(manifest([e]))).toMatch(
+      /recordedTimestamp is before timing.intakeCompletionTimestamp/,
+    );
+  });
+
+  it("requires preparedAt and each lifecycle timestamp to be valid timestamps", () => {
+    expect(issuesOf({ ...manifest([pendingEntry(1)]), preparedAt: "not-a-date" })).toMatch(
+      /preparedAt must be a valid timestamp/,
+    );
+    expect(issuesOf({ ...manifest([pendingEntry(1)]), randomizationTimestamp: "soon" })).toMatch(
+      /randomizationTimestamp must be null or a valid timestamp/,
+    );
+    expect(
+      issuesOf({ ...manifest([pendingEntry(1)]), machineExecutionTimestamp: "later" }),
+    ).toMatch(/machineExecutionTimestamp must be null or a valid timestamp/);
+  });
+});
+
+describe("bounded JSON reading (every CLI input path)", () => {
+  it("returns a bounded governed error for malformed JSON and missing files without throwing", () => {
+    const dir = mkdtempSync(join(tmpdir(), "json-"));
+    const badPath = join(dir, "bad.json");
+    writeFileSync(badPath, "{ not: valid json ");
+    expect(() => readJsonFile(badPath)).not.toThrow();
+    const bad = readJsonFile(badPath);
+    expect(bad.ok).toBe(false);
+    if (!bad.ok) expect(bad.error).toMatch(/invalid JSON in .*bad\.json/);
+
+    const missing = readJsonFile(join(dir, "does-not-exist.json"));
+    expect(missing.ok).toBe(false);
+    if (!missing.ok) expect(missing.error).toMatch(/cannot read .*ENOENT/);
+
+    const goodPath = join(dir, "good.json");
+    writeFileSync(goodPath, JSON.stringify({ a: 1 }));
+    const good = readJsonFile(goodPath);
+    expect(good.ok).toBe(true);
+    if (good.ok) expect(good.value).toEqual({ a: 1 });
   });
 });
