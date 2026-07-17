@@ -18,7 +18,6 @@
  * Run with: npx vite-node --config vitest.config.ts scripts/pilots/declaration-intake.ts <cmd> ...
  */
 import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { join, resolve, sep } from "node:path";
 
 import {
   DECLARATION_MANIFEST_SCHEMA_VERSION,
@@ -28,14 +27,13 @@ import {
   computeDeclarationInputDigest,
   computeEntryDigest,
   computeFullManifestDigest,
-  isSafeSourceRelRef,
+  createAuthorizedRootReader,
+  parseCandidateInputs,
   validateDeclarationManifest,
   verifySourcesAgainstInventory,
   verifySourcesWithReader,
-  type DeclarationEligibilityState,
   type DeclarationEntry,
   type DeclarationManifest,
-  type DeclarationMediaType,
   type TrustedInventoryRecord,
 } from "../../src/pilots/ship-readiness/declaration-manifest.ts";
 
@@ -55,20 +53,11 @@ function loadValidManifest(path: string): DeclarationManifest {
   return raw as DeclarationManifest;
 }
 
-interface CandidateInput {
-  run002CaseId: string;
-  sourceImageRef: string;
-  sourceImageSha256: string;
-  sourceMediaType: DeclarationMediaType;
-  sourceByteSize: number;
-  priorPilotIdentity: string | null;
-  eligibility: DeclarationEligibilityState;
-  reason?: string | null;
-}
-
 /** Build a pre-declaration skeleton: no declared values, provenance pending. */
 function skeleton(candidatesPath: string, outPath: string): void {
-  const candidates = readJson<CandidateInput[]>(candidatesPath);
+  const parsed = parseCandidateInputs(readJson<unknown>(candidatesPath));
+  if (!parsed.ok) fail(`candidates invalid:\n${parsed.issues.join("\n")}`);
+  const candidates = parsed.candidates;
   const entries: DeclarationEntry[] = candidates.map((c) => {
     const entry: DeclarationEntry = {
       runId: "ship-readiness-002",
@@ -181,16 +170,10 @@ function verifySources(manifestPath: string, rootOrInventory: string, outPath: s
     }));
     report = verifySourcesAgainstInventory(manifest, records);
   } else {
-    const root = resolve(rootOrInventory);
-    if (!existsSync(root) || !statSync(root).isDirectory())
+    if (!existsSync(rootOrInventory) || !statSync(rootOrInventory).isDirectory())
       fail(`authorized root is not a directory: ${rootOrInventory}`);
-    report = verifySourcesWithReader(manifest, (ref) => {
-      if (!isSafeSourceRelRef(ref)) return null;
-      const full = resolve(join(root, ref));
-      if (full !== root && !full.startsWith(root + sep)) return null; // path escape guard
-      if (!existsSync(full) || !statSync(full).isFile()) return null;
-      return new Uint8Array(readFileSync(full));
-    });
+    // Confined reader resists both `..` traversal and symlink escape (canonical-root containment).
+    report = verifySourcesWithReader(manifest, createAuthorizedRootReader(rootOrInventory));
   }
   // Bounded report: relative refs only, never absolute private paths.
   writeFileSync(

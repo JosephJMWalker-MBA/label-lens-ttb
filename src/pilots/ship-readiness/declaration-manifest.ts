@@ -22,6 +22,9 @@
  * Independent of the observation-quality (#114) and RDR-004 (#116) schemas.
  */
 
+import { existsSync, lstatSync, readFileSync, realpathSync } from "node:fs";
+import { join, resolve, sep } from "node:path";
+
 import { sha256Hex } from "@/pipeline/extractor/image-integrity";
 
 export const DECLARATION_MANIFEST_SCHEMA_VERSION =
@@ -371,12 +374,43 @@ function deepForbiddenScan(value: unknown, path: string, issues: string[]): void
 }
 
 /** Structural pass: returns issues and whether the shape is safe to run semantics on. */
+/**
+ * Exact runtime shape validation over untrusted JSON. Beyond container shape and
+ * unknown-key rejection, this type-checks EVERY governed primitive/null field at
+ * every level — manifest metadata and each entry — independent of eligibility
+ * state, so a pending/non-primary entry with a wrong-typed field fails closed.
+ */
 function validateShape(input: unknown): { issues: string[]; safe: boolean } {
   const issues: string[] = [];
   if (!isPlainObject(input)) return { issues: ["manifest must be a JSON object"], safe: false };
-  checkUnknownKeys(input, "", MANIFEST_KEYS, issues);
+  const str = (v: unknown, name: string) => {
+    if (typeof v !== "string") issues.push(`${name} must be a string`);
+  };
+  const strOrNull = (v: unknown, name: string) => {
+    if (v !== null && typeof v !== "string") issues.push(`${name} must be a string or null`);
+  };
+  const num = (v: unknown, name: string) => {
+    if (typeof v !== "number") issues.push(`${name} must be a number`);
+  };
+  const numOrNull = (v: unknown, name: string) => {
+    if (v !== null && typeof v !== "number") issues.push(`${name} must be a number or null`);
+  };
 
-  const entries = (input as Record<string, unknown>).entries;
+  checkUnknownKeys(input, "", MANIFEST_KEYS, issues);
+  // Manifest metadata types (independent of any entry state).
+  str(input.schemaVersion, "schemaVersion");
+  str(input.runId, "runId");
+  str(input.productBoundaryStatement, "productBoundaryStatement");
+  str(input.preparedAt, "preparedAt");
+  str(input.preparedBy, "preparedBy");
+  num(input.expectedCandidateCount, "expectedCandidateCount");
+  strOrNull(input.randomizationTimestamp, "randomizationTimestamp");
+  strOrNull(input.reviewerExposureTimestamp, "reviewerExposureTimestamp");
+  strOrNull(input.machineExecutionTimestamp, "machineExecutionTimestamp");
+  strOrNull(input.declarationInputDigest, "declarationInputDigest");
+  strOrNull(input.fullManifestDigest, "fullManifestDigest");
+
+  const entries = input.entries;
   if (!Array.isArray(entries))
     return { issues: [...issues, "entries must be an array"], safe: false };
 
@@ -389,18 +423,50 @@ function validateShape(input: unknown): { issues: string[]; safe: boolean } {
       return;
     }
     checkUnknownKeys(e, p, ENTRY_KEYS, issues);
-    for (const [key, allowed] of [
-      ["declaredBrand", DECLARED_VALUE_KEYS],
-      ["declaredAlcohol", DECLARED_VALUE_KEYS],
-      ["timing", TIMING_KEYS],
-    ] as const) {
+    // Entry primitive/null types, every field, every state.
+    str(e.runId, `${p}.runId`);
+    str(e.run002CaseId, `${p}.run002CaseId`);
+    str(e.sourceImageRef, `${p}.sourceImageRef`);
+    str(e.sourceImageSha256, `${p}.sourceImageSha256`);
+    str(e.sourceMediaType, `${p}.sourceMediaType`);
+    str(e.primaryBlindEligibilityState, `${p}.primaryBlindEligibilityState`);
+    str(e.schemaVersion, `${p}.schemaVersion`);
+    num(e.sourceByteSize, `${p}.sourceByteSize`);
+    strOrNull(e.priorPilotIdentity, `${p}.priorPilotIdentity`);
+    strOrNull(e.declarationSourceType, `${p}.declarationSourceType`);
+    strOrNull(e.declarationSourceRef, `${p}.declarationSourceRef`);
+    strOrNull(e.sourceAccessDate, `${p}.sourceAccessDate`);
+    strOrNull(e.recordedTimestamp, `${p}.recordedTimestamp`);
+    strOrNull(e.transcriptionMethod, `${p}.transcriptionMethod`);
+    strOrNull(e.independenceStatement, `${p}.independenceStatement`);
+    strOrNull(e.exclusionOrNonBlindReason, `${p}.exclusionOrNonBlindReason`);
+    strOrNull(e.manifestEntryDigest, `${p}.manifestEntryDigest`);
+
+    for (const key of ["declaredBrand", "declaredAlcohol"] as const) {
       const v = e[key];
       if (!isPlainObject(v)) {
         issues.push(`${p}.${key} must be an object`);
         safe = false;
       } else {
-        checkUnknownKeys(v, `${p}.${key}`, allowed, issues);
+        checkUnknownKeys(v, `${p}.${key}`, DECLARED_VALUE_KEYS, issues);
+        strOrNull(v.exactSourceText, `${p}.${key}.exactSourceText`);
+        strOrNull(v.normalizedComparisonForm, `${p}.${key}.normalizedComparisonForm`);
+        str(v.valueState, `${p}.${key}.valueState`);
+        str(v.uncertaintyState, `${p}.${key}.uncertaintyState`);
       }
+    }
+    const timing = e.timing;
+    if (!isPlainObject(timing)) {
+      issues.push(`${p}.timing must be an object`);
+      safe = false;
+    } else {
+      checkUnknownKeys(timing, `${p}.timing`, TIMING_KEYS, issues);
+      strOrNull(timing.intakeStartTimestamp, `${p}.timing.intakeStartTimestamp`);
+      strOrNull(timing.intakeCompletionTimestamp, `${p}.timing.intakeCompletionTimestamp`);
+      numOrNull(timing.sourceSearchMs, `${p}.timing.sourceSearchMs`);
+      numOrNull(timing.transcriptionMs, `${p}.timing.transcriptionMs`);
+      numOrNull(timing.verificationMs, `${p}.timing.verificationMs`);
+      numOrNull(timing.totalIntakeBurdenMs, `${p}.timing.totalIntakeBurdenMs`);
     }
     const rb = e.recordedBy;
     if (rb !== null && rb !== undefined && !isPlainObject(rb)) {
@@ -408,6 +474,8 @@ function validateShape(input: unknown): { issues: string[]; safe: boolean } {
       safe = false;
     } else if (isPlainObject(rb)) {
       checkUnknownKeys(rb, `${p}.recordedBy`, RECORDED_BY_KEYS, issues);
+      str(rb.identity, `${p}.recordedBy.identity`);
+      str(rb.role, `${p}.recordedBy.role`);
     }
   });
   return { issues, safe };
@@ -427,8 +495,11 @@ function validateDeclaredValue(
       push(`${field}.exactSourceText must be non-empty and not whitespace-only when PRESENT`);
     if (typeof value.normalizedComparisonForm !== "string")
       push(`${field}.normalizedComparisonForm must be present when PRESENT`);
-  } else if (value.exactSourceText !== null) {
-    push(`${field}.exactSourceText must be null unless valueState is PRESENT`);
+  } else {
+    if (value.exactSourceText !== null)
+      push(`${field}.exactSourceText must be null unless valueState is PRESENT`);
+    if (value.normalizedComparisonForm !== null)
+      push(`${field}.normalizedComparisonForm must be null unless valueState is PRESENT`);
   }
 }
 
@@ -472,12 +543,19 @@ export function isDeclarationProvenanceComplete(
   const t = entry.timing;
   if (!isIsoTimestamp(t.intakeStartTimestamp) || !isIsoTimestamp(t.intakeCompletionTimestamp))
     return false;
+  // Interval order: completion must not precede start (moved in so accounting
+  // and validation cannot disagree).
+  if (Date.parse(t.intakeCompletionTimestamp) < Date.parse(t.intakeStartTimestamp)) return false;
   if (
-    ![t.sourceSearchMs, t.transcriptionMs, t.verificationMs, t.totalIntakeBurdenMs].every(
-      isNonNegNumber,
-    )
+    !isNonNegNumber(t.sourceSearchMs) ||
+    !isNonNegNumber(t.transcriptionMs) ||
+    !isNonNegNumber(t.verificationMs) ||
+    !isNonNegNumber(t.totalIntakeBurdenMs)
   )
     return false;
+  // Burden consistency: total must be at least the sum of the three governed
+  // components (permitted overhead is allowed above the sum, never below it).
+  if (t.totalIntakeBurdenMs < t.sourceSearchMs + t.transcriptionMs + t.verificationMs) return false;
   if (!beforeIfSet(entry.recordedTimestamp, manifest.randomizationTimestamp)) return false;
   if (!beforeIfSet(entry.recordedTimestamp, manifest.reviewerExposureTimestamp)) return false;
   if (!beforeIfSet(entry.recordedTimestamp, manifest.machineExecutionTimestamp)) return false;
@@ -555,6 +633,17 @@ function validateEntry(entry: DeclarationEntry, manifest: DeclarationManifest): 
     Date.parse(t.intakeCompletionTimestamp) < Date.parse(t.intakeStartTimestamp)
   )
     push("timing.intakeCompletionTimestamp is before intakeStartTimestamp");
+  // Burden consistency: total must be at least the sum of the three components.
+  if (
+    isNonNegNumber(t.sourceSearchMs) &&
+    isNonNegNumber(t.transcriptionMs) &&
+    isNonNegNumber(t.verificationMs) &&
+    isNonNegNumber(t.totalIntakeBurdenMs) &&
+    t.totalIntakeBurdenMs < t.sourceSearchMs + t.transcriptionMs + t.verificationMs
+  )
+    push(
+      "timing.totalIntakeBurdenMs must be at least the sum of source-search + transcription + verification",
+    );
 
   if (entry.recordedTimestamp !== null && !isIsoTimestamp(entry.recordedTimestamp))
     push("recordedTimestamp invalid");
@@ -882,4 +971,114 @@ export function verifySourcesAgainstInventory(
     };
   });
   return { ok: results.every((r) => r.ok), results };
+}
+
+/** True iff `targetReal` (a canonical path) is the root or nested under it. */
+export function isWithinCanonicalRoot(rootReal: string, targetReal: string): boolean {
+  return targetReal === rootReal || targetReal.startsWith(rootReal + sep);
+}
+
+/**
+ * A byte reader confined to an authorized root that resists BOTH `..` traversal
+ * and symlink escape: it resolves the target's canonical real path and reads it
+ * only when that real path remains under the canonical root. An in-root symlink
+ * that points outside the root is rejected, and the outside file is never read.
+ */
+export function createAuthorizedRootReader(rootDir: string): (ref: string) => Uint8Array | null {
+  const resolvedRoot = resolve(rootDir);
+  const rootReal = existsSync(resolvedRoot) ? realpathSync(resolvedRoot) : resolvedRoot;
+  return (ref: string): Uint8Array | null => {
+    if (!isSafeSourceRelRef(ref)) return null;
+    const target = join(rootReal, ref);
+    if (!existsSync(target)) return null; // missing or dangling symlink
+    let real: string;
+    try {
+      real = realpathSync(target); // canonicalize through any symlinks
+    } catch {
+      return null;
+    }
+    if (!isWithinCanonicalRoot(rootReal, real)) return null; // symlink/target escapes the root
+    try {
+      if (!lstatSync(real).isFile()) return null;
+    } catch {
+      return null;
+    }
+    return new Uint8Array(readFileSync(real));
+  };
+}
+
+// ---- Fail-closed candidate-input parsing (pre-skeleton) --------------------
+
+export interface CandidateInput {
+  readonly run002CaseId: string;
+  readonly sourceImageRef: string;
+  readonly sourceImageSha256: string;
+  readonly sourceMediaType: DeclarationMediaType;
+  readonly sourceByteSize: number;
+  readonly priorPilotIdentity: string | null;
+  readonly eligibility: DeclarationEligibilityState;
+  readonly reason: string | null;
+}
+
+const CANDIDATE_KEYS = new Set([
+  "run002CaseId",
+  "sourceImageRef",
+  "sourceImageSha256",
+  "sourceMediaType",
+  "sourceByteSize",
+  "priorPilotIdentity",
+  "eligibility",
+  "reason",
+]);
+
+export interface CandidateParseResult {
+  readonly ok: boolean;
+  readonly issues: readonly string[];
+  readonly candidates: readonly CandidateInput[];
+}
+
+/** Parse + validate untrusted candidates JSON fail-closed before skeleton construction. */
+export function parseCandidateInputs(raw: unknown): CandidateParseResult {
+  const issues: string[] = [];
+  if (!Array.isArray(raw))
+    return { ok: false, issues: ["candidates must be an array"], candidates: [] };
+
+  const candidates: CandidateInput[] = [];
+  raw.forEach((c, i) => {
+    const p = `candidates[${i}]`;
+    if (!isPlainObject(c)) {
+      issues.push(`${p} must be an object`);
+      return;
+    }
+    checkUnknownKeys(c, p, CANDIDATE_KEYS, issues);
+    const before = issues.length;
+    if (typeof c.run002CaseId !== "string" || !RUN2_CASE_ID.test(c.run002CaseId))
+      issues.push(`${p}.run002CaseId must match r2-case-NNN`);
+    if (!trimmedNonEmpty(c.sourceImageRef))
+      issues.push(`${p}.sourceImageRef must be a non-empty string`);
+    if (typeof c.sourceImageSha256 !== "string" || !SHA_256.test(c.sourceImageSha256))
+      issues.push(`${p}.sourceImageSha256 must be a 64-char lowercase SHA-256`);
+    if (typeof c.sourceMediaType !== "string" || !MEDIA_SET.has(c.sourceMediaType))
+      issues.push(`${p}.sourceMediaType must be image/jpeg or image/png`);
+    if (!(Number.isSafeInteger(c.sourceByteSize) && (c.sourceByteSize as number) > 0))
+      issues.push(`${p}.sourceByteSize must be a positive integer`);
+    if (c.priorPilotIdentity !== null && typeof c.priorPilotIdentity !== "string")
+      issues.push(`${p}.priorPilotIdentity must be a string or null`);
+    if (typeof c.eligibility !== "string" || !ELIGIBILITY_SET.has(c.eligibility))
+      issues.push(`${p}.eligibility must be a valid eligibility state`);
+    if (c.reason !== undefined && c.reason !== null && typeof c.reason !== "string")
+      issues.push(`${p}.reason must be a string, null, or omitted`);
+    if (issues.length === before)
+      candidates.push({
+        run002CaseId: c.run002CaseId as string,
+        sourceImageRef: c.sourceImageRef as string,
+        sourceImageSha256: c.sourceImageSha256 as string,
+        sourceMediaType: c.sourceMediaType as DeclarationMediaType,
+        sourceByteSize: c.sourceByteSize as number,
+        priorPilotIdentity: (c.priorPilotIdentity as string | null) ?? null,
+        eligibility: c.eligibility as DeclarationEligibilityState,
+        reason: (c.reason as string | null | undefined) ?? null,
+      });
+  });
+  return { ok: issues.length === 0, issues, candidates };
 }

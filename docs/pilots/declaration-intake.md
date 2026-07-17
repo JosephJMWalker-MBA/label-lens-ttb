@@ -85,15 +85,22 @@ counted `declarationsComplete` only when it has PRESENT brand+alcohol, a valid
 non-forbidden source type/reference, source access date, recorded-by
 identity/role, recorded timestamp, transcription method, independence statement,
 intake start+completion timestamps, all four non-negative component timings, and
-correct ordering before randomization/reviewer/machine. PRESENT values without
-that provenance are never counted complete.
+correct ordering before randomization/reviewer/machine. It also enforces **timing
+consistency inside the predicate itself** so validation and accounting cannot
+disagree: `intakeCompletionTimestamp` must not precede `intakeStartTimestamp`, and
+`totalIntakeBurdenMs` must be **at least** the sum of source-search + transcription
++ verification (overhead above the sum is permitted; a total below the sum is
+rejected). PRESENT values without that provenance are never counted complete.
 
 ## Validation rules (fail-closed over untrusted JSON)
 
-Never throws on null/missing/malformed/wrong-typed input; rejects unknown keys at
-every governed object level; rejects arrays-for-objects and objects-for-primitives;
-**recursively** rejects run-001 / reviewer-answer / OCR / machine-result /
-adjudicator / expected-value keys at any depth. Plus: schema version; source-type
+Never throws on null/missing/malformed/wrong-typed input; **type-checks every
+governed primitive/null field at every level — manifest metadata and each entry —
+independent of eligibility state**; rejects unknown keys at every governed object
+level; rejects arrays-for-objects and objects-for-primitives; **recursively**
+rejects run-001 / reviewer-answer / OCR / machine-result / adjudicator /
+expected-value keys at any depth. `candidates.json` is parsed the same way
+(`parseCandidateInputs`) before any skeleton is built. Plus: schema version; source-type
 enum; 64-hex source digest; non-empty-or-explicit-missing values; **supported
 alcohol syntax without changing exact text (bare numeric accepted, see below)**;
 governed normalization (no uncontrolled normalization); valid timestamps;
@@ -108,7 +115,9 @@ case-count/accounting checks.
 
 `verify-sources` recomputes SHA-256 from the actual bytes and checks byte size and
 media type (from magic bytes), either against files under an authorized root
-(path traversal/escape and missing files rejected) or against a trusted
+(`..` traversal, **symlink escape via canonical-real-path containment**, and
+missing files all rejected — an in-root symlink to an outside file is refused and
+the outside file is never read) or against a trusted
 preservation inventory (digest + byte size). The report is bounded and contains
 only relative refs — never absolute private paths.
 

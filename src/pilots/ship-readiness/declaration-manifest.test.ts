@@ -1,3 +1,7 @@
+import { mkdtempSync, mkdirSync, symlinkSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import { sha256Hex } from "@/pipeline/extractor/image-integrity";
@@ -10,12 +14,14 @@ import {
   computeDeclarationInputDigest,
   computeEntryDigest,
   computeFullManifestDigest,
+  createAuthorizedRootReader,
   eligibleMembershipFreezeAuthorized,
   isDeclarationProvenanceComplete,
   isSafeSourceRelRef,
   isSupportedDeclaredAlcohol,
   normalizeDeclaredAlcohol,
   normalizeDeclaredBrand,
+  parseCandidateInputs,
   pilotExecutionAuthorized,
   sniffMediaType,
   validateDeclarationManifest,
@@ -551,6 +557,169 @@ describe("no-leakage gate", () => {
     } as unknown as DeclarationManifest;
     expect(checkNoLeakage(nested).issues.join()).toMatch(
       /forbidden run-001-outcome\/machine-result key "adjudication"/,
+    );
+  });
+});
+
+describe("declaration manifest — exact per-field type validation (all states)", () => {
+  it("type-checks manifest metadata without throwing", () => {
+    expect(issuesOf({ ...manifest([pendingEntry(1)]), preparedAt: 7 })).toMatch(
+      /preparedAt must be a string/,
+    );
+    expect(issuesOf({ ...manifest([pendingEntry(1)]), preparedBy: {} })).toMatch(
+      /preparedBy must be a string/,
+    );
+    expect(issuesOf({ ...manifest([pendingEntry(1)]), randomizationTimestamp: {} })).toMatch(
+      /randomizationTimestamp must be a string or null/,
+    );
+    expect(() =>
+      validateDeclarationManifest({ ...manifest([pendingEntry(1)]), preparedAt: 7 }),
+    ).not.toThrow();
+  });
+
+  it("type-checks pending / non-primary entry fields, not only primary candidates", () => {
+    const bad = (over: Record<string, unknown>, re: RegExp) => {
+      const m = {
+        ...manifest([]),
+        entries: [{ ...pendingEntry(1), ...over }],
+        expectedCandidateCount: 1,
+      };
+      expect(() => validateDeclarationManifest(m)).not.toThrow();
+      expect(issuesOf(m)).toMatch(re);
+    };
+    bad({ declarationSourceRef: 12 }, /declarationSourceRef must be a string or null/);
+    bad({ recordedBy: { identity: 1, role: [] } }, /recordedBy\.identity must be a string/);
+    bad({ recordedBy: { identity: 1, role: [] } }, /recordedBy\.role must be a string/);
+    bad(
+      { transcriptionMethod: { machine_output: "x" } },
+      /transcriptionMethod must be a string or null/,
+    );
+    bad({ priorPilotIdentity: [] }, /priorPilotIdentity must be a string or null/);
+    bad({ exclusionOrNonBlindReason: false }, /exclusionOrNonBlindReason must be a string or null/);
+  });
+
+  it("rejects a non-null normalizedComparisonForm on a non-PRESENT value", () => {
+    const m = manifest([
+      pendingEntry(1, {
+        declaredBrand: {
+          exactSourceText: null,
+          normalizedComparisonForm: "should-be-null",
+          valueState: "PENDING_INDEPENDENT_SOURCE",
+          uncertaintyState: "UNCERTAIN",
+        },
+      }),
+    ]);
+    expect(issuesOf(m)).toMatch(
+      /normalizedComparisonForm must be null unless valueState is PRESENT/,
+    );
+  });
+});
+
+describe("candidate-input fail-closed parsing", () => {
+  const goodCandidate = {
+    run002CaseId: "r2-case-001",
+    sourceImageRef: "ship-readiness-001/raw/pilot-wine-001.jpeg",
+    sourceImageSha256: digest(1),
+    sourceMediaType: "image/jpeg",
+    sourceByteSize: 1000,
+    priorPilotIdentity: "pilot-wine-001",
+    eligibility: "PENDING_SOURCE_VERIFICATION",
+    reason: "pending",
+  };
+  const parseIssues = (raw: unknown) => parseCandidateInputs(raw).issues.join("\n");
+
+  it("accepts a valid candidate array (reason optional)", () => {
+    const { reason: _r, ...noReason } = goodCandidate;
+    void _r;
+    const parsed = parseCandidateInputs([goodCandidate, noReason]);
+    expect(parsed.ok).toBe(true);
+    expect(parsed.candidates).toHaveLength(2);
+    expect(parsed.candidates[1].reason).toBeNull();
+  });
+
+  it("fails closed on null, object-not-array, and a null candidate without throwing", () => {
+    expect(() => parseCandidateInputs(null)).not.toThrow();
+    expect(parseIssues(null)).toMatch(/candidates must be an array/);
+    expect(parseIssues({})).toMatch(/candidates must be an array/);
+    expect(parseIssues([null])).toMatch(/candidates\[0\] must be an object/);
+  });
+
+  it("rejects missing fields, wrong types, unknown fields, invalid eligibility, malformed reason", () => {
+    expect(parseIssues([{ ...goodCandidate, run002CaseId: undefined }])).toMatch(
+      /run002CaseId must match/,
+    );
+    expect(parseIssues([{ ...goodCandidate, sourceByteSize: "big" }])).toMatch(
+      /sourceByteSize must be a positive integer/,
+    );
+    expect(parseIssues([{ ...goodCandidate, extra: 1 }])).toMatch(
+      /candidates\[0\]: unknown key "extra"/,
+    );
+    expect(parseIssues([{ ...goodCandidate, eligibility: "MADE_UP" }])).toMatch(
+      /eligibility must be a valid eligibility state/,
+    );
+    expect(parseIssues([{ ...goodCandidate, reason: 5 }])).toMatch(
+      /reason must be a string, null, or omitted/,
+    );
+    expect(parseIssues([{ ...goodCandidate, sourceImageSha256: "TOOSHORT" }])).toMatch(
+      /sourceImageSha256 must be a 64-char/,
+    );
+  });
+});
+
+describe("authorized-root reader — symlink escape", () => {
+  const jpeg = (tag = 1) => new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, tag]);
+
+  it("reads a legitimate in-root file but refuses an in-root symlink pointing outside the root", () => {
+    const root = mkdtempSync(join(tmpdir(), "authroot-"));
+    const outside = mkdtempSync(join(tmpdir(), "outside-"));
+    mkdirSync(join(root, "raw"));
+    const good = jpeg(1);
+    writeFileSync(join(root, "raw", "real.jpeg"), Buffer.from(good));
+    writeFileSync(join(outside, "secret.jpeg"), Buffer.from(jpeg(9)));
+    symlinkSync(join(outside, "secret.jpeg"), join(root, "raw", "link.jpeg"));
+
+    const reader = createAuthorizedRootReader(root);
+    expect(reader("raw/real.jpeg")).not.toBeNull(); // legit in-root file is read
+    expect(reader("raw/link.jpeg")).toBeNull(); // escaping symlink refused, outside file never read
+    expect(reader("../escape.jpeg")).toBeNull(); // lexical traversal refused
+
+    // End to end: verification fails for the symlinked entry.
+    const linked: DeclarationEntry = {
+      ...primaryEntry(2),
+      sourceImageRef: "raw/link.jpeg",
+      sourceImageSha256: sha256Hex(jpeg(9)),
+      sourceByteSize: jpeg(9).length,
+    };
+    const report = verifySourcesWithReader(manifest([linked]), reader);
+    expect(report.ok).toBe(false);
+    expect(report.results[0].issues.join()).toMatch(/not found under the authorized root/);
+  });
+});
+
+describe("timing interval + burden consistency (predicate and validation agree)", () => {
+  it("rejects a reversed intake interval in both the predicate and validation and excludes it from complete", () => {
+    const reversed = primaryEntry(1, {
+      primaryBlindEligibilityState: "NON_BLIND_OPERATIONAL",
+      exclusionOrNonBlindReason: "exposed",
+      timing: {
+        ...FULL_TIMING,
+        intakeStartTimestamp: "2026-07-16T00:10:00Z",
+        intakeCompletionTimestamp: "2026-07-16T00:05:00Z",
+      },
+    });
+    const m = manifest([reversed]);
+    expect(isDeclarationProvenanceComplete(reversed, m)).toBe(false);
+    expect(computeCandidateAccounting(m).declarationsComplete).toBe(0);
+    expect(issuesOf(m)).toMatch(/intakeCompletionTimestamp is before intakeStartTimestamp/);
+  });
+
+  it("rejects component totals exceeding total burden in both the predicate and validation", () => {
+    const overSum = primaryEntry(1, {
+      timing: { ...FULL_TIMING, totalIntakeBurdenMs: 100000 }, // < 120000 + 60000 + 30000
+    });
+    expect(isDeclarationProvenanceComplete(overSum, manifest([overSum]))).toBe(false);
+    expect(issuesOf(manifest([overSum]))).toMatch(
+      /totalIntakeBurdenMs must be at least the sum of source-search \+ transcription \+ verification/,
     );
   });
 });
