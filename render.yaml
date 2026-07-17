@@ -43,3 +43,7 @@ services:
       # automatic RENDER_GIT_COMMIT environment variable is used if available.
       - key: LABEL_LENS_BUILD_COMMIT
         sync: false
+      # Temporary bounded server-side tracing for Issue #125. No image bytes,
+      # declared values, secrets, private paths, or stack traces are emitted.
+      - key: LABEL_LENS_PRECHECK_DIAGNOSTICS
+        value: "1"

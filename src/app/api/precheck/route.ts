@@ -1,6 +1,7 @@
 import { runPrecheckService } from "@/server/precheck-service";
 import type { PrecheckServiceError, PrecheckServiceRequest } from "@/server/precheck-service.types";
 import { MAX_REQUEST_BYTES } from "@/server/resource-policy";
+import { createPrecheckDiagnosticTrace } from "@/shared/precheck-diagnostics";
 
 // Node runtime is required for sharp, tesseract.js, and the vendored assets.
 export const runtime = "nodejs";
@@ -65,6 +66,7 @@ function errorResponse(code: PrecheckServiceError["code"], message: string): Res
  * only render-safe data. No stack traces, paths, or environment values leak.
  */
 export async function POST(request: Request): Promise<Response> {
+  const diagnostics = createPrecheckDiagnosticTrace();
   // Earliest guards, before any body buffering. A declared Content-Length above
   // the request limit is rejected without calling formData(); a non-multipart
   // request is refused before parsing. When the header is absent or false, the
@@ -106,6 +108,7 @@ export async function POST(request: Request): Promise<Response> {
     source,
     declaredBrand: brand,
     declaredAlcohol: alcohol,
+    diagnostics,
   };
 
   if (source === "upload") {
@@ -119,7 +122,19 @@ export async function POST(request: Request): Promise<Response> {
     serviceRequest.filename = file.name;
   }
 
-  const result = await runPrecheckService(serviceRequest);
+  diagnostics?.requestAccepted();
+
+  let result;
+  try {
+    result = await runPrecheckService(serviceRequest);
+  } catch (cause) {
+    diagnostics?.fail("request-accepted", {
+      layer: "route",
+      code: "UNHANDLED_EXCEPTION",
+      issues: [cause instanceof Error ? cause.message : String(cause)],
+    });
+    throw cause;
+  }
   if (!result.ok) return errorResponse(result.error.code, result.error.message);
 
   return Response.json({ ok: true, data: result.value }, { status: 200 });

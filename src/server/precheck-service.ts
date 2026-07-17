@@ -178,11 +178,13 @@ export async function runPrecheckService(
   const { bytes, mediaType, displayName } = resolved.value;
 
   const sha = createHash("sha256").update(bytes).digest("hex");
+  request.diagnostics?.recordSource({ sha256: sha, mediaType, byteSize: bytes.length });
   const path = `${sha}.${extensionFor(mediaType)}`;
 
   // One canonical provenance drives the run, extractor, orchestration, and
   // assembly, so every executable identity is identical across all layers.
-  const prov = await getExecutableProvenance();
+  const prov = await getExecutableProvenance(request.diagnostics);
+  request.diagnostics?.recordExecutable(prov);
 
   const runResult = createAnalysisRun(
     runInput(prov, sha, path, request.declaredBrand, request.declaredAlcohol),
@@ -200,6 +202,7 @@ export async function runPrecheckService(
     ocrEngine: prov.ocrEngine as AnalyzerOcrEngine,
     parserId: prov.parserId,
     parserVersion: prov.parserVersion,
+    diagnostics: request.diagnostics,
   };
   const extraction = await extractLabelEvidence(extractorInput);
   if (!extraction.ok) return mapExtractionError(extraction.error.code);
@@ -216,10 +219,16 @@ export async function runPrecheckService(
     coverage: { brandNameProcessed: true, alcoholStatementProcessed: true },
   });
   if (!orchestration.ok) {
+    request.diagnostics?.fail("orchestration-completed", {
+      layer: "orchestrator",
+      code: orchestration.error.code,
+      issues: orchestration.error.issues,
+    });
     const code =
       orchestration.error.code === "PROFILE_MISMATCH" ? "PROFILE_MISMATCH" : "EXTRACTION_FAILED";
     return fail(code, "The pre-check could not be evaluated for this image.");
   }
+  request.diagnostics?.reach("orchestration-completed", undefined, { once: true });
 
   const assembled = assemblePrecheckResult({
     run,
@@ -231,14 +240,25 @@ export async function runPrecheckService(
     },
     expectedProvenance: prov,
   });
-  if (!assembled.ok) return fail("ASSEMBLY_FAILED", "The pre-check result could not be assembled.");
+  if (!assembled.ok) {
+    request.diagnostics?.fail("assembly-export-completed", {
+      layer: "assembly",
+      code: assembled.error.code,
+      issues: assembled.error.issues,
+    });
+    return fail("ASSEMBLY_FAILED", "The pre-check result could not be assembled.");
+  }
 
-  return buildResponse(assembled.value, {
-    displayName,
-    mediaType,
-    byteSize: bytes.length,
-    source: request.source,
-  });
+  return buildResponse(
+    assembled.value,
+    {
+      displayName,
+      mediaType,
+      byteSize: bytes.length,
+      source: request.source,
+    },
+    request.diagnostics,
+  );
 }
 
 /**
@@ -251,35 +271,68 @@ export async function runPrecheckService(
 function buildResponse(
   result: PrecheckResult,
   file: PrecheckServiceResponse["file"],
+  diagnostics?: PrecheckServiceRequest["diagnostics"],
 ): Result<PrecheckServiceResponse, PrecheckServiceError> {
   const exportResult = buildJsonExport(result);
-  if (!exportResult.ok)
+  if (!exportResult.ok) {
+    diagnostics?.fail("assembly-export-completed", {
+      layer: "assembly",
+      code: exportResult.error.code,
+      issues: exportResult.error.issues,
+    });
     return fail("EXPORT_CHECKSUM_FAILED", "The JSON export could not be produced.");
+  }
   const verified = verifyExportIntegrity(exportResult.value);
-  if (!verified.ok)
+  if (!verified.ok) {
+    diagnostics?.fail("assembly-export-completed", {
+      layer: "assembly",
+      code: verified.error.code,
+      issues: verified.error.issues,
+    });
     return fail("EXPORT_CHECKSUM_FAILED", "The JSON export failed its integrity check.");
+  }
 
   const filename = suggestedExportFilename(verified.value);
-  if (!filename.ok)
+  if (!filename.ok) {
+    diagnostics?.fail("assembly-export-completed", {
+      layer: "assembly",
+      code: filename.error.code,
+      issues: filename.error.issues,
+    });
     return fail("EXPORT_CHECKSUM_FAILED", "The export filename could not be derived.");
+  }
 
   const report = buildReadableReport({
     result,
     jsonChecksum: verified.value.integrity.value,
   });
-  if (!report.ok) return fail("REPORT_FAILED", "The readable report could not be produced.");
+  if (!report.ok) {
+    diagnostics?.fail("assembly-export-completed", {
+      layer: "assembly",
+      code: report.error.code,
+      issues: report.error.issues,
+    });
+    return fail("REPORT_FAILED", "The readable report could not be produced.");
+  }
 
   // Server-issued append authorization: proves this server assembled the machine
   // result. The signing secret is never placed in the export, report, or client
   // payload — only this opaque HMAC over the machine-result id is returned.
   const token = issueAppendToken(result.machineResultId);
-  if (!token.ok)
+  if (!token.ok) {
+    diagnostics?.fail("assembly-export-completed", {
+      layer: "assembly",
+      code: token.error.code,
+      issues: [],
+    });
     return fail(
       "APPEND_SIGNING_KEY_UNAVAILABLE",
       "The append-authorization service is not configured.",
     );
+  }
 
   rememberLatestAppendableExport(result.machineResultId, verified.value.integrity.value);
+  diagnostics?.reach("assembly-export-completed", undefined, { once: true });
 
   return ok({
     machineResultId: result.machineResultId,

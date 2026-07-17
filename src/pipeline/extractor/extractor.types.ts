@@ -1,4 +1,5 @@
 import type { AnalyzerOcrEngine, EvidenceGeometry } from "@/pipeline/analyzer/analyzer.types";
+import type { PrecheckDiagnosticTrace } from "@/shared/precheck-diagnostics";
 
 /**
  * Deterministic input to the local extractor. Every mutable or environment
@@ -20,6 +21,7 @@ export interface ExtractionInput {
   ocrEngine: AnalyzerOcrEngine;
   parserId: string;
   parserVersion: string;
+  diagnostics?: PrecheckDiagnosticTrace;
 }
 
 export type ExtractionErrorCode =
