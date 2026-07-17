@@ -5,6 +5,7 @@ import { join } from "node:path";
 import type { ExecutableProvenance } from "@/domain/run/version-manifest.types";
 import { resolveLangPath } from "@/pipeline/extractor/ocr-engine";
 import { winePrecheckRegistry } from "@/pipeline/precheck/wine-precheck.profile";
+import type { PrecheckDiagnosticTrace } from "@/shared/precheck-diagnostics";
 
 /**
  * The single canonical runtime provenance source.
@@ -41,8 +42,20 @@ const AUTHORITIES = [
 let cached: ExecutableProvenance | null = null;
 
 /** Cached SHA-256 of the vendored language model, computed from the actual file. */
-async function trainedDataSha256(): Promise<string> {
-  const bytes = await readFile(join(resolveLangPath(), TRAINEDDATA_FILE));
+async function trainedDataSha256(diagnostics?: PrecheckDiagnosticTrace): Promise<string> {
+  let langPath: string;
+  try {
+    langPath = resolveLangPath();
+  } catch (cause) {
+    diagnostics?.fail("ocr-language-data-resolved", {
+      layer: "runtime-provenance",
+      code: "OCR_LANGUAGE_DATA_UNAVAILABLE",
+      issues: [cause instanceof Error ? cause.message : String(cause)],
+    });
+    throw cause;
+  }
+  diagnostics?.reach("ocr-language-data-resolved", undefined, { once: true });
+  const bytes = await readFile(join(langPath, TRAINEDDATA_FILE));
   return createHash("sha256").update(bytes).digest("hex");
 }
 
@@ -73,9 +86,14 @@ function resolveCommitFromEnv(name: string): string | undefined {
  * identical executable inputs: it reads no clock and generates no random id, and
  * the model digest is a pure function of the committed file.
  */
-export async function getExecutableProvenance(): Promise<ExecutableProvenance> {
-  if (cached) return cached;
-  const modelSha256 = await trainedDataSha256();
+export async function getExecutableProvenance(
+  diagnostics?: PrecheckDiagnosticTrace,
+): Promise<ExecutableProvenance> {
+  if (cached) {
+    diagnostics?.reach("ocr-language-data-resolved", undefined, { once: true });
+    return cached;
+  }
+  const modelSha256 = await trainedDataSha256(diagnostics);
   cached = {
     extractionAdapterId: EXTRACTION_ADAPTER_ID,
     extractionAdapterVersion: EXTRACTION_ADAPTER_VERSION,

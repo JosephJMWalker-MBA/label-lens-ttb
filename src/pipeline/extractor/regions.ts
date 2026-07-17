@@ -1,6 +1,7 @@
 import sharp from "sharp";
 
 import type { EvidenceGeometry } from "@/pipeline/analyzer/analyzer.types";
+import type { PrecheckDiagnosticTrace } from "@/shared/precheck-diagnostics";
 
 import { mapBoxToOriginalGeometry, unionGeometry } from "./geometry";
 import type { OcrEngine } from "./ocr-engine";
@@ -481,26 +482,75 @@ export async function runOcrPass(
   bytes: Uint8Array,
   pass: PlannedOcrPass,
   engine: OcrEngine,
+  diagnostics?: PrecheckDiagnosticTrace,
 ): Promise<RegionOcrResult> {
   const startedAt = performance.now();
   const preprocessStartedAt = performance.now();
-  const { png, transformedSize } = await preprocess(bytes, pass);
+  let png: Buffer;
+  let transformedSize: { width: number; height: number };
+  try {
+    ({ png, transformedSize } = await preprocess(bytes, pass));
+  } catch (cause) {
+    diagnostics?.fail(
+      "preprocessing-completed",
+      {
+        layer: "extractor",
+        code: "PREPROCESSING_FAILED",
+        issues: [cause instanceof Error ? cause.message : String(cause)],
+      },
+      { passId: pass.passId, passKind: pass.passKind },
+    );
+    throw cause;
+  }
   const preprocessMs = performance.now() - preprocessStartedAt;
+  diagnostics?.reach(
+    "preprocessing-completed",
+    { passId: pass.passId, passKind: pass.passKind },
+    { once: false },
+  );
 
   const ocrStartedAt = performance.now();
-  const rawWords = await engine.recognizeWords(png, pass.pageSegMode);
+  let rawWords;
+  try {
+    rawWords = await engine.recognizeWords(png, pass.pageSegMode);
+  } catch (cause) {
+    diagnostics?.fail(
+      "ocr-pass-completed",
+      {
+        layer: "extractor",
+        code: "OCR_PASS_FAILED",
+        issues: [cause instanceof Error ? cause.message : String(cause)],
+      },
+      { passId: pass.passId, passKind: pass.passKind },
+    );
+    throw cause;
+  }
   const ocrMs = performance.now() - ocrStartedAt;
 
   const mappingStartedAt = performance.now();
-  const words = rawWords
-    .map((word) => {
-      const originalGeometry = mapBoxToOriginalGeometry(word.bbox, pass.transform);
-      return originalGeometry ? { ...word, originalGeometry } : null;
-    })
-    .filter((word): word is NonNullable<typeof word> => word !== null);
+  let words;
+  try {
+    words = rawWords
+      .map((word) => {
+        const originalGeometry = mapBoxToOriginalGeometry(word.bbox, pass.transform);
+        return originalGeometry ? { ...word, originalGeometry } : null;
+      })
+      .filter((word): word is NonNullable<typeof word> => word !== null);
+  } catch (cause) {
+    diagnostics?.fail(
+      "ocr-pass-completed",
+      {
+        layer: "extractor",
+        code: "OCR_PASS_MAPPING_FAILED",
+        issues: [cause instanceof Error ? cause.message : String(cause)],
+      },
+      { passId: pass.passId, passKind: pass.passKind },
+    );
+    throw cause;
+  }
   const inverseMappingMs = performance.now() - mappingStartedAt;
 
-  return {
+  const result: RegionOcrResult = {
     passId: pass.passId,
     regionName: pass.regionName,
     passKind: pass.passKind,
@@ -520,4 +570,10 @@ export async function runOcrPass(
     },
     words,
   };
+  diagnostics?.reach(
+    "ocr-pass-completed",
+    { passId: pass.passId, passKind: pass.passKind },
+    { once: false },
+  );
+  return result;
 }

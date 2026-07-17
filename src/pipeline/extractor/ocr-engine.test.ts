@@ -3,18 +3,50 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync } from "nod
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { resolveLangPath, resolveCorePath } from "./ocr-engine";
+import { createPrecheckDiagnosticTrace } from "@/shared/precheck-diagnostics";
+
+import { createLocalOcrEngine, resolveLangPath, resolveCorePath } from "./ocr-engine";
+
+const MOCKS = vi.hoisted(() => ({
+  workerPathInspectionFails: false,
+  createWorker: vi.fn(),
+}));
+
+vi.mock("tesseract.js", () => ({ createWorker: MOCKS.createWorker }));
+vi.mock("tesseract.js/src/worker/node/defaultOptions.js", () => ({
+  default: {
+    get workerPath() {
+      if (MOCKS.workerPathInspectionFails) throw new Error("worker probe failed");
+      return process.execPath;
+    },
+  },
+}));
 
 const ORIGINAL_CWD = process.cwd();
 const CLEANUP: string[] = [];
+
+function successfulWorker() {
+  return {
+    setParameters: vi.fn().mockResolvedValue(undefined),
+    recognize: vi.fn().mockResolvedValue({ data: { blocks: [] } }),
+    terminate: vi.fn().mockResolvedValue(undefined),
+  };
+}
+
+beforeEach(() => {
+  MOCKS.workerPathInspectionFails = false;
+  MOCKS.createWorker.mockReset().mockResolvedValue(successfulWorker());
+});
 
 afterEach(() => {
   process.chdir(ORIGINAL_CWD);
   delete process.env.LABEL_LENS_OCR_ASSET_DIR;
   delete process.env.LABEL_LENS_OCR_CORE_DIR;
+  delete process.env.LABEL_LENS_PRECHECK_DIAGNOSTICS;
   while (CLEANUP.length) rmSync(CLEANUP.pop()!, { recursive: true, force: true });
+  vi.restoreAllMocks();
 });
 
 function tempDir(): string {
@@ -96,5 +128,59 @@ describe("ocr-engine source is offline and free of build-machine paths", () => {
     expect(source).not.toMatch(/https?:\/\/|fetch\(|cdn|unpkg|jsdelivr|tessdata.*http/i);
     expect(source).toMatch(/cacheMethod:\s*"none"/);
     expect(source).toMatch(/gzip:\s*false/);
+  });
+});
+
+describe("diagnostic worker-script inspection", () => {
+  it("does not inspect worker defaults when diagnostics are disabled", async () => {
+    MOCKS.workerPathInspectionFails = true;
+
+    const engine = await createLocalOcrEngine();
+
+    expect(MOCKS.createWorker).toHaveBeenCalledOnce();
+    await engine.terminate();
+  });
+
+  it("records probe-only unavailability without changing successful worker creation", async () => {
+    process.env.LABEL_LENS_PRECHECK_DIAGNOSTICS = "1";
+    MOCKS.workerPathInspectionFails = true;
+    const writes: string[] = [];
+    vi.spyOn(process.stderr, "write").mockImplementation((chunk) => {
+      writes.push(String(chunk));
+      return true;
+    });
+
+    const engine = await createLocalOcrEngine(createPrecheckDiagnosticTrace());
+
+    expect(MOCKS.createWorker).toHaveBeenCalledOnce();
+    const probe = writes
+      .map((line) => JSON.parse(line.replace(/^PRECHECK_DIAGNOSTIC /, "").trim()))
+      .find((event) => event.boundary === "ocr-worker-script-resolved");
+    expect(probe).toMatchObject({
+      status: "probe-unavailable",
+      error: { code: "OCR_WORKER_SCRIPT_PROBE_UNAVAILABLE" },
+    });
+    expect(writes.join("\n")).not.toContain("OCR_WORKER_INIT_FAILED");
+    await engine.terminate();
+  });
+
+  it("preserves the original createWorker failure with diagnostics disabled or enabled", async () => {
+    const workerFailure = new Error("original createWorker failure");
+    MOCKS.workerPathInspectionFails = true;
+    MOCKS.createWorker.mockRejectedValue(workerFailure);
+
+    await expect(createLocalOcrEngine()).rejects.toBe(workerFailure);
+
+    process.env.LABEL_LENS_PRECHECK_DIAGNOSTICS = "1";
+    const writes: string[] = [];
+    vi.spyOn(process.stderr, "write").mockImplementation((chunk) => {
+      writes.push(String(chunk));
+      return true;
+    });
+    await expect(createLocalOcrEngine(createPrecheckDiagnosticTrace())).rejects.toBe(workerFailure);
+
+    expect(MOCKS.createWorker).toHaveBeenCalledTimes(2);
+    expect(writes.join("\n")).toContain("OCR_WORKER_SCRIPT_PROBE_UNAVAILABLE");
+    expect(writes.join("\n")).toContain("OCR_WORKER_INIT_FAILED");
   });
 });

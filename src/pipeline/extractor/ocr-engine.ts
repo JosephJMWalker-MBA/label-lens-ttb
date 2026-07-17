@@ -1,6 +1,8 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
 
+import type { PrecheckDiagnosticTrace } from "@/shared/precheck-diagnostics";
+
 import type { OcrWord } from "./extractor.types";
 
 /**
@@ -74,6 +76,30 @@ export function resolveCorePath(): string {
   );
 }
 
+async function inspectWorkerPath(): Promise<void> {
+  const mod = await import("tesseract.js/src/worker/node/defaultOptions.js");
+  const options = (mod.default ?? mod) as { workerPath?: unknown };
+  const workerPath = typeof options.workerPath === "string" ? options.workerPath : "";
+  if (workerPath && existsSync(workerPath)) return;
+  throw new Error("Local Tesseract worker script could not be resolved.");
+}
+
+async function inspectWorkerPathForDiagnostics(
+  diagnostics: PrecheckDiagnosticTrace,
+): Promise<void> {
+  try {
+    await inspectWorkerPath();
+    diagnostics.reach("ocr-worker-script-resolved", undefined, { once: true });
+  } catch (cause) {
+    // This observes Tesseract internals only. createWorker remains authoritative.
+    diagnostics.probeUnavailable("ocr-worker-script-resolved", {
+      layer: "ocr",
+      code: "OCR_WORKER_SCRIPT_PROBE_UNAVAILABLE",
+      issues: [cause instanceof Error ? cause.message : String(cause)],
+    });
+  }
+}
+
 export interface OcrEngine {
   /** Recognize words in a preprocessed PNG buffer at the given page-seg mode. */
   recognizeWords(png: Buffer, pageSegMode: number): Promise<OcrWord[]>;
@@ -83,20 +109,69 @@ export interface OcrEngine {
 /** Page-seg modes used by the region strategy (Tesseract PSM values). */
 export const PAGE_SEG = { SPARSE_TEXT: 11, SINGLE_LINE: 7 } as const;
 
-export async function createLocalOcrEngine(): Promise<OcrEngine> {
-  const tesseract = await import("tesseract.js");
-  const langPath = resolveLangPath();
-  const corePath = resolveCorePath();
+export async function createLocalOcrEngine(
+  diagnostics?: PrecheckDiagnosticTrace,
+): Promise<OcrEngine> {
+  let tesseract;
+  try {
+    tesseract = await import("tesseract.js");
+  } catch (cause) {
+    diagnostics?.fail("tesseract-worker-initialized", {
+      layer: "ocr",
+      code: "OCR_LIBRARY_UNAVAILABLE",
+      issues: [cause instanceof Error ? cause.message : String(cause)],
+    });
+    throw cause;
+  }
+
+  let langPath: string;
+  try {
+    langPath = resolveLangPath();
+  } catch (cause) {
+    diagnostics?.fail("ocr-language-data-resolved", {
+      layer: "ocr",
+      code: "OCR_LANGUAGE_DATA_UNAVAILABLE",
+      issues: [cause instanceof Error ? cause.message : String(cause)],
+    });
+    throw cause;
+  }
+  diagnostics?.reach("ocr-language-data-resolved", undefined, { once: true });
+
+  let corePath: string;
+  try {
+    corePath = resolveCorePath();
+  } catch (cause) {
+    diagnostics?.fail("ocr-core-resolved", {
+      layer: "ocr",
+      code: "OCR_CORE_UNAVAILABLE",
+      issues: [cause instanceof Error ? cause.message : String(cause)],
+    });
+    throw cause;
+  }
+  diagnostics?.reach("ocr-core-resolved", undefined, { once: true });
+
+  if (diagnostics) await inspectWorkerPathForDiagnostics(diagnostics);
 
   // OEM 1 = LSTM only. All asset paths are local; nothing is downloaded.
-  const worker = await tesseract.createWorker("eng", 1, {
-    langPath,
-    gzip: false,
-    cacheMethod: "none",
-    corePath,
-    logger: () => {},
-    errorHandler: () => {},
-  });
+  let worker;
+  try {
+    worker = await tesseract.createWorker("eng", 1, {
+      langPath,
+      gzip: false,
+      cacheMethod: "none",
+      corePath,
+      logger: () => {},
+      errorHandler: () => {},
+    });
+  } catch (cause) {
+    diagnostics?.fail("tesseract-worker-initialized", {
+      layer: "ocr",
+      code: "OCR_WORKER_INIT_FAILED",
+      issues: [cause instanceof Error ? cause.message : String(cause)],
+    });
+    throw cause;
+  }
+  diagnostics?.reach("tesseract-worker-initialized", undefined, { once: true });
 
   return {
     async recognizeWords(png: Buffer, pageSegMode: number): Promise<OcrWord[]> {

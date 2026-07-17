@@ -46,11 +46,22 @@ export async function extractLabelEvidenceDetailed(
   input: ExtractionInput,
 ): Promise<Result<DetailedExtractionResult, ExtractionError>> {
   const decoded = await verifyAndDecode(input.imageBytes, input.derivativeSha256);
-  if (!decoded.ok) return decoded;
+  if (!decoded.ok) {
+    input.diagnostics?.fail("image-decoded", {
+      layer: "extractor",
+      code: decoded.error.code,
+      issues: decoded.error.issues,
+    });
+    return decoded;
+  }
+  input.diagnostics?.recordDecoded({
+    width: decoded.value.width,
+    height: decoded.value.height,
+  });
 
   let engine;
   try {
-    engine = await createLocalOcrEngine();
+    engine = await createLocalOcrEngine(input.diagnostics);
   } catch (cause) {
     return err({
       code: "OCR_UNAVAILABLE",
@@ -69,6 +80,7 @@ export async function extractLabelEvidenceDetailed(
       input.imageBytes,
       planPrimaryOcrPass(decoded.value.width, decoded.value.height),
       engine,
+      input.diagnostics,
     );
     primaryBrand = selectBrandObservation([primaryPass]);
     primaryAlcohol = selectAlcoholObservation([primaryPass]);
@@ -80,7 +92,7 @@ export async function extractLabelEvidenceDetailed(
       needsAlcoholRecovery: primaryAlcohol.observation.state === "NOT_OBSERVED",
     });
     for (const pass of recoveryPasses) {
-      passes.push(await runOcrPass(input.imageBytes, pass, engine));
+      passes.push(await runOcrPass(input.imageBytes, pass, engine, input.diagnostics));
     }
 
     brand =
@@ -89,6 +101,7 @@ export async function extractLabelEvidenceDetailed(
       primaryAlcohol.observation.state === "NOT_OBSERVED"
         ? selectAlcoholObservation(passes)
         : primaryAlcohol;
+    input.diagnostics?.reach("field-selection-completed", undefined, { once: true });
   } catch (cause) {
     // A recognition or preprocessing failure after worker creation is a safe,
     // typed failure — never an unhandled throw. The worker is still terminated
@@ -130,12 +143,18 @@ export async function extractLabelEvidenceDetailed(
 
   const validated = validateAnalyzerEvidenceResponse(response);
   if (!validated.ok) {
+    input.diagnostics?.fail("analyzer-validation-completed", {
+      layer: "extractor",
+      code: "INVALID_RESPONSE",
+      issues: validated.error.issues,
+    });
     return err({
       code: "INVALID_RESPONSE",
       message: "Constructed analyzer response failed evidence-only validation.",
       issues: validated.error.issues,
     });
   }
+  input.diagnostics?.reach("analyzer-validation-completed", undefined, { once: true });
   return ok({
     response: validated.value,
     debug: {

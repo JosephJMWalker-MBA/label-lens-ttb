@@ -1,6 +1,7 @@
 import type { DeclaredFact } from "@/domain/run/declared-facts.types";
 import type { VerificationFinding } from "@/domain/verification/finding.types";
 import type { EvidenceAssessment } from "@/pipeline/precheck/precheck.types";
+import type { PrecheckDiagnosticTrace } from "@/shared/precheck-diagnostics";
 import type {
   AdvisoryNotice,
   DispositionEntry,
@@ -29,6 +30,8 @@ export interface PrecheckServiceRequest {
   mediaType?: string;
   declaredBrand: string;
   declaredAlcohol: string;
+  /** Optional server-only tracing for bounded diagnostic runs. */
+  diagnostics?: PrecheckDiagnosticTrace;
 }
 
 /** Bounded, render-only projection of one field observation and its provenance. */
