@@ -5,30 +5,38 @@
  * image bytes, no private paths, and no declared values — those are supplied at
  * run time. It never reads label artwork and never produces declared values;
  * declared brand/alcohol values must be established independently by controlled
- * human intake or genuine records before randomization.
+ * human intake or genuine records before randomization. All parsed JSON is
+ * validated fail-closed before use.
  *
  * Subcommands:
- *   skeleton    <candidates.json> <out-manifest.json>
- *   validate    <manifest.json>
- *   accounting  <manifest.json> <out.json>
- *   no-leakage  <manifest.json> <out.json>
+ *   skeleton       <candidates.json> <out-manifest.json>
+ *   validate       <manifest.json>
+ *   accounting     <manifest.json> <out.json>
+ *   no-leakage     <manifest.json> <out.json>
+ *   verify-sources <manifest.json> <authorized-root-dir | trusted-inventory.json> <out.json>
  *
  * Run with: npx vite-node --config vitest.config.ts scripts/pilots/declaration-intake.ts <cmd> ...
  */
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { join, resolve, sep } from "node:path";
 
 import {
   DECLARATION_MANIFEST_SCHEMA_VERSION,
   PRODUCT_BOUNDARY_STATEMENT,
   checkNoLeakage,
   computeCandidateAccounting,
+  computeDeclarationInputDigest,
   computeEntryDigest,
-  computeManifestDigest,
+  computeFullManifestDigest,
+  isSafeSourceRelRef,
   validateDeclarationManifest,
+  verifySourcesAgainstInventory,
+  verifySourcesWithReader,
   type DeclarationEligibilityState,
   type DeclarationEntry,
   type DeclarationManifest,
   type DeclarationMediaType,
+  type TrustedInventoryRecord,
 } from "../../src/pilots/ship-readiness/declaration-manifest.ts";
 
 function fail(message: string): never {
@@ -37,6 +45,14 @@ function fail(message: string): never {
 }
 function readJson<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf8")) as T;
+}
+
+/** Load + validate a manifest fail-closed before any typed use. */
+function loadValidManifest(path: string): DeclarationManifest {
+  const raw = readJson<unknown>(path);
+  const result = validateDeclarationManifest(raw);
+  if (!result.ok) fail(`manifest invalid:\n${result.issues.join("\n")}`);
+  return raw as DeclarationManifest;
 }
 
 interface CandidateInput {
@@ -108,31 +124,36 @@ function skeleton(candidatesPath: string, outPath: string): void {
     preparedAt: new Date().toISOString(),
     preparedBy: "declaration-intake-cli",
     entries,
-    manifestDigest: null,
+    declarationInputDigest: null,
+    fullManifestDigest: null,
   };
-  const withDigest: DeclarationManifest = { ...base, manifestDigest: computeManifestDigest(base) };
-  const result = validateDeclarationManifest(withDigest);
+  const sealed: DeclarationManifest = {
+    ...base,
+    declarationInputDigest: computeDeclarationInputDigest(base),
+    fullManifestDigest: computeFullManifestDigest(base),
+  };
+  const result = validateDeclarationManifest(sealed);
   if (!result.ok) fail(`skeleton invalid:\n${result.issues.join("\n")}`);
-  writeFileSync(outPath, JSON.stringify(withDigest, null, 2) + "\n");
+  writeFileSync(outPath, JSON.stringify(sealed, null, 2) + "\n");
   console.log(`wrote validated skeleton (${entries.length} candidates) -> ${outPath}`);
 }
 
 function validate(manifestPath: string): void {
-  const result = validateDeclarationManifest(readJson<DeclarationManifest>(manifestPath));
+  const result = validateDeclarationManifest(readJson<unknown>(manifestPath));
   if (!result.ok) fail(`validation FAILED:\n${result.issues.join("\n")}`);
   console.log("validation PASSED");
 }
 
 function accounting(manifestPath: string, outPath: string): void {
-  const acct = computeCandidateAccounting(readJson<DeclarationManifest>(manifestPath));
+  const acct = computeCandidateAccounting(loadValidManifest(manifestPath));
   writeFileSync(outPath, JSON.stringify(acct, null, 2) + "\n");
   console.log(
-    `accounting: total ${acct.totalCandidateImages}, primary ${acct.primaryBlindCandidates}, pending ${acct.pending}, non-blind ${acct.nonBlindOperational}, excluded ${acct.excluded} -> ${outPath}`,
+    `accounting: total ${acct.totalCandidateImages}, complete ${acct.declarationsComplete}, primary ${acct.primaryBlindCandidates}, pending ${acct.pending}, non-blind ${acct.nonBlindOperational}, excluded ${acct.excluded} -> ${outPath}`,
   );
 }
 
 function noLeakage(manifestPath: string, outPath: string): void {
-  const result = checkNoLeakage(readJson<DeclarationManifest>(manifestPath));
+  const result = checkNoLeakage(loadValidManifest(manifestPath));
   writeFileSync(
     outPath,
     JSON.stringify(
@@ -143,6 +164,48 @@ function noLeakage(manifestPath: string, outPath: string): void {
   );
   if (!result.ok) fail(`leakage detected:\n${result.issues.join("\n")}`);
   console.log(`no-leakage PASSED -> ${outPath}`);
+}
+
+/** Verify source bytes against an authorized root dir, or digests against a trusted inventory. */
+function verifySources(manifestPath: string, rootOrInventory: string, outPath: string): void {
+  const manifest = loadValidManifest(manifestPath);
+  let report;
+  if (rootOrInventory.endsWith(".json")) {
+    const inv = readJson<
+      { files?: { sha256: string; sizeBytes: number }[] } | { sha256: string; sizeBytes: number }[]
+    >(rootOrInventory);
+    const files = Array.isArray(inv) ? inv : (inv.files ?? []);
+    const records: TrustedInventoryRecord[] = files.map((f) => ({
+      sha256: f.sha256,
+      sizeBytes: f.sizeBytes,
+    }));
+    report = verifySourcesAgainstInventory(manifest, records);
+  } else {
+    const root = resolve(rootOrInventory);
+    if (!existsSync(root) || !statSync(root).isDirectory())
+      fail(`authorized root is not a directory: ${rootOrInventory}`);
+    report = verifySourcesWithReader(manifest, (ref) => {
+      if (!isSafeSourceRelRef(ref)) return null;
+      const full = resolve(join(root, ref));
+      if (full !== root && !full.startsWith(root + sep)) return null; // path escape guard
+      if (!existsSync(full) || !statSync(full).isFile()) return null;
+      return new Uint8Array(readFileSync(full));
+    });
+  }
+  // Bounded report: relative refs only, never absolute private paths.
+  writeFileSync(
+    outPath,
+    JSON.stringify(
+      { ok: report.ok, results: report.results, checkedAt: new Date().toISOString() },
+      null,
+      2,
+    ) + "\n",
+  );
+  if (!report.ok)
+    fail(
+      `source verification FAILED (${report.results.filter((r) => !r.ok).length} of ${report.results.length}) -> ${outPath}`,
+    );
+  console.log(`source verification PASSED (${report.results.length} sources) -> ${outPath}`);
 }
 
 const [cmd, ...args] = process.argv.slice(2);
@@ -163,6 +226,15 @@ switch (cmd) {
     if (args.length !== 2) fail("no-leakage <manifest.json> <out.json>");
     noLeakage(args[0], args[1]);
     break;
+  case "verify-sources":
+    if (args.length !== 3)
+      fail(
+        "verify-sources <manifest.json> <authorized-root-dir | trusted-inventory.json> <out.json>",
+      );
+    verifySources(args[0], args[1], args[2]);
+    break;
   default:
-    fail(`unknown command ${cmd ?? "(none)"} — use skeleton|validate|accounting|no-leakage`);
+    fail(
+      `unknown command ${cmd ?? "(none)"} — use skeleton|validate|accounting|no-leakage|verify-sources`,
+    );
 }

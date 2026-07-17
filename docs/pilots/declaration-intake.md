@@ -61,20 +61,64 @@ governed `normalizedComparisonForm` + `valueState` + `uncertaintyState`),
 plus start/completion), `primaryBlindEligibilityState`, `exclusionOrNonBlindReason`,
 `schemaVersion`, `manifestEntryDigest`. The manifest holds the run-level
 `randomizationTimestamp`/`reviewerExposureTimestamp`/`machineExecutionTimestamp`
-(all null before freeze), `expectedCandidateCount`, and a whole-manifest digest.
+(all null before freeze), `expectedCandidateCount`, and **two seals** (below).
 
-## Validation rules (fail-closed)
+## Two seals (do not conflate)
 
-Required fields; schema version; source-type enum; 64-hex source digest;
-non-empty-or-explicit-missing values; supported alcohol syntax **without changing
-exact text**; governed normalization (no uncontrolled normalization); valid
-timestamps; non-negative intake durations; declaration timestamp before
-randomization/reviewer/machine timestamps; independence statement present for
-candidates; no forbidden provenance sources; unique run-002 case IDs; unique
-primary source-image membership; exposed/excluded cases barred from the primary
-pool; no run-001 outcome/machine-result keys; deterministic canonical
-serialization; stable per-entry and whole-manifest digests; case-count/accounting
-checks; and fail-closed rejection of incomplete or contradictory provenance.
+- **`declarationInputDigest`** binds the stable declaration-input projection —
+  schema/run/boundary/count and every entry's content. It is intentionally
+  independent of `preparedAt`/`preparedBy` and the lifecycle timestamps, so an
+  administrative re-record does not change the declaration-input identity.
+- **`fullManifestDigest`** binds the entire governed manifest state — everything
+  except the two digest fields themselves, including `preparedAt`, `preparedBy`,
+  and the randomization/reviewer/machine lifecycle timestamps.
+
+A change to a declared value moves **both** seals; a change to the preparer or a
+lifecycle timestamp moves **only** the full-manifest seal. Neither is called a
+"whole-manifest digest" unless it binds the whole manifest.
+
+## Provenance-complete declarations
+
+`isDeclarationProvenanceComplete` is the single governed predicate used by
+validation, primary-blind eligibility, **and** accounting. A declaration is
+counted `declarationsComplete` only when it has PRESENT brand+alcohol, a valid
+non-forbidden source type/reference, source access date, recorded-by
+identity/role, recorded timestamp, transcription method, independence statement,
+intake start+completion timestamps, all four non-negative component timings, and
+correct ordering before randomization/reviewer/machine. PRESENT values without
+that provenance are never counted complete.
+
+## Validation rules (fail-closed over untrusted JSON)
+
+Never throws on null/missing/malformed/wrong-typed input; rejects unknown keys at
+every governed object level; rejects arrays-for-objects and objects-for-primitives;
+**recursively** rejects run-001 / reviewer-answer / OCR / machine-result /
+adjudicator / expected-value keys at any depth. Plus: schema version; source-type
+enum; 64-hex source digest; non-empty-or-explicit-missing values; **supported
+alcohol syntax without changing exact text (bare numeric accepted, see below)**;
+governed normalization (no uncontrolled normalization); valid timestamps;
+non-negative intake durations; declaration timestamp before
+randomization/reviewer/machine; provenance-complete primary candidates; no
+forbidden provenance sources; unique run-002 case IDs; unique primary source-image
+membership; exposed/excluded cases barred from the primary pool; deterministic
+canonical serialization; stable per-entry and dual manifest seals; and
+case-count/accounting checks.
+
+## Source-byte integrity
+
+`verify-sources` recomputes SHA-256 from the actual bytes and checks byte size and
+media type (from magic bytes), either against files under an authorized root
+(path traversal/escape and missing files rejected) or against a trusted
+preservation inventory (digest + byte size). The report is bounded and contains
+only relative refs — never absolute private paths.
+
+## Alcohol input compatibility
+
+The deployed declared-value workflow accepts a **bare numeric** alcohol input
+(`12`, `12.5`). The manifest accepts both bare bounded numerics (0..100, ≤2
+decimals) and marker forms (`12.5% ALC./VOL.`, `13% by volume`); `Napa Valley`
+and out-of-range `120` are rejected. Exact source text is always preserved;
+governed normalization derives the numeric comparison form.
 
 ## Timing rules
 
@@ -93,6 +137,8 @@ $R skeleton   candidates.json declarations/declaration-manifest.json   # no decl
 $R validate   declarations/declaration-manifest.json
 $R accounting declarations/declaration-manifest.json manifests/candidate-accounting.json
 $R no-leakage declarations/declaration-manifest.json validation/no-leakage-report.json
+# verify source bytes against a trusted preservation inventory (or an authorized root dir)
+$R verify-sources declarations/declaration-manifest.json <inventory.json | authorized-root-dir> validation/source-integrity-report.json
 ```
 
 ## Boundary
