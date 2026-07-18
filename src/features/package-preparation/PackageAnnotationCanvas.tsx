@@ -50,17 +50,21 @@ export function PackageAnnotationCanvas({
   imageUrl,
   activeCategoryId,
   regions,
+  workingRegion,
   machineRegions,
   activeRegionId,
   onActiveRegionChange,
   onRegionCommit,
   onRegionRemove,
+  onWorkingRegionChange,
+  onWorkingRegionDiscard,
   onPanelRotationChange,
 }: {
   panel: PackagePanelMetadata;
   imageUrl: string;
   activeCategoryId: PackageCategoryId;
   regions: SellerEvidenceRegion[];
+  workingRegion: SellerEvidenceRegion | null;
   machineRegions: MachinePackageRegion[];
   activeRegionId: string | null;
   onActiveRegionChange: (regionId: string | null) => void;
@@ -69,6 +73,8 @@ export function PackageAnnotationCanvas({
     action: Extract<SellerPackageChangeAction, "region_added" | "region_moved" | "region_resized">,
   ) => void;
   onRegionRemove: (regionId: string) => void;
+  onWorkingRegionChange: (region: SellerEvidenceRegion) => void;
+  onWorkingRegionDiscard: () => void;
   onPanelRotationChange: (rotation: PackagePanelMetadata["rotation"]) => void;
 }) {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -77,11 +83,16 @@ export function PackageAnnotationCanvas({
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [previewRegion, setPreviewRegion] = useState<SellerEvidenceRegion | null>(null);
-  const [message, setMessage] = useState("Select Draw region, then click and drag on the image.");
+  const [message, setMessage] = useState(
+    "Move or resize the starter box, or draw a replacement region.",
+  );
 
   const activeRegion = useMemo(
-    () => regions.find((region) => region.regionId === activeRegionId) ?? null,
-    [activeRegionId, regions],
+    () =>
+      workingRegion?.regionId === activeRegionId
+        ? workingRegion
+        : (regions.find((region) => region.regionId === activeRegionId) ?? null),
+    [activeRegionId, regions, workingRegion],
   );
   const [coordinates, setCoordinates] = useState({ x: "", y: "", width: "", height: "" });
 
@@ -102,6 +113,7 @@ export function PackageAnnotationCanvas({
     setPreviewRegion(null);
     gestureRef.current = null;
     setTool("select");
+    setMessage("Move or resize the starter box, or draw a replacement region.");
   }, [activeCategoryId, panel.panelId]);
 
   function pointFromClient(clientX: number, clientY: number) {
@@ -145,7 +157,8 @@ export function PackageAnnotationCanvas({
     if (event.button !== 0) return;
     event.stopPropagation();
     onActiveRegionChange(region.regionId);
-    if (kind === "move" && tool !== "move") return;
+    const isWorkingRegion = region.regionId === workingRegion?.regionId;
+    if (kind === "move" && tool !== "move" && !isWorkingRegion) return;
     const point = pointFromClient(event.clientX, event.clientY);
     if (!point) return;
     gestureRef.current = {
@@ -220,12 +233,17 @@ export function PackageAnnotationCanvas({
       setMessage("No region was saved. Click and drag a larger non-empty rectangle.");
       return;
     }
-    const action =
-      gesture.kind === "draw"
-        ? "region_added"
-        : gesture.kind === "move"
-          ? "region_moved"
-          : "region_resized";
+    const isWorkingRegion = completed.regionId === workingRegion?.regionId;
+    if (gesture.kind === "draw" || isWorkingRegion) {
+      onWorkingRegionChange(completed);
+      onActiveRegionChange(completed.regionId);
+      setTool("select");
+      setMessage(
+        `${labelForCategory(activeCategoryId)} working box updated. Accept the category to save it.`,
+      );
+      return;
+    }
+    const action = gesture.kind === "move" ? "region_moved" : "region_resized";
     onRegionCommit(completed, action);
     onActiveRegionChange(completed.regionId);
     setTool("select");
@@ -245,20 +263,33 @@ export function PackageAnnotationCanvas({
       setMessage("Coordinates were not saved. Use non-empty percentages contained within 0–100.");
       return;
     }
+    if (activeRegion.regionId === workingRegion?.regionId) {
+      onWorkingRegionChange(next);
+      setMessage(
+        `${labelForCategory(activeCategoryId)} working coordinates updated. Accept to save them.`,
+      );
+      return;
+    }
     onRegionCommit(next, "region_resized");
     setMessage(`${labelForCategory(activeCategoryId)} coordinates saved.`);
   }
 
-  const visibleRegions = regions.map((region) =>
+  const baseRegions = workingRegion
+    ? [...regions.filter((region) => region.regionId !== workingRegion.regionId), workingRegion]
+    : regions;
+  const visibleRegions = baseRegions.map((region) =>
     previewRegion?.regionId === region.regionId ? previewRegion : region,
   );
-  if (previewRegion && !regions.some((region) => region.regionId === previewRegion.regionId)) {
+  if (previewRegion && !baseRegions.some((region) => region.regionId === previewRegion.regionId)) {
     visibleRegions.push(previewRegion);
   }
 
   const handleSize = 0.024 / zoom;
   return (
-    <section className="flex min-w-0 flex-col gap-4 rounded-md border border-border bg-card p-4">
+    <section
+      className="flex min-w-0 flex-col gap-4 rounded-md border border-border bg-card p-4"
+      data-testid="annotation-workspace"
+    >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -393,9 +424,18 @@ export function PackageAnnotationCanvas({
               size="sm"
               variant="outline"
               disabled={!activeRegion}
-              onClick={() => activeRegion && onRegionRemove(activeRegion.regionId)}
+              onClick={() => {
+                if (!activeRegion) return;
+                if (activeRegion.regionId === workingRegion?.regionId) {
+                  onWorkingRegionDiscard();
+                  return;
+                }
+                onRegionRemove(activeRegion.regionId);
+              }}
             >
-              Remove selected
+              {activeRegion?.regionId === workingRegion?.regionId
+                ? "Discard working box"
+                : "Remove selected"}
             </Button>
           </div>
           <p className="mt-2 text-sm" aria-live="polite">
@@ -454,6 +494,7 @@ export function PackageAnnotationCanvas({
 
           {visibleRegions.map((region, index) => {
             const active = region.regionId === activeRegionId;
+            const working = region.regionId === workingRegion?.regionId;
             const regionLabel = `${labelForCategory(region.categoryId)} seller region ${index + 1}`;
             return (
               <g
@@ -463,6 +504,7 @@ export function PackageAnnotationCanvas({
                 aria-label={regionLabel}
                 data-region-id={region.regionId}
                 data-active={active}
+                data-working={working}
                 onPointerDown={(event) => startRegionGesture(event, region, "move")}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ")
@@ -474,9 +516,10 @@ export function PackageAnnotationCanvas({
                   y={region.y}
                   width={region.width}
                   height={region.height}
-                  fill="rgba(194,65,12,.14)"
-                  stroke="rgb(194,65,12)"
+                  fill={working ? "rgba(126,34,206,.12)" : "rgba(194,65,12,.14)"}
+                  stroke={working ? "rgb(126,34,206)" : "rgb(194,65,12)"}
                   strokeWidth={(active ? 0.009 : 0.006) / zoom}
+                  strokeDasharray={working ? "0.018 0.01" : undefined}
                   vectorEffect="non-scaling-stroke"
                 />
                 <text
@@ -484,9 +527,9 @@ export function PackageAnnotationCanvas({
                   y={Math.max(0.025, region.y)}
                   fontSize={0.03 / zoom}
                   fontWeight="700"
-                  fill="rgb(124,45,18)"
+                  fill={working ? "rgb(88,28,135)" : "rgb(124,45,18)"}
                 >
-                  Seller · {labelForCategory(region.categoryId)}
+                  {working ? "Working" : "Seller"} · {labelForCategory(region.categoryId)}
                 </text>
                 {active
                   ? (["nw", "ne", "sw", "se"] as const).map((corner) => {
@@ -500,7 +543,7 @@ export function PackageAnnotationCanvas({
                           width={handleSize}
                           height={handleSize}
                           fill="white"
-                          stroke="rgb(124,45,18)"
+                          stroke={working ? "rgb(88,28,135)" : "rgb(124,45,18)"}
                           strokeWidth={0.004 / zoom}
                           vectorEffect="non-scaling-stroke"
                           aria-label={`Resize ${regionLabel} from ${corner}`}

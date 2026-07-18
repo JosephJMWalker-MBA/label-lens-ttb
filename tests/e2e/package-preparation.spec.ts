@@ -1,8 +1,38 @@
+import { mkdir } from "node:fs/promises";
+
 import { expect, test, type Page, type Route } from "@playwright/test";
 
 const FIXTURE = "tests/fixtures/precheck/m-cellars-24205001000905/label-ocr-source.jpeg";
+const SCREENSHOT_DIRECTORY = "docs/reviews/issue-140";
 
 test.use({ deviceScaleFactor: 2 });
+
+async function capture(
+  page: Page,
+  locator: ReturnType<Page["locator"]>,
+  name: string,
+  hideProgress = false,
+) {
+  if (process.env.ISSUE_140_SCREENSHOTS !== "1") return;
+  await mkdir(SCREENSHOT_DIRECTORY, { recursive: true });
+  const progress = page.locator('section[aria-labelledby="package-progress-heading"]');
+  const priorStyle = hideProgress ? await progress.getAttribute("style") : null;
+  if (hideProgress) {
+    await progress.evaluate((element) => {
+      (element as HTMLElement).style.position = "static";
+    });
+  }
+  try {
+    await locator.screenshot({ path: `${SCREENSHOT_DIRECTORY}/${name}.png` });
+  } finally {
+    if (hideProgress) {
+      await progress.evaluate((element, style) => {
+        if (style === null) element.removeAttribute("style");
+        else element.setAttribute("style", style);
+      }, priorStyle);
+    }
+  }
+}
 
 function packageDraftFromMultipart(route: Route) {
   const body = route.request().postDataBuffer()?.toString("utf8") ?? "";
@@ -169,25 +199,45 @@ test("seller prepares, saves, analyzes, exports, reloads, and reanalyzes a front
   await mockPackageAnalysis(page);
   await page.goto("/review");
   await expect(
-    page.getByRole("heading", { name: /upload the seller label package/i }),
+    page.getByRole("heading", { name: /see the two label areas this profile reviews/i }),
   ).toBeVisible();
+  await expect(page.getByTestId("example-label-map")).toBeVisible();
+  await capture(
+    page,
+    page.locator('section[aria-labelledby="example-label-map-heading"]'),
+    "01-example-label-map",
+    true,
+  );
+  await page.getByRole("button", { name: /start with my label panels/i }).click();
 
   await page.getByLabel(/front panel image/i).setInputFiles(FIXTURE);
   await page.getByLabel(/back panel image/i).setInputFiles(FIXTURE);
+  await expect(page.getByRole("heading", { name: "Brand name" })).toBeVisible();
   await page.getByRole("button", { name: /^front panel$/i }).click();
-  await page.getByLabel(/seller-provided value/i).fill("M CELLARS");
+  await page.getByLabel(/what the label says/i).fill("M CELLARS");
+  await capture(page, page.getByTestId("annotation-workspace"), "02-front-starter-box", true);
 
   await page.getByRole("button", { name: /zoom in/i }).click();
   await page.getByRole("button", { name: /pan right/i }).click();
   await page.getByRole("button", { name: /reset view/i }).click();
   await page.getByRole("button", { name: /rotate clockwise/i }).click();
   await page.getByRole("button", { name: /reset view/i }).click();
-  await dragRegion(page);
-  await expect(page.getByText(/1 across 1 panel/)).toBeVisible();
+  await page.getByLabel(/^left %$/i).fill("10");
+  await page.getByLabel(/^top %$/i).fill("10");
+  await page.getByLabel(/^width %$/i).fill("75");
+  await page.getByLabel(/^height %$/i).fill("70");
+  await page.getByRole("button", { name: /apply coordinates/i }).click();
+  await page.getByRole("button", { name: /accept brand name/i }).click();
+  await expect(page.getByRole("heading", { name: "Alcohol statement" })).toBeVisible();
+  await capture(
+    page,
+    page.locator('section[aria-labelledby="package-progress-heading"]'),
+    "03-progress-one-category-complete",
+  );
 
-  await page.getByRole("button", { name: /alcohol statement.*preparation incomplete/i }).click();
   await page.getByRole("button", { name: /^back panel$/i }).click();
-  await page.getByLabel(/seller-provided value/i).fill("12.5");
+  await page.getByLabel(/what the label says/i).fill("12.5");
+  await capture(page, page.getByTestId("annotation-workspace"), "04-back-starter-box", true);
   await dragRegion(page);
 
   await page.getByLabel(/^left %$/i).fill("10");
@@ -195,8 +245,6 @@ test("seller prepares, saves, analyzes, exports, reloads, and reanalyzes a front
   await page.getByLabel(/^width %$/i).fill("75");
   await page.getByLabel(/^height %$/i).fill("70");
   await page.getByRole("button", { name: /apply coordinates/i }).click();
-  await dragRegion(page);
-  await expect(page.getByText(/2 across 1 panel/)).toBeVisible();
 
   const southeastHandle = page.locator('rect[aria-label$="from se"]');
   const handleBox = await southeastHandle.boundingBox();
@@ -223,14 +271,19 @@ test("seller prepares, saves, analyzes, exports, reloads, and reanalyzes a front
     selectedBox!.y + selectedBox!.height / 2 + 8,
   );
   await page.mouse.up();
-  await page.getByRole("button", { name: /remove selected/i }).click();
-  await expect(page.getByText(/1 across 1 panel/)).toBeVisible();
+  await page.getByRole("button", { name: /accept alcohol statement/i }).click();
+  await expect(page.getByText(/Categories: 2\/2 complete/i)).toBeVisible();
 
   await page.getByRole("button", { name: /save draft locally/i }).click();
-  await expect(page.getByText(/Draft: saved/)).toBeVisible();
+  await expect(page.getByText(/Local draft: saved/)).toBeVisible();
   await page.getByRole("button", { name: /analyze saved package/i }).click();
-  await expect(page.getByText(/Analysis runs: 1/)).toBeVisible();
+  await expect(page.getByText(/Pre-check runs: 1/)).toBeVisible();
   await expect(page.getByText(/Ready for local agent-package export/).first()).toBeVisible();
+  await capture(
+    page,
+    page.locator('section[aria-labelledby="package-progress-heading"]'),
+    "05-completed-ready-state",
+  );
 
   await page.getByLabel(/seller or submitter name/i).fill("Seller E2E");
   const downloadPromise = page.waitForEvent("download");
@@ -239,23 +292,33 @@ test("seller prepares, saves, analyzes, exports, reloads, and reanalyzes a front
   expect(download.suggestedFilename()).toMatch(/seller-agent-package\.json$/);
   await expect(page.getByText(/nothing was sent to an agent or to TTB/i)).toBeVisible();
 
-  await page.getByRole("button", { name: /copy machine region as seller region/i }).click();
+  await page.getByRole("button", { name: /use machine box as working suggestion/i }).click();
+  await page.getByRole("button", { name: /accept alcohol statement/i }).click();
   await expect(page.getByText(/Reanalysis required after seller changes/).first()).toBeVisible();
   await expect(
     page.getByRole("button", { name: /submit to agent.*download locally/i }),
   ).toBeDisabled();
   await page.getByRole("button", { name: /save draft locally/i }).click();
   await page.getByRole("button", { name: /analyze saved package/i }).click();
-  await expect(page.getByText(/Analysis runs: 2/)).toBeVisible();
+  await expect(page.getByText(/Pre-check runs: 2/)).toBeVisible();
 
   await page.reload();
-  await expect(page.getByText(/Analysis runs: 2/)).toBeVisible();
+  await expect(page.getByText(/Pre-check runs: 2/)).toBeVisible();
   await page.getByRole("button", { name: /brand name.*clearly readable/i }).click();
-  await page.getByLabel(/seller-provided value/i).fill("WRONG BRAND");
+  await page.getByLabel(/what the label says/i).fill("WRONG BRAND");
+  await page.getByRole("button", { name: /accept brand name/i }).click();
   await page.getByRole("button", { name: /save draft locally/i }).click();
   await page.getByRole("button", { name: /analyze saved package/i }).click();
-  await expect(page.getByText(/Analysis runs: 3/)).toBeVisible();
+  await expect(page.getByText(/Pre-check runs: 3/)).toBeVisible();
   await expect(page.getByText(/Seller review required/).first()).toBeVisible();
+  await expect(
+    page.getByLabel("Category progress").getByRole("button", { name: /brand name/i }),
+  ).toBeVisible();
+  await expect(
+    page.getByLabel("Category progress").getByRole("button", { name: /alcohol statement/i }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: /next category/i }).click();
+  await expect(page.getByRole("heading", { name: "Brand name" })).toBeVisible();
   await expect(
     page.getByRole("button", { name: /submit to agent.*download locally/i }),
   ).toBeDisabled();
@@ -293,4 +356,13 @@ test("package workspace stacks without horizontal overflow at 390px", async ({ p
   );
   expect(overflow).toBeLessThanOrEqual(1);
   await expect(page.getByText(/nothing is submitted to TTB/i)).toBeVisible();
+  await capture(page, page.locator("body"), "06-mobile-390");
+  await page.getByRole("button", { name: /start with my label panels/i }).click();
+  await page.getByLabel(/front panel image/i).setInputFiles(FIXTURE);
+  await page.getByLabel(/back panel image/i).setInputFiles(FIXTURE);
+  await expect(page.getByTestId("annotation-workspace")).toBeVisible();
+  const annotationOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(annotationOverflow).toBeLessThanOrEqual(1);
 });

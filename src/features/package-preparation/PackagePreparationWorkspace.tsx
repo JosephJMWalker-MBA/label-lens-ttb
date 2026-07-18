@@ -7,7 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { triggerDownload } from "@/features/precheck/download";
 
+import { GuidedCategoryTask } from "./GuidedCategoryTask";
 import { PackageAnnotationCanvas, type MachinePackageRegion } from "./PackageAnnotationCanvas";
+import { PackageProgressHeader } from "./PackageProgressHeader";
+import { ProfileExampleLabelMap } from "./ProfileExampleLabelMap";
 import {
   loadPackageDraftLocally,
   savePackageDraftLocally,
@@ -16,12 +19,11 @@ import {
 import {
   appendSellerChange,
   buildSellerPackageExport,
-  categoryPreparationComplete,
   labelForCategory,
   latestAnalysisIsCurrent,
   normalizedRegionFromObservation,
-  packagePreparationComplete,
   serializeSellerPackageExport,
+  validNormalizedRegion,
   type CategoryAnalysisState,
   type PackageCategoryDraft,
   type PackageCategoryId,
@@ -33,12 +35,16 @@ import {
   type SellerPackageChangeAction,
   type SellerPackageDraft,
 } from "./package-model";
-import { WINE_PACKAGE_CATEGORY_DEFINITIONS, WINE_PACKAGE_PROFILE } from "./package-profile";
+import {
+  WINE_PACKAGE_CATEGORY_DEFINITIONS,
+  WINE_PACKAGE_CATEGORY_INSTRUCTIONS,
+  WINE_PACKAGE_PROFILE,
+} from "./package-profile";
+import { deriveGuidedPackageWorkflow, type PackageSaveState } from "./package-workflow";
 
 const ACCEPTED_IMAGES = "image/png,image/jpeg";
 const MAX_PACKAGE_PANELS = 6;
 
-type SaveState = "unsaved" | "saving" | "saved" | "error";
 type AnalysisState = "idle" | "analyzing" | "complete" | "error";
 
 interface RuntimePanel {
@@ -185,15 +191,40 @@ function readinessLabel(readiness: PackageReadiness | undefined, analysisCurrent
     : "Seller review required";
 }
 
+function restoredSaveState(draft: SellerPackageDraft): PackageSaveState {
+  const lastAction = draft.sellerChangeHistory.at(-1)?.action;
+  return lastAction === "draft_saved" ||
+    lastAction === "analysis_completed" ||
+    lastAction === "agent_package_exported"
+    ? "saved"
+    : "unsaved";
+}
+
+function sameRegion(left: SellerEvidenceRegion, right: SellerEvidenceRegion): boolean {
+  return (
+    left.regionId === right.regionId &&
+    left.categoryId === right.categoryId &&
+    left.panelId === right.panelId &&
+    left.x === right.x &&
+    left.y === right.y &&
+    left.width === right.width &&
+    left.height === right.height
+  );
+}
+
 export function PackagePreparationWorkspace() {
   const [draft, setDraft] = useState<SellerPackageDraft | null>(null);
   const [runtimePanels, setRuntimePanels] = useState<RuntimePanel[]>([]);
   const [activePanelId, setActivePanelId] = useState<string | null>(null);
   const [activeCategoryId, setActiveCategoryId] = useState<PackageCategoryId>("brandName");
   const [activeRegionId, setActiveRegionId] = useState<string | null>(null);
+  const [workingRegion, setWorkingRegion] = useState<SellerEvidenceRegion | null>(null);
+  const [workingValue, setWorkingValue] = useState("");
+  const [acceptingCategory, setAcceptingCategory] = useState(false);
+  const [learnComplete, setLearnComplete] = useState(false);
   const [optionalRole, setOptionalRole] =
     useState<Extract<PanelRole, "neck" | "side" | "other">>("neck");
-  const [saveState, setSaveState] = useState<SaveState>("unsaved");
+  const [saveState, setSaveState] = useState<PackageSaveState>("unsaved");
   const [analysisState, setAnalysisState] = useState<AnalysisState>("idle");
   const [submitter, setSubmitter] = useState("");
   const [message, setMessage] = useState(
@@ -226,7 +257,8 @@ export function PackagePreparationWorkspace() {
         setDraft(stored.draft);
         setRuntimePanels(runtime);
         setActivePanelId(stored.draft.panels[0]?.panelId ?? null);
-        setSaveState("saved");
+        setLearnComplete(stored.draft.panels.length > 0);
+        setSaveState(restoredSaveState(stored.draft));
         setAnalysisState(stored.draft.analysisRuns.length > 0 ? "complete" : "idle");
         setMessage("Restored the last locally saved seller package draft in this browser.");
       })
@@ -258,17 +290,28 @@ export function PackagePreparationWorkspace() {
   const activeDefinition = WINE_PACKAGE_CATEGORY_DEFINITIONS.find(
     (definition) => definition.categoryId === activeCategoryId,
   );
+  const activeInstruction = WINE_PACKAGE_CATEGORY_INSTRUCTIONS.find(
+    (instruction) => instruction.categoryId === activeCategoryId,
+  );
+  const activePanelForWorkingId = activePanel?.panelId ?? null;
+  const activeCategoryExpectedValue = activeCategory?.expectedValue ?? "";
+  const activeCategoryRegions = activeCategory?.regions;
   const latestRun = draft?.analysisRuns.at(-1);
   const analysisCurrent = draft ? latestAnalysisIsCurrent(draft) : false;
   const latestCategoryResult = latestRun?.categories.find(
     (category) => category.categoryId === activeCategoryId,
   );
-  const preparationComplete = draft
-    ? packagePreparationComplete(draft, WINE_PACKAGE_CATEGORY_DEFINITIONS)
-    : false;
+  const workflow = draft
+    ? deriveGuidedPackageWorkflow({
+        draft,
+        definitions: WINE_PACKAGE_CATEGORY_DEFINITIONS,
+        instructions: WINE_PACKAGE_CATEGORY_INSTRUCTIONS,
+        saveState,
+        learnComplete,
+      })
+    : null;
   const canAnalyze =
-    preparationComplete &&
-    saveState === "saved" &&
+    workflow?.readyForPrecheck === true &&
     analysisState !== "analyzing" &&
     draft?.panels.length === runtimePanels.length;
   const canExport =
@@ -276,6 +319,35 @@ export function PackagePreparationWorkspace() {
     analysisCurrent &&
     saveState === "saved" &&
     submitter.trim() !== "";
+
+  useEffect(() => {
+    if (!activePanelForWorkingId || !activeCategoryRegions || !activeInstruction) {
+      setWorkingRegion(null);
+      setWorkingValue(activeCategoryExpectedValue);
+      setActiveRegionId(null);
+      return;
+    }
+    const existing = activeCategoryRegions.find(
+      (region) => region.panelId === activePanelForWorkingId,
+    );
+    const nextRegion: SellerEvidenceRegion = existing ?? {
+      regionId: makeId("working-region"),
+      categoryId: activeCategoryId,
+      panelId: activePanelForWorkingId,
+      unit: "normalized-panel-relative",
+      provenance: "seller-selected-region",
+      ...activeInstruction.starterRegion,
+    };
+    setWorkingValue(activeCategoryExpectedValue);
+    setWorkingRegion(nextRegion);
+    setActiveRegionId(nextRegion.regionId);
+  }, [
+    activeCategoryExpectedValue,
+    activeCategoryRegions,
+    activeCategoryId,
+    activeInstruction,
+    activePanelForWorkingId,
+  ]);
 
   const machineRegions = useMemo<MachinePackageRegion[]>(() => {
     if (!activePanel || !latestRun) return [];
@@ -304,6 +376,61 @@ export function PackagePreparationWorkspace() {
     setDraft(next);
     setSaveState("unsaved");
     if (nextMessage) setMessage(nextMessage);
+  }
+
+  function selectCategory(categoryId: PackageCategoryId, sourceDraft = draftRef.current) {
+    setActiveCategoryId(categoryId);
+    setActiveRegionId(null);
+    if (!sourceDraft) return;
+    const category = sourceDraft.categories.find(
+      (candidate) => candidate.categoryId === categoryId,
+    );
+    const instruction = WINE_PACKAGE_CATEGORY_INSTRUCTIONS.find(
+      (candidate) => candidate.categoryId === categoryId,
+    );
+    const preferredPanelId =
+      category?.regions[0]?.panelId ??
+      sourceDraft.panels.find((panel) => panel.role === instruction?.examplePanelRole)?.panelId ??
+      sourceDraft.panels[0]?.panelId ??
+      null;
+    setActivePanelId(preferredPanelId);
+  }
+
+  function selectAdjacentCategory(direction: -1 | 1, sourceDraft = draftRef.current) {
+    if (!sourceDraft) return;
+    const sourceRun = sourceDraft.analysisRuns.at(-1);
+    const definitions =
+      sourceRun?.readiness === "needs_seller_review"
+        ? WINE_PACKAGE_CATEGORY_DEFINITIONS.filter((definition) => {
+            const result = sourceRun.categories.find(
+              (category) => category.categoryId === definition.categoryId,
+            );
+            return (
+              result && result.state !== "clearly_readable" && result.state !== "not_applicable"
+            );
+          })
+        : WINE_PACKAGE_CATEGORY_DEFINITIONS;
+    if (definitions.length === 0) return;
+    const currentIndex = Math.max(
+      0,
+      definitions.findIndex((definition) => definition.categoryId === activeCategoryId),
+    );
+    const nextIndex = (currentIndex + direction + definitions.length) % definitions.length;
+    selectCategory(definitions[nextIndex].categoryId, sourceDraft);
+  }
+
+  function selectNextFocusedCategory(sourceDraft: SellerPackageDraft) {
+    const nextWorkflow = deriveGuidedPackageWorkflow({
+      draft: sourceDraft,
+      definitions: WINE_PACKAGE_CATEGORY_DEFINITIONS,
+      instructions: WINE_PACKAGE_CATEGORY_INSTRUCTIONS,
+      saveState: "unsaved",
+      learnComplete: true,
+    });
+    const nextCategoryId = nextWorkflow.focusCategoryIds.find(
+      (categoryId) => categoryId !== activeCategoryId,
+    );
+    if (nextCategoryId) selectCategory(nextCategoryId, sourceDraft);
   }
 
   async function receivePanel(role: PanelRole, file: File | undefined, panelId?: string) {
@@ -382,7 +509,14 @@ export function PackagePreparationWorkspace() {
       ];
       runtimePanelsRef.current = nextRuntime;
       setRuntimePanels(nextRuntime);
-      setActivePanelId(identity);
+      setLearnComplete(true);
+      const activeCategoryInstruction = WINE_PACKAGE_CATEGORY_INSTRUCTIONS.find(
+        (instruction) => instruction.categoryId === activeCategoryId,
+      );
+      setActivePanelId(
+        panels.find((candidate) => candidate.role === activeCategoryInstruction?.examplePanelRole)
+          ?.panelId ?? identity,
+      );
       updateDraft(
         next,
         `${ROLE_LABEL[role]} saved in the working draft. Save the draft to persist it.`,
@@ -424,26 +558,6 @@ export function PackagePreparationWorkspace() {
     setActivePanelId(next.panels[0]?.panelId ?? null);
     setActiveRegionId(null);
     updateDraft(next, "Optional panel removed. Historical machine runs remain unchanged.");
-  }
-
-  function updateCategory(
-    categoryId: PackageCategoryId,
-    mutation: (category: PackageCategoryDraft) => PackageCategoryDraft,
-    detail: string,
-  ) {
-    if (!draft) return;
-    let updatedCategory: PackageCategoryDraft | undefined;
-    const categories = draft.categories.map((category) => {
-      if (category.categoryId !== categoryId) return category;
-      updatedCategory = mutation(category);
-      return updatedCategory;
-    });
-    if (!updatedCategory) return;
-    const next = appendSellerChange(
-      { ...draft, categories },
-      changeFor({ action: "category_updated", category: updatedCategory, detail }),
-    );
-    updateDraft(next, detail);
   }
 
   function commitRegion(
@@ -528,9 +642,144 @@ export function PackagePreparationWorkspace() {
       setMessage("No contained machine region is available for this category on the active panel.");
       return;
     }
-    commitRegion(region, "region_added");
+    setWorkingRegion(region);
+    setActiveRegionId(region.regionId);
     setMessage(
-      "Machine geometry was copied into a new seller region. The machine observation remains unchanged.",
+      "Machine geometry was copied into the uncommitted working box. Accept the category to save seller evidence; the machine observation remains unchanged.",
+    );
+  }
+
+  async function checkpointCategory(next: SellerPackageDraft, successMessage: string) {
+    setAcceptingCategory(true);
+    try {
+      await savePackageDraftLocally({
+        draft: next,
+        panelFiles: orderedPanelFiles(next, runtimePanelsRef.current),
+      });
+      draftRef.current = next;
+      setDraft(next);
+      setSaveState("unsaved");
+      setMessage(successMessage);
+      selectNextFocusedCategory(next);
+      return true;
+    } catch {
+      setSaveState("error");
+      setMessage(
+        "This category was not accepted because the local recovery checkpoint failed. Nothing was added to seller history, and the workflow did not advance.",
+      );
+      return false;
+    } finally {
+      setAcceptingCategory(false);
+    }
+  }
+
+  async function acceptActiveCategory() {
+    if (!draft || !activeCategory || !activeDefinition) return;
+    if (activeDefinition.requiresValue && workingValue.trim() === "") {
+      setMessage(`Enter the ${activeDefinition.label.toLowerCase()} exactly as it appears.`);
+      return;
+    }
+    const acceptedRegion =
+      workingRegion && validNormalizedRegion(workingRegion) ? workingRegion : null;
+    if (!acceptedRegion && activeCategory.regions.length === 0) {
+      setMessage("Move, resize, or draw a non-empty evidence box before accepting this category.");
+      return;
+    }
+
+    const existingRegion = acceptedRegion
+      ? activeCategory.regions.find((region) => region.regionId === acceptedRegion.regionId)
+      : undefined;
+    const regions = acceptedRegion
+      ? existingRegion
+        ? activeCategory.regions.map((region) =>
+            region.regionId === acceptedRegion.regionId ? acceptedRegion : region,
+          )
+        : [...activeCategory.regions, acceptedRegion]
+      : activeCategory.regions;
+    const updatedCategory: PackageCategoryDraft = {
+      ...activeCategory,
+      decision: "provided",
+      expectedValue: workingValue.trim(),
+      regions,
+    };
+    let next: SellerPackageDraft = {
+      ...draft,
+      categories: draft.categories.map((category) =>
+        category.categoryId === activeCategoryId ? updatedCategory : category,
+      ),
+    };
+    const categoryChanged =
+      activeCategory.decision !== updatedCategory.decision ||
+      activeCategory.expectedValue !== updatedCategory.expectedValue;
+    if (categoryChanged) {
+      next = appendSellerChange(
+        next,
+        changeFor({
+          action: "category_updated",
+          category: updatedCategory,
+          detail: `${activeDefinition.label} seller value and decision explicitly accepted.`,
+        }),
+      );
+    }
+    if (acceptedRegion && (!existingRegion || !sameRegion(existingRegion, acceptedRegion))) {
+      const action: Extract<
+        SellerPackageChangeAction,
+        "region_added" | "region_moved" | "region_resized"
+      > = !existingRegion
+        ? "region_added"
+        : existingRegion.width !== acceptedRegion.width ||
+            existingRegion.height !== acceptedRegion.height
+          ? "region_resized"
+          : "region_moved";
+      next = appendSellerChange(
+        next,
+        changeFor({
+          action,
+          region: acceptedRegion,
+          detail: `${activeDefinition.label} working box explicitly accepted on panel ${acceptedRegion.panelId}.`,
+        }),
+      );
+    }
+
+    if (
+      !categoryChanged &&
+      (!acceptedRegion || (existingRegion && sameRegion(existingRegion, acceptedRegion)))
+    ) {
+      setMessage(
+        `${activeDefinition.label} was already accepted; seller history was not duplicated.`,
+      );
+      selectNextFocusedCategory(draft);
+      return;
+    }
+    await checkpointCategory(
+      next,
+      `${activeDefinition.label} accepted and recovery-checkpointed in this browser. Save the whole package before pre-check.`,
+    );
+  }
+
+  async function markActiveCategoryNeedsAttention() {
+    if (!draft || !activeCategory || !activeDefinition) return;
+    const updatedCategory: PackageCategoryDraft = {
+      ...activeCategory,
+      decision: "unresolved",
+      expectedValue: workingValue.trim(),
+    };
+    const next = appendSellerChange(
+      {
+        ...draft,
+        categories: draft.categories.map((category) =>
+          category.categoryId === activeCategoryId ? updatedCategory : category,
+        ),
+      },
+      changeFor({
+        action: "category_updated",
+        category: updatedCategory,
+        detail: `${activeDefinition.label} explicitly marked as needing seller attention.`,
+      }),
+    );
+    await checkpointCategory(
+      next,
+      `${activeDefinition.label} remains incomplete and was recovery-checkpointed without guessing.`,
     );
   }
 
@@ -590,6 +839,10 @@ export function PackagePreparationWorkspace() {
       setDraft(analyzed);
       setSaveState("saved");
       setAnalysisState("complete");
+      const firstFlagged = result.data.analysisRun.categories.find(
+        (category) => category.state !== "clearly_readable" && category.state !== "not_applicable",
+      );
+      if (firstFlagged) selectCategory(firstFlagged.categoryId, analyzed);
       setMessage(
         `${readinessLabel(result.data.analysisRun.readiness)}. Correct evidence in this workspace and save before reanalysis.`,
       );
@@ -638,37 +891,60 @@ export function PackagePreparationWorkspace() {
     }
   }
 
-  if (restoring || !draft) {
+  if (restoring || !draft || !workflow) {
     return <p role="status">Restoring the locally saved package draft…</p>;
   }
 
+  const focusedDefinitions =
+    latestRun?.readiness === "needs_seller_review"
+      ? WINE_PACKAGE_CATEGORY_DEFINITIONS.filter((definition) =>
+          workflow.flaggedCategoryIds.includes(definition.categoryId),
+        )
+      : WINE_PACKAGE_CATEGORY_DEFINITIONS;
+  const activeTaskPosition = Math.max(
+    0,
+    focusedDefinitions.findIndex((definition) => definition.categoryId === activeCategoryId),
+  );
+
   return (
     <section className="flex min-w-0 flex-col gap-8">
-      <div className="sticky top-0 z-20 grid min-w-0 gap-3 rounded-md border border-border bg-background/95 p-4 shadow-sm backdrop-blur md:grid-cols-[minmax(0,1fr)_auto]">
-        <div className="min-w-0">
-          <p className="text-sm font-semibold">Package {draft.packageId}</p>
-          <p className="break-words text-sm text-muted-foreground" aria-live="polite">
-            {message}
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="rounded border border-border px-2 py-1">Draft: {saveState}</span>
-          <span className="rounded border border-border px-2 py-1">
-            Analysis runs: {draft.analysisRuns.length}
-          </span>
-          <span className="rounded border border-border px-2 py-1">
-            {readinessLabel(latestRun?.readiness, analysisCurrent)}
-          </span>
-        </div>
-      </div>
+      <PackageProgressHeader
+        packageId={draft.packageId}
+        workflow={workflow}
+        saveState={saveState}
+        analysisRunCount={draft.analysisRuns.length}
+        message={message}
+      />
+
+      {!learnComplete ? (
+        <ProfileExampleLabelMap
+          instructions={WINE_PACKAGE_CATEGORY_INSTRUCTIONS}
+          onContinue={() => {
+            setLearnComplete(true);
+            setMessage("Example reviewed. Upload the required front and back label panels.");
+          }}
+        />
+      ) : (
+        <details className="rounded-md border border-border p-3">
+          <summary className="cursor-pointer text-sm font-semibold">
+            Reopen the synthetic example label map
+          </summary>
+          <div className="mt-3">
+            <ProfileExampleLabelMap
+              instructions={WINE_PACKAGE_CATEGORY_INSTRUCTIONS}
+              onContinue={() => setLearnComplete(true)}
+            />
+          </div>
+        </details>
+      )}
 
       <section className="flex min-w-0 flex-col gap-4" aria-labelledby="package-panels-heading">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Step 1
+            Phase B · Upload
           </p>
           <h2 id="package-panels-heading" className="text-2xl font-semibold">
-            Upload the seller label package
+            Upload the front and back label panels
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Front and back are required and remain independent artifacts. Each panel keeps its own
@@ -782,7 +1058,9 @@ export function PackagePreparationWorkspace() {
                     aria-pressed={panel.panelId === activePanelId}
                     onClick={() => {
                       setActivePanelId(panel.panelId);
-                      setActiveRegionId(null);
+                      setActiveRegionId(
+                        panel.panelId === workingRegion?.panelId ? workingRegion.regionId : null,
+                      );
                     }}
                   >
                     {ROLE_LABEL[panel.role]}
@@ -804,175 +1082,143 @@ export function PackagePreparationWorkspace() {
         ) : null}
       </section>
 
-      <section className="flex min-w-0 flex-col gap-4" aria-labelledby="category-checklist-heading">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Step 2
-          </p>
-          <h2 id="category-checklist-heading" className="text-2xl font-semibold">
-            Prepare profile evidence
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            This checklist contains only categories backed by the existing reviewed wine
-            requirements profile. Mark uncertainty directly; do not guess.
-          </p>
-        </div>
+      {workflow.frontUploaded && workflow.backUploaded ? (
+        <section
+          className="flex min-w-0 flex-col gap-4"
+          aria-labelledby="category-checklist-heading"
+        >
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              {latestRun?.readiness === "needs_seller_review"
+                ? "Phase E · Fix flagged categories"
+                : "Phase C · Mark one category at a time"}
+            </p>
+            <h2 id="category-checklist-heading" className="text-2xl font-semibold">
+              {latestRun?.readiness === "needs_seller_review"
+                ? "Correct only what the pre-check flagged"
+                : "Prepare the reviewed profile evidence"}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {latestRun?.readiness === "needs_seller_review"
+                ? "Passing categories stay out of the correction queue. Seller edits make the prior run stale until save and re-check."
+                : "The active reviewed profile currently contains brand name and alcohol statement only. Accept each task explicitly; uncertainty never counts as ready."}
+            </p>
+          </div>
 
-        <div className="grid min-w-0 gap-3 sm:grid-cols-2">
-          {WINE_PACKAGE_CATEGORY_DEFINITIONS.map((definition) => {
-            const category = draft.categories.find(
-              (candidate) => candidate.categoryId === definition.categoryId,
-            )!;
-            const result = latestRun?.categories.find(
-              (candidate) => candidate.categoryId === definition.categoryId,
-            );
-            const complete = categoryPreparationComplete(category, definition);
-            return (
-              <button
-                key={definition.categoryId}
-                type="button"
-                className={`min-w-0 rounded-md border p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                  activeCategoryId === definition.categoryId
-                    ? "border-primary bg-muted/40"
-                    : "border-border"
-                }`}
-                aria-pressed={activeCategoryId === definition.categoryId}
-                onClick={() => {
-                  setActiveCategoryId(definition.categoryId);
-                  setActiveRegionId(null);
-                }}
-              >
-                <span className="block font-semibold">{definition.label}</span>
-                <span className="block break-words text-xs text-muted-foreground">
-                  {complete ? "Prepared" : "Preparation incomplete"} · {category.regions.length}{" "}
-                  seller region{category.regions.length === 1 ? "" : "s"}
-                </span>
-                <span className="mt-1 block text-xs">
-                  Analysis: {result ? ANALYSIS_LABEL[result.state] : "Not run"}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
+          <div className="grid min-w-0 gap-3 sm:grid-cols-2" aria-label="Category progress">
+            {focusedDefinitions.map((definition) => {
+              const status = workflow.categoryStatuses.find(
+                (candidate) => candidate.categoryId === definition.categoryId,
+              );
+              const result = latestRun?.categories.find(
+                (candidate) => candidate.categoryId === definition.categoryId,
+              );
+              return (
+                <button
+                  key={definition.categoryId}
+                  type="button"
+                  className={`min-w-0 rounded-md border p-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    activeCategoryId === definition.categoryId
+                      ? "border-primary bg-muted/40"
+                      : "border-border"
+                  }`}
+                  aria-pressed={activeCategoryId === definition.categoryId}
+                  onClick={() => selectCategory(definition.categoryId)}
+                >
+                  <span className="block font-semibold">{definition.label}</span>
+                  <span className="block text-xs text-muted-foreground">
+                    {status?.complete
+                      ? "Accepted"
+                      : status?.needsAttention
+                        ? "Needs attention — readiness blocked"
+                        : "Incomplete"}
+                    {result ? ` · ${ANALYSIS_LABEL[result.state]}` : " · Pre-check not run"}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
-      {activePanel && activeRuntimePanel && activeCategory && activeDefinition ? (
-        <div className="grid min-w-0 items-start gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(20rem,0.75fr)]">
-          <PackageAnnotationCanvas
-            panel={activePanel}
-            imageUrl={activeRuntimePanel.imageUrl}
-            activeCategoryId={activeCategoryId}
-            regions={activeCategory.regions.filter((region) => region.panelId === activePanelId)}
-            machineRegions={machineRegions}
-            activeRegionId={activeRegionId}
-            onActiveRegionChange={setActiveRegionId}
-            onRegionCommit={commitRegion}
-            onRegionRemove={removeRegion}
-            onPanelRotationChange={rotatePanel}
-          />
-
-          <aside className="flex min-w-0 flex-col gap-4 rounded-md border border-border bg-card p-4 lg:sticky lg:top-28">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Active category
-              </p>
-              <h3 className="text-xl font-semibold">{activeDefinition.label}</h3>
-              <p className="text-xs text-muted-foreground">
-                Registry requirement {activeDefinition.requirementId} v
-                {activeDefinition.requirementVersion} · {activeDefinition.applicability}
-              </p>
-            </div>
-
-            <fieldset className="flex flex-col gap-2">
-              <legend className="text-sm font-semibold">Seller preparation decision</legend>
-              {(
-                [
-                  ["provided", "I can provide a value and evidence region"],
-                  ["unresolved", "Unable to confirm — preserve uncertainty"],
-                  ["not_present", "Not present on the supplied package"],
-                ] as const
-              ).map(([decision, label]) => (
-                <label key={decision} className="flex items-start gap-2 text-sm">
-                  <input
-                    type="radio"
-                    name={`decision-${activeCategoryId}`}
-                    value={decision}
-                    checked={activeCategory.decision === decision}
-                    onChange={() =>
-                      updateCategory(
-                        activeCategoryId,
-                        (category) => ({ ...category, decision }),
-                        `${activeDefinition.label} seller decision changed to ${decision}.`,
-                      )
-                    }
-                  />
-                  <span>{label}</span>
-                </label>
-              ))}
-            </fieldset>
-
-            <div>
-              <Label htmlFor="seller-expected-value">Seller-provided value</Label>
-              <Input
-                id="seller-expected-value"
-                value={activeCategory.expectedValue}
-                disabled={activeCategory.decision !== "provided"}
-                onChange={(event) => {
-                  const expectedValue = event.target.value;
-                  updateCategory(
-                    activeCategoryId,
-                    (category) => ({ ...category, decision: "provided", expectedValue }),
-                    `${activeDefinition.label} seller value revised.`,
-                  );
-                }}
-              />
-              <p className="mt-1 text-xs text-muted-foreground">
-                This is seller-provided context. It never overwrites machine-observed text.
-              </p>
-            </div>
-
-            <div className="rounded-md border border-border p-3 text-sm">
-              <p className="font-semibold">Evidence regions</p>
-              <p className="text-muted-foreground">
-                {activeCategory.regions.length} across{" "}
-                {new Set(activeCategory.regions.map((r) => r.panelId)).size} panel(s). Multiple
-                regions and panels remain separate.
-              </p>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="mt-2"
-                disabled={!machineRegions.some((region) => region.categoryId === activeCategoryId)}
-                onClick={useMachineRegion}
-              >
-                Copy machine region as seller region
-              </Button>
-            </div>
-
-            <div className="rounded-md border border-border bg-muted/30 p-3 text-sm">
-              <p className="font-semibold">Latest machine observation</p>
+          {activePanel &&
+          activeRuntimePanel &&
+          activeCategory &&
+          activeDefinition &&
+          activeInstruction ? (
+            <>
               {latestCategoryResult ? (
-                <>
-                  <p>{ANALYSIS_LABEL[latestCategoryResult.state]}</p>
-                  <p className="break-words text-muted-foreground">
-                    Observed: {latestCategoryResult.observedValue ?? "No observed value"}
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {latestCategoryResult.reason}
-                  </p>
-                </>
-              ) : (
-                <p className="text-muted-foreground">
-                  Not run. Seller evidence can be saved first.
-                </p>
-              )}
-            </div>
-          </aside>
-        </div>
+                <div className="flex flex-wrap items-center gap-3 rounded-md border border-border bg-muted/20 p-3 text-sm">
+                  <span>
+                    Pre-check: <strong>{ANALYSIS_LABEL[latestCategoryResult.state]}</strong>
+                  </span>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={
+                      !machineRegions.some((region) => region.categoryId === activeCategoryId)
+                    }
+                    onClick={useMachineRegion}
+                  >
+                    Use machine box as working suggestion
+                  </Button>
+                </div>
+              ) : null}
+              <div className="grid min-w-0 items-start gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(20rem,0.75fr)]">
+                <PackageAnnotationCanvas
+                  panel={activePanel}
+                  imageUrl={activeRuntimePanel.imageUrl}
+                  activeCategoryId={activeCategoryId}
+                  regions={activeCategory.regions.filter(
+                    (region) => region.panelId === activePanelId,
+                  )}
+                  workingRegion={workingRegion?.panelId === activePanelId ? workingRegion : null}
+                  machineRegions={machineRegions}
+                  activeRegionId={activeRegionId}
+                  onActiveRegionChange={setActiveRegionId}
+                  onRegionCommit={commitRegion}
+                  onRegionRemove={removeRegion}
+                  onWorkingRegionChange={(region) => {
+                    setWorkingRegion(region);
+                    setActiveRegionId(region.regionId);
+                  }}
+                  onWorkingRegionDiscard={() => {
+                    setWorkingRegion(null);
+                    setActiveRegionId(null);
+                    setMessage("Working box discarded. Accepted seller evidence was unchanged.");
+                  }}
+                  onPanelRotationChange={rotatePanel}
+                />
+
+                <GuidedCategoryTask
+                  definition={activeDefinition}
+                  instruction={activeInstruction}
+                  category={activeCategory}
+                  analysis={latestCategoryResult}
+                  taskPosition={activeTaskPosition + 1}
+                  taskCount={focusedDefinitions.length}
+                  workingValue={workingValue}
+                  pendingRegionAvailable={Boolean(
+                    workingRegion && validNormalizedRegion(workingRegion),
+                  )}
+                  accepting={acceptingCategory}
+                  onWorkingValueChange={setWorkingValue}
+                  onAccept={() => void acceptActiveCategory()}
+                  onNeedsAttention={() => void markActiveCategoryNeedsAttention()}
+                  onBack={() => selectAdjacentCategory(-1)}
+                  onNext={() => selectAdjacentCategory(1)}
+                />
+              </div>
+            </>
+          ) : (
+            <p className="rounded-md border border-dashed border-border p-6 text-sm text-muted-foreground">
+              Select a package panel to open the focused evidence task.
+            </p>
+          )}
+        </section>
       ) : (
         <p className="rounded-md border border-dashed border-border p-6 text-sm text-muted-foreground">
-          Upload and select a panel to open the evidence editor.
+          Upload both required panels to begin category marking. No starter box is saved before
+          explicit category acceptance.
         </p>
       )}
 
@@ -982,11 +1228,15 @@ export function PackagePreparationWorkspace() {
       >
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Step 3
+            Phase D · Save and pre-check
           </p>
           <h2 id="package-actions-heading" className="text-2xl font-semibold">
-            Save, analyze, and prepare a local agent package
+            Save the package, then run the pre-check
           </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Category acceptance creates a local recovery checkpoint. This explicit package save is
+            still required before analysis and remains local to this browser.
+          </p>
         </div>
         <div className="flex flex-wrap gap-3">
           <Button
@@ -1010,12 +1260,18 @@ export function PackagePreparationWorkspace() {
             Back panel uploaded:{" "}
             {draft.panels.some((panel) => panel.role === "back") ? "yes" : "no"}
           </li>
-          <li>All profile categories prepared: {preparationComplete ? "yes" : "no"}</li>
+          <li>
+            All required categories accepted: {workflow.completedCategoryCount}/
+            {workflow.totalCategoryCount}
+          </li>
           <li>Saved before analysis: {saveState === "saved" ? "yes" : "no"}</li>
         </ul>
 
         <div className="border-t border-border pt-4">
-          <h3 className="font-semibold">Submit to agent</h3>
+          <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Phase F · Prepare for agent
+          </p>
+          <h3 className="font-semibold">Prepare a local-only agent package</h3>
           <p className="text-sm text-muted-foreground">
             In this slice, “Submit to agent” creates a local, auditable download only. No receiver
             is configured; nothing is transmitted to an agent, TTB, or any government system.

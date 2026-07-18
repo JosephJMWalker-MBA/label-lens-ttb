@@ -18,7 +18,12 @@ describe("seller package review route", () => {
       screen.getByRole("heading", { level: 1, name: /prepare a seller label package/i }),
     ).toBeInTheDocument();
     expect(
-      await screen.findByRole("heading", { name: /upload the seller label package/i }),
+      await screen.findByRole("heading", { name: /see the two label areas/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("example-label-map")).toBeInTheDocument();
+    expect(screen.getByText(/future categories.*not supported/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /upload the front and back label panels/i }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/front panel image/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/back panel image/i)).toBeInTheDocument();
