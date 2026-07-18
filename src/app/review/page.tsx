@@ -21,7 +21,7 @@ export default function ReviewPage() {
     <AppProviders introOnFirstVisit>
       <SkipLink />
       <AppHeader current="review" />
-      <div className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-14">
+      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-10 sm:px-6 sm:py-14">
         <header className="flex flex-col gap-4">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Label Lens TTB</h1>
           <p className="text-lg text-foreground">Prescreen a wine label before formal review.</p>

@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import type { HumanFieldConfirmationEntry } from "@/pipeline/result/result.types";
 import type { PrecheckServiceResponse } from "@/server/precheck-service.types";
 
 import { PrecheckWorkspace } from "./PrecheckWorkspace";
@@ -270,7 +271,7 @@ describe("PrecheckWorkspace — run & results", () => {
     fireEvent.click(screen.getByRole("button", { name: /run pre-check/i }));
     await screen.findByRole("heading", { name: /pre-check result/i });
 
-    fireEvent.click(screen.getByRole("button", { name: /download json export/i }));
+    fireEvent.click(screen.getByRole("button", { name: /download structured pre-check record/i }));
 
     const anchor = created.find((a) => a.download);
     expect(anchor?.download).toBe(CANNED.suggestedFilename);
@@ -361,14 +362,117 @@ const CANNED_WITH_CONFIRMATION: PrecheckServiceResponse = {
   },
 };
 
+const REPLACEMENT_GEOMETRY = {
+  unit: "normalized-image-relative",
+  provenance: "human-selected-region",
+  imageIndex: 0,
+  x: 0.1,
+  y: 0.1,
+  width: 0.5,
+  height: 0.5,
+} as const;
+
+function responseWithConfirmation(
+  confirmation: HumanFieldConfirmationEntry,
+): PrecheckServiceResponse {
+  return {
+    ...CANNED,
+    humanFieldConfirmationHistory: [confirmation],
+    report: {
+      html: "<!doctype html><html><body>report with confirmation</body></html>",
+      filename: CANNED.report.filename,
+    },
+  };
+}
+
+const CANNED_WITH_REGION_CONFIRMATION = responseWithConfirmation({
+  confirmationId: "field-confirmation-region",
+  sequence: 1,
+  schemaVersion: "human-field-confirmation.v1",
+  provenance: "human-confirmed",
+  fieldId: "brandName",
+  recordedAt: "2026-07-18T12:00:00Z",
+  decisionType: "accepted-machine-reading",
+  humanGeometry: REPLACEMENT_GEOMETRY,
+});
+
+const CANNED_WITH_VALUE_AND_REGION_CONFIRMATION = responseWithConfirmation({
+  confirmationId: "field-confirmation-value-region",
+  sequence: 1,
+  schemaVersion: "human-field-confirmation.v1",
+  provenance: "human-confirmed",
+  fieldId: "brandName",
+  recordedAt: "2026-07-18T12:00:00Z",
+  decisionType: "corrected-value",
+  correctedValue: {
+    fieldId: "brandName",
+    rawValue: "M CELLARS ESTATE",
+    normalizedValue: "M CELLARS ESTATE",
+  },
+  humanGeometry: REPLACEMENT_GEOMETRY,
+});
+
+const CANNED_WITH_BRAND_CORRECTION = responseWithConfirmation({
+  confirmationId: "field-confirmation-brand-correction",
+  sequence: 1,
+  schemaVersion: "human-field-confirmation.v1",
+  provenance: "human-confirmed",
+  fieldId: "brandName",
+  recordedAt: "2026-07-18T12:00:00Z",
+  decisionType: "corrected-value",
+  correctedValue: {
+    fieldId: "brandName",
+    rawValue: "M CELLARS ESTATE",
+    normalizedValue: "M CELLARS ESTATE",
+  },
+});
+
+const CANNED_WITH_ALCOHOL_CORRECTION = responseWithConfirmation({
+  confirmationId: "field-confirmation-alcohol-correction",
+  sequence: 1,
+  schemaVersion: "human-field-confirmation.v1",
+  provenance: "human-confirmed",
+  fieldId: "alcoholStatement",
+  recordedAt: "2026-07-18T12:00:00Z",
+  decisionType: "corrected-value",
+  correctedValue: {
+    fieldId: "alcoholStatement",
+    rawValue: "12.8% alc./vol.",
+    normalizedValue: "12.8% alc./vol.",
+    parsed: { kind: "direct", basisPoints: 1280 },
+  },
+});
+
+const CANNED_WITHOUT_BRAND_VALUE: PrecheckServiceResponse = {
+  ...CANNED,
+  observations: {
+    ...CANNED.observations,
+    brandName: {
+      state: "NOT_OBSERVED",
+      value: null,
+      confidence: 0,
+      ocrEvidenceScore: 0,
+      alternates: [],
+    },
+  },
+};
+
 /** Route fetch by URL: pre-check vs. disposition append. */
-function routedFetch() {
+function routedFetch({
+  precheck = CANNED,
+  confirmation = CANNED_WITH_CONFIRMATION,
+  disposition = CANNED_WITH_HISTORY,
+}: {
+  precheck?: PrecheckServiceResponse;
+  confirmation?: PrecheckServiceResponse;
+  disposition?: PrecheckServiceResponse;
+} = {}) {
   return vi.fn((url: string) => {
     const data = String(url).includes("/disposition")
-      ? CANNED_WITH_HISTORY
+      ? disposition
       : String(url).includes("/confirmation")
-        ? CANNED_WITH_CONFIRMATION
-        : CANNED;
+        ? confirmation
+        : precheck;
     return Promise.resolve({ ok: true, json: async () => ({ ok: true, data }) } as Response);
   });
 }
@@ -377,6 +481,30 @@ async function runPrecheckToResult() {
   selectFileAndFill();
   fireEvent.click(screen.getByRole("button", { name: /run pre-check/i }));
   await screen.findByRole("heading", { name: /pre-check result/i });
+}
+
+function drawActiveReplacementRegion() {
+  const reviewImage = screen.getByAltText(/confirmation review image/i);
+  const content = reviewImage.parentElement as HTMLElement;
+  Object.defineProperty(content, "getBoundingClientRect", {
+    configurable: true,
+    value: () => ({
+      x: 0,
+      y: 0,
+      left: 0,
+      top: 0,
+      width: 200,
+      height: 100,
+      right: 200,
+      bottom: 100,
+      toJSON: () => "",
+    }),
+  });
+
+  fireEvent.click(screen.getByRole("button", { name: /draw region/i }));
+  fireEvent.mouseDown(content, { button: 0, buttons: 1, clientX: 20, clientY: 10 });
+  fireEvent.mouseMove(content, { buttons: 1, clientX: 120, clientY: 60 });
+  fireEvent.mouseUp(content, { clientX: 120, clientY: 60 });
 }
 
 describe("PrecheckWorkspace — human disposition", () => {
@@ -452,8 +580,10 @@ describe("PrecheckWorkspace — human disposition", () => {
     render(<PrecheckWorkspace />);
     await runPrecheckToResult();
 
-    const jsonBtn = screen.getByRole("button", { name: /download json export/i });
-    const reportBtn = screen.getByRole("button", { name: /download readable report/i });
+    const jsonBtn = screen.getByRole("button", { name: /download structured pre-check record/i });
+    const reportBtn = screen.getByRole("button", {
+      name: /download human-readable pre-check report/i,
+    });
     expect(jsonBtn).toBeInTheDocument();
     expect(reportBtn).toBeInTheDocument();
     expect(jsonBtn).not.toBe(reportBtn);
@@ -614,18 +744,20 @@ async function runToResultWithFile() {
 describe("PrecheckWorkspace — review-first layout", () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it("shows the concise summary before the technical detail sections", async () => {
+  it("shows the machine summary before the technical detail sections", async () => {
     await runToResultWithFile();
-    const summary = screen.getByRole("heading", { name: /^summary$/i });
+    const summary = screen.getByRole("heading", { name: /machine pre-check summary/i });
     const evidence = screen.getByText("Evidence details");
     // Summary appears earlier in document order than Evidence details.
     expect(
       summary.compareDocumentPosition(evidence) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
-    // Plain-language reading + extracted value are in the summary.
-    expect(screen.getAllByText("Found").length).toBeGreaterThan(0);
-    expect(screen.getByText(/detected brand/i)).toBeInTheDocument();
-    expect(screen.getByText(/detected alcohol/i)).toBeInTheDocument();
+    // Machine evidence and extracted values remain visible in the seller workspace.
+    expect(
+      screen.getByRole("heading", { name: /review what the machine found/i }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText(/M CELLARS/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/12.5% ALC\.\/VOL\./).length).toBeGreaterThan(0);
     expect(
       screen.getByText(/checks need human review|check needs human review/i),
     ).toBeInTheDocument();
@@ -708,7 +840,7 @@ describe("PrecheckWorkspace — download error handling", () => {
       revokeObjectURL: () => {},
     });
 
-    fireEvent.click(screen.getByRole("button", { name: /download json export/i }));
+    fireEvent.click(screen.getByRole("button", { name: /download structured pre-check record/i }));
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByText(/could not be downloaded/i)).toBeInTheDocument();
@@ -728,7 +860,9 @@ describe("PrecheckWorkspace — download error handling", () => {
       },
       revokeObjectURL: () => {},
     });
-    fireEvent.click(screen.getByRole("button", { name: /download readable report/i }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /download human-readable pre-check report/i }),
+    );
     expect(await screen.findByRole("alert")).toBeInTheDocument();
 
     // Recovery: a working object-URL implementation lets the retry succeed and
@@ -738,7 +872,9 @@ describe("PrecheckWorkspace — download error handling", () => {
       createObjectURL: () => "blob:ok",
       revokeObjectURL: () => {},
     });
-    fireEvent.click(screen.getByRole("button", { name: /download readable report/i }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /download human-readable pre-check report/i }),
+    );
     await waitFor(() => expect(screen.queryByRole("alert")).toBeNull());
   });
 });
@@ -809,19 +945,30 @@ describe("PrecheckWorkspace — processing accessibility", () => {
 describe("PrecheckWorkspace — field confirmation", () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it("renders active confirmation controls instead of the old preview-only disclosure", async () => {
+  it("renders the evidence-centered seller review actions", async () => {
     vi.stubGlobal("fetch", mockFetch({ ok: true, data: CANNED }));
     render(<PrecheckWorkspace />);
     selectFileAndFill();
     fireEvent.click(screen.getByRole("button", { name: /run pre-check/i }));
     await screen.findByRole("heading", { name: /pre-check result/i });
 
-    expect(screen.getByRole("heading", { name: /review and confirm fields/i })).toBeInTheDocument();
-    expect(screen.getAllByText(/accept machine reading/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/select alternate candidate/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/correct value manually/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/mark not visible/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByRole("button", { name: /save confirmation/i }).length).toBeGreaterThan(0);
+    expect(
+      screen.getByRole("heading", { name: /review what the machine found/i }),
+    ).toBeInTheDocument();
+    for (const label of [
+      /accept finding/i,
+      /revise value$/i,
+      /fix evidence region/i,
+      /revise value and region/i,
+      /not this field/i,
+      /not present/i,
+      /unable to confirm/i,
+      /add missing finding/i,
+    ]) {
+      expect(screen.getAllByText(label).length).toBeGreaterThan(0);
+    }
+    expect(screen.getByRole("button", { name: /save seller decision/i })).toBeInTheDocument();
+    expect(screen.getByText(/0 of 2 findings reviewed/i)).toBeInTheDocument();
     expect(screen.queryByText(/what confirmation will do \(preview\)/i)).toBeNull();
   });
 
@@ -836,7 +983,9 @@ describe("PrecheckWorkspace — field confirmation", () => {
     expect(screen.getAllByText(/M CELLARS/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/12.5% ALC\.\/VOL\./).length).toBeGreaterThan(0);
     // Downloads and the disposition disclosure remain reachable.
-    expect(screen.getByRole("button", { name: /download json export/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /download structured pre-check record/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText("Record internal disposition")).toBeInTheDocument();
   });
 
@@ -846,11 +995,11 @@ describe("PrecheckWorkspace — field confirmation", () => {
     render(<PrecheckWorkspace />);
     await runPrecheckToResult();
 
-    const acceptRadio = screen.getAllByRole("radio", { name: /accept machine reading/i })[0];
+    const acceptRadio = screen.getByRole("radio", { name: /accept finding/i });
     fireEvent.click(acceptRadio);
-    fireEvent.click(screen.getAllByRole("button", { name: /save confirmation/i })[0]);
+    fireEvent.click(screen.getByRole("button", { name: /save seller decision/i }));
 
-    expect(await screen.findByText(/brand name confirmation saved/i)).toBeInTheDocument();
+    expect(await screen.findByText(/brand name seller decision saved/i)).toBeInTheDocument();
     const urls = fetchMock.mock.calls.map((c) => String(c[0]));
     expect(urls).toContain("/api/precheck/confirmation");
     const confirmationCall = fetchMock.mock.calls.find((c) =>
@@ -861,4 +1010,179 @@ describe("PrecheckWorkspace — field confirmation", () => {
     expect(body.appendToken).toBe(CANNED.appendToken);
     expect(body.findings).toBeUndefined();
   });
+
+  it.each([
+    ["not this field", "not_this_field"],
+    ["unable to confirm", "unable_to_confirm"],
+  ])(
+    "preserves %s in the review session without misencoding it",
+    async (decisionLabel, decisionState) => {
+      const fetchMock = routedFetch();
+      vi.stubGlobal("fetch", fetchMock);
+      render(<PrecheckWorkspace />);
+      await runPrecheckToResult();
+
+      fireEvent.click(screen.getByRole("radio", { name: new RegExp(decisionLabel, "i") }));
+      fireEvent.click(screen.getByRole("button", { name: /save seller decision/i }));
+
+      expect(await screen.findByText(/saved for this review session/i)).toBeInTheDocument();
+      expect(screen.getByText(/1 of 2 findings reviewed/i)).toBeInTheDocument();
+      expect(screen.getByText(/not included in current downloads/i)).toBeInTheDocument();
+      expect(screen.getByText(/remain in this review session/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/session-only seller decisions are not included/i),
+      ).toBeInTheDocument();
+      expect(CANNED.exportJson).not.toContain(decisionState);
+      expect(CANNED.report.html).not.toContain(decisionState);
+      const confirmationCalls = fetchMock.mock.calls.filter((call) =>
+        String(call[0]).includes("/confirmation"),
+      );
+      expect(confirmationCalls).toHaveLength(0);
+    },
+  );
+
+  it.each([
+    {
+      action: "Fix evidence region",
+      response: CANNED_WITH_REGION_CONFIRMATION,
+      expectedDecisionType: "accepted-machine-reading",
+      correctedValue: null,
+    },
+    {
+      action: "Revise value and region",
+      response: CANNED_WITH_VALUE_AND_REGION_CONFIRMATION,
+      expectedDecisionType: "corrected-value",
+      correctedValue: "M CELLARS ESTATE",
+    },
+  ])(
+    "requires seller replacement geometry before $action can be saved",
+    async ({ action, response, expectedDecisionType, correctedValue }) => {
+      const fetchMock = routedFetch({ confirmation: response });
+      const machineGeometryBefore = structuredClone(CANNED.observations.brandName.geometry);
+      vi.stubGlobal("fetch", fetchMock);
+      render(<PrecheckWorkspace />);
+      await runPrecheckToResult();
+
+      fireEvent.click(screen.getByRole("radio", { name: action }));
+      if (correctedValue) {
+        fireEvent.change(screen.getByLabelText(/seller-confirmed value/i), {
+          target: { value: correctedValue },
+        });
+      }
+      fireEvent.click(screen.getByRole("button", { name: /save seller decision/i }));
+
+      expect(
+        await screen.findByText(
+          /draw a replacement evidence region on the image before saving this decision/i,
+        ),
+      ).toBeInTheDocument();
+      expect(screen.getByText(/0 of 2 findings reviewed/i)).toBeInTheDocument();
+      expect(
+        fetchMock.mock.calls.filter((call) => String(call[0]).includes("/confirmation")),
+      ).toHaveLength(0);
+      expect(CANNED.observations.brandName.geometry).toEqual(machineGeometryBefore);
+
+      drawActiveReplacementRegion();
+      fireEvent.click(screen.getByRole("button", { name: /save seller decision/i }));
+
+      expect(await screen.findByText(/brand name seller decision saved/i)).toBeInTheDocument();
+      expect(screen.getByText(/1 of 2 findings reviewed/i)).toBeInTheDocument();
+      const confirmationCalls = fetchMock.mock.calls.filter((call) =>
+        String(call[0]).includes("/confirmation"),
+      );
+      expect(confirmationCalls).toHaveLength(1);
+      const confirmationCall = confirmationCalls[0] as unknown as [string, RequestInit];
+      const body = JSON.parse(confirmationCall[1].body as string);
+      expect(body.decisionType).toBe(expectedDecisionType);
+      expect(body.humanGeometry).toEqual(REPLACEMENT_GEOMETRY);
+      if (correctedValue) expect(body.correctedValue).toBe(correctedValue);
+      expect(CANNED.observations.brandName.geometry).toEqual(machineGeometryBefore);
+    },
+  );
+
+  it("does not accept an absent machine-selected value or advance review progress", async () => {
+    const fetchMock = routedFetch({ precheck: CANNED_WITHOUT_BRAND_VALUE });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<PrecheckWorkspace />);
+    await runPrecheckToResult();
+
+    const acceptFinding = screen.getByRole("radio", { name: /accept finding/i });
+    expect(acceptFinding).toBeDisabled();
+    // Exercise the defensive save guard even if a stale or manipulated client
+    // bypasses the disabled presentation control.
+    Object.defineProperty(acceptFinding, "disabled", { configurable: true, value: false });
+    fireEvent.click(acceptFinding);
+    fireEvent.click(screen.getByRole("button", { name: /save seller decision/i }));
+
+    expect(
+      await screen.findByText(/there is no machine-observed value to accept/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/0 of 2 findings reviewed/i)).toBeInTheDocument();
+    expect(
+      fetchMock.mock.calls.filter((call) => String(call[0]).includes("/confirmation")),
+    ).toHaveLength(0);
+  });
+
+  it.each([
+    {
+      field: "brandName" as const,
+      invalidValue: "M\u0000 CELLARS",
+      validValue: "M CELLARS ESTATE",
+      errorText: /brand corrections cannot include control characters/i,
+      response: CANNED_WITH_BRAND_CORRECTION,
+    },
+    {
+      field: "alcoholStatement" as const,
+      invalidValue: "25 proof",
+      validValue: "12.8% alc./vol.",
+      errorText: /proof is not a supported wine alcohol statement/i,
+      response: CANNED_WITH_ALCOHOL_CORRECTION,
+    },
+  ])(
+    "rejects an invalid $field correction, preserves the draft, and accepts a valid correction",
+    async ({ field, invalidValue, validValue, errorText, response }) => {
+      const fetchMock = routedFetch({ confirmation: response });
+      vi.stubGlobal("fetch", fetchMock);
+      render(<PrecheckWorkspace />);
+      await runPrecheckToResult();
+
+      if (field === "alcoholStatement") {
+        fireEvent.click(
+          screen.getByRole("button", { name: /alcohol statement unreviewed machine/i }),
+        );
+      }
+      fireEvent.click(screen.getByRole("radio", { name: /revise value$/i }));
+      const correctedInput = screen.getByLabelText(/seller-confirmed value/i);
+      fireEvent.change(correctedInput, { target: { value: invalidValue } });
+      fireEvent.click(screen.getByRole("button", { name: /save seller decision/i }));
+
+      expect(await screen.findByText(errorText)).toBeInTheDocument();
+      expect(correctedInput).toHaveValue(invalidValue);
+      expect(screen.getByText(/0 of 2 findings reviewed/i)).toBeInTheDocument();
+      expect(
+        fetchMock.mock.calls.filter((call) => String(call[0]).includes("/confirmation")),
+      ).toHaveLength(0);
+
+      fireEvent.change(correctedInput, { target: { value: validValue } });
+      fireEvent.click(screen.getByRole("button", { name: /save seller decision/i }));
+
+      expect(
+        await screen.findByText(
+          field === "brandName"
+            ? /brand name seller decision saved/i
+            : /alcohol statement seller decision saved/i,
+        ),
+      ).toBeInTheDocument();
+      expect(screen.getByText(/1 of 2 findings reviewed/i)).toBeInTheDocument();
+      const confirmationCalls = fetchMock.mock.calls.filter((call) =>
+        String(call[0]).includes("/confirmation"),
+      );
+      expect(confirmationCalls).toHaveLength(1);
+      const confirmationCall = confirmationCalls[0] as unknown as [string, RequestInit];
+      const body = JSON.parse(confirmationCall[1].body as string);
+      expect(body.fieldId).toBe(field);
+      expect(body.decisionType).toBe("corrected-value");
+      expect(body.correctedValue).toBe(validValue);
+    },
+  );
 });

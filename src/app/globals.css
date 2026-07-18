@@ -37,6 +37,7 @@
     --evidence-brand: 222 84% 45%;
     --evidence-alcohol: 292 55% 40%;
     --evidence-candidate: 215 16% 40%;
+    --evidence-seller: 25 80% 32%;
     --radius: 0.5rem;
   }
 
@@ -65,6 +66,7 @@
     --evidence-brand: 210 90% 70%;
     --evidence-alcohol: 290 75% 78%;
     --evidence-candidate: 215 20% 72%;
+    --evidence-seller: 35 90% 70%;
   }
 
   /* Bounded font-size preference. Scaling the root font-size scales the rem-based
@@ -223,6 +225,29 @@
     color: hsl(var(--foreground));
     background-color: hsl(var(--background) / 0.9);
     border-bottom-right-radius: 2px;
+    white-space: nowrap;
+  }
+
+  /* Seller-selected geometry is independent from machine evidence. A double
+     border and explicit chip distinguish it even without color perception. */
+  .seller-evidence-overlay {
+    border: 3px double hsl(var(--evidence-seller));
+    border-radius: 2px;
+    background-color: hsl(var(--evidence-seller) / 0.12);
+  }
+  .seller-evidence-chip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-bottom-right-radius: 2px;
+    background-color: hsl(var(--background) / 0.95);
+    color: hsl(var(--foreground));
+    padding: 0 0.25rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     white-space: nowrap;
   }
 

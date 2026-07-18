@@ -3,7 +3,7 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 /**
  * Evidence-centered result: overlays drawn from server geometry must track the
  * rendered image across responsive widths, link bidirectionally with the
- * evidence cards, and degrade honestly when no preview exists (sample run).
+ * seller-review cards, and degrade honestly when no preview exists.
  */
 
 const FIXTURE = "tests/fixtures/precheck/m-cellars-24205001000905/label-ocr-source.jpeg";
@@ -47,17 +47,17 @@ test("upload result draws evidence overlays inside the rendered image at desktop
   test.setTimeout(180_000);
   await runUpload(page);
 
-  const resultImage = page.getByAltText(/preview of the selected label image/i).last();
-  const alcoholOverlay = page.getByRole("button", { name: /alcohol evidence region/i });
-  const brandOverlay = page.getByRole("button", { name: /brand evidence region/i });
+  const resultImage = page.getByAltText(/confirmation review image/i);
+  const alcoholOverlay = page.getByRole("button", {
+    name: /alcohol machine evidence region/i,
+  });
+  const brandOverlay = page.getByRole("button", { name: /brand machine evidence region/i });
 
   await expect(alcoholOverlay).toBeVisible();
   await expect(brandOverlay).toBeVisible();
   await expectWithin(alcoholOverlay, resultImage);
   await expectWithin(brandOverlay, resultImage);
 
-  // Responsive: at a narrow viewport the layout stacks, the overlays keep
-  // tracking the resized image, and nothing scrolls horizontally.
   await page.setViewportSize({ width: 375, height: 812 });
   await expectWithin(alcoholOverlay, resultImage);
   await expectWithin(brandOverlay, resultImage);
@@ -67,27 +67,20 @@ test("upload result draws evidence overlays inside the rendered image at desktop
   expect(overflow).toBeLessThanOrEqual(1);
 });
 
-test("evidence cards and image regions are linked in both directions", async ({ page }) => {
+test("seller finding cards and machine regions are linked in both directions", async ({ page }) => {
   test.setTimeout(180_000);
   await runUpload(page);
 
-  // Card → image: the alcohol card's locate control highlights and focuses its
-  // region. The card element carries both aria-labelledby and tabindex, which
-  // distinguishes it from the enclosing Summary section.
-  const alcoholCard = page
-    .locator('[aria-labelledby][tabindex="-1"]', { hasText: "Detected alcohol" })
-    .first();
-  await alcoholCard
-    .getByRole("button", { name: /view on label/i })
-    .first()
-    .click();
-  const alcoholOverlay = page.getByRole("button", { name: /alcohol evidence region/i });
-  await expect(alcoholOverlay).toHaveAttribute("data-active", "true");
-  await expect(alcoholOverlay).toBeFocused();
+  const alcoholCard = page.getByRole("button", { name: /alcohol statement.*machine:/i });
+  await alcoholCard.click();
 
-  // Image → card: activating the region focuses the corresponding card.
+  const alcoholOverlay = page.getByRole("button", {
+    name: /alcohol machine evidence region/i,
+  });
+  await expect(alcoholOverlay).toHaveAttribute("data-active", "true");
+
   await alcoholOverlay.click();
-  await expect(alcoholCard).toBeFocused();
+  await expect(alcoholCard).toHaveAttribute("data-active", "true");
 });
 
 test("overlays remain present in dark mode", async ({ page }) => {
@@ -96,7 +89,9 @@ test("overlays remain present in dark mode", async ({ page }) => {
   await page.getByRole("button", { name: /display settings/i }).click();
   await page.getByRole("radio", { name: /^dark$/i }).check();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await expect(page.getByRole("button", { name: /alcohol evidence region/i })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /alcohol machine evidence region/i }),
+  ).toBeVisible();
 });
 
 test("sample run shows an honest no-preview state instead of overlays", async ({ page }) => {
@@ -107,10 +102,9 @@ test("sample run shows an honest no-preview state instead of overlays", async ({
     timeout: 150_000,
   });
 
-  await expect(page.getByText(/no image preview for this run/i)).toBeVisible();
-  await expect(page.getByRole("button", { name: /evidence region/i })).toHaveCount(0);
-  // Field confirmation is active even when the sample has no local preview.
-  await expect(page.getByRole("heading", { name: /review and confirm fields/i })).toBeVisible();
   await expect(page.getByText(/no image review is available for this run/i)).toBeVisible();
-  await expect(page.getByRole("button", { name: /save confirmation/i })).toHaveCount(2);
+  await expect(page.getByRole("button", { name: /machine evidence region/i })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: /review what the machine found/i })).toBeVisible();
+  await expect(page.getByText(/drawing or revising a human review region/i)).toBeVisible();
+  await expect(page.getByRole("button", { name: /save seller decision/i })).toBeVisible();
 });
