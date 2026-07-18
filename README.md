@@ -1,358 +1,420 @@
 # Label Lens TTB
 
-Label Lens TTB is a **domestic-wine label prescreen prototype**. A reviewer uploads
-wine-label artwork (or loads a bundled sample) and enters the application facts
-(brand name and alcohol value). Local OCR/extraction surfaces **brand** and
-**alcohol** evidence from the image; deterministic wine rules compare that evidence
-against the entered application facts; and the result **preserves uncertainty and
-keeps a human authoritative**. It produces an explainable, checksum-protected
-report. **It does not approve or reject labels, and it is not a TTB system.**
+Label Lens TTB is a **domestic-wine label prescreen prototype** that helps a seller or reviewer assemble, inspect, and evaluate label evidence without pretending to make a government decision.
 
-> **AI and OCR may extract evidence. Deterministic rules evaluate that evidence.
-> Human reviewers remain authoritative.**
+A user provides label artwork and application facts. Local OCR extracts bounded evidence from the artwork. Versioned deterministic rules compare that evidence with the declared facts. The system preserves uncertainty, exposes provenance, and keeps the human reviewer authoritative.
 
-The primary review route now includes a browser-local seller package-preparation
-slice for front, back, and optional panels. The established one-image pre-check
-remains available at `/review/legacy`. Neither workflow is a complete
-alcohol-label verification or submission system. What is and is not implemented
-is stated explicitly below.
+> **OCR and AI may extract evidence. Deterministic rules evaluate that evidence. Human reviewers remain authoritative.**
 
----
+**Label Lens does not approve or reject labels, is not a TTB system, and is not legal advice.**
 
-## 2. Live demo
+## Live demo
 
-**<https://ttb-test.com>**
+- Primary: **<https://ttb-test.com>**
+- Secondary: <https://label-lens-ttb.onrender.com>
+- Legacy one-image review: `/review/legacy`
 
-Secondary deployment: <https://label-lens-ttb.onrender.com>
-
-On the deployed demo you can:
-
-- load the bundled **M Cellars** sample, or upload a supported PNG/JPEG wine-label image;
-- enter the application **brand name** and **alcohol value**;
-- run the prescreen (real local OCR + deterministic rules run server-side);
-- inspect the **concise result** and expand full **evidence**, **regulatory checks**, and **technical provenance**;
-- record an **internal disposition** (operator workflow note);
-- download a **checksum-protected JSON export** and a **readable HTML report**.
-
-> The public deployment is a **reviewer demonstration**, not a government system,
-> not a COLA integration, and not a production authorization. It processes one
-> image in memory and stores nothing between requests.
+The public deployment is a reviewer demonstration. It is not a COLA integration, production authorization, or hardened government environment.
 
 ---
 
-## 3. Five-minute reviewer path
+## Project status
 
-1. Open the [live demo](https://ttb-test.com).
-2. Click **Load verified M Cellars sample** (or upload a wine-label PNG/JPEG and enter brand + alcohol).
-3. Read the **concise summary**: detected brand, detected alcohol, count needing review, one suggested next step.
-4. Expand **Evidence details**, **Regulatory checks**, and **Technical provenance** to see raw values, findings, geometry, and versions.
-5. In **Downloads**, download the **JSON export** and the **HTML report**; optionally record a disposition and re-download to see it included.
-6. Optional: [run locally](#7-running-locally) and inspect the test suites.
+The project has moved beyond a simple OCR demonstration. It now contains two connected product slices:
 
----
+1. **Seller package preparation** for front, back, and optional label panels.
+2. **A one-image domestic-wine prescreen** using real local OCR, deterministic checks, explainable findings, and downloadable reports.
 
-## 4. What is implemented today
+The core architecture is established. The next phase should emphasize **completion and usability of one end-to-end domestic-wine workflow**, rather than adding new beverage categories or reopening settled architecture.
 
-Verified against `main`. This is the current behavior, not a roadmap.
+### Current release focus
 
-- **Browser-local seller package preparation** — front and back plus optional panels, reviewed-profile
-  category checklist, seller values/uncertainty/absence, multi-region panel-relative evidence,
-  save/reload, immutable package analysis runs, correction/reanalysis, and a gated local agent-package
-  record. See [`docs/issue-138-seller-package-preparation.md`](docs/issue-138-seller-package-preparation.md).
-- **One-image domestic-wine workflow** — a single label per run, via upload or the bundled sample; source `upload` or `sample`.
-- **PNG/JPEG validation** — declared type checked against decoded format; empty/oversized/corrupt images and out-of-bounds dimensions/pixel budgets are rejected with typed errors.
-- **Immediate local image preview** — a client object URL preview with filename/type/size, replace/clear, revoked on change/unmount; the file is not uploaded to build the preview.
-- **Application-fact inputs** — operator-entered **brand name** and **alcohol value** (percent), clearly labelled as entered facts, **not** OCR output.
-- **Local OCR-based observations** — brand and alcohol evidence extracted by a vendored **Tesseract WebAssembly** engine running server-side (no mandatory cloud call).
-- **Machine observation states** — `OBSERVED`, `LOW_CONFIDENCE`, `AMBIGUOUS`, `NOT_OBSERVED`, presented in plain language while the exact state stays in the technical detail.
-- **Deterministic wine rules currently present** — executed: `wine-alcohol-syntax`, `wine-alcohol-declared-comparison`, `brand-name-canonical-comparison`; plus three **evidence-dependent** checks that deliberately do **not run** from artwork alone (`wine-alcohol-actual-content-tolerance`, `wine-alcohol-class-type-boundary`, `wine-alcohol-omission-eligibility`).
-- **Evidence geometry and provenance** — per-field bounding boxes and reference frame, plus extractor/OCR/parser identities and versions and the derivative SHA-256.
-- **Uncertainty and human-review states** — findings are `PASS` / `WARN` / `FAIL` / `NEEDS_REVIEW` / `not_run`; there is **no overall pass/fail verdict**.
-- **Checksum-protected JSON export** — canonical JSON with a SHA-256 integrity block that can be re-verified with the committed export logic.
-- **Readable HTML report** — a deterministic, human-readable report of the same validated result.
-- **Append-only internal disposition history** — an operator can record a bounded internal-workflow decision (e.g. *escalated for human review*) that is appended to the result via a server-issued authorization token; it never edits or deletes machine findings.
-- **Progressive-disclosure result UI** — concise summary first, with Evidence / Regulatory checks / Technical provenance / Downloads / disposition behind accessible disclosures.
-- **Accessible error handling and real browser downloads** — labelled inputs, keyboard-operable disclosures, `role="alert"` errors, and a hardened download path (see [PR #60](https://github.com/JosephJMWalker-MBA/label-lens-ttb/pull/60)).
-- **A versioned wine-label fixture corpus and a bounded real-OCR regression** — see [`docs/fixture-corpus.md`](docs/fixture-corpus.md) and `src/fixtures/corpus-real-ocr.test.ts`.
-- **Testing** — unit/component (Vitest + Testing Library), architectural/boundary tests, a production build, a relocation smoke, and Playwright end-to-end coverage.
+A seller should be able to:
 
-> The [original vision](docs/original-vision-and-scope.md) lists seven target
-> label fields. **Only brand name and alcohol content are extracted today.**
+1. State which package panels exist.
+2. Upload the applicable artwork.
+3. inspect and magnify each image.
+4. Review and correct machine-read evidence.
+5. Identify where required information appears.
+6. Enter the required application facts.
+7. Run deterministic checks.
+8. Understand what passed, failed, needs review, or could not be evaluated.
+9. Download a clear, traceable package for further human review.
 
 ---
 
-## 5. What is deliberately not implemented
+## Work completed
 
-Current non-goals (by design for this prototype):
+### 1. Product and review boundaries
 
-- No TTB approval or rejection, and no overall compliance verdict.
-- No COLA integration; no government authentication, identity, or authorization.
-- No production identity/authorization or hardened production environment.
-- No authenticated seller portal, server-persisted package, agent queue, or multi-device workflow.
-- No agent or government transmission; the new package action is an explicitly local download only.
-- No retained production evidence store (processing is in-memory and ephemeral).
-- No cloud-vision fallback in the current public flow (local OCR only).
-- No beer, malt-beverage, or spirits scoring — **domestic wine only**.
-- No complete regulatory review, entitlement determination, automatic policy creation, or self-training.
+- Defined the product as a **prescreen and evidence-construction system**, not an approval engine.
+- Separated:
+  - artwork evidence;
+  - OCR observations;
+  - seller-declared facts;
+  - deterministic findings;
+  - internal human disposition;
+  - actual TTB action, which remains out of scope.
+- Preserved uncertainty through explicit states instead of forcing a false binary verdict.
+- Documented the prototype, security, retention, compliance, and government-authority boundaries.
 
-Several of these exist as **accepted architecture** or **roadmap** (see §6 and §15) but are **not** current behavior.
+### 2. Seller package preparation
 
----
+The browser-local package workflow currently supports:
 
-## 6. System architecture
+- front and back labels;
+- optional additional panels;
+- reviewed-profile category checklist;
+- seller-entered values, uncertainty, and absence states;
+- multi-region, panel-relative evidence;
+- save and reload;
+- immutable package-analysis runs;
+- correction and reanalysis;
+- gated local agent-package generation.
 
-Current end-to-end flow (implemented on `main`):
+See [`docs/issue-138-seller-package-preparation.md`](docs/issue-138-seller-package-preparation.md).
+
+### 3. Artwork intake and preview
+
+- PNG and JPEG validation.
+- Declared type checked against decoded image format.
+- Empty, oversized, corrupt, and out-of-bounds images rejected with typed errors.
+- Immediate browser-local preview with filename, type, and size.
+- Replace and clear behavior.
+- Object URLs revoked when replaced or unmounted.
+- Uploads processed in memory and not retained between requests.
+
+### 4. OCR and evidence extraction
+
+- Vendored Tesseract WebAssembly OCR running server-side.
+- No mandatory cloud call at request time.
+- Current extracted fields:
+  - brand name;
+  - alcohol statement.
+- Typed machine-observation states:
+  - `OBSERVED`;
+  - `LOW_CONFIDENCE`;
+  - `AMBIGUOUS`;
+  - `NOT_OBSERVED`.
+- Per-field geometry, reference frame, extractor identity, OCR version, parser identity, and derivative SHA-256.
+- Versioned fixture corpus and bounded real-OCR regression coverage.
+
+> The original vision includes seven target fields. **Only brand name and alcohol content are extracted today.**
+
+### 5. Deterministic wine checks
+
+Currently executed:
+
+- `wine-alcohol-syntax`;
+- `wine-alcohol-declared-comparison`;
+- `brand-name-canonical-comparison`.
+
+Registered but deliberately not run from artwork alone:
+
+- `wine-alcohol-actual-content-tolerance`;
+- `wine-alcohol-class-type-boundary`;
+- `wine-alcohol-omission-eligibility`.
+
+Finding states are:
+
+- `PASS`;
+- `WARN`;
+- `FAIL`;
+- `NEEDS_REVIEW`;
+- `not_run`.
+
+There is **no aggregate compliance score or overall pass/fail verdict**.
+
+### 6. Results and reporting
+
+- Concise summary first.
+- Progressive disclosure for:
+  - evidence;
+  - regulatory checks;
+  - technical provenance;
+  - downloads;
+  - internal disposition.
+- Deterministic readable HTML report.
+- Canonical JSON export with a SHA-256 integrity block.
+- Append-only internal disposition history.
+- Server-issued authorization token for bounded disposition append operations.
+- Machine findings cannot be silently edited or deleted by a disposition.
+
+### 7. Architecture and deployment
+
+Implemented flow:
 
 ```text
-Browser (upload + application facts)
-  → upload validation (type / size / integrity / bounds)
-  → local extraction (Tesseract WASM OCR)
-  → typed observations (brand, alcohol; state + geometry + provenance)
-  → deterministic wine rules (versioned)
-  → governed findings (PASS / WARN / FAIL / NEEDS_REVIEW / not_run)
-  → report generation (checksum JSON + readable HTML)
-  → human disposition (append-only internal workflow record)
+Browser artwork + declared facts
+  → image validation
+  → local OCR extraction
+  → typed observations + geometry + provenance
+  → versioned deterministic wine rules
+  → governed findings
+  → checksum JSON + readable HTML report
+  → append-only human disposition
 ```
 
-Details: [`docs/architecture.md`](docs/architecture.md), the analyzer/result
-contracts under `src/pipeline/`, and the ADRs in [`docs/adr/`](docs/adr/).
+Completed infrastructure includes:
 
-### Future-compatible architecture (seams, not current behavior)
+- Next.js standalone production build;
+- Node 22 runtime;
+- Hostinger deployment at `ttb-test.com`;
+- secondary Render deployment;
+- deployment-relative OCR asset resolution;
+- relocation smoke test using a real OCR request;
+- HMAC signing for append authorization;
+- runtime health reporting;
+- deployed-commit provenance support.
 
-The code is organized so these accepted directions can be added behind stable
-interfaces **without** rework — but none is active in the public flow today:
+Architecture details: [`docs/architecture.md`](docs/architecture.md) and [`docs/adr/`](docs/adr/).
 
-- **Replaceable analyzers** behind a stable observation contract ([ADR-0004](docs/adr/0004-local-first-replaceable-analysis.md)).
-- **Bounded optional cloud-vision enhancement** behind that same interface ([ADR-0005](docs/adr/0005-use-cost-aware-openai-vision-fallback.md)).
-- **Secure, configurable evidence retention and audit** ([`docs/evidence-retention-and-auditability.md`](docs/evidence-retention-and-auditability.md)).
-- **Batch/camera intake** and **reviewer/applicant workflows** ([`docs/usability-accessibility-batch-workflow.md`](docs/usability-accessibility-batch-workflow.md)).
+### 8. Quality, accessibility, and testing
+
+- Unit and component tests with Vitest and Testing Library.
+- Architecture and boundary tests.
+- Production build validation.
+- Standalone relocation smoke test.
+- Playwright end-to-end browser coverage.
+- Labelled inputs and keyboard-operable disclosures.
+- Accessible alert handling.
+- Hardened browser download path.
+- User-safe bounded errors without stack traces, absolute paths, or environment leakage.
 
 ---
 
-## 7. Running locally
+## Recommended work to continue
 
-**Prerequisites**
+The recommended order is based on completing one useful workflow before expanding scope.
 
-- **Node 22** (`.nvmrc` = `22`; `engines` requires `>=22 <23`).
-- A **glibc** environment (Debian/Ubuntu or macOS) for the native `sharp` binary.
-- No network is needed at request time — OCR language data and the WASM core are vendored.
+### P1 — Finish the guided seller workflow
 
-**Install, develop, build, and run**
+- Replace scattered actions with a **persistent control area** that keeps the path to completion visible.
+- Keep package progress visible in a fixed footer or equivalent persistent status surface.
+- Make **No back label** and **No additional panels** explicit package decisions.
+- Keep the central workspace focused on the current task while navigation and submission controls remain stable.
+- Move synthetic-label instructions into contextual guidance shown only when relevant.
+- Establish one unmistakable completion and handoff state.
+
+### P1 — Complete human verification of OCR
+
+- Show the user exactly what the machine read.
+- Show where each observation came from on the artwork.
+- Allow correction before rules run or before the package is finalized.
+- Preserve the original observation and the human correction as separate provenance-bearing records.
+- Re-run analysis from corrected evidence without overwriting prior analysis runs.
+
+### P1 — Strengthen label mapping and inspection
+
+- Complete click-and-draw evidence-region mapping.
+- Allow the seller to assign each region to the category it is intended to fulfill.
+- Add a practical magnification suite for detailed artwork inspection.
+- Make panel-relative coordinates stable across save, reload, correction, and reanalysis.
+- Clearly distinguish detected regions, user-confirmed regions, and unresolved regions.
+
+### P1 — Validate the first end-to-end definition of done
+
+A first complete domestic-wine path should demonstrate that a seller can:
+
+- configure the package;
+- upload the artwork;
+- verify the OCR;
+- map required evidence;
+- provide declared facts;
+- run the registered checks;
+- understand all result states;
+- see source citations and limitations;
+- create a coherent review package.
+
+Do not treat additional beverage categories as release blockers for this path.
+
+### P2 — Complete measured OCR evaluation
+
+- Finish the full-corpus extraction measurement currently developed separately from `main`.
+- Categorize failures before tuning.
+- Repair the highest-frequency or highest-impact measured failures first.
+- Pay particular attention to:
+  - decorative or script brand names;
+  - low contrast;
+  - rotated side text;
+  - split alcohol tokens;
+  - difficult multi-panel layouts.
+- Publish accuracy claims only after the harness and corpus are stable and merged.
+
+### P2 — Expand bounded wine evidence slices
+
+After the first workflow is complete, add fields one at a time with explicit contracts, fixtures, rules, and uncertainty behavior. Likely candidates include:
+
+- net contents;
+- government warning;
+- class or type;
+- bottler or producer information;
+- country or state of origin where applicable.
+
+Each new slice should preserve the same distinction between observed evidence, declared facts, deterministic evaluation, and facts that cannot be established from artwork alone.
+
+### P2 — Operational hardening
+
+- Cross-browser verification in Firefox and Safari.
+- Secure authenticated seller and reviewer roles.
+- Server-persisted packages and multi-device continuation.
+- Configurable evidence retention and audit policy.
+- Agent or reviewer queue.
+- Rate limiting, monitoring, backup, and incident procedures.
+- Formal deployment controls for any environment beyond a public demonstration.
+
+### P3 — Deferred expansion
+
+Defer until the domestic-wine workflow is complete and measured:
+
+- beer and malt-beverage profiles;
+- distilled-spirits profiles;
+- batch or camera intake;
+- cloud-vision fallback;
+- generalized semantic comparison across all label fields;
+- COLA or government-system integration;
+- production authorization claims.
+
+---
+
+## Deliberately not implemented
+
+- TTB approval or rejection.
+- Overall compliance verdict.
+- COLA integration.
+- Government authentication, identity, or authorization.
+- Production identity and access controls.
+- Authenticated seller portal.
+- Persistent production evidence store.
+- Agent or government transmission.
+- Beer, malt-beverage, or spirits scoring.
+- Complete regulatory review or entitlement determination.
+- Automatic policy creation or self-training.
+- FedRAMP authorization, ATO, certification, or government endorsement.
+
+Several of these have future-compatible seams or accepted architectural directions. They are not current behavior.
+
+---
+
+## Five-minute reviewer path
+
+1. Open <https://ttb-test.com>.
+2. Load the verified **M Cellars** sample, or upload a supported wine-label image.
+3. Enter the application brand name and alcohol value.
+4. Run the prescreen.
+5. Read the concise summary.
+6. Expand Evidence, Regulatory checks, and Technical provenance.
+7. Download the JSON export and HTML report.
+8. Optionally record an internal disposition and download the updated report.
+
+---
+
+## Known limitations and tradeoffs
+
+- Local OCR supports privacy and reproducibility but misses difficult typography and layouts.
+- Preserving uncertainty routes more cases to a human instead of auto-clearing them.
+- Deterministic rules are explainable but only cover implemented evidence slices.
+- Artwork alone cannot establish every regulatory fact.
+- The public demo proves the review contract, not batch throughput or production security.
+- The package workflow remains browser-local and is not yet a persisted multi-user system.
+- Extraction accuracy is not yet a production-readiness claim.
+
+---
+
+## Running locally
+
+### Prerequisites
+
+- Node 22 (`.nvmrc` = `22`; package engines require `>=22 <23`).
+- A glibc environment such as Debian, Ubuntu, or macOS for the native `sharp` binary.
+- No network is required at request time; OCR language data and WASM assets are vendored.
+
+### Install and run
 
 ```bash
-npm install                # install dependencies
-npm run dev                # start the dev server (http://localhost:3000)
-npm run build              # production build (Next.js standalone output)
-npm run start              # start the production server (binds to $PORT, default 3000)
+npm install
+npm run dev
+npm run build
+npm run start
 ```
 
-**Quality and tests**
+### Validation
 
 ```bash
-npm run format:check       # Prettier (use `npm run format` to write)
-npm run lint               # ESLint (next lint)
-npm run typecheck          # tsc --noEmit
-npm test                   # full Vitest suite (unit / component / boundary)
-npm run test:coverage      # Vitest with coverage
-npm run smoke:relocation   # standalone relocation smoke (requires a prior build)
+npm run format:check
+npm run lint
+npm run typecheck
+npm test
+npm run test:coverage
+npm run build
+npm run smoke:relocation
+npx playwright install
+npm run test:e2e
 ```
 
-**Playwright (end-to-end)**
-
-```bash
-npx playwright install     # one-time: download browser binaries
-npm run test:e2e           # runs tests/e2e; starts a dev server automatically
-```
-
-**Signing key for pre-checks.** Every pre-check issues an HMAC append-authorization
-token. In **development**, a process-local key is used automatically — no setup
-needed. In **production** you must set `LABEL_LENS_APPEND_SIGNING_KEY` (see §8), or
-pre-checks return HTTP 500. There is no `eval:baseline` script on `main` (the
-extraction-accuracy harness is on a separate branch — see §11).
+Exact test counts are intentionally not hardcoded because the suite changes as the system grows.
 
 ---
 
-## 8. Environment variables
+## Environment variables
 
-Derived from the code (`src/server/append-token.ts`, `src/app/api/health/route.ts`,
-`src/server/runtime-provenance.ts`, `src/pipeline/extractor/ocr-engine.ts`) and
-[`docs/deployment.md`](docs/deployment.md). **No secret is committed to the repo.**
+| Variable | Requirement | Purpose |
+|---|---|---|
+| `LABEL_LENS_APPEND_SIGNING_KEY` | Required in production | HMAC-signs append-authorization tokens. Use a secret of at least 32 characters and store it only in the deployment secret store. |
+| `NODE_ENV` | Platform supplied | Selects production or development behavior. |
+| `PORT` | Platform supplied | Server port; defaults to `3000` locally. |
+| `LABEL_LENS_BUILD_COMMIT` | Required for auditable Hostinger exports | Stamps the deployed commit into runtime provenance. |
+| `LABEL_LENS_OCR_ASSET_DIR` | Optional | Overrides OCR language-data location. |
+| `LABEL_LENS_OCR_CORE_DIR` | Optional | Overrides OCR WASM-core location. |
 
-| Variable | Required? | Purpose | Local development | Production expectation |
-|---|---|---|---|---|
-| `LABEL_LENS_APPEND_SIGNING_KEY` | **Required in production** | Secret used to HMAC-sign the per-result append-authorization token | Optional — a process-local key is used automatically when unset (non-production) | Must be set to a ≥ 32-char secret (e.g. `openssl rand -hex 32`); otherwise pre-checks return HTTP 500. Set only in the platform secret store |
-| `NODE_ENV` | Set by platform | Selects production vs. development behavior (incl. the signing-key fallback) | Usually `development` | `production` |
-| `PORT` | Set by platform | Port the server binds to | Defaults to `3000` | Provided by the host |
-| `LABEL_LENS_BUILD_COMMIT` | **Required for auditable Hostinger exports** | Stamps the running commit into export provenance | Unset is fine | Set to the deployed commit SHA on Hostinger; Render can fall back to `RENDER_GIT_COMMIT` |
-| `LABEL_LENS_OCR_ASSET_DIR` | Optional | Override the OCR language-data directory | Not needed (resolves deployment-relative) | Not needed |
-| `LABEL_LENS_OCR_CORE_DIR` | Optional | Override the OCR WASM-core directory | Not needed (resolves deployment-relative) | Not needed |
+A development-only process-local signing key is used when `LABEL_LENS_APPEND_SIGNING_KEY` is unset outside production. Production prechecks fail closed if the key is missing.
 
 ---
 
-## 9. Deployment
-
-The primary public deployment runs on **Hostinger Web Apps** at
-<https://ttb-test.com>, connected to the GitHub `main` branch with the Next.js
-preset and Node 22.x. Details and the full production checklist are in
-[`docs/deployment.md`](docs/deployment.md).
-
-- **Primary public demo:** <https://ttb-test.com>
-- **Secondary Render demo:** <https://label-lens-ttb.onrender.com>
-- **Build / start:** `npm ci --include=dev && npm run build` then `npm run start`.
-- **Runtime:** a persistent Node 22 server with `output: "standalone"` (not static hosting, not short-lived serverless — OCR runs in a Node worker); ~512 MB RAM; glibc for `sharp`.
-- **Required secret:** `LABEL_LENS_APPEND_SIGNING_KEY`. `GET /api/health` reports `appendSigningKeyConfigured`.
-- **Required Hostinger provenance:** `LABEL_LENS_BUILD_COMMIT` set to the deployed commit SHA.
-- **Ephemeral by design:** uploads are processed in memory and **never written to disk**; nothing is persisted between requests.
-
-A production smoke test on 2026-07-17 confirmed real server-side OCR, deterministic
-rule execution, honest `AMBIGUOUS` / `NEEDS_REVIEW` handling, and successful JSON
-and HTML downloads. It also exposed the missing deployed-commit provenance when
-`LABEL_LENS_BUILD_COMMIT` is unset; see the deployment document for the corrective
-configuration and remaining manual-upload test.
-
-The standalone build is exercised by `npm run smoke:relocation`, which relocates
-the standalone output outside the repo and drives a real OCR request — so the
-earlier standalone asset-resolution risk is guarded and is **not** a current known
-warning.
-
----
-
-## 10. Evidence, rules, and human authority
-
-> **OCR and AI may extract evidence. Deterministic rules evaluate that evidence.
-> Human reviewers remain authoritative.**
-
-The UI keeps these layers distinct:
-
-- **Observed artwork evidence** — what OCR read from the image (brand/alcohol values, confidence, geometry). Uncertain readings stay uncertain (`AMBIGUOUS`, `LOW_CONFIDENCE`, `NOT_OBSERVED`).
-- **Application-declared facts** — the brand and alcohol values the operator entered; never presented as extracted.
-- **Deterministic findings** — versioned rule outcomes comparing evidence with declared facts (`PASS`/`WARN`/`FAIL`/`NEEDS_REVIEW`). There is no aggregate score.
-- **Checks that cannot run without external evidence** — grouped and marked `not_run` (e.g. actual-content tolerance), because artwork alone cannot establish them.
-- **Internal human disposition** — an operator's append-only workflow note; it does **not** change machine findings.
-- **Actual TTB action** — out of scope; this tool never performs or represents one.
-
----
-
-## 11. Evaluation status
-
-- The repository on `main` includes a **versioned wine-label fixture corpus** and a **bounded real-OCR regression** (`src/fixtures/corpus-real-ocr.test.ts`, [`docs/fixture-corpus.md`](docs/fixture-corpus.md)) that runs the real extractor deterministically on enabled fixtures.
-- A **complete wine-corpus extraction evaluation is in progress on a separate branch** and is **not merged**; its metrics are not yet authoritative. **No provisional counts, accuracy figures, or tuning recommendations from that work are published here.**
-- Any early diagnostic baseline was intentionally **small and diagnostic** — a starting instrument, not a production accuracy claim.
-- **Tuning should follow measured failure categories, not anecdotes.** Current extraction accuracy must **not** be read as production-ready.
-
-> The measured extraction-accuracy harness and its baseline report are part of the
-> in-progress evaluation branch and are **not on `main`**; this README does not
-> quote their results.
-
----
-
-## 12. Tradeoffs and known limitations
-
-- **Local OCR** (vendored Tesseract) supports privacy and reproducibility and needs no cloud call, but it **misses difficult layouts** — decorative/script brands, low contrast, rotated side text, and split alcohol tokens are frequently `AMBIGUOUS` or `NOT_OBSERVED`.
-- **Preserving uncertainty** avoids false certainty but can **route more results to a human**, rather than auto-clearing them.
-- **Deterministic rules** are explainable and auditable but cover **only the implemented evidence slices** (brand + alcohol); most regulatory checks are intentionally `not_run`.
-- **A single-image prototype** proves the review contract but **not batch throughput** or queueing.
-- The **public demo differs from a secure government environment** (no auth, ephemeral processing, public custom domain).
-- **Artwork alone cannot establish every regulatory fact** (actual alcohol content, class/type, omission eligibility) — these stay `not_run` by design.
-- **Browser downloads** were recently hardened ([PR #60](https://github.com/JosephJMWalker-MBA/label-lens-ttb/pull/60)); the Chromium path is covered by Playwright, but **cross-browser (Firefox/Safari) live verification is still recommended** since the original symptom was environment-dependent.
-
----
-
-## 13. Security and privacy boundary
-
-Only what is true on `main` today:
-
-- **Server-side processing** — OCR, rules, export, and signing run on the server; the browser never calls a model provider directly.
-- **No secrets in the client bundle** — the signing key stays server-side; the browser only carries an opaque append token.
-- **File validation** — declared type vs. decoded format, size/dimension/pixel-budget limits, corrupt-image rejection.
-- **Bounded reports and errors** — user-safe error codes; no stack traces, absolute paths, or environment data leak into responses or exports.
-- **No hidden training on uploads** — uploads are used only to produce the current result.
-- **Ephemeral retention** — images are processed in memory and not persisted; nothing is retained between requests.
-- **Integrity** — exports carry a SHA-256 integrity value re-verifiable with the committed export logic.
-- **Public-demo limits** — this is a demonstration, not a hardened production system.
-
-> This is **not** FedRAMP-authorized, not ATO'd, not compliance-certified, and not
-> government-endorsed. See [`docs/compliance-readiness-boundary.md`](docs/compliance-readiness-boundary.md).
-
----
-
-## 14. Stakeholder mapping
-
-From the take-home discovery notes (full narrative in
-[`docs/original-vision-and-scope.md`](docs/original-vision-and-scope.md)).
-
-| Stakeholder | Operational concern | Current design response | Remaining gap |
-|---|---|---|---|
-| **Sarah** — adoption | Fast, obvious tool that removes repetitive work | One-screen review-first flow; concise summary; real server-side prescreen | Speed not yet benchmarked to a budget; no batch to remove bulk work |
-| **Dave** — judgment | Human-obvious equivalents (`STONE'S THROW` ≈ `Stone's Throw`) shouldn't be false mismatches | Normalized brand comparison; uncertainty preserved rather than naïve string equality | Broader semantic/nuance coverage across more fields is future work |
-| **Jenny** — strict compliance / hard images | Exact statutory text; honest handling of poor images | Deterministic rules with no aggregate verdict; `AMBIGUOUS`/`NOT_OBSERVED` surfaced honestly | Government-warning and layout rules not yet implemented; no image-quality gate |
-| **Marcus** — boundaries / federal reality | Standalone, no mandatory cloud, no false FedRAMP claim | Local OCR, no COLA coupling, explicit "not a TTB system" framing | Retention, audit, and secure deployment remain architectural, not active |
-
----
-
-## 15. Roadmap
-
-Direction, **not commitment**, ordered by evidence rather than hype:
-
-1. Complete the **full-corpus extraction measurement** (in progress, separate branch).
-2. Repair the **largest measured extraction failures** first.
-3. Add **guided correction and annotation** for reviewers.
-4. Expand **bounded wine evidence slices** (e.g. net contents, government warning) rule by rule.
-5. Add **applicant and reviewer workflows**.
-6. Add **secure evidence retention and audit** infrastructure.
-7. Validate **fallback, batch, and operational deployment** modes.
-
-See [`docs/remaining-work-plan.md`](docs/remaining-work-plan.md) and
-[`docs/product-plan.md`](docs/product-plan.md).
-
----
-
-## 16. Repository map
+## Repository map
 
 | Area | Location |
 |---|---|
-| UI / workspace | [`src/features/precheck/`](src/features/precheck/), [`src/app/page.tsx`](src/app/page.tsx) |
-| Extractor (OCR + selection) | [`src/pipeline/extractor/`](src/pipeline/extractor/) |
-| Analyzer / result contracts | [`src/pipeline/analyzer/`](src/pipeline/analyzer/), [`src/pipeline/result/`](src/pipeline/result/) |
-| Rule registry (wine rules) | [`src/domain/rules/`](src/domain/rules/), [`src/domain/verification/`](src/domain/verification/) |
-| Report / export | [`src/pipeline/export/`](src/pipeline/export/) |
+| Primary UI and workspace | [`src/features/precheck/`](src/features/precheck/), [`src/app/page.tsx`](src/app/page.tsx) |
+| OCR and extraction | [`src/pipeline/extractor/`](src/pipeline/extractor/) |
+| Analyzer and result contracts | [`src/pipeline/analyzer/`](src/pipeline/analyzer/), [`src/pipeline/result/`](src/pipeline/result/) |
+| Wine rules | [`src/domain/rules/`](src/domain/rules/), [`src/domain/verification/`](src/domain/verification/) |
+| Reports and exports | [`src/pipeline/export/`](src/pipeline/export/) |
 | API routes | [`src/app/api/precheck/`](src/app/api/precheck/), [`src/app/api/health/`](src/app/api/health/) |
-| Fixtures / evaluation corpus | [`src/fixtures/`](src/fixtures/), [`tests/fixtures/precheck/`](tests/fixtures/precheck/) |
-| Tests (e2e) | [`tests/e2e/`](tests/e2e/) |
-| Architecture / security docs | [`docs/architecture.md`](docs/architecture.md), [`docs/security-deployment-strategy.md`](docs/security-deployment-strategy.md), [`docs/adr/`](docs/adr/) |
+| Fixtures and evaluation | [`src/fixtures/`](src/fixtures/), [`tests/fixtures/precheck/`](tests/fixtures/precheck/) |
+| End-to-end tests | [`tests/e2e/`](tests/e2e/) |
+| Architecture and security | [`docs/architecture.md`](docs/architecture.md), [`docs/security-deployment-strategy.md`](docs/security-deployment-strategy.md), [`docs/adr/`](docs/adr/) |
 
-More design docs: [`docs/product-plan.md`](docs/product-plan.md),
-[`docs/validation-rules.md`](docs/validation-rules.md),
-[`docs/ocr-reliability-strategy.md`](docs/ocr-reliability-strategy.md),
-[`docs/test-strategy.md`](docs/test-strategy.md),
-[`docs/system-governance.md`](docs/system-governance.md),
-[`docs/slice-3-acceptance.md`](docs/slice-3-acceptance.md),
-[`docs/submission-scope-and-definition-of-done.md`](docs/submission-scope-and-definition-of-done.md),
-and the preserved [original vision](docs/original-vision-and-scope.md).
+Additional planning and governance documents:
+
+- [`docs/product-plan.md`](docs/product-plan.md)
+- [`docs/remaining-work-plan.md`](docs/remaining-work-plan.md)
+- [`docs/validation-rules.md`](docs/validation-rules.md)
+- [`docs/ocr-reliability-strategy.md`](docs/ocr-reliability-strategy.md)
+- [`docs/test-strategy.md`](docs/test-strategy.md)
+- [`docs/system-governance.md`](docs/system-governance.md)
+- [`docs/submission-scope-and-definition-of-done.md`](docs/submission-scope-and-definition-of-done.md)
+- [`docs/original-vision-and-scope.md`](docs/original-vision-and-scope.md)
 
 ---
 
-## 17. Validation and submission status
+## Security and privacy boundary
 
-Run the repository's full validation locally (these are the commands CI/review use):
+- OCR, rules, export generation, and signing run server-side.
+- The browser does not call a model provider directly.
+- Signing secrets do not enter the client bundle.
+- Images are validated and processed in memory.
+- Uploads are not retained or used for hidden training.
+- Reports and errors are bounded to avoid leaking server paths or environment data.
+- Exports contain a re-verifiable SHA-256 integrity value.
+- The public demo is not a hardened production environment.
 
-```bash
-npm run format:check     # formatting
-npm run lint             # lint
-npm run typecheck        # type checking
-npm test                 # unit / component / architecture-boundary tests
-npm run build            # production build
-npm run smoke:relocation # standalone relocation smoke (after build)
-npm run test:e2e         # Playwright browser workflow (after `npx playwright install`)
-```
+See [`docs/compliance-readiness-boundary.md`](docs/compliance-readiness-boundary.md).
 
-Together these cover formatting, lint, type checking, unit/component tests,
-architectural boundaries, the production build, the standalone relocation smoke,
-and the real browser workflow. Exact pass counts are intentionally **not** hardcoded
-here, since they change as the suite grows — run the commands to see current results.
+---
 
-The system is **live** at <https://ttb-test.com>. This repository is a
-hiring-assignment submission; nothing here should be read as a formally accepted,
-certified, or complete deliverable.
+## Governing principle
 
-> *"Let all things be done decently and in order." — 1 Corinthians 14:40*
+Label Lens should remain useful precisely because it does not hide uncertainty or confuse software assistance with government authority.
+
+> *“Let all things be done decently and in order.” — 1 Corinthians 14:40*
