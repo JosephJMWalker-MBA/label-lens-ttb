@@ -112,9 +112,9 @@ test("bundled M Cellars sample runs the real pipeline end-to-end and downloads a
   await expect(checks.getByText(/actual alcohol content with provenance/).first()).toBeVisible();
   await expect(checks.getByText(/class\/type or taxable-boundary evidence/).first()).toBeVisible();
   await expect(checks.getByText(/table\/light-wine designation evidence/).first()).toBeVisible();
-  await expect(
-    page.getByText(/\b(Approved|Compliant|Noncompliant|Official result)\b/),
-  ).toHaveCount(0);
+  await expect(page.getByText(/\b(Approved|Compliant|Noncompliant|Official result)\b/)).toHaveCount(
+    0,
+  );
 
   const downloads = await openSection(page, "Downloads");
   const filenameShown = (await downloads.locator("code").first().innerText()).trim();
