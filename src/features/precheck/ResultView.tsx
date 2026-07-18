@@ -275,6 +275,7 @@ export function ResultView({
             <Button
               type="button"
               variant="outline"
+              className="h-auto min-h-10 max-w-full whitespace-normal"
               onClick={() =>
                 download(response.report.html, response.report.filename, "text/html;charset=utf-8")
               }
