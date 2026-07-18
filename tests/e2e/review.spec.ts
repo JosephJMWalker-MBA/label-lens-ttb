@@ -112,7 +112,9 @@ test("bundled M Cellars sample runs the real pipeline end-to-end and downloads a
   await expect(checks.getByText(/actual alcohol content with provenance/).first()).toBeVisible();
   await expect(checks.getByText(/class\/type or taxable-boundary evidence/).first()).toBeVisible();
   await expect(checks.getByText(/table\/light-wine designation evidence/).first()).toBeVisible();
-  await expect(page.getByText(/\b(Approved|Compliant|Noncompliant|Official result)\b/)).toHaveCount(0);
+  await expect(
+    page.getByText(/\b(Approved|Compliant|Noncompliant|Official result)\b/),
+  ).toHaveCount(0);
 
   const downloads = await openSection(page, "Downloads");
   const filenameShown = (await downloads.locator("code").first().innerText()).trim();
@@ -185,7 +187,9 @@ test("operator can record a disposition and download an updated report from the 
   expect(reportHtml).not.toMatch(/\b(Approved|Rejected|Compliant|Noncompliant)\b/);
 });
 
-test("upload rerun with alcohol 13 flips only the declared-comparison outcome", async ({ page }) => {
+test("upload rerun with alcohol 13 flips only the declared-comparison outcome", async ({
+  page,
+}) => {
   test.setTimeout(180_000);
 
   async function statusesFor(alcohol: string) {
