@@ -1,5 +1,5 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SellerPackageDraft } from "./package-model";
 
@@ -79,6 +79,116 @@ function stored(value: SellerPackageDraft) {
   };
 }
 
+function fullyAcceptedDraft(): SellerPackageDraft {
+  const value = storedDraft(true);
+  value.categories[1] = {
+    categoryId: "alcoholStatement",
+    decision: "provided",
+    expectedValue: "12.5% alc. by vol.",
+    regions: [
+      {
+        regionId: "alcohol-region",
+        categoryId: "alcoholStatement",
+        panelId: "back-panel",
+        unit: "normalized-panel-relative",
+        provenance: "seller-selected-region",
+        x: 0.2,
+        y: 0.3,
+        width: 0.4,
+        height: 0.15,
+      },
+    ],
+  };
+  value.sellerChangeHistory = [
+    {
+      changeId: "saved-1",
+      sequence: 1,
+      recordedAt: "2026-07-18T00:30:00.000Z",
+      action: "draft_saved",
+      detail: "Seller package draft saved locally.",
+    },
+  ];
+  return value;
+}
+
+function machinePanelRun(panelId: string) {
+  const observation = {
+    state: "OBSERVED" as const,
+    value: "MACHINE VALUE",
+    normalizedValue: "MACHINE VALUE",
+    confidence: 0.9,
+    ocrEvidenceScore: 0.9,
+    alternates: [],
+    geometry: {
+      imageIndex: 0,
+      x: 100,
+      y: 100,
+      width: 300,
+      height: 100,
+      imageWidth: 1000,
+      imageHeight: 1500,
+    },
+  };
+  return {
+    panelId,
+    machineResultId: `machine-${panelId}`,
+    exportJson: "{}",
+    observations: {
+      provenance: {
+        artifactRef: panelId,
+        derivativeSha256: "c".repeat(64),
+        extractionAdapterId: "test",
+        extractionAdapterVersion: "1",
+        ocrEngine: { kind: "not_applicable" as const },
+        parserId: "test",
+        parserVersion: "1",
+        processedAt: "2026-07-18T01:00:00.000Z",
+      },
+      brandName: observation,
+      alcoholStatement: observation,
+    },
+  };
+}
+
+function analysisRun(readiness: "needs_seller_review" | "ready_for_agent_submission") {
+  return {
+    analysisRunId: `analysis-${readiness}`,
+    sequence: 1,
+    sellerChangeSequence: 1,
+    recordedAt: "2026-07-18T01:00:00.000Z",
+    panelRuns: [machinePanelRun("front-panel"), machinePanelRun("back-panel")],
+    categories: (["brandName", "alcoholStatement"] as const).map((categoryId) => ({
+      categoryId,
+      state:
+        readiness === "needs_seller_review"
+          ? ("needs_review" as const)
+          : ("clearly_readable" as const),
+      observedValue: "MACHINE VALUE",
+      supportingPanelIds: [],
+      supportingRegionIds: [],
+      reason:
+        readiness === "needs_seller_review"
+          ? "Seller-confirmed text differs from the machine observation."
+          : "Seller and machine evidence agree.",
+    })),
+    readiness,
+  };
+}
+
+async function drawActiveRegion() {
+  await waitFor(() =>
+    expect(screen.getByRole("button", { name: "Draw region" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    ),
+  );
+  const image = screen.getByRole("img", { name: /label annotation image/i });
+  fireEvent.pointerDown(image, { button: 0, pointerId: 1, clientX: 10, clientY: 20 });
+  fireEvent.pointerMove(image, { pointerId: 1, clientX: 60, clientY: 50 });
+  fireEvent.pointerUp(image, { pointerId: 1, clientX: 60, clientY: 50 });
+  await waitFor(() => expect(document.querySelector('[data-working="true"]')).not.toBeNull());
+}
+
 beforeEach(() => {
   store.load.mockReset();
   store.save.mockReset();
@@ -95,10 +205,42 @@ beforeEach(() => {
       digest: vi.fn(async () => new Uint8Array(32).buffer),
     },
   });
+  vi.stubGlobal("PointerEvent", MouseEvent);
   vi.stubGlobal(
     "createImageBitmap",
     vi.fn(async () => ({ width: 1000, height: 1500, close: vi.fn() })),
   );
+  Object.defineProperty(SVGSVGElement.prototype, "getScreenCTM", {
+    configurable: true,
+    value: () => ({ inverse: () => ({}) }),
+  });
+  Object.defineProperty(SVGSVGElement.prototype, "createSVGPoint", {
+    configurable: true,
+    value: () => ({
+      x: 0,
+      y: 0,
+      matrixTransform() {
+        return { x: this.x / 100, y: this.y / 100 };
+      },
+    }),
+  });
+  Object.defineProperty(SVGSVGElement.prototype, "setPointerCapture", {
+    configurable: true,
+    value: vi.fn(),
+  });
+  Object.defineProperty(SVGSVGElement.prototype, "hasPointerCapture", {
+    configurable: true,
+    value: () => true,
+  });
+  Object.defineProperty(SVGSVGElement.prototype, "releasePointerCapture", {
+    configurable: true,
+    value: vi.fn(),
+  });
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
 });
 
 describe("guided category acceptance", () => {
@@ -128,20 +270,31 @@ describe("guided category acceptance", () => {
     expect(checkpoint.draft.panels.some((panel) => panel.role === "back")).toBe(false);
   });
 
-  it("keeps the starter box ephemeral until explicit acceptance, then checkpoints and advances", async () => {
+  it("starts clean, highlights Draw region, and saves category evidence once before advancing", async () => {
     const value = storedDraft();
     store.load.mockResolvedValue(stored(value));
     render(<PackagePreparationWorkspace />);
 
     expect(await screen.findByRole("heading", { name: "Brand name" })).toBeInTheDocument();
-    await waitFor(() => expect(document.querySelector('[data-working="true"]')).not.toBeNull());
+    expect(document.querySelector('[data-working="true"]')).toBeNull();
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Draw region" })).toHaveAttribute(
+        "aria-pressed",
+        "true",
+      ),
+    );
+    expect(screen.getByRole("button", { name: "Save Brand name" })).toBeDisabled();
     expect(store.save).not.toHaveBeenCalled();
     expect(value.sellerChangeHistory).toHaveLength(0);
 
     fireEvent.change(screen.getByLabelText("What the label says"), {
       target: { value: "CEDAR RIDGE" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Accept Brand name" }));
+    await drawActiveRegion();
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Save Brand name" })).toBeEnabled(),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Save Brand name" }));
 
     await waitFor(() => expect(store.save).toHaveBeenCalledTimes(1));
     const checkpoint = store.save.mock.calls[0][0] as { draft: SellerPackageDraft };
@@ -152,7 +305,6 @@ describe("guided category acceptance", () => {
     expect(checkpoint.draft.categories[0].regions).toHaveLength(1);
     expect(checkpoint.draft.sellerChangeHistory.map((change) => change.action)).toEqual([
       "category_updated",
-      "region_added",
     ]);
     expect(await screen.findByRole("heading", { name: "Alcohol statement" })).toBeInTheDocument();
   });
@@ -166,12 +318,11 @@ describe("guided category acceptance", () => {
     fireEvent.change(await screen.findByLabelText("What the label says"), {
       target: { value: "CEDAR RIDGE" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Accept Brand name" }));
+    await drawActiveRegion();
+    fireEvent.click(screen.getByRole("button", { name: "Save Brand name" }));
 
     expect(
-      await screen.findByText(
-        /category was not accepted because the local recovery checkpoint failed/i,
-      ),
+      await screen.findByText(/category was not saved because browser-local persistence failed/i),
     ).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Brand name" })).toBeInTheDocument();
     expect(value.sellerChangeHistory).toHaveLength(0);
@@ -186,9 +337,10 @@ describe("guided category acceptance", () => {
 
     const sellerText = await screen.findByLabelText("What the label says");
     fireEvent.change(sellerText, { target: { value: "UNCOMMITTED BRAND" } });
+    await drawActiveRegion();
     fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
-    fireEvent.click(screen.getByRole("button", { name: "Pan right" }));
     const canvas = screen.getByTestId("annotation-workspace");
+    fireEvent.keyDown(canvas, { key: "ArrowRight" });
     expect(canvas).toHaveAttribute("data-zoom", "1.25");
     expect(canvas).toHaveAttribute("data-pan-x", "-48");
     const workingId = document
@@ -211,17 +363,15 @@ describe("guided category acceptance", () => {
     );
   });
 
-  it("does not append duplicate history or checkpoint when an accepted category is reopened unchanged", async () => {
+  it("keeps an accepted category in optional review without auto-cycling or duplicate history", async () => {
     const value = storedDraft(true);
     store.load.mockResolvedValue(stored(value));
     render(<PackagePreparationWorkspace />);
 
-    expect(await screen.findByRole("heading", { name: "Brand name" })).toBeInTheDocument();
-    const accept = screen.getByRole("button", { name: "Accept Brand name" });
-    await waitFor(() => expect(accept).toBeEnabled());
-    fireEvent.click(accept);
-
     expect(await screen.findByRole("heading", { name: "Alcohol statement" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Brand name" }));
+    expect(await screen.findByRole("heading", { name: "Brand name" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Continue with Alcohol statement" })).toBeEnabled();
     expect(store.save).not.toHaveBeenCalled();
     expect(value.sellerChangeHistory).toHaveLength(0);
   });
@@ -237,5 +387,124 @@ describe("guided category acceptance", () => {
     expect(checkpoint.draft.categories[0].decision).toBe("unresolved");
     expect(screen.getByText(/Categories: 0\/2/i)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /run pre-check/i })).toBeNull();
+  });
+
+  it("keeps machine evidence secondary and exits the correction queue after both dispositions", async () => {
+    const value = fullyAcceptedDraft();
+    const immutableRun = analysisRun("needs_seller_review");
+    value.analysisRuns = [immutableRun];
+    store.load.mockResolvedValue(stored(value));
+    render(<PackagePreparationWorkspace />);
+
+    expect(await screen.findByRole("heading", { name: "Brand name" })).toBeInTheDocument();
+    expect(screen.getByText("You confirmed")).toBeInTheDocument();
+    expect(screen.getByText("Machine detected")).toBeInTheDocument();
+    expect(document.querySelector("[data-machine-observation]")).toBeNull();
+    expect(screen.getByRole("button", { name: "Keep my evidence" })).toBeEnabled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Show machine observation" }));
+    expect(document.querySelector("[data-machine-observation]")).not.toBeNull();
+    expect(store.save).not.toHaveBeenCalled();
+    expect(value.sellerChangeHistory).toHaveLength(1);
+
+    fireEvent.click(screen.getByRole("button", { name: "Keep my evidence" }));
+    expect(await screen.findByRole("heading", { name: "Alcohol statement" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Keep my evidence" })).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: "Keep my evidence" }));
+
+    expect(
+      await screen.findByRole("heading", { name: "All required evidence has been reviewed." }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Save the updated draft to continue.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Save updated draft" })).toBeEnabled();
+    expect(screen.queryByRole("button", { name: "Previous" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Next" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /save brand name/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /save alcohol statement/i })).toBeNull();
+
+    const finalCheckpoint = store.save.mock.calls[1][0] as { draft: SellerPackageDraft };
+    expect(finalCheckpoint.draft.sellerChangeHistory.map((change) => change.action)).toEqual([
+      "draft_saved",
+      "category_updated",
+      "category_updated",
+    ]);
+    expect(finalCheckpoint.draft.analysisRuns[0]).toBe(immutableRun);
+  });
+
+  it("copies machine geometry only into an uncommitted seller edit", async () => {
+    const value = fullyAcceptedDraft();
+    value.analysisRuns = [analysisRun("needs_seller_review")];
+    store.load.mockResolvedValue(stored(value));
+    render(<PackagePreparationWorkspace />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Use machine region" }));
+    expect(document.querySelector('[data-working="true"]')).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Save Brand name" })).toBeEnabled();
+    expect(store.save).not.toHaveBeenCalled();
+    expect(value.sellerChangeHistory).toHaveLength(1);
+    expect(value.analysisRuns[0].panelRuns[0].observations.brandName.geometry).toEqual({
+      imageIndex: 0,
+      x: 100,
+      y: 100,
+      width: 300,
+      height: 100,
+      imageWidth: 1000,
+      imageHeight: 1500,
+    });
+  });
+
+  it("shows elapsed pre-check time, blocks duplicates, and appends the successful immutable run", async () => {
+    const value = fullyAcceptedDraft();
+    store.load.mockResolvedValue(stored(value));
+    let resolveRequest: ((value: unknown) => void) | undefined;
+    const request = new Promise((resolve) => {
+      resolveRequest = resolve;
+    });
+    const fetchMock = vi.fn(() => request);
+    vi.stubGlobal("fetch", fetchMock);
+    render(<PackagePreparationWorkspace />);
+
+    const runButton = await screen.findByRole("button", { name: "Run pre-check" });
+    vi.useFakeTimers();
+    fireEvent.click(runButton);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("button", { name: /running pre-check/i })).toBeDisabled();
+    expect(screen.getByText("00:00")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /running pre-check/i }));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    act(() => vi.advanceTimersByTime(1_250));
+    expect(screen.getByText("00:01")).toBeInTheDocument();
+
+    const completedRun = analysisRun("ready_for_agent_submission");
+    await act(async () => {
+      resolveRequest?.({
+        json: async () => ({ ok: true, data: { analysisRun: completedRun } }),
+      });
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    vi.useRealTimers();
+
+    expect(await screen.findByRole("button", { name: "Prepare agent package" })).toBeDisabled();
+    const saved = store.save.mock.calls.at(-1)?.[0] as { draft: SellerPackageDraft };
+    expect(saved.draft.analysisRuns).toHaveLength(1);
+    expect(saved.draft.analysisRuns[0]).toBe(completedRun);
+  });
+
+  it("restores Retry after a failed pre-check without false advancement", async () => {
+    const value = fullyAcceptedDraft();
+    store.load.mockResolvedValue(stored(value));
+    const fetchMock = vi.fn(async () => ({
+      json: async () => ({ ok: false, error: { code: "OCR_FAILED", message: "OCR unavailable" } }),
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+    render(<PackagePreparationWorkspace />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Run pre-check" }));
+    expect(await screen.findByRole("button", { name: "Retry pre-check" })).toBeEnabled();
+    expect(screen.getByText(/analysis did not complete: OCR unavailable/i)).toBeInTheDocument();
+    expect(store.save).not.toHaveBeenCalled();
+    expect(value.analysisRuns).toHaveLength(0);
   });
 });

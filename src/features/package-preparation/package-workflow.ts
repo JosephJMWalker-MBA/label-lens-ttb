@@ -4,6 +4,7 @@ import {
   validNormalizedRegion,
   type PackageCategoryDefinition,
   type PackageCategoryId,
+  type SellerPackageChangeAction,
   type SellerPackageDraft,
 } from "./package-model";
 import type { PackageCategoryInstruction } from "./package-profile";
@@ -42,6 +43,9 @@ export interface GuidedPackageWorkflow {
   categoryStatuses: GuidedCategoryStatus[];
   incompleteCategoryIds: PackageCategoryId[];
   flaggedCategoryIds: PackageCategoryId[];
+  correctionResolvedCategoryIds: PackageCategoryId[];
+  correctionPendingCategoryIds: PackageCategoryId[];
+  correctionCycleComplete: boolean;
   focusCategoryIds: PackageCategoryId[];
   analysisExists: boolean;
   analysisCurrent: boolean;
@@ -50,6 +54,14 @@ export interface GuidedPackageWorkflow {
   progressStages: PackageProgressStage[];
   recommendedAction: string;
 }
+
+const CORRECTION_DISPOSITION_ACTIONS: ReadonlySet<SellerPackageChangeAction> = new Set([
+  "category_updated",
+  "region_added",
+  "region_moved",
+  "region_resized",
+  "region_removed",
+] as const);
 
 function categoryComplete(args: {
   draft: SellerPackageDraft;
@@ -122,6 +134,29 @@ export function deriveGuidedPackageWorkflow(args: {
         })
         .map((definition) => definition.categoryId)
     : [];
+  const completeCategoryIds = new Set(
+    categoryStatuses.filter((status) => status.complete).map((status) => status.categoryId),
+  );
+  const correctionResolvedCategoryIds = latestRun
+    ? flaggedCategoryIds.filter(
+        (categoryId) =>
+          completeCategoryIds.has(categoryId) &&
+          draft.sellerChangeHistory.some(
+            (change) =>
+              change.sequence > latestRun.sellerChangeSequence &&
+              change.categoryId === categoryId &&
+              CORRECTION_DISPOSITION_ACTIONS.has(change.action),
+          ),
+      )
+    : [];
+  const correctionResolved = new Set(correctionResolvedCategoryIds);
+  const correctionPendingCategoryIds = flaggedCategoryIds.filter(
+    (categoryId) => !correctionResolved.has(categoryId),
+  );
+  const correctionCycleComplete =
+    latestRun?.readiness === "needs_seller_review" &&
+    flaggedCategoryIds.length > 0 &&
+    correctionPendingCategoryIds.length === 0;
   const allCategoriesComplete = incompleteCategoryIds.length === 0;
   const readyForPrecheck =
     panelDecisionsComplete && allCategoriesComplete && args.saveState === "saved";
@@ -138,13 +173,12 @@ export function deriveGuidedPackageWorkflow(args: {
   } else if (!allCategoriesComplete && !latestRun) {
     phase = "mark";
     recommendedAction = "Complete the next required category";
-  } else if (latestRun?.readiness === "needs_seller_review") {
+  } else if (
+    latestRun?.readiness === "needs_seller_review" &&
+    correctionPendingCategoryIds.length > 0
+  ) {
     phase = "fix";
-    recommendedAction = analysisCurrent
-      ? "Review only the categories flagged by the pre-check"
-      : args.saveState === "saved"
-        ? "Re-run the pre-check"
-        : "Save the updated draft";
+    recommendedAction = "Review only the categories flagged by the pre-check";
   } else if (readyForAgentPackage) {
     phase = "prepare";
     recommendedAction = "Prepare the local-only agent package";
@@ -155,8 +189,12 @@ export function deriveGuidedPackageWorkflow(args: {
     phase = "save";
     recommendedAction =
       args.saveState === "saved"
-        ? "Run the saved package pre-check"
-        : "Save the prepared package in this browser";
+        ? latestRun && !analysisCurrent
+          ? "Run the package pre-check again"
+          : "Run the saved package pre-check"
+        : latestRun && !analysisCurrent
+          ? "Save the updated draft"
+          : "Save the prepared package in this browser";
   }
 
   const exportedAfterLatestAnalysis = Boolean(
@@ -181,7 +219,9 @@ export function deriveGuidedPackageWorkflow(args: {
       id: "mark",
       label: "Mark",
       status: allCategoriesComplete
-        ? "complete"
+        ? phase === "fix"
+          ? "needs_attention"
+          : "complete"
         : phase === "fix"
           ? "needs_attention"
           : panelDecisionsComplete
@@ -237,8 +277,13 @@ export function deriveGuidedPackageWorkflow(args: {
     categoryStatuses,
     incompleteCategoryIds,
     flaggedCategoryIds,
+    correctionResolvedCategoryIds,
+    correctionPendingCategoryIds,
+    correctionCycleComplete,
     focusCategoryIds:
-      latestRun?.readiness === "needs_seller_review" ? flaggedCategoryIds : incompleteCategoryIds,
+      latestRun?.readiness === "needs_seller_review"
+        ? correctionPendingCategoryIds
+        : incompleteCategoryIds,
     analysisExists: Boolean(latestRun),
     analysisCurrent,
     readyForPrecheck,

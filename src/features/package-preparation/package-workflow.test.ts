@@ -221,6 +221,71 @@ describe("guided package workflow projection", () => {
     expect(workflow.focusCategoryIds).toEqual(["alcoholStatement"]);
   });
 
+  it("removes resolved correction categories from the queue and exits instead of cycling", () => {
+    const value = draft();
+    addPanels(value);
+    acceptCategories(value);
+    value.analysisRuns = [
+      {
+        analysisRunId: "analysis-1",
+        sequence: 1,
+        sellerChangeSequence: 0,
+        recordedAt: "2026-07-18T01:00:00.000Z",
+        panelRuns: [],
+        categories: WINE_PACKAGE_CATEGORY_DEFINITIONS.map((definition) => ({
+          categoryId: definition.categoryId,
+          state: "needs_review" as const,
+          observedValue: "machine value",
+          supportingPanelIds: [],
+          supportingRegionIds: [],
+          reason: "Seller and machine evidence differ.",
+        })),
+        readiness: "needs_seller_review",
+      },
+    ];
+
+    expect(project(value, "saved").correctionPendingCategoryIds).toEqual([
+      "brandName",
+      "alcoholStatement",
+    ]);
+    value.sellerChangeHistory.push({
+      changeId: "brand-reviewed",
+      sequence: 1,
+      recordedAt: "2026-07-18T02:00:00.000Z",
+      action: "category_updated",
+      categoryId: "brandName",
+      detail: "Brand discrepancy reviewed.",
+    });
+    expect(project(value, "unsaved")).toMatchObject({
+      phase: "fix",
+      correctionResolvedCategoryIds: ["brandName"],
+      correctionPendingCategoryIds: ["alcoholStatement"],
+      focusCategoryIds: ["alcoholStatement"],
+      correctionCycleComplete: false,
+    });
+
+    value.sellerChangeHistory.push({
+      changeId: "alcohol-reviewed",
+      sequence: 2,
+      recordedAt: "2026-07-18T03:00:00.000Z",
+      action: "category_updated",
+      categoryId: "alcoholStatement",
+      detail: "Alcohol discrepancy reviewed.",
+    });
+    expect(project(value, "unsaved")).toMatchObject({
+      phase: "save",
+      correctionPendingCategoryIds: [],
+      focusCategoryIds: [],
+      correctionCycleComplete: true,
+      recommendedAction: "Save the updated draft",
+    });
+    expect(project(value, "saved")).toMatchObject({
+      phase: "save",
+      correctionCycleComplete: true,
+      recommendedAction: "Run the package pre-check again",
+    });
+  });
+
   it("distinguishes stale readiness from a current local-export-ready run", () => {
     const value = draft();
     addPanels(value);

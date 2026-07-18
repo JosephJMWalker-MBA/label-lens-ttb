@@ -2,19 +2,15 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { triggerDownload } from "@/features/precheck/download";
 
 import { GuidedCategoryTask } from "./GuidedCategoryTask";
 import { PackageAnnotationCanvas, type MachinePackageRegion } from "./PackageAnnotationCanvas";
-import { PackageProgressFooter } from "./PackageProgressFooter";
+import { PackageProgressFooter, type PackageFooterAction } from "./PackageProgressFooter";
 import { PackageUploadDecisions } from "./PackageUploadDecisions";
-import {
-  PackageWorkstationControls,
-  type WorkstationPrimaryAction,
-} from "./PackageWorkstationControls";
+import { PackageWorkstationControls } from "./PackageWorkstationControls";
 import { ProfileExampleLabelMap } from "./ProfileExampleLabelMap";
 import {
   loadPackageDraftLocally,
@@ -89,6 +85,14 @@ function now(): string {
 
 function makeId(prefix: string): string {
   return `${prefix}-${crypto.randomUUID()}`;
+}
+
+function formatElapsedTime(seconds: number): string {
+  const minutes = Math.floor(seconds / 60)
+    .toString()
+    .padStart(2, "0");
+  const remainder = (seconds % 60).toString().padStart(2, "0");
+  return `${minutes}:${remainder}`;
 }
 
 function newDraft(): SellerPackageDraft {
@@ -220,7 +224,9 @@ export function PackagePreparationWorkspace() {
   const [activeRegionId, setActiveRegionId] = useState<string | null>(null);
   const [workingRegion, setWorkingRegion] = useState<SellerEvidenceRegion | null>(null);
   const [workingValue, setWorkingValue] = useState("");
+  const [editingCategory, setEditingCategory] = useState(false);
   const [acceptingCategory, setAcceptingCategory] = useState(false);
+  const [showMachineObservation, setShowMachineObservation] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
   const [editingPanels, setEditingPanels] = useState(false);
   const [reviewingEvidence, setReviewingEvidence] = useState(false);
@@ -228,6 +234,7 @@ export function PackagePreparationWorkspace() {
     useState<Extract<PanelRole, "neck" | "side" | "other">>("neck");
   const [saveState, setSaveState] = useState<PackageSaveState>("unsaved");
   const [analysisState, setAnalysisState] = useState<AnalysisState>("idle");
+  const [analysisElapsedSeconds, setAnalysisElapsedSeconds] = useState(0);
   const [submitter, setSubmitter] = useState("");
   const [message, setMessage] = useState(
     "Resolve the panel choices, then prepare each supported category.",
@@ -297,6 +304,7 @@ export function PackagePreparationWorkspace() {
   const activePanelForWorkingId = activePanel?.panelId ?? null;
   const activeCategoryExpectedValue = activeCategory?.expectedValue ?? "";
   const activeCategoryRegions = activeCategory?.regions;
+  const activeCategoryDecision = activeCategory?.decision;
   const latestRun = draft?.analysisRuns.at(-1);
   const analysisCurrent = draft ? latestAnalysisIsCurrent(draft) : false;
   const latestCategoryResult = latestRun?.categories.find(
@@ -310,6 +318,9 @@ export function PackagePreparationWorkspace() {
         saveState,
       })
     : null;
+  const reviewingAcceptedEvidence = Boolean(
+    workflow && reviewingEvidence && !workflow.focusCategoryIds.includes(activeCategoryId),
+  );
   const canAnalyze =
     workflow?.readyForPrecheck === true &&
     analysisState !== "analyzing" &&
@@ -330,25 +341,43 @@ export function PackagePreparationWorkspace() {
     const existing = activeCategoryRegions.find(
       (region) => region.panelId === activePanelForWorkingId,
     );
-    const nextRegion: SellerEvidenceRegion = existing ?? {
-      regionId: makeId("working-region"),
-      categoryId: activeCategoryId,
-      panelId: activePanelForWorkingId,
-      unit: "normalized-panel-relative",
-      provenance: "seller-selected-region",
-      ...activeInstruction.starterRegion,
-    };
     setWorkingValue(activeCategoryExpectedValue);
-    setWorkingRegion(nextRegion);
-    setActiveRegionId(nextRegion.regionId);
+    setWorkingRegion(null);
+    setActiveRegionId(existing?.regionId ?? null);
+    setEditingCategory(
+      activeCategoryDecision === "unresolved" ||
+        activeCategoryRegions.length === 0 ||
+        activeCategoryExpectedValue === "",
+    );
+    setShowMachineObservation(false);
   }, [
     activeCategoryExpectedValue,
+    activeCategoryDecision,
     activeCategoryRegions,
     activeCategoryId,
     activeInstruction,
     activePanelForWorkingId,
     workflow?.panelDecisionsComplete,
   ]);
+
+  useEffect(() => {
+    if (analysisState !== "analyzing") return;
+    const startedAt = Date.now();
+    setAnalysisElapsedSeconds(0);
+    const timer = window.setInterval(() => {
+      setAnalysisElapsedSeconds(Math.floor((Date.now() - startedAt) / 1000));
+    }, 250);
+    return () => window.clearInterval(timer);
+  }, [analysisState]);
+
+  useEffect(() => {
+    if (!workflow || reviewingAcceptedEvidence || editingPanels) return;
+    if (workflow.phase !== "mark" && workflow.phase !== "fix") return;
+    const nextCategoryId = workflow.focusCategoryIds[0];
+    if (nextCategoryId && !workflow.focusCategoryIds.includes(activeCategoryId)) {
+      selectCategory(nextCategoryId);
+    }
+  }, [activeCategoryId, editingPanels, reviewingAcceptedEvidence, workflow]);
 
   const machineRegions = useMemo<MachinePackageRegion[]>(() => {
     if (!activePanel || !latestRun) return [];
@@ -420,7 +449,9 @@ export function PackagePreparationWorkspace() {
     selectCategory(definitions[nextIndex].categoryId, sourceDraft);
   }
 
-  function selectNextFocusedCategory(sourceDraft: SellerPackageDraft) {
+  function selectNextFocusedCategory(
+    sourceDraft: SellerPackageDraft,
+  ): "advanced" | "current" | "complete" {
     const nextWorkflow = deriveGuidedPackageWorkflow({
       draft: sourceDraft,
       definitions: WINE_PACKAGE_CATEGORY_DEFINITIONS,
@@ -430,7 +461,11 @@ export function PackagePreparationWorkspace() {
     const nextCategoryId = nextWorkflow.focusCategoryIds.find(
       (categoryId) => categoryId !== activeCategoryId,
     );
-    if (nextCategoryId) selectCategory(nextCategoryId, sourceDraft);
+    if (!nextCategoryId) {
+      return nextWorkflow.focusCategoryIds.includes(activeCategoryId) ? "current" : "complete";
+    }
+    selectCategory(nextCategoryId, sourceDraft);
+    return "advanced";
   }
 
   async function receivePanel(role: PanelRole, file: File | undefined, panelId?: string) {
@@ -748,54 +783,6 @@ export function PackagePreparationWorkspace() {
     updateDraft(next, "Optional panel removed. Historical machine runs remain unchanged.");
   }
 
-  function commitRegion(
-    region: SellerEvidenceRegion,
-    action: Extract<SellerPackageChangeAction, "region_added" | "region_moved" | "region_resized">,
-  ) {
-    if (!draft) return;
-    const category = draft.categories.find((item) => item.categoryId === region.categoryId);
-    if (!category) return;
-    const exists = category.regions.some((item) => item.regionId === region.regionId);
-    const updatedCategory = {
-      ...category,
-      decision: "provided" as const,
-      regions: exists
-        ? category.regions.map((item) => (item.regionId === region.regionId ? region : item))
-        : [...category.regions, region],
-    };
-    const categories = draft.categories.map((item) =>
-      item.categoryId === region.categoryId ? updatedCategory : item,
-    );
-    const next = appendSellerChange(
-      { ...draft, categories },
-      changeFor({
-        action,
-        region,
-        detail: `${labelForCategory(region.categoryId)} seller region ${exists ? "updated" : "added"} on panel ${region.panelId}.`,
-      }),
-    );
-    setActiveRegionId(region.regionId);
-    updateDraft(next);
-  }
-
-  function removeRegion(regionId: string) {
-    if (!draft) return;
-    const region = draft.categories
-      .flatMap((category) => category.regions)
-      .find((candidate) => candidate.regionId === regionId);
-    if (!region) return;
-    const categories = draft.categories.map((category) => ({
-      ...category,
-      regions: category.regions.filter((candidate) => candidate.regionId !== regionId),
-    }));
-    const next = appendSellerChange(
-      { ...draft, categories },
-      changeFor({ action: "region_removed", region, detail: "Seller evidence region removed." }),
-    );
-    setActiveRegionId(null);
-    updateDraft(next, "Seller region removed. The change is preserved in append-only history.");
-  }
-
   function rotatePanel(rotation: PackagePanelMetadata["rotation"]) {
     if (!draft || !activePanel) return;
     const panel = { ...activePanel, rotation };
@@ -832,8 +819,9 @@ export function PackagePreparationWorkspace() {
     }
     setWorkingRegion(region);
     setActiveRegionId(region.regionId);
+    setEditingCategory(true);
     setMessage(
-      "Machine geometry was copied into the uncommitted working box. Accept the category to save seller evidence; the machine observation remains unchanged.",
+      `Machine geometry was copied into a seller edit. Save ${labelForCategory(activeCategoryId)} to record it; the machine observation remains unchanged.`,
     );
   }
 
@@ -848,12 +836,21 @@ export function PackagePreparationWorkspace() {
       setDraft(next);
       setSaveState("unsaved");
       setMessage(successMessage);
-      selectNextFocusedCategory(next);
+      setWorkingRegion(null);
+      setEditingCategory(false);
+      const focusResult = selectNextFocusedCategory(next);
+      if (focusResult === "current") {
+        setEditingCategory(true);
+        setReviewingEvidence(true);
+      } else if (focusResult === "complete") {
+        setReviewingEvidence(false);
+        setActiveRegionId(null);
+      }
       return true;
     } catch {
       setSaveState("error");
       setMessage(
-        "This category was not accepted because the local recovery checkpoint failed. Nothing was added to seller history, and the workflow did not advance.",
+        "This category was not saved because browser-local persistence failed. No evidence record was added, and the workflow did not advance.",
       );
       return false;
     } finally {
@@ -899,49 +896,45 @@ export function PackagePreparationWorkspace() {
     const categoryChanged =
       activeCategory.decision !== updatedCategory.decision ||
       activeCategory.expectedValue !== updatedCategory.expectedValue;
-    if (categoryChanged) {
+    const regionChanged = Boolean(
+      acceptedRegion && (!existingRegion || !sameRegion(existingRegion, acceptedRegion)),
+    );
+    if (categoryChanged || regionChanged) {
       next = appendSellerChange(
         next,
         changeFor({
           action: "category_updated",
           category: updatedCategory,
-          detail: `${activeDefinition.label} seller value and decision explicitly accepted.`,
-        }),
-      );
-    }
-    if (acceptedRegion && (!existingRegion || !sameRegion(existingRegion, acceptedRegion))) {
-      const action: Extract<
-        SellerPackageChangeAction,
-        "region_added" | "region_moved" | "region_resized"
-      > = !existingRegion
-        ? "region_added"
-        : existingRegion.width !== acceptedRegion.width ||
-            existingRegion.height !== acceptedRegion.height
-          ? "region_resized"
-          : "region_moved";
-      next = appendSellerChange(
-        next,
-        changeFor({
-          action,
-          region: acceptedRegion,
-          detail: `${activeDefinition.label} working box explicitly accepted on panel ${acceptedRegion.panelId}.`,
+          region: acceptedRegion ?? undefined,
+          detail: `${activeDefinition.label} seller-confirmed text and region saved together.`,
         }),
       );
     }
 
-    if (
-      !categoryChanged &&
-      (!acceptedRegion || (existingRegion && sameRegion(existingRegion, acceptedRegion)))
-    ) {
-      setMessage(
-        `${activeDefinition.label} was already accepted; seller history was not duplicated.`,
-      );
-      selectNextFocusedCategory(draft);
+    if (!categoryChanged && !regionChanged) {
+      setMessage(`${activeDefinition.label} is unchanged; no duplicate evidence record was added.`);
       return;
     }
     await checkpointCategory(
       next,
-      `${activeDefinition.label} accepted and recovery-checkpointed in this browser. Save the whole package before pre-check.`,
+      `${activeDefinition.label} saved. The package still has unsaved changes.`,
+    );
+  }
+
+  async function keepActiveCategoryEvidence() {
+    if (!draft || !activeCategory || !activeDefinition || !latestRun) return;
+    if (!workflow?.correctionPendingCategoryIds.includes(activeCategoryId)) return;
+    const next = appendSellerChange(
+      draft,
+      changeFor({
+        action: "category_updated",
+        category: activeCategory,
+        detail: `${activeDefinition.label} machine discrepancy reviewed; seller evidence deliberately kept unchanged.`,
+      }),
+    );
+    await checkpointCategory(
+      next,
+      `${activeDefinition.label} reviewed. Your evidence was kept, and the package still has unsaved changes.`,
     );
   }
 
@@ -1085,9 +1078,9 @@ export function PackagePreparationWorkspace() {
   }
 
   const focusedDefinitions =
-    latestRun?.readiness === "needs_seller_review"
+    workflow.phase === "fix"
       ? WINE_PACKAGE_CATEGORY_DEFINITIONS.filter((definition) =>
-          workflow.flaggedCategoryIds.includes(definition.categoryId),
+          workflow.correctionPendingCategoryIds.includes(definition.categoryId),
         )
       : WINE_PACKAGE_CATEGORY_DEFINITIONS;
   const activeTaskPosition = Math.max(
@@ -1098,77 +1091,153 @@ export function PackagePreparationWorkspace() {
   const annotationActive =
     !editingPanels &&
     workflow.panelDecisionsComplete &&
-    (workflow.phase === "mark" || workflow.phase === "fix" || reviewingEvidence);
+    (workflow.phase === "mark" || workflow.phase === "fix" || reviewingAcceptedEvidence);
   const allCategoriesComplete = workflow.completedCategoryCount === workflow.totalCategoryCount;
   const canSavePackage =
     workflow.panelDecisionsComplete && allCategoriesComplete && saveState !== "saving";
-  let primaryAction: WorkstationPrimaryAction;
-  if (reviewingEvidence && analysisCurrent && workflow.phase !== "fix") {
-    primaryAction = {
+  const activeCategoryComplete =
+    workflow.categoryStatuses.find((status) => status.categoryId === activeCategoryId)?.complete ??
+    false;
+  const activeCorrectionPending = workflow.correctionPendingCategoryIds.includes(activeCategoryId);
+  const acceptedRegionOnPanel = activeCategory?.regions.find(
+    (region) => region.panelId === activePanelId,
+  );
+  const workingRegionChanged = Boolean(
+    workingRegion && (!acceptedRegionOnPanel || !sameRegion(acceptedRegionOnPanel, workingRegion)),
+  );
+  const workingTextChanged = Boolean(
+    activeCategory && workingValue.trim() !== activeCategory.expectedValue.trim(),
+  );
+  const categoryHasMaterialChange =
+    !activeCategoryComplete || workingRegionChanged || workingTextChanged;
+  const categoryHasRegion = Boolean(
+    (workingRegion && validNormalizedRegion(workingRegion)) || activeCategory?.regions.length,
+  );
+  const categoryHasText = Boolean(!activeDefinition?.requiresValue || workingValue.trim());
+  const categoryReadyToSave =
+    categoryHasRegion && categoryHasText && categoryHasMaterialChange && !acceptingCategory;
+
+  let footerAction: PackageFooterAction;
+  if (analysisState === "analyzing") {
+    footerAction = {
+      label: "Running pre-check…",
+      disabled: true,
+      pending: true,
       reason:
-        "Review the accepted category in the task inspector. Any material edit will invalidate the current pre-check.",
+        "OCR and deterministic checks are running for this saved package. Duplicate requests are disabled.",
     };
-  } else if (workflow.phase === "upload") {
-    primaryAction = {
-      reason:
-        "Use the active upload workspace to resolve front, back, and additional-panel intent.",
+  } else if (
+    activeDefinition &&
+    annotationActive &&
+    ((workflow.phase === "mark" && !activeCategoryComplete) || editingCategory)
+  ) {
+    footerAction = {
+      label: acceptingCategory
+        ? `Saving ${activeDefinition.label}…`
+        : `Save ${activeDefinition.label}`,
+      disabled: !categoryReadyToSave,
+      onClick: () => void acceptActiveCategory(),
+      reason: acceptingCategory
+        ? `${activeDefinition.label} evidence is being saved in this browser.`
+        : !categoryHasRegion
+          ? `Draw one region around the ${activeDefinition.label.toLowerCase()}.`
+          : !categoryHasText
+            ? `Confirm what the label says for the ${activeDefinition.label.toLowerCase()}.`
+            : !categoryHasMaterialChange
+              ? "No seller evidence has changed. Keep the current evidence or make an edit."
+              : undefined,
     };
   } else if (workflow.phase === "mark") {
-    primaryAction = {
-      reason:
-        "Use Accept in the task inspector after seller text and a valid blue working box are ready.",
-    };
-  } else if (workflow.phase === "fix" && !analysisCurrent) {
-    primaryAction =
-      saveState === "saved"
-        ? {
-            label: analysisState === "analyzing" ? "Running pre-check…" : "Re-run pre-check",
-            disabled: !canAnalyze,
-            onClick: () => void analyzePackage(),
-            reason: canAnalyze ? undefined : "The corrected package must be saved before re-check.",
+    const nextIncompleteCategoryId = workflow.incompleteCategoryIds[0];
+    footerAction = {
+      label: nextIncompleteCategoryId
+        ? `Continue with ${labelForCategory(nextIncompleteCategoryId)}`
+        : "Continue marking",
+      disabled: !nextIncompleteCategoryId,
+      onClick: nextIncompleteCategoryId
+        ? () => {
+            setReviewingEvidence(false);
+            selectCategory(nextIncompleteCategoryId);
           }
-        : {
-            label: "Save updated draft",
-            disabled: !canSavePackage,
-            onClick: () => void saveDraft(),
-            reason: "Seller evidence changed after the latest analysis.",
-          };
-  } else if (workflow.phase === "fix") {
-    primaryAction = {
+        : undefined,
+      reason: "Return to the next incomplete category to finish the marking stage.",
+    };
+  } else if (workflow.phase === "fix" && activeCorrectionPending) {
+    footerAction = {
+      label: acceptingCategory ? "Saving reviewed evidence…" : "Keep my evidence",
+      disabled: acceptingCategory,
+      onClick: () => void keepActiveCategoryEvidence(),
       reason:
-        "Use the task inspector to correct only the categories flagged by the latest pre-check.",
+        "Confirms that you reviewed the discrepancy while preserving machine and seller evidence as separate records.",
+    };
+  } else if (workflow.phase === "fix") {
+    const nextPendingCategoryId = workflow.correctionPendingCategoryIds[0];
+    footerAction = {
+      label: nextPendingCategoryId
+        ? `Review ${labelForCategory(nextPendingCategoryId)}`
+        : "Review flagged evidence",
+      disabled: !nextPendingCategoryId,
+      onClick: nextPendingCategoryId ? () => selectCategory(nextPendingCategoryId) : undefined,
+      reason: "Return to the remaining flagged category to complete this correction stage.",
+    };
+  } else if (workflow.phase === "upload") {
+    footerAction = {
+      label: "Continue to marking",
+      disabled: true,
+      reason: !workflow.frontUploaded
+        ? "Upload the front label before continuing."
+        : !workflow.backResolved
+          ? "Choose whether this package has a back label."
+          : "Choose whether this package has additional panels.",
+    };
+  } else if (workflow.phase === "save" && saveState !== "saved") {
+    footerAction = {
+      label:
+        saveState === "saving"
+          ? "Saving package…"
+          : latestRun && !analysisCurrent
+            ? "Save updated draft"
+            : "Save draft locally",
+      disabled: !canSavePackage,
+      onClick: () => void saveDraft(),
+      reason: !canSavePackage
+        ? "Complete every required category before saving the package."
+        : latestRun && !analysisCurrent
+          ? "Seller evidence changed. Save the updated browser-local draft before re-checking."
+          : "Package saving is browser-local and is required before the pre-check.",
     };
   } else if (workflow.phase === "save") {
-    primaryAction =
-      saveState === "saved"
-        ? {
-            label: analysisState === "analyzing" ? "Running pre-check…" : "Run pre-check",
-            disabled: !canAnalyze,
-            onClick: () => void analyzePackage(),
-            reason: canAnalyze
-              ? undefined
-              : "The current package is not yet eligible for analysis.",
-          }
-        : {
-            label: "Save draft locally",
-            disabled: !canSavePackage,
-            onClick: () => void saveDraft(),
-            reason: "The explicit save remains browser-local and is required before analysis.",
-          };
+    footerAction = {
+      label:
+        analysisState === "error"
+          ? "Retry pre-check"
+          : latestRun && !analysisCurrent
+            ? "Run pre-check again"
+            : "Run pre-check",
+      disabled: !canAnalyze,
+      onClick: () => void analyzePackage(),
+      reason: canAnalyze
+        ? analysisState === "error"
+          ? "The prior attempt failed without advancing readiness or appending a successful run."
+          : latestRun && !analysisCurrent
+            ? "Pre-check results are stale because seller evidence changed."
+            : "Runs OCR and deterministic checks on the current saved package."
+        : "Save the package before running the pre-check.",
+    };
   } else {
-    primaryAction = {
+    footerAction = {
       label: "Prepare agent package",
       disabled: !canExport,
       onClick: () => void exportAgentPackage(),
       reason:
         submitter.trim() === ""
-          ? "Enter the seller or submitter name in the preparation workspace."
+          ? "Enter the seller or submitter name before preparing the package."
           : "Creates a local download only. Nothing is transmitted.",
     };
   }
 
   return (
-    <section className="min-w-0 pb-32" data-testid="seller-workstation">
+    <section className="min-w-0 pb-64 lg:pb-44" data-testid="seller-workstation">
       <div className="grid min-w-0 items-start gap-4 lg:grid-cols-[15rem_minmax(0,1fr)_19rem]">
         <PackageWorkstationControls
           draft={draft}
@@ -1177,15 +1246,22 @@ export function PackagePreparationWorkspace() {
           activeCategoryId={activeCategoryId}
           guideOpen={guideOpen}
           editingPanels={editingPanels}
-          reviewingEvidence={reviewingEvidence}
+          reviewingEvidence={reviewingAcceptedEvidence}
           message={message}
-          primaryAction={primaryAction}
-          showCategoryControls={annotationActive}
+          showCategoryControls={workflow.panelDecisionsComplete && !editingPanels}
           onSelectPanel={(panelId) => {
             setActivePanelId(panelId);
             setActiveRegionId(panelId === workingRegion?.panelId ? workingRegion.regionId : null);
           }}
-          onSelectCategory={selectCategory}
+          onSelectMissingPanel={() => {
+            setGuideOpen(false);
+            setReviewingEvidence(false);
+            setEditingPanels(true);
+          }}
+          onSelectCategory={(categoryId) => {
+            setReviewingEvidence(!workflow.focusCategoryIds.includes(categoryId));
+            selectCategory(categoryId);
+          }}
           onToggleGuide={() => setGuideOpen((open) => !open)}
           onTogglePanels={() => {
             setGuideOpen(false);
@@ -1198,7 +1274,12 @@ export function PackagePreparationWorkspace() {
           }}
         />
 
-        <main className="min-w-0" data-testid="cycling-workspace">
+        <main
+          className="min-w-0 rounded-xl border border-blue-500/30 shadow-[0_0_24px_rgba(37,99,235,0.10)]"
+          data-testid="cycling-workspace"
+          data-current-phase={workflow.phase}
+          aria-current="step"
+        >
           {workflow.phase === "upload" || editingPanels ? (
             <PackageUploadDecisions
               draft={draft}
@@ -1228,22 +1309,9 @@ export function PackagePreparationWorkspace() {
                   </h2>
                 </div>
                 {latestCategoryResult ? (
-                  <div className="flex items-center gap-2 text-sm">
-                    <span>
-                      Pre-check: <strong>{ANALYSIS_LABEL[latestCategoryResult.state]}</strong>
-                    </span>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      disabled={
-                        !machineRegions.some((region) => region.categoryId === activeCategoryId)
-                      }
-                      onClick={useMachineRegion}
-                    >
-                      Use machine box
-                    </Button>
-                  </div>
+                  <span className="text-sm">
+                    Pre-check: <strong>{ANALYSIS_LABEL[latestCategoryResult.state]}</strong>
+                  </span>
                 ) : null}
               </div>
               <div className="relative min-h-[32rem] min-w-0">
@@ -1256,19 +1324,18 @@ export function PackagePreparationWorkspace() {
                       (region) => region.panelId === activePanelId,
                     )}
                     workingRegion={workingRegion?.panelId === activePanelId ? workingRegion : null}
-                    machineRegions={machineRegions}
+                    machineRegions={showMachineObservation ? machineRegions : []}
                     activeRegionId={activeRegionId}
                     onActiveRegionChange={setActiveRegionId}
-                    onRegionCommit={commitRegion}
-                    onRegionRemove={removeRegion}
                     onWorkingRegionChange={(region) => {
                       setWorkingRegion(region);
                       setActiveRegionId(region.regionId);
+                      setEditingCategory(true);
                     }}
                     onWorkingRegionDiscard={() => {
                       setWorkingRegion(null);
                       setActiveRegionId(null);
-                      setMessage("Working box discarded. Accepted seller evidence was unchanged.");
+                      setMessage("Unsaved region edit deleted. Your saved evidence was unchanged.");
                     }}
                     onPanelRotationChange={rotatePanel}
                   />
@@ -1348,13 +1415,18 @@ export function PackagePreparationWorkspace() {
                 Save and pre-check
               </p>
               <h2 id="save-workspace-heading" className="text-2xl font-semibold">
-                {saveState === "saved"
-                  ? "Run the saved package pre-check"
-                  : "Save the accepted package"}
+                {latestRun && !analysisCurrent && saveState !== "saved"
+                  ? "All required evidence has been reviewed."
+                  : saveState === "saved"
+                    ? latestRun && !analysisCurrent
+                      ? "Run the pre-check again"
+                      : "Run the saved package pre-check"
+                    : "All required evidence has been saved."}
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Category acceptance created recovery checkpoints. The explicit package save remains
-                local to this browser and is required before analysis.
+                {latestRun && !analysisCurrent && saveState !== "saved"
+                  ? "Save the updated draft to continue."
+                  : "The explicit package save remains local to this browser and is required before analysis."}
               </p>
               <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
                 <div className="rounded border border-border p-3">
@@ -1367,7 +1439,7 @@ export function PackagePreparationWorkspace() {
                 <div className="rounded border border-border p-3">
                   <dt className="font-semibold">Categories</dt>
                   <dd className="text-muted-foreground">
-                    {workflow.completedCategoryCount}/{workflow.totalCategoryCount} accepted
+                    {workflow.completedCategoryCount}/{workflow.totalCategoryCount} saved
                   </dd>
                 </div>
                 <div className="rounded border border-border p-3">
@@ -1397,11 +1469,41 @@ export function PackagePreparationWorkspace() {
             taskCount={focusedDefinitions.length}
             workingValue={workingValue}
             pendingRegionAvailable={Boolean(workingRegion && validNormalizedRegion(workingRegion))}
-            accepting={acceptingCategory}
-            onWorkingValueChange={setWorkingValue}
-            onAccept={() => void acceptActiveCategory()}
+            editing={editingCategory}
+            machineObservationVisible={showMachineObservation}
+            machineRegionAvailable={machineRegions.some(
+              (region) => region.categoryId === activeCategoryId,
+            )}
+            showReviewNavigation={
+              focusedDefinitions.length > 1 && !workflow.correctionCycleComplete
+            }
+            onWorkingValueChange={(value) => {
+              setWorkingValue(value);
+              setEditingCategory(true);
+            }}
+            onBeginRegionEdit={() => {
+              const existing = activeCategory.regions.find(
+                (region) => region.panelId === activePanelId,
+              );
+              if (existing) {
+                setWorkingRegion({ ...existing });
+                setActiveRegionId(existing.regionId);
+              }
+              setEditingCategory(true);
+              setMessage(
+                `Edit the ${activeDefinition.label.toLowerCase()} region, then save it from the footer.`,
+              );
+            }}
+            onBeginTextEdit={() => {
+              setEditingCategory(true);
+              setMessage(
+                `Edit the confirmed ${activeDefinition.label.toLowerCase()} text, then save it from the footer.`,
+              );
+            }}
+            onToggleMachineObservation={() => setShowMachineObservation((visible) => !visible)}
+            onUseMachineRegion={useMachineRegion}
             onNeedsAttention={() => void markActiveCategoryNeedsAttention()}
-            onBack={() => selectAdjacentCategory(-1)}
+            onPrevious={() => selectAdjacentCategory(-1)}
             onNext={() => selectAdjacentCategory(1)}
           />
         ) : (
@@ -1430,6 +1532,10 @@ export function PackagePreparationWorkspace() {
         workflow={workflow}
         saveState={saveState}
         analysisRunCount={draft.analysisRuns.length}
+        action={footerAction}
+        elapsedLabel={
+          analysisState === "analyzing" ? formatElapsedTime(analysisElapsedSeconds) : undefined
+        }
       />
     </section>
   );

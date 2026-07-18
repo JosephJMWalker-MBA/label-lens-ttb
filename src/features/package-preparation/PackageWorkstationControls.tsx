@@ -24,13 +24,6 @@ const PHASE_LABEL = {
   prepare: "Prepare local package",
 } as const;
 
-export interface WorkstationPrimaryAction {
-  label?: string;
-  onClick?: () => void;
-  disabled?: boolean;
-  reason?: string;
-}
-
 export function PackageWorkstationControls({
   draft,
   workflow,
@@ -40,9 +33,9 @@ export function PackageWorkstationControls({
   editingPanels,
   reviewingEvidence,
   message,
-  primaryAction,
   showCategoryControls,
   onSelectPanel,
+  onSelectMissingPanel,
   onSelectCategory,
   onToggleGuide,
   onTogglePanels,
@@ -56,9 +49,9 @@ export function PackageWorkstationControls({
   editingPanels: boolean;
   reviewingEvidence: boolean;
   message: string;
-  primaryAction: WorkstationPrimaryAction;
   showCategoryControls: boolean;
   onSelectPanel: (panelId: string) => void;
+  onSelectMissingPanel: (role: "front" | "back") => void;
   onSelectCategory: (categoryId: PackageCategoryId) => void;
   onToggleGuide: () => void;
   onTogglePanels: () => void;
@@ -67,7 +60,7 @@ export function PackageWorkstationControls({
   const phaseDetail =
     workflow.phase === "upload"
       ? "Resolve the panel choices shown in the workspace."
-      : showCategoryControls
+      : workflow.phase === "mark" || workflow.phase === "fix" || reviewingEvidence
         ? `Current task: ${labelForCategory(activeCategoryId)}`
         : `Next: ${workflow.recommendedAction}`;
 
@@ -85,29 +78,42 @@ export function PackageWorkstationControls({
         <p className="mt-1 text-xs text-muted-foreground">{phaseDetail}</p>
       </div>
 
-      {draft.panels.length > 0 ? (
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Current panel
-          </p>
-          <div className="mt-2 flex flex-wrap gap-2" aria-label="Package panels">
-            {[...draft.panels]
-              .sort((left, right) => left.order - right.order)
-              .map((panel) => (
-                <Button
-                  key={panel.panelId}
-                  type="button"
-                  size="sm"
-                  variant={panel.panelId === activePanelId ? "default" : "outline"}
-                  aria-pressed={panel.panelId === activePanelId}
-                  onClick={() => onSelectPanel(panel.panelId)}
-                >
-                  {ROLE_LABEL[panel.role]}
-                </Button>
-              ))}
-          </div>
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Panel</p>
+        <div className="mt-2 flex flex-wrap gap-2" aria-label="Package panels">
+          {(["front", "back"] as const).map((role) => {
+            const panel = draft.panels.find((candidate) => candidate.role === role);
+            return (
+              <Button
+                key={role}
+                type="button"
+                size="sm"
+                variant={panel?.panelId === activePanelId ? "default" : "outline"}
+                aria-pressed={panel?.panelId === activePanelId}
+                aria-label={panel ? ROLE_LABEL[role] : `${ROLE_LABEL[role]} — add image`}
+                onClick={() => (panel ? onSelectPanel(panel.panelId) : onSelectMissingPanel(role))}
+              >
+                {ROLE_LABEL[role]}
+              </Button>
+            );
+          })}
+          {[...draft.panels]
+            .filter((panel) => panel.role !== "front" && panel.role !== "back")
+            .sort((left, right) => left.order - right.order)
+            .map((panel) => (
+              <Button
+                key={panel.panelId}
+                type="button"
+                size="sm"
+                variant={panel.panelId === activePanelId ? "default" : "outline"}
+                aria-pressed={panel.panelId === activePanelId}
+                onClick={() => onSelectPanel(panel.panelId)}
+              >
+                {panel.displayName}
+              </Button>
+            ))}
         </div>
-      ) : null}
+      </div>
 
       {workflow.phase !== "upload" ? (
         <Button type="button" size="sm" variant="outline" onClick={onTogglePanels}>
@@ -115,9 +121,9 @@ export function PackageWorkstationControls({
         </Button>
       ) : null}
 
-      {(workflow.phase === "save" || workflow.phase === "prepare") && !editingPanels ? (
+      {reviewingEvidence && !editingPanels ? (
         <Button type="button" size="sm" variant="outline" onClick={onToggleEvidence}>
-          {reviewingEvidence ? "Return to current phase" : "Review accepted evidence"}
+          Return to current phase
         </Button>
       ) : null}
 
@@ -127,28 +133,22 @@ export function PackageWorkstationControls({
             Category
           </p>
           <div className="mt-2 grid gap-2" aria-label="Category progress">
-            {workflow.categoryStatuses
-              .filter(
-                (status) =>
-                  workflow.phase !== "fix" ||
-                  workflow.flaggedCategoryIds.includes(status.categoryId),
-              )
-              .map((status) => (
-                <Button
-                  key={status.categoryId}
-                  type="button"
-                  size="sm"
-                  variant={status.categoryId === activeCategoryId ? "default" : "outline"}
-                  className="justify-between"
-                  aria-pressed={status.categoryId === activeCategoryId}
-                  onClick={() => onSelectCategory(status.categoryId)}
-                >
-                  <span>{labelForCategory(status.categoryId)}</span>
-                  <span aria-hidden="true">
-                    {status.complete ? "✓" : status.needsAttention ? "!" : "○"}
-                  </span>
-                </Button>
-              ))}
+            {workflow.categoryStatuses.map((status) => (
+              <Button
+                key={status.categoryId}
+                type="button"
+                size="sm"
+                variant={status.categoryId === activeCategoryId ? "default" : "outline"}
+                className="justify-between"
+                aria-pressed={status.categoryId === activeCategoryId}
+                onClick={() => onSelectCategory(status.categoryId)}
+              >
+                <span>{labelForCategory(status.categoryId)}</span>
+                <span aria-hidden="true">
+                  {status.complete ? "✓" : status.needsAttention ? "!" : "○"}
+                </span>
+              </Button>
+            ))}
           </div>
           <Button
             type="button"
@@ -162,24 +162,6 @@ export function PackageWorkstationControls({
           </Button>
         </div>
       ) : null}
-
-      <div className="rounded-md border border-blue-600/40 bg-blue-50 p-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-blue-900">Next action</p>
-        <p className="mt-1 text-sm font-semibold text-blue-950">{workflow.recommendedAction}</p>
-        {primaryAction.label ? (
-          <Button
-            type="button"
-            className="mt-3 w-full"
-            disabled={primaryAction.disabled}
-            onClick={primaryAction.onClick}
-          >
-            {primaryAction.label}
-          </Button>
-        ) : null}
-        {primaryAction.reason ? (
-          <p className="mt-2 text-xs text-blue-950/80">{primaryAction.reason}</p>
-        ) : null}
-      </div>
 
       <p
         className="rounded-md border border-border bg-background p-3 text-xs"
