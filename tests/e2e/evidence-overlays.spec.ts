@@ -19,7 +19,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 async function runUpload(page: Page) {
-  await page.goto("/review");
+  await page.goto("/review/legacy");
   await page.getByLabel(/select one label image/i).setInputFiles(FIXTURE);
   await page.getByLabel(/application brand name/i).fill("M CELLARS");
   await page.getByLabel(/application alcohol value/i).fill("12.5");
@@ -96,7 +96,7 @@ test("overlays remain present in dark mode", async ({ page }) => {
 
 test("sample run shows an honest no-preview state instead of overlays", async ({ page }) => {
   test.setTimeout(180_000);
-  await page.goto("/review");
+  await page.goto("/review/legacy");
   await page.getByRole("button", { name: /load verified m cellars sample/i }).click();
   await expect(page.getByRole("heading", { name: /pre-check result/i })).toBeVisible({
     timeout: 150_000,
