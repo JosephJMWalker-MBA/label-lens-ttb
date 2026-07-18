@@ -50,6 +50,8 @@ import type {
   RecoveryPassContribution,
 } from "./eval-report.types";
 import type { Result } from "@/shared/result";
+import { semanticAnnotationForCase } from "./semantic-scene/annotations";
+import { buildSemanticCaseDiagnostic } from "./semantic-scene/survival-trace";
 
 /**
  * The evaluation harness runs the REAL extractor once per case and reuses the
@@ -911,13 +913,51 @@ export function buildCaseReport(
 }
 
 export async function runCase(evalCase: EvalCase): Promise<CaseReport> {
+  return (await runCaseArtifacts(evalCase)).report;
+}
+
+export interface EvalCaseArtifacts {
+  report: CaseReport;
+  productionResponseBytes: string | null;
+  extractionError: string | null;
+}
+
+export interface EvalCaseRunOptions {
+  /** Opt in to the bounded Issue #131 evaluation-only scene diagnostic. */
+  semanticScene?: boolean;
+}
+
+/**
+ * Evaluation-only access to the exact production analyzer response emitted by
+ * the real extractor. The semantic diagnostic consumes this downstream; the
+ * extractor never imports the harness or any evaluation truth.
+ */
+export async function runCaseArtifacts(
+  evalCase: EvalCase,
+  options: EvalCaseRunOptions = {},
+): Promise<EvalCaseArtifacts> {
   const { bytes, sha256 } = loadCaseImage(evalCase);
   const input: ExtractionInput = { ...extractionInput(evalCase, sha256), imageBytes: bytes };
 
   const start = performance.now();
   const result = await extractLabelEvidenceDetailed(input);
   const latencyMs = performance.now() - start;
-  return buildCaseReport(evalCase, result, latencyMs);
+  const productionResponseBytes = result.ok ? JSON.stringify(result.value.response) : null;
+  const report = buildCaseReport(evalCase, result, latencyMs);
+  const annotation = options.semanticScene ? semanticAnnotationForCase(evalCase.caseId) : null;
+  if (result.ok && annotation) {
+    report.semanticScene = buildSemanticCaseDiagnostic({
+      caseId: evalCase.caseId,
+      debug: result.value.debug,
+      caseReport: report,
+      annotation,
+    });
+  }
+  return {
+    report,
+    productionResponseBytes,
+    extractionError: result.ok ? null : result.error.code,
+  };
 }
 
 function emptyFieldReport(
