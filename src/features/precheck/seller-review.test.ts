@@ -69,4 +69,23 @@ describe("seller review contract", () => {
     expect(draft.state).toBe("seller_added");
     expect(draft.evidenceRegions).toHaveLength(1);
   });
+
+  it("keeps an incomplete seller-added draft outside review progress", () => {
+    const incompleteDraft: SellerAddedFindingDraft = {
+      temporaryId: "seller-draft-incomplete",
+      state: "seller_added",
+      fieldKind: "other",
+      observedValue: "",
+      evidenceRegions: [],
+    };
+
+    expect(incompleteDraft.state).toBe("seller_added");
+    expect(incompleteDraft.evidenceRegions).toHaveLength(0);
+    expect(sellerReviewProgress(["unreviewed", "unreviewed"])).toEqual({
+      reviewed: 0,
+      total: 2,
+      remaining: 2,
+      complete: false,
+    });
+  });
 });
