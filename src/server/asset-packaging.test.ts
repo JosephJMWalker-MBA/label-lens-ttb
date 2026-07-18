@@ -87,12 +87,14 @@ describe("hardened processing routes", () => {
     return found;
   }
 
-  it("exposes exactly one OCR processing route, two bounded append routes, and an inert health probe", () => {
+  it("exposes exactly two bounded processing routes, two append routes, and an inert health probe", () => {
     const routes = routeFiles(apiDir).sort();
     const healthRoute = join(apiDir, "health", "route.ts");
+    const packageAnalysisRoute = join(apiDir, "package", "analyze", "route.ts");
     const confirmationRoute = join(apiDir, "precheck", "confirmation", "route.ts");
     expect(routes).toEqual([
       healthRoute,
+      packageAnalysisRoute,
       confirmationRoute,
       join(apiDir, "precheck", "disposition", "route.ts"),
       join(apiDir, "precheck", "route.ts"),
@@ -108,9 +110,19 @@ describe("hardened processing routes", () => {
     expect(health).not.toMatch(/POST|precheck-service|extractor|tesseract|sharp/);
   });
 
-  it("keeps OCR/extraction in the single processing route; append routes never duplicate it", () => {
+  it("keeps OCR/extraction in the two declared processing routes; append routes never duplicate it", () => {
     const ocrRoute = readFileSync(join(apiDir, "precheck", "route.ts"), "utf8");
     expect(ocrRoute).toMatch(/@\/server\/precheck-service/);
+
+    const packageAnalysisRoute = readFileSync(
+      join(apiDir, "package", "analyze", "route.ts"),
+      "utf8",
+    );
+    expect(packageAnalysisRoute).toMatch(/@\/pipeline\/extractor\/extractor/);
+    expect(packageAnalysisRoute).toMatch(/MAX_PACKAGE_PANELS\s*=\s*6/);
+    expect(packageAnalysisRoute).toMatch(
+      /ALLOWED_FIELDS\s*=\s*new Set\(\["packageDraft", "file"\]\)/,
+    );
 
     const dispositionRoute = readFileSync(
       join(apiDir, "precheck", "disposition", "route.ts"),
@@ -131,6 +143,7 @@ describe("hardened processing routes", () => {
 
   it("declares the Node runtime and is not configured for Edge on all mutable routes", () => {
     for (const rel of [
+      "package/analyze/route.ts",
       "precheck/route.ts",
       "precheck/disposition/route.ts",
       "precheck/confirmation/route.ts",

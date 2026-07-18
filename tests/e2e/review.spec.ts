@@ -41,7 +41,7 @@ async function openSection(page: Page, title: string): Promise<Locator> {
 }
 
 async function loadSample(page: Page) {
-  await page.goto("/review");
+  await page.goto("/review/legacy");
   await page.getByRole("button", { name: /load verified m cellars sample/i }).click();
   await expect(page.getByRole("heading", { name: /pre-check result/i })).toBeVisible({
     timeout: 150_000,
@@ -49,7 +49,7 @@ async function loadSample(page: Page) {
 }
 
 async function runUpload(page: Page, alcohol: string) {
-  await page.goto("/review");
+  await page.goto("/review/legacy");
   await page.getByLabel(/select one label image/i).setInputFiles(FIXTURE);
   await page.getByLabel(/application brand name/i).fill("M CELLARS");
   await page.getByLabel(/application alcohol value/i).fill(alcohol);
@@ -67,7 +67,7 @@ const readableDownloadButton = (page: Page) =>
 test("review page shows the advisory pre-check with run disabled until inputs exist", async ({
   page,
 }) => {
-  await page.goto("/review");
+  await page.goto("/review/legacy");
   await expect(page.getByRole("heading", { level: 1, name: /label lens ttb/i })).toBeVisible();
   await expect(page.getByText(/not a TTB approval/i).first()).toBeVisible();
   await expect(page.getByText(/prescreen a wine label before formal review/i)).toBeVisible();
@@ -78,7 +78,7 @@ test("bundled M Cellars sample runs the real pipeline end-to-end and downloads a
   page,
 }) => {
   test.setTimeout(180_000);
-  await page.goto("/review");
+  await page.goto("/review/legacy");
 
   await expect(page.getByText(/not a TTB approval/i).first()).toBeVisible();
   await expect(page.getByText(/does not store it/i)).toBeVisible();

@@ -11,9 +11,11 @@ report. **It does not approve or reject labels, and it is not a TTB system.**
 > **AI and OCR may extract evidence. Deterministic rules evaluate that evidence.
 > Human reviewers remain authoritative.**
 
-This is a focused prototype of one review contract on a single image — not a
-complete alcohol-label verification system across all beverage types. What is and
-is not implemented is stated explicitly below.
+The primary review route now includes a browser-local seller package-preparation
+slice for front, back, and optional panels. The established one-image pre-check
+remains available at `/review/legacy`. Neither workflow is a complete
+alcohol-label verification or submission system. What is and is not implemented
+is stated explicitly below.
 
 ---
 
@@ -53,6 +55,10 @@ On the deployed demo you can:
 
 Verified against `main`. This is the current behavior, not a roadmap.
 
+- **Browser-local seller package preparation** — front and back plus optional panels, reviewed-profile
+  category checklist, seller values/uncertainty/absence, multi-region panel-relative evidence,
+  save/reload, immutable package analysis runs, correction/reanalysis, and a gated local agent-package
+  record. See [`docs/issue-138-seller-package-preparation.md`](docs/issue-138-seller-package-preparation.md).
 - **One-image domestic-wine workflow** — a single label per run, via upload or the bundled sample; source `upload` or `sample`.
 - **PNG/JPEG validation** — declared type checked against decoded format; empty/oversized/corrupt images and out-of-bounds dimensions/pixel budgets are rejected with typed errors.
 - **Immediate local image preview** — a client object URL preview with filename/type/size, replace/clear, revoked on change/unmount; the file is not uploaded to build the preview.
@@ -82,7 +88,8 @@ Current non-goals (by design for this prototype):
 - No TTB approval or rejection, and no overall compliance verdict.
 - No COLA integration; no government authentication, identity, or authorization.
 - No production identity/authorization or hardened production environment.
-- No batch/multi-image submission workflow; no applicant/seller portal.
+- No authenticated seller portal, server-persisted package, agent queue, or multi-device workflow.
+- No agent or government transmission; the new package action is an explicitly local download only.
 - No retained production evidence store (processing is in-memory and ephemeral).
 - No cloud-vision fallback in the current public flow (local OCR only).
 - No beer, malt-beverage, or spirits scoring — **domestic wine only**.
