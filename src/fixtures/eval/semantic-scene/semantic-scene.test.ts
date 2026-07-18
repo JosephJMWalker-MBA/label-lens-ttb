@@ -11,6 +11,7 @@ import {
   SEMANTIC_REGION_CLASSES_BY_FAMILY,
   SEMANTIC_REGION_FAMILIES,
 } from "./ontology";
+import { deriveSemanticTerminalCategory } from "./survival-trace";
 import type { SemanticProjectionCandidate, SemanticRegionNode } from "./types";
 
 function projection(
@@ -122,6 +123,69 @@ describe("semantic region ontology and provisional classification", () => {
   it("keeps adjudicated expected values out of classifier and routing source", () => {
     const source = readFileSync(new URL("./classifier.ts", import.meta.url), "utf8");
     expect(source).not.toMatch(/acceptable(?:Percents)?|expectedClass|expectedOperation/);
+  });
+
+  it("does not use expected operation to choose the content-bearing representative", () => {
+    const source = readFileSync(new URL("./survival-trace.ts", import.meta.url), "utf8");
+    const selection = source.slice(
+      source.indexOf("function contentBearingNode"),
+      source.indexOf("function recommendedOperationFor"),
+    );
+    expect(selection).not.toContain("expectedOperation");
+    expect(selection).not.toContain("expectedClass");
+  });
+});
+
+describe("observable survival terminal attribution", () => {
+  const filteredAfterRecovery = {
+    targetProposed: true,
+    correctClassRetained: true,
+    operationFailureCausallySupported: true,
+    contentRecovered: true,
+    sceneObjectAssembled: true,
+    fieldCandidateProjected: true,
+    candidateStatus: "filtered" as const,
+    trustworthyDownstreamEvidence: false,
+    falseCertainty: false,
+    fieldState: "NOT_OBSERVED" as const,
+    fieldTop3: false,
+  };
+
+  it("assigns the furthest observable loss even when routing disagrees", () => {
+    expect(deriveSemanticTerminalCategory(filteredAfterRecovery)).toBe("candidate_filtered");
+  });
+
+  it("permits operation attribution only inside a failed-content stage", () => {
+    expect(
+      deriveSemanticTerminalCategory({
+        ...filteredAfterRecovery,
+        contentRecovered: false,
+        sceneObjectAssembled: false,
+        fieldCandidateProjected: false,
+        candidateStatus: "not_projected",
+      }),
+    ).toBe("target_class_preserved_wrong_operation");
+    expect(
+      deriveSemanticTerminalCategory({
+        ...filteredAfterRecovery,
+        operationFailureCausallySupported: false,
+        contentRecovered: false,
+        sceneObjectAssembled: false,
+        fieldCandidateProjected: false,
+        candidateStatus: "not_projected",
+      }),
+    ).toBe("content_not_recovered");
+  });
+
+  it("does not let routing agreement gate recovery, assembly, or projection", () => {
+    for (const operationFailureCausallySupported of [false, true]) {
+      expect(
+        deriveSemanticTerminalCategory({
+          ...filteredAfterRecovery,
+          operationFailureCausallySupported,
+        }),
+      ).toBe("candidate_filtered");
+    }
   });
 });
 

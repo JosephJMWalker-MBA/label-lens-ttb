@@ -120,7 +120,17 @@ Proposal sources distinguish annotation anchors, OCR pass regions, OCR token or 
 | `no_read_contextual` | Preserve a contextual object without trying to project text. |
 | `unresolved_operation` | Current evidence does not justify a more specific routing recommendation. |
 
-Operation appropriateness compares the deterministic recommendation with the operation expected for the adjudicated target. Because production currently uses generic fixed OCR passes, specialized-operation gaps are reported honestly rather than treated as completed work.
+Operation routing is a parallel, descriptive diagnostic. The trace reports the deterministic recommendation from (a) the geometry-selected representative proposal and (b) the deterministically selected content-bearing proposal when recovered content exists, alongside the actual recorded acquisition operation and the expected evaluation operation. Agreement does not gate content recovery, assembly, projection, candidate survival, or trustworthy evidence. Because production currently uses generic fixed OCR passes, specialized-operation gaps are reported honestly rather than treated as completed work.
+
+When several nodes bear recovered target content, the content-bearing representative is selected deterministically by furthest observed projection, proposal-source specificity, target coverage, and node ID. All content-bearing node IDs and their distinct recommendations remain in the trace. Expected operation is never a selection feature.
+
+An operation-related acquisition failure may be terminal only when content was not recovered, the correct semantic class survived, the independently selected representative recommended the expected operation, and the actual recorded operation differed. Otherwise the trace uses the furthest observable loss, including `content_not_recovered` or `unattributed`, rather than manufacturing a routing cause.
+
+## Proposal matching views
+
+The permissive matching view accepts every system proposal that covers at least 8% of the target or whose center lies inside the target. Proposal and classification success then use any-of-all-matched-node semantics. This is retained as an optimistic upper-bound diagnostic.
+
+The strict comparison selects exactly one node from the permissive set by greatest target coverage, then proposal-source specificity, then stable node ID. It reports proposal recall and correct-class top-1/top-3 beside the permissive view. Expected class and expected operation do not influence either geometry matching or representative selection. The generated report includes every target's matched-proposal count plus the mean, median, maximum, and exact maximum target.
 
 ## Survival trace
 
@@ -129,12 +139,13 @@ Each selected brand or alcohol target receives exactly one trace through:
 1. target annotated;
 2. overlapping system region proposed;
 3. correct semantic class retained;
-4. appropriate acquisition operation identified;
-5. useful target content recovered;
-6. content and correct class assembled in one scene object;
-7. brand or alcohol candidate projected;
-8. candidate selected, retained as an alternate, quarantined, filtered, or not projected;
-9. trustworthy evidence produced or a terminal loss assigned.
+4. useful target content recovered;
+5. content and correct class assembled in one scene object;
+6. brand or alcohol candidate projected;
+7. candidate selected, retained as an alternate, quarantined, filtered, or not projected;
+8. trustworthy evidence produced or a terminal loss assigned.
+
+In parallel, the trace records representative-node, content-bearing-node, actual-operation, and expected-operation routing diagnostics. These comparisons never interrupt the observable survival sequence.
 
 Terminal categories preserve the distinctions required by Issue #131, including proposal loss, semantic suppression, wrong operation, content loss, assembly loss, projection loss, filtering, ranking, honest alternate, honest unresolved, trustworthy selected evidence, false certainty, and unattributed.
 
@@ -145,7 +156,8 @@ The generated report ranks experiments by measured trigger count but does not se
 | Boundary | Approach A | Approach B | Fixed-risk comparison |
 | --- | --- | --- | --- |
 | Proposal | Existing OCR/candidate regions | Deterministic connected-component or contour proposals | Semantic-object proposal recall at the same proposal budget |
-| Operation routing | Existing generic fixed OCR | Shadow stylized/numeric targeted OCR | Correct content recovered per operation millisecond, with false certainty fixed |
+| Content acquisition | Existing generic fixed OCR | Shadow stylized/numeric targeted OCR | Correct content recovered per operation millisecond, with false certainty fixed |
+| Operation routing | Actual recorded acquisition | Independently recommended evaluation operation | Causally supported routing failures with false certainty fixed |
 | Object assembly | Independent OCR lines | Panel/alignment/adjacency/continuation grouping | Complete objects assembled without unsafe text joins |
 | Projection timing | Current token-first filtering | Region-first provisional classification before projection | Target projection and suppression with false-certainty count fixed |
 

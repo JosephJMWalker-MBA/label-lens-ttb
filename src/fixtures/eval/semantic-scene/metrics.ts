@@ -4,6 +4,7 @@ import { SEMANTIC_REGION_ONTOLOGY_VERSION, type SemanticRegionClass } from "./on
 import type {
   SemanticAcquisitionOperation,
   SemanticCandidateStatus,
+  SemanticOperationAgreement,
   SemanticProposalSource,
   SemanticSurvivalTrace,
   SemanticTerminalCategory,
@@ -20,7 +21,6 @@ export interface SemanticFunnelStage extends SemanticIdentityBucket {
     | "annotated_target"
     | "region_proposed"
     | "correct_class_retained"
-    | "appropriate_operation"
     | "content_recovered"
     | "object_assembled"
     | "field_candidate_projected"
@@ -29,9 +29,54 @@ export interface SemanticFunnelStage extends SemanticIdentityBucket {
 }
 
 export interface SemanticOperationRoutingBucket extends SemanticIdentityBucket {
-  recommendedOperation: SemanticAcquisitionOperation;
-  actualOperation: SemanticAcquisitionOperation;
-  appropriateCount: number;
+  representativeRecommendedOperation: SemanticAcquisitionOperation;
+  contentBearingRecommendedOperation: SemanticAcquisitionOperation;
+  actualAcquisitionOperation: SemanticAcquisitionOperation;
+  expectedEvaluationOperation: SemanticAcquisitionOperation;
+  representativeAgreement: SemanticOperationAgreement;
+  contentBearingAgreement: SemanticOperationAgreement;
+  actualAgreement: SemanticOperationAgreement;
+  recoveredCount: number;
+}
+
+export interface SemanticNodeIdentityBucket {
+  count: number;
+  caseIds: string[];
+  nodeIds: string[];
+  distinctCaseCount: number;
+  totalSystemProposalCount: number;
+}
+
+export interface SemanticMatchedProposalCount {
+  targetId: string;
+  count: number;
+}
+
+export interface SemanticProposalMatchingView {
+  rule: string;
+  optimisticUpperBound: boolean;
+  proposalRecall: SemanticIdentityBucket;
+  correctClassTop1: SemanticIdentityBucket;
+  correctClassTop3: SemanticIdentityBucket;
+  matchedProposalCounts: {
+    mean: number;
+    median: number;
+    maximum: number;
+    maximumTargetIds: string[];
+    byTarget: SemanticMatchedProposalCount[];
+  };
+}
+
+export interface SemanticOperationDiagnostics {
+  representativeAgreement: Record<SemanticOperationAgreement, SemanticIdentityBucket>;
+  contentBearingAgreement: Record<SemanticOperationAgreement, SemanticIdentityBucket>;
+  actualOperationAgreement: Record<SemanticOperationAgreement, SemanticIdentityBucket>;
+  representativeMismatchDespiteSuccessfulRecovery: SemanticIdentityBucket;
+  representativeMismatchWithFailedRecovery: SemanticIdentityBucket;
+  representativeUnresolvedDespiteSuccessfulRecovery: SemanticIdentityBucket;
+  representativeUnresolvedWithFailedRecovery: SemanticIdentityBucket;
+  causallySupportedAcquisitionFailure: SemanticIdentityBucket;
+  routingMatrix: SemanticOperationRoutingBucket[];
 }
 
 export interface SemanticTokenFirstComparisonBucket extends SemanticIdentityBucket {
@@ -66,20 +111,33 @@ export interface SemanticRegionSurvivalMetrics {
     notProposed: SemanticIdentityBucket;
     bySource: Partial<Record<SemanticProposalSource, SemanticIdentityBucket>>;
   };
+  proposalMatching: {
+    permissive: SemanticProposalMatchingView;
+    strictRepresentative: SemanticProposalMatchingView;
+  };
   classification: {
     top1: SemanticIdentityBucket;
     top3: SemanticIdentityBucket;
     retainedAlternative: SemanticIdentityBucket;
     suppressed: SemanticIdentityBucket;
   };
-  operationRouting: SemanticOperationRoutingBucket[];
-  appropriateOperation: SemanticIdentityBucket;
+  operationRouting: SemanticOperationDiagnostics;
+  rawSurvival: {
+    targetProposed: SemanticIdentityBucket;
+    correctClassRetained: SemanticIdentityBucket;
+    contentRecovered: SemanticIdentityBucket;
+    objectAssembled: SemanticIdentityBucket;
+    candidateProjected: SemanticIdentityBucket;
+    candidateFiltered: SemanticIdentityBucket;
+    candidateSurvived: SemanticIdentityBucket;
+    trustworthyEvidence: SemanticIdentityBucket;
+  };
   funnel: SemanticFunnelStage[];
   candidateStatus: Record<SemanticCandidateStatus, SemanticIdentityBucket>;
   terminalCategories: Record<SemanticTerminalCategory, SemanticIdentityBucket>;
   falseCertainty: SemanticIdentityBucket;
-  unknownRegions: SemanticIdentityBucket;
-  conflictingClassifications: SemanticIdentityBucket;
+  unknownBearingProposals: SemanticNodeIdentityBucket;
+  conflictingClassificationProposals: SemanticNodeIdentityBucket;
   unattributed: SemanticIdentityBucket;
   tokenFirstComparison: SemanticTokenFirstComparisonBucket[];
   nextExperiments: SemanticNextExperiment[];
@@ -110,6 +168,52 @@ function funnelStage(
   predicate: (trace: SemanticSurvivalTrace) => boolean,
 ): SemanticFunnelStage {
   return { stage, ...identities(traces.filter(predicate)) };
+}
+
+function agreementBuckets(
+  traces: SemanticSurvivalTrace[],
+  agreement: (trace: SemanticSurvivalTrace) => SemanticOperationAgreement,
+): Record<SemanticOperationAgreement, SemanticIdentityBucket> {
+  return {
+    agree: identities(traces.filter((trace) => agreement(trace) === "agree")),
+    disagree: identities(traces.filter((trace) => agreement(trace) === "disagree")),
+    unresolved: identities(traces.filter((trace) => agreement(trace) === "unresolved")),
+  };
+}
+
+function matchingView(args: {
+  traces: SemanticSurvivalTrace[];
+  rule: string;
+  optimisticUpperBound: boolean;
+  proposed: (trace: SemanticSurvivalTrace) => boolean;
+  top1: (trace: SemanticSurvivalTrace) => boolean;
+  top3: (trace: SemanticSurvivalTrace) => boolean;
+  matchedCount: (trace: SemanticSurvivalTrace) => number;
+}): SemanticProposalMatchingView {
+  const byTarget = args.traces
+    .map((trace) => ({
+      targetId: trace.targetAnnotationId,
+      count: args.matchedCount(trace),
+    }))
+    .sort((left, right) => left.targetId.localeCompare(right.targetId));
+  const counts = byTarget.map((item) => item.count).sort((left, right) => left - right);
+  const maximum = counts.at(-1) ?? 0;
+  return {
+    rule: args.rule,
+    optimisticUpperBound: args.optimisticUpperBound,
+    proposalRecall: identities(args.traces.filter(args.proposed)),
+    correctClassTop1: identities(args.traces.filter(args.top1)),
+    correctClassTop3: identities(args.traces.filter(args.top3)),
+    matchedProposalCounts: {
+      mean: counts.length === 0 ? 0 : counts.reduce((sum, count) => sum + count, 0) / counts.length,
+      median: counts.length === 0 ? 0 : counts[Math.floor(counts.length / 2)],
+      maximum,
+      maximumTargetIds: byTarget
+        .filter((item) => item.count === maximum)
+        .map((item) => item.targetId),
+      byTarget,
+    },
+  };
 }
 
 const CANDIDATE_STATUSES = [
@@ -149,10 +253,31 @@ function buildNextExperiments(
       bucket: terminal.target_not_proposed,
     },
     {
-      experiment: "Operation routing",
+      experiment: "Content acquisition",
       approachA: "Existing generic fixed OCR pass",
       approachB: "Class-specific stylized or numeric OCR in shadow mode",
       measurement: "correct content recovered per operation millisecond",
+      bucket: {
+        count:
+          terminal.content_not_recovered.count +
+          terminal.target_class_preserved_wrong_operation.count,
+        caseIds: [
+          ...new Set([
+            ...terminal.content_not_recovered.caseIds,
+            ...terminal.target_class_preserved_wrong_operation.caseIds,
+          ]),
+        ].sort(),
+        targetIds: [
+          ...terminal.content_not_recovered.targetIds,
+          ...terminal.target_class_preserved_wrong_operation.targetIds,
+        ].sort(),
+      },
+    },
+    {
+      experiment: "Operation routing",
+      approachA: "Actual existing acquisition operation",
+      approachB: "Independently recommended evaluation operation",
+      measurement: "causally supported routing failures at fixed false certainty",
       bucket: terminal.target_class_preserved_wrong_operation,
     },
     {
@@ -228,31 +353,59 @@ export function buildSemanticRegionSurvivalMetrics(
 
   const routing = new Map<string, SemanticSurvivalTrace[]>();
   for (const trace of traces) {
-    const actual =
-      trace.actualOperations.length > 0 ? trace.actualOperations : ["unresolved_operation"];
-    for (const actualOperation of actual) {
-      const key = `${trace.recommendedOperation}:${actualOperation}`;
-      routing.set(key, [...(routing.get(key) ?? []), trace]);
-    }
+    const key = [
+      trace.representativeRecommendedOperation,
+      trace.contentBearingRecommendedOperation,
+      trace.actualAcquisitionOperation,
+      trace.expectedEvaluationOperation,
+      trace.representativeOperationAgreement,
+      trace.contentBearingOperationAgreement,
+      trace.actualOperationAgreement,
+    ].join(":");
+    routing.set(key, [...(routing.get(key) ?? []), trace]);
   }
-  const operationRouting = [...routing.entries()]
+  const routingMatrix = [...routing.entries()]
     .map(([key, bucketTraces]) => {
-      const [recommendedOperation, actualOperation] = key.split(":") as [
+      const [
+        representativeRecommendedOperation,
+        contentBearingRecommendedOperation,
+        actualAcquisitionOperation,
+        expectedEvaluationOperation,
+        representativeAgreement,
+        contentBearingAgreement,
+        actualAgreement,
+      ] = key.split(":") as [
         SemanticAcquisitionOperation,
         SemanticAcquisitionOperation,
+        SemanticAcquisitionOperation,
+        SemanticAcquisitionOperation,
+        SemanticOperationAgreement,
+        SemanticOperationAgreement,
+        SemanticOperationAgreement,
       ];
       return {
-        recommendedOperation,
-        actualOperation,
-        appropriateCount: bucketTraces.filter((trace) => trace.operationAppropriate).length,
+        representativeRecommendedOperation,
+        contentBearingRecommendedOperation,
+        actualAcquisitionOperation,
+        expectedEvaluationOperation,
+        representativeAgreement,
+        contentBearingAgreement,
+        actualAgreement,
+        recoveredCount: bucketTraces.filter((trace) => trace.contentRecovered).length,
         ...identities(bucketTraces),
       };
     })
     .sort(
       (left, right) =>
         right.count - left.count ||
-        left.recommendedOperation.localeCompare(right.recommendedOperation) ||
-        left.actualOperation.localeCompare(right.actualOperation),
+        left.representativeRecommendedOperation.localeCompare(
+          right.representativeRecommendedOperation,
+        ) ||
+        left.contentBearingRecommendedOperation.localeCompare(
+          right.contentBearingRecommendedOperation,
+        ) ||
+        left.actualAcquisitionOperation.localeCompare(right.actualAcquisitionOperation) ||
+        left.expectedEvaluationOperation.localeCompare(right.expectedEvaluationOperation),
     );
 
   const candidateStatus = identityRecord(CANDIDATE_STATUSES);
@@ -268,30 +421,29 @@ export function buildSemanticRegionSurvivalMetrics(
     );
   }
 
-  const unknownNodes = semanticCases.flatMap((caseReport) =>
+  const systemProposalNodes = semanticCases.flatMap((caseReport) =>
     (caseReport.semanticScene?.nodes ?? []).filter(
-      (node) =>
-        node.evaluationRole === "system_proposal" &&
-        node.classHypotheses.some(
-          (hypothesis) =>
-            hypothesis.semanticClass === "unknown_text_region" ||
-            hypothesis.semanticClass === "unknown_non_text_region",
-        ),
+      (node) => node.evaluationRole === "system_proposal",
     ),
   );
-  const conflictingNodes = semanticCases.flatMap((caseReport) =>
-    (caseReport.semanticScene?.nodes ?? []).filter(
-      (node) =>
-        node.evaluationRole === "system_proposal" &&
-        node.classHypotheses.some(
-          (hypothesis) => hypothesis.semanticClass === "conflicting_classification",
-        ),
+  const unknownNodes = systemProposalNodes.filter((node) =>
+    node.classHypotheses.some(
+      (hypothesis) =>
+        hypothesis.semanticClass === "unknown_text_region" ||
+        hypothesis.semanticClass === "unknown_non_text_region",
     ),
   );
-  const nodeIdentities = (nodes: typeof unknownNodes): SemanticIdentityBucket => ({
+  const conflictingNodes = systemProposalNodes.filter((node) =>
+    node.classHypotheses.some(
+      (hypothesis) => hypothesis.semanticClass === "conflicting_classification",
+    ),
+  );
+  const nodeIdentities = (nodes: typeof unknownNodes): SemanticNodeIdentityBucket => ({
     count: nodes.length,
     caseIds: [...new Set(nodes.map((node) => node.caseId))].sort(),
-    targetIds: nodes.map((node) => node.id).sort(),
+    nodeIds: nodes.map((node) => node.id).sort(),
+    distinctCaseCount: new Set(nodes.map((node) => node.caseId)).size,
+    totalSystemProposalCount: systemProposalNodes.length,
   });
 
   const tokenComparison = new Map<string, SemanticSurvivalTrace[]>();
@@ -332,6 +484,26 @@ export function buildSemanticRegionSurvivalMetrics(
       notProposed: identities(traces.filter((trace) => !trace.targetProposed)),
       bySource: proposalBySource,
     },
+    proposalMatching: {
+      permissive: matchingView({
+        traces,
+        rule: "Any system proposal with target coverage >= 0.08 or proposal center inside the target; success is any-of-all-matched proposals.",
+        optimisticUpperBound: true,
+        proposed: (trace) => trace.targetProposed,
+        top1: (trace) => trace.correctClassTop1,
+        top3: (trace) => trace.correctClassTop3,
+        matchedCount: (trace) => trace.matchedProposalCount,
+      }),
+      strictRepresentative: matchingView({
+        traces,
+        rule: "Exactly one deterministic representative from the permissive match set: greatest target coverage, then proposal-source specificity, then node ID; expected class and expected operation are not selection features.",
+        optimisticUpperBound: false,
+        proposed: (trace) => trace.strictTargetProposed,
+        top1: (trace) => trace.strictCorrectClassTop1,
+        top3: (trace) => trace.strictCorrectClassTop3,
+        matchedCount: (trace) => Number(trace.strictTargetProposed),
+      }),
+    },
     classification: {
       top1: identities(traces.filter((trace) => trace.correctClassTop1)),
       top3: identities(traces.filter((trace) => trace.correctClassTop3)),
@@ -340,8 +512,61 @@ export function buildSemanticRegionSurvivalMetrics(
       ),
       suppressed: identities(traces.filter((trace) => trace.targetIncorrectlySuppressed)),
     },
-    operationRouting,
-    appropriateOperation: identities(traces.filter((trace) => trace.operationAppropriate)),
+    operationRouting: {
+      representativeAgreement: agreementBuckets(
+        traces,
+        (trace) => trace.representativeOperationAgreement,
+      ),
+      contentBearingAgreement: agreementBuckets(
+        traces,
+        (trace) => trace.contentBearingOperationAgreement,
+      ),
+      actualOperationAgreement: agreementBuckets(traces, (trace) => trace.actualOperationAgreement),
+      representativeMismatchDespiteSuccessfulRecovery: identities(
+        traces.filter(
+          (trace) =>
+            trace.representativeOperationAgreement === "disagree" && trace.contentRecovered,
+        ),
+      ),
+      representativeMismatchWithFailedRecovery: identities(
+        traces.filter(
+          (trace) =>
+            trace.representativeOperationAgreement === "disagree" && !trace.contentRecovered,
+        ),
+      ),
+      representativeUnresolvedDespiteSuccessfulRecovery: identities(
+        traces.filter(
+          (trace) =>
+            trace.representativeOperationAgreement === "unresolved" && trace.contentRecovered,
+        ),
+      ),
+      representativeUnresolvedWithFailedRecovery: identities(
+        traces.filter(
+          (trace) =>
+            trace.representativeOperationAgreement === "unresolved" && !trace.contentRecovered,
+        ),
+      ),
+      causallySupportedAcquisitionFailure: identities(
+        traces.filter((trace) => trace.operationFailureCausallySupported),
+      ),
+      routingMatrix,
+    },
+    rawSurvival: {
+      targetProposed: identities(traces.filter((trace) => trace.targetProposed)),
+      correctClassRetained: identities(
+        traces.filter((trace) => trace.targetProposed && !trace.targetIncorrectlySuppressed),
+      ),
+      contentRecovered: identities(traces.filter((trace) => trace.contentRecovered)),
+      objectAssembled: identities(traces.filter((trace) => trace.sceneObjectAssembled)),
+      candidateProjected: identities(traces.filter((trace) => trace.fieldCandidateProjected)),
+      candidateFiltered: identities(traces.filter((trace) => trace.candidateStatus === "filtered")),
+      candidateSurvived: identities(
+        traces.filter((trace) => !["filtered", "not_projected"].includes(trace.candidateStatus)),
+      ),
+      trustworthyEvidence: identities(
+        traces.filter((trace) => trace.trustworthyDownstreamEvidence),
+      ),
+    },
     funnel: [
       funnelStage("annotated_target", traces, () => true),
       funnelStage("region_proposed", traces, (trace) => trace.targetProposed),
@@ -351,19 +576,10 @@ export function buildSemanticRegionSurvivalMetrics(
         (trace) => trace.targetProposed && !trace.targetIncorrectlySuppressed,
       ),
       funnelStage(
-        "appropriate_operation",
-        traces,
-        (trace) =>
-          trace.targetProposed && !trace.targetIncorrectlySuppressed && trace.operationAppropriate,
-      ),
-      funnelStage(
         "content_recovered",
         traces,
         (trace) =>
-          trace.targetProposed &&
-          !trace.targetIncorrectlySuppressed &&
-          trace.operationAppropriate &&
-          trace.contentRecovered,
+          trace.targetProposed && !trace.targetIncorrectlySuppressed && trace.contentRecovered,
       ),
       funnelStage(
         "object_assembled",
@@ -371,7 +587,6 @@ export function buildSemanticRegionSurvivalMetrics(
         (trace) =>
           trace.targetProposed &&
           !trace.targetIncorrectlySuppressed &&
-          trace.operationAppropriate &&
           trace.contentRecovered &&
           trace.sceneObjectAssembled,
       ),
@@ -381,7 +596,6 @@ export function buildSemanticRegionSurvivalMetrics(
         (trace) =>
           trace.targetProposed &&
           !trace.targetIncorrectlySuppressed &&
-          trace.operationAppropriate &&
           trace.contentRecovered &&
           trace.sceneObjectAssembled &&
           trace.fieldCandidateProjected,
@@ -392,7 +606,6 @@ export function buildSemanticRegionSurvivalMetrics(
         (trace) =>
           trace.targetProposed &&
           !trace.targetIncorrectlySuppressed &&
-          trace.operationAppropriate &&
           trace.contentRecovered &&
           trace.sceneObjectAssembled &&
           trace.fieldCandidateProjected &&
@@ -404,7 +617,6 @@ export function buildSemanticRegionSurvivalMetrics(
         (trace) =>
           trace.targetProposed &&
           !trace.targetIncorrectlySuppressed &&
-          trace.operationAppropriate &&
           trace.contentRecovered &&
           trace.sceneObjectAssembled &&
           trace.fieldCandidateProjected &&
@@ -415,8 +627,8 @@ export function buildSemanticRegionSurvivalMetrics(
     candidateStatus,
     terminalCategories,
     falseCertainty: identities(traces.filter((trace) => trace.falseCertainty)),
-    unknownRegions: nodeIdentities(unknownNodes),
-    conflictingClassifications: nodeIdentities(conflictingNodes),
+    unknownBearingProposals: nodeIdentities(unknownNodes),
+    conflictingClassificationProposals: nodeIdentities(conflictingNodes),
     unattributed: terminalCategories.unattributed,
     tokenFirstComparison,
     nextExperiments: buildNextExperiments(terminalCategories),

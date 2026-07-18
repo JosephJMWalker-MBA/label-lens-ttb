@@ -170,6 +170,49 @@ function representativeNode(
   );
 }
 
+function contentBearingNode(
+  nodes: SemanticRegionNode[],
+  target: SemanticObjectAnnotation,
+  targetGeometry: EvidenceGeometry,
+  caseReport: CaseReport,
+): SemanticRegionNode | null {
+  return (
+    [...nodes].sort((left, right) => {
+      const projectionDelta =
+        Number(
+          right.projectionCandidates.some((candidate) =>
+            candidateMatches(candidate, target, caseReport),
+          ),
+        ) -
+        Number(
+          left.projectionCandidates.some((candidate) =>
+            candidateMatches(candidate, target, caseReport),
+          ),
+        );
+      if (projectionDelta !== 0) return projectionDelta;
+      const specificityDelta =
+        sourceSpecificity(right.proposalSource) - sourceSpecificity(left.proposalSource);
+      if (specificityDelta !== 0) return specificityDelta;
+      const coverageDelta =
+        targetCoverage(right, targetGeometry) - targetCoverage(left, targetGeometry);
+      if (Math.abs(coverageDelta) > 1e-9) return coverageDelta;
+      return left.id.localeCompare(right.id);
+    })[0] ?? null
+  );
+}
+
+function recommendedOperationFor(node: SemanticRegionNode | null): SemanticAcquisitionOperation {
+  return node?.acquisitionHistory.at(-1)?.recommendedOperation ?? "unresolved_operation";
+}
+
+function operationAgreement(
+  observed: SemanticAcquisitionOperation,
+  expected: SemanticAcquisitionOperation,
+): "agree" | "disagree" | "unresolved" {
+  if (observed === "unresolved_operation") return "unresolved";
+  return observed === expected ? "agree" : "disagree";
+}
+
 function allRetainedClasses(nodes: SemanticRegionNode[]): SemanticRegionClass[] {
   return [
     ...new Set(nodes.flatMap((node) => node.classHypotheses.map((item) => item.semanticClass))),
@@ -191,10 +234,10 @@ function bestCandidateStatus(candidates: SemanticProjectionCandidate[]): Semanti
   );
 }
 
-function terminalCategory(args: {
+export function deriveSemanticTerminalCategory(args: {
   targetProposed: boolean;
   correctClassRetained: boolean;
-  operationAppropriate: boolean;
+  operationFailureCausallySupported: boolean;
   contentRecovered: boolean;
   sceneObjectAssembled: boolean;
   fieldCandidateProjected: boolean;
@@ -204,15 +247,16 @@ function terminalCategory(args: {
   fieldState: CaseReport["brand"]["state"];
   fieldTop3: boolean;
 }): SemanticTerminalCategory {
-  if (args.falseCertainty) return "false_certainty";
   if (!args.targetProposed) return "target_not_proposed";
   if (!args.correctClassRetained) return "target_proposed_but_semantically_suppressed";
-  if (!args.operationAppropriate) return "target_class_preserved_wrong_operation";
-  if (!args.contentRecovered) return "content_not_recovered";
+  if (!args.contentRecovered) {
+    return args.operationFailureCausallySupported
+      ? "target_class_preserved_wrong_operation"
+      : "content_not_recovered";
+  }
   if (!args.sceneObjectAssembled) return "object_assembly_failure";
   if (!args.fieldCandidateProjected) return "field_projection_failure";
   if (args.candidateStatus === "filtered") return "candidate_filtered";
-  if (args.trustworthyDownstreamEvidence) return "trustworthy_selected_evidence";
   if (args.candidateStatus === "quarantined") return "honest_alternate";
   if (args.candidateStatus === "alternate") {
     return args.fieldTop3 ? "honest_alternate" : "candidate_ranked_below_useful_range";
@@ -220,6 +264,8 @@ function terminalCategory(args: {
   if (args.fieldState === "AMBIGUOUS" || args.fieldState === "NOT_OBSERVED") {
     return "honest_unresolved";
   }
+  if (args.trustworthyDownstreamEvidence) return "trustworthy_selected_evidence";
+  if (args.falseCertainty) return "false_certainty";
   return "unattributed";
 }
 
@@ -252,16 +298,57 @@ function traceTarget(
       .slice(0, 3)
       .some((hypothesis) => hypothesis.semanticClass === target.expectedClass),
   );
-  const recommendedOperation: SemanticAcquisitionOperation =
-    representative?.acquisitionHistory.at(-1)?.recommendedOperation ?? "unresolved_operation";
-  const actualOperations = [
+  const representativeRecommendedOperation = recommendedOperationFor(representative);
+  const actualAcquisitionOperations = [
     ...new Set(
       proposals.flatMap((node) =>
         node.acquisitionHistory.map((history) => history.actualOperation),
       ),
     ),
-  ];
+  ].sort();
+  const actualAcquisitionOperation: SemanticAcquisitionOperation =
+    actualAcquisitionOperations.length === 1
+      ? actualAcquisitionOperations[0]
+      : "unresolved_operation";
   const contentRecovered = combinedContentMatches(proposals, target, caseReport);
+  const contentBearingNodes = contentRecovered
+    ? proposals.filter((node) => nodeContentMatches(node, target, caseReport))
+    : [];
+  const contentBearing = contentBearingNode(
+    contentBearingNodes,
+    target,
+    targetGeometry,
+    caseReport,
+  );
+  const contentBearingRecommendedOperation = recommendedOperationFor(contentBearing);
+  const contentBearingRecommendedOperations = [
+    ...new Set(contentBearingNodes.map((node) => recommendedOperationFor(node))),
+  ].sort();
+  const contentBearingOperationRecommendations = contentBearingNodes
+    .map((node) => ({
+      nodeId: node.id,
+      recommendedOperation: recommendedOperationFor(node),
+    }))
+    .sort((left, right) => left.nodeId.localeCompare(right.nodeId));
+  const representativeOperationAgreement = operationAgreement(
+    representativeRecommendedOperation,
+    target.expectedOperation,
+  );
+  const contentBearingOperationAgreement = operationAgreement(
+    contentBearingRecommendedOperation,
+    target.expectedOperation,
+  );
+  const actualOperationAgreement =
+    actualAcquisitionOperations.length === 0
+      ? "unresolved"
+      : actualAcquisitionOperations.includes(target.expectedOperation)
+        ? "agree"
+        : "disagree";
+  const operationFailureCausallySupported =
+    !contentRecovered &&
+    correctClassRetained &&
+    representativeOperationAgreement === "agree" &&
+    actualOperationAgreement === "disagree";
   const sceneObjectAssembled = proposals.some(
     (node) =>
       node.classHypotheses.some(
@@ -284,10 +371,10 @@ function traceTarget(
     target.relevantField === "brand"
       ? caseReport.brand.top3Recall
       : caseReport.alcohol.parsedAccurate;
-  const terminal = terminalCategory({
+  const terminal = deriveSemanticTerminalCategory({
     targetProposed: proposals.length > 0,
     correctClassRetained,
-    operationAppropriate: recommendedOperation === target.expectedOperation,
+    operationFailureCausallySupported,
     contentRecovered,
     sceneObjectAssembled,
     fieldCandidateProjected,
@@ -307,15 +394,43 @@ function traceTarget(
     targetProposed: proposals.length > 0,
     proposalNodeIds: proposals.map((node) => node.id),
     proposalSources: [...new Set(proposals.map((node) => node.proposalSource))],
+    matchedProposalCount: proposals.length,
     correctClassTop1,
     correctClassTop3,
+    strictProposalNodeId: representative?.id ?? null,
+    strictTargetProposed: representative !== null,
+    strictCorrectClassTop1:
+      representative?.classHypotheses[0]?.semanticClass === target.expectedClass,
+    strictCorrectClassTop3:
+      representative?.classHypotheses
+        .slice(0, 3)
+        .some((hypothesis) => hypothesis.semanticClass === target.expectedClass) ?? false,
     retainedAlternatives: retainedClasses.filter(
       (semanticClass) => semanticClass !== target.expectedClass,
     ),
     targetIncorrectlySuppressed: proposals.length > 0 && !correctClassRetained,
-    recommendedOperation,
-    actualOperations,
-    operationAppropriate: recommendedOperation === target.expectedOperation,
+    representativeNodeId: representative?.id ?? null,
+    representativeRecommendedOperation,
+    contentBearingNodeId: contentBearing?.id ?? null,
+    contentBearingNodeIds: contentBearingNodes.map((node) => node.id).sort(),
+    contentBearingRecommendedOperation,
+    contentBearingRecommendedOperations,
+    contentBearingOperationRecommendations,
+    actualAcquisitionOperation,
+    actualAcquisitionOperations,
+    expectedEvaluationOperation: target.expectedOperation,
+    representativeOperationAgreement,
+    contentBearingOperationAgreement,
+    actualOperationAgreement,
+    operationFailureCausallySupported,
+    operationDiagnosticBasis: [
+      `representative node=${representative?.id ?? "none"}; recommendation=${representativeRecommendedOperation}; agreement=${representativeOperationAgreement}`,
+      `content-bearing node=${contentBearing?.id ?? "none"}; recommendation=${contentBearingRecommendedOperation}; agreement=${contentBearingOperationAgreement}`,
+      `actual acquisition operations=${actualAcquisitionOperations.join(", ") || "none"}; expected evaluation operation=${target.expectedOperation}; agreement=${actualOperationAgreement}`,
+      operationFailureCausallySupported
+        ? "routing failure is causally supported: content was not recovered, the correct class survived, the representative independently recommended the expected operation, and the executed operation differed"
+        : "routing comparison is descriptive and is not used as a survival gate",
+    ],
     contentRecovered,
     sceneObjectAssembled,
     fieldCandidateProjected,
@@ -325,9 +440,9 @@ function traceTarget(
     tokenFirstFailureClass: fieldReport.failureClass,
     terminalCategory: terminal,
     attributionBasis: [
-      `${proposals.length} qualifying system proposal(s) overlap the annotated target`,
+      `${proposals.length} qualifying system proposal(s) match the permissive rule (target coverage >= 0.08 or proposal center inside target); strict representative=${representative?.id ?? "none"}`,
       `correct class retained=${correctClassRetained}; top1=${correctClassTop1}; top3=${correctClassTop3}`,
-      `recommended operation=${recommendedOperation}; expected operation=${target.expectedOperation}`,
+      `representative recommendation=${representativeRecommendedOperation}; content-bearing recommendation=${contentBearingRecommendedOperation}; expected operation=${target.expectedOperation}`,
       `content recovered=${contentRecovered}; assembled=${sceneObjectAssembled}; projected=${fieldCandidateProjected}`,
       `candidate status=${candidateStatus}; token-first category=${fieldReport.failureClass}`,
     ],

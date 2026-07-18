@@ -44,6 +44,8 @@ export type SemanticAcquisitionOperation =
   | "no_read_contextual"
   | "unresolved_operation";
 
+export type SemanticOperationAgreement = "agree" | "disagree" | "unresolved";
+
 export type SemanticObservedBasisKind =
   | "annotation"
   | "filter_reason"
@@ -197,13 +199,33 @@ export interface SemanticSurvivalTrace {
   targetProposed: boolean;
   proposalNodeIds: string[];
   proposalSources: SemanticProposalSource[];
+  matchedProposalCount: number;
   correctClassTop1: boolean;
   correctClassTop3: boolean;
+  strictProposalNodeId: string | null;
+  strictTargetProposed: boolean;
+  strictCorrectClassTop1: boolean;
+  strictCorrectClassTop3: boolean;
   retainedAlternatives: SemanticRegionClass[];
   targetIncorrectlySuppressed: boolean;
-  recommendedOperation: SemanticAcquisitionOperation;
-  actualOperations: SemanticAcquisitionOperation[];
-  operationAppropriate: boolean;
+  representativeNodeId: string | null;
+  representativeRecommendedOperation: SemanticAcquisitionOperation;
+  contentBearingNodeId: string | null;
+  contentBearingNodeIds: string[];
+  contentBearingRecommendedOperation: SemanticAcquisitionOperation;
+  contentBearingRecommendedOperations: SemanticAcquisitionOperation[];
+  contentBearingOperationRecommendations: Array<{
+    nodeId: string;
+    recommendedOperation: SemanticAcquisitionOperation;
+  }>;
+  actualAcquisitionOperation: SemanticAcquisitionOperation;
+  actualAcquisitionOperations: SemanticAcquisitionOperation[];
+  expectedEvaluationOperation: SemanticAcquisitionOperation;
+  representativeOperationAgreement: SemanticOperationAgreement;
+  contentBearingOperationAgreement: SemanticOperationAgreement;
+  actualOperationAgreement: SemanticOperationAgreement;
+  operationFailureCausallySupported: boolean;
+  operationDiagnosticBasis: string[];
   contentRecovered: boolean;
   sceneObjectAssembled: boolean;
   fieldCandidateProjected: boolean;
