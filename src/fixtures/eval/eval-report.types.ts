@@ -25,6 +25,9 @@ import type {
 } from "@/pipeline/extractor/extractor.types";
 
 import type { AggregateMetrics } from "./metrics";
+import type { ProductionAnalyzerParityProof } from "./production-parity";
+import type { SemanticRegionSurvivalMetrics } from "./semantic-scene/metrics";
+import type { SemanticCaseDiagnostic } from "./semantic-scene/types";
 import type {
   EvalCandidateFilteringSubtype,
   EvalFailureClass,
@@ -276,6 +279,8 @@ export interface CaseReport {
     parsedAccurate: boolean;
   };
   diagnostics: CaseDiagnostics;
+  /** Evaluation-only semantic scene graph and target survival attribution. */
+  semanticScene?: SemanticCaseDiagnostic;
   latencyMs: number;
 }
 
@@ -368,7 +373,7 @@ export interface EvalCalibrationCoverage {
 }
 
 export interface EvalReport {
-  schemaVersion: "extraction-baseline-report.v4";
+  schemaVersion: "extraction-baseline-report.v5";
   manifestSchemaVersion: string;
   extractorAdapter: { id: string; version: string };
   aggregate: AggregateMetrics;
@@ -380,6 +385,10 @@ export interface EvalReport {
     recoveryPassContributions: EvalRecoveryPassContributionBucket[];
     calibrationCoverage: EvalCalibrationCoverage;
     performance: EvalPerformanceBreakdown;
+  };
+  semanticRegionSurvival: {
+    metrics: SemanticRegionSurvivalMetrics;
+    productionParity: ProductionAnalyzerParityProof;
   };
   cases: CaseReport[];
 }

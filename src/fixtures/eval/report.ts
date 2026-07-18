@@ -26,6 +26,12 @@ import type {
   EvalReport,
 } from "./eval-report.types";
 import { EVAL_ADAPTER } from "./eval-harness";
+import {
+  ISSUE_131_BASE_COMMIT,
+  PRODUCTION_ANALYZER_PARITY_SCHEMA_VERSION,
+  type ProductionAnalyzerParityProof,
+} from "./production-parity";
+import { buildSemanticRegionSurvivalMetrics } from "./semantic-scene/metrics";
 
 function brandObservedOf(caseReport: CaseReport): ObservedField {
   return {
@@ -730,7 +736,24 @@ function buildPerformanceBreakdown(cases: CaseReport[]): EvalPerformanceBreakdow
   };
 }
 
-export function buildReport(cases: CaseReport[], manifest: LoadedEvalManifest): EvalReport {
+function parityNotRun(caseCount: number): ProductionAnalyzerParityProof {
+  return {
+    status: "not_run",
+    fixtureSchemaVersion: PRODUCTION_ANALYZER_PARITY_SCHEMA_VERSION,
+    baseCommit: ISSUE_131_BASE_COMMIT,
+    expectedCaseCount: caseCount,
+    actualCaseCount: 0,
+    matchedCaseCount: 0,
+    mismatches: [],
+    comparisonBasis: "exact-serialized-analyzer-response-bytes",
+  };
+}
+
+export function buildReport(
+  cases: CaseReport[],
+  manifest: LoadedEvalManifest,
+  productionParity: ProductionAnalyzerParityProof = parityNotRun(cases.length),
+): EvalReport {
   const scores = cases.map(scoreOf);
   const scoreByCaseId = new Map(scores.map((score) => [score.caseId, score]));
   const casesById = new Map(cases.map((caseReport) => [caseReport.caseId, caseReport]));
@@ -740,7 +763,7 @@ export function buildReport(cases: CaseReport[], manifest: LoadedEvalManifest): 
   assertCandidateFilteringSubtypeCoverage(cases, candidateFilteringSubtypes);
   assertCalibrationCoverage(cases, calibrationCoverage);
   return {
-    schemaVersion: "extraction-baseline-report.v4",
+    schemaVersion: "extraction-baseline-report.v5",
     manifestSchemaVersion: manifest.schemaVersion,
     extractorAdapter: { id: EVAL_ADAPTER.id, version: EVAL_ADAPTER.version },
     aggregate: aggregate(scores),
@@ -752,6 +775,10 @@ export function buildReport(cases: CaseReport[], manifest: LoadedEvalManifest): 
       recoveryPassContributions: buildRecoveryPassContributionBreakdown(cases),
       calibrationCoverage,
       performance: buildPerformanceBreakdown(cases),
+    },
+    semanticRegionSurvival: {
+      metrics: buildSemanticRegionSurvivalMetrics(cases),
+      productionParity,
     },
     cases,
   };
@@ -788,6 +815,280 @@ function yesNo(value: boolean): string {
   return value ? "yes" : "no";
 }
 
+function identityList(values: string[]): string {
+  return values.length === 0 ? "—" : values.map((value) => `\`${value}\``).join("<br>");
+}
+
+function countRate(count: number, denominator: number): string {
+  return denominator === 0
+    ? `${count}/0 (not measured)`
+    : `${count}/${denominator} (${pct(count / denominator)})`;
+}
+
+function renderSemanticRegionSurvival(report: EvalReport): string[] {
+  const semantic = report.semanticRegionSurvival;
+  const metrics = semantic.metrics;
+  const coverage = metrics.annotationCoverage;
+  const targetCount = coverage.targetCount;
+  const lines: string[] = [];
+
+  lines.push("## Semantic Region Survival Diagnostic (Issue #131)");
+  lines.push("");
+  lines.push(
+    "This diagnostic is evaluation-only. It authorizes no production architecture, activates no new production field, and does not alter the analyzer, evidence, rules, exports, provenance, or reviewer contracts. Semantic ranking scores are ordering features, not probabilities; OCR evidence scores remain recognition evidence, not correctness probabilities. Any production adoption requires a separately authorized issue or ADR decision.",
+  );
+  lines.push(
+    "Independent review identified an attribution defect in the earlier operation-gated funnel. This corrected report derives primary terminal outcomes from observable survival and reports operation routing separately without treating disagreement as a causal gate.",
+  );
+  lines.push("");
+  lines.push("### 1. Semantic ontology version");
+  lines.push("");
+  lines.push(`- Ontology: \`${metrics.ontologyVersion}\``);
+  lines.push(`- Annotation schema: \`${metrics.annotationSchemaVersion}\``);
+  lines.push(
+    "- Scene sequence: observe → segment → provisionally classify → choose operation → acquire content → update scene → redirect attention.",
+  );
+  lines.push("");
+  lines.push("### 2. Annotation coverage");
+  lines.push("");
+  lines.push("| Cases | Targets | Brand | Alcohol | Hard negatives | Panels |");
+  lines.push("| ---: | ---: | ---: | ---: | ---: | ---: |");
+  lines.push(
+    `| ${coverage.selectedCaseCount} | ${targetCount} | ${coverage.brandTargetCount} | ${coverage.alcoholTargetCount} | ${coverage.hardNegativeCount} | ${coverage.panelCount} |`,
+  );
+  lines.push("");
+  lines.push(
+    "Hard-negative class counts: " +
+      (Object.entries(coverage.hardNegativeClassCounts)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([semanticClass, count]) => `${semanticClass}: ${count}`)
+        .join(", ") || "—"),
+  );
+  lines.push("");
+  lines.push("### 3. Target-object proposal matching views");
+  lines.push("");
+  lines.push(
+    "The permissive view is an optimistic upper bound: it matches every system proposal with at least 8% target coverage or with its center inside the target, then counts success when any matched node succeeds. The strict comparison chooses exactly one representative by target coverage, proposal-source specificity, and node ID; expected class and expected operation never influence selection.",
+  );
+  lines.push("");
+  lines.push(
+    "| View | Proposal recall | Correct class top-1 | Correct class top-3 | Mean / median / max matched | Maximum target |",
+  );
+  lines.push("| --- | ---: | ---: | ---: | --- | --- |");
+  for (const [name, view] of Object.entries(metrics.proposalMatching)) {
+    lines.push(
+      `| ${name}${view.optimisticUpperBound ? " (optimistic upper bound)" : ""} | ${countRate(view.proposalRecall.count, targetCount)} | ${countRate(view.correctClassTop1.count, targetCount)} | ${countRate(view.correctClassTop3.count, targetCount)} | ${view.matchedProposalCounts.mean.toFixed(2)} / ${view.matchedProposalCounts.median} / ${view.matchedProposalCounts.maximum} | ${identityList(view.matchedProposalCounts.maximumTargetIds)} |`,
+    );
+  }
+  lines.push("");
+  lines.push(`- Permissive rule: ${metrics.proposalMatching.permissive.rule}`);
+  lines.push(`- Strict rule: ${metrics.proposalMatching.strictRepresentative.rule}`);
+  lines.push(
+    `- Not proposed in the permissive view: ${metrics.proposal.notProposed.count}/${targetCount}; targets: ${identityList(metrics.proposal.notProposed.targetIds)}`,
+  );
+  lines.push("");
+  lines.push("### 4. Proposal-source breakdown");
+  lines.push("");
+  lines.push("| Observable source | Targets reached | Exact targets |");
+  lines.push("| --- | ---: | --- |");
+  for (const [source, bucket] of Object.entries(metrics.proposal.bySource)) {
+    if (!bucket) continue;
+    lines.push(
+      `| ${source} | ${bucket.count}/${targetCount} | ${identityList(bucket.targetIds)} |`,
+    );
+  }
+  lines.push("");
+  lines.push("### 5. Provisional class performance (permissive upper-bound view)");
+  lines.push("");
+  lines.push("| Metric | Count | Exact targets |");
+  lines.push("| --- | ---: | --- |");
+  lines.push(
+    `| Correct class top-1 | ${countRate(metrics.classification.top1.count, targetCount)} | ${identityList(metrics.classification.top1.targetIds)} |`,
+  );
+  lines.push(
+    `| Correct class top-3 | ${countRate(metrics.classification.top3.count, targetCount)} | ${identityList(metrics.classification.top3.targetIds)} |`,
+  );
+  lines.push("");
+  lines.push("### 6. Retained alternatives");
+  lines.push("");
+  lines.push(
+    `Retained warranted alternatives for ${countRate(metrics.classification.retainedAlternative.count, targetCount)} targets: ${identityList(metrics.classification.retainedAlternative.targetIds)}.`,
+  );
+  lines.push("");
+  lines.push("### 7. Target suppression analysis");
+  lines.push("");
+  lines.push(
+    `Correct target class absent from all overlapping system proposals: ${metrics.classification.suppressed.count}/${targetCount}; targets: ${identityList(metrics.classification.suppressed.targetIds)}.`,
+  );
+  lines.push("");
+  lines.push("### 8. Operation-routing matrix");
+  lines.push("");
+  lines.push(
+    "Operation routing is descriptive metadata and does not gate content recovery, object assembly, projection, candidate survival, or trustworthy evidence. A specialized operation is never claimed to have run unless it appears in the actual acquisition history.",
+  );
+  lines.push("");
+  lines.push("| Comparison | Agree | Disagree | Unresolved |");
+  lines.push("| --- | ---: | ---: | ---: |");
+  for (const [name, buckets] of [
+    ["Representative recommendation vs expected", metrics.operationRouting.representativeAgreement],
+    [
+      "Content-bearing recommendation vs expected",
+      metrics.operationRouting.contentBearingAgreement,
+    ],
+    ["Actual acquisition vs expected", metrics.operationRouting.actualOperationAgreement],
+  ] as const) {
+    lines.push(
+      `| ${name} | ${buckets.agree.count}/${targetCount} | ${buckets.disagree.count}/${targetCount} | ${buckets.unresolved.count}/${targetCount} |`,
+    );
+  }
+  lines.push("");
+  lines.push(
+    `- Representative mismatch despite successful content recovery: ${metrics.operationRouting.representativeMismatchDespiteSuccessfulRecovery.count}/${targetCount}; targets: ${identityList(metrics.operationRouting.representativeMismatchDespiteSuccessfulRecovery.targetIds)}`,
+  );
+  lines.push(
+    `- Representative mismatch with failed content recovery: ${metrics.operationRouting.representativeMismatchWithFailedRecovery.count}/${targetCount}; targets: ${identityList(metrics.operationRouting.representativeMismatchWithFailedRecovery.targetIds)}`,
+  );
+  lines.push(
+    `- Representative unresolved despite successful content recovery: ${metrics.operationRouting.representativeUnresolvedDespiteSuccessfulRecovery.count}/${targetCount}; targets: ${identityList(metrics.operationRouting.representativeUnresolvedDespiteSuccessfulRecovery.targetIds)}`,
+  );
+  lines.push(
+    `- Representative unresolved with failed content recovery: ${metrics.operationRouting.representativeUnresolvedWithFailedRecovery.count}/${targetCount}; targets: ${identityList(metrics.operationRouting.representativeUnresolvedWithFailedRecovery.targetIds)}`,
+  );
+  lines.push(
+    `- Causally supported operation-related acquisition failure: ${metrics.operationRouting.causallySupportedAcquisitionFailure.count}/${targetCount}; targets: ${identityList(metrics.operationRouting.causallySupportedAcquisitionFailure.targetIds)}`,
+  );
+  lines.push("");
+  lines.push(
+    "| Representative recommendation | Content-bearing recommendation | Actual acquisition | Expected evaluation | Representative / content / actual agreement | Targets | Recovered | Exact targets |",
+  );
+  lines.push("| --- | --- | --- | --- | --- | ---: | ---: | --- |");
+  for (const bucket of metrics.operationRouting.routingMatrix) {
+    lines.push(
+      `| ${bucket.representativeRecommendedOperation} | ${bucket.contentBearingRecommendedOperation} | ${bucket.actualAcquisitionOperation} | ${bucket.expectedEvaluationOperation} | ${bucket.representativeAgreement} / ${bucket.contentBearingAgreement} / ${bucket.actualAgreement} | ${bucket.count} | ${bucket.recoveredCount} | ${identityList(bucket.targetIds)} |`,
+    );
+  }
+  lines.push("");
+  lines.push("### 9. Observable semantic survival");
+  lines.push("");
+  lines.push(
+    "Raw flags are independent observations; the cumulative funnel is reported separately.",
+  );
+  lines.push("");
+  lines.push("| Raw observable flag | Count | Exact targets |");
+  lines.push("| --- | ---: | --- |");
+  for (const [name, bucket] of Object.entries(metrics.rawSurvival)) {
+    lines.push(`| ${name} | ${bucket.count}/${targetCount} | ${identityList(bucket.targetIds)} |`);
+  }
+  lines.push("");
+  lines.push("#### Cumulative funnel");
+  lines.push("");
+  lines.push("| Cumulative stage | Surviving targets | Exact targets |");
+  lines.push("| --- | ---: | --- |");
+  for (const stage of metrics.funnel) {
+    lines.push(
+      `| ${stage.stage} | ${stage.count}/${targetCount} | ${identityList(stage.targetIds)} |`,
+    );
+  }
+  lines.push("");
+  lines.push("### 10. Terminal failure categories");
+  lines.push("");
+  lines.push("| Terminal category | Count | Exact cases | Exact targets |");
+  lines.push("| --- | ---: | --- | --- |");
+  for (const [category, bucket] of Object.entries(metrics.terminalCategories)) {
+    lines.push(
+      `| ${category} | ${bucket.count} | ${identityList(bucket.caseIds)} | ${identityList(bucket.targetIds)} |`,
+    );
+  }
+  lines.push("");
+  lines.push(
+    `False certainty: ${metrics.falseCertainty.count}/${targetCount}; cases: ${identityList(metrics.falseCertainty.caseIds)}; targets: ${identityList(metrics.falseCertainty.targetIds)}.`,
+  );
+  lines.push("");
+  lines.push("### 11. Per-case survival traces");
+  lines.push("");
+  lines.push(
+    "| Case | Target | Field | Permissive matches | Permissive top-1 / top-3 | Strict node / top-1 / top-3 | Representative / content-bearing recommendation | Actual / expected operation | Agreement (rep / content / actual) | Content / assembly / projection | Candidate status | Terminal |",
+  );
+  lines.push("| --- | --- | --- | ---: | --- | --- | --- | --- | --- | --- | --- | --- |");
+  for (const caseReport of report.cases) {
+    for (const trace of caseReport.semanticScene?.traces ?? []) {
+      lines.push(
+        `| ${trace.caseId} | ${trace.targetAnnotationId} | ${trace.field} | ${trace.matchedProposalCount} | ${yesNo(trace.correctClassTop1)} / ${yesNo(trace.correctClassTop3)} | ${trace.strictProposalNodeId ?? "none"} / ${yesNo(trace.strictCorrectClassTop1)} / ${yesNo(trace.strictCorrectClassTop3)} | ${trace.representativeRecommendedOperation} / ${trace.contentBearingRecommendedOperation} | ${trace.actualAcquisitionOperations.join(", ") || "none"} / ${trace.expectedEvaluationOperation} | ${trace.representativeOperationAgreement} / ${trace.contentBearingOperationAgreement} / ${trace.actualOperationAgreement} | ${yesNo(trace.contentRecovered)} / ${yesNo(trace.sceneObjectAssembled)} / ${yesNo(trace.fieldCandidateProjected)} | ${trace.candidateStatus} | ${trace.terminalCategory} |`,
+      );
+    }
+  }
+  lines.push("");
+  lines.push("### 12. Token-first comparison");
+  lines.push("");
+  lines.push(
+    "| Existing token-first category | Semantic terminal category | Count | Exact targets |",
+  );
+  lines.push("| --- | --- | ---: | --- |");
+  for (const bucket of metrics.tokenFirstComparison) {
+    lines.push(
+      `| ${bucket.tokenFirstFailureClass} | ${bucket.semanticTerminalCategory} | ${bucket.count} | ${identityList(bucket.targetIds)} |`,
+    );
+  }
+  lines.push("");
+  lines.push("### 13. Unknown, conflicting, and unattributed evidence");
+  lines.push("");
+  lines.push(
+    `- Unknown-bearing system proposal nodes: ${metrics.unknownBearingProposals.count}/${metrics.unknownBearingProposals.totalSystemProposalCount}; distinct cases: ${metrics.unknownBearingProposals.distinctCaseCount}; cases: ${identityList(metrics.unknownBearingProposals.caseIds)}; node IDs: ${identityList(metrics.unknownBearingProposals.nodeIds)}`,
+  );
+  lines.push(
+    `- Conflicting-classification system proposal nodes: ${metrics.conflictingClassificationProposals.count}/${metrics.conflictingClassificationProposals.totalSystemProposalCount}; distinct cases: ${metrics.conflictingClassificationProposals.distinctCaseCount}; cases: ${identityList(metrics.conflictingClassificationProposals.caseIds)}; node IDs: ${identityList(metrics.conflictingClassificationProposals.nodeIds)}`,
+  );
+  lines.push(
+    "- These are proposal-node counts over the bounded, non-deduplicated proposal set, not counts of unique semantic regions. Unknown-bearing means an unknown class is present among a node's hypotheses, not necessarily ranked first.",
+  );
+  lines.push(
+    `- Unattributed target outcomes: ${metrics.unattributed.count}; cases: ${identityList(metrics.unattributed.caseIds)}; targets: ${identityList(metrics.unattributed.targetIds)}`,
+  );
+  lines.push("");
+  lines.push("### 14. Production parity proof");
+  lines.push("");
+  lines.push(`- Result: **${semantic.productionParity.status}**`);
+  lines.push(`- Basis: ${semantic.productionParity.comparisonBasis}`);
+  lines.push(`- Baseline commit: \`${semantic.productionParity.baseCommit}\``);
+  lines.push(
+    `- Matched: ${semantic.productionParity.matchedCaseCount}/${semantic.productionParity.expectedCaseCount}; actual corpus cases: ${semantic.productionParity.actualCaseCount}`,
+  );
+  lines.push(
+    `- Mismatches: ${semantic.productionParity.mismatches.length === 0 ? "none" : identityList(semantic.productionParity.mismatches.map((mismatch) => `${mismatch.caseId}:${mismatch.reason}`))}`,
+  );
+  lines.push("");
+  lines.push("### 15. Explicit limitations");
+  lines.push("");
+  const limitations = [
+    ...new Set(report.cases.flatMap((caseReport) => caseReport.semanticScene?.limitations ?? [])),
+  ];
+  for (const limitation of limitations) lines.push(`- ${limitation}`);
+  lines.push(
+    "- Sparse annotations measure only selected high-value targets and hard negatives; they are not dense scene segmentation.",
+  );
+  lines.push(
+    "- This diagnostic measures the current artifacts. It does not itself improve extraction accuracy.",
+  );
+  lines.push("");
+  lines.push("### 16. Ranked falsifiable next experiments");
+  lines.push("");
+  lines.push(
+    "Competing approaches remain unresolved until measured under the stated fixed-risk comparison.",
+  );
+  lines.push("");
+  lines.push(
+    "| Rank | Boundary | Approach A | Approach B | Measurement | Trigger targets | Exact targets |",
+  );
+  lines.push("| ---: | --- | --- | --- | --- | ---: | --- |");
+  for (const experiment of metrics.nextExperiments) {
+    lines.push(
+      `| ${experiment.rank} | ${experiment.experiment} | ${experiment.approachA} | ${experiment.approachB} | ${experiment.measurement} | ${experiment.measuredTriggerCount} | ${identityList(experiment.targetIds)} |`,
+    );
+  }
+  lines.push("");
+  return lines;
+}
+
 export function renderMarkdown(report: EvalReport): string {
   const aggregateMetrics = report.aggregate;
   const performance = report.breakdowns.performance;
@@ -816,6 +1117,7 @@ export function renderMarkdown(report: EvalReport): string {
     "No field in this report is a calibrated correctness probability: OCR evidence is an OCR observation, ranking is Label Lens selection logic, and correctness labels remain evaluation-only.",
   );
   lines.push("");
+  lines.push(...renderSemanticRegionSurvival(report));
   lines.push("## Brand metrics");
   lines.push("");
   lines.push("| Metric | Value | Denominator |");

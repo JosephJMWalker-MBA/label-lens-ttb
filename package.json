@@ -18,6 +18,8 @@
     "eval:inventory": "node scripts/fixtures/generate-eval-manifest.mjs",
     "eval:inspect": "node scripts/fixtures/generate-ocr-inspection-summary.mjs",
     "eval:baseline": "EVAL_BASELINE=1 vitest run src/fixtures/eval/baseline-report.gen.test.ts",
+    "eval:production-parity": "EVAL_PRODUCTION_PARITY=1 vitest run src/fixtures/eval/production-parity.gen.test.ts",
+    "eval:production-parity:capture": "EVAL_CAPTURE_PRODUCTION_PARITY=1 vitest run src/fixtures/eval/production-parity.gen.test.ts",
     "eval:ocr-region-benchmark": "EVAL_REGION_BENCHMARK=1 vitest run src/fixtures/eval/ocr-region-benchmark.gen.test.ts",
     "eval:vision-region-benchmark": "npx vite-node --config vitest.config.ts scripts/eval/run-vision-region-benchmark.ts",
     "eval:local-vlm-smoke": "npx vite-node --config vitest.config.ts scripts/eval/run-local-vlm-smoke.ts",

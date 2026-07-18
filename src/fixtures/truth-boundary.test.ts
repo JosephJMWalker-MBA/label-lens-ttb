@@ -78,6 +78,21 @@ describe("truth-label boundary — corpus truth is imported only by tests/evalua
   });
 });
 
+describe("truth-label boundary — semantic diagnostics stay evaluation-only", () => {
+  it("no production module imports semantic scenes, annotations, traces, or metrics", () => {
+    const productionFiles = ALL.filter((file) => !isTest(file) && !isFixtureTooling(file));
+    const semanticEvaluationModule =
+      /fixtures\/eval\/semantic-scene|semantic-scene\/(?:annotations|survival-trace|metrics)/;
+    for (const file of productionFiles) {
+      for (const path of importsOf(readFileSync(file, "utf8"))) {
+        expect(path, `${rel(file)} imports evaluation-only semantic truth`).not.toMatch(
+          semanticEvaluationModule,
+        );
+      }
+    }
+  });
+});
+
 describe("truth-label boundary — stateless observer modules never accept evaluation truth", () => {
   const observerFiles = [
     join(SRC, "fixtures", "eval", "vision-observer", "fake-observer-adapter.ts"),

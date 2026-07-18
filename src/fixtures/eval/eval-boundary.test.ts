@@ -34,7 +34,7 @@ function importsOf(source: string): string[] {
 }
 
 const EVAL_MODULE =
-  /eval-manifest|eval-harness|eval-loader|eval-report|fixtures\/eval|live-baseline/;
+  /eval-manifest|eval-harness|eval-loader|eval-report|fixtures\/eval|live-baseline|semantic-scene/;
 
 describe("evaluation truth is imported only by the eval tooling and its tests", () => {
   it("no production module imports any evaluation module", () => {
@@ -57,6 +57,16 @@ describe("evaluation truth is imported only by the eval tooling and its tests", 
     expect(critical.length).toBeGreaterThan(0);
     for (const file of critical) {
       expect(readFileSync(file, "utf8")).not.toMatch(EVAL_MODULE);
+    }
+  });
+
+  it("semantic annotations and diagnostics remain downstream of production", () => {
+    const production = ALL.filter((file) => !isTest(file) && !isEvalTooling(file));
+    for (const file of production) {
+      const source = readFileSync(file, "utf8");
+      expect(source, rel(file)).not.toMatch(
+        /SEMANTIC_CASE_ANNOTATIONS|semanticAnnotationForCase|SemanticCaseDiagnostic/,
+      );
     }
   });
 });

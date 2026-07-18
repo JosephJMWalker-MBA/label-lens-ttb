@@ -1,14 +1,22 @@
 // @vitest-environment node
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { format, resolveConfig } from "prettier";
 import { describe, expect, it } from "vitest";
 
-import { runCase } from "./eval-harness";
+import { runCaseArtifacts } from "./eval-harness";
 import { loadEvalManifest } from "./eval-loader";
 import type { CaseReport } from "./eval-report.types";
 import { LIVE_BASELINE } from "./live-baseline";
+import {
+  buildProductionAnalyzerParityFixture,
+  buildProductionAnalyzerParityProof,
+  ISSUE_131_BASE_COMMIT,
+  PRODUCTION_PARITY_FIXTURE_PATH,
+  type ProductionAnalyzerParityFixture,
+  type ProductionAnalyzerParityInput,
+} from "./production-parity";
 import { buildReport, renderMarkdown } from "./report";
 
 /**
@@ -40,11 +48,28 @@ async function writeFormattedJson(filePath: string, value: unknown) {
     async () => {
       const manifest = loadEvalManifest();
       const cases: CaseReport[] = [];
+      const parityInputs: ProductionAnalyzerParityInput[] = [];
       for (const evalCase of manifest.cases) {
         // Sequential: bound peak memory and keep OCR workers from contending.
-        cases.push(await runCase(evalCase));
+        const artifacts = await runCaseArtifacts(evalCase, { semanticScene: true });
+        cases.push(artifacts.report);
+        parityInputs.push({
+          caseId: evalCase.caseId,
+          responseBytes: artifacts.productionResponseBytes,
+          extractionError: artifacts.extractionError,
+        });
       }
-      const report = buildReport(cases, manifest);
+      const expectedParity = JSON.parse(
+        readFileSync(PRODUCTION_PARITY_FIXTURE_PATH, "utf8"),
+      ) as ProductionAnalyzerParityFixture;
+      const actualParity = buildProductionAnalyzerParityFixture(
+        ISSUE_131_BASE_COMMIT,
+        parityInputs,
+      );
+      const productionParity = buildProductionAnalyzerParityProof(expectedParity, actualParity);
+      expect(productionParity.status).toBe("PASS");
+      expect(productionParity.mismatches).toEqual([]);
+      const report = buildReport(cases, manifest, productionParity);
 
       mkdirSync(OUTPUT_DIR, { recursive: true });
       await writeFormattedJson(join(OUTPUT_DIR, "extractor-report.json"), {
