@@ -163,6 +163,24 @@ describe("seller package model", () => {
     expect(packagePreparationComplete(value, definitions)).toBe(true);
   });
 
+  it("accepts explicit back absence without a fake panel and rejects orphaned evidence", () => {
+    const value = draft();
+    value.panels = value.panels.filter((panel) => panel.role !== "back");
+    value.panelDecisions = { back: "absent", additional: "none" };
+    expect(packagePreparationComplete(value, definitions)).toBe(false);
+
+    value.categories[1].regions = [
+      region({
+        regionId: "alcohol-front",
+        categoryId: "alcoholStatement",
+        panelId: "front-1",
+      }),
+    ];
+    expect(packagePreparationComplete(value, definitions)).toBe(true);
+    expect(value.panels).toHaveLength(1);
+    expect(value.panels[0].role).toBe("front");
+  });
+
   it("supports multiple regions for one category across different panels", () => {
     const value = draft();
     const brand = value.categories[0];

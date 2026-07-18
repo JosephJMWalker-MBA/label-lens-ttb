@@ -8,7 +8,7 @@ binding comments. It starts from `e575ca664b6ea897b0d7a25235dc87da428b69dd` on `
 It proves this lifecycle:
 
 ```text
-front + back + optional panels
+front + explicit back/additional-panel decisions
   -> reviewed-profile category checklist
   -> seller values, uncertainty, absence, and panel-relative regions
   -> local draft save
@@ -28,10 +28,12 @@ Before this slice, `/review` was a one-image pre-check whose declared facts had 
 analyzer ran. Seller evidence-region work happened only after a machine result. That unchanged
 workflow remains available at `/review/legacy`.
 
-After this slice, `/review` starts with a package and seller evidence preparation. Front and back
-are required artifacts in one package. Optional neck, side, and other panels can be added. Each
-panel preserves a stable id, order, SHA-256, decoded dimensions, media type, byte size, rotation,
-and its own normalized coordinate frame.
+After this slice, `/review` starts with package and seller evidence preparation. The front label is
+required. The seller must either upload a back label or explicitly choose "No back label," and must
+either add another panel or explicitly choose "No additional panels." These decisions do not
+create placeholder artifacts. Uploaded back, neck, side, and other panels preserve a stable id,
+order, SHA-256, decoded dimensions, media type, byte size, rotation, and their own normalized
+coordinate frame.
 
 ## Reused production boundaries
 
@@ -61,6 +63,12 @@ readability states. They are not regulatory findings and do not replace `PASS`, 
 - append-only package analysis runs containing immutable per-panel machine records;
 - the seller-history sequence analyzed by each run, so later material seller changes make readiness
   stale until reanalysis.
+
+Issue #140 adds optional, backward-compatible `panelDecisions` workflow metadata to that draft
+contract. It records whether the back and additional-panel choices are unresolved, uploaded/added,
+or explicitly absent. It is not seller evidence, does not add a regulatory category, and does not
+change the `seller-package-draft.v1` schema identifier. Older drafts infer safe decisions from their
+real panels; no decision ever creates a fake panel or checksum.
 
 `seller-agent-package.v1` is a checksum-protected local download. Its boundary states
 `local-download-only`, `governmentApproval: false`, `receivingAgent: not-configured-local-export`,
@@ -137,8 +145,9 @@ Production smoke after deploying the reviewed commit:
 1. Confirm the deployment's build commit equals the reviewed PR head before testing behavior.
 2. Open `/review` in a new browser profile and verify the package-first heading and local-storage
    boundary.
-3. Upload a front and back PNG/JPEG; verify both filename, dimensions, partial checksum, and distinct
-   panel controls remain visible.
+3. Upload a front and choose "No back label" and "No additional panels"; verify no fake artifact is
+   created. Return to panel decisions, upload a back PNG/JPEG, and verify both real files keep their
+   filename, dimensions, partial checksum, and distinct panel controls.
 4. Enter one category through pointer geometry and the other through keyboard coordinates. Save,
    reload, and confirm files, regions, values, panel identity, and save status recover.
 5. Analyze. Confirm the result reports each category separately and never converts uncertainty or

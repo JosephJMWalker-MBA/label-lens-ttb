@@ -53,9 +53,11 @@ test("both active intents navigate, and the package review workflow loads", asyn
   await page.goto("/");
   await page.getByRole("link", { name: /review a label/i }).click();
   await expect(page).toHaveURL(/\/review$/);
-  await expect(page.getByLabel(/front panel image/i)).toBeVisible();
-  await expect(page.getByLabel(/back panel image/i)).toBeVisible();
-  await expect(page.getByRole("button", { name: /analyze saved package/i })).toBeDisabled();
+  await expect(page.getByLabel(/upload front label/i)).toBeVisible();
+  await expect(page.getByRole("button", { name: /upload back label/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /no back label/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /no additional panels/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /analyze saved package/i })).toHaveCount(0);
 
   await page.goto("/");
   await page.getByRole("link", { name: /see what is checked/i }).click();

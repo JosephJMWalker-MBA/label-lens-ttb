@@ -55,7 +55,7 @@ export function GuidedCategoryTask({
 
   return (
     <aside
-      className="flex min-w-0 flex-col gap-4 rounded-md border border-border bg-card p-4 lg:sticky lg:top-52"
+      className="flex min-w-0 flex-col gap-3 rounded-md border border-border bg-card p-4 lg:sticky lg:top-4 lg:max-h-[calc(100vh-10rem)] lg:overflow-y-auto"
       aria-labelledby={`guided-task-${definition.categoryId}`}
     >
       <div>
@@ -66,14 +66,8 @@ export function GuidedCategoryTask({
           {definition.label}
         </h3>
         <p className="mt-1 text-sm">{instruction.plainLanguageQuestion}</p>
-        <p className="mt-1 text-xs text-muted-foreground">{instruction.placementHint}</p>
-      </div>
-
-      <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-sm">
-        <p className="font-semibold">Starter box</p>
-        <p>
-          Move or resize the starter box to enclose the printed text. Draw a replacement if the
-          suggested area is wrong. Nothing enters seller history until you accept this category.
+        <p className="mt-1 text-xs text-muted-foreground">
+          Likely location: {instruction.placementHint}
         </p>
       </div>
 
@@ -91,10 +85,15 @@ export function GuidedCategoryTask({
       </div>
 
       <div className="rounded-md border border-border p-3 text-sm">
-        <p className="font-semibold">Evidence for this category</p>
+        <p className="font-semibold">Task status</p>
         <p className="text-muted-foreground">
-          {committedRegions} accepted region{committedRegions === 1 ? "" : "s"}
-          {pendingRegionAvailable ? " · 1 uncommitted working box" : ""}
+          {category.decision === "unresolved"
+            ? "Needs attention"
+            : committedRegions > 0
+              ? "Accepted evidence available"
+              : "Working"}
+          <br />
+          Regions: {committedRegions} accepted · {pendingRegionAvailable ? 1 : 0} working
         </p>
       </div>
 
@@ -105,11 +104,6 @@ export function GuidedCategoryTask({
         <Button type="button" variant="outline" disabled={accepting} onClick={onNeedsAttention}>
           Mark as needs attention
         </Button>
-        {instruction.notPresentAllowed ? (
-          <Button type="button" variant="outline" disabled={accepting}>
-            Mark not present
-          </Button>
-        ) : null}
       </div>
 
       <div className="flex flex-wrap justify-between gap-2 border-t border-border pt-3">

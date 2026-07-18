@@ -287,10 +287,14 @@ export function PackageAnnotationCanvas({
   const handleSize = 0.024 / zoom;
   return (
     <section
-      className="flex min-w-0 flex-col gap-4 rounded-md border border-border bg-card p-4"
+      className="flex min-w-0 flex-col gap-3 rounded-md border border-border bg-card p-3"
       data-testid="annotation-workspace"
+      data-tool={tool}
+      data-zoom={zoom.toFixed(2)}
+      data-pan-x={pan.x}
+      data-pan-y={pan.y}
     >
-      <div className="flex flex-wrap items-start justify-between gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-3 px-1">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Image workspace
@@ -309,7 +313,7 @@ export function PackageAnnotationCanvas({
         </span>
       </div>
 
-      <div className="grid gap-3 rounded-md border border-border bg-muted/20 p-3 md:grid-cols-2">
+      <div className="sticky top-0 z-10 grid gap-3 rounded-md border border-border bg-background/95 p-3 shadow-sm backdrop-blur md:grid-cols-2">
         <div>
           <p className="text-sm font-semibold">Image navigation</p>
           <div className="mt-2 flex flex-wrap gap-2">
@@ -457,7 +461,7 @@ export function PackageAnnotationCanvas({
           className={`block max-w-full touch-none ${tool === "draw" ? "cursor-crosshair" : tool === "move" ? "cursor-move" : "cursor-default"}`}
           style={{
             aspectRatio: `${panel.width} / ${panel.height}`,
-            width: `min(100%, ${(70 * panel.width) / panel.height}vh)`,
+            width: `min(100%, ${(78 * panel.width) / panel.height}vh)`,
             transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom}) rotate(${panel.rotation}deg)`,
             transformOrigin: "center",
           }}
@@ -475,8 +479,8 @@ export function PackageAnnotationCanvas({
                 y={region.y}
                 width={region.width}
                 height={region.height}
-                fill="rgba(37,99,235,.10)"
-                stroke="rgb(37,99,235)"
+                fill="rgba(71,85,105,.08)"
+                stroke="rgb(71,85,105)"
                 strokeWidth={0.006 / zoom}
                 strokeDasharray="0.02 0.012"
                 vectorEffect="non-scaling-stroke"
@@ -485,7 +489,7 @@ export function PackageAnnotationCanvas({
                 x={region.x}
                 y={Math.max(0.025, region.y)}
                 fontSize={0.03 / zoom}
-                fill="rgb(30,64,175)"
+                fill="rgb(51,65,85)"
               >
                 Machine · {labelForCategory(region.categoryId)}
               </text>
@@ -516,8 +520,8 @@ export function PackageAnnotationCanvas({
                   y={region.y}
                   width={region.width}
                   height={region.height}
-                  fill={working ? "rgba(126,34,206,.12)" : "rgba(194,65,12,.14)"}
-                  stroke={working ? "rgb(126,34,206)" : "rgb(194,65,12)"}
+                  fill={working ? "rgba(37,99,235,.14)" : "rgba(194,65,12,.14)"}
+                  stroke={working ? "rgb(37,99,235)" : "rgb(194,65,12)"}
                   strokeWidth={(active ? 0.009 : 0.006) / zoom}
                   strokeDasharray={working ? "0.018 0.01" : undefined}
                   vectorEffect="non-scaling-stroke"
@@ -527,7 +531,7 @@ export function PackageAnnotationCanvas({
                   y={Math.max(0.025, region.y)}
                   fontSize={0.03 / zoom}
                   fontWeight="700"
-                  fill={working ? "rgb(88,28,135)" : "rgb(124,45,18)"}
+                  fill={working ? "rgb(30,64,175)" : "rgb(124,45,18)"}
                 >
                   {working ? "Working" : "Seller"} · {labelForCategory(region.categoryId)}
                 </text>
@@ -543,7 +547,7 @@ export function PackageAnnotationCanvas({
                           width={handleSize}
                           height={handleSize}
                           fill="white"
-                          stroke={working ? "rgb(88,28,135)" : "rgb(124,45,18)"}
+                          stroke={working ? "rgb(30,64,175)" : "rgb(124,45,18)"}
                           strokeWidth={0.004 / zoom}
                           vectorEffect="non-scaling-stroke"
                           aria-label={`Resize ${regionLabel} from ${corner}`}
@@ -560,43 +564,47 @@ export function PackageAnnotationCanvas({
         </svg>
       </div>
 
-      <fieldset className="rounded-md border border-border p-3" disabled={!activeRegion}>
-        <legend className="px-1 text-sm font-semibold">Keyboard coordinate fallback</legend>
-        <p className="text-xs text-muted-foreground">
-          Percentages are relative only to the active panel. They never share a front/back
-          coordinate frame.
-        </p>
-        <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {(["x", "y", "width", "height"] as const).map((key) => (
-            <div key={key} className="flex min-w-0 flex-col gap-1">
-              <Label htmlFor={`region-${key}`}>
-                {key === "x" ? "Left" : key === "y" ? "Top" : key[0].toUpperCase() + key.slice(1)} %
-              </Label>
-              <Input
-                id={`region-${key}`}
-                type="number"
-                min="0"
-                max="100"
-                step="0.01"
-                value={coordinates[key]}
-                onChange={(event) =>
-                  setCoordinates((value) => ({ ...value, [key]: event.target.value }))
-                }
-              />
-            </div>
-          ))}
-        </div>
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          className="mt-3"
-          disabled={!activeRegion}
-          onClick={applyCoordinates}
-        >
-          Apply coordinates
-        </Button>
-      </fieldset>
+      <details className="rounded-md border border-border p-3">
+        <summary className="cursor-pointer text-sm font-semibold">Enter coordinates</summary>
+        <fieldset className="mt-2" disabled={!activeRegion}>
+          <legend className="sr-only">Keyboard coordinate fallback</legend>
+          <p className="text-xs text-muted-foreground">
+            Percentages are relative only to the active panel. They never share a front/back
+            coordinate frame.
+          </p>
+          <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {(["x", "y", "width", "height"] as const).map((key) => (
+              <div key={key} className="flex min-w-0 flex-col gap-1">
+                <Label htmlFor={`region-${key}`}>
+                  {key === "x" ? "Left" : key === "y" ? "Top" : key[0].toUpperCase() + key.slice(1)}{" "}
+                  %
+                </Label>
+                <Input
+                  id={`region-${key}`}
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  value={coordinates[key]}
+                  onChange={(event) =>
+                    setCoordinates((value) => ({ ...value, [key]: event.target.value }))
+                  }
+                />
+              </div>
+            ))}
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="mt-3"
+            disabled={!activeRegion}
+            onClick={applyCoordinates}
+          >
+            Apply coordinates
+          </Button>
+        </fieldset>
+      </details>
     </section>
   );
 }

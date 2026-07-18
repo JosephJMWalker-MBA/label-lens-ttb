@@ -20,8 +20,9 @@ export default function ReviewPage() {
             Prepare a seller label package
           </h1>
           <p className="max-w-4xl text-lg text-foreground">
-            Upload the front, back, and any additional panels. Preserve seller evidence before
-            analysis, then review machine observations without overwriting either record.
+            Add the required front label, then explicitly upload or rule out the back and any
+            additional panels. Preserve seller evidence before analysis, then review machine
+            observations without overwriting either record.
           </p>
           <p className="max-w-4xl rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
             Drafts are saved only in this browser. Analysis is a preparation aid. Downloads are

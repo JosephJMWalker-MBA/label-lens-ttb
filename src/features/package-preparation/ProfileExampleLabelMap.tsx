@@ -4,10 +4,12 @@ import type { PackageCategoryInstruction } from "./package-profile";
 
 export function ProfileExampleLabelMap({
   instructions,
-  onContinue,
+  emphasizedCategoryId,
+  onClose,
 }: {
   instructions: readonly PackageCategoryInstruction[];
-  onContinue: () => void;
+  emphasizedCategoryId?: PackageCategoryInstruction["categoryId"];
+  onClose: () => void;
 }) {
   return (
     <section
@@ -16,10 +18,10 @@ export function ProfileExampleLabelMap({
     >
       <div className="min-w-0">
         <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Phase A · Learn
+          Contextual guide
         </p>
         <h2 id="example-label-map-heading" className="mt-1 text-2xl font-semibold">
-          See the two label areas this profile reviews
+          Example label map
         </h2>
         <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
           This synthetic map teaches placement only. It is not a real label and its wording should
@@ -82,7 +84,14 @@ export function ProfileExampleLabelMap({
       <div className="flex min-w-0 flex-col justify-between gap-5">
         <div className="space-y-3">
           {instructions.map((instruction, index) => (
-            <div key={instruction.categoryId} className="rounded-md border border-border p-3">
+            <div
+              key={instruction.categoryId}
+              className={`rounded-md border p-3 ${
+                instruction.categoryId === emphasizedCategoryId
+                  ? "border-blue-600 bg-blue-50"
+                  : "border-border"
+              }`}
+            >
               <p className="text-sm font-semibold">
                 {index + 1}. {instruction.plainLanguageQuestion}
               </p>
@@ -95,8 +104,8 @@ export function ProfileExampleLabelMap({
             reviewed profile.
           </div>
         </div>
-        <Button type="button" onClick={onContinue}>
-          Start with my label panels
+        <Button type="button" onClick={onClose}>
+          Close guide
         </Button>
       </div>
     </section>

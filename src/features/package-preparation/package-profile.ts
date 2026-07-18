@@ -46,28 +46,39 @@ const WINE_PACKAGE_INSTRUCTION_BY_CATEGORY: Readonly<
  * registry. This UI contract must not become a second, hand-maintained source
  * of regulatory requirements.
  */
+const WINE_PACKAGE_PRESENTATION_ORDER = ["brandName", "alcoholStatement"] as const;
+
+const REVIEWED_DEFINITION_BY_CATEGORY = new Map(
+  wineRequirementsRegistry.all().map((requirement) => [
+    requirement.fieldId,
+    {
+      categoryId: requirement.fieldId,
+      requirementId: requirement.requirementId,
+      requirementVersion: requirement.version,
+      label: labelForCategory(requirement.fieldId),
+      requiresValue: true,
+      applicability: requirement.applicability,
+    } satisfies PackageCategoryDefinition,
+  ]),
+);
+
 export const WINE_PACKAGE_CATEGORY_DEFINITIONS: readonly PackageCategoryDefinition[] =
-  wineRequirementsRegistry.all().map((requirement) => ({
-    categoryId: requirement.fieldId,
-    requirementId: requirement.requirementId,
-    requirementVersion: requirement.version,
-    label: labelForCategory(requirement.fieldId),
-    requiresValue: true,
-    applicability: requirement.applicability,
-  }));
+  WINE_PACKAGE_PRESENTATION_ORDER.flatMap((categoryId) => {
+    const definition = REVIEWED_DEFINITION_BY_CATEGORY.get(categoryId);
+    return definition ? [definition] : [];
+  });
 
 /**
  * Instructional copy and example geometry are presentation metadata only.
  * Category membership still comes exclusively from the reviewed registry
  * projection above; this mapping cannot add a rule or an analysis category.
  */
-export const WINE_PACKAGE_CATEGORY_INSTRUCTIONS: readonly PackageCategoryInstruction[] = (
-  ["brandName", "alcoholStatement"] as const
-).flatMap((categoryId) =>
-  WINE_PACKAGE_CATEGORY_DEFINITIONS.some((definition) => definition.categoryId === categoryId)
-    ? [{ categoryId, ...WINE_PACKAGE_INSTRUCTION_BY_CATEGORY[categoryId] }]
-    : [],
-);
+export const WINE_PACKAGE_CATEGORY_INSTRUCTIONS: readonly PackageCategoryInstruction[] =
+  WINE_PACKAGE_PRESENTATION_ORDER.flatMap((categoryId) =>
+    WINE_PACKAGE_CATEGORY_DEFINITIONS.some((definition) => definition.categoryId === categoryId)
+      ? [{ categoryId, ...WINE_PACKAGE_INSTRUCTION_BY_CATEGORY[categoryId] }]
+      : [],
+  );
 
 export const WINE_PACKAGE_PROFILE = {
   id: wineRequirementsRegistry.profileId,

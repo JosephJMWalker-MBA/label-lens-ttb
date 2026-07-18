@@ -17,28 +17,24 @@ describe("seller package review route", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: /prepare a seller label package/i }),
     ).toBeInTheDocument();
-    expect(
-      await screen.findByRole("heading", { name: /see the two label areas/i }),
-    ).toBeInTheDocument();
-    expect(screen.getByTestId("example-label-map")).toBeInTheDocument();
-    expect(screen.getByText(/future categories.*not supported/i)).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: /upload the front and back label panels/i }),
-    ).toBeInTheDocument();
-    expect(screen.getByLabelText(/front panel image/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/back panel image/i)).toBeInTheDocument();
+    expect(await screen.findByTestId("seller-workstation")).toBeInTheDocument();
+    expect(screen.getByTestId("workstation-controls")).toBeInTheDocument();
+    expect(screen.getByTestId("cycling-workspace")).toBeInTheDocument();
+    expect(screen.getByTestId("package-progress-footer")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /resolve the label panels/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/upload front label/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /no back label/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /no additional panels/i })).toBeInTheDocument();
+    expect(screen.queryByTestId("example-label-map")).toBeNull();
     expect(screen.getByText(/nothing is submitted to TTB/i)).toBeInTheDocument();
     expect(screen.queryByText(/TTB submission complete/i)).toBeNull();
   });
 
-  it("gates analysis and local agent-package export", async () => {
+  it("hides invalid future actions until canonical package state permits them", async () => {
     render(<ReviewPage />);
-    expect(await screen.findByRole("button", { name: /analyze saved package/i })).toBeDisabled();
-    expect(
-      screen.getByRole("button", { name: /submit to agent.*download locally/i }),
-    ).toBeDisabled();
-    expect(
-      screen.getByText(/local download only · not a TTB submission or approval/i),
-    ).toBeInTheDocument();
+    expect(await screen.findByTestId("upload-workspace")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /run pre-check/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /prepare agent package/i })).toBeNull();
+    expect(screen.getByText(/next: resolve the required panel decisions/i)).toBeInTheDocument();
   });
 });

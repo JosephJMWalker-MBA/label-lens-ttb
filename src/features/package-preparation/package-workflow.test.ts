@@ -14,6 +14,7 @@ function draft(): SellerPackageDraft {
     createdAt: "2026-07-18T00:00:00.000Z",
     updatedAt: "2026-07-18T00:00:00.000Z",
     profile: { id: "wine-label-requirements", version: "1.0.0" },
+    panelDecisions: { back: "unresolved", additional: "unresolved" },
     panels: [],
     categories: WINE_PACKAGE_CATEGORY_DEFINITIONS.map((definition) => ({
       categoryId: definition.categoryId,
@@ -27,6 +28,7 @@ function draft(): SellerPackageDraft {
 }
 
 function addPanels(value: SellerPackageDraft) {
+  value.panelDecisions = { back: "upload", additional: "none" };
   value.panels = (["front", "back"] as const).map((role, index) => ({
     panelId: `${role}-panel`,
     order: index,
@@ -61,13 +63,12 @@ function acceptCategories(value: SellerPackageDraft) {
   }));
 }
 
-function project(value: SellerPackageDraft, saveState: "unsaved" | "saved", learnComplete = true) {
+function project(value: SellerPackageDraft, saveState: "unsaved" | "saved") {
   return deriveGuidedPackageWorkflow({
     draft: value,
     definitions: WINE_PACKAGE_CATEGORY_DEFINITIONS,
     instructions: WINE_PACKAGE_CATEGORY_INSTRUCTIONS,
     saveState,
-    learnComplete,
   });
 }
 
@@ -79,10 +80,13 @@ describe("guided package workflow projection", () => {
     expect(WINE_PACKAGE_CATEGORY_INSTRUCTIONS.every((item) => !item.notPresentAllowed)).toBe(true);
   });
 
-  it("moves from learn to upload to one-category marking", () => {
+  it("moves from explicit panel decisions to one-category marking", () => {
     const value = draft();
-    expect(project(value, "unsaved", false).phase).toBe("learn");
     expect(project(value, "unsaved").phase).toBe("upload");
+    expect(project(value, "unsaved").progressStages[0]).toMatchObject({
+      id: "upload",
+      status: "current",
+    });
     addPanels(value);
     const marking = project(value, "unsaved");
     expect(marking.phase).toBe("mark");
@@ -90,6 +94,43 @@ describe("guided package workflow projection", () => {
       WINE_PACKAGE_CATEGORY_DEFINITIONS.map((definition) => definition.categoryId),
     );
     expect(marking.recommendedAction).toBe("Complete the next required category");
+    expect(marking.progressStages.map((stage) => stage.status)).toEqual([
+      "complete",
+      "current",
+      "not_started",
+      "not_started",
+      "not_started",
+    ]);
+  });
+
+  it("resolves truthful back absence and optional-panel intent without fake artifacts", () => {
+    const value = draft();
+    value.panels = [
+      {
+        panelId: "front-panel",
+        order: 0,
+        role: "front",
+        displayName: "front.png",
+        mediaType: "image/png",
+        byteSize: 10,
+        checksumSha256: "0".repeat(64),
+        width: 1000,
+        height: 1500,
+        rotation: 0,
+      },
+    ];
+    value.panelDecisions = { back: "absent", additional: "none" };
+    const workflow = project(value, "unsaved");
+    expect(workflow).toMatchObject({
+      phase: "mark",
+      backUploaded: false,
+      backAbsent: true,
+      backResolved: true,
+      additionalResolved: true,
+      panelDecisionsComplete: true,
+      uploadedPanelCount: 1,
+    });
+    expect(value.panels).toHaveLength(1);
   });
 
   it("requires explicit provided evidence for readiness even though the canonical model preserves uncertainty", () => {
@@ -122,7 +163,6 @@ describe("guided package workflow projection", () => {
         notPresentAllowed: instruction.categoryId === allowedCategory,
       })),
       saveState: "saved",
-      learnComplete: true,
     });
     expect(
       workflow.categoryStatuses.find((status) => status.categoryId === allowedCategory)?.complete,

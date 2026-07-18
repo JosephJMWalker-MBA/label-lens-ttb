@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SellerPackageDraft } from "./package-model";
@@ -34,6 +34,7 @@ function storedDraft(brandAccepted = false): SellerPackageDraft {
     createdAt: "2026-07-18T00:00:00.000Z",
     updatedAt: "2026-07-18T00:00:00.000Z",
     profile: { id: "wine-label-requirements", version: "1.0.0" },
+    panelDecisions: { back: "upload", additional: "none" },
     panels,
     categories: [
       {
@@ -90,10 +91,43 @@ beforeEach(() => {
   vi.stubGlobal("crypto", {
     ...crypto,
     randomUUID: vi.fn(() => "00000000-0000-4000-8000-000000000000"),
+    subtle: {
+      digest: vi.fn(async () => new Uint8Array(32).buffer),
+    },
   });
+  vi.stubGlobal(
+    "createImageBitmap",
+    vi.fn(async () => ({ width: 1000, height: 1500, close: vi.fn() })),
+  );
 });
 
 describe("guided category acceptance", () => {
+  it("truthfully resolves no back and no additional panels without creating artifacts", async () => {
+    store.load.mockResolvedValue(null);
+    render(<PackagePreparationWorkspace />);
+
+    const front = new File(["front"], "front.png", { type: "image/png" });
+    Object.defineProperty(front, "arrayBuffer", {
+      value: async () => new TextEncoder().encode("front").buffer,
+    });
+    fireEvent.change(await screen.findByLabelText("Upload front label"), {
+      target: { files: [front] },
+    });
+    expect(await screen.findByText(/Uploaded: front\.png/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "No back label" }));
+    await waitFor(() => expect(store.save).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByRole("button", { name: "No additional panels" }));
+    await waitFor(() => expect(store.save).toHaveBeenCalledTimes(2));
+
+    expect(await screen.findByRole("heading", { name: "Brand name" })).toBeInTheDocument();
+    const checkpoint = store.save.mock.calls[1][0] as { draft: SellerPackageDraft };
+    expect(checkpoint.draft.panelDecisions).toEqual({ back: "absent", additional: "none" });
+    expect(checkpoint.draft.panels).toHaveLength(1);
+    expect(checkpoint.draft.panels[0]).toMatchObject({ role: "front", displayName: "front.png" });
+    expect(checkpoint.draft.panels.some((panel) => panel.role === "back")).toBe(false);
+  });
+
   it("keeps the starter box ephemeral until explicit acceptance, then checkpoints and advances", async () => {
     const value = storedDraft();
     store.load.mockResolvedValue(stored(value));
@@ -141,6 +175,40 @@ describe("guided category acceptance", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Brand name" })).toBeInTheDocument();
     expect(value.sellerChangeHistory).toHaveLength(0);
+    expect(screen.getByText(/Categories: 0\/2/i)).toBeInTheDocument();
+    expect(screen.getByText(/Draft: error/i)).toBeInTheDocument();
+  });
+
+  it("opens contextual guidance without resetting the category, panel, view, box, or text", async () => {
+    const value = storedDraft();
+    store.load.mockResolvedValue(stored(value));
+    render(<PackagePreparationWorkspace />);
+
+    const sellerText = await screen.findByLabelText("What the label says");
+    fireEvent.change(sellerText, { target: { value: "UNCOMMITTED BRAND" } });
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    fireEvent.click(screen.getByRole("button", { name: "Pan right" }));
+    const canvas = screen.getByTestId("annotation-workspace");
+    expect(canvas).toHaveAttribute("data-zoom", "1.25");
+    expect(canvas).toHaveAttribute("data-pan-x", "-48");
+    const workingId = document
+      .querySelector('[data-working="true"]')
+      ?.getAttribute("data-region-id");
+
+    fireEvent.click(screen.getByRole("button", { name: "Open Guide" }));
+    const guide = screen.getByTestId("contextual-guide");
+    expect(within(guide).getByRole("heading", { name: "Example label map" })).toBeInTheDocument();
+    expect(store.save).not.toHaveBeenCalled();
+    fireEvent.click(within(guide).getByRole("button", { name: "Close guide" }));
+
+    expect(screen.getByRole("heading", { name: "Brand name" })).toBeInTheDocument();
+    expect(screen.getByLabelText("What the label says")).toHaveValue("UNCOMMITTED BRAND");
+    expect(screen.getByTestId("annotation-workspace")).toHaveAttribute("data-zoom", "1.25");
+    expect(screen.getByTestId("annotation-workspace")).toHaveAttribute("data-pan-x", "-48");
+    expect(document.querySelector('[data-working="true"]')).toHaveAttribute(
+      "data-region-id",
+      workingId,
+    );
   });
 
   it("does not append duplicate history or checkpoint when an accepted category is reopened unchanged", async () => {
@@ -167,7 +235,7 @@ describe("guided category acceptance", () => {
     await waitFor(() => expect(store.save).toHaveBeenCalledTimes(1));
     const checkpoint = store.save.mock.calls[0][0] as { draft: SellerPackageDraft };
     expect(checkpoint.draft.categories[0].decision).toBe("unresolved");
-    expect(screen.getByText(/Categories: 0\/2 complete/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /analyze saved package/i })).toBeDisabled();
+    expect(screen.getByText(/Categories: 0\/2/i)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /run pre-check/i })).toBeNull();
   });
 });

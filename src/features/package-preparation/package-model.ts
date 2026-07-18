@@ -14,6 +14,8 @@ export const SELLER_PACKAGE_EXPORT_VERSION = "seller-agent-package.v1" as const;
 export type PackageCategoryId = LabelRequirementFieldId;
 export type PanelRole = "front" | "back" | "neck" | "side" | "other";
 export type PanelRotation = 0 | 90 | 180 | 270;
+export type BackPanelDecision = "unresolved" | "upload" | "absent";
+export type AdditionalPanelDecision = "unresolved" | "add" | "none";
 export type CategoryPreparationDecision = "provided" | "unresolved" | "not_present";
 export type CategoryAnalysisState =
   "clearly_readable" | "needs_review" | "not_found" | "not_applicable";
@@ -58,6 +60,17 @@ export interface PackageCategoryDraft {
   decision: CategoryPreparationDecision;
   expectedValue: string;
   regions: SellerEvidenceRegion[];
+}
+
+/**
+ * Seller upload intent is package workflow metadata, not evidence. It records
+ * an explicit absence without manufacturing a panel, checksum, or geometry.
+ * Optional for backward compatibility with seller-package-draft.v1 records
+ * created before the workstation introduced explicit panel decisions.
+ */
+export interface PackagePanelDecisions {
+  back: BackPanelDecision;
+  additional: AdditionalPanelDecision;
 }
 
 export type SellerPackageChangeAction =
@@ -121,10 +134,25 @@ export interface SellerPackageDraft {
   createdAt: string;
   updatedAt: string;
   profile: { id: string; version: string };
+  panelDecisions?: PackagePanelDecisions;
   panels: PackagePanelMetadata[];
   categories: PackageCategoryDraft[];
   sellerChangeHistory: SellerPackageChange[];
   analysisRuns: PackageAnalysisRun[];
+}
+
+export function packagePanelDecisions(draft: SellerPackageDraft): PackagePanelDecisions {
+  const backUploaded = draft.panels.some((panel) => panel.role === "back");
+  const additionalUploaded = draft.panels.some(
+    (panel) => panel.role !== "front" && panel.role !== "back",
+  );
+  return {
+    back: draft.panelDecisions?.back ?? (backUploaded ? "upload" : "unresolved"),
+    // Older v1 drafts treated an empty optional-panel list as complete. Keep
+    // those records usable while every newly created workstation draft starts
+    // with an explicit unresolved decision.
+    additional: draft.panelDecisions?.additional ?? (additionalUploaded ? "add" : "none"),
+  };
 }
 
 export interface PackageExportPayload {
@@ -209,10 +237,19 @@ export function packagePreparationComplete(
   definitions: readonly PackageCategoryDefinition[],
 ): boolean {
   const roles = new Set(draft.panels.map((panel) => panel.role));
-  if (!roles.has("front") || !roles.has("back")) return false;
+  const panelDecisions = packagePanelDecisions(draft);
+  const backResolved = roles.has("back") || panelDecisions.back === "absent";
+  const additionalResolved =
+    [...roles].some((role) => role !== "front" && role !== "back") ||
+    panelDecisions.additional === "none";
+  if (!roles.has("front") || !backResolved || !additionalResolved) return false;
+  const panelIds = new Set(draft.panels.map((panel) => panel.panelId));
   return definitions.every((definition) => {
     const category = draft.categories.find((item) => item.categoryId === definition.categoryId);
-    return category ? categoryPreparationComplete(category, definition) : false;
+    return category
+      ? categoryPreparationComplete(category, definition) &&
+          category.regions.every((region) => panelIds.has(region.panelId))
+      : false;
   });
 }
 
