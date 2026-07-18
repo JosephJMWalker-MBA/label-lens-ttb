@@ -3,12 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  normalizedHumanGeometryFromMachine,
-  resolveMachineAlternates,
-} from "@/pipeline/result/field-confirmation";
+import { normalizedHumanGeometryFromMachine } from "@/pipeline/result/field-confirmation";
 import type {
-  HumanFieldConfirmationDecisionType,
   HumanFieldGeometry,
   ReviewableFieldId,
   ResolvedFieldReviews,
@@ -42,8 +38,6 @@ export function ConfirmationImageReview({
   reviews,
   activeField,
   onActiveFieldChange,
-  activeDecisionType,
-  activeAlternateId,
   activeHumanGeometry,
   onHumanGeometryChange,
 }: {
@@ -51,8 +45,6 @@ export function ConfirmationImageReview({
   reviews: ResolvedFieldReviews;
   activeField: ReviewableFieldId;
   onActiveFieldChange: (fieldId: ReviewableFieldId) => void;
-  activeDecisionType: HumanFieldConfirmationDecisionType | "";
-  activeAlternateId: string;
   activeHumanGeometry: HumanFieldGeometry | null;
   onHumanGeometryChange: (geometry: HumanFieldGeometry | null) => void;
 }) {
@@ -75,21 +67,8 @@ export function ConfirmationImageReview({
     latestGeometryRef.current = activeHumanGeometry;
   }, [activeHumanGeometry]);
 
-  const activeMachineReferenceGeometry = (() => {
-    if (activeDecisionType === "selected-alternate" && activeAlternateId.trim() !== "") {
-      const alternates = resolveMachineAlternates(
-        activeField,
-        activeField === "brandName"
-          ? reviews.brandName.machineObservation
-          : reviews.alcoholStatement.machineObservation,
-      );
-      return (
-        alternates.find((alternate) => alternate.alternateId === activeAlternateId)?.geometry ??
-        null
-      );
-    }
-    return activeField === "brandName" ? (brandGeometry ?? null) : (alcoholGeometry ?? null);
-  })();
+  const activeMachineReferenceGeometry =
+    activeField === "brandName" ? (brandGeometry ?? null) : (alcoholGeometry ?? null);
 
   const clampPan = useCallback(
     (next: { x: number; y: number }, nextZoom = zoom) => {
@@ -209,11 +188,11 @@ export function ConfirmationImageReview({
   }
 
   return (
-    <section className="flex flex-col gap-3 rounded-md border border-border p-4">
+    <section className="flex min-w-0 flex-col gap-3 rounded-md border border-border p-4">
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h4 className="text-base font-semibold">Image review</h4>
+            <h4 className="text-base font-semibold">Evidence image</h4>
             <p className="text-sm text-muted-foreground">
               Active field:{" "}
               <span className="font-medium text-foreground">{FIELD_LABEL[activeField]}</span>
@@ -395,6 +374,7 @@ export function ConfirmationImageReview({
                 key={fieldId}
                 type="button"
                 className="evidence-overlay"
+                data-field={fieldId === "brandName" ? "brand" : "alcohol"}
                 data-active={activeField === fieldId}
                 style={overlayStyle(geometry)}
                 aria-label={`${FIELD_LABEL[fieldId]} machine evidence region`}
@@ -409,22 +389,20 @@ export function ConfirmationImageReview({
 
           {activeHumanGeometry ? (
             <span
-              className="pointer-events-none absolute border-2 border-amber-500 bg-amber-200/20"
+              className="seller-evidence-overlay pointer-events-none absolute"
               style={normalizedOverlayStyle(activeHumanGeometry)}
               role="img"
               aria-label={`${FIELD_LABEL[activeField]} human review region`}
             >
-              <span className="absolute left-0 top-0 rounded-br bg-amber-500 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
-                Human
-              </span>
+              <span className="seller-evidence-chip">Seller</span>
             </span>
           ) : null}
         </div>
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Machine regions stay blue. Human-selected regions are shown in amber and are stored in
-        normalized image-relative coordinates.
+        Machine regions retain their field-specific color and border style. The seller region uses a
+        double border and is stored in normalized image-relative coordinates.
       </p>
     </section>
   );

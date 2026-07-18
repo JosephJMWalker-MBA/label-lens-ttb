@@ -5,11 +5,7 @@ import { describe, expect, it } from "vitest";
 import { resolveFieldReviews } from "@/pipeline/result/field-confirmation";
 import { assemblePrecheckResult } from "@/pipeline/result/assemble";
 import { buildAssembleInput } from "@/pipeline/result/build.fixtures";
-import type {
-  HumanFieldConfirmationDecisionType,
-  HumanFieldGeometry,
-  ReviewableFieldId,
-} from "@/pipeline/result/result.types";
+import type { HumanFieldGeometry, ReviewableFieldId } from "@/pipeline/result/result.types";
 
 import { ConfirmationImageReview } from "./ConfirmationImageReview";
 
@@ -22,11 +18,7 @@ function reviews() {
   });
 }
 
-function Harness({
-  decisionType = "accepted-machine-reading",
-}: {
-  decisionType?: HumanFieldConfirmationDecisionType | "";
-}) {
+function Harness() {
   const [activeField, setActiveField] = useState<ReviewableFieldId>("brandName");
   const [humanGeometry, setHumanGeometry] = useState<HumanFieldGeometry | null>(null);
   return (
@@ -35,8 +27,6 @@ function Harness({
       reviews={reviews()}
       activeField={activeField}
       onActiveFieldChange={setActiveField}
-      activeDecisionType={decisionType}
-      activeAlternateId=""
       activeHumanGeometry={humanGeometry}
       onHumanGeometryChange={setHumanGeometry}
     />
@@ -44,6 +34,15 @@ function Harness({
 }
 
 describe("ConfirmationImageReview", () => {
+  it("synchronizes machine-region selection with the active finding", () => {
+    render(<Harness />);
+    expect(screen.getByText(/active field:/i).parentElement).toHaveTextContent("Brand");
+
+    fireEvent.click(screen.getByRole("button", { name: /alcohol machine evidence region/i }));
+
+    expect(screen.getByText(/active field:/i).parentElement).toHaveTextContent("Alcohol");
+  });
+
   it("copies the machine region into normalized human geometry and keeps percentages stable across zoom, pan, and reset", () => {
     render(<Harness />);
     fireEvent.click(screen.getByRole("button", { name: /use machine region/i }));

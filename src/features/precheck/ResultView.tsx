@@ -10,7 +10,6 @@ import type { PrecheckServiceResponse } from "@/server/precheck-service.types";
 
 import { ConfirmationSection } from "./ConfirmationSection";
 import { triggerDownload } from "./download";
-import { EvidencePanel } from "./EvidencePanel";
 import {
   countChecksNeedingReview,
   executedFindings,
@@ -148,24 +147,19 @@ export function ResultView({
         {response.advisoryNotice.text}
       </p>
 
-      {/* Evidence-centered summary: the label with evidence regions overlaid,
-          beside concise Brand and Alcohol evidence cards. */}
       <section aria-labelledby="summary-heading" className="rounded-md border border-border p-4">
         <h3 id="summary-heading" className="text-lg font-semibold">
-          Summary
+          Machine pre-check summary
         </h3>
-        <div className="mt-3 flex flex-col gap-4">
-          <EvidencePanel observations={observations} previewImage={previewImage} />
-          <div className="flex flex-col gap-2 border-t border-border pt-3">
-            <p className="text-sm">
-              <span className="font-medium">{reviewCount}</span>{" "}
-              {reviewCount === 1 ? "check needs" : "checks need"} human review.
-            </p>
-            <p className="rounded-md bg-muted/50 p-3 text-sm">
-              <span className="font-semibold">Suggested next step: </span>
-              {nextAction(observations, findings)}
-            </p>
-          </div>
+        <div className="mt-3 flex flex-col gap-2">
+          <p className="text-sm">
+            <span className="font-medium">{reviewCount}</span>{" "}
+            {reviewCount === 1 ? "check needs" : "checks need"} human review.
+          </p>
+          <p className="rounded-md bg-muted/50 p-3 text-sm">
+            <span className="font-semibold">Suggested next step: </span>
+            {nextAction(observations, findings)}
+          </p>
         </div>
       </section>
 
@@ -276,7 +270,7 @@ export function ResultView({
                 download(response.exportJson, response.suggestedFilename, "application/json")
               }
             >
-              Download JSON export
+              Download structured pre-check record
             </Button>
             <Button
               type="button"
@@ -285,7 +279,7 @@ export function ResultView({
                 download(response.report.html, response.report.filename, "text/html;charset=utf-8")
               }
             >
-              Download readable report (HTML)
+              Download human-readable pre-check report
             </Button>
           </div>
           {downloadError ? (
@@ -299,10 +293,13 @@ export function ResultView({
             </div>
           ) : null}
           <p className="text-xs text-muted-foreground">
-            Saves the exact server-produced, checksum-verified JSON export as{" "}
-            <code className="break-all">{response.suggestedFilename}</code>, and a readable HTML
-            report as <code className="break-all">{response.report.filename}</code>. Both include
-            the current field-confirmation and disposition histories.
+            These are pre-check artifacts, not a finalized seller package. They do not include the
+            original image bytes, and nothing has been sent to TTB or to a reviewer. The structured
+            record is the exact server-produced, checksum-verified JSON saved as{" "}
+            <code className="break-all">{response.suggestedFilename}</code>. The HTML report is
+            saved as <code className="break-all">{response.report.filename}</code> and presents the
+            active confirmation, not the full append-only confirmation history. Session-only seller
+            decisions are not included.
           </p>
         </div>
       </Disclosure>

@@ -270,7 +270,7 @@ describe("PrecheckWorkspace — run & results", () => {
     fireEvent.click(screen.getByRole("button", { name: /run pre-check/i }));
     await screen.findByRole("heading", { name: /pre-check result/i });
 
-    fireEvent.click(screen.getByRole("button", { name: /download json export/i }));
+    fireEvent.click(screen.getByRole("button", { name: /download structured pre-check record/i }));
 
     const anchor = created.find((a) => a.download);
     expect(anchor?.download).toBe(CANNED.suggestedFilename);
@@ -452,8 +452,10 @@ describe("PrecheckWorkspace — human disposition", () => {
     render(<PrecheckWorkspace />);
     await runPrecheckToResult();
 
-    const jsonBtn = screen.getByRole("button", { name: /download json export/i });
-    const reportBtn = screen.getByRole("button", { name: /download readable report/i });
+    const jsonBtn = screen.getByRole("button", { name: /download structured pre-check record/i });
+    const reportBtn = screen.getByRole("button", {
+      name: /download human-readable pre-check report/i,
+    });
     expect(jsonBtn).toBeInTheDocument();
     expect(reportBtn).toBeInTheDocument();
     expect(jsonBtn).not.toBe(reportBtn);
@@ -614,18 +616,20 @@ async function runToResultWithFile() {
 describe("PrecheckWorkspace — review-first layout", () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it("shows the concise summary before the technical detail sections", async () => {
+  it("shows the machine summary before the technical detail sections", async () => {
     await runToResultWithFile();
-    const summary = screen.getByRole("heading", { name: /^summary$/i });
+    const summary = screen.getByRole("heading", { name: /machine pre-check summary/i });
     const evidence = screen.getByText("Evidence details");
     // Summary appears earlier in document order than Evidence details.
     expect(
       summary.compareDocumentPosition(evidence) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
-    // Plain-language reading + extracted value are in the summary.
-    expect(screen.getAllByText("Found").length).toBeGreaterThan(0);
-    expect(screen.getByText(/detected brand/i)).toBeInTheDocument();
-    expect(screen.getByText(/detected alcohol/i)).toBeInTheDocument();
+    // Machine evidence and extracted values remain visible in the seller workspace.
+    expect(
+      screen.getByRole("heading", { name: /review what the machine found/i }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText(/M CELLARS/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/12.5% ALC\.\/VOL\./).length).toBeGreaterThan(0);
     expect(
       screen.getByText(/checks need human review|check needs human review/i),
     ).toBeInTheDocument();
@@ -708,7 +712,7 @@ describe("PrecheckWorkspace — download error handling", () => {
       revokeObjectURL: () => {},
     });
 
-    fireEvent.click(screen.getByRole("button", { name: /download json export/i }));
+    fireEvent.click(screen.getByRole("button", { name: /download structured pre-check record/i }));
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByText(/could not be downloaded/i)).toBeInTheDocument();
@@ -728,7 +732,9 @@ describe("PrecheckWorkspace — download error handling", () => {
       },
       revokeObjectURL: () => {},
     });
-    fireEvent.click(screen.getByRole("button", { name: /download readable report/i }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /download human-readable pre-check report/i }),
+    );
     expect(await screen.findByRole("alert")).toBeInTheDocument();
 
     // Recovery: a working object-URL implementation lets the retry succeed and
@@ -738,7 +744,9 @@ describe("PrecheckWorkspace — download error handling", () => {
       createObjectURL: () => "blob:ok",
       revokeObjectURL: () => {},
     });
-    fireEvent.click(screen.getByRole("button", { name: /download readable report/i }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /download human-readable pre-check report/i }),
+    );
     await waitFor(() => expect(screen.queryByRole("alert")).toBeNull());
   });
 });
@@ -809,19 +817,30 @@ describe("PrecheckWorkspace — processing accessibility", () => {
 describe("PrecheckWorkspace — field confirmation", () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it("renders active confirmation controls instead of the old preview-only disclosure", async () => {
+  it("renders the evidence-centered seller review actions", async () => {
     vi.stubGlobal("fetch", mockFetch({ ok: true, data: CANNED }));
     render(<PrecheckWorkspace />);
     selectFileAndFill();
     fireEvent.click(screen.getByRole("button", { name: /run pre-check/i }));
     await screen.findByRole("heading", { name: /pre-check result/i });
 
-    expect(screen.getByRole("heading", { name: /review and confirm fields/i })).toBeInTheDocument();
-    expect(screen.getAllByText(/accept machine reading/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/select alternate candidate/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/correct value manually/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/mark not visible/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByRole("button", { name: /save confirmation/i }).length).toBeGreaterThan(0);
+    expect(
+      screen.getByRole("heading", { name: /review what the machine found/i }),
+    ).toBeInTheDocument();
+    for (const label of [
+      /accept finding/i,
+      /revise value$/i,
+      /fix evidence region/i,
+      /revise value and region/i,
+      /not this field/i,
+      /not present/i,
+      /unable to confirm/i,
+      /add missing finding/i,
+    ]) {
+      expect(screen.getAllByText(label).length).toBeGreaterThan(0);
+    }
+    expect(screen.getByRole("button", { name: /save seller decision/i })).toBeInTheDocument();
+    expect(screen.getByText(/0 of 2 findings reviewed/i)).toBeInTheDocument();
     expect(screen.queryByText(/what confirmation will do \(preview\)/i)).toBeNull();
   });
 
@@ -836,7 +855,9 @@ describe("PrecheckWorkspace — field confirmation", () => {
     expect(screen.getAllByText(/M CELLARS/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/12.5% ALC\.\/VOL\./).length).toBeGreaterThan(0);
     // Downloads and the disposition disclosure remain reachable.
-    expect(screen.getByRole("button", { name: /download json export/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /download structured pre-check record/i }),
+    ).toBeInTheDocument();
     expect(screen.getByText("Record internal disposition")).toBeInTheDocument();
   });
 
@@ -846,11 +867,11 @@ describe("PrecheckWorkspace — field confirmation", () => {
     render(<PrecheckWorkspace />);
     await runPrecheckToResult();
 
-    const acceptRadio = screen.getAllByRole("radio", { name: /accept machine reading/i })[0];
+    const acceptRadio = screen.getByRole("radio", { name: /accept finding/i });
     fireEvent.click(acceptRadio);
-    fireEvent.click(screen.getAllByRole("button", { name: /save confirmation/i })[0]);
+    fireEvent.click(screen.getByRole("button", { name: /save seller decision/i }));
 
-    expect(await screen.findByText(/brand name confirmation saved/i)).toBeInTheDocument();
+    expect(await screen.findByText(/brand name seller decision saved/i)).toBeInTheDocument();
     const urls = fetchMock.mock.calls.map((c) => String(c[0]));
     expect(urls).toContain("/api/precheck/confirmation");
     const confirmationCall = fetchMock.mock.calls.find((c) =>
@@ -860,5 +881,23 @@ describe("PrecheckWorkspace — field confirmation", () => {
     expect(body.exportJson).toBe(CANNED.exportJson);
     expect(body.appendToken).toBe(CANNED.appendToken);
     expect(body.findings).toBeUndefined();
+  });
+
+  it("preserves a broader uncertainty decision in the workspace without misencoding it", async () => {
+    const fetchMock = routedFetch();
+    vi.stubGlobal("fetch", fetchMock);
+    render(<PrecheckWorkspace />);
+    await runPrecheckToResult();
+
+    fireEvent.click(screen.getByRole("radio", { name: /not this field/i }));
+    fireEvent.click(screen.getByRole("button", { name: /save seller decision/i }));
+
+    expect(await screen.findByText(/saved for this review session/i)).toBeInTheDocument();
+    expect(screen.getByText(/1 of 2 findings reviewed/i)).toBeInTheDocument();
+    expect(screen.getByText(/not included in current downloads/i)).toBeInTheDocument();
+    const confirmationCalls = fetchMock.mock.calls.filter((call) =>
+      String(call[0]).includes("/confirmation"),
+    );
+    expect(confirmationCalls).toHaveLength(0);
   });
 });
