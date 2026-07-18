@@ -45,7 +45,7 @@ test("all five intents appear, and create, review and learn are active", async (
   await expect(page.getByText(/coming soon|waitlist|early access/i)).toHaveCount(0);
 });
 
-test("both active intents navigate, and the review workflow still loads", async ({ page }) => {
+test("both active intents navigate, and the package review workflow loads", async ({ page }) => {
   await page.addInitScript(() =>
     window.localStorage.setItem("label-lens.onboarding.seen.v1", "true"),
   );
@@ -53,8 +53,9 @@ test("both active intents navigate, and the review workflow still loads", async 
   await page.goto("/");
   await page.getByRole("link", { name: /review a label/i }).click();
   await expect(page).toHaveURL(/\/review$/);
-  await expect(page.getByLabel(/select one label image/i)).toBeVisible();
-  await expect(page.getByRole("button", { name: /^run pre-check$/i })).toBeDisabled();
+  await expect(page.getByLabel(/front panel image/i)).toBeVisible();
+  await expect(page.getByLabel(/back panel image/i)).toBeVisible();
+  await expect(page.getByRole("button", { name: /analyze saved package/i })).toBeDisabled();
 
   await page.goto("/");
   await page.getByRole("link", { name: /see what is checked/i }).click();
