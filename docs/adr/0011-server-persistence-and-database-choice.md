@@ -1,38 +1,35 @@
 # ADR 0011: Server Persistence and Database Choice
 
-- Status: Accepted
+- Status: Proposed
 - Date: 2026-07-18
 
 ## Context
 
-To support the transition from a purely client-side local draft workflow to an agent queue, we require a server-side relational database. The database must store submissions, multi-panel metadata, immutable category snapshots, machine analysis records, agent decisions, and audit events.
+We need a database mapping layer (ORM/query builder) and schema migration tool to support server-side persistence. The database layer must support complex relational queries (for the queue and status pages), handle transaction boundaries (for submissions and claims), and enforce concurrency locking.
 
-The system must run reliably on Hostinger Web Apps. Hostinger provides shared/managed MySQL instances as part of their web hosting plans. Local development and continuous integration (CI) tests require a quick-start, low-overhead database option to avoid requiring all developers and CI runners to spin up full MySQL servers.
+The target production database is **Hostinger-managed MySQL**. For local development and CI testing, we want to maintain the option to use **SQLite** to ensure fast, zero-config startup and test execution. However, using two different database engines introduces the risk of dialect drift (e.g., SQLite lacks native ENUMs, handle JSON columns differently, and has different locking semantics).
 
-Concurrently, we must handle race conditions in the agent portal (e.g., two agents trying to claim the same submission at the same time, or an agent reviewing an outdated revision).
+We need to choose a specific database library and establish how we will prove correct MySQL behavior during local development and testing.
 
 ## Decision
 
-We will use a relational database with dialect abstraction to support different database engines in different environments:
+We will use **Prisma** as the primary ORM and schema management tool, with a dual-database verification strategy:
 
-1. **Production & Staging:** Deployed on **Hostinger-managed MySQL**.
-2. **Local Development & Testing:** Run on **SQLite** to allow zero-config local startup and rapid test runs.
-3. **Database Client:** Use a query builder or ORM (such as Prisma or Kysely) that translates queries cleanly to both MySQL and SQLite dialects, avoiding vendor-specific SQL scripts.
-4. **Optimistic Concurrency Control (OCC):** The `submissions` and `claims` tables will include a `version` integer column. Updates to status or claims must include the expected version in the `WHERE` clause and increment it on update:
-   ```sql
-   UPDATE submissions SET current_status = ?, version = version + 1 WHERE submission_id = ? AND version = ?
-   ```
-   If zero rows are updated, a concurrency conflict is thrown, preventing double-actions.
+1. **ORM Selection:** Prisma is selected because:
+   - It provides standard schema migrations (`prisma migrate`) that translate to both MySQL and SQLite.
+   - It generates a strongly typed query client matching our domain model.
+   - It natively supports transactional operations (`prisma.$transaction`) necessary for atomic submissions.
+2. **Local Parity & Testing Strategy:** 
+   - Local unit and integration tests (in Vitest) will run against an in-memory or file-backed **SQLite** database by default for speed.
+   - Before any staging deployment or PR merge, developers must run the test suite against a local **MySQL** instance (run via Docker or native service) using a separate test environment file (`.env.test.mysql`). This validates MySQL-specific transaction, constraint, and lock behaviors.
+3. **Optimistic Concurrency Control:** Enforced at the Prisma schema level using an auto-incrementing `version` integer field on the `Submission` and `Claim` models. Every update operation must verify and increment the version to prevent overlapping claims or stale updates.
 
 ## Consequences
 
 Positive:
-- No additional database hosting costs in production.
-- Extremely simple developer onboarding; developers can run `npm run dev` with SQLite instantly.
-- Safe, concurrent execution of agent portal operations protected by OCC.
-- Strongly typed relational boundaries for complex joins (e.g. queue filters).
+- Strongly typed database access layer prevents SQL injection and syntax errors.
+- SQLite support keeps local test suites extremely fast (under 10 seconds).
+- MySQL test verification ensures dialect drift or transaction isolation level discrepancies are caught locally before deploying to Hostinger.
 
 Trade-offs:
-- Minor dialect differences (e.g., date formats, JSON column handling, auto-increment differences) must be handled by the ORM/client library.
-- SQLite is single-write, which is fine for local workloads but must not be used in production.
-- SQLite lacks full ENUM support, so application-level string constraints must enforce domain values.
+- Prisma schemas are mostly database-agnostic, but some features (like ENUMs or JSON filters) require custom handling or workarounds on SQLite. We will enforce enums as strings with application-level Zod validations to keep schema definitions fully compatible with both SQLite and MySQL.
