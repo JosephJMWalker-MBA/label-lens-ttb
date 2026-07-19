@@ -7,29 +7,37 @@
 
 We need a database mapping layer (ORM/query builder) and schema migration tool to support server-side persistence. The database layer must support complex relational queries (for the queue and status pages), handle transaction boundaries (for submissions and claims), and enforce concurrency locking.
 
-The target production database is **Hostinger-managed MySQL**. For local development and CI testing, we want to maintain the option to use **SQLite** to ensure fast, zero-config startup and test execution. However, using two different database engines introduces the risk of dialect drift (e.g., SQLite lacks native ENUMs, handle JSON columns differently, and has different locking semantics).
+The target production database is **Hostinger-managed MySQL**. For local development and CI testing, we want to maintain the option to use **SQLite** to ensure fast, zero-config startup and test execution. 
 
-We need to choose a specific database library and establish how we will prove correct MySQL behavior during local development and testing.
+Prisma was initially considered, but Prisma compile-time schemas require a single, hardcoded `provider` (e.g. `provider = "sqlite"` or `provider = "mysql"`). It is not possible to dynamically switch the datasource provider at runtime without maintaining duplicate schema files, duplicate migrations, and separate generated clients. This would introduce significant risk of schema drift and deployment fragility.
+
+We need a database client that:
+1. Allows declaring a single, unified database schema in TypeScript.
+2. Supports dynamic runtime driver swapping (SQLite via `better-sqlite3` in development/testing, and MySQL via `mysql2` in staging/production) using the same schema.
+3. Provides robust schema migration generation.
+4. Guarantees that MySQL-specific transactions, locking, and constraints are fully verified during testing.
 
 ## Decision
 
-We will use **Prisma** as the primary ORM and schema management tool, with a dual-database verification strategy:
+We will use **Drizzle ORM** as the primary database client and migration tool, combined with a strict MySQL test-verification requirement:
 
-1. **ORM Selection:** Prisma is selected because:
-   - It provides standard schema migrations (`prisma migrate`) that translate to both MySQL and SQLite.
-   - It generates a strongly typed query client matching our domain model.
-   - It natively supports transactional operations (`prisma.$transaction`) necessary for atomic submissions.
-2. **Local Parity & Testing Strategy:** 
-   - Local unit and integration tests (in Vitest) will run against an in-memory or file-backed **SQLite** database by default for speed.
-   - Before any staging deployment or PR merge, developers must run the test suite against a local **MySQL** instance (run via Docker or native service) using a separate test environment file (`.env.test.mysql`). This validates MySQL-specific transaction, constraint, and lock behaviors.
-3. **Optimistic Concurrency Control:** Enforced at the Prisma schema level using an auto-incrementing `version` integer field on the `Submission` and `Claim` models. Every update operation must verify and increment the version to prevent overlapping claims or stale updates.
+1. **ORM Selection:** Drizzle ORM is selected because:
+   - It defines schemas in pure TypeScript (`schema.ts`), allowing the same schema definition to be mapped to either a SQLite or MySQL connection at runtime.
+   - It supports generating migrations (`drizzle-kit generate`) for both dialects from the same code structure.
+   - It provides lightweight, high-performance query execution and native SQL transaction boundaries (`db.transaction(...)`).
+2. **Dynamic Driver Instantiation:** At runtime, the database client imports the appropriate driver based on `DATABASE_URL`:
+   - If `sqlite:` protocol, instantiates `drizzle-orm/better-sqlite3`.
+   - If `mysql:` protocol, instantiates `drizzle-orm/mysql2`.
+3. **Database Verification Parity:**
+   - Local unit and integration tests (in Vitest) will run against SQLite by default for developer speed.
+   - **Crucial Guardrail:** The authoritative state-machine, transaction, and concurrency tests (OCC) must run against a real local **MySQL** instance (via Docker or native service) using a separate test environment configuration (`.env.test.mysql`). Pre-push and CI pipeline checks will block merges if MySQL test execution fails.
 
 ## Consequences
 
 Positive:
-- Strongly typed database access layer prevents SQL injection and syntax errors.
-- SQLite support keeps local test suites extremely fast (under 10 seconds).
-- MySQL test verification ensures dialect drift or transaction isolation level discrepancies are caught locally before deploying to Hostinger.
+- A single source of truth for the database schema in TypeScript prevents schema drift.
+- Dynamic runtime driver swapping completely solves Prisma's fixed datasource provider limitation.
+- Strict MySQL test verification ensures transaction isolation levels, constraints, and locking behave correctly in the production dialect.
 
 Trade-offs:
-- Prisma schemas are mostly database-agnostic, but some features (like ENUMs or JSON filters) require custom handling or workarounds on SQLite. We will enforce enums as strings with application-level Zod validations to keep schema definitions fully compatible with both SQLite and MySQL.
+- SQLite and MySQL handles certain features (like ENUMs or JSON fields) differently. Drizzle ORM provides separate DSL helper functions for different dialects (e.g. `mysqlEnum` vs `text`). To maintain cross-dialect portability, we will declare table column types using portable primitive types (e.g., standard text columns validated in application code using Zod) rather than dialect-specific schema types.

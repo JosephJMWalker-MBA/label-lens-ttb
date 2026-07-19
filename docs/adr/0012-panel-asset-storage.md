@@ -13,13 +13,14 @@ We need to choose a specific object storage provider, establish secure access au
 
 ## Decision
 
-We will use **Cloudflare R2** as the primary S3-compatible object storage provider, with local fallback for offline development, combined with a secure proxy authorization layer:
+We will use **Cloudflare R2** as the primary S3-compatible object storage provider, with local fallback for offline development, combined with a secure streaming proxy authorization layer:
 
 1. **Storage Provider:** Cloudflare R2 is selected for production and staging due to its zero egress fees, S3 compatibility, and high reliability.
-2. **Access Authorization (Secure Proxy):** S3/R2 buckets will remain private and will not be exposed to the public internet. Access to panel images is proxied through the server endpoint `/api/package/panel/[panelId]/image`. This endpoint:
+2. **Access Authorization (Streaming Proxy):** S3/R2 buckets will remain private and will not be exposed to the public internet. Presigned URLs are rejected as they act as bearer tokens that can be leaked or shared. Instead, all panel image requests are routed to `/api/package/panel/[panelId]/image`. This endpoint:
    - Verifies the user session.
    - Confirms that the caller is an authorized Agent/Admin, or the Seller who owns the submission.
-   - Generates a short-lived presigned URL (10-minute expiry) to stream the file securely to the client, preventing URL sharing leakages.
+   - Reads the file bytes directly from Cloudflare R2 (or local disk in dev) using the S3 client credentials.
+   - Streams the raw bytes back in the HTTP response body with the correct `Content-Type` header, keeping the storage URL completely hidden from the browser.
 3. **Upload Validation:** The server endpoint `/api/package/submit/upload-panel` validates the file stream:
    - File size is capped at 10MB.
    - The first few bytes are inspected to verify the file signature (magic numbers) matches PNG or JPEG.
@@ -37,6 +38,7 @@ Positive:
 - Zero egress fees from Cloudflare R2 reduce ongoing operational costs.
 - Stream-level validation blocks malicious or corrupt uploads before they reach storage.
 - Demo isolation prevents developers or tests from polluting production files.
+- The streaming proxy ensures that no temporary S3 bearer URLs are exposed to client environments.
 
 Trade-offs:
-- Image loading requires verifying permissions and generating presigned URLs, which adds slight request overhead. This is necessary to satisfy the strict privacy requirements.
+- Image loading requires reading through the Next.js server, which increases CPU/memory usage and bandwidth compared to direct R2 downloads. This is necessary to satisfy the strict privacy requirements.

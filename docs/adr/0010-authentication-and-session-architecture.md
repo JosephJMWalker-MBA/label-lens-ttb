@@ -27,15 +27,15 @@ We evaluated three potential authentication architectures:
 ### 2. Auth.js (NextAuth.js v5)
 * **Description:** The industry standard Next.js authentication library.
 * **Why it was considered:** Broad ecosystem adoption, native database adapters, supports credentials provider.
-* **Why it was rejected:** NextAuth v5 (currently in beta/release candidate state) has known compatibility and configuration complexities under Next.js 15 and React 19, particularly in standalone output mode and with credentials-based authentication.
+* **Why it was rejected:** While fully capable, Auth.js v5 configuration boilerplate for credentials-based authentication in Next.js standalone Node.js server environments requires extensive manual setup and adapters. We prefer a tool that natively optimizes developer velocity and type safety for custom credentials.
 
 ### 3. Better Auth
 * **Description:** A modern, type-safe authentication framework for TypeScript.
 * **Why it was considered:** 
   - Native database-backed session management out-of-the-box.
-  - Complete support for React 19 and Next.js 15 standalone Node environments.
+  - Complete support for Next.js 15 standalone Node environments.
   - Clean API for credentials-based login and role management.
-  - Out-of-the-box database adapter support for Prisma.
+  - Built-in type-safe client and server SDKs.
 * **Recommendation:** **Better Auth** is selected as the primary authentication library.
 
 ## Decision
