@@ -31,7 +31,7 @@ jobs:
       - run: npm run build
 
   mysql-integration:
-    name: MySQL finalize/status integration
+    name: MySQL finalize/status + auth integration
     runs-on: ubuntu-latest
 
     services:
@@ -78,12 +78,41 @@ jobs:
       - name: Apply committed Drizzle migration to a fresh MySQL database
         run: npm run db:migrate
 
-      - name: Run authoritative MySQL finalize/status integration suite
+      - name: Run authoritative MySQL integration suite (finalize/status, agent authz, bootstrap)
         run: npm run test:mysql
+
+      - name: Bootstrap CLI smoke — idempotent provisioning against MySQL
+        # Test-only fake credentials, isolated to CI. Not real, not reusable, and
+        # not tied to any Hostinger environment. Run twice to prove idempotency.
+        env:
+          LABEL_LENS_BOOTSTRAP_ADMIN_EMAIL: ci-admin@example.test
+          LABEL_LENS_BOOTSTRAP_ADMIN_PASSWORD: ci-only-admin-password-1234
+          LABEL_LENS_BOOTSTRAP_AGENT_EMAIL: ci-agent@example.test
+          LABEL_LENS_BOOTSTRAP_AGENT_PASSWORD: ci-only-agent-password-1234
+          LABEL_LENS_BOOTSTRAP_SELLER_EMAIL: ci-seller@example.test
+          LABEL_LENS_BOOTSTRAP_SELLER_PASSWORD: ci-only-seller-password-1234
+        run: |
+          npm run auth:bootstrap | tee first.log
+          grep -q "created" first.log
+          npm run auth:bootstrap | tee second.log
+          grep -q "already-present" second.log
 
   e2e:
     name: Playwright end-to-end
     runs-on: ubuntu-latest
+    # Local SQLite for e2e — never MySQL/Hostinger. The bootstrap credentials are
+    # obviously-fake, CI-only values that must match tests/e2e/auth-fixtures.ts.
+    env:
+      DATABASE_URL: file:.local/e2e-auth.db
+      BETTER_AUTH_SECRET: e2e-secret-key-at-least-32-characters-long
+      BETTER_AUTH_URL: http://localhost:3000
+      LABEL_LENS_INTEGRITY_SECRET: e2e-integrity-secret-at-least-32-characters
+      LABEL_LENS_BOOTSTRAP_ADMIN_EMAIL: e2e-admin@example.test
+      LABEL_LENS_BOOTSTRAP_ADMIN_PASSWORD: e2e-only-admin-password-1234
+      LABEL_LENS_BOOTSTRAP_AGENT_EMAIL: e2e-agent@example.test
+      LABEL_LENS_BOOTSTRAP_AGENT_PASSWORD: e2e-only-agent-password-1234
+      LABEL_LENS_BOOTSTRAP_SELLER_EMAIL: e2e-seller@example.test
+      LABEL_LENS_BOOTSTRAP_SELLER_PASSWORD: e2e-only-seller-password-1234
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -92,4 +121,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+      - name: Seed the e2e database (schema, provisioned accounts, submissions)
+        run: npm run e2e:seed
       - run: npm run test:e2e

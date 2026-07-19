@@ -20,6 +20,11 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+      // `server-only` guards server modules from client bundles. Under Next it
+      // resolves via the `react-server` condition to a no-op; vitest lacks that
+      // condition and would otherwise throw, so alias it to the package's own
+      // empty entry for tests.
+      "server-only": fileURLToPath(new URL("./node_modules/server-only/empty.js", import.meta.url)),
     },
   },
 });

@@ -1,42 +1,20 @@
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/db/client";
-import { auth } from "@/lib/auth";
 
 export const runtime = "nodejs";
 import { verifyRevision } from "@/lib/integrity";
+import { requireSubmissionOwnerOrRole } from "@/server/submissions/access";
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  // 1. Authenticate user
-  const session = await auth.api.getSession({
-    headers: request.headers,
-  });
-
-  if (!session || !session.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { id: submissionId } = await params;
 
-  if (!submissionId) {
-    return NextResponse.json({ error: "Submission ID is required" }, { status: 400 });
-  }
-
-  // 2. Fetch Submission details
-  const result = await db
-    .select()
-    .from(schema.submissions)
-    .where(eq(schema.submissions.id, submissionId))
-    .limit(1);
-
-  const submission = result[0];
-
-  // 3. Strictly owner-only authorization. A missing submission and a submission
-  //    owned by another seller return an identical 404 so the boundary never
-  //    leaks whether another seller's submission exists.
-  if (result.length === 0 || submission.creatorId !== session.user.id) {
-    return NextResponse.json({ error: "Submission not found" }, { status: 404 });
-  }
+  // Seller owner-only in this slice (no roles are allowed via this route; agent
+  // access is served by the separate agent detail route). Missing session → 401;
+  // a missing or non-owned submission → an identical 404 (no existence leak).
+  const access = await requireSubmissionOwnerOrRole(request, submissionId, []);
+  if (!access.ok) return access.response;
+  const submission = access.submission;
 
   // 4. Fetch Submission Revisions (including canonicalJson for integrity check)
   const revisionsFromDb = await db

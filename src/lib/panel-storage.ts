@@ -81,3 +81,30 @@ export function persistPanelAsset(storageKey: string, bytes: Buffer): PanelStora
   }
   return { ok: true, storageKey, durability: resolved.durability };
 }
+
+export type PanelReadResult =
+  | { ok: true; bytes: Buffer }
+  | { ok: false; error: "PANEL_STORAGE_UNAVAILABLE" | "PANEL_NOT_FOUND" | "PANEL_PATH_INVALID" };
+
+/**
+ * Read durable panel bytes for a server-owned storage key. The key is resolved
+ * strictly under the storage root — a resolved path that escapes the root (path
+ * traversal) is rejected, and a missing file is reported without revealing the
+ * server filesystem layout.
+ */
+export function readPanelAsset(storageKey: string): PanelReadResult {
+  const resolved = resolveStorageRoot();
+  if (!resolved.ok) return { ok: false, error: "PANEL_STORAGE_UNAVAILABLE" };
+
+  const root = path.resolve(resolved.root);
+  const filePath = path.resolve(root, storageKey);
+  // The resolved path must stay within the storage root.
+  if (filePath !== root && !filePath.startsWith(root + path.sep)) {
+    return { ok: false, error: "PANEL_PATH_INVALID" };
+  }
+  try {
+    return { ok: true, bytes: fs.readFileSync(filePath) };
+  } catch {
+    return { ok: false, error: "PANEL_NOT_FOUND" };
+  }
+}

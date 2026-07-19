@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { ProductMark } from "@/components/brand/ProductMark";
 import { AppearanceSettings } from "@/components/settings/AppearanceSettings";
+import { AuthStatusNav } from "@/components/auth/AuthStatusNav";
 
 /**
  * The one global header shared by every route. It carries the product mark, a
@@ -42,6 +43,7 @@ export function AppHeader({ current }: { current: "home" | "create" | "review" |
             <HeaderLink href="/learn" active={current === "learn"}>
               Learn
             </HeaderLink>
+            <AuthStatusNav />
           </nav>
           <AppearanceSettings />
         </div>
