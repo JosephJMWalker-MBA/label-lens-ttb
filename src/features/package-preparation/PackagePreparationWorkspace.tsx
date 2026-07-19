@@ -331,7 +331,30 @@ export function PackagePreparationWorkspace() {
     saveState === "saved" &&
     submitter.trim() !== "";
 
+  // A render-synced mirror of `workingRegion` so the reset effect below can read
+  // the current in-progress edit without taking it as a dependency.
+  const workingRegionRef = useRef(workingRegion);
+  workingRegionRef.current = workingRegion;
+
+  // Reset the in-progress (uncommitted) working edit to the active context's
+  // defaults when the seller navigates to a different category or panel.
+  //
+  // Two guards keep this from racing a just-created working edit (e.g. copying
+  // machine geometry): (1) it does nothing until the draft has loaded, so a
+  // stale pre-load effect closure cannot flush after a click and wipe the edit;
+  // (2) if a working edit already belongs to the current category+panel, it is
+  // left untouched — only edits carried over from a previous context are cleared.
   useEffect(() => {
+    if (!draft) return;
+    const current = workingRegionRef.current;
+    if (
+      current &&
+      current.categoryId === activeCategoryId &&
+      current.panelId === activePanelForWorkingId
+    ) {
+      return;
+    }
+
     if (!activePanelForWorkingId || !activeCategoryRegions || !activeInstruction) {
       setWorkingRegion(null);
       setWorkingValue(activeCategoryExpectedValue);
@@ -351,6 +374,7 @@ export function PackagePreparationWorkspace() {
     );
     setShowMachineObservation(false);
   }, [
+    draft,
     activeCategoryExpectedValue,
     activeCategoryDecision,
     activeCategoryRegions,

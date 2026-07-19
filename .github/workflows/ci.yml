@@ -9,6 +9,13 @@ jobs:
   verify:
     name: Lint, typecheck, test, build
     runs-on: ubuntu-latest
+    # Standard verify path uses the local SQLite test database only. It must never
+    # attempt to connect to MySQL: MySQL coverage lives in the dedicated
+    # `mysql-integration` job below (gated by RUN_MYSQL_TESTS).
+    env:
+      DATABASE_URL: file:.local/ci-verify.db
+      BETTER_AUTH_SECRET: test-only-secret-at-least-32-characters
+      BETTER_AUTH_URL: http://localhost:3000
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,6 +29,57 @@ jobs:
       - run: npm run docs:check
       - run: npm test
       - run: npm run build
+
+  mysql-integration:
+    name: MySQL finalize/status integration
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+
+    env:
+      # Test-only credentials, used exclusively inside GitHub Actions. This never
+      # points at Hostinger staging, and no Hostinger secrets are used in CI.
+      DATABASE_URL: mysql://root:root@127.0.0.1:3306/test_db
+      BETTER_AUTH_SECRET: test-only-secret-at-least-32-characters
+      BETTER_AUTH_URL: http://localhost:3000
+      LABEL_LENS_INTEGRITY_SECRET: test-only-integrity-secret-at-least-32-characters
+      LABEL_LENS_APPEND_SIGNING_KEY: test-only-append-secret-at-least-32-characters
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Wait for MySQL to be ready
+        run: |
+          for i in $(seq 1 30); do
+            if mysqladmin ping -h 127.0.0.1 -P 3306 -uroot -proot --silent; then
+              echo "MySQL is ready"; exit 0
+            fi
+            echo "Waiting for MySQL... ($i)"; sleep 2
+          done
+          echo "MySQL did not become ready in time"; exit 1
+
+      - name: Apply committed Drizzle migration to a fresh MySQL database
+        run: npm run db:migrate
+
+      - name: Run authoritative MySQL finalize/status integration suite
+        run: npm run test:mysql
 
   e2e:
     name: Playwright end-to-end

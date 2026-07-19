@@ -5,14 +5,34 @@ import { createHash } from "node:crypto";
 import { eq, sql } from "drizzle-orm";
 
 // Configure database/auth environment before importing client/auth modules.
+//
+// Dialect selection:
+//   - By default this suite runs against SQLite so ordinary `npm test` (and the
+//     standard CI verify job) never touches a database server.
+//   - Setting RUN_MYSQL_TESTS=1 (see `npm run test:mysql`) runs the SAME suite
+//     against the authoritative MySQL dialect, using the caller-provided
+//     `DATABASE_URL`. It fails loudly if that URL is absent or not MySQL, so the
+//     MySQL job can never falsely pass by silently skipping MySQL cases.
 const TEST_DB_FILE = ".local/test-integration.db";
-const MYSQL_TEST_URL = "mysql://root@127.0.0.1:3306/test_db";
+const RUN_MYSQL_TESTS = process.env.RUN_MYSQL_TESTS === "1";
 
 vi.hoisted(() => {
-  process.env.DATABASE_URL = "file:.local/test-integration.db";
-  process.env.BETTER_AUTH_SECRET = "super-secret-test-better-auth-key-1234567890";
-  process.env.BETTER_AUTH_URL = "http://localhost:3000";
+  process.env.BETTER_AUTH_SECRET ||= "super-secret-test-better-auth-key-1234567890";
+  process.env.BETTER_AUTH_URL ||= "http://localhost:3000";
+  // Only default DATABASE_URL to SQLite when MySQL testing is NOT enabled; when
+  // it is, the caller's mysql:// DATABASE_URL must be preserved.
+  if (process.env.RUN_MYSQL_TESTS !== "1") {
+    process.env.DATABASE_URL = "file:.local/test-integration.db";
+  }
 });
+
+const MYSQL_DATABASE_URL = process.env.DATABASE_URL;
+if (RUN_MYSQL_TESTS && (!MYSQL_DATABASE_URL || !/^mysql2?:\/\//.test(MYSQL_DATABASE_URL))) {
+  throw new Error(
+    "RUN_MYSQL_TESTS=1 requires DATABASE_URL to be a mysql:// connection string (got: " +
+      `${MYSQL_DATABASE_URL ?? "undefined"}). Run via 'npm run test:mysql' with a MySQL DATABASE_URL.`,
+  );
+}
 
 import { createTestSqliteDb } from "../../../../../../tests/integration/test-db-setup";
 import { issueAppendToken } from "@/server/append-token";
@@ -215,7 +235,7 @@ function buildFinalizeRequest(
   });
 }
 
-const TEST_DIALECTS = ["sqlite", "mysql"] as const;
+const TEST_DIALECTS = RUN_MYSQL_TESTS ? (["mysql"] as const) : (["sqlite"] as const);
 
 for (const dialect of TEST_DIALECTS) {
   describe(`Bounded Slice 1 — Finalize & Status (${dialect})`, () => {
@@ -236,7 +256,8 @@ for (const dialect of TEST_DIALECTS) {
         sqlite.close();
         process.env.DATABASE_URL = `file:${TEST_DB_FILE}`;
       } else {
-        process.env.DATABASE_URL = MYSQL_TEST_URL;
+        // Use the caller-provided MySQL DATABASE_URL (validated at load time).
+        process.env.DATABASE_URL = MYSQL_DATABASE_URL as string;
       }
 
       const clientMod = await import("@/db/client");
@@ -352,6 +373,12 @@ for (const dialect of TEST_DIALECTS) {
 
     beforeAll(async () => {
       await loadModules();
+      // Guard against a false pass: the MySQL job must actually run on MySQL.
+      expect(isSQLite).toBe(dialect === "sqlite");
+    });
+
+    it(`runs against the ${dialect} dialect`, () => {
+      expect(isSQLite).toBe(dialect === "sqlite");
     });
 
     beforeEach(async () => {
