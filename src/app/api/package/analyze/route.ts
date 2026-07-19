@@ -41,7 +41,7 @@ function parseDraft(value: FormDataEntryValue | null): SellerPackageDraft | null
     ) {
       return null;
     }
-    if (draft.panels.length < 2 || draft.panels.length > MAX_PACKAGE_PANELS) return null;
+    if (draft.panels.length < 1 || draft.panels.length > MAX_PACKAGE_PANELS) return null;
     const panelIds = new Set(draft.panels.map((panel) => panel.panelId));
     if (panelIds.size !== draft.panels.length) return null;
     if (new Set(draft.panels.map((panel) => panel.order)).size !== draft.panels.length) return null;

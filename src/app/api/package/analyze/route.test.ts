@@ -102,8 +102,9 @@ function draft(): SellerPackageDraft {
 function requestFor(value: SellerPackageDraft): Request {
   const form = new FormData();
   form.set("packageDraft", JSON.stringify(value));
-  form.append("file", new File([PANEL_BYTES], "front.png", { type: "image/png" }));
-  form.append("file", new File([PANEL_BYTES], "back.png", { type: "image/png" }));
+  for (const panel of value.panels) {
+    form.append("file", new File([PANEL_BYTES], panel.displayName, { type: "image/png" }));
+  }
   return new Request("http://localhost/api/package/analyze", { method: "POST", body: form });
 }
 
@@ -175,6 +176,20 @@ describe("package analysis route", () => {
     );
     expect(body.data.analysisRun.readiness).toBe("needs_seller_review");
     expect(mocks.extract).toHaveBeenCalledTimes(2);
+  });
+
+  it("analyzes one real front panel after explicit back and additional-panel absence", async () => {
+    const frontOnly = draft();
+    frontOnly.panelDecisions = { back: "absent", additional: "none" };
+    frontOnly.panels = frontOnly.panels.filter((panel) => panel.role === "front");
+    frontOnly.categories[1].regions = [{ ...frontOnly.categories[1].regions[0], panelId: "front" }];
+
+    const response = await POST(requestFor(frontOnly));
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.data.analysisRun.panelRuns).toHaveLength(1);
+    expect(body.data.analysisRun.panelRuns[0].panelId).toBe("front");
+    expect(mocks.extract).toHaveBeenCalledTimes(1);
   });
 
   it("rejects client attempts to alter the reviewed profile or omit prepared evidence", async () => {
