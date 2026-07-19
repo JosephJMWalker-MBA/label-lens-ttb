@@ -1,0 +1,137 @@
+import { sql } from "drizzle-orm";
+import { mysqlTable, varchar, text, boolean, timestamp, int, uniqueIndex } from "drizzle-orm/mysql-core";
+
+// 1. Users Table
+export const users = mysqlTable("users", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  name: text("name"),
+  email: varchar("email", { length: 255 }).notNull(),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  image: text("image"),
+  role: varchar("role", { length: 50 }).default("seller").notNull(), // "seller" | "agent" | "admin"
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  emailIdx: uniqueIndex("email_idx").on(table.email),
+}));
+
+// 2. Sessions Table
+export const sessions = mysqlTable("sessions", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  token: varchar("token", { length: 255 }).notNull(),
+  userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }).notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  tokenIdx: uniqueIndex("token_idx").on(table.token),
+}));
+
+// 3. Accounts Table (required by Better Auth credentials hashing)
+export const accounts = mysqlTable("accounts", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  accountId: text("account_id").notNull(),
+  providerId: text("provider_id").notNull(),
+  userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }).notNull(),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  idToken: text("id_token"),
+  expiresAt: timestamp("expires_at"),
+  password: text("password"), // Stores the hashed credentials password
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+// 4. Verifications Table (required by Better Auth token validation)
+export const verifications = mysqlTable("verifications", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
+});
+
+// 5. Submissions Table
+export const submissions = mysqlTable("submissions", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  creatorId: varchar("creator_id", { length: 36 }).references(() => users.id).notNull(),
+  currentStatus: varchar("current_status", { length: 50 }).notNull(), // "waiting_for_agent_review" | "in_agent_review" | "changes_requested" | "internally_accepted" | "withdrawn"
+  isDemo: boolean("is_demo").default(false).notNull(),
+  version: int("version").default(1).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+// 6. Submission Revisions Table
+export const submissionRevisions = mysqlTable("submission_revisions", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  submissionId: varchar("submission_id", { length: 36 }).references(() => submissions.id, { onDelete: "cascade" }).notNull(),
+  revisionNumber: int("revision_number").notNull(),
+  profileId: varchar("profile_id", { length: 100 }).notNull(),
+  profileVersion: varchar("profile_version", { length: 50 }).notNull(),
+  submittedBy: varchar("submitted_by", { length: 255 }).notNull(),
+  submittedAt: timestamp("submitted_at").notNull(),
+  canonicalJson: text("canonical_json").notNull(),
+  integritySignature: varchar("integrity_signature", { length: 255 }).notNull(), // format: "v1:<hmac-sha256-hex>"
+}, (table) => ({
+  subRevisionIdx: uniqueIndex("sub_revision_idx").on(table.submissionId, table.revisionNumber),
+}));
+
+// 7. Submitted Panels Table
+export const submittedPanels = mysqlTable("submitted_panels", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  revisionId: varchar("revision_id", { length: 36 }).references(() => submissionRevisions.id, { onDelete: "cascade" }).notNull(),
+  role: varchar("role", { length: 50 }).notNull(),
+  displayName: varchar("display_name", { length: 255 }).notNull(),
+  mediaType: varchar("media_type", { length: 100 }).notNull(),
+  byteSize: int("byte_size").notNull(),
+  checksumSha256: varchar("checksum_sha256", { length: 64 }).notNull(),
+  width: int("width").notNull(),
+  height: int("height").notNull(),
+  rotation: int("rotation").notNull(),
+  storageKey: varchar("storage_key", { length: 500 }).notNull(),
+});
+
+// 8. Seller Evidence Snapshots Table
+export const sellerEvidenceSnapshots = mysqlTable("seller_evidence_snapshots", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  revisionId: varchar("revision_id", { length: 36 }).references(() => submissionRevisions.id, { onDelete: "cascade" }).notNull(),
+  categoryId: varchar("category_id", { length: 100 }).notNull(),
+  decision: varchar("decision", { length: 50 }).notNull(),
+  expectedValue: text("expected_value"),
+  regions: text("regions").notNull(),
+});
+
+// 9. Machine Analysis Snapshots Table
+export const machineAnalysisSnapshots = mysqlTable("machine_analysis_snapshots", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  revisionId: varchar("revision_id", { length: 36 }).references(() => submissionRevisions.id, { onDelete: "cascade" }).notNull(),
+  analysisRunId: varchar("analysis_run_id", { length: 36 }).notNull(),
+  sequence: int("sequence").notNull(),
+  panelRuns: text("panel_runs").notNull(),
+  categories: text("categories").notNull(),
+  readiness: varchar("readiness", { length: 50 }).notNull(),
+  recordedAt: timestamp("recorded_at").notNull(),
+});
+
+// 10. Submission Status Events Table
+export const submissionStatusEvents = mysqlTable("submission_status_events", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  submissionId: varchar("submission_id", { length: 36 }).references(() => submissions.id, { onDelete: "cascade" }).notNull(),
+  status: varchar("status", { length: 50 }).notNull(),
+  actorId: varchar("actor_id", { length: 36 }).references(() => users.id),
+  actorRole: varchar("actor_role", { length: 50 }).notNull(),
+  reasonComment: text("reason_comment"),
+  recordedAt: timestamp("recorded_at").defaultNow().notNull(),
+});
+
+// 11. Idempotency Records Table
+export const idempotencyRecords = mysqlTable("idempotency_records", {
+  key: varchar("key", { length: 255 }).primaryKey(),
+  requestHash: varchar("request_hash", { length: 64 }).notNull(),
+  responsePayload: text("response_payload").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
