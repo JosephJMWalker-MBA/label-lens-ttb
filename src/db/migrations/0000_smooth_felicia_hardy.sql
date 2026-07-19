@@ -131,20 +131,22 @@ CREATE TABLE `verifications` (
 );
 --> statement-breakpoint
 ALTER TABLE `accounts` ADD CONSTRAINT `accounts_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `machine_analysis_snapshots` ADD CONSTRAINT `machine_analysis_snapshots_revision_id_submission_revisions_id_fk` FOREIGN KEY (`revision_id`) REFERENCES `submission_revisions`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `seller_evidence_snapshots` ADD CONSTRAINT `seller_evidence_snapshots_revision_id_submission_revisions_id_fk` FOREIGN KEY (`revision_id`) REFERENCES `submission_revisions`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `machine_analysis_snapshots` ADD CONSTRAINT `machine_analysis_snapshots_revision_id_fk` FOREIGN KEY (`revision_id`) REFERENCES `submission_revisions`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `seller_evidence_snapshots` ADD CONSTRAINT `seller_evidence_snapshots_revision_id_fk` FOREIGN KEY (`revision_id`) REFERENCES `submission_revisions`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `sessions` ADD CONSTRAINT `sessions_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `submission_revisions` ADD CONSTRAINT `submission_revisions_submission_id_submissions_id_fk` FOREIGN KEY (`submission_id`) REFERENCES `submissions`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `submission_status_events` ADD CONSTRAINT `submission_status_events_submission_id_submissions_id_fk` FOREIGN KEY (`submission_id`) REFERENCES `submissions`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `submission_status_events` ADD CONSTRAINT `submission_status_events_actor_id_users_id_fk` FOREIGN KEY (`actor_id`) REFERENCES `users`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `submissions` ADD CONSTRAINT `submissions_creator_id_users_id_fk` FOREIGN KEY (`creator_id`) REFERENCES `users`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `submitted_panels` ADD CONSTRAINT `submitted_panels_revision_id_submission_revisions_id_fk` FOREIGN KEY (`revision_id`) REFERENCES `submission_revisions`(`id`) ON DELETE cascade ON UPDATE no action;
+ALTER TABLE `submitted_panels` ADD CONSTRAINT `submitted_panels_revision_id_fk` FOREIGN KEY (`revision_id`) REFERENCES `submission_revisions`(`id`) ON DELETE cascade ON UPDATE no action;
 --> statement-breakpoint
 CREATE TRIGGER prevent_submissions_update
 BEFORE UPDATE ON submissions
 FOR EACH ROW
 BEGIN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Submissions are immutable and cannot be updated.';
+    IF OLD.creator_id <> NEW.creator_id OR OLD.id <> NEW.id OR OLD.is_demo <> NEW.is_demo OR OLD.created_at <> NEW.created_at THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Immutable fields on submissions cannot be updated.';
+    END IF;
 END;
 --> statement-breakpoint
 CREATE TRIGGER prevent_submissions_delete

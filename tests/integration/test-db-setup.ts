@@ -175,7 +175,10 @@ export function createTestSqliteDb(filepath: string, forceDelete = false) {
     CREATE TRIGGER IF NOT EXISTS prevent_submissions_update
     BEFORE UPDATE ON submissions
     BEGIN
-      SELECT RAISE(FAIL, 'Submissions are immutable and cannot be updated.');
+      SELECT CASE
+        WHEN OLD.creator_id != NEW.creator_id OR OLD.id != NEW.id OR OLD.is_demo != NEW.is_demo OR OLD.created_at != NEW.created_at
+        THEN RAISE(FAIL, 'Immutable fields on submissions cannot be updated.')
+      END;
     END;
   `);
 

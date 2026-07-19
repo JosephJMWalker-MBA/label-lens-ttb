@@ -7,14 +7,16 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const url = new URL(request.url);
-  
-  // Intercept and block any email credentials signup attempts
-  if (url.pathname.endsWith("/signup/email")) {
+
+  // Intercept and block any public email credentials signup attempt. Better Auth
+  // exposes this as `/sign-up/email`; older callers may use `/signup/email`.
+  // Seller accounts are provisioned administratively, never self-registered.
+  if (/\/sign-?up(\/|$)/.test(url.pathname)) {
     return NextResponse.json(
       { error: "Public seller registration is disabled. Accounts must be provisioned." },
-      { status: 403 }
+      { status: 403 },
     );
   }
-  
+
   return auth.handler(request);
 }

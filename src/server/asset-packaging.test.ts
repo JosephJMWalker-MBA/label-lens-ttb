@@ -94,16 +94,18 @@ describe("hardened processing routes", () => {
     const confirmationRoute = join(apiDir, "precheck", "confirmation", "route.ts");
     const statusRoute = join(apiDir, "package", "submit", "status", "[id]", "route.ts");
     const authRoute = join(apiDir, "auth", "[...all]", "route.ts");
-    expect(routes).toEqual([
-      authRoute,
-      healthRoute,
-      packageAnalysisRoute,
-      join(apiDir, "package", "submit", "finalize", "route.ts"),
-      statusRoute,
-      confirmationRoute,
-      join(apiDir, "precheck", "disposition", "route.ts"),
-      join(apiDir, "precheck", "route.ts"),
-    ].sort());
+    expect(routes).toEqual(
+      [
+        authRoute,
+        healthRoute,
+        packageAnalysisRoute,
+        join(apiDir, "package", "submit", "finalize", "route.ts"),
+        statusRoute,
+        confirmationRoute,
+        join(apiDir, "precheck", "disposition", "route.ts"),
+        join(apiDir, "precheck", "route.ts"),
+      ].sort(),
+    );
     // The mutable processing/append/finalize routes accept POST; status is GET-only.
     for (const route of routes) {
       if (route === healthRoute || route === statusRoute || route === authRoute) continue;

@@ -193,7 +193,7 @@ export async function POST(request: Request): Promise<Response> {
       return error(
         "APPEND_SIGNING_KEY_UNAVAILABLE",
         "The append-authorization service is not configured.",
-        500
+        500,
       );
     }
     const appendToken = tokenResult.token;

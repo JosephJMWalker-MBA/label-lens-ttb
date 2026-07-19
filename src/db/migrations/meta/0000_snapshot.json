@@ -223,8 +223,8 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "machine_analysis_snapshots_revision_id_submission_revisions_id_fk": {
-          "name": "machine_analysis_snapshots_revision_id_submission_revisions_id_fk",
+        "machine_analysis_snapshots_revision_id_fk": {
+          "name": "machine_analysis_snapshots_revision_id_fk",
           "tableFrom": "machine_analysis_snapshots",
           "tableTo": "submission_revisions",
           "columnsFrom": [
@@ -296,8 +296,8 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "seller_evidence_snapshots_revision_id_submission_revisions_id_fk": {
-          "name": "seller_evidence_snapshots_revision_id_submission_revisions_id_fk",
+        "seller_evidence_snapshots_revision_id_fk": {
+          "name": "seller_evidence_snapshots_revision_id_fk",
           "tableFrom": "seller_evidence_snapshots",
           "tableTo": "submission_revisions",
           "columnsFrom": [
@@ -784,8 +784,8 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "submitted_panels_revision_id_submission_revisions_id_fk": {
-          "name": "submitted_panels_revision_id_submission_revisions_id_fk",
+        "submitted_panels_revision_id_fk": {
+          "name": "submitted_panels_revision_id_fk",
           "tableFrom": "submitted_panels",
           "tableTo": "submission_revisions",
           "columnsFrom": [

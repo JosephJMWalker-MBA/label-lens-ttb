@@ -1,412 +1,500 @@
 import { createHash, randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
-import { eq, and } from "drizzle-orm";
-import { z } from "zod";
+import { eq } from "drizzle-orm";
 
 export const runtime = "nodejs";
+
 import { db, schema, isSQLite } from "@/db/client";
 import { auth } from "@/lib/auth";
-import { canonicalizeJson } from "@/lib/canonical";
+import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
 import { signRevision } from "@/lib/integrity";
 import { verifyAppendToken } from "@/server/append-token";
 import { latestAnalysisIsCurrent } from "@/features/package-preparation/package-model";
-import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
+import {
+  parseAgentReviewSubmission,
+  LOCAL_DOWNLOAD_ONLY_TRANSMISSION,
+  AGENT_REVIEW_TRANSMISSION,
+} from "@/features/package-preparation/agent-submission-contract";
+import { panelStorageKey, persistPanelAsset } from "@/lib/panel-storage";
+import { detectImage } from "@/lib/image-signature";
 
-// 1. Zod Schema Definitions for seller-agent-package.v1 validation
-const PanelRoleSchema = z.enum(["front", "back", "neck", "side", "other"]);
-const PanelRotationSchema = z.union([z.literal(0), z.literal(90), z.literal(180), z.literal(270)]);
+/** Durable-asset ingest limits enforced server-side. */
+const MAX_PANEL_BYTES = 15 * 1024 * 1024;
+const MAX_PANEL_DIMENSION = 20000;
 
-const PackagePanelMetadataSchema = z.object({
-  panelId: z.string().min(1),
-  order: z.number().int().nonnegative(),
-  role: PanelRoleSchema,
-  displayName: z.string().min(1),
-  mediaType: z.string().min(1),
-  byteSize: z.number().int().positive(),
-  checksumSha256: z.string().length(64),
-  width: z.number().int().positive(),
-  height: z.number().int().positive(),
-  rotation: PanelRotationSchema,
-  storageKey: z.string().min(1),
-});
-
-const SellerEvidenceRegionSchema = z.object({
-  regionId: z.string().min(1),
-  categoryId: z.string().min(1),
-  panelId: z.string().min(1),
-  unit: z.literal("normalized-panel-relative"),
-  provenance: z.literal("seller-selected-region"),
-  x: z.number().min(0).max(1),
-  y: z.number().min(0).max(1),
-  width: z.number().positive().max(1),
-  height: z.number().positive().max(1),
-});
-
-const PackageCategoryDraftSchema = z.object({
-  categoryId: z.string().min(1),
-  decision: z.enum(["provided", "unresolved", "not_present"]),
-  expectedValue: z.string(),
-  regions: z.array(SellerEvidenceRegionSchema),
-});
-
-const PackagePanelMachineRunSchema = z.object({
-  panelId: z.string().min(1),
-  machineResultId: z.string().min(1),
-  exportJson: z.string(),
-  observations: z.record(z.any()),
-});
-
-const PackageCategoryAnalysisSchema = z.object({
-  categoryId: z.string().min(1),
-  state: z.enum(["clearly_readable", "needs_review", "not_found", "not_applicable"]),
-  observedValue: z.string().nullable(),
-  supportingPanelIds: z.array(z.string()),
-  supportingRegionIds: z.array(z.string()),
-  reason: z.string(),
-});
-
-const PackageAnalysisRunSchema = z.object({
-  analysisRunId: z.string().min(1),
-  sequence: z.number().int().positive(),
-  sellerChangeSequence: z.number().int().nonnegative(),
-  recordedAt: z.string(),
-  panelRuns: z.array(PackagePanelMachineRunSchema),
-  categories: z.array(PackageCategoryAnalysisSchema),
-  readiness: z.enum(["needs_seller_review", "ready_for_agent_submission"]),
-});
-
-const SellerPackageChangeSchema = z.object({
-  changeId: z.string().min(1),
-  sequence: z.number().int().positive(),
-  recordedAt: z.string(),
-  action: z.string(),
-  categoryId: z.string().optional(),
-  panelId: z.string().optional(),
-  regionId: z.string().optional(),
-  detail: z.string(),
-});
-
-const SellerPackageDraftSchema = z.object({
-  schemaVersion: z.literal("seller-package-draft.v1"),
-  packageId: z.string().min(1),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  profile: z.object({
-    id: z.string().min(1),
-    version: z.string().min(1),
-  }),
-  panelDecisions: z.object({
-    back: z.enum(["unresolved", "upload", "absent"]),
-    additional: z.enum(["unresolved", "add", "none"]),
-  }).optional(),
-  panels: z.array(PackagePanelMetadataSchema),
-  categories: z.array(PackageCategoryDraftSchema),
-  sellerChangeHistory: z.array(SellerPackageChangeSchema),
-  analysisRuns: z.array(PackageAnalysisRunSchema),
-});
-
-const SellerPackageExportSchema = z.object({
-  exportSchemaVersion: z.literal("seller-agent-package.v1"),
-  exportType: z.literal("seller-prepared-agent-package"),
-  boundary: z.object({
-    transmission: z.string().min(1),
-    governmentApproval: z.literal(false),
-    statement: z.string().min(1),
-  }),
-  submittedBy: z.string().email(),
-  submittedAt: z.string(),
-  receivingAgent: z.string().min(1),
-  package: SellerPackageDraftSchema,
-  readiness: z.literal("ready_for_agent_submission"),
-  applicationBuild: z.any(),
-  integrity: z.object({
-    algorithm: z.literal("sha256"),
-    scope: z.literal("canonical-package-payload"),
-    value: z.string().length(64),
-  }),
-});
+interface CachedIdempotencyRecord {
+  requestHash: string;
+  responsePayload: string;
+}
 
 export async function POST(request: Request) {
-  // 1. Authenticate user
-  const session = await auth.api.getSession({
-    headers: request.headers,
-  });
-
-  if (!session || !session.user || session.user.role !== "seller") {
+  // 1. Authenticate: inline session + role check (not middleware). Provisioned seller only.
+  const session = await auth.api.getSession({ headers: request.headers });
+  if (!session?.user || session.user.role !== "seller") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // 2. Validate Idempotency header
+  // 2. Idempotency key, scoped by authenticated actor + action.
   const idempotencyKey = request.headers.get("X-Idempotency-Key");
   if (!idempotencyKey) {
     return NextResponse.json({ error: "X-Idempotency-Key header is required" }, { status: 400 });
   }
+  const scopedKey = `finalize:${session.user.id}:${idempotencyKey}`;
 
-  let rawBody: any;
+  // 3. Parse the multipart submission (JSON envelope + panel blobs).
+  let formData: FormData;
   try {
-    rawBody = await request.json();
+    formData = await request.formData();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid multipart form data" }, { status: 400 });
   }
 
-  // 3. Schema validation using Zod
-  const validationResult = SellerPackageExportSchema.safeParse(rawBody);
-  if (!validationResult.success) {
+  const exportJsonStr = formData.get("packageExport");
+  if (typeof exportJsonStr !== "string") {
     return NextResponse.json(
-      { error: "Invalid schema validation", details: validationResult.error.issues },
-      { status: 400 }
+      { error: "Missing or invalid packageExport form data field" },
+      { status: 400 },
     );
   }
 
-  const exportPayload = validationResult.data;
+  let rawPayload: unknown;
+  try {
+    rawPayload = JSON.parse(exportJsonStr);
+  } catch {
+    return NextResponse.json({ error: "packageExport field is not valid JSON" }, { status: 400 });
+  }
 
-  // 4. Validate payload integrity signature
-  const payloadWithoutIntegrity = { ...exportPayload } as any;
-  delete payloadWithoutIntegrity.integrity;
-  const canonicalString = canonicalizeJson(payloadWithoutIntegrity);
+  // 4. Transmission-truth boundary: refuse the local-only export up front with a
+  //    truthful, actionable message before generic schema validation.
+  const rawBoundary = (rawPayload as { boundary?: { transmission?: unknown } })?.boundary;
+  if (rawBoundary?.transmission === LOCAL_DOWNLOAD_ONLY_TRANSMISSION) {
+    return NextResponse.json(
+      {
+        error:
+          `Bad Request: Transmission type must be '${AGENT_REVIEW_TRANSMISSION}' for server submission. ` +
+          `A 'local-download-only' export was never transmitted and cannot be uploaded directly.`,
+      },
+      { status: 400 },
+    );
+  }
+
+  // 5. Validate against the ONE shared server-safe package parser.
+  const parsed = parseAgentReviewSubmission(rawPayload);
+  if (!parsed.ok) {
+    return NextResponse.json(
+      { error: "Invalid schema validation", details: parsed.issues },
+      { status: 400 },
+    );
+  }
+  const exportPayload = parsed.value;
+  const draft = exportPayload.package;
+
+  // 6. Verify the client-declared integrity value against the canonical payload,
+  //    hashed with the SAME canonicalization the merged model uses to sign it.
+  //    Computed over the raw parsed payload (snapshots intact) minus integrity.
+  const payloadForIntegrity = { ...(rawPayload as Record<string, unknown>) };
+  delete payloadForIntegrity.integrity;
+  const canonicalString = canonicalStringify(payloadForIntegrity);
   const recomputedHash = createHash("sha256").update(canonicalString).digest("hex");
-
   if (recomputedHash !== exportPayload.integrity.value) {
     return NextResponse.json(
-      { error: "Bad Request: Integrity value mismatch. Payload has been tampered with or corrupted." },
-      { status: 400 }
+      {
+        error:
+          "Bad Request: Integrity value mismatch. Payload has been tampered with or corrupted.",
+      },
+      { status: 400 },
     );
   }
 
-  // 5. Enforce package currentness and readiness
-  const draft = exportPayload.package as any;
+  // 7. Enforce package currentness and readiness against the real model helpers.
   if (!latestAnalysisIsCurrent(draft)) {
     return NextResponse.json(
-      { error: "Bad Request: Stale package. Analysis must be run on the latest draft before finalizing." },
-      { status: 400 }
+      {
+        error:
+          "Bad Request: Stale package. Analysis must be run on the latest draft before finalizing.",
+      },
+      { status: 400 },
     );
   }
 
   const latestRun = draft.analysisRuns.at(-1);
   if (!latestRun || latestRun.readiness !== "ready_for_agent_submission") {
     return NextResponse.json(
-      { error: "Bad Request: Package is not ready. Analysis status must be ready_for_agent_submission." },
-      { status: 400 }
+      {
+        error:
+          "Bad Request: Package is not ready. Analysis status must be ready_for_agent_submission.",
+      },
+      { status: 400 },
     );
   }
 
-  // 6. Validate server provenance for all panel machine runs in the latest analysis run
+  // 8. Verify server-issued provenance for every machine result: recompute the
+  //    machineResultId from the embedded record and verify the append token that
+  //    only this server could have issued for that id.
   for (const panelRun of latestRun.panelRuns) {
-    let parsedJson: any;
+    let parsedExport: {
+      schemaVersion?: unknown;
+      packageId?: unknown;
+      panel?: unknown;
+      sourceSha256?: unknown;
+      observations?: unknown;
+      versionManifest?: unknown;
+      appendToken?: unknown;
+    };
     try {
-      parsedJson = JSON.parse(panelRun.exportJson);
+      parsedExport = JSON.parse(panelRun.exportJson);
     } catch {
       return NextResponse.json(
         { error: "Bad Request: Panel run exportJson is invalid JSON." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    // Verify HMAC signature matches the machine result ID
-    const verifyResult = verifyAppendToken(parsedJson.appendToken, panelRun.machineResultId);
-    if (!verifyResult.ok) {
-      return NextResponse.json(
-        { error: "Bad Request: Invalid server provenance token on analysis panel run." },
-        { status: 400 }
-      );
-    }
-
-    // Recompute machineResultId to prove payload consistency
+    // Recompute the machine result id to prove the record is internally self-consistent.
     const machinePayload = {
-      schemaVersion: "package-panel-machine-record.v1",
-      packageId: draft.packageId,
-      panel: parsedJson.panel,
-      sourceSha256: parsedJson.sourceSha256,
-      observations: parsedJson.observations,
-      versionManifest: parsedJson.versionManifest,
+      schemaVersion: parsedExport.schemaVersion,
+      packageId: parsedExport.packageId,
+      panel: parsedExport.panel,
+      sourceSha256: parsedExport.sourceSha256,
+      observations: parsedExport.observations,
+      versionManifest: parsedExport.versionManifest,
     };
-    const recomputedId = createHash("sha256")
+    const recomputedMachineId = createHash("sha256")
       .update(canonicalStringify(machinePayload))
       .digest("hex");
-
-    if (recomputedId !== panelRun.machineResultId) {
+    if (recomputedMachineId !== panelRun.machineResultId) {
       return NextResponse.json(
-        { error: "Bad Request: Recomputed panel run ID mismatch." },
-        { status: 400 }
+        {
+          error:
+            "Bad Request: Recomputed machine-result ID mismatch. Analysis record is inconsistent.",
+        },
+        { status: 400 },
+      );
+    }
+
+    // Prove the server actually issued this result (provenance), not just self-consistency.
+    const tokenCheck = verifyAppendToken(parsedExport.appendToken, panelRun.machineResultId);
+    if (!tokenCheck.ok) {
+      return NextResponse.json(
+        { error: "Bad Request: Invalid server provenance token. Forged observation run detected." },
+        { status: 400 },
       );
     }
   }
 
-  const requestHash = createHash("sha256").update(canonicalizeJson(exportPayload)).digest("hex");
-  const scopedKey = `${session.user.id}:finalize:${idempotencyKey}`;
+  // 9. Verify and durably persist each panel asset. Server owns the storage key;
+  //    client-supplied storage references are never trusted. Fail closed if the
+  //    durable store is unavailable so a receipt never points at missing assets.
+  const verifiedPanels: Array<{
+    panelId: string;
+    role: string;
+    displayName: string;
+    mediaType: string;
+    byteSize: number;
+    checksumSha256: string;
+    width: number;
+    height: number;
+    rotation: number;
+    storageKey: string;
+  }> = [];
 
-  // Helper to parse idempotency key error
-  const handleIdempotencyConflict = async () => {
-    const existing = await db
-      .select()
-      .from(schema.idempotencyRecords)
-      .where(eq(schema.idempotencyRecords.key, scopedKey))
-      .limit(1);
+  for (const panel of draft.panels) {
+    const file = formData.get(panel.panelId);
+    if (!file || !(file instanceof Blob)) {
+      return NextResponse.json(
+        { error: `Bad Request: Missing uploaded file for panel ID ${panel.panelId}` },
+        { status: 400 },
+      );
+    }
 
-    if (existing.length > 0) {
-      if (existing[0].requestHash !== requestHash) {
+    const fileBytes = Buffer.from(await file.arrayBuffer());
+
+    // Server enforces size limits; the byte length must also match the declared size.
+    if (fileBytes.byteLength > MAX_PANEL_BYTES) {
+      return NextResponse.json(
+        {
+          error: `Bad Request: Panel ${panel.displayName} exceeds the maximum allowed size of ${MAX_PANEL_BYTES} bytes.`,
+        },
+        { status: 400 },
+      );
+    }
+    if (fileBytes.byteLength !== panel.byteSize) {
+      return NextResponse.json(
+        {
+          error: `Bad Request: File size mismatch for panel ${panel.displayName}. Expected ${panel.byteSize} bytes, got ${fileBytes.byteLength}.`,
+        },
+        { status: 400 },
+      );
+    }
+
+    // Server verifies the real (decoded) media type from the byte signature, not
+    // the client-declared MIME, and enforces dimension limits.
+    const detected = detectImage(fileBytes);
+    if (!detected) {
+      return NextResponse.json(
+        {
+          error: `Bad Request: Panel ${panel.displayName} is not a supported image (PNG, JPEG, or WebP).`,
+        },
+        { status: 400 },
+      );
+    }
+    if (detected.mediaType !== panel.mediaType) {
+      return NextResponse.json(
+        {
+          error: `Bad Request: Media type mismatch for panel ${panel.displayName}. Declared ${panel.mediaType}, decoded ${detected.mediaType}.`,
+        },
+        { status: 400 },
+      );
+    }
+    if (detected.width !== undefined && detected.height !== undefined) {
+      if (detected.width > MAX_PANEL_DIMENSION || detected.height > MAX_PANEL_DIMENSION) {
         return NextResponse.json(
-          { error: "Bad Request: Idempotency key reused with different request payload" },
-          { status: 400 }
+          {
+            error: `Bad Request: Panel ${panel.displayName} exceeds the maximum dimension of ${MAX_PANEL_DIMENSION}px.`,
+          },
+          { status: 400 },
         );
       }
-      return NextResponse.json(JSON.parse(existing[0].responsePayload));
+      if (detected.width !== panel.width || detected.height !== panel.height) {
+        return NextResponse.json(
+          {
+            error: `Bad Request: Dimension mismatch for panel ${panel.displayName}. Declared ${panel.width}x${panel.height}, decoded ${detected.width}x${detected.height}.`,
+          },
+          { status: 400 },
+        );
+      }
     }
-    return null;
-  };
 
-  // Pre-transaction lookup to handle standard sequential retries
-  const cachedResponse = await handleIdempotencyConflict();
-  if (cachedResponse) {
-    return cachedResponse;
+    // Server recomputes the checksum; never trusts the client-declared one.
+    const recomputedChecksum = createHash("sha256").update(fileBytes).digest("hex");
+    if (recomputedChecksum !== panel.checksumSha256) {
+      return NextResponse.json(
+        {
+          error: `Bad Request: Checksum mismatch for panel ${panel.displayName}. Expected ${panel.checksumSha256}, got ${recomputedChecksum}.`,
+        },
+        { status: 400 },
+      );
+    }
+
+    // Server-owned storage key derived from authenticated package + recomputed checksum.
+    const storageKey = panelStorageKey(draft.packageId, panel.panelId, recomputedChecksum);
+    const stored = persistPanelAsset(storageKey, fileBytes);
+    if (!stored.ok) {
+      return NextResponse.json(
+        { error: "Internal server error: durable panel storage is unavailable." },
+        { status: 500 },
+      );
+    }
+
+    verifiedPanels.push({
+      panelId: panel.panelId,
+      role: panel.role,
+      displayName: panel.displayName,
+      mediaType: panel.mediaType,
+      byteSize: panel.byteSize,
+      checksumSha256: recomputedChecksum,
+      width: panel.width,
+      height: panel.height,
+      rotation: panel.rotation,
+      storageKey: stored.storageKey,
+    });
   }
 
+  // 10. Server-authoritative receipt + revision fields. Nothing here is trusted
+  //     from the client: revision id, timestamps, receipt status, and signature
+  //     are all generated server-side.
+  const requestHash = createHash("sha256").update(canonicalStringify(exportPayload)).digest("hex");
+  const revisionId = randomUUID();
+  const signature = signRevision(canonicalString);
+  const recordedAt = new Date();
+
+  const receiptPayload = {
+    submissionId: draft.packageId,
+    revisionId,
+    revisionNumber: 1,
+    status: "waiting_for_agent_review" as const,
+    receivingAgent: exportPayload.receivingAgent,
+    signature,
+    recordedAt: recordedAt.toISOString(),
+  };
+
+  // Idempotency lookup: return a committed receipt only after confirming the
+  // canonical request hash matches; a reused key with a different payload fails.
+  // When recovering from a raced unique-key violation the winning commit may not
+  // be visible on this pooled connection for a beat, so allow a bounded re-read.
+  async function handleIdempotencyConflict(waitForCommit = false): Promise<NextResponse | null> {
+    let existing: CachedIdempotencyRecord[] = [];
+    const attempts = waitForCommit ? 12 : 1;
+    for (let attempt = 0; attempt < attempts; attempt++) {
+      existing = (await db
+        .select({
+          requestHash: schema.idempotencyRecords.requestHash,
+          responsePayload: schema.idempotencyRecords.responsePayload,
+        })
+        .from(schema.idempotencyRecords)
+        .where(eq(schema.idempotencyRecords.key, scopedKey))
+        .limit(1)) as CachedIdempotencyRecord[];
+      if (existing.length > 0) break;
+      if (attempt < attempts - 1) await new Promise((resolve) => setTimeout(resolve, 25));
+    }
+
+    if (existing.length === 0) return null;
+
+    if (existing[0].requestHash !== requestHash) {
+      return NextResponse.json(
+        { error: "Bad Request: Idempotency key reused with a different request payload." },
+        { status: 400 },
+      );
+    }
+    try {
+      return NextResponse.json(JSON.parse(existing[0].responsePayload), {
+        headers: { "X-Idempotent-Replay": "true" },
+      });
+    } catch {
+      return null;
+    }
+  }
+
+  // Pre-transaction fast path for sequential retries.
+  const preCheckResponse = await handleIdempotencyConflict();
+  if (preCheckResponse) return preCheckResponse;
+
   try {
-    const submittedAtDate = new Date();
-    const signature = signRevision(canonicalString);
-    const revisionId = randomUUID();
-
-    const receiptPayload = {
-      receiptId: revisionId,
-      submissionId: draft.packageId,
-      revisionNumber: 1,
-      submittedAt: submittedAtDate.toISOString(),
-      integritySignature: signature,
-      status: "waiting_for_agent_review",
-    };
-
-    // 7. Atomic transaction commit
     if (isSQLite) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       db.transaction((tx: any) => {
-        // Ensure submission doesn't already exist
         const existingSub = tx
           .select()
           .from(schema.submissions)
           .where(eq(schema.submissions.id, draft.packageId))
+          .limit(1)
           .all();
-
         if (existingSub.length > 0) {
           throw new Error("SUBMISSION_ALREADY_EXISTS");
         }
 
-        // Save Idempotency Record first to trigger unique constraint check concurrently
-        tx.insert(schema.idempotencyRecords).values({
-          key: scopedKey,
-          requestHash: requestHash,
-          responsePayload: JSON.stringify(receiptPayload),
-          createdAt: submittedAtDate,
-        }).run();
+        // Idempotency record first: its unique key is the concurrency boundary.
+        tx.insert(schema.idempotencyRecords)
+          .values({
+            key: scopedKey,
+            requestHash,
+            responsePayload: JSON.stringify(receiptPayload),
+            createdAt: recordedAt,
+          })
+          .run();
 
-        // Create Submission record
-        tx.insert(schema.submissions).values({
-          id: draft.packageId,
-          creatorId: session.user.id,
-          currentStatus: "waiting_for_agent_review",
-          isDemo: false,
-          version: 1,
-          createdAt: submittedAtDate,
-          updatedAt: submittedAtDate,
-        }).run();
+        tx.insert(schema.submissions)
+          .values({
+            id: draft.packageId,
+            creatorId: session.user.id,
+            currentStatus: "waiting_for_agent_review",
+            isDemo: false,
+            version: 1,
+            createdAt: recordedAt,
+            updatedAt: recordedAt,
+          })
+          .run();
 
-        // Create SubmissionRevision record
-        tx.insert(schema.submissionRevisions).values({
-          id: revisionId,
-          submissionId: draft.packageId,
-          revisionNumber: 1,
-          profileId: draft.profile.id,
-          profileVersion: draft.profile.version,
-          submittedBy: session.user.email,
-          submittedAt: submittedAtDate,
-          canonicalJson: canonicalString,
-          integritySignature: signature,
-        }).run();
+        tx.insert(schema.submissionRevisions)
+          .values({
+            id: revisionId,
+            submissionId: draft.packageId,
+            revisionNumber: 1,
+            profileId: draft.profile.id,
+            profileVersion: draft.profile.version,
+            submittedBy: session.user.email,
+            submittedAt: recordedAt,
+            canonicalJson: canonicalString,
+            integritySignature: signature,
+          })
+          .run();
 
-        // Create SubmittedPanel records
-        for (const panel of draft.panels) {
-          tx.insert(schema.submittedPanels).values({
-            id: panel.panelId || randomUUID(),
-            revisionId: revisionId,
-            role: panel.role,
-            displayName: panel.displayName,
-            mediaType: panel.mediaType,
-            byteSize: panel.byteSize,
-            checksumSha256: panel.checksumSha256,
-            width: panel.width,
-            height: panel.height,
-            rotation: panel.rotation,
-            storageKey: panel.storageKey,
-          }).run();
+        for (const panel of verifiedPanels) {
+          tx.insert(schema.submittedPanels)
+            .values({
+              id: panel.panelId,
+              revisionId,
+              role: panel.role,
+              displayName: panel.displayName,
+              mediaType: panel.mediaType,
+              byteSize: panel.byteSize,
+              checksumSha256: panel.checksumSha256,
+              width: panel.width,
+              height: panel.height,
+              rotation: panel.rotation,
+              storageKey: panel.storageKey,
+            })
+            .run();
         }
 
-        // Create SellerEvidenceSnapshot records
         for (const ev of draft.categories) {
-          tx.insert(schema.sellerEvidenceSnapshots).values({
-            id: ev.evidenceId || randomUUID(),
-            revisionId: revisionId,
-            categoryId: ev.categoryId,
-            decision: ev.decision,
-            expectedValue: ev.expectedValue,
-            regions: JSON.stringify(ev.regions || []),
-          }).run();
+          tx.insert(schema.sellerEvidenceSnapshots)
+            .values({
+              id: randomUUID(),
+              revisionId,
+              categoryId: ev.categoryId,
+              decision: ev.decision,
+              expectedValue: ev.expectedValue,
+              regions: JSON.stringify(ev.regions ?? []),
+            })
+            .run();
         }
 
-        // Create MachineAnalysisSnapshot records
-        for (const run of latestRun.panelRuns) {
-          tx.insert(schema.machineAnalysisSnapshots).values({
+        // Exactly one machine analysis snapshot, carrying the real panel runs + categories.
+        tx.insert(schema.machineAnalysisSnapshots)
+          .values({
             id: randomUUID(),
-            revisionId: revisionId,
+            revisionId,
             analysisRunId: latestRun.analysisRunId,
             sequence: latestRun.sequence,
-            panelRuns: JSON.stringify(run.panelRuns || []),
-            categories: JSON.stringify(latestRun.categories || []),
+            panelRuns: JSON.stringify(latestRun.panelRuns),
+            categories: JSON.stringify(latestRun.categories),
             readiness: latestRun.readiness,
-            recordedAt: new Date(latestRun.recordedAt || Date.now()),
-          }).run();
-        }
+            recordedAt: new Date(latestRun.recordedAt),
+          })
+          .run();
 
-        // Create SubmissionStatusEvent record
-        tx.insert(schema.submissionStatusEvents).values({
-          id: randomUUID(),
-          submissionId: draft.packageId,
-          status: "waiting_for_agent_review",
-          actorId: session.user.id,
-          actorRole: session.user.role,
-          reasonComment: "Seller finalized workspace submission",
-          recordedAt: submittedAtDate,
-        }).run();
+        tx.insert(schema.submissionStatusEvents)
+          .values({
+            id: randomUUID(),
+            submissionId: draft.packageId,
+            status: "waiting_for_agent_review",
+            actorId: session.user.id,
+            actorRole: session.user.role,
+            reasonComment: "Seller finalized workspace submission",
+            recordedAt,
+          })
+          .run();
       });
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await db.transaction(async (tx: any) => {
         const existingSub = await tx
           .select()
           .from(schema.submissions)
           .where(eq(schema.submissions.id, draft.packageId))
           .limit(1);
-
         if (existingSub.length > 0) {
           throw new Error("SUBMISSION_ALREADY_EXISTS");
         }
 
-        // Save Idempotency Record
         await tx.insert(schema.idempotencyRecords).values({
           key: scopedKey,
-          requestHash: requestHash,
+          requestHash,
           responsePayload: JSON.stringify(receiptPayload),
-          createdAt: submittedAtDate,
+          createdAt: recordedAt,
         });
 
-        // Create Submission record
         await tx.insert(schema.submissions).values({
           id: draft.packageId,
           creatorId: session.user.id,
           currentStatus: "waiting_for_agent_review",
           isDemo: false,
           version: 1,
-          createdAt: submittedAtDate,
-          updatedAt: submittedAtDate,
+          createdAt: recordedAt,
+          updatedAt: recordedAt,
         });
 
-        // Create SubmissionRevision record
         await tx.insert(schema.submissionRevisions).values({
           id: revisionId,
           submissionId: draft.packageId,
@@ -414,16 +502,15 @@ export async function POST(request: Request) {
           profileId: draft.profile.id,
           profileVersion: draft.profile.version,
           submittedBy: session.user.email,
-          submittedAt: submittedAtDate,
+          submittedAt: recordedAt,
           canonicalJson: canonicalString,
           integritySignature: signature,
         });
 
-        // Create SubmittedPanel records
-        for (const panel of draft.panels) {
+        for (const panel of verifiedPanels) {
           await tx.insert(schema.submittedPanels).values({
-            id: panel.panelId || randomUUID(),
-            revisionId: revisionId,
+            id: panel.panelId,
+            revisionId,
             role: panel.role,
             displayName: panel.displayName,
             mediaType: panel.mediaType,
@@ -436,33 +523,28 @@ export async function POST(request: Request) {
           });
         }
 
-        // Create SellerEvidenceSnapshot records
         for (const ev of draft.categories) {
           await tx.insert(schema.sellerEvidenceSnapshots).values({
-            id: ev.evidenceId || randomUUID(),
-            revisionId: revisionId,
+            id: randomUUID(),
+            revisionId,
             categoryId: ev.categoryId,
             decision: ev.decision,
             expectedValue: ev.expectedValue,
-            regions: JSON.stringify(ev.regions || []),
+            regions: JSON.stringify(ev.regions ?? []),
           });
         }
 
-        // Create MachineAnalysisSnapshot records
-        for (const run of latestRun.panelRuns) {
-          await tx.insert(schema.machineAnalysisSnapshots).values({
-            id: randomUUID(),
-            revisionId: revisionId,
-            analysisRunId: latestRun.analysisRunId,
-            sequence: latestRun.sequence,
-            panelRuns: JSON.stringify(run.panelRuns || []),
-            categories: JSON.stringify(latestRun.categories || []),
-            readiness: latestRun.readiness,
-            recordedAt: new Date(latestRun.recordedAt || Date.now()),
-          });
-        }
+        await tx.insert(schema.machineAnalysisSnapshots).values({
+          id: randomUUID(),
+          revisionId,
+          analysisRunId: latestRun.analysisRunId,
+          sequence: latestRun.sequence,
+          panelRuns: JSON.stringify(latestRun.panelRuns),
+          categories: JSON.stringify(latestRun.categories),
+          readiness: latestRun.readiness,
+          recordedAt: new Date(latestRun.recordedAt),
+        });
 
-        // Create SubmissionStatusEvent record
         await tx.insert(schema.submissionStatusEvents).values({
           id: randomUUID(),
           submissionId: draft.packageId,
@@ -470,29 +552,58 @@ export async function POST(request: Request) {
           actorId: session.user.id,
           actorRole: session.user.role,
           reasonComment: "Seller finalized workspace submission",
-          recordedAt: submittedAtDate,
+          recordedAt,
         });
       });
     }
 
     return NextResponse.json(receiptPayload);
-  } catch (err: any) {
-    // 8. Catch unique key conflicts for concurrent idempotency safety
-    const isDuplicate =
-      err.code === "SQLITE_CONSTRAINT_PRIMARYKEY" ||
-      err.code === "ER_DUP_ENTRY" ||
-      err.errno === 1062 ||
-      (err.message && err.message.includes("UNIQUE constraint failed"));
+  } catch (err) {
+    const errorObject = err as { code?: string; errno?: number; message?: string };
 
-    if (isDuplicate) {
-      const cachedResponse = await handleIdempotencyConflict();
+    // Drizzle wraps driver errors (e.g. DrizzleQueryError), so the real
+    // unique-violation code/errno may live on a nested `cause`. Walk the chain.
+    const isUniqueViolation = (): boolean => {
+      let current: unknown = err;
+      for (let depth = 0; current && depth < 5; depth++) {
+        const e = current as { code?: string; errno?: number; message?: string; cause?: unknown };
+        if (
+          e.code === "SQLITE_CONSTRAINT_PRIMARYKEY" ||
+          e.code === "SQLITE_CONSTRAINT_UNIQUE" ||
+          e.code === "ER_DUP_ENTRY" ||
+          e.errno === 1062 ||
+          (e.message?.includes("UNIQUE constraint failed") ?? false)
+        ) {
+          return true;
+        }
+        current = e.cause;
+      }
+      return false;
+    };
+
+    // Duplicate-key recovery: the unique constraint is the final concurrency
+    // boundary. Return the committed response only after verifying request hash.
+    const isDuplicate = isUniqueViolation();
+
+    // Either a raced unique-key violation or the in-transaction existence guard
+    // means another commit for this package won. For the same idempotency key
+    // that is a successful replay; for a different key it is a genuine conflict.
+    if (isDuplicate || errorObject.message === "SUBMISSION_ALREADY_EXISTS") {
+      const cachedResponse = await handleIdempotencyConflict(true);
       if (cachedResponse) return cachedResponse;
     }
 
-    console.error("[Finalize Route Error]", err);
-    if (err.message === "SUBMISSION_ALREADY_EXISTS") {
-      return NextResponse.json({ error: "Conflict: Submission already finalized" }, { status: 409 });
+    if (errorObject.message === "SUBMISSION_ALREADY_EXISTS") {
+      return NextResponse.json(
+        { error: "Conflict: Submission already finalized" },
+        { status: 409 },
+      );
     }
-    return NextResponse.json({ error: "Internal server error during finalization commit" }, { status: 500 });
+
+    console.error("[Finalize Route Error]", err);
+    return NextResponse.json(
+      { error: "Internal server error during finalization commit" },
+      { status: 500 },
+    );
   }
 }

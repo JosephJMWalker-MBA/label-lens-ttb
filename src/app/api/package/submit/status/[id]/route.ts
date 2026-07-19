@@ -29,15 +29,13 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     .where(eq(schema.submissions.id, submissionId))
     .limit(1);
 
-  if (result.length === 0) {
-    return NextResponse.json({ error: "Submission not found" }, { status: 404 });
-  }
-
   const submission = result[0];
 
-  // 3. Strictly owner-only authorization check
-  if (submission.creatorId !== session.user.id) {
-    return NextResponse.json({ error: "Forbidden: Access restricted to owner" }, { status: 403 });
+  // 3. Strictly owner-only authorization. A missing submission and a submission
+  //    owned by another seller return an identical 404 so the boundary never
+  //    leaks whether another seller's submission exists.
+  if (result.length === 0 || submission.creatorId !== session.user.id) {
+    return NextResponse.json({ error: "Submission not found" }, { status: 404 });
   }
 
   // 4. Fetch Submission Revisions (including canonicalJson for integrity check)
@@ -60,14 +58,17 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const isValid = verifyRevision(rev.canonicalJson, rev.integritySignature);
     if (!isValid) {
       return NextResponse.json(
-        { error: "Internal Server Error: Database integrity check failed. Submission data has been tampered with or corrupted." },
-        { status: 500 }
+        {
+          error:
+            "Internal Server Error: Database integrity check failed. Submission data has been tampered with or corrupted.",
+        },
+        { status: 500 },
       );
     }
   }
 
   // Map revisions to exclude canonicalJson from client response
-  const revisions = revisionsFromDb.map((rev) => ({
+  const revisions = revisionsFromDb.map((rev: (typeof revisionsFromDb)[number]) => ({
     id: rev.id,
     revisionNumber: rev.revisionNumber,
     profileId: rev.profileId,

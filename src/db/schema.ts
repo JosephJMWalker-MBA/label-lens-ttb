@@ -1,40 +1,60 @@
-import { sql } from "drizzle-orm";
-import { mysqlTable, varchar, text, boolean, timestamp, int, uniqueIndex } from "drizzle-orm/mysql-core";
+import {
+  mysqlTable,
+  varchar,
+  text,
+  boolean,
+  timestamp,
+  int,
+  uniqueIndex,
+  foreignKey,
+} from "drizzle-orm/mysql-core";
 
 // 1. Users Table
-export const users = mysqlTable("users", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  name: text("name"),
-  email: varchar("email", { length: 255 }).notNull(),
-  emailVerified: boolean("email_verified").default(false).notNull(),
-  image: text("image"),
-  role: varchar("role", { length: 50 }).default("seller").notNull(), // "seller" | "agent" | "admin"
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  emailIdx: uniqueIndex("email_idx").on(table.email),
-}));
+export const users = mysqlTable(
+  "users",
+  {
+    id: varchar("id", { length: 36 }).primaryKey(),
+    name: text("name"),
+    email: varchar("email", { length: 255 }).notNull(),
+    emailVerified: boolean("email_verified").default(false).notNull(),
+    image: text("image"),
+    role: varchar("role", { length: 50 }).default("seller").notNull(), // "seller" | "agent" | "admin"
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+  },
+  (table) => ({
+    emailIdx: uniqueIndex("email_idx").on(table.email),
+  }),
+);
 
 // 2. Sessions Table
-export const sessions = mysqlTable("sessions", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  token: varchar("token", { length: 255 }).notNull(),
-  userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }).notNull(),
-  expiresAt: timestamp("expires_at").notNull(),
-  ipAddress: text("ip_address"),
-  userAgent: text("user_agent"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  tokenIdx: uniqueIndex("token_idx").on(table.token),
-}));
+export const sessions = mysqlTable(
+  "sessions",
+  {
+    id: varchar("id", { length: 36 }).primaryKey(),
+    token: varchar("token", { length: 255 }).notNull(),
+    userId: varchar("user_id", { length: 36 })
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+  },
+  (table) => ({
+    tokenIdx: uniqueIndex("token_idx").on(table.token),
+  }),
+);
 
 // 3. Accounts Table (required by Better Auth credentials hashing)
 export const accounts = mysqlTable("accounts", {
   id: varchar("id", { length: 36 }).primaryKey(),
   accountId: text("account_id").notNull(),
   providerId: text("provider_id").notNull(),
-  userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }).notNull(),
+  userId: varchar("user_id", { length: 36 })
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
   accessToken: text("access_token"),
   refreshToken: text("refresh_token"),
   idToken: text("id_token"),
@@ -57,7 +77,9 @@ export const verifications = mysqlTable("verifications", {
 // 5. Submissions Table
 export const submissions = mysqlTable("submissions", {
   id: varchar("id", { length: 255 }).primaryKey(),
-  creatorId: varchar("creator_id", { length: 36 }).references(() => users.id).notNull(),
+  creatorId: varchar("creator_id", { length: 36 })
+    .references(() => users.id)
+    .notNull(),
   currentStatus: varchar("current_status", { length: 50 }).notNull(), // "waiting_for_agent_review" | "in_agent_review" | "changes_requested" | "internally_accepted" | "withdrawn"
   isDemo: boolean("is_demo").default(false).notNull(),
   version: int("version").default(1).notNull(),
@@ -66,61 +88,99 @@ export const submissions = mysqlTable("submissions", {
 });
 
 // 6. Submission Revisions Table
-export const submissionRevisions = mysqlTable("submission_revisions", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  submissionId: varchar("submission_id", { length: 255 }).references(() => submissions.id, { onDelete: "cascade" }).notNull(),
-  revisionNumber: int("revision_number").notNull(),
-  profileId: varchar("profile_id", { length: 100 }).notNull(),
-  profileVersion: varchar("profile_version", { length: 50 }).notNull(),
-  submittedBy: varchar("submitted_by", { length: 255 }).notNull(),
-  submittedAt: timestamp("submitted_at").notNull(),
-  canonicalJson: text("canonical_json").notNull(),
-  integritySignature: varchar("integrity_signature", { length: 255 }).notNull(), // format: "v1:<hmac-sha256-hex>"
-}, (table) => ({
-  subRevisionIdx: uniqueIndex("sub_revision_idx").on(table.submissionId, table.revisionNumber),
-}));
+export const submissionRevisions = mysqlTable(
+  "submission_revisions",
+  {
+    id: varchar("id", { length: 36 }).primaryKey(),
+    submissionId: varchar("submission_id", { length: 255 })
+      .references(() => submissions.id, { onDelete: "cascade" })
+      .notNull(),
+    revisionNumber: int("revision_number").notNull(),
+    profileId: varchar("profile_id", { length: 100 }).notNull(),
+    profileVersion: varchar("profile_version", { length: 50 }).notNull(),
+    submittedBy: varchar("submitted_by", { length: 255 }).notNull(),
+    submittedAt: timestamp("submitted_at").notNull(),
+    canonicalJson: text("canonical_json").notNull(),
+    integritySignature: varchar("integrity_signature", { length: 255 }).notNull(), // format: "v1:<hmac-sha256-hex>"
+  },
+  (table) => ({
+    subRevisionIdx: uniqueIndex("sub_revision_idx").on(table.submissionId, table.revisionNumber),
+  }),
+);
 
 // 7. Submitted Panels Table
-export const submittedPanels = mysqlTable("submitted_panels", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  revisionId: varchar("revision_id", { length: 36 }).references(() => submissionRevisions.id, { onDelete: "cascade" }).notNull(),
-  role: varchar("role", { length: 50 }).notNull(),
-  displayName: varchar("display_name", { length: 255 }).notNull(),
-  mediaType: varchar("media_type", { length: 100 }).notNull(),
-  byteSize: int("byte_size").notNull(),
-  checksumSha256: varchar("checksum_sha256", { length: 64 }).notNull(),
-  width: int("width").notNull(),
-  height: int("height").notNull(),
-  rotation: int("rotation").notNull(),
-  storageKey: varchar("storage_key", { length: 500 }).notNull(),
-});
+export const submittedPanels = mysqlTable(
+  "submitted_panels",
+  {
+    id: varchar("id", { length: 36 }).primaryKey(),
+    revisionId: varchar("revision_id", { length: 36 }).notNull(),
+    role: varchar("role", { length: 50 }).notNull(),
+    displayName: varchar("display_name", { length: 255 }).notNull(),
+    mediaType: varchar("media_type", { length: 100 }).notNull(),
+    byteSize: int("byte_size").notNull(),
+    checksumSha256: varchar("checksum_sha256", { length: 64 }).notNull(),
+    width: int("width").notNull(),
+    height: int("height").notNull(),
+    rotation: int("rotation").notNull(),
+    storageKey: varchar("storage_key", { length: 500 }).notNull(),
+  },
+  (table) => ({
+    fk: foreignKey({
+      name: "submitted_panels_revision_id_fk",
+      columns: [table.revisionId],
+      foreignColumns: [submissionRevisions.id],
+    }).onDelete("cascade"),
+  }),
+);
 
 // 8. Seller Evidence Snapshots Table
-export const sellerEvidenceSnapshots = mysqlTable("seller_evidence_snapshots", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  revisionId: varchar("revision_id", { length: 36 }).references(() => submissionRevisions.id, { onDelete: "cascade" }).notNull(),
-  categoryId: varchar("category_id", { length: 100 }).notNull(),
-  decision: varchar("decision", { length: 50 }).notNull(),
-  expectedValue: text("expected_value"),
-  regions: text("regions").notNull(),
-});
+export const sellerEvidenceSnapshots = mysqlTable(
+  "seller_evidence_snapshots",
+  {
+    id: varchar("id", { length: 36 }).primaryKey(),
+    revisionId: varchar("revision_id", { length: 36 }).notNull(),
+    categoryId: varchar("category_id", { length: 100 }).notNull(),
+    decision: varchar("decision", { length: 50 }).notNull(),
+    expectedValue: text("expected_value"),
+    regions: text("regions").notNull(),
+  },
+  (table) => ({
+    fk: foreignKey({
+      name: "seller_evidence_snapshots_revision_id_fk",
+      columns: [table.revisionId],
+      foreignColumns: [submissionRevisions.id],
+    }).onDelete("cascade"),
+  }),
+);
 
 // 9. Machine Analysis Snapshots Table
-export const machineAnalysisSnapshots = mysqlTable("machine_analysis_snapshots", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  revisionId: varchar("revision_id", { length: 36 }).references(() => submissionRevisions.id, { onDelete: "cascade" }).notNull(),
-  analysisRunId: varchar("analysis_run_id", { length: 36 }).notNull(),
-  sequence: int("sequence").notNull(),
-  panelRuns: text("panel_runs").notNull(),
-  categories: text("categories").notNull(),
-  readiness: varchar("readiness", { length: 50 }).notNull(),
-  recordedAt: timestamp("recorded_at").notNull(),
-});
+export const machineAnalysisSnapshots = mysqlTable(
+  "machine_analysis_snapshots",
+  {
+    id: varchar("id", { length: 36 }).primaryKey(),
+    revisionId: varchar("revision_id", { length: 36 }).notNull(),
+    analysisRunId: varchar("analysis_run_id", { length: 36 }).notNull(),
+    sequence: int("sequence").notNull(),
+    panelRuns: text("panel_runs").notNull(),
+    categories: text("categories").notNull(),
+    readiness: varchar("readiness", { length: 50 }).notNull(),
+    recordedAt: timestamp("recorded_at").notNull(),
+  },
+  (table) => ({
+    fk: foreignKey({
+      name: "machine_analysis_snapshots_revision_id_fk",
+      columns: [table.revisionId],
+      foreignColumns: [submissionRevisions.id],
+    }).onDelete("cascade"),
+  }),
+);
 
 // 10. Submission Status Events Table
 export const submissionStatusEvents = mysqlTable("submission_status_events", {
   id: varchar("id", { length: 36 }).primaryKey(),
-  submissionId: varchar("submission_id", { length: 255 }).references(() => submissions.id, { onDelete: "cascade" }).notNull(),
+  submissionId: varchar("submission_id", { length: 255 })
+    .references(() => submissions.id, { onDelete: "cascade" })
+    .notNull(),
   status: varchar("status", { length: 50 }).notNull(),
   actorId: varchar("actor_id", { length: 36 }).references(() => users.id),
   actorRole: varchar("actor_role", { length: 50 }).notNull(),
