@@ -1,373 +1,209 @@
-# Label Lens TTB
+# Label Lens
 
-Label Lens TTB is a **domestic-wine label prescreen prototype** that helps a seller or reviewer assemble, inspect, and evaluate label evidence without pretending to make a government decision.
+**An evidence-producing perception and review pipeline for beverage-label packages.**
 
-A user provides label artwork and application facts. Local OCR extracts bounded evidence from the artwork. Versioned deterministic rules compare that evidence with the declared facts. The system preserves uncertainty, exposes provenance, and keeps the human reviewer authoritative.
+Label Lens helps a seller prepare a label package, separates seller claims from machine observations, runs deterministic pre-checks, and preserves the resulting evidence for authenticated internal review.
 
-> **OCR and AI may extract evidence. Deterministic rules evaluate that evidence. Human reviewers remain authoritative.**
+> **Machine perception produces observations. Deterministic rules evaluate bounded evidence. Human reviewers make internal workflow decisions.**
 
-**Label Lens does not approve or reject labels, is not a TTB system, and is not legal advice.**
-
-## Live demo
-
-- Primary: **<https://ttb-test.com>**
-- Secondary: <https://label-lens-ttb.onrender.com>
-- Legacy one-image review: `/review/legacy`
-
-The public deployment is a reviewer demonstration. It is not a COLA integration, production authorization, or hardened government environment.
+Label Lens is **not** a TTB system, does not grant COLA approval, does not provide legal advice, and does not replace an official government determination.
 
 ---
 
-## Project status
+## Why this project exists
 
-The project has moved beyond a simple OCR demonstration. It now contains two connected product slices:
+Beverage-label review is not only an OCR problem.
 
-1. **Seller package preparation** for front, back, and optional label panels.
-2. **A one-image domestic-wine prescreen** using real local OCR, deterministic checks, explainable findings, and downloadable reports.
+A useful system must preserve the difference between:
 
-The core architecture is established. The next phase should emphasize **completion and usability of one end-to-end domestic-wine workflow**, rather than adding new beverage categories or reopening settled architecture.
+- what the seller says;
+- what artwork is actually present;
+- what the machine observed;
+- what the machine could not observe;
+- what deterministic rules can evaluate;
+- what still requires human judgment;
+- what changed between revisions;
+- who made each internal decision and when.
 
-### Current release focus
-
-A seller should be able to:
-
-1. State which package panels exist.
-2. Upload the applicable artwork.
-3. inspect and magnify each image.
-4. Review and correct machine-read evidence.
-5. Identify where required information appears.
-6. Enter the required application facts.
-7. Run deterministic checks.
-8. Understand what passed, failed, needs review, or could not be evaluated.
-9. Download a clear, traceable package for further human review.
+Label Lens treats those distinctions as first-class data rather than collapsing them into a single score or an unsupported “approved” result.
 
 ---
 
-## Work completed
+## Product model
 
-### 1. Product and review boundaries
+Label Lens is organized around two connected systems.
 
-- Defined the product as a **prescreen and evidence-construction system**, not an approval engine.
-- Separated:
-  - artwork evidence;
-  - OCR observations;
-  - seller-declared facts;
-  - deterministic findings;
-  - internal human disposition;
-  - actual TTB action, which remains out of scope.
-- Preserved uncertainty through explicit states instead of forcing a false binary verdict.
-- Documented the prototype, security, retention, compliance, and government-authority boundaries.
-
-### 2. Seller package preparation
-
-The browser-local package workflow currently supports:
-
-- front and back labels;
-- optional additional panels;
-- reviewed-profile category checklist;
-- seller-entered values, uncertainty, and absence states;
-- multi-region, panel-relative evidence;
-- save and reload;
-- immutable package-analysis runs;
-- correction and reanalysis;
-- gated local agent-package generation.
-
-See [`docs/issue-138-seller-package-preparation.md`](docs/issue-138-seller-package-preparation.md).
-
-### 3. Artwork intake and preview
-
-- PNG and JPEG validation.
-- Declared type checked against decoded image format.
-- Empty, oversized, corrupt, and out-of-bounds images rejected with typed errors.
-- Immediate browser-local preview with filename, type, and size.
-- Replace and clear behavior.
-- Object URLs revoked when replaced or unmounted.
-- Uploads processed in memory and not retained between requests.
-
-### 4. OCR and evidence extraction
-
-- Vendored Tesseract WebAssembly OCR running server-side.
-- No mandatory cloud call at request time.
-- Current extracted fields:
-  - brand name;
-  - alcohol statement.
-- Typed machine-observation states:
-  - `OBSERVED`;
-  - `LOW_CONFIDENCE`;
-  - `AMBIGUOUS`;
-  - `NOT_OBSERVED`.
-- Per-field geometry, reference frame, extractor identity, OCR version, parser identity, and derivative SHA-256.
-- Versioned fixture corpus and bounded real-OCR regression coverage.
-
-> The original vision includes seven target fields. **Only brand name and alcohol content are extracted today.**
-
-### 5. Deterministic wine checks
-
-Currently executed:
-
-- `wine-alcohol-syntax`;
-- `wine-alcohol-declared-comparison`;
-- `brand-name-canonical-comparison`.
-
-Registered but deliberately not run from artwork alone:
-
-- `wine-alcohol-actual-content-tolerance`;
-- `wine-alcohol-class-type-boundary`;
-- `wine-alcohol-omission-eligibility`.
-
-Finding states are:
-
-- `PASS`;
-- `WARN`;
-- `FAIL`;
-- `NEEDS_REVIEW`;
-- `not_run`.
-
-There is **no aggregate compliance score or overall pass/fail verdict**.
-
-### 6. Results and reporting
-
-- Concise summary first.
-- Progressive disclosure for:
-  - evidence;
-  - regulatory checks;
-  - technical provenance;
-  - downloads;
-  - internal disposition.
-- Deterministic readable HTML report.
-- Canonical JSON export with a SHA-256 integrity block.
-- Append-only internal disposition history.
-- Server-issued authorization token for bounded disposition append operations.
-- Machine findings cannot be silently edited or deleted by a disposition.
-
-### 7. Architecture and deployment
-
-Implemented flow:
+### 1. The perception pipeline
 
 ```text
-Browser artwork + declared facts
-  → image validation
-  → local OCR extraction
-  → typed observations + geometry + provenance
-  → versioned deterministic wine rules
-  → governed findings
-  → checksum JSON + readable HTML report
-  → append-only human disposition
+Artwork
+  → decoded-image validation
+  → stateless visual observation
+  → OCR as a skeptical reviewer
+  → typed evidence and geometry
+  → semantic relationships
+  → deterministic pre-check rules
+  → provenance-bearing findings
 ```
 
-Completed infrastructure includes:
+The machine does not “know the answer” in advance. It proposes and verifies bounded observations, records uncertainty, and preserves the source geometry and extraction provenance.
 
-- Next.js standalone production build;
-- Node 22 runtime;
-- Hostinger deployment at `ttb-test.com`;
-- secondary Render deployment;
-- deployment-relative OCR asset resolution;
-- relocation smoke test using a real OCR request;
-- HMAC signing for append authorization;
-- runtime health reporting;
-- deployed-commit provenance support.
+Current machine-observation states include:
 
-Architecture details: [`docs/architecture.md`](docs/architecture.md) and [`docs/adr/`](docs/adr/).
+- `OBSERVED`
+- `LOW_CONFIDENCE`
+- `AMBIGUOUS`
+- `NOT_OBSERVED`
 
-### 8. Quality, accessibility, and testing
+Current deterministic result states include:
 
-- Unit and component tests with Vitest and Testing Library.
-- Architecture and boundary tests.
-- Production build validation.
-- Standalone relocation smoke test.
-- Playwright end-to-end browser coverage.
-- Labelled inputs and keyboard-operable disclosures.
-- Accessible alert handling.
-- Hardened browser download path.
-- User-safe bounded errors without stack traces, absolute paths, or environment leakage.
+- `PASS`
+- `WARN`
+- `FAIL`
+- `NEEDS_REVIEW`
+- `not_run`
 
----
+There is no aggregate compliance score and no overall government-approval verdict.
 
-## Recommended work to continue
+### 2. The seller-to-agent workflow
 
-The recommended order is based on completing one useful workflow before expanding scope.
-
-### P1 — Finish the guided seller workflow
-
-- Replace scattered actions with a **persistent control area** that keeps the path to completion visible.
-- Keep package progress visible in a fixed footer or equivalent persistent status surface.
-- Make **No back label** and **No additional panels** explicit package decisions.
-- Keep the central workspace focused on the current task while navigation and submission controls remain stable.
-- Move synthetic-label instructions into contextual guidance shown only when relevant.
-- Establish one unmistakable completion and handoff state.
-
-### P1 — Complete human verification of OCR
-
-- Show the user exactly what the machine read.
-- Show where each observation came from on the artwork.
-- Allow correction before rules run or before the package is finalized.
-- Preserve the original observation and the human correction as separate provenance-bearing records.
-- Re-run analysis from corrected evidence without overwriting prior analysis runs.
-
-### P1 — Strengthen label mapping and inspection
-
-- Complete click-and-draw evidence-region mapping.
-- Allow the seller to assign each region to the category it is intended to fulfill.
-- Add a practical magnification suite for detailed artwork inspection.
-- Make panel-relative coordinates stable across save, reload, correction, and reanalysis.
-- Clearly distinguish detected regions, user-confirmed regions, and unresolved regions.
-
-### P1 — Validate the first end-to-end definition of done
-
-A first complete domestic-wine path should demonstrate that a seller can:
-
-- configure the package;
-- upload the artwork;
-- verify the OCR;
-- map required evidence;
-- provide declared facts;
-- run the registered checks;
-- understand all result states;
-- see source citations and limitations;
-- create a coherent review package.
-
-Do not treat additional beverage categories as release blockers for this path.
-
-### P2 — Complete measured OCR evaluation
-
-- Finish the full-corpus extraction measurement currently developed separately from `main`.
-- Categorize failures before tuning.
-- Repair the highest-frequency or highest-impact measured failures first.
-- Pay particular attention to:
-  - decorative or script brand names;
-  - low contrast;
-  - rotated side text;
-  - split alcohol tokens;
-  - difficult multi-panel layouts.
-- Publish accuracy claims only after the harness and corpus are stable and merged.
-
-### P2 — Expand bounded wine evidence slices
-
-After the first workflow is complete, add fields one at a time with explicit contracts, fixtures, rules, and uncertainty behavior. Likely candidates include:
-
-- net contents;
-- government warning;
-- class or type;
-- bottler or producer information;
-- country or state of origin where applicable.
-
-Each new slice should preserve the same distinction between observed evidence, declared facts, deterministic evaluation, and facts that cannot be established from artwork alone.
-
-### P2 — Operational hardening
-
-- Cross-browser verification in Firefox and Safari.
-- Secure authenticated seller and reviewer roles.
-- Server-persisted packages and multi-device continuation.
-- Configurable evidence retention and audit policy.
-- Agent or reviewer queue.
-- Rate limiting, monitoring, backup, and incident procedures.
-- Formal deployment controls for any environment beyond a public demonstration.
-
-### P3 — Deferred expansion
-
-Defer until the domestic-wine workflow is complete and measured:
-
-- beer and malt-beverage profiles;
-- distilled-spirits profiles;
-- batch or camera intake;
-- cloud-vision fallback;
-- generalized semantic comparison across all label fields;
-- COLA or government-system integration;
-- production authorization claims.
-
----
-
-## Deliberately not implemented
-
-- TTB approval or rejection.
-- Overall compliance verdict.
-- COLA integration.
-- Government authentication, identity, or authorization.
-- Production identity and access controls.
-- Authenticated seller portal.
-- Persistent production evidence store.
-- Agent or government transmission.
-- Beer, malt-beverage, or spirits scoring.
-- Complete regulatory review or entitlement determination.
-- Automatic policy creation or self-training.
-- FedRAMP authorization, ATO, certification, or government endorsement.
-
-Several of these have future-compatible seams or accepted architectural directions. They are not current behavior.
-
----
-
-## Five-minute reviewer path
-
-1. Open <https://ttb-test.com>.
-2. Load the verified **M Cellars** sample, or upload a supported wine-label image.
-3. Enter the application brand name and alcohol value.
-4. Run the prescreen.
-5. Read the concise summary.
-6. Expand Evidence, Regulatory checks, and Technical provenance.
-7. Download the JSON export and HTML report.
-8. Optionally record an internal disposition and download the updated report.
-
----
-
-## Known limitations and tradeoffs
-
-- Local OCR supports privacy and reproducibility but misses difficult typography and layouts.
-- Preserving uncertainty routes more cases to a human instead of auto-clearing them.
-- Deterministic rules are explainable but only cover implemented evidence slices.
-- Artwork alone cannot establish every regulatory fact.
-- The public demo proves the review contract, not batch throughput or production security.
-- The package workflow remains browser-local and is not yet a persisted multi-user system.
-- Extraction accuracy is not yet a production-readiness claim.
-
----
-
-## Running locally
-
-### Prerequisites
-
-- Node 22 (`.nvmrc` = `22`; package engines require `>=22 <23`).
-- A glibc environment such as Debian, Ubuntu, or macOS for the native `sharp` binary.
-- No network is required at request time; OCR language data and WASM assets are vendored.
-
-### Install and run
-
-```bash
-npm install
-npm run dev
-npm run build
-npm run start
+```text
+Seller package preparation
+  → saved current package
+  → deterministic pre-check
+  → immutable submitted revision
+  → truthful submission receipt
+  → authenticated internal queue
+  → read-only evidence review
+  → future append-only internal disposition
 ```
 
-### Validation
+The product language is deliberately bounded:
 
-```bash
-npm run format:check
-npm run lint
-npm run typecheck
-npm test
-npm run test:coverage
-npm run build
-npm run smoke:relocation
-npx playwright install
-npm run test:e2e
-```
+- `Waiting for agent review`
+- `In review`
+- `Changes requested`
+- `Internally accepted for next step`
+- `Agent review complete`
 
-Exact test counts are intentionally not hardcoded because the suite changes as the system grows.
+Internal review is not TTB approval, COLA approval, legal acceptance, or regulatory acceptance.
 
 ---
 
-## Environment variables
+## Current project status
 
-| Variable | Requirement | Purpose |
-|---|---|---|
-| `LABEL_LENS_APPEND_SIGNING_KEY` | Required in production | HMAC-signs append-authorization tokens. Use a secret of at least 32 characters and store it only in the deployment secret store. |
-| `NODE_ENV` | Platform supplied | Selects production or development behavior. |
-| `PORT` | Platform supplied | Server port; defaults to `3000` locally. |
-| `LABEL_LENS_BUILD_COMMIT` | Required for auditable Hostinger exports | Stamps the deployed commit into runtime provenance. |
-| `LABEL_LENS_OCR_ASSET_DIR` | Optional | Overrides OCR language-data location. |
-| `LABEL_LENS_OCR_CORE_DIR` | Optional | Overrides OCR WASM-core location. |
+Label Lens is an active prototype focused on one end-to-end domestic-wine workflow.
 
-A development-only process-local signing key is used when `LABEL_LENS_APPEND_SIGNING_KEY` is unset outside production. Production prechecks fail closed if the key is missing.
+### Implemented
+
+#### Seller package preparation
+
+- Front, back, and optional panel decisions.
+- Browser-local draft persistence.
+- Image upload, replacement, and preview.
+- Category-by-category guided preparation.
+- Seller-confirmed values, uncertainty, and absence states.
+- Panel-relative evidence regions.
+- Machine observations maintained separately from seller evidence.
+- Immutable local analysis runs.
+- Reanalysis after seller changes.
+- Durable server-side finalization for review-ready packages.
+- Truthful submission receipt and owner-only status lookup.
+
+#### Perception and deterministic checks
+
+- Server-side Tesseract WebAssembly OCR.
+- No mandatory cloud inference call at request time.
+- Decoded image-type, size, dimension, and checksum validation.
+- Geometry and reference-frame provenance.
+- Brand-name and alcohol-statement extraction.
+- Versioned deterministic domestic-wine rules.
+- Explainable findings and canonical JSON export.
+
+#### Authentication and internal receiving workflow
+
+- Better Auth with database-backed, revocable sessions.
+- Provisioned `seller`, `agent`, and `admin` roles.
+- No public account registration.
+- Server-side authorization inside sensitive routes.
+- Role-directed landing pages.
+- Authenticated agent queue.
+- Read-only, integrity-verified submission detail views.
+- Seller ownership isolation.
+- Authorized panel streaming without exposing server filesystem paths.
+- Secure logout and session invalidation.
+- Idempotent environment-driven account bootstrap.
+- Programmatic database migration and optional bootstrap during production startup.
+
+#### Persistence and provenance
+
+- Drizzle ORM.
+- MySQL as the authoritative staging/production database.
+- SQLite as a local and test convenience with explicit parity coverage.
+- Immutable submission revisions.
+- HMAC integrity signatures.
+- Append-only status history.
+- Scoped idempotency.
+- Optimistic concurrency protections for submission finalization.
+- Private server-side panel storage.
+
+#### Quality and deployment
+
+- Next.js 15 and Node 22.
+- Hostinger branch-specific staging.
+- Vitest unit and integration coverage.
+- Dedicated real-MySQL CI lane.
+- Playwright end-to-end coverage.
+- Production build validation without requiring the native SQLite driver on the MySQL path.
+- Build-commit provenance.
+
+### In progress
+
+- Harden browser-local draft restoration so IndexedDB failure can never block the workspace.
+- Keep the public `Sign in` entry point visible while session state is pending or unavailable.
+- Complete staging smoke testing of the provisioned seller, agent, and admin accounts.
+
+### Not yet implemented
+
+- Reviewer claim locking.
+- Request-changes and internal-accept decision writes.
+- Review rationale forms.
+- Concurrent reviewer-decision protection.
+- Seller resubmission UI.
+- Resettable seeded demo queue in staging.
+- Email notifications.
+- Production invitation and password-recovery flows.
+- S3/R2 object-storage migration.
+- Beer, malt-beverage, or distilled-spirits profiles.
+- Official TTB transmission or government-system integration.
+
+---
+
+## Architecture principles
+
+### Evidence before conclusion
+
+Every meaningful conclusion should be traceable to preserved evidence, a deterministic rule, or an identified human actor.
+
+### Seller, machine, and reviewer records remain separate
+
+A reviewer may add an internal record, but may not silently rewrite seller evidence or machine output.
+
+### Submitted revisions are immutable
+
+Later seller edits create a new revision or resubmission. They do not alter the package already under review.
+
+### Authorization is enforced at the operation
+
+Middleware may improve navigation, but every sensitive queue, submission, status, asset, or decision operation must authorize the active server-side session directly.
+
+### Fail closed without pretending success
+
+The system must not issue a receipt for an asset it did not durably persist, report a submission that was not committed, or show a successful decision after a stale or unauthorized write.
+
+### Uncertainty is data
+
+`NOT_OBSERVED`, low confidence, ambiguity, and “cannot be evaluated from artwork alone” are valid outcomes. They are not forced into false certainty.
 
 ---
 
@@ -375,46 +211,206 @@ A development-only process-local signing key is used when `LABEL_LENS_APPEND_SIG
 
 | Area | Location |
 |---|---|
-| Primary UI and workspace | [`src/features/precheck/`](src/features/precheck/), [`src/app/page.tsx`](src/app/page.tsx) |
-| OCR and extraction | [`src/pipeline/extractor/`](src/pipeline/extractor/) |
-| Analyzer and result contracts | [`src/pipeline/analyzer/`](src/pipeline/analyzer/), [`src/pipeline/result/`](src/pipeline/result/) |
-| Wine rules | [`src/domain/rules/`](src/domain/rules/), [`src/domain/verification/`](src/domain/verification/) |
-| Reports and exports | [`src/pipeline/export/`](src/pipeline/export/) |
-| API routes | [`src/app/api/precheck/`](src/app/api/precheck/), [`src/app/api/health/`](src/app/api/health/) |
-| Fixtures and evaluation | [`src/fixtures/`](src/fixtures/), [`tests/fixtures/precheck/`](tests/fixtures/precheck/) |
-| End-to-end tests | [`tests/e2e/`](tests/e2e/) |
-| Architecture and security | [`docs/architecture.md`](docs/architecture.md), [`docs/security-deployment-strategy.md`](docs/security-deployment-strategy.md), [`docs/adr/`](docs/adr/) |
-
-Additional planning and governance documents:
-
-- [`docs/product-plan.md`](docs/product-plan.md)
-- [`docs/remaining-work-plan.md`](docs/remaining-work-plan.md)
-- [`docs/validation-rules.md`](docs/validation-rules.md)
-- [`docs/ocr-reliability-strategy.md`](docs/ocr-reliability-strategy.md)
-- [`docs/test-strategy.md`](docs/test-strategy.md)
-- [`docs/system-governance.md`](docs/system-governance.md)
-- [`docs/submission-scope-and-definition-of-done.md`](docs/submission-scope-and-definition-of-done.md)
-- [`docs/original-vision-and-scope.md`](docs/original-vision-and-scope.md)
+| Seller package workspace | `src/features/package-preparation/` |
+| One-image legacy prescreen | `src/features/precheck/` and `/review/legacy` |
+| OCR and extraction | `src/pipeline/extractor/` |
+| Deterministic rules | `src/rules/` |
+| Auth configuration | `src/lib/auth.ts` |
+| Server auth guards | `src/server/auth/guards.ts` |
+| Agent queue and detail APIs | `src/app/api/agent/` |
+| Submission finalization | `src/app/api/package/submit/finalize/` |
+| Submission status | `src/app/api/package/submit/status/` |
+| Database schema | `src/db/schema.ts` and `src/db/schema.sqlite.ts` |
+| Migrations | `src/db/migrations/` |
+| Production startup | `src/server/startup.ts`, `src/server/migrate.ts`, `scripts/start.ts` |
+| Architecture decisions | `docs/adr/` |
+| Browser tests | `tests/e2e/` |
 
 ---
 
-## Security and privacy boundary
+## Running locally
 
-- OCR, rules, export generation, and signing run server-side.
-- The browser does not call a model provider directly.
-- Signing secrets do not enter the client bundle.
-- Images are validated and processed in memory.
-- Uploads are not retained or used for hidden training.
-- Reports and errors are bounded to avoid leaking server paths or environment data.
-- Exports contain a re-verifiable SHA-256 integrity value.
-- The public demo is not a hardened production environment.
+### Requirements
 
-See [`docs/compliance-readiness-boundary.md`](docs/compliance-readiness-boundary.md).
+- Node.js 22 (`>=22 <23`).
+- npm.
+- MySQL 8.x for authoritative integration testing.
+- A modern browser for the package-preparation workspace.
+
+### Install
+
+```bash
+npm ci
+```
+
+### Development
+
+```bash
+npm run dev
+```
+
+Open:
+
+```text
+http://localhost:3000
+```
+
+### Production build
+
+```bash
+npm run build
+npm start
+```
+
+`npm start` runs the production startup wrapper:
+
+```text
+apply committed migrations
+  → optionally provision configured accounts
+  → start Next.js
+```
 
 ---
 
-## Governing principle
+## Validation
 
-Label Lens should remain useful precisely because it does not hide uncertainty or confuse software assistance with government authority.
+```bash
+npm run format:check
+npm run lint
+npm run typecheck
+npm run docs:check
+npm run docs:check:test
+npm test
+npm run build
+npm run test:mysql
+npm run test:e2e
+```
 
-> *“Let all things be done decently and in order.” — 1 Corinthians 14:40*
+The CI workflow separates:
+
+1. lint, typecheck, standard tests, and build;
+2. authoritative MySQL migration and integration tests;
+3. Playwright end-to-end browser tests.
+
+CI never connects to the Hostinger staging database.
+
+---
+
+## Environment variables
+
+### Core production configuration
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | Authoritative MySQL connection string. |
+| `BETTER_AUTH_SECRET` | Better Auth signing/encryption secret. |
+| `BETTER_AUTH_URL` | Canonical application URL used by Better Auth. |
+| `LABEL_LENS_INTEGRITY_SECRET` | Signs immutable submission integrity records. |
+| `LABEL_LENS_APPEND_SIGNING_KEY` | Signs bounded append-authorization records. |
+| `LABEL_LENS_BUILD_COMMIT` | Records the exact deployed Git commit. |
+| `LABEL_LENS_STORAGE_DIR` | Private server-side storage root for submitted panel assets. |
+
+Production secrets should be at least 32 characters and stored only in the deployment secret manager.
+
+### Provisioned demonstration accounts
+
+Public registration is disabled. Staging accounts can be provisioned from:
+
+```text
+LABEL_LENS_BOOTSTRAP_ADMIN_EMAIL
+LABEL_LENS_BOOTSTRAP_ADMIN_PASSWORD
+LABEL_LENS_BOOTSTRAP_AGENT_EMAIL
+LABEL_LENS_BOOTSTRAP_AGENT_PASSWORD
+LABEL_LENS_BOOTSTRAP_SELLER_EMAIL
+LABEL_LENS_BOOTSTRAP_SELLER_PASSWORD
+```
+
+Enable provisioning during startup with:
+
+```text
+LABEL_LENS_BOOTSTRAP_ON_START=1
+```
+
+Existing passwords are preserved by default. A deliberate password reset requires:
+
+```text
+LABEL_LENS_BOOTSTRAP_RESET_PASSWORDS=1
+```
+
+Never commit demonstration passwords, print them in CI, place them in screenshots, or paste them into issue and pull-request comments.
+
+---
+
+## Deployment notes
+
+The current branch-specific staging environment is used to prove the complete workflow before merge:
+
+```text
+seller login
+  → package preparation
+  → durable submission
+  → agent login
+  → queue visibility
+  → read-only evidence inspection
+  → seller status visibility
+```
+
+A staging deployment is not accepted from a successful build alone. It must also prove:
+
+- database migration completed;
+- provisioned accounts can authenticate;
+- seller and agent authorization boundaries hold;
+- private assets remain private;
+- submitted revisions verify successfully;
+- logout invalidates access;
+- no official-approval language appears;
+- local draft recovery cannot trap the user in a loading state.
+
+---
+
+## Security and truth boundaries
+
+Label Lens must not imply any of the following:
+
+- TTB approval;
+- COLA approval;
+- government approval;
+- legal compliance approval;
+- regulatory acceptance;
+- FedRAMP authorization;
+- production government endorsement.
+
+The project is designed to support evidence preparation and internal review while preserving a clear boundary between machine assistance, organizational workflow, and official authority.
+
+---
+
+## Live environments
+
+- Primary public demonstration: <https://ttb-test.com>
+- Branch-specific Issue #143 staging: <https://pr143.ttb-test.com>
+- Legacy one-image workflow: `/review/legacy`
+
+Availability and features may differ between the primary demonstration and the active branch-specific staging build.
+
+---
+
+## Contributing
+
+Keep changes narrow and evidence-driven.
+
+Before opening or updating a pull request:
+
+1. preserve the seller/machine/reviewer record boundaries;
+2. add authorization checks inside sensitive server operations;
+3. add or update deterministic tests;
+4. prove MySQL behavior when persistence semantics matter;
+5. preserve truthful internal-review language;
+6. keep the pull request draft until branch-specific staging is validated.
+
+See `docs/architecture.md`, `docs/adr/`, and the active GitHub issues for current implementation boundaries.
+
+---
+
+## License and use
+
+This repository is a research and product-development prototype. Review the repository license and deployment policies before reuse in production or regulated environments.
