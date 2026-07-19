@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+
+// Run layout effects synchronously in the browser/jsdom, but fall back to a
+// passive effect during server prerender (where `useLayoutEffect` is a no-op and
+// warns). Used for state that must settle before the user can interact.
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -339,12 +344,14 @@ export function PackagePreparationWorkspace() {
   // Reset the in-progress (uncommitted) working edit to the active context's
   // defaults when the seller navigates to a different category or panel.
   //
-  // Two guards keep this from racing a just-created working edit (e.g. copying
-  // machine geometry): (1) it does nothing until the draft has loaded, so a
-  // stale pre-load effect closure cannot flush after a click and wipe the edit;
-  // (2) if a working edit already belongs to the current category+panel, it is
-  // left untouched — only edits carried over from a previous context are cleared.
-  useEffect(() => {
+  // It runs as a layout effect so this settling happens synchronously at load,
+  // before the seller can type or draw — otherwise a passive re-run could flush
+  // during a later interaction and wipe freshly entered text or a just-drawn/
+  // copied region, silently disabling Save. Two further guards: (1) it does
+  // nothing until the draft has loaded; (2) a working edit already belonging to
+  // the current category+panel is left untouched — only edits carried over from
+  // a previous context are cleared.
+  useIsomorphicLayoutEffect(() => {
     if (!draft) return;
     const current = workingRegionRef.current;
     if (
