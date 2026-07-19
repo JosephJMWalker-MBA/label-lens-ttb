@@ -87,22 +87,26 @@ describe("hardened processing routes", () => {
     return found;
   }
 
-  it("exposes exactly two bounded processing routes, two append routes, and an inert health probe", () => {
+  it("exposes exactly two bounded processing routes, two append routes, an inert health probe, and authenticated submission routes", () => {
     const routes = routeFiles(apiDir).sort();
     const healthRoute = join(apiDir, "health", "route.ts");
     const packageAnalysisRoute = join(apiDir, "package", "analyze", "route.ts");
     const confirmationRoute = join(apiDir, "precheck", "confirmation", "route.ts");
+    const statusRoute = join(apiDir, "package", "submit", "status", "[id]", "route.ts");
+    const authRoute = join(apiDir, "auth", "[...all]", "route.ts");
     expect(routes).toEqual([
+      authRoute,
       healthRoute,
       packageAnalysisRoute,
+      join(apiDir, "package", "submit", "finalize", "route.ts"),
+      statusRoute,
       confirmationRoute,
       join(apiDir, "precheck", "disposition", "route.ts"),
       join(apiDir, "precheck", "route.ts"),
-    ]);
-    // The three mutable routes accept POST; the health probe is a GET-only
-    // liveness endpoint that performs no OCR and imports no processing service.
+    ].sort());
+    // The mutable processing/append/finalize routes accept POST; status is GET-only.
     for (const route of routes) {
-      if (route === healthRoute) continue;
+      if (route === healthRoute || route === statusRoute || route === authRoute) continue;
       expect(readFileSync(route, "utf8")).toMatch(/export\s+async\s+function\s+POST/);
     }
     const health = readFileSync(healthRoute, "utf8");
@@ -147,6 +151,8 @@ describe("hardened processing routes", () => {
       "precheck/route.ts",
       "precheck/disposition/route.ts",
       "precheck/confirmation/route.ts",
+      "package/submit/finalize/route.ts",
+      "package/submit/status/[id]/route.ts",
     ]) {
       const source = readFileSync(join(apiDir, rel), "utf8");
       expect(source).toMatch(/export\s+const\s+runtime\s*=\s*["']nodejs["']/);

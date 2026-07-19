@@ -1,13 +1,133 @@
 import { createHash, randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
+import { z } from "zod";
+
+export const runtime = "nodejs";
 import { db, schema, isSQLite } from "@/db/client";
 import { auth } from "@/lib/auth";
 import { canonicalizeJson } from "@/lib/canonical";
 import { signRevision } from "@/lib/integrity";
+import { verifyAppendToken } from "@/server/append-token";
+import { latestAnalysisIsCurrent } from "@/features/package-preparation/package-model";
+import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
+
+// 1. Zod Schema Definitions for seller-agent-package.v1 validation
+const PanelRoleSchema = z.enum(["front", "back", "neck", "side", "other"]);
+const PanelRotationSchema = z.union([z.literal(0), z.literal(90), z.literal(180), z.literal(270)]);
+
+const PackagePanelMetadataSchema = z.object({
+  panelId: z.string().min(1),
+  order: z.number().int().nonnegative(),
+  role: PanelRoleSchema,
+  displayName: z.string().min(1),
+  mediaType: z.string().min(1),
+  byteSize: z.number().int().positive(),
+  checksumSha256: z.string().length(64),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+  rotation: PanelRotationSchema,
+  storageKey: z.string().min(1),
+});
+
+const SellerEvidenceRegionSchema = z.object({
+  regionId: z.string().min(1),
+  categoryId: z.string().min(1),
+  panelId: z.string().min(1),
+  unit: z.literal("normalized-panel-relative"),
+  provenance: z.literal("seller-selected-region"),
+  x: z.number().min(0).max(1),
+  y: z.number().min(0).max(1),
+  width: z.number().positive().max(1),
+  height: z.number().positive().max(1),
+});
+
+const PackageCategoryDraftSchema = z.object({
+  categoryId: z.string().min(1),
+  decision: z.enum(["provided", "unresolved", "not_present"]),
+  expectedValue: z.string(),
+  regions: z.array(SellerEvidenceRegionSchema),
+});
+
+const PackagePanelMachineRunSchema = z.object({
+  panelId: z.string().min(1),
+  machineResultId: z.string().min(1),
+  exportJson: z.string(),
+  observations: z.record(z.any()),
+});
+
+const PackageCategoryAnalysisSchema = z.object({
+  categoryId: z.string().min(1),
+  state: z.enum(["clearly_readable", "needs_review", "not_found", "not_applicable"]),
+  observedValue: z.string().nullable(),
+  supportingPanelIds: z.array(z.string()),
+  supportingRegionIds: z.array(z.string()),
+  reason: z.string(),
+});
+
+const PackageAnalysisRunSchema = z.object({
+  analysisRunId: z.string().min(1),
+  sequence: z.number().int().positive(),
+  sellerChangeSequence: z.number().int().nonnegative(),
+  recordedAt: z.string(),
+  panelRuns: z.array(PackagePanelMachineRunSchema),
+  categories: z.array(PackageCategoryAnalysisSchema),
+  readiness: z.enum(["needs_seller_review", "ready_for_agent_submission"]),
+});
+
+const SellerPackageChangeSchema = z.object({
+  changeId: z.string().min(1),
+  sequence: z.number().int().positive(),
+  recordedAt: z.string(),
+  action: z.string(),
+  categoryId: z.string().optional(),
+  panelId: z.string().optional(),
+  regionId: z.string().optional(),
+  detail: z.string(),
+});
+
+const SellerPackageDraftSchema = z.object({
+  schemaVersion: z.literal("seller-package-draft.v1"),
+  packageId: z.string().min(1),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  profile: z.object({
+    id: z.string().min(1),
+    version: z.string().min(1),
+  }),
+  panelDecisions: z.object({
+    back: z.enum(["unresolved", "upload", "absent"]),
+    additional: z.enum(["unresolved", "add", "none"]),
+  }).optional(),
+  panels: z.array(PackagePanelMetadataSchema),
+  categories: z.array(PackageCategoryDraftSchema),
+  sellerChangeHistory: z.array(SellerPackageChangeSchema),
+  analysisRuns: z.array(PackageAnalysisRunSchema),
+});
+
+const SellerPackageExportSchema = z.object({
+  exportSchemaVersion: z.literal("seller-agent-package.v1"),
+  exportType: z.literal("seller-prepared-agent-package"),
+  boundary: z.object({
+    transmission: z.string().min(1),
+    governmentApproval: z.literal(false),
+    statement: z.string().min(1),
+  }),
+  submittedBy: z.string().email(),
+  submittedAt: z.string(),
+  receivingAgent: z.string().min(1),
+  package: SellerPackageDraftSchema,
+  readiness: z.literal("ready_for_agent_submission"),
+  applicationBuild: z.any(),
+  integrity: z.object({
+    algorithm: z.literal("sha256"),
+    scope: z.literal("canonical-package-payload"),
+    value: z.string().length(64),
+  }),
+});
 
 export async function POST(request: Request) {
-  // 1. Authenticate the user and verify role
+  // 1. Authenticate user
   const session = await auth.api.getSession({
     headers: request.headers,
   });
@@ -22,27 +142,101 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "X-Idempotency-Key header is required" }, { status: 400 });
   }
 
-  let payload: any;
+  let rawBody: any;
   try {
-    payload = await request.json();
+    rawBody = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  // 3. Validate minimal payload constraints
-  if (!payload.packageId || !payload.profileId || !payload.profileVersion) {
+  // 3. Schema validation using Zod
+  const validationResult = SellerPackageExportSchema.safeParse(rawBody);
+  if (!validationResult.success) {
     return NextResponse.json(
-      { error: "Missing required fields: packageId, profileId, profileVersion" },
+      { error: "Invalid schema validation", details: validationResult.error.issues },
       { status: 400 }
     );
   }
 
-  const canonicalString = canonicalizeJson(payload);
-  const requestHash = createHash("sha256").update(canonicalString).digest("hex");
+  const exportPayload = validationResult.data;
+
+  // 4. Validate payload integrity signature
+  const payloadWithoutIntegrity = { ...exportPayload } as any;
+  delete payloadWithoutIntegrity.integrity;
+  const canonicalString = canonicalizeJson(payloadWithoutIntegrity);
+  const recomputedHash = createHash("sha256").update(canonicalString).digest("hex");
+
+  if (recomputedHash !== exportPayload.integrity.value) {
+    return NextResponse.json(
+      { error: "Bad Request: Integrity value mismatch. Payload has been tampered with or corrupted." },
+      { status: 400 }
+    );
+  }
+
+  // 5. Enforce package currentness and readiness
+  const draft = exportPayload.package as any;
+  if (!latestAnalysisIsCurrent(draft)) {
+    return NextResponse.json(
+      { error: "Bad Request: Stale package. Analysis must be run on the latest draft before finalizing." },
+      { status: 400 }
+    );
+  }
+
+  const latestRun = draft.analysisRuns.at(-1);
+  if (!latestRun || latestRun.readiness !== "ready_for_agent_submission") {
+    return NextResponse.json(
+      { error: "Bad Request: Package is not ready. Analysis status must be ready_for_agent_submission." },
+      { status: 400 }
+    );
+  }
+
+  // 6. Validate server provenance for all panel machine runs in the latest analysis run
+  for (const panelRun of latestRun.panelRuns) {
+    let parsedJson: any;
+    try {
+      parsedJson = JSON.parse(panelRun.exportJson);
+    } catch {
+      return NextResponse.json(
+        { error: "Bad Request: Panel run exportJson is invalid JSON." },
+        { status: 400 }
+      );
+    }
+
+    // Verify HMAC signature matches the machine result ID
+    const verifyResult = verifyAppendToken(parsedJson.appendToken, panelRun.machineResultId);
+    if (!verifyResult.ok) {
+      return NextResponse.json(
+        { error: "Bad Request: Invalid server provenance token on analysis panel run." },
+        { status: 400 }
+      );
+    }
+
+    // Recompute machineResultId to prove payload consistency
+    const machinePayload = {
+      schemaVersion: "package-panel-machine-record.v1",
+      packageId: draft.packageId,
+      panel: parsedJson.panel,
+      sourceSha256: parsedJson.sourceSha256,
+      observations: parsedJson.observations,
+      versionManifest: parsedJson.versionManifest,
+    };
+    const recomputedId = createHash("sha256")
+      .update(canonicalStringify(machinePayload))
+      .digest("hex");
+
+    if (recomputedId !== panelRun.machineResultId) {
+      return NextResponse.json(
+        { error: "Bad Request: Recomputed panel run ID mismatch." },
+        { status: 400 }
+      );
+    }
+  }
+
+  const requestHash = createHash("sha256").update(canonicalizeJson(exportPayload)).digest("hex");
   const scopedKey = `${session.user.id}:finalize:${idempotencyKey}`;
 
-  try {
-    // 4. Check idempotency records
+  // Helper to parse idempotency key error
+  const handleIdempotencyConflict = async () => {
     const existing = await db
       .select()
       .from(schema.idempotencyRecords)
@@ -58,144 +252,152 @@ export async function POST(request: Request) {
       }
       return NextResponse.json(JSON.parse(existing[0].responsePayload));
     }
+    return null;
+  };
 
+  // Pre-transaction lookup to handle standard sequential retries
+  const cachedResponse = await handleIdempotencyConflict();
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+
+  try {
     const submittedAtDate = new Date();
     const signature = signRevision(canonicalString);
     const revisionId = randomUUID();
 
     const receiptPayload = {
       receiptId: revisionId,
-      submissionId: payload.packageId,
+      submissionId: draft.packageId,
       revisionNumber: 1,
       submittedAt: submittedAtDate.toISOString(),
       integritySignature: signature,
       status: "waiting_for_agent_review",
     };
 
-    // 5. Execute transaction (durable commit before receipt is returned)
+    // 7. Atomic transaction commit
     if (isSQLite) {
-      // Local SQLite Synchronous Transaction
       db.transaction((tx: any) => {
-        // 5.a Check if submission ID exists
+        // Ensure submission doesn't already exist
         const existingSub = tx
           .select()
           .from(schema.submissions)
-          .where(eq(schema.submissions.id, payload.packageId))
+          .where(eq(schema.submissions.id, draft.packageId))
           .all();
 
         if (existingSub.length > 0) {
           throw new Error("SUBMISSION_ALREADY_EXISTS");
         }
 
-        // 5.b Create Submission record
-        tx.insert(schema.submissions).values({
-          id: payload.packageId,
-          creatorId: session.user.id,
-          currentStatus: "waiting_for_agent_review",
-          isDemo: false,
-          version: 1,
-          createdAt: submittedAtDate,
-          updatedAt: submittedAtDate,
-        }).run();
-
-        // 5.c Create SubmissionRevision record
-        tx.insert(schema.submissionRevisions).values({
-          id: revisionId,
-          submissionId: payload.packageId,
-          revisionNumber: 1,
-          profileId: payload.profileId,
-          profileVersion: payload.profileVersion,
-          submittedBy: session.user.email,
-          submittedAt: submittedAtDate,
-          canonicalJson: canonicalString,
-          integritySignature: signature,
-        }).run();
-
-        // 5.d Create SubmittedPanel records
-        if (Array.isArray(payload.panels)) {
-          for (const panel of payload.panels) {
-            tx.insert(schema.submittedPanels).values({
-              id: panel.panelId || randomUUID(),
-              revisionId: revisionId,
-              role: panel.role,
-              displayName: panel.displayName,
-              mediaType: panel.mediaType,
-              byteSize: panel.byteSize,
-              checksumSha256: panel.checksumSha256,
-              width: panel.width,
-              height: panel.height,
-              rotation: panel.rotation,
-              storageKey: panel.storageKey,
-            }).run();
-          }
-        }
-
-        // 5.e Create SellerEvidenceSnapshot records
-        if (Array.isArray(payload.evidence)) {
-          for (const ev of payload.evidence) {
-            tx.insert(schema.sellerEvidenceSnapshots).values({
-              id: ev.evidenceId || randomUUID(),
-              revisionId: revisionId,
-              categoryId: ev.categoryId,
-              decision: ev.decision,
-              expectedValue: ev.expectedValue,
-              regions: JSON.stringify(ev.regions || []),
-            }).run();
-          }
-        }
-
-        // 5.f Create MachineAnalysisSnapshot records
-        if (Array.isArray(payload.machineRuns)) {
-          for (const run of payload.machineRuns) {
-            tx.insert(schema.machineAnalysisSnapshots).values({
-              id: run.analysisSnapshotId || randomUUID(),
-              revisionId: revisionId,
-              analysisRunId: run.analysisRunId,
-              sequence: run.sequence || 1,
-              panelRuns: JSON.stringify(run.panelRuns || []),
-              categories: JSON.stringify(run.categories || []),
-              readiness: run.readiness,
-              recordedAt: new Date(run.recordedAt || Date.now()),
-            }).run();
-          }
-        }
-
-        // 5.g Create SubmissionStatusEvent record
-        tx.insert(schema.submissionStatusEvents).values({
-          id: randomUUID(),
-          submissionId: payload.packageId,
-          status: "waiting_for_agent_review",
-          actorId: session.user.id,
-          actorRole: session.user.role,
-          reasonComment: "Seller finalized workspace submission",
-          recordedAt: submittedAtDate,
-        }).run();
-
-        // 5.h Save Idempotency Record
+        // Save Idempotency Record first to trigger unique constraint check concurrently
         tx.insert(schema.idempotencyRecords).values({
           key: scopedKey,
           requestHash: requestHash,
           responsePayload: JSON.stringify(receiptPayload),
           createdAt: submittedAtDate,
         }).run();
+
+        // Create Submission record
+        tx.insert(schema.submissions).values({
+          id: draft.packageId,
+          creatorId: session.user.id,
+          currentStatus: "waiting_for_agent_review",
+          isDemo: false,
+          version: 1,
+          createdAt: submittedAtDate,
+          updatedAt: submittedAtDate,
+        }).run();
+
+        // Create SubmissionRevision record
+        tx.insert(schema.submissionRevisions).values({
+          id: revisionId,
+          submissionId: draft.packageId,
+          revisionNumber: 1,
+          profileId: draft.profile.id,
+          profileVersion: draft.profile.version,
+          submittedBy: session.user.email,
+          submittedAt: submittedAtDate,
+          canonicalJson: canonicalString,
+          integritySignature: signature,
+        }).run();
+
+        // Create SubmittedPanel records
+        for (const panel of draft.panels) {
+          tx.insert(schema.submittedPanels).values({
+            id: panel.panelId || randomUUID(),
+            revisionId: revisionId,
+            role: panel.role,
+            displayName: panel.displayName,
+            mediaType: panel.mediaType,
+            byteSize: panel.byteSize,
+            checksumSha256: panel.checksumSha256,
+            width: panel.width,
+            height: panel.height,
+            rotation: panel.rotation,
+            storageKey: panel.storageKey,
+          }).run();
+        }
+
+        // Create SellerEvidenceSnapshot records
+        for (const ev of draft.categories) {
+          tx.insert(schema.sellerEvidenceSnapshots).values({
+            id: ev.evidenceId || randomUUID(),
+            revisionId: revisionId,
+            categoryId: ev.categoryId,
+            decision: ev.decision,
+            expectedValue: ev.expectedValue,
+            regions: JSON.stringify(ev.regions || []),
+          }).run();
+        }
+
+        // Create MachineAnalysisSnapshot records
+        for (const run of latestRun.panelRuns) {
+          tx.insert(schema.machineAnalysisSnapshots).values({
+            id: randomUUID(),
+            revisionId: revisionId,
+            analysisRunId: latestRun.analysisRunId,
+            sequence: latestRun.sequence,
+            panelRuns: JSON.stringify(run.panelRuns || []),
+            categories: JSON.stringify(latestRun.categories || []),
+            readiness: latestRun.readiness,
+            recordedAt: new Date(latestRun.recordedAt || Date.now()),
+          }).run();
+        }
+
+        // Create SubmissionStatusEvent record
+        tx.insert(schema.submissionStatusEvents).values({
+          id: randomUUID(),
+          submissionId: draft.packageId,
+          status: "waiting_for_agent_review",
+          actorId: session.user.id,
+          actorRole: session.user.role,
+          reasonComment: "Seller finalized workspace submission",
+          recordedAt: submittedAtDate,
+        }).run();
       });
     } else {
-      // Production MySQL Asynchronous Transaction
       await db.transaction(async (tx: any) => {
-        // 5.a Check if submission ID exists
         const existingSub = await tx
           .select()
           .from(schema.submissions)
-          .where(eq(schema.submissions.id, payload.packageId))
+          .where(eq(schema.submissions.id, draft.packageId))
           .limit(1);
 
         if (existingSub.length > 0) {
           throw new Error("SUBMISSION_ALREADY_EXISTS");
         }
 
-        // 5.b Create Submission record
+        // Save Idempotency Record
+        await tx.insert(schema.idempotencyRecords).values({
+          key: scopedKey,
+          requestHash: requestHash,
+          responsePayload: JSON.stringify(receiptPayload),
+          createdAt: submittedAtDate,
+        });
+
+        // Create Submission record
         await tx.insert(schema.submissions).values({
-          id: payload.packageId,
+          id: draft.packageId,
           creatorId: session.user.id,
           currentStatus: "waiting_for_agent_review",
           isDemo: false,
@@ -204,91 +406,89 @@ export async function POST(request: Request) {
           updatedAt: submittedAtDate,
         });
 
-        // 5.c Create SubmissionRevision record
+        // Create SubmissionRevision record
         await tx.insert(schema.submissionRevisions).values({
           id: revisionId,
-          submissionId: payload.packageId,
+          submissionId: draft.packageId,
           revisionNumber: 1,
-          profileId: payload.profileId,
-          profileVersion: payload.profileVersion,
+          profileId: draft.profile.id,
+          profileVersion: draft.profile.version,
           submittedBy: session.user.email,
           submittedAt: submittedAtDate,
           canonicalJson: canonicalString,
           integritySignature: signature,
         });
 
-        // 5.d Create SubmittedPanel records
-        if (Array.isArray(payload.panels)) {
-          for (const panel of payload.panels) {
-            await tx.insert(schema.submittedPanels).values({
-              id: panel.panelId || randomUUID(),
-              revisionId: revisionId,
-              role: panel.role,
-              displayName: panel.displayName,
-              mediaType: panel.mediaType,
-              byteSize: panel.byteSize,
-              checksumSha256: panel.checksumSha256,
-              width: panel.width,
-              height: panel.height,
-              rotation: panel.rotation,
-              storageKey: panel.storageKey,
-            });
-          }
+        // Create SubmittedPanel records
+        for (const panel of draft.panels) {
+          await tx.insert(schema.submittedPanels).values({
+            id: panel.panelId || randomUUID(),
+            revisionId: revisionId,
+            role: panel.role,
+            displayName: panel.displayName,
+            mediaType: panel.mediaType,
+            byteSize: panel.byteSize,
+            checksumSha256: panel.checksumSha256,
+            width: panel.width,
+            height: panel.height,
+            rotation: panel.rotation,
+            storageKey: panel.storageKey,
+          });
         }
 
-        // 5.e Create SellerEvidenceSnapshot records
-        if (Array.isArray(payload.evidence)) {
-          for (const ev of payload.evidence) {
-            await tx.insert(schema.sellerEvidenceSnapshots).values({
-              id: ev.evidenceId || randomUUID(),
-              revisionId: revisionId,
-              categoryId: ev.categoryId,
-              decision: ev.decision,
-              expectedValue: ev.expectedValue,
-              regions: JSON.stringify(ev.regions || []),
-            });
-          }
+        // Create SellerEvidenceSnapshot records
+        for (const ev of draft.categories) {
+          await tx.insert(schema.sellerEvidenceSnapshots).values({
+            id: ev.evidenceId || randomUUID(),
+            revisionId: revisionId,
+            categoryId: ev.categoryId,
+            decision: ev.decision,
+            expectedValue: ev.expectedValue,
+            regions: JSON.stringify(ev.regions || []),
+          });
         }
 
-        // 5.f Create MachineAnalysisSnapshot records
-        if (Array.isArray(payload.machineRuns)) {
-          for (const run of payload.machineRuns) {
-            await tx.insert(schema.machineAnalysisSnapshots).values({
-              id: run.analysisSnapshotId || randomUUID(),
-              revisionId: revisionId,
-              analysisRunId: run.analysisRunId,
-              sequence: run.sequence || 1,
-              panelRuns: JSON.stringify(run.panelRuns || []),
-              categories: JSON.stringify(run.categories || []),
-              readiness: run.readiness,
-              recordedAt: new Date(run.recordedAt || Date.now()),
-            });
-          }
+        // Create MachineAnalysisSnapshot records
+        for (const run of latestRun.panelRuns) {
+          await tx.insert(schema.machineAnalysisSnapshots).values({
+            id: randomUUID(),
+            revisionId: revisionId,
+            analysisRunId: latestRun.analysisRunId,
+            sequence: latestRun.sequence,
+            panelRuns: JSON.stringify(run.panelRuns || []),
+            categories: JSON.stringify(latestRun.categories || []),
+            readiness: latestRun.readiness,
+            recordedAt: new Date(latestRun.recordedAt || Date.now()),
+          });
         }
 
-        // 5.g Create SubmissionStatusEvent record
+        // Create SubmissionStatusEvent record
         await tx.insert(schema.submissionStatusEvents).values({
           id: randomUUID(),
-          submissionId: payload.packageId,
+          submissionId: draft.packageId,
           status: "waiting_for_agent_review",
           actorId: session.user.id,
           actorRole: session.user.role,
           reasonComment: "Seller finalized workspace submission",
           recordedAt: submittedAtDate,
         });
-
-        // 5.h Save Idempotency Record
-        await tx.insert(schema.idempotencyRecords).values({
-          key: scopedKey,
-          requestHash: requestHash,
-          responsePayload: JSON.stringify(receiptPayload),
-          createdAt: submittedAtDate,
-        });
       });
     }
 
     return NextResponse.json(receiptPayload);
   } catch (err: any) {
+    // 8. Catch unique key conflicts for concurrent idempotency safety
+    const isDuplicate =
+      err.code === "SQLITE_CONSTRAINT_PRIMARYKEY" ||
+      err.code === "ER_DUP_ENTRY" ||
+      err.errno === 1062 ||
+      (err.message && err.message.includes("UNIQUE constraint failed"));
+
+    if (isDuplicate) {
+      const cachedResponse = await handleIdempotencyConflict();
+      if (cachedResponse) return cachedResponse;
+    }
+
     console.error("[Finalize Route Error]", err);
     if (err.message === "SUBMISSION_ALREADY_EXISTS") {
       return NextResponse.json({ error: "Conflict: Submission already finalized" }, { status: 409 });

@@ -170,5 +170,39 @@ export function createTestSqliteDb(filepath: string, forceDelete = false) {
     );
   `);
 
+  // Enforce table immutability via triggers on submissions
+  sqliteDb.exec(`
+    CREATE TRIGGER IF NOT EXISTS prevent_submissions_update
+    BEFORE UPDATE ON submissions
+    BEGIN
+      SELECT RAISE(FAIL, 'Submissions are immutable and cannot be updated.');
+    END;
+  `);
+
+  sqliteDb.exec(`
+    CREATE TRIGGER IF NOT EXISTS prevent_submissions_delete
+    BEFORE DELETE ON submissions
+    BEGIN
+      SELECT RAISE(FAIL, 'Submissions are immutable and cannot be deleted.');
+    END;
+  `);
+
+  // Enforce table immutability via triggers on submission_revisions
+  sqliteDb.exec(`
+    CREATE TRIGGER IF NOT EXISTS prevent_revisions_update
+    BEFORE UPDATE ON submission_revisions
+    BEGIN
+      SELECT RAISE(FAIL, 'Submission revisions are immutable and cannot be updated.');
+    END;
+  `);
+
+  sqliteDb.exec(`
+    CREATE TRIGGER IF NOT EXISTS prevent_revisions_delete
+    BEFORE DELETE ON submission_revisions
+    BEGIN
+      SELECT RAISE(FAIL, 'Submission revisions are immutable and cannot be deleted.');
+    END;
+  `);
+
   return sqliteDb;
 }

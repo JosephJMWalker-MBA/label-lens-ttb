@@ -56,7 +56,7 @@ export const verifications = mysqlTable("verifications", {
 
 // 5. Submissions Table
 export const submissions = mysqlTable("submissions", {
-  id: varchar("id", { length: 36 }).primaryKey(),
+  id: varchar("id", { length: 255 }).primaryKey(),
   creatorId: varchar("creator_id", { length: 36 }).references(() => users.id).notNull(),
   currentStatus: varchar("current_status", { length: 50 }).notNull(), // "waiting_for_agent_review" | "in_agent_review" | "changes_requested" | "internally_accepted" | "withdrawn"
   isDemo: boolean("is_demo").default(false).notNull(),
@@ -68,7 +68,7 @@ export const submissions = mysqlTable("submissions", {
 // 6. Submission Revisions Table
 export const submissionRevisions = mysqlTable("submission_revisions", {
   id: varchar("id", { length: 36 }).primaryKey(),
-  submissionId: varchar("submission_id", { length: 36 }).references(() => submissions.id, { onDelete: "cascade" }).notNull(),
+  submissionId: varchar("submission_id", { length: 255 }).references(() => submissions.id, { onDelete: "cascade" }).notNull(),
   revisionNumber: int("revision_number").notNull(),
   profileId: varchar("profile_id", { length: 100 }).notNull(),
   profileVersion: varchar("profile_version", { length: 50 }).notNull(),
@@ -120,7 +120,7 @@ export const machineAnalysisSnapshots = mysqlTable("machine_analysis_snapshots",
 // 10. Submission Status Events Table
 export const submissionStatusEvents = mysqlTable("submission_status_events", {
   id: varchar("id", { length: 36 }).primaryKey(),
-  submissionId: varchar("submission_id", { length: 36 }).references(() => submissions.id, { onDelete: "cascade" }).notNull(),
+  submissionId: varchar("submission_id", { length: 255 }).references(() => submissions.id, { onDelete: "cascade" }).notNull(),
   status: varchar("status", { length: 50 }).notNull(),
   actorId: varchar("actor_id", { length: 36 }).references(() => users.id),
   actorRole: varchar("actor_role", { length: 50 }).notNull(),

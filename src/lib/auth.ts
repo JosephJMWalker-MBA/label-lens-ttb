@@ -27,9 +27,6 @@ export const auth = betterAuth({
         type: "string",
         defaultValue: "seller",
       },
-      passwordHash: {
-        type: "string",
-      },
     },
   },
 });

@@ -3,6 +3,9 @@ import { eq } from "drizzle-orm";
 import { db, schema } from "@/db/client";
 import { auth } from "@/lib/auth";
 
+export const runtime = "nodejs";
+import { verifyRevision } from "@/lib/integrity";
+
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   // 1. Authenticate user
   const session = await auth.api.getSession({
@@ -32,14 +35,13 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
   const submission = result[0];
 
-  // 3. Enforce Owner-Only Access for Sellers
-  // If the authenticated user is a seller, they can only read their own submissions.
-  if (session.user.role === "seller" && submission.creatorId !== session.user.id) {
+  // 3. Strictly owner-only authorization check
+  if (submission.creatorId !== session.user.id) {
     return NextResponse.json({ error: "Forbidden: Access restricted to owner" }, { status: 403 });
   }
 
-  // 4. Fetch Submission Revisions
-  const revisions = await db
+  // 4. Fetch Submission Revisions (including canonicalJson for integrity check)
+  const revisionsFromDb = await db
     .select({
       id: schema.submissionRevisions.id,
       revisionNumber: schema.submissionRevisions.revisionNumber,
@@ -47,12 +49,35 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       profileVersion: schema.submissionRevisions.profileVersion,
       submittedBy: schema.submissionRevisions.submittedBy,
       submittedAt: schema.submissionRevisions.submittedAt,
+      canonicalJson: schema.submissionRevisions.canonicalJson,
       integritySignature: schema.submissionRevisions.integritySignature,
     })
     .from(schema.submissionRevisions)
     .where(eq(schema.submissionRevisions.submissionId, submissionId));
 
-  // 5. Fetch Submission Status Events
+  // 5. Verify revision HMAC signature to guarantee database integrity
+  for (const rev of revisionsFromDb) {
+    const isValid = verifyRevision(rev.canonicalJson, rev.integritySignature);
+    if (!isValid) {
+      return NextResponse.json(
+        { error: "Internal Server Error: Database integrity check failed. Submission data has been tampered with or corrupted." },
+        { status: 500 }
+      );
+    }
+  }
+
+  // Map revisions to exclude canonicalJson from client response
+  const revisions = revisionsFromDb.map((rev) => ({
+    id: rev.id,
+    revisionNumber: rev.revisionNumber,
+    profileId: rev.profileId,
+    profileVersion: rev.profileVersion,
+    submittedBy: rev.submittedBy,
+    submittedAt: rev.submittedAt,
+    integritySignature: rev.integritySignature,
+  }));
+
+  // 6. Fetch Submission Status Events
   const events = await db
     .select({
       id: schema.submissionStatusEvents.id,
