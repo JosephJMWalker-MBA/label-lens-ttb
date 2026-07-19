@@ -14,6 +14,7 @@ To ensure high security, session management must:
 1. Support database-backed sessions to allow administrators or users to audit and revoke active sessions instantly.
 2. Prevent single-point middleware authorization bypasses by enforcing strict role and ownership checks inside every sensitive API route handler.
 3. Authenticate sellers directly rather than relying on anonymous possession-token links, ensuring robust data isolation and ownership verification.
+4. Prevent unauthorized public access or spam registrations in the staging and production environments.
 
 ## Evaluation of Authentication Options
 
@@ -44,9 +45,10 @@ We will implement a database-backed, role-based authentication system using **Be
 
 1. **Role Classification:** Every user is represented in a `User` table with a specific `role` ENUM (`seller`, `agent`, `admin`).
 2. **Database-Backed Sessions:** Sessions are stored in the database (`Session` table) and associated with a unique session token. Session verification requires querying the database, enabling real-time session revocation.
-3. **Authenticated Sellers:** Sellers must log in to create and manage submissions. All submissions are linked directly to the creator's `user_id`. Anonymous or unauthenticated package submissions are prohibited.
-4. **Endpoint-Level Authorization:** Next.js Middleware acts as a first-line routing guard to redirect unauthenticated requests. However, **every sensitive API route must perform inline authorization** (verifying the active session, verifying the user's role, and confirming ownership of the target resource) before processing any data or state changes.
-5. **Session Cookies:** Signed session tokens are delivered via `HttpOnly`, `Secure`, `SameSite=Lax` cookies managed by Better Auth.
+3. **No Public Registration:** Self-service registration is disabled for all user roles. All accounts (Sellers, Agents, and Administrators) must be provisioned by an Administrator or via an admin-controlled invitation flow. There is no open public signup API endpoint in v1.
+4. **Authenticated Sellers:** Sellers must log in to create and manage submissions. All submissions are linked directly to the creator's `user_id`. Anonymous or unauthenticated package submissions are prohibited.
+5. **Endpoint-Level Authorization:** Next.js Middleware acts as a first-line routing guard to redirect unauthenticated requests. However, **every sensitive API route must perform inline authorization** (verifying the active session, verifying the user's role, and confirming ownership of the target resource) before processing any data or state changes.
+6. **Session Cookies:** Signed session tokens are delivered via `HttpOnly`, `Secure`, `SameSite=Lax` cookies managed by Better Auth.
 
 ## Consequences
 
@@ -54,6 +56,7 @@ Positive:
 - Standardized, secure authentication library reduces the risk of security vulnerabilities.
 - Real-time session revocation capability protects the system if user credentials or devices are compromised.
 - Authenticated sellers guarantee robust ownership verification, preventing IDOR attacks on package submissions.
+- Disabled public registration blocks unauthorized users from provisioning roles or accessing staging endpoints.
 - Defense-in-depth security model: middleware route protection is backed up by endpoint-level role and resource-ownership checks.
 
 Trade-offs:

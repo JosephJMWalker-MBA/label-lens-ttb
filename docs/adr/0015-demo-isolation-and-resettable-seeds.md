@@ -11,9 +11,11 @@ However, demo records must never pollute real seller submission queues or affect
 
 If the reset code or database queries are improperly written, there is a risk that a cascading delete or bulk reset command could delete or corrupt production data. We must construct a hardened barrier between demo management and production seller records.
 
+Furthermore, we must prevent any possibility of running the demo reset logic in production. Even an environment variable bypass introduces the risk of human error or misconfiguration.
+
 ## Decision
 
-We will isolate demo data and implement a secure, isolated re-seeding mechanism:
+We will isolate demo data, implement a secure, isolated local/staging re-seeding mechanism, and compile out/disallow it in production:
 
 1. **Database Flagting & Prefix Isolation:**
    - The `submissions` table includes an `is_demo` boolean column.
@@ -38,8 +40,7 @@ We will isolate demo data and implement a secure, isolated re-seeding mechanism:
      ```
    - This ensures that even if a cascade constraint is modified, the deletion queries are hard-coded to require specific ID matching and the `is_demo = true` condition.
 3. **Queue Query Isolation:** The agent queue retrieval API (`GET /api/agent/queue`) filters out records with `is_demo = true` by default. It will only include them if the caller explicitly appends the query parameter `?includeDemos=true`. The agent queue UI will visually highlight demo records using distinctive badges and warning banners to prevent confusion.
-4. **Resettable API Endpoint:** We will expose an endpoint `/api/agent/demo/reset` (restricted to Administrator role).
-5. **Production Safety Guards:** The demo reset endpoint is disabled and returns `404 Not Found` if `NODE_ENV = production` is active, unless explicitly bypassed by setting `LABEL_LENS_ENABLE_DEMO_SEEDING = true` in the production environment variables.
+4. **Absolute Production Disabling:** The demo reset endpoint `/api/agent/demo/reset` and associated database seed scripts will be hard-coded to throw an exception and return `404 Not Found` if `NODE_ENV === "production"` is set. **No environment variable overrides or bypasses are permitted.** The execution path is completely blocked in production code.
 
 ## Consequences
 
@@ -47,6 +48,7 @@ Positive:
 - Showcases and tests can run in staging and development without cluttering or polluting real queues.
 - Administrators can reset the system to a clean state instantly during demonstration sessions.
 - Explicit, ID-scoped deletion queries completely eliminate the risk of cascading deletes wiping production data.
+- Hard production block completely safeguards production databases from accidental seeds or resets, with zero risk of human misconfiguration.
 
 Trade-offs:
 - Changing the schema or canonical JSON structure requires updating the static seed JSON fixtures to prevent validation errors during re-seeding.
