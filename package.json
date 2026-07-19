@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "npx vite-node --config vitest.config.ts scripts/start.ts",
+    "start:next": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
@@ -14,7 +15,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:sqlite:finalize": "vitest run src/app/api/package/submit/finalize/route.test.ts",
-    "test:mysql": "RUN_MYSQL_TESTS=1 vitest run --no-file-parallelism src/app/api/package/submit/finalize/route.test.ts src/app/api/agent/agent-portal.test.ts src/server/auth/bootstrap.test.ts",
+    "test:mysql": "RUN_MYSQL_TESTS=1 vitest run --no-file-parallelism src/app/api/package/submit/finalize/route.test.ts src/app/api/agent/agent-portal.test.ts src/server/auth/bootstrap.test.ts src/server/startup.test.ts",
     "db:migrate": "drizzle-kit migrate",
     "auth:bootstrap": "npx vite-node --config vitest.config.ts scripts/auth-bootstrap.ts",
     "e2e:seed": "npx vite-node --config vitest.config.ts scripts/e2e-seed.ts",
