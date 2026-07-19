@@ -1,60 +1,158 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-<title id="title">Label Lens evidence-producing perception and review pipeline</title>
-<desc id="desc">Machine perception pipeline on the left and authenticated seller-to-agent workflow on the right, using internal review language only.</desc>
+<title id="title">Label Lens evidence and review workflow</title>
+<desc id="desc">A clean two-column diagram showing the machine perception pipeline and the authenticated seller-to-agent workflow.</desc>
 <defs>
-  <linearGradient id="bg" x1="0" x2="1"><stop stop-color="#f7f4fb"/><stop offset="1" stop-color="#fffaf5"/></linearGradient>
-  <linearGradient id="purple" x1="0" x2="1"><stop stop-color="#3f1d52"/><stop offset="1" stop-color="#6f3a83"/></linearGradient>
-  <linearGradient id="teal" x1="0" x2="1"><stop stop-color="#168c94"/><stop offset="1" stop-color="#35b9b2"/></linearGradient>
+  <linearGradient id="bg" x1="0" x2="1">
+    <stop stop-color="#f8f6fb"/>
+    <stop offset="1" stop-color="#fffaf6"/>
+  </linearGradient>
+  <linearGradient id="purple" x1="0" x2="1">
+    <stop stop-color="#3b1d4d"/>
+    <stop offset="1" stop-color="#72448a"/>
+  </linearGradient>
+  <linearGradient id="teal" x1="0" x2="1">
+    <stop stop-color="#148c95"/>
+    <stop offset="1" stop-color="#3bbab2"/>
+  </linearGradient>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+    <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#2b163a" flood-opacity=".08"/>
+  </filter>
   <style>
-    .title{font:700 46px Arial,sans-serif;fill:#2b163a}.section{font:700 28px Arial,sans-serif;fill:#111}.h{font:700 22px Arial,sans-serif;fill:#1c1c1c}.p{font:400 17px Arial,sans-serif;fill:#333}.small{font:400 14px Arial,sans-serif;fill:#555}.label{font:700 15px Arial,sans-serif;fill:#2b163a}.card{fill:#fff;stroke:#dacfe2;stroke-width:2}.line{stroke:#6f3a83;stroke-width:4;fill:none;marker-end:url(#arrow)}
+    .title{font:700 48px Arial,sans-serif;fill:#2b163a}
+    .subtitle{font:400 18px Arial,sans-serif;fill:#4b4650}
+    .section{font:700 30px Arial,sans-serif;fill:#17131a}
+    .sectionSub{font:400 16px Arial,sans-serif;fill:#625d66}
+    .step{font:700 15px Arial,sans-serif;fill:#fff}
+    .h{font:700 23px Arial,sans-serif;fill:#1d1920}
+    .p{font:400 16px Arial,sans-serif;fill:#4d4850}
+    .meta{font:600 14px Arial,sans-serif;fill:#6e6872}
+    .card{fill:#fff;stroke:#ded5e5;stroke-width:2;filter:url(#shadow)}
+    .divider{stroke:#e4dce8;stroke-width:2}
+    .arrow{stroke:#7b4a8f;stroke-width:4;fill:none}
+    .badge{font:700 14px Arial,sans-serif;fill:#2b163a}
   </style>
-  <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0L12 6 0 12z" fill="#6f3a83"/></marker>
 </defs>
+
 <rect width="1600" height="900" fill="url(#bg)"/>
-<text x="48" y="70" class="title">Label Lens: Evidence-Producing Perception and Review</text>
-<text x="48" y="103" class="p">A bounded domestic-wine prototype that separates observation, seller evidence, deterministic checks, and internal human review.</text>
 
-<text x="48" y="155" class="section">1. Perception pipeline</text>
-<text x="48" y="185" class="small">Machine analysis produces evidence; it does not make the final decision.</text>
+<text x="64" y="76" class="title">Label Lens</text>
+<text x="346" y="76" class="title" style="font-weight:400">Evidence-Producing Perception and Review</text>
+<text x="64" y="112" class="subtitle">Machine observations, seller evidence, deterministic checks, and internal human review remain separate and traceable.</text>
 
-<rect x="48" y="220" width="305" height="150" rx="18" class="card"/>
-<circle cx="100" cy="275" r="34" fill="url(#teal)"/><path d="M68 275c14-25 46-25 60 0-14 25-46 25-60 0z" fill="none" stroke="#2b163a" stroke-width="4"/><circle cx="98" cy="275" r="9" fill="#2b163a"/>
-<text x="145" y="255" class="h">Fresh visual observation</text><text x="145" y="285" class="p">Each run detects salient regions</text><text x="145" y="309" class="p">without reusing a prior answer.</text><text x="145" y="338" class="small">Regions, geometry, uncertainty</text>
+<line x1="800" y1="162" x2="800" y2="775" class="divider"/>
 
-<rect x="420" y="220" width="305" height="150" rx="18" class="card"/>
-<rect x="454" y="250" width="58" height="76" rx="5" fill="#f6f0f8" stroke="#6f3a83" stroke-width="3"/><path d="M465 269h35M465 285h33M465 301h27" stroke="#8b6b9b" stroke-width="4"/>
-<text x="535" y="255" class="h">OCR as skeptical reviewer</text><text x="535" y="285" class="p">Text extraction tests visual</text><text x="535" y="309" class="p">proposals without assuming truth.</text><text x="535" y="338" class="small">Typed observations + provenance</text>
+<text x="64" y="175" class="section">Perception pipeline</text>
+<text x="64" y="205" class="sectionSub">The machine produces bounded evidence. It does not make the final decision.</text>
 
-<rect x="48" y="420" width="305" height="150" rx="18" class="card"/>
-<g stroke="#9b7aaa" stroke-width="2"><line x1="93" y1="465" x2="150" y2="450"/><line x1="150" y1="450" x2="205" y2="490"/><line x1="93" y1="465" x2="138" y2="520"/><line x1="75" y1="525" x2="138" y2="520"/><line x1="138" y1="520" x2="205" y2="490"/></g><g><circle cx="93" cy="465" r="11" fill="#f47d31"/><circle cx="150" cy="450" r="11" fill="#6f3a83"/><circle cx="205" cy="490" r="11" fill="#f47d31"/><circle cx="138" cy="520" r="11" fill="#35b9b2"/><circle cx="75" cy="525" r="11" fill="#6f3a83"/></g>
-<text x="180" y="455" class="h">Semantic scene graph</text><text x="180" y="485" class="p">Internal relationships connect</text><text x="180" y="509" class="p">candidate regions and categories.</text><text x="180" y="538" class="small">brand-bearing vs. producer-address</text>
+<g>
+  <rect x="64" y="245" width="670" height="112" rx="20" class="card"/>
+  <circle cx="112" cy="301" r="28" fill="url(#teal)"/>
+  <path d="M86 301c13-21 39-21 52 0-13 21-39 21-52 0z" fill="none" stroke="#2b163a" stroke-width="4"/>
+  <circle cx="112" cy="301" r="8" fill="#2b163a"/>
+  <circle cx="178" cy="275" r="16" fill="#5e316f"/><text x="173" y="281" class="step">1</text>
+  <text x="210" y="284" class="h">Fresh visual observation</text>
+  <text x="210" y="312" class="p">Detect salient regions on each run without reusing a prior answer.</text>
+  <text x="210" y="337" class="meta">Regions • geometry • uncertainty</text>
+</g>
 
-<rect x="420" y="420" width="305" height="150" rx="18" class="card"/>
-<rect x="452" y="451" width="72" height="88" rx="8" fill="#fff" stroke="#6f3a83" stroke-width="3"/><path d="M466 472l9 9 17-18M466 500l9 9 17-18M466 528l9 9 17-18" fill="none" stroke="#168c94" stroke-width="5"/>
-<text x="550" y="455" class="h">Deterministic pre-check</text><text x="550" y="485" class="p">Versioned rules evaluate evidence</text><text x="550" y="509" class="p">for supported conditions only.</text><text x="550" y="538" class="small">PASS, WARN, FAIL, NEEDS_REVIEW</text>
-<path d="M353 295h52" class="line"/><path d="M572 370v35" class="line"/><path d="M420 495h-52" class="line"/>
+<path d="M399 357v24" class="arrow"/><path d="M390 374l9 10 9-10" fill="none" stroke="#7b4a8f" stroke-width="4"/>
 
-<rect x="48" y="620" width="677" height="190" rx="18" class="card"/>
-<text x="78" y="655" class="h">Measured failure mechanisms guide improvement</text><text x="78" y="684" class="small">Example Phase 5A attribution categories; counts are diagnostic events, not user scores.</text>
-<rect x="78" y="710" width="510" height="34" rx="10" fill="#eee5f1"/><rect x="78" y="710" width="425" height="34" rx="10" fill="url(#purple)"/><text x="90" y="733" fill="#fff" style="font:700 16px Arial">Candidate filtering</text><text x="604" y="733" class="label">73</text>
-<rect x="78" y="754" width="510" height="34" rx="10" fill="#eee5f1"/><rect x="78" y="754" width="170" height="34" rx="10" fill="url(#teal)"/><text x="90" y="777" fill="#fff" style="font:700 16px Arial">OCR recognition</text><text x="604" y="777" class="label">29</text>
+<g>
+  <rect x="64" y="386" width="670" height="112" rx="20" class="card"/>
+  <rect x="88" y="414" width="52" height="66" rx="7" fill="#f5eff7" stroke="#6e3b80" stroke-width="3"/>
+  <path d="M99 432h30M99 448h28M99 464h22" stroke="#8a6a97" stroke-width="4"/>
+  <circle cx="178" cy="416" r="16" fill="#5e316f"/><text x="173" y="422" class="step">2</text>
+  <text x="210" y="425" class="h">OCR as a skeptical reviewer</text>
+  <text x="210" y="453" class="p">Test visual proposals without assuming the text is correct.</text>
+  <text x="210" y="478" class="meta">Typed observations • provenance • NOT_OBSERVED</text>
+</g>
 
-<text x="825" y="155" class="section">2. Seller-to-agent workflow</text>
-<text x="825" y="185" class="small">A real receiving workflow with authenticated roles and immutable records.</text>
+<path d="M399 498v24" class="arrow"/><path d="M390 515l9 10 9-10" fill="none" stroke="#7b4a8f" stroke-width="4"/>
 
-<rect x="825" y="220" width="700" height="130" rx="18" class="card"/>
-<rect x="855" y="248" width="170" height="75" rx="8" fill="#f8f4fa" stroke="#6f3a83" stroke-width="3"/><rect x="872" y="265" width="52" height="43" rx="4" fill="#fff" stroke="#8b6b9b" stroke-width="2"/><rect x="946" y="265" width="52" height="43" rx="4" fill="#fff" stroke="#8b6b9b" stroke-width="2"/><text x="884" y="319" class="small">Front</text><text x="961" y="319" class="small">Back</text>
-<text x="1060" y="260" class="h">Seller package preparation</text><text x="1060" y="290" class="p">Upload front, back, and optional panels.</text><text x="1060" y="314" class="p">Confirm values, uncertainty, and evidence regions.</text>
+<g>
+  <rect x="64" y="527" width="670" height="112" rx="20" class="card"/>
+  <g stroke="#9a7aa7" stroke-width="2">
+    <line x1="94" y1="570" x2="132" y2="553"/><line x1="132" y1="553" x2="162" y2="582"/>
+    <line x1="94" y1="570" x2="126" y2="606"/><line x1="126" y1="606" x2="162" y2="582"/>
+  </g>
+  <circle cx="94" cy="570" r="9" fill="#ef7b31"/><circle cx="132" cy="553" r="9" fill="#6d3d80"/>
+  <circle cx="162" cy="582" r="9" fill="#ef7b31"/><circle cx="126" cy="606" r="9" fill="#31b2ad"/>
+  <circle cx="178" cy="557" r="16" fill="#5e316f"/><text x="173" y="563" class="step">3</text>
+  <text x="210" y="566" class="h">Semantic evidence relationships</text>
+  <text x="210" y="594" class="p">Connect candidate regions to supported label categories.</text>
+  <text x="210" y="619" class="meta">Example: brand-bearing vs. producer-address</text>
+</g>
 
-<rect x="825" y="390" width="700" height="130" rx="18" class="card"/>
-<rect x="855" y="420" width="170" height="70" rx="8" fill="#fff" stroke="#6f3a83" stroke-width="3"/><circle cx="880" cy="442" r="7" fill="#f47d31"/><circle cx="880" cy="462" r="7" fill="#35b9b2"/><circle cx="880" cy="482" r="7" fill="#8b6b9b"/><path d="M900 442h95M900 462h80M900 482h90" stroke="#b8a7c1" stroke-width="5"/>
-<text x="1060" y="430" class="h">Authenticated agent queue</text><text x="1060" y="460" class="p">Durable receipt and immutable revision.</text><text x="1060" y="484" class="p">Default status: Waiting for agent review.</text>
+<path d="M399 639v24" class="arrow"/><path d="M390 656l9 10 9-10" fill="none" stroke="#7b4a8f" stroke-width="4"/>
 
-<rect x="825" y="560" width="700" height="150" rx="18" class="card"/>
-<rect x="855" y="590" width="220" height="90" rx="8" fill="#f8f4fa" stroke="#6f3a83" stroke-width="3"/><line x1="965" y1="590" x2="965" y2="680" stroke="#8b6b9b" stroke-width="2"/><text x="870" y="615" class="label">Machine observations</text><text x="987" y="615" class="label">Seller evidence</text><circle cx="930" cy="650" r="22" fill="none" stroke="#168c94" stroke-width="5"/><line x1="915" y1="668" x2="895" y2="686" stroke="#168c94" stroke-width="7"/>
-<text x="1105" y="595" class="h">Human-in-the-loop internal review</text><text x="1105" y="625" class="p">Agent inspects seller and machine records separately.</text>
-<rect x="1105" y="650" width="190" height="34" rx="17" fill="#f2eaf7" stroke="#8b6b9b"/><text x="1122" y="672" class="label">Changes requested</text><rect x="1310" y="650" width="190" height="34" rx="17" fill="#e7f7f3" stroke="#35b9b2"/><text x="1326" y="672" class="label">Internally accepted</text>
-<path d="M1175 350v25" class="line"/><path d="M1175 520v25" class="line"/>
+<g>
+  <rect x="64" y="668" width="670" height="112" rx="20" class="card"/>
+  <rect x="88" y="694" width="58" height="66" rx="8" fill="#fff" stroke="#6e3b80" stroke-width="3"/>
+  <path d="M101 711l8 8 15-17M101 731l8 8 15-17M101 751l8 8 15-17" fill="none" stroke="#168c95" stroke-width="4"/>
+  <circle cx="178" cy="698" r="16" fill="#5e316f"/><text x="173" y="704" class="step">4</text>
+  <text x="210" y="707" class="h">Deterministic pre-check</text>
+  <text x="210" y="735" class="p">Versioned rules evaluate only the evidence they support.</text>
+  <text x="210" y="760" class="meta">PASS • WARN • FAIL • NEEDS_REVIEW • not_run</text>
+</g>
 
-<rect x="825" y="748" width="700" height="62" rx="18" fill="#2b163a"/><text x="850" y="775" fill="#fff" style="font:700 18px Arial">Boundary:</text><text x="955" y="775" fill="#fff" style="font:400 17px Arial">Internal review does not equal TTB, COLA, government, legal, or regulatory approval.</text><text x="850" y="799" fill="#fff" style="font:400 15px Arial">Human reviewers remain authoritative; official determinations remain outside this prototype.</text>
+<text x="864" y="175" class="section">Seller-to-agent workflow</text>
+<text x="864" y="205" class="sectionSub">Authenticated roles preserve an immutable receiving and review record.</text>
+
+<g>
+  <rect x="864" y="245" width="670" height="112" rx="20" class="card"/>
+  <rect x="890" y="273" width="92" height="58" rx="8" fill="#f7f2f9" stroke="#6e3b80" stroke-width="3"/>
+  <rect x="902" y="285" width="28" height="34" rx="4" fill="#fff" stroke="#9a7aa7" stroke-width="2"/>
+  <rect x="942" y="285" width="28" height="34" rx="4" fill="#fff" stroke="#9a7aa7" stroke-width="2"/>
+  <circle cx="1010" cy="275" r="16" fill="#ef7b31"/><text x="1005" y="281" class="step">1</text>
+  <text x="1042" y="284" class="h">Seller package preparation</text>
+  <text x="1042" y="312" class="p">Upload panels; confirm values, uncertainty, and evidence regions.</text>
+  <text x="1042" y="337" class="meta">Browser draft • explicit panel decisions • reviewed evidence</text>
+</g>
+
+<path d="M1199 357v24" class="arrow"/><path d="M1190 374l9 10 9-10" fill="none" stroke="#7b4a8f" stroke-width="4"/>
+
+<g>
+  <rect x="864" y="386" width="670" height="112" rx="20" class="card"/>
+  <rect x="890" y="414" width="92" height="58" rx="8" fill="#fff" stroke="#6e3b80" stroke-width="3"/>
+  <circle cx="907" cy="433" r="6" fill="#ef7b31"/><circle cx="907" cy="451" r="6" fill="#31b2ad"/>
+  <path d="M921 433h45M921 451h38" stroke="#b09bb9" stroke-width="4"/>
+  <circle cx="1010" cy="416" r="16" fill="#ef7b31"/><text x="1005" y="422" class="step">2</text>
+  <text x="1042" y="425" class="h">Immutable submission and receipt</text>
+  <text x="1042" y="453" class="p">Persist the package revision before reporting submission success.</text>
+  <text x="1042" y="478" class="meta">Revision ID • checksum • provenance • Waiting for agent review</text>
+</g>
+
+<path d="M1199 498v24" class="arrow"/><path d="M1190 515l9 10 9-10" fill="none" stroke="#7b4a8f" stroke-width="4"/>
+
+<g>
+  <rect x="864" y="527" width="670" height="112" rx="20" class="card"/>
+  <rect x="890" y="555" width="92" height="58" rx="8" fill="#fff" stroke="#6e3b80" stroke-width="3"/>
+  <circle cx="907" cy="572" r="6" fill="#ef7b31"/><circle cx="907" cy="589" r="6" fill="#31b2ad"/>
+  <path d="M921 572h45M921 589h34" stroke="#b09bb9" stroke-width="4"/>
+  <circle cx="1010" cy="557" r="16" fill="#ef7b31"/><text x="1005" y="563" class="step">3</text>
+  <text x="1042" y="566" class="h">Authenticated agent queue</text>
+  <text x="1042" y="594" class="p">Agents see waiting submissions; seller-local drafts remain private.</text>
+  <text x="1042" y="619" class="meta">Role checks • owner isolation • stable queue ordering</text>
+</g>
+
+<path d="M1199 639v24" class="arrow"/><path d="M1190 656l9 10 9-10" fill="none" stroke="#7b4a8f" stroke-width="4"/>
+
+<g>
+  <rect x="864" y="668" width="670" height="112" rx="20" class="card"/>
+  <rect x="890" y="695" width="112" height="62" rx="8" fill="#f7f2f9" stroke="#6e3b80" stroke-width="3"/>
+  <line x1="946" y1="695" x2="946" y2="757" stroke="#9a7aa7" stroke-width="2"/>
+  <circle cx="925" cy="727" r="16" fill="none" stroke="#168c95" stroke-width="4"/>
+  <line x1="913" y1="739" x2="902" y2="750" stroke="#168c95" stroke-width="5"/>
+  <circle cx="1018" cy="698" r="16" fill="#ef7b31"/><text x="1013" y="704" class="step">4</text>
+  <text x="1050" y="707" class="h">Read-only internal review</text>
+  <text x="1050" y="735" class="p">Inspect seller evidence and machine observations separately.</text>
+  <rect x="1050" y="748" width="142" height="26" rx="13" fill="#f1e8f5" stroke="#9a7aa7"/>
+  <text x="1064" y="766" class="badge">Changes requested</text>
+  <rect x="1204" y="748" width="184" height="26" rx="13" fill="#e7f7f3" stroke="#31b2ad"/>
+  <text x="1218" y="766" class="badge">Internally accepted</text>
+</g>
+
+<rect x="64" y="824" width="1470" height="48" rx="16" fill="#2b163a"/>
+<text x="88" y="854" style="font:700 17px Arial,sans-serif;fill:#fff">Boundary:</text>
+<text x="186" y="854" style="font:400 16px Arial,sans-serif;fill:#fff">Internal review is not TTB, COLA, government, legal, or regulatory approval. Official determinations remain outside this prototype.</text>
 </svg>
