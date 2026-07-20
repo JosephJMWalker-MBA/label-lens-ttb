@@ -39,8 +39,7 @@ export function PackageProgressFooter({
   action: PackageFooterAction;
   elapsedLabel?: string;
 }) {
-  const reviewedDispositionPendingSave =
-    workflow.correctionCycleComplete && saveState !== "saved";
+  const reviewedDispositionPendingSave = workflow.correctionCycleComplete && saveState !== "saved";
   const displayedAction: PackageFooterAction = reviewedDispositionPendingSave
     ? {
         ...action,
