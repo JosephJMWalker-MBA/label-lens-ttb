@@ -2,9 +2,7 @@
 name: Apply final PR 148 fix
 
 on:
-  push:
-    branches:
-      - fix/allow-reviewed-agent-submission
+  pull_request:
 
 permissions:
   contents: write
