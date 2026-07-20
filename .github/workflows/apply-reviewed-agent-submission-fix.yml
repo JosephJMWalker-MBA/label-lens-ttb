@@ -1,3 +1,4 @@
+# One-time branch patch; removed before merge.
 name: Apply reviewed agent submission fix
 
 on:
