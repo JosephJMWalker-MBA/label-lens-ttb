@@ -43,8 +43,14 @@ jobs:
           workflow = "src/features/package-preparation/package-workflow.ts"
           replace_once(
               workflow,
-              '''        : latestRun && !analysisCurrent\n          ? "Save the updated draft"\n          : "Save the prepared package in this browser";\n''',
-              '''        : correctionCycleComplete\n          ? "Save the reviewed package"\n          : latestRun && !analysisCurrent\n            ? "Save the updated draft"\n            : "Save the prepared package in this browser";\n''',
+              '''        : latestRun && !analysisCurrent
+          ? "Save the updated draft"
+          : "Save the prepared package in this browser";
+''',
+              '''        : correctionCycleComplete || (latestRun && !analysisCurrent)
+          ? "Save the updated draft"
+          : "Save the prepared package in this browser";
+''',
           )
 
           workspace = Path("src/features/package-preparation/PackagePreparationWorkspace.tsx")
@@ -56,13 +62,31 @@ jobs:
               old_heading,
               'latestRun && (workflow.correctionCycleComplete || !analysisCurrent) && saveState !== "saved"',
           )
-          old_label = '''        saveState === "saving"\n          ? "Saving package…"\n          : latestRun && !analysisCurrent\n            ? "Save updated draft"\n            : "Save draft locally",\n'''
-          new_label = '''        saveState === "saving"\n          ? "Saving package…"\n          : workflow.correctionCycleComplete || (latestRun && !analysisCurrent)\n            ? "Save updated draft"\n            : "Save draft locally",\n'''
+          old_label = '''        saveState === "saving"
+          ? "Saving package…"
+          : latestRun && !analysisCurrent
+            ? "Save updated draft"
+            : "Save draft locally",
+'''
+          new_label = '''        saveState === "saving"
+          ? "Saving package…"
+          : workflow.correctionCycleComplete || (latestRun && !analysisCurrent)
+            ? "Save updated draft"
+            : "Save draft locally",
+'''
           if old_label not in text:
               raise SystemExit("Expected footer label block missing")
           text = text.replace(old_label, new_label, 1)
-          old_reason = '''        : latestRun && !analysisCurrent\n          ? "Seller evidence changed. Save the updated browser-local draft before re-checking."\n          : "Package saving is browser-local and is required before the pre-check.",\n'''
-          new_reason = '''        : workflow.correctionCycleComplete\n          ? "Every flagged category was reviewed. Save this browser-local disposition before submission."\n          : latestRun && !analysisCurrent\n            ? "Seller evidence changed. Save the updated browser-local draft before re-checking."\n            : "Package saving is browser-local and is required before the pre-check.",\n'''
+          old_reason = '''        : latestRun && !analysisCurrent
+          ? "Seller evidence changed. Save the updated browser-local draft before re-checking."
+          : "Package saving is browser-local and is required before the pre-check.",
+'''
+          new_reason = '''        : workflow.correctionCycleComplete
+          ? "Every flagged category was reviewed. Save this browser-local disposition before submission."
+          : latestRun && !analysisCurrent
+            ? "Seller evidence changed. Save the updated browser-local draft before re-checking."
+            : "Package saving is browser-local and is required before the pre-check.",
+'''
           if old_reason not in text:
               raise SystemExit("Expected footer reason block missing")
           workspace.write_text(text.replace(old_reason, new_reason, 1))
@@ -70,7 +94,7 @@ jobs:
           git fetch origin main
           git show origin/main:.github/workflows/ci.yml > .github/workflows/ci.yml
           rm -f .github/workflows/capture-pr148-test-failure.yml
-          rm -f .pr148-failure-summary.txt .pr148-test-failure.log .pr148-vitest-results.json
+          rm -f .pr148-failure-summary.txt .pr148-test-failure.log .pr148-vitest-results.json .pr148-second-failure.log
           npx prettier --write \
             src/features/package-preparation/package-workflow.ts \
             src/features/package-preparation/PackagePreparationWorkspace.tsx
@@ -78,6 +102,11 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run docs:check
+      - name: Run affected workflow tests
+        run: >-
+          npx vitest run
+          src/features/package-preparation/package-workflow.test.ts
+          src/features/package-preparation/PackagePreparationWorkspace.test.tsx
       - run: npm test
       - run: npm run build
       - name: Commit validated fix
