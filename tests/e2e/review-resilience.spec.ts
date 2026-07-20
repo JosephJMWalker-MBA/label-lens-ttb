@@ -96,7 +96,12 @@ test.describe("resilience: /review cold load is reliable on the production build
     await expectWorkspaceUsable(page);
   });
 
-  test("8. /review/legacy → click Review → guided workspace loads", async ({ page }) => {
+  test("8. /review/legacy → click Prepare a package → guided workspace loads", async ({ page }) => {
+    // The legacy route auto-opens the pre-check introduction for a first-time
+    // visitor, whose overlay would intercept the navigation click.
+    await page.addInitScript(() =>
+      window.localStorage.setItem("label-lens.onboarding.seen.v1", "true"),
+    );
     await page.goto("/review/legacy");
     await page.getByRole("link", { name: "Prepare a package" }).first().click();
     await expect(page).toHaveURL(/\/review$/);

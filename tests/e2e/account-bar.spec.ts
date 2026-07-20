@@ -11,6 +11,11 @@ const PUBLIC_PATHS = ["/", "/create", "/review", "/review/legacy", "/learn", "/l
 test.describe("sticky account bar — signed out", () => {
   for (const path of PUBLIC_PATHS) {
     test(`shows a Sign in action fixed to the viewport bottom on ${path}`, async ({ page }) => {
+      // The legacy route auto-opens the pre-check introduction for a first-time
+      // visitor; its overlay would sit above the bar.
+      await page.addInitScript(() =>
+        window.localStorage.setItem("label-lens.onboarding.seen.v1", "true"),
+      );
       await page.goto(path);
       const signIn = page.getByTestId("account-bar-sign-in");
       await expect(signIn).toBeVisible();

@@ -107,6 +107,10 @@ jobs:
       BETTER_AUTH_SECRET: e2e-secret-key-at-least-32-characters-long
       BETTER_AUTH_URL: http://localhost:3000
       LABEL_LENS_INTEGRITY_SECRET: e2e-integrity-secret-at-least-32-characters
+      # The e2e suite runs against a real production build (next build + next
+      # start), where the pre-check route requires an append signing key and
+      # returns 500 without it. The dev server did not enforce this.
+      LABEL_LENS_APPEND_SIGNING_KEY: e2e-append-signing-secret-at-least-32-chars
       LABEL_LENS_BOOTSTRAP_ADMIN_EMAIL: e2e-admin@example.test
       LABEL_LENS_BOOTSTRAP_ADMIN_PASSWORD: e2e-only-admin-password-1234
       LABEL_LENS_BOOTSTRAP_AGENT_EMAIL: e2e-agent@example.test

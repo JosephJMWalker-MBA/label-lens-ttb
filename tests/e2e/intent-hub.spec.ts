@@ -23,6 +23,9 @@ test("the hub asks what you want to do and offers the upload-or-build promise", 
 test("all six intents appear, and the four active paths are offered", async ({ page }) => {
   await page.goto("/");
 
+  // Scope to the intent list: some titles intentionally match a header nav link
+  // (e.g. "Prepare a package"), which is a separate landmark.
+  const intentList = page.getByRole("list").first();
   for (const title of [
     "Create a new label",
     "Improve an existing draft",
@@ -31,7 +34,7 @@ test("all six intents appear, and the four active paths are offered", async ({ p
     "Learn labeling requirements",
     "Find professional help",
   ]) {
-    await expect(page.getByText(title, { exact: true })).toBeVisible();
+    await expect(intentList.getByText(title, { exact: true })).toBeVisible();
   }
 
   // The intent list offers exactly four destinations.
