@@ -6,15 +6,12 @@ on:
 
 permissions:
   actions: read
-  contents: write
+  issues: write
 
 jobs:
   capture:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: fix/allow-reviewed-agent-submission
       - name: Capture failed test output
         env:
           GH_TOKEN: ${{ github.token }}
@@ -27,15 +24,22 @@ jobs:
             > /tmp/pr148-unit.log
           {
             echo "=== FAILURE INDEX ==="
-            grep -n -E "FAIL|AssertionError|expected|received|Test Files|Tests|Error:|×|❯" /tmp/pr148-unit.log | tail -n 250 || true
+            grep -n -E "FAIL|AssertionError|expected|received|Test Files|Tests|Error:|×|❯" /tmp/pr148-unit.log | tail -n 180 || true
             echo
             echo "=== LOG TAIL ==="
-            tail -n 550 /tmp/pr148-unit.log
-          } > .pr148-second-failure.log
-      - name: Commit captured failure
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .pr148-second-failure.log
-          git commit -m "Record current PR 148 unit failure"
-          git push origin HEAD:fix/allow-reviewed-agent-submission
+            tail -n 280 /tmp/pr148-unit.log
+          } > /tmp/pr148-summary.log
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          text = Path('/tmp/pr148-summary.log').read_text(errors='replace')
+          body = "Temporary diagnostic output for PR #148:\n\n```text\n" + text[-50000:] + "\n```"
+          Path('/tmp/pr148-comment.json').write_text(json.dumps({'body': body}))
+          PY
+          curl --fail --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/JosephJMWalker-MBA/label-lens-ttb/issues/148/comments \
+            --data-binary @/tmp/pr148-comment.json
