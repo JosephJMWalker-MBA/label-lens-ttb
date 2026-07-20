@@ -5,9 +5,6 @@ on:
     branches: [main]
   pull_request:
 
-permissions:
-  contents: write
-
 jobs:
   verify:
     name: Lint, typecheck, test, build
@@ -21,105 +18,17 @@ jobs:
       BETTER_AUTH_URL: http://localhost:3000
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: fix/allow-reviewed-agent-submission
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Apply reviewed-package save transition
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          def replace_once(path: str, old: str, new: str) -> None:
-              file = Path(path)
-              text = file.read_text()
-              if old not in text:
-                  raise SystemExit(f"Expected source block missing in {path}")
-              file.write_text(text.replace(old, new, 1))
-
-          workflow = "src/features/package-preparation/package-workflow.ts"
-          replace_once(
-              workflow,
-              '''        : latestRun && !analysisCurrent
-          ? "Save the updated draft"
-          : "Save the prepared package in this browser";
-''',
-              '''        : correctionCycleComplete || (latestRun && !analysisCurrent)
-          ? "Save the updated draft"
-          : "Save the prepared package in this browser";
-''',
-          )
-
-          workspace = Path("src/features/package-preparation/PackagePreparationWorkspace.tsx")
-          text = workspace.read_text()
-          old_heading = 'latestRun && !analysisCurrent && saveState !== "saved"'
-          if text.count(old_heading) != 2:
-              raise SystemExit(f"Expected two reviewed-heading conditions, found {text.count(old_heading)}")
-          text = text.replace(
-              old_heading,
-              'latestRun && (workflow.correctionCycleComplete || !analysisCurrent) && saveState !== "saved"',
-          )
-          old_label = '''        saveState === "saving"
-          ? "Saving package…"
-          : latestRun && !analysisCurrent
-            ? "Save updated draft"
-            : "Save draft locally",
-'''
-          new_label = '''        saveState === "saving"
-          ? "Saving package…"
-          : workflow.correctionCycleComplete || (latestRun && !analysisCurrent)
-            ? "Save updated draft"
-            : "Save draft locally",
-'''
-          if old_label not in text:
-              raise SystemExit("Expected footer label block missing")
-          text = text.replace(old_label, new_label, 1)
-          old_reason = '''        : latestRun && !analysisCurrent
-          ? "Seller evidence changed. Save the updated browser-local draft before re-checking."
-          : "Package saving is browser-local and is required before the pre-check.",
-'''
-          new_reason = '''        : workflow.correctionCycleComplete
-          ? "Every flagged category was reviewed. Save this browser-local disposition before submission."
-          : latestRun && !analysisCurrent
-            ? "Seller evidence changed. Save the updated browser-local draft before re-checking."
-            : "Package saving is browser-local and is required before the pre-check.",
-'''
-          if old_reason not in text:
-              raise SystemExit("Expected footer reason block missing")
-          workspace.write_text(text.replace(old_reason, new_reason, 1))
-          PY
-          git fetch origin main
-          git show origin/main:.github/workflows/ci.yml > .github/workflows/ci.yml
-          rm -f .github/workflows/capture-pr148-test-failure.yml
-          rm -f .pr148-failure-summary.txt .pr148-test-failure.log .pr148-vitest-results.json .pr148-second-failure.log
-          npx prettier --write \
-            src/features/package-preparation/package-workflow.ts \
-            src/features/package-preparation/PackagePreparationWorkspace.tsx
       - run: npm run format:check
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run docs:check
-      - name: Run affected workflow tests
-        run: >-
-          npx vitest run
-          src/features/package-preparation/package-workflow.test.ts
-          src/features/package-preparation/PackagePreparationWorkspace.test.tsx
       - run: npm test
       - run: npm run build
-      - name: Commit validated fix
-        run: |
-          if git diff --quiet && [ -z "$(git status --porcelain)" ]; then
-            echo "No changes to commit."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "Clarify reviewed package save before submission"
-          git push origin HEAD:fix/allow-reviewed-agent-submission
 
   mysql-integration:
     name: MySQL finalize/status + auth integration
