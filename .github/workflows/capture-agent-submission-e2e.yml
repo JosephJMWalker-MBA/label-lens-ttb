@@ -1,0 +1,31 @@
+name: Capture agent submission browser failure
+
+on:
+  push:
+    branches:
+      - agent/submit-to-review-queue
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/submit-to-review-queue
+      - name: Capture failed Playwright output
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run view 29723477670 --repo JosephJMWalker-MBA/label-lens-ttb \
+            --job 88291248684 --log-failed > .agent-submission-e2e-failure.log
+      - name: Commit captured output
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .agent-submission-e2e-failure.log
+          git commit -m "Capture agent submission browser failure"
+          git push origin HEAD:agent/submit-to-review-queue
