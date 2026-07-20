@@ -1,0 +1,2726 @@
+{
+  "generatedAt": "2026-07-20T20:35:41.073Z",
+  "wallClockMs": 235207,
+  "cases": [
+    {
+      "caseId": "luigi-giovanni-live",
+      "strata": [
+        "decorative-or-script-brand",
+        "brand-punctuation",
+        "multiple-brand-like-phrases",
+        "alcohol-at-side-or-rotated",
+        "front-label"
+      ],
+      "latencyMs": 2556.2639169999998,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [14],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "VANNI",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "alfredos-wine",
+      "strata": ["multi-line-brand", "brand-punctuation", "alcohol-at-bottom", "front-label"],
+      "latencyMs": 2585.376333,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [14],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "HLTRE",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "la-fattoria-rotated",
+      "strata": [
+        "decorative-or-script-brand",
+        "vertical-mandatory-strip",
+        "alcohol-at-side-or-rotated",
+        "front-label"
+      ],
+      "latencyMs": 3735.858083,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [14],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "cCTIO",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-004",
+      "strata": [
+        "decorative-or-script-brand",
+        "vertical-mandatory-strip",
+        "alcohol-at-side-or-rotated",
+        "front-label"
+      ],
+      "latencyMs": 3659.1082079999996,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [14],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "NORTH COAST CA OF",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-005",
+      "strata": [
+        "decorative-or-script-brand",
+        "vertical-mandatory-strip",
+        "alcohol-at-side-or-rotated",
+        "front-label"
+      ],
+      "latencyMs": 2952.1079580000005,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [14],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "0 Ao BARBERA",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-006",
+      "strata": ["simple-centered-brand", "low-contrast", "front-label", "alcohol-at-bottom"],
+      "latencyMs": 2131.7029169999987,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% BY VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "2 LRS3 aoc",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "casanova-della-spinetta",
+      "strata": ["multi-line-brand", "low-contrast", "split-alcohol-tokens", "front-label"],
+      "latencyMs": 1562.798666999999,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "ALCOHOL 14 BY VOLUME",
+        "present": true,
+        "acceptablePercents": [14],
+        "parsedValue": 14,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "CASANOVA DELLA SPINETTA",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-008",
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
+      "latencyMs": 1282.7847080000029,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13],
+        "parsedValue": 13,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Azienda Agricola Terre Sparse",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-009",
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
+      "latencyMs": 1149.9324579999993,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Azienda Agricola Terre Sparse",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "domaine-follin-arbelet",
+      "strata": [
+        "brand-punctuation",
+        "multiple-brand-like-phrases",
+        "alcohol-at-bottom",
+        "front-label"
+      ],
+      "latencyMs": 982.0149160000001,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "14% BY VOL.",
+        "present": true,
+        "acceptablePercents": [14],
+        "parsedValue": 14,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "DOMAINE FOLLIN-ARBELET",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-011",
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
+      "latencyMs": 3605.670750000001,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "ocr-recognition-failure",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Societa Agricola Maria Antonie",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-012",
+      "strata": ["simple-centered-brand", "front-label", "alcohol-at-bottom"],
+      "latencyMs": 1399.457542,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.8% BY VOL.",
+        "present": true,
+        "acceptablePercents": [13.8],
+        "parsedValue": 13.8,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Cool&y",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-013",
+      "strata": [
+        "decorative-or-script-brand",
+        "front-label",
+        "multiple-brand-like-phrases",
+        "alcohol-at-bottom"
+      ],
+      "latencyMs": 4936.2698329999985,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Play ers Heart",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-ranking-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-014",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 5343.926332999996,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [14],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-unsupported-pattern"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "TRE CORI",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "patricia-green-cellars",
+      "strata": [
+        "low-contrast",
+        "multiple-brand-like-phrases",
+        "genuinely-ambiguous",
+        "alcohol-at-bottom",
+        "front-label"
+      ],
+      "latencyMs": 1099.2361670000028,
+      "alcohol": {
+        "state": "LOW_CONFIDENCE",
+        "value": "13.8% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.8],
+        "parsedValue": 13.8,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "ESTATE VINEYARD",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-016",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 1029.1133750000008,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% BY VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "MARQUES vo NAVARRO",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-017",
+      "strata": ["simple-centered-brand", "front-label", "alcohol-at-bottom"],
+      "latencyMs": 679.5031249999956,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "12% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [12],
+        "parsedValue": 12,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "oABORDE NOIRE",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-018",
+      "strata": ["multi-line-brand", "front-label", "dense-text", "alcohol-at-bottom"],
+      "latencyMs": 1774.8255840000056,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "3.5% BY VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 3.5,
+        "detected": true,
+        "parsedAccurate": false,
+        "failureClass": "parser-failure",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Indigenous blend",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-019",
+      "strata": ["simple-centered-brand", "front-label", "alcohol-at-bottom"],
+      "latencyMs": 2977.7661670000016,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "KYRIOS",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-020",
+      "strata": ["simple-centered-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 1391.796709000002,
+      "alcohol": {
+        "state": "LOW_CONFIDENCE",
+        "value": "12.5% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [12.5],
+        "parsedValue": 12.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "COURTIEU",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "saker",
+      "strata": ["simple-centered-brand", "low-contrast", "front-label"],
+      "latencyMs": 3005.197874999998,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "12.6% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [12.6],
+        "parsedValue": 12.6,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "SAKER",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-022",
+      "strata": ["back-label", "alcohol-at-bottom"],
+      "latencyMs": 763.4081670000014,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "12% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [12],
+        "parsedValue": 12,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "correct"
+      }
+    },
+    {
+      "caseId": "approved-wine-023",
+      "strata": ["decorative-or-script-brand", "front-label", "alcohol-at-bottom"],
+      "latencyMs": 1180.603458000005,
+      "alcohol": {
+        "state": "LOW_CONFIDENCE",
+        "value": "14% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [14],
+        "parsedValue": 14,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "PRIMITIVO",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-024",
+      "strata": ["back-label", "dense-text", "missing-alcohol-statement"],
+      "latencyMs": 4047.7390830000004,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": false,
+        "acceptablePercents": [],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "CADILLAC COTES DE BORDEAUX",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "nebla-mencia",
+      "strata": ["simple-centered-brand", "alcohol-at-bottom", "front-label"],
+      "latencyMs": 1115.4944590000014,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13],
+        "parsedValue": 13,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "NEBLA",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-026",
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
+      "latencyMs": 983.2724579999995,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "PRINCIPE. DIPHESA",
+        "exactMatch": false,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-027",
+      "strata": [
+        "decorative-or-script-brand",
+        "front-label",
+        "brand-punctuation",
+        "alcohol-at-bottom"
+      ],
+      "latencyMs": 3192.0706250000003,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-unsupported-pattern"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "N Gy A001",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-028",
+      "strata": ["simple-centered-brand", "front-label", "alcohol-at-side-or-rotated"],
+      "latencyMs": 1606.1471659999952,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.3% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.3],
+        "parsedValue": 13.3,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "FIELD",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-031",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+      "latencyMs": 1332.0541669999948,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Contiene Sulfitos Enthalt Sulfite",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-032",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 1841.4730419999978,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "14% BY VOL.",
+        "present": true,
+        "acceptablePercents": [14],
+        "parsedValue": 14,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "TRAVERS RESERVE",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-033",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+      "latencyMs": 1941.5841250000085,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.7% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.7],
+        "parsedValue": 13.7,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "COVE",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-ranking-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-034",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 2172.852208000011,
+      "alcohol": {
+        "state": "LOW_CONFIDENCE",
+        "value": "13.5% BY VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "NICO",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-035",
+      "strata": ["decorative-or-script-brand", "front-label", "alcohol-at-side-or-rotated"],
+      "latencyMs": 967.1631659999985,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "ocr-recognition-failure",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "CHASSAGNE-MONTRACHET",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-037",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+      "latencyMs": 1326.261249999996,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "19.0% BY VOL.",
+        "present": true,
+        "acceptablePercents": [13],
+        "parsedValue": 19,
+        "detected": true,
+        "parsedAccurate": false,
+        "failureClass": "parser-failure",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Strumica - Radovish Region",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-038",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+      "latencyMs": 897.1686669999908,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "2024 SOUTH COAST PRIMITIVO",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-039",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 871.8310000000056,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "DOMAINE JULIEN AUROUX",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "chateau-bonneau",
+      "strata": ["brand-punctuation", "multi-line-brand", "low-contrast", "front-label"],
+      "latencyMs": 3074.9064999999973,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [14],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-generation-failure",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "BONNEAU",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "line-reconstruction-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-041",
+      "strata": ["back-label", "alcohol-at-bottom"],
+      "latencyMs": 1368.3493330000056,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.0% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13],
+        "parsedValue": 13,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Petite Nature",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-042",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 1001.2667920000094,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "PRODUCT OF FRANCE",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-043",
+      "strata": ["simple-centered-brand", "front-label", "low-contrast", "alcohol-at-bottom"],
+      "latencyMs": 960.8287909999926,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.8% BY VOL.",
+        "present": true,
+        "acceptablePercents": [13],
+        "parsedValue": 13.8,
+        "detected": true,
+        "parsedAccurate": false,
+        "failureClass": "parser-failure",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "FULCRUM",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-044",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+      "latencyMs": 1724.3924169999955,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "VEEL",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-045",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+      "latencyMs": 1127.1668749999953,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.7% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.7],
+        "parsedValue": 13.7,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Meeting of ihe Minds",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-046",
+      "strata": ["back-label", "dense-text", "missing-alcohol-statement"],
+      "latencyMs": 4041.2632500000036,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": false,
+        "acceptablePercents": [],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Red Wine Blend Curious",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-047",
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
+      "latencyMs": 5978.080582999988,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [14],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "ocr-recognition-failure",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "DENOMINACIO D'ORIGEN",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-048",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+      "latencyMs": 1418.653416000001,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "14.0% BY VOL.",
+        "present": true,
+        "acceptablePercents": [14],
+        "parsedValue": 14,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Pacha RESERVA - CARMENERE",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-049",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+      "latencyMs": 3436.032416999995,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.2% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.2],
+        "parsedValue": 13.2,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "CAYWOQOD VINEYARD",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "le-temps-des-fleurs",
+      "strata": ["simple-centered-brand", "alcohol-at-bottom", "front-label"],
+      "latencyMs": 887.3050420000072,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "11.5% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [11.5],
+        "parsedValue": 11.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "LE TEMPS DES FLEURS",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-051",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+      "latencyMs": 3859.0348749999976,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-unsupported-pattern"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "PACHECA DOURO D.O.C",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-052",
+      "strata": ["back-label", "dense-text", "missing-alcohol-statement"],
+      "latencyMs": 5741.114417000004,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": false,
+        "acceptablePercents": [],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "OLp VINE ZINFANDEL",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-053",
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-side-or-rotated"],
+      "latencyMs": 3433.4485419999983,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "11.5% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [11.5],
+        "parsedValue": 11.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Vineya",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-054",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-side-or-rotated"],
+      "latencyMs": 2866.4151659999916,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [12.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "ocr-recognition-failure",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "IA5 ME15",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-055",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 780.2073329999985,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13],
+        "parsedValue": 13,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "FRANCOIS VILLARD",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-056",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom", "low-contrast"],
+      "latencyMs": 728.784541999994,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% BY VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "CAMP dPIETRU",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-ranking-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-057",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 757.554250000001,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13% BY VOL.",
+        "present": true,
+        "acceptablePercents": [13],
+        "parsedValue": 13,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "JI Lill",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-ranking-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-058",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+      "latencyMs": 2930.1994590000104,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [12],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "correct"
+      }
+    },
+    {
+      "caseId": "approved-wine-059",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 1725.514750000002,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "JI mmm Ill",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "three-steves-winery",
+      "strata": ["missing-alcohol-statement", "multiple-brand-like-phrases", "front-label"],
+      "latencyMs": 3449.5079169999954,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": false,
+        "acceptablePercents": [],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "OBSERVED",
+        "value": "3 STEVES WINERY",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct"
+      }
+    },
+    {
+      "caseId": "approved-wine-061",
+      "strata": ["back-label", "low-resolution", "missing-alcohol-statement"],
+      "latencyMs": 2606.8297919999895,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": false,
+        "acceptablePercents": [],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "APHRODITE",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-062",
+      "strata": ["back-label", "low-resolution", "missing-alcohol-statement"],
+      "latencyMs": 7345.432915999991,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": false,
+        "acceptablePercents": [],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "correct"
+      }
+    },
+    {
+      "caseId": "approved-wine-063",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 1717.4645829999936,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "TRE FICHI",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-064",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 2109.511958999996,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Prins",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-065",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 1731.6638750000275,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Prins",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-066",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 931.9883749999863,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13],
+        "parsedValue": 13,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "JULIETTE VRIL",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-067",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 896.3527920000197,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13% BY VOL.",
+        "present": true,
+        "acceptablePercents": [13],
+        "parsedValue": 13,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "JULIETTE VRIL",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-068",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 920.0764999999956,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13],
+        "parsedValue": 13,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "SARA",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-069",
+      "strata": ["multi-line-brand", "back-label", "low-contrast", "alcohol-at-bottom"],
+      "latencyMs": 3768.2497079999885,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "ALTACIMA 4.090",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "altacima",
+      "strata": ["brand-punctuation", "low-contrast", "alcohol-at-bottom", "front-label"],
+      "latencyMs": 3789.382708000019,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "ALTACIMA 4.090",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-071",
+      "strata": ["multi-line-brand", "back-label", "low-contrast", "alcohol-at-bottom"],
+      "latencyMs": 5553.023167000007,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "ocr-recognition-failure",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "LATE HARVEST 2013",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-ranking-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-072",
+      "strata": ["back-label", "dense-text", "missing-alcohol-statement", "genuinely-ambiguous"],
+      "latencyMs": 4980.722582999995,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": false,
+        "acceptablePercents": [],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "HINNANT FAMILY VINEYARDS",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-073",
+      "strata": ["multi-line-brand", "back-label", "missing-alcohol-statement"],
+      "latencyMs": 2706.7747500000114,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": false,
+        "acceptablePercents": [],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "OBSERVED",
+        "value": "Mike's Farm, Inc.",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct"
+      }
+    },
+    {
+      "caseId": "approved-wine-074",
+      "strata": ["multi-line-brand", "back-label", "missing-alcohol-statement"],
+      "latencyMs": 2918.587499999994,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": false,
+        "acceptablePercents": [],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "HINNANT VINEYARDS",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-075",
+      "strata": ["back-label", "dense-text", "missing-alcohol-statement"],
+      "latencyMs": 4065.7818330000155,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": false,
+        "acceptablePercents": [],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "correct"
+      }
+    },
+    {
+      "caseId": "approved-wine-076",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+      "latencyMs": 1061.6833749999932,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Flore",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-077",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 910.2741249999963,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "VALDINERA",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-078",
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
+      "latencyMs": 727.3656659999979,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "14% BY VOL.",
+        "present": true,
+        "acceptablePercents": [14],
+        "parsedValue": 14,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "MUSCOLINE-ITALIA",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-079",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 710.956124999997,
+      "alcohol": {
+        "state": "LOW_CONFIDENCE",
+        "value": "13.5% BY VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "OFFIDA",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-ranking-failure"
+      }
+    },
+    {
+      "caseId": "le-caniette",
+      "strata": ["multi-line-brand", "split-alcohol-tokens", "alcohol-at-bottom", "front-label"],
+      "latencyMs": 701.7877920000174,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "12.5% BY VOL.",
+        "present": true,
+        "acceptablePercents": [12.5],
+        "parsedValue": 12.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "INDICAZIONE GEOGRAFICA PROTETTA",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-ranking-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-081",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 789.8227079999924,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "12% BY VOL.",
+        "present": true,
+        "acceptablePercents": [12],
+        "parsedValue": 12,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "CORTEADAGIO",
+        "exactMatch": false,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-082",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom", "low-contrast"],
+      "latencyMs": 1218.4143329999933,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "14.0% BY VOL.",
+        "present": true,
+        "acceptablePercents": [14],
+        "parsedValue": 14,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "correct"
+      }
+    },
+    {
+      "caseId": "approved-wine-083",
+      "strata": ["decorative-or-script-brand", "front-label", "alcohol-at-bottom"],
+      "latencyMs": 2008.407124999998,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [12],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Bam il",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-084",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 1039.2063749999797,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "BUTA DISTRIBUTORS INC",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-085",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 1259.39724999998,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-explicit-alcohol-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Denominazione Origine Controllata",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-086",
+      "strata": ["back-label", "dense-text", "missing-alcohol-statement"],
+      "latencyMs": 3045.568250000011,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": false,
+        "acceptablePercents": [],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "OBSERVED",
+        "value": "3 STEVES WINERY",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct"
+      }
+    },
+    {
+      "caseId": "approved-wine-087",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+      "latencyMs": 2017.5594170000113,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "LANGHE SAUVIGNON Tuga",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-ranking-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-088",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 867.2764580000076,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "12.5% BY VOL.",
+        "present": true,
+        "acceptablePercents": [12.5],
+        "parsedValue": 12.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "LA MESMA Yellow Label",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-089",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 780.4516669999866,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13% BY VOL.",
+        "present": true,
+        "acceptablePercents": [13],
+        "parsedValue": 13,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "LA MESMA Black Label",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-090",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 796.2742499999877,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "12.5% BY VOL.",
+        "present": true,
+        "acceptablePercents": [12.5],
+        "parsedValue": 12.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "WHITE WINE 2018 Lo219",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-091",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 640.9267079999845,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% BY VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "D CONTROLLATA E",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-092",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+      "latencyMs": 960.235416999989,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.6% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.6],
+        "parsedValue": 13.6,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Hn SANTA BARBARA",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-093",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 905.9567500000121,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.50% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "DELRAY BEACH, FL, USA",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-094",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 876.730332999985,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.50% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "DELRAY BEACH. FL, USA",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-095",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom", "low-resolution"],
+      "latencyMs": 589.8564999999944,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "12% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [12],
+        "parsedValue": 12,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "correct"
+      }
+    },
+    {
+      "caseId": "approved-wine-096",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+      "latencyMs": 1141.6199170000036,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "12% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [12],
+        "parsedValue": 12,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "correct"
+      }
+    },
+    {
+      "caseId": "approved-wine-097",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+      "latencyMs": 1006.6189169999852,
+      "alcohol": {
+        "state": "LOW_CONFIDENCE",
+        "value": "12% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [12],
+        "parsedValue": 12,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "correct"
+      }
+    },
+    {
+      "caseId": "approved-wine-098",
+      "strata": ["back-label", "low-resolution", "alcohol-at-bottom"],
+      "latencyMs": 783.6310830000148,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [12.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "correct"
+      }
+    },
+    {
+      "caseId": "approved-wine-099",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 892.3421669999952,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.50% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "DELRAY BEACH, FL, USA",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "amuninni-ferracane",
+      "strata": [
+        "decorative-or-script-brand",
+        "multiple-brand-like-phrases",
+        "genuinely-ambiguous",
+        "alcohol-at-bottom",
+        "front-label"
+      ],
+      "latencyMs": 1050.2473330000066,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "12.5% BY VOL.",
+        "present": true,
+        "acceptablePercents": [12.5],
+        "parsedValue": 12.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "INV ENVY",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-101",
+      "strata": ["back-label", "dense-text", "missing-alcohol-statement"],
+      "latencyMs": 2523.4718750000175,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": false,
+        "acceptablePercents": [],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "correct"
+      }
+    },
+    {
+      "caseId": "approved-wine-102",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+      "latencyMs": 858.5676670000248,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.4% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [13.4],
+        "parsedValue": 13.4,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Mevushal Kosher for Passover",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-103",
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
+      "latencyMs": 2090.8166250000068,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-unsupported-pattern"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "SNA VALSO",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-104",
+      "strata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
+      "latencyMs": 2240.8972079999803,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "BLAZIC",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-105",
+      "strata": [
+        "decorative-or-script-brand",
+        "front-label",
+        "multiple-brand-like-phrases",
+        "alcohol-at-bottom"
+      ],
+      "latencyMs": 2549.136958999996,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [12.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "VANNI",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-106",
+      "strata": [
+        "simple-centered-brand",
+        "front-label",
+        "multiple-brand-like-phrases",
+        "alcohol-at-bottom"
+      ],
+      "latencyMs": 1970.7774999999965,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [12.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "REDO",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-107",
+      "strata": [
+        "decorative-or-script-brand",
+        "wraparound",
+        "vertical-mandatory-strip",
+        "alcohol-at-side-or-rotated",
+        "front-label"
+      ],
+      "latencyMs": 2947.0564159999776,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "FATTORIA",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-108",
+      "strata": [
+        "decorative-or-script-brand",
+        "wraparound",
+        "vertical-mandatory-strip",
+        "alcohol-at-side-or-rotated",
+        "front-label"
+      ],
+      "latencyMs": 2686.758167000022,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [12.5],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "8 Ao VINO BIANCO",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "approved-wine-109",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 850.3259169999801,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "12.5% BY VOL.",
+        "present": true,
+        "acceptablePercents": [12.5],
+        "parsedValue": 12.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "SANGOUARD-CHENE",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "approved-wine-110",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "latencyMs": 1140.9617909999797,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "12.8% BY VOL.",
+        "present": true,
+        "acceptablePercents": [12.8],
+        "parsedValue": 12.8,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Cool&y",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "m-cellars-baseline",
+      "strata": [
+        "multiple-brand-like-phrases",
+        "alcohol-at-bottom",
+        "genuinely-ambiguous",
+        "front-label"
+      ],
+      "latencyMs": 4769.0375420000055,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "12.5% ALC./VOL.",
+        "present": true,
+        "acceptablePercents": [12.5],
+        "parsedValue": 12.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "CELLARS",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "correct-uncertainty"
+      }
+    },
+    {
+      "caseId": "wine-multi-artifact-04",
+      "strata": ["multi-panel", "alcohol-at-bottom"],
+      "latencyMs": 3193.032291999989,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [13.2],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Donovan Visayas",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "wine-multi-artifact-05",
+      "strata": ["multi-panel", "alcohol-at-bottom"],
+      "latencyMs": 1386.349583000003,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "ALCOHOL 13.5 BY VOLUME",
+        "present": true,
+        "acceptablePercents": [13.5],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "BLAZIC COLLIO",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "wine-multi-artifact-06",
+      "strata": ["multi-panel", "alcohol-at-side-or-rotated"],
+      "latencyMs": 2024.7986249999958,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% BY VOL.",
+        "present": true,
+        "acceptablePercents": [13.4],
+        "parsedValue": 13.5,
+        "detected": true,
+        "parsedAccurate": false,
+        "failureClass": "parser-failure",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "MOLINO",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "wine-multi-artifact-07",
+      "strata": ["multi-panel", "missing-alcohol-statement"],
+      "latencyMs": 1091.3059579999826,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "12% ALC./VOL.",
+        "present": false,
+        "acceptablePercents": [],
+        "parsedValue": 12,
+        "detected": true,
+        "parsedAccurate": false,
+        "failureClass": "false-certainty",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "North Carolina Nuscadine Nig",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "ocr-recognition-failure"
+      }
+    },
+    {
+      "caseId": "wine-multi-artifact-08",
+      "strata": ["multi-panel", "alcohol-at-bottom"],
+      "latencyMs": 839.2249160000065,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "12.6% BY VOL.",
+        "present": true,
+        "acceptablePercents": [12.6],
+        "parsedValue": 12.6,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "Z-lor",
+        "exactMatch": false,
+        "normalizedMatch": false,
+        "failureClass": "candidate-filtering-failure"
+      }
+    },
+    {
+      "caseId": "wine-multi-artifact-09",
+      "strata": ["multi-panel", "alcohol-at-bottom"],
+      "latencyMs": 860.815082999994,
+      "alcohol": {
+        "state": "OBSERVED",
+        "value": "12.5% BY VOL.",
+        "present": true,
+        "acceptablePercents": [12.5],
+        "parsedValue": 12.5,
+        "detected": true,
+        "parsedAccurate": true,
+        "failureClass": "correct",
+        "candidateFilteringSubtype": null
+      },
+      "brand": {
+        "state": "OBSERVED",
+        "value": "DUCK WALK VINEYARDS",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct"
+      }
+    },
+    {
+      "caseId": "wine-multi-artifact-10",
+      "strata": ["multi-panel", "alcohol-at-side-or-rotated"],
+      "latencyMs": 2511.0274999999965,
+      "alcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "present": true,
+        "acceptablePercents": [14],
+        "parsedValue": null,
+        "detected": false,
+        "parsedAccurate": false,
+        "failureClass": "candidate-filtering-failure",
+        "candidateFilteringSubtype": "alcohol-rejected-missing-volume-marker"
+      },
+      "brand": {
+        "state": "AMBIGUOUS",
+        "value": "MAURO MOLINO",
+        "exactMatch": true,
+        "normalizedMatch": true,
+        "failureClass": "correct-uncertainty"
+      }
+    }
+  ]
+}

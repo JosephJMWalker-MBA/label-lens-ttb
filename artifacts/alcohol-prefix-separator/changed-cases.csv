@@ -1,0 +1,7 @@
+case_id,truth_percent,alcohol_state_before,alcohol_state_after,alcohol_value_before,alcohol_value_after,parsed_accurate_before,parsed_accurate_after,failure_class_before,failure_class_after,brand_changed,verdict,alcohol_present
+"patricia-green-cellars",13.8,"NOT_OBSERVED","LOW_CONFIDENCE","","13.8% ALC./VOL.",false,true,"candidate-filtering-failure","correct",false,"IMPROVED",true
+"approved-wine-055",13,"NOT_OBSERVED","OBSERVED","","13% ALC./VOL.",false,true,"candidate-filtering-failure","correct",false,"IMPROVED",true
+"approved-wine-077",13.5,"NOT_OBSERVED","OBSERVED","","13.5% ALC./VOL.",false,true,"candidate-filtering-failure","correct",false,"IMPROVED",true
+"approved-wine-095",12,"NOT_OBSERVED","OBSERVED","","12% ALC./VOL.",false,true,"candidate-filtering-failure","correct",false,"IMPROVED",true
+"approved-wine-096",12,"NOT_OBSERVED","OBSERVED","","12% ALC./VOL.",false,true,"candidate-filtering-failure","correct",false,"IMPROVED",true
+"approved-wine-097",12,"NOT_OBSERVED","LOW_CONFIDENCE","","12% ALC./VOL.",false,true,"candidate-filtering-failure","correct",false,"IMPROVED",true
