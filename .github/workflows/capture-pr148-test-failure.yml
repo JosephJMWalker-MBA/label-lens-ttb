@@ -1,3 +1,4 @@
+# One-time diagnostic workflow; removed before merge.
 name: Capture PR 148 unit failure
 
 on:
