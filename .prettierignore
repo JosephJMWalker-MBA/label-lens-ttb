@@ -19,3 +19,6 @@ src/pipeline/extractor/assets/*.traineddata
 
 # Generated evaluation baseline report (produced by `npm run eval:baseline`).
 docs/extraction-baseline/
+
+# Generated Drizzle migration artifacts (authored by drizzle-kit in its own style).
+src/db/migrations/

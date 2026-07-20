@@ -38,7 +38,17 @@
     --evidence-alcohol: 292 55% 40%;
     --evidence-candidate: 215 16% 40%;
     --evidence-seller: 25 80% 32%;
+    /* Persistent account action (sticky footer "Sign in" / role landing). A blue
+       that clears WCAG AA against white in light mode. Kept as a token so the
+       footer button is defined once, not as scattered literals. */
+    --action: 221 83% 45%;
+    --action-foreground: 0 0% 100%;
+    --action-hover: 221 83% 38%;
+    /* Decorative container glow: a broad, soft brand halo behind a panel. */
+    --panel-glow: 222 84% 55%;
     --radius: 0.5rem;
+    /* Reserved height for the sticky account footer. */
+    --account-bar-height: 3.5rem;
   }
 
   /* Dark theme (contrast-checked against WCAG AA for body and muted text).
@@ -67,6 +77,12 @@
     --evidence-alcohol: 290 75% 78%;
     --evidence-candidate: 215 20% 72%;
     --evidence-seller: 35 90% 70%;
+    /* In dark mode the action uses a light blue fill with dark text, which clears
+       WCAG AA far more comfortably than white-on-saturated-blue. */
+    --action: 213 94% 68%;
+    --action-foreground: 222 47% 11%;
+    --action-hover: 213 94% 78%;
+    --panel-glow: 213 94% 62%;
   }
 
   /* Bounded font-size preference. Scaling the root font-size scales the rem-based
@@ -88,6 +104,14 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+  }
+
+  /* When the sticky account footer is mounted, reserve space so it never covers
+     page content, and lift any page-level fixed action footer above it. Scoped to
+     the data flag the footer sets on mount, so pages without it are unaffected. */
+  body[data-account-bar="open"] {
+    padding-bottom: calc(var(--account-bar-height) + env(safe-area-inset-bottom));
+    --stacked-footer-bottom: calc(var(--account-bar-height) + env(safe-area-inset-bottom));
   }
 
   /* Reduced motion: honor the OS setting and an explicit local override. Essential
@@ -249,6 +273,101 @@
     letter-spacing: 0.04em;
     text-transform: uppercase;
     white-space: nowrap;
+  }
+
+  /* Sticky account footer: always visible at the viewport bottom on public pages.
+     High contrast, keyboard accessible, mobile safe-area aware, no layout shift,
+     no horizontal overflow. Works in light and dark. */
+  .account-bar {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: var(--account-bar-height);
+    padding: 0.5rem max(1rem, env(safe-area-inset-left)) calc(0.5rem + env(safe-area-inset-bottom));
+    border-top: 1px solid hsl(var(--border));
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+  }
+  .account-bar__label {
+    min-width: 0;
+    font-size: 0.875rem;
+    color: hsl(var(--muted-foreground));
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* The persistent primary action. Minimum 44px touch target, blue token fill,
+     legible in both themes, with a clearly visible focus ring. */
+  .account-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding: 0 1.25rem;
+    border-radius: var(--radius);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    white-space: nowrap;
+    background-color: hsl(var(--action));
+    color: hsl(var(--action-foreground));
+  }
+  .account-action:hover {
+    background-color: hsl(var(--action-hover));
+  }
+  .account-action:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+  .account-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: hsl(var(--foreground));
+    text-underline-offset: 4px;
+  }
+  .account-link:hover {
+    text-decoration: underline;
+  }
+  .account-link:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: var(--radius);
+  }
+
+  /* Decorative container glow. A broad, soft brand halo that sits BEHIND the panel
+     and extends beyond its edges — deliberately larger and blurrier than the card
+     so it never reads as a second, misaligned border. The crisp card border is the
+     only defined edge. Non-interactive; isolated so the negative z-index stays
+     behind the card content but not behind the page. */
+  .workspace-panel {
+    position: relative;
+    isolation: isolate;
+    border-radius: 0.75rem;
+    border: 1px solid hsl(var(--evidence-brand) / 0.35);
+    background-color: hsl(var(--card));
+  }
+  .workspace-panel::before {
+    content: "";
+    position: absolute;
+    inset: -16px;
+    z-index: -1;
+    border-radius: 1.5rem;
+    background: radial-gradient(65% 60% at 50% 42%, hsl(var(--panel-glow) / 0.2), transparent 72%);
+    filter: blur(26px);
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .workspace-panel::before {
+      transition: opacity 200ms ease;
+    }
   }
 
   /* A slow, non-essential spinner. Hidden entirely under reduced motion; the

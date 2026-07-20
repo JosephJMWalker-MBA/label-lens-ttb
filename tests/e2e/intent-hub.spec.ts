@@ -20,22 +20,26 @@ test("the hub asks what you want to do and offers the upload-or-build promise", 
   await expect(page.getByText(/not a TTB approval/i)).toBeVisible();
 });
 
-test("all five intents appear, and create, review and learn are active", async ({ page }) => {
+test("all six intents appear, and the four active paths are offered", async ({ page }) => {
   await page.goto("/");
 
+  // Scope to the intent list: some titles intentionally match a header nav link
+  // (e.g. "Prepare a package"), which is a separate landmark.
+  const intentList = page.getByRole("list").first();
   for (const title of [
     "Create a new label",
     "Improve an existing draft",
-    "Review a label before submission",
+    "Prepare a package",
+    "Run a single-image pre-check",
     "Learn labeling requirements",
     "Find professional help",
   ]) {
-    await expect(page.getByText(title, { exact: true })).toBeVisible();
+    await expect(intentList.getByText(title, { exact: true })).toBeVisible();
   }
 
-  // The intent list offers exactly three destinations.
+  // The intent list offers exactly four destinations.
   const intentLinks = page.getByRole("list").first().getByRole("link");
-  await expect(intentLinks).toHaveCount(3);
+  await expect(intentLinks).toHaveCount(4);
 
   // Unavailable paths state their absence in text and expose nothing to click.
   await expect(page.getByText(/not available yet/i)).toHaveCount(2);
@@ -51,7 +55,11 @@ test("both active intents navigate, and the package review workflow loads", asyn
   );
 
   await page.goto("/");
-  await page.getByRole("link", { name: /review a label/i }).click();
+  await page
+    .getByRole("list")
+    .first()
+    .getByRole("link", { name: /prepare a package/i })
+    .click();
   await expect(page).toHaveURL(/\/review$/);
   await expect(page.getByLabel(/upload front label/i)).toBeVisible();
   await expect(page.getByRole("button", { name: /upload back label/i })).toBeVisible();

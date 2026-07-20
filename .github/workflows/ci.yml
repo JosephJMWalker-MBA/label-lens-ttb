@@ -9,6 +9,13 @@ jobs:
   verify:
     name: Lint, typecheck, test, build
     runs-on: ubuntu-latest
+    # Standard verify path uses the local SQLite test database only. It must never
+    # attempt to connect to MySQL: MySQL coverage lives in the dedicated
+    # `mysql-integration` job below (gated by RUN_MYSQL_TESTS).
+    env:
+      DATABASE_URL: file:.local/ci-verify.db
+      BETTER_AUTH_SECRET: test-only-secret-at-least-32-characters
+      BETTER_AUTH_URL: http://localhost:3000
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -23,9 +30,112 @@ jobs:
       - run: npm test
       - run: npm run build
 
+  mysql-integration:
+    name: MySQL finalize/status + auth integration
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+
+    env:
+      # Test-only credentials, used exclusively inside GitHub Actions. This never
+      # points at Hostinger staging, and no Hostinger secrets are used in CI.
+      DATABASE_URL: mysql://root:root@127.0.0.1:3306/test_db
+      BETTER_AUTH_SECRET: test-only-secret-at-least-32-characters
+      BETTER_AUTH_URL: http://localhost:3000
+      LABEL_LENS_INTEGRITY_SECRET: test-only-integrity-secret-at-least-32-characters
+      LABEL_LENS_APPEND_SIGNING_KEY: test-only-append-secret-at-least-32-characters
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Wait for MySQL to be ready
+        run: |
+          for i in $(seq 1 30); do
+            if mysqladmin ping -h 127.0.0.1 -P 3306 -uroot -proot --silent; then
+              echo "MySQL is ready"; exit 0
+            fi
+            echo "Waiting for MySQL... ($i)"; sleep 2
+          done
+          echo "MySQL did not become ready in time"; exit 1
+
+      - name: Apply committed Drizzle migration to a fresh MySQL database
+        run: npm run db:migrate
+
+      - name: Run authoritative MySQL integration suite (finalize/status, agent authz, bootstrap)
+        run: npm run test:mysql
+
+      - name: Bootstrap CLI smoke — idempotent provisioning against MySQL
+        # Test-only fake credentials, isolated to CI. Not real, not reusable, and
+        # not tied to any Hostinger environment. Run twice to prove idempotency.
+        env:
+          LABEL_LENS_BOOTSTRAP_ADMIN_EMAIL: ci-admin@example.test
+          LABEL_LENS_BOOTSTRAP_ADMIN_PASSWORD: ci-only-admin-password-1234
+          LABEL_LENS_BOOTSTRAP_AGENT_EMAIL: ci-agent@example.test
+          LABEL_LENS_BOOTSTRAP_AGENT_PASSWORD: ci-only-agent-password-1234
+          LABEL_LENS_BOOTSTRAP_SELLER_EMAIL: ci-seller@example.test
+          LABEL_LENS_BOOTSTRAP_SELLER_PASSWORD: ci-only-seller-password-1234
+        run: |
+          npm run auth:bootstrap | tee first.log
+          grep -q "created" first.log
+          npm run auth:bootstrap | tee second.log
+          grep -q "already-present" second.log
+
+      - name: Prove the MySQL production build works with better-sqlite3 absent
+        # Reproduces the Hostinger condition exactly: the native SQLite addon is an
+        # optionalDependency that the production host cannot compile, so it simply
+        # is not there. The build must complete through page-data collection, and
+        # the emitted server graph must contain no path to the driver at all.
+        run: |
+          rm -rf node_modules/better-sqlite3
+          npm run build
+          npm run verify:mysql-graph
+
+      - name: Prove the standalone artifact migrates from a relocated root
+        # Validates the ACTUAL EMITTED ARTIFACT, not a source-tree build: the
+        # committed migrations must be packaged into .next/standalone, and the
+        # relocated server must apply them to a fresh database when launched from
+        # an unrelated working directory, then start again idempotently.
+        env:
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/standalone_verify_db
+        run: npm run verify:standalone-migrations
+
   e2e:
     name: Playwright end-to-end
     runs-on: ubuntu-latest
+    # Local SQLite for e2e — never MySQL/Hostinger. The bootstrap credentials are
+    # obviously-fake, CI-only values that must match tests/e2e/auth-fixtures.ts.
+    env:
+      DATABASE_URL: file:.local/e2e-auth.db
+      BETTER_AUTH_SECRET: e2e-secret-key-at-least-32-characters-long
+      BETTER_AUTH_URL: http://localhost:3000
+      LABEL_LENS_INTEGRITY_SECRET: e2e-integrity-secret-at-least-32-characters
+      # The e2e suite runs against a real production build (next build + next
+      # start), where the pre-check route requires an append signing key and
+      # returns 500 without it. The dev server did not enforce this.
+      LABEL_LENS_APPEND_SIGNING_KEY: e2e-append-signing-secret-at-least-32-chars
+      LABEL_LENS_BOOTSTRAP_ADMIN_EMAIL: e2e-admin@example.test
+      LABEL_LENS_BOOTSTRAP_ADMIN_PASSWORD: e2e-only-admin-password-1234
+      LABEL_LENS_BOOTSTRAP_AGENT_EMAIL: e2e-agent@example.test
+      LABEL_LENS_BOOTSTRAP_AGENT_PASSWORD: e2e-only-agent-password-1234
+      LABEL_LENS_BOOTSTRAP_SELLER_EMAIL: e2e-seller@example.test
+      LABEL_LENS_BOOTSTRAP_SELLER_PASSWORD: e2e-only-seller-password-1234
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -34,4 +144,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+      - name: Seed the e2e database (schema, provisioned accounts, submissions)
+        run: npm run e2e:seed
       - run: npm run test:e2e

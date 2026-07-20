@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+
+// Run layout effects synchronously in the browser/jsdom, but fall back to a
+// passive effect during server prerender (where `useLayoutEffect` is a no-op and
+// warns). Used for state that must settle before the user can interact.
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,8 +18,10 @@ import { PackageUploadDecisions } from "./PackageUploadDecisions";
 import { PackageWorkstationControls } from "./PackageWorkstationControls";
 import { ProfileExampleLabelMap } from "./ProfileExampleLabelMap";
 import {
+  DraftStoreError,
   loadPackageDraftLocally,
   savePackageDraftLocally,
+  type StoredPackageDraft,
   type StoredPackagePanelFile,
 } from "./package-draft-store";
 import {
@@ -94,6 +101,22 @@ function formatElapsedTime(seconds: number): string {
   const remainder = (seconds % 60).toString().padStart(2, "0");
   return `${minutes}:${remainder}`;
 }
+
+/**
+ * Local draft recovery is best-effort. If IndexedDB never settles within this
+ * deadline (blocked, stuck, or missing events), the workstation falls back to a
+ * fresh in-memory draft rather than staying on the loading screen forever.
+ */
+const RESTORE_DEADLINE_MS = 5000;
+
+const RESTORATION_WARNING =
+  "We could not restore the locally saved draft. A new unsaved package has been opened. Your previous browser draft was not deleted.";
+
+// Shown when a valid saved draft exists but the seller already started new work in
+// the fresh draft, so it was not loaded automatically (active work is never
+// overwritten). The seller can choose to load it explicitly.
+const RESTORED_AVAILABLE_NOTICE =
+  "A previously saved local draft is available. You have already started a new package, so it was not loaded automatically. Loading it will replace your current unsaved work.";
 
 function newDraft(): SellerPackageDraft {
   const recordedAt = now();
@@ -239,57 +262,176 @@ export function PackagePreparationWorkspace() {
   const [message, setMessage] = useState(
     "Resolve the panel choices, then prepare each supported category.",
   );
-  const [restoring, setRestoring] = useState(true);
+  // Non-gating: true only while a background restoration attempt is in flight.
+  // The workspace is usable regardless; this drives a subtle inline indicator.
+  const [restorationPending, setRestorationPending] = useState(false);
+  const [restorationWarning, setRestorationWarning] = useState<string | null>(null);
+  const [restorationDiagnostic, setRestorationDiagnostic] = useState<string | null>(null);
   const objectUrlsRef = useRef<Set<string>>(new Set());
   const draftRef = useRef<SellerPackageDraft | null>(null);
   const runtimePanelsRef = useRef<RuntimePanel[]>([]);
+  // The pristine fallback draft, used to detect whether the seller has since
+  // materially edited it before allowing a retry to replace it.
+  const fallbackBaselineRef = useRef<SellerPackageDraft | null>(null);
+  const restoreAttemptRef = useRef(0);
+  const restoreDeadlineRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const restoreCancelledRef = useRef(false);
 
-  useEffect(() => {
-    let cancelled = false;
-    const objectUrls = objectUrlsRef.current;
-    void loadPackageDraftLocally()
+  const revokeAllObjectUrls = useCallback(() => {
+    for (const url of objectUrlsRef.current) URL.revokeObjectURL(url);
+    objectUrlsRef.current.clear();
+  }, []);
+
+  // Safe, browser-visible diagnostic only: a failure category, never any cookie,
+  // token, email, secret, or URL.
+  const diagnose = useCallback((category: string) => {
+    setRestorationDiagnostic(category);
+    if (typeof console !== "undefined") {
+      console.warn("[review] local draft restoration fell back", { category });
+    }
+  }, []);
+
+  // Open a fresh, immediately usable draft. Called at mount so the workspace
+  // renders and is interactive right away — its availability never depends on
+  // IndexedDB. `warning`/`diagnostic` are surfaced only as a non-blocking banner.
+  const openNewDraft = useCallback((warning: string | null, diagnostic: string | null) => {
+    const initial = newDraft();
+    draftRef.current = initial;
+    fallbackBaselineRef.current = initial;
+    runtimePanelsRef.current = [];
+    setDraft(initial);
+    setRuntimePanels([]);
+    setActivePanelId(null);
+    setSaveState("unsaved");
+    setAnalysisState("idle");
+    setRestorationWarning(warning);
+    setRestorationDiagnostic(diagnostic);
+    if (!warning) {
+      setMessage("Resolve the panel choices, then prepare each supported category.");
+    }
+  }, []);
+
+  const applyRestoredDraft = useCallback((stored: StoredPackageDraft) => {
+    const runtime = stored.panelFiles.map(({ panelId, file }) => {
+      const imageUrl = URL.createObjectURL(file);
+      objectUrlsRef.current.add(imageUrl);
+      return { panelId, file, imageUrl };
+    });
+    draftRef.current = stored.draft;
+    fallbackBaselineRef.current = null;
+    runtimePanelsRef.current = runtime;
+    setDraft(stored.draft);
+    setRuntimePanels(runtime);
+    setActivePanelId(stored.draft.panels[0]?.panelId ?? null);
+    setSaveState(restoredSaveState(stored.draft));
+    setAnalysisState(stored.draft.analysisRuns.length > 0 ? "complete" : "idle");
+    setMessage("Restored the last locally saved seller package draft in this browser.");
+    setRestorationWarning(null);
+    setRestorationDiagnostic(null);
+  }, []);
+
+  // A local-draft failure must never block preparation or discard in-progress
+  // work: the fresh draft opened at mount stays in place and usable; we only
+  // surface a truthful, non-destructive warning + retry.
+  const warnRestorationFailed = useCallback(
+    (diagnostic: string) => {
+      diagnose(diagnostic);
+      setRestorationWarning(RESTORATION_WARNING);
+    },
+    [diagnose],
+  );
+
+  const sellerHasEdited = useCallback(
+    () =>
+      draftRef.current !== null &&
+      fallbackBaselineRef.current !== null &&
+      draftRef.current !== fallbackBaselineRef.current,
+    [],
+  );
+
+  // Background restoration: enhances the already-open workspace. Never gates the
+  // page. A stored draft only replaces the fresh draft when the seller has not
+  // already started new work; failures surface a non-destructive warning.
+  const runRestore = useCallback(() => {
+    const attempt = ++restoreAttemptRef.current;
+    // Discard any object URLs from a previous attempt before starting a new one,
+    // so a retry never leaks or duplicates image URLs. At mount this set is empty.
+    revokeAllObjectUrls();
+    setRestorationPending(true);
+    setRestorationWarning(null);
+    setRestorationDiagnostic(null);
+
+    let settled = false;
+    const isCurrent = () =>
+      !restoreCancelledRef.current && attempt === restoreAttemptRef.current && !settled;
+    const finish = () => {
+      settled = true;
+      setRestorationPending(false);
+      if (restoreDeadlineRef.current) {
+        clearTimeout(restoreDeadlineRef.current);
+        restoreDeadlineRef.current = null;
+      }
+    };
+
+    restoreDeadlineRef.current = setTimeout(() => {
+      if (!isCurrent()) return;
+      finish();
+      warnRestorationFailed("timeout");
+    }, RESTORE_DEADLINE_MS);
+
+    loadPackageDraftLocally()
       .then((stored) => {
-        if (cancelled) return;
+        if (!isCurrent()) return;
+        finish();
         if (!stored) {
-          const initial = newDraft();
-          draftRef.current = initial;
-          setDraft(initial);
+          // No stored draft (a normal first visit): keep the fresh draft, no warning.
           return;
         }
-        const runtime = stored.panelFiles.map(({ panelId, file }) => {
-          const imageUrl = URL.createObjectURL(file);
-          objectUrls.add(imageUrl);
-          return { panelId, file, imageUrl };
-        });
-        draftRef.current = stored.draft;
-        runtimePanelsRef.current = runtime;
-        setDraft(stored.draft);
-        setRuntimePanels(runtime);
-        setActivePanelId(stored.draft.panels[0]?.panelId ?? null);
-        setSaveState(restoredSaveState(stored.draft));
-        setAnalysisState(stored.draft.analysisRuns.length > 0 ? "complete" : "idle");
-        setMessage("Restored the last locally saved seller package draft in this browser.");
-      })
-      .catch(() => {
-        if (!cancelled) {
-          const initial = newDraft();
-          draftRef.current = initial;
-          setDraft(initial);
-          setSaveState("error");
-          setMessage(
-            "Local draft storage is unavailable. You may continue, but reload recovery cannot be promised.",
-          );
+        if (sellerHasEdited()) {
+          // A valid saved draft exists, but the seller already began new work.
+          // Do not overwrite it; offer explicit restoration via the retry action.
+          setRestorationWarning(RESTORED_AVAILABLE_NOTICE);
+          setRestorationDiagnostic("superseded-by-active-edit");
+          return;
         }
+        applyRestoredDraft(stored);
       })
-      .finally(() => {
-        if (!cancelled) setRestoring(false);
+      .catch((error: unknown) => {
+        if (!isCurrent()) return;
+        finish();
+        const reason =
+          error instanceof DraftStoreError ? error.reason : "LOCAL_DRAFT_STORAGE_FAILED";
+        warnRestorationFailed(reason);
       });
+  }, [applyRestoredDraft, revokeAllObjectUrls, sellerHasEdited, warnRestorationFailed]);
+
+  const retryRestore = useCallback(() => {
+    // Never overwrite active seller work without an explicit confirmation.
+    if (sellerHasEdited() && typeof window !== "undefined") {
+      const confirmed = window.confirm(
+        "Replace your current unsaved package with the restored draft? Your current changes will be discarded.",
+      );
+      if (!confirmed) return;
+    }
+    runRestore();
+  }, [runRestore, sellerHasEdited]);
+
+  useEffect(() => {
+    restoreCancelledRef.current = false;
+    // Render a usable workspace immediately with a fresh draft, then restore in the
+    // background. Strict Mode double-invocation simply re-opens a fresh draft (no
+    // edits exist yet at mount) and re-runs restoration under a new attempt id.
+    openNewDraft(null, null);
+    runRestore();
     return () => {
-      cancelled = true;
-      for (const url of objectUrls) URL.revokeObjectURL(url);
-      objectUrls.clear();
+      restoreCancelledRef.current = true;
+      if (restoreDeadlineRef.current) {
+        clearTimeout(restoreDeadlineRef.current);
+        restoreDeadlineRef.current = null;
+      }
+      revokeAllObjectUrls();
     };
-  }, []);
+  }, [openNewDraft, runRestore, revokeAllObjectUrls]);
 
   const activePanel = draft?.panels.find((panel) => panel.panelId === activePanelId) ?? null;
   const activeRuntimePanel = runtimePanels.find((panel) => panel.panelId === activePanelId) ?? null;
@@ -331,7 +473,32 @@ export function PackagePreparationWorkspace() {
     saveState === "saved" &&
     submitter.trim() !== "";
 
-  useEffect(() => {
+  // A render-synced mirror of `workingRegion` so the reset effect below can read
+  // the current in-progress edit without taking it as a dependency.
+  const workingRegionRef = useRef(workingRegion);
+  workingRegionRef.current = workingRegion;
+
+  // Reset the in-progress (uncommitted) working edit to the active context's
+  // defaults when the seller navigates to a different category or panel.
+  //
+  // It runs as a layout effect so this settling happens synchronously at load,
+  // before the seller can type or draw — otherwise a passive re-run could flush
+  // during a later interaction and wipe freshly entered text or a just-drawn/
+  // copied region, silently disabling Save. Two further guards: (1) it does
+  // nothing until the draft has loaded; (2) a working edit already belonging to
+  // the current category+panel is left untouched — only edits carried over from
+  // a previous context are cleared.
+  useIsomorphicLayoutEffect(() => {
+    if (!draft) return;
+    const current = workingRegionRef.current;
+    if (
+      current &&
+      current.categoryId === activeCategoryId &&
+      current.panelId === activePanelForWorkingId
+    ) {
+      return;
+    }
+
     if (!activePanelForWorkingId || !activeCategoryRegions || !activeInstruction) {
       setWorkingRegion(null);
       setWorkingValue(activeCategoryExpectedValue);
@@ -351,6 +518,7 @@ export function PackagePreparationWorkspace() {
     );
     setShowMachineObservation(false);
   }, [
+    draft,
     activeCategoryExpectedValue,
     activeCategoryDecision,
     activeCategoryRegions,
@@ -1073,8 +1241,15 @@ export function PackagePreparationWorkspace() {
     }
   }
 
-  if (restoring || !draft || !workflow) {
-    return <p role="status">Restoring the locally saved package draft…</p>;
+  // The structural workspace renders as soon as the mount effect has opened the
+  // fresh draft; only the brief SSR / pre-mount frame (before any client effect)
+  // shows this placeholder. Restoration is never allowed to gate the page.
+  if (!draft || !workflow) {
+    return (
+      <p role="status" data-restoration-status="initializing">
+        Preparing the package workspace…
+      </p>
+    );
   }
 
   const focusedDefinitions =
@@ -1237,7 +1412,38 @@ export function PackagePreparationWorkspace() {
   }
 
   return (
-    <section className="min-w-0 pb-64 lg:pb-44" data-testid="seller-workstation">
+    <section
+      className="min-w-0 pb-64 lg:pb-44"
+      data-testid="seller-workstation"
+      data-restoration-status={restorationDiagnostic ?? "restored"}
+    >
+      {restorationPending ? (
+        <p
+          role="status"
+          data-testid="restoration-pending"
+          className="mb-4 text-sm text-muted-foreground"
+        >
+          Checking for a locally saved draft… the workspace below is ready to use.
+        </p>
+      ) : null}
+      {restorationWarning ? (
+        <div
+          role="alert"
+          data-testid="restoration-warning"
+          className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-500/60 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:bg-amber-950/40 dark:text-amber-100"
+        >
+          <p className="min-w-0">{restorationWarning}</p>
+          <button
+            type="button"
+            onClick={retryRestore}
+            className="shrink-0 rounded-md border border-amber-600/60 px-3 py-1.5 text-sm font-medium hover:bg-amber-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring dark:hover:bg-amber-900/40"
+          >
+            {restorationDiagnostic === "superseded-by-active-edit"
+              ? "Load saved local draft"
+              : "Retry local draft restoration"}
+          </button>
+        </div>
+      ) : null}
       <div className="grid min-w-0 items-start gap-4 lg:grid-cols-[15rem_minmax(0,1fr)_19rem]">
         <PackageWorkstationControls
           draft={draft}
@@ -1275,7 +1481,7 @@ export function PackagePreparationWorkspace() {
         />
 
         <main
-          className="min-w-0 rounded-xl border border-blue-500/30 shadow-[0_0_24px_rgba(37,99,235,0.10)]"
+          className="workspace-panel min-w-0"
           data-testid="cycling-workspace"
           data-current-phase={workflow.phase}
           aria-current="step"

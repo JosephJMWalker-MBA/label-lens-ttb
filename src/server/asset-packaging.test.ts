@@ -87,23 +87,59 @@ describe("hardened processing routes", () => {
     return found;
   }
 
-  it("exposes exactly two bounded processing routes, two append routes, and an inert health probe", () => {
+  it("exposes exactly two bounded processing routes, two append routes, an inert health probe, and authenticated submission routes", () => {
     const routes = routeFiles(apiDir).sort();
     const healthRoute = join(apiDir, "health", "route.ts");
     const packageAnalysisRoute = join(apiDir, "package", "analyze", "route.ts");
     const confirmationRoute = join(apiDir, "precheck", "confirmation", "route.ts");
-    expect(routes).toEqual([
+    const statusRoute = join(apiDir, "package", "submit", "status", "[id]", "route.ts");
+    const authRoute = join(apiDir, "auth", "[...all]", "route.ts");
+    // Read-only agent review routes (GET-only, agent/admin authorized).
+    const agentQueueRoute = join(apiDir, "agent", "submissions", "route.ts");
+    const agentDetailRoute = join(apiDir, "agent", "submissions", "[id]", "route.ts");
+    const agentPanelRoute = join(
+      apiDir,
+      "agent",
+      "submissions",
+      "[id]",
+      "panels",
+      "[panelId]",
+      "route.ts",
+    );
+    const getOnlyRoutes = new Set([
       healthRoute,
-      packageAnalysisRoute,
-      confirmationRoute,
-      join(apiDir, "precheck", "disposition", "route.ts"),
-      join(apiDir, "precheck", "route.ts"),
+      statusRoute,
+      authRoute,
+      agentQueueRoute,
+      agentDetailRoute,
+      agentPanelRoute,
     ]);
-    // The three mutable routes accept POST; the health probe is a GET-only
-    // liveness endpoint that performs no OCR and imports no processing service.
+    expect(routes).toEqual(
+      [
+        authRoute,
+        healthRoute,
+        packageAnalysisRoute,
+        join(apiDir, "package", "submit", "finalize", "route.ts"),
+        statusRoute,
+        agentQueueRoute,
+        agentDetailRoute,
+        agentPanelRoute,
+        confirmationRoute,
+        join(apiDir, "precheck", "disposition", "route.ts"),
+        join(apiDir, "precheck", "route.ts"),
+      ].sort(),
+    );
+    // The mutable processing/append/finalize routes accept POST; status and the
+    // agent review routes are GET-only.
     for (const route of routes) {
-      if (route === healthRoute) continue;
+      if (getOnlyRoutes.has(route)) continue;
       expect(readFileSync(route, "utf8")).toMatch(/export\s+async\s+function\s+POST/);
+    }
+    // The agent review routes are GET handlers, never POST.
+    for (const route of [agentQueueRoute, agentDetailRoute, agentPanelRoute]) {
+      const source = readFileSync(route, "utf8");
+      expect(source).toMatch(/export\s+async\s+function\s+GET/);
+      expect(source).not.toMatch(/export\s+async\s+function\s+POST/);
     }
     const health = readFileSync(healthRoute, "utf8");
     expect(health).toMatch(/export\s+function\s+GET/);
@@ -147,6 +183,8 @@ describe("hardened processing routes", () => {
       "precheck/route.ts",
       "precheck/disposition/route.ts",
       "precheck/confirmation/route.ts",
+      "package/submit/finalize/route.ts",
+      "package/submit/status/[id]/route.ts",
     ]) {
       const source = readFileSync(join(apiDir, rel), "utf8");
       expect(source).toMatch(/export\s+const\s+runtime\s*=\s*["']nodejs["']/);

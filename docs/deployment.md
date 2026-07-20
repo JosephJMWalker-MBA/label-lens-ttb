@@ -45,6 +45,118 @@ but `ttb-test.com` is the current custom-domain deployment documented here.
 **No secrets are committed to the repository.** Set the signing key only in the
 hosting platform's secret store. The build commit is not a secret.
 
+## Database dialect graphs (`better-sqlite3` is never required in production)
+
+MySQL is authoritative in production. SQLite backs local development and tests
+only, and its driver `better-sqlite3` is a **native addon Hostinger cannot
+compile** — it is an `optionalDependency` that is simply absent there.
+
+The two dialects live in fully separate modules (`src/db/client.mysql.ts` and
+`src/db/client.sqlite.ts`). At build time `next.config.mjs` resolves the dialect
+and, for a MySQL build, **replaces the SQLite module with a stub**, so the
+emitted server graph contains no import, no external factory, and no executable
+`require("better-sqlite3")` anywhere. The build prints which graph it emitted:
+
+```text
+[build] database dialect graph: mysql (better-sqlite3 excluded entirely)
+```
+
+Marking the driver `external` was **not** sufficient: webpack still emitted
+`a.exports=require("better-sqlite3")` into every route bundle that reached the
+database client, and `next build` then failed during page-data collection with
+`Cannot find module 'better-sqlite3'` for `/api/package/submit/finalize` and
+`/api/package/submit/status/[id]`.
+
+The dialect is resolved from `DATABASE_URL` (tolerant of padding and scheme
+casing). If a host's connection string cannot be sniffed confidently, set
+`LABEL_LENS_DB_DIALECT=mysql` to force the MySQL graph explicitly.
+
+Verify a production build the way CI does:
+
+```bash
+rm -rf node_modules/better-sqlite3
+DATABASE_URL='mysql://…' npm run build
+npm run verify:mysql-graph
+```
+
+## Startup migrations and account bootstrap (Hostinger web-app runtime)
+
+Hostinger's shared SSH shell is **not** the Node web-app runtime: it exposes no
+deployed `package.json` and no `node`, so operators cannot run a provisioning
+command over SSH. Instead, database migrations and (optionally) account
+provisioning run **inside the deployed runtime at server startup**, via the
+Next.js instrumentation hook (`src/instrumentation.ts`). This runs as ordinary
+compiled JavaScript using only runtime dependencies — no `vite-node`, no
+TypeScript execution, and no devDependencies.
+
+Startup order (fail-closed): **validate environment → apply committed migrations
+→ optionally bootstrap accounts → start serving**. A migration failure or a
+requested-but-failed bootstrap exits the process non-zero *before* the server
+accepts requests.
+
+### Migration artifacts must ship with the server
+
+The committed migrations are **data read at runtime**, not imports, so static
+tracing never discovers them. They are packaged explicitly via a global
+`outputFileTracingIncludes` entry for `./src/db/migrations/**`, which carries
+every SQL file, every snapshot, and `meta/_journal.json` into the standalone
+output. Without it a standalone deploy boots with no migrations on disk and
+fails with `Can't find meta/_journal.json file`.
+
+The runtime folder is resolved deterministically for both deployment shapes — a
+source checkout, and a relocated `.next/standalone` artifact (whose `server.js`
+does `process.chdir(__dirname)`) — and never by assuming a checkout-shaped
+`process.cwd()`. If the folder cannot be found, startup **fails closed** with a
+secret-free diagnostic listing every path it tried; migrations are never skipped
+and `_journal.json` is never generated or reconstructed at runtime.
+`LABEL_LENS_MIGRATIONS_DIR` overrides resolution for an unusual layout.
+
+Verify the real emitted artifact the way CI does:
+
+```bash
+DATABASE_URL='mysql://…' npm run build
+DATABASE_URL='mysql://…/disposable_db' npm run verify:standalone-migrations
+```
+
+That relocates the artifact outside the repository, launches it from an
+unrelated working directory, applies migrations to a fresh database, and proves
+a second startup is idempotent.
+
+`npm run start` is plain `next start`; the instrumentation hook does the rest.
+
+| Name | Required | Notes |
+|---|---|---|
+| `DATABASE_URL` | **Yes (production)** | Authoritative MySQL connection string. Migrations run against it at startup. |
+| `BETTER_AUTH_SECRET` | **Yes (production)** | ≥ 32 chars, secret. |
+| `BETTER_AUTH_URL` | **Yes (production)** | The public origin, e.g. `https://ttb-test.com`. Drives the auth base URL; no hostname is hardcoded. |
+| `LABEL_LENS_DB_DIALECT` | Optional | Force the dialect graph (`mysql` / `sqlite`) when `DATABASE_URL` cannot be sniffed confidently. Overrides URL detection at both build and runtime. |
+| `LABEL_LENS_MIGRATIONS_DIR` | Optional | Absolute path to the committed migrations, for a deployment layout where they are neither beside the working directory nor in the standalone root. |
+| `LABEL_LENS_BOOTSTRAP_ON_START` | Optional | Set to `1` to provision accounts at startup. Remove it once accounts exist. |
+| `LABEL_LENS_BOOTSTRAP_RESET_PASSWORDS` | Optional | Set to `1` only to reset provisioned passwords; otherwise existing passwords are left unchanged. |
+| `LABEL_LENS_BOOTSTRAP_ADMIN_EMAIL` / `_PASSWORD` | With bootstrap | Admin account. Password ≥ 12 chars. |
+| `LABEL_LENS_BOOTSTRAP_AGENT_EMAIL` / `_PASSWORD` | With bootstrap | Agent account. |
+| `LABEL_LENS_BOOTSTRAP_SELLER_EMAIL` / `_PASSWORD` | With bootstrap | Seller account. |
+
+Bootstrap is **idempotent** and **fail-closed**: with `LABEL_LENS_BOOTSTRAP_ON_START=1`
+set, missing credentials abort startup rather than starting a half-provisioned
+server. It never prints passwords or full secret-bearing URLs, redacts emails in
+logs, and exposes no public bootstrap route. Repeated restarts are safe: existing
+accounts are left unchanged unless `LABEL_LENS_BOOTSTRAP_RESET_PASSWORDS=1`.
+
+Startup emits non-secret logs, for example:
+
+```text
+[startup] Applying database migrations…
+[startup] Migrations applied.
+[startup] admin a***@example.com → created
+[startup] agent a***@example.com → created
+[startup] seller s***@example.com → created
+[startup] Starting the production server…
+```
+
+To promote the deployment to a new hostname later, follow the
+[hostname promotion runbook](deploy/hostname-promotion.md).
+
 ## Health check
 
 `GET /api/health` → `200 { "status": "ok", "appendSigningKeyConfigured": <bool> }`.
@@ -168,5 +280,7 @@ non-government language is always visible.
 
 ## What is intentionally NOT deployed
 
-Persistence, accounts, cloud OCR fallback, multi-artifact intake, non-wine
-categories, corpus annotation, and any benchmark — all documented future work.
+Cloud OCR fallback, non-wine categories, corpus annotation, and any benchmark —
+all documented future work. Persistence (MySQL) and provisioned role-based
+accounts are part of the review-portal slice; there is no public self-service
+registration.

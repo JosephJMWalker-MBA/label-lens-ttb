@@ -16,6 +16,7 @@ import {
 } from "@/features/package-preparation/package-profile";
 import { getExecutableProvenance } from "@/server/runtime-provenance";
 import { ALLOWED_MEDIA_TYPES, MAX_IMAGE_BYTES } from "@/server/resource-policy";
+import { issueAppendToken } from "@/server/append-token";
 
 export const runtime = "nodejs";
 
@@ -186,12 +187,24 @@ export async function POST(request: Request): Promise<Response> {
       .update(canonicalStringify(machinePayload))
       .digest("hex");
     const integrity = createHash("sha256").update(canonicalStringify(machinePayload)).digest("hex");
+
+    const tokenResult = issueAppendToken(machineResultId);
+    if (!tokenResult.ok) {
+      return error(
+        "APPEND_SIGNING_KEY_UNAVAILABLE",
+        "The append-authorization service is not configured.",
+        500,
+      );
+    }
+    const appendToken = tokenResult.token;
+
     panelRuns.push({
       panelId: panel.panelId,
       machineResultId,
       observations,
       exportJson: canonicalStringify({
         ...machinePayload,
+        appendToken,
         integrity: {
           algorithm: "sha256",
           scope: "canonical-package-panel-machine-payload",
