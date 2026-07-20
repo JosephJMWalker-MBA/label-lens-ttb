@@ -27,7 +27,7 @@ interface SubmissionReceipt {
   submissionId: string;
   revisionId: string;
   revisionNumber: number;
-  status: "waiting_for_agent_review";
+  status: string;
   receivingAgent: string;
   signature: string;
   recordedAt: string;
@@ -74,6 +74,13 @@ function readinessMessage(stored: StoredPackageDraft | null): string {
     return "One or more saved panel files are unavailable in this browser. Restore them before submitting.";
   }
   return "The package and its panel images are ready to enter the internal agent review queue.";
+}
+
+function statusLabel(status: string): string {
+  return status
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 export function AgentReviewSubmissionDock() {
@@ -127,8 +134,11 @@ export function AgentReviewSubmissionDock() {
 
   useEffect(() => {
     attemptRef.current = null;
-    if (phase !== "submitted") setKnownServerStatus(null);
-  }, [draft?.packageId, draft?.updatedAt, latestRun?.analysisRunId, submitter, phase]);
+    setKnownServerStatus(null);
+    setReceipt(null);
+    setPhase("idle");
+    setErrorMessage(null);
+  }, [draft?.packageId, draft?.updatedAt, latestRun?.analysisRunId, submitter]);
 
   useEffect(() => {
     const packageId = draft?.packageId;
@@ -144,20 +154,18 @@ export function AgentReviewSubmissionDock() {
         if (!response.ok) return;
         const value = (await response.json()) as SubmissionStatusResponse;
         if (cancelled) return;
+        const latestRevision = value.revisions.at(-1);
         setKnownServerStatus(value.currentStatus);
-        if (value.currentStatus === "waiting_for_agent_review") {
-          const latestRevision = value.revisions.at(-1);
-          setReceipt({
-            submissionId: value.submissionId,
-            revisionId: latestRevision?.id ?? "recorded",
-            revisionNumber: latestRevision?.revisionNumber ?? 1,
-            status: "waiting_for_agent_review",
-            receivingAgent: AGENT_REVIEW_RECEIVER,
-            signature: "verified-server-record",
-            recordedAt: latestRevision?.submittedAt ?? value.createdAt,
-          });
-          setPhase("submitted");
-        }
+        setReceipt({
+          submissionId: value.submissionId,
+          revisionId: latestRevision?.id ?? "recorded",
+          revisionNumber: latestRevision?.revisionNumber ?? 1,
+          status: value.currentStatus,
+          receivingAgent: AGENT_REVIEW_RECEIVER,
+          signature: "verified-server-record",
+          recordedAt: latestRevision?.submittedAt ?? value.createdAt,
+        });
+        setPhase("submitted");
       })
       .catch(() => {
         // The status lookup is an enhancement. Submission remains available if it fails.
@@ -195,7 +203,8 @@ export function AgentReviewSubmissionDock() {
           submittedBy: submitter,
           submittedAt: new Date().toISOString(),
         });
-        const { integrity: _localIntegrity, ...localPayload } = localExport;
+        const { integrity: localIntegrity, ...localPayload } = localExport;
+        void localIntegrity;
         const agentPayload = {
           ...localPayload,
           boundary: {
@@ -262,7 +271,7 @@ export function AgentReviewSubmissionDock() {
     }
   }
 
-  const alreadySubmitted = phase === "submitted" || knownServerStatus === "waiting_for_agent_review";
+  const alreadySubmitted = phase === "submitted" || knownServerStatus !== null;
 
   return (
     <section
@@ -280,7 +289,7 @@ export function AgentReviewSubmissionDock() {
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {alreadySubmitted
-              ? "The package documents and panel images are stored in the internal queue and are waiting for an agent."
+              ? "The package documents and panel images are stored in the internal queue for agent review."
               : loadError
                 ? "The browser-local package could not be read. Restore the draft before submission."
                 : summary}
@@ -293,7 +302,7 @@ export function AgentReviewSubmissionDock() {
         <div className="w-full shrink-0 lg:w-[26rem]">
           {alreadySubmitted && receipt ? (
             <div className="rounded-md border border-emerald-700/40 bg-emerald-50 p-3 text-sm text-emerald-950 dark:bg-emerald-950/40 dark:text-emerald-100">
-              <p className="font-semibold">Waiting for agent review</p>
+              <p className="font-semibold">{statusLabel(receipt.status)}</p>
               <p className="mt-1 font-mono text-xs">{receipt.submissionId}</p>
               <p className="mt-1 text-xs">Revision v{receipt.revisionNumber} is recorded.</p>
               <Link className="mt-2 inline-block font-medium underline underline-offset-4" href="/seller">
