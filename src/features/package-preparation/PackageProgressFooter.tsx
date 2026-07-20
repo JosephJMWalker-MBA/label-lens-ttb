@@ -39,8 +39,8 @@ export function PackageProgressFooter({
   action: PackageFooterAction;
   elapsedLabel?: string;
 }) {
-  // Category dispositions are checkpointed immediately, but the package-level
-  // save remains an explicit final confirmation before agent submission.
+  // Reviewed category dispositions are checkpointed immediately, while the
+  // package-level save remains the explicit confirmation before submission.
   const reviewedDispositionPendingSave = workflow.correctionCycleComplete && saveState !== "saved";
   const displayedAction: PackageFooterAction = reviewedDispositionPendingSave
     ? {
