@@ -1,0 +1,112 @@
+{
+  "correctionDate": "2026-07-20",
+  "firstReader": "Claude (not blind - had already seen the stored truths and OCR outputs)",
+  "secondReaderStatus": "COMPLETE - independently confirmed by a second human reader",
+  "secondReaderPolicy": "These corrections raise reported metrics, so they required a second independent human reader before being treated as final. That review is now complete. OCR output was not used as a reader by either party.",
+  "canonicalFile": "src/fixtures/eval/eval-full-corpus-overrides.mjs",
+  "derivedFiles": ["src/fixtures/eval/eval-manifest.json", "docs/extraction-full-corpus/**"],
+  "machineBehaviorChanged": false,
+  "corrections": [
+    {
+      "caseId": "approved-wine-043",
+      "image": "tests/fixtures/precheck/approved-wine-043/label.jpeg",
+      "crop": {
+        "left": 210,
+        "top": 950,
+        "width": 250,
+        "height": 70,
+        "scale": 8
+      },
+      "visibleTranscription": "ALC. 13.8% BY VOL.",
+      "before": {
+        "acceptablePercents": [13],
+        "acceptableStatements": ["ALC. 13% BY VOL.", "13%"]
+      },
+      "after": {
+        "acceptablePercents": [13.8],
+        "acceptableStatements": ["ALC. 13.8% BY VOL.", "13.8%"]
+      },
+      "priorQc": "confirmed (in error)",
+      "reclassification": "parser-failure -> correct",
+      "secondReaderReading": "13.8%",
+      "secondReaderConfirmed": true
+    },
+    {
+      "caseId": "wine-multi-artifact-06",
+      "image": "tests/fixtures/precheck/wine-multi-artifact-06/label.png",
+      "crop": {
+        "left": 560,
+        "top": 60,
+        "width": 110,
+        "height": 150,
+        "rotateDeg": 90,
+        "scale": 12
+      },
+      "visibleTranscription": "ITALY Alc. 13,5 % by Vol.",
+      "before": {
+        "acceptablePercents": [13.4],
+        "acceptableStatements": ["Alc. 13,4% vol.", "13.4%", "13,4%"]
+      },
+      "after": {
+        "acceptablePercents": [13.5],
+        "acceptableStatements": ["Alc. 13,5 % by Vol.", "13.5%", "13,5%"]
+      },
+      "priorQc": "confirmed (in error)",
+      "reclassification": "parser-failure -> correct",
+      "secondReaderReading": "13.5%",
+      "secondReaderConfirmed": true,
+      "secondReaderUncertainty": "Confirmed as the numeric value 13.5. The second reader noted the decimal separator was not visually clear; the uncertainty is about the separator glyph only, not the numeric value."
+    },
+    {
+      "caseId": "wine-multi-artifact-07",
+      "image": "tests/fixtures/precheck/wine-multi-artifact-07/label.png",
+      "crop": {
+        "left": 60,
+        "top": 600,
+        "width": 300,
+        "height": 80,
+        "scale": 7
+      },
+      "visibleTranscription": "12% ALC./VOL.",
+      "before": {
+        "presence": "absent",
+        "absenceReason": "No alcohol statement appears on the committed composite image."
+      },
+      "after": {
+        "presence": "present",
+        "acceptablePercents": [12],
+        "acceptableStatements": ["12% ALC./VOL.", "12%"]
+      },
+      "priorQc": "confirmed (in error)",
+      "reclassification": "false-certainty -> correct",
+      "note": "The false absenceReason is removed; the stratum changes from missing-alcohol-statement to alcohol-at-bottom.",
+      "secondReaderReading": "12%",
+      "secondReaderConfirmed": true
+    }
+  ],
+  "notCorrected": [
+    {
+      "caseId": "approved-wine-018",
+      "reason": "Artwork reads Alc.13.5% by Vol. - the truth of 13.5 is correct; the machine's 3.5 is a genuine OCR error."
+    },
+    {
+      "caseId": "approved-wine-037",
+      "reason": "Artwork reads Alcohol 13.0 % by volume - the truth of 13 is correct; the machine's 19.0 is a genuine OCR error."
+    }
+  ],
+  "secondReader": {
+    "name": "Joseph",
+    "date": "2026-07-20",
+    "blind": true,
+    "sawExpectedAnswersBeforehand": false,
+    "independentReadings": {
+      "approved-wine-043": "13.8%",
+      "wine-multi-artifact-06": "13.5%",
+      "wine-multi-artifact-07": "12%"
+    },
+    "uncertainty": {
+      "wine-multi-artifact-06": "The decimal separator was not visually clear; the numeric reading was 13.5%."
+    },
+    "ocrUsedAsReader": false
+  }
+}

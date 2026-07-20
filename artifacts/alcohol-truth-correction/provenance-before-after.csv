@@ -1,0 +1,5 @@
+case_id,field,before,after,prior_qc_outcome,new_qc_outcome,first_reader,second_reader,second_reader_reading,second_reader_blind,evidence_crop,visible_transcription
+approved-wine-043,annotation.alcohol.acceptablePercents,[13],[13.8],confirmed,corrected,Claude,Joseph (2026-07-20),13.8%,yes,"(210,950,250x70)x8",ALC. 13.8% BY VOL.
+wine-multi-artifact-06,annotation.alcohol.acceptablePercents,[13.4],[13.5],confirmed,corrected,Claude,Joseph (2026-07-20),13.5%,yes,"(560,60,110x150) rot90 x12","Alc. 13,5 % by Vol."
+wine-multi-artifact-07,annotation.alcohol.presence,absent,present,confirmed,corrected,Claude,Joseph (2026-07-20),12%,yes,"(60,600,300x80)x7",12% ALC./VOL.
+wine-multi-artifact-07,annotation.alcohol.acceptablePercents,[],[12],confirmed,corrected,Claude,Joseph (2026-07-20),12%,yes,"(60,600,300x80)x7",12% ALC./VOL.

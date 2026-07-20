@@ -1,0 +1,52 @@
+{
+  "gitShaNote": "see git-sha.txt",
+  "caseCount": 115,
+  "presentAlcohol": 102,
+  "absentAlcohol": 13,
+  "alcoholDetectionRecall": {
+    "numerator": 69,
+    "denominator": 102
+  },
+  "alcoholParsedValueAccuracy": {
+    "numerator": 65,
+    "denominator": 102
+  },
+  "alcoholFalseCertainty_repoDefinition": {
+    "count": 1,
+    "cases": ["wine-multi-artifact-07"],
+    "definition": "classifyAlcohol: !truth.present && alcoholDetected(observed). Counts ONLY emitted values on labels with no alcohol statement."
+  },
+  "wrongAcceptedValueOnPresentTruth": {
+    "count": 4,
+    "cases": [
+      "approved-wine-018",
+      "approved-wine-037",
+      "approved-wine-043",
+      "wine-multi-artifact-06"
+    ],
+    "note": "Evaluator classifies these as parser-failure, NOT false-certainty."
+  },
+  "absentAlcoholFalsePositives": 1,
+  "alcoholStateHistogram": {
+    "NOT_OBSERVED": 45,
+    "OBSERVED": 64,
+    "LOW_CONFIDENCE": 6
+  },
+  "alcoholFailureClassHistogram": {
+    "candidate-filtering-failure": 27,
+    "correct": 77,
+    "ocr-recognition-failure": 5,
+    "parser-failure": 4,
+    "candidate-generation-failure": 1,
+    "false-certainty": 1
+  },
+  "brand": {
+    "exactMatch": 27,
+    "normalizedMatch": 29,
+    "falseCertainty": 0
+  },
+  "latencyMs": {
+    "median": 1587,
+    "p95": 6149
+  }
+}

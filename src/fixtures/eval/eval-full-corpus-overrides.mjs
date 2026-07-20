@@ -341,11 +341,11 @@ export const FULL_CORPUS_RECORD_OVERRIDES = {
   "approved-wine-043": include({
     strata: [...FRONT_SIMPLE, "low-contrast", "alcohol-at-bottom"],
     notes:
-      "Fulcrum Pinot Noir panel with a low-contrast cream-on-charcoal treatment and a small 13% by volume footer line.",
+      "Fulcrum Pinot Noir panel with a low-contrast cream-on-charcoal treatment and a small 13.8% by volume footer line.",
     brand: brandPresent(["Fulcrum"], {
       forbiddenPresentations: ["Pinot Noir"],
     }),
-    alcohol: presentAlcohol([13], ["ALC. 13% BY VOL.", "13%"]),
+    alcohol: presentAlcohol([13.8], ["ALC. 13.8% BY VOL.", "13.8%"]),
   }),
   "approved-wine-044": include({
     strata: [...BACK_DENSE, "alcohol-at-bottom"],
@@ -949,20 +949,20 @@ export const FULL_CORPUS_RECORD_OVERRIDES = {
   "wine-multi-artifact-06": include({
     strata: [...MULTI_PANEL, "alcohol-at-side-or-rotated"],
     notes:
-      "Mauro Molino Livrot Langhe Chardonnay composite with the 13,4% alcohol printed vertically on the front label edge.",
+      "Mauro Molino Livrot Langhe Chardonnay composite with the 13,5% alcohol printed vertically on the front label edge.",
     brand: brandPresent(["Mauro Molino"], {
       forbiddenPresentations: ["Livrot", "Chardonnay"],
     }),
-    alcohol: presentAlcohol([13.4], ["Alc. 13,4% vol.", "13.4%", "13,4%"], {
+    alcohol: presentAlcohol([13.5], ["Alc. 13,5 % by Vol.", "13.5%", "13,5%"], {
       orientation: "mixed",
     }),
   }),
   "wine-multi-artifact-07": include({
-    strata: [...MULTI_PANEL, "missing-alcohol-statement"],
+    strata: [...MULTI_PANEL, "alcohol-at-bottom"],
     notes:
-      "Mike's Farm Scuppernong White composite with a distinct front title panel but no alcohol statement visible on the committed composite.",
+      "Mike's Farm Scuppernong White composite with a distinct front title panel and a 12% ALC./VOL. statement beneath the muscadine-grapes line.",
     brand: brandPresent(["Mike's Farm", "Mike's Farm, Inc."]),
-    alcohol: absentAlcohol("No alcohol statement appears on the committed composite image."),
+    alcohol: presentAlcohol([12], ["12% ALC./VOL.", "12%"]),
   }),
   "wine-multi-artifact-08": include({
     strata: [...MULTI_PANEL, "alcohol-at-bottom"],
