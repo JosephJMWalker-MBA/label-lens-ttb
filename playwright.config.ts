@@ -24,10 +24,15 @@ export default defineConfig({
     navigationTimeout: 30_000,
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  // Run the end-to-end suite against a real production build (`next build` +
+  // `next start`), not `next dev`. This is what staging/production actually ship:
+  // it exercises the compiled Next server (including the instrumentation startup
+  // hook), production minification, and the real `/review` cold-load path — the
+  // conditions under which the guided workspace restoration must stay reliable.
   webServer: {
-    command: "npm run dev",
+    command: "npm run build && npm run start",
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
+    timeout: 240_000,
   },
 });

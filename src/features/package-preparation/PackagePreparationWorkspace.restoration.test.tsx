@@ -97,11 +97,22 @@ async function flush() {
   });
 }
 
-describe("workspace local-draft restoration", () => {
+describe("workspace local-draft restoration (non-blocking)", () => {
+  it("renders a usable workspace immediately, before restoration settles", async () => {
+    // Restoration never settles: the workspace must still be present and its
+    // upload control usable — the page is not gated on IndexedDB.
+    store.load.mockReturnValue(new Promise(() => {}));
+    render(<PackagePreparationWorkspace />);
+    expect(screen.getByTestId("seller-workstation")).toBeInTheDocument();
+    expect(screen.getByLabelText("Upload front label")).toBeInTheDocument();
+    // The gate placeholder is never shown once mounted.
+    expect(screen.queryByText(/Preparing the package workspace/i)).toBeNull();
+  });
+
   it("opens a usable new draft, with no warning, on an empty database", async () => {
     store.load.mockResolvedValue(null);
     render(<PackagePreparationWorkspace />);
-    await waitFor(() => expect(screen.queryByText(/Restoring the locally saved/i)).toBeNull());
+    await flush();
     expect(screen.queryByTestId("restoration-warning")).toBeNull();
     expect(screen.getByTestId("seller-workstation")).toHaveAttribute(
       "data-restoration-status",
@@ -112,12 +123,11 @@ describe("workspace local-draft restoration", () => {
   it("restores a valid draft and creates one object URL per panel (no duplicates)", async () => {
     store.load.mockResolvedValue(panelDraft());
     render(<PackagePreparationWorkspace />);
-    await waitFor(() => expect(screen.getByTestId("seller-workstation")).toBeInTheDocument());
+    await waitFor(() => expect(createdUrls).toHaveLength(1));
     expect(screen.queryByTestId("restoration-warning")).toBeNull();
-    expect(createdUrls).toHaveLength(1);
   });
 
-  it("falls back to a usable draft with a warning when storage errors", async () => {
+  it("keeps a usable workspace with a warning when storage errors", async () => {
     store.load.mockRejectedValue(new DraftStoreError("LOCAL_DRAFT_STORAGE_OPEN_FAILED"));
     render(<PackagePreparationWorkspace />);
     await waitFor(() => expect(screen.getByTestId("restoration-warning")).toBeInTheDocument());
@@ -125,6 +135,8 @@ describe("workspace local-draft restoration", () => {
       /could not restore the locally saved draft/i,
     );
     expect(screen.getByTestId("restoration-warning")).toHaveTextContent(/was not deleted/i);
+    // The workspace stays usable throughout the failure.
+    expect(screen.getByLabelText("Upload front label")).toBeInTheDocument();
     expect(screen.getByTestId("seller-workstation")).toHaveAttribute(
       "data-restoration-status",
       "LOCAL_DRAFT_STORAGE_OPEN_FAILED",
@@ -134,7 +146,7 @@ describe("workspace local-draft restoration", () => {
     ).toBeInTheDocument();
   });
 
-  it("falls back with a warning on a malformed stored draft (never auto-deletes)", async () => {
+  it("keeps a usable workspace with a warning on a malformed draft (never auto-deletes)", async () => {
     store.load.mockRejectedValue(new DraftStoreError("LOCAL_DRAFT_MALFORMED"));
     render(<PackagePreparationWorkspace />);
     await waitFor(() => expect(screen.getByTestId("restoration-warning")).toBeInTheDocument());
@@ -142,27 +154,29 @@ describe("workspace local-draft restoration", () => {
       "data-restoration-status",
       "LOCAL_DRAFT_MALFORMED",
     );
+    expect(screen.getByLabelText("Upload front label")).toBeInTheDocument();
   });
 
-  it("stops loading and opens a usable draft when IndexedDB never settles (deadline)", async () => {
+  it("surfaces a non-destructive warning when IndexedDB never settles (deadline)", async () => {
     vi.useFakeTimers();
     store.load.mockReturnValue(new Promise(() => {})); // never settles
     render(<PackagePreparationWorkspace />);
-    // Loading is shown initially.
-    expect(screen.getByText(/Restoring the locally saved/i)).toBeInTheDocument();
-    // Advance past the bounded deadline.
+    // The workspace is usable immediately (not gated on the pending read).
+    expect(screen.getByTestId("seller-workstation")).toBeInTheDocument();
+    expect(screen.getByLabelText("Upload front label")).toBeInTheDocument();
+    // Advance past the bounded deadline → non-destructive warning appears.
     await act(async () => {
       vi.advanceTimersByTime(5000);
     });
-    expect(screen.queryByText(/Restoring the locally saved/i)).toBeNull();
     expect(screen.getByTestId("restoration-warning")).toBeInTheDocument();
+    expect(screen.getByLabelText("Upload front label")).toBeInTheDocument();
     expect(screen.getByTestId("seller-workstation")).toHaveAttribute(
       "data-restoration-status",
       "timeout",
     );
   });
 
-  it("ignores a late IndexedDB success after the deadline fallback (does not overwrite)", async () => {
+  it("ignores a late IndexedDB success after the deadline (does not overwrite active work)", async () => {
     vi.useFakeTimers();
     let resolveLate: (v: unknown) => void = () => {};
     store.load.mockReturnValue(new Promise((resolve) => (resolveLate = resolve)));
@@ -200,8 +214,7 @@ describe("workspace local-draft restoration", () => {
   it("revokes created object URLs on unmount (no leaks)", async () => {
     store.load.mockResolvedValue(panelDraft());
     const { unmount } = render(<PackagePreparationWorkspace />);
-    await waitFor(() => expect(screen.getByTestId("seller-workstation")).toBeInTheDocument());
-    expect(createdUrls).toHaveLength(1);
+    await waitFor(() => expect(createdUrls).toHaveLength(1));
     unmount();
     expect(revokedUrls).toEqual(createdUrls);
   });
