@@ -1621,7 +1621,7 @@ export function PackagePreparationWorkspace() {
                 Save and pre-check
               </p>
               <h2 id="save-workspace-heading" className="text-2xl font-semibold">
-                {latestRun && !analysisCurrent && saveState !== "saved"
+                {workflow.correctionCycleComplete && saveState !== "saved"
                   ? "All required evidence has been reviewed."
                   : saveState === "saved"
                     ? latestRun && !analysisCurrent
@@ -1630,7 +1630,7 @@ export function PackagePreparationWorkspace() {
                     : "All required evidence has been saved."}
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                {latestRun && !analysisCurrent && saveState !== "saved"
+                {workflow.correctionCycleComplete && saveState !== "saved"
                   ? "Save the updated draft to continue."
                   : "The explicit package save remains local to this browser and is required before analysis."}
               </p>

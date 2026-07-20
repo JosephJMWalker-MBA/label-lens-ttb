@@ -10,7 +10,11 @@ import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
 
 import { AGENT_REVIEW_RECEIVER, AGENT_REVIEW_TRANSMISSION } from "./agent-submission-contract";
 import { loadPackageDraftLocally, type StoredPackageDraft } from "./package-draft-store";
-import { buildSellerPackageExport, latestAnalysisIsCurrent } from "./package-model";
+import {
+  buildSellerPackageExport,
+  latestAnalysisIsCurrent,
+  packageReadyForAgentReview,
+} from "./package-model";
 
 type SubmissionPhase = "idle" | "submitting" | "submitted" | "error";
 
@@ -56,8 +60,8 @@ function readinessMessage(stored: StoredPackageDraft | null): string {
   if (!latestAnalysisIsCurrent(stored.draft)) {
     return "Seller evidence changed after the last pre-check. Save and run the pre-check again.";
   }
-  if (latestRun.readiness !== "ready_for_agent_submission") {
-    return "Review the flagged evidence, save the corrections, and run the pre-check again.";
+  if (!packageReadyForAgentReview(stored.draft)) {
+    return "Review each category flagged by the pre-check. Correct the evidence or explicitly keep it for the human agent.";
   }
   if (stored.panelFiles.length !== stored.draft.panels.length) {
     return "One or more saved panel files are unavailable in this browser. Restore them before submitting.";
@@ -116,8 +120,7 @@ export function AgentReviewSubmissionDock() {
   const latestRun = draft?.analysisRuns.at(-1);
   const ready = Boolean(
     stored &&
-    latestRun?.readiness === "ready_for_agent_submission" &&
-    latestAnalysisIsCurrent(stored.draft) &&
+    packageReadyForAgentReview(stored.draft) &&
     stored.panelFiles.length === stored.draft.panels.length,
   );
 

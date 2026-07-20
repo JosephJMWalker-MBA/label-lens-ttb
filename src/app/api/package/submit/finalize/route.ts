@@ -9,7 +9,10 @@ import { auth } from "@/lib/auth";
 import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
 import { signRevision } from "@/lib/integrity";
 import { verifyAppendToken } from "@/server/append-token";
-import { latestAnalysisIsCurrent } from "@/features/package-preparation/package-model";
+import {
+  latestAnalysisIsCurrent,
+  packageReadyForAgentReview,
+} from "@/features/package-preparation/package-model";
 import {
   parseAgentReviewSubmission,
   LOCAL_DOWNLOAD_ONLY_TRANSMISSION,
@@ -118,11 +121,11 @@ export async function POST(request: Request) {
   }
 
   const latestRun = draft.analysisRuns.at(-1);
-  if (!latestRun || latestRun.readiness !== "ready_for_agent_submission") {
+  if (!latestRun || !packageReadyForAgentReview(draft)) {
     return NextResponse.json(
       {
         error:
-          "Bad Request: Package is not ready. Analysis status must be ready_for_agent_submission.",
+          "Bad Request: Package is not ready. Every machine-flagged category must be corrected or explicitly kept for human agent review.",
       },
       { status: 400 },
     );

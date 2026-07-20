@@ -286,6 +286,57 @@ describe("guided package workflow projection", () => {
     });
   });
 
+  it("allows human-agent handoff after the seller explicitly keeps flagged evidence unchanged", () => {
+    const value = draft();
+    addPanels(value);
+    acceptCategories(value);
+    value.analysisRuns = [
+      {
+        analysisRunId: "analysis-1",
+        sequence: 1,
+        sellerChangeSequence: 0,
+        recordedAt: "2026-07-18T01:00:00.000Z",
+        panelRuns: [],
+        categories: [
+          {
+            categoryId: "brandName",
+            state: "clearly_readable",
+            observedValue: "CEDAR RIDGE",
+            supportingPanelIds: ["front-panel"],
+            supportingRegionIds: ["brandName-region"],
+            reason: "Clear.",
+          },
+          {
+            categoryId: "alcoholStatement",
+            state: "needs_review",
+            observedValue: "12%",
+            supportingPanelIds: [],
+            supportingRegionIds: [],
+            reason: "Seller and machine evidence differ.",
+          },
+        ],
+        readiness: "needs_seller_review",
+      },
+    ];
+    value.sellerChangeHistory.push({
+      changeId: "alcohol-kept",
+      sequence: 1,
+      recordedAt: "2026-07-18T02:00:00.000Z",
+      action: "category_updated",
+      categoryId: "alcoholStatement",
+      detail:
+        "Alcohol statement machine discrepancy reviewed; seller evidence deliberately kept unchanged.",
+    });
+
+    expect(project(value, "saved")).toMatchObject({
+      phase: "prepare",
+      analysisCurrent: true,
+      correctionCycleComplete: true,
+      readyForAgentPackage: true,
+      recommendedAction: "Prepare the local-only agent package",
+    });
+  });
+
   it("distinguishes stale readiness from a current local-export-ready run", () => {
     const value = draft();
     addPanels(value);
