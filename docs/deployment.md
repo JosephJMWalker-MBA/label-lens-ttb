@@ -45,6 +45,40 @@ but `ttb-test.com` is the current custom-domain deployment documented here.
 **No secrets are committed to the repository.** Set the signing key only in the
 hosting platform's secret store. The build commit is not a secret.
 
+## Database dialect graphs (`better-sqlite3` is never required in production)
+
+MySQL is authoritative in production. SQLite backs local development and tests
+only, and its driver `better-sqlite3` is a **native addon Hostinger cannot
+compile** — it is an `optionalDependency` that is simply absent there.
+
+The two dialects live in fully separate modules (`src/db/client.mysql.ts` and
+`src/db/client.sqlite.ts`). At build time `next.config.mjs` resolves the dialect
+and, for a MySQL build, **replaces the SQLite module with a stub**, so the
+emitted server graph contains no import, no external factory, and no executable
+`require("better-sqlite3")` anywhere. The build prints which graph it emitted:
+
+```text
+[build] database dialect graph: mysql (better-sqlite3 excluded entirely)
+```
+
+Marking the driver `external` was **not** sufficient: webpack still emitted
+`a.exports=require("better-sqlite3")` into every route bundle that reached the
+database client, and `next build` then failed during page-data collection with
+`Cannot find module 'better-sqlite3'` for `/api/package/submit/finalize` and
+`/api/package/submit/status/[id]`.
+
+The dialect is resolved from `DATABASE_URL` (tolerant of padding and scheme
+casing). If a host's connection string cannot be sniffed confidently, set
+`LABEL_LENS_DB_DIALECT=mysql` to force the MySQL graph explicitly.
+
+Verify a production build the way CI does:
+
+```bash
+rm -rf node_modules/better-sqlite3
+DATABASE_URL='mysql://…' npm run build
+npm run verify:mysql-graph
+```
+
 ## Startup migrations and account bootstrap (Hostinger web-app runtime)
 
 Hostinger's shared SSH shell is **not** the Node web-app runtime: it exposes no
@@ -67,6 +101,7 @@ accepts requests.
 | `DATABASE_URL` | **Yes (production)** | Authoritative MySQL connection string. Migrations run against it at startup. |
 | `BETTER_AUTH_SECRET` | **Yes (production)** | ≥ 32 chars, secret. |
 | `BETTER_AUTH_URL` | **Yes (production)** | The public origin, e.g. `https://ttb-test.com`. Drives the auth base URL; no hostname is hardcoded. |
+| `LABEL_LENS_DB_DIALECT` | Optional | Force the dialect graph (`mysql` / `sqlite`) when `DATABASE_URL` cannot be sniffed confidently. Overrides URL detection at both build and runtime. |
 | `LABEL_LENS_BOOTSTRAP_ON_START` | Optional | Set to `1` to provision accounts at startup. Remove it once accounts exist. |
 | `LABEL_LENS_BOOTSTRAP_RESET_PASSWORDS` | Optional | Set to `1` only to reset provisioned passwords; otherwise existing passwords are left unchanged. |
 | `LABEL_LENS_BOOTSTRAP_ADMIN_EMAIL` / `_PASSWORD` | With bootstrap | Admin account. Password ≥ 12 chars. |

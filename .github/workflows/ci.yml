@@ -97,6 +97,16 @@ jobs:
           npm run auth:bootstrap | tee second.log
           grep -q "already-present" second.log
 
+      - name: Prove the MySQL production build works with better-sqlite3 absent
+        # Reproduces the Hostinger condition exactly: the native SQLite addon is an
+        # optionalDependency that the production host cannot compile, so it simply
+        # is not there. The build must complete through page-data collection, and
+        # the emitted server graph must contain no path to the driver at all.
+        run: |
+          rm -rf node_modules/better-sqlite3
+          npm run build
+          npm run verify:mysql-graph
+
   e2e:
     name: Playwright end-to-end
     runs-on: ubuntu-latest
