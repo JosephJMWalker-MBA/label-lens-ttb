@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 
 import { ProductMark } from "@/components/brand/ProductMark";
+import { AccountBar } from "@/components/layout/AccountBar";
 import { readSession, roleLandingPath } from "@/server/auth/guards";
 import { safeInternalPath } from "@/lib/redirect-safety";
 import { PORTAL_DISCLAIMER } from "@/lib/product-language";
@@ -53,6 +54,7 @@ export default async function LoginPage({
       <p className="mt-8 border-t border-border/70 pt-4 text-xs text-muted-foreground">
         {PORTAL_DISCLAIMER}
       </p>
+      <AccountBar />
     </main>
   );
 }

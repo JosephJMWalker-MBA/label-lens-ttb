@@ -23,7 +23,7 @@ export function IntentHub() {
           Upload your label — or, if you do not have one yet, build it here.
         </p>
         <p className="max-w-2xl text-muted-foreground">
-          Two of these paths work today. The rest are named so you can see what Label Lens is for,
+          Four of these paths work today. The rest are named so you can see what Label Lens is for,
           and told plainly what it cannot do yet.
         </p>
       </div>

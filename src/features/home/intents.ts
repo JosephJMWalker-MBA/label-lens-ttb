@@ -2,9 +2,10 @@
  * The five entry intents offered on the home page, and — honestly — which of
  * them the product can actually serve today.
  *
- * Two capabilities exist: reviewing a finished label, and learning what the
- * system checks. The other three are named because the product should tell a
- * visitor what it is *for*, not because they are implemented. Their copy states
+ * Available capabilities: creating a label from facts, preparing a multi-panel
+ * package, running a single-image pre-check, and learning what the system checks.
+ * The remaining intents are named because the product should tell a visitor what
+ * it is *for*, not because they are implemented. Their copy states
  * plainly what is missing, never "coming soon", never a waitlist, never a
  * disabled control that implies a working one is a click away.
  *
@@ -58,12 +59,21 @@ export const INTENTS: readonly Intent[] = [
   },
   {
     id: "review",
-    title: "Review a label before submission",
+    title: "Prepare a package",
     summary:
-      "Upload finished artwork. The system reads it, compares it with the facts you state, and shows you the evidence.",
+      "Assemble a multi-panel label package: mark your own evidence, run the pre-check, and take away an internal review record. Nothing is submitted to TTB.",
     status: "available",
     href: "/review",
-    action: "Review a label",
+    action: "Start preparing a package",
+  },
+  {
+    id: "legacy",
+    title: "Run a single-image pre-check",
+    summary:
+      "Check one finished label image on its own. The system reads it, compares it with the facts you state, and shows you the evidence.",
+    status: "available",
+    href: "/review/legacy",
+    action: "Run single-image pre-check",
   },
   {
     id: "learn",

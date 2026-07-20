@@ -16,24 +16,28 @@ describe("HomePage — intent hub", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders all five intent paths", () => {
+  it("renders all six intent paths", () => {
     render(<HomePage />);
-    expect(INTENTS).toHaveLength(5);
+    expect(INTENTS).toHaveLength(6);
+    // Scope to the intent list: some titles intentionally match a header nav link
+    // (e.g. "Prepare a package"), which is a separate landmark.
+    const list = within(screen.getByRole("list"));
     for (const intent of INTENTS) {
-      expect(screen.getByText(intent.title)).toBeInTheDocument();
+      expect(list.getByText(intent.title)).toBeInTheDocument();
     }
   });
 
-  it("offers exactly three active paths: create, review and learn", () => {
+  it("offers exactly four active paths: create, prepare package, single-image pre-check and learn", () => {
     render(<HomePage />);
     // The intent list is the only place intents are offered; the header's
-    // navigation is a separate landmark and is not counted here.
+    // navigation and the sticky account bar are separate landmarks, not counted.
     const list = screen.getByRole("list");
     const links = within(list).getAllByRole("link");
     expect(links.map((a) => a.getAttribute("href")).sort()).toEqual([
       "/create",
       "/learn",
       "/review",
+      "/review/legacy",
     ]);
   });
 

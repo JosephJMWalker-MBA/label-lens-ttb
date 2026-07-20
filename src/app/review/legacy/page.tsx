@@ -9,7 +9,7 @@ export default function LegacyReviewPage() {
   return (
     <AppProviders introOnFirstVisit>
       <SkipLink />
-      <AppHeader current="review" />
+      <AppHeader current="legacy" />
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-10 sm:px-6 sm:py-14">
         <header className="flex flex-col gap-4">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Label Lens TTB</h1>
