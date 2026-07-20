@@ -20,18 +20,22 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          curl --fail --location --silent --show-error \
+          set +e
+          curl --location --silent --show-error \
             -H "Authorization: Bearer ${GH_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             https://api.github.com/repos/JosephJMWalker-MBA/label-lens-ttb/actions/jobs/88291248648/logs \
-            | tail -n 350 > .agent-submission-unit-failure.log
-          curl --fail --location --silent --show-error \
+            2>&1 | tail -n 350 > .agent-submission-unit-failure.log
+          printf '\nlog-capture-exit=%s\n' "$?" >> .agent-submission-unit-failure.log
+          curl --location --silent --show-error \
             -H "Authorization: Bearer ${GH_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             https://api.github.com/repos/JosephJMWalker-MBA/label-lens-ttb/actions/jobs/88291248684/logs \
-            | tail -n 350 > .agent-submission-e2e-failure.log
+            2>&1 | tail -n 350 > .agent-submission-e2e-failure.log
+          printf '\nlog-capture-exit=%s\n' "$?" >> .agent-submission-e2e-failure.log
+          set -e
       - name: Commit captured output
         run: |
           git config user.name "github-actions[bot]"
