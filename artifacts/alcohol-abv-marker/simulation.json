@@ -1,0 +1,277 @@
+{
+  "experiment": "alcohol-abv-marker (C3)",
+  "treatment": "canonicalize whole-token /\\babv\\b/ -> 'by vol' before split-percent-by",
+  "ranAnyOcr": false,
+  "corpus": {
+    "cases": 115,
+    "filteringFailures": 34,
+    "absentAlcohol": 13,
+    "currentlyCorrect": 70
+  },
+  "forms": [
+    {
+      "input": "13.5% ABV",
+      "note": "positive",
+      "before": {
+        "value": null,
+        "reason": "missing-volume-marker"
+      },
+      "after": {
+        "value": 13.5,
+        "reason": "accepted",
+        "canonical": "13.5% by vol"
+      },
+      "changed": true
+    },
+    {
+      "input": "13.5%ABV",
+      "note": "positive",
+      "before": {
+        "value": null,
+        "reason": "missing-volume-marker"
+      },
+      "after": {
+        "value": 13.5,
+        "reason": "accepted",
+        "canonical": "13.5% by vol"
+      },
+      "changed": true
+    },
+    {
+      "input": "ABV 13.5%",
+      "note": "prefix form \u2014 expected NOT supported in this experiment",
+      "before": {
+        "value": null,
+        "reason": "missing-volume-marker"
+      },
+      "after": {
+        "value": null,
+        "reason": "unsupported-pattern",
+        "canonical": "by vol 13.5%"
+      },
+      "changed": true
+    },
+    {
+      "input": "ABV",
+      "note": "negative: bare marker",
+      "before": {
+        "value": null,
+        "reason": "no-supported-number"
+      },
+      "after": {
+        "value": null,
+        "reason": "unsupported-pattern",
+        "canonical": "by vol"
+      },
+      "changed": true
+    },
+    {
+      "input": "ABVX",
+      "note": "negative: partial-token noise",
+      "before": {
+        "value": null,
+        "reason": "no-supported-number"
+      },
+      "after": {
+        "value": null,
+        "reason": "no-supported-number",
+        "canonical": "abvx"
+      },
+      "changed": false
+    },
+    {
+      "input": "CABVERNET 13.5%",
+      "note": "negative: letters abv inside a word",
+      "before": {
+        "value": null,
+        "reason": "missing-volume-marker"
+      },
+      "after": {
+        "value": null,
+        "reason": "missing-volume-marker",
+        "canonical": "cabvernet 13.5%"
+      },
+      "changed": false
+    },
+    {
+      "input": "ABVOCADO 13.5%",
+      "note": "negative: word starting with abv",
+      "before": {
+        "value": null,
+        "reason": "missing-volume-marker"
+      },
+      "after": {
+        "value": null,
+        "reason": "missing-volume-marker",
+        "canonical": "abvocado 13.5%"
+      },
+      "changed": false
+    },
+    {
+      "input": "13.5.5% ABV",
+      "note": "negative: malformed decimal beside ABV",
+      "before": {
+        "value": null,
+        "reason": "missing-volume-marker"
+      },
+      "after": {
+        "value": null,
+        "reason": "unsupported-pattern",
+        "canonical": "13.5.5% by vol"
+      },
+      "changed": true
+    },
+    {
+      "input": "ABV %",
+      "note": "negative: marker with no number",
+      "before": {
+        "value": null,
+        "reason": "no-supported-number"
+      },
+      "after": {
+        "value": null,
+        "reason": "unsupported-pattern",
+        "canonical": "by vol %"
+      },
+      "changed": true
+    },
+    {
+      "input": "13.5% BY VOL",
+      "note": "existing form must be unchanged",
+      "before": {
+        "value": 13.5,
+        "reason": "accepted"
+      },
+      "after": {
+        "value": 13.5,
+        "reason": "accepted",
+        "canonical": "13.5% by vol"
+      },
+      "changed": false
+    },
+    {
+      "input": "13.5% ALC./VOL.",
+      "note": "existing form must be unchanged",
+      "before": {
+        "value": 13.5,
+        "reason": "accepted"
+      },
+      "after": {
+        "value": 13.5,
+        "reason": "accepted",
+        "canonical": "13.5% alc / vol."
+      },
+      "changed": false
+    },
+    {
+      "input": "ALC.13% BY VOL",
+      "note": "existing fused form (C1) must be unchanged",
+      "before": {
+        "value": 13,
+        "reason": "accepted"
+      },
+      "after": {
+        "value": 13,
+        "reason": "accepted",
+        "canonical": "alc 13% by vol"
+      },
+      "changed": false
+    },
+    {
+      "input": "80 PROOF",
+      "note": "negative: proof-only",
+      "before": {
+        "value": null,
+        "reason": "proof-only"
+      },
+      "after": {
+        "value": null,
+        "reason": "proof-only",
+        "canonical": "80 proof"
+      },
+      "changed": false
+    },
+    {
+      "input": "750 mL",
+      "note": "negative: net contents",
+      "before": {
+        "value": null,
+        "reason": "missing-volume-marker"
+      },
+      "after": {
+        "value": null,
+        "reason": "missing-volume-marker",
+        "canonical": "750 ml"
+      },
+      "changed": false
+    },
+    {
+      "input": "EST. 1985",
+      "note": "negative: date",
+      "before": {
+        "value": null,
+        "reason": "missing-volume-marker"
+      },
+      "after": {
+        "value": null,
+        "reason": "missing-volume-marker",
+        "canonical": "est. 1985"
+      },
+      "changed": false
+    },
+    {
+      "input": "1-800-555-0199",
+      "note": "negative: phone",
+      "before": {
+        "value": null,
+        "reason": "missing-volume-marker"
+      },
+      "after": {
+        "value": null,
+        "reason": "missing-volume-marker",
+        "canonical": "1-800-555-0199"
+      },
+      "changed": false
+    },
+    {
+      "input": "123 MAIN ST.",
+      "note": "negative: address",
+      "before": {
+        "value": null,
+        "reason": "missing-volume-marker"
+      },
+      "after": {
+        "value": null,
+        "reason": "missing-volume-marker",
+        "canonical": "123 main st."
+      },
+      "changed": false
+    },
+    {
+      "input": "MAY CAUSE HEALTH PROBLEMS. CONTAINS SULFITES",
+      "note": "negative: government warning",
+      "before": {
+        "value": null,
+        "reason": "missing-volume-marker"
+      },
+      "after": {
+        "value": null,
+        "reason": "missing-volume-marker",
+        "canonical": "may cause health problems. contains sulfites"
+      },
+      "changed": false
+    }
+  ],
+  "corpusEffect": {
+    "recovered": [
+      {
+        "caseId": "approved-wine-013",
+        "truth": 13.5,
+        "via": "13.5% ABV"
+      }
+    ],
+    "newFalsePositivesOnAbsentAlcohol": [],
+    "currentlyCorrectCasesGainingNewValues": []
+  },
+  "caveat": "This simulation transcribes canonicalization + acceptance ONLY. It bypasses candidate-window construction, so it over-predicted the single fused token '13.5%ABV': in the real pipeline no window is built for that token and no candidate exists. Corpus measurement is authoritative; the simulation ranks and sizes, it does not prove."
+}

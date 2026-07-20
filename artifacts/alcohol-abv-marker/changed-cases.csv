@@ -1,0 +1,2 @@
+case_id,truth_percent,alcohol_state_before,alcohol_state_after,alcohol_value_before,alcohol_value_after,parsed_accurate_before,parsed_accurate_after,failure_class_before,failure_class_after,brand_changed,verdict,alcohol_present
+"approved-wine-013",13.5,"NOT_OBSERVED","OBSERVED","","13.5% BY VOL.",false,true,"candidate-filtering-failure","correct",false,"IMPROVED",true
