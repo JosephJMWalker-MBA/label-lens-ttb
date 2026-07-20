@@ -107,6 +107,15 @@ jobs:
           npm run build
           npm run verify:mysql-graph
 
+      - name: Prove the standalone artifact migrates from a relocated root
+        # Validates the ACTUAL EMITTED ARTIFACT, not a source-tree build: the
+        # committed migrations must be packaged into .next/standalone, and the
+        # relocated server must apply them to a fresh database when launched from
+        # an unrelated working directory, then start again idempotently.
+        env:
+          DATABASE_URL: mysql://root:root@127.0.0.1:3306/standalone_verify_db
+        run: npm run verify:standalone-migrations
+
   e2e:
     name: Playwright end-to-end
     runs-on: ubuntu-latest

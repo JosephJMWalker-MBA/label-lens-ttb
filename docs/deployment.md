@@ -94,6 +94,34 @@ Startup order (fail-closed): **validate environment → apply committed migratio
 requested-but-failed bootstrap exits the process non-zero *before* the server
 accepts requests.
 
+### Migration artifacts must ship with the server
+
+The committed migrations are **data read at runtime**, not imports, so static
+tracing never discovers them. They are packaged explicitly via a global
+`outputFileTracingIncludes` entry for `./src/db/migrations/**`, which carries
+every SQL file, every snapshot, and `meta/_journal.json` into the standalone
+output. Without it a standalone deploy boots with no migrations on disk and
+fails with `Can't find meta/_journal.json file`.
+
+The runtime folder is resolved deterministically for both deployment shapes — a
+source checkout, and a relocated `.next/standalone` artifact (whose `server.js`
+does `process.chdir(__dirname)`) — and never by assuming a checkout-shaped
+`process.cwd()`. If the folder cannot be found, startup **fails closed** with a
+secret-free diagnostic listing every path it tried; migrations are never skipped
+and `_journal.json` is never generated or reconstructed at runtime.
+`LABEL_LENS_MIGRATIONS_DIR` overrides resolution for an unusual layout.
+
+Verify the real emitted artifact the way CI does:
+
+```bash
+DATABASE_URL='mysql://…' npm run build
+DATABASE_URL='mysql://…/disposable_db' npm run verify:standalone-migrations
+```
+
+That relocates the artifact outside the repository, launches it from an
+unrelated working directory, applies migrations to a fresh database, and proves
+a second startup is idempotent.
+
 `npm run start` is plain `next start`; the instrumentation hook does the rest.
 
 | Name | Required | Notes |
@@ -102,6 +130,7 @@ accepts requests.
 | `BETTER_AUTH_SECRET` | **Yes (production)** | ≥ 32 chars, secret. |
 | `BETTER_AUTH_URL` | **Yes (production)** | The public origin, e.g. `https://ttb-test.com`. Drives the auth base URL; no hostname is hardcoded. |
 | `LABEL_LENS_DB_DIALECT` | Optional | Force the dialect graph (`mysql` / `sqlite`) when `DATABASE_URL` cannot be sniffed confidently. Overrides URL detection at both build and runtime. |
+| `LABEL_LENS_MIGRATIONS_DIR` | Optional | Absolute path to the committed migrations, for a deployment layout where they are neither beside the working directory nor in the standalone root. |
 | `LABEL_LENS_BOOTSTRAP_ON_START` | Optional | Set to `1` to provision accounts at startup. Remove it once accounts exist. |
 | `LABEL_LENS_BOOTSTRAP_RESET_PASSWORDS` | Optional | Set to `1` only to reset provisioned passwords; otherwise existing passwords are left unchanged. |
 | `LABEL_LENS_BOOTSTRAP_ADMIN_EMAIL` / `_PASSWORD` | With bootstrap | Admin account. Password ≥ 12 chars. |

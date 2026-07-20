@@ -87,9 +87,16 @@ const nextConfig = {
   // inert TypeScript that Node never loads, but excluding it keeps the MySQL
   // production output completely free of any `better-sqlite3` reference.
   ...(IS_MYSQL_BUILD ? { outputFileTracingExcludes: { "*": ["src/db/client.sqlite.ts"] } } : {}),
-  // Ensure the vendored OCR language data and the bundled demo fixture are
-  // packaged with the pre-check route so it runs reproducibly after build.
   outputFileTracingIncludes: {
+    // The committed Drizzle migrations must ship with EVERY standalone artifact:
+    // the instrumentation startup hook applies them at boot, before the server
+    // accepts requests. Static tracing never sees them (they are data read at
+    // runtime, not imports), so a standalone deploy previously started with no
+    // migrations on disk and failed with "Can't find meta/_journal.json".
+    // The glob covers the SQL files, `meta/_journal.json`, and every snapshot.
+    "*": ["./src/db/migrations/**"],
+    // Ensure the vendored OCR language data and the bundled demo fixture are
+    // packaged with the pre-check route so it runs reproducibly after build.
     "/api/precheck": [
       "./src/pipeline/extractor/assets/**",
       "./tests/fixtures/precheck/m-cellars-24205001000905/label-ocr-source.jpeg",
