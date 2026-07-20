@@ -21,7 +21,7 @@ Label Lens TTB is a **domestic-wine label prescreen and internal-review prototyp
 | Agent/reviewer | `agent@ttb-test.com` | `/agent` |
 | Seller | `seller@ttb-test.com` | `/seller` |
 
-The three accounts use the shared reviewer-demo password distributed by the maintainer. These are public demonstration accounts. Do not upload confidential, proprietary, personal, or regulated information. Demo activity may be visible to other reviewers and may be reset without notice.
+The three accounts use the shared reviewer-demo password [4TESTING1234]. These are public demonstration accounts. Do not upload confidential, proprietary, personal, or regulated information. Demo activity may be visible to other reviewers and may be reset without notice.
 
 The public deployment is not a COLA integration, production authorization, government identity system, or hardened government environment.
 
