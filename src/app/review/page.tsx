@@ -29,8 +29,8 @@ export default function ReviewPage() {
           <p className="max-w-4xl rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
             Draft work remains in this browser until you choose Submit for agent review. Final
             submission sends the package record, seller evidence, machine observations, and uploaded
-            panel images to the Label Lens internal review queue. Nothing is submitted to TTB, and no
-            result is an approval or legal determination.
+            panel images to the Label Lens internal review queue. Nothing is submitted to TTB, and
+            no result is an approval or legal determination.
           </p>
           <p className="text-sm text-muted-foreground">
             Need the established one-image pre-check?{" "}

@@ -8,18 +8,9 @@ import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
 import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
 
-import {
-  AGENT_REVIEW_RECEIVER,
-  AGENT_REVIEW_TRANSMISSION,
-} from "./agent-submission-contract";
-import {
-  loadPackageDraftLocally,
-  type StoredPackageDraft,
-} from "./package-draft-store";
-import {
-  buildSellerPackageExport,
-  latestAnalysisIsCurrent,
-} from "./package-model";
+import { AGENT_REVIEW_RECEIVER, AGENT_REVIEW_TRANSMISSION } from "./agent-submission-contract";
+import { loadPackageDraftLocally, type StoredPackageDraft } from "./package-draft-store";
+import { buildSellerPackageExport, latestAnalysisIsCurrent } from "./package-model";
 
 type SubmissionPhase = "idle" | "submitting" | "submitted" | "error";
 
@@ -55,9 +46,7 @@ interface SubmissionAttempt {
 async function sha256Hex(value: string): Promise<string> {
   const bytes = new TextEncoder().encode(value);
   const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return [...new Uint8Array(digest)]
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 function readinessMessage(stored: StoredPackageDraft | null): string {
@@ -127,9 +116,9 @@ export function AgentReviewSubmissionDock() {
   const latestRun = draft?.analysisRuns.at(-1);
   const ready = Boolean(
     stored &&
-      latestRun?.readiness === "ready_for_agent_submission" &&
-      latestAnalysisIsCurrent(stored.draft) &&
-      stored.panelFiles.length === stored.draft.panels.length,
+    latestRun?.readiness === "ready_for_agent_submission" &&
+    latestAnalysisIsCurrent(stored.draft) &&
+    stored.panelFiles.length === stored.draft.panels.length,
   );
 
   useEffect(() => {
@@ -243,8 +232,7 @@ export function AgentReviewSubmissionDock() {
         body,
       });
       const result = (await response.json().catch(() => ({}))) as
-        | SubmissionReceipt
-        | { error?: string };
+        SubmissionReceipt | { error?: string };
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -295,7 +283,8 @@ export function AgentReviewSubmissionDock() {
                 : summary}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            This sends records to Label Lens internal review only. It does not submit anything to TTB.
+            This sends records to Label Lens internal review only. It does not submit anything to
+            TTB.
           </p>
         </div>
 
@@ -305,7 +294,10 @@ export function AgentReviewSubmissionDock() {
               <p className="font-semibold">{statusLabel(receipt.status)}</p>
               <p className="mt-1 font-mono text-xs">{receipt.submissionId}</p>
               <p className="mt-1 text-xs">Revision v{receipt.revisionNumber} is recorded.</p>
-              <Link className="mt-2 inline-block font-medium underline underline-offset-4" href="/seller">
+              <Link
+                className="mt-2 inline-block font-medium underline underline-offset-4"
+                href="/seller"
+              >
                 Open my submissions
               </Link>
             </div>
