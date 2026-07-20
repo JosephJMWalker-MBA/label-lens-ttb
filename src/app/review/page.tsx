@@ -1,5 +1,6 @@
 import { SkipLink } from "@/components/a11y/SkipLink";
 import { AppHeader } from "@/components/layout/AppHeader";
+import { AgentReviewSubmissionDock } from "@/features/package-preparation/AgentReviewSubmissionDock";
 import { PackagePreparationWorkspace } from "@/features/package-preparation/PackagePreparationWorkspace";
 
 import { AppProviders } from "../AppProviders";
@@ -29,6 +30,10 @@ export default function ReviewPage() {
             local records; nothing is submitted to TTB and no result is an approval or legal
             determination.
           </p>
+          <p className="max-w-4xl rounded-md border border-emerald-700/40 bg-emerald-50 p-3 text-sm text-emerald-950 dark:bg-emerald-950/40 dark:text-emerald-100">
+            When the package is ready, Submit for agent review sends its record, seller evidence,
+            machine observations, and uploaded panel images to the Label Lens internal review queue.
+          </p>
           <p className="text-sm text-muted-foreground">
             Need the established one-image pre-check?{" "}
             <a className="underline underline-offset-4" href="/review/legacy">
@@ -39,6 +44,7 @@ export default function ReviewPage() {
         </header>
 
         <main id="main-content" className="min-w-0">
+          <AgentReviewSubmissionDock />
           <PackagePreparationWorkspace />
         </main>
       </div>
