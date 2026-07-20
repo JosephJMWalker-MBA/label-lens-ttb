@@ -1,148 +1,115 @@
 # Label Lens TTB
 
-Label Lens TTB is a **domestic-wine label prescreen prototype** that helps a seller or reviewer assemble, inspect, and evaluate label evidence without pretending to make a government decision.
-
-A user provides label artwork and application facts. Local OCR extracts bounded evidence from the artwork. Versioned deterministic rules compare that evidence with the declared facts. The system preserves uncertainty, exposes provenance, and keeps the human reviewer authoritative.
+Label Lens TTB is a **domestic-wine label prescreen and internal-review prototype**. It helps sellers assemble label evidence, runs bounded OCR and deterministic checks, and gives authenticated reviewers a traceable package without pretending to make a government decision.
 
 > **OCR and AI may extract evidence. Deterministic rules evaluate that evidence. Human reviewers remain authoritative.**
 
 **Label Lens does not approve or reject labels, is not a TTB system, and is not legal advice.**
 
-## Live demo
+## Live reviewer demo
 
-- Primary: **<https://ttb-test.com>**
-- Secondary: <https://label-lens-ttb.onrender.com>
-- Legacy one-image review: `/review/legacy`
+- Primary deployment: **<https://ttb-test.com>**
+- Sign in: **<https://ttb-test.com/login>**
+- Legacy one-image review: <https://ttb-test.com/review/legacy>
+- Secondary deployment: <https://label-lens-ttb.onrender.com>
 
-The public deployment is a reviewer demonstration. It is not a COLA integration, production authorization, or hardened government environment.
+### Demonstration accounts
 
----
+| Role | Email | Landing page |
+|---|---|---|
+| Admin | `admin@ttb-test.com` | `/admin` |
+| Agent/reviewer | `agent@ttb-test.com` | `/agent` |
+| Seller | `seller@ttb-test.com` | `/seller` |
 
-## Project status
+The three accounts use the shared reviewer-demo password distributed by the maintainer. These are public demonstration accounts. Do not upload confidential, proprietary, personal, or regulated information. Demo activity may be visible to other reviewers and may be reset without notice.
 
-The project has moved beyond a simple OCR demonstration. It now contains two connected product slices:
-
-1. **Seller package preparation** for front, back, and optional label panels.
-2. **A one-image domestic-wine prescreen** using real local OCR, deterministic checks, explainable findings, and downloadable reports.
-
-The core architecture is established. The next phase should emphasize **completion and usability of one end-to-end domestic-wine workflow**, rather than adding new beverage categories or reopening settled architecture.
-
-### Current release focus
-
-A seller should be able to:
-
-1. State which package panels exist.
-2. Upload the applicable artwork.
-3. inspect and magnify each image.
-4. Review and correct machine-read evidence.
-5. Identify where required information appears.
-6. Enter the required application facts.
-7. Run deterministic checks.
-8. Understand what passed, failed, needs review, or could not be evaluated.
-9. Download a clear, traceable package for further human review.
+The public deployment is not a COLA integration, production authorization, government identity system, or hardened government environment.
 
 ---
 
-## Work completed
+## What is implemented
 
-### 1. Product and review boundaries
+### Seller package preparation
 
-- Defined the product as a **prescreen and evidence-construction system**, not an approval engine.
-- Separated:
-  - artwork evidence;
-  - OCR observations;
-  - seller-declared facts;
-  - deterministic findings;
-  - internal human disposition;
-  - actual TTB action, which remains out of scope.
-- Preserved uncertainty through explicit states instead of forcing a false binary verdict.
-- Documented the prototype, security, retention, compliance, and government-authority boundaries.
+- Front and back label panels, plus optional additional panels.
+- Seller-entered facts, uncertainty, and absence states.
+- Multi-region, panel-relative evidence mapping.
+- Browser-local draft restoration.
+- Immutable package-analysis runs.
+- Authenticated package finalization.
+- Persisted status receipts and immutable revision history.
 
-### 2. Seller package preparation
+### Authenticated review portal
 
-The browser-local package workflow currently supports:
+- Better Auth with database-backed, revocable sessions.
+- Authenticated `seller`, `agent`, and limited `admin` roles.
+- No public signup; accounts are provisioned by the deployment operator.
+- Server-side authorization inside sensitive handlers.
+- MySQL-authoritative persistence with committed Drizzle migrations.
+- Immutable submission revisions with server-recomputed integrity.
+- Durable, idempotent package finalization.
+- Authenticated agent queue and read-only submission detail.
+- Authorized artwork-panel streaming without public object URLs.
+- Role-aware navigation, logout, and unauthorized handling.
 
-- front and back labels;
-- optional additional panels;
-- reviewed-profile category checklist;
-- seller-entered values, uncertainty, and absence states;
-- multi-region, panel-relative evidence;
-- save and reload;
-- immutable package-analysis runs;
-- correction and reanalysis;
-- gated local agent-package generation.
+Reviewer claim locking and append-only request-changes/internal-accept decision writes are intentionally deferred to the next review slice.
 
-See [`docs/issue-138-seller-package-preparation.md`](docs/issue-138-seller-package-preparation.md).
+### OCR and deterministic checks
 
-### 3. Artwork intake and preview
+Current machine-extracted fields:
 
-- PNG and JPEG validation.
-- Declared type checked against decoded image format.
-- Empty, oversized, corrupt, and out-of-bounds images rejected with typed errors.
-- Immediate browser-local preview with filename, type, and size.
-- Replace and clear behavior.
-- Object URLs revoked when replaced or unmounted.
-- Uploads processed in memory and not retained between requests.
+- brand name;
+- alcohol statement.
 
-### 4. OCR and evidence extraction
-
-- Vendored Tesseract WebAssembly OCR running server-side.
-- No mandatory cloud call at request time.
-- Current extracted fields:
-  - brand name;
-  - alcohol statement.
-- Typed machine-observation states:
-  - `OBSERVED`;
-  - `LOW_CONFIDENCE`;
-  - `AMBIGUOUS`;
-  - `NOT_OBSERVED`.
-- Per-field geometry, reference frame, extractor identity, OCR version, parser identity, and derivative SHA-256.
-- Versioned fixture corpus and bounded real-OCR regression coverage.
-
-> The original vision includes seven target fields. **Only brand name and alcohol content are extracted today.**
-
-### 5. Deterministic wine checks
-
-Currently executed:
+Current deterministic checks:
 
 - `wine-alcohol-syntax`;
 - `wine-alcohol-declared-comparison`;
 - `brand-name-canonical-comparison`.
 
-Registered but deliberately not run from artwork alone:
+Finding states include `PASS`, `WARN`, `FAIL`, `NEEDS_REVIEW`, and `not_run`. There is no aggregate compliance score or overall approval verdict.
 
-- `wine-alcohol-actual-content-tolerance`;
-- `wine-alcohol-class-type-boundary`;
-- `wine-alcohol-omission-eligibility`.
+### Reporting and provenance
 
-Finding states are:
+- Concise result summary with progressive disclosure.
+- Evidence, checks, technical provenance, and downloads.
+- Canonical JSON export and readable HTML report.
+- SHA-256 integrity blocks.
+- HMAC-signed immutable revision metadata.
+- Append-only internal disposition history in the one-image path.
 
-- `PASS`;
-- `WARN`;
-- `FAIL`;
-- `NEEDS_REVIEW`;
-- `not_run`.
+---
 
-There is **no aggregate compliance score or overall pass/fail verdict**.
+## Five-minute reviewer paths
 
-### 6. Results and reporting
+### Agent/reviewer
 
-- Concise summary first.
-- Progressive disclosure for:
-  - evidence;
-  - regulatory checks;
-  - technical provenance;
-  - downloads;
-  - internal disposition.
-- Deterministic readable HTML report.
-- Canonical JSON export with a SHA-256 integrity block.
-- Append-only internal disposition history.
-- Server-issued authorization token for bounded disposition append operations.
-- Machine findings cannot be silently edited or deleted by a disposition.
+1. Open <https://ttb-test.com/login>.
+2. Sign in as `agent@ttb-test.com` using the shared reviewer-demo password.
+3. Open the agent queue.
+4. Select a submission and inspect its immutable revision, declared facts, checks, and authorized artwork panels.
+5. Confirm that the interface uses internal-review language and makes no government-approval claim.
 
-### 7. Architecture and deployment
+### Seller
 
-Implemented flow:
+1. Open <https://ttb-test.com/login>.
+2. Sign in as `seller@ttb-test.com` using the shared reviewer-demo password.
+3. Prepare or inspect a package.
+4. Finalize it and verify that the resulting status is persisted.
+5. Confirm that direct access to `/agent` is denied.
+
+### One-image prescreen
+
+1. Open <https://ttb-test.com>.
+2. Load the verified **M Cellars** sample, or upload a supported wine-label image.
+3. Enter the application brand name and alcohol value.
+4. Run the prescreen.
+5. Expand Evidence, Regulatory checks, and Technical provenance.
+6. Download the JSON export and HTML report.
+
+---
+
+## Architecture
 
 ```text
 Browser artwork + declared facts
@@ -151,173 +118,23 @@ Browser artwork + declared facts
   → typed observations + geometry + provenance
   → versioned deterministic wine rules
   → governed findings
-  → checksum JSON + readable HTML report
-  → append-only human disposition
+  → immutable package revision + integrity record
+  → authenticated internal review queue
 ```
 
-Completed infrastructure includes:
+Production infrastructure includes:
 
-- Next.js standalone production build;
+- Next.js 15 standalone build;
 - Node 22 runtime;
 - Hostinger deployment at `ttb-test.com`;
-- secondary Render deployment;
-- deployment-relative OCR asset resolution;
-- relocation smoke test using a real OCR request;
-- HMAC signing for append authorization;
-- runtime health reporting;
-- deployed-commit provenance support.
+- MySQL-authoritative persistence;
+- startup-applied Drizzle migrations;
+- database-backed Better Auth sessions;
+- standalone migration-artifact verification;
+- MySQL production-graph verification with `better-sqlite3` absent;
+- runtime health and deployed-commit provenance.
 
-Architecture details: [`docs/architecture.md`](docs/architecture.md) and [`docs/adr/`](docs/adr/).
-
-### 8. Quality, accessibility, and testing
-
-- Unit and component tests with Vitest and Testing Library.
-- Architecture and boundary tests.
-- Production build validation.
-- Standalone relocation smoke test.
-- Playwright end-to-end browser coverage.
-- Labelled inputs and keyboard-operable disclosures.
-- Accessible alert handling.
-- Hardened browser download path.
-- User-safe bounded errors without stack traces, absolute paths, or environment leakage.
-
----
-
-## Recommended work to continue
-
-The recommended order is based on completing one useful workflow before expanding scope.
-
-### P1 — Finish the guided seller workflow
-
-- Replace scattered actions with a **persistent control area** that keeps the path to completion visible.
-- Keep package progress visible in a fixed footer or equivalent persistent status surface.
-- Make **No back label** and **No additional panels** explicit package decisions.
-- Keep the central workspace focused on the current task while navigation and submission controls remain stable.
-- Move synthetic-label instructions into contextual guidance shown only when relevant.
-- Establish one unmistakable completion and handoff state.
-
-### P1 — Complete human verification of OCR
-
-- Show the user exactly what the machine read.
-- Show where each observation came from on the artwork.
-- Allow correction before rules run or before the package is finalized.
-- Preserve the original observation and the human correction as separate provenance-bearing records.
-- Re-run analysis from corrected evidence without overwriting prior analysis runs.
-
-### P1 — Strengthen label mapping and inspection
-
-- Complete click-and-draw evidence-region mapping.
-- Allow the seller to assign each region to the category it is intended to fulfill.
-- Add a practical magnification suite for detailed artwork inspection.
-- Make panel-relative coordinates stable across save, reload, correction, and reanalysis.
-- Clearly distinguish detected regions, user-confirmed regions, and unresolved regions.
-
-### P1 — Validate the first end-to-end definition of done
-
-A first complete domestic-wine path should demonstrate that a seller can:
-
-- configure the package;
-- upload the artwork;
-- verify the OCR;
-- map required evidence;
-- provide declared facts;
-- run the registered checks;
-- understand all result states;
-- see source citations and limitations;
-- create a coherent review package.
-
-Do not treat additional beverage categories as release blockers for this path.
-
-### P2 — Complete measured OCR evaluation
-
-- Finish the full-corpus extraction measurement currently developed separately from `main`.
-- Categorize failures before tuning.
-- Repair the highest-frequency or highest-impact measured failures first.
-- Pay particular attention to:
-  - decorative or script brand names;
-  - low contrast;
-  - rotated side text;
-  - split alcohol tokens;
-  - difficult multi-panel layouts.
-- Publish accuracy claims only after the harness and corpus are stable and merged.
-
-### P2 — Expand bounded wine evidence slices
-
-After the first workflow is complete, add fields one at a time with explicit contracts, fixtures, rules, and uncertainty behavior. Likely candidates include:
-
-- net contents;
-- government warning;
-- class or type;
-- bottler or producer information;
-- country or state of origin where applicable.
-
-Each new slice should preserve the same distinction between observed evidence, declared facts, deterministic evaluation, and facts that cannot be established from artwork alone.
-
-### P2 — Operational hardening
-
-- Cross-browser verification in Firefox and Safari.
-- Secure authenticated seller and reviewer roles.
-- Server-persisted packages and multi-device continuation.
-- Configurable evidence retention and audit policy.
-- Agent or reviewer queue.
-- Rate limiting, monitoring, backup, and incident procedures.
-- Formal deployment controls for any environment beyond a public demonstration.
-
-### P3 — Deferred expansion
-
-Defer until the domestic-wine workflow is complete and measured:
-
-- beer and malt-beverage profiles;
-- distilled-spirits profiles;
-- batch or camera intake;
-- cloud-vision fallback;
-- generalized semantic comparison across all label fields;
-- COLA or government-system integration;
-- production authorization claims.
-
----
-
-## Deliberately not implemented
-
-- TTB approval or rejection.
-- Overall compliance verdict.
-- COLA integration.
-- Government authentication, identity, or authorization.
-- Production identity and access controls.
-- Authenticated seller portal.
-- Persistent production evidence store.
-- Agent or government transmission.
-- Beer, malt-beverage, or spirits scoring.
-- Complete regulatory review or entitlement determination.
-- Automatic policy creation or self-training.
-- FedRAMP authorization, ATO, certification, or government endorsement.
-
-Several of these have future-compatible seams or accepted architectural directions. They are not current behavior.
-
----
-
-## Five-minute reviewer path
-
-1. Open <https://ttb-test.com>.
-2. Load the verified **M Cellars** sample, or upload a supported wine-label image.
-3. Enter the application brand name and alcohol value.
-4. Run the prescreen.
-5. Read the concise summary.
-6. Expand Evidence, Regulatory checks, and Technical provenance.
-7. Download the JSON export and HTML report.
-8. Optionally record an internal disposition and download the updated report.
-
----
-
-## Known limitations and tradeoffs
-
-- Local OCR supports privacy and reproducibility but misses difficult typography and layouts.
-- Preserving uncertainty routes more cases to a human instead of auto-clearing them.
-- Deterministic rules are explainable but only cover implemented evidence slices.
-- Artwork alone cannot establish every regulatory fact.
-- The public demo proves the review contract, not batch throughput or production security.
-- The package workflow remains browser-local and is not yet a persisted multi-user system.
-- Extraction accuracy is not yet a production-readiness claim.
+Architecture details are in [`docs/architecture.md`](docs/architecture.md) and [`docs/adr/`](docs/adr/).
 
 ---
 
@@ -325,9 +142,9 @@ Several of these have future-compatible seams or accepted architectural directio
 
 ### Prerequisites
 
-- Node 22 (`.nvmrc` = `22`; package engines require `>=22 <23`).
-- A glibc environment such as Debian, Ubuntu, or macOS for the native `sharp` binary.
-- No network is required at request time; OCR language data and WASM assets are vendored.
+- Node 22 (`>=22 <23`).
+- A glibc environment such as Debian, Ubuntu, or macOS for native image tooling.
+- MySQL for the authoritative integration and production path.
 
 ### Install and run
 
@@ -345,71 +162,60 @@ npm run format:check
 npm run lint
 npm run typecheck
 npm test
-npm run test:coverage
+npm run test:mysql
 npm run build
-npm run smoke:relocation
+npm run verify:mysql-graph
+npm run verify:standalone-migrations
 npx playwright install
 npm run test:e2e
 ```
 
-Exact test counts are intentionally not hardcoded because the suite changes as the system grows.
-
 ---
 
-## Environment variables
+## Production environment variables
 
-| Variable | Requirement | Purpose |
-|---|---|---|
-| `LABEL_LENS_APPEND_SIGNING_KEY` | Required in production | HMAC-signs append-authorization tokens. Use a secret of at least 32 characters and store it only in the deployment secret store. |
-| `NODE_ENV` | Platform supplied | Selects production or development behavior. |
-| `PORT` | Platform supplied | Server port; defaults to `3000` locally. |
-| `LABEL_LENS_BUILD_COMMIT` | Required for auditable Hostinger exports | Stamps the deployed commit into runtime provenance. |
-| `LABEL_LENS_OCR_ASSET_DIR` | Optional | Overrides OCR language-data location. |
-| `LABEL_LENS_OCR_CORE_DIR` | Optional | Overrides OCR WASM-core location. |
-
-A development-only process-local signing key is used when `LABEL_LENS_APPEND_SIGNING_KEY` is unset outside production. Production prechecks fail closed if the key is missing.
-
----
-
-## Repository map
-
-| Area | Location |
+| Variable | Purpose |
 |---|---|
-| Primary UI and workspace | [`src/features/precheck/`](src/features/precheck/), [`src/app/page.tsx`](src/app/page.tsx) |
-| OCR and extraction | [`src/pipeline/extractor/`](src/pipeline/extractor/) |
-| Analyzer and result contracts | [`src/pipeline/analyzer/`](src/pipeline/analyzer/), [`src/pipeline/result/`](src/pipeline/result/) |
-| Wine rules | [`src/domain/rules/`](src/domain/rules/), [`src/domain/verification/`](src/domain/verification/) |
-| Reports and exports | [`src/pipeline/export/`](src/pipeline/export/) |
-| API routes | [`src/app/api/precheck/`](src/app/api/precheck/), [`src/app/api/health/`](src/app/api/health/) |
-| Fixtures and evaluation | [`src/fixtures/`](src/fixtures/), [`tests/fixtures/precheck/`](tests/fixtures/precheck/) |
-| End-to-end tests | [`tests/e2e/`](tests/e2e/) |
-| Architecture and security | [`docs/architecture.md`](docs/architecture.md), [`docs/security-deployment-strategy.md`](docs/security-deployment-strategy.md), [`docs/adr/`](docs/adr/) |
+| `DATABASE_URL` | MySQL connection string. |
+| `BETTER_AUTH_SECRET` | Protects authentication and session operations. Keep stable across redeployments. |
+| `BETTER_AUTH_URL` | Canonical deployment origin, such as `https://ttb-test.com`. |
+| `LABEL_LENS_DB_DIALECT` | Explicitly selects the MySQL production graph. |
+| `LABEL_LENS_INTEGRITY_SECRET` | Signs immutable package-revision metadata. |
+| `LABEL_LENS_APPEND_SIGNING_KEY` | Signs append-authorization tokens; required for production prechecks. |
+| `LABEL_LENS_STORAGE_DIR` | Private server path for persisted artwork panels. |
+| `LABEL_LENS_BUILD_COMMIT` | Records deployed-commit provenance. |
+| `LABEL_LENS_BOOTSTRAP_ON_START` | Temporary account-provisioning control; disable after bootstrap. |
+| `LABEL_LENS_BOOTSTRAP_*_EMAIL` | Admin, agent, and seller emails used during provisioning. |
+| `LABEL_LENS_BOOTSTRAP_*_PASSWORD` | Initial account passwords used during provisioning. Never commit private credentials. |
 
-Additional planning and governance documents:
-
-- [`docs/product-plan.md`](docs/product-plan.md)
-- [`docs/remaining-work-plan.md`](docs/remaining-work-plan.md)
-- [`docs/validation-rules.md`](docs/validation-rules.md)
-- [`docs/ocr-reliability-strategy.md`](docs/ocr-reliability-strategy.md)
-- [`docs/test-strategy.md`](docs/test-strategy.md)
-- [`docs/system-governance.md`](docs/system-governance.md)
-- [`docs/submission-scope-and-definition-of-done.md`](docs/submission-scope-and-definition-of-done.md)
-- [`docs/original-vision-and-scope.md`](docs/original-vision-and-scope.md)
+Production prechecks fail closed when `LABEL_LENS_APPEND_SIGNING_KEY` is missing. `/api/health` reports whether it is configured without exposing its value.
 
 ---
 
 ## Security and privacy boundary
 
-- OCR, rules, export generation, and signing run server-side.
-- The browser does not call a model provider directly.
-- Signing secrets do not enter the client bundle.
-- Images are validated and processed in memory.
-- Uploads are not retained or used for hidden training.
-- Reports and errors are bounded to avoid leaking server paths or environment data.
-- Exports contain a re-verifiable SHA-256 integrity value.
+- OCR, deterministic rules, signing, authentication, and authorization run server-side.
+- Sensitive routes perform server-side authorization checks.
+- Authentication and signing secrets do not enter the browser bundle.
+- Sessions are database-backed and revocable.
+- Package revisions are immutable and integrity-signed.
+- Errors are bounded to avoid leaking paths, credentials, or environment values.
+- Shared demo credentials are unsuitable for sensitive information.
 - The public demo is not a hardened production environment.
 
 See [`docs/compliance-readiness-boundary.md`](docs/compliance-readiness-boundary.md).
+
+---
+
+## Deliberately out of scope
+
+- TTB approval or rejection.
+- Overall compliance verdict.
+- COLA or government-system integration.
+- Government authentication or authorization.
+- Agent or government transmission.
+- Beer, malt-beverage, or distilled-spirits scoring.
+- FedRAMP authorization, ATO, certification, or government endorsement.
 
 ---
 
