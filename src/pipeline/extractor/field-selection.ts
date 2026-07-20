@@ -574,7 +574,13 @@ function canonicalizeAlcoholWindowText(rawText: string): {
     }
   };
 
-  apply(text.replace(/\ba[1il]c(?=[0-9oOil])/g, "alc "), "split-fused-alcohol-prefix");
+  // OCR routinely fuses the alcohol marker to the number, either directly
+  // ("ALC13%") or through the marker's own abbreviating period ("ALC.13%").
+  // Consume that optional separator so the existing acceptance patterns, which
+  // require whitespace after the marker, can match. This restores spacing only —
+  // the volume-marker requirement below is unchanged, so no statement is accepted
+  // on weaker evidence than before.
+  apply(text.replace(/\ba[1il]c\.?(?=[0-9oOil])/g, "alc "), "split-fused-alcohol-prefix");
   apply(text.replace(/\ba[1il]c(?=\b|\d)/g, "alc"), "marker-ocr-normalized");
   apply(text.replace(/\bv[o0][l1i]ume\b/g, "volume"), "marker-ocr-normalized");
   apply(text.replace(/\bv[o0][l1i]\b/g, "vol"), "marker-ocr-normalized");

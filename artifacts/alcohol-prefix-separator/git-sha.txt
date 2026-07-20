@@ -1,0 +1,8 @@
+measured-at-base: 08ac2a7d4d2a2ab8c40b1615f75aeddb983e5085
+rebased-onto:     6efda3e6f89c5a6c28bd133d0c5a73ec54548fb3
+
+The corpus baseline/treatment runs were executed against 08ac2a7. The branch was
+later rebased onto 6efda3e ("Allow seller-reviewed discrepancies into agent
+review", #148), which touches only the submission/workflow surface and the
+finalize route — no extractor, eval-harness, or domain-rule code. The measured
+corpus deltas therefore still hold on the new base.

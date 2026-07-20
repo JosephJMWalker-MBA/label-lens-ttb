@@ -287,6 +287,138 @@ describe("selectAlcoholObservation", () => {
     );
   });
 
+  // OCR frequently fuses the alcohol marker to the number through the marker's own
+  // period ("ALC.13%"). The evidence is complete — percentage, alcohol marker, and
+  // volume marker are all read — so only the missing whitespace prevents the
+  // existing acceptance regexes from matching. Splitting on that separator changes
+  // no evidentiary requirement: the volume marker is still mandatory below.
+  describe("fused alcohol prefix separated by the marker's period", () => {
+    it.each([
+      [
+        "ALC.13% BY VOL",
+        [
+          ["ALC.13%", 90],
+          ["BY", 90],
+          ["VOL", 90],
+        ],
+        "13% ALC./VOL.",
+      ],
+      [
+        "ALC.12% BY VOL.",
+        [
+          ["ALC.12%", 90],
+          ["BY", 90],
+          ["VOL.", 90],
+        ],
+        "12% ALC./VOL.",
+      ],
+      [
+        "ALC.13.5% BYVOL",
+        [
+          ["ALC.13.5%", 90],
+          ["BYVOL", 90],
+        ],
+        "13.5% ALC./VOL.",
+      ],
+      [
+        "ALC.13.8%BY VOL",
+        [
+          ["ALC.13.8%BY", 90],
+          ["VOL", 90],
+        ],
+        "13.8% ALC./VOL.",
+      ],
+    ])("accepts %s", (_label, tokens, expected) => {
+      const { observation, alcoholDiagnostics } = selectAlcoholObservation([
+        region(line(tokens as [string, number][], 10)),
+      ]);
+      expect(observation.state).toBe("OBSERVED");
+      expect(observation.value).toBe(expected);
+      expect(
+        alcoholDiagnostics?.candidates.find((candidate) => candidate.kept)?.normalizationOperations,
+      ).toContain("split-fused-alcohol-prefix");
+    });
+
+    it("still accepts the existing no-period fused form", () => {
+      const { observation } = selectAlcoholObservation([
+        region(
+          line(
+            [
+              ["ALC13%", 90],
+              ["BY", 90],
+              ["VOL", 90],
+            ],
+            10,
+          ),
+        ),
+      ]);
+      expect(observation.state).toBe("OBSERVED");
+      expect(observation.value).toBe("13% ALC./VOL.");
+    });
+
+    // Negative controls: the volume-marker requirement and every other evidentiary
+    // gate must be unchanged by the separator split.
+    it.each([
+      ["a fused prefix with no volume marker", [["ALC.13%", 90]]],
+      ["a bare percentage", [["13%", 90]]],
+      [
+        "a net-contents statement",
+        [
+          ["750", 90],
+          ["mL", 90],
+        ],
+      ],
+      [
+        "a proof-only statement",
+        [
+          ["80", 90],
+          ["PROOF", 90],
+        ],
+      ],
+      [
+        "a vintage/date fragment",
+        [
+          ["EST.", 90],
+          ["1985", 90],
+        ],
+      ],
+      ["a phone-like number", [["1-800-555-0199", 90]]],
+      [
+        "a street address",
+        [
+          ["123", 90],
+          ["MAIN", 90],
+          ["ST.", 90],
+        ],
+      ],
+      [
+        "an alc. marker with no numeric continuation",
+        [
+          ["ALC.X%", 90],
+          ["BY", 90],
+          ["VOL", 90],
+        ],
+      ],
+      [
+        "government warning prose",
+        [
+          ["MAY", 90],
+          ["CAUSE", 90],
+          ["HEALTH", 90],
+          ["PROBLEMS.", 90],
+          ["CONTAINS", 90],
+          ["SULFITES", 90],
+        ],
+      ],
+    ])("still rejects %s", (_label, tokens) => {
+      const { observation } = selectAlcoholObservation([
+        region(line(tokens as [string, number][], 10)),
+      ]);
+      expect(observation.state).not.toBe("OBSERVED");
+      expect(observation.value).toBeNull();
+    });
+  });
+
   it("preserves a low-confidence value rather than dropping it", () => {
     const words = line(
       [

@@ -1,0 +1,68 @@
+{
+  "totalCandidateFilteringFailures": 34,
+  "bucketDefinitions": {
+    "1": "marker detection failure",
+    "3": "token grouping/window failure",
+    "5": "unsupported but valid statement syntax",
+    "6": "false rejection caused by a defensive filter",
+    "8": "report misclassification or other (no near-truth candidate in OCR)"
+  },
+  "counts": {
+    "1": 1,
+    "3": 9,
+    "5": 14,
+    "6": 7,
+    "8": 3
+  },
+  "casesByBucket": {
+    "1": ["approved-wine-013"],
+    "3": [
+      "approved-wine-019",
+      "approved-wine-027",
+      "approved-wine-058",
+      "approved-wine-069",
+      "altacima",
+      "approved-wine-104",
+      "approved-wine-106",
+      "wine-multi-artifact-04",
+      "wine-multi-artifact-10"
+    ],
+    "5": [
+      "luigi-giovanni-live",
+      "alfredos-wine",
+      "la-fattoria-rotated",
+      "approved-wine-004",
+      "approved-wine-005",
+      "approved-wine-014",
+      "approved-wine-059",
+      "approved-wine-063",
+      "approved-wine-064",
+      "approved-wine-065",
+      "approved-wine-103",
+      "approved-wine-105",
+      "approved-wine-107",
+      "approved-wine-108"
+    ],
+    "6": [
+      "patricia-green-cellars",
+      "approved-wine-051",
+      "approved-wine-055",
+      "approved-wine-077",
+      "approved-wine-095",
+      "approved-wine-096",
+      "approved-wine-097"
+    ],
+    "8": ["approved-wine-083", "approved-wine-085", "approved-wine-098"]
+  },
+  "caseFilteringSubtypeCounts": {
+    "alcohol-rejected-missing-volume-marker": 26,
+    "alcohol-rejected-unsupported-pattern": 7,
+    "alcohol-rejected-missing-explicit-alcohol-marker": 1
+  },
+  "rejectionReasonCountsAcrossAllCandidates": {
+    "missing-volume-marker": 437,
+    "missing-explicit-alcohol-marker": 91,
+    "unsupported-pattern": 162,
+    "bare-volume-marker-too-weak": 4
+  }
+}
