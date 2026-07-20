@@ -2,9 +2,7 @@
 name: Capture PR 148 unit failure
 
 on:
-  push:
-    branches:
-      - fix/allow-reviewed-agent-submission
+  pull_request:
 
 permissions:
   actions: read
@@ -12,7 +10,6 @@ permissions:
 
 jobs:
   capture:
-    if: ${{ !contains(github.event.head_commit.message, 'Record PR 148 unit failure') }}
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -26,7 +23,7 @@ jobs:
             -H "Authorization: Bearer ${GH_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/JosephJMWalker-MBA/label-lens-ttb/actions/jobs/88432234881/logs \
+            https://api.github.com/repos/JosephJMWalker-MBA/label-lens-ttb/actions/jobs/88440217637/logs \
             > /tmp/pr148-unit.log
           {
             echo "=== FAILURE INDEX ==="
@@ -34,11 +31,11 @@ jobs:
             echo
             echo "=== LOG TAIL ==="
             tail -n 550 /tmp/pr148-unit.log
-          } > .pr148-test-failure.log
+          } > .pr148-second-failure.log
       - name: Commit captured failure
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .pr148-test-failure.log
-          git commit -m "Record PR 148 unit failure"
+          git add .pr148-second-failure.log
+          git commit -m "Record current PR 148 unit failure"
           git push origin HEAD:fix/allow-reviewed-agent-submission
