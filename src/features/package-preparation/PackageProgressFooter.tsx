@@ -39,6 +39,17 @@ export function PackageProgressFooter({
   action: PackageFooterAction;
   elapsedLabel?: string;
 }) {
+  const reviewedDispositionPendingSave =
+    workflow.correctionCycleComplete && saveState !== "saved";
+  const displayedAction: PackageFooterAction = reviewedDispositionPendingSave
+    ? {
+        ...action,
+        label: "Save updated draft",
+        reason:
+          "Every flagged category was reviewed. Save this browser-local disposition before submission.",
+      }
+    : action;
+
   return (
     <footer
       // Sits at the viewport bottom, but lifts above the sticky account bar when
@@ -101,37 +112,47 @@ export function PackageProgressFooter({
             <p className="text-xs font-semibold uppercase tracking-wide text-blue-900">
               Complete this stage
             </p>
-            {action.pending && elapsedLabel ? (
+            {displayedAction.pending && elapsedLabel ? (
               <span className="font-mono text-xs text-blue-950">{elapsedLabel}</span>
             ) : null}
           </div>
+          {reviewedDispositionPendingSave ? (
+            <div className="mt-1.5">
+              <h3 className="text-sm font-semibold text-blue-950">
+                All required evidence has been reviewed.
+              </h3>
+              <p className="text-xs text-blue-950/80">Save the updated draft to continue.</p>
+            </div>
+          ) : null}
           <Button
             type="button"
             className="mt-1.5 w-full"
-            disabled={action.disabled || action.pending}
-            onClick={action.onClick}
-            aria-describedby={action.reason ? "footer-action-reason" : undefined}
+            disabled={displayedAction.disabled || displayedAction.pending}
+            onClick={displayedAction.onClick}
+            aria-describedby={displayedAction.reason ? "footer-action-reason" : undefined}
             data-stage-completion-action
           >
-            {action.pending ? (
+            {displayedAction.pending ? (
               <span className="flex items-center justify-center gap-2">
                 <span
                   className="h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent"
                   aria-hidden="true"
                 />
-                {action.label}
+                {displayedAction.label}
               </span>
             ) : (
-              action.label
+              displayedAction.label
             )}
           </Button>
-          {action.reason ? (
+          {displayedAction.reason ? (
             <p id="footer-action-reason" className="mt-1.5 text-xs text-blue-950/80">
-              {action.reason}
+              {displayedAction.reason}
             </p>
           ) : null}
           <p className="sr-only" aria-live="polite">
-            {action.pending && elapsedLabel ? `${action.label} ${elapsedLabel}` : action.label}
+            {displayedAction.pending && elapsedLabel
+              ? `${displayedAction.label} ${elapsedLabel}`
+              : displayedAction.label}
           </p>
         </div>
       </div>
