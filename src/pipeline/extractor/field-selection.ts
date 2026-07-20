@@ -227,6 +227,7 @@ export const ALCOHOL_NORMALIZATION_OPERATIONS = [
   "split-fused-alcohol-prefix",
   "split-percent-by",
   "split-byvol",
+  "expand-abv",
   "collapse-marker-slash",
   "percent-before-number-reordered",
 ] as const;
@@ -584,6 +585,16 @@ function canonicalizeAlcoholWindowText(rawText: string): {
   apply(text.replace(/\ba[1il]c(?=\b|\d)/g, "alc"), "marker-ocr-normalized");
   apply(text.replace(/\bv[o0][l1i]ume\b/g, "volume"), "marker-ocr-normalized");
   apply(text.replace(/\bv[o0][l1i]\b/g, "vol"), "marker-ocr-normalized");
+  // "ABV" is the standard abbreviation for "alcohol by volume" — a single token
+  // carrying both the alcohol marker and the volume marker. Expand the whole
+  // token so an otherwise complete statement reaches the existing acceptance
+  // patterns. Word boundaries keep this to the exact token: "ABVX" and words
+  // merely containing the letters are untouched, and this grants no evidence to a
+  // percentage that lacks explicit alcohol-by-volume language. It runs before the
+  // percent/by split so a percentage abutting the expanded marker still gains its
+  // space. (A percentage and ABV fused into ONE OCR token builds no candidate
+  // window at all — a window-construction concern, not a canonicalization one.)
+  apply(text.replace(/\babv\b/g, "by vol"), "expand-abv");
   apply(text.replace(/%\s*by\b/g, "% by"), "split-percent-by");
   apply(
     text.replace(/\bbyvol(?:ume)?\b/g, (value) => (value.includes("ume") ? "by volume" : "by vol")),

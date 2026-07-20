@@ -419,6 +419,183 @@ describe("selectAlcoholObservation", () => {
     });
   });
 
+  // "ABV" is the standard abbreviation for "alcohol by volume": one token that
+  // carries both the alcohol marker and the volume marker. Expanding the whole
+  // token lets an otherwise complete statement reach the existing acceptance
+  // patterns. It matches on word boundaries only, so partial-token noise is never
+  // treated as evidence, and it broadens nothing else: a percentage with no
+  // explicit alcohol-by-volume language is still rejected.
+  describe("ABV as explicit alcohol-by-volume language", () => {
+    it.each([
+      [
+        "13.5% ABV",
+        [
+          ["13.5%", 95],
+          ["ABV", 96],
+        ],
+      ],
+    ])("accepts %s", (_label, tokens) => {
+      const { observation, alcoholDiagnostics } = selectAlcoholObservation([
+        region(line(tokens as [string, number][], 10)),
+      ]);
+      expect(observation.state).toBe("OBSERVED");
+      expect(observation.value).toBe("13.5% BY VOL.");
+      const kept = alcoholDiagnostics?.candidates.find((candidate) => candidate.kept);
+      // Raw evidence and the normalization performed are both retained.
+      expect(kept?.rawText).toContain("ABV");
+      expect(kept?.normalizationOperations).toContain("expand-abv");
+    });
+
+    it("leaves existing accepted forms unchanged", () => {
+      for (const [tokens, expected] of [
+        [
+          [
+            ["13.5%", 94],
+            ["BY", 93],
+            ["VOL", 92],
+          ],
+          "13.5% BY VOL.",
+        ],
+        [
+          [
+            ["12.5%", 92],
+            ["ALC./VOL.", 91],
+          ],
+          "12.5% ALC./VOL.",
+        ],
+        [
+          [
+            ["ALC.13%", 90],
+            ["BY", 90],
+            ["VOL", 90],
+          ],
+          "13% ALC./VOL.",
+        ],
+      ] as [[string, number][], string][]) {
+        const { observation } = selectAlcoholObservation([region(line(tokens, 10))]);
+        expect(observation.state).toBe("OBSERVED");
+        expect(observation.value).toBe(expected);
+      }
+    });
+
+    // Negative controls: whole-token only, and no relaxation of any other gate.
+    it.each([
+      ["a bare ABV marker with no number", [["ABV", 96]]],
+      [
+        "ABV with only a percent sign",
+        [
+          ["ABV", 96],
+          ["%", 90],
+        ],
+      ],
+      [
+        "partial-token noise ABVX",
+        [
+          ["ABVX", 96],
+          ["13.5%", 95],
+        ],
+      ],
+      [
+        "a word merely containing abv",
+        [
+          ["CABVERNET", 90],
+          ["13.5%", 95],
+        ],
+      ],
+      [
+        "a word beginning with abv",
+        [
+          ["ABVOCADO", 90],
+          ["13.5%", 95],
+        ],
+      ],
+      [
+        "a malformed decimal beside ABV",
+        [
+          ["13.5.5%", 90],
+          ["ABV", 96],
+        ],
+      ],
+      ["a percentage with no alcohol-by-volume language", [["13.5%", 95]]],
+      [
+        "a proof-only statement",
+        [
+          ["80", 90],
+          ["PROOF", 90],
+        ],
+      ],
+      [
+        "a net-contents statement",
+        [
+          ["750", 90],
+          ["mL", 90],
+        ],
+      ],
+      [
+        "a vintage/date fragment",
+        [
+          ["EST.", 90],
+          ["1985", 90],
+        ],
+      ],
+      ["a phone-like number", [["1-800-555-0199", 90]]],
+      [
+        "a street address",
+        [
+          ["123", 90],
+          ["MAIN", 90],
+          ["ST.", 90],
+        ],
+      ],
+      [
+        "government warning prose",
+        [
+          ["MAY", 90],
+          ["CAUSE", 90],
+          ["HEALTH", 90],
+          ["PROBLEMS.", 90],
+          ["CONTAINS", 90],
+          ["SULFITES", 90],
+        ],
+      ],
+    ])("still rejects %s", (_label, tokens) => {
+      const { observation } = selectAlcoholObservation([
+        region(line(tokens as [string, number][], 10)),
+      ]);
+      expect(observation.state).not.toBe("OBSERVED");
+      expect(observation.value).toBeNull();
+    });
+
+    // Documented boundary, not a defect of this change: when OCR returns the
+    // percentage and the marker as ONE token ("13.5%ABV"), no candidate window is
+    // constructed at all, so canonicalization never runs. Supporting it requires a
+    // window-construction change, which is deliberately out of scope here.
+    it("does not accept a single fused percent+ABV token (needs window construction)", () => {
+      const { observation, alcoholDiagnostics } = selectAlcoholObservation([
+        region(line([["13.5%ABV", 95]], 10)),
+      ]);
+      expect(observation.state).not.toBe("OBSERVED");
+      expect(observation.value).toBeNull();
+      expect(alcoholDiagnostics?.candidates ?? []).toHaveLength(0);
+    });
+
+    it("does not accept ABV before the number (prefix form is out of scope)", () => {
+      const { observation } = selectAlcoholObservation([
+        region(
+          line(
+            [
+              ["ABV", 96],
+              ["13.5%", 95],
+            ],
+            10,
+          ),
+        ),
+      ]);
+      expect(observation.state).not.toBe("OBSERVED");
+      expect(observation.value).toBeNull();
+    });
+  });
+
   it("preserves a low-confidence value rather than dropping it", () => {
     const words = line(
       [
