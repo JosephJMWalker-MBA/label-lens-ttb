@@ -1,6 +1,7 @@
 import {
   latestAnalysisIsCurrent,
   packagePanelDecisions,
+  packageReadyForAgentReview,
   validNormalizedRegion,
   type PackageCategoryDefinition,
   type PackageCategoryId,
@@ -160,10 +161,7 @@ export function deriveGuidedPackageWorkflow(args: {
   const allCategoriesComplete = incompleteCategoryIds.length === 0;
   const readyForPrecheck =
     panelDecisionsComplete && allCategoriesComplete && args.saveState === "saved";
-  const readyForAgentPackage =
-    latestRun?.readiness === "ready_for_agent_submission" &&
-    analysisCurrent &&
-    args.saveState === "saved";
+  const readyForAgentPackage = packageReadyForAgentReview(draft) && args.saveState === "saved";
 
   let phase: PackageWorkflowPhase;
   let recommendedAction: string;

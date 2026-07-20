@@ -412,6 +412,21 @@ const NON_MATERIAL_POST_ANALYSIS_ACTIONS: ReadonlySet<SellerPackageChangeAction>
   "agent_package_exported",
 ]);
 
+const LEGACY_SELLER_DISCREPANCY_ACKNOWLEDGEMENT =
+  "machine discrepancy reviewed; seller evidence deliberately kept unchanged";
+
+/**
+ * The original workstation recorded a deliberate keep-evidence decision as a
+ * generic category_updated entry. Preserve those existing browser drafts while
+ * treating only this exact, non-mutating disposition as post-analysis metadata.
+ */
+export function isSellerDiscrepancyAcknowledgement(change: SellerPackageChange): boolean {
+  return (
+    change.action === "category_updated" &&
+    change.detail.toLowerCase().includes(LEGACY_SELLER_DISCREPANCY_ACKNOWLEDGEMENT)
+  );
+}
+
 /**
  * A ready machine run is not a timeless approval. Any later panel, category, or
  * region edit makes it stale until the seller saves and runs analysis again.
@@ -421,7 +436,40 @@ export function latestAnalysisIsCurrent(draft: SellerPackageDraft): boolean {
   if (!latestRun) return false;
   return draft.sellerChangeHistory
     .filter((change) => change.sequence > latestRun.sellerChangeSequence)
-    .every((change) => NON_MATERIAL_POST_ANALYSIS_ACTIONS.has(change.action));
+    .every(
+      (change) =>
+        NON_MATERIAL_POST_ANALYSIS_ACTIONS.has(change.action) ||
+        isSellerDiscrepancyAcknowledgement(change),
+    );
+}
+
+/**
+ * Agent review is the destination for unresolved machine disagreement, not a
+ * reward reserved for machine-perfect packages. A package may be handed off
+ * when its latest analysis is still current and either the machine found no
+ * issues or the seller explicitly reviewed every flagged category and kept the
+ * underlying evidence unchanged.
+ */
+export function packageReadyForAgentReview(draft: SellerPackageDraft): boolean {
+  const latestRun = draft.analysisRuns.at(-1);
+  if (!latestRun || !latestAnalysisIsCurrent(draft)) return false;
+  if (latestRun.readiness === "ready_for_agent_submission") return true;
+
+  const flaggedCategoryIds = latestRun.categories
+    .filter(
+      (category) => category.state !== "clearly_readable" && category.state !== "not_applicable",
+    )
+    .map((category) => category.categoryId);
+  if (flaggedCategoryIds.length === 0) return false;
+
+  return flaggedCategoryIds.every((categoryId) =>
+    draft.sellerChangeHistory.some(
+      (change) =>
+        change.sequence > latestRun.sellerChangeSequence &&
+        change.categoryId === categoryId &&
+        isSellerDiscrepancyAcknowledgement(change),
+    ),
+  );
 }
 
 export function createAnalysisRun(args: {
@@ -474,7 +522,7 @@ export async function buildSellerPackageExport(args: {
 }): Promise<SellerPackageExport> {
   const latestRun = args.draft.analysisRuns.at(-1);
   const readiness = latestRun?.readiness ?? "needs_seller_review";
-  if (readiness !== "ready_for_agent_submission" || !latestAnalysisIsCurrent(args.draft)) {
+  if (!packageReadyForAgentReview(args.draft)) {
     throw new Error("PACKAGE_NOT_READY_FOR_AGENT_SUBMISSION");
   }
   if (args.submittedBy.trim() === "") throw new Error("SUBMITTER_REQUIRED");
