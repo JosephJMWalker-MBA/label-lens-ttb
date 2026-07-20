@@ -41,7 +41,11 @@ export function PackageProgressFooter({
 }) {
   return (
     <footer
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] backdrop-blur"
+      // Sits at the viewport bottom, but lifts above the sticky account bar when
+      // that bar is mounted (globals.css sets --stacked-footer-bottom), so the
+      // persistent "Sign in" / account action is never covered.
+      className="fixed inset-x-0 z-50 border-t border-border bg-background/95 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] backdrop-blur"
+      style={{ bottom: "var(--stacked-footer-bottom, 0px)" }}
       aria-labelledby="package-progress-heading"
       data-testid="package-progress-footer"
     >
