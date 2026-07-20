@@ -45,6 +45,54 @@ but `ttb-test.com` is the current custom-domain deployment documented here.
 **No secrets are committed to the repository.** Set the signing key only in the
 hosting platform's secret store. The build commit is not a secret.
 
+## Startup migrations and account bootstrap (Hostinger web-app runtime)
+
+Hostinger's shared SSH shell is **not** the Node web-app runtime: it exposes no
+deployed `package.json` and no `node`, so operators cannot run a provisioning
+command over SSH. Instead, database migrations and (optionally) account
+provisioning run **inside the deployed runtime at server startup**, via the
+Next.js instrumentation hook (`src/instrumentation.ts`). This runs as ordinary
+compiled JavaScript using only runtime dependencies — no `vite-node`, no
+TypeScript execution, and no devDependencies.
+
+Startup order (fail-closed): **validate environment → apply committed migrations
+→ optionally bootstrap accounts → start serving**. A migration failure or a
+requested-but-failed bootstrap exits the process non-zero *before* the server
+accepts requests.
+
+`npm run start` is plain `next start`; the instrumentation hook does the rest.
+
+| Name | Required | Notes |
+|---|---|---|
+| `DATABASE_URL` | **Yes (production)** | Authoritative MySQL connection string. Migrations run against it at startup. |
+| `BETTER_AUTH_SECRET` | **Yes (production)** | ≥ 32 chars, secret. |
+| `BETTER_AUTH_URL` | **Yes (production)** | The public origin, e.g. `https://ttb-test.com`. Drives the auth base URL; no hostname is hardcoded. |
+| `LABEL_LENS_BOOTSTRAP_ON_START` | Optional | Set to `1` to provision accounts at startup. Remove it once accounts exist. |
+| `LABEL_LENS_BOOTSTRAP_RESET_PASSWORDS` | Optional | Set to `1` only to reset provisioned passwords; otherwise existing passwords are left unchanged. |
+| `LABEL_LENS_BOOTSTRAP_ADMIN_EMAIL` / `_PASSWORD` | With bootstrap | Admin account. Password ≥ 12 chars. |
+| `LABEL_LENS_BOOTSTRAP_AGENT_EMAIL` / `_PASSWORD` | With bootstrap | Agent account. |
+| `LABEL_LENS_BOOTSTRAP_SELLER_EMAIL` / `_PASSWORD` | With bootstrap | Seller account. |
+
+Bootstrap is **idempotent** and **fail-closed**: with `LABEL_LENS_BOOTSTRAP_ON_START=1`
+set, missing credentials abort startup rather than starting a half-provisioned
+server. It never prints passwords or full secret-bearing URLs, redacts emails in
+logs, and exposes no public bootstrap route. Repeated restarts are safe: existing
+accounts are left unchanged unless `LABEL_LENS_BOOTSTRAP_RESET_PASSWORDS=1`.
+
+Startup emits non-secret logs, for example:
+
+```text
+[startup] Applying database migrations…
+[startup] Migrations applied.
+[startup] admin a***@example.com → created
+[startup] agent a***@example.com → created
+[startup] seller s***@example.com → created
+[startup] Starting the production server…
+```
+
+To promote the deployment to a new hostname later, follow the
+[hostname promotion runbook](deploy/hostname-promotion.md).
+
 ## Health check
 
 `GET /api/health` → `200 { "status": "ok", "appendSigningKeyConfigured": <bool> }`.
@@ -168,5 +216,7 @@ non-government language is always visible.
 
 ## What is intentionally NOT deployed
 
-Persistence, accounts, cloud OCR fallback, multi-artifact intake, non-wine
-categories, corpus annotation, and any benchmark — all documented future work.
+Cloud OCR fallback, non-wine categories, corpus annotation, and any benchmark —
+all documented future work. Persistence (MySQL) and provisioned role-based
+accounts are part of the review-portal slice; there is no public self-service
+registration.
