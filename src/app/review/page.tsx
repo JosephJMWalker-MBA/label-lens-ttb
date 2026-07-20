@@ -26,8 +26,9 @@ export default function ReviewPage() {
             observations without overwriting either record.
           </p>
           <p className="max-w-4xl rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
-            Drafts are saved only in this browser. Analysis is a preparation aid. Downloads are local
-            records; nothing is submitted to TTB and no result is an approval or legal determination.
+            Drafts are saved only in this browser. Analysis is a preparation aid. Downloads are
+            local records; nothing is submitted to TTB and no result is an approval or legal
+            determination.
           </p>
           <p className="max-w-4xl rounded-md border border-emerald-700/40 bg-emerald-50 p-3 text-sm text-emerald-950 dark:bg-emerald-950/40 dark:text-emerald-100">
             When the package is ready, Submit for agent review sends its record, seller evidence,
