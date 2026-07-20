@@ -117,14 +117,6 @@ export function PackageProgressFooter({
               <span className="font-mono text-xs text-blue-950">{elapsedLabel}</span>
             ) : null}
           </div>
-          {reviewedDispositionPendingSave ? (
-            <div className="mt-1.5">
-              <h3 className="text-sm font-semibold text-blue-950">
-                All required evidence has been reviewed.
-              </h3>
-              <p className="text-xs text-blue-950/80">Save the updated draft to continue.</p>
-            </div>
-          ) : null}
           <Button
             type="button"
             className="mt-1.5 w-full"
