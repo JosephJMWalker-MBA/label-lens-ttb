@@ -18,19 +18,20 @@ export default function ReviewPage() {
       <div className="mx-auto flex max-w-[96rem] min-w-0 flex-col gap-10 px-4 py-8 sm:px-6 sm:py-12">
         <header className="flex min-w-0 flex-col gap-4">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            Prepare and submit a seller label package
+            Prepare a seller label package
           </h1>
           <p className="max-w-4xl text-lg text-foreground">
             Add the required front label, then explicitly upload or rule out the back and any
-            additional panels. Preserve seller evidence before analysis, review machine observations
-            without overwriting either record, then submit the complete package for human agent
-            review.
+            additional panels. Preserve seller evidence before analysis, then review machine
+            observations without overwriting either record.
           </p>
           <p className="max-w-4xl rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
-            Draft work remains in this browser until you choose Submit for agent review. Final
-            submission sends the package record, seller evidence, machine observations, and uploaded
-            panel images to the Label Lens internal review queue. Nothing is submitted to TTB, and
-            no result is an approval or legal determination.
+            Drafts are saved only in this browser. Analysis is a preparation aid. Downloads are local
+            records; nothing is submitted to TTB and no result is an approval or legal determination.
+          </p>
+          <p className="max-w-4xl rounded-md border border-emerald-700/40 bg-emerald-50 p-3 text-sm text-emerald-950 dark:bg-emerald-950/40 dark:text-emerald-100">
+            When the package is ready, Submit for agent review sends its record, seller evidence,
+            machine observations, and uploaded panel images to the Label Lens internal review queue.
           </p>
           <p className="text-sm text-muted-foreground">
             Need the established one-image pre-check?{" "}
