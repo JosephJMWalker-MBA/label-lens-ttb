@@ -190,7 +190,7 @@ export function deriveGuidedPackageWorkflow(args: {
         ? latestRun && !analysisCurrent
           ? "Run the package pre-check again"
           : "Run the saved package pre-check"
-        : latestRun && !analysisCurrent
+        : correctionCycleComplete || (latestRun && !analysisCurrent)
           ? "Save the updated draft"
           : "Save the prepared package in this browser";
   }
