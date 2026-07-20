@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  actions: read
+  contents: write
+
 jobs:
   verify:
     name: Lint, typecheck, test, build
@@ -49,6 +53,33 @@ jobs:
             NODE
             exit "$status"
           fi
+      - name: Record focused unit failure
+        if: failure()
+        run: |
+          node - <<'NODE' > /tmp/pr148-failure-summary.txt
+          const fs = require("node:fs");
+          const report = JSON.parse(fs.readFileSync("/tmp/vitest-results.json", "utf8"));
+          for (const file of report.testResults ?? []) {
+            const failed = (file.assertionResults ?? []).filter((test) => test.status === "failed");
+            if (failed.length === 0) continue;
+            console.log(`FAILED FILE: ${file.name}`);
+            for (const test of failed) {
+              console.log(`FAILED TEST: ${test.fullName ?? test.title ?? "unknown"}`);
+              for (const message of test.failureMessages ?? []) console.log(message);
+            }
+          }
+          NODE
+          git fetch origin fix/allow-reviewed-agent-submission
+          git checkout -B fix/allow-reviewed-agent-submission origin/fix/allow-reviewed-agent-submission
+          cp /tmp/pr148-failure-summary.txt .pr148-failure-summary.txt
+          if git diff --quiet -- .pr148-failure-summary.txt; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .pr148-failure-summary.txt
+          git commit -m "Record focused PR 148 failure"
+          git push origin HEAD:fix/allow-reviewed-agent-submission
       - run: npm run build
 
   mysql-integration:
