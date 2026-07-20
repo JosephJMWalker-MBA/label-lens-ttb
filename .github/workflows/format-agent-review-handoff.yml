@@ -1,0 +1,39 @@
+name: Format agent review handoff
+
+on:
+  push:
+    branches:
+      - agent/submit-to-review-queue
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/submit-to-review-queue
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Apply repository formatting
+        run: >-
+          npx prettier --write
+          src/app/review/page.tsx
+          src/features/package-preparation/AgentReviewSubmissionDock.tsx
+      - name: Commit formatting when needed
+        run: |
+          if git diff --quiet; then
+            echo "Formatting already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/app/review/page.tsx \
+            src/features/package-preparation/AgentReviewSubmissionDock.tsx
+          git commit -m "Format agent review handoff"
+          git push origin HEAD:agent/submit-to-review-queue
