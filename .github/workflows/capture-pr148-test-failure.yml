@@ -1,0 +1,43 @@
+name: Capture PR 148 unit failure
+
+on:
+  push:
+    branches:
+      - fix/allow-reviewed-agent-submission
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  capture:
+    if: ${{ !contains(github.event.head_commit.message, 'Record PR 148 unit failure') }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/allow-reviewed-agent-submission
+      - name: Capture failed test output
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          curl --fail --location --silent --show-error \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/JosephJMWalker-MBA/label-lens-ttb/actions/jobs/88432234881/logs \
+            > /tmp/pr148-unit.log
+          {
+            echo "=== FAILURE INDEX ==="
+            grep -n -E "FAIL|AssertionError|expected|received|Test Files|Tests|Error:|×|❯" /tmp/pr148-unit.log | tail -n 250 || true
+            echo
+            echo "=== LOG TAIL ==="
+            tail -n 550 /tmp/pr148-unit.log
+          } > .pr148-test-failure.log
+      - name: Commit captured failure
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .pr148-test-failure.log
+          git commit -m "Record PR 148 unit failure"
+          git push origin HEAD:fix/allow-reviewed-agent-submission
