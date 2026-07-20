@@ -39,6 +39,20 @@ export function PackageProgressFooter({
   action: PackageFooterAction;
   elapsedLabel?: string;
 }) {
+  const finalHandoff = workflow.phase === "prepare";
+  const displayedAction: PackageFooterAction = finalHandoff
+    ? {
+        label: "Submit for agent review",
+        reason:
+          "Opens the final handoff control, which sends the package documents and panel images to the internal agent queue.",
+        onClick: () => {
+          document
+            .getElementById("agent-submission-heading")
+            ?.scrollIntoView({ behavior: "smooth", block: "center" });
+        },
+      }
+    : action;
+
   return (
     <footer
       // Sits at the viewport bottom, but lifts above the sticky account bar when
@@ -90,7 +104,7 @@ export function PackageProgressFooter({
               Pre-check:{" "}
               {analysisRunCount === 0 ? "not run" : workflow.analysisCurrent ? "current" : "stale"}
             </span>
-            <span>Preparation: {workflow.readyForAgentPackage ? "ready" : "not ready"}</span>
+            <span>Submission: {workflow.readyForAgentPackage ? "ready" : "not ready"}</span>
           </div>
         </div>
         <div
@@ -101,37 +115,39 @@ export function PackageProgressFooter({
             <p className="text-xs font-semibold uppercase tracking-wide text-blue-900">
               Complete this stage
             </p>
-            {action.pending && elapsedLabel ? (
+            {displayedAction.pending && elapsedLabel ? (
               <span className="font-mono text-xs text-blue-950">{elapsedLabel}</span>
             ) : null}
           </div>
           <Button
             type="button"
             className="mt-1.5 w-full"
-            disabled={action.disabled || action.pending}
-            onClick={action.onClick}
-            aria-describedby={action.reason ? "footer-action-reason" : undefined}
+            disabled={displayedAction.disabled || displayedAction.pending}
+            onClick={displayedAction.onClick}
+            aria-describedby={displayedAction.reason ? "footer-action-reason" : undefined}
             data-stage-completion-action
           >
-            {action.pending ? (
+            {displayedAction.pending ? (
               <span className="flex items-center justify-center gap-2">
                 <span
                   className="h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent"
                   aria-hidden="true"
                 />
-                {action.label}
+                {displayedAction.label}
               </span>
             ) : (
-              action.label
+              displayedAction.label
             )}
           </Button>
-          {action.reason ? (
+          {displayedAction.reason ? (
             <p id="footer-action-reason" className="mt-1.5 text-xs text-blue-950/80">
-              {action.reason}
+              {displayedAction.reason}
             </p>
           ) : null}
           <p className="sr-only" aria-live="polite">
-            {action.pending && elapsedLabel ? `${action.label} ${elapsedLabel}` : action.label}
+            {displayedAction.pending && elapsedLabel
+              ? `${displayedAction.label} ${elapsedLabel}`
+              : displayedAction.label}
           </p>
         </div>
       </div>
