@@ -17,6 +17,8 @@ const OUT_DIR = path.join(REPO_ROOT, "docs/extraction-full-corpus");
 const CONTACT_SHEET_DIR = path.join(OUT_DIR, "contact-sheets");
 
 const TODAY = "2026-07-12";
+const CORRECTION_DATE = "2026-07-20";
+const SECOND_READ_DATE = "2026-07-20";
 const QC_CHECKS = [
   "capitalization-and-punctuation",
   "varietal-not-brand",
@@ -27,6 +29,81 @@ const QC_CHECKS = [
   "genuine-ambiguity",
   "duplicate-labels",
 ];
+
+/**
+ * Truth corrections applied after visual re-adjudication of the committed
+ * artwork (2026-07-20). Each entry records what the earlier review confirmed,
+ * what the artwork actually shows, and why the value changed. The prior QC pass
+ * is NOT rewritten: these records move to outcome "corrected" and keep the
+ * superseded value in `before`, so the mistaken confirmation stays visible.
+ *
+ * Second-reader review is COMPLETE. Because these corrections raise reported
+ * metrics they required an independent human re-read before being treated as
+ * final. Joseph re-read the committed artwork on 2026-07-20 without having seen
+ * the expected answers, and his readings match the corrected values in all three
+ * cases. OCR output was not used as a reader by either party.
+ *
+ * The two reads are NOT equivalent and are recorded as such: the first reader
+ * (Claude) had already seen both the stored truths and the OCR outputs during the
+ * preceding diagnosis rounds and could not read blind; the second reader (Joseph)
+ * did read blind.
+ */
+const TRUTH_CORRECTIONS = new Map([
+  [
+    "approved-wine-043",
+    {
+      corrections: [
+        {
+          fieldPath: "annotation.alcohol.acceptablePercents",
+          before: "[13]",
+          after: "[13.8]",
+          reason:
+            "Visual re-adjudication of tests/fixtures/precheck/approved-wine-043/label.jpeg at crop (210,950,250x70) shows 'ALC. 13.8% BY VOL.' The prior QC pass confirmed 13 in error.",
+        },
+      ],
+      notes:
+        "Corrected 2026-07-20 after magnified visual re-read. First reader: Claude (not blind - had seen the stored truth and OCR output). Second reader: Joseph, 2026-07-20, blind to the expected answers, independently read '13.8%'. Independently confirmed by a second human reader. Prior QC incorrectly confirmed 13.",
+    },
+  ],
+  [
+    "wine-multi-artifact-06",
+    {
+      corrections: [
+        {
+          fieldPath: "annotation.alcohol.acceptablePercents",
+          before: "[13.4]",
+          after: "[13.5]",
+          reason:
+            "Visual re-adjudication of tests/fixtures/precheck/wine-multi-artifact-06/label.png at crop (560,60,110x150) rotated 90deg shows 'Alc. 13,5 % by Vol.' The prior QC pass confirmed 13.4 in error.",
+        },
+      ],
+      notes:
+        "Corrected 2026-07-20 after rotating the vertical statement and re-reading. First reader: Claude (not blind - had seen the stored truth and OCR output). Second reader: Joseph, 2026-07-20, blind to the expected answers, independently read '13.5%' and noted the decimal separator was not visually clear while the numeric reading was unambiguous. Independently confirmed by a second human reader as the numeric value 13.5, with recorded uncertainty about the visual clarity of the decimal separator only. Prior QC incorrectly confirmed 13,4.",
+    },
+  ],
+  [
+    "wine-multi-artifact-07",
+    {
+      corrections: [
+        {
+          fieldPath: "annotation.alcohol.presence",
+          before: "absent",
+          after: "present",
+          reason:
+            "Visual re-adjudication of tests/fixtures/precheck/wine-multi-artifact-07/label.png at crop (60,600,300x80) shows '12% ALC./VOL.' printed beneath the muscadine-grapes line. The recorded absenceReason was factually incorrect and the prior QC pass confirmed the absence in error.",
+        },
+        {
+          fieldPath: "annotation.alcohol.acceptablePercents",
+          before: "[]",
+          after: "[12]",
+          reason: "The statement reads 12% ALC./VOL. on the committed composite image.",
+        },
+      ],
+      notes:
+        "Corrected 2026-07-20 after direct visual re-read. First reader: Claude (not blind - had seen the stored truth and OCR output). Second reader: Joseph, 2026-07-20, blind to the expected answers, independently read '12%'. Independently confirmed by a second human reader. Prior QC incorrectly confirmed an absent alcohol statement.",
+    },
+  ],
+]);
 
 const NON_WINE_OVERRIDES = new Map([
   ["wine-multi-artifact-01", "distilled-spirits"],
@@ -512,7 +589,19 @@ function manualOverrideRecord(discovered, override) {
       },
       notes: override.annotation.notes,
     },
-    qualityControl: {
+    qualityControl: qualityControlFor(discovered.caseId),
+  };
+}
+
+/**
+ * Quality control for a manually annotated record. A case listed in
+ * TRUTH_CORRECTIONS carries outcome "corrected" plus its correction ledger; every
+ * other case keeps the original confirmation unchanged.
+ */
+function qualityControlFor(caseId) {
+  const corrected = TRUTH_CORRECTIONS.get(caseId);
+  if (!corrected) {
+    return {
       reviewedBy: "Codex",
       reviewedOn: TODAY,
       method: "second-pass-visual-inspection",
@@ -520,7 +609,16 @@ function manualOverrideRecord(discovered, override) {
       checks: QC_CHECKS,
       corrections: [],
       notes: "Full-corpus annotation confirmed after direct image review and bounded OCR preview.",
-    },
+    };
+  }
+  return {
+    reviewedBy: "Claude (first reader, not blind); Joseph (second reader, blind, 2026-07-20)",
+    reviewedOn: SECOND_READ_DATE,
+    method: "second-pass-visual-inspection",
+    outcome: "corrected",
+    checks: QC_CHECKS,
+    corrections: corrected.corrections,
+    notes: corrected.notes,
   };
 }
 

@@ -2896,7 +2896,7 @@
           "alcohol-at-bottom"
         ],
         "reviewReasons": [],
-        "notes": "Fulcrum Pinot Noir panel with a low-contrast cream-on-charcoal treatment and a small 13% by volume footer line."
+        "notes": "Fulcrum Pinot Noir panel with a low-contrast cream-on-charcoal treatment and a small 13.8% by volume footer line."
       },
       "status": "included",
       "exclusionReason": null,
@@ -2913,9 +2913,9 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [13],
-          "acceptableStatements": ["ALC. 13% BY VOL.", "13%"],
-          "characteristics": [],
+          "acceptablePercents": [13.8],
+          "acceptableStatements": ["ALC. 13.8% BY VOL.", "13.8%"],
+          "characteristics": ["decimal-value"],
           "approxGeometry": [],
           "orientation": "horizontal"
         },
@@ -2925,13 +2925,13 @@
           "annotatedOn": "2026-07-12",
           "method": "manual inspection of the committed fixture image aided by bounded local OCR preview"
         },
-        "notes": "Fulcrum Pinot Noir panel with a low-contrast cream-on-charcoal treatment and a small 13% by volume footer line."
+        "notes": "Fulcrum Pinot Noir panel with a low-contrast cream-on-charcoal treatment and a small 13.8% by volume footer line."
       },
       "qualityControl": {
-        "reviewedBy": "Codex",
-        "reviewedOn": "2026-07-12",
+        "reviewedBy": "Claude (first reader, not blind); Joseph (second reader, blind, 2026-07-20)",
+        "reviewedOn": "2026-07-20",
         "method": "second-pass-visual-inspection",
-        "outcome": "confirmed",
+        "outcome": "corrected",
         "checks": [
           "capitalization-and-punctuation",
           "varietal-not-brand",
@@ -2942,8 +2942,15 @@
           "genuine-ambiguity",
           "duplicate-labels"
         ],
-        "corrections": [],
-        "notes": "Full-corpus annotation confirmed after direct image review and bounded OCR preview."
+        "corrections": [
+          {
+            "fieldPath": "annotation.alcohol.acceptablePercents",
+            "before": "[13]",
+            "after": "[13.8]",
+            "reason": "Visual re-adjudication of tests/fixtures/precheck/approved-wine-043/label.jpeg at crop (210,950,250x70) shows 'ALC. 13.8% BY VOL.' The prior QC pass confirmed 13 in error."
+          }
+        ],
+        "notes": "Corrected 2026-07-20 after magnified visual re-read. First reader: Claude (not blind - had seen the stored truth and OCR output). Second reader: Joseph, 2026-07-20, blind to the expected answers, independently read '13.8%'. Independently confirmed by a second human reader. Prior QC incorrectly confirmed 13."
       }
     },
     {
@@ -8298,7 +8305,7 @@
         "imageOrientation": "portrait",
         "visualStrata": ["multi-panel", "alcohol-at-side-or-rotated"],
         "reviewReasons": [],
-        "notes": "Mauro Molino Livrot Langhe Chardonnay composite with the 13,4% alcohol printed vertically on the front label edge."
+        "notes": "Mauro Molino Livrot Langhe Chardonnay composite with the 13,5% alcohol printed vertically on the front label edge."
       },
       "status": "included",
       "exclusionReason": null,
@@ -8315,8 +8322,8 @@
         },
         "alcohol": {
           "presence": "present",
-          "acceptablePercents": [13.4],
-          "acceptableStatements": ["Alc. 13,4% vol.", "13.4%", "13,4%"],
+          "acceptablePercents": [13.5],
+          "acceptableStatements": ["Alc. 13,5 % by Vol.", "13.5%", "13,5%"],
           "characteristics": ["decimal-value", "rotated-or-vertical"],
           "approxGeometry": [],
           "orientation": "mixed"
@@ -8327,13 +8334,13 @@
           "annotatedOn": "2026-07-12",
           "method": "manual inspection of the committed fixture image aided by bounded local OCR preview"
         },
-        "notes": "Mauro Molino Livrot Langhe Chardonnay composite with the 13,4% alcohol printed vertically on the front label edge."
+        "notes": "Mauro Molino Livrot Langhe Chardonnay composite with the 13,5% alcohol printed vertically on the front label edge."
       },
       "qualityControl": {
-        "reviewedBy": "Codex",
-        "reviewedOn": "2026-07-12",
+        "reviewedBy": "Claude (first reader, not blind); Joseph (second reader, blind, 2026-07-20)",
+        "reviewedOn": "2026-07-20",
         "method": "second-pass-visual-inspection",
-        "outcome": "confirmed",
+        "outcome": "corrected",
         "checks": [
           "capitalization-and-punctuation",
           "varietal-not-brand",
@@ -8344,8 +8351,15 @@
           "genuine-ambiguity",
           "duplicate-labels"
         ],
-        "corrections": [],
-        "notes": "Full-corpus annotation confirmed after direct image review and bounded OCR preview."
+        "corrections": [
+          {
+            "fieldPath": "annotation.alcohol.acceptablePercents",
+            "before": "[13.4]",
+            "after": "[13.5]",
+            "reason": "Visual re-adjudication of tests/fixtures/precheck/wine-multi-artifact-06/label.png at crop (560,60,110x150) rotated 90deg shows 'Alc. 13,5 % by Vol.' The prior QC pass confirmed 13.4 in error."
+          }
+        ],
+        "notes": "Corrected 2026-07-20 after rotating the vertical statement and re-reading. First reader: Claude (not blind - had seen the stored truth and OCR output). Second reader: Joseph, 2026-07-20, blind to the expected answers, independently read '13.5%' and noted the decimal separator was not visually clear while the numeric reading was unambiguous. Independently confirmed by a second human reader as the numeric value 13.5, with recorded uncertainty about the visual clarity of the decimal separator only. Prior QC incorrectly confirmed 13,4."
       }
     },
     {
@@ -8365,9 +8379,9 @@
       },
       "inspection": {
         "imageOrientation": "portrait",
-        "visualStrata": ["multi-panel", "missing-alcohol-statement"],
+        "visualStrata": ["multi-panel", "alcohol-at-bottom"],
         "reviewReasons": [],
-        "notes": "Mike's Farm Scuppernong White composite with a distinct front title panel but no alcohol statement visible on the committed composite."
+        "notes": "Mike's Farm Scuppernong White composite with a distinct front title panel and a 12% ALC./VOL. statement beneath the muscadine-grapes line."
       },
       "status": "included",
       "exclusionReason": null,
@@ -8383,13 +8397,12 @@
           "orientation": "horizontal"
         },
         "alcohol": {
-          "presence": "absent",
-          "acceptablePercents": [],
-          "acceptableStatements": [],
+          "presence": "present",
+          "acceptablePercents": [12],
+          "acceptableStatements": ["12% ALC./VOL.", "12%"],
           "characteristics": [],
-          "absenceReason": "No alcohol statement appears on the committed composite image.",
           "approxGeometry": [],
-          "orientation": "not-applicable"
+          "orientation": "horizontal"
         },
         "confidence": { "overall": "high", "brand": "high", "alcohol": "high" },
         "provenance": {
@@ -8397,13 +8410,13 @@
           "annotatedOn": "2026-07-12",
           "method": "manual inspection of the committed fixture image aided by bounded local OCR preview"
         },
-        "notes": "Mike's Farm Scuppernong White composite with a distinct front title panel but no alcohol statement visible on the committed composite."
+        "notes": "Mike's Farm Scuppernong White composite with a distinct front title panel and a 12% ALC./VOL. statement beneath the muscadine-grapes line."
       },
       "qualityControl": {
-        "reviewedBy": "Codex",
-        "reviewedOn": "2026-07-12",
+        "reviewedBy": "Claude (first reader, not blind); Joseph (second reader, blind, 2026-07-20)",
+        "reviewedOn": "2026-07-20",
         "method": "second-pass-visual-inspection",
-        "outcome": "confirmed",
+        "outcome": "corrected",
         "checks": [
           "capitalization-and-punctuation",
           "varietal-not-brand",
@@ -8414,8 +8427,21 @@
           "genuine-ambiguity",
           "duplicate-labels"
         ],
-        "corrections": [],
-        "notes": "Full-corpus annotation confirmed after direct image review and bounded OCR preview."
+        "corrections": [
+          {
+            "fieldPath": "annotation.alcohol.presence",
+            "before": "absent",
+            "after": "present",
+            "reason": "Visual re-adjudication of tests/fixtures/precheck/wine-multi-artifact-07/label.png at crop (60,600,300x80) shows '12% ALC./VOL.' printed beneath the muscadine-grapes line. The recorded absenceReason was factually incorrect and the prior QC pass confirmed the absence in error."
+          },
+          {
+            "fieldPath": "annotation.alcohol.acceptablePercents",
+            "before": "[]",
+            "after": "[12]",
+            "reason": "The statement reads 12% ALC./VOL. on the committed composite image."
+          }
+        ],
+        "notes": "Corrected 2026-07-20 after direct visual re-read. First reader: Claude (not blind - had seen the stored truth and OCR output). Second reader: Joseph, 2026-07-20, blind to the expected answers, independently read '12%'. Independently confirmed by a second human reader. Prior QC incorrectly confirmed an absent alcohol statement."
       }
     },
     {
