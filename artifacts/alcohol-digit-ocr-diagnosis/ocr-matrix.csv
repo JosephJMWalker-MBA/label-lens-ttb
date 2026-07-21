@@ -1,0 +1,1793 @@
+caseId,region,scale,psm,treatment,whitelist,text,confidence,parsed,recoveredTruth,deterministic,distinctOutputs,msPerRun
+approved-wine-018,line,1.5,sparse,production,unrestricted,Al 13 5% by Vol Ch,81,13,false,true,1,106
+approved-wine-018,line,1.5,sparse,production,numeric,13 5%,68,13,false,true,1,77
+approved-wine-018,line,1.5,sparse,production,numericPlusMarker,Al 13 5% by Vol Ch,81,13,false,true,1,75
+approved-wine-018,line,1.5,sparse,grayscaleOnly,unrestricted,Al 13 5% by Vol Ch,78,13,false,true,1,75
+approved-wine-018,line,1.5,sparse,normalise,unrestricted,Al 13 5% by Vol Ch,81,13,false,true,1,80
+approved-wine-018,line,1.5,sparse,linearBoost,unrestricted,Al 13 5% by Vol TC ~,72,13,false,true,1,65
+approved-wine-018,line,1.5,sparse,otsu,unrestricted,Al 13 5% by Vol Cah,79,13,false,true,1,47
+approved-wine-018,line,1.5,sparse,otsu,numeric,13 5%,73,13,false,true,1,47
+approved-wine-018,line,1.5,sparse,otsu,numericPlusMarker,Al 13 5% by Vol Cah,79,13,false,true,1,48
+approved-wine-018,line,1.5,sparse,thresholdFixed,unrestricted,Al 13 5% by Vol Cah,79,13,false,true,1,51
+approved-wine-018,line,1.5,sparse,inverted,unrestricted,Al 13 5% by Vol Ch,78,13,false,true,1,83
+approved-wine-018,line,1.5,sparse,inverted,numeric,13 5%,70,13,false,true,1,85
+approved-wine-018,line,1.5,sparse,inverted,numericPlusMarker,Al 13 5% by Vol Ch,78,13,false,true,1,86
+approved-wine-018,line,1.5,sparse,invertedThreshold,unrestricted,Al 13 5% by Vol Cah,81,13,false,true,1,60
+approved-wine-018,line,1.5,singleLine,production,unrestricted,c] 3.9% by Vol. Al,81,3.9,false,true,1,70
+approved-wine-018,line,1.5,singleLine,production,numeric,1 3.9% .,31,1,false,true,1,70
+approved-wine-018,line,1.5,singleLine,production,numericPlusMarker,c 1 3.9% by Vol. Al,59,1,false,true,1,70
+approved-wine-018,line,1.5,singleLine,grayscaleOnly,unrestricted,c] 3.9% by Vol. Al,79,3.9,false,true,1,70
+approved-wine-018,line,1.5,singleLine,normalise,unrestricted,c] 3.9% by Vol. Al,81,3.9,false,true,1,70
+approved-wine-018,line,1.5,singleLine,linearBoost,unrestricted,c] 3.5% by Vol. A,74,3.5,false,true,1,56
+approved-wine-018,line,1.5,singleLine,otsu,unrestricted,c] 3.5% by Vol. A,78,3.5,false,true,1,46
+approved-wine-018,line,1.5,singleLine,otsu,numeric,1 3.5% .,31,1,false,true,1,43
+approved-wine-018,line,1.5,singleLine,otsu,numericPlusMarker,c1 3.5% by Vol. A,70,1,false,true,1,42
+approved-wine-018,line,1.5,singleLine,thresholdFixed,unrestricted,c] 3.9% by Vol. Al,78,3.9,false,true,1,43
+approved-wine-018,line,1.5,singleLine,inverted,unrestricted,c] 3.9% by Vol. Al,80,3.9,false,true,1,77
+approved-wine-018,line,1.5,singleLine,inverted,numeric,1 3.9% .,31,1,false,true,1,77
+approved-wine-018,line,1.5,singleLine,inverted,numericPlusMarker,c 1 3.9% by Vol. Al,59,1,false,true,1,78
+approved-wine-018,line,1.5,singleLine,invertedThreshold,unrestricted,c] 3.5% by Vol. A,81,3.5,false,true,1,50
+approved-wine-018,line,1.5,singleWord,production,unrestricted,135%. A,53,13,false,true,1,88
+approved-wine-018,line,1.5,singleWord,production,numeric,135%0.,0,13,false,true,1,88
+approved-wine-018,line,1.5,singleWord,production,numericPlusMarker,135%. A,53,13,false,true,1,89
+approved-wine-018,line,1.5,singleWord,grayscaleOnly,unrestricted,135%. A,55,13,false,true,1,88
+approved-wine-018,line,1.5,singleWord,normalise,unrestricted,135%. A,53,13,false,true,1,89
+approved-wine-018,line,1.5,singleWord,linearBoost,unrestricted,135% A,60,13,false,true,1,66
+approved-wine-018,line,1.5,singleWord,otsu,unrestricted,135%. Al,54,13,false,true,1,46
+approved-wine-018,line,1.5,singleWord,otsu,numeric,135%.,0,13,false,true,1,45
+approved-wine-018,line,1.5,singleWord,otsu,numericPlusMarker,135%. Al,54,13,false,true,1,46
+approved-wine-018,line,1.5,singleWord,thresholdFixed,unrestricted,135%. A,47,13,false,true,1,45
+approved-wine-018,line,1.5,singleWord,inverted,unrestricted,135%. A,59,13,false,true,1,119
+approved-wine-018,line,1.5,singleWord,inverted,numeric,135%0.,0,13,false,true,1,105
+approved-wine-018,line,1.5,singleWord,inverted,numericPlusMarker,135%. A,59,13,false,true,1,128
+approved-wine-018,line,1.5,singleWord,invertedThreshold,unrestricted,135%. A,52,13,false,true,1,53
+approved-wine-018,line,1.5,singleBlock,production,unrestricted,c] 3.5% by Vol. Al 2 Ch,77,3.5,false,true,1,78
+approved-wine-018,line,1.5,singleBlock,production,numeric,1 3.5% . 2,34,1,false,true,1,76
+approved-wine-018,line,1.5,singleBlock,production,numericPlusMarker,c 1 3.5% by Vol. Al 2 Ch,61,1,false,true,1,78
+approved-wine-018,line,1.5,singleBlock,grayscaleOnly,unrestricted,c] 3.5% by Vol. Al 2 Ch,72,3.5,false,true,1,78
+approved-wine-018,line,1.5,singleBlock,normalise,unrestricted,c] 3.5% by Vol. Al 2 Ch,77,3.5,false,true,1,81
+approved-wine-018,line,1.5,singleBlock,linearBoost,unrestricted,c] 3.5% by Vol. Al 2,72,3.5,false,true,1,64
+approved-wine-018,line,1.5,singleBlock,otsu,unrestricted,c] 3.5% by Vol. Al Cha,78,3.5,false,true,1,47
+approved-wine-018,line,1.5,singleBlock,otsu,numeric,1 3.5% .,31,1,false,true,1,48
+approved-wine-018,line,1.5,singleBlock,otsu,numericPlusMarker,c1 3.5% by Vol. Al Cha,72,1,false,true,1,50
+approved-wine-018,line,1.5,singleBlock,thresholdFixed,unrestricted,c] 3.5% by Vol. Al ) Cah,69,3.5,false,true,1,50
+approved-wine-018,line,1.5,singleBlock,inverted,unrestricted,c] 3.5% by Vol. Al 3 Ch,77,3.5,false,true,1,87
+approved-wine-018,line,1.5,singleBlock,inverted,numeric,1 3.5% . 3,42,1,false,true,1,89
+approved-wine-018,line,1.5,singleBlock,inverted,numericPlusMarker,c 1 3.5% by Vol. Al 3 Ch,62,1,false,true,1,86
+approved-wine-018,line,1.5,singleBlock,invertedThreshold,unrestricted,c] 3.5% by Vol. I) Ch,66,3.5,false,true,1,76
+approved-wine-018,line,2,sparse,production,unrestricted,Al 13 5% by Vol Ch,78,13,false,true,1,127
+approved-wine-018,line,2,sparse,production,numeric,13 5%,68,13,false,true,1,139
+approved-wine-018,line,2,sparse,production,numericPlusMarker,Al 13 5% by Vol Ch,78,13,false,true,1,120
+approved-wine-018,line,2,sparse,grayscaleOnly,unrestricted,Al 13 5% by Vol Ch,80,13,false,true,1,116
+approved-wine-018,line,2,sparse,normalise,unrestricted,Al 13 5% by Vol Ch,78,13,false,true,1,114
+approved-wine-018,line,2,sparse,linearBoost,unrestricted,Al 13 5% by Vol rs,78,13,false,true,1,102
+approved-wine-018,line,2,sparse,otsu,unrestricted,Al 13 5% by Vol Cah,75,13,false,true,1,79
+approved-wine-018,line,2,sparse,otsu,numeric,13 5%,62,13,false,true,1,77
+approved-wine-018,line,2,sparse,otsu,numericPlusMarker,Al 13 5% by Vol Cah,75,13,false,true,1,75
+approved-wine-018,line,2,sparse,thresholdFixed,unrestricted,Al 13 5% by Vol Cah,77,13,false,true,1,100
+approved-wine-018,line,2,sparse,inverted,unrestricted,Al 13 5% by Vol Ch,81,13,false,true,1,125
+approved-wine-018,line,2,sparse,inverted,numeric,13 5%,68,13,false,true,1,126
+approved-wine-018,line,2,sparse,inverted,numericPlusMarker,Al 13 5% by Vol Ch,81,13,false,true,1,125
+approved-wine-018,line,2,sparse,invertedThreshold,unrestricted,Al 13 5% by Vol Cah,78,13,false,true,1,86
+approved-wine-018,line,2,singleLine,production,unrestricted,c] 3.9% by Vol. Al,80,3.9,false,true,1,112
+approved-wine-018,line,2,singleLine,production,numeric,1 3.9% .,31,1,false,true,1,112
+approved-wine-018,line,2,singleLine,production,numericPlusMarker,c 1 3.9% by Vol. Al,63,1,false,true,1,111
+approved-wine-018,line,2,singleLine,grayscaleOnly,unrestricted,c] 3.9% by Vol. Al,80,3.9,false,true,1,113
+approved-wine-018,line,2,singleLine,normalise,unrestricted,c] 3.9% by Vol. Al,80,3.9,false,true,1,113
+approved-wine-018,line,2,singleLine,linearBoost,unrestricted,c] 3.5% by Vol. A,71,3.5,false,true,1,89
+approved-wine-018,line,2,singleLine,otsu,unrestricted,c] 3.5% by Vol. Al,77,3.5,false,true,1,66
+approved-wine-018,line,2,singleLine,otsu,numeric,1 3.5% .,32,1,false,true,1,66
+approved-wine-018,line,2,singleLine,otsu,numericPlusMarker,c 1 3.5% by Vol. Al,61,1,false,true,1,66
+approved-wine-018,line,2,singleLine,thresholdFixed,unrestricted,c] 3.9% by Vol. Al,83,3.9,false,true,1,67
+approved-wine-018,line,2,singleLine,inverted,unrestricted,c] 3.9% by Vol. Al,81,3.9,false,true,1,120
+approved-wine-018,line,2,singleLine,inverted,numeric,1 3.9% .,31,1,false,true,1,118
+approved-wine-018,line,2,singleLine,inverted,numericPlusMarker,c 1 3.9% by Vol. Al,60,1,false,true,1,118
+approved-wine-018,line,2,singleLine,invertedThreshold,unrestricted,c] 3.5% by Vol. Al,79,3.5,false,true,1,74
+approved-wine-018,line,2,singleWord,production,unrestricted,135%. A,62,13,false,true,1,140
+approved-wine-018,line,2,singleWord,production,numeric,135%.,0,13,false,true,1,158
+approved-wine-018,line,2,singleWord,production,numericPlusMarker,135%. A,62,13,false,true,1,140
+approved-wine-018,line,2,singleWord,grayscaleOnly,unrestricted,135%. A,49,13,false,true,1,151
+approved-wine-018,line,2,singleWord,normalise,unrestricted,135%. A,62,13,false,true,1,167
+approved-wine-018,line,2,singleWord,linearBoost,unrestricted,135% A,57,13,false,true,1,109
+approved-wine-018,line,2,singleWord,otsu,unrestricted,135%. A,52,13,false,true,1,78
+approved-wine-018,line,2,singleWord,otsu,numeric,135%0.,0,13,false,true,1,80
+approved-wine-018,line,2,singleWord,otsu,numericPlusMarker,135%. A,52,13,false,true,1,86
+approved-wine-018,line,2,singleWord,thresholdFixed,unrestricted,135%. A,49,13,false,true,1,87
+approved-wine-018,line,2,singleWord,inverted,unrestricted,135%. A,50,13,false,true,1,146
+approved-wine-018,line,2,singleWord,inverted,numeric,135%0.,0,13,false,true,1,149
+approved-wine-018,line,2,singleWord,inverted,numericPlusMarker,135%. A,50,13,false,true,1,145
+approved-wine-018,line,2,singleWord,invertedThreshold,unrestricted,135%. A,48,13,false,true,1,82
+approved-wine-018,line,2,singleBlock,production,unrestricted,c] 3.5% by Vol. Al Z Ch,66,3.5,false,true,1,126
+approved-wine-018,line,2,singleBlock,production,numeric,1 3.5% .,31,1,false,true,1,108
+approved-wine-018,line,2,singleBlock,production,numericPlusMarker,c 1 3.5% by Vol. Al Ch,62,1,false,true,1,109
+approved-wine-018,line,2,singleBlock,grayscaleOnly,unrestricted,c] 3.5% by Vol. Al Z Ch,64,3.5,false,true,1,105
+approved-wine-018,line,2,singleBlock,normalise,unrestricted,c] 3.5% by Vol. Al Z Ch,66,3.5,false,true,1,108
+approved-wine-018,line,2,singleBlock,linearBoost,unrestricted,c] 3.5% by Vol. Al 2 =,66,3.5,false,true,1,95
+approved-wine-018,line,2,singleBlock,otsu,unrestricted,c] 3.5% by Vol. Al Cah,70,3.5,false,true,1,68
+approved-wine-018,line,2,singleBlock,otsu,numeric,1 3.5% .,32,1,false,true,1,66
+approved-wine-018,line,2,singleBlock,otsu,numericPlusMarker,c 1 3.5% by Vol. Al Cah,56,1,false,true,1,67
+approved-wine-018,line,2,singleBlock,thresholdFixed,unrestricted,c] 3.5% by Vol. Alf ) Cha,62,3.5,false,true,1,75
+approved-wine-018,line,2,singleBlock,inverted,unrestricted,c] 3.5% by Vol. Al Ch,76,3.5,false,true,1,121
+approved-wine-018,line,2,singleBlock,inverted,numeric,1 3.5% .,31,1,false,true,1,122
+approved-wine-018,line,2,singleBlock,inverted,numericPlusMarker,c 1 3.5% by Vol. Al Ch,63,1,false,true,1,119
+approved-wine-018,line,2,singleBlock,invertedThreshold,unrestricted,c] 3.5% by Vol. Al Cah,71,3.5,false,true,1,79
+approved-wine-018,line,3,sparse,production,unrestricted,Al 13 5% by Vol Ch,79,13,false,true,1,223
+approved-wine-018,line,3,sparse,production,numeric,13 5%,65,13,false,true,1,224
+approved-wine-018,line,3,sparse,production,numericPlusMarker,Al 13 5% by Vol Ch,79,13,false,true,1,221
+approved-wine-018,line,3,sparse,grayscaleOnly,unrestricted,Al 13 5% by Vol Ch,78,13,false,true,1,213
+approved-wine-018,line,3,sparse,normalise,unrestricted,Al 13 5% by Vol Ch,79,13,false,true,1,222
+approved-wine-018,line,3,sparse,linearBoost,unrestricted,Al 13 5% by Vol =,78,13,false,true,1,198
+approved-wine-018,line,3,sparse,otsu,unrestricted,Al 13 5% by Vol Ch,78,13,false,true,1,146
+approved-wine-018,line,3,sparse,otsu,numeric,13 5%,74,13,false,true,1,150
+approved-wine-018,line,3,sparse,otsu,numericPlusMarker,Al 13 5% by Vol Ch,78,13,false,true,1,147
+approved-wine-018,line,3,sparse,thresholdFixed,unrestricted,Al 13 5% by Vol Cah,73,13,false,true,1,158
+approved-wine-018,line,3,sparse,inverted,unrestricted,Al 13 5% by Vol Ch,79,13,false,true,1,240
+approved-wine-018,line,3,sparse,inverted,numeric,13 5%,65,13,false,true,1,352
+approved-wine-018,line,3,sparse,inverted,numericPlusMarker,Al 13 5% by Vol Ch,79,13,false,true,1,231
+approved-wine-018,line,3,sparse,invertedThreshold,unrestricted,Al 13 5% by Vol Ch,79,13,false,true,1,190
+approved-wine-018,line,3,singleLine,production,unrestricted,c] 3.9% by Vol. Al,76,3.9,false,true,1,221
+approved-wine-018,line,3,singleLine,production,numeric,1 3.9% .,31,1,false,true,1,221
+approved-wine-018,line,3,singleLine,production,numericPlusMarker,c 1 3.9% by Vol. Al,64,1,false,true,1,217
+approved-wine-018,line,3,singleLine,grayscaleOnly,unrestricted,c] 3.9% by Vol. Al,76,3.9,false,true,1,209
+approved-wine-018,line,3,singleLine,normalise,unrestricted,c] 3.9% by Vol. Al,76,3.9,false,true,1,218
+approved-wine-018,line,3,singleLine,linearBoost,unrestricted,c 1 3.5% by Vol. Al,64,1,false,true,1,180
+approved-wine-018,line,3,singleLine,otsu,unrestricted,c] 3.5% by Vol. Al,80,3.5,false,true,1,128
+approved-wine-018,line,3,singleLine,otsu,numeric,1 3.5% .,31,1,false,true,1,128
+approved-wine-018,line,3,singleLine,otsu,numericPlusMarker,c 1 3.5% by Vol. Al,61,1,false,true,1,129
+approved-wine-018,line,3,singleLine,thresholdFixed,unrestricted,c] 3.9% by Vol. Al,82,3.9,false,true,1,133
+approved-wine-018,line,3,singleLine,inverted,unrestricted,c] 3.9% by Vol. Al,77,3.9,false,true,1,229
+approved-wine-018,line,3,singleLine,inverted,numeric,1 3.9% .,31,1,false,true,1,225
+approved-wine-018,line,3,singleLine,inverted,numericPlusMarker,c 1 3.9% by Vol. Al,61,1,false,true,1,223
+approved-wine-018,line,3,singleLine,invertedThreshold,unrestricted,c] 3.5% by Vol. Al,80,3.5,false,true,1,138
+approved-wine-018,line,3,singleWord,production,unrestricted,135%. A,50,13,false,true,1,278
+approved-wine-018,line,3,singleWord,production,numeric,135%0.,0,13,false,true,1,277
+approved-wine-018,line,3,singleWord,production,numericPlusMarker,135%. A,50,13,false,true,1,281
+approved-wine-018,line,3,singleWord,grayscaleOnly,unrestricted,135%. A,50,13,false,true,1,271
+approved-wine-018,line,3,singleWord,normalise,unrestricted,135%. A,50,13,false,true,1,278
+approved-wine-018,line,3,singleWord,linearBoost,unrestricted,135% A,58,13,false,true,1,226
+approved-wine-018,line,3,singleWord,otsu,unrestricted,135%. A,51,13,false,true,1,161
+approved-wine-018,line,3,singleWord,otsu,numeric,135%00.,0,13,false,true,1,161
+approved-wine-018,line,3,singleWord,otsu,numericPlusMarker,135%. A,51,13,false,true,1,167
+approved-wine-018,line,3,singleWord,thresholdFixed,unrestricted,135%. A,47,13,false,true,1,163
+approved-wine-018,line,3,singleWord,inverted,unrestricted,135%. A,50,13,false,true,1,286
+approved-wine-018,line,3,singleWord,inverted,numeric,135%0.,0,13,false,true,1,284
+approved-wine-018,line,3,singleWord,inverted,numericPlusMarker,135%. A,50,13,false,true,1,285
+approved-wine-018,line,3,singleWord,invertedThreshold,unrestricted,135%. A,49,13,false,true,1,169
+approved-wine-018,line,3,singleBlock,production,unrestricted,c] 3.5% by Vol. Al 3 Ch,75,3.5,false,true,1,210
+approved-wine-018,line,3,singleBlock,production,numeric,1 3.5% . 3,42,1,false,true,1,209
+approved-wine-018,line,3,singleBlock,production,numericPlusMarker,c 1 3.5% by Vol. Al 3 Ch,67,1,false,true,1,209
+approved-wine-018,line,3,singleBlock,grayscaleOnly,unrestricted,c] 3.5% by Vol. Al 3 Ch,75,3.5,false,true,1,201
+approved-wine-018,line,3,singleBlock,normalise,unrestricted,c] 3.5% by Vol. Al 3 Ch,75,3.5,false,true,1,209
+approved-wine-018,line,3,singleBlock,linearBoost,unrestricted,c 1 3.5% by Vol. Al 0 =,59,1,false,true,1,179
+approved-wine-018,line,3,singleBlock,otsu,unrestricted,c] 3.5% by Vol. Al Ch,72,3.5,false,true,1,130
+approved-wine-018,line,3,singleBlock,otsu,numeric,1 3.5% .,31,1,false,true,1,129
+approved-wine-018,line,3,singleBlock,otsu,numericPlusMarker,c 1 3.5% by Vol. Al Ch,57,1,false,true,1,129
+approved-wine-018,line,3,singleBlock,thresholdFixed,unrestricted,c] 3.5% by Vol. Alf | Cah,61,3.5,false,true,1,135
+approved-wine-018,line,3,singleBlock,inverted,unrestricted,c] 3.5% by Vol. Al ) Ch,66,3.5,false,true,1,227
+approved-wine-018,line,3,singleBlock,inverted,numeric,1 3.5% .,31,1,false,true,1,221
+approved-wine-018,line,3,singleBlock,inverted,numericPlusMarker,c 1 3.5% by Vol. Al Ch,64,1,false,true,1,221
+approved-wine-018,line,3,singleBlock,invertedThreshold,unrestricted,c] 3.5% by Vol. Al Ch,71,3.5,false,true,1,143
+approved-wine-018,line,4,sparse,production,unrestricted,Al 13 5% by Vol Ch,74,13,false,true,1,366
+approved-wine-018,line,4,sparse,production,numeric,13 5%,55,13,false,true,1,362
+approved-wine-018,line,4,sparse,production,numericPlusMarker,Al 13 5% by Vol Ch,74,13,false,true,1,368
+approved-wine-018,line,4,sparse,grayscaleOnly,unrestricted,Al 13 5% by Vol Ch,72,13,false,true,1,349
+approved-wine-018,line,4,sparse,normalise,unrestricted,Al 13 5% by Vol Ch,74,13,false,true,1,362
+approved-wine-018,line,4,sparse,linearBoost,unrestricted,Al 13 5% by Vol 0,72,13,false,true,1,327
+approved-wine-018,line,4,sparse,otsu,unrestricted,Al 13 5% by Vol Ch,79,13,false,true,1,249
+approved-wine-018,line,4,sparse,otsu,numeric,13 5%,73,13,false,true,1,242
+approved-wine-018,line,4,sparse,otsu,numericPlusMarker,Al 13 5% by Vol Ch,79,13,false,true,1,242
+approved-wine-018,line,4,sparse,thresholdFixed,unrestricted,Al 13 5% by Vol Cah,70,13,false,true,1,241
+approved-wine-018,line,4,sparse,inverted,unrestricted,\} 13 5% by Vol Cn,57,13,false,true,1,371
+approved-wine-018,line,4,sparse,inverted,numeric,13 5%,53,13,false,true,1,373
+approved-wine-018,line,4,sparse,inverted,numericPlusMarker,13 5% by Vol Cah,66,13,false,true,1,369
+approved-wine-018,line,4,sparse,invertedThreshold,unrestricted,Al 13 5% by Vol Cha,78,13,false,true,1,259
+approved-wine-018,line,4,singleLine,production,unrestricted,1 3.9% by Vol. Al,72,1,false,true,1,353
+approved-wine-018,line,4,singleLine,production,numeric,1 3.9% .,31,1,false,true,1,371
+approved-wine-018,line,4,singleLine,production,numericPlusMarker,1 3.9% by Vol. Al,72,1,false,true,1,353
+approved-wine-018,line,4,singleLine,grayscaleOnly,unrestricted,1 3.9% by Vol. Al,71,1,false,true,1,338
+approved-wine-018,line,4,singleLine,normalise,unrestricted,1 3.9% by Vol. Al,72,1,false,true,1,352
+approved-wine-018,line,4,singleLine,linearBoost,unrestricted,N 3.5% by Vol. Al,71,3.5,false,true,1,298
+approved-wine-018,line,4,singleLine,otsu,unrestricted,c 1 3.5% by Vol. Al,73,1,false,true,1,213
+approved-wine-018,line,4,singleLine,otsu,numeric,1 3.5% .,32,1,false,true,1,214
+approved-wine-018,line,4,singleLine,otsu,numericPlusMarker,c 1 3.5% by Vol. Al,73,1,false,true,1,211
+approved-wine-018,line,4,singleLine,thresholdFixed,unrestricted,1 3.9% by Vol. Al,72,1,false,true,1,217
+approved-wine-018,line,4,singleLine,inverted,unrestricted,1 3.9% WAS Al,56,1,false,true,1,354
+approved-wine-018,line,4,singleLine,inverted,numeric,1 3.9%,47,1,false,true,1,357
+approved-wine-018,line,4,singleLine,inverted,numericPlusMarker,1 3.9% A Al,42,1,false,true,1,365
+approved-wine-018,line,4,singleLine,invertedThreshold,unrestricted,1 3.5% by Vol. Al,72,1,false,true,1,244
+approved-wine-018,line,4,singleWord,production,unrestricted,135%. A,49,13,false,true,1,470
+approved-wine-018,line,4,singleWord,production,numeric,135%00.,0,13,false,true,1,498
+approved-wine-018,line,4,singleWord,production,numericPlusMarker,135%. A,49,13,false,true,1,460
+approved-wine-018,line,4,singleWord,grayscaleOnly,unrestricted,135%. A,50,13,false,true,1,447
+approved-wine-018,line,4,singleWord,normalise,unrestricted,135%. A,49,13,false,true,1,461
+approved-wine-018,line,4,singleWord,linearBoost,unrestricted,135% A,56,13,false,true,1,387
+approved-wine-018,line,4,singleWord,otsu,unrestricted,135%. Al,44,13,false,true,1,285
+approved-wine-018,line,4,singleWord,otsu,numeric,135%0.,0,13,false,true,1,281
+approved-wine-018,line,4,singleWord,otsu,numericPlusMarker,135%. Al,44,13,false,true,1,280
+approved-wine-018,line,4,singleWord,thresholdFixed,unrestricted,135%. Al,39,13,false,true,1,281
+approved-wine-018,line,4,singleWord,inverted,unrestricted,135%. A,56,13,false,true,1,470
+approved-wine-018,line,4,singleWord,inverted,numeric,135%.,0,13,false,true,1,471
+approved-wine-018,line,4,singleWord,inverted,numericPlusMarker,135%. A,56,13,false,true,1,491
+approved-wine-018,line,4,singleWord,invertedThreshold,unrestricted,135%. A,49,13,false,true,1,295
+approved-wine-018,line,4,singleBlock,production,unrestricted,1 3.5% by Vol. Al Ch,71,1,false,true,1,346
+approved-wine-018,line,4,singleBlock,production,numeric,1 3.5% .,31,1,false,true,1,343
+approved-wine-018,line,4,singleBlock,production,numericPlusMarker,1 3.5% by Vol. Al Ch,71,1,false,true,1,343
+approved-wine-018,line,4,singleBlock,grayscaleOnly,unrestricted,1 3.5% by Vol. Al Ch,71,1,false,true,1,330
+approved-wine-018,line,4,singleBlock,normalise,unrestricted,1 3.5% by Vol. Al Ch,71,1,false,true,1,345
+approved-wine-018,line,4,singleBlock,linearBoost,unrestricted,N 3.5% by Vol. Al 0,69,3.5,false,true,1,298
+approved-wine-018,line,4,singleBlock,otsu,unrestricted,c] 3.5% by Vol. Al Cah,72,3.5,false,true,1,214
+approved-wine-018,line,4,singleBlock,otsu,numeric,1 3.5% .,32,1,false,true,1,213
+approved-wine-018,line,4,singleBlock,otsu,numericPlusMarker,c 1 3.5% by Vol. Al Cah,62,1,false,true,1,213
+approved-wine-018,line,4,singleBlock,thresholdFixed,unrestricted,1 3.5% by Vol. Al ] Cah,62,1,false,true,1,227
+approved-wine-018,line,4,singleBlock,inverted,unrestricted,1 3.5% by Vol. Al Ch,72,1,false,true,1,354
+approved-wine-018,line,4,singleBlock,inverted,numeric,1 3.5% .,31,1,false,true,1,353
+approved-wine-018,line,4,singleBlock,inverted,numericPlusMarker,1 3.5% by Vol. Al Ch,72,1,false,true,1,355
+approved-wine-018,line,4,singleBlock,invertedThreshold,unrestricted,c] 3.5% by Vol. Al Ch,70,3.5,false,true,1,225
+approved-wine-018,markerAndNumber,1.5,sparse,production,unrestricted,5 3.9% by \,76,5,false,true,1,107
+approved-wine-018,markerAndNumber,1.5,sparse,production,numeric,5 3.9%,60,5,false,true,1,104
+approved-wine-018,markerAndNumber,1.5,sparse,production,numericPlusMarker,5 3.9% by,40,5,false,true,1,104
+approved-wine-018,markerAndNumber,1.5,sparse,grayscaleOnly,unrestricted,13 5% by),60,13,false,true,1,94
+approved-wine-018,markerAndNumber,1.5,sparse,normalise,unrestricted,5 3.9% by \,76,5,false,true,1,103
+approved-wine-018,markerAndNumber,1.5,sparse,linearBoost,unrestricted,13 5% by,63,13,false,true,1,83
+approved-wine-018,markerAndNumber,1.5,sparse,otsu,unrestricted,c 1 3.5% by \,72,1,false,true,1,59
+approved-wine-018,markerAndNumber,1.5,sparse,otsu,numeric,1 3.5%,45,1,false,true,1,60
+approved-wine-018,markerAndNumber,1.5,sparse,otsu,numericPlusMarker,c 1 3.5% by,44,1,false,true,1,62
+approved-wine-018,markerAndNumber,1.5,sparse,thresholdFixed,unrestricted,c 1 3.9% by \,72,1,false,true,1,62
+approved-wine-018,markerAndNumber,1.5,sparse,inverted,unrestricted,c 1 3.9% by \,71,1,false,true,1,108
+approved-wine-018,markerAndNumber,1.5,sparse,inverted,numeric,1 3.9%,47,1,false,true,1,108
+approved-wine-018,markerAndNumber,1.5,sparse,inverted,numericPlusMarker,c 1 3.9% by,43,1,false,true,1,108
+approved-wine-018,markerAndNumber,1.5,sparse,invertedThreshold,unrestricted,c 1 3.5% by \,72,1,false,true,1,67
+approved-wine-018,markerAndNumber,1.5,singleLine,production,unrestricted,N 3.9% by \,80,3.9,false,true,1,98
+approved-wine-018,markerAndNumber,1.5,singleLine,production,numeric,3.9%,94,3.9,false,true,1,97
+approved-wine-018,markerAndNumber,1.5,singleLine,production,numericPlusMarker,3.9% by,47,3.9,false,true,1,96
+approved-wine-018,markerAndNumber,1.5,singleLine,grayscaleOnly,unrestricted,N 3.9% by \,80,3.9,false,true,1,97
+approved-wine-018,markerAndNumber,1.5,singleLine,normalise,unrestricted,N 3.9% by \,80,3.9,false,true,1,97
+approved-wine-018,markerAndNumber,1.5,singleLine,linearBoost,unrestricted,N 3.5% by \,83,3.5,false,true,1,77
+approved-wine-018,markerAndNumber,1.5,singleLine,otsu,unrestricted,N 3.5% by \,84,3.5,false,true,1,52
+approved-wine-018,markerAndNumber,1.5,singleLine,otsu,numeric,3.5%,96,3.5,false,true,1,53
+approved-wine-018,markerAndNumber,1.5,singleLine,otsu,numericPlusMarker,3.5% by,48,3.5,false,true,1,52
+approved-wine-018,markerAndNumber,1.5,singleLine,thresholdFixed,unrestricted,N 3.9% by \,75,3.9,false,true,1,55
+approved-wine-018,markerAndNumber,1.5,singleLine,inverted,unrestricted,N 3.9% by \,80,3.9,false,true,1,100
+approved-wine-018,markerAndNumber,1.5,singleLine,inverted,numeric,3.9%,94,3.9,false,true,1,100
+approved-wine-018,markerAndNumber,1.5,singleLine,inverted,numericPlusMarker,3.9% by,47,3.9,false,true,1,100
+approved-wine-018,markerAndNumber,1.5,singleLine,invertedThreshold,unrestricted,N 3.5% by \,84,3.5,false,true,1,58
+approved-wine-018,markerAndNumber,1.5,singleWord,production,unrestricted,13.5%,52,13.5,true,true,1,113
+approved-wine-018,markerAndNumber,1.5,singleWord,production,numeric,13.5%,52,13.5,true,true,1,113
+approved-wine-018,markerAndNumber,1.5,singleWord,production,numericPlusMarker,13.5%,52,13.5,true,true,1,113
+approved-wine-018,markerAndNumber,1.5,singleWord,grayscaleOnly,unrestricted,13.5%,51,13.5,true,true,1,110
+approved-wine-018,markerAndNumber,1.5,singleWord,normalise,unrestricted,13.5%,52,13.5,true,true,1,112
+approved-wine-018,markerAndNumber,1.5,singleWord,linearBoost,unrestricted,13.5%,43,13.5,true,true,1,86
+approved-wine-018,markerAndNumber,1.5,singleWord,otsu,unrestricted,13.5%,53,13.5,true,true,1,61
+approved-wine-018,markerAndNumber,1.5,singleWord,otsu,numeric,13.5%,53,13.5,true,true,1,58
+approved-wine-018,markerAndNumber,1.5,singleWord,otsu,numericPlusMarker,13.5%,53,13.5,true,true,1,59
+approved-wine-018,markerAndNumber,1.5,singleWord,thresholdFixed,unrestricted,13.5%,47,13.5,true,true,1,59
+approved-wine-018,markerAndNumber,1.5,singleWord,inverted,unrestricted,13.5%,45,13.5,true,true,1,116
+approved-wine-018,markerAndNumber,1.5,singleWord,inverted,numeric,13.5%,45,13.5,true,true,1,116
+approved-wine-018,markerAndNumber,1.5,singleWord,inverted,numericPlusMarker,13.5%,45,13.5,true,true,1,117
+approved-wine-018,markerAndNumber,1.5,singleWord,invertedThreshold,unrestricted,SEL,36,,false,true,1,60
+approved-wine-018,markerAndNumber,1.5,singleBlock,production,unrestricted,N 3.9% by \,80,3.9,false,true,1,97
+approved-wine-018,markerAndNumber,1.5,singleBlock,production,numeric,3.9%,94,3.9,false,true,1,98
+approved-wine-018,markerAndNumber,1.5,singleBlock,production,numericPlusMarker,3.9% by,47,3.9,false,true,1,97
+approved-wine-018,markerAndNumber,1.5,singleBlock,grayscaleOnly,unrestricted,N 3.9% by \,80,3.9,false,true,1,92
+approved-wine-018,markerAndNumber,1.5,singleBlock,normalise,unrestricted,N 3.9% by \,80,3.9,false,true,1,97
+approved-wine-018,markerAndNumber,1.5,singleBlock,linearBoost,unrestricted,N 3.5% by \,83,3.5,false,true,1,79
+approved-wine-018,markerAndNumber,1.5,singleBlock,otsu,unrestricted,N 3.5% by \,84,3.5,false,true,1,54
+approved-wine-018,markerAndNumber,1.5,singleBlock,otsu,numeric,3.5%,96,3.5,false,true,1,53
+approved-wine-018,markerAndNumber,1.5,singleBlock,otsu,numericPlusMarker,3.5% by,48,3.5,false,true,1,55
+approved-wine-018,markerAndNumber,1.5,singleBlock,thresholdFixed,unrestricted,N 3.9% by \,75,3.9,false,true,1,54
+approved-wine-018,markerAndNumber,1.5,singleBlock,inverted,unrestricted,N 3.9% by \,80,3.9,false,true,1,104
+approved-wine-018,markerAndNumber,1.5,singleBlock,inverted,numeric,3.9%,94,3.9,false,true,1,101
+approved-wine-018,markerAndNumber,1.5,singleBlock,inverted,numericPlusMarker,3.9% by,47,3.9,false,true,1,101
+approved-wine-018,markerAndNumber,1.5,singleBlock,invertedThreshold,unrestricted,N 3.5% by \,84,3.5,false,true,1,59
+approved-wine-018,markerAndNumber,2,sparse,production,unrestricted,13 5% by),56,13,false,true,1,157
+approved-wine-018,markerAndNumber,2,sparse,production,numeric,13 5%,20,13,false,true,1,158
+approved-wine-018,markerAndNumber,2,sparse,production,numericPlusMarker,13 5% by,56,13,false,true,1,158
+approved-wine-018,markerAndNumber,2,sparse,grayscaleOnly,unrestricted,13 5% by),58,13,false,true,1,152
+approved-wine-018,markerAndNumber,2,sparse,normalise,unrestricted,13 5% by),56,13,false,true,1,158
+approved-wine-018,markerAndNumber,2,sparse,linearBoost,unrestricted,13 5% by,67,13,false,true,1,137
+approved-wine-018,markerAndNumber,2,sparse,otsu,unrestricted,13 5% by,72,13,false,true,1,99
+approved-wine-018,markerAndNumber,2,sparse,otsu,numeric,13 5%,28,13,false,true,1,98
+approved-wine-018,markerAndNumber,2,sparse,otsu,numericPlusMarker,13 5% by,72,13,false,true,1,96
+approved-wine-018,markerAndNumber,2,sparse,thresholdFixed,unrestricted,13 5% by,61,13,false,true,1,97
+approved-wine-018,markerAndNumber,2,sparse,inverted,unrestricted,13 5% by),53,13,false,true,1,165
+approved-wine-018,markerAndNumber,2,sparse,inverted,numeric,13 5%,17,13,false,true,1,163
+approved-wine-018,markerAndNumber,2,sparse,inverted,numericPlusMarker,13 5% by,50,13,false,true,1,163
+approved-wine-018,markerAndNumber,2,sparse,invertedThreshold,unrestricted,13 5% by,69,13,false,true,1,104
+approved-wine-018,markerAndNumber,2,singleLine,production,unrestricted,N 3.9% by \,84,3.9,false,true,1,155
+approved-wine-018,markerAndNumber,2,singleLine,production,numeric,3.9%,94,3.9,false,true,1,153
+approved-wine-018,markerAndNumber,2,singleLine,production,numericPlusMarker,3.9% by,47,3.9,false,true,1,155
+approved-wine-018,markerAndNumber,2,singleLine,grayscaleOnly,unrestricted,5 3.9% by \,69,5,false,true,1,149
+approved-wine-018,markerAndNumber,2,singleLine,normalise,unrestricted,N 3.9% by \,84,3.9,false,true,1,164
+approved-wine-018,markerAndNumber,2,singleLine,linearBoost,unrestricted,N 3.5% Dy \,84,3.5,false,true,1,130
+approved-wine-018,markerAndNumber,2,singleLine,otsu,unrestricted,N 3.5% Dy \,82,3.5,false,true,1,84
+approved-wine-018,markerAndNumber,2,singleLine,otsu,numeric,3.5%,96,3.5,false,true,1,141
+approved-wine-018,markerAndNumber,2,singleLine,otsu,numericPlusMarker,3.5% by,48,3.5,false,true,1,152
+approved-wine-018,markerAndNumber,2,singleLine,thresholdFixed,unrestricted,N 3.9% by \,81,3.9,false,true,1,90
+approved-wine-018,markerAndNumber,2,singleLine,inverted,unrestricted,N 3.9% by \,83,3.9,false,true,1,160
+approved-wine-018,markerAndNumber,2,singleLine,inverted,numeric,3.9%,93,3.9,false,true,1,192
+approved-wine-018,markerAndNumber,2,singleLine,inverted,numericPlusMarker,3.9% by,46,3.9,false,true,1,160
+approved-wine-018,markerAndNumber,2,singleLine,invertedThreshold,unrestricted,N 3.5% Dy \,81,3.5,false,true,1,91
+approved-wine-018,markerAndNumber,2,singleWord,production,unrestricted,13.5%,45,13.5,true,true,1,183
+approved-wine-018,markerAndNumber,2,singleWord,production,numeric,13.5%,45,13.5,true,true,1,187
+approved-wine-018,markerAndNumber,2,singleWord,production,numericPlusMarker,13.5%,45,13.5,true,true,1,183
+approved-wine-018,markerAndNumber,2,singleWord,grayscaleOnly,unrestricted,13.5%,44,13.5,true,true,1,176
+approved-wine-018,markerAndNumber,2,singleWord,normalise,unrestricted,13.5%,45,13.5,true,true,1,183
+approved-wine-018,markerAndNumber,2,singleWord,linearBoost,unrestricted,13.5%,45,13.5,true,true,1,146
+approved-wine-018,markerAndNumber,2,singleWord,otsu,unrestricted,13.5%,55,13.5,true,true,1,101
+approved-wine-018,markerAndNumber,2,singleWord,otsu,numeric,13.5%,55,13.5,true,true,1,100
+approved-wine-018,markerAndNumber,2,singleWord,otsu,numericPlusMarker,13.5%,55,13.5,true,true,1,101
+approved-wine-018,markerAndNumber,2,singleWord,thresholdFixed,unrestricted,13.5%,44,13.5,true,true,1,102
+approved-wine-018,markerAndNumber,2,singleWord,inverted,unrestricted,13.5%,48,13.5,true,true,1,187
+approved-wine-018,markerAndNumber,2,singleWord,inverted,numeric,13.5%,48,13.5,true,true,1,192
+approved-wine-018,markerAndNumber,2,singleWord,inverted,numericPlusMarker,13.5%,48,13.5,true,true,1,188
+approved-wine-018,markerAndNumber,2,singleWord,invertedThreshold,unrestricted,SEL,28,,false,true,1,103
+approved-wine-018,markerAndNumber,2,singleBlock,production,unrestricted,N 3.9% by \,84,3.9,false,true,1,154
+approved-wine-018,markerAndNumber,2,singleBlock,production,numeric,3.9%,94,3.9,false,true,1,155
+approved-wine-018,markerAndNumber,2,singleBlock,production,numericPlusMarker,3.9% by,47,3.9,false,true,1,155
+approved-wine-018,markerAndNumber,2,singleBlock,grayscaleOnly,unrestricted,5 3.9% by \,69,5,false,true,1,146
+approved-wine-018,markerAndNumber,2,singleBlock,normalise,unrestricted,N 3.9% by \,84,3.9,false,true,1,157
+approved-wine-018,markerAndNumber,2,singleBlock,linearBoost,unrestricted,N 3.5% Dy \,84,3.5,false,true,1,126
+approved-wine-018,markerAndNumber,2,singleBlock,otsu,unrestricted,N 3.5% Dy \,82,3.5,false,true,1,84
+approved-wine-018,markerAndNumber,2,singleBlock,otsu,numeric,3.5%,96,3.5,false,true,1,84
+approved-wine-018,markerAndNumber,2,singleBlock,otsu,numericPlusMarker,3.5% by,48,3.5,false,true,1,88
+approved-wine-018,markerAndNumber,2,singleBlock,thresholdFixed,unrestricted,N 3.9% by \,81,3.9,false,true,1,90
+approved-wine-018,markerAndNumber,2,singleBlock,inverted,unrestricted,N 3.9% by \,83,3.9,false,true,1,164
+approved-wine-018,markerAndNumber,2,singleBlock,inverted,numeric,3.9%,93,3.9,false,true,1,159
+approved-wine-018,markerAndNumber,2,singleBlock,inverted,numericPlusMarker,3.9% by,46,3.9,false,true,1,160
+approved-wine-018,markerAndNumber,2,singleBlock,invertedThreshold,unrestricted,N 3.5% Dy \,81,3.5,false,true,1,91
+approved-wine-018,markerAndNumber,3,sparse,production,unrestricted,13 9% by),50,13,false,true,1,328
+approved-wine-018,markerAndNumber,3,sparse,production,numeric,13 9%,21,13,false,true,1,335
+approved-wine-018,markerAndNumber,3,sparse,production,numericPlusMarker,13 9% by,50,13,false,true,1,334
+approved-wine-018,markerAndNumber,3,sparse,grayscaleOnly,unrestricted,13 5% by),47,13,false,true,1,332
+approved-wine-018,markerAndNumber,3,sparse,normalise,unrestricted,13 9% by),50,13,false,true,1,331
+approved-wine-018,markerAndNumber,3,sparse,linearBoost,unrestricted,13 5% by,65,13,false,true,1,291
+approved-wine-018,markerAndNumber,3,sparse,otsu,unrestricted,13 5% by,72,13,false,true,1,202
+approved-wine-018,markerAndNumber,3,sparse,otsu,numeric,13 5%,29,13,false,true,1,201
+approved-wine-018,markerAndNumber,3,sparse,otsu,numericPlusMarker,13 5% by,72,13,false,true,1,199
+approved-wine-018,markerAndNumber,3,sparse,thresholdFixed,unrestricted,13 5% by),63,13,false,true,1,206
+approved-wine-018,markerAndNumber,3,sparse,inverted,unrestricted,13 9% by),50,13,false,true,1,335
+approved-wine-018,markerAndNumber,3,sparse,inverted,numeric,13 9%,20,13,false,true,1,334
+approved-wine-018,markerAndNumber,3,sparse,inverted,numericPlusMarker,13 9% by,50,13,false,true,1,344
+approved-wine-018,markerAndNumber,3,sparse,invertedThreshold,unrestricted,13 5% by,71,13,false,true,1,211
+approved-wine-018,markerAndNumber,3,singleLine,production,unrestricted,i] 3.9% by \,76,3.9,false,true,1,314
+approved-wine-018,markerAndNumber,3,singleLine,production,numeric,1 3.9%,56,1,false,true,1,313
+approved-wine-018,markerAndNumber,3,singleLine,production,numericPlusMarker,1 3.9% by,37,1,false,true,1,315
+approved-wine-018,markerAndNumber,3,singleLine,grayscaleOnly,unrestricted,ol 3.9% by \,77,3.9,false,true,1,282
+approved-wine-018,markerAndNumber,3,singleLine,normalise,unrestricted,i] 3.9% by \,76,3.9,false,true,1,313
+approved-wine-018,markerAndNumber,3,singleLine,linearBoost,unrestricted,1 3.5% by \,61,1,false,true,1,258
+approved-wine-018,markerAndNumber,3,singleLine,otsu,unrestricted,1 3.9% Dy \,59,1,false,true,1,168
+approved-wine-018,markerAndNumber,3,singleLine,otsu,numeric,1 3.9%,47,1,false,true,1,168
+approved-wine-018,markerAndNumber,3,singleLine,otsu,numericPlusMarker,1 3.9% by,31,1,false,true,1,168
+approved-wine-018,markerAndNumber,3,singleLine,thresholdFixed,unrestricted,c 1 3.9% by \,71,1,false,true,1,184
+approved-wine-018,markerAndNumber,3,singleLine,inverted,unrestricted,5 3.9% by \,69,5,false,true,1,325
+approved-wine-018,markerAndNumber,3,singleLine,inverted,numeric,5 3.9%,47,5,false,true,1,318
+approved-wine-018,markerAndNumber,3,singleLine,inverted,numericPlusMarker,5 3.9% by,31,5,false,true,1,318
+approved-wine-018,markerAndNumber,3,singleLine,invertedThreshold,unrestricted,1 3.9% Dy \,57,1,false,true,1,181
+approved-wine-018,markerAndNumber,3,singleWord,production,unrestricted,13.5%,56,13.5,true,true,1,376
+approved-wine-018,markerAndNumber,3,singleWord,production,numeric,13.5%,56,13.5,true,true,1,379
+approved-wine-018,markerAndNumber,3,singleWord,production,numericPlusMarker,13.5%,56,13.5,true,true,1,375
+approved-wine-018,markerAndNumber,3,singleWord,grayscaleOnly,unrestricted,13.5%,49,13.5,true,true,1,364
+approved-wine-018,markerAndNumber,3,singleWord,normalise,unrestricted,13.5%,56,13.5,true,true,1,380
+approved-wine-018,markerAndNumber,3,singleWord,linearBoost,unrestricted,13.5%,54,13.5,true,true,1,333
+approved-wine-018,markerAndNumber,3,singleWord,otsu,unrestricted,13.5%,49,13.5,true,true,1,217
+approved-wine-018,markerAndNumber,3,singleWord,otsu,numeric,13.5%,49,13.5,true,true,1,216
+approved-wine-018,markerAndNumber,3,singleWord,otsu,numericPlusMarker,13.5%,49,13.5,true,true,1,215
+approved-wine-018,markerAndNumber,3,singleWord,thresholdFixed,unrestricted,13.5%,39,13.5,true,true,1,217
+approved-wine-018,markerAndNumber,3,singleWord,inverted,unrestricted,13.5%,48,13.5,true,true,1,383
+approved-wine-018,markerAndNumber,3,singleWord,inverted,numeric,13.5%,48,13.5,true,true,1,380
+approved-wine-018,markerAndNumber,3,singleWord,inverted,numericPlusMarker,13.5%,48,13.5,true,true,1,380
+approved-wine-018,markerAndNumber,3,singleWord,invertedThreshold,unrestricted,SEL,26,,false,true,1,222
+approved-wine-018,markerAndNumber,3,singleBlock,production,unrestricted,i] 3.9% by \,76,3.9,false,true,1,313
+approved-wine-018,markerAndNumber,3,singleBlock,production,numeric,1 3.9%,56,1,false,true,1,315
+approved-wine-018,markerAndNumber,3,singleBlock,production,numericPlusMarker,1 3.9% by,37,1,false,true,1,369
+approved-wine-018,markerAndNumber,3,singleBlock,grayscaleOnly,unrestricted,ol 3.9% by \,77,3.9,false,true,1,334
+approved-wine-018,markerAndNumber,3,singleBlock,normalise,unrestricted,i] 3.9% by \,76,3.9,false,true,1,343
+approved-wine-018,markerAndNumber,3,singleBlock,linearBoost,unrestricted,13 5% by \,69,13,false,true,1,255
+approved-wine-018,markerAndNumber,3,singleBlock,otsu,unrestricted,13 5% Dy \,56,13,false,true,1,173
+approved-wine-018,markerAndNumber,3,singleBlock,otsu,numeric,13 5%,43,13,false,true,1,178
+approved-wine-018,markerAndNumber,3,singleBlock,otsu,numericPlusMarker,13 5% by,28,13,false,true,1,172
+approved-wine-018,markerAndNumber,3,singleBlock,thresholdFixed,unrestricted,c 1 3.9% by \,71,1,false,true,1,182
+approved-wine-018,markerAndNumber,3,singleBlock,inverted,unrestricted,5 3.9% by \,69,5,false,true,1,318
+approved-wine-018,markerAndNumber,3,singleBlock,inverted,numeric,5 3.9%,47,5,false,true,1,318
+approved-wine-018,markerAndNumber,3,singleBlock,inverted,numericPlusMarker,5 3.9% by,31,5,false,true,1,319
+approved-wine-018,markerAndNumber,3,singleBlock,invertedThreshold,unrestricted,13 5% Dy \,60,13,false,true,1,189
+approved-wine-018,markerAndNumber,4,sparse,production,unrestricted,13.9% by \,71,13.9,false,true,1,550
+approved-wine-018,markerAndNumber,4,sparse,production,numeric,13.9%,41,13.9,false,true,1,548
+approved-wine-018,markerAndNumber,4,sparse,production,numericPlusMarker,13.9% by,20,13.9,false,true,1,551
+approved-wine-018,markerAndNumber,4,sparse,grayscaleOnly,unrestricted,13.9% by \,70,13.9,false,true,1,538
+approved-wine-018,markerAndNumber,4,sparse,normalise,unrestricted,13.9% by \,71,13.9,false,true,1,552
+approved-wine-018,markerAndNumber,4,sparse,linearBoost,unrestricted,1 3.9% Dy \,65,1,false,true,1,487
+approved-wine-018,markerAndNumber,4,sparse,otsu,unrestricted,13.5% by \,60,13.5,true,true,1,345
+approved-wine-018,markerAndNumber,4,sparse,otsu,numeric,13.5%,41,13.5,true,true,1,343
+approved-wine-018,markerAndNumber,4,sparse,otsu,numericPlusMarker,13.5% by,20,13.5,true,true,1,343
+approved-wine-018,markerAndNumber,4,sparse,thresholdFixed,unrestricted,13.95% by \,63,13.95,false,true,1,346
+approved-wine-018,markerAndNumber,4,sparse,inverted,unrestricted,13.9% by \,70,13.9,false,true,1,555
+approved-wine-018,markerAndNumber,4,sparse,inverted,numeric,13.9%,36,13.9,false,true,1,558
+approved-wine-018,markerAndNumber,4,sparse,inverted,numericPlusMarker,13.9% by,18,13.9,false,true,1,565
+approved-wine-018,markerAndNumber,4,sparse,invertedThreshold,unrestricted,13.5% by \,58,13.5,true,true,1,367
+approved-wine-018,markerAndNumber,4,singleLine,production,unrestricted,,0,,false,true,1,243
+approved-wine-018,markerAndNumber,4,singleLine,production,numeric,,0,,false,true,1,243
+approved-wine-018,markerAndNumber,4,singleLine,production,numericPlusMarker,,0,,false,true,1,247
+approved-wine-018,markerAndNumber,4,singleLine,grayscaleOnly,unrestricted,,0,,false,true,1,244
+approved-wine-018,markerAndNumber,4,singleLine,normalise,unrestricted,,0,,false,true,1,243
+approved-wine-018,markerAndNumber,4,singleLine,linearBoost,unrestricted,,0,,false,true,1,241
+approved-wine-018,markerAndNumber,4,singleLine,otsu,unrestricted,,0,,false,true,1,228
+approved-wine-018,markerAndNumber,4,singleLine,otsu,numeric,,0,,false,true,1,230
+approved-wine-018,markerAndNumber,4,singleLine,otsu,numericPlusMarker,,0,,false,true,1,235
+approved-wine-018,markerAndNumber,4,singleLine,thresholdFixed,unrestricted,,0,,false,true,1,237
+approved-wine-018,markerAndNumber,4,singleLine,inverted,unrestricted,,0,,false,true,1,239
+approved-wine-018,markerAndNumber,4,singleLine,inverted,numeric,,0,,false,true,1,235
+approved-wine-018,markerAndNumber,4,singleLine,inverted,numericPlusMarker,,0,,false,true,1,237
+approved-wine-018,markerAndNumber,4,singleLine,invertedThreshold,unrestricted,,0,,false,true,1,243
+approved-wine-018,markerAndNumber,4,singleWord,production,unrestricted,13.5%,36,13.5,true,true,1,624
+approved-wine-018,markerAndNumber,4,singleWord,production,numeric,13.5%,36,13.5,true,true,1,624
+approved-wine-018,markerAndNumber,4,singleWord,production,numericPlusMarker,13.5%,36,13.5,true,true,1,644
+approved-wine-018,markerAndNumber,4,singleWord,grayscaleOnly,unrestricted,13.5%,40,13.5,true,true,1,595
+approved-wine-018,markerAndNumber,4,singleWord,normalise,unrestricted,13.5%,36,13.5,true,true,1,623
+approved-wine-018,markerAndNumber,4,singleWord,linearBoost,unrestricted,13.5%,40,13.5,true,true,1,530
+approved-wine-018,markerAndNumber,4,singleWord,otsu,unrestricted,13.5%,44,13.5,true,true,1,370
+approved-wine-018,markerAndNumber,4,singleWord,otsu,numeric,13.5%,44,13.5,true,true,1,370
+approved-wine-018,markerAndNumber,4,singleWord,otsu,numericPlusMarker,13.5%,44,13.5,true,true,1,387
+approved-wine-018,markerAndNumber,4,singleWord,thresholdFixed,unrestricted,13.5%,43,13.5,true,true,1,375
+approved-wine-018,markerAndNumber,4,singleWord,inverted,unrestricted,13.5%,37,13.5,true,true,1,630
+approved-wine-018,markerAndNumber,4,singleWord,inverted,numeric,13.5%,37,13.5,true,true,1,630
+approved-wine-018,markerAndNumber,4,singleWord,inverted,numericPlusMarker,13.5%,37,13.5,true,true,1,627
+approved-wine-018,markerAndNumber,4,singleWord,invertedThreshold,unrestricted,SEL,26,,false,true,1,394
+approved-wine-018,markerAndNumber,4,singleBlock,production,unrestricted,,0,,false,true,1,248
+approved-wine-018,markerAndNumber,4,singleBlock,production,numeric,,0,,false,true,1,243
+approved-wine-018,markerAndNumber,4,singleBlock,production,numericPlusMarker,,0,,false,true,1,243
+approved-wine-018,markerAndNumber,4,singleBlock,grayscaleOnly,unrestricted,,0,,false,true,1,243
+approved-wine-018,markerAndNumber,4,singleBlock,normalise,unrestricted,,0,,false,true,1,245
+approved-wine-018,markerAndNumber,4,singleBlock,linearBoost,unrestricted,,0,,false,true,1,254
+approved-wine-018,markerAndNumber,4,singleBlock,otsu,unrestricted,,0,,false,true,1,229
+approved-wine-018,markerAndNumber,4,singleBlock,otsu,numeric,,0,,false,true,1,228
+approved-wine-018,markerAndNumber,4,singleBlock,otsu,numericPlusMarker,,0,,false,true,1,229
+approved-wine-018,markerAndNumber,4,singleBlock,thresholdFixed,unrestricted,,0,,false,true,1,232
+approved-wine-018,markerAndNumber,4,singleBlock,inverted,unrestricted,,0,,false,true,1,241
+approved-wine-018,markerAndNumber,4,singleBlock,inverted,numeric,,0,,false,true,1,242
+approved-wine-018,markerAndNumber,4,singleBlock,inverted,numericPlusMarker,,0,,false,true,1,251
+approved-wine-018,markerAndNumber,4,singleBlock,invertedThreshold,unrestricted,,0,,false,true,1,239
+approved-wine-018,numberOnly,1.5,sparse,production,unrestricted,3.9%,95,3.9,false,true,1,135
+approved-wine-018,numberOnly,1.5,sparse,production,numeric,3.9%,95,3.9,false,true,1,134
+approved-wine-018,numberOnly,1.5,sparse,production,numericPlusMarker,3.9%,95,3.9,false,true,1,135
+approved-wine-018,numberOnly,1.5,sparse,grayscaleOnly,unrestricted,3.9%,94,3.9,false,true,1,130
+approved-wine-018,numberOnly,1.5,sparse,normalise,unrestricted,3.9%,95,3.9,false,true,1,135
+approved-wine-018,numberOnly,1.5,sparse,linearBoost,unrestricted,3.5%,88,3.5,false,true,1,117
+approved-wine-018,numberOnly,1.5,sparse,otsu,unrestricted,3.9%,92,3.9,false,true,1,73
+approved-wine-018,numberOnly,1.5,sparse,otsu,numeric,3.9%,92,3.9,false,true,1,75
+approved-wine-018,numberOnly,1.5,sparse,otsu,numericPlusMarker,3.9%,92,3.9,false,true,1,73
+approved-wine-018,numberOnly,1.5,sparse,thresholdFixed,unrestricted,3.9%,93,3.9,false,true,1,75
+approved-wine-018,numberOnly,1.5,sparse,inverted,unrestricted,3.9%,92,3.9,false,true,1,138
+approved-wine-018,numberOnly,1.5,sparse,inverted,numeric,3.9%,92,3.9,false,true,1,139
+approved-wine-018,numberOnly,1.5,sparse,inverted,numericPlusMarker,3.9%,92,3.9,false,true,1,138
+approved-wine-018,numberOnly,1.5,sparse,invertedThreshold,unrestricted,3.9%,93,3.9,false,true,1,79
+approved-wine-018,numberOnly,1.5,singleLine,production,unrestricted,3.5%,88,3.5,false,true,1,126
+approved-wine-018,numberOnly,1.5,singleLine,production,numeric,3.5%,88,3.5,false,true,1,126
+approved-wine-018,numberOnly,1.5,singleLine,production,numericPlusMarker,3.5%,88,3.5,false,true,1,126
+approved-wine-018,numberOnly,1.5,singleLine,grayscaleOnly,unrestricted,3.5%,92,3.5,false,true,1,122
+approved-wine-018,numberOnly,1.5,singleLine,normalise,unrestricted,3.5%,88,3.5,false,true,1,126
+approved-wine-018,numberOnly,1.5,singleLine,linearBoost,unrestricted,3.5%,96,3.5,false,true,1,108
+approved-wine-018,numberOnly,1.5,singleLine,otsu,unrestricted,3.5%,96,3.5,false,true,1,74
+approved-wine-018,numberOnly,1.5,singleLine,otsu,numeric,3.5%,96,3.5,false,true,1,66
+approved-wine-018,numberOnly,1.5,singleLine,otsu,numericPlusMarker,3.5%,96,3.5,false,true,1,67
+approved-wine-018,numberOnly,1.5,singleLine,thresholdFixed,unrestricted,3.9%,95,3.9,false,true,1,72
+approved-wine-018,numberOnly,1.5,singleLine,inverted,unrestricted,3.5%,92,3.5,false,true,1,130
+approved-wine-018,numberOnly,1.5,singleLine,inverted,numeric,3.5%,92,3.5,false,true,1,130
+approved-wine-018,numberOnly,1.5,singleLine,inverted,numericPlusMarker,3.5%,92,3.5,false,true,1,129
+approved-wine-018,numberOnly,1.5,singleLine,invertedThreshold,unrestricted,3.5%,96,3.5,false,true,1,71
+approved-wine-018,numberOnly,1.5,singleWord,production,unrestricted,3.5%,96,3.5,false,true,1,153
+approved-wine-018,numberOnly,1.5,singleWord,production,numeric,3.5%,96,3.5,false,true,1,153
+approved-wine-018,numberOnly,1.5,singleWord,production,numericPlusMarker,3.5%,96,3.5,false,true,1,154
+approved-wine-018,numberOnly,1.5,singleWord,grayscaleOnly,unrestricted,3.5%,96,3.5,false,true,1,145
+approved-wine-018,numberOnly,1.5,singleWord,normalise,unrestricted,3.5%,96,3.5,false,true,1,152
+approved-wine-018,numberOnly,1.5,singleWord,linearBoost,unrestricted,3.5%,96,3.5,false,true,1,129
+approved-wine-018,numberOnly,1.5,singleWord,otsu,unrestricted,3.5%,96,3.5,false,true,1,81
+approved-wine-018,numberOnly,1.5,singleWord,otsu,numeric,3.5%,96,3.5,false,true,1,79
+approved-wine-018,numberOnly,1.5,singleWord,otsu,numericPlusMarker,3.5%,96,3.5,false,true,1,79
+approved-wine-018,numberOnly,1.5,singleWord,thresholdFixed,unrestricted,3.5%,96,3.5,false,true,1,82
+approved-wine-018,numberOnly,1.5,singleWord,inverted,unrestricted,3.5%,96,3.5,false,true,1,157
+approved-wine-018,numberOnly,1.5,singleWord,inverted,numeric,3.5%,96,3.5,false,true,1,156
+approved-wine-018,numberOnly,1.5,singleWord,inverted,numericPlusMarker,3.5%,96,3.5,false,true,1,156
+approved-wine-018,numberOnly,1.5,singleWord,invertedThreshold,unrestricted,3.5%,96,3.5,false,true,1,85
+approved-wine-018,numberOnly,1.5,singleBlock,production,unrestricted,3.5%,88,3.5,false,true,1,126
+approved-wine-018,numberOnly,1.5,singleBlock,production,numeric,3.5%,88,3.5,false,true,1,128
+approved-wine-018,numberOnly,1.5,singleBlock,production,numericPlusMarker,3.5%,88,3.5,false,true,1,128
+approved-wine-018,numberOnly,1.5,singleBlock,grayscaleOnly,unrestricted,3.5%,92,3.5,false,true,1,121
+approved-wine-018,numberOnly,1.5,singleBlock,normalise,unrestricted,3.5%,88,3.5,false,true,1,130
+approved-wine-018,numberOnly,1.5,singleBlock,linearBoost,unrestricted,3.5%,96,3.5,false,true,1,108
+approved-wine-018,numberOnly,1.5,singleBlock,otsu,unrestricted,3.5%,96,3.5,false,true,1,66
+approved-wine-018,numberOnly,1.5,singleBlock,otsu,numeric,3.5%,96,3.5,false,true,1,65
+approved-wine-018,numberOnly,1.5,singleBlock,otsu,numericPlusMarker,3.5%,96,3.5,false,true,1,66
+approved-wine-018,numberOnly,1.5,singleBlock,thresholdFixed,unrestricted,3.9%,95,3.9,false,true,1,73
+approved-wine-018,numberOnly,1.5,singleBlock,inverted,unrestricted,3.5%,92,3.5,false,true,1,131
+approved-wine-018,numberOnly,1.5,singleBlock,inverted,numeric,3.5%,92,3.5,false,true,1,130
+approved-wine-018,numberOnly,1.5,singleBlock,inverted,numericPlusMarker,3.5%,92,3.5,false,true,1,129
+approved-wine-018,numberOnly,1.5,singleBlock,invertedThreshold,unrestricted,3.5%,96,3.5,false,true,1,70
+approved-wine-018,numberOnly,2,sparse,production,unrestricted,3.9%,95,3.9,false,true,1,223
+approved-wine-018,numberOnly,2,sparse,production,numeric,3.9%,95,3.9,false,true,1,223
+approved-wine-018,numberOnly,2,sparse,production,numericPlusMarker,3.9%,95,3.9,false,true,1,228
+approved-wine-018,numberOnly,2,sparse,grayscaleOnly,unrestricted,3.9%,95,3.9,false,true,1,211
+approved-wine-018,numberOnly,2,sparse,normalise,unrestricted,3.9%,95,3.9,false,true,1,224
+approved-wine-018,numberOnly,2,sparse,linearBoost,unrestricted,3.9%,95,3.9,false,true,1,199
+approved-wine-018,numberOnly,2,sparse,otsu,unrestricted,3.9%,88,3.9,false,true,1,126
+approved-wine-018,numberOnly,2,sparse,otsu,numeric,3.9%,88,3.9,false,true,1,128
+approved-wine-018,numberOnly,2,sparse,otsu,numericPlusMarker,3.9%,88,3.9,false,true,1,127
+approved-wine-018,numberOnly,2,sparse,thresholdFixed,unrestricted,3.9%,91,3.9,false,true,1,130
+approved-wine-018,numberOnly,2,sparse,inverted,unrestricted,3.9%,94,3.9,false,true,1,248
+approved-wine-018,numberOnly,2,sparse,inverted,numeric,3.9%,94,3.9,false,true,1,226
+approved-wine-018,numberOnly,2,sparse,inverted,numericPlusMarker,3.9%,94,3.9,false,true,1,225
+approved-wine-018,numberOnly,2,sparse,invertedThreshold,unrestricted,3.9%,85,3.9,false,true,1,133
+approved-wine-018,numberOnly,2,singleLine,production,unrestricted,3.9%,96,3.9,false,true,1,206
+approved-wine-018,numberOnly,2,singleLine,production,numeric,3.9%,96,3.9,false,true,1,207
+approved-wine-018,numberOnly,2,singleLine,production,numericPlusMarker,3.9%,96,3.9,false,true,1,207
+approved-wine-018,numberOnly,2,singleLine,grayscaleOnly,unrestricted,3.9%,96,3.9,false,true,1,196
+approved-wine-018,numberOnly,2,singleLine,normalise,unrestricted,3.9%,96,3.9,false,true,1,205
+approved-wine-018,numberOnly,2,singleLine,linearBoost,unrestricted,3.9%,96,3.9,false,true,1,180
+approved-wine-018,numberOnly,2,singleLine,otsu,unrestricted,3.9%,96,3.9,false,true,1,111
+approved-wine-018,numberOnly,2,singleLine,otsu,numeric,3.9%,96,3.9,false,true,1,112
+approved-wine-018,numberOnly,2,singleLine,otsu,numericPlusMarker,3.9%,96,3.9,false,true,1,110
+approved-wine-018,numberOnly,2,singleLine,thresholdFixed,unrestricted,3.9%,95,3.9,false,true,1,123
+approved-wine-018,numberOnly,2,singleLine,inverted,unrestricted,3.9%,96,3.9,false,true,1,209
+approved-wine-018,numberOnly,2,singleLine,inverted,numeric,3.9%,96,3.9,false,true,1,212
+approved-wine-018,numberOnly,2,singleLine,inverted,numericPlusMarker,3.9%,96,3.9,false,true,1,315
+approved-wine-018,numberOnly,2,singleLine,invertedThreshold,unrestricted,3.9%,95,3.9,false,true,1,131
+approved-wine-018,numberOnly,2,singleWord,production,unrestricted,3.5%,96,3.5,false,true,1,253
+approved-wine-018,numberOnly,2,singleWord,production,numeric,3.5%,96,3.5,false,true,1,276
+approved-wine-018,numberOnly,2,singleWord,production,numericPlusMarker,3.5%,96,3.5,false,true,1,253
+approved-wine-018,numberOnly,2,singleWord,grayscaleOnly,unrestricted,3.5%,96,3.5,false,true,1,243
+approved-wine-018,numberOnly,2,singleWord,normalise,unrestricted,3.5%,96,3.5,false,true,1,252
+approved-wine-018,numberOnly,2,singleWord,linearBoost,unrestricted,3.5%,96,3.5,false,true,1,217
+approved-wine-018,numberOnly,2,singleWord,otsu,unrestricted,3.5%,96,3.5,false,true,1,139
+approved-wine-018,numberOnly,2,singleWord,otsu,numeric,3.5%,96,3.5,false,true,1,137
+approved-wine-018,numberOnly,2,singleWord,otsu,numericPlusMarker,3.5%,96,3.5,false,true,1,139
+approved-wine-018,numberOnly,2,singleWord,thresholdFixed,unrestricted,3.5%,96,3.5,false,true,1,142
+approved-wine-018,numberOnly,2,singleWord,inverted,unrestricted,3.5%,96,3.5,false,true,1,255
+approved-wine-018,numberOnly,2,singleWord,inverted,numeric,3.5%,96,3.5,false,true,1,256
+approved-wine-018,numberOnly,2,singleWord,inverted,numericPlusMarker,3.5%,96,3.5,false,true,1,256
+approved-wine-018,numberOnly,2,singleWord,invertedThreshold,unrestricted,3.5%,96,3.5,false,true,1,147
+approved-wine-018,numberOnly,2,singleBlock,production,unrestricted,3.9%,96,3.9,false,true,1,206
+approved-wine-018,numberOnly,2,singleBlock,production,numeric,3.9%,96,3.9,false,true,1,206
+approved-wine-018,numberOnly,2,singleBlock,production,numericPlusMarker,3.9%,96,3.9,false,true,1,206
+approved-wine-018,numberOnly,2,singleBlock,grayscaleOnly,unrestricted,3.9%,96,3.9,false,true,1,195
+approved-wine-018,numberOnly,2,singleBlock,normalise,unrestricted,3.9%,96,3.9,false,true,1,206
+approved-wine-018,numberOnly,2,singleBlock,linearBoost,unrestricted,3.9%,96,3.9,false,true,1,180
+approved-wine-018,numberOnly,2,singleBlock,otsu,unrestricted,3.9%,96,3.9,false,true,1,111
+approved-wine-018,numberOnly,2,singleBlock,otsu,numeric,3.9%,96,3.9,false,true,1,114
+approved-wine-018,numberOnly,2,singleBlock,otsu,numericPlusMarker,3.9%,96,3.9,false,true,1,112
+approved-wine-018,numberOnly,2,singleBlock,thresholdFixed,unrestricted,3.9%,95,3.9,false,true,1,123
+approved-wine-018,numberOnly,2,singleBlock,inverted,unrestricted,3.9%,96,3.9,false,true,1,210
+approved-wine-018,numberOnly,2,singleBlock,inverted,numeric,3.9%,96,3.9,false,true,1,212
+approved-wine-018,numberOnly,2,singleBlock,inverted,numericPlusMarker,3.9%,96,3.9,false,true,1,209
+approved-wine-018,numberOnly,2,singleBlock,invertedThreshold,unrestricted,3.9%,95,3.9,false,true,1,121
+approved-wine-018,numberOnly,3,sparse,production,unrestricted,3.9%,94,3.9,false,true,1,474
+approved-wine-018,numberOnly,3,sparse,production,numeric,3.9%,94,3.9,false,true,1,481
+approved-wine-018,numberOnly,3,sparse,production,numericPlusMarker,3.9%,94,3.9,false,true,1,466
+approved-wine-018,numberOnly,3,sparse,grayscaleOnly,unrestricted,3.9%,95,3.9,false,true,1,445
+approved-wine-018,numberOnly,3,sparse,normalise,unrestricted,3.9%,94,3.9,false,true,1,466
+approved-wine-018,numberOnly,3,sparse,linearBoost,unrestricted,3.9%,95,3.9,false,true,1,418
+approved-wine-018,numberOnly,3,sparse,otsu,unrestricted,3.9%,90,3.9,false,true,1,279
+approved-wine-018,numberOnly,3,sparse,otsu,numeric,3.9%,90,3.9,false,true,1,279
+approved-wine-018,numberOnly,3,sparse,otsu,numericPlusMarker,3.9%,90,3.9,false,true,1,291
+approved-wine-018,numberOnly,3,sparse,thresholdFixed,unrestricted,3.9%,90,3.9,false,true,1,281
+approved-wine-018,numberOnly,3,sparse,inverted,unrestricted,3.9%,95,3.9,false,true,1,468
+approved-wine-018,numberOnly,3,sparse,inverted,numeric,3.9%,95,3.9,false,true,1,468
+approved-wine-018,numberOnly,3,sparse,inverted,numericPlusMarker,3.9%,95,3.9,false,true,1,469
+approved-wine-018,numberOnly,3,sparse,invertedThreshold,unrestricted,3.9%,88,3.9,false,true,1,287
+approved-wine-018,numberOnly,3,singleLine,production,unrestricted,3.5%,92,3.5,false,true,1,423
+approved-wine-018,numberOnly,3,singleLine,production,numeric,3.5%,92,3.5,false,true,1,425
+approved-wine-018,numberOnly,3,singleLine,production,numericPlusMarker,3.5%,92,3.5,false,true,1,425
+approved-wine-018,numberOnly,3,singleLine,grayscaleOnly,unrestricted,3.5%,92,3.5,false,true,1,403
+approved-wine-018,numberOnly,3,singleLine,normalise,unrestricted,3.5%,92,3.5,false,true,1,423
+approved-wine-018,numberOnly,3,singleLine,linearBoost,unrestricted,3.5%,94,3.5,false,true,1,380
+approved-wine-018,numberOnly,3,singleLine,otsu,unrestricted,3.5%,93,3.5,false,true,1,238
+approved-wine-018,numberOnly,3,singleLine,otsu,numeric,3.5%,93,3.5,false,true,1,241
+approved-wine-018,numberOnly,3,singleLine,otsu,numericPlusMarker,3.5%,93,3.5,false,true,1,240
+approved-wine-018,numberOnly,3,singleLine,thresholdFixed,unrestricted,3.9%,95,3.9,false,true,1,272
+approved-wine-018,numberOnly,3,singleLine,inverted,unrestricted,3.5%,92,3.5,false,true,1,450
+approved-wine-018,numberOnly,3,singleLine,inverted,numeric,3.5%,92,3.5,false,true,1,428
+approved-wine-018,numberOnly,3,singleLine,inverted,numericPlusMarker,3.5%,92,3.5,false,true,1,428
+approved-wine-018,numberOnly,3,singleLine,invertedThreshold,unrestricted,3.5%,93,3.5,false,true,1,249
+approved-wine-018,numberOnly,3,singleWord,production,unrestricted,3.5%,96,3.5,false,true,1,522
+approved-wine-018,numberOnly,3,singleWord,production,numeric,3.5%,96,3.5,false,true,1,524
+approved-wine-018,numberOnly,3,singleWord,production,numericPlusMarker,3.5%,96,3.5,false,true,1,526
+approved-wine-018,numberOnly,3,singleWord,grayscaleOnly,unrestricted,3.5%,96,3.5,false,true,1,641
+approved-wine-018,numberOnly,3,singleWord,normalise,unrestricted,3.5%,96,3.5,false,true,1,556
+approved-wine-018,numberOnly,3,singleWord,linearBoost,unrestricted,3.5%,96,3.5,false,true,1,457
+approved-wine-018,numberOnly,3,singleWord,otsu,unrestricted,3.5%,96,3.5,false,true,1,312
+approved-wine-018,numberOnly,3,singleWord,otsu,numeric,3.5%,96,3.5,false,true,1,307
+approved-wine-018,numberOnly,3,singleWord,otsu,numericPlusMarker,3.5%,96,3.5,false,true,1,310
+approved-wine-018,numberOnly,3,singleWord,thresholdFixed,unrestricted,3.5%,96,3.5,false,true,1,310
+approved-wine-018,numberOnly,3,singleWord,inverted,unrestricted,3.5%,96,3.5,false,true,1,535
+approved-wine-018,numberOnly,3,singleWord,inverted,numeric,3.5%,96,3.5,false,true,1,527
+approved-wine-018,numberOnly,3,singleWord,inverted,numericPlusMarker,3.5%,96,3.5,false,true,1,525
+approved-wine-018,numberOnly,3,singleWord,invertedThreshold,unrestricted,3.5%,96,3.5,false,true,1,322
+approved-wine-018,numberOnly,3,singleBlock,production,unrestricted,3.97 5%,92,3.97,false,true,1,608
+approved-wine-018,numberOnly,3,singleBlock,production,numeric,3.97 5%,92,3.97,false,true,1,610
+approved-wine-018,numberOnly,3,singleBlock,production,numericPlusMarker,3.97 5%,92,3.97,false,true,1,610
+approved-wine-018,numberOnly,3,singleBlock,grayscaleOnly,unrestricted,3.97 5%,94,3.97,false,true,1,587
+approved-wine-018,numberOnly,3,singleBlock,normalise,unrestricted,3.97 5%,92,3.97,false,true,1,604
+approved-wine-018,numberOnly,3,singleBlock,linearBoost,unrestricted,3.5% 9%,67,3.5,false,true,1,472
+approved-wine-018,numberOnly,3,singleBlock,otsu,unrestricted,3.5% 5%,73,3.5,false,true,1,274
+approved-wine-018,numberOnly,3,singleBlock,otsu,numeric,3.5% 5%,73,3.5,false,true,1,274
+approved-wine-018,numberOnly,3,singleBlock,otsu,numericPlusMarker,3.5% 5%,73,3.5,false,true,1,280
+approved-wine-018,numberOnly,3,singleBlock,thresholdFixed,unrestricted,3.97 5%,92,3.97,false,true,1,329
+approved-wine-018,numberOnly,3,singleBlock,inverted,unrestricted,3.97 5%,92,3.97,false,true,1,611
+approved-wine-018,numberOnly,3,singleBlock,inverted,numeric,3.97 5%,92,3.97,false,true,1,607
+approved-wine-018,numberOnly,3,singleBlock,inverted,numericPlusMarker,3.97 5%,92,3.97,false,true,1,609
+approved-wine-018,numberOnly,3,singleBlock,invertedThreshold,unrestricted,3.59 5%,71,3.59,false,true,1,288
+approved-wine-018,numberOnly,4,sparse,production,unrestricted,3.9%,93,3.9,false,true,1,783
+approved-wine-018,numberOnly,4,sparse,production,numeric,3.9%,93,3.9,false,true,1,790
+approved-wine-018,numberOnly,4,sparse,production,numericPlusMarker,3.9%,93,3.9,false,true,1,780
+approved-wine-018,numberOnly,4,sparse,grayscaleOnly,unrestricted,3.9%,93,3.9,false,true,1,755
+approved-wine-018,numberOnly,4,sparse,normalise,unrestricted,3.9%,93,3.9,false,true,1,802
+approved-wine-018,numberOnly,4,sparse,linearBoost,unrestricted,3.9%,96,3.9,false,true,1,733
+approved-wine-018,numberOnly,4,sparse,otsu,unrestricted,3.9%,93,3.9,false,true,1,481
+approved-wine-018,numberOnly,4,sparse,otsu,numeric,3.9%,93,3.9,false,true,1,489
+approved-wine-018,numberOnly,4,sparse,otsu,numericPlusMarker,3.9%,93,3.9,false,true,1,482
+approved-wine-018,numberOnly,4,sparse,thresholdFixed,unrestricted,3.9%,93,3.9,false,true,1,496
+approved-wine-018,numberOnly,4,sparse,inverted,unrestricted,3.9%,94,3.9,false,true,1,925
+approved-wine-018,numberOnly,4,sparse,inverted,numeric,3.9%,94,3.9,false,true,1,810
+approved-wine-018,numberOnly,4,sparse,inverted,numericPlusMarker,3.9%,94,3.9,false,true,1,790
+approved-wine-018,numberOnly,4,sparse,invertedThreshold,unrestricted,3.9%,92,3.9,false,true,1,503
+approved-wine-018,numberOnly,4,singleLine,production,unrestricted,3.5%,86,3.5,false,true,1,714
+approved-wine-018,numberOnly,4,singleLine,production,numeric,3.5%,86,3.5,false,true,1,715
+approved-wine-018,numberOnly,4,singleLine,production,numericPlusMarker,3.5%,86,3.5,false,true,1,711
+approved-wine-018,numberOnly,4,singleLine,grayscaleOnly,unrestricted,3.5%,84,3.5,false,true,1,679
+approved-wine-018,numberOnly,4,singleLine,normalise,unrestricted,3.5%,86,3.5,false,true,1,716
+approved-wine-018,numberOnly,4,singleLine,linearBoost,unrestricted,3.5%,85,3.5,false,true,1,659
+approved-wine-018,numberOnly,4,singleLine,otsu,unrestricted,3.5%,89,3.5,false,true,1,414
+approved-wine-018,numberOnly,4,singleLine,otsu,numeric,3.5%,89,3.5,false,true,1,417
+approved-wine-018,numberOnly,4,singleLine,otsu,numericPlusMarker,3.5%,89,3.5,false,true,1,413
+approved-wine-018,numberOnly,4,singleLine,thresholdFixed,unrestricted,3.9%,94,3.9,false,true,1,474
+approved-wine-018,numberOnly,4,singleLine,inverted,unrestricted,3.5%,81,3.5,false,true,1,727
+approved-wine-018,numberOnly,4,singleLine,inverted,numeric,3.5%,81,3.5,false,true,1,714
+approved-wine-018,numberOnly,4,singleLine,inverted,numericPlusMarker,3.5%,81,3.5,false,true,1,718
+approved-wine-018,numberOnly,4,singleLine,invertedThreshold,unrestricted,3.5%,90,3.5,false,true,1,435
+approved-wine-018,numberOnly,4,singleWord,production,unrestricted,3.5%,96,3.5,false,true,1,879
+approved-wine-018,numberOnly,4,singleWord,production,numeric,3.5%,96,3.5,false,true,1,877
+approved-wine-018,numberOnly,4,singleWord,production,numericPlusMarker,3.5%,96,3.5,false,true,1,879
+approved-wine-018,numberOnly,4,singleWord,grayscaleOnly,unrestricted,3.5%,96,3.5,false,true,1,850
+approved-wine-018,numberOnly,4,singleWord,normalise,unrestricted,3.5%,96,3.5,false,true,1,1013
+approved-wine-018,numberOnly,4,singleWord,linearBoost,unrestricted,3.5%,96,3.5,false,true,1,778
+approved-wine-018,numberOnly,4,singleWord,otsu,unrestricted,3.5%,96,3.5,false,true,1,533
+approved-wine-018,numberOnly,4,singleWord,otsu,numeric,3.5%,96,3.5,false,true,1,529
+approved-wine-018,numberOnly,4,singleWord,otsu,numericPlusMarker,3.5%,96,3.5,false,true,1,544
+approved-wine-018,numberOnly,4,singleWord,thresholdFixed,unrestricted,3.5%,96,3.5,false,true,1,543
+approved-wine-018,numberOnly,4,singleWord,inverted,unrestricted,3.5%,96,3.5,false,true,1,885
+approved-wine-018,numberOnly,4,singleWord,inverted,numeric,3.5%,96,3.5,false,true,1,887
+approved-wine-018,numberOnly,4,singleWord,inverted,numericPlusMarker,3.5%,96,3.5,false,true,1,891
+approved-wine-018,numberOnly,4,singleWord,invertedThreshold,unrestricted,3.5%,96,3.5,false,true,1,560
+approved-wine-018,numberOnly,4,singleBlock,production,unrestricted,| 5% 3.,95,5,false,true,1,789
+approved-wine-018,numberOnly,4,singleBlock,production,numeric,5% 3.,96,5,false,true,1,787
+approved-wine-018,numberOnly,4,singleBlock,production,numericPlusMarker,5% 3.,96,5,false,true,1,795
+approved-wine-018,numberOnly,4,singleBlock,grayscaleOnly,unrestricted,| 5% 3.,95,5,false,true,1,767
+approved-wine-018,numberOnly,4,singleBlock,normalise,unrestricted,| 5% 3.,95,5,false,true,1,785
+approved-wine-018,numberOnly,4,singleBlock,linearBoost,unrestricted,| 9% 3.,88,9,false,true,1,648
+approved-wine-018,numberOnly,4,singleBlock,otsu,unrestricted,| 9% 3.,83,9,false,true,1,432
+approved-wine-018,numberOnly,4,singleBlock,otsu,numeric,9% 3.,86,9,false,true,1,438
+approved-wine-018,numberOnly,4,singleBlock,otsu,numericPlusMarker,9% 3.,86,9,false,true,1,428
+approved-wine-018,numberOnly,4,singleBlock,thresholdFixed,unrestricted,| 5% 3.,79,5,false,true,1,507
+approved-wine-018,numberOnly,4,singleBlock,inverted,unrestricted,| 5% 3.,95,5,false,true,1,794
+approved-wine-018,numberOnly,4,singleBlock,inverted,numeric,5% 3.,96,5,false,true,1,794
+approved-wine-018,numberOnly,4,singleBlock,inverted,numericPlusMarker,l 5% 3.,64,5,false,true,1,798
+approved-wine-018,numberOnly,4,singleBlock,invertedThreshold,unrestricted,| 9% 3.,84,9,false,true,1,447
+approved-wine-018,padded,1.5,sparse,production,unrestricted,Alc] 3.9% by Vol. Alti Soil,86,3.9,false,true,1,83
+approved-wine-018,padded,1.5,sparse,production,numeric,1 3.9% .,31,1,false,true,1,83
+approved-wine-018,padded,1.5,sparse,production,numericPlusMarker,Alc 1 3.9% by Vol. Al oll,50,1,false,true,1,82
+approved-wine-018,padded,1.5,sparse,grayscaleOnly,unrestricted,Alc] 3.9% by Vol. Alti Soil,86,3.9,false,true,1,81
+approved-wine-018,padded,1.5,sparse,normalise,unrestricted,Alc] 3.9% by Vol. Alti Soil,86,3.9,false,true,1,82
+approved-wine-018,padded,1.5,sparse,linearBoost,unrestricted,Alc] 3.5% by Vol. Alti Soil,84,3.5,false,true,1,69
+approved-wine-018,padded,1.5,sparse,otsu,unrestricted,Alc] 3.5% by Vol. Alti Soil,89,3.5,false,true,1,56
+approved-wine-018,padded,1.5,sparse,otsu,numeric,1 3.5% .,32,1,false,true,1,58
+approved-wine-018,padded,1.5,sparse,otsu,numericPlusMarker,Alc 1 3.5% by Vol. Al ol,50,1,false,true,1,56
+approved-wine-018,padded,1.5,sparse,thresholdFixed,unrestricted,Alc] 3.9% by Vol. Alti Soil,88,3.9,false,true,1,56
+approved-wine-018,padded,1.5,sparse,inverted,unrestricted,Alc] 3.9% AE Alti Soil,72,3.9,false,true,1,91
+approved-wine-018,padded,1.5,sparse,inverted,numeric,1 3.9%,47,1,false,true,1,89
+approved-wine-018,padded,1.5,sparse,inverted,numericPlusMarker,Alc 1 3.9% A Al oll,27,1,false,true,1,91
+approved-wine-018,padded,1.5,sparse,invertedThreshold,unrestricted,Alc] 3.5% by Vol. Alti Soil,88,3.5,false,true,1,70
+approved-wine-018,padded,1.5,singleLine,production,unrestricted,Alc] 3.9% by Vol. At,79,3.9,false,true,1,76
+approved-wine-018,padded,1.5,singleLine,production,numeric,1 3.9% .,31,1,false,true,1,77
+approved-wine-018,padded,1.5,singleLine,production,numericPlusMarker,Alc 1 3.9% by Vol. Al,66,1,false,true,1,76
+approved-wine-018,padded,1.5,singleLine,grayscaleOnly,unrestricted,Alc] 3.9% by Vol. At,78,3.9,false,true,1,76
+approved-wine-018,padded,1.5,singleLine,normalise,unrestricted,Alc] 3.9% by Vol. At,79,3.9,false,true,1,77
+approved-wine-018,padded,1.5,singleLine,linearBoost,unrestricted,™ 3.5% by Vol. at,73,3.5,false,true,1,64
+approved-wine-018,padded,1.5,singleLine,otsu,unrestricted,Alc] 3.5% by Vol. At,79,3.5,false,true,1,47
+approved-wine-018,padded,1.5,singleLine,otsu,numeric,1 3.5% .,31,1,false,true,1,49
+approved-wine-018,padded,1.5,singleLine,otsu,numericPlusMarker,Alc 1 3.5% by Vol. Al,65,1,false,true,1,47
+approved-wine-018,padded,1.5,singleLine,thresholdFixed,unrestricted,Alc] 3.9% by Vol. At,80,3.9,false,true,1,47
+approved-wine-018,padded,1.5,singleLine,inverted,unrestricted,Alc] 3.9% AE At,59,3.9,false,true,1,80
+approved-wine-018,padded,1.5,singleLine,inverted,numeric,1 3.9%,47,1,false,true,1,79
+approved-wine-018,padded,1.5,singleLine,inverted,numericPlusMarker,Alc 1 3.9% A A,37,1,false,true,1,80
+approved-wine-018,padded,1.5,singleLine,invertedThreshold,unrestricted,Alc] 3.5% by Vol. ai,77,3.5,false,true,1,55
+approved-wine-018,padded,1.5,singleWord,production,unrestricted,13S A,47,13,false,true,1,126
+approved-wine-018,padded,1.5,singleWord,production,numeric,13,0,13,false,true,1,103
+approved-wine-018,padded,1.5,singleWord,production,numericPlusMarker,3B A,34,3,false,true,1,103
+approved-wine-018,padded,1.5,singleWord,grayscaleOnly,unrestricted,13S A,47,13,false,true,1,101
+approved-wine-018,padded,1.5,singleWord,normalise,unrestricted,13S A,47,13,false,true,1,103
+approved-wine-018,padded,1.5,singleWord,linearBoost,unrestricted,13S Al,42,13,false,true,1,72
+approved-wine-018,padded,1.5,singleWord,otsu,unrestricted,13S A,47,13,false,true,1,54
+approved-wine-018,padded,1.5,singleWord,otsu,numeric,13,0,13,false,true,1,54
+approved-wine-018,padded,1.5,singleWord,otsu,numericPlusMarker,13 A,36,13,false,true,1,54
+approved-wine-018,padded,1.5,singleWord,thresholdFixed,unrestricted,13S A,45,13,false,true,1,54
+approved-wine-018,padded,1.5,singleWord,inverted,unrestricted,13S A,50,13,false,true,1,102
+approved-wine-018,padded,1.5,singleWord,inverted,numeric,13,0,13,false,true,1,103
+approved-wine-018,padded,1.5,singleWord,inverted,numericPlusMarker,3B A,35,3,false,true,1,104
+approved-wine-018,padded,1.5,singleWord,invertedThreshold,unrestricted,13S Al,41,13,false,true,1,54
+approved-wine-018,padded,1.5,singleBlock,production,unrestricted,Alc] 3.5% by Vol. Alti ; Soil,77,3.5,false,true,1,75
+approved-wine-018,padded,1.5,singleBlock,production,numeric,1 3.5% .,32,1,false,true,1,76
+approved-wine-018,padded,1.5,singleBlock,production,numericPlusMarker,Alc 1 3.5% by Vol. Al oll,51,1,false,true,1,76
+approved-wine-018,padded,1.5,singleBlock,grayscaleOnly,unrestricted,Alc] 3.5% by Vol. Alti Soil,86,3.5,false,true,1,74
+approved-wine-018,padded,1.5,singleBlock,normalise,unrestricted,Alc] 3.5% by Vol. Alti ; Soil,77,3.5,false,true,1,79
+approved-wine-018,padded,1.5,singleBlock,linearBoost,unrestricted,7c 13.5%by vol. Ali Soil,43,7,false,true,1,62
+approved-wine-018,padded,1.5,singleBlock,otsu,unrestricted,Alc] 3.5% by Vol. Alti Soil,89,3.5,false,true,1,50
+approved-wine-018,padded,1.5,singleBlock,otsu,numeric,1 3.5% .,32,1,false,true,1,49
+approved-wine-018,padded,1.5,singleBlock,otsu,numericPlusMarker,Alc 1 3.5% by Vol. Al ol,50,1,false,true,1,49
+approved-wine-018,padded,1.5,singleBlock,thresholdFixed,unrestricted,Alc] 3.5% by Vol. Alti Soil,88,3.5,false,true,1,49
+approved-wine-018,padded,1.5,singleBlock,inverted,unrestricted,Alc] 3.5% by Vol. Alti Soil,87,3.5,false,true,1,87
+approved-wine-018,padded,1.5,singleBlock,inverted,numeric,1 3.5% .,31,1,false,true,1,88
+approved-wine-018,padded,1.5,singleBlock,inverted,numericPlusMarker,Alc 1 3.5% by Vol. Al oll,50,1,false,true,1,88
+approved-wine-018,padded,1.5,singleBlock,invertedThreshold,unrestricted,Alc] 3.5% by Vol. Alti Soil,88,3.5,false,true,1,63
+approved-wine-018,padded,2,sparse,production,unrestricted,Alc] 3.9% by Vol. Alt Soi,85,3.9,false,true,1,129
+approved-wine-018,padded,2,sparse,production,numeric,1 3.9% .,31,1,false,true,1,128
+approved-wine-018,padded,2,sparse,production,numericPlusMarker,Alc 1 3.9% by Vol. All ol,54,1,false,true,1,130
+approved-wine-018,padded,2,sparse,grayscaleOnly,unrestricted,Alc] 3.9% by Vol. Alt Soi,85,3.9,false,true,1,127
+approved-wine-018,padded,2,sparse,normalise,unrestricted,Alc] 3.9% by Vol. Alt Soi,85,3.9,false,true,1,129
+approved-wine-018,padded,2,sparse,linearBoost,unrestricted,™ 3.5% by Vol. Alti Soil,85,3.5,false,true,1,143
+approved-wine-018,padded,2,sparse,otsu,unrestricted,Ale 1 3.5% by Vol. Alti Soil,80,1,false,true,1,144
+approved-wine-018,padded,2,sparse,otsu,numeric,.1 3.5% .,32,1,false,true,1,98
+approved-wine-018,padded,2,sparse,otsu,numericPlusMarker,Alc 1 3.5% by Vol. Al ol,54,1,false,true,1,83
+approved-wine-018,padded,2,sparse,thresholdFixed,unrestricted,Alc] 3.9% by Vol. Alt Soil,87,3.9,false,true,1,83
+approved-wine-018,padded,2,sparse,inverted,unrestricted,Alc] 3.9% WATE Alt Soi,72,3.9,false,true,1,138
+approved-wine-018,padded,2,sparse,inverted,numeric,1 3.9%,47,1,false,true,1,160
+approved-wine-018,padded,2,sparse,inverted,numericPlusMarker,Alc 1 3.9% A All ol,30,1,false,true,1,137
+approved-wine-018,padded,2,sparse,invertedThreshold,unrestricted,Ale 1 3.5% by Vol. Alti Soil,81,1,false,true,1,97
+approved-wine-018,padded,2,singleLine,production,unrestricted,Alc] 3.9% by Vol. at,78,3.9,false,true,1,118
+approved-wine-018,padded,2,singleLine,production,numeric,1 3.9% .,31,1,false,true,1,119
+approved-wine-018,padded,2,singleLine,production,numericPlusMarker,Alc 1 3.9% by Vol. a,64,1,false,true,1,119
+approved-wine-018,padded,2,singleLine,grayscaleOnly,unrestricted,Alc] 3.9% by Vol. at,78,3.9,false,true,1,115
+approved-wine-018,padded,2,singleLine,normalise,unrestricted,Alc] 3.9% by Vol. at,78,3.9,false,true,1,121
+approved-wine-018,padded,2,singleLine,linearBoost,unrestricted,Ale. 13.9% by vol at,63,13.9,false,true,1,99
+approved-wine-018,padded,2,singleLine,otsu,unrestricted,Ale 1 3.5% by Vol. al,72,1,false,true,1,72
+approved-wine-018,padded,2,singleLine,otsu,numeric,.1 3.5% .,32,1,false,true,1,72
+approved-wine-018,padded,2,singleLine,otsu,numericPlusMarker,Alc 1 3.5% by Vol. al,72,1,false,true,1,72
+approved-wine-018,padded,2,singleLine,thresholdFixed,unrestricted,Alc] 3.9% by Vol. at,77,3.9,false,true,1,71
+approved-wine-018,padded,2,singleLine,inverted,unrestricted,Alc] 3.9% WATE al,64,3.9,false,true,1,122
+approved-wine-018,padded,2,singleLine,inverted,numeric,1 3.9%,47,1,false,true,1,122
+approved-wine-018,padded,2,singleLine,inverted,numericPlusMarker,Alc 1 3.9% A al,41,1,false,true,1,121
+approved-wine-018,padded,2,singleLine,invertedThreshold,unrestricted,Ale 1 3.5% by Vol. at,72,1,false,true,1,80
+approved-wine-018,padded,2,singleWord,production,unrestricted,13S A,50,13,false,true,1,163
+approved-wine-018,padded,2,singleWord,production,numeric,13,0,13,false,true,1,159
+approved-wine-018,padded,2,singleWord,production,numericPlusMarker,13 A,34,13,false,true,1,160
+approved-wine-018,padded,2,singleWord,grayscaleOnly,unrestricted,13S A,50,13,false,true,1,161
+approved-wine-018,padded,2,singleWord,normalise,unrestricted,13S A,50,13,false,true,1,160
+approved-wine-018,padded,2,singleWord,linearBoost,unrestricted,13S A,49,13,false,true,1,118
+approved-wine-018,padded,2,singleWord,otsu,unrestricted,L135 A,53,13,false,true,1,87
+approved-wine-018,padded,2,singleWord,otsu,numeric,135,21,13,false,true,1,87
+approved-wine-018,padded,2,singleWord,otsu,numericPlusMarker,L135 A,53,13,false,true,1,87
+approved-wine-018,padded,2,singleWord,thresholdFixed,unrestricted,13S A,48,13,false,true,1,87
+approved-wine-018,padded,2,singleWord,inverted,unrestricted,13S A,48,13,false,true,1,161
+approved-wine-018,padded,2,singleWord,inverted,numeric,13,0,13,false,true,1,160
+approved-wine-018,padded,2,singleWord,inverted,numericPlusMarker,13 A,33,13,false,true,1,161
+approved-wine-018,padded,2,singleWord,invertedThreshold,unrestricted,13S Al,47,13,false,true,1,89
+approved-wine-018,padded,2,singleBlock,production,unrestricted,L All) ac 13.5% by vol. Alt : Soi,38,13.5,true,true,1,132
+approved-wine-018,padded,2,singleBlock,production,numeric,11 13.5%.,0,11,false,true,1,131
+approved-wine-018,padded,2,singleBlock,production,numericPlusMarker,L All ac 13.5% by vol. Al ol,16,13.5,true,true,1,132
+approved-wine-018,padded,2,singleBlock,grayscaleOnly,unrestricted,nc 13.5%by vo. Alt Soi,30,13.5,true,true,1,118
+approved-wine-018,padded,2,singleBlock,normalise,unrestricted,L All) ac 13.5% by vol. Alt : Soi,38,13.5,true,true,1,133
+approved-wine-018,padded,2,singleBlock,linearBoost,unrestricted,nc 13.5% by vol. Alt Soil,30,13.5,true,true,1,102
+approved-wine-018,padded,2,singleBlock,otsu,unrestricted,Ale 1 3.5% by Vol. Alti Soil,80,1,false,true,1,71
+approved-wine-018,padded,2,singleBlock,otsu,numeric,.1 3.5% .,32,1,false,true,1,71
+approved-wine-018,padded,2,singleBlock,otsu,numericPlusMarker,Alc 1 3.5% by Vol. Al ol,54,1,false,true,1,72
+approved-wine-018,padded,2,singleBlock,thresholdFixed,unrestricted,nc 13.5%by vo. Alt | Soil,45,13.5,true,true,1,81
+approved-wine-018,padded,2,singleBlock,inverted,unrestricted,lL All) ic 13.5% by vol. Alt Soi,31,13.5,true,true,1,149
+approved-wine-018,padded,2,singleBlock,inverted,numeric,11 13.5%.,0,11,false,true,1,153
+approved-wine-018,padded,2,singleBlock,inverted,numericPlusMarker,lL All ac 13.5% by vol. Al ol,13,13.5,true,true,1,151
+approved-wine-018,padded,2,singleBlock,invertedThreshold,unrestricted,Ale 1 3.5% by Vol. Alti Soil,81,1,false,true,1,96
+approved-wine-018,padded,3,sparse,production,unrestricted,Ac 1 3.9% by Vol. Alt Soil,78,1,false,true,1,261
+approved-wine-018,padded,3,sparse,production,numeric,1 3.9% .,31,1,false,true,1,252
+approved-wine-018,padded,3,sparse,production,numericPlusMarker,Ac 1 3.9% by Vol. All oll,55,1,false,true,1,266
+approved-wine-018,padded,3,sparse,grayscaleOnly,unrestricted,Alti mS 3.9% by Vol. Soil,77,3.9,false,true,1,232
+approved-wine-018,padded,3,sparse,normalise,unrestricted,Ac 1 3.9% by Vol. Alt Soil,78,1,false,true,1,252
+approved-wine-018,padded,3,sparse,linearBoost,unrestricted,™ 3.5% by Vol. Alt Soil,80,3.5,false,true,1,217
+approved-wine-018,padded,3,sparse,otsu,unrestricted,Alc] 3.5% by Vol. Alti Soil,85,3.5,false,true,1,158
+approved-wine-018,padded,3,sparse,otsu,numeric,.1 3.5% .,28,1,false,true,1,158
+approved-wine-018,padded,3,sparse,otsu,numericPlusMarker,Alc. 3.5% by Vol. Al ol,45,3.5,false,true,1,158
+approved-wine-018,padded,3,sparse,thresholdFixed,unrestricted,Alti nN 3.9% by Vol. Soil,77,3.9,false,true,1,163
+approved-wine-018,padded,3,sparse,inverted,unrestricted,Alc 1 3.9% by Vol. Alt Soil,78,1,false,true,1,262
+approved-wine-018,padded,3,sparse,inverted,numeric,1 3.9% .,31,1,false,true,1,263
+approved-wine-018,padded,3,sparse,inverted,numericPlusMarker,Alc 1 3.9% by Vol. All oll,54,1,false,true,1,261
+approved-wine-018,padded,3,sparse,invertedThreshold,unrestricted,Alc] 3.9% by Vol. Alti Soil,84,3.9,false,true,1,175
+approved-wine-018,padded,3,singleLine,production,unrestricted,™ 3.9% by Vol. al,75,3.9,false,true,1,231
+approved-wine-018,padded,3,singleLine,production,numeric,3.9% .,47,3.9,false,true,1,229
+approved-wine-018,padded,3,singleLine,production,numericPlusMarker,3.9% by Vol. al,84,3.9,false,true,1,230
+approved-wine-018,padded,3,singleLine,grayscaleOnly,unrestricted,™ 3.9% by Vol. al,76,3.9,false,true,1,217
+approved-wine-018,padded,3,singleLine,normalise,unrestricted,™ 3.9% by Vol. al,75,3.9,false,true,1,228
+approved-wine-018,padded,3,singleLine,linearBoost,unrestricted,™ 3.5% by Vol. al,77,3.5,false,true,1,192
+approved-wine-018,padded,3,singleLine,otsu,unrestricted,Alc 1 3.5% by Vol. al,76,1,false,true,1,141
+approved-wine-018,padded,3,singleLine,otsu,numeric,.1 3.5% .,31,1,false,true,1,136
+approved-wine-018,padded,3,singleLine,otsu,numericPlusMarker,Alc 1 3.5% by Vol. al,76,1,false,true,1,138
+approved-wine-018,padded,3,singleLine,thresholdFixed,unrestricted,Ale 1 3.9% by Vol. al,73,1,false,true,1,140
+approved-wine-018,padded,3,singleLine,inverted,unrestricted,™ 3.9% by Vol. al,76,3.9,false,true,1,234
+approved-wine-018,padded,3,singleLine,inverted,numeric,3.9% .,47,3.9,false,true,1,234
+approved-wine-018,padded,3,singleLine,inverted,numericPlusMarker,3.9% by Vol. al,84,3.9,false,true,1,235
+approved-wine-018,padded,3,singleLine,invertedThreshold,unrestricted,Alc 1 3.5% by Vol. Al,76,1,false,true,1,152
+approved-wine-018,padded,3,singleWord,production,unrestricted,13S A,46,13,false,true,1,314
+approved-wine-018,padded,3,singleWord,production,numeric,13,0,13,false,true,1,309
+approved-wine-018,padded,3,singleWord,production,numericPlusMarker,13 A,35,13,false,true,1,310
+approved-wine-018,padded,3,singleWord,grayscaleOnly,unrestricted,13S A,44,13,false,true,1,303
+approved-wine-018,padded,3,singleWord,normalise,unrestricted,13S A,46,13,false,true,1,331
+approved-wine-018,padded,3,singleWord,linearBoost,unrestricted,13S Al,43,13,false,true,1,250
+approved-wine-018,padded,3,singleWord,otsu,unrestricted,L135 A,52,13,false,true,1,183
+approved-wine-018,padded,3,singleWord,otsu,numeric,135,20,13,false,true,1,185
+approved-wine-018,padded,3,singleWord,otsu,numericPlusMarker,L135 A,52,13,false,true,1,181
+approved-wine-018,padded,3,singleWord,thresholdFixed,unrestricted,13S A,47,13,false,true,1,212
+approved-wine-018,padded,3,singleWord,inverted,unrestricted,13S A,44,13,false,true,1,311
+approved-wine-018,padded,3,singleWord,inverted,numeric,13,0,13,false,true,1,312
+approved-wine-018,padded,3,singleWord,inverted,numericPlusMarker,13 A,33,13,false,true,1,309
+approved-wine-018,padded,3,singleWord,invertedThreshold,unrestricted,13S A,47,13,false,true,1,185
+approved-wine-018,padded,3,singleBlock,production,unrestricted,™ 3.5% by Vol. Alti : Soil,82,3.5,false,true,1,212
+approved-wine-018,padded,3,singleBlock,production,numeric,3.5% .,48,3.5,false,true,1,213
+approved-wine-018,padded,3,singleBlock,production,numericPlusMarker,3.5% by Vol. Al oll,57,3.5,false,true,1,212
+approved-wine-018,padded,3,singleBlock,grayscaleOnly,unrestricted,™ 3.5% by Vol. Alti Soil,80,3.5,false,true,1,205
+approved-wine-018,padded,3,singleBlock,normalise,unrestricted,™ 3.5% by Vol. Alti : Soil,82,3.5,false,true,1,215
+approved-wine-018,padded,3,singleBlock,linearBoost,unrestricted,™ 3.5% by Vol. Alti Soil,80,3.5,false,true,1,189
+approved-wine-018,padded,3,singleBlock,otsu,unrestricted,Alc 1 3.5% by Vol. Alti Soil,81,1,false,true,1,136
+approved-wine-018,padded,3,singleBlock,otsu,numeric,.1 3.5% .,31,1,false,true,1,134
+approved-wine-018,padded,3,singleBlock,otsu,numericPlusMarker,Alc 1 3.5% by Vol. Al ol,56,1,false,true,1,135
+approved-wine-018,padded,3,singleBlock,thresholdFixed,unrestricted,Ale 1 3.5% by Vol. Alti | Soil,82,1,false,true,1,168
+approved-wine-018,padded,3,singleBlock,inverted,unrestricted,™ 3.5% by Vol. Alti Soil,83,3.5,false,true,1,235
+approved-wine-018,padded,3,singleBlock,inverted,numeric,3.5% .,48,3.5,false,true,1,297
+approved-wine-018,padded,3,singleBlock,inverted,numericPlusMarker,3.5% by Vol. Al oll,57,3.5,false,true,1,307
+approved-wine-018,padded,3,singleBlock,invertedThreshold,unrestricted,Alc 1 3.5% by Vol. Alti Soil,82,1,false,true,1,150
+approved-wine-018,padded,4,sparse,production,unrestricted,Alti ™ 3.9% by Vol. Soil,78,3.9,false,true,1,427
+approved-wine-018,padded,4,sparse,production,numeric,3.9% .,46,3.9,false,true,1,396
+approved-wine-018,padded,4,sparse,production,numericPlusMarker,Al 3.9% by Vol. oll,56,3.9,false,true,1,398
+approved-wine-018,padded,4,sparse,grayscaleOnly,unrestricted,mS 3.9% by Vol. Alt Soil,76,3.9,false,true,1,397
+approved-wine-018,padded,4,sparse,normalise,unrestricted,Alti ™ 3.9% by Vol. Soil,78,3.9,false,true,1,396
+approved-wine-018,padded,4,sparse,linearBoost,unrestricted,rc 13.9% by vol Alt Soil,76,13.9,false,true,1,372
+approved-wine-018,padded,4,sparse,otsu,unrestricted,Alc 1 3.5% by Vol. Alt Soil,82,1,false,true,1,275
+approved-wine-018,padded,4,sparse,otsu,numeric,1 3.5% .,31,1,false,true,1,272
+approved-wine-018,padded,4,sparse,otsu,numericPlusMarker,Alc 1 3.5% by Vol. All ol,60,1,false,true,1,272
+approved-wine-018,padded,4,sparse,thresholdFixed,unrestricted,Alc 1 3.9% by Vol. Alt Soil,81,1,false,true,1,276
+approved-wine-018,padded,4,sparse,inverted,unrestricted,Alti Alc 1 3.9% by Vol. Soil,78,1,false,true,1,406
+approved-wine-018,padded,4,sparse,inverted,numeric,1 3.9% .,31,1,false,true,1,409
+approved-wine-018,padded,4,sparse,inverted,numericPlusMarker,Al Alc 1 3.9% by Vol. oll,56,1,false,true,1,407
+approved-wine-018,padded,4,sparse,invertedThreshold,unrestricted,Alc 1 3.5% by Vol. Alt Soil,82,1,false,true,1,290
+approved-wine-018,padded,4,singleLine,production,unrestricted,Alc 1 3.9% by Vol. al,76,1,false,true,1,375
+approved-wine-018,padded,4,singleLine,production,numeric,1 3.9% .,31,1,false,true,1,377
+approved-wine-018,padded,4,singleLine,production,numericPlusMarker,Alc 1 3.9% by Vol. al,76,1,false,true,1,396
+approved-wine-018,padded,4,singleLine,grayscaleOnly,unrestricted,mS 3.9% by Vol. al,71,3.9,false,true,1,355
+approved-wine-018,padded,4,singleLine,normalise,unrestricted,Alc 1 3.9% by Vol. al,76,1,false,true,1,373
+approved-wine-018,padded,4,singleLine,linearBoost,unrestricted,Ae. 13.9% by vol al,67,13.9,false,true,1,345
+approved-wine-018,padded,4,singleLine,otsu,unrestricted,Alc 1 3.5% by Vol. al,77,1,false,true,1,258
+approved-wine-018,padded,4,singleLine,otsu,numeric,1 3.5% .,31,1,false,true,1,228
+approved-wine-018,padded,4,singleLine,otsu,numericPlusMarker,Alc 1 3.5% by Vol. al,77,1,false,true,1,230
+approved-wine-018,padded,4,singleLine,thresholdFixed,unrestricted,Alc 1 3.9% by Vol. al,75,1,false,true,1,233
+approved-wine-018,padded,4,singleLine,inverted,unrestricted,™ 3.9% by Vol. al,76,3.9,false,true,1,390
+approved-wine-018,padded,4,singleLine,inverted,numeric,3.9% .,46,3.9,false,true,1,384
+approved-wine-018,padded,4,singleLine,inverted,numericPlusMarker,3.9% by Vol. al,86,3.9,false,true,1,378
+approved-wine-018,padded,4,singleLine,invertedThreshold,unrestricted,Alc 1 3.5% by Vol. al,77,1,false,true,1,239
+approved-wine-018,padded,4,singleWord,production,unrestricted,13S A,48,13,false,true,1,515
+approved-wine-018,padded,4,singleWord,production,numeric,13,0,13,false,true,1,522
+approved-wine-018,padded,4,singleWord,production,numericPlusMarker,13 A,33,13,false,true,1,542
+approved-wine-018,padded,4,singleWord,grayscaleOnly,unrestricted,13S A,52,13,false,true,1,587
+approved-wine-018,padded,4,singleWord,normalise,unrestricted,13S A,48,13,false,true,1,558
+approved-wine-018,padded,4,singleWord,linearBoost,unrestricted,13S A,44,13,false,true,1,426
+approved-wine-018,padded,4,singleWord,otsu,unrestricted,13S Al,44,13,false,true,1,339
+approved-wine-018,padded,4,singleWord,otsu,numeric,13,0,13,false,true,1,312
+approved-wine-018,padded,4,singleWord,otsu,numericPlusMarker,13 Al,36,13,false,true,1,310
+approved-wine-018,padded,4,singleWord,thresholdFixed,unrestricted,13S A,44,13,false,true,1,319
+approved-wine-018,padded,4,singleWord,inverted,unrestricted,13S A,46,13,false,true,1,541
+approved-wine-018,padded,4,singleWord,inverted,numeric,13,0,13,false,true,1,562
+approved-wine-018,padded,4,singleWord,inverted,numericPlusMarker,13 A,32,13,false,true,1,560
+approved-wine-018,padded,4,singleWord,invertedThreshold,unrestricted,13S Al,48,13,false,true,1,321
+approved-wine-018,padded,4,singleBlock,production,unrestricted,ac 13.5% by vol. Alti | Soil,40,13.5,true,true,1,411
+approved-wine-018,padded,4,singleBlock,production,numeric,13.5%..,0,13.5,true,true,1,373
+approved-wine-018,padded,4,singleBlock,production,numericPlusMarker,ac 13.5% by vol. All oll,7,13.5,true,true,1,375
+approved-wine-018,padded,4,singleBlock,grayscaleOnly,unrestricted,mS 3.5% by Vol. Alti Soil,73,3.5,false,true,1,449
+approved-wine-018,padded,4,singleBlock,normalise,unrestricted,ac 13.5% by vol. Alti | Soil,40,13.5,true,true,1,408
+approved-wine-018,padded,4,singleBlock,linearBoost,unrestricted,7c 13.5% by vo. Alt Soil,30,7,false,true,1,333
+approved-wine-018,padded,4,singleBlock,otsu,unrestricted,Alc 1 3.5% by Vol. Alti Soil,81,1,false,true,1,219
+approved-wine-018,padded,4,singleBlock,otsu,numeric,1 3.5% .,31,1,false,true,1,219
+approved-wine-018,padded,4,singleBlock,otsu,numericPlusMarker,Alc 1 3.5% by Vol. Al ol,57,1,false,true,1,221
+approved-wine-018,padded,4,singleBlock,thresholdFixed,unrestricted,Alc 1 3.5% by Vol. Alti | Soil,81,1,false,true,1,224
+approved-wine-018,padded,4,singleBlock,inverted,unrestricted,ic 13.5% by vol. Alti Soil,34,13.5,true,true,1,385
+approved-wine-018,padded,4,singleBlock,inverted,numeric,13.5%..,0,13.5,true,true,1,388
+approved-wine-018,padded,4,singleBlock,inverted,numericPlusMarker,Ac 13.5% by vol. All oll,8,13.5,true,true,1,409
+approved-wine-018,padded,4,singleBlock,invertedThreshold,unrestricted,Alc 1 3.5% by Vol. Alti Soil,81,1,false,true,1,236
+approved-wine-037,line,1.5,sparse,production,unrestricted,ono 13.0 % by volume,80,13,true,true,1,44
+approved-wine-037,line,1.5,sparse,production,numeric,13.0 %,43,13,true,true,1,42
+approved-wine-037,line,1.5,sparse,production,numericPlusMarker,ovo 13.0 % by vol,58,13,true,true,1,43
+approved-wine-037,line,1.5,sparse,grayscaleOnly,unrestricted,not 13.0 % by volume,79,13,true,true,1,41
+approved-wine-037,line,1.5,sparse,normalise,unrestricted,ono 13.0 % by volume,80,13,true,true,1,43
+approved-wine-037,line,1.5,sparse,linearBoost,unrestricted,ono 13.0 % by volume,82,13,true,true,1,40
+approved-wine-037,line,1.5,sparse,otsu,unrestricted,,0,,false,true,1,9
+approved-wine-037,line,1.5,sparse,otsu,numeric,,0,,false,true,1,8
+approved-wine-037,line,1.5,sparse,otsu,numericPlusMarker,,0,,false,true,1,8
+approved-wine-037,line,1.5,sparse,thresholdFixed,unrestricted,,0,,false,true,1,5
+approved-wine-037,line,1.5,sparse,inverted,unrestricted,ono 13.0 % by volume,82,13,true,true,1,32
+approved-wine-037,line,1.5,sparse,inverted,numeric,13.0 %,44,13,true,true,1,31
+approved-wine-037,line,1.5,sparse,inverted,numericPlusMarker,ovo 13.0 % by vol,59,13,true,true,1,32
+approved-wine-037,line,1.5,sparse,invertedThreshold,unrestricted,,0,,false,true,1,8
+approved-wine-037,line,1.5,singleLine,production,unrestricted,13.0 Y sie,51,13,true,true,1,36
+approved-wine-037,line,1.5,singleLine,production,numeric,13.0%,0,13,true,true,1,35
+approved-wine-037,line,1.5,singleLine,production,numericPlusMarker,13.0 Y,28,13,true,true,1,36
+approved-wine-037,line,1.5,singleLine,grayscaleOnly,unrestricted,13.0 Y% sie,47,13,true,true,1,35
+approved-wine-037,line,1.5,singleLine,normalise,unrestricted,13.0 Y sie,51,13,true,true,1,36
+approved-wine-037,line,1.5,singleLine,linearBoost,unrestricted,13.0 Y ie,53,13,true,true,1,32
+approved-wine-037,line,1.5,singleLine,otsu,unrestricted,. 4 | |,48,4,false,true,1,10
+approved-wine-037,line,1.5,singleLine,otsu,numeric,. 4,36,4,false,true,1,9
+approved-wine-037,line,1.5,singleLine,otsu,numericPlusMarker,. 4,36,4,false,true,1,9
+approved-wine-037,line,1.5,singleLine,thresholdFixed,unrestricted,EE,13,,false,true,1,22
+approved-wine-037,line,1.5,singleLine,inverted,unrestricted,13.0 Y sie,53,13,true,true,1,30
+approved-wine-037,line,1.5,singleLine,inverted,numeric,13.0%,0,13,true,true,1,31
+approved-wine-037,line,1.5,singleLine,inverted,numericPlusMarker,13.0 Y,32,13,true,true,1,30
+approved-wine-037,line,1.5,singleLine,invertedThreshold,unrestricted,. 4 | |,48,4,false,true,1,8
+approved-wine-037,line,1.5,singleWord,production,unrestricted,13.0 Y% syiome.,28,13,true,true,1,35
+approved-wine-037,line,1.5,singleWord,production,numeric,13.0%.,0,13,true,true,1,35
+approved-wine-037,line,1.5,singleWord,production,numericPlusMarker,13.0 Y% oyo.,28,13,true,true,1,36
+approved-wine-037,line,1.5,singleWord,grayscaleOnly,unrestricted,13.0 Y% syne.,30,13,true,true,1,34
+approved-wine-037,line,1.5,singleWord,normalise,unrestricted,13.0 Y% syiome.,28,13,true,true,1,36
+approved-wine-037,line,1.5,singleWord,linearBoost,unrestricted,13.0 Y cine,30,13,true,true,1,31
+approved-wine-037,line,1.5,singleWord,otsu,unrestricted,Coa,46,,false,true,1,22
+approved-wine-037,line,1.5,singleWord,otsu,numeric,,0,,false,true,1,22
+approved-wine-037,line,1.5,singleWord,otsu,numericPlusMarker,Coa,46,,false,true,1,22
+approved-wine-037,line,1.5,singleWord,thresholdFixed,unrestricted,EE,13,,false,true,1,21
+approved-wine-037,line,1.5,singleWord,inverted,unrestricted,13.0 Y% syiome.,26,13,true,true,1,36
+approved-wine-037,line,1.5,singleWord,inverted,numeric,13.0%.,0,13,true,true,1,35
+approved-wine-037,line,1.5,singleWord,inverted,numericPlusMarker,13.0 Y% oyo.,26,13,true,true,1,35
+approved-wine-037,line,1.5,singleWord,invertedThreshold,unrestricted,Coa,34,,false,true,1,22
+approved-wine-037,line,1.5,singleBlock,production,unrestricted,13.0 Y sie,51,13,true,true,1,36
+approved-wine-037,line,1.5,singleBlock,production,numeric,13.0%,0,13,true,true,1,39
+approved-wine-037,line,1.5,singleBlock,production,numericPlusMarker,13.0 Y,28,13,true,true,1,36
+approved-wine-037,line,1.5,singleBlock,grayscaleOnly,unrestricted,13.0 Y% sie,47,13,true,true,1,34
+approved-wine-037,line,1.5,singleBlock,normalise,unrestricted,13.0 Y sie,51,13,true,true,1,35
+approved-wine-037,line,1.5,singleBlock,linearBoost,unrestricted,13.0 Y ie,53,13,true,true,1,31
+approved-wine-037,line,1.5,singleBlock,otsu,unrestricted,Nl ceo tf ',15,,false,true,1,19
+approved-wine-037,line,1.5,singleBlock,otsu,numeric,,0,,false,true,1,20
+approved-wine-037,line,1.5,singleBlock,otsu,numericPlusMarker,yl cao,10,,false,true,1,20
+approved-wine-037,line,1.5,singleBlock,thresholdFixed,unrestricted,,0,,false,true,1,4
+approved-wine-037,line,1.5,singleBlock,inverted,unrestricted,13.0 Y sie,53,13,true,true,1,33
+approved-wine-037,line,1.5,singleBlock,inverted,numeric,13.0%,0,13,true,true,1,30
+approved-wine-037,line,1.5,singleBlock,inverted,numericPlusMarker,13.0 Y,32,13,true,true,1,30
+approved-wine-037,line,1.5,singleBlock,invertedThreshold,unrestricted,Nl | ceo tf ',24,,false,true,1,19
+approved-wine-037,line,2,sparse,production,unrestricted,ono 13.0 % by volume,80,13,true,true,1,55
+approved-wine-037,line,2,sparse,production,numeric,13.0 %,42,13,true,true,1,55
+approved-wine-037,line,2,sparse,production,numericPlusMarker,ovo 13.0 % by vol,56,13,true,true,1,55
+approved-wine-037,line,2,sparse,grayscaleOnly,unrestricted,ono 13.0 % by volume,81,13,true,true,1,53
+approved-wine-037,line,2,sparse,normalise,unrestricted,ono 13.0 % by volume,80,13,true,true,1,56
+approved-wine-037,line,2,sparse,linearBoost,unrestricted,ont 13.0 % by volume,82,13,true,true,1,55
+approved-wine-037,line,2,sparse,otsu,unrestricted,| 4 -,61,4,false,true,1,15
+approved-wine-037,line,2,sparse,otsu,numeric,4,74,4,false,true,1,15
+approved-wine-037,line,2,sparse,otsu,numericPlusMarker,l 4,46,4,false,true,1,15
+approved-wine-037,line,2,sparse,thresholdFixed,unrestricted,,0,,false,true,1,9
+approved-wine-037,line,2,sparse,inverted,unrestricted,ono 13.0 % by volume,81,13,true,true,1,44
+approved-wine-037,line,2,sparse,inverted,numeric,13.0 %,44,13,true,true,1,44
+approved-wine-037,line,2,sparse,inverted,numericPlusMarker,ool 13.0 % by vol,53,13,true,true,1,44
+approved-wine-037,line,2,sparse,invertedThreshold,unrestricted,| 4 -,62,4,false,true,1,14
+approved-wine-037,line,2,singleLine,production,unrestricted,13.0 Y sie,51,13,true,true,1,52
+approved-wine-037,line,2,singleLine,production,numeric,13.0%,0,13,true,true,1,50
+approved-wine-037,line,2,singleLine,production,numericPlusMarker,13.0 Yc,39,13,true,true,1,50
+approved-wine-037,line,2,singleLine,grayscaleOnly,unrestricted,13.0 Y% sie,51,13,true,true,1,47
+approved-wine-037,line,2,singleLine,normalise,unrestricted,13.0 Y sie,51,13,true,true,1,50
+approved-wine-037,line,2,singleLine,linearBoost,unrestricted,ro 13.0 Y ie,35,13,true,true,1,45
+approved-wine-037,line,2,singleLine,otsu,unrestricted,. bE | |,44,,false,true,1,12
+approved-wine-037,line,2,singleLine,otsu,numeric,.,57,,false,true,1,12
+approved-wine-037,line,2,singleLine,otsu,numericPlusMarker,. l,28,,false,true,1,12
+approved-wine-037,line,2,singleLine,thresholdFixed,unrestricted,EE,13,,false,true,1,28
+approved-wine-037,line,2,singleLine,inverted,unrestricted,13.0 Y ie,55,13,true,true,1,44
+approved-wine-037,line,2,singleLine,inverted,numeric,13.0%,0,13,true,true,1,44
+approved-wine-037,line,2,singleLine,inverted,numericPlusMarker,13.0 Y,42,13,true,true,1,44
+approved-wine-037,line,2,singleLine,invertedThreshold,unrestricted,. | |,59,,false,true,1,12
+approved-wine-037,line,2,singleWord,production,unrestricted,213.0 Y% syne.,29,21,false,true,1,49
+approved-wine-037,line,2,singleWord,production,numeric,213.0%.,0,21,false,true,1,50
+approved-wine-037,line,2,singleWord,production,numericPlusMarker,213.0 Y% oyoa.,29,21,false,true,1,54
+approved-wine-037,line,2,singleWord,grayscaleOnly,unrestricted,13.0 Y% syne.,22,13,true,true,1,47
+approved-wine-037,line,2,singleWord,normalise,unrestricted,213.0 Y% syne.,29,21,false,true,1,49
+approved-wine-037,line,2,singleWord,linearBoost,unrestricted,013.0 Y cine,31,1,false,true,1,43
+approved-wine-037,line,2,singleWord,otsu,unrestricted,Coa,33,,false,true,1,30
+approved-wine-037,line,2,singleWord,otsu,numeric,,0,,false,true,1,30
+approved-wine-037,line,2,singleWord,otsu,numericPlusMarker,Coa,33,,false,true,1,30
+approved-wine-037,line,2,singleWord,thresholdFixed,unrestricted,EE,13,,false,true,1,29
+approved-wine-037,line,2,singleWord,inverted,unrestricted,213.0 Y% syne.,28,21,false,true,1,49
+approved-wine-037,line,2,singleWord,inverted,numeric,213.0%.,0,21,false,true,1,49
+approved-wine-037,line,2,singleWord,inverted,numericPlusMarker,213.0 Y% oyo.,28,21,false,true,1,49
+approved-wine-037,line,2,singleWord,invertedThreshold,unrestricted,Coa,34,,false,true,1,29
+approved-wine-037,line,2,singleBlock,production,unrestricted,13.0 Y sie,51,13,true,true,1,50
+approved-wine-037,line,2,singleBlock,production,numeric,13.0%,0,13,true,true,1,50
+approved-wine-037,line,2,singleBlock,production,numericPlusMarker,13.0 Yc,39,13,true,true,1,50
+approved-wine-037,line,2,singleBlock,grayscaleOnly,unrestricted,13.0 Y% sie,51,13,true,true,1,47
+approved-wine-037,line,2,singleBlock,normalise,unrestricted,13.0 Y sie,51,13,true,true,1,50
+approved-wine-037,line,2,singleBlock,linearBoost,unrestricted,ro 13.0 Y ie,35,13,true,true,1,43
+approved-wine-037,line,2,singleBlock,otsu,unrestricted,Yl EN | a ',29,,false,true,1,23
+approved-wine-037,line,2,singleBlock,otsu,numeric,,0,,false,true,1,22
+approved-wine-037,line,2,singleBlock,otsu,numericPlusMarker,Yl A a,11,,false,true,1,23
+approved-wine-037,line,2,singleBlock,thresholdFixed,unrestricted,,0,,false,true,1,9
+approved-wine-037,line,2,singleBlock,inverted,unrestricted,13.0 Y ie,55,13,true,true,1,44
+approved-wine-037,line,2,singleBlock,inverted,numeric,13.0%,0,13,true,true,1,44
+approved-wine-037,line,2,singleBlock,inverted,numericPlusMarker,13.0 Y,42,13,true,true,1,44
+approved-wine-037,line,2,singleBlock,invertedThreshold,unrestricted,Yl EN | 2 ',28,2,false,true,1,23
+approved-wine-037,line,3,sparse,production,unrestricted,ono 13.0 % by volume,80,13,true,true,1,88
+approved-wine-037,line,3,sparse,production,numeric,13.0 %,43,13,true,true,1,87
+approved-wine-037,line,3,sparse,production,numericPlusMarker,ool 13.0 % by vol,53,13,true,true,1,88
+approved-wine-037,line,3,sparse,grayscaleOnly,unrestricted,ono 13.0 % by volume,85,13,true,true,1,82
+approved-wine-037,line,3,sparse,normalise,unrestricted,ono 13.0 % by volume,80,13,true,true,1,87
+approved-wine-037,line,3,sparse,linearBoost,unrestricted,ont 13.0 % by volume,82,13,true,true,1,82
+approved-wine-037,line,3,sparse,otsu,unrestricted,|,57,,false,true,1,21
+approved-wine-037,line,3,sparse,otsu,numeric,,0,,false,true,1,21
+approved-wine-037,line,3,sparse,otsu,numericPlusMarker,,0,,false,true,1,21
+approved-wine-037,line,3,sparse,thresholdFixed,unrestricted,,0,,false,true,1,20
+approved-wine-037,line,3,sparse,inverted,unrestricted,ono 13.0 % by volume,80,13,true,true,1,76
+approved-wine-037,line,3,sparse,inverted,numeric,13.0 %,41,13,true,true,1,77
+approved-wine-037,line,3,sparse,inverted,numericPlusMarker,ovo 13.0 % by vol,54,13,true,true,1,78
+approved-wine-037,line,3,sparse,invertedThreshold,unrestricted,,0,,false,true,1,21
+approved-wine-037,line,3,singleLine,production,unrestricted,13.0 Y sie,57,13,true,true,1,87
+approved-wine-037,line,3,singleLine,production,numeric,13.0%,0,13,true,true,1,86
+approved-wine-037,line,3,singleLine,production,numericPlusMarker,13.0 Y,51,13,true,true,1,87
+approved-wine-037,line,3,singleLine,grayscaleOnly,unrestricted,13.0 Yo ie,40,13,true,true,1,82
+approved-wine-037,line,3,singleLine,normalise,unrestricted,13.0 Y sie,57,13,true,true,1,86
+approved-wine-037,line,3,singleLine,linearBoost,unrestricted,ro 13.0 Yo oy em,25,13,true,true,1,79
+approved-wine-037,line,3,singleLine,otsu,unrestricted,,0,,false,true,1,19
+approved-wine-037,line,3,singleLine,otsu,numeric,,0,,false,true,1,19
+approved-wine-037,line,3,singleLine,otsu,numericPlusMarker,,0,,false,true,1,19
+approved-wine-037,line,3,singleLine,thresholdFixed,unrestricted,EE,13,,false,true,1,52
+approved-wine-037,line,3,singleLine,inverted,unrestricted,13.0 Y ie,52,13,true,true,1,80
+approved-wine-037,line,3,singleLine,inverted,numeric,13.0%,0,13,true,true,1,80
+approved-wine-037,line,3,singleLine,inverted,numericPlusMarker,13.0 Y,47,13,true,true,1,81
+approved-wine-037,line,3,singleLine,invertedThreshold,unrestricted,,0,,false,true,1,18
+approved-wine-037,line,3,singleWord,production,unrestricted,#0130 Y% oyiome,26,1,false,true,1,86
+approved-wine-037,line,3,singleWord,production,numeric,013.0%,0,1,false,true,1,85
+approved-wine-037,line,3,singleWord,production,numericPlusMarker,013.0 Y% oyo,23,1,false,true,1,85
+approved-wine-037,line,3,singleWord,grayscaleOnly,unrestricted,13.0 Y% some.,40,13,true,true,1,90
+approved-wine-037,line,3,singleWord,normalise,unrestricted,#0130 Y% oyiome,26,1,false,true,1,85
+approved-wine-037,line,3,singleWord,linearBoost,unrestricted,013.0 Y cine,27,1,false,true,1,76
+approved-wine-037,line,3,singleWord,otsu,unrestricted,Coa,28,,false,true,1,50
+approved-wine-037,line,3,singleWord,otsu,numeric,,0,,false,true,1,50
+approved-wine-037,line,3,singleWord,otsu,numericPlusMarker,Coa,28,,false,true,1,50
+approved-wine-037,line,3,singleWord,thresholdFixed,unrestricted,EE,13,,false,true,1,48
+approved-wine-037,line,3,singleWord,inverted,unrestricted,2013.0 Y% some.,40,20,false,true,1,86
+approved-wine-037,line,3,singleWord,inverted,numeric,2013.0%.,0,20,false,true,1,85
+approved-wine-037,line,3,singleWord,inverted,numericPlusMarker,2013.0 Y% oyo.,29,20,false,true,1,85
+approved-wine-037,line,3,singleWord,invertedThreshold,unrestricted,Coa,27,,false,true,1,48
+approved-wine-037,line,3,singleBlock,production,unrestricted,13.0 Y sie,57,13,true,true,1,87
+approved-wine-037,line,3,singleBlock,production,numeric,13.0%,0,13,true,true,1,86
+approved-wine-037,line,3,singleBlock,production,numericPlusMarker,13.0 Y,51,13,true,true,1,86
+approved-wine-037,line,3,singleBlock,grayscaleOnly,unrestricted,13.0 Yo ie,40,13,true,true,1,82
+approved-wine-037,line,3,singleBlock,normalise,unrestricted,13.0 Y sie,57,13,true,true,1,86
+approved-wine-037,line,3,singleBlock,linearBoost,unrestricted,ro 13.0 Yo oy em,25,13,true,true,1,79
+approved-wine-037,line,3,singleBlock,otsu,unrestricted,EE N | | 4 : | a,37,4,false,true,1,44
+approved-wine-037,line,3,singleBlock,otsu,numeric,4,22,4,false,true,1,43
+approved-wine-037,line,3,singleBlock,otsu,numericPlusMarker,A 4 a,8,4,false,true,1,44
+approved-wine-037,line,3,singleBlock,thresholdFixed,unrestricted,,0,,false,true,1,16
+approved-wine-037,line,3,singleBlock,inverted,unrestricted,13.0 Y ie,52,13,true,true,1,81
+approved-wine-037,line,3,singleBlock,inverted,numeric,13.0%,0,13,true,true,1,83
+approved-wine-037,line,3,singleBlock,inverted,numericPlusMarker,13.0 Y,47,13,true,true,1,80
+approved-wine-037,line,3,singleBlock,invertedThreshold,unrestricted,EE N | | 4 a 2!,45,4,false,true,1,42
+approved-wine-037,line,4,sparse,production,unrestricted,ono 13.0 % by volume,81,13,true,true,1,133
+approved-wine-037,line,4,sparse,production,numeric,13.0 %,41,13,true,true,1,128
+approved-wine-037,line,4,sparse,production,numericPlusMarker,ool 13.0 % by vol,52,13,true,true,1,129
+approved-wine-037,line,4,sparse,grayscaleOnly,unrestricted,ono 13.0 % by volume,82,13,true,true,1,119
+approved-wine-037,line,4,sparse,normalise,unrestricted,ono 13.0 % by volume,81,13,true,true,1,129
+approved-wine-037,line,4,sparse,linearBoost,unrestricted,ono 13.0 h by volume,62,13,true,true,1,121
+approved-wine-037,line,4,sparse,otsu,unrestricted,| 4,73,4,false,true,1,37
+approved-wine-037,line,4,sparse,otsu,numeric,4,93,4,false,true,1,37
+approved-wine-037,line,4,sparse,otsu,numericPlusMarker,4,93,4,false,true,1,37
+approved-wine-037,line,4,sparse,thresholdFixed,unrestricted,,0,,false,true,1,35
+approved-wine-037,line,4,sparse,inverted,unrestricted,ono 13.0 % by volume,80,13,true,true,1,117
+approved-wine-037,line,4,sparse,inverted,numeric,13.0 %,38,13,true,true,1,117
+approved-wine-037,line,4,sparse,inverted,numericPlusMarker,ovo 13.0 % by vol,53,13,true,true,1,117
+approved-wine-037,line,4,sparse,invertedThreshold,unrestricted,4,93,4,false,true,1,35
+approved-wine-037,line,4,singleLine,production,unrestricted,13.0 Yo ie,40,13,true,true,1,147
+approved-wine-037,line,4,singleLine,production,numeric,13.0,0,13,true,true,1,138
+approved-wine-037,line,4,singleLine,production,numericPlusMarker,13.0 Yo,36,13,true,true,1,138
+approved-wine-037,line,4,singleLine,grayscaleOnly,unrestricted,13.0 Y ie,52,13,true,true,1,130
+approved-wine-037,line,4,singleLine,normalise,unrestricted,13.0 Yo ie,40,13,true,true,1,144
+approved-wine-037,line,4,singleLine,linearBoost,unrestricted,13.0 Y in,50,13,true,true,1,124
+approved-wine-037,line,4,singleLine,otsu,unrestricted,: | |,46,,false,true,1,39
+approved-wine-037,line,4,singleLine,otsu,numeric,.,0,,false,true,1,36
+approved-wine-037,line,4,singleLine,otsu,numericPlusMarker,.,0,,false,true,1,37
+approved-wine-037,line,4,singleLine,thresholdFixed,unrestricted,EE,13,,false,true,1,76
+approved-wine-037,line,4,singleLine,inverted,unrestricted,13.0 Y ie,55,13,true,true,1,133
+approved-wine-037,line,4,singleLine,inverted,numeric,13.0%,0,13,true,true,1,134
+approved-wine-037,line,4,singleLine,inverted,numericPlusMarker,13.0 Y,47,13,true,true,1,133
+approved-wine-037,line,4,singleLine,invertedThreshold,unrestricted,: | |,47,,false,true,1,35
+approved-wine-037,line,4,singleWord,production,unrestricted,013.0 Y% syiome,18,1,false,true,1,133
+approved-wine-037,line,4,singleWord,production,numeric,013.0%,0,1,false,true,1,139
+approved-wine-037,line,4,singleWord,production,numericPlusMarker,013.0 Y% oyo,18,1,false,true,1,137
+approved-wine-037,line,4,singleWord,grayscaleOnly,unrestricted,13.0 Y% oyiome,24,13,true,true,1,124
+approved-wine-037,line,4,singleWord,normalise,unrestricted,013.0 Y% syiome,18,1,false,true,1,135
+approved-wine-037,line,4,singleWord,linearBoost,unrestricted,013.0 Y cine,27,1,false,true,1,123
+approved-wine-037,line,4,singleWord,otsu,unrestricted,Coa,39,,false,true,1,78
+approved-wine-037,line,4,singleWord,otsu,numeric,,0,,false,true,1,86
+approved-wine-037,line,4,singleWord,otsu,numericPlusMarker,Coa,39,,false,true,1,83
+approved-wine-037,line,4,singleWord,thresholdFixed,unrestricted,EE,13,,false,true,1,81
+approved-wine-037,line,4,singleWord,inverted,unrestricted,#0130 Y% oyiome,27,1,false,true,1,137
+approved-wine-037,line,4,singleWord,inverted,numeric,013.0%,0,1,false,true,1,134
+approved-wine-037,line,4,singleWord,inverted,numericPlusMarker,013.0 Y% oyo,23,1,false,true,1,133
+approved-wine-037,line,4,singleWord,invertedThreshold,unrestricted,Coa,38,,false,true,1,75
+approved-wine-037,line,4,singleBlock,production,unrestricted,13.0 Yo ie,40,13,true,true,1,183
+approved-wine-037,line,4,singleBlock,production,numeric,13.0,0,13,true,true,1,140
+approved-wine-037,line,4,singleBlock,production,numericPlusMarker,13.0 Yo,36,13,true,true,1,140
+approved-wine-037,line,4,singleBlock,grayscaleOnly,unrestricted,13.0 Y ie,52,13,true,true,1,127
+approved-wine-037,line,4,singleBlock,normalise,unrestricted,13.0 Yo ie,40,13,true,true,1,144
+approved-wine-037,line,4,singleBlock,linearBoost,unrestricted,13.0 Y in,50,13,true,true,1,129
+approved-wine-037,line,4,singleBlock,otsu,unrestricted,NK | » 4a 2 |,38,4,false,true,1,46
+approved-wine-037,line,4,singleBlock,otsu,numeric,.4 2,22,4,false,true,1,46
+approved-wine-037,line,4,singleBlock,otsu,numericPlusMarker,. 4a 2,24,4,false,true,1,46
+approved-wine-037,line,4,singleBlock,thresholdFixed,unrestricted,,0,,false,true,1,29
+approved-wine-037,line,4,singleBlock,inverted,unrestricted,13.0 Y ie,55,13,true,true,1,134
+approved-wine-037,line,4,singleBlock,inverted,numeric,13.0%,0,13,true,true,1,136
+approved-wine-037,line,4,singleBlock,inverted,numericPlusMarker,13.0 Y,47,13,true,true,1,135
+approved-wine-037,line,4,singleBlock,invertedThreshold,unrestricted,NK | EN 2,44,2,false,true,1,44
+approved-wine-037,markerAndNumber,1.5,sparse,production,unrestricted,13.0 % vy,59,13,true,true,1,48
+approved-wine-037,markerAndNumber,1.5,sparse,production,numeric,13.0%,0,13,true,true,1,47
+approved-wine-037,markerAndNumber,1.5,sparse,production,numericPlusMarker,13.0 % vy,59,13,true,true,1,50
+approved-wine-037,markerAndNumber,1.5,sparse,grayscaleOnly,unrestricted,13.0 % by,89,13,true,true,1,40
+approved-wine-037,markerAndNumber,1.5,sparse,normalise,unrestricted,13.0 % vy,59,13,true,true,1,47
+approved-wine-037,markerAndNumber,1.5,sparse,linearBoost,unrestricted,13.0 % vy,60,13,true,true,1,44
+approved-wine-037,markerAndNumber,1.5,sparse,otsu,unrestricted,4 l -—,69,4,false,true,1,16
+approved-wine-037,markerAndNumber,1.5,sparse,otsu,numeric,4,91,4,false,true,1,16
+approved-wine-037,markerAndNumber,1.5,sparse,otsu,numericPlusMarker,4 l,70,4,false,true,1,16
+approved-wine-037,markerAndNumber,1.5,sparse,thresholdFixed,unrestricted,,0,,false,true,1,8
+approved-wine-037,markerAndNumber,1.5,sparse,inverted,unrestricted,13.0 % vy,59,13,true,true,1,46
+approved-wine-037,markerAndNumber,1.5,sparse,inverted,numeric,13.0%,0,13,true,true,1,43
+approved-wine-037,markerAndNumber,1.5,sparse,inverted,numericPlusMarker,13.0 % vy,59,13,true,true,1,43
+approved-wine-037,markerAndNumber,1.5,sparse,invertedThreshold,unrestricted,4 l -—,68,4,false,true,1,15
+approved-wine-037,markerAndNumber,1.5,singleLine,production,unrestricted,13.0 % vy,59,13,true,true,1,45
+approved-wine-037,markerAndNumber,1.5,singleLine,production,numeric,13.0%,0,13,true,true,1,45
+approved-wine-037,markerAndNumber,1.5,singleLine,production,numericPlusMarker,13.0 % vy,59,13,true,true,1,45
+approved-wine-037,markerAndNumber,1.5,singleLine,grayscaleOnly,unrestricted,13.0 % uy,59,13,true,true,1,42
+approved-wine-037,markerAndNumber,1.5,singleLine,normalise,unrestricted,13.0 % vy,59,13,true,true,1,45
+approved-wine-037,markerAndNumber,1.5,singleLine,linearBoost,unrestricted,13.0 % vy,60,13,true,true,1,41
+approved-wine-037,markerAndNumber,1.5,singleLine,otsu,unrestricted,. . | |,66,,false,true,1,12
+approved-wine-037,markerAndNumber,1.5,singleLine,otsu,numeric,. .,51,,false,true,1,12
+approved-wine-037,markerAndNumber,1.5,singleLine,otsu,numericPlusMarker,. .,51,,false,true,1,12
+approved-wine-037,markerAndNumber,1.5,singleLine,thresholdFixed,unrestricted,EE,10,,false,true,1,23
+approved-wine-037,markerAndNumber,1.5,singleLine,inverted,unrestricted,13.0 % vy,59,13,true,true,1,40
+approved-wine-037,markerAndNumber,1.5,singleLine,inverted,numeric,13.0%,0,13,true,true,1,40
+approved-wine-037,markerAndNumber,1.5,singleLine,inverted,numericPlusMarker,13.0 % vy,59,13,true,true,1,40
+approved-wine-037,markerAndNumber,1.5,singleLine,invertedThreshold,unrestricted,. . | |,66,,false,true,1,12
+approved-wine-037,markerAndNumber,1.5,singleWord,production,unrestricted,"13.0 %.,",61,13,true,true,1,43
+approved-wine-037,markerAndNumber,1.5,singleWord,production,numeric,"13.0%.,",0,13,true,true,1,43
+approved-wine-037,markerAndNumber,1.5,singleWord,production,numericPlusMarker,"13.0 %.,",61,13,true,true,1,44
+approved-wine-037,markerAndNumber,1.5,singleWord,grayscaleOnly,unrestricted,"13.0 %.,",58,13,true,true,1,39
+approved-wine-037,markerAndNumber,1.5,singleWord,normalise,unrestricted,"13.0 %.,",61,13,true,true,1,43
+approved-wine-037,markerAndNumber,1.5,singleWord,linearBoost,unrestricted,"13.0 %.,",59,13,true,true,1,38
+approved-wine-037,markerAndNumber,1.5,singleWord,otsu,unrestricted,ER,42,,false,true,1,24
+approved-wine-037,markerAndNumber,1.5,singleWord,otsu,numeric,,0,,false,true,1,24
+approved-wine-037,markerAndNumber,1.5,singleWord,otsu,numericPlusMarker,,0,,false,true,1,24
+approved-wine-037,markerAndNumber,1.5,singleWord,thresholdFixed,unrestricted,EE,10,,false,true,1,23
+approved-wine-037,markerAndNumber,1.5,singleWord,inverted,unrestricted,"13.0 %.,",57,13,true,true,1,63
+approved-wine-037,markerAndNumber,1.5,singleWord,inverted,numeric,"13.0%.,",0,13,true,true,1,67
+approved-wine-037,markerAndNumber,1.5,singleWord,inverted,numericPlusMarker,"13.0 %.,",57,13,true,true,1,68
+approved-wine-037,markerAndNumber,1.5,singleWord,invertedThreshold,unrestricted,ERE,34,,false,true,1,48
+approved-wine-037,markerAndNumber,1.5,singleBlock,production,unrestricted,13.0 % vy,59,13,true,true,1,57
+approved-wine-037,markerAndNumber,1.5,singleBlock,production,numeric,13.0%,0,13,true,true,1,55
+approved-wine-037,markerAndNumber,1.5,singleBlock,production,numericPlusMarker,13.0 % vy,59,13,true,true,1,45
+approved-wine-037,markerAndNumber,1.5,singleBlock,grayscaleOnly,unrestricted,13.0 % uy,59,13,true,true,1,42
+approved-wine-037,markerAndNumber,1.5,singleBlock,normalise,unrestricted,13.0 % vy,59,13,true,true,1,45
+approved-wine-037,markerAndNumber,1.5,singleBlock,linearBoost,unrestricted,13.0 % vy,60,13,true,true,1,40
+approved-wine-037,markerAndNumber,1.5,singleBlock,otsu,unrestricted,"A "" | 401 _",19,40,false,true,1,38
+approved-wine-037,markerAndNumber,1.5,singleBlock,otsu,numeric,401,0,40,false,true,1,38
+approved-wine-037,markerAndNumber,1.5,singleBlock,otsu,numericPlusMarker,A 401,5,40,false,true,1,38
+approved-wine-037,markerAndNumber,1.5,singleBlock,thresholdFixed,unrestricted,,0,,false,true,1,13
+approved-wine-037,markerAndNumber,1.5,singleBlock,inverted,unrestricted,13.0 % vy,59,13,true,true,1,62
+approved-wine-037,markerAndNumber,1.5,singleBlock,inverted,numeric,13.0%,0,13,true,true,1,43
+approved-wine-037,markerAndNumber,1.5,singleBlock,inverted,numericPlusMarker,13.0 % vy,59,13,true,true,1,40
+approved-wine-037,markerAndNumber,1.5,singleBlock,invertedThreshold,unrestricted,"SR "" | 401 _",21,40,false,true,1,38
+approved-wine-037,markerAndNumber,2,sparse,production,unrestricted,13.0 % uy,55,13,true,true,1,71
+approved-wine-037,markerAndNumber,2,sparse,production,numeric,13.0%,0,13,true,true,1,71
+approved-wine-037,markerAndNumber,2,sparse,production,numericPlusMarker,13.0 % oy,48,13,true,true,1,71
+approved-wine-037,markerAndNumber,2,sparse,grayscaleOnly,unrestricted,13.0 % uy,61,13,true,true,1,65
+approved-wine-037,markerAndNumber,2,sparse,normalise,unrestricted,13.0 % uy,55,13,true,true,1,71
+approved-wine-037,markerAndNumber,2,sparse,linearBoost,unrestricted,13.0 % uy,53,13,true,true,1,65
+approved-wine-037,markerAndNumber,2,sparse,otsu,unrestricted,,0,,false,true,1,22
+approved-wine-037,markerAndNumber,2,sparse,otsu,numeric,,0,,false,true,1,22
+approved-wine-037,markerAndNumber,2,sparse,otsu,numericPlusMarker,,0,,false,true,1,23
+approved-wine-037,markerAndNumber,2,sparse,thresholdFixed,unrestricted,,0,,false,true,1,15
+approved-wine-037,markerAndNumber,2,sparse,inverted,unrestricted,13.0 % uy,50,13,true,true,1,67
+approved-wine-037,markerAndNumber,2,sparse,inverted,numeric,13.0%,0,13,true,true,1,66
+approved-wine-037,markerAndNumber,2,sparse,inverted,numericPlusMarker,13.0 % oy,46,13,true,true,1,66
+approved-wine-037,markerAndNumber,2,sparse,invertedThreshold,unrestricted,,0,,false,true,1,22
+approved-wine-037,markerAndNumber,2,singleLine,production,unrestricted,13.0 % uy,55,13,true,true,1,66
+approved-wine-037,markerAndNumber,2,singleLine,production,numeric,13.0%,0,13,true,true,1,67
+approved-wine-037,markerAndNumber,2,singleLine,production,numericPlusMarker,13.0 % oy,48,13,true,true,1,66
+approved-wine-037,markerAndNumber,2,singleLine,grayscaleOnly,unrestricted,13.0 % uy,61,13,true,true,1,61
+approved-wine-037,markerAndNumber,2,singleLine,normalise,unrestricted,13.0 % uy,55,13,true,true,1,69
+approved-wine-037,markerAndNumber,2,singleLine,linearBoost,unrestricted,13.0 % uy,53,13,true,true,1,61
+approved-wine-037,markerAndNumber,2,singleLine,otsu,unrestricted,: { |,31,,false,true,1,19
+approved-wine-037,markerAndNumber,2,singleLine,otsu,numeric,.,0,,false,true,1,19
+approved-wine-037,markerAndNumber,2,singleLine,otsu,numericPlusMarker,.,0,,false,true,1,19
+approved-wine-037,markerAndNumber,2,singleLine,thresholdFixed,unrestricted,EE,10,,false,true,1,34
+approved-wine-037,markerAndNumber,2,singleLine,inverted,unrestricted,13.0 % uy,50,13,true,true,1,62
+approved-wine-037,markerAndNumber,2,singleLine,inverted,numeric,13.0%,0,13,true,true,1,61
+approved-wine-037,markerAndNumber,2,singleLine,inverted,numericPlusMarker,13.0 % oy,46,13,true,true,1,61
+approved-wine-037,markerAndNumber,2,singleLine,invertedThreshold,unrestricted,: a |,54,,false,true,1,18
+approved-wine-037,markerAndNumber,2,singleWord,production,unrestricted,"13.0 %.,",62,13,true,true,1,65
+approved-wine-037,markerAndNumber,2,singleWord,production,numeric,"13.0%.,",0,13,true,true,1,64
+approved-wine-037,markerAndNumber,2,singleWord,production,numericPlusMarker,"13.0 %.,",62,13,true,true,1,64
+approved-wine-037,markerAndNumber,2,singleWord,grayscaleOnly,unrestricted,"13.0 %.,",61,13,true,true,1,58
+approved-wine-037,markerAndNumber,2,singleWord,normalise,unrestricted,"13.0 %.,",62,13,true,true,1,64
+approved-wine-037,markerAndNumber,2,singleWord,linearBoost,unrestricted,"13.0 %.,",59,13,true,true,1,58
+approved-wine-037,markerAndNumber,2,singleWord,otsu,unrestricted,ERE,37,,false,true,1,36
+approved-wine-037,markerAndNumber,2,singleWord,otsu,numeric,,0,,false,true,1,35
+approved-wine-037,markerAndNumber,2,singleWord,otsu,numericPlusMarker,,0,,false,true,1,36
+approved-wine-037,markerAndNumber,2,singleWord,thresholdFixed,unrestricted,EE,10,,false,true,1,33
+approved-wine-037,markerAndNumber,2,singleWord,inverted,unrestricted,"13.0 %.,",57,13,true,true,1,61
+approved-wine-037,markerAndNumber,2,singleWord,inverted,numeric,"13.0%.,",0,13,true,true,1,60
+approved-wine-037,markerAndNumber,2,singleWord,inverted,numericPlusMarker,"13.0 %.,",57,13,true,true,1,60
+approved-wine-037,markerAndNumber,2,singleWord,invertedThreshold,unrestricted,ERE,35,,false,true,1,35
+approved-wine-037,markerAndNumber,2,singleBlock,production,unrestricted,13.0 % uy,55,13,true,true,1,67
+approved-wine-037,markerAndNumber,2,singleBlock,production,numeric,13.0%,0,13,true,true,1,67
+approved-wine-037,markerAndNumber,2,singleBlock,production,numericPlusMarker,13.0 % oy,48,13,true,true,1,66
+approved-wine-037,markerAndNumber,2,singleBlock,grayscaleOnly,unrestricted,13.0 % uy,61,13,true,true,1,61
+approved-wine-037,markerAndNumber,2,singleBlock,normalise,unrestricted,13.0 % uy,55,13,true,true,1,67
+approved-wine-037,markerAndNumber,2,singleBlock,linearBoost,unrestricted,13.0 % uy,53,13,true,true,1,65
+approved-wine-037,markerAndNumber,2,singleBlock,otsu,unrestricted,. | | A | _!,51,,false,true,1,31
+approved-wine-037,markerAndNumber,2,singleBlock,otsu,numeric,.,54,,false,true,1,31
+approved-wine-037,markerAndNumber,2,singleBlock,otsu,numericPlusMarker,. l A,31,,false,true,1,31
+approved-wine-037,markerAndNumber,2,singleBlock,thresholdFixed,unrestricted,,0,,false,true,1,12
+approved-wine-037,markerAndNumber,2,singleBlock,inverted,unrestricted,13.0 % uy,50,13,true,true,1,62
+approved-wine-037,markerAndNumber,2,singleBlock,inverted,numeric,13.0%,0,13,true,true,1,62
+approved-wine-037,markerAndNumber,2,singleBlock,inverted,numericPlusMarker,13.0 % oy,46,13,true,true,1,62
+approved-wine-037,markerAndNumber,2,singleBlock,invertedThreshold,unrestricted,. | i | | A | _!,50,,false,true,1,31
+approved-wine-037,markerAndNumber,3,sparse,production,unrestricted,13.0 % uy,54,13,true,true,1,133
+approved-wine-037,markerAndNumber,3,sparse,production,numeric,13.0%,0,13,true,true,1,135
+approved-wine-037,markerAndNumber,3,sparse,production,numericPlusMarker,13.0 % oy,49,13,true,true,1,132
+approved-wine-037,markerAndNumber,3,sparse,grayscaleOnly,unrestricted,13.0 % uy,55,13,true,true,1,120
+approved-wine-037,markerAndNumber,3,sparse,normalise,unrestricted,13.0 % uy,54,13,true,true,1,132
+approved-wine-037,markerAndNumber,3,sparse,linearBoost,unrestricted,13.0 % uy,52,13,true,true,1,125
+approved-wine-037,markerAndNumber,3,sparse,otsu,unrestricted,,0,,false,true,1,47
+approved-wine-037,markerAndNumber,3,sparse,otsu,numeric,,0,,false,true,1,47
+approved-wine-037,markerAndNumber,3,sparse,otsu,numericPlusMarker,,0,,false,true,1,47
+approved-wine-037,markerAndNumber,3,sparse,thresholdFixed,unrestricted,,0,,false,true,1,33
+approved-wine-037,markerAndNumber,3,sparse,inverted,unrestricted,13.0 % oy,45,13,true,true,1,127
+approved-wine-037,markerAndNumber,3,sparse,inverted,numeric,13.0%,0,13,true,true,1,129
+approved-wine-037,markerAndNumber,3,sparse,inverted,numericPlusMarker,13.0 % oy,45,13,true,true,1,128
+approved-wine-037,markerAndNumber,3,sparse,invertedThreshold,unrestricted,,0,,false,true,1,47
+approved-wine-037,markerAndNumber,3,singleLine,production,unrestricted,13.0 % uy,54,13,true,true,1,126
+approved-wine-037,markerAndNumber,3,singleLine,production,numeric,13.0%,0,13,true,true,1,125
+approved-wine-037,markerAndNumber,3,singleLine,production,numericPlusMarker,13.0 % oy,49,13,true,true,1,127
+approved-wine-037,markerAndNumber,3,singleLine,grayscaleOnly,unrestricted,13.0 % uy,55,13,true,true,1,112
+approved-wine-037,markerAndNumber,3,singleLine,normalise,unrestricted,13.0 % uy,54,13,true,true,1,125
+approved-wine-037,markerAndNumber,3,singleLine,linearBoost,unrestricted,13.0 % uy,52,13,true,true,1,120
+approved-wine-037,markerAndNumber,3,singleLine,otsu,unrestricted,,0,,false,true,1,30
+approved-wine-037,markerAndNumber,3,singleLine,otsu,numeric,,0,,false,true,1,31
+approved-wine-037,markerAndNumber,3,singleLine,otsu,numericPlusMarker,,0,,false,true,1,31
+approved-wine-037,markerAndNumber,3,singleLine,thresholdFixed,unrestricted,EE,10,,false,true,1,67
+approved-wine-037,markerAndNumber,3,singleLine,inverted,unrestricted,13.0 % oy,45,13,true,true,1,120
+approved-wine-037,markerAndNumber,3,singleLine,inverted,numeric,13.0%,0,13,true,true,1,120
+approved-wine-037,markerAndNumber,3,singleLine,inverted,numericPlusMarker,13.0 % oy,45,13,true,true,1,120
+approved-wine-037,markerAndNumber,3,singleLine,invertedThreshold,unrestricted,,0,,false,true,1,30
+approved-wine-037,markerAndNumber,3,singleWord,production,unrestricted,"13.0 %.,",63,13,true,true,1,121
+approved-wine-037,markerAndNumber,3,singleWord,production,numeric,"13.0%.,",0,13,true,true,1,119
+approved-wine-037,markerAndNumber,3,singleWord,production,numericPlusMarker,"13.0 %.,",63,13,true,true,1,119
+approved-wine-037,markerAndNumber,3,singleWord,grayscaleOnly,unrestricted,"13.0 %.,",56,13,true,true,1,108
+approved-wine-037,markerAndNumber,3,singleWord,normalise,unrestricted,"13.0 %.,",63,13,true,true,1,120
+approved-wine-037,markerAndNumber,3,singleWord,linearBoost,unrestricted,"13.0 %.,",60,13,true,true,1,111
+approved-wine-037,markerAndNumber,3,singleWord,otsu,unrestricted,ERE,36,,false,true,1,68
+approved-wine-037,markerAndNumber,3,singleWord,otsu,numeric,,0,,false,true,1,67
+approved-wine-037,markerAndNumber,3,singleWord,otsu,numericPlusMarker,,0,,false,true,1,67
+approved-wine-037,markerAndNumber,3,singleWord,thresholdFixed,unrestricted,EE,10,,false,true,1,66
+approved-wine-037,markerAndNumber,3,singleWord,inverted,unrestricted,"13.0 %.,",58,13,true,true,1,116
+approved-wine-037,markerAndNumber,3,singleWord,inverted,numeric,"13.0%.,",0,13,true,true,1,115
+approved-wine-037,markerAndNumber,3,singleWord,inverted,numericPlusMarker,"13.0 %.,",58,13,true,true,1,117
+approved-wine-037,markerAndNumber,3,singleWord,invertedThreshold,unrestricted,ERE,36,,false,true,1,66
+approved-wine-037,markerAndNumber,3,singleBlock,production,unrestricted,13.0 % uy,54,13,true,true,1,126
+approved-wine-037,markerAndNumber,3,singleBlock,production,numeric,13.0%,0,13,true,true,1,127
+approved-wine-037,markerAndNumber,3,singleBlock,production,numericPlusMarker,13.0 % oy,49,13,true,true,1,126
+approved-wine-037,markerAndNumber,3,singleBlock,grayscaleOnly,unrestricted,13.0 % uy,55,13,true,true,1,112
+approved-wine-037,markerAndNumber,3,singleBlock,normalise,unrestricted,13.0 % uy,54,13,true,true,1,125
+approved-wine-037,markerAndNumber,3,singleBlock,linearBoost,unrestricted,13.0 % uy,52,13,true,true,1,118
+approved-wine-037,markerAndNumber,3,singleBlock,otsu,unrestricted,a L | | cn _,40,,false,true,1,50
+approved-wine-037,markerAndNumber,3,singleBlock,otsu,numeric,.41,0,41,false,true,1,50
+approved-wine-037,markerAndNumber,3,singleBlock,otsu,numericPlusMarker,a L l co 1,7,1,false,true,1,50
+approved-wine-037,markerAndNumber,3,singleBlock,thresholdFixed,unrestricted,,0,,false,true,1,27
+approved-wine-037,markerAndNumber,3,singleBlock,inverted,unrestricted,13.0 % oy,45,13,true,true,1,119
+approved-wine-037,markerAndNumber,3,singleBlock,inverted,numeric,13.0%,0,13,true,true,1,121
+approved-wine-037,markerAndNumber,3,singleBlock,inverted,numericPlusMarker,13.0 % oy,45,13,true,true,1,120
+approved-wine-037,markerAndNumber,3,singleBlock,invertedThreshold,unrestricted,| L} | | 41 _,40,41,false,true,1,49
+approved-wine-037,markerAndNumber,4,sparse,production,unrestricted,13.0 % uy,52,13,true,true,1,211
+approved-wine-037,markerAndNumber,4,sparse,production,numeric,13.0%,0,13,true,true,1,220
+approved-wine-037,markerAndNumber,4,sparse,production,numericPlusMarker,13.0 % oy,49,13,true,true,1,211
+approved-wine-037,markerAndNumber,4,sparse,grayscaleOnly,unrestricted,13.0 % uy,56,13,true,true,1,192
+approved-wine-037,markerAndNumber,4,sparse,normalise,unrestricted,13.0 % uy,52,13,true,true,1,213
+approved-wine-037,markerAndNumber,4,sparse,linearBoost,unrestricted,13.0 % uy,51,13,true,true,1,203
+approved-wine-037,markerAndNumber,4,sparse,otsu,unrestricted,,0,,false,true,1,86
+approved-wine-037,markerAndNumber,4,sparse,otsu,numeric,,0,,false,true,1,86
+approved-wine-037,markerAndNumber,4,sparse,otsu,numericPlusMarker,,0,,false,true,1,85
+approved-wine-037,markerAndNumber,4,sparse,thresholdFixed,unrestricted,,0,,false,true,1,57
+approved-wine-037,markerAndNumber,4,sparse,inverted,unrestricted,13.0 % uy,47,13,true,true,1,205
+approved-wine-037,markerAndNumber,4,sparse,inverted,numeric,13.0%,0,13,true,true,1,209
+approved-wine-037,markerAndNumber,4,sparse,inverted,numericPlusMarker,13.0 % oy,47,13,true,true,1,226
+approved-wine-037,markerAndNumber,4,sparse,invertedThreshold,unrestricted,,0,,false,true,1,82
+approved-wine-037,markerAndNumber,4,singleLine,production,unrestricted,13.0 % uy,52,13,true,true,1,198
+approved-wine-037,markerAndNumber,4,singleLine,production,numeric,13.0%,0,13,true,true,1,197
+approved-wine-037,markerAndNumber,4,singleLine,production,numericPlusMarker,13.0 % oy,49,13,true,true,1,197
+approved-wine-037,markerAndNumber,4,singleLine,grayscaleOnly,unrestricted,13.0 % uy,56,13,true,true,1,179
+approved-wine-037,markerAndNumber,4,singleLine,normalise,unrestricted,13.0 % uy,52,13,true,true,1,199
+approved-wine-037,markerAndNumber,4,singleLine,linearBoost,unrestricted,13.0 % uy,51,13,true,true,1,194
+approved-wine-037,markerAndNumber,4,singleLine,otsu,unrestricted,iL,12,,false,true,1,69
+approved-wine-037,markerAndNumber,4,singleLine,otsu,numeric,",",0,,false,true,1,69
+approved-wine-037,markerAndNumber,4,singleLine,otsu,numericPlusMarker,LL,5,,false,true,1,68
+approved-wine-037,markerAndNumber,4,singleLine,thresholdFixed,unrestricted,EE,10,,false,true,1,113
+approved-wine-037,markerAndNumber,4,singleLine,inverted,unrestricted,13.0 % uy,47,13,true,true,1,192
+approved-wine-037,markerAndNumber,4,singleLine,inverted,numeric,13.0%,0,13,true,true,1,191
+approved-wine-037,markerAndNumber,4,singleLine,inverted,numericPlusMarker,13.0 % oy,47,13,true,true,1,192
+approved-wine-037,markerAndNumber,4,singleLine,invertedThreshold,unrestricted,dL,15,,false,true,1,65
+approved-wine-037,markerAndNumber,4,singleWord,production,unrestricted,"13.0 %.,",56,13,true,true,1,190
+approved-wine-037,markerAndNumber,4,singleWord,production,numeric,"13.0%.,",0,13,true,true,1,190
+approved-wine-037,markerAndNumber,4,singleWord,production,numericPlusMarker,"13.0 %.,",56,13,true,true,1,193
+approved-wine-037,markerAndNumber,4,singleWord,grayscaleOnly,unrestricted,"13.0 %.,",61,13,true,true,1,176
+approved-wine-037,markerAndNumber,4,singleWord,normalise,unrestricted,"13.0 %.,",56,13,true,true,1,190
+approved-wine-037,markerAndNumber,4,singleWord,linearBoost,unrestricted,"13.0 %.,",55,13,true,true,1,181
+approved-wine-037,markerAndNumber,4,singleWord,otsu,unrestricted,ERE,34,,false,true,1,117
+approved-wine-037,markerAndNumber,4,singleWord,otsu,numeric,,0,,false,true,1,117
+approved-wine-037,markerAndNumber,4,singleWord,otsu,numericPlusMarker,,0,,false,true,1,119
+approved-wine-037,markerAndNumber,4,singleWord,thresholdFixed,unrestricted,EE,10,,false,true,1,114
+approved-wine-037,markerAndNumber,4,singleWord,inverted,unrestricted,"13.0 %.,",56,13,true,true,1,187
+approved-wine-037,markerAndNumber,4,singleWord,inverted,numeric,"13.0%.,",0,13,true,true,1,186
+approved-wine-037,markerAndNumber,4,singleWord,inverted,numericPlusMarker,"13.0 %.,",56,13,true,true,1,189
+approved-wine-037,markerAndNumber,4,singleWord,invertedThreshold,unrestricted,ERE,35,,false,true,1,112
+approved-wine-037,markerAndNumber,4,singleBlock,production,unrestricted,13.0 % uy,52,13,true,true,1,197
+approved-wine-037,markerAndNumber,4,singleBlock,production,numeric,13.0%,0,13,true,true,1,196
+approved-wine-037,markerAndNumber,4,singleBlock,production,numericPlusMarker,13.0 % oy,49,13,true,true,1,197
+approved-wine-037,markerAndNumber,4,singleBlock,grayscaleOnly,unrestricted,13.0 % uy,56,13,true,true,1,178
+approved-wine-037,markerAndNumber,4,singleBlock,normalise,unrestricted,13.0 % uy,52,13,true,true,1,200
+approved-wine-037,markerAndNumber,4,singleBlock,linearBoost,unrestricted,13.0 % uy,51,13,true,true,1,192
+approved-wine-037,markerAndNumber,4,singleBlock,otsu,unrestricted,| yo | v4 2!,49,4,false,true,1,75
+approved-wine-037,markerAndNumber,4,singleBlock,otsu,numeric,4 2,5,4,false,true,1,78
+approved-wine-037,markerAndNumber,4,singleBlock,otsu,numericPlusMarker,yo l v4 2,10,4,false,true,1,76
+approved-wine-037,markerAndNumber,4,singleBlock,thresholdFixed,unrestricted,,0,,false,true,1,50
+approved-wine-037,markerAndNumber,4,singleBlock,inverted,unrestricted,13.0 % uy,47,13,true,true,1,195
+approved-wine-037,markerAndNumber,4,singleBlock,inverted,numeric,13.0%,0,13,true,true,1,191
+approved-wine-037,markerAndNumber,4,singleBlock,inverted,numericPlusMarker,13.0 % oy,47,13,true,true,1,193
+approved-wine-037,markerAndNumber,4,singleBlock,invertedThreshold,unrestricted,| yo | v4 2!,46,4,false,true,1,74
+approved-wine-037,numberOnly,1.5,sparse,production,unrestricted,13.0 %,70,13,true,true,1,63
+approved-wine-037,numberOnly,1.5,sparse,production,numeric,13.0%,0,13,true,true,1,47
+approved-wine-037,numberOnly,1.5,sparse,production,numericPlusMarker,13.0 %,70,13,true,true,1,48
+approved-wine-037,numberOnly,1.5,sparse,grayscaleOnly,unrestricted,13.0 %,65,13,true,true,1,43
+approved-wine-037,numberOnly,1.5,sparse,normalise,unrestricted,13.0 %,70,13,true,true,1,47
+approved-wine-037,numberOnly,1.5,sparse,linearBoost,unrestricted,13.0 %,64,13,true,true,1,41
+approved-wine-037,numberOnly,1.5,sparse,otsu,unrestricted,|,57,,false,true,1,9
+approved-wine-037,numberOnly,1.5,sparse,otsu,numeric,,0,,false,true,1,9
+approved-wine-037,numberOnly,1.5,sparse,otsu,numericPlusMarker,,0,,false,true,1,9
+approved-wine-037,numberOnly,1.5,sparse,thresholdFixed,unrestricted,,0,,false,true,1,7
+approved-wine-037,numberOnly,1.5,sparse,inverted,unrestricted,13.0 %,64,13,true,true,1,43
+approved-wine-037,numberOnly,1.5,sparse,inverted,numeric,13.0%,0,13,true,true,1,42
+approved-wine-037,numberOnly,1.5,sparse,inverted,numericPlusMarker,13.0 %,64,13,true,true,1,42
+approved-wine-037,numberOnly,1.5,sparse,invertedThreshold,unrestricted,,0,,false,true,1,8
+approved-wine-037,numberOnly,1.5,singleLine,production,unrestricted,13.0 %,70,13,true,true,1,45
+approved-wine-037,numberOnly,1.5,singleLine,production,numeric,13.0%,0,13,true,true,1,45
+approved-wine-037,numberOnly,1.5,singleLine,production,numericPlusMarker,13.0 %,70,13,true,true,1,45
+approved-wine-037,numberOnly,1.5,singleLine,grayscaleOnly,unrestricted,13.0 %,65,13,true,true,1,48
+approved-wine-037,numberOnly,1.5,singleLine,normalise,unrestricted,13.0 %,70,13,true,true,1,47
+approved-wine-037,numberOnly,1.5,singleLine,linearBoost,unrestricted,13.0 %,64,13,true,true,1,38
+approved-wine-037,numberOnly,1.5,singleLine,otsu,unrestricted,Co,11,,false,true,1,15
+approved-wine-037,numberOnly,1.5,singleLine,otsu,numeric,,0,,false,true,1,15
+approved-wine-037,numberOnly,1.5,singleLine,otsu,numericPlusMarker,Co,11,,false,true,1,14
+approved-wine-037,numberOnly,1.5,singleLine,thresholdFixed,unrestricted,I,16,,false,true,1,22
+approved-wine-037,numberOnly,1.5,singleLine,inverted,unrestricted,13.0 %,64,13,true,true,1,40
+approved-wine-037,numberOnly,1.5,singleLine,inverted,numeric,13.0%,0,13,true,true,1,40
+approved-wine-037,numberOnly,1.5,singleLine,inverted,numericPlusMarker,13.0 %,64,13,true,true,1,41
+approved-wine-037,numberOnly,1.5,singleLine,invertedThreshold,unrestricted,Co,13,,false,true,1,15
+approved-wine-037,numberOnly,1.5,singleWord,production,unrestricted,13.0 %,70,13,true,true,1,42
+approved-wine-037,numberOnly,1.5,singleWord,production,numeric,"13.0%,",13,13,true,true,1,42
+approved-wine-037,numberOnly,1.5,singleWord,production,numericPlusMarker,13.0 %,70,13,true,true,1,42
+approved-wine-037,numberOnly,1.5,singleWord,grayscaleOnly,unrestricted,13.0 %,71,13,true,true,1,38
+approved-wine-037,numberOnly,1.5,singleWord,normalise,unrestricted,13.0 %,70,13,true,true,1,42
+approved-wine-037,numberOnly,1.5,singleWord,linearBoost,unrestricted,"13.0 %.,",61,13,true,true,1,38
+approved-wine-037,numberOnly,1.5,singleWord,otsu,unrestricted,ER,51,,false,true,1,23
+approved-wine-037,numberOnly,1.5,singleWord,otsu,numeric,,0,,false,true,1,22
+approved-wine-037,numberOnly,1.5,singleWord,otsu,numericPlusMarker,BA,0,,false,true,1,23
+approved-wine-037,numberOnly,1.5,singleWord,thresholdFixed,unrestricted,I,16,,false,true,1,22
+approved-wine-037,numberOnly,1.5,singleWord,inverted,unrestricted,"13.0%»,",0,13,true,true,1,38
+approved-wine-037,numberOnly,1.5,singleWord,inverted,numeric,"13.0%,",0,13,true,true,1,38
+approved-wine-037,numberOnly,1.5,singleWord,inverted,numericPlusMarker,"13.0%,",0,13,true,true,1,38
+approved-wine-037,numberOnly,1.5,singleWord,invertedThreshold,unrestricted,ER,53,,false,true,1,23
+approved-wine-037,numberOnly,1.5,singleBlock,production,unrestricted,13.0 %,70,13,true,true,1,45
+approved-wine-037,numberOnly,1.5,singleBlock,production,numeric,13.0%,0,13,true,true,1,46
+approved-wine-037,numberOnly,1.5,singleBlock,production,numericPlusMarker,13.0 %,70,13,true,true,1,45
+approved-wine-037,numberOnly,1.5,singleBlock,grayscaleOnly,unrestricted,13.0 %,65,13,true,true,1,42
+approved-wine-037,numberOnly,1.5,singleBlock,normalise,unrestricted,13.0 %,70,13,true,true,1,45
+approved-wine-037,numberOnly,1.5,singleBlock,linearBoost,unrestricted,13.0 %,64,13,true,true,1,38
+approved-wine-037,numberOnly,1.5,singleBlock,otsu,unrestricted,Co | | 4 : | a,43,4,false,true,1,33
+approved-wine-037,numberOnly,1.5,singleBlock,otsu,numeric,4,22,4,false,true,1,32
+approved-wine-037,numberOnly,1.5,singleBlock,otsu,numericPlusMarker,Co 4 a,15,4,false,true,1,33
+approved-wine-037,numberOnly,1.5,singleBlock,thresholdFixed,unrestricted,,0,,false,true,1,6
+approved-wine-037,numberOnly,1.5,singleBlock,inverted,unrestricted,13.0 %,64,13,true,true,1,40
+approved-wine-037,numberOnly,1.5,singleBlock,inverted,numeric,13.0%,0,13,true,true,1,40
+approved-wine-037,numberOnly,1.5,singleBlock,inverted,numericPlusMarker,13.0 %,64,13,true,true,1,40
+approved-wine-037,numberOnly,1.5,singleBlock,invertedThreshold,unrestricted,Co | | 4 a 2!,53,4,false,true,1,32
+approved-wine-037,numberOnly,2,sparse,production,unrestricted,13.0 %,68,13,true,true,1,64
+approved-wine-037,numberOnly,2,sparse,production,numeric,13.0%,0,13,true,true,1,64
+approved-wine-037,numberOnly,2,sparse,production,numericPlusMarker,13.0 %,68,13,true,true,1,64
+approved-wine-037,numberOnly,2,sparse,grayscaleOnly,unrestricted,13.0 %,65,13,true,true,1,67
+approved-wine-037,numberOnly,2,sparse,normalise,unrestricted,13.0 %,68,13,true,true,1,64
+approved-wine-037,numberOnly,2,sparse,linearBoost,unrestricted,13.0 %,75,13,true,true,1,60
+approved-wine-037,numberOnly,2,sparse,otsu,unrestricted,,0,,false,true,1,20
+approved-wine-037,numberOnly,2,sparse,otsu,numeric,,0,,false,true,1,20
+approved-wine-037,numberOnly,2,sparse,otsu,numericPlusMarker,,0,,false,true,1,20
+approved-wine-037,numberOnly,2,sparse,thresholdFixed,unrestricted,,0,,false,true,1,13
+approved-wine-037,numberOnly,2,sparse,inverted,unrestricted,13.0 %,75,13,true,true,1,59
+approved-wine-037,numberOnly,2,sparse,inverted,numeric,13.0%,0,13,true,true,1,59
+approved-wine-037,numberOnly,2,sparse,inverted,numericPlusMarker,13.0 %,75,13,true,true,1,59
+approved-wine-037,numberOnly,2,sparse,invertedThreshold,unrestricted,,0,,false,true,1,20
+approved-wine-037,numberOnly,2,singleLine,production,unrestricted,13.0 %,68,13,true,true,1,61
+approved-wine-037,numberOnly,2,singleLine,production,numeric,13.0%,0,13,true,true,1,61
+approved-wine-037,numberOnly,2,singleLine,production,numericPlusMarker,13.0 %,68,13,true,true,1,61
+approved-wine-037,numberOnly,2,singleLine,grayscaleOnly,unrestricted,13.0 %,65,13,true,true,1,61
+approved-wine-037,numberOnly,2,singleLine,normalise,unrestricted,13.0 %,68,13,true,true,1,61
+approved-wine-037,numberOnly,2,singleLine,linearBoost,unrestricted,13.0 %,75,13,true,true,1,57
+approved-wine-037,numberOnly,2,singleLine,otsu,unrestricted,Co,9,,false,true,1,21
+approved-wine-037,numberOnly,2,singleLine,otsu,numeric,,0,,false,true,1,21
+approved-wine-037,numberOnly,2,singleLine,otsu,numericPlusMarker,Co,9,,false,true,1,21
+approved-wine-037,numberOnly,2,singleLine,thresholdFixed,unrestricted,I,16,,false,true,1,31
+approved-wine-037,numberOnly,2,singleLine,inverted,unrestricted,13.0 %,75,13,true,true,1,57
+approved-wine-037,numberOnly,2,singleLine,inverted,numeric,13.0%,0,13,true,true,1,56
+approved-wine-037,numberOnly,2,singleLine,inverted,numericPlusMarker,13.0 %,75,13,true,true,1,56
+approved-wine-037,numberOnly,2,singleLine,invertedThreshold,unrestricted,Co,11,,false,true,1,21
+approved-wine-037,numberOnly,2,singleWord,production,unrestricted,13.0 %,63,13,true,true,1,63
+approved-wine-037,numberOnly,2,singleWord,production,numeric,"13.0%,",0,13,true,true,1,63
+approved-wine-037,numberOnly,2,singleWord,production,numericPlusMarker,13.0 %,63,13,true,true,1,62
+approved-wine-037,numberOnly,2,singleWord,grayscaleOnly,unrestricted,"13.0%,",16,13,true,true,1,57
+approved-wine-037,numberOnly,2,singleWord,normalise,unrestricted,13.0 %,63,13,true,true,1,63
+approved-wine-037,numberOnly,2,singleWord,linearBoost,unrestricted,"13.0%,",0,13,true,true,1,57
+approved-wine-037,numberOnly,2,singleWord,otsu,unrestricted,ER,51,,false,true,1,33
+approved-wine-037,numberOnly,2,singleWord,otsu,numeric,,0,,false,true,1,35
+approved-wine-037,numberOnly,2,singleWord,otsu,numericPlusMarker,,0,,false,true,1,34
+approved-wine-037,numberOnly,2,singleWord,thresholdFixed,unrestricted,I,16,,false,true,1,32
+approved-wine-037,numberOnly,2,singleWord,inverted,unrestricted,"13.0%»,",0,13,true,true,1,67
+approved-wine-037,numberOnly,2,singleWord,inverted,numeric,"13.0%,",0,13,true,true,1,58
+approved-wine-037,numberOnly,2,singleWord,inverted,numericPlusMarker,"13.0%,",0,13,true,true,1,58
+approved-wine-037,numberOnly,2,singleWord,invertedThreshold,unrestricted,ER,52,,false,true,1,33
+approved-wine-037,numberOnly,2,singleBlock,production,unrestricted,13.0 %,68,13,true,true,1,61
+approved-wine-037,numberOnly,2,singleBlock,production,numeric,13.0%,0,13,true,true,1,61
+approved-wine-037,numberOnly,2,singleBlock,production,numericPlusMarker,13.0 %,68,13,true,true,1,61
+approved-wine-037,numberOnly,2,singleBlock,grayscaleOnly,unrestricted,13.0 %,65,13,true,true,1,61
+approved-wine-037,numberOnly,2,singleBlock,normalise,unrestricted,13.0 %,68,13,true,true,1,61
+approved-wine-037,numberOnly,2,singleBlock,linearBoost,unrestricted,13.0 %,75,13,true,true,1,56
+approved-wine-037,numberOnly,2,singleBlock,otsu,unrestricted,EE | | v4 i,46,4,false,true,1,41
+approved-wine-037,numberOnly,2,singleBlock,otsu,numeric,4,0,4,false,true,1,40
+approved-wine-037,numberOnly,2,singleBlock,otsu,numericPlusMarker,l v4,18,4,false,true,1,40
+approved-wine-037,numberOnly,2,singleBlock,thresholdFixed,unrestricted,,0,,false,true,1,11
+approved-wine-037,numberOnly,2,singleBlock,inverted,unrestricted,13.0 %,75,13,true,true,1,56
+approved-wine-037,numberOnly,2,singleBlock,inverted,numeric,13.0%,0,13,true,true,1,56
+approved-wine-037,numberOnly,2,singleBlock,inverted,numericPlusMarker,13.0 %,75,13,true,true,1,56
+approved-wine-037,numberOnly,2,singleBlock,invertedThreshold,unrestricted,EE | | v4 i,46,4,false,true,1,40
+approved-wine-037,numberOnly,3,sparse,production,unrestricted,13.0 %,81,13,true,true,1,130
+approved-wine-037,numberOnly,3,sparse,production,numeric,13.0%,0,13,true,true,1,129
+approved-wine-037,numberOnly,3,sparse,production,numericPlusMarker,13.0 %,81,13,true,true,1,130
+approved-wine-037,numberOnly,3,sparse,grayscaleOnly,unrestricted,13.0 %,78,13,true,true,1,118
+approved-wine-037,numberOnly,3,sparse,normalise,unrestricted,13.0 %,81,13,true,true,1,133
+approved-wine-037,numberOnly,3,sparse,linearBoost,unrestricted,13.0 %,84,13,true,true,1,115
+approved-wine-037,numberOnly,3,sparse,otsu,unrestricted,,0,,false,true,1,43
+approved-wine-037,numberOnly,3,sparse,otsu,numeric,,0,,false,true,1,42
+approved-wine-037,numberOnly,3,sparse,otsu,numericPlusMarker,,0,,false,true,1,42
+approved-wine-037,numberOnly,3,sparse,thresholdFixed,unrestricted,,0,,false,true,1,29
+approved-wine-037,numberOnly,3,sparse,inverted,unrestricted,13.0 %,78,13,true,true,1,125
+approved-wine-037,numberOnly,3,sparse,inverted,numeric,13.0%,0,13,true,true,1,128
+approved-wine-037,numberOnly,3,sparse,inverted,numericPlusMarker,13.0 %,78,13,true,true,1,125
+approved-wine-037,numberOnly,3,sparse,invertedThreshold,unrestricted,,0,,false,true,1,42
+approved-wine-037,numberOnly,3,singleLine,production,unrestricted,13.0 %,81,13,true,true,1,125
+approved-wine-037,numberOnly,3,singleLine,production,numeric,13.0%,0,13,true,true,1,122
+approved-wine-037,numberOnly,3,singleLine,production,numericPlusMarker,13.0 %,81,13,true,true,1,122
+approved-wine-037,numberOnly,3,singleLine,grayscaleOnly,unrestricted,13.0 %,78,13,true,true,1,110
+approved-wine-037,numberOnly,3,singleLine,normalise,unrestricted,13.0 %,81,13,true,true,1,123
+approved-wine-037,numberOnly,3,singleLine,linearBoost,unrestricted,13.0 %,84,13,true,true,1,105
+approved-wine-037,numberOnly,3,singleLine,otsu,unrestricted,,0,,false,true,1,32
+approved-wine-037,numberOnly,3,singleLine,otsu,numeric,,0,,false,true,1,28
+approved-wine-037,numberOnly,3,singleLine,otsu,numericPlusMarker,,0,,false,true,1,28
+approved-wine-037,numberOnly,3,singleLine,thresholdFixed,unrestricted,I,16,,false,true,1,62
+approved-wine-037,numberOnly,3,singleLine,inverted,unrestricted,13.0 %,78,13,true,true,1,119
+approved-wine-037,numberOnly,3,singleLine,inverted,numeric,13.0%,0,13,true,true,1,117
+approved-wine-037,numberOnly,3,singleLine,inverted,numericPlusMarker,13.0 %,78,13,true,true,1,117
+approved-wine-037,numberOnly,3,singleLine,invertedThreshold,unrestricted,,0,,false,true,1,27
+approved-wine-037,numberOnly,3,singleWord,production,unrestricted,"13.0%,",0,13,true,true,1,114
+approved-wine-037,numberOnly,3,singleWord,production,numeric,"13.0%,",0,13,true,true,1,114
+approved-wine-037,numberOnly,3,singleWord,production,numericPlusMarker,"13.0%,",0,13,true,true,1,115
+approved-wine-037,numberOnly,3,singleWord,grayscaleOnly,unrestricted,13.0 %,70,13,true,true,1,105
+approved-wine-037,numberOnly,3,singleWord,normalise,unrestricted,"13.0%,",0,13,true,true,1,115
+approved-wine-037,numberOnly,3,singleWord,linearBoost,unrestricted,"13.0 %.,",57,13,true,true,1,108
+approved-wine-037,numberOnly,3,singleWord,otsu,unrestricted,ER,52,,false,true,1,63
+approved-wine-037,numberOnly,3,singleWord,otsu,numeric,,0,,false,true,1,63
+approved-wine-037,numberOnly,3,singleWord,otsu,numericPlusMarker,,0,,false,true,1,62
+approved-wine-037,numberOnly,3,singleWord,thresholdFixed,unrestricted,I,16,,false,true,1,61
+approved-wine-037,numberOnly,3,singleWord,inverted,unrestricted,"13.0%,",0,13,true,true,1,111
+approved-wine-037,numberOnly,3,singleWord,inverted,numeric,"13.0%,",0,13,true,true,1,113
+approved-wine-037,numberOnly,3,singleWord,inverted,numericPlusMarker,"13.0%,",0,13,true,true,1,111
+approved-wine-037,numberOnly,3,singleWord,invertedThreshold,unrestricted,ER,55,,false,true,1,62
+approved-wine-037,numberOnly,3,singleBlock,production,unrestricted,13.0 %,81,13,true,true,1,140
+approved-wine-037,numberOnly,3,singleBlock,production,numeric,13.0%,0,13,true,true,1,123
+approved-wine-037,numberOnly,3,singleBlock,production,numericPlusMarker,13.0 %,81,13,true,true,1,125
+approved-wine-037,numberOnly,3,singleBlock,grayscaleOnly,unrestricted,13.0 %,78,13,true,true,1,112
+approved-wine-037,numberOnly,3,singleBlock,normalise,unrestricted,13.0 %,81,13,true,true,1,125
+approved-wine-037,numberOnly,3,singleBlock,linearBoost,unrestricted,13.0 %,84,13,true,true,1,105
+approved-wine-037,numberOnly,3,singleBlock,otsu,unrestricted,BE C41 =!,24,41,false,true,1,48
+approved-wine-037,numberOnly,3,singleBlock,otsu,numeric,41,0,41,false,true,1,48
+approved-wine-037,numberOnly,3,singleBlock,otsu,numericPlusMarker,BL C41,11,41,false,true,1,47
+approved-wine-037,numberOnly,3,singleBlock,thresholdFixed,unrestricted,,0,,false,true,1,24
+approved-wine-037,numberOnly,3,singleBlock,inverted,unrestricted,13.0 %,78,13,true,true,1,119
+approved-wine-037,numberOnly,3,singleBlock,inverted,numeric,13.0%,0,13,true,true,1,119
+approved-wine-037,numberOnly,3,singleBlock,inverted,numericPlusMarker,13.0 %,78,13,true,true,1,128
+approved-wine-037,numberOnly,3,singleBlock,invertedThreshold,unrestricted,BE C41 =!,25,41,false,true,1,47
+approved-wine-037,numberOnly,4,sparse,production,unrestricted,13.0 %,86,13,true,true,1,205
+approved-wine-037,numberOnly,4,sparse,production,numeric,13.0%,0,13,true,true,1,205
+approved-wine-037,numberOnly,4,sparse,production,numericPlusMarker,13.0 %,86,13,true,true,1,205
+approved-wine-037,numberOnly,4,sparse,grayscaleOnly,unrestricted,13.0 %,86,13,true,true,1,191
+approved-wine-037,numberOnly,4,sparse,normalise,unrestricted,13.0 %,86,13,true,true,1,205
+approved-wine-037,numberOnly,4,sparse,linearBoost,unrestricted,13.0 %,81,13,true,true,1,178
+approved-wine-037,numberOnly,4,sparse,otsu,unrestricted,,0,,false,true,1,78
+approved-wine-037,numberOnly,4,sparse,otsu,numeric,,0,,false,true,1,78
+approved-wine-037,numberOnly,4,sparse,otsu,numericPlusMarker,,0,,false,true,1,81
+approved-wine-037,numberOnly,4,sparse,thresholdFixed,unrestricted,,0,,false,true,1,51
+approved-wine-037,numberOnly,4,sparse,inverted,unrestricted,13.0 %,86,13,true,true,1,203
+approved-wine-037,numberOnly,4,sparse,inverted,numeric,13.0%,0,13,true,true,1,200
+approved-wine-037,numberOnly,4,sparse,inverted,numericPlusMarker,13.0 %,86,13,true,true,1,201
+approved-wine-037,numberOnly,4,sparse,invertedThreshold,unrestricted,,0,,false,true,1,76
+approved-wine-037,numberOnly,4,singleLine,production,unrestricted,13.0 %,86,13,true,true,1,193
+approved-wine-037,numberOnly,4,singleLine,production,numeric,13.0%,0,13,true,true,1,192
+approved-wine-037,numberOnly,4,singleLine,production,numericPlusMarker,13.0 %,86,13,true,true,1,192
+approved-wine-037,numberOnly,4,singleLine,grayscaleOnly,unrestricted,13.0 %,86,13,true,true,1,178
+approved-wine-037,numberOnly,4,singleLine,normalise,unrestricted,13.0 %,86,13,true,true,1,197
+approved-wine-037,numberOnly,4,singleLine,linearBoost,unrestricted,13.0 %,81,13,true,true,1,165
+approved-wine-037,numberOnly,4,singleLine,otsu,unrestricted,Co,5,,false,true,1,65
+approved-wine-037,numberOnly,4,singleLine,otsu,numeric,,0,,false,true,1,63
+approved-wine-037,numberOnly,4,singleLine,otsu,numericPlusMarker,Co,5,,false,true,1,65
+approved-wine-037,numberOnly,4,singleLine,thresholdFixed,unrestricted,I,16,,false,true,1,100
+approved-wine-037,numberOnly,4,singleLine,inverted,unrestricted,13.0 %,86,13,true,true,1,189
+approved-wine-037,numberOnly,4,singleLine,inverted,numeric,13.0%,0,13,true,true,1,187
+approved-wine-037,numberOnly,4,singleLine,inverted,numericPlusMarker,13.0 %,86,13,true,true,1,187
+approved-wine-037,numberOnly,4,singleLine,invertedThreshold,unrestricted,Co,3,,false,true,1,62
+approved-wine-037,numberOnly,4,singleWord,production,unrestricted,13.0 %,67,13,true,true,1,180
+approved-wine-037,numberOnly,4,singleWord,production,numeric,"13.0%,",9,13,true,true,1,183
+approved-wine-037,numberOnly,4,singleWord,production,numericPlusMarker,13.0 %,67,13,true,true,1,180
+approved-wine-037,numberOnly,4,singleWord,grayscaleOnly,unrestricted,13.0 %,67,13,true,true,1,164
+approved-wine-037,numberOnly,4,singleWord,normalise,unrestricted,13.0 %,67,13,true,true,1,180
+approved-wine-037,numberOnly,4,singleWord,linearBoost,unrestricted,"13.0 %.,",46,13,true,true,1,173
+approved-wine-037,numberOnly,4,singleWord,otsu,unrestricted,ER,51,,false,true,1,105
+approved-wine-037,numberOnly,4,singleWord,otsu,numeric,,0,,false,true,1,103
+approved-wine-037,numberOnly,4,singleWord,otsu,numericPlusMarker,,0,,false,true,1,104
+approved-wine-037,numberOnly,4,singleWord,thresholdFixed,unrestricted,I,16,,false,true,1,100
+approved-wine-037,numberOnly,4,singleWord,inverted,unrestricted,13.0 %,66,13,true,true,1,175
+approved-wine-037,numberOnly,4,singleWord,inverted,numeric,"13.0%,",0,13,true,true,1,178
+approved-wine-037,numberOnly,4,singleWord,inverted,numericPlusMarker,13.0 %,66,13,true,true,1,176
+approved-wine-037,numberOnly,4,singleWord,invertedThreshold,unrestricted,ER,54,,false,true,1,103
+approved-wine-037,numberOnly,4,singleBlock,production,unrestricted,13.0 %,86,13,true,true,1,194
+approved-wine-037,numberOnly,4,singleBlock,production,numeric,13.0%,0,13,true,true,1,193
+approved-wine-037,numberOnly,4,singleBlock,production,numericPlusMarker,13.0 %,86,13,true,true,1,193
+approved-wine-037,numberOnly,4,singleBlock,grayscaleOnly,unrestricted,13.0 %,86,13,true,true,1,177
+approved-wine-037,numberOnly,4,singleBlock,normalise,unrestricted,13.0 %,86,13,true,true,1,210
+approved-wine-037,numberOnly,4,singleBlock,linearBoost,unrestricted,13.0 %,81,13,true,true,1,167
+approved-wine-037,numberOnly,4,singleBlock,otsu,unrestricted,I TE | C4 _,28,4,false,true,1,83
+approved-wine-037,numberOnly,4,singleBlock,otsu,numeric,4,0,4,false,true,1,81
+approved-wine-037,numberOnly,4,singleBlock,otsu,numericPlusMarker,B l C4,2,4,false,true,1,82
+approved-wine-037,numberOnly,4,singleBlock,thresholdFixed,unrestricted,,0,,false,true,1,43
+approved-wine-037,numberOnly,4,singleBlock,inverted,unrestricted,13.0 %,86,13,true,true,1,187
+approved-wine-037,numberOnly,4,singleBlock,inverted,numeric,13.0%,0,13,true,true,1,187
+approved-wine-037,numberOnly,4,singleBlock,inverted,numericPlusMarker,13.0 %,86,13,true,true,1,188
+approved-wine-037,numberOnly,4,singleBlock,invertedThreshold,unrestricted,A TE | C4 _,29,4,false,true,1,78
+approved-wine-037,padded,1.5,sparse,production,unrestricted,WFNS WEN — coro 13.0 % by volume ME lalal,50,13,true,true,1,92
+approved-wine-037,padded,1.5,sparse,production,numeric,13.0 %,44,13,true,true,1,89
+approved-wine-037,padded,1.5,sparse,production,numericPlusMarker,coo 13.0 % by vol lal al,42,13,true,true,1,122
+approved-wine-037,padded,1.5,sparse,grayscaleOnly,unrestricted,WFNS WEN — coro 13.0 % by volume ME lalal,50,13,true,true,1,164
+approved-wine-037,padded,1.5,sparse,normalise,unrestricted,WFNS WEN — coro 13.0 % by volume ME lalal,50,13,true,true,1,107
+approved-wine-037,padded,1.5,sparse,linearBoost,unrestricted,"TIRES. WEN W— NN RN— ould, 0 Yoo an -_—.",30,0,false,true,1,137
+approved-wine-037,padded,1.5,sparse,otsu,unrestricted,ar. We VemeS 8 Wg OW Ra hdd Ad TR — v Vas,29,8,false,true,1,146
+approved-wine-037,padded,1.5,sparse,otsu,numeric,.89,0,89,false,true,1,181
+approved-wine-037,padded,1.5,sparse,otsu,numericPlusMarker,VV 8 V9 a hh A a v Va,19,8,false,true,1,145
+approved-wine-037,padded,1.5,sparse,thresholdFixed,unrestricted,SE We WV # Re - - ——,33,,false,true,1,92
+approved-wine-037,padded,1.5,sparse,inverted,unrestricted,WFNS WEN — cool 13.0 % by volume --—rm,51,13,true,true,1,83
+approved-wine-037,padded,1.5,sparse,inverted,numeric,"13.0 % ,",29,13,true,true,1,81
+approved-wine-037,padded,1.5,sparse,inverted,numericPlusMarker,"cool 13.0 % by vol ,",50,13,true,true,1,82
+approved-wine-037,padded,1.5,sparse,invertedThreshold,unrestricted,ar. We VemeS 8 Wg ¥W Ra ws w¥ TR — v Vas,27,8,false,true,1,128
+approved-wine-037,padded,1.5,singleLine,production,unrestricted,130 Yop,28,13,true,true,1,39
+approved-wine-037,padded,1.5,singleLine,production,numeric,130,0,13,true,true,1,39
+approved-wine-037,padded,1.5,singleLine,production,numericPlusMarker,130 ya,35,13,true,true,1,39
+approved-wine-037,padded,1.5,singleLine,grayscaleOnly,unrestricted,130 Yop,28,13,true,true,1,39
+approved-wine-037,padded,1.5,singleLine,normalise,unrestricted,130 Yop,28,13,true,true,1,39
+approved-wine-037,padded,1.5,singleLine,linearBoost,unrestricted,al30 tyra,14,30,false,true,1,34
+approved-wine-037,padded,1.5,singleLine,otsu,unrestricted,die and hn ; TWEE WY wW Tay Sarees V Vu,29,,false,true,1,104
+approved-wine-037,padded,1.5,singleLine,otsu,numeric,",",0,,false,true,1,104
+approved-wine-037,padded,1.5,singleLine,otsu,numericPlusMarker,"ha aa Bh , vv VY V Vaya V Va",14,,false,true,1,104
+approved-wine-037,padded,1.5,singleLine,thresholdFixed,unrestricted,wT Wee % Wg ¥ OW Taw VW WW a Ta a eT,27,,false,true,1,162
+approved-wine-037,padded,1.5,singleLine,inverted,unrestricted,130 Yop,30,13,true,true,1,39
+approved-wine-037,padded,1.5,singleLine,inverted,numeric,130,0,13,true,true,1,39
+approved-wine-037,padded,1.5,singleLine,inverted,numericPlusMarker,130 oy,30,13,true,true,1,39
+approved-wine-037,padded,1.5,singleLine,invertedThreshold,unrestricted,hie and ; TWEE WY wW Tay Sarees V Va,29,,false,true,1,104
+approved-wine-037,padded,1.5,singleWord,production,unrestricted,130 Yop,28,13,true,true,1,37
+approved-wine-037,padded,1.5,singleWord,production,numeric,130,0,13,true,true,1,37
+approved-wine-037,padded,1.5,singleWord,production,numericPlusMarker,130 ya,35,13,true,true,1,37
+approved-wine-037,padded,1.5,singleWord,grayscaleOnly,unrestricted,130 Yop,28,13,true,true,1,37
+approved-wine-037,padded,1.5,singleWord,normalise,unrestricted,130 Yop,28,13,true,true,1,37
+approved-wine-037,padded,1.5,singleWord,linearBoost,unrestricted,al30 tyra,14,30,false,true,1,32
+approved-wine-037,padded,1.5,singleWord,otsu,unrestricted,Ca,20,,false,true,1,23
+approved-wine-037,padded,1.5,singleWord,otsu,numeric,,0,,false,true,1,23
+approved-wine-037,padded,1.5,singleWord,otsu,numericPlusMarker,Ca,20,,false,true,1,23
+approved-wine-037,padded,1.5,singleWord,thresholdFixed,unrestricted,I,21,,false,true,1,22
+approved-wine-037,padded,1.5,singleWord,inverted,unrestricted,130 Yop,30,13,true,true,1,37
+approved-wine-037,padded,1.5,singleWord,inverted,numeric,130,0,13,true,true,1,37
+approved-wine-037,padded,1.5,singleWord,inverted,numericPlusMarker,130 oy,30,13,true,true,1,37
+approved-wine-037,padded,1.5,singleWord,invertedThreshold,unrestricted,ERT,25,,false,true,1,22
+approved-wine-037,padded,1.5,singleBlock,production,unrestricted,v3.0 Hct,2,3,false,true,1,35
+approved-wine-037,padded,1.5,singleBlock,production,numeric,13.0,0,13,true,true,1,38
+approved-wine-037,padded,1.5,singleBlock,production,numericPlusMarker,13.0 Hh,5,13,true,true,1,35
+approved-wine-037,padded,1.5,singleBlock,grayscaleOnly,unrestricted,v3.0 Hct,2,3,false,true,1,35
+approved-wine-037,padded,1.5,singleBlock,normalise,unrestricted,v3.0 Hct,2,3,false,true,1,35
+approved-wine-037,padded,1.5,singleBlock,linearBoost,unrestricted,conot 19.0 % by volume,71,19,false,true,1,49
+approved-wine-037,padded,1.5,singleBlock,otsu,unrestricted,Ta We ey WW og OW Www VW WW EN Rm Nm — ve . § N i 0 vod 1 wt LI 1,32,0,false,true,1,219
+approved-wine-037,padded,1.5,singleBlock,otsu,numeric,% . 0 4 1 1,31,0,false,true,1,209
+approved-wine-037,padded,1.5,singleBlock,otsu,numericPlusMarker,Va a ay Va O av VV OV YC va . 0 v4 1 o La 1,17,0,false,true,1,195
+approved-wine-037,padded,1.5,singleBlock,thresholdFixed,unrestricted,wT Wee % Wg ¥ OW Taw VW WW a Ta a eT,27,,false,true,1,164
+approved-wine-037,padded,1.5,singleBlock,inverted,unrestricted,v3.0 Hct,8,3,false,true,1,35
+approved-wine-037,padded,1.5,singleBlock,inverted,numeric,"13,0",0,13,true,true,1,34
+approved-wine-037,padded,1.5,singleBlock,inverted,numericPlusMarker,"13,0 Hyco",15,13,true,true,1,34
+approved-wine-037,padded,1.5,singleBlock,invertedThreshold,unrestricted,TRY We ey WW og OW Www VW WW EN Rm Nm — va . § N i 0 vod 1 wt LI 1,34,0,false,true,1,176
+approved-wine-037,padded,2,sparse,production,unrestricted,TEETER Nm... worot 13.0 % by volume --_rm,48,13,true,true,1,125
+approved-wine-037,padded,2,sparse,production,numeric,".,.. 13.0 % ,,",18,13,true,true,1,124
+approved-wine-037,padded,2,sparse,production,numericPlusMarker,"CY. ,. . ool 13.0 % by vol ,,",26,13,true,true,1,125
+approved-wine-037,padded,2,sparse,grayscaleOnly,unrestricted,TEETER Nm... worot 13.0 % by volume --_rm,48,13,true,true,1,126
+approved-wine-037,padded,2,sparse,normalise,unrestricted,TEETER Nm... worot 13.0 % by volume --_rm,48,13,true,true,1,125
+approved-wine-037,padded,2,sparse,linearBoost,unrestricted,ETRE. WEN R——S. - — NR NN— cont 19.0 % by volume -_—r.,41,19,false,true,1,166
+approved-wine-037,padded,2,sparse,otsu,unrestricted,ww Tae Wy aa S$ VV gg ¥ TW Saw TVW eV adie Aa ha,43,,false,true,1,170
+approved-wine-037,padded,2,sparse,otsu,numeric,,0,,false,true,1,168
+approved-wine-037,padded,2,sparse,otsu,numericPlusMarker,Va av aa VV aa Vv oV ha aa Aa ha,11,,false,true,1,174
+approved-wine-037,padded,2,sparse,thresholdFixed,unrestricted,a Wy amy Wg T- a - hd -———,28,,false,true,1,114
+approved-wine-037,padded,2,sparse,inverted,unrestricted,FEET. EN Nm... wonot 13.0 % by volume --_rm,47,13,true,true,1,103
+approved-wine-037,padded,2,sparse,inverted,numeric,".,.. 13.0 % ,",21,13,true,true,1,103
+approved-wine-037,padded,2,sparse,inverted,numericPlusMarker,"HY. ,. . ool 13.0 % by vol ,",29,13,true,true,1,106
+approved-wine-037,padded,2,sparse,invertedThreshold,unrestricted,ww Taye Wy aay ® VV gg ¥ TW Saw TVW eV a a a= ha,39,,false,true,1,170
+approved-wine-037,padded,2,singleLine,production,unrestricted,130 tyra,36,13,true,true,1,55
+approved-wine-037,padded,2,singleLine,production,numeric,130,0,13,true,true,1,55
+approved-wine-037,padded,2,singleLine,production,numericPlusMarker,130 ya,29,13,true,true,1,54
+approved-wine-037,padded,2,singleLine,grayscaleOnly,unrestricted,130 tyra,36,13,true,true,1,56
+approved-wine-037,padded,2,singleLine,normalise,unrestricted,130 tyra,36,13,true,true,1,55
+approved-wine-037,padded,2,singleLine,linearBoost,unrestricted,130 tym,22,13,true,true,1,49
+approved-wine-037,padded,2,singleLine,otsu,unrestricted,dia and ; TW eV aay mss VV,30,,false,true,1,113
+approved-wine-037,padded,2,singleLine,otsu,numeric,", %",0,,false,true,1,110
+approved-wine-037,padded,2,singleLine,otsu,numericPlusMarker,"a aa Bh , %V aay a a VV",6,,false,true,1,111
+approved-wine-037,padded,2,singleLine,thresholdFixed,unrestricted,wr Ta Wy amet WV 9 VW Ta TW eV hada da EEA,29,9,false,true,1,173
+approved-wine-037,padded,2,singleLine,inverted,unrestricted,130 Yop,33,13,true,true,1,58
+approved-wine-037,padded,2,singleLine,inverted,numeric,130,0,13,true,true,1,55
+approved-wine-037,padded,2,singleLine,inverted,numericPlusMarker,130 ya,37,13,true,true,1,55
+approved-wine-037,padded,2,singleLine,invertedThreshold,unrestricted,dia and oo ; TW eV aay mss VV,28,,false,true,1,111
+approved-wine-037,padded,2,singleWord,production,unrestricted,130 tyra,36,13,true,true,1,52
+approved-wine-037,padded,2,singleWord,production,numeric,130,0,13,true,true,1,68
+approved-wine-037,padded,2,singleWord,production,numericPlusMarker,130 ya,29,13,true,true,1,52
+approved-wine-037,padded,2,singleWord,grayscaleOnly,unrestricted,130 tyra,36,13,true,true,1,53
+approved-wine-037,padded,2,singleWord,normalise,unrestricted,130 tyra,36,13,true,true,1,52
+approved-wine-037,padded,2,singleWord,linearBoost,unrestricted,130 tym,22,13,true,true,1,46
+approved-wine-037,padded,2,singleWord,otsu,unrestricted,Can,27,,false,true,1,31
+approved-wine-037,padded,2,singleWord,otsu,numeric,,0,,false,true,1,31
+approved-wine-037,padded,2,singleWord,otsu,numericPlusMarker,Ca,26,,false,true,1,32
+approved-wine-037,padded,2,singleWord,thresholdFixed,unrestricted,I,26,,false,true,1,30
+approved-wine-037,padded,2,singleWord,inverted,unrestricted,130 Yop,33,13,true,true,1,52
+approved-wine-037,padded,2,singleWord,inverted,numeric,130,0,13,true,true,1,52
+approved-wine-037,padded,2,singleWord,inverted,numericPlusMarker,130 ya,37,13,true,true,1,52
+approved-wine-037,padded,2,singleWord,invertedThreshold,unrestricted,Can,26,,false,true,1,31
+approved-wine-037,padded,2,singleBlock,production,unrestricted,"vi 13,0 Ht",7,13,true,true,1,48
+approved-wine-037,padded,2,singleBlock,production,numeric,"13,01",9,13.01,true,true,1,48
+approved-wine-037,padded,2,singleBlock,production,numericPlusMarker,"13,0 Hy",17,13,true,true,1,48
+approved-wine-037,padded,2,singleBlock,grayscaleOnly,unrestricted,"vi 13,0 Ht",7,13,true,true,1,48
+approved-wine-037,padded,2,singleBlock,normalise,unrestricted,"vi 13,0 Ht",7,13,true,true,1,48
+approved-wine-037,padded,2,singleBlock,linearBoost,unrestricted,cohol 19.0 % by volume,75,19,false,true,1,51
+approved-wine-037,padded,2,singleBlock,otsu,unrestricted,ww Tae Wy aa S$ VV gg ¥ TW Saw Tw eV A. di. A ao J v Ps . 1 Md i A | _! ’ LE | fl,39,1,false,true,1,211
+approved-wine-037,padded,2,singleBlock,otsu,numeric,.. . 1,11,1,false,true,1,208
+approved-wine-037,padded,2,singleBlock,otsu,numericPlusMarker,Va av aa VV aa vV V A. oo h. A ao v . 1 A LA l,9,1,false,true,1,210
+approved-wine-037,padded,2,singleBlock,thresholdFixed,unrestricted,wr Ta Wy amet WV 9 VW Ta TW eV hada da EEA,29,9,false,true,1,172
+approved-wine-037,padded,2,singleBlock,inverted,unrestricted,v3.0 Ht,19,3,false,true,1,48
+approved-wine-037,padded,2,singleBlock,inverted,numeric,"13,01",0,13.01,true,true,1,49
+approved-wine-037,padded,2,singleBlock,inverted,numericPlusMarker,"13,0 Hy",18,13,true,true,1,48
+approved-wine-037,padded,2,singleBlock,invertedThreshold,unrestricted,ww Taye Wy aay ® VV gg ¥ TW Saw Tw eV A. di. A ao J v Ts . 1 Md i A | =! ’ LE | fl,39,1,false,true,1,197
+approved-wine-037,padded,3,sparse,production,unrestricted,"FE EN NS——"" ono 13.1 % by volume a,",46,13.1,false,true,1,147
+approved-wine-037,padded,3,sparse,production,numeric,"13.1 % ,",27,13.1,false,true,1,148
+approved-wine-037,padded,3,sparse,production,numericPlusMarker,"ool 13.1 % by vol a,",42,13.1,false,true,1,148
+approved-wine-037,padded,3,sparse,grayscaleOnly,unrestricted,"FE EN NS——"" ono 13.1 % by volume a,",46,13.1,false,true,1,147
+approved-wine-037,padded,3,sparse,normalise,unrestricted,"FE EN NS——"" ono 13.1 % by volume a,",46,13.1,false,true,1,150
+approved-wine-037,padded,3,sparse,linearBoost,unrestricted,i — NNR NR—N—. eonol 13.0 % by volume --—.m,42,13,true,true,1,219
+approved-wine-037,padded,3,sparse,otsu,unrestricted,Ww amv WY Taw © 9 vv Ww aw vw 9 ha,34,9,false,true,1,153
+approved-wine-037,padded,3,sparse,otsu,numeric,9 9,0,9,false,true,1,150
+approved-wine-037,padded,3,sparse,otsu,numericPlusMarker,av aay 9 vv a vV 9 ha,19,9,false,true,1,151
+approved-wine-037,padded,3,sparse,thresholdFixed,unrestricted,- aay - ye Er Vaasv © Vp -_—y aw a as,35,,false,true,1,154
+approved-wine-037,padded,3,sparse,inverted,unrestricted,"NE ES NS——"" coro 13.1 % by volume eb of",45,13.1,false,true,1,113
+approved-wine-037,padded,3,sparse,inverted,numeric,13.1 % .,29,13.1,false,true,1,112
+approved-wine-037,padded,3,sparse,inverted,numericPlusMarker,a coo 13.1 % by vol bo,36,13.1,false,true,1,112
+approved-wine-037,padded,3,sparse,invertedThreshold,unrestricted,Ww amv WY Vay © 9 vv Ww aw vw 9 an,27,9,false,true,1,93
+approved-wine-037,padded,3,singleLine,production,unrestricted,130 Yop,26,13,true,true,1,98
+approved-wine-037,padded,3,singleLine,production,numeric,130,0,13,true,true,1,96
+approved-wine-037,padded,3,singleLine,production,numericPlusMarker,130 ya,30,13,true,true,1,97
+approved-wine-037,padded,3,singleLine,grayscaleOnly,unrestricted,130 Yop,26,13,true,true,1,96
+approved-wine-037,padded,3,singleLine,normalise,unrestricted,130 Yop,26,13,true,true,1,98
+approved-wine-037,padded,3,singleLine,linearBoost,unrestricted,130 tyra,26,13,true,true,1,89
+approved-wine-037,padded,3,singleLine,otsu,unrestricted,die. ad hn h Vw 9@ -_y Tay Wrasse $V Yas,22,9,false,true,1,136
+approved-wine-037,padded,3,singleLine,otsu,numeric,. 9,0,9,false,true,1,135
+approved-wine-037,padded,3,singleLine,otsu,numericPlusMarker,LL a. a hl h VV 9 y ay aa Vv Ya,6,9,false,true,1,135
+approved-wine-037,padded,3,singleLine,thresholdFixed,unrestricted,Ww Tar WD Yat © V pp ¥ Taw VW ev -_—y Caw Wwams YY Ves,37,,false,true,1,202
+approved-wine-037,padded,3,singleLine,inverted,unrestricted,oa130 Yop,5,13,true,true,1,96
+approved-wine-037,padded,3,singleLine,inverted,numeric,130,0,13,true,true,1,98
+approved-wine-037,padded,3,singleLine,inverted,numericPlusMarker,130 ya,28,13,true,true,1,97
+approved-wine-037,padded,3,singleLine,invertedThreshold,unrestricted,Ld. ad oo ; Vw 9@ -y Tay Wrasse $V Yas,24,9,false,true,1,135
+approved-wine-037,padded,3,singleWord,production,unrestricted,130 Yop,26,13,true,true,1,91
+approved-wine-037,padded,3,singleWord,production,numeric,130,0,13,true,true,1,91
+approved-wine-037,padded,3,singleWord,production,numericPlusMarker,130 ya,30,13,true,true,1,91
+approved-wine-037,padded,3,singleWord,grayscaleOnly,unrestricted,130 Yop,26,13,true,true,1,95
+approved-wine-037,padded,3,singleWord,normalise,unrestricted,130 Yop,26,13,true,true,1,91
+approved-wine-037,padded,3,singleWord,linearBoost,unrestricted,130 tyra,26,13,true,true,1,85
+approved-wine-037,padded,3,singleWord,otsu,unrestricted,BRITE,29,,false,true,1,53
+approved-wine-037,padded,3,singleWord,otsu,numeric,,0,,false,true,1,52
+approved-wine-037,padded,3,singleWord,otsu,numericPlusMarker,B,0,,false,true,1,52
+approved-wine-037,padded,3,singleWord,thresholdFixed,unrestricted,I,25,,false,true,1,52
+approved-wine-037,padded,3,singleWord,inverted,unrestricted,oa130 Yop,5,13,true,true,1,92
+approved-wine-037,padded,3,singleWord,inverted,numeric,130,0,13,true,true,1,94
+approved-wine-037,padded,3,singleWord,inverted,numericPlusMarker,130 ya,28,13,true,true,1,92
+approved-wine-037,padded,3,singleWord,invertedThreshold,unrestricted,Can,24,,false,true,1,53
+approved-wine-037,padded,3,singleBlock,production,unrestricted,"vi 13,0 01 te",12,13,true,true,1,83
+approved-wine-037,padded,3,singleBlock,production,numeric,"13,001",0,13,true,true,1,82
+approved-wine-037,padded,3,singleBlock,production,numericPlusMarker,"13,0 01",13,13,true,true,1,83
+approved-wine-037,padded,3,singleBlock,grayscaleOnly,unrestricted,"vi 13,0 01 te",12,13,true,true,1,83
+approved-wine-037,padded,3,singleBlock,normalise,unrestricted,"vi 13,0 01 te",12,13,true,true,1,83
+approved-wine-037,padded,3,singleBlock,linearBoost,unrestricted,eonol 13.0 % by volume,70,13,true,true,1,79
+approved-wine-037,padded,3,singleBlock,otsu,unrestricted,"wr ee -r Tas © VV gg ¥ Saw vw 9V A. di. a oo J v ha . | | , 4 | I LE | \",43,9,false,true,1,228
+approved-wine-037,padded,3,singleBlock,otsu,numeric,"9 9 .. . . ,.4",7,9,false,true,1,230
+approved-wine-037,padded,3,singleBlock,otsu,numericPlusMarker,"vv aa VV 9 aa vV 9V A. hh . a oo v ha . , 4 a L",19,9,false,true,1,226
+approved-wine-037,padded,3,singleBlock,thresholdFixed,unrestricted,Ww Tar WD Yat © V pp ¥ Taw VW ev -_—y Caw Wwams YY Ves,37,,false,true,1,203
+approved-wine-037,padded,3,singleBlock,inverted,unrestricted,v3.0 01 te,15,3,false,true,1,83
+approved-wine-037,padded,3,singleBlock,inverted,numeric,"13,001",0,13,true,true,1,84
+approved-wine-037,padded,3,singleBlock,inverted,numericPlusMarker,"13,0 01",17,13,true,true,1,83
+approved-wine-037,padded,3,singleBlock,invertedThreshold,unrestricted,"wr ae -r Tas © VV gg ¥ Saw vw 9V Ah. di. a oo J v ha . | i , 4 | LE | \",43,9,false,true,1,180
+approved-wine-037,padded,4,sparse,production,unrestricted,i --—rm,16,,false,true,1,128
+approved-wine-037,padded,4,sparse,production,numeric,.,0,,false,true,1,127
+approved-wine-037,padded,4,sparse,production,numericPlusMarker,a .,6,,false,true,1,126
+approved-wine-037,padded,4,sparse,grayscaleOnly,unrestricted,i --—rm,16,,false,true,1,127
+approved-wine-037,padded,4,sparse,normalise,unrestricted,i --—rm,16,,false,true,1,132
+approved-wine-037,padded,4,sparse,linearBoost,unrestricted,FEET. EN —m585m. - — RNR N—N— eonol 13.0 % by volume -_-—r.m,35,58,false,true,1,266
+approved-wine-037,padded,4,sparse,otsu,unrestricted,Ww Tar WF var © Vp - y Vw 9V ba,38,9,false,true,1,171
+approved-wine-037,padded,4,sparse,otsu,numeric,. 9,0,9,false,true,1,169
+approved-wine-037,padded,4,sparse,otsu,numericPlusMarker,av va V ay VV 9V ba,10,9,false,true,1,170
+approved-wine-037,padded,4,sparse,thresholdFixed,unrestricted,"ayy WS” Vasc © VU hh A. 4 v -—"" Taw Wa aa",42,4,false,true,1,170
+approved-wine-037,padded,4,sparse,inverted,unrestricted,i -_-rnmn,24,,false,true,1,121
+approved-wine-037,padded,4,sparse,inverted,numeric,,0,,false,true,1,119
+approved-wine-037,padded,4,sparse,inverted,numericPlusMarker,a,10,,false,true,1,120
+approved-wine-037,padded,4,sparse,invertedThreshold,unrestricted,Ww Tar WF var © Vp - ay Vw 9V ba,36,9,false,true,1,124
+approved-wine-037,padded,4,singleLine,production,unrestricted,col pire,36,,false,true,1,156
+approved-wine-037,padded,4,singleLine,production,numeric,130,1,13,true,true,1,156
+approved-wine-037,padded,4,singleLine,production,numericPlusMarker,col oy,13,,false,true,1,152
+approved-wine-037,padded,4,singleLine,grayscaleOnly,unrestricted,col pire,36,,false,true,1,153
+approved-wine-037,padded,4,singleLine,normalise,unrestricted,col pire,36,,false,true,1,152
+approved-wine-037,padded,4,singleLine,linearBoost,unrestricted,130 pire,52,13,true,true,1,149
+approved-wine-037,padded,4,singleLine,otsu,unrestricted,ww re hn h Vw ov A. dB A a J vv Vas,36,,false,true,1,165
+approved-wine-037,padded,4,singleLine,otsu,numeric,.4,0,4,false,true,1,285
+approved-wine-037,padded,4,singleLine,otsu,numericPlusMarker,vv hl h vVV ov A. oo B a A a vv Va,22,,false,true,1,168
+approved-wine-037,padded,4,singleLine,thresholdFixed,unrestricted,Ww Tar WW eas © VV gg VV Daw VV WwW SV -—rY va ewWwwrrass $V Yas,25,,false,true,1,237
+approved-wine-037,padded,4,singleLine,inverted,unrestricted,col pire,26,,false,true,1,178
+approved-wine-037,padded,4,singleLine,inverted,numeric,130,1,13,true,true,1,153
+approved-wine-037,padded,4,singleLine,inverted,numericPlusMarker,130 oy,25,13,true,true,1,153
+approved-wine-037,padded,4,singleLine,invertedThreshold,unrestricted,ww re oo h Vw ©V A. de A a J vv Vas,37,,false,true,1,148
+approved-wine-037,padded,4,singleWord,production,unrestricted,col pire,36,,false,true,1,143
+approved-wine-037,padded,4,singleWord,production,numeric,130,1,13,true,true,1,143
+approved-wine-037,padded,4,singleWord,production,numericPlusMarker,col oy,13,,false,true,1,147
+approved-wine-037,padded,4,singleWord,grayscaleOnly,unrestricted,col pire,36,,false,true,1,143
+approved-wine-037,padded,4,singleWord,normalise,unrestricted,col pire,36,,false,true,1,143
+approved-wine-037,padded,4,singleWord,linearBoost,unrestricted,130 pire,52,13,true,true,1,139
+approved-wine-037,padded,4,singleWord,otsu,unrestricted,BET,29,,false,true,1,86
+approved-wine-037,padded,4,singleWord,otsu,numeric,,0,,false,true,1,86
+approved-wine-037,padded,4,singleWord,otsu,numericPlusMarker,BV,29,,false,true,1,86
+approved-wine-037,padded,4,singleWord,thresholdFixed,unrestricted,I,12,,false,true,1,82
+approved-wine-037,padded,4,singleWord,inverted,unrestricted,col pire,26,,false,true,1,143
+approved-wine-037,padded,4,singleWord,inverted,numeric,130,1,13,true,true,1,158
+approved-wine-037,padded,4,singleWord,inverted,numericPlusMarker,130 oy,25,13,true,true,1,145
+approved-wine-037,padded,4,singleWord,invertedThreshold,unrestricted,ETE,34,,false,true,1,84
+approved-wine-037,padded,4,singleBlock,production,unrestricted,"vi 13,0 Yb",14,13,true,true,1,129
+approved-wine-037,padded,4,singleBlock,production,numeric,"13,001",0,13,true,true,1,128
+approved-wine-037,padded,4,singleBlock,production,numericPlusMarker,"13,0 Yb",8,13,true,true,1,128
+approved-wine-037,padded,4,singleBlock,grayscaleOnly,unrestricted,"vi 13,0 Yb",14,13,true,true,1,130
+approved-wine-037,padded,4,singleBlock,normalise,unrestricted,"vi 13,0 Yb",14,13,true,true,1,128
+approved-wine-037,padded,4,singleBlock,linearBoost,unrestricted,eonol 13.0 % by volume,67,13,true,true,1,114
+approved-wine-037,padded,4,singleBlock,otsu,unrestricted,WW Tar WF ar © UV pp ¥V UU Taw VY VW 9 ny ov ew eas vv ve . | v4 1 =! ' |,43,9,false,true,1,264
+approved-wine-037,padded,4,singleBlock,otsu,numeric,99 9 . 41,22,99,false,true,1,261
+approved-wine-037,padded,4,singleBlock,otsu,numericPlusMarker,av BB aa 9 V vV aa VY V 9 yy ov a vv vv . l v4 1 l,21,9,false,true,1,265
+approved-wine-037,padded,4,singleBlock,thresholdFixed,unrestricted,Ww Tar WW eas © VV gg VV Daw VV WwW SV -—rY va ewWwwrrass $V Yas,25,,false,true,1,228
+approved-wine-037,padded,4,singleBlock,inverted,unrestricted,"vi 13,0 0 byte",19,13,true,true,1,129
+approved-wine-037,padded,4,singleBlock,inverted,numeric,"13,001",0,13,true,true,1,146
+approved-wine-037,padded,4,singleBlock,inverted,numericPlusMarker,"13,0 0 by",11,13,true,true,1,133
+approved-wine-037,padded,4,singleBlock,invertedThreshold,unrestricted,WW Tar WF ar © UV pp Vv UU Taw VV VW 9 ny TW ew aS vv ve . | | v4 1 =! ' |,44,9,false,true,1,203

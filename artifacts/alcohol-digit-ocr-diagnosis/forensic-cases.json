@@ -1,0 +1,5620 @@
+[
+  {
+    "caseId": "approved-wine-018",
+    "strata": ["multi-line-brand", "front-label", "dense-text", "alcohol-at-bottom"],
+    "truth": {
+      "present": true,
+      "acceptablePercents": [13.5]
+    },
+    "observed": {
+      "state": "OBSERVED",
+      "value": "3.5% BY VOL.",
+      "confidence": 0.9566666666666667,
+      "ocrEvidenceScore": 0.9566666666666667,
+      "ocrConfidence": {
+        "aggregation": "mean",
+        "rawScale": "0-100",
+        "rawTokenConfidences": [95, 96, 96],
+        "rawMean": 95.66666666666667,
+        "rawMin": 95,
+        "rawMax": 96,
+        "missingTokenCount": 0
+      },
+      "candidateProvenance": {
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "triggerReasons": ["primary-pass"],
+        "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+        "regionName": "full-image",
+        "supportingPassIds": ["pass-0-full-image"],
+        "supportingPassKinds": ["full-image-primary"],
+        "recoveryPassUsed": false
+      },
+      "ranking": {
+        "strategy": "alcohol-ocr-evidence-comparator",
+        "orderingMode": "ocr-evidence-first",
+        "comparator": [
+          {
+            "id": "ocr-evidence-score",
+            "direction": "desc",
+            "value": 0.9566666666666667
+          },
+          {
+            "id": "normalized-value-key",
+            "direction": "asc",
+            "value": "35byvol"
+          }
+        ]
+      },
+      "alternates": [],
+      "parsedValue": 3.5,
+      "parsedAccurate": false,
+      "failureClass": "parser-failure"
+    },
+    "recovery": {
+      "passes": [],
+      "primarySelections": {
+        "brandState": "AMBIGUOUS",
+        "brandValue": "Indigenous blend",
+        "alcoholState": "OBSERVED",
+        "alcoholValue": "3.5% BY VOL."
+      },
+      "finalSelectionPasses": {
+        "brandSourcePassId": "pass-0-full-image",
+        "brandSupportingPassIds": ["pass-0-full-image"],
+        "alcoholSourcePassId": "pass-0-full-image",
+        "alcoholSupportingPassIds": ["pass-0-full-image"]
+      }
+    },
+    "regions": [
+      {
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "wordCount": 189
+      }
+    ],
+    "candidateDecisions": [
+      {
+        "rawText": "3.5% by Vol.",
+        "normalizedValue": "3.5% BY VOL.",
+        "normalizedParsingText": "3.5% BY VOL.",
+        "confidence": 0.9566666666666667,
+        "ocrEvidenceScore": 0.9566666666666667,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96, 96],
+          "rawMean": 95.66666666666667,
+          "rawMin": 95,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "same-line-window",
+        "lineIndexes": [11],
+        "sourceTokens": ["3.5%", "by", "Vol."],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": true,
+        "acceptanceReason": "explicit-percent-by-volume",
+        "positiveMarkers": ["percent", "by-volume-marker"],
+        "normalizationOperations": ["split-decimal-merge"],
+        "parsedPercent": 3.5,
+        "decision": "selected",
+        "ranking": {
+          "strategy": "alcohol-ocr-evidence-comparator",
+          "orderingMode": "ocr-evidence-first",
+          "comparator": [
+            {
+              "id": "ocr-evidence-score",
+              "direction": "desc",
+              "value": 0.9566666666666667
+            },
+            {
+              "id": "normalized-value-key",
+              "direction": "asc",
+              "value": "35byvol"
+            }
+          ]
+        }
+      },
+      {
+        "rawText": "3.5% by Vol.",
+        "normalizedValue": "3.5% BY VOL.",
+        "normalizedParsingText": "3.5% BY VOL.",
+        "confidence": 0.9566666666666667,
+        "ocrEvidenceScore": 0.9566666666666667,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96, 96],
+          "rawMean": 95.66666666666667,
+          "rawMin": 95,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [10, 11],
+        "sourceTokens": ["3.5%", "by", "Vol."],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": true,
+        "acceptanceReason": "explicit-percent-by-volume",
+        "positiveMarkers": ["percent", "by-volume-marker"],
+        "normalizationOperations": ["split-decimal-merge"],
+        "parsedPercent": 3.5,
+        "ranking": {
+          "strategy": "alcohol-ocr-evidence-comparator",
+          "orderingMode": "ocr-evidence-first",
+          "comparator": [
+            {
+              "id": "ocr-evidence-score",
+              "direction": "desc",
+              "value": 0.9566666666666667
+            },
+            {
+              "id": "normalized-value-key",
+              "direction": "asc",
+              "value": "35byvol"
+            }
+          ]
+        }
+      },
+      {
+        "rawText": "3.5% by Vol.",
+        "normalizedValue": "3.5% BY VOL.",
+        "normalizedParsingText": "3.5% BY VOL.",
+        "confidence": 0.9566666666666667,
+        "ocrEvidenceScore": 0.9566666666666667,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96, 96],
+          "rawMean": 95.66666666666667,
+          "rawMin": 95,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [11, 12],
+        "sourceTokens": ["3.5%", "by", "Vol."],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": true,
+        "acceptanceReason": "explicit-percent-by-volume",
+        "positiveMarkers": ["percent", "by-volume-marker"],
+        "normalizationOperations": ["split-decimal-merge"],
+        "parsedPercent": 3.5,
+        "ranking": {
+          "strategy": "alcohol-ocr-evidence-comparator",
+          "orderingMode": "ocr-evidence-first",
+          "comparator": [
+            {
+              "id": "ocr-evidence-score",
+              "direction": "desc",
+              "value": 0.9566666666666667
+            },
+            {
+              "id": "normalized-value-key",
+              "direction": "asc",
+              "value": "35byvol"
+            }
+          ]
+        }
+      },
+      {
+        "rawText": "3.5% by",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.955,
+        "ocrEvidenceScore": 0.955,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96],
+          "rawMean": 95.5,
+          "rawMin": 95,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "same-line-window",
+        "lineIndexes": [11],
+        "sourceTokens": ["3.5%", "by"],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      },
+      {
+        "rawText": "3.5% by",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.955,
+        "ocrEvidenceScore": 0.955,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96],
+          "rawMean": 95.5,
+          "rawMin": 95,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [10, 11],
+        "sourceTokens": ["3.5%", "by"],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      },
+      {
+        "rawText": "3.5% by",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.955,
+        "ocrEvidenceScore": 0.955,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96],
+          "rawMean": 95.5,
+          "rawMin": 95,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [11, 12],
+        "sourceTokens": ["3.5%", "by"],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      },
+      {
+        "rawText": "3.5% by Vol. Altitude:",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9475,
+        "ocrEvidenceScore": 0.9475,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96, 96, 92],
+          "rawMean": 94.75,
+          "rawMin": 92,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "same-line-window",
+        "lineIndexes": [11],
+        "sourceTokens": ["3.5%", "by", "Vol.", "Altitude:"],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      },
+      {
+        "rawText": "3.5% by Vol. Altitude:",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9475,
+        "ocrEvidenceScore": 0.9475,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96, 96, 92],
+          "rawMean": 94.75,
+          "rawMin": 92,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [10, 11],
+        "sourceTokens": ["3.5%", "by", "Vol.", "Altitude:"],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      },
+      {
+        "rawText": "3.5% by Vol. Altitude:",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9475,
+        "ocrEvidenceScore": 0.9475,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96, 96, 92],
+          "rawMean": 94.75,
+          "rawMin": 92,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [11, 12],
+        "sourceTokens": ["3.5%", "by", "Vol.", "Altitude:"],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      },
+      {
+        "rawText": "3.5% by Vol. Altitude: 1200-1500m above",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9416666666666668,
+        "ocrEvidenceScore": 0.9416666666666668,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96, 96, 92, 90, 96],
+          "rawMean": 94.16666666666667,
+          "rawMin": 90,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "same-line-window",
+        "lineIndexes": [11],
+        "sourceTokens": ["3.5%", "by", "Vol.", "Altitude:", "1200-1500m", "above"],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          },
+          {
+            "x0": 614,
+            "y0": 651,
+            "x1": 844,
+            "y1": 686
+          },
+          {
+            "x0": 860,
+            "y0": 649,
+            "x1": 968,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 409,
+            "y": 434,
+            "width": 154,
+            "height": 23,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 573,
+            "y": 433,
+            "width": 72,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      },
+      {
+        "rawText": "3.5% by Vol. Altitude: 1200-1500m above",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9416666666666668,
+        "ocrEvidenceScore": 0.9416666666666668,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96, 96, 92, 90, 96],
+          "rawMean": 94.16666666666667,
+          "rawMin": 90,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [10, 11],
+        "sourceTokens": ["3.5%", "by", "Vol.", "Altitude:", "1200-1500m", "above"],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          },
+          {
+            "x0": 614,
+            "y0": 651,
+            "x1": 844,
+            "y1": 686
+          },
+          {
+            "x0": 860,
+            "y0": 649,
+            "x1": 968,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 409,
+            "y": 434,
+            "width": 154,
+            "height": 23,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 573,
+            "y": 433,
+            "width": 72,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      },
+      {
+        "rawText": "3.5% by Vol. Altitude: 1200-1500m above",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9416666666666668,
+        "ocrEvidenceScore": 0.9416666666666668,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96, 96, 92, 90, 96],
+          "rawMean": 94.16666666666667,
+          "rawMin": 90,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [11, 12],
+        "sourceTokens": ["3.5%", "by", "Vol.", "Altitude:", "1200-1500m", "above"],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          },
+          {
+            "x0": 614,
+            "y0": 651,
+            "x1": 844,
+            "y1": 686
+          },
+          {
+            "x0": 860,
+            "y0": 649,
+            "x1": 968,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 409,
+            "y": 434,
+            "width": 154,
+            "height": 23,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 573,
+            "y": 433,
+            "width": 72,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      },
+      {
+        "rawText": "3.5% by Vol. Altitude: 1200-1500m above sea",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9400000000000001,
+        "ocrEvidenceScore": 0.9400000000000001,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96, 96, 92, 90, 96, 93],
+          "rawMean": 94,
+          "rawMin": 90,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "same-line-window",
+        "lineIndexes": [11],
+        "sourceTokens": ["3.5%", "by", "Vol.", "Altitude:", "1200-1500m", "above", "sea"],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          },
+          {
+            "x0": 614,
+            "y0": 651,
+            "x1": 844,
+            "y1": 686
+          },
+          {
+            "x0": 860,
+            "y0": 649,
+            "x1": 968,
+            "y1": 686
+          },
+          {
+            "x0": 983,
+            "y0": 659,
+            "x1": 1045,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 409,
+            "y": 434,
+            "width": 154,
+            "height": 23,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 573,
+            "y": 433,
+            "width": 72,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 655,
+            "y": 439,
+            "width": 42,
+            "height": 18,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      },
+      {
+        "rawText": "3.5% by Vol. Altitude: 1200-1500m above sea",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9400000000000001,
+        "ocrEvidenceScore": 0.9400000000000001,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96, 96, 92, 90, 96, 93],
+          "rawMean": 94,
+          "rawMin": 90,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [10, 11],
+        "sourceTokens": ["3.5%", "by", "Vol.", "Altitude:", "1200-1500m", "above", "sea"],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          },
+          {
+            "x0": 614,
+            "y0": 651,
+            "x1": 844,
+            "y1": 686
+          },
+          {
+            "x0": 860,
+            "y0": 649,
+            "x1": 968,
+            "y1": 686
+          },
+          {
+            "x0": 983,
+            "y0": 659,
+            "x1": 1045,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 409,
+            "y": 434,
+            "width": 154,
+            "height": 23,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 573,
+            "y": 433,
+            "width": 72,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 655,
+            "y": 439,
+            "width": 42,
+            "height": 18,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      },
+      {
+        "rawText": "3.5% by Vol. Altitude: 1200-1500m above sea",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9400000000000001,
+        "ocrEvidenceScore": 0.9400000000000001,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96, 96, 92, 90, 96, 93],
+          "rawMean": 94,
+          "rawMin": 90,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [11, 12],
+        "sourceTokens": ["3.5%", "by", "Vol.", "Altitude:", "1200-1500m", "above", "sea"],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          },
+          {
+            "x0": 614,
+            "y0": 651,
+            "x1": 844,
+            "y1": 686
+          },
+          {
+            "x0": 860,
+            "y0": 649,
+            "x1": 968,
+            "y1": 686
+          },
+          {
+            "x0": 983,
+            "y0": 659,
+            "x1": 1045,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 409,
+            "y": 434,
+            "width": 154,
+            "height": 23,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 573,
+            "y": 433,
+            "width": 72,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 655,
+            "y": 439,
+            "width": 42,
+            "height": 18,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      },
+      {
+        "rawText": "by Vol. Altitude: 1200-1500m above",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9399999999999998,
+        "ocrEvidenceScore": 0.9399999999999998,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [96, 96, 92, 90, 96],
+          "rawMean": 94,
+          "rawMin": 90,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 31,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "same-line-window",
+        "lineIndexes": [11],
+        "sourceTokens": ["by", "Vol.", "Altitude:", "1200-1500m", "above"],
+        "sourceBoxes": [
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          },
+          {
+            "x0": 614,
+            "y0": 651,
+            "x1": 844,
+            "y1": 686
+          },
+          {
+            "x0": 860,
+            "y0": 649,
+            "x1": 968,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 409,
+            "y": 434,
+            "width": 154,
+            "height": 23,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 573,
+            "y": 433,
+            "width": 72,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-explicit-alcohol-marker"
+      },
+      {
+        "rawText": "by Vol. Altitude: 1200-1500m above",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9399999999999998,
+        "ocrEvidenceScore": 0.9399999999999998,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [96, 96, 92, 90, 96],
+          "rawMean": 94,
+          "rawMin": 90,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 31,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [10, 11],
+        "sourceTokens": ["by", "Vol.", "Altitude:", "1200-1500m", "above"],
+        "sourceBoxes": [
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          },
+          {
+            "x0": 614,
+            "y0": 651,
+            "x1": 844,
+            "y1": 686
+          },
+          {
+            "x0": 860,
+            "y0": 649,
+            "x1": 968,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 409,
+            "y": 434,
+            "width": 154,
+            "height": 23,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 573,
+            "y": 433,
+            "width": 72,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-explicit-alcohol-marker"
+      },
+      {
+        "rawText": "by Vol. Altitude: 1200-1500m above",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9399999999999998,
+        "ocrEvidenceScore": 0.9399999999999998,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [96, 96, 92, 90, 96],
+          "rawMean": 94,
+          "rawMin": 90,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 31,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [11, 12],
+        "sourceTokens": ["by", "Vol.", "Altitude:", "1200-1500m", "above"],
+        "sourceBoxes": [
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          },
+          {
+            "x0": 614,
+            "y0": 651,
+            "x1": 844,
+            "y1": 686
+          },
+          {
+            "x0": 860,
+            "y0": 649,
+            "x1": 968,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 409,
+            "y": 434,
+            "width": 154,
+            "height": 23,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 573,
+            "y": 433,
+            "width": 72,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-explicit-alcohol-marker"
+      },
+      {
+        "rawText": "by Vol. Altitude: 1200-1500m above sea",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9383333333333331,
+        "ocrEvidenceScore": 0.9383333333333331,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [96, 96, 92, 90, 96, 93],
+          "rawMean": 93.83333333333333,
+          "rawMin": 90,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 31,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "same-line-window",
+        "lineIndexes": [11],
+        "sourceTokens": ["by", "Vol.", "Altitude:", "1200-1500m", "above", "sea"],
+        "sourceBoxes": [
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          },
+          {
+            "x0": 614,
+            "y0": 651,
+            "x1": 844,
+            "y1": 686
+          },
+          {
+            "x0": 860,
+            "y0": 649,
+            "x1": 968,
+            "y1": 686
+          },
+          {
+            "x0": 983,
+            "y0": 659,
+            "x1": 1045,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 409,
+            "y": 434,
+            "width": 154,
+            "height": 23,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 573,
+            "y": 433,
+            "width": 72,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 655,
+            "y": 439,
+            "width": 42,
+            "height": 18,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-explicit-alcohol-marker"
+      },
+      {
+        "rawText": "by Vol. Altitude: 1200-1500m above sea",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9383333333333331,
+        "ocrEvidenceScore": 0.9383333333333331,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [96, 96, 92, 90, 96, 93],
+          "rawMean": 93.83333333333333,
+          "rawMin": 90,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 31,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [10, 11],
+        "sourceTokens": ["by", "Vol.", "Altitude:", "1200-1500m", "above", "sea"],
+        "sourceBoxes": [
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          },
+          {
+            "x0": 614,
+            "y0": 651,
+            "x1": 844,
+            "y1": 686
+          },
+          {
+            "x0": 860,
+            "y0": 649,
+            "x1": 968,
+            "y1": 686
+          },
+          {
+            "x0": 983,
+            "y0": 659,
+            "x1": 1045,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 409,
+            "y": 434,
+            "width": 154,
+            "height": 23,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 573,
+            "y": 433,
+            "width": 72,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 655,
+            "y": 439,
+            "width": 42,
+            "height": 18,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-explicit-alcohol-marker"
+      },
+      {
+        "rawText": "by Vol. Altitude: 1200-1500m above sea",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9383333333333331,
+        "ocrEvidenceScore": 0.9383333333333331,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [96, 96, 92, 90, 96, 93],
+          "rawMean": 93.83333333333333,
+          "rawMin": 90,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 31,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [11, 12],
+        "sourceTokens": ["by", "Vol.", "Altitude:", "1200-1500m", "above", "sea"],
+        "sourceBoxes": [
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          },
+          {
+            "x0": 614,
+            "y0": 651,
+            "x1": 844,
+            "y1": 686
+          },
+          {
+            "x0": 860,
+            "y0": 649,
+            "x1": 968,
+            "y1": 686
+          },
+          {
+            "x0": 983,
+            "y0": 659,
+            "x1": 1045,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 409,
+            "y": 434,
+            "width": 154,
+            "height": 23,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 573,
+            "y": 433,
+            "width": 72,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 655,
+            "y": 439,
+            "width": 42,
+            "height": 18,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-explicit-alcohol-marker"
+      },
+      {
+        "rawText": "3.5% by Vol. Altitude: 1200-1500m",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9380000000000001,
+        "ocrEvidenceScore": 0.9380000000000001,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96, 96, 92, 90],
+          "rawMean": 93.8,
+          "rawMin": 90,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "same-line-window",
+        "lineIndexes": [11],
+        "sourceTokens": ["3.5%", "by", "Vol.", "Altitude:", "1200-1500m"],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          },
+          {
+            "x0": 614,
+            "y0": 651,
+            "x1": 844,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 409,
+            "y": 434,
+            "width": 154,
+            "height": 23,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      },
+      {
+        "rawText": "3.5% by Vol. Altitude: 1200-1500m",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9380000000000001,
+        "ocrEvidenceScore": 0.9380000000000001,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96, 96, 92, 90],
+          "rawMean": 93.8,
+          "rawMin": 90,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [10, 11],
+        "sourceTokens": ["3.5%", "by", "Vol.", "Altitude:", "1200-1500m"],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          },
+          {
+            "x0": 614,
+            "y0": 651,
+            "x1": 844,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 409,
+            "y": 434,
+            "width": 154,
+            "height": 23,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      },
+      {
+        "rawText": "3.5% by Vol. Altitude: 1200-1500m",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.9380000000000001,
+        "ocrEvidenceScore": 0.9380000000000001,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 96, 96, 92, 90],
+          "rawMean": 93.8,
+          "rawMin": 90,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 47,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [11, 12],
+        "sourceTokens": ["3.5%", "by", "Vol.", "Altitude:", "1200-1500m"],
+        "sourceBoxes": [
+          {
+            "x0": 196,
+            "y0": 648,
+            "x1": 304,
+            "y1": 719
+          },
+          {
+            "x0": 313,
+            "y0": 666,
+            "x1": 337,
+            "y1": 696
+          },
+          {
+            "x0": 345,
+            "y0": 666,
+            "x1": 388,
+            "y1": 690
+          },
+          {
+            "x0": 436,
+            "y0": 649,
+            "x1": 598,
+            "y1": 686
+          },
+          {
+            "x0": 614,
+            "y0": 651,
+            "x1": 844,
+            "y1": 686
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 131,
+            "y": 432,
+            "width": 72,
+            "height": 47,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 209,
+            "y": 444,
+            "width": 16,
+            "height": 20,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 230,
+            "y": 444,
+            "width": 29,
+            "height": 16,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 291,
+            "y": 433,
+            "width": 108,
+            "height": 24,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          },
+          {
+            "imageIndex": 0,
+            "x": 409,
+            "y": 434,
+            "width": 154,
+            "height": 23,
+            "imageWidth": 1080,
+            "imageHeight": 1305
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      }
+    ],
+    "flags": {
+      "abstentionReason": "unsupported-candidates-only",
+      "numberInOcr": true,
+      "percentInOcr": true,
+      "alcoholMarkerInOcr": false,
+      "volumeMarkerInOcr": true,
+      "candidateAccepted": true,
+      "filterRejectedCandidate": true,
+      "parserRejectedCandidate": false
+    }
+  },
+  {
+    "caseId": "approved-wine-037",
+    "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+    "truth": {
+      "present": true,
+      "acceptablePercents": [13]
+    },
+    "observed": {
+      "state": "OBSERVED",
+      "value": "19.0% BY VOL.",
+      "confidence": 0.8999999999999999,
+      "ocrEvidenceScore": 0.8999999999999999,
+      "ocrConfidence": {
+        "aggregation": "mean",
+        "rawScale": "0-100",
+        "rawTokenConfidences": [79, 90, 96, 95],
+        "rawMean": 90,
+        "rawMin": 79,
+        "rawMax": 96,
+        "missingTokenCount": 0
+      },
+      "candidateProvenance": {
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "triggerReasons": ["primary-pass"],
+        "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+        "regionName": "full-image",
+        "supportingPassIds": ["pass-0-full-image"],
+        "supportingPassKinds": ["full-image-primary"],
+        "recoveryPassUsed": false
+      },
+      "ranking": {
+        "strategy": "alcohol-ocr-evidence-comparator",
+        "orderingMode": "ocr-evidence-first",
+        "comparator": [
+          {
+            "id": "ocr-evidence-score",
+            "direction": "desc",
+            "value": 0.8999999999999999
+          },
+          {
+            "id": "normalized-value-key",
+            "direction": "asc",
+            "value": "190byvol"
+          }
+        ]
+      },
+      "alternates": [],
+      "parsedValue": 19,
+      "parsedAccurate": false,
+      "failureClass": "parser-failure"
+    },
+    "recovery": {
+      "passes": [],
+      "primarySelections": {
+        "brandState": "AMBIGUOUS",
+        "brandValue": "Strumica - Radovish Region",
+        "alcoholState": "OBSERVED",
+        "alcoholValue": "19.0% BY VOL."
+      },
+      "finalSelectionPasses": {
+        "brandSourcePassId": "pass-0-full-image",
+        "brandSupportingPassIds": ["pass-0-full-image"],
+        "alcoholSourcePassId": "pass-0-full-image",
+        "alcoholSupportingPassIds": ["pass-0-full-image"]
+      }
+    },
+    "regions": [
+      {
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "wordCount": 101
+      }
+    ],
+    "candidateDecisions": [
+      {
+        "rawText": "19.0 % by volume",
+        "normalizedValue": "19.0% BY VOL.",
+        "normalizedParsingText": "19.0% BY VOL.",
+        "confidence": 0.8999999999999999,
+        "ocrEvidenceScore": 0.8999999999999999,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [79, 90, 96, 95],
+          "rawMean": 90,
+          "rawMin": 79,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 32,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "same-line-window",
+        "lineIndexes": [18],
+        "sourceTokens": ["19.0", "%", "by", "volume"],
+        "sourceBoxes": [
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          },
+          {
+            "x0": 416,
+            "y0": 1208,
+            "x1": 498,
+            "y1": 1221
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 277,
+            "y": 805,
+            "width": 55,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": true,
+        "acceptanceReason": "explicit-percent-by-volume",
+        "positiveMarkers": ["percent", "by-volume-marker"],
+        "normalizationOperations": ["split-decimal-merge"],
+        "parsedPercent": 19,
+        "decision": "selected",
+        "ranking": {
+          "strategy": "alcohol-ocr-evidence-comparator",
+          "orderingMode": "ocr-evidence-first",
+          "comparator": [
+            {
+              "id": "ocr-evidence-score",
+              "direction": "desc",
+              "value": 0.8999999999999999
+            },
+            {
+              "id": "normalized-value-key",
+              "direction": "asc",
+              "value": "190byvol"
+            }
+          ]
+        }
+      },
+      {
+        "rawText": "19.0 % by volume",
+        "normalizedValue": "19.0% BY VOL.",
+        "normalizedParsingText": "19.0% BY VOL.",
+        "confidence": 0.8999999999999999,
+        "ocrEvidenceScore": 0.8999999999999999,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [79, 90, 96, 95],
+          "rawMean": 90,
+          "rawMin": 79,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 32,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [17, 18],
+        "sourceTokens": ["19.0", "%", "by", "volume"],
+        "sourceBoxes": [
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          },
+          {
+            "x0": 416,
+            "y0": 1208,
+            "x1": 498,
+            "y1": 1221
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 277,
+            "y": 805,
+            "width": 55,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": true,
+        "acceptanceReason": "explicit-percent-by-volume",
+        "positiveMarkers": ["percent", "by-volume-marker"],
+        "normalizationOperations": ["split-decimal-merge"],
+        "parsedPercent": 19,
+        "ranking": {
+          "strategy": "alcohol-ocr-evidence-comparator",
+          "orderingMode": "ocr-evidence-first",
+          "comparator": [
+            {
+              "id": "ocr-evidence-score",
+              "direction": "desc",
+              "value": 0.8999999999999999
+            },
+            {
+              "id": "normalized-value-key",
+              "direction": "asc",
+              "value": "190byvol"
+            }
+          ]
+        }
+      },
+      {
+        "rawText": "19.0 % by volume",
+        "normalizedValue": "19.0% BY VOL.",
+        "normalizedParsingText": "19.0% BY VOL.",
+        "confidence": 0.8999999999999999,
+        "ocrEvidenceScore": 0.8999999999999999,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [79, 90, 96, 95],
+          "rawMean": 90,
+          "rawMin": 79,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 32,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [18, 19],
+        "sourceTokens": ["19.0", "%", "by", "volume"],
+        "sourceBoxes": [
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          },
+          {
+            "x0": 416,
+            "y0": 1208,
+            "x1": 498,
+            "y1": 1221
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 277,
+            "y": 805,
+            "width": 55,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": true,
+        "acceptanceReason": "explicit-percent-by-volume",
+        "positiveMarkers": ["percent", "by-volume-marker"],
+        "normalizationOperations": ["split-decimal-merge"],
+        "parsedPercent": 19,
+        "ranking": {
+          "strategy": "alcohol-ocr-evidence-comparator",
+          "orderingMode": "ocr-evidence-first",
+          "comparator": [
+            {
+              "id": "ocr-evidence-score",
+              "direction": "desc",
+              "value": 0.8999999999999999
+            },
+            {
+              "id": "normalized-value-key",
+              "direction": "asc",
+              "value": "190byvol"
+            }
+          ]
+        }
+      },
+      {
+        "rawText": "19.0 % by",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.8833333333333333,
+        "ocrEvidenceScore": 0.8833333333333333,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [79, 90, 96],
+          "rawMean": 88.33333333333333,
+          "rawMin": 79,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 32,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "same-line-window",
+        "lineIndexes": [18],
+        "sourceTokens": ["19.0", "%", "by"],
+        "sourceBoxes": [
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      },
+      {
+        "rawText": "19.0 % by",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.8833333333333333,
+        "ocrEvidenceScore": 0.8833333333333333,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [79, 90, 96],
+          "rawMean": 88.33333333333333,
+          "rawMin": 79,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 32,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [17, 18],
+        "sourceTokens": ["19.0", "%", "by"],
+        "sourceBoxes": [
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      },
+      {
+        "rawText": "19.0 % by",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.8833333333333333,
+        "ocrEvidenceScore": 0.8833333333333333,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [79, 90, 96],
+          "rawMean": 88.33333333333333,
+          "rawMin": 79,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 32,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [18, 19],
+        "sourceTokens": ["19.0", "%", "by"],
+        "sourceBoxes": [
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      },
+      {
+        "rawText": "19.0 %",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.845,
+        "ocrEvidenceScore": 0.845,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [79, 90],
+          "rawMean": 84.5,
+          "rawMin": 79,
+          "rawMax": 90,
+          "missingTokenCount": 0
+        },
+        "prominence": 32,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "same-line-window",
+        "lineIndexes": [18],
+        "sourceTokens": ["19.0", "%"],
+        "sourceBoxes": [
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      },
+      {
+        "rawText": "19.0 %",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.845,
+        "ocrEvidenceScore": 0.845,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [79, 90],
+          "rawMean": 84.5,
+          "rawMin": 79,
+          "rawMax": 90,
+          "missingTokenCount": 0
+        },
+        "prominence": 32,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [17, 18],
+        "sourceTokens": ["19.0", "%"],
+        "sourceBoxes": [
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      },
+      {
+        "rawText": "19.0 %",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.845,
+        "ocrEvidenceScore": 0.845,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [79, 90],
+          "rawMean": 84.5,
+          "rawMin": 79,
+          "rawMax": 90,
+          "missingTokenCount": 0
+        },
+        "prominence": 32,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [18, 19],
+        "sourceTokens": ["19.0", "%"],
+        "sourceBoxes": [
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      },
+      {
+        "rawText": "CAUSE HEALTH PROBLEMS. conol 19.0 % by",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.8142857142857143,
+        "ocrEvidenceScore": 0.8142857142857143,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 94, 77, 39, 79, 90, 96],
+          "rawMean": 81.42857142857143,
+          "rawMin": 39,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 73,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [17, 18],
+        "sourceTokens": ["CAUSE", "HEALTH", "PROBLEMS.", "conol", "19.0", "%", "by"],
+        "sourceBoxes": [
+          {
+            "x0": 427,
+            "y0": 1115,
+            "x1": 508,
+            "y1": 1148
+          },
+          {
+            "x0": 523,
+            "y0": 1115,
+            "x1": 620,
+            "y1": 1148
+          },
+          {
+            "x0": 636,
+            "y0": 1115,
+            "x1": 785,
+            "y1": 1148
+          },
+          {
+            "x0": 156,
+            "y0": 1207,
+            "x1": 217,
+            "y1": 1221
+          },
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 285,
+            "y": 743,
+            "width": 54,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 349,
+            "y": 743,
+            "width": 64,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 424,
+            "y": 743,
+            "width": 99,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 104,
+            "y": 805,
+            "width": 41,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      },
+      {
+        "rawText": "HEALTH PROBLEMS. conol 19.0 % by volume",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.8142857142857143,
+        "ocrEvidenceScore": 0.8142857142857143,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [94, 77, 39, 79, 90, 96, 95],
+          "rawMean": 81.42857142857143,
+          "rawMin": 39,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 73,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [17, 18],
+        "sourceTokens": ["HEALTH", "PROBLEMS.", "conol", "19.0", "%", "by", "volume"],
+        "sourceBoxes": [
+          {
+            "x0": 523,
+            "y0": 1115,
+            "x1": 620,
+            "y1": 1148
+          },
+          {
+            "x0": 636,
+            "y0": 1115,
+            "x1": 785,
+            "y1": 1148
+          },
+          {
+            "x0": 156,
+            "y0": 1207,
+            "x1": 217,
+            "y1": 1221
+          },
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          },
+          {
+            "x0": 416,
+            "y0": 1208,
+            "x1": 498,
+            "y1": 1221
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 349,
+            "y": 743,
+            "width": 64,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 424,
+            "y": 743,
+            "width": 99,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 104,
+            "y": 805,
+            "width": 41,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 277,
+            "y": 805,
+            "width": 55,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      },
+      {
+        "rawText": "19.0 % by volume a",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.8139999999999998,
+        "ocrEvidenceScore": 0.8139999999999998,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [79, 90, 96, 95, 47],
+          "rawMean": 81.4,
+          "rawMin": 47,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 70,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [18, 19],
+        "sourceTokens": ["19.0", "%", "by", "volume", "a"],
+        "sourceBoxes": [
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          },
+          {
+            "x0": 416,
+            "y0": 1208,
+            "x1": 498,
+            "y1": 1221
+          },
+          {
+            "x0": 132,
+            "y0": 1265,
+            "x1": 213,
+            "y1": 1281
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 277,
+            "y": 805,
+            "width": 55,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 88,
+            "y": 843,
+            "width": 54,
+            "height": 11,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      },
+      {
+        "rawText": "MAY CAUSE HEALTH PROBLEMS. conol 19.0 %",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.812857142857143,
+        "ocrEvidenceScore": 0.812857142857143,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 95, 94, 77, 39, 79, 90],
+          "rawMean": 81.28571428571429,
+          "rawMin": 39,
+          "rawMax": 95,
+          "missingTokenCount": 0
+        },
+        "prominence": 73,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [17, 18],
+        "sourceTokens": ["MAY", "CAUSE", "HEALTH", "PROBLEMS.", "conol", "19.0", "%"],
+        "sourceBoxes": [
+          {
+            "x0": 364,
+            "y0": 1115,
+            "x1": 411,
+            "y1": 1148
+          },
+          {
+            "x0": 427,
+            "y0": 1115,
+            "x1": 508,
+            "y1": 1148
+          },
+          {
+            "x0": 523,
+            "y0": 1115,
+            "x1": 620,
+            "y1": 1148
+          },
+          {
+            "x0": 636,
+            "y0": 1115,
+            "x1": 785,
+            "y1": 1148
+          },
+          {
+            "x0": 156,
+            "y0": 1207,
+            "x1": 217,
+            "y1": 1221
+          },
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 243,
+            "y": 743,
+            "width": 31,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 285,
+            "y": 743,
+            "width": 54,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 349,
+            "y": 743,
+            "width": 64,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 424,
+            "y": 743,
+            "width": 99,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 104,
+            "y": 805,
+            "width": 41,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      },
+      {
+        "rawText": "conol 19.0 % by volume",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.798,
+        "ocrEvidenceScore": 0.798,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [39, 79, 90, 96, 95],
+          "rawMean": 79.8,
+          "rawMin": 39,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 32,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "same-line-window",
+        "lineIndexes": [18],
+        "sourceTokens": ["conol", "19.0", "%", "by", "volume"],
+        "sourceBoxes": [
+          {
+            "x0": 156,
+            "y0": 1207,
+            "x1": 217,
+            "y1": 1221
+          },
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          },
+          {
+            "x0": 416,
+            "y0": 1208,
+            "x1": 498,
+            "y1": 1221
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 104,
+            "y": 805,
+            "width": 41,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 277,
+            "y": 805,
+            "width": 55,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      },
+      {
+        "rawText": "conol 19.0 % by volume",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.798,
+        "ocrEvidenceScore": 0.798,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [39, 79, 90, 96, 95],
+          "rawMean": 79.8,
+          "rawMin": 39,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 32,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [17, 18],
+        "sourceTokens": ["conol", "19.0", "%", "by", "volume"],
+        "sourceBoxes": [
+          {
+            "x0": 156,
+            "y0": 1207,
+            "x1": 217,
+            "y1": 1221
+          },
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          },
+          {
+            "x0": 416,
+            "y0": 1208,
+            "x1": 498,
+            "y1": 1221
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 104,
+            "y": 805,
+            "width": 41,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 277,
+            "y": 805,
+            "width": 55,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      },
+      {
+        "rawText": "conol 19.0 % by volume",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.798,
+        "ocrEvidenceScore": 0.798,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [39, 79, 90, 96, 95],
+          "rawMean": 79.8,
+          "rawMin": 39,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 32,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [18, 19],
+        "sourceTokens": ["conol", "19.0", "%", "by", "volume"],
+        "sourceBoxes": [
+          {
+            "x0": 156,
+            "y0": 1207,
+            "x1": 217,
+            "y1": 1221
+          },
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          },
+          {
+            "x0": 416,
+            "y0": 1208,
+            "x1": 498,
+            "y1": 1221
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 104,
+            "y": 805,
+            "width": 41,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 277,
+            "y": 805,
+            "width": 55,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      },
+      {
+        "rawText": "PROBLEMS. conol 19.0 % by volume",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.7933333333333333,
+        "ocrEvidenceScore": 0.7933333333333333,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [77, 39, 79, 90, 96, 95],
+          "rawMean": 79.33333333333333,
+          "rawMin": 39,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 73,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [17, 18],
+        "sourceTokens": ["PROBLEMS.", "conol", "19.0", "%", "by", "volume"],
+        "sourceBoxes": [
+          {
+            "x0": 636,
+            "y0": 1115,
+            "x1": 785,
+            "y1": 1148
+          },
+          {
+            "x0": 156,
+            "y0": 1207,
+            "x1": 217,
+            "y1": 1221
+          },
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          },
+          {
+            "x0": 416,
+            "y0": 1208,
+            "x1": 498,
+            "y1": 1221
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 424,
+            "y": 743,
+            "width": 99,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 104,
+            "y": 805,
+            "width": 41,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 277,
+            "y": 805,
+            "width": 55,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "unsupported-pattern"
+      },
+      {
+        "rawText": "HEALTH PROBLEMS. conol 19.0 % by",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.7916666666666666,
+        "ocrEvidenceScore": 0.7916666666666666,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [94, 77, 39, 79, 90, 96],
+          "rawMean": 79.16666666666667,
+          "rawMin": 39,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 73,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [17, 18],
+        "sourceTokens": ["HEALTH", "PROBLEMS.", "conol", "19.0", "%", "by"],
+        "sourceBoxes": [
+          {
+            "x0": 523,
+            "y0": 1115,
+            "x1": 620,
+            "y1": 1148
+          },
+          {
+            "x0": 636,
+            "y0": 1115,
+            "x1": 785,
+            "y1": 1148
+          },
+          {
+            "x0": 156,
+            "y0": 1207,
+            "x1": 217,
+            "y1": 1221
+          },
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 349,
+            "y": 743,
+            "width": 64,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 424,
+            "y": 743,
+            "width": 99,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 104,
+            "y": 805,
+            "width": 41,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      },
+      {
+        "rawText": "CAUSE HEALTH PROBLEMS. conol 19.0 %",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.79,
+        "ocrEvidenceScore": 0.79,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [95, 94, 77, 39, 79, 90],
+          "rawMean": 79,
+          "rawMin": 39,
+          "rawMax": 95,
+          "missingTokenCount": 0
+        },
+        "prominence": 73,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [17, 18],
+        "sourceTokens": ["CAUSE", "HEALTH", "PROBLEMS.", "conol", "19.0", "%"],
+        "sourceBoxes": [
+          {
+            "x0": 427,
+            "y0": 1115,
+            "x1": 508,
+            "y1": 1148
+          },
+          {
+            "x0": 523,
+            "y0": 1115,
+            "x1": 620,
+            "y1": 1148
+          },
+          {
+            "x0": 636,
+            "y0": 1115,
+            "x1": 785,
+            "y1": 1148
+          },
+          {
+            "x0": 156,
+            "y0": 1207,
+            "x1": 217,
+            "y1": 1221
+          },
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 285,
+            "y": 743,
+            "width": 54,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 349,
+            "y": 743,
+            "width": 64,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 424,
+            "y": 743,
+            "width": 99,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 104,
+            "y": 805,
+            "width": 41,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      },
+      {
+        "rawText": "PROBLEMS. conol 19.0 % by",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.762,
+        "ocrEvidenceScore": 0.762,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [77, 39, 79, 90, 96],
+          "rawMean": 76.2,
+          "rawMin": 39,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 73,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [17, 18],
+        "sourceTokens": ["PROBLEMS.", "conol", "19.0", "%", "by"],
+        "sourceBoxes": [
+          {
+            "x0": 636,
+            "y0": 1115,
+            "x1": 785,
+            "y1": 1148
+          },
+          {
+            "x0": 156,
+            "y0": 1207,
+            "x1": 217,
+            "y1": 1221
+          },
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 424,
+            "y": 743,
+            "width": 99,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 104,
+            "y": 805,
+            "width": 41,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      },
+      {
+        "rawText": "conol 19.0 % by",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.76,
+        "ocrEvidenceScore": 0.76,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [39, 79, 90, 96],
+          "rawMean": 76,
+          "rawMin": 39,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 32,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "same-line-window",
+        "lineIndexes": [18],
+        "sourceTokens": ["conol", "19.0", "%", "by"],
+        "sourceBoxes": [
+          {
+            "x0": 156,
+            "y0": 1207,
+            "x1": 217,
+            "y1": 1221
+          },
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 104,
+            "y": 805,
+            "width": 41,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      },
+      {
+        "rawText": "conol 19.0 % by",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.76,
+        "ocrEvidenceScore": 0.76,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [39, 79, 90, 96],
+          "rawMean": 76,
+          "rawMin": 39,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 32,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [17, 18],
+        "sourceTokens": ["conol", "19.0", "%", "by"],
+        "sourceBoxes": [
+          {
+            "x0": 156,
+            "y0": 1207,
+            "x1": 217,
+            "y1": 1221
+          },
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 104,
+            "y": 805,
+            "width": 41,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      },
+      {
+        "rawText": "conol 19.0 % by",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.76,
+        "ocrEvidenceScore": 0.76,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [39, 79, 90, 96],
+          "rawMean": 76,
+          "rawMin": 39,
+          "rawMax": 96,
+          "missingTokenCount": 0
+        },
+        "prominence": 32,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [18, 19],
+        "sourceTokens": ["conol", "19.0", "%", "by"],
+        "sourceBoxes": [
+          {
+            "x0": 156,
+            "y0": 1207,
+            "x1": 217,
+            "y1": 1221
+          },
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          },
+          {
+            "x0": 379,
+            "y0": 1206,
+            "x1": 399,
+            "y1": 1224
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 104,
+            "y": 805,
+            "width": 41,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 253,
+            "y": 804,
+            "width": 13,
+            "height": 12,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      },
+      {
+        "rawText": "HEALTH PROBLEMS. conol 19.0 %",
+        "normalizedValue": null,
+        "normalizedParsingText": null,
+        "confidence": 0.758,
+        "ocrEvidenceScore": 0.758,
+        "ocrConfidence": {
+          "aggregation": "mean",
+          "rawScale": "0-100",
+          "rawTokenConfidences": [94, 77, 39, 79, 90],
+          "rawMean": 75.8,
+          "rawMin": 39,
+          "rawMax": 94,
+          "missingTokenCount": 0
+        },
+        "prominence": 73,
+        "passId": "pass-0-full-image",
+        "passKind": "full-image-primary",
+        "supportPassIds": ["pass-0-full-image"],
+        "candidateProvenance": {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "triggerReasons": ["primary-pass"],
+          "preprocessing": ["grayscale", "normalise", "scale:1.5"],
+          "regionName": "full-image",
+          "supportingPassIds": ["pass-0-full-image"],
+          "supportingPassKinds": ["full-image-primary"],
+          "recoveryPassUsed": false
+        },
+        "assembly": "adjacent-line-window",
+        "lineIndexes": [17, 18],
+        "sourceTokens": ["HEALTH", "PROBLEMS.", "conol", "19.0", "%"],
+        "sourceBoxes": [
+          {
+            "x0": 523,
+            "y0": 1115,
+            "x1": 620,
+            "y1": 1148
+          },
+          {
+            "x0": 636,
+            "y0": 1115,
+            "x1": 785,
+            "y1": 1148
+          },
+          {
+            "x0": 156,
+            "y0": 1207,
+            "x1": 217,
+            "y1": 1221
+          },
+          {
+            "x0": 235,
+            "y0": 1176,
+            "x1": 309,
+            "y1": 1224
+          },
+          {
+            "x0": 332,
+            "y0": 1179,
+            "x1": 363,
+            "y1": 1221
+          }
+        ],
+        "sourceOriginalBoxes": [
+          {
+            "imageIndex": 0,
+            "x": 349,
+            "y": 743,
+            "width": 64,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 424,
+            "y": 743,
+            "width": 99,
+            "height": 22,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 104,
+            "y": 805,
+            "width": 41,
+            "height": 9,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 157,
+            "y": 784,
+            "width": 49,
+            "height": 32,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          },
+          {
+            "imageIndex": 0,
+            "x": 221,
+            "y": 786,
+            "width": 21,
+            "height": 28,
+            "imageWidth": 608,
+            "imageHeight": 1130
+          }
+        ],
+        "kept": false,
+        "positiveMarkers": [],
+        "normalizationOperations": [],
+        "parsedPercent": null,
+        "rejectionReason": "missing-volume-marker"
+      }
+    ],
+    "flags": {
+      "abstentionReason": "unsupported-candidates-only",
+      "numberInOcr": true,
+      "percentInOcr": true,
+      "alcoholMarkerInOcr": false,
+      "volumeMarkerInOcr": true,
+      "candidateAccepted": true,
+      "filterRejectedCandidate": true,
+      "parserRejectedCandidate": false
+    }
+  }
+]
