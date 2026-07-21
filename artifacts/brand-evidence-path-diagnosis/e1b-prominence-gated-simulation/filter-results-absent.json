@@ -1,0 +1,13 @@
+{
+  "byFilterReason": {
+    "low-information-fragment": 116,
+    "KEPT:candidate-plausible": 364,
+    "sentence-fragment": 496,
+    "no-letters-or-too-short": 22,
+    "varietal-or-designation": 26,
+    "generic-product-language": 47,
+    "KEPT:candidate-positive": 10,
+    "domain-like": 4,
+    "location-or-appellation": 12
+  }
+}

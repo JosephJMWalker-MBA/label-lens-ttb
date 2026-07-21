@@ -1,0 +1,69 @@
+{
+  "baseline": {
+    "exactSelectedMatch": 27,
+    "normalizedSelectedMatch": 29,
+    "top3Recall": 33,
+    "truthReachingAnyCandidate": 37,
+    "truthRankedFirst": 29,
+    "truthRankedFirstNotObserved": 25,
+    "stateOBSERVED": 4,
+    "stateAMBIGUOUS": 101,
+    "stateNOT_OBSERVED": 10,
+    "wrongSelectedCandidates": 76,
+    "wrongObservedCandidates": 0,
+    "absentBrandEmittingValue": 0
+  },
+  "treatment": {
+    "exactSelectedMatch": 15,
+    "normalizedSelectedMatch": 17,
+    "top3Recall": 21,
+    "truthReachingAnyCandidate": 54,
+    "truthRankedFirst": 17,
+    "truthRankedFirstNotObserved": 13,
+    "stateOBSERVED": 6,
+    "stateAMBIGUOUS": 107,
+    "stateNOT_OBSERVED": 2,
+    "wrongSelectedCandidates": 88,
+    "wrongObservedCandidates": 0,
+    "absentBrandEmittingValue": 8
+  },
+  "delta": {
+    "exactSelectedMatch": -12,
+    "normalizedSelectedMatch": -12,
+    "top3Recall": -12,
+    "truthReachingAnyCandidate": 17,
+    "truthRankedFirst": -12,
+    "truthRankedFirstNotObserved": -12,
+    "stateOBSERVED": 2,
+    "stateAMBIGUOUS": 6,
+    "stateNOT_OBSERVED": -8,
+    "wrongSelectedCandidates": 12,
+    "wrongObservedCandidates": 0,
+    "absentBrandEmittingValue": 8
+  },
+  "changedCaseCount": 43,
+  "gains": 0,
+  "neutral": 23,
+  "regressions": 20,
+  "currentlyCorrectCasesChanged": 12,
+  "knownAmbiguousCasesChanged": 1,
+  "candidateVolume": {
+    "baseline": {
+      "min": 8,
+      "median": 22,
+      "p95": 38,
+      "max": 72,
+      "total": 2715
+    },
+    "treatment": {
+      "min": 8,
+      "median": 58,
+      "p95": 356,
+      "max": 448,
+      "total": 12378
+    },
+    "generatedSubSpansTotal": 9602,
+    "casesWithTriggerLine": 86,
+    "triggerLinesTotal": 377
+  }
+}
