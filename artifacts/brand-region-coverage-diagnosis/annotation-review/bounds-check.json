@@ -1,0 +1,5 @@
+{
+  "checked": 13,
+  "allWithinCanonicalBounds": true,
+  "note": "build fails loudly if any proposed region leaves the canonical image frame"
+}

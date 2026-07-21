@@ -1,0 +1,1763 @@
+[
+  {
+    "caseId": "la-fattoria-rotated",
+    "population": "primary",
+    "strata": [
+      "decorative-or-script-brand",
+      "vertical-mandatory-strip",
+      "alcohol-at-side-or-rotated",
+      "front-label"
+    ],
+    "fixtureBrand": ["La Fattoria"],
+    "imageSize": {
+      "width": 1350,
+      "height": 1650
+    },
+    "machineSelectedBrand": "cCTIO",
+    "machineState": "AMBIGUOUS",
+    "executedPassCount": 1,
+    "occurrences": [
+      {
+        "label": "sole visible brand occurrence",
+        "region": {
+          "x": 350,
+          "y": 360,
+          "width": 650,
+          "height": 290
+        },
+        "regionArea": 188500,
+        "passes": [
+          {
+            "passId": "pass-0-full-image",
+            "passKind": "full-image-primary",
+            "triggerReasons": ["primary-pass"],
+            "rotate": 0,
+            "scale": 1.5,
+            "footprint": {
+              "x": 0,
+              "y": 0,
+              "width": 1350,
+              "height": 1650
+            },
+            "transformedSize": {
+              "width": 2025,
+              "height": 2475
+            },
+            "coverageRatio": 1,
+            "geometricallyCovers": true,
+            "regionInCanonicalPx": {
+              "width": 650,
+              "height": 290
+            },
+            "regionAfterTransformPx": {
+              "width": 975,
+              "height": 435
+            },
+            "overlappingWordCount": 0,
+            "overlappingWords": [],
+            "overlappingTextCarriesBrandEvidence": false,
+            "contributedToFinalBrandCandidates": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "approved-wine-004",
+    "population": "primary",
+    "strata": [
+      "decorative-or-script-brand",
+      "vertical-mandatory-strip",
+      "alcohol-at-side-or-rotated",
+      "front-label"
+    ],
+    "fixtureBrand": ["La Fattoria"],
+    "imageSize": {
+      "width": 1350,
+      "height": 1650
+    },
+    "machineSelectedBrand": "NORTH COAST CA OF",
+    "machineState": "AMBIGUOUS",
+    "executedPassCount": 1,
+    "occurrences": [
+      {
+        "label": "sole visible brand occurrence",
+        "region": {
+          "x": 350,
+          "y": 360,
+          "width": 650,
+          "height": 290
+        },
+        "regionArea": 188500,
+        "passes": [
+          {
+            "passId": "pass-0-full-image",
+            "passKind": "full-image-primary",
+            "triggerReasons": ["primary-pass"],
+            "rotate": 0,
+            "scale": 1.5,
+            "footprint": {
+              "x": 0,
+              "y": 0,
+              "width": 1350,
+              "height": 1650
+            },
+            "transformedSize": {
+              "width": 2025,
+              "height": 2475
+            },
+            "coverageRatio": 1,
+            "geometricallyCovers": true,
+            "regionInCanonicalPx": {
+              "width": 650,
+              "height": 290
+            },
+            "regionAfterTransformPx": {
+              "width": 975,
+              "height": 435
+            },
+            "overlappingWordCount": 0,
+            "overlappingWords": [],
+            "overlappingTextCarriesBrandEvidence": false,
+            "contributedToFinalBrandCandidates": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "approved-wine-005",
+    "population": "primary",
+    "strata": [
+      "decorative-or-script-brand",
+      "vertical-mandatory-strip",
+      "alcohol-at-side-or-rotated",
+      "front-label"
+    ],
+    "fixtureBrand": ["La Fattoria"],
+    "imageSize": {
+      "width": 1500,
+      "height": 1140
+    },
+    "machineSelectedBrand": "0 Ao BARBERA",
+    "machineState": "AMBIGUOUS",
+    "executedPassCount": 1,
+    "occurrences": [
+      {
+        "label": "sole visible brand occurrence",
+        "region": {
+          "x": 495,
+          "y": 240,
+          "width": 520,
+          "height": 270
+        },
+        "regionArea": 140400,
+        "passes": [
+          {
+            "passId": "pass-0-full-image",
+            "passKind": "full-image-primary",
+            "triggerReasons": ["primary-pass"],
+            "rotate": 0,
+            "scale": 1.5,
+            "footprint": {
+              "x": 0,
+              "y": 0,
+              "width": 1500,
+              "height": 1140
+            },
+            "transformedSize": {
+              "width": 2250,
+              "height": 1710
+            },
+            "coverageRatio": 1,
+            "geometricallyCovers": true,
+            "regionInCanonicalPx": {
+              "width": 520,
+              "height": 270
+            },
+            "regionAfterTransformPx": {
+              "width": 780,
+              "height": 405
+            },
+            "overlappingWordCount": 0,
+            "overlappingWords": [],
+            "overlappingTextCarriesBrandEvidence": false,
+            "contributedToFinalBrandCandidates": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "approved-wine-023",
+    "population": "primary",
+    "strata": ["decorative-or-script-brand", "front-label", "alcohol-at-bottom"],
+    "fixtureBrand": ["Podere don Cataldo", "Podere Don Cataldo"],
+    "imageSize": {
+      "width": 988,
+      "height": 1253
+    },
+    "machineSelectedBrand": "PRIMITIVO",
+    "machineState": "AMBIGUOUS",
+    "executedPassCount": 1,
+    "occurrences": [
+      {
+        "label": "sole visible brand occurrence",
+        "region": {
+          "x": 293,
+          "y": 59,
+          "width": 403,
+          "height": 162
+        },
+        "regionArea": 65286,
+        "passes": [
+          {
+            "passId": "pass-0-full-image",
+            "passKind": "full-image-primary",
+            "triggerReasons": ["primary-pass"],
+            "rotate": 0,
+            "scale": 1.5,
+            "footprint": {
+              "x": 0,
+              "y": 0,
+              "width": 988,
+              "height": 1253
+            },
+            "transformedSize": {
+              "width": 1482,
+              "height": 1880
+            },
+            "coverageRatio": 1,
+            "geometricallyCovers": true,
+            "regionInCanonicalPx": {
+              "width": 403,
+              "height": 162
+            },
+            "regionAfterTransformPx": {
+              "width": 604.5,
+              "height": 243
+            },
+            "overlappingWordCount": 2,
+            "overlappingWords": [
+              {
+                "text": "7",
+                "confidence": 4,
+                "geometry": {
+                  "x": 341,
+                  "y": 55,
+                  "width": 106,
+                  "height": 79
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 0.949,
+                "lineIndex": 0,
+                "lineText": "7",
+                "wordAspect": 1.34
+              },
+              {
+                "text": "ary",
+                "confidence": 37,
+                "geometry": {
+                  "x": 302,
+                  "y": 142,
+                  "width": 89,
+                  "height": 51
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 1,
+                "lineText": "ary",
+                "wordAspect": 1.75
+              }
+            ],
+            "overlappingTextCarriesBrandEvidence": false,
+            "contributedToFinalBrandCandidates": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "approved-wine-027",
+    "population": "primary",
+    "strata": [
+      "decorative-or-script-brand",
+      "front-label",
+      "brand-punctuation",
+      "alcohol-at-bottom"
+    ],
+    "fixtureBrand": ["The Golden Girls", "Golden Girls"],
+    "imageSize": {
+      "width": 976,
+      "height": 1126
+    },
+    "machineSelectedBrand": "N Gy A001",
+    "machineState": "AMBIGUOUS",
+    "executedPassCount": 1,
+    "occurrences": [
+      {
+        "label": "sole visible brand occurrence",
+        "region": {
+          "x": 77,
+          "y": 71,
+          "width": 822,
+          "height": 340
+        },
+        "regionArea": 279480,
+        "passes": [
+          {
+            "passId": "pass-0-full-image",
+            "passKind": "full-image-primary",
+            "triggerReasons": ["primary-pass"],
+            "rotate": 0,
+            "scale": 1.5,
+            "footprint": {
+              "x": 0,
+              "y": 0,
+              "width": 976,
+              "height": 1126
+            },
+            "transformedSize": {
+              "width": 1464,
+              "height": 1689
+            },
+            "coverageRatio": 1,
+            "geometricallyCovers": true,
+            "regionInCanonicalPx": {
+              "width": 822,
+              "height": 340
+            },
+            "regionAfterTransformPx": {
+              "width": 1233,
+              "height": 510
+            },
+            "overlappingWordCount": 8,
+            "overlappingWords": [
+              {
+                "text": "HE",
+                "confidence": 63,
+                "geometry": {
+                  "x": 453,
+                  "y": 60,
+                  "width": 125,
+                  "height": 76
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 0.855,
+                "lineIndex": 1,
+                "lineText": "HE",
+                "wordAspect": 1.64
+              },
+              {
+                "text": "¥",
+                "confidence": 30,
+                "geometry": {
+                  "x": 481,
+                  "y": 138,
+                  "width": 99,
+                  "height": 85
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 2,
+                "lineText": "¥",
+                "wordAspect": 1.16
+              },
+              {
+                "text": "a}",
+                "confidence": 1,
+                "geometry": {
+                  "x": 443,
+                  "y": 209,
+                  "width": 139,
+                  "height": 106
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 3,
+                "lineText": "a}",
+                "wordAspect": 1.31
+              },
+              {
+                "text": ">",
+                "confidence": 54,
+                "geometry": {
+                  "x": 695,
+                  "y": 252,
+                  "width": 41,
+                  "height": 58
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 4,
+                "lineText": ">",
+                "wordAspect": 0.71
+              },
+              {
+                "text": "N",
+                "confidence": 75,
+                "geometry": {
+                  "x": 123,
+                  "y": 339,
+                  "width": 42,
+                  "height": 39
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": null,
+                "lineText": null,
+                "wordAspect": 1.08
+              },
+              {
+                "text": "A001",
+                "confidence": 17,
+                "geometry": {
+                  "x": 691,
+                  "y": 339,
+                  "width": 166,
+                  "height": 39
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": null,
+                "lineText": null,
+                "wordAspect": 4.26
+              },
+              {
+                "text": "Gy",
+                "confidence": 51,
+                "geometry": {
+                  "x": 373,
+                  "y": 310,
+                  "width": 230,
+                  "height": 112
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 0.902,
+                "lineIndex": null,
+                "lineText": null,
+                "wordAspect": 2.05
+              },
+              {
+                "text": "PRA",
+                "confidence": 0,
+                "geometry": {
+                  "x": 763,
+                  "y": 369,
+                  "width": 213,
+                  "height": 71
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": false,
+                "fractionOfBoxInRegion": 0.378,
+                "lineIndex": 7,
+                "lineText": "PRA",
+                "wordAspect": 3
+              }
+            ],
+            "overlappingTextCarriesBrandEvidence": true,
+            "contributedToFinalBrandCandidates": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "approved-wine-031",
+    "population": "primary",
+    "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+    "fixtureBrand": ["embeleso"],
+    "imageSize": {
+      "width": 646,
+      "height": 1171
+    },
+    "machineSelectedBrand": "Contiene Sulfitos Enthalt Sulfite",
+    "machineState": "AMBIGUOUS",
+    "executedPassCount": 1,
+    "occurrences": [
+      {
+        "label": "sole visible brand occurrence",
+        "region": {
+          "x": 163,
+          "y": 38,
+          "width": 330,
+          "height": 76
+        },
+        "regionArea": 25080,
+        "passes": [
+          {
+            "passId": "pass-0-full-image",
+            "passKind": "full-image-primary",
+            "triggerReasons": ["primary-pass"],
+            "rotate": 0,
+            "scale": 1.5,
+            "footprint": {
+              "x": 0,
+              "y": 0,
+              "width": 646,
+              "height": 1171
+            },
+            "transformedSize": {
+              "width": 969,
+              "height": 1757
+            },
+            "coverageRatio": 1,
+            "geometricallyCovers": true,
+            "regionInCanonicalPx": {
+              "width": 330,
+              "height": 76
+            },
+            "regionAfterTransformPx": {
+              "width": 495,
+              "height": 114
+            },
+            "overlappingWordCount": 1,
+            "overlappingWords": [
+              {
+                "text": "enrhekeso",
+                "confidence": 10,
+                "geometry": {
+                  "x": 166,
+                  "y": 30,
+                  "width": 321,
+                  "height": 77
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 0.896,
+                "lineIndex": 0,
+                "lineText": "enrhekeso",
+                "wordAspect": 4.17
+              }
+            ],
+            "overlappingTextCarriesBrandEvidence": false,
+            "contributedToFinalBrandCandidates": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "approved-wine-035",
+    "population": "primary",
+    "strata": ["decorative-or-script-brand", "front-label", "alcohol-at-side-or-rotated"],
+    "fixtureBrand": ["Hubert Lamy"],
+    "imageSize": {
+      "width": 557,
+      "height": 471
+    },
+    "machineSelectedBrand": "CHASSAGNE-MONTRACHET",
+    "machineState": "AMBIGUOUS",
+    "executedPassCount": 1,
+    "occurrences": [
+      {
+        "label": "sole visible brand occurrence",
+        "region": {
+          "x": 58,
+          "y": 42,
+          "width": 364,
+          "height": 92
+        },
+        "regionArea": 33488,
+        "passes": [
+          {
+            "passId": "pass-0-full-image",
+            "passKind": "full-image-primary",
+            "triggerReasons": ["primary-pass"],
+            "rotate": 0,
+            "scale": 1.5,
+            "footprint": {
+              "x": 0,
+              "y": 0,
+              "width": 557,
+              "height": 471
+            },
+            "transformedSize": {
+              "width": 836,
+              "height": 707
+            },
+            "coverageRatio": 1,
+            "geometricallyCovers": true,
+            "regionInCanonicalPx": {
+              "width": 364,
+              "height": 92
+            },
+            "regionAfterTransformPx": {
+              "width": 546,
+              "height": 138
+            },
+            "overlappingWordCount": 1,
+            "overlappingWords": [
+              {
+                "text": "Hectiont",
+                "confidence": 0,
+                "geometry": {
+                  "x": 51,
+                  "y": 46,
+                  "width": 191,
+                  "height": 75
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 0.963,
+                "lineIndex": 1,
+                "lineText": "Hectiont",
+                "wordAspect": 2.55
+              }
+            ],
+            "overlappingTextCarriesBrandEvidence": false,
+            "contributedToFinalBrandCandidates": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "approved-wine-085",
+    "population": "primary",
+    "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+    "fixtureBrand": ["Mosaikon"],
+    "imageSize": {
+      "width": 414,
+      "height": 464
+    },
+    "machineSelectedBrand": "Denominazione Origine Controllata",
+    "machineState": "AMBIGUOUS",
+    "executedPassCount": 1,
+    "occurrences": [
+      {
+        "label": "sole visible brand occurrence",
+        "region": {
+          "x": 88,
+          "y": 18,
+          "width": 250,
+          "height": 50
+        },
+        "regionArea": 12500,
+        "passes": [
+          {
+            "passId": "pass-0-full-image",
+            "passKind": "full-image-primary",
+            "triggerReasons": ["primary-pass"],
+            "rotate": 0,
+            "scale": 1.5,
+            "footprint": {
+              "x": 0,
+              "y": 0,
+              "width": 414,
+              "height": 464
+            },
+            "transformedSize": {
+              "width": 621,
+              "height": 696
+            },
+            "coverageRatio": 1,
+            "geometricallyCovers": true,
+            "regionInCanonicalPx": {
+              "width": 250,
+              "height": 50
+            },
+            "regionAfterTransformPx": {
+              "width": 375,
+              "height": 75
+            },
+            "overlappingWordCount": 3,
+            "overlappingWords": [
+              {
+                "text": "=",
+                "confidence": 5,
+                "geometry": {
+                  "x": 101,
+                  "y": 35,
+                  "width": 19,
+                  "height": 14
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 0,
+                "lineText": "= SP “i",
+                "wordAspect": 1.36
+              },
+              {
+                "text": "SP",
+                "confidence": 25,
+                "geometry": {
+                  "x": 169,
+                  "y": 13,
+                  "width": 74,
+                  "height": 48
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 0.896,
+                "lineIndex": 0,
+                "lineText": "= SP “i",
+                "wordAspect": 1.54
+              },
+              {
+                "text": "“i",
+                "confidence": 45,
+                "geometry": {
+                  "x": 251,
+                  "y": 23,
+                  "width": 74,
+                  "height": 35
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 0,
+                "lineText": "= SP “i",
+                "wordAspect": 2.11
+              }
+            ],
+            "overlappingTextCarriesBrandEvidence": true,
+            "contributedToFinalBrandCandidates": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "approved-wine-091",
+    "population": "primary",
+    "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+    "fixtureBrand": ["Rias"],
+    "imageSize": {
+      "width": 303,
+      "height": 598
+    },
+    "machineSelectedBrand": "D CONTROLLATA E",
+    "machineState": "AMBIGUOUS",
+    "executedPassCount": 1,
+    "occurrences": [
+      {
+        "label": "sole visible brand occurrence",
+        "region": {
+          "x": 20,
+          "y": 6,
+          "width": 92,
+          "height": 150
+        },
+        "regionArea": 13800,
+        "passes": [
+          {
+            "passId": "pass-0-full-image",
+            "passKind": "full-image-primary",
+            "triggerReasons": ["primary-pass"],
+            "rotate": 0,
+            "scale": 1.5,
+            "footprint": {
+              "x": 0,
+              "y": 0,
+              "width": 303,
+              "height": 598
+            },
+            "transformedSize": {
+              "width": 455,
+              "height": 897
+            },
+            "coverageRatio": 1,
+            "geometricallyCovers": true,
+            "regionInCanonicalPx": {
+              "width": 92,
+              "height": 150
+            },
+            "regionAfterTransformPx": {
+              "width": 138,
+              "height": 225
+            },
+            "overlappingWordCount": 4,
+            "overlappingWords": [
+              {
+                "text": "/",
+                "confidence": 67,
+                "geometry": {
+                  "x": 81,
+                  "y": 13,
+                  "width": 14,
+                  "height": 12
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 0,
+                "lineText": "/",
+                "wordAspect": 1.17
+              },
+              {
+                "text": "R{",
+                "confidence": 0,
+                "geometry": {
+                  "x": 27,
+                  "y": 33,
+                  "width": 78,
+                  "height": 60
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": null,
+                "lineText": null,
+                "wordAspect": 1.3
+              },
+              {
+                "text": "d",
+                "confidence": 91,
+                "geometry": {
+                  "x": 27,
+                  "y": 81,
+                  "width": 42,
+                  "height": 46
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": null,
+                "lineText": null,
+                "wordAspect": 0.91
+              },
+              {
+                "text": "D>",
+                "confidence": 59,
+                "geometry": {
+                  "x": 66,
+                  "y": 93,
+                  "width": 37,
+                  "height": 56
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": null,
+                "lineText": null,
+                "wordAspect": 0.66
+              }
+            ],
+            "overlappingTextCarriesBrandEvidence": true,
+            "contributedToFinalBrandCandidates": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "wine-multi-artifact-04",
+    "population": "primary",
+    "strata": ["multi-panel", "alcohol-at-bottom"],
+    "fixtureBrand": ["Dry Cellar"],
+    "imageSize": {
+      "width": 674,
+      "height": 1522
+    },
+    "machineSelectedBrand": "Donovan Visayas",
+    "machineState": "AMBIGUOUS",
+    "executedPassCount": 1,
+    "occurrences": [
+      {
+        "label": "front panel — 'Dry Cellar' script mark",
+        "region": {
+          "x": 53,
+          "y": 123,
+          "width": 230,
+          "height": 140
+        },
+        "regionArea": 32200,
+        "passes": [
+          {
+            "passId": "pass-0-full-image",
+            "passKind": "full-image-primary",
+            "triggerReasons": ["primary-pass"],
+            "rotate": 0,
+            "scale": 1.5,
+            "footprint": {
+              "x": 0,
+              "y": 0,
+              "width": 674,
+              "height": 1522
+            },
+            "transformedSize": {
+              "width": 1011,
+              "height": 2283
+            },
+            "coverageRatio": 1,
+            "geometricallyCovers": true,
+            "regionInCanonicalPx": {
+              "width": 230,
+              "height": 140
+            },
+            "regionAfterTransformPx": {
+              "width": 345,
+              "height": 210
+            },
+            "overlappingWordCount": 1,
+            "overlappingWords": [
+              {
+                "text": "9.",
+                "confidence": 74,
+                "geometry": {
+                  "x": 61,
+                  "y": 119,
+                  "width": 119,
+                  "height": 60
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 0.933,
+                "lineIndex": 0,
+                "lineText": "9.",
+                "wordAspect": 1.98
+              }
+            ],
+            "overlappingTextCarriesBrandEvidence": false,
+            "contributedToFinalBrandCandidates": true
+          }
+        ]
+      },
+      {
+        "label": "back panel — 'Dry Cellar' script header",
+        "region": {
+          "x": 173,
+          "y": 982,
+          "width": 156,
+          "height": 55
+        },
+        "regionArea": 8580,
+        "passes": [
+          {
+            "passId": "pass-0-full-image",
+            "passKind": "full-image-primary",
+            "triggerReasons": ["primary-pass"],
+            "rotate": 0,
+            "scale": 1.5,
+            "footprint": {
+              "x": 0,
+              "y": 0,
+              "width": 674,
+              "height": 1522
+            },
+            "transformedSize": {
+              "width": 1011,
+              "height": 2283
+            },
+            "coverageRatio": 1,
+            "geometricallyCovers": true,
+            "regionInCanonicalPx": {
+              "width": 156,
+              "height": 55
+            },
+            "regionAfterTransformPx": {
+              "width": 234,
+              "height": 82.5
+            },
+            "overlappingWordCount": 2,
+            "overlappingWords": [
+              {
+                "text": "Dy",
+                "confidence": 41,
+                "geometry": {
+                  "x": 181,
+                  "y": 993,
+                  "width": 60,
+                  "height": 35
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 16,
+                "lineText": "Dy Colla",
+                "wordAspect": 1.71
+              },
+              {
+                "text": "Colla",
+                "confidence": 35,
+                "geometry": {
+                  "x": 250,
+                  "y": 989,
+                  "width": 70,
+                  "height": 29
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 16,
+                "lineText": "Dy Colla",
+                "wordAspect": 2.41
+              }
+            ],
+            "overlappingTextCarriesBrandEvidence": false,
+            "contributedToFinalBrandCandidates": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "luigi-giovanni-live",
+    "population": "control",
+    "strata": [
+      "decorative-or-script-brand",
+      "brand-punctuation",
+      "multiple-brand-like-phrases",
+      "alcohol-at-side-or-rotated",
+      "front-label"
+    ],
+    "fixtureBrand": ["Luigi & Giovanni"],
+    "imageSize": {
+      "width": 975,
+      "height": 1500
+    },
+    "machineSelectedBrand": "VANNI",
+    "machineState": "AMBIGUOUS",
+    "executedPassCount": 1,
+    "occurrences": [
+      {
+        "label": "derived-from-machine-geometry (control only)",
+        "region": {
+          "imageIndex": 0,
+          "x": 421,
+          "y": 440,
+          "width": 382,
+          "height": 96,
+          "imageWidth": 975,
+          "imageHeight": 1500
+        },
+        "regionArea": 36672,
+        "passes": [
+          {
+            "passId": "pass-0-full-image",
+            "passKind": "full-image-primary",
+            "triggerReasons": ["primary-pass"],
+            "rotate": 0,
+            "scale": 1.5,
+            "footprint": {
+              "x": 0,
+              "y": 0,
+              "width": 975,
+              "height": 1500
+            },
+            "transformedSize": {
+              "width": 1463,
+              "height": 2250
+            },
+            "coverageRatio": 1,
+            "geometricallyCovers": true,
+            "regionInCanonicalPx": {
+              "width": 382,
+              "height": 96
+            },
+            "regionAfterTransformPx": {
+              "width": 573,
+              "height": 144
+            },
+            "overlappingWordCount": 1,
+            "overlappingWords": [
+              {
+                "text": "VANNI",
+                "confidence": 91,
+                "geometry": {
+                  "x": 421,
+                  "y": 440,
+                  "width": 382,
+                  "height": 96
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 1,
+                "lineText": "VANNI",
+                "wordAspect": 3.98
+              }
+            ],
+            "overlappingTextCarriesBrandEvidence": true,
+            "contributedToFinalBrandCandidates": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "approved-wine-013",
+    "population": "control",
+    "strata": [
+      "decorative-or-script-brand",
+      "front-label",
+      "multiple-brand-like-phrases",
+      "alcohol-at-bottom"
+    ],
+    "fixtureBrand": ["Afflicted"],
+    "imageSize": {
+      "width": 1000,
+      "height": 1429
+    },
+    "machineSelectedBrand": "Play ers Heart",
+    "machineState": "AMBIGUOUS",
+    "executedPassCount": 1,
+    "occurrences": [
+      {
+        "label": "derived-from-machine-geometry (control only)",
+        "region": {
+          "imageIndex": 0,
+          "x": 343,
+          "y": 752,
+          "width": 314,
+          "height": 63,
+          "imageWidth": 1000,
+          "imageHeight": 1429
+        },
+        "regionArea": 19782,
+        "passes": [
+          {
+            "passId": "pass-0-full-image",
+            "passKind": "full-image-primary",
+            "triggerReasons": ["primary-pass"],
+            "rotate": 0,
+            "scale": 1.5,
+            "footprint": {
+              "x": 0,
+              "y": 0,
+              "width": 1000,
+              "height": 1429
+            },
+            "transformedSize": {
+              "width": 1500,
+              "height": 2144
+            },
+            "coverageRatio": 1,
+            "geometricallyCovers": true,
+            "regionInCanonicalPx": {
+              "width": 314,
+              "height": 63
+            },
+            "regionAfterTransformPx": {
+              "width": 471,
+              "height": 94.5
+            },
+            "overlappingWordCount": 3,
+            "overlappingWords": [
+              {
+                "text": "Play",
+                "confidence": 89,
+                "geometry": {
+                  "x": 343,
+                  "y": 752,
+                  "width": 94,
+                  "height": 63
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 11,
+                "lineText": "Play er’s Heart",
+                "wordAspect": 1.49
+              },
+              {
+                "text": "er’s",
+                "confidence": 90,
+                "geometry": {
+                  "x": 440,
+                  "y": 775,
+                  "width": 75,
+                  "height": 35
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 11,
+                "lineText": "Play er’s Heart",
+                "wordAspect": 2.14
+              },
+              {
+                "text": "Heart",
+                "confidence": 40,
+                "geometry": {
+                  "x": 529,
+                  "y": 761,
+                  "width": 128,
+                  "height": 47
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 11,
+                "lineText": "Play er’s Heart",
+                "wordAspect": 2.72
+              }
+            ],
+            "overlappingTextCarriesBrandEvidence": false,
+            "contributedToFinalBrandCandidates": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "amuninni-ferracane",
+    "population": "control",
+    "strata": [
+      "decorative-or-script-brand",
+      "multiple-brand-like-phrases",
+      "genuinely-ambiguous",
+      "alcohol-at-bottom",
+      "front-label"
+    ],
+    "fixtureBrand": ["Amuninni", "Fabio Ferracane"],
+    "imageSize": {
+      "width": 591,
+      "height": 946
+    },
+    "machineSelectedBrand": "INV ENVY",
+    "machineState": "AMBIGUOUS",
+    "executedPassCount": 1,
+    "occurrences": [
+      {
+        "label": "derived-from-machine-geometry (control only)",
+        "region": {
+          "imageIndex": 0,
+          "x": 89,
+          "y": 230,
+          "width": 408,
+          "height": 129,
+          "imageWidth": 591,
+          "imageHeight": 946
+        },
+        "regionArea": 52632,
+        "passes": [
+          {
+            "passId": "pass-0-full-image",
+            "passKind": "full-image-primary",
+            "triggerReasons": ["primary-pass"],
+            "rotate": 0,
+            "scale": 1.5,
+            "footprint": {
+              "x": 0,
+              "y": 0,
+              "width": 591,
+              "height": 946
+            },
+            "transformedSize": {
+              "width": 887,
+              "height": 1419
+            },
+            "coverageRatio": 1,
+            "geometricallyCovers": true,
+            "regionInCanonicalPx": {
+              "width": 408,
+              "height": 129
+            },
+            "regionAfterTransformPx": {
+              "width": 612,
+              "height": 193.5
+            },
+            "overlappingWordCount": 6,
+            "overlappingWords": [
+              {
+                "text": "INV",
+                "confidence": 25,
+                "geometry": {
+                  "x": 89,
+                  "y": 230,
+                  "width": 118,
+                  "height": 129
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 2,
+                "lineText": "INV ENVY]",
+                "wordAspect": 0.91
+              },
+              {
+                "text": "ENVY]",
+                "confidence": 0,
+                "geometry": {
+                  "x": 250,
+                  "y": 230,
+                  "width": 247,
+                  "height": 129
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 2,
+                "lineText": "INV ENVY]",
+                "wordAspect": 1.91
+              },
+              {
+                "text": "@amuninnivini",
+                "confidence": 88,
+                "geometry": {
+                  "x": 93,
+                  "y": 337,
+                  "width": 188,
+                  "height": 24
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 0.917,
+                "lineIndex": 3,
+                "lineText": "@amuninnivini new york, ny",
+                "wordAspect": 7.83
+              },
+              {
+                "text": "new",
+                "confidence": 94,
+                "geometry": {
+                  "x": 337,
+                  "y": 343,
+                  "width": 50,
+                  "height": 14
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 3,
+                "lineText": "@amuninnivini new york, ny",
+                "wordAspect": 3.57
+              },
+              {
+                "text": "york,",
+                "confidence": 95,
+                "geometry": {
+                  "x": 395,
+                  "y": 337,
+                  "width": 60,
+                  "height": 26
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 0.846,
+                "lineIndex": 3,
+                "lineText": "@amuninnivini new york, ny",
+                "wordAspect": 2.31
+              },
+              {
+                "text": "ny",
+                "confidence": 96,
+                "geometry": {
+                  "x": 467,
+                  "y": 343,
+                  "width": 28,
+                  "height": 20
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 0.8,
+                "lineIndex": 3,
+                "lineText": "@amuninnivini new york, ny",
+                "wordAspect": 1.4
+              }
+            ],
+            "overlappingTextCarriesBrandEvidence": false,
+            "contributedToFinalBrandCandidates": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "approved-wine-105",
+    "population": "control",
+    "strata": [
+      "decorative-or-script-brand",
+      "front-label",
+      "multiple-brand-like-phrases",
+      "alcohol-at-bottom"
+    ],
+    "fixtureBrand": ["Luigi & Giovanni"],
+    "imageSize": {
+      "width": 975,
+      "height": 1140
+    },
+    "machineSelectedBrand": "VANNI",
+    "machineState": "AMBIGUOUS",
+    "executedPassCount": 1,
+    "occurrences": [
+      {
+        "label": "derived-from-machine-geometry (control only)",
+        "region": {
+          "imageIndex": 0,
+          "x": 413,
+          "y": 304,
+          "width": 382,
+          "height": 95,
+          "imageWidth": 975,
+          "imageHeight": 1140
+        },
+        "regionArea": 36290,
+        "passes": [
+          {
+            "passId": "pass-0-full-image",
+            "passKind": "full-image-primary",
+            "triggerReasons": ["primary-pass"],
+            "rotate": 0,
+            "scale": 1.5,
+            "footprint": {
+              "x": 0,
+              "y": 0,
+              "width": 975,
+              "height": 1140
+            },
+            "transformedSize": {
+              "width": 1463,
+              "height": 1710
+            },
+            "coverageRatio": 1,
+            "geometricallyCovers": true,
+            "regionInCanonicalPx": {
+              "width": 382,
+              "height": 95
+            },
+            "regionAfterTransformPx": {
+              "width": 573,
+              "height": 142.5
+            },
+            "overlappingWordCount": 1,
+            "overlappingWords": [
+              {
+                "text": "VANNI",
+                "confidence": 92,
+                "geometry": {
+                  "x": 413,
+                  "y": 304,
+                  "width": 382,
+                  "height": 95
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 0,
+                "lineText": "VANNI",
+                "wordAspect": 4.02
+              }
+            ],
+            "overlappingTextCarriesBrandEvidence": true,
+            "contributedToFinalBrandCandidates": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "approved-wine-107",
+    "population": "control",
+    "strata": [
+      "decorative-or-script-brand",
+      "wraparound",
+      "vertical-mandatory-strip",
+      "alcohol-at-side-or-rotated",
+      "front-label"
+    ],
+    "fixtureBrand": ["La Fattoria"],
+    "imageSize": {
+      "width": 1500,
+      "height": 1140
+    },
+    "machineSelectedBrand": "FATTORIA",
+    "machineState": "AMBIGUOUS",
+    "executedPassCount": 1,
+    "occurrences": [
+      {
+        "label": "derived-from-machine-geometry (control only)",
+        "region": {
+          "imageIndex": 0,
+          "x": 503,
+          "y": 413,
+          "width": 484,
+          "height": 86,
+          "imageWidth": 1500,
+          "imageHeight": 1140
+        },
+        "regionArea": 41624,
+        "passes": [
+          {
+            "passId": "pass-0-full-image",
+            "passKind": "full-image-primary",
+            "triggerReasons": ["primary-pass"],
+            "rotate": 0,
+            "scale": 1.5,
+            "footprint": {
+              "x": 0,
+              "y": 0,
+              "width": 1500,
+              "height": 1140
+            },
+            "transformedSize": {
+              "width": 2250,
+              "height": 1710
+            },
+            "coverageRatio": 1,
+            "geometricallyCovers": true,
+            "regionInCanonicalPx": {
+              "width": 484,
+              "height": 86
+            },
+            "regionAfterTransformPx": {
+              "width": 726,
+              "height": 129
+            },
+            "overlappingWordCount": 1,
+            "overlappingWords": [
+              {
+                "text": "FATTORIA",
+                "confidence": 89,
+                "geometry": {
+                  "x": 503,
+                  "y": 413,
+                  "width": 484,
+                  "height": 86
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 7,
+                "lineText": "FATTORIA",
+                "wordAspect": 5.63
+              }
+            ],
+            "overlappingTextCarriesBrandEvidence": true,
+            "contributedToFinalBrandCandidates": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "caseId": "approved-wine-108",
+    "population": "control",
+    "strata": [
+      "decorative-or-script-brand",
+      "wraparound",
+      "vertical-mandatory-strip",
+      "alcohol-at-side-or-rotated",
+      "front-label"
+    ],
+    "fixtureBrand": ["La Fattoria"],
+    "imageSize": {
+      "width": 1500,
+      "height": 1140
+    },
+    "machineSelectedBrand": "8 Ao VINO BIANCO",
+    "machineState": "AMBIGUOUS",
+    "executedPassCount": 1,
+    "occurrences": [
+      {
+        "label": "derived-from-machine-geometry (control only)",
+        "region": {
+          "imageIndex": 0,
+          "x": 76,
+          "y": 711,
+          "width": 1040,
+          "height": 90,
+          "imageWidth": 1500,
+          "imageHeight": 1140
+        },
+        "regionArea": 93600,
+        "passes": [
+          {
+            "passId": "pass-0-full-image",
+            "passKind": "full-image-primary",
+            "triggerReasons": ["primary-pass"],
+            "rotate": 0,
+            "scale": 1.5,
+            "footprint": {
+              "x": 0,
+              "y": 0,
+              "width": 1500,
+              "height": 1140
+            },
+            "transformedSize": {
+              "width": 2250,
+              "height": 1710
+            },
+            "coverageRatio": 1,
+            "geometricallyCovers": true,
+            "regionInCanonicalPx": {
+              "width": 1040,
+              "height": 90
+            },
+            "regionAfterTransformPx": {
+              "width": 1560,
+              "height": 135
+            },
+            "overlappingWordCount": 10,
+            "overlappingWords": [
+              {
+                "text": "w",
+                "confidence": 36,
+                "geometry": {
+                  "x": 101,
+                  "y": 714,
+                  "width": 11,
+                  "height": 9
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": null,
+                "lineText": null,
+                "wordAspect": 1.22
+              },
+              {
+                "text": "Oo",
+                "confidence": 26,
+                "geometry": {
+                  "x": 121,
+                  "y": 712,
+                  "width": 12,
+                  "height": 11
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": null,
+                "lineText": null,
+                "wordAspect": 1.09
+              },
+              {
+                "text": "=2=2C",
+                "confidence": 16,
+                "geometry": {
+                  "x": 101,
+                  "y": 723,
+                  "width": 32,
+                  "height": 10
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": null,
+                "lineText": null,
+                "wordAspect": 3.2
+              },
+              {
+                "text": "a0",
+                "confidence": 65,
+                "geometry": {
+                  "x": 101,
+                  "y": 733,
+                  "width": 32,
+                  "height": 10
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 18,
+                "lineText": "a0",
+                "wordAspect": 3.2
+              },
+              {
+                "text": "8",
+                "confidence": 57,
+                "geometry": {
+                  "x": 76,
+                  "y": 746,
+                  "width": 13,
+                  "height": 15
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": null,
+                "lineText": null,
+                "wordAspect": 0.87
+              },
+              {
+                "text": "Ao",
+                "confidence": 77,
+                "geometry": {
+                  "x": 101,
+                  "y": 748,
+                  "width": 32,
+                  "height": 14
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": null,
+                "lineText": null,
+                "wordAspect": 2.29
+              },
+              {
+                "text": "2",
+                "confidence": 79,
+                "geometry": {
+                  "x": 121,
+                  "y": 768,
+                  "width": 12,
+                  "height": 23
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": 20,
+                "lineText": "2",
+                "wordAspect": 0.52
+              },
+              {
+                "text": "of",
+                "confidence": 0,
+                "geometry": {
+                  "x": 121,
+                  "y": 790,
+                  "width": 34,
+                  "height": 15
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 0.733,
+                "lineIndex": 21,
+                "lineText": "of",
+                "wordAspect": 2.27
+              },
+              {
+                "text": "VINO",
+                "confidence": 94,
+                "geometry": {
+                  "x": 393,
+                  "y": 711,
+                  "width": 268,
+                  "height": 90
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": null,
+                "lineText": null,
+                "wordAspect": 2.98
+              },
+              {
+                "text": "BIANCO",
+                "confidence": 96,
+                "geometry": {
+                  "x": 689,
+                  "y": 711,
+                  "width": 427,
+                  "height": 90
+                },
+                "centreInsideRegion": true,
+                "atLeastHalfOfBoxInRegion": true,
+                "fractionOfBoxInRegion": 1,
+                "lineIndex": null,
+                "lineText": null,
+                "wordAspect": 4.74
+              }
+            ],
+            "overlappingTextCarriesBrandEvidence": false,
+            "contributedToFinalBrandCandidates": true
+          }
+        ]
+      }
+    ]
+  }
+]

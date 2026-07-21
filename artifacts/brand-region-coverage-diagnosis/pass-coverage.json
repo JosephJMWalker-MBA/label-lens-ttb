@@ -1,0 +1,499 @@
+{
+  "coverageThreshold": 0.9,
+  "rows": [
+    {
+      "caseId": "la-fattoria-rotated",
+      "occurrence": "sole visible brand occurrence",
+      "region": {
+        "x": 350,
+        "y": 360,
+        "width": 650,
+        "height": 290
+      },
+      "passes": [
+        {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "rotate": 0,
+          "scale": 1.5,
+          "footprint": {
+            "x": 0,
+            "y": 0,
+            "width": 1350,
+            "height": 1650
+          },
+          "coverageRatio": 1,
+          "geometricallyCovers": true,
+          "overlappingWordCount": 0,
+          "contributedToFinalBrandCandidates": true
+        }
+      ]
+    },
+    {
+      "caseId": "approved-wine-004",
+      "occurrence": "sole visible brand occurrence",
+      "region": {
+        "x": 350,
+        "y": 360,
+        "width": 650,
+        "height": 290
+      },
+      "passes": [
+        {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "rotate": 0,
+          "scale": 1.5,
+          "footprint": {
+            "x": 0,
+            "y": 0,
+            "width": 1350,
+            "height": 1650
+          },
+          "coverageRatio": 1,
+          "geometricallyCovers": true,
+          "overlappingWordCount": 0,
+          "contributedToFinalBrandCandidates": true
+        }
+      ]
+    },
+    {
+      "caseId": "approved-wine-005",
+      "occurrence": "sole visible brand occurrence",
+      "region": {
+        "x": 495,
+        "y": 240,
+        "width": 520,
+        "height": 270
+      },
+      "passes": [
+        {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "rotate": 0,
+          "scale": 1.5,
+          "footprint": {
+            "x": 0,
+            "y": 0,
+            "width": 1500,
+            "height": 1140
+          },
+          "coverageRatio": 1,
+          "geometricallyCovers": true,
+          "overlappingWordCount": 0,
+          "contributedToFinalBrandCandidates": true
+        }
+      ]
+    },
+    {
+      "caseId": "approved-wine-023",
+      "occurrence": "sole visible brand occurrence",
+      "region": {
+        "x": 293,
+        "y": 59,
+        "width": 403,
+        "height": 162
+      },
+      "passes": [
+        {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "rotate": 0,
+          "scale": 1.5,
+          "footprint": {
+            "x": 0,
+            "y": 0,
+            "width": 988,
+            "height": 1253
+          },
+          "coverageRatio": 1,
+          "geometricallyCovers": true,
+          "overlappingWordCount": 2,
+          "contributedToFinalBrandCandidates": true
+        }
+      ]
+    },
+    {
+      "caseId": "approved-wine-027",
+      "occurrence": "sole visible brand occurrence",
+      "region": {
+        "x": 77,
+        "y": 71,
+        "width": 822,
+        "height": 340
+      },
+      "passes": [
+        {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "rotate": 0,
+          "scale": 1.5,
+          "footprint": {
+            "x": 0,
+            "y": 0,
+            "width": 976,
+            "height": 1126
+          },
+          "coverageRatio": 1,
+          "geometricallyCovers": true,
+          "overlappingWordCount": 8,
+          "contributedToFinalBrandCandidates": true
+        }
+      ]
+    },
+    {
+      "caseId": "approved-wine-031",
+      "occurrence": "sole visible brand occurrence",
+      "region": {
+        "x": 163,
+        "y": 38,
+        "width": 330,
+        "height": 76
+      },
+      "passes": [
+        {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "rotate": 0,
+          "scale": 1.5,
+          "footprint": {
+            "x": 0,
+            "y": 0,
+            "width": 646,
+            "height": 1171
+          },
+          "coverageRatio": 1,
+          "geometricallyCovers": true,
+          "overlappingWordCount": 1,
+          "contributedToFinalBrandCandidates": true
+        }
+      ]
+    },
+    {
+      "caseId": "approved-wine-035",
+      "occurrence": "sole visible brand occurrence",
+      "region": {
+        "x": 58,
+        "y": 42,
+        "width": 364,
+        "height": 92
+      },
+      "passes": [
+        {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "rotate": 0,
+          "scale": 1.5,
+          "footprint": {
+            "x": 0,
+            "y": 0,
+            "width": 557,
+            "height": 471
+          },
+          "coverageRatio": 1,
+          "geometricallyCovers": true,
+          "overlappingWordCount": 1,
+          "contributedToFinalBrandCandidates": true
+        }
+      ]
+    },
+    {
+      "caseId": "approved-wine-085",
+      "occurrence": "sole visible brand occurrence",
+      "region": {
+        "x": 88,
+        "y": 18,
+        "width": 250,
+        "height": 50
+      },
+      "passes": [
+        {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "rotate": 0,
+          "scale": 1.5,
+          "footprint": {
+            "x": 0,
+            "y": 0,
+            "width": 414,
+            "height": 464
+          },
+          "coverageRatio": 1,
+          "geometricallyCovers": true,
+          "overlappingWordCount": 3,
+          "contributedToFinalBrandCandidates": true
+        }
+      ]
+    },
+    {
+      "caseId": "approved-wine-091",
+      "occurrence": "sole visible brand occurrence",
+      "region": {
+        "x": 20,
+        "y": 6,
+        "width": 92,
+        "height": 150
+      },
+      "passes": [
+        {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "rotate": 0,
+          "scale": 1.5,
+          "footprint": {
+            "x": 0,
+            "y": 0,
+            "width": 303,
+            "height": 598
+          },
+          "coverageRatio": 1,
+          "geometricallyCovers": true,
+          "overlappingWordCount": 4,
+          "contributedToFinalBrandCandidates": true
+        }
+      ]
+    },
+    {
+      "caseId": "wine-multi-artifact-04",
+      "occurrence": "front panel — 'Dry Cellar' script mark",
+      "region": {
+        "x": 53,
+        "y": 123,
+        "width": 230,
+        "height": 140
+      },
+      "passes": [
+        {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "rotate": 0,
+          "scale": 1.5,
+          "footprint": {
+            "x": 0,
+            "y": 0,
+            "width": 674,
+            "height": 1522
+          },
+          "coverageRatio": 1,
+          "geometricallyCovers": true,
+          "overlappingWordCount": 1,
+          "contributedToFinalBrandCandidates": true
+        }
+      ]
+    },
+    {
+      "caseId": "wine-multi-artifact-04",
+      "occurrence": "back panel — 'Dry Cellar' script header",
+      "region": {
+        "x": 173,
+        "y": 982,
+        "width": 156,
+        "height": 55
+      },
+      "passes": [
+        {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "rotate": 0,
+          "scale": 1.5,
+          "footprint": {
+            "x": 0,
+            "y": 0,
+            "width": 674,
+            "height": 1522
+          },
+          "coverageRatio": 1,
+          "geometricallyCovers": true,
+          "overlappingWordCount": 2,
+          "contributedToFinalBrandCandidates": true
+        }
+      ]
+    },
+    {
+      "caseId": "luigi-giovanni-live",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "region": {
+        "imageIndex": 0,
+        "x": 421,
+        "y": 440,
+        "width": 382,
+        "height": 96,
+        "imageWidth": 975,
+        "imageHeight": 1500
+      },
+      "passes": [
+        {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "rotate": 0,
+          "scale": 1.5,
+          "footprint": {
+            "x": 0,
+            "y": 0,
+            "width": 975,
+            "height": 1500
+          },
+          "coverageRatio": 1,
+          "geometricallyCovers": true,
+          "overlappingWordCount": 1,
+          "contributedToFinalBrandCandidates": true
+        }
+      ]
+    },
+    {
+      "caseId": "approved-wine-013",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "region": {
+        "imageIndex": 0,
+        "x": 343,
+        "y": 752,
+        "width": 314,
+        "height": 63,
+        "imageWidth": 1000,
+        "imageHeight": 1429
+      },
+      "passes": [
+        {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "rotate": 0,
+          "scale": 1.5,
+          "footprint": {
+            "x": 0,
+            "y": 0,
+            "width": 1000,
+            "height": 1429
+          },
+          "coverageRatio": 1,
+          "geometricallyCovers": true,
+          "overlappingWordCount": 3,
+          "contributedToFinalBrandCandidates": true
+        }
+      ]
+    },
+    {
+      "caseId": "amuninni-ferracane",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "region": {
+        "imageIndex": 0,
+        "x": 89,
+        "y": 230,
+        "width": 408,
+        "height": 129,
+        "imageWidth": 591,
+        "imageHeight": 946
+      },
+      "passes": [
+        {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "rotate": 0,
+          "scale": 1.5,
+          "footprint": {
+            "x": 0,
+            "y": 0,
+            "width": 591,
+            "height": 946
+          },
+          "coverageRatio": 1,
+          "geometricallyCovers": true,
+          "overlappingWordCount": 6,
+          "contributedToFinalBrandCandidates": true
+        }
+      ]
+    },
+    {
+      "caseId": "approved-wine-105",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "region": {
+        "imageIndex": 0,
+        "x": 413,
+        "y": 304,
+        "width": 382,
+        "height": 95,
+        "imageWidth": 975,
+        "imageHeight": 1140
+      },
+      "passes": [
+        {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "rotate": 0,
+          "scale": 1.5,
+          "footprint": {
+            "x": 0,
+            "y": 0,
+            "width": 975,
+            "height": 1140
+          },
+          "coverageRatio": 1,
+          "geometricallyCovers": true,
+          "overlappingWordCount": 1,
+          "contributedToFinalBrandCandidates": true
+        }
+      ]
+    },
+    {
+      "caseId": "approved-wine-107",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "region": {
+        "imageIndex": 0,
+        "x": 503,
+        "y": 413,
+        "width": 484,
+        "height": 86,
+        "imageWidth": 1500,
+        "imageHeight": 1140
+      },
+      "passes": [
+        {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "rotate": 0,
+          "scale": 1.5,
+          "footprint": {
+            "x": 0,
+            "y": 0,
+            "width": 1500,
+            "height": 1140
+          },
+          "coverageRatio": 1,
+          "geometricallyCovers": true,
+          "overlappingWordCount": 1,
+          "contributedToFinalBrandCandidates": true
+        }
+      ]
+    },
+    {
+      "caseId": "approved-wine-108",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "region": {
+        "imageIndex": 0,
+        "x": 76,
+        "y": 711,
+        "width": 1040,
+        "height": 90,
+        "imageWidth": 1500,
+        "imageHeight": 1140
+      },
+      "passes": [
+        {
+          "passId": "pass-0-full-image",
+          "passKind": "full-image-primary",
+          "rotate": 0,
+          "scale": 1.5,
+          "footprint": {
+            "x": 0,
+            "y": 0,
+            "width": 1500,
+            "height": 1140
+          },
+          "coverageRatio": 1,
+          "geometricallyCovers": true,
+          "overlappingWordCount": 10,
+          "contributedToFinalBrandCandidates": true
+        }
+      ]
+    }
+  ]
+}
