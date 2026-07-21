@@ -1,0 +1,443 @@
+{
+  "gitSha": "a4a0fd902ec25a82dd8bec7e56e2e18d82820d9c",
+  "inputCaseCount": 24,
+  "categoryCounts": {
+    "BOUNDED_NEAR_MISS": 2,
+    "PARTIAL_RECOGNITION": 9,
+    "TRUE_NON_RECOGNITION": 13
+  },
+  "categoryPercent": {
+    "BOUNDED_NEAR_MISS": 8.3,
+    "PARTIAL_RECOGNITION": 37.5,
+    "TRUE_NON_RECOGNITION": 54.2
+  },
+  "categoryCases": {
+    "BOUNDED_NEAR_MISS": ["approved-wine-017", "approved-wine-049"],
+    "PARTIAL_RECOGNITION": [
+      "approved-wine-011",
+      "approved-wine-044",
+      "approved-wine-047",
+      "approved-wine-053",
+      "approved-wine-059",
+      "approved-wine-092",
+      "approved-wine-102",
+      "approved-wine-107",
+      "approved-wine-108"
+    ],
+    "TRUE_NON_RECOGNITION": [
+      "la-fattoria-rotated",
+      "approved-wine-004",
+      "approved-wine-005",
+      "approved-wine-023",
+      "approved-wine-027",
+      "approved-wine-031",
+      "approved-wine-035",
+      "approved-wine-074",
+      "approved-wine-083",
+      "approved-wine-085",
+      "approved-wine-091",
+      "wine-multi-artifact-04",
+      "wine-multi-artifact-07"
+    ]
+  },
+  "partialRecognitionShapes": {
+    "prefix fragment (apparent truncation)": 1,
+    "complete distinctive token found": 4,
+    "suffix fragment (apparent truncation)": 1,
+    "multiple partial tokens": 3
+  },
+  "partialRecognitionRule": {
+    "B": 2,
+    "A": 7
+  },
+  "nearestEditDistanceDistribution": {
+    "1": 2,
+    "2": 5,
+    "3": 2,
+    "4": 1,
+    "5": 2,
+    "6": 1,
+    "7": 4,
+    "8": 2,
+    "9": 2,
+    "10": 3
+  },
+  "byNormalizedTruthLength": {
+    "8-11|TRUE_NON_RECOGNITION": 8,
+    "12-15|PARTIAL_RECOGNITION": 3,
+    "12-15|BOUNDED_NEAR_MISS": 2,
+    "16+|TRUE_NON_RECOGNITION": 1,
+    "12-15|TRUE_NON_RECOGNITION": 3,
+    "8-11|PARTIAL_RECOGNITION": 5,
+    "16+|PARTIAL_RECOGNITION": 1,
+    "<8|TRUE_NON_RECOGNITION": 1
+  },
+  "byTruthTokenCount": {
+    "2tok|TRUE_NON_RECOGNITION": 6,
+    "1tok|PARTIAL_RECOGNITION": 1,
+    "3tok|BOUNDED_NEAR_MISS": 1,
+    "3tok|TRUE_NON_RECOGNITION": 3,
+    "1tok|TRUE_NON_RECOGNITION": 3,
+    "2tok|PARTIAL_RECOGNITION": 7,
+    "2tok|BOUNDED_NEAR_MISS": 1,
+    "3tok|PARTIAL_RECOGNITION": 1,
+    "4tok|TRUE_NON_RECOGNITION": 1
+  },
+  "byOcrConfidence": {
+    "<60|TRUE_NON_RECOGNITION": 4,
+    "mean>=80|TRUE_NON_RECOGNITION": 8,
+    "mean>=80|PARTIAL_RECOGNITION": 7,
+    "60-79|BOUNDED_NEAR_MISS": 2,
+    "60-79|TRUE_NON_RECOGNITION": 1,
+    "60-79|PARTIAL_RECOGNITION": 2
+  },
+  "byLayoutSlice": {
+    "decorative-or-script-brand": {
+      "TRUE_NON_RECOGNITION": 7,
+      "PARTIAL_RECOGNITION": 2
+    },
+    "vertical-mandatory-strip": {
+      "TRUE_NON_RECOGNITION": 3,
+      "PARTIAL_RECOGNITION": 2
+    },
+    "alcohol-at-side-or-rotated": {
+      "TRUE_NON_RECOGNITION": 4,
+      "PARTIAL_RECOGNITION": 3
+    },
+    "front-label": {
+      "TRUE_NON_RECOGNITION": 7,
+      "PARTIAL_RECOGNITION": 5,
+      "BOUNDED_NEAR_MISS": 1
+    },
+    "multiple-brand-like-phrases": {
+      "PARTIAL_RECOGNITION": 3
+    },
+    "alcohol-at-bottom": {
+      "PARTIAL_RECOGNITION": 6,
+      "BOUNDED_NEAR_MISS": 2,
+      "TRUE_NON_RECOGNITION": 8
+    },
+    "simple-centered-brand": {
+      "BOUNDED_NEAR_MISS": 1
+    },
+    "brand-punctuation": {
+      "TRUE_NON_RECOGNITION": 1
+    },
+    "back-label": {
+      "TRUE_NON_RECOGNITION": 4,
+      "PARTIAL_RECOGNITION": 4,
+      "BOUNDED_NEAR_MISS": 1
+    },
+    "dense-text": {
+      "TRUE_NON_RECOGNITION": 1,
+      "PARTIAL_RECOGNITION": 3,
+      "BOUNDED_NEAR_MISS": 1
+    },
+    "multi-line-brand": {
+      "PARTIAL_RECOGNITION": 1,
+      "TRUE_NON_RECOGNITION": 3
+    },
+    "missing-alcohol-statement": {
+      "TRUE_NON_RECOGNITION": 1
+    },
+    "wraparound": {
+      "PARTIAL_RECOGNITION": 2
+    },
+    "multi-panel": {
+      "TRUE_NON_RECOGNITION": 2
+    }
+  },
+  "bySourcePass": {
+    "primary": 24
+  },
+  "byFailureShape": {
+    "complete omission": 7,
+    "truncation": 8,
+    "recognition": 8,
+    "segmentation": 1
+  },
+  "anyDistinctiveTruthTokenPresent": 9,
+  "moreThanHalfTheBrandVisible": 9,
+  "noDistinctiveFragmentAtAll": 12,
+  "truthOnSingleLine": 5,
+  "truthSplitAcrossLines": 7,
+  "noLineCarriesAFourCharFragment": 12,
+  "nearBoundaryFlags": [
+    {
+      "caseId": "approved-wine-083",
+      "category": "TRUE_NON_RECOGNITION",
+      "reasons": [
+        "only generic truth token(s) present in OCR: wine — excluded by the pre-registered rule"
+      ]
+    },
+    {
+      "caseId": "approved-wine-091",
+      "category": "TRUE_NON_RECOGNITION",
+      "reasons": ["nearest span is distance 2 — just outside the bound"]
+    },
+    {
+      "caseId": "approved-wine-092",
+      "category": "PARTIAL_RECOGNITION",
+      "reasons": ["nearest span is distance 2 — just outside the bound"]
+    },
+    {
+      "caseId": "approved-wine-102",
+      "category": "PARTIAL_RECOGNITION",
+      "reasons": ["nearest span is distance 2 — just outside the bound"]
+    },
+    {
+      "caseId": "approved-wine-107",
+      "category": "PARTIAL_RECOGNITION",
+      "reasons": ["nearest span is distance 2 — just outside the bound"]
+    },
+    {
+      "caseId": "approved-wine-108",
+      "category": "PARTIAL_RECOGNITION",
+      "reasons": ["nearest span is distance 2 — just outside the bound"]
+    }
+  ],
+  "humanReviewNeeded": [
+    {
+      "caseId": "approved-wine-044",
+      "truth": ["Sweet Seduction"],
+      "category": "PARTIAL_RECOGNITION",
+      "reasons": [
+        "qualifies on a single token (\"sweet\") that is arguably descriptive rather than distinctive, and is not on the pre-registered generic list. PARTIAL_RECOGNITION vs TRUE_NON_RECOGNITION."
+      ]
+    },
+    {
+      "caseId": "approved-wine-083",
+      "truth": ["Barn Sill Wine Co.", "Barn Sill Wine Co"],
+      "category": "TRUE_NON_RECOGNITION",
+      "reasons": [
+        "the only truth token found in OCR is generic (wine), excluded by the pre-registered rule. A reader may judge whether it is distinctive on this label. TRUE_NON_RECOGNITION vs PARTIAL_RECOGNITION."
+      ]
+    },
+    {
+      "caseId": "approved-wine-091",
+      "truth": ["Rias"],
+      "category": "TRUE_NON_RECOGNITION",
+      "reasons": [
+        "truth is only 4 characters, so a 1-edit bound is proportionally very tight; nearest span is distance 2 (\"RISK\"). TRUE_NON_RECOGNITION vs BOUNDED_NEAR_MISS turns on the bound, not on the evidence."
+      ]
+    }
+  ],
+  "perCase": [
+    {
+      "caseId": "la-fattoria-rotated",
+      "truth": "La Fattoria",
+      "category": "TRUE_NON_RECOGNITION",
+      "rule": "neither bounded near miss nor partial recognition",
+      "editDistance": 7,
+      "coverage": 0.2,
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-004",
+      "truth": "La Fattoria",
+      "category": "TRUE_NON_RECOGNITION",
+      "rule": "neither bounded near miss nor partial recognition",
+      "editDistance": 8,
+      "coverage": 0.2,
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-005",
+      "truth": "La Fattoria",
+      "category": "TRUE_NON_RECOGNITION",
+      "rule": "neither bounded near miss nor partial recognition",
+      "editDistance": 9,
+      "coverage": 0.1,
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-011",
+      "truth": "MariaAntonietta",
+      "category": "PARTIAL_RECOGNITION",
+      "rule": "B: longest shared substring >=4 chars and >=50% of normalized truth",
+      "editDistance": 3,
+      "coverage": 0.8,
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-017",
+      "truth": "La Borde Noire",
+      "category": "BOUNDED_NEAR_MISS",
+      "rule": "damerau-levenshtein distance exactly 1 on a qualifying span",
+      "editDistance": 1,
+      "coverage": 0.9167,
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-023",
+      "truth": "Podere don Cataldo",
+      "category": "TRUE_NON_RECOGNITION",
+      "rule": "neither bounded near miss nor partial recognition",
+      "editDistance": 10,
+      "coverage": 0.1875,
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-027",
+      "truth": "The Golden Girls",
+      "category": "TRUE_NON_RECOGNITION",
+      "rule": "neither bounded near miss nor partial recognition",
+      "editDistance": 9,
+      "coverage": 0.2143,
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-031",
+      "truth": "embeleso",
+      "category": "TRUE_NON_RECOGNITION",
+      "rule": "neither bounded near miss nor partial recognition",
+      "editDistance": 4,
+      "coverage": 0.375,
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-035",
+      "truth": "Hubert Lamy",
+      "category": "TRUE_NON_RECOGNITION",
+      "rule": "neither bounded near miss nor partial recognition",
+      "editDistance": 7,
+      "coverage": 0.3,
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-044",
+      "truth": "Sweet Seduction",
+      "category": "PARTIAL_RECOGNITION",
+      "rule": "A: complete substantive truth token (len>=4) present in OCR",
+      "editDistance": 7,
+      "coverage": 0.5,
+      "confidence": "medium"
+    },
+    {
+      "caseId": "approved-wine-047",
+      "truth": "Etiris GX",
+      "category": "PARTIAL_RECOGNITION",
+      "rule": "B: longest shared substring >=4 chars and >=50% of normalized truth",
+      "editDistance": 5,
+      "coverage": 0.875,
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-049",
+      "truth": "Caywood Vineyard",
+      "category": "BOUNDED_NEAR_MISS",
+      "rule": "damerau-levenshtein distance exactly 1 on a qualifying span",
+      "editDistance": 1,
+      "coverage": 0.6667,
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-053",
+      "truth": "Golden Road Vineyards",
+      "category": "PARTIAL_RECOGNITION",
+      "rule": "A: complete substantive truth token (len>=4) present in OCR",
+      "editDistance": 10,
+      "coverage": 0.5263,
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-059",
+      "truth": "Domenico Negro",
+      "category": "PARTIAL_RECOGNITION",
+      "rule": "A: complete substantive truth token (len>=4) present in OCR",
+      "editDistance": 7,
+      "coverage": 0.3846,
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-074",
+      "truth": "Mike's Farm, Inc.",
+      "category": "TRUE_NON_RECOGNITION",
+      "rule": "neither bounded near miss nor partial recognition",
+      "editDistance": 8,
+      "coverage": 0.1667,
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-083",
+      "truth": "Barn Sill Wine Co.",
+      "category": "TRUE_NON_RECOGNITION",
+      "rule": "neither bounded near miss nor partial recognition",
+      "editDistance": 10,
+      "coverage": 0.2857,
+      "confidence": "medium"
+    },
+    {
+      "caseId": "approved-wine-085",
+      "truth": "Mosaikon",
+      "category": "TRUE_NON_RECOGNITION",
+      "rule": "neither bounded near miss nor partial recognition",
+      "editDistance": 5,
+      "coverage": 0.25,
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-091",
+      "truth": "Rias",
+      "category": "TRUE_NON_RECOGNITION",
+      "rule": "neither bounded near miss nor partial recognition",
+      "editDistance": 2,
+      "coverage": 0.5,
+      "confidence": "medium"
+    },
+    {
+      "caseId": "approved-wine-092",
+      "truth": "Twin Suns",
+      "category": "PARTIAL_RECOGNITION",
+      "rule": "A: complete substantive truth token (len>=4) present in OCR",
+      "editDistance": 2,
+      "coverage": 0.75,
+      "confidence": "medium"
+    },
+    {
+      "caseId": "approved-wine-102",
+      "truth": "Twin Suns",
+      "category": "PARTIAL_RECOGNITION",
+      "rule": "A: complete substantive truth token (len>=4) present in OCR",
+      "editDistance": 2,
+      "coverage": 0.75,
+      "confidence": "medium"
+    },
+    {
+      "caseId": "approved-wine-107",
+      "truth": "La Fattoria",
+      "category": "PARTIAL_RECOGNITION",
+      "rule": "A: complete substantive truth token (len>=4) present in OCR",
+      "editDistance": 2,
+      "coverage": 0.9,
+      "confidence": "medium"
+    },
+    {
+      "caseId": "approved-wine-108",
+      "truth": "La Fattoria",
+      "category": "PARTIAL_RECOGNITION",
+      "rule": "A: complete substantive truth token (len>=4) present in OCR",
+      "editDistance": 2,
+      "coverage": 0.8,
+      "confidence": "medium"
+    },
+    {
+      "caseId": "wine-multi-artifact-04",
+      "truth": "Dry Cellar",
+      "category": "TRUE_NON_RECOGNITION",
+      "rule": "neither bounded near miss nor partial recognition",
+      "editDistance": 3,
+      "coverage": 0.3333,
+      "confidence": "high"
+    },
+    {
+      "caseId": "wine-multi-artifact-07",
+      "truth": "Mike's Farm",
+      "category": "TRUE_NON_RECOGNITION",
+      "rule": "neither bounded near miss nor partial recognition",
+      "editDistance": 6,
+      "coverage": 0.2222,
+      "confidence": "high"
+    }
+  ]
+}
