@@ -1,0 +1,19 @@
+{
+  "baseline": {
+    "min": 8,
+    "median": 22,
+    "p95": 38,
+    "max": 72,
+    "total": 2715
+  },
+  "treatment": {
+    "min": 8,
+    "median": 58,
+    "p95": 356,
+    "max": 448,
+    "total": 12378
+  },
+  "generatedSubSpansTotal": 9602,
+  "casesWithTriggerLine": 86,
+  "triggerLinesTotal": 377
+}

@@ -1,0 +1,829 @@
+{
+  "summary": {
+    "gains": 0,
+    "neutral": 23,
+    "regressions": 20
+  },
+  "gains": [],
+  "neutral": [
+    {
+      "caseId": "approved-wine-012",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Cooley Bay"],
+      "baseline": {
+        "value": "Cool&y",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "Texas Tempranillo 750ml",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 188,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-016",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Marques de Navarro"],
+      "baseline": {
+        "value": "MARQUES vo NAVARRO",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "Young fruit. Expressive and",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 122,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-018",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Poqr Krya", "POQR KRYA"],
+      "baseline": {
+        "value": "Indigenous blend",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "BOTTLING DATE. 17.08.2023 LOT",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 248,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-023",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Podere don Cataldo", "Podere Don Cataldo"],
+      "baseline": {
+        "value": "PRIMITIVO",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "Fire 3070 BRISTOL",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 62,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-024",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Chateau de Laville"],
+      "baseline": {
+        "value": "CADILLAC COTES DE BORDEAUX",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "Vignobles Gonfrier ont",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 332,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-031",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["embeleso"],
+      "baseline": {
+        "value": "Contiene Sulfitos Enthalt Sulfite",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "Embotellado por PALACIO",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 314,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-037",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Touch"],
+      "baseline": {
+        "value": "Strumica - Radovish Region",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "WINE WITH CONTROLLED ORIGIN",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 54,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-042",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Domaine Quivy"],
+      "baseline": {
+        "value": "PRODUCT OF FRANCE",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "MISA IMPORTS, DALLAS, TEXAS",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 54,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-044",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Sweet Seduction"],
+      "baseline": {
+        "value": "VEEL",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "Get seduced",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 42,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-045",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Meeting of the Minds"],
+      "baseline": {
+        "value": "Meeting of ihe Minds",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "Cabernet Sauvignon offers",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 322,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-049",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Caywood Vineyard"],
+      "baseline": {
+        "value": "CAYWOQOD VINEYARD",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "Estate Caywood",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 92,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-066",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Domaine Juliette Avril"],
+      "baseline": {
+        "value": "JULIETTE VRIL",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "GRENACHE 45-ROUSSANNE 25-CLAIRETTE 15-BOURBOULENC",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 28,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-071",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["AltaCima 6.330", "AltaCima"],
+      "baseline": {
+        "value": "LATE HARVEST 2013",
+        "state": "AMBIGUOUS",
+        "truthRank": 2
+      },
+      "treatment": {
+        "value": "Parinacota Volcano, part",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 274,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-078",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Pietta"],
+      "baseline": {
+        "value": "MUSCOLINE-ITALIA",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "CHARDONNAY DENOMINAZIONE",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 50,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-079",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Le Caniette"],
+      "baseline": {
+        "value": "OFFIDA",
+        "state": "AMBIGUOUS",
+        "truthRank": 3
+      },
+      "treatment": {
+        "value": "ORIGINE CONTROLLATA",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 80,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-087",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Viridis"],
+      "baseline": {
+        "value": "LANGHE SAUVIGNON Tuga",
+        "state": "AMBIGUOUS",
+        "truthRank": 3
+      },
+      "treatment": {
+        "value": "CAUSE",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 120,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-091",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Rias"],
+      "baseline": {
+        "value": "D CONTROLLATA E",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "BUTA DISTRIBUTORS INC. Boca",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 22,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-092",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Twin Suns"],
+      "baseline": {
+        "value": "Hn SANTA BARBARA",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "This Chardonnay from the",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 156,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-094",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Fontanavecchia"],
+      "baseline": {
+        "value": "DELRAY BEACH. FL, USA",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "FONTANAVECCHIA DI LIBERO RILLO",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 18,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-099",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Fontanavecchia"],
+      "baseline": {
+        "value": "DELRAY BEACH, FL, USA",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "FONTANAVECCHIA DI LIBERO RILLO",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 18,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "approved-wine-110",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Cooley Bay"],
+      "baseline": {
+        "value": "Cool&y",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "ROUSSANNE",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 182,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "m-cellars-baseline",
+      "present": true,
+      "knownAmbiguous": true,
+      "truth": ["M Cellars"],
+      "baseline": {
+        "value": "CELLARS",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "Cellars wines",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 164,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    },
+    {
+      "caseId": "wine-multi-artifact-08",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Pindar"],
+      "baseline": {
+        "value": "Z-lor",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "Residual sugar 8.9",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 44,
+      "verdict": "neutral",
+      "reason": "selected value changed between two incorrect values"
+    }
+  ],
+  "regressions": [
+    {
+      "caseId": "approved-wine-014",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Tre Cori"],
+      "baseline": {
+        "value": "TRE CORI",
+        "state": "AMBIGUOUS",
+        "truthRank": 1
+      },
+      "treatment": {
+        "value": "Those Who Love",
+        "state": "AMBIGUOUS",
+        "truthRank": 2
+      },
+      "generatedSpans": 234,
+      "verdict": "regression",
+      "reason": "a generated sub-span displaced a correct selection"
+    },
+    {
+      "caseId": "approved-wine-019",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Kyrios"],
+      "baseline": {
+        "value": "KYRIOS",
+        "state": "AMBIGUOUS",
+        "truthRank": 1
+      },
+      "treatment": {
+        "value": "WEINCBAVER WEIN-BAUER, Inc. Franklin",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 150,
+      "verdict": "regression",
+      "reason": "a generated sub-span displaced a correct selection"
+    },
+    {
+      "caseId": "approved-wine-022",
+      "present": false,
+      "knownAmbiguous": false,
+      "truth": [],
+      "baseline": {
+        "value": null,
+        "state": "NOT_OBSERVED",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "MARBLE CREEK ACRES",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 22,
+      "verdict": "regression",
+      "reason": "absent-brand case"
+    },
+    {
+      "caseId": "nebla-mencia",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Nebla"],
+      "baseline": {
+        "value": "NEBLA",
+        "state": "AMBIGUOUS",
+        "truthRank": 1
+      },
+      "treatment": {
+        "value": "Ruby red",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 120,
+      "verdict": "regression",
+      "reason": "a generated sub-span displaced a correct selection"
+    },
+    {
+      "caseId": "approved-wine-028",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Field", "Field Vineyards"],
+      "baseline": {
+        "value": "FIELD",
+        "state": "AMBIGUOUS",
+        "truthRank": 1
+      },
+      "treatment": {
+        "value": "Russian River Valley",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 146,
+      "verdict": "regression",
+      "reason": "a generated sub-span displaced a correct selection"
+    },
+    {
+      "caseId": "approved-wine-034",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Nico"],
+      "baseline": {
+        "value": "NICO",
+        "state": "AMBIGUOUS",
+        "truthRank": 1
+      },
+      "treatment": {
+        "value": "ME 156 1A5",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 66,
+      "verdict": "regression",
+      "reason": "a generated sub-span displaced a correct selection"
+    },
+    {
+      "caseId": "le-temps-des-fleurs",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Le Temps des Fleurs", "Le Temps Des Fleurs"],
+      "baseline": {
+        "value": "LE TEMPS DES FLEURS",
+        "state": "AMBIGUOUS",
+        "truthRank": 1
+      },
+      "treatment": {
+        "value": "BOUTEILLE PAR FAMILLE ARBEAU",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 32,
+      "verdict": "regression",
+      "reason": "a generated sub-span displaced a correct selection"
+    },
+    {
+      "caseId": "approved-wine-058",
+      "present": false,
+      "knownAmbiguous": false,
+      "truth": [],
+      "baseline": {
+        "value": null,
+        "state": "NOT_OBSERVED",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "STILL WHITE WINE",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 120,
+      "verdict": "regression",
+      "reason": "absent-brand case"
+    },
+    {
+      "caseId": "approved-wine-061",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Aphrodite"],
+      "baseline": {
+        "value": "APHRODITE",
+        "state": "AMBIGUOUS",
+        "truthRank": 1
+      },
+      "treatment": {
+        "value": "Textur opulent, the",
+        "state": "AMBIGUOUS",
+        "truthRank": 2
+      },
+      "generatedSpans": 60,
+      "verdict": "regression",
+      "reason": "a generated sub-span displaced a correct selection"
+    },
+    {
+      "caseId": "approved-wine-062",
+      "present": false,
+      "knownAmbiguous": false,
+      "truth": [],
+      "baseline": {
+        "value": null,
+        "state": "NOT_OBSERVED",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "BECAUSE OF THE RIS",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 72,
+      "verdict": "regression",
+      "reason": "absent-brand case"
+    },
+    {
+      "caseId": "approved-wine-069",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["AltaCima 4.090", "AltaCima"],
+      "baseline": {
+        "value": "ALTACIMA 4.090",
+        "state": "AMBIGUOUS",
+        "truthRank": 1
+      },
+      "treatment": {
+        "value": "1.5, Sagrada Familia, Region",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 232,
+      "verdict": "regression",
+      "reason": "a generated sub-span displaced a correct selection"
+    },
+    {
+      "caseId": "altacima",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["AltaCima 4.090", "AltaCima"],
+      "baseline": {
+        "value": "ALTACIMA 4.090",
+        "state": "AMBIGUOUS",
+        "truthRank": 1
+      },
+      "treatment": {
+        "value": "This Gewurztraminer has",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 218,
+      "verdict": "regression",
+      "reason": "a generated sub-span displaced a correct selection"
+    },
+    {
+      "caseId": "approved-wine-075",
+      "present": false,
+      "knownAmbiguous": false,
+      "truth": [],
+      "baseline": {
+        "value": null,
+        "state": "NOT_OBSERVED",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "Baltana Vella vineyard",
+        "state": "OBSERVED",
+        "truthRank": null
+      },
+      "generatedSpans": 396,
+      "verdict": "regression",
+      "reason": "absent-brand case"
+    },
+    {
+      "caseId": "approved-wine-077",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Valdinera"],
+      "baseline": {
+        "value": "VALDINERA",
+        "state": "AMBIGUOUS",
+        "truthRank": 1
+      },
+      "treatment": {
+        "value": "ORIGINE CONTROLLATA",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 82,
+      "verdict": "regression",
+      "reason": "a generated sub-span displaced a correct selection"
+    },
+    {
+      "caseId": "approved-wine-082",
+      "present": false,
+      "knownAmbiguous": false,
+      "truth": [],
+      "baseline": {
+        "value": null,
+        "state": "NOT_OBSERVED",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "OPENED THEIR WINERY AND",
+        "state": "OBSERVED",
+        "truthRank": null
+      },
+      "generatedSpans": 168,
+      "verdict": "regression",
+      "reason": "absent-brand case"
+    },
+    {
+      "caseId": "approved-wine-096",
+      "present": false,
+      "knownAmbiguous": false,
+      "truth": [],
+      "baseline": {
+        "value": null,
+        "state": "NOT_OBSERVED",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "OFFICE PALAZZOLO DISONA -",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 90,
+      "verdict": "regression",
+      "reason": "absent-brand case"
+    },
+    {
+      "caseId": "approved-wine-097",
+      "present": false,
+      "knownAmbiguous": false,
+      "truth": [],
+      "baseline": {
+        "value": null,
+        "state": "NOT_OBSERVED",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "OFFICE PALAZZOLO DISONA -",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 90,
+      "verdict": "regression",
+      "reason": "absent-brand case"
+    },
+    {
+      "caseId": "approved-wine-101",
+      "present": false,
+      "knownAmbiguous": false,
+      "truth": [],
+      "baseline": {
+        "value": null,
+        "state": "NOT_OBSERVED",
+        "truthRank": null
+      },
+      "treatment": {
+        "value": "PEPPEE This very",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 120,
+      "verdict": "regression",
+      "reason": "absent-brand case"
+    },
+    {
+      "caseId": "approved-wine-104",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Blazic"],
+      "baseline": {
+        "value": "BLAZIC",
+        "state": "AMBIGUOUS",
+        "truthRank": 1
+      },
+      "treatment": {
+        "value": "Collio",
+        "state": "AMBIGUOUS",
+        "truthRank": null
+      },
+      "generatedSpans": 44,
+      "verdict": "regression",
+      "reason": "a generated sub-span displaced a correct selection"
+    },
+    {
+      "caseId": "wine-multi-artifact-10",
+      "present": true,
+      "knownAmbiguous": false,
+      "truth": ["Mauro Molino"],
+      "baseline": {
+        "value": "MAURO MOLINO",
+        "state": "AMBIGUOUS",
+        "truthRank": 1
+      },
+      "treatment": {
+        "value": "Actual Dimensions 2.36 inches",
+        "state": "AMBIGUOUS",
+        "truthRank": 2
+      },
+      "generatedSpans": 30,
+      "verdict": "regression",
+      "reason": "a generated sub-span displaced a correct selection"
+    }
+  ]
+}

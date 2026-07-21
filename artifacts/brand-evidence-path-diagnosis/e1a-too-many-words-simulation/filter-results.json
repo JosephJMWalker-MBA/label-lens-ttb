@@ -1,0 +1,16 @@
+{
+  "generatedSubSpans": 9602,
+  "byFilterReason": {
+    "KEPT:candidate-plausible": 2017,
+    "sentence-fragment": 5689,
+    "low-information-fragment": 1060,
+    "no-letters-or-too-short": 303,
+    "location-or-appellation": 61,
+    "generic-product-language": 183,
+    "varietal-or-designation": 235,
+    "KEPT:candidate-positive": 77,
+    "domain-like": 38
+  },
+  "note": "byFilterReason counts CANDIDATE DIAGNOSTICS produced from the generated spans, not the spans themselves. It exceeds generatedSubSpans by 61 because production applies shouldTrimWholeLineCandidate to each synthetic single-line pass: a generated span that is itself classified `positive` and noisy spawns further line-window sub-spans inside that pass. This is unmodified production behaviour, and it is an additional source of candidate growth a real implementation would also have.",
+  "candidateDiagnosticsFromGeneratedSpans": 9663
+}

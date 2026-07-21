@@ -1,0 +1,182 @@
+[
+  {
+    "caseId": "luigi-giovanni-live",
+    "truth": ["Luigi & Giovanni"],
+    "selected": "VANNI",
+    "knownAmbiguous": false,
+    "relation": "truth-contains-selected",
+    "state": "AMBIGUOUS",
+    "failureClass": "CANDIDATE_GENERATION_MISS"
+  },
+  {
+    "caseId": "patricia-green-cellars",
+    "truth": ["Patricia Green Cellars"],
+    "selected": "ESTATE VINEYARD",
+    "knownAmbiguous": true,
+    "relation": "known-ambiguous",
+    "state": "AMBIGUOUS",
+    "failureClass": "CANDIDATE_GENERATION_MISS"
+  },
+  {
+    "caseId": "approved-wine-033",
+    "truth": ["Haywater Cove"],
+    "selected": "COVE",
+    "knownAmbiguous": false,
+    "relation": "truth-contains-selected",
+    "state": "AMBIGUOUS",
+    "failureClass": "RANKING_MISS"
+  },
+  {
+    "caseId": "chateau-bonneau",
+    "truth": ["Château Bonneau", "Chateau Bonneau"],
+    "selected": "BONNEAU",
+    "knownAmbiguous": false,
+    "relation": "truth-contains-selected",
+    "state": "AMBIGUOUS",
+    "failureClass": "RECONSTRUCTION_MISS"
+  },
+  {
+    "caseId": "approved-wine-046",
+    "truth": ["Curious"],
+    "selected": "Red Wine Blend Curious",
+    "knownAmbiguous": false,
+    "relation": "selected-contains-truth",
+    "state": "AMBIGUOUS",
+    "failureClass": "CANDIDATE_GENERATION_MISS"
+  },
+  {
+    "caseId": "approved-wine-048",
+    "truth": ["Pacha"],
+    "selected": "Pacha RESERVA - CARMENERE",
+    "knownAmbiguous": false,
+    "relation": "selected-contains-truth",
+    "state": "AMBIGUOUS",
+    "failureClass": "CANDIDATE_GENERATION_MISS"
+  },
+  {
+    "caseId": "approved-wine-051",
+    "truth": ["Pacheca"],
+    "selected": "PACHECA DOURO D.O.C",
+    "knownAmbiguous": false,
+    "relation": "selected-contains-truth",
+    "state": "AMBIGUOUS",
+    "failureClass": "CANDIDATE_GENERATION_MISS"
+  },
+  {
+    "caseId": "approved-wine-053",
+    "truth": ["Golden Road Vineyards"],
+    "selected": "Vineya",
+    "knownAmbiguous": false,
+    "relation": "truth-contains-selected",
+    "state": "AMBIGUOUS",
+    "failureClass": "OCR_RECOGNITION_MISS"
+  },
+  {
+    "caseId": "approved-wine-064",
+    "truth": ["Prinsi"],
+    "selected": "Prins",
+    "knownAmbiguous": false,
+    "relation": "truth-contains-selected",
+    "state": "AMBIGUOUS",
+    "failureClass": "CANDIDATE_GENERATION_MISS"
+  },
+  {
+    "caseId": "approved-wine-065",
+    "truth": ["Prinsi"],
+    "selected": "Prins",
+    "knownAmbiguous": false,
+    "relation": "truth-contains-selected",
+    "state": "AMBIGUOUS",
+    "failureClass": "CANDIDATE_GENERATION_MISS"
+  },
+  {
+    "caseId": "approved-wine-072",
+    "truth": ["Ava Gardner"],
+    "selected": "HINNANT FAMILY VINEYARDS",
+    "knownAmbiguous": true,
+    "relation": "known-ambiguous",
+    "state": "AMBIGUOUS",
+    "failureClass": "CANDIDATE_GENERATION_MISS"
+  },
+  {
+    "caseId": "approved-wine-088",
+    "truth": ["La Mesma"],
+    "selected": "LA MESMA Yellow Label",
+    "knownAmbiguous": false,
+    "relation": "selected-contains-truth",
+    "state": "AMBIGUOUS",
+    "failureClass": "CANDIDATE_GENERATION_MISS"
+  },
+  {
+    "caseId": "approved-wine-089",
+    "truth": ["La Mesma"],
+    "selected": "LA MESMA Black Label",
+    "knownAmbiguous": false,
+    "relation": "selected-contains-truth",
+    "state": "AMBIGUOUS",
+    "failureClass": "CANDIDATE_GENERATION_MISS"
+  },
+  {
+    "caseId": "amuninni-ferracane",
+    "truth": ["Amuninni", "Fabio Ferracane"],
+    "selected": "INV ENVY",
+    "knownAmbiguous": true,
+    "relation": "known-ambiguous",
+    "state": "AMBIGUOUS",
+    "failureClass": "CANDIDATE_GENERATION_MISS"
+  },
+  {
+    "caseId": "approved-wine-105",
+    "truth": ["Luigi & Giovanni"],
+    "selected": "VANNI",
+    "knownAmbiguous": false,
+    "relation": "truth-contains-selected",
+    "state": "AMBIGUOUS",
+    "failureClass": "CANDIDATE_GENERATION_MISS"
+  },
+  {
+    "caseId": "approved-wine-106",
+    "truth": ["Alfredo's Wine", "Alfredos Wine"],
+    "selected": "REDO",
+    "knownAmbiguous": false,
+    "relation": "truth-contains-selected",
+    "state": "AMBIGUOUS",
+    "failureClass": "CANDIDATE_GENERATION_MISS"
+  },
+  {
+    "caseId": "approved-wine-107",
+    "truth": ["La Fattoria"],
+    "selected": "FATTORIA",
+    "knownAmbiguous": false,
+    "relation": "truth-contains-selected",
+    "state": "AMBIGUOUS",
+    "failureClass": "OCR_RECOGNITION_MISS"
+  },
+  {
+    "caseId": "m-cellars-baseline",
+    "truth": ["M Cellars"],
+    "selected": "CELLARS",
+    "knownAmbiguous": true,
+    "relation": "truth-contains-selected",
+    "state": "AMBIGUOUS",
+    "failureClass": "CANDIDATE_GENERATION_MISS"
+  },
+  {
+    "caseId": "wine-multi-artifact-05",
+    "truth": ["Blazic"],
+    "selected": "BLAZIC COLLIO",
+    "knownAmbiguous": false,
+    "relation": "selected-contains-truth",
+    "state": "AMBIGUOUS",
+    "failureClass": "CANDIDATE_GENERATION_MISS"
+  },
+  {
+    "caseId": "wine-multi-artifact-06",
+    "truth": ["Mauro Molino"],
+    "selected": "MOLINO",
+    "knownAmbiguous": false,
+    "relation": "truth-contains-selected",
+    "state": "AMBIGUOUS",
+    "failureClass": "CANDIDATE_GENERATION_MISS"
+  }
+]

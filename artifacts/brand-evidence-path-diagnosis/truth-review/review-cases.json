@@ -1,0 +1,163 @@
+[
+  {
+    "caseId": "approved-wine-088",
+    "expectedBrandTruth": ["La Mesma"],
+    "knownAmbiguous": false,
+    "selectedMachineCandidate": "LA MESMA Yellow Label",
+    "machineState": "AMBIGUOUS",
+    "relevantAlternates": [
+      "WHITE WINE 2018 Lo119",
+      "DEL COMUNE DI GAVI",
+      "CONTROLLATA E GARANTITA",
+      "DENOMINAZIONE DI ORIGINE",
+      "GAVI"
+    ],
+    "sourceImage": "tests/fixtures/precheck/approved-wine-088/label.jpeg",
+    "imageSize": {
+      "width": 521,
+      "height": 543
+    },
+    "fullLabelReference": "crops/approved-wine-088-full.jpg",
+    "brandAreaCrop": "crops/approved-wine-088-brand-area.jpg",
+    "nearbyLabelText": [
+      "LA MESMA Yellow Label",
+      "GAVI",
+      "DENOMINAZIONE DI ORIGINE",
+      "CONTROLLATA E GARANTITA",
+      "DEL COMUNE DI GAVI",
+      "WHITE WINE 2018 Lo119",
+      "The ideal companion for shell fish and sushi",
+      "Estate Bottled by: Az. Agr. La Mesma srl Soc. Agr. Gavi - Italy",
+      "www. lamesma.it",
+      "Imported by: Buta Distributors Inc. - Boca Raton (FL)",
+      "NET.CONT. 750 ML ALCOHOL 12,5% BY VOL",
+      "CONTAINS SULFITES Product of Italy"
+    ],
+    "reviewQuestion": "Reading only the artwork: what text constitutes the brand as presented on this label, and where does the brand mark end and designation, varietal, appellation, label-series, or descriptive wording begin?"
+  },
+  {
+    "caseId": "approved-wine-089",
+    "expectedBrandTruth": ["La Mesma"],
+    "knownAmbiguous": false,
+    "selectedMachineCandidate": "LA MESMA Black Label",
+    "machineState": "AMBIGUOUS",
+    "relevantAlternates": [
+      "DEL COMUNE DI GAVI",
+      "CONTROLLATA E GARANTITA",
+      "DENOMINAZIONE DI ORIGINE",
+      "GAVI"
+    ],
+    "sourceImage": "tests/fixtures/precheck/approved-wine-089/label.jpeg",
+    "imageSize": {
+      "width": 495,
+      "height": 517
+    },
+    "fullLabelReference": "crops/approved-wine-089-full.jpg",
+    "brandAreaCrop": "crops/approved-wine-089-brand-area.jpg",
+    "nearbyLabelText": [
+      "LA MESMA Black Label",
+      "GAVI",
+      "DENOMINAZIONE DI ORIGINE",
+      "CONTROLLATA E GARANTITA",
+      "DEL COMUNE DI GAVI",
+      "WHITE WINE 2017 L 0418",
+      "Dry and mineral, pairs beautifully with fish",
+      "Estate Bottled by: Az. Agr. La Mesma srl Soc. Agr. Gavi - Italy",
+      "www.lamesma.it",
+      "Imported by: Buta Distributors Inc. - Boca Raton (FL)",
+      "NET.CONT. 750 ML. ALCOHOL 13% BY VOL",
+      "CONTAINS SULFITES Product of Italy"
+    ],
+    "reviewQuestion": "Reading only the artwork: what text constitutes the brand as presented on this label, and where does the brand mark end and designation, varietal, appellation, label-series, or descriptive wording begin?"
+  },
+  {
+    "caseId": "approved-wine-051",
+    "expectedBrandTruth": ["Pacheca"],
+    "knownAmbiguous": false,
+    "selectedMachineCandidate": "PACHECA DOURO D.O.C",
+    "machineState": "AMBIGUOUS",
+    "relevantAlternates": ["SELO GROUP 1 afr", "RESERVA VINHAS VELHAS 2023", "Lerevvaons"],
+    "sourceImage": "tests/fixtures/precheck/approved-wine-051/label.jpeg",
+    "imageSize": {
+      "width": 1236,
+      "height": 954
+    },
+    "fullLabelReference": "crops/approved-wine-051-full.jpg",
+    "brandAreaCrop": "crops/approved-wine-051-brand-area.jpg",
+    "nearbyLabelText": [
+      "PACHECA DOURO/ D.O.C",
+      "Vinho Tinto | Red Wine | Vin Rouge",
+      "RESERVA VINHAS VELHAS 2023",
+      "% Blend de diferentes castas de vinhas muito velhas | Blend of different grape varieties from very",
+      "old vines | Assemblage de différentes cépages provenant de vignes trés anciennes",
+      "See spun Xisto | Schist | Schistes",
+      "i Altitude entre 70 e 90 metros | Altitude between 70 and 90 metres | Altitude entre 70 et 90 métres",
+      "Vinhas com idade superior a 55 anos | Vines over 55 years old | Vignes de plus de 55 ans",
+      "D J Estagio de 1 ano em barricas de 300L de Carvalho Francés | Aged for 1 year in 300L French",
+      "Oak barrels | Elevé pendant 1 an en fats de chéne francais de 300L",
+      "Contém Sulfitos | Contains Sulfites | Contient des Sulfites",
+      "PRODUTO DE PORTUGAL | PRODUCT OF PORTUGAL | PRODUIT DU PORTUGAL"
+    ],
+    "reviewQuestion": "Reading only the artwork: what text constitutes the brand as presented on this label, and where does the brand mark end and designation, varietal, appellation, label-series, or descriptive wording begin?"
+  },
+  {
+    "caseId": "approved-wine-048",
+    "expectedBrandTruth": ["Pacha"],
+    "knownAmbiguous": false,
+    "selectedMachineCandidate": "Pacha RESERVA - CARMENERE",
+    "machineState": "AMBIGUOUS",
+    "relevantAlternates": ["Vifia Marty SpA", "Andes Wine Imports LLC", "Seattle WA", "Winemaker"],
+    "sourceImage": "tests/fixtures/precheck/approved-wine-048/label.png",
+    "imageSize": {
+      "width": 822,
+      "height": 942
+    },
+    "fullLabelReference": "crops/approved-wine-048-full.jpg",
+    "brandAreaCrop": "crops/approved-wine-048-brand-area.jpg",
+    "nearbyLabelText": [
+      "Pacha RESERVA - CARMENERE",
+      "WINE OF CHILE - D.O. CENTRAL VALLEY",
+      "Pacha, in local language means “the earth or the world”, a concept closely",
+      "related to nature and how we interact with it. We grow our grapes from the",
+      "“Pacha Mama” (mother earth), right in front of the impressive Cordillera de",
+      "los Andes mountain range. This situation gives vitality to the soil and vines",
+      "creating a beautiful connection between the origin and your glass. Pacha",
+      "wines are created with passion and excellence, with a distinctive character",
+      "that makes them unique. They are a perfect balance between old and new",
+      "world styles",
+      "JF",
+      "]"
+    ],
+    "reviewQuestion": "Reading only the artwork: what text constitutes the brand as presented on this label, and where does the brand mark end and designation, varietal, appellation, label-series, or descriptive wording begin?"
+  },
+  {
+    "caseId": "approved-wine-046",
+    "expectedBrandTruth": ["Curious"],
+    "knownAmbiguous": false,
+    "selectedMachineCandidate": "Red Wine Blend Curious",
+    "machineState": "AMBIGUOUS",
+    "relevantAlternates": ["Acampo, CA BW-CA-6492", "CA CRV"],
+    "sourceImage": "tests/fixtures/precheck/approved-wine-046/label.jpeg",
+    "imageSize": {
+      "width": 714,
+      "height": 1295
+    },
+    "fullLabelReference": "crops/approved-wine-046-full.jpg",
+    "brandAreaCrop": "crops/approved-wine-046-brand-area.jpg",
+    "nearbyLabelText": [
+      "Red Wine Blend “Curious”",
+      "Red blends are crafted from a",
+      "combination of grape varieties, which",
+      "may vary from vintage to vintage. When",
+      "done well, they allow the winemaker to",
+      "bring together the best qualities of each",
+      "varietal, resulting in a wine that’s both",
+      "delicious and delightfully Curious.",
+      ": i",
+      "ft",
+      "i",
+      "Produced & Bottled by Macchia"
+    ],
+    "reviewQuestion": "Reading only the artwork: what text constitutes the brand as presented on this label, and where does the brand mark end and designation, varietal, appellation, label-series, or descriptive wording begin?"
+  }
+]
