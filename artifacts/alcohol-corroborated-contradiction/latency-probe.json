@@ -1,0 +1,578 @@
+[
+  {
+    "caseId": "approved-wine-006",
+    "cropPx": 1900,
+    "preprocessMs": 12,
+    "ocrPsm8Ms": 54,
+    "ocrPsm11Ms": 36,
+    "totalAddedMs": 102,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "casanova-della-spinetta",
+    "cropPx": 17181,
+    "preprocessMs": 14,
+    "ocrPsm8Ms": 37,
+    "ocrPsm11Ms": 31,
+    "totalAddedMs": 82,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-008",
+    "cropPx": 34782,
+    "preprocessMs": 26,
+    "ocrPsm8Ms": 39,
+    "ocrPsm11Ms": 94,
+    "totalAddedMs": 160,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-009",
+    "cropPx": 40067,
+    "preprocessMs": 25,
+    "ocrPsm8Ms": 39,
+    "ocrPsm11Ms": 131,
+    "totalAddedMs": 196,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "domaine-follin-arbelet",
+    "cropPx": 5280,
+    "preprocessMs": 9,
+    "ocrPsm8Ms": 14,
+    "ocrPsm11Ms": 17,
+    "totalAddedMs": 39,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-012",
+    "cropPx": 16947,
+    "preprocessMs": 40,
+    "ocrPsm8Ms": 23,
+    "ocrPsm11Ms": 28,
+    "totalAddedMs": 92,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-013",
+    "cropPx": 3828,
+    "preprocessMs": 14,
+    "ocrPsm8Ms": 17,
+    "ocrPsm11Ms": 16,
+    "totalAddedMs": 47,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-016",
+    "cropPx": 7568,
+    "preprocessMs": 13,
+    "ocrPsm8Ms": 14,
+    "ocrPsm11Ms": 18,
+    "totalAddedMs": 45,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-017",
+    "cropPx": 6480,
+    "preprocessMs": 7,
+    "ocrPsm8Ms": 16,
+    "ocrPsm11Ms": 58,
+    "totalAddedMs": 82,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-018",
+    "cropPx": 18952,
+    "preprocessMs": 21,
+    "ocrPsm8Ms": 28,
+    "ocrPsm11Ms": 24,
+    "totalAddedMs": 72,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "saker",
+    "cropPx": 13475,
+    "preprocessMs": 12,
+    "ocrPsm8Ms": 30,
+    "ocrPsm11Ms": 35,
+    "totalAddedMs": 77,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-022",
+    "cropPx": 9307,
+    "preprocessMs": 10,
+    "ocrPsm8Ms": 18,
+    "ocrPsm11Ms": 23,
+    "totalAddedMs": 52,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "nebla-mencia",
+    "cropPx": 46128,
+    "preprocessMs": 18,
+    "ocrPsm8Ms": 40,
+    "ocrPsm11Ms": 41,
+    "totalAddedMs": 100,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-026",
+    "cropPx": 12726,
+    "preprocessMs": 19,
+    "ocrPsm8Ms": 21,
+    "ocrPsm11Ms": 26,
+    "totalAddedMs": 66,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-028",
+    "cropPx": 63118,
+    "preprocessMs": 15,
+    "ocrPsm8Ms": 38,
+    "ocrPsm11Ms": 42,
+    "totalAddedMs": 95,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-031",
+    "cropPx": 20962,
+    "preprocessMs": 14,
+    "ocrPsm8Ms": 31,
+    "ocrPsm11Ms": 43,
+    "totalAddedMs": 87,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-032",
+    "cropPx": 50172,
+    "preprocessMs": 30,
+    "ocrPsm8Ms": 50,
+    "ocrPsm11Ms": 45,
+    "totalAddedMs": 125,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-033",
+    "cropPx": 16896,
+    "preprocessMs": 15,
+    "ocrPsm8Ms": 27,
+    "ocrPsm11Ms": 57,
+    "totalAddedMs": 99,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-037",
+    "cropPx": 14910,
+    "preprocessMs": 12,
+    "ocrPsm8Ms": 29,
+    "ocrPsm11Ms": 56,
+    "totalAddedMs": 97,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-038",
+    "cropPx": 3960,
+    "preprocessMs": 10,
+    "ocrPsm8Ms": 16,
+    "ocrPsm11Ms": 15,
+    "totalAddedMs": 41,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-039",
+    "cropPx": 9494,
+    "preprocessMs": 16,
+    "ocrPsm8Ms": 20,
+    "ocrPsm11Ms": 46,
+    "totalAddedMs": 82,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-041",
+    "cropPx": 41234,
+    "preprocessMs": 25,
+    "ocrPsm8Ms": 37,
+    "ocrPsm11Ms": 38,
+    "totalAddedMs": 100,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-042",
+    "cropPx": 22425,
+    "preprocessMs": 23,
+    "ocrPsm8Ms": 34,
+    "ocrPsm11Ms": 38,
+    "totalAddedMs": 95,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-043",
+    "cropPx": 10292,
+    "preprocessMs": 12,
+    "ocrPsm8Ms": 14,
+    "ocrPsm11Ms": 59,
+    "totalAddedMs": 85,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-044",
+    "cropPx": 89550,
+    "preprocessMs": 36,
+    "ocrPsm8Ms": 84,
+    "ocrPsm11Ms": 124,
+    "totalAddedMs": 244,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-045",
+    "cropPx": 4260,
+    "preprocessMs": 8,
+    "ocrPsm8Ms": 15,
+    "ocrPsm11Ms": 19,
+    "totalAddedMs": 42,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-048",
+    "cropPx": 20230,
+    "preprocessMs": 18,
+    "ocrPsm8Ms": 23,
+    "ocrPsm11Ms": 116,
+    "totalAddedMs": 157,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-049",
+    "cropPx": 55518,
+    "preprocessMs": 30,
+    "ocrPsm8Ms": 83,
+    "ocrPsm11Ms": 107,
+    "totalAddedMs": 219,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "le-temps-des-fleurs",
+    "cropPx": 16940,
+    "preprocessMs": 12,
+    "ocrPsm8Ms": 33,
+    "ocrPsm11Ms": 38,
+    "totalAddedMs": 82,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-053",
+    "cropPx": 38514,
+    "preprocessMs": 22,
+    "ocrPsm8Ms": 59,
+    "ocrPsm11Ms": 24,
+    "totalAddedMs": 104,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-055",
+    "cropPx": 6768,
+    "preprocessMs": 10,
+    "ocrPsm8Ms": 19,
+    "ocrPsm11Ms": 19,
+    "totalAddedMs": 48,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-056",
+    "cropPx": 12810,
+    "preprocessMs": 10,
+    "ocrPsm8Ms": 26,
+    "ocrPsm11Ms": 56,
+    "totalAddedMs": 92,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-057",
+    "cropPx": 14790,
+    "preprocessMs": 10,
+    "ocrPsm8Ms": 24,
+    "ocrPsm11Ms": 38,
+    "totalAddedMs": 73,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-066",
+    "cropPx": 15517,
+    "preprocessMs": 14,
+    "ocrPsm8Ms": 25,
+    "ocrPsm11Ms": 72,
+    "totalAddedMs": 112,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-067",
+    "cropPx": 11269,
+    "preprocessMs": 12,
+    "ocrPsm8Ms": 18,
+    "ocrPsm11Ms": 46,
+    "totalAddedMs": 77,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-068",
+    "cropPx": 16107,
+    "preprocessMs": 12,
+    "ocrPsm8Ms": 23,
+    "ocrPsm11Ms": 67,
+    "totalAddedMs": 102,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-076",
+    "cropPx": 16191,
+    "preprocessMs": 15,
+    "ocrPsm8Ms": 25,
+    "ocrPsm11Ms": 28,
+    "totalAddedMs": 68,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-077",
+    "cropPx": 4108,
+    "preprocessMs": 9,
+    "ocrPsm8Ms": 20,
+    "ocrPsm11Ms": 64,
+    "totalAddedMs": 93,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-078",
+    "cropPx": 6222,
+    "preprocessMs": 8,
+    "ocrPsm8Ms": 18,
+    "ocrPsm11Ms": 40,
+    "totalAddedMs": 67,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "le-caniette",
+    "cropPx": 3683,
+    "preprocessMs": 7,
+    "ocrPsm8Ms": 14,
+    "ocrPsm11Ms": 16,
+    "totalAddedMs": 37,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-081",
+    "cropPx": 960,
+    "preprocessMs": 6,
+    "ocrPsm8Ms": 19,
+    "ocrPsm11Ms": 22,
+    "totalAddedMs": 47,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-082",
+    "cropPx": 18340,
+    "preprocessMs": 11,
+    "ocrPsm8Ms": 24,
+    "ocrPsm11Ms": 28,
+    "totalAddedMs": 63,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-084",
+    "cropPx": 7120,
+    "preprocessMs": 9,
+    "ocrPsm8Ms": 30,
+    "ocrPsm11Ms": 85,
+    "totalAddedMs": 123,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-087",
+    "cropPx": 65750,
+    "preprocessMs": 30,
+    "ocrPsm8Ms": 64,
+    "ocrPsm11Ms": 230,
+    "totalAddedMs": 325,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-088",
+    "cropPx": 4356,
+    "preprocessMs": 8,
+    "ocrPsm8Ms": 14,
+    "ocrPsm11Ms": 17,
+    "totalAddedMs": 38,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-089",
+    "cropPx": 2990,
+    "preprocessMs": 8,
+    "ocrPsm8Ms": 13,
+    "ocrPsm11Ms": 16,
+    "totalAddedMs": 38,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-090",
+    "cropPx": 3900,
+    "preprocessMs": 7,
+    "ocrPsm8Ms": 14,
+    "ocrPsm11Ms": 17,
+    "totalAddedMs": 39,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-091",
+    "cropPx": 4464,
+    "preprocessMs": 9,
+    "ocrPsm8Ms": 14,
+    "ocrPsm11Ms": 44,
+    "totalAddedMs": 67,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-092",
+    "cropPx": 7956,
+    "preprocessMs": 30,
+    "ocrPsm8Ms": 22,
+    "ocrPsm11Ms": 91,
+    "totalAddedMs": 143,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-093",
+    "cropPx": 34430,
+    "preprocessMs": 15,
+    "ocrPsm8Ms": 44,
+    "ocrPsm11Ms": 97,
+    "totalAddedMs": 155,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-094",
+    "cropPx": 32849,
+    "preprocessMs": 15,
+    "ocrPsm8Ms": 44,
+    "ocrPsm11Ms": 82,
+    "totalAddedMs": 140,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-095",
+    "cropPx": 1908,
+    "preprocessMs": 5,
+    "ocrPsm8Ms": 15,
+    "ocrPsm11Ms": 17,
+    "totalAddedMs": 37,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-096",
+    "cropPx": 16368,
+    "preprocessMs": 14,
+    "ocrPsm8Ms": 25,
+    "ocrPsm11Ms": 28,
+    "totalAddedMs": 67,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-099",
+    "cropPx": 34100,
+    "preprocessMs": 15,
+    "ocrPsm8Ms": 44,
+    "ocrPsm11Ms": 69,
+    "totalAddedMs": 128,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "amuninni-ferracane",
+    "cropPx": 10672,
+    "preprocessMs": 31,
+    "ocrPsm8Ms": 16,
+    "ocrPsm11Ms": 95,
+    "totalAddedMs": 142,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-102",
+    "cropPx": 3050,
+    "preprocessMs": 29,
+    "ocrPsm8Ms": 14,
+    "ocrPsm11Ms": 45,
+    "totalAddedMs": 88,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-109",
+    "cropPx": 5040,
+    "preprocessMs": 10,
+    "ocrPsm8Ms": 12,
+    "ocrPsm11Ms": 17,
+    "totalAddedMs": 39,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "approved-wine-110",
+    "cropPx": 16947,
+    "preprocessMs": 35,
+    "ocrPsm8Ms": 21,
+    "ocrPsm11Ms": 24,
+    "totalAddedMs": 81,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "m-cellars-baseline",
+    "cropPx": 207306,
+    "preprocessMs": 39,
+    "ocrPsm8Ms": 118,
+    "ocrPsm11Ms": 69,
+    "totalAddedMs": 226,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "wine-multi-artifact-05",
+    "cropPx": 1575,
+    "preprocessMs": 18,
+    "ocrPsm8Ms": 17,
+    "ocrPsm11Ms": 18,
+    "totalAddedMs": 53,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "wine-multi-artifact-06",
+    "cropPx": 19470,
+    "preprocessMs": 19,
+    "ocrPsm8Ms": 20,
+    "ocrPsm11Ms": 31,
+    "totalAddedMs": 69,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "wine-multi-artifact-07",
+    "cropPx": 4968,
+    "preprocessMs": 15,
+    "ocrPsm8Ms": 14,
+    "ocrPsm11Ms": 16,
+    "totalAddedMs": 46,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "wine-multi-artifact-08",
+    "cropPx": 5264,
+    "preprocessMs": 16,
+    "ocrPsm8Ms": 16,
+    "ocrPsm11Ms": 16,
+    "totalAddedMs": 47,
+    "baselineLatencyMs": null
+  },
+  {
+    "caseId": "wine-multi-artifact-09",
+    "cropPx": 1892,
+    "preprocessMs": 13,
+    "ocrPsm8Ms": 10,
+    "ocrPsm11Ms": 11,
+    "totalAddedMs": 34,
+    "baselineLatencyMs": null
+  }
+]

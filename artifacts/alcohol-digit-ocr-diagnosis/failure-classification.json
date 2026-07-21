@@ -1,0 +1,46 @@
+{
+  "sharedMechanism": false,
+  "conclusion": "The two errors do NOT share a mechanism and must not be combined into one experiment.",
+  "cases": {
+    "approved-wine-018": {
+      "truth": 13.5,
+      "machineValue": 3.5,
+      "visible": "Alc.13.5% by Vol.",
+      "primaryCause": "glyph fusion / token grouping under tight kerning",
+      "secondaryFactors": ["page-segmentation mismatch (sparse text on a full page)"],
+      "evidence": {
+        "polarity": "dark-on-light",
+        "contrastRange": 204,
+        "interGlyphGaps": [2, 5, 1, 1, 5, 1],
+        "note": "A 1px gap separates the Alc. period from the numerals, and one 44px-wide run spans merged glyphs. The leading 1 is the narrowest glyph, so it is the one lost when the gap closes under 1.5x cubic resampling.",
+        "ocrBehaviour": "On a line crop at production settings the 1 IS recovered ('Al 13 5% by Vol Ch') but the decimal is lost. Only a hand-tuned marker+number crop with psm=singleWord yields a clean '13.5%'."
+      },
+      "earliestStageCorrectDigitAbsent": "OCR recognition in the primary full-image pass; the 1 never enters token grouping, so every downstream stage is innocent",
+      "resolvedByAnyGeneralTreatment": false
+    },
+    "approved-wine-037": {
+      "truth": 13.0,
+      "machineValue": 19.0,
+      "visible": "Alcohol 13.0 % by volume",
+      "primaryCause": "Tesseract character confusion (3 read as 9) under low dynamic range with inverted polarity",
+      "secondaryFactors": [
+        "insufficient effective resolution of the region within the full-image pass"
+      ],
+      "evidence": {
+        "polarity": "light-on-dark (inverted)",
+        "contrastRange": 134,
+        "interGlyphGaps": [5, 3, 5, 13, 8],
+        "note": "Segmentation is clean; glyphs are well separated. The 3 and the 0 have identical bounding boxes (w14 h32), so the failure is shape discrimination, not grouping.",
+        "ocrBehaviour": "A tight line crop at the SAME production treatment and SAME page-segmentation mode reads '13.0' correctly and deterministically (conf 80)."
+      },
+      "earliestStageCorrectDigitAbsent": "OCR recognition in the primary full-image pass; a re-read of the same pixels at higher effective resolution recovers the correct digit",
+      "resolvedByAnyGeneralTreatment": "partially - recoverable as an abstention signal, not as a safe replacement"
+    }
+  },
+  "categoriesConsideredAndRejected": {
+    "cropClipping": "no - the recorded candidate geometry contains the digits in both cases",
+    "normalizationRemovedIt": "no - canonicalization never saw the missing digit",
+    "windowConstructionExcludedIt": "no - windows form correctly around what OCR produced",
+    "correctAlternateResultNotConsumed": "no - no existing pass produced the correct value for either case"
+  }
+}
