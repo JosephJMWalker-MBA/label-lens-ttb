@@ -1,0 +1,289 @@
+{
+  "schema": "brand-region-annotation.proposed.v1",
+  "status": "PROPOSED — not yet approved; must not be used as evaluation truth",
+  "proposedBy": "Claude (visual inspection of the artwork)",
+  "proposedAt": "2026-07-21",
+  "coordinateFrame": "canonical original-image pixels, origin top-left",
+  "rule": "enclose only the visible brand mark with modest padding; exclude varietal, appellation, series, and descriptive text unless visually part of the fixture brand",
+  "regions": [
+    {
+      "caseId": "la-fattoria-rotated",
+      "fixtureBrand": "La Fattoria",
+      "imagePath": "tests/fixtures/precheck/approved-wine-003/label.png",
+      "imageWidth": 1350,
+      "imageHeight": 1650,
+      "note": "Script 'La' over roman 'FATTORIA' inside a decorative ellipse; the ellipse itself is excluded.",
+      "occurrences": [
+        {
+          "label": "sole visible brand occurrence",
+          "region": {
+            "x": 350,
+            "y": 360,
+            "width": 650,
+            "height": 290
+          }
+        }
+      ],
+      "occurrenceCount": 1
+    },
+    {
+      "caseId": "approved-wine-004",
+      "fixtureBrand": "La Fattoria",
+      "imagePath": "tests/fixtures/precheck/approved-wine-004/label.png",
+      "imageWidth": 1350,
+      "imageHeight": 1650,
+      "note": "Same artwork family as la-fattoria-rotated and approved-wine-005.",
+      "occurrences": [
+        {
+          "label": "sole visible brand occurrence",
+          "region": {
+            "x": 350,
+            "y": 360,
+            "width": 650,
+            "height": 290
+          }
+        }
+      ],
+      "occurrenceCount": 1
+    },
+    {
+      "caseId": "approved-wine-005",
+      "fixtureBrand": "La Fattoria",
+      "imagePath": "tests/fixtures/precheck/approved-wine-005/label.png",
+      "imageWidth": 1500,
+      "imageHeight": 1140,
+      "note": "Landscape variant of the same mark. Region widened after visual check so the final 'A' of FATTORIA is not clipped.",
+      "occurrences": [
+        {
+          "label": "sole visible brand occurrence",
+          "region": {
+            "x": 495,
+            "y": 240,
+            "width": 520,
+            "height": 270
+          }
+        }
+      ],
+      "occurrenceCount": 1
+    },
+    {
+      "caseId": "approved-wine-023",
+      "fixtureBrand": "Podere don Cataldo",
+      "imagePath": "tests/fixtures/precheck/approved-wine-023/label.png",
+      "imageWidth": 988,
+      "imageHeight": 1253,
+      "note": "Two-line calligraphic script; 'PRIMITIVO SALENTO' below is varietal/appellation and is excluded.",
+      "occurrences": [
+        {
+          "label": "sole visible brand occurrence",
+          "region": {
+            "x": 293,
+            "y": 59,
+            "width": 403,
+            "height": 162
+          }
+        }
+      ],
+      "occurrenceCount": 1
+    },
+    {
+      "caseId": "approved-wine-027",
+      "fixtureBrand": "The Golden Girls",
+      "imagePath": "tests/fixtures/precheck/approved-wine-027/label.jpeg",
+      "imageWidth": 976,
+      "imageHeight": 1126,
+      "note": "'THE' + 'GOLDEN' in wide serif caps over 'Girls' in script; all three lines are the mark. The lower roundel repeats the name but is a separate device.",
+      "occurrences": [
+        {
+          "label": "sole visible brand occurrence",
+          "region": {
+            "x": 77,
+            "y": 71,
+            "width": 822,
+            "height": 340
+          }
+        }
+      ],
+      "occurrenceCount": 1
+    },
+    {
+      "caseId": "approved-wine-031",
+      "fixtureBrand": "embeleso",
+      "imagePath": "tests/fixtures/precheck/approved-wine-031/label.jpeg",
+      "imageWidth": 646,
+      "imageHeight": 1171,
+      "note": "Stylised lowercase wordmark with ligatures and a diaeresis; 'CRIANZA 2022' below is excluded.",
+      "occurrences": [
+        {
+          "label": "sole visible brand occurrence",
+          "region": {
+            "x": 163,
+            "y": 38,
+            "width": 330,
+            "height": 76
+          }
+        }
+      ],
+      "occurrenceCount": 1
+    },
+    {
+      "caseId": "approved-wine-035",
+      "fixtureBrand": "Hubert Lamy",
+      "imagePath": "tests/fixtures/precheck/approved-wine-035/label.png",
+      "imageWidth": 557,
+      "imageHeight": 471,
+      "note": "Cursive script; 'Saint-Aubin' below is an appellation and is excluded.",
+      "occurrences": [
+        {
+          "label": "sole visible brand occurrence",
+          "region": {
+            "x": 58,
+            "y": 42,
+            "width": 364,
+            "height": 92
+          }
+        }
+      ],
+      "occurrenceCount": 1
+    },
+    {
+      "caseId": "approved-wine-074",
+      "fixtureBrand": "Mike's Farm, Inc.",
+      "imagePath": "tests/fixtures/precheck/approved-wine-074/label.jpeg",
+      "imageWidth": 786,
+      "imageHeight": 1619,
+      "note": "Reversed-out white condensed type on an orange field; address lines below are excluded.",
+      "occurrences": [
+        {
+          "label": "sole visible brand occurrence",
+          "region": {
+            "x": 130,
+            "y": 68,
+            "width": 547,
+            "height": 107
+          }
+        }
+      ],
+      "occurrenceCount": 1
+    },
+    {
+      "caseId": "approved-wine-083",
+      "fixtureBrand": "Barn Sill Wine Co.",
+      "imagePath": "tests/fixtures/precheck/approved-wine-083/label.jpeg",
+      "imageWidth": 447,
+      "imageHeight": 927,
+      "note": "Green script. Reader note: 'Wine Co.' is set in the same script as 'Barn Sill', which bears on the E3 borderline question for this case.",
+      "occurrences": [
+        {
+          "label": "sole visible brand occurrence",
+          "region": {
+            "x": 28,
+            "y": 48,
+            "width": 394,
+            "height": 76
+          }
+        }
+      ],
+      "occurrenceCount": 1
+    },
+    {
+      "caseId": "approved-wine-085",
+      "fixtureBrand": "Mosaikon",
+      "imagePath": "tests/fixtures/precheck/approved-wine-085/label.jpeg",
+      "imageWidth": 414,
+      "imageHeight": 464,
+      "note": "Gold script wordmark on a pale field; low contrast.",
+      "occurrences": [
+        {
+          "label": "sole visible brand occurrence",
+          "region": {
+            "x": 88,
+            "y": 18,
+            "width": 250,
+            "height": 50
+          }
+        }
+      ],
+      "occurrenceCount": 1
+    },
+    {
+      "caseId": "approved-wine-091",
+      "fixtureBrand": "Rias",
+      "imagePath": "tests/fixtures/precheck/approved-wine-091/label.jpeg",
+      "imageWidth": 303,
+      "imageHeight": 598,
+      "note": "Stacked two-line mark: 'RÍ' over 'aS', mixed case. Region corrected after reader review — the first proposal cut through the 'a' and 'S'; measured extent is x 26-105, y 11-147, so the region now clears the S descender and the acute accent.",
+      "occurrences": [
+        {
+          "label": "sole visible brand occurrence",
+          "region": {
+            "x": 20,
+            "y": 6,
+            "width": 92,
+            "height": 150
+          }
+        }
+      ],
+      "occurrenceCount": 1
+    },
+    {
+      "caseId": "wine-multi-artifact-04",
+      "fixtureBrand": "Dry Cellar",
+      "imagePath": "tests/fixtures/precheck/wine-multi-artifact-04/label.png",
+      "imageWidth": 674,
+      "imageHeight": 1522,
+      "note": "Multi-panel artifact. Proposed region is the FRONT-panel script mark. A second, smaller 'Dry Cellar' appears on the back panel near (235,985)-(330,1015); the reader should decide whether the annotation should cover one or both.",
+      "occurrences": [
+        {
+          "label": "front panel — 'Dry Cellar' script mark",
+          "region": {
+            "x": 53,
+            "y": 123,
+            "width": 230,
+            "height": 140
+          }
+        },
+        {
+          "label": "back panel — 'Dry Cellar' script header",
+          "region": {
+            "x": 173,
+            "y": 982,
+            "width": 156,
+            "height": 55
+          }
+        }
+      ],
+      "occurrenceCount": 2
+    },
+    {
+      "caseId": "wine-multi-artifact-07",
+      "fixtureBrand": "Mike's Farm",
+      "imagePath": "tests/fixtures/precheck/wine-multi-artifact-07/label.png",
+      "imageWidth": 400,
+      "imageHeight": 1554,
+      "note": "Multi-panel artifact. Proposed region is the FRONT-panel 'MIKE'S FARM' in orange display type. A second 'Mike's Farm, Inc.' appears on the back panel near (60,890)-(350,930); the reader should decide whether both are in scope. Front-panel region extended after visual check so the display type is not clipped at the baseline.",
+      "occurrences": [
+        {
+          "label": "front panel — 'MIKE'S FARM' display type",
+          "region": {
+            "x": 25,
+            "y": 52,
+            "width": 290,
+            "height": 98
+          }
+        },
+        {
+          "label": "back panel — 'Mike's Farm, Inc.' display type",
+          "region": {
+            "x": 58,
+            "y": 913,
+            "width": 227,
+            "height": 51
+          }
+        }
+      ],
+      "occurrenceCount": 2
+    }
+  ],
+  "multiPanelRule": "every distinct visible brand occurrence gets its own labelled region"
+}

@@ -1,0 +1,84 @@
+{
+  "schema": "brand-region-coverage.policy-excluded.v1",
+  "excludedFrom": "Phase 2 classification",
+  "excludedBefore": "any interpretation of these cases' OCR mechanism. Exclusion was decided during annotation review, before their pass coverage or word overlap was examined.",
+  "reason": "Their evaluation depends on the unresolved company-name-vs-brand-name policy question. The brand text itself is disputed, so the region to evaluate against is not settled.",
+  "policyQuestionScope": "The policy question reaches 13 of 105 brand-present fixtures corpus-wide, and all four cases the pipeline currently marks OBSERVED correctly.",
+  "referral": "annotation-review/truth-conflict-referrals.md",
+  "fixtureModified": false,
+  "phase2CategoryAssigned": false,
+  "excludedCaseCount": 3,
+  "cases": [
+    {
+      "caseId": "approved-wine-074",
+      "annotationStatus": "PROPOSED — not approved",
+      "proposedOccurrences": [
+        {
+          "label": "sole visible brand occurrence",
+          "region": {
+            "x": 130,
+            "y": 68,
+            "width": 547,
+            "height": 107
+          }
+        }
+      ],
+      "phase2CategoryAssigned": false,
+      "appearsInClassifications": false,
+      "recordedTruth": ["Mike’s Farm, Inc. (as recorded: Mike's Farm, Inc.)", "Mike's Farm"],
+      "readerReading": "company name, not a brand. The label carries no other brand-like text, so the implication is presence: absent, not a redrawn region.",
+      "forbiddenPresentations": ["Hinnant Vineyards"]
+    },
+    {
+      "caseId": "approved-wine-083",
+      "annotationStatus": "PROPOSED — not approved",
+      "proposedOccurrences": [
+        {
+          "label": "sole visible brand occurrence",
+          "region": {
+            "x": 28,
+            "y": 48,
+            "width": 394,
+            "height": 76
+          }
+        }
+      ],
+      "phase2CategoryAssigned": false,
+      "appearsInClassifications": false,
+      "recordedTruth": ["Barn Sill Wine Co.", "Barn Sill Wine Co"],
+      "readerReading": "brand is Christmas Hayride; Barn Sill Wine Co. is the company",
+      "forbiddenPresentations": ["Christmas Hayride", "North Carolina Muscadine Wine"],
+      "conflictNote": "Christmas Hayride is recorded as a FORBIDDEN presentation by a prior reviewer (Codex, 2026-07-12, outcome confirmed, checks included varietal-not-brand and producer-importer-bottler-not-brand). The reader's reading would invert that decision."
+    },
+    {
+      "caseId": "wine-multi-artifact-07",
+      "annotationStatus": "PROPOSED — not approved",
+      "proposedOccurrences": [
+        {
+          "label": "front panel — 'MIKE'S FARM' display type",
+          "region": {
+            "x": 25,
+            "y": 52,
+            "width": 290,
+            "height": 98
+          }
+        },
+        {
+          "label": "back panel — 'Mike's Farm, Inc.' display type",
+          "region": {
+            "x": 58,
+            "y": 913,
+            "width": 227,
+            "height": 51
+          }
+        }
+      ],
+      "phase2CategoryAssigned": false,
+      "appearsInClassifications": false,
+      "recordedTruth": ["Mike's Farm", "Mike's Farm, Inc."],
+      "readerReading": "brand is Scuppernong White",
+      "forbiddenPresentations": [],
+      "counterEvidence": "scuppernong is a muscadine grape cultivar and White is a colour; the same label carries North Carolina Muscadine Wine and Made with North Carolina Muscadine Grapes, which reads as a varietal/type designation."
+    }
+  ]
+}

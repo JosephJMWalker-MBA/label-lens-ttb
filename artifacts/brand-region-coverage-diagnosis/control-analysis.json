@@ -1,0 +1,343 @@
+{
+  "note": "Control regions are DERIVED FROM MACHINE GEOMETRY (no human annotation), so control first-failure categories are circular and are NOT reported. Only size/volume/confidence distributions are compared.",
+  "primaryCount": 10,
+  "controlCount": 6,
+  "regionWidthPx": {
+    "primary": {
+      "min": 92,
+      "median": 403,
+      "max": 822
+    },
+    "control": {
+      "min": 314,
+      "median": 408,
+      "max": 1040
+    }
+  },
+  "regionHeightPx": {
+    "primary": {
+      "min": 50,
+      "median": 162,
+      "max": 340
+    },
+    "control": {
+      "min": 63,
+      "median": 95,
+      "max": 129
+    }
+  },
+  "regionAreaPctOfImage": {
+    "primary": {
+      "min": 3.14,
+      "median": 8.21,
+      "max": 25.43
+    },
+    "control": {
+      "min": 1.38,
+      "median": 3.26,
+      "max": 9.41
+    }
+  },
+  "passesGeometricallyCovering": {
+    "primary": {
+      "min": 1,
+      "median": 1,
+      "max": 1
+    },
+    "control": {
+      "min": 1,
+      "median": 1,
+      "max": 1
+    }
+  },
+  "executedPasses": {
+    "primary": {
+      "min": 1,
+      "median": 1,
+      "max": 1
+    },
+    "control": {
+      "min": 1,
+      "median": 1,
+      "max": 1
+    }
+  },
+  "overlappingWordCount": {
+    "primary": {
+      "min": 0,
+      "median": 2,
+      "max": 8
+    },
+    "control": {
+      "min": 1,
+      "median": 3,
+      "max": 10
+    }
+  },
+  "meanOverlapConfidence": {
+    "primary": {
+      "min": 0,
+      "median": 25,
+      "max": 54
+    },
+    "control": {
+      "min": 55,
+      "median": 89,
+      "max": 92
+    }
+  },
+  "decorativeOrScript": {
+    "primary": "6/10",
+    "control": "6/6"
+  },
+  "rotatedVerticalOrWraparound": {
+    "primary": "4/10",
+    "control": "3/6"
+  },
+  "bestPassKind": {
+    "primary": ["full-image-primary"],
+    "control": ["full-image-primary"]
+  },
+  "rows": [
+    {
+      "caseId": "la-fattoria-rotated",
+      "population": "primary",
+      "regionW": 650,
+      "regionH": 290,
+      "regionAreaPctOfImage": 8.46,
+      "passesCovering": 1,
+      "executedPasses": 1,
+      "overlappingWords": 0,
+      "meanOverlapConfidence": null,
+      "decorativeOrScript": true,
+      "rotatedOrVertical": true,
+      "bestPassKind": "full-image-primary",
+      "regionSource": "human-approved"
+    },
+    {
+      "caseId": "approved-wine-004",
+      "population": "primary",
+      "regionW": 650,
+      "regionH": 290,
+      "regionAreaPctOfImage": 8.46,
+      "passesCovering": 1,
+      "executedPasses": 1,
+      "overlappingWords": 0,
+      "meanOverlapConfidence": null,
+      "decorativeOrScript": true,
+      "rotatedOrVertical": true,
+      "bestPassKind": "full-image-primary",
+      "regionSource": "human-approved"
+    },
+    {
+      "caseId": "approved-wine-005",
+      "population": "primary",
+      "regionW": 520,
+      "regionH": 270,
+      "regionAreaPctOfImage": 8.21,
+      "passesCovering": 1,
+      "executedPasses": 1,
+      "overlappingWords": 0,
+      "meanOverlapConfidence": null,
+      "decorativeOrScript": true,
+      "rotatedOrVertical": true,
+      "bestPassKind": "full-image-primary",
+      "regionSource": "human-approved"
+    },
+    {
+      "caseId": "approved-wine-023",
+      "population": "primary",
+      "regionW": 403,
+      "regionH": 162,
+      "regionAreaPctOfImage": 5.27,
+      "passesCovering": 1,
+      "executedPasses": 1,
+      "overlappingWords": 2,
+      "meanOverlapConfidence": 21,
+      "decorativeOrScript": true,
+      "rotatedOrVertical": false,
+      "bestPassKind": "full-image-primary",
+      "regionSource": "human-approved"
+    },
+    {
+      "caseId": "approved-wine-027",
+      "population": "primary",
+      "regionW": 822,
+      "regionH": 340,
+      "regionAreaPctOfImage": 25.43,
+      "passesCovering": 1,
+      "executedPasses": 1,
+      "overlappingWords": 8,
+      "meanOverlapConfidence": 36,
+      "decorativeOrScript": true,
+      "rotatedOrVertical": false,
+      "bestPassKind": "full-image-primary",
+      "regionSource": "human-approved"
+    },
+    {
+      "caseId": "approved-wine-031",
+      "population": "primary",
+      "regionW": 330,
+      "regionH": 76,
+      "regionAreaPctOfImage": 3.32,
+      "passesCovering": 1,
+      "executedPasses": 1,
+      "overlappingWords": 1,
+      "meanOverlapConfidence": 10,
+      "decorativeOrScript": false,
+      "rotatedOrVertical": false,
+      "bestPassKind": "full-image-primary",
+      "regionSource": "human-approved"
+    },
+    {
+      "caseId": "approved-wine-035",
+      "population": "primary",
+      "regionW": 364,
+      "regionH": 92,
+      "regionAreaPctOfImage": 12.76,
+      "passesCovering": 1,
+      "executedPasses": 1,
+      "overlappingWords": 1,
+      "meanOverlapConfidence": 0,
+      "decorativeOrScript": true,
+      "rotatedOrVertical": true,
+      "bestPassKind": "full-image-primary",
+      "regionSource": "human-approved"
+    },
+    {
+      "caseId": "approved-wine-085",
+      "population": "primary",
+      "regionW": 250,
+      "regionH": 50,
+      "regionAreaPctOfImage": 6.51,
+      "passesCovering": 1,
+      "executedPasses": 1,
+      "overlappingWords": 3,
+      "meanOverlapConfidence": 25,
+      "decorativeOrScript": false,
+      "rotatedOrVertical": false,
+      "bestPassKind": "full-image-primary",
+      "regionSource": "human-approved"
+    },
+    {
+      "caseId": "approved-wine-091",
+      "population": "primary",
+      "regionW": 92,
+      "regionH": 150,
+      "regionAreaPctOfImage": 7.62,
+      "passesCovering": 1,
+      "executedPasses": 1,
+      "overlappingWords": 4,
+      "meanOverlapConfidence": 54,
+      "decorativeOrScript": false,
+      "rotatedOrVertical": false,
+      "bestPassKind": "full-image-primary",
+      "regionSource": "human-approved"
+    },
+    {
+      "caseId": "wine-multi-artifact-04",
+      "population": "primary",
+      "regionW": 230,
+      "regionH": 140,
+      "regionAreaPctOfImage": 3.14,
+      "passesCovering": 1,
+      "executedPasses": 1,
+      "overlappingWords": 3,
+      "meanOverlapConfidence": 50,
+      "decorativeOrScript": false,
+      "rotatedOrVertical": false,
+      "bestPassKind": "full-image-primary",
+      "regionSource": "human-approved"
+    },
+    {
+      "caseId": "luigi-giovanni-live",
+      "population": "control",
+      "regionW": 382,
+      "regionH": 96,
+      "regionAreaPctOfImage": 2.51,
+      "passesCovering": 1,
+      "executedPasses": 1,
+      "overlappingWords": 1,
+      "meanOverlapConfidence": 91,
+      "decorativeOrScript": true,
+      "rotatedOrVertical": true,
+      "bestPassKind": "full-image-primary",
+      "regionSource": "machine-derived"
+    },
+    {
+      "caseId": "approved-wine-013",
+      "population": "control",
+      "regionW": 314,
+      "regionH": 63,
+      "regionAreaPctOfImage": 1.38,
+      "passesCovering": 1,
+      "executedPasses": 1,
+      "overlappingWords": 3,
+      "meanOverlapConfidence": 73,
+      "decorativeOrScript": true,
+      "rotatedOrVertical": false,
+      "bestPassKind": "full-image-primary",
+      "regionSource": "machine-derived"
+    },
+    {
+      "caseId": "amuninni-ferracane",
+      "population": "control",
+      "regionW": 408,
+      "regionH": 129,
+      "regionAreaPctOfImage": 9.41,
+      "passesCovering": 1,
+      "executedPasses": 1,
+      "overlappingWords": 6,
+      "meanOverlapConfidence": 66,
+      "decorativeOrScript": true,
+      "rotatedOrVertical": false,
+      "bestPassKind": "full-image-primary",
+      "regionSource": "machine-derived"
+    },
+    {
+      "caseId": "approved-wine-105",
+      "population": "control",
+      "regionW": 382,
+      "regionH": 95,
+      "regionAreaPctOfImage": 3.26,
+      "passesCovering": 1,
+      "executedPasses": 1,
+      "overlappingWords": 1,
+      "meanOverlapConfidence": 92,
+      "decorativeOrScript": true,
+      "rotatedOrVertical": false,
+      "bestPassKind": "full-image-primary",
+      "regionSource": "machine-derived"
+    },
+    {
+      "caseId": "approved-wine-107",
+      "population": "control",
+      "regionW": 484,
+      "regionH": 86,
+      "regionAreaPctOfImage": 2.43,
+      "passesCovering": 1,
+      "executedPasses": 1,
+      "overlappingWords": 1,
+      "meanOverlapConfidence": 89,
+      "decorativeOrScript": true,
+      "rotatedOrVertical": true,
+      "bestPassKind": "full-image-primary",
+      "regionSource": "machine-derived"
+    },
+    {
+      "caseId": "approved-wine-108",
+      "population": "control",
+      "regionW": 1040,
+      "regionH": 90,
+      "regionAreaPctOfImage": 5.47,
+      "passesCovering": 1,
+      "executedPasses": 1,
+      "overlappingWords": 10,
+      "meanOverlapConfidence": 55,
+      "decorativeOrScript": true,
+      "rotatedOrVertical": true,
+      "bestPassKind": "full-image-primary",
+      "regionSource": "machine-derived"
+    }
+  ]
+}

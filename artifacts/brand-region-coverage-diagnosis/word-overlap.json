@@ -1,0 +1,840 @@
+{
+  "rows": [
+    {
+      "caseId": "approved-wine-023",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "7",
+      "confidence": 4,
+      "geometry": {
+        "x": 341,
+        "y": 55,
+        "width": 106,
+        "height": 79
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 0.949,
+      "lineIndex": 0,
+      "lineText": "7",
+      "wordAspect": 1.34
+    },
+    {
+      "caseId": "approved-wine-023",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "ary",
+      "confidence": 37,
+      "geometry": {
+        "x": 302,
+        "y": 142,
+        "width": 89,
+        "height": 51
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 1,
+      "lineText": "ary",
+      "wordAspect": 1.75
+    },
+    {
+      "caseId": "approved-wine-027",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "HE",
+      "confidence": 63,
+      "geometry": {
+        "x": 453,
+        "y": 60,
+        "width": 125,
+        "height": 76
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 0.855,
+      "lineIndex": 1,
+      "lineText": "HE",
+      "wordAspect": 1.64
+    },
+    {
+      "caseId": "approved-wine-027",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "¥",
+      "confidence": 30,
+      "geometry": {
+        "x": 481,
+        "y": 138,
+        "width": 99,
+        "height": 85
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 2,
+      "lineText": "¥",
+      "wordAspect": 1.16
+    },
+    {
+      "caseId": "approved-wine-027",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "a}",
+      "confidence": 1,
+      "geometry": {
+        "x": 443,
+        "y": 209,
+        "width": 139,
+        "height": 106
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 3,
+      "lineText": "a}",
+      "wordAspect": 1.31
+    },
+    {
+      "caseId": "approved-wine-027",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": ">",
+      "confidence": 54,
+      "geometry": {
+        "x": 695,
+        "y": 252,
+        "width": 41,
+        "height": 58
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 4,
+      "lineText": ">",
+      "wordAspect": 0.71
+    },
+    {
+      "caseId": "approved-wine-027",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "N",
+      "confidence": 75,
+      "geometry": {
+        "x": 123,
+        "y": 339,
+        "width": 42,
+        "height": 39
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": null,
+      "lineText": null,
+      "wordAspect": 1.08
+    },
+    {
+      "caseId": "approved-wine-027",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "A001",
+      "confidence": 17,
+      "geometry": {
+        "x": 691,
+        "y": 339,
+        "width": 166,
+        "height": 39
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": null,
+      "lineText": null,
+      "wordAspect": 4.26
+    },
+    {
+      "caseId": "approved-wine-027",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "Gy",
+      "confidence": 51,
+      "geometry": {
+        "x": 373,
+        "y": 310,
+        "width": 230,
+        "height": 112
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 0.902,
+      "lineIndex": null,
+      "lineText": null,
+      "wordAspect": 2.05
+    },
+    {
+      "caseId": "approved-wine-027",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "PRA",
+      "confidence": 0,
+      "geometry": {
+        "x": 763,
+        "y": 369,
+        "width": 213,
+        "height": 71
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": false,
+      "fractionOfBoxInRegion": 0.378,
+      "lineIndex": 7,
+      "lineText": "PRA",
+      "wordAspect": 3
+    },
+    {
+      "caseId": "approved-wine-031",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "enrhekeso",
+      "confidence": 10,
+      "geometry": {
+        "x": 166,
+        "y": 30,
+        "width": 321,
+        "height": 77
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 0.896,
+      "lineIndex": 0,
+      "lineText": "enrhekeso",
+      "wordAspect": 4.17
+    },
+    {
+      "caseId": "approved-wine-035",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "Hectiont",
+      "confidence": 0,
+      "geometry": {
+        "x": 51,
+        "y": 46,
+        "width": 191,
+        "height": 75
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 0.963,
+      "lineIndex": 1,
+      "lineText": "Hectiont",
+      "wordAspect": 2.55
+    },
+    {
+      "caseId": "approved-wine-085",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "=",
+      "confidence": 5,
+      "geometry": {
+        "x": 101,
+        "y": 35,
+        "width": 19,
+        "height": 14
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 0,
+      "lineText": "= SP “i",
+      "wordAspect": 1.36
+    },
+    {
+      "caseId": "approved-wine-085",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "SP",
+      "confidence": 25,
+      "geometry": {
+        "x": 169,
+        "y": 13,
+        "width": 74,
+        "height": 48
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 0.896,
+      "lineIndex": 0,
+      "lineText": "= SP “i",
+      "wordAspect": 1.54
+    },
+    {
+      "caseId": "approved-wine-085",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "“i",
+      "confidence": 45,
+      "geometry": {
+        "x": 251,
+        "y": 23,
+        "width": 74,
+        "height": 35
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 0,
+      "lineText": "= SP “i",
+      "wordAspect": 2.11
+    },
+    {
+      "caseId": "approved-wine-091",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "/",
+      "confidence": 67,
+      "geometry": {
+        "x": 81,
+        "y": 13,
+        "width": 14,
+        "height": 12
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 0,
+      "lineText": "/",
+      "wordAspect": 1.17
+    },
+    {
+      "caseId": "approved-wine-091",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "R{",
+      "confidence": 0,
+      "geometry": {
+        "x": 27,
+        "y": 33,
+        "width": 78,
+        "height": 60
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": null,
+      "lineText": null,
+      "wordAspect": 1.3
+    },
+    {
+      "caseId": "approved-wine-091",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "d",
+      "confidence": 91,
+      "geometry": {
+        "x": 27,
+        "y": 81,
+        "width": 42,
+        "height": 46
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": null,
+      "lineText": null,
+      "wordAspect": 0.91
+    },
+    {
+      "caseId": "approved-wine-091",
+      "occurrence": "sole visible brand occurrence",
+      "passId": "pass-0-full-image",
+      "text": "D>",
+      "confidence": 59,
+      "geometry": {
+        "x": 66,
+        "y": 93,
+        "width": 37,
+        "height": 56
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": null,
+      "lineText": null,
+      "wordAspect": 0.66
+    },
+    {
+      "caseId": "wine-multi-artifact-04",
+      "occurrence": "front panel — 'Dry Cellar' script mark",
+      "passId": "pass-0-full-image",
+      "text": "9.",
+      "confidence": 74,
+      "geometry": {
+        "x": 61,
+        "y": 119,
+        "width": 119,
+        "height": 60
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 0.933,
+      "lineIndex": 0,
+      "lineText": "9.",
+      "wordAspect": 1.98
+    },
+    {
+      "caseId": "wine-multi-artifact-04",
+      "occurrence": "back panel — 'Dry Cellar' script header",
+      "passId": "pass-0-full-image",
+      "text": "Dy",
+      "confidence": 41,
+      "geometry": {
+        "x": 181,
+        "y": 993,
+        "width": 60,
+        "height": 35
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 16,
+      "lineText": "Dy Colla",
+      "wordAspect": 1.71
+    },
+    {
+      "caseId": "wine-multi-artifact-04",
+      "occurrence": "back panel — 'Dry Cellar' script header",
+      "passId": "pass-0-full-image",
+      "text": "Colla",
+      "confidence": 35,
+      "geometry": {
+        "x": 250,
+        "y": 989,
+        "width": 70,
+        "height": 29
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 16,
+      "lineText": "Dy Colla",
+      "wordAspect": 2.41
+    },
+    {
+      "caseId": "luigi-giovanni-live",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "VANNI",
+      "confidence": 91,
+      "geometry": {
+        "x": 421,
+        "y": 440,
+        "width": 382,
+        "height": 96
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 1,
+      "lineText": "VANNI",
+      "wordAspect": 3.98
+    },
+    {
+      "caseId": "approved-wine-013",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "Play",
+      "confidence": 89,
+      "geometry": {
+        "x": 343,
+        "y": 752,
+        "width": 94,
+        "height": 63
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 11,
+      "lineText": "Play er’s Heart",
+      "wordAspect": 1.49
+    },
+    {
+      "caseId": "approved-wine-013",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "er’s",
+      "confidence": 90,
+      "geometry": {
+        "x": 440,
+        "y": 775,
+        "width": 75,
+        "height": 35
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 11,
+      "lineText": "Play er’s Heart",
+      "wordAspect": 2.14
+    },
+    {
+      "caseId": "approved-wine-013",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "Heart",
+      "confidence": 40,
+      "geometry": {
+        "x": 529,
+        "y": 761,
+        "width": 128,
+        "height": 47
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 11,
+      "lineText": "Play er’s Heart",
+      "wordAspect": 2.72
+    },
+    {
+      "caseId": "amuninni-ferracane",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "INV",
+      "confidence": 25,
+      "geometry": {
+        "x": 89,
+        "y": 230,
+        "width": 118,
+        "height": 129
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 2,
+      "lineText": "INV ENVY]",
+      "wordAspect": 0.91
+    },
+    {
+      "caseId": "amuninni-ferracane",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "ENVY]",
+      "confidence": 0,
+      "geometry": {
+        "x": 250,
+        "y": 230,
+        "width": 247,
+        "height": 129
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 2,
+      "lineText": "INV ENVY]",
+      "wordAspect": 1.91
+    },
+    {
+      "caseId": "amuninni-ferracane",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "@amuninnivini",
+      "confidence": 88,
+      "geometry": {
+        "x": 93,
+        "y": 337,
+        "width": 188,
+        "height": 24
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 0.917,
+      "lineIndex": 3,
+      "lineText": "@amuninnivini new york, ny",
+      "wordAspect": 7.83
+    },
+    {
+      "caseId": "amuninni-ferracane",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "new",
+      "confidence": 94,
+      "geometry": {
+        "x": 337,
+        "y": 343,
+        "width": 50,
+        "height": 14
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 3,
+      "lineText": "@amuninnivini new york, ny",
+      "wordAspect": 3.57
+    },
+    {
+      "caseId": "amuninni-ferracane",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "york,",
+      "confidence": 95,
+      "geometry": {
+        "x": 395,
+        "y": 337,
+        "width": 60,
+        "height": 26
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 0.846,
+      "lineIndex": 3,
+      "lineText": "@amuninnivini new york, ny",
+      "wordAspect": 2.31
+    },
+    {
+      "caseId": "amuninni-ferracane",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "ny",
+      "confidence": 96,
+      "geometry": {
+        "x": 467,
+        "y": 343,
+        "width": 28,
+        "height": 20
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 0.8,
+      "lineIndex": 3,
+      "lineText": "@amuninnivini new york, ny",
+      "wordAspect": 1.4
+    },
+    {
+      "caseId": "approved-wine-105",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "VANNI",
+      "confidence": 92,
+      "geometry": {
+        "x": 413,
+        "y": 304,
+        "width": 382,
+        "height": 95
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 0,
+      "lineText": "VANNI",
+      "wordAspect": 4.02
+    },
+    {
+      "caseId": "approved-wine-107",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "FATTORIA",
+      "confidence": 89,
+      "geometry": {
+        "x": 503,
+        "y": 413,
+        "width": 484,
+        "height": 86
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 7,
+      "lineText": "FATTORIA",
+      "wordAspect": 5.63
+    },
+    {
+      "caseId": "approved-wine-108",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "w",
+      "confidence": 36,
+      "geometry": {
+        "x": 101,
+        "y": 714,
+        "width": 11,
+        "height": 9
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": null,
+      "lineText": null,
+      "wordAspect": 1.22
+    },
+    {
+      "caseId": "approved-wine-108",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "Oo",
+      "confidence": 26,
+      "geometry": {
+        "x": 121,
+        "y": 712,
+        "width": 12,
+        "height": 11
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": null,
+      "lineText": null,
+      "wordAspect": 1.09
+    },
+    {
+      "caseId": "approved-wine-108",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "=2=2C",
+      "confidence": 16,
+      "geometry": {
+        "x": 101,
+        "y": 723,
+        "width": 32,
+        "height": 10
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": null,
+      "lineText": null,
+      "wordAspect": 3.2
+    },
+    {
+      "caseId": "approved-wine-108",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "a0",
+      "confidence": 65,
+      "geometry": {
+        "x": 101,
+        "y": 733,
+        "width": 32,
+        "height": 10
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 18,
+      "lineText": "a0",
+      "wordAspect": 3.2
+    },
+    {
+      "caseId": "approved-wine-108",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "8",
+      "confidence": 57,
+      "geometry": {
+        "x": 76,
+        "y": 746,
+        "width": 13,
+        "height": 15
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": null,
+      "lineText": null,
+      "wordAspect": 0.87
+    },
+    {
+      "caseId": "approved-wine-108",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "Ao",
+      "confidence": 77,
+      "geometry": {
+        "x": 101,
+        "y": 748,
+        "width": 32,
+        "height": 14
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": null,
+      "lineText": null,
+      "wordAspect": 2.29
+    },
+    {
+      "caseId": "approved-wine-108",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "2",
+      "confidence": 79,
+      "geometry": {
+        "x": 121,
+        "y": 768,
+        "width": 12,
+        "height": 23
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": 20,
+      "lineText": "2",
+      "wordAspect": 0.52
+    },
+    {
+      "caseId": "approved-wine-108",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "of",
+      "confidence": 0,
+      "geometry": {
+        "x": 121,
+        "y": 790,
+        "width": 34,
+        "height": 15
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 0.733,
+      "lineIndex": 21,
+      "lineText": "of",
+      "wordAspect": 2.27
+    },
+    {
+      "caseId": "approved-wine-108",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "VINO",
+      "confidence": 94,
+      "geometry": {
+        "x": 393,
+        "y": 711,
+        "width": 268,
+        "height": 90
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": null,
+      "lineText": null,
+      "wordAspect": 2.98
+    },
+    {
+      "caseId": "approved-wine-108",
+      "occurrence": "derived-from-machine-geometry (control only)",
+      "passId": "pass-0-full-image",
+      "text": "BIANCO",
+      "confidence": 96,
+      "geometry": {
+        "x": 689,
+        "y": 711,
+        "width": 427,
+        "height": 90
+      },
+      "centreInsideRegion": true,
+      "atLeastHalfOfBoxInRegion": true,
+      "fractionOfBoxInRegion": 1,
+      "lineIndex": null,
+      "lineText": null,
+      "wordAspect": 4.74
+    }
+  ]
+}

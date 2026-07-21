@@ -1,0 +1,95 @@
+{
+  "schema": "brand-region-coverage.controls.v1",
+  "selectedBefore": "any Phase-2 measurement was taken",
+  "rule": "all remaining cases carrying the decorative-or-script-brand slice, plus all La Fattoria fixtures, deduplicated, excluding the 13 primary cases",
+  "primaryCaseCount": 13,
+  "decorativeOrScriptBrandAll": [
+    "luigi-giovanni-live",
+    "la-fattoria-rotated",
+    "approved-wine-004",
+    "approved-wine-005",
+    "approved-wine-013",
+    "approved-wine-023",
+    "approved-wine-027",
+    "approved-wine-035",
+    "approved-wine-083",
+    "amuninni-ferracane",
+    "approved-wine-105",
+    "approved-wine-107",
+    "approved-wine-108"
+  ],
+  "laFattoriaFixturesAll": [
+    "la-fattoria-rotated",
+    "approved-wine-004",
+    "approved-wine-005",
+    "approved-wine-107",
+    "approved-wine-108"
+  ],
+  "controls": [
+    {
+      "caseId": "luigi-giovanni-live",
+      "fixtureBrand": "Luigi & Giovanni",
+      "strata": [
+        "decorative-or-script-brand",
+        "brand-punctuation",
+        "multiple-brand-like-phrases",
+        "alcohol-at-side-or-rotated",
+        "front-label"
+      ]
+    },
+    {
+      "caseId": "approved-wine-013",
+      "fixtureBrand": "Afflicted",
+      "strata": [
+        "decorative-or-script-brand",
+        "front-label",
+        "multiple-brand-like-phrases",
+        "alcohol-at-bottom"
+      ]
+    },
+    {
+      "caseId": "amuninni-ferracane",
+      "fixtureBrand": "Amuninni",
+      "strata": [
+        "decorative-or-script-brand",
+        "multiple-brand-like-phrases",
+        "genuinely-ambiguous",
+        "alcohol-at-bottom",
+        "front-label"
+      ]
+    },
+    {
+      "caseId": "approved-wine-105",
+      "fixtureBrand": "Luigi & Giovanni",
+      "strata": [
+        "decorative-or-script-brand",
+        "front-label",
+        "multiple-brand-like-phrases",
+        "alcohol-at-bottom"
+      ]
+    },
+    {
+      "caseId": "approved-wine-107",
+      "fixtureBrand": "La Fattoria",
+      "strata": [
+        "decorative-or-script-brand",
+        "wraparound",
+        "vertical-mandatory-strip",
+        "alcohol-at-side-or-rotated",
+        "front-label"
+      ]
+    },
+    {
+      "caseId": "approved-wine-108",
+      "fixtureBrand": "La Fattoria",
+      "strata": [
+        "decorative-or-script-brand",
+        "wraparound",
+        "vertical-mandatory-strip",
+        "alcohol-at-side-or-rotated",
+        "front-label"
+      ]
+    }
+  ],
+  "controlCount": 6
+}

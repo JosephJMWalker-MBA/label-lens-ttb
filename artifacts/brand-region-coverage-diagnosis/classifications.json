@@ -1,0 +1,675 @@
+{
+  "coverageThreshold": 0.9,
+  "primaryCaseCount": 10,
+  "controlCaseCount": 6,
+  "primaryCategoryCounts": {
+    "REGION_COVERED_NO_TEXT_RECOGNIZED": 3,
+    "ORIENTATION_OR_SEGMENTATION_FAILURE": 5,
+    "REGION_COVERED_SEVERE_GLYPH_MISRECOGNITION": 2
+  },
+  "controlCategoryCounts": {
+    "ORIENTATION_OR_SEGMENTATION_FAILURE": 6
+  },
+  "primaryCategorySum": 10,
+  "coveredByPrimaryFullImagePass": 10,
+  "coveredByAnyRecoveryPass": 0,
+  "recoveryRan": 0,
+  "zeroOcrBoxesOverRegion": 3,
+  "overlappingButNoRecognizableBrandText": 7,
+  "showingOrientationOrSegmentationEvidence": 5,
+  "cases": [
+    {
+      "caseId": "la-fattoria-rotated",
+      "population": "primary",
+      "strata": [
+        "decorative-or-script-brand",
+        "vertical-mandatory-strip",
+        "alcohol-at-side-or-rotated",
+        "front-label"
+      ],
+      "fixtureBrand": "La Fattoria",
+      "machineSelectedBrand": "cCTIO",
+      "machineState": "AMBIGUOUS",
+      "executedPassCount": 1,
+      "occurrenceCount": 1,
+      "primaryCategory": "REGION_COVERED_NO_TEXT_RECOGNIZED",
+      "classifiedOnOccurrence": "sole visible brand occurrence",
+      "signals": {
+        "bestCoverage": 1,
+        "overlappingWords": 0
+      },
+      "overlappingWordSample": [],
+      "secondaryMechanisms": []
+    },
+    {
+      "caseId": "approved-wine-004",
+      "population": "primary",
+      "strata": [
+        "decorative-or-script-brand",
+        "vertical-mandatory-strip",
+        "alcohol-at-side-or-rotated",
+        "front-label"
+      ],
+      "fixtureBrand": "La Fattoria",
+      "machineSelectedBrand": "NORTH COAST CA OF",
+      "machineState": "AMBIGUOUS",
+      "executedPassCount": 1,
+      "occurrenceCount": 1,
+      "primaryCategory": "REGION_COVERED_NO_TEXT_RECOGNIZED",
+      "classifiedOnOccurrence": "sole visible brand occurrence",
+      "signals": {
+        "bestCoverage": 1,
+        "overlappingWords": 0
+      },
+      "overlappingWordSample": [],
+      "secondaryMechanisms": []
+    },
+    {
+      "caseId": "approved-wine-005",
+      "population": "primary",
+      "strata": [
+        "decorative-or-script-brand",
+        "vertical-mandatory-strip",
+        "alcohol-at-side-or-rotated",
+        "front-label"
+      ],
+      "fixtureBrand": "La Fattoria",
+      "machineSelectedBrand": "0 Ao BARBERA",
+      "machineState": "AMBIGUOUS",
+      "executedPassCount": 1,
+      "occurrenceCount": 1,
+      "primaryCategory": "REGION_COVERED_NO_TEXT_RECOGNIZED",
+      "classifiedOnOccurrence": "sole visible brand occurrence",
+      "signals": {
+        "bestCoverage": 1,
+        "overlappingWords": 0
+      },
+      "overlappingWordSample": [],
+      "secondaryMechanisms": []
+    },
+    {
+      "caseId": "approved-wine-023",
+      "population": "primary",
+      "strata": ["decorative-or-script-brand", "front-label", "alcohol-at-bottom"],
+      "fixtureBrand": "Podere don Cataldo",
+      "machineSelectedBrand": "PRIMITIVO",
+      "machineState": "AMBIGUOUS",
+      "executedPassCount": 1,
+      "occurrenceCount": 1,
+      "primaryCategory": "ORIENTATION_OR_SEGMENTATION_FAILURE",
+      "classifiedOnOccurrence": "sole visible brand occurrence",
+      "signals": {
+        "bestCoverage": 1,
+        "overlappingWords": 2,
+        "distinctLinesSpanned": 2,
+        "wordsNotGroupedIntoAnyLine": 0,
+        "coveringPassRotated": false,
+        "truthTokenCount": 3,
+        "splitIntoMoreWordsThanTruth": false,
+        "fusedIntoFewerWordsThanTruth": true
+      },
+      "overlappingWordSample": [
+        {
+          "text": "7",
+          "confidence": 4,
+          "lineIndex": 0
+        },
+        {
+          "text": "ary",
+          "confidence": 37,
+          "lineIndex": 1
+        }
+      ],
+      "secondaryMechanisms": []
+    },
+    {
+      "caseId": "approved-wine-027",
+      "population": "primary",
+      "strata": [
+        "decorative-or-script-brand",
+        "front-label",
+        "brand-punctuation",
+        "alcohol-at-bottom"
+      ],
+      "fixtureBrand": "The Golden Girls",
+      "machineSelectedBrand": "N Gy A001",
+      "machineState": "AMBIGUOUS",
+      "executedPassCount": 1,
+      "occurrenceCount": 1,
+      "primaryCategory": "ORIENTATION_OR_SEGMENTATION_FAILURE",
+      "classifiedOnOccurrence": "sole visible brand occurrence",
+      "signals": {
+        "bestCoverage": 1,
+        "overlappingWords": 8,
+        "distinctLinesSpanned": 5,
+        "wordsNotGroupedIntoAnyLine": 3,
+        "coveringPassRotated": false,
+        "truthTokenCount": 3,
+        "splitIntoMoreWordsThanTruth": true,
+        "fusedIntoFewerWordsThanTruth": false
+      },
+      "overlappingWordSample": [
+        {
+          "text": "HE",
+          "confidence": 63,
+          "lineIndex": 1
+        },
+        {
+          "text": "¥",
+          "confidence": 30,
+          "lineIndex": 2
+        },
+        {
+          "text": "a}",
+          "confidence": 1,
+          "lineIndex": 3
+        },
+        {
+          "text": ">",
+          "confidence": 54,
+          "lineIndex": 4
+        },
+        {
+          "text": "N",
+          "confidence": 75,
+          "lineIndex": null
+        },
+        {
+          "text": "A001",
+          "confidence": 17,
+          "lineIndex": null
+        },
+        {
+          "text": "Gy",
+          "confidence": 51,
+          "lineIndex": null
+        },
+        {
+          "text": "PRA",
+          "confidence": 0,
+          "lineIndex": 7
+        }
+      ],
+      "secondaryMechanisms": []
+    },
+    {
+      "caseId": "approved-wine-031",
+      "population": "primary",
+      "strata": ["back-label", "dense-text", "alcohol-at-bottom"],
+      "fixtureBrand": "embeleso",
+      "machineSelectedBrand": "Contiene Sulfitos Enthalt Sulfite",
+      "machineState": "AMBIGUOUS",
+      "executedPassCount": 1,
+      "occurrenceCount": 1,
+      "primaryCategory": "REGION_COVERED_SEVERE_GLYPH_MISRECOGNITION",
+      "classifiedOnOccurrence": "sole visible brand occurrence",
+      "signals": {
+        "bestCoverage": 1,
+        "overlappingWords": 1,
+        "distinctLinesSpanned": 1,
+        "wordsNotGroupedIntoAnyLine": 0,
+        "coveringPassRotated": false,
+        "truthTokenCount": 1,
+        "splitIntoMoreWordsThanTruth": false,
+        "fusedIntoFewerWordsThanTruth": false
+      },
+      "overlappingWordSample": [
+        {
+          "text": "enrhekeso",
+          "confidence": 10,
+          "lineIndex": 0
+        }
+      ],
+      "secondaryMechanisms": []
+    },
+    {
+      "caseId": "approved-wine-035",
+      "population": "primary",
+      "strata": ["decorative-or-script-brand", "front-label", "alcohol-at-side-or-rotated"],
+      "fixtureBrand": "Hubert Lamy",
+      "machineSelectedBrand": "CHASSAGNE-MONTRACHET",
+      "machineState": "AMBIGUOUS",
+      "executedPassCount": 1,
+      "occurrenceCount": 1,
+      "primaryCategory": "ORIENTATION_OR_SEGMENTATION_FAILURE",
+      "classifiedOnOccurrence": "sole visible brand occurrence",
+      "signals": {
+        "bestCoverage": 1,
+        "overlappingWords": 1,
+        "distinctLinesSpanned": 1,
+        "wordsNotGroupedIntoAnyLine": 0,
+        "coveringPassRotated": false,
+        "truthTokenCount": 2,
+        "splitIntoMoreWordsThanTruth": false,
+        "fusedIntoFewerWordsThanTruth": true
+      },
+      "overlappingWordSample": [
+        {
+          "text": "Hectiont",
+          "confidence": 0,
+          "lineIndex": 1
+        }
+      ],
+      "secondaryMechanisms": []
+    },
+    {
+      "caseId": "approved-wine-085",
+      "population": "primary",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "fixtureBrand": "Mosaikon",
+      "machineSelectedBrand": "Denominazione Origine Controllata",
+      "machineState": "AMBIGUOUS",
+      "executedPassCount": 1,
+      "occurrenceCount": 1,
+      "primaryCategory": "ORIENTATION_OR_SEGMENTATION_FAILURE",
+      "classifiedOnOccurrence": "sole visible brand occurrence",
+      "signals": {
+        "bestCoverage": 1,
+        "overlappingWords": 3,
+        "distinctLinesSpanned": 1,
+        "wordsNotGroupedIntoAnyLine": 0,
+        "coveringPassRotated": false,
+        "truthTokenCount": 1,
+        "splitIntoMoreWordsThanTruth": true,
+        "fusedIntoFewerWordsThanTruth": false
+      },
+      "overlappingWordSample": [
+        {
+          "text": "=",
+          "confidence": 5,
+          "lineIndex": 0
+        },
+        {
+          "text": "SP",
+          "confidence": 25,
+          "lineIndex": 0
+        },
+        {
+          "text": "“i",
+          "confidence": 45,
+          "lineIndex": 0
+        }
+      ],
+      "secondaryMechanisms": []
+    },
+    {
+      "caseId": "approved-wine-091",
+      "population": "primary",
+      "strata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
+      "fixtureBrand": "Rias",
+      "machineSelectedBrand": "D CONTROLLATA E",
+      "machineState": "AMBIGUOUS",
+      "executedPassCount": 1,
+      "occurrenceCount": 1,
+      "primaryCategory": "ORIENTATION_OR_SEGMENTATION_FAILURE",
+      "classifiedOnOccurrence": "sole visible brand occurrence",
+      "signals": {
+        "bestCoverage": 1,
+        "overlappingWords": 4,
+        "distinctLinesSpanned": 1,
+        "wordsNotGroupedIntoAnyLine": 3,
+        "coveringPassRotated": false,
+        "truthTokenCount": 1,
+        "splitIntoMoreWordsThanTruth": true,
+        "fusedIntoFewerWordsThanTruth": false
+      },
+      "overlappingWordSample": [
+        {
+          "text": "/",
+          "confidence": 67,
+          "lineIndex": 0
+        },
+        {
+          "text": "R{",
+          "confidence": 0,
+          "lineIndex": null
+        },
+        {
+          "text": "d",
+          "confidence": 91,
+          "lineIndex": null
+        },
+        {
+          "text": "D>",
+          "confidence": 59,
+          "lineIndex": null
+        }
+      ],
+      "secondaryMechanisms": []
+    },
+    {
+      "caseId": "wine-multi-artifact-04",
+      "population": "primary",
+      "strata": ["multi-panel", "alcohol-at-bottom"],
+      "fixtureBrand": "Dry Cellar",
+      "machineSelectedBrand": "Donovan Visayas",
+      "machineState": "AMBIGUOUS",
+      "executedPassCount": 1,
+      "occurrenceCount": 2,
+      "primaryCategory": "REGION_COVERED_SEVERE_GLYPH_MISRECOGNITION",
+      "classifiedOnOccurrence": "back panel — 'Dry Cellar' script header",
+      "signals": {
+        "bestCoverage": 1,
+        "overlappingWords": 2,
+        "distinctLinesSpanned": 1,
+        "wordsNotGroupedIntoAnyLine": 0,
+        "coveringPassRotated": false,
+        "truthTokenCount": 2,
+        "splitIntoMoreWordsThanTruth": false,
+        "fusedIntoFewerWordsThanTruth": false
+      },
+      "overlappingWordSample": [
+        {
+          "text": "Dy",
+          "confidence": 41,
+          "lineIndex": 16
+        },
+        {
+          "text": "Colla",
+          "confidence": 35,
+          "lineIndex": 16
+        }
+      ],
+      "secondaryMechanisms": [
+        {
+          "occurrence": "front panel — 'Dry Cellar' script mark",
+          "category": "ORIENTATION_OR_SEGMENTATION_FAILURE",
+          "signals": {
+            "bestCoverage": 1,
+            "overlappingWords": 1,
+            "distinctLinesSpanned": 1,
+            "wordsNotGroupedIntoAnyLine": 0,
+            "coveringPassRotated": false,
+            "truthTokenCount": 2,
+            "splitIntoMoreWordsThanTruth": false,
+            "fusedIntoFewerWordsThanTruth": true
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "luigi-giovanni-live",
+      "population": "control",
+      "strata": [
+        "decorative-or-script-brand",
+        "brand-punctuation",
+        "multiple-brand-like-phrases",
+        "alcohol-at-side-or-rotated",
+        "front-label"
+      ],
+      "fixtureBrand": "Luigi & Giovanni",
+      "machineSelectedBrand": "VANNI",
+      "machineState": "AMBIGUOUS",
+      "executedPassCount": 1,
+      "occurrenceCount": 1,
+      "primaryCategory": "ORIENTATION_OR_SEGMENTATION_FAILURE",
+      "classifiedOnOccurrence": "derived-from-machine-geometry (control only)",
+      "signals": {
+        "bestCoverage": 1,
+        "overlappingWords": 1,
+        "distinctLinesSpanned": 1,
+        "wordsNotGroupedIntoAnyLine": 0,
+        "coveringPassRotated": false,
+        "truthTokenCount": 3,
+        "splitIntoMoreWordsThanTruth": false,
+        "fusedIntoFewerWordsThanTruth": true
+      },
+      "overlappingWordSample": [
+        {
+          "text": "VANNI",
+          "confidence": 91,
+          "lineIndex": 1
+        }
+      ],
+      "secondaryMechanisms": []
+    },
+    {
+      "caseId": "approved-wine-013",
+      "population": "control",
+      "strata": [
+        "decorative-or-script-brand",
+        "front-label",
+        "multiple-brand-like-phrases",
+        "alcohol-at-bottom"
+      ],
+      "fixtureBrand": "Afflicted",
+      "machineSelectedBrand": "Play ers Heart",
+      "machineState": "AMBIGUOUS",
+      "executedPassCount": 1,
+      "occurrenceCount": 1,
+      "primaryCategory": "ORIENTATION_OR_SEGMENTATION_FAILURE",
+      "classifiedOnOccurrence": "derived-from-machine-geometry (control only)",
+      "signals": {
+        "bestCoverage": 1,
+        "overlappingWords": 3,
+        "distinctLinesSpanned": 1,
+        "wordsNotGroupedIntoAnyLine": 0,
+        "coveringPassRotated": false,
+        "truthTokenCount": 1,
+        "splitIntoMoreWordsThanTruth": true,
+        "fusedIntoFewerWordsThanTruth": false
+      },
+      "overlappingWordSample": [
+        {
+          "text": "Play",
+          "confidence": 89,
+          "lineIndex": 11
+        },
+        {
+          "text": "er’s",
+          "confidence": 90,
+          "lineIndex": 11
+        },
+        {
+          "text": "Heart",
+          "confidence": 40,
+          "lineIndex": 11
+        }
+      ],
+      "secondaryMechanisms": []
+    },
+    {
+      "caseId": "amuninni-ferracane",
+      "population": "control",
+      "strata": [
+        "decorative-or-script-brand",
+        "multiple-brand-like-phrases",
+        "genuinely-ambiguous",
+        "alcohol-at-bottom",
+        "front-label"
+      ],
+      "fixtureBrand": "Amuninni",
+      "machineSelectedBrand": "INV ENVY",
+      "machineState": "AMBIGUOUS",
+      "executedPassCount": 1,
+      "occurrenceCount": 1,
+      "primaryCategory": "ORIENTATION_OR_SEGMENTATION_FAILURE",
+      "classifiedOnOccurrence": "derived-from-machine-geometry (control only)",
+      "signals": {
+        "bestCoverage": 1,
+        "overlappingWords": 6,
+        "distinctLinesSpanned": 2,
+        "wordsNotGroupedIntoAnyLine": 0,
+        "coveringPassRotated": false,
+        "truthTokenCount": 1,
+        "splitIntoMoreWordsThanTruth": true,
+        "fusedIntoFewerWordsThanTruth": false
+      },
+      "overlappingWordSample": [
+        {
+          "text": "INV",
+          "confidence": 25,
+          "lineIndex": 2
+        },
+        {
+          "text": "ENVY]",
+          "confidence": 0,
+          "lineIndex": 2
+        },
+        {
+          "text": "@amuninnivini",
+          "confidence": 88,
+          "lineIndex": 3
+        },
+        {
+          "text": "new",
+          "confidence": 94,
+          "lineIndex": 3
+        },
+        {
+          "text": "york,",
+          "confidence": 95,
+          "lineIndex": 3
+        },
+        {
+          "text": "ny",
+          "confidence": 96,
+          "lineIndex": 3
+        }
+      ],
+      "secondaryMechanisms": []
+    },
+    {
+      "caseId": "approved-wine-105",
+      "population": "control",
+      "strata": [
+        "decorative-or-script-brand",
+        "front-label",
+        "multiple-brand-like-phrases",
+        "alcohol-at-bottom"
+      ],
+      "fixtureBrand": "Luigi & Giovanni",
+      "machineSelectedBrand": "VANNI",
+      "machineState": "AMBIGUOUS",
+      "executedPassCount": 1,
+      "occurrenceCount": 1,
+      "primaryCategory": "ORIENTATION_OR_SEGMENTATION_FAILURE",
+      "classifiedOnOccurrence": "derived-from-machine-geometry (control only)",
+      "signals": {
+        "bestCoverage": 1,
+        "overlappingWords": 1,
+        "distinctLinesSpanned": 1,
+        "wordsNotGroupedIntoAnyLine": 0,
+        "coveringPassRotated": false,
+        "truthTokenCount": 3,
+        "splitIntoMoreWordsThanTruth": false,
+        "fusedIntoFewerWordsThanTruth": true
+      },
+      "overlappingWordSample": [
+        {
+          "text": "VANNI",
+          "confidence": 92,
+          "lineIndex": 0
+        }
+      ],
+      "secondaryMechanisms": []
+    },
+    {
+      "caseId": "approved-wine-107",
+      "population": "control",
+      "strata": [
+        "decorative-or-script-brand",
+        "wraparound",
+        "vertical-mandatory-strip",
+        "alcohol-at-side-or-rotated",
+        "front-label"
+      ],
+      "fixtureBrand": "La Fattoria",
+      "machineSelectedBrand": "FATTORIA",
+      "machineState": "AMBIGUOUS",
+      "executedPassCount": 1,
+      "occurrenceCount": 1,
+      "primaryCategory": "ORIENTATION_OR_SEGMENTATION_FAILURE",
+      "classifiedOnOccurrence": "derived-from-machine-geometry (control only)",
+      "signals": {
+        "bestCoverage": 1,
+        "overlappingWords": 1,
+        "distinctLinesSpanned": 1,
+        "wordsNotGroupedIntoAnyLine": 0,
+        "coveringPassRotated": false,
+        "truthTokenCount": 2,
+        "splitIntoMoreWordsThanTruth": false,
+        "fusedIntoFewerWordsThanTruth": true
+      },
+      "overlappingWordSample": [
+        {
+          "text": "FATTORIA",
+          "confidence": 89,
+          "lineIndex": 7
+        }
+      ],
+      "secondaryMechanisms": []
+    },
+    {
+      "caseId": "approved-wine-108",
+      "population": "control",
+      "strata": [
+        "decorative-or-script-brand",
+        "wraparound",
+        "vertical-mandatory-strip",
+        "alcohol-at-side-or-rotated",
+        "front-label"
+      ],
+      "fixtureBrand": "La Fattoria",
+      "machineSelectedBrand": "8 Ao VINO BIANCO",
+      "machineState": "AMBIGUOUS",
+      "executedPassCount": 1,
+      "occurrenceCount": 1,
+      "primaryCategory": "ORIENTATION_OR_SEGMENTATION_FAILURE",
+      "classifiedOnOccurrence": "derived-from-machine-geometry (control only)",
+      "signals": {
+        "bestCoverage": 1,
+        "overlappingWords": 10,
+        "distinctLinesSpanned": 3,
+        "wordsNotGroupedIntoAnyLine": 7,
+        "coveringPassRotated": false,
+        "truthTokenCount": 2,
+        "splitIntoMoreWordsThanTruth": true,
+        "fusedIntoFewerWordsThanTruth": false
+      },
+      "overlappingWordSample": [
+        {
+          "text": "w",
+          "confidence": 36,
+          "lineIndex": null
+        },
+        {
+          "text": "Oo",
+          "confidence": 26,
+          "lineIndex": null
+        },
+        {
+          "text": "=2=2C",
+          "confidence": 16,
+          "lineIndex": null
+        },
+        {
+          "text": "a0",
+          "confidence": 65,
+          "lineIndex": 18
+        },
+        {
+          "text": "8",
+          "confidence": 57,
+          "lineIndex": null
+        },
+        {
+          "text": "Ao",
+          "confidence": 77,
+          "lineIndex": null
+        },
+        {
+          "text": "2",
+          "confidence": 79,
+          "lineIndex": 20
+        },
+        {
+          "text": "of",
+          "confidence": 0,
+          "lineIndex": 21
+        }
+      ],
+      "secondaryMechanisms": []
+    }
+  ]
+}
