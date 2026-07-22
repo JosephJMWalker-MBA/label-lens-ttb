@@ -19,6 +19,38 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
+function shortChecksum(value: string): string {
+  return value.slice(0, 12);
+}
+
+function panelCountList(
+  entries: Array<{ role: string; checksumSha256: string; count: number }>,
+): string {
+  return (
+    entries
+      .map((entry) => `${entry.role} ${shortChecksum(entry.checksumSha256)} x${entry.count}`)
+      .join(", ") || "None"
+  );
+}
+
+function replacedPanelList(
+  entries: Array<{
+    role: string;
+    priorChecksumSha256: string;
+    resultingChecksumSha256: string;
+    count: number;
+  }>,
+): string {
+  return (
+    entries
+      .map(
+        (entry) =>
+          `${entry.role} ${shortChecksum(entry.priorChecksumSha256)} -> ${shortChecksum(entry.resultingChecksumSha256)} x${entry.count}`,
+      )
+      .join(", ") || "None"
+  );
+}
+
 export default async function AgentSubmissionPage({ params }: { params: Promise<{ id: string }> }) {
   const user = await requireRolePage(["agent", "admin"]);
   const { id } = await params;
@@ -121,19 +153,19 @@ function Detail({ view, user }: { view: SubmissionDetailView; user: SessionUser 
           <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
             <Field
               label="Panels unchanged"
-              value={view.revisionComparison.panelChanges.unchangedRoles.join(", ") || "None"}
+              value={panelCountList(view.revisionComparison.panelChanges.unchanged)}
             />
             <Field
-              label="Panels changed"
-              value={view.revisionComparison.panelChanges.changedRoles.join(", ") || "None"}
+              label="Panels replaced"
+              value={replacedPanelList(view.revisionComparison.panelChanges.replaced)}
             />
             <Field
               label="Panels added"
-              value={view.revisionComparison.panelChanges.addedRoles.join(", ") || "None"}
+              value={panelCountList(view.revisionComparison.panelChanges.added)}
             />
             <Field
               label="Panels removed"
-              value={view.revisionComparison.panelChanges.removedRoles.join(", ") || "None"}
+              value={panelCountList(view.revisionComparison.panelChanges.removed)}
             />
             <Field
               label="Prior analysis"

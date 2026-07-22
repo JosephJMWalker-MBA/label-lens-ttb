@@ -308,76 +308,83 @@ async function persistVerifiedPanels(args: {
   const panels: VerifiedPanel[] = [];
   const storageKeys: string[] = [];
 
-  for (const panel of args.panels) {
-    const file = args.formData.get(panel.panelId);
-    if (!file || !(file instanceof Blob)) {
-      throw new ResubmitError(
-        400,
-        "PANEL_FILE_MISSING",
-        `Missing uploaded file for panel ID ${panel.panelId}.`,
-      );
-    }
-
-    const fileBytes = Buffer.from(await file.arrayBuffer());
-    if (fileBytes.byteLength > MAX_PANEL_BYTES) {
-      throw new ResubmitError(400, "PANEL_TOO_LARGE", "Panel exceeds the maximum allowed size.");
-    }
-    if (fileBytes.byteLength !== panel.byteSize) {
-      throw new ResubmitError(400, "PANEL_SIZE_MISMATCH", "Panel byte size mismatch.");
-    }
-
-    const detected = detectImage(fileBytes);
-    if (!detected) {
-      throw new ResubmitError(400, "PANEL_UNSUPPORTED_TYPE", "Panel is not a supported image.");
-    }
-    if (detected.mediaType !== panel.mediaType) {
-      throw new ResubmitError(400, "PANEL_MEDIA_TYPE_MISMATCH", "Panel media type mismatch.");
-    }
-    if (detected.width !== undefined && detected.height !== undefined) {
-      if (detected.width > MAX_PANEL_DIMENSION || detected.height > MAX_PANEL_DIMENSION) {
+  try {
+    for (const panel of args.panels) {
+      const file = args.formData.get(panel.panelId);
+      if (!file || !(file instanceof Blob)) {
         throw new ResubmitError(
           400,
-          "PANEL_DIMENSION_TOO_LARGE",
-          "Panel dimensions are too large.",
+          "PANEL_FILE_MISSING",
+          `Missing uploaded file for panel ID ${panel.panelId}.`,
         );
       }
-      if (detected.width !== panel.width || detected.height !== panel.height) {
-        throw new ResubmitError(400, "PANEL_DIMENSION_MISMATCH", "Panel dimensions mismatch.");
+
+      const fileBytes = Buffer.from(await file.arrayBuffer());
+      if (fileBytes.byteLength > MAX_PANEL_BYTES) {
+        throw new ResubmitError(400, "PANEL_TOO_LARGE", "Panel exceeds the maximum allowed size.");
       }
-    }
+      if (fileBytes.byteLength !== panel.byteSize) {
+        throw new ResubmitError(400, "PANEL_SIZE_MISMATCH", "Panel byte size mismatch.");
+      }
 
-    const checksum = createHash("sha256").update(fileBytes).digest("hex");
-    if (checksum !== panel.checksumSha256) {
-      throw new ResubmitError(400, "PANEL_CHECKSUM_MISMATCH", "Panel checksum mismatch.");
-    }
+      const detected = detectImage(fileBytes);
+      if (!detected) {
+        throw new ResubmitError(400, "PANEL_UNSUPPORTED_TYPE", "Panel is not a supported image.");
+      }
+      if (detected.mediaType !== panel.mediaType) {
+        throw new ResubmitError(400, "PANEL_MEDIA_TYPE_MISMATCH", "Panel media type mismatch.");
+      }
+      if (detected.width !== undefined && detected.height !== undefined) {
+        if (detected.width > MAX_PANEL_DIMENSION || detected.height > MAX_PANEL_DIMENSION) {
+          throw new ResubmitError(
+            400,
+            "PANEL_DIMENSION_TOO_LARGE",
+            "Panel dimensions are too large.",
+          );
+        }
+        if (detected.width !== panel.width || detected.height !== panel.height) {
+          throw new ResubmitError(400, "PANEL_DIMENSION_MISMATCH", "Panel dimensions mismatch.");
+        }
+      }
 
-    const storageKey = resubmissionPanelStorageKey(
-      args.packageId,
-      args.childRevisionId,
-      panel.panelId,
-      checksum,
-    );
-    const stored = persistPanelAsset(storageKey, fileBytes);
-    if (!stored.ok) {
-      throw new ResubmitError(
-        500,
-        "PANEL_STORAGE_UNAVAILABLE",
-        "Durable panel storage is unavailable.",
+      const checksum = createHash("sha256").update(fileBytes).digest("hex");
+      if (checksum !== panel.checksumSha256) {
+        throw new ResubmitError(400, "PANEL_CHECKSUM_MISMATCH", "Panel checksum mismatch.");
+      }
+
+      const storageKey = resubmissionPanelStorageKey(
+        args.packageId,
+        args.childRevisionId,
+        panel.panelId,
+        checksum,
       );
+      const stored = persistPanelAsset(storageKey, fileBytes);
+      if (!stored.ok) {
+        throw new ResubmitError(
+          500,
+          "PANEL_STORAGE_UNAVAILABLE",
+          "Durable panel storage is unavailable.",
+        );
+      }
+      storageKeys.push(storageKey);
+      panels.push({
+        panelId: panel.panelId,
+        role: panel.role,
+        displayName: panel.displayName,
+        mediaType: panel.mediaType,
+        byteSize: panel.byteSize,
+        checksumSha256: checksum,
+        width: panel.width,
+        height: panel.height,
+        rotation: panel.rotation,
+        storageKey,
+      });
     }
-    storageKeys.push(storageKey);
-    panels.push({
-      panelId: panel.panelId,
-      role: panel.role,
-      displayName: panel.displayName,
-      mediaType: panel.mediaType,
-      byteSize: panel.byteSize,
-      checksumSha256: checksum,
-      width: panel.width,
-      height: panel.height,
-      rotation: panel.rotation,
-      storageKey,
-    });
+  } catch (error) {
+    for (const storageKey of storageKeys) {
+      deletePanelAsset(storageKey);
+    }
+    throw error;
   }
 
   return { panels, storageKeys };

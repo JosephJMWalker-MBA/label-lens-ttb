@@ -9,6 +9,12 @@ import { authClient } from "@/lib/auth-client";
 import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
 
 import { AGENT_REVIEW_RECEIVER, AGENT_REVIEW_TRANSMISSION } from "./agent-submission-contract";
+import {
+  normalizeSubmissionReceipt,
+  parseSubmissionErrorMessage,
+  safeSubmissionErrorMessage,
+  type AgentReviewSubmissionReceipt,
+} from "./agent-review-submission-response";
 import { loadPackageDraftLocally, type StoredPackageDraft } from "./package-draft-store";
 import {
   buildSellerPackageExport,
@@ -17,15 +23,6 @@ import {
 } from "./package-model";
 
 type SubmissionPhase = "idle" | "submitting" | "submitted" | "error";
-
-interface SubmissionReceipt {
-  submissionId: string;
-  revisionId: string;
-  revisionNumber: number;
-  status: string;
-  receivingAgent: string;
-  recordedAt: string;
-}
 
 interface SubmissionStatusResponse {
   submissionId: string;
@@ -82,7 +79,7 @@ export function AgentReviewSubmissionDock() {
   const [submitter, setSubmitter] = useState("");
   const [phase, setPhase] = useState<SubmissionPhase>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [receipt, setReceipt] = useState<SubmissionReceipt | null>(null);
+  const [receipt, setReceipt] = useState<AgentReviewSubmissionReceipt | null>(null);
   const [knownServerStatus, setKnownServerStatus] = useState<string | null>(null);
   const attemptRef = useRef<SubmissionAttempt | null>(null);
 
@@ -162,7 +159,6 @@ export function AgentReviewSubmissionDock() {
           revisionId: latestRevision?.id ?? "recorded",
           revisionNumber: latestRevision?.revisionNumber ?? 1,
           status: value.currentStatus,
-          receivingAgent: AGENT_REVIEW_RECEIVER,
           recordedAt: latestRevision?.submittedAt ?? value.createdAt,
         });
         setPhase("submitted");
@@ -258,21 +254,19 @@ export function AgentReviewSubmissionDock() {
           body,
         },
       );
-      const result = (await response.json().catch(() => ({}))) as
-        SubmissionReceipt | { error?: string };
+      const result = await response.json().catch(() => ({}));
 
       if (!response.ok) {
         if (response.status === 401) {
           throw new Error("Sign in with a seller account before submitting this package.");
         }
-        throw new Error(
-          "error" in result && result.error
-            ? result.error
-            : "The package could not be placed in the agent review queue.",
-        );
+        throw new Error(parseSubmissionErrorMessage(result));
       }
 
-      const submitted = result as SubmissionReceipt;
+      const submitted = normalizeSubmissionReceipt(result);
+      if (!submitted) {
+        throw new Error(safeSubmissionErrorMessage());
+      }
       setReceipt(submitted);
       setKnownServerStatus(submitted.status);
       setPhase("submitted");

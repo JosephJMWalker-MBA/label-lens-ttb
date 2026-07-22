@@ -2,6 +2,9 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
+import type { StoredPackageDraft } from "./package-draft-store";
+
 const store = vi.hoisted(() => ({
   load: vi.fn(),
   save: vi.fn(),
@@ -105,7 +108,7 @@ function seedResponse() {
 
 function existingStoredDraft(
   context = { ...revisionContext, respondedToDecisionId: "other-decision" },
-) {
+): StoredPackageDraft {
   return {
     draft: {
       schemaVersion: "seller-package-draft.v1",
@@ -120,7 +123,7 @@ function existingStoredDraft(
     },
     panelFiles: [],
     revisionContext: context,
-  };
+  } as StoredPackageDraft;
 }
 
 beforeEach(() => {
@@ -174,7 +177,12 @@ describe("RevisionSeedHydrator", () => {
     expect(saved.draft.packageId).toBe("pkg-seed");
     expect(saved.draft.analysisRuns).toEqual([]);
     expect(saved.draft.sellerChangeHistory).toEqual([
-      expect.objectContaining({ sequence: 1, action: "revision_response_started" }),
+      expect.objectContaining({
+        sequence: 1,
+        action: "revision_response_started",
+        detail:
+          "Revision response draft created. Prior machine analysis and provenance were not copied; run analysis again before resubmitting.",
+      }),
     ]);
 
     const panelIds = saved.draft.panels.map((panel: { panelId: string }) => panel.panelId);
@@ -192,6 +200,14 @@ describe("RevisionSeedHydrator", () => {
     expect(JSON.stringify(saved.draft)).not.toMatch(
       /old-front|old-back|old-brand-region|old-alcohol-region|machineResultId|appendToken|analysisRunId/,
     );
+    const serializedDraft = canonicalStringify(saved.draft);
+    expect(serializedDraft).not.toContain(revisionContext.baseRevisionId);
+    expect(serializedDraft).not.toContain(revisionContext.respondedToDecisionId);
+    expect(serializedDraft).not.toContain(seedResponse().changeRequest.rationale);
+    expect(
+      saved.draft.sellerChangeHistory.map((entry: { detail: string }) => entry.detail).join(" "),
+    ).not.toMatch(/revision v1|revision 1/i);
+    expect(saved.revisionContext).toEqual(revisionContext);
   });
 
   it("does not overwrite an unrelated local draft when the seller declines confirmation", async () => {
@@ -209,13 +225,63 @@ describe("RevisionSeedHydrator", () => {
     expect(screen.queryByText(/revision response draft is ready/i)).toBeNull();
   });
 
-  it("does not prompt when the existing draft already has the same revision context", async () => {
-    store.load.mockResolvedValue(existingStoredDraft(revisionContext));
+  it("resumes an existing same-context draft without overwriting seller edits", async () => {
+    const existing = existingStoredDraft(revisionContext);
+    existing.draft.panels = [
+      {
+        panelId: "edited-front-panel",
+        order: 0,
+        role: "front" as const,
+        displayName: "edited-front.png",
+        mediaType: "image/png",
+        byteSize: 11,
+        checksumSha256: "c".repeat(64),
+        width: 100,
+        height: 100,
+        rotation: 0 as const,
+      },
+    ];
+    existing.panelFiles = [
+      {
+        panelId: "edited-front-panel",
+        file: new File(["edited-file"], "edited-front.png", { type: "image/png" }),
+      },
+    ];
+    existing.draft.categories = [
+      {
+        categoryId: "brandName",
+        decision: "provided" as const,
+        expectedValue: "Seller Edited Brand",
+        regions: [],
+      },
+    ];
+    existing.draft.analysisRuns = [
+      {
+        analysisRunId: "seller-edited-analysis",
+        sequence: 1,
+        sellerChangeSequence: 1,
+        recordedAt: "2026-07-22T00:00:00.000Z",
+        panelRuns: [],
+        categories: [],
+        readiness: "ready_for_agent_submission" as const,
+      },
+    ];
+    store.load.mockResolvedValue(existing);
     render(<RevisionSeedHydrator submissionId="pkg-seed" />);
 
     fireEvent.click(screen.getByRole("button", { name: /prepare local revision draft/i }));
 
-    await waitFor(() => expect(store.save).toHaveBeenCalledTimes(1));
+    expect(
+      await screen.findByText(
+        "An existing revision response draft is already stored in this browser. Resume it in Review.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /open review workspace/i })).toBeInTheDocument();
+    expect(store.save).not.toHaveBeenCalled();
     expect(confirm).not.toHaveBeenCalled();
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(existing.draft.categories[0].expectedValue).toBe("Seller Edited Brand");
+    expect(existing.draft.panels[0].panelId).toBe("edited-front-panel");
+    expect(existing.draft.analysisRuns[0].analysisRunId).toBe("seller-edited-analysis");
   });
 });

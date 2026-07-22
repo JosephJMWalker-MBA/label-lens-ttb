@@ -308,6 +308,37 @@ for (const dialect of DIALECTS) {
       return resign(payload);
     }
 
+    function withExtraPanel(
+      payload: ReturnType<typeof createValidAgentReviewPayload>,
+      args: { panelId: string; role?: "back" | "side" | "other" },
+    ) {
+      const mutablePayload = payload as any;
+      const basePanel = mutablePayload.package.panels[0];
+      const role = args.role ?? "back";
+      mutablePayload.package.panels.push({
+        ...basePanel,
+        panelId: args.panelId,
+        order: mutablePayload.package.panels.length,
+        role,
+        displayName: `${args.panelId}.png`,
+      });
+      mutablePayload.package.panelDecisions = {
+        back:
+          role === "back" ? "upload" : (mutablePayload.package.panelDecisions?.back ?? "absent"),
+        additional:
+          role === "side" || role === "other"
+            ? "add"
+            : (mutablePayload.package.panelDecisions?.additional ?? "none"),
+      };
+      return resign(mutablePayload);
+    }
+
+    function corruptedPanelBytes(): Buffer {
+      const copy = Buffer.from(PANEL_BYTES);
+      copy[40] = copy[40] ^ 0xff;
+      return copy;
+    }
+
     function resubmitRequest(args: {
       submissionId: string;
       cookie: string;
@@ -315,6 +346,7 @@ for (const dialect of DIALECTS) {
       payload: unknown;
       revisionContext: unknown;
       panelId?: string;
+      files?: Record<string, Blob>;
     }) {
       const panelId = args.panelId ?? "revision-panel-front";
       return buildMultipartRequest({
@@ -323,7 +355,7 @@ for (const dialect of DIALECTS) {
         cookie: args.cookie,
         idempotencyKey: args.idempotencyKey,
         revisionContext: args.revisionContext,
-        files: { [panelId]: panelBlob() },
+        files: args.files ?? { [panelId]: panelBlob() },
       });
     }
 
@@ -335,6 +367,10 @@ for (const dialect of DIALECTS) {
         count += entry.isDirectory() ? storageFileCount(full) : 1;
       }
       return count;
+    }
+
+    function revisionStorageFileCount(submissionId: string): number {
+      return storageFileCount(join(TEST_STORAGE_DIR, "submissions", submissionId, "revisions"));
     }
 
     async function readRevisionRows(submissionId: string) {
@@ -460,10 +496,10 @@ for (const dialect of DIALECTS) {
         parentRevision: { id: parentRevision.id, revisionNumber: 1, integrityVerified: true },
         childRevision: { id: receipt.revisionId, revisionNumber: 2, integrityVerified: true },
         panelChanges: {
-          addedRoles: [],
-          removedRoles: [],
-          changedRoles: [],
-          unchangedRoles: ["front"],
+          added: [],
+          removed: [],
+          replaced: [],
+          unchanged: [{ role: "front", checksumSha256: PANEL_SHA, count: 1 }],
         },
         machineAnalysis: {
           priorAnalysisRunId: "parent-run",
@@ -485,6 +521,103 @@ for (const dialect of DIALECTS) {
       expect(JSON.stringify(detail)).not.toMatch(
         /canonicalJson|canonical_json|integritySignature|storageKey|storage_key|appendToken|\.local\/test-storage/i,
       );
+    });
+
+    it("compares repeated panel roles by checksum counts", async () => {
+      const { seller, agent, submissionId, parentRevision, revisionContext } =
+        await seedRequestedChanges();
+      const response = await resubmitPOST(
+        resubmitRequest({
+          submissionId,
+          cookie: seller.cookie,
+          idempotencyKey: "k-repeated-role-comparison",
+          payload: childPayload(submissionId),
+          revisionContext,
+        }),
+        params(submissionId),
+      );
+      expect(response.status).toBe(200);
+      const receipt = (await response.json()) as { revisionId: string };
+      const sameSideChecksum = "1".repeat(64);
+      const replacementChecksum = "2".repeat(64);
+
+      await db.insert(schema.submittedPanels).values([
+        {
+          id: "parent-side-a",
+          revisionId: parentRevision.id,
+          role: "side",
+          displayName: "parent-side-a.png",
+          mediaType: "image/png",
+          byteSize: PANEL_BYTES.length,
+          checksumSha256: sameSideChecksum,
+          width: 1,
+          height: 1,
+          rotation: 0,
+          storageKey: "test/parent-side-a",
+        },
+        {
+          id: "parent-side-b",
+          revisionId: parentRevision.id,
+          role: "side",
+          displayName: "parent-side-b.png",
+          mediaType: "image/png",
+          byteSize: PANEL_BYTES.length,
+          checksumSha256: sameSideChecksum,
+          width: 1,
+          height: 1,
+          rotation: 0,
+          storageKey: "test/parent-side-b",
+        },
+        {
+          id: "child-side-a",
+          revisionId: receipt.revisionId,
+          role: "side",
+          displayName: "child-side-a.png",
+          mediaType: "image/png",
+          byteSize: PANEL_BYTES.length,
+          checksumSha256: sameSideChecksum,
+          width: 1,
+          height: 1,
+          rotation: 0,
+          storageKey: "test/child-side-a",
+        },
+        {
+          id: "child-side-b",
+          revisionId: receipt.revisionId,
+          role: "side",
+          displayName: "child-side-b.png",
+          mediaType: "image/png",
+          byteSize: PANEL_BYTES.length,
+          checksumSha256: replacementChecksum,
+          width: 1,
+          height: 1,
+          rotation: 0,
+          storageKey: "test/child-side-b",
+        },
+      ]);
+
+      const agentDetail = await detailGET(
+        getReq(`/api/agent/submissions/${submissionId}`, agent.cookie),
+        params(submissionId),
+      );
+      expect(agentDetail.status).toBe(200);
+      const detail = await agentDetail.json();
+      expect(detail.revisionComparison.panelChanges).toMatchObject({
+        added: [],
+        removed: [],
+        unchanged: expect.arrayContaining([
+          { role: "front", checksumSha256: PANEL_SHA, count: 1 },
+          { role: "side", checksumSha256: sameSideChecksum, count: 1 },
+        ]),
+        replaced: [
+          {
+            role: "side",
+            priorChecksumSha256: sameSideChecksum,
+            resultingChecksumSha256: replacementChecksum,
+            count: 1,
+          },
+        ],
+      });
     });
 
     it("replays sequential and simultaneous same-key resubmissions as the exact winning response", async () => {
@@ -662,17 +795,111 @@ for (const dialect of DIALECTS) {
       expect(storageFileCount()).toBe(2);
     });
 
+    it("cleans the first persisted panel when a later panel is missing", async () => {
+      const { seller, submissionId, revisionContext, receipt } = await seedRequestedChanges();
+      const payload = withExtraPanel(childPayload(submissionId), {
+        panelId: "revision-panel-back",
+        role: "back",
+      });
+
+      const response = await resubmitPOST(
+        resubmitRequest({
+          submissionId,
+          cookie: seller.cookie,
+          idempotencyKey: "k-clean-missing-panel",
+          payload,
+          revisionContext,
+          files: { "revision-panel-front": panelBlob() },
+        }),
+        params(submissionId),
+      );
+      expect(response.status).toBe(400);
+      expect(await response.json()).toMatchObject({ error: { code: "PANEL_FILE_MISSING" } });
+      expect(revisionStorageFileCount(submissionId)).toBe(0);
+
+      const originalPanel = await db.query.submittedPanels.findFirst({
+        where: (panel: any, { eq: e }: any) => e(panel.revisionId, receipt.revisionId),
+      });
+      expect(readPanelAsset(originalPanel.storageKey)).toEqual({ ok: true, bytes: PANEL_BYTES });
+      expect(storageFileCount()).toBe(1);
+    });
+
+    it("cleans the first persisted panel when a later panel checksum is invalid", async () => {
+      const { seller, submissionId, revisionContext } = await seedRequestedChanges();
+      const payload = withExtraPanel(childPayload(submissionId), {
+        panelId: "revision-panel-back",
+        role: "back",
+      });
+
+      const response = await resubmitPOST(
+        resubmitRequest({
+          submissionId,
+          cookie: seller.cookie,
+          idempotencyKey: "k-clean-bad-checksum",
+          payload,
+          revisionContext,
+          files: {
+            "revision-panel-front": panelBlob(),
+            "revision-panel-back": panelBlob(corruptedPanelBytes()),
+          },
+        }),
+        params(submissionId),
+      );
+      expect(response.status).toBe(400);
+      expect(await response.json()).toMatchObject({ error: { code: "PANEL_CHECKSUM_MISMATCH" } });
+      expect(revisionStorageFileCount(submissionId)).toBe(0);
+      expect(storageFileCount()).toBe(1);
+    });
+
+    it("cleans the first persisted panel when a later panel storage write fails", async () => {
+      const { seller, submissionId, revisionContext } = await seedRequestedChanges();
+      const longPanelId = "x".repeat(255);
+      const payload = withExtraPanel(childPayload(submissionId), {
+        panelId: longPanelId,
+        role: "back",
+      });
+
+      const response = await resubmitPOST(
+        resubmitRequest({
+          submissionId,
+          cookie: seller.cookie,
+          idempotencyKey: "k-clean-storage-failure",
+          payload,
+          revisionContext,
+          files: {
+            "revision-panel-front": panelBlob(),
+            [longPanelId]: panelBlob(),
+          },
+        }),
+        params(submissionId),
+      );
+      expect(response.status).toBe(500);
+      expect(await response.json()).toMatchObject({
+        error: { code: "PANEL_STORAGE_UNAVAILABLE" },
+      });
+      expect(revisionStorageFileCount(submissionId)).toBe(0);
+      expect(storageFileCount()).toBe(1);
+    });
+
     it("rolls back partial child rows when the final projection update fails", async () => {
       const { seller, submissionId, revisionContext } = await seedRequestedChanges();
       await createProjectionFailureTrigger();
+      const payload = withExtraPanel(childPayload(submissionId), {
+        panelId: "revision-panel-back",
+        role: "back",
+      });
 
       const response = await resubmitPOST(
         resubmitRequest({
           submissionId,
           cookie: seller.cookie,
           idempotencyKey: "k-rollback-projection",
-          payload: childPayload(submissionId),
+          payload,
           revisionContext,
+          files: {
+            "revision-panel-front": panelBlob(),
+            "revision-panel-back": panelBlob(),
+          },
         }),
         params(submissionId),
       );
@@ -687,6 +914,12 @@ for (const dialect of DIALECTS) {
           .select()
           .from(schema.submittedPanels)
           .where(eq(schema.submittedPanels.id, "revision-panel-front")),
+      ).toHaveLength(0);
+      expect(
+        await db
+          .select()
+          .from(schema.submittedPanels)
+          .where(eq(schema.submittedPanels.id, "revision-panel-back")),
       ).toHaveLength(0);
       expect(await db.select().from(schema.sellerEvidenceSnapshots)).toHaveLength(2);
       expect(
@@ -721,6 +954,7 @@ for (const dialect of DIALECTS) {
         "in_agent_review",
         "waiting_for_agent_review",
       ]);
+      expect(revisionStorageFileCount(submissionId)).toBe(0);
       expect(storageFileCount()).toBe(1);
     });
 

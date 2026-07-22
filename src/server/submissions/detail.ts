@@ -48,6 +48,19 @@ export interface MachineAnalysisView {
   categories: unknown[];
 }
 
+export interface PanelChecksumCountView {
+  role: string;
+  checksumSha256: string;
+  count: number;
+}
+
+export interface ReplacedPanelChecksumCountView {
+  role: string;
+  priorChecksumSha256: string;
+  resultingChecksumSha256: string;
+  count: number;
+}
+
 export interface SubmissionDetailView {
   submission: { id: string; status: string; isDemo: boolean; version: number };
   revision: {
@@ -103,10 +116,10 @@ export interface SubmissionDetailView {
       recordedAt: string;
     };
     panelChanges: {
-      unchangedRoles: string[];
-      changedRoles: string[];
-      addedRoles: string[];
-      removedRoles: string[];
+      unchanged: PanelChecksumCountView[];
+      replaced: ReplacedPanelChecksumCountView[];
+      added: PanelChecksumCountView[];
+      removed: PanelChecksumCountView[];
     };
     sellerEvidenceChanges: Array<{
       categoryId: string;
@@ -558,27 +571,92 @@ function comparePanels(
   parentPanels: Array<{ role: string; checksumSha256: string }>,
   childPanels: Array<{ role: string; checksumSha256: string }>,
 ) {
-  const parentByRole = new Map(parentPanels.map((panel) => [panel.role, panel.checksumSha256]));
-  const childByRole = new Map(childPanels.map((panel) => [panel.role, panel.checksumSha256]));
-  const roles = new Set([...parentByRole.keys(), ...childByRole.keys()]);
-  const unchangedRoles: string[] = [];
-  const changedRoles: string[] = [];
-  const addedRoles: string[] = [];
-  const removedRoles: string[] = [];
+  const parentCounts = panelCounts(parentPanels);
+  const childCounts = panelCounts(childPanels);
+  const roles = new Set([...parentCounts.keys(), ...childCounts.keys()]);
+  const unchanged: PanelChecksumCountView[] = [];
+  const replaced: ReplacedPanelChecksumCountView[] = [];
+  const added: PanelChecksumCountView[] = [];
+  const removed: PanelChecksumCountView[] = [];
+
   for (const role of roles) {
-    const parent = parentByRole.get(role);
-    const child = childByRole.get(role);
-    if (parent && child && parent === child) unchangedRoles.push(role);
-    else if (parent && child) changedRoles.push(role);
-    else if (child) addedRoles.push(role);
-    else removedRoles.push(role);
+    const parentByChecksum = parentCounts.get(role) ?? new Map<string, number>();
+    const childByChecksum = childCounts.get(role) ?? new Map<string, number>();
+    for (const checksum of [
+      ...new Set([...parentByChecksum.keys(), ...childByChecksum.keys()]),
+    ].sort()) {
+      const overlap = Math.min(
+        parentByChecksum.get(checksum) ?? 0,
+        childByChecksum.get(checksum) ?? 0,
+      );
+      if (overlap > 0) {
+        unchanged.push({ role, checksumSha256: checksum, count: overlap });
+        decrementPanelCount(parentByChecksum, checksum, overlap);
+        decrementPanelCount(childByChecksum, checksum, overlap);
+      }
+    }
+
+    const parentRemainder = checksumRemainder(parentByChecksum);
+    const childRemainder = checksumRemainder(childByChecksum);
+    while (parentRemainder.length > 0 && childRemainder.length > 0) {
+      const parent = parentRemainder[0];
+      const child = childRemainder[0];
+      const count = Math.min(parent.count, child.count);
+      replaced.push({
+        role,
+        priorChecksumSha256: parent.checksumSha256,
+        resultingChecksumSha256: child.checksumSha256,
+        count,
+      });
+      parent.count -= count;
+      child.count -= count;
+      if (parent.count === 0) parentRemainder.shift();
+      if (child.count === 0) childRemainder.shift();
+    }
+    removed.push(...parentRemainder.map((entry) => ({ role, ...entry })));
+    added.push(...childRemainder.map((entry) => ({ role, ...entry })));
   }
+
   return {
-    unchangedRoles: unchangedRoles.sort(),
-    changedRoles: changedRoles.sort(),
-    addedRoles: addedRoles.sort(),
-    removedRoles: removedRoles.sort(),
+    unchanged: sortPanelCounts(unchanged),
+    replaced: replaced.sort(
+      (a, b) =>
+        a.role.localeCompare(b.role) ||
+        a.priorChecksumSha256.localeCompare(b.priorChecksumSha256) ||
+        a.resultingChecksumSha256.localeCompare(b.resultingChecksumSha256),
+    ),
+    added: sortPanelCounts(added),
+    removed: sortPanelCounts(removed),
   };
+}
+
+function panelCounts(panels: Array<{ role: string; checksumSha256: string }>) {
+  const counts = new Map<string, Map<string, number>>();
+  for (const panel of panels) {
+    const roleCounts = counts.get(panel.role) ?? new Map<string, number>();
+    roleCounts.set(panel.checksumSha256, (roleCounts.get(panel.checksumSha256) ?? 0) + 1);
+    counts.set(panel.role, roleCounts);
+  }
+  return counts;
+}
+
+function decrementPanelCount(counts: Map<string, number>, checksum: string, count: number) {
+  const next = (counts.get(checksum) ?? 0) - count;
+  if (next > 0) counts.set(checksum, next);
+  else counts.delete(checksum);
+}
+
+function checksumRemainder(counts: Map<string, number>) {
+  return [...counts.entries()]
+    .map(([checksumSha256, count]) => ({ checksumSha256, count }))
+    .filter((entry) => entry.count > 0)
+    .sort((a, b) => a.checksumSha256.localeCompare(b.checksumSha256));
+}
+
+function sortPanelCounts<T extends PanelChecksumCountView>(entries: T[]): T[] {
+  return entries.sort(
+    (a, b) => a.role.localeCompare(b.role) || a.checksumSha256.localeCompare(b.checksumSha256),
+  );
 }
 
 function compareEvidence(

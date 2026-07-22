@@ -151,7 +151,8 @@ async function hydrateFromSeed(seed: RevisionSeedResponse): Promise<StoredPackag
         sequence: 1,
         recordedAt,
         action: "revision_response_started",
-        detail: `Revision response draft started from revision v${seed.baseRevision.revisionNumber}. Prior analysis and machine provenance were not copied; run analysis again before resubmitting.`,
+        detail:
+          "Revision response draft created. Prior machine analysis and provenance were not copied; run analysis again before resubmitting.",
       },
     ],
     analysisRuns: [],
@@ -184,6 +185,13 @@ export function RevisionSeedHydrator({ submissionId }: { submissionId: string })
       }
       const seed = (await seedResponse.json()) as RevisionSeedResponse;
       const existing = await loadPackageDraftLocally();
+      if (existing && sameContext(existing.revisionContext, seed.revisionContext)) {
+        setState("ready");
+        setMessage(
+          "An existing revision response draft is already stored in this browser. Resume it in Review.",
+        );
+        return;
+      }
       if (existing && !sameContext(existing.revisionContext, seed.revisionContext)) {
         const confirmed = window.confirm(
           "Replace your current browser-local draft with this requested-change response draft?",
