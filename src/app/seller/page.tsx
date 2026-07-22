@@ -46,9 +46,25 @@ export default async function SellerPage() {
                   <div>
                     <p className="font-mono text-sm">{submission.id}</p>
                     <p className="text-xs text-muted-foreground">
-                      Revision v{submission.version}
+                      {submission.latestRevisionNumber
+                        ? `Package revision v${submission.latestRevisionNumber}`
+                        : "Package revision not recorded"}
                       {submission.isDemo ? " · Demo submission" : ""}
                     </p>
+                    {submission.changesRequestedFeedback ? (
+                      <div className="mt-2 max-w-2xl rounded border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-sm">
+                        <p className="text-xs font-medium uppercase tracking-wide text-amber-700 dark:text-amber-300">
+                          Requested changes
+                        </p>
+                        <p className="mt-1 text-sm">
+                          {submission.changesRequestedFeedback.rationale}
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          Revision v{submission.changesRequestedFeedback.revisionNumber} ·{" "}
+                          {submission.changesRequestedFeedback.recordedAt.toLocaleString()}
+                        </p>
+                      </div>
+                    ) : null}
                   </div>
                   <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium">
                     {statusLabel(submission.currentStatus)}

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import { db, schema } from "@/db/client";
 
 export const runtime = "nodejs";
@@ -29,7 +29,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       integritySignature: schema.submissionRevisions.integritySignature,
     })
     .from(schema.submissionRevisions)
-    .where(eq(schema.submissionRevisions.submissionId, submissionId));
+    .where(eq(schema.submissionRevisions.submissionId, submissionId))
+    .orderBy(asc(schema.submissionRevisions.revisionNumber));
 
   // 5. Verify revision HMAC signature to guarantee database integrity
   for (const rev of revisionsFromDb) {
@@ -37,15 +38,19 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     if (!isValid) {
       return NextResponse.json(
         {
-          error:
-            "Internal Server Error: Database integrity check failed. Submission data has been tampered with or corrupted.",
+          error: {
+            code: "REVISION_INTEGRITY_FAILED",
+            message: "Submission revision integrity failed. Reload or contact support.",
+          },
         },
-        { status: 500 },
+        { status: 409 },
       );
     }
   }
 
-  // Map revisions to exclude canonicalJson from client response
+  // Map revisions to exclude canonicalJson and integrity signatures from the
+  // seller-facing response. Signatures remain server-side verification material,
+  // not seller workflow data.
   const revisions = revisionsFromDb.map((rev: (typeof revisionsFromDb)[number]) => ({
     id: rev.id,
     revisionNumber: rev.revisionNumber,
@@ -53,27 +58,59 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     profileVersion: rev.profileVersion,
     submittedBy: rev.submittedBy,
     submittedAt: rev.submittedAt,
-    integritySignature: rev.integritySignature,
   }));
 
   // 6. Fetch Submission Status Events
   const events = await db
     .select({
-      id: schema.submissionStatusEvents.id,
       status: schema.submissionStatusEvents.status,
-      actorRole: schema.submissionStatusEvents.actorRole,
-      reasonComment: schema.submissionStatusEvents.reasonComment,
       recordedAt: schema.submissionStatusEvents.recordedAt,
     })
     .from(schema.submissionStatusEvents)
-    .where(eq(schema.submissionStatusEvents.submissionId, submissionId));
+    .where(eq(schema.submissionStatusEvents.submissionId, submissionId))
+    .orderBy(asc(schema.submissionStatusEvents.recordedAt));
+
+  const changeRequestRows =
+    submission.currentStatus === "changes_requested"
+      ? ((await db
+          .select({
+            revisionNumber: schema.agentDecisions.revisionNumber,
+            rationale: schema.agentDecisions.rationale,
+            recordedAt: schema.agentDecisions.recordedAt,
+          })
+          .from(schema.agentDecisions)
+          .where(
+            and(
+              eq(schema.agentDecisions.submissionId, submissionId),
+              eq(schema.agentDecisions.decisionType, "changes_requested"),
+            ),
+          )
+          .orderBy(desc(schema.agentDecisions.recordedAt))
+          .limit(1)) as {
+          revisionNumber: number;
+          rationale: string;
+          recordedAt: Date;
+        }[])
+      : [];
+
+  const changeRequest = changeRequestRows[0] ?? null;
 
   return NextResponse.json({
     submissionId: submission.id,
     currentStatus: submission.currentStatus,
+    submissionVersion: submission.version,
     createdAt: submission.createdAt,
     updatedAt: submission.updatedAt,
     revisions,
     events,
+    feedback: {
+      changesRequested: changeRequest
+        ? {
+            revisionNumber: changeRequest.revisionNumber,
+            rationale: changeRequest.rationale,
+            recordedAt: changeRequest.recordedAt,
+          }
+        : null,
+    },
   });
 }

@@ -94,7 +94,7 @@ describe("hardened processing routes", () => {
     const confirmationRoute = join(apiDir, "precheck", "confirmation", "route.ts");
     const statusRoute = join(apiDir, "package", "submit", "status", "[id]", "route.ts");
     const authRoute = join(apiDir, "auth", "[...all]", "route.ts");
-    // Read-only agent review routes (GET-only, agent/admin authorized).
+    // Agent review routes (agent/admin authorized).
     const agentQueueRoute = join(apiDir, "agent", "submissions", "route.ts");
     const agentDetailRoute = join(apiDir, "agent", "submissions", "[id]", "route.ts");
     const agentPanelRoute = join(
@@ -104,6 +104,24 @@ describe("hardened processing routes", () => {
       "[id]",
       "panels",
       "[panelId]",
+      "route.ts",
+    );
+    const agentClaimRoute = join(apiDir, "agent", "submissions", "[id]", "claim", "route.ts");
+    const agentReleaseRoute = join(apiDir, "agent", "submissions", "[id]", "release", "route.ts");
+    const agentRequestChangesRoute = join(
+      apiDir,
+      "agent",
+      "submissions",
+      "[id]",
+      "request-changes",
+      "route.ts",
+    );
+    const agentInternalAcceptRoute = join(
+      apiDir,
+      "agent",
+      "submissions",
+      "[id]",
+      "internal-accept",
       "route.ts",
     );
     const getOnlyRoutes = new Set([
@@ -121,21 +139,25 @@ describe("hardened processing routes", () => {
         packageAnalysisRoute,
         join(apiDir, "package", "submit", "finalize", "route.ts"),
         statusRoute,
+        agentClaimRoute,
         agentQueueRoute,
         agentDetailRoute,
+        agentInternalAcceptRoute,
         agentPanelRoute,
+        agentReleaseRoute,
+        agentRequestChangesRoute,
         confirmationRoute,
         join(apiDir, "precheck", "disposition", "route.ts"),
         join(apiDir, "precheck", "route.ts"),
       ].sort(),
     );
-    // The mutable processing/append/finalize routes accept POST; status and the
-    // agent review routes are GET-only.
+    // Mutable processing/append/finalize/review-action routes accept POST; status
+    // and read-only agent routes are GET-only.
     for (const route of routes) {
       if (getOnlyRoutes.has(route)) continue;
       expect(readFileSync(route, "utf8")).toMatch(/export\s+async\s+function\s+POST/);
     }
-    // The agent review routes are GET handlers, never POST.
+    // The read-only agent review routes are GET handlers, never POST.
     for (const route of [agentQueueRoute, agentDetailRoute, agentPanelRoute]) {
       const source = readFileSync(route, "utf8");
       expect(source).toMatch(/export\s+async\s+function\s+GET/);
@@ -179,6 +201,10 @@ describe("hardened processing routes", () => {
 
   it("declares the Node runtime and is not configured for Edge on all mutable routes", () => {
     for (const rel of [
+      "agent/submissions/[id]/claim/route.ts",
+      "agent/submissions/[id]/internal-accept/route.ts",
+      "agent/submissions/[id]/release/route.ts",
+      "agent/submissions/[id]/request-changes/route.ts",
       "package/analyze/route.ts",
       "precheck/route.ts",
       "precheck/disposition/route.ts",

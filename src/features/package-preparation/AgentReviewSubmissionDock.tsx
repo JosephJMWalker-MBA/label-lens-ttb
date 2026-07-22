@@ -24,7 +24,6 @@ interface SubmissionReceipt {
   revisionNumber: number;
   status: string;
   receivingAgent: string;
-  signature: string;
   recordedAt: string;
 }
 
@@ -154,7 +153,6 @@ export function AgentReviewSubmissionDock() {
           revisionNumber: latestRevision?.revisionNumber ?? 1,
           status: value.currentStatus,
           receivingAgent: AGENT_REVIEW_RECEIVER,
-          signature: "verified-server-record",
           recordedAt: latestRevision?.submittedAt ?? value.createdAt,
         });
         setPhase("submitted");

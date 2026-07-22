@@ -189,7 +189,80 @@ export const submissionStatusEvents = mysqlTable("submission_status_events", {
   recordedAt: timestamp("recorded_at").defaultNow().notNull(),
 });
 
-// 11. Idempotency Records Table
+// 11. Reviewer Claims Table
+export const reviewerClaims = mysqlTable(
+  "reviewer_claims",
+  {
+    id: varchar("id", { length: 36 }).primaryKey(),
+    submissionId: varchar("submission_id", { length: 255 })
+      .references(() => submissions.id)
+      .notNull(),
+    revisionId: varchar("revision_id", { length: 36 })
+      .references(() => submissionRevisions.id)
+      .notNull(),
+    revisionNumber: int("revision_number").notNull(),
+    reviewerId: varchar("reviewer_id", { length: 36 })
+      .references(() => users.id)
+      .notNull(),
+    reviewerRole: varchar("reviewer_role", { length: 50 }).notNull(),
+    state: varchar("state", { length: 50 }).notNull(), // "active" | "released" | "force_released" | "decided"
+    activeSubmissionId: varchar("active_submission_id", { length: 255 }).references(
+      () => submissions.id,
+    ),
+    claimedSubmissionVersion: int("claimed_submission_version").notNull(),
+    claimedAt: timestamp("claimed_at").notNull(),
+    releasedAt: timestamp("released_at"),
+    releasedBy: varchar("released_by", { length: 36 }).references(() => users.id),
+    releasedByRole: varchar("released_by_role", { length: 50 }),
+    releaseReason: text("release_reason"),
+    decidedAt: timestamp("decided_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    activeSubmissionIdx: uniqueIndex("reviewer_claims_active_submission_idx").on(
+      table.activeSubmissionId,
+    ),
+  }),
+);
+
+// 12. Agent Decisions Table
+export const agentDecisions = mysqlTable(
+  "agent_decisions",
+  {
+    id: varchar("id", { length: 36 }).primaryKey(),
+    submissionId: varchar("submission_id", { length: 255 })
+      .references(() => submissions.id)
+      .notNull(),
+    revisionId: varchar("revision_id", { length: 36 })
+      .references(() => submissionRevisions.id)
+      .notNull(),
+    revisionNumber: int("revision_number").notNull(),
+    claimId: varchar("claim_id", { length: 36 })
+      .references(() => reviewerClaims.id)
+      .notNull(),
+    reviewerId: varchar("reviewer_id", { length: 36 })
+      .references(() => users.id)
+      .notNull(),
+    reviewerRole: varchar("reviewer_role", { length: 50 }).notNull(),
+    decisionType: varchar("decision_type", { length: 50 }).notNull(), // "changes_requested" | "internally_accepted"
+    priorStatus: varchar("prior_status", { length: 50 }).notNull(),
+    resultingStatus: varchar("resulting_status", { length: 50 }).notNull(),
+    rationale: text("rationale").notNull(),
+    submissionVersionBefore: int("submission_version_before").notNull(),
+    submissionVersionAfter: int("submission_version_after").notNull(),
+    idempotencyRecordKey: varchar("idempotency_record_key", { length: 255 }).notNull(),
+    recordedAt: timestamp("recorded_at").notNull(),
+  },
+  (table) => ({
+    revisionDecisionIdx: uniqueIndex("agent_decisions_revision_idx").on(table.revisionId),
+    claimDecisionIdx: uniqueIndex("agent_decisions_claim_idx").on(table.claimId),
+    idempotencyDecisionIdx: uniqueIndex("agent_decisions_idempotency_record_key_idx").on(
+      table.idempotencyRecordKey,
+    ),
+  }),
+);
+
+// 13. Idempotency Records Table
 export const idempotencyRecords = mysqlTable("idempotency_records", {
   key: varchar("key", { length: 255 }).primaryKey(),
   requestHash: varchar("request_hash", { length: 64 }).notNull(),

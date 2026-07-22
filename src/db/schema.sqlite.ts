@@ -174,7 +174,80 @@ export const submissionStatusEvents = sqliteTable("submission_status_events", {
     .notNull(),
 });
 
-// 11. Idempotency Records Table
+// 11. Reviewer Claims Table
+export const reviewerClaims = sqliteTable(
+  "reviewer_claims",
+  {
+    id: text("id").primaryKey(),
+    submissionId: text("submission_id")
+      .references(() => submissions.id)
+      .notNull(),
+    revisionId: text("revision_id")
+      .references(() => submissionRevisions.id)
+      .notNull(),
+    revisionNumber: integer("revision_number").notNull(),
+    reviewerId: text("reviewer_id")
+      .references(() => users.id)
+      .notNull(),
+    reviewerRole: text("reviewer_role").notNull(),
+    state: text("state").notNull(),
+    activeSubmissionId: text("active_submission_id").references(() => submissions.id),
+    claimedSubmissionVersion: integer("claimed_submission_version").notNull(),
+    claimedAt: integer("claimed_at", { mode: "timestamp" }).notNull(),
+    releasedAt: integer("released_at", { mode: "timestamp" }),
+    releasedBy: text("released_by").references(() => users.id),
+    releasedByRole: text("released_by_role"),
+    releaseReason: text("release_reason"),
+    decidedAt: integer("decided_at", { mode: "timestamp" }),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => ({
+    activeSubmissionIdx: uniqueIndex("reviewer_claims_active_submission_idx").on(
+      table.activeSubmissionId,
+    ),
+  }),
+);
+
+// 12. Agent Decisions Table
+export const agentDecisions = sqliteTable(
+  "agent_decisions",
+  {
+    id: text("id").primaryKey(),
+    submissionId: text("submission_id")
+      .references(() => submissions.id)
+      .notNull(),
+    revisionId: text("revision_id")
+      .references(() => submissionRevisions.id)
+      .notNull(),
+    revisionNumber: integer("revision_number").notNull(),
+    claimId: text("claim_id")
+      .references(() => reviewerClaims.id)
+      .notNull(),
+    reviewerId: text("reviewer_id")
+      .references(() => users.id)
+      .notNull(),
+    reviewerRole: text("reviewer_role").notNull(),
+    decisionType: text("decision_type").notNull(),
+    priorStatus: text("prior_status").notNull(),
+    resultingStatus: text("resulting_status").notNull(),
+    rationale: text("rationale").notNull(),
+    submissionVersionBefore: integer("submission_version_before").notNull(),
+    submissionVersionAfter: integer("submission_version_after").notNull(),
+    idempotencyRecordKey: text("idempotency_record_key").notNull(),
+    recordedAt: integer("recorded_at", { mode: "timestamp" }).notNull(),
+  },
+  (table) => ({
+    revisionDecisionIdx: uniqueIndex("agent_decisions_revision_idx").on(table.revisionId),
+    claimDecisionIdx: uniqueIndex("agent_decisions_claim_idx").on(table.claimId),
+    idempotencyDecisionIdx: uniqueIndex("agent_decisions_idempotency_record_key_idx").on(
+      table.idempotencyRecordKey,
+    ),
+  }),
+);
+
+// 13. Idempotency Records Table
 export const idempotencyRecords = sqliteTable("idempotency_records", {
   key: text("key").primaryKey(),
   requestHash: text("request_hash").notNull(),
