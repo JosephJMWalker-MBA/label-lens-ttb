@@ -2,6 +2,7 @@ import {
   mysqlTable,
   varchar,
   text,
+  mediumtext,
   boolean,
   timestamp,
   int,
@@ -100,7 +101,7 @@ export const submissionRevisions = mysqlTable(
     profileVersion: varchar("profile_version", { length: 50 }).notNull(),
     submittedBy: varchar("submitted_by", { length: 255 }).notNull(),
     submittedAt: timestamp("submitted_at").notNull(),
-    canonicalJson: text("canonical_json").notNull(),
+    canonicalJson: mediumtext("canonical_json").notNull(),
     integritySignature: varchar("integrity_signature", { length: 255 }).notNull(), // format: "v1:<hmac-sha256-hex>"
   },
   (table) => ({

@@ -1,0 +1,3 @@
+base_head=8ee6fe40a3ba1cee4bc81a09a6b6ff6e03537cd3
+base_commit=docs(audit): assess product strength and roadmap (#159)
+branch=codex/issue-160-package-integrity-diagnosis

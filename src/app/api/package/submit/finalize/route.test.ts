@@ -19,6 +19,7 @@ const RUN_MYSQL_TESTS = process.env.RUN_MYSQL_TESTS === "1";
 vi.hoisted(() => {
   process.env.BETTER_AUTH_SECRET ||= "super-secret-test-better-auth-key-1234567890";
   process.env.BETTER_AUTH_URL ||= "http://localhost:3000";
+  process.env.LABEL_LENS_INTEGRITY_SECRET ||= "test-only-integrity-secret-at-least-32-characters";
   // Only default DATABASE_URL to SQLite when MySQL testing is NOT enabled; when
   // it is, the caller's mysql:// DATABASE_URL must be preserved.
   if (process.env.RUN_MYSQL_TESTS !== "1") {
@@ -39,9 +40,13 @@ import { issueAppendToken } from "@/server/append-token";
 import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
 import { panelStorageKey } from "@/lib/panel-storage";
 
-type RouteHandler = (
+type SubmissionRouteHandler = (
   request: Request,
   context?: { params: Promise<{ id: string }> },
+) => Promise<Response>;
+type PanelRouteHandler = (
+  request: Request,
+  context: { params: Promise<{ id: string; panelId: string }> },
 ) => Promise<Response>;
 
 // A real 1x1 PNG. The route recomputes the checksum and decodes the byte
@@ -73,6 +78,10 @@ function integrityValue(payloadWithoutIntegrity: Record<string, unknown>): strin
   const clone = { ...payloadWithoutIntegrity };
   delete clone.integrity;
   return createHash("sha256").update(canonicalStringify(clone)).digest("hex");
+}
+
+function sha256Hex(value: string): string {
+  return createHash("sha256").update(value).digest("hex");
 }
 
 /** Recompute and attach the integrity value in place after a payload mutation. */
@@ -244,9 +253,9 @@ for (const dialect of TEST_DIALECTS) {
     let schema: any;
     let isSQLite: boolean;
     let auth: any;
-    let finalizePOST: RouteHandler;
-    let statusGET: RouteHandler;
-    let authPOST: RouteHandler;
+    let finalizePOST: SubmissionRouteHandler;
+    let statusGET: SubmissionRouteHandler;
+    let authPOST: SubmissionRouteHandler;
     let verifyRevision: (canonicalJson: string, expectedSignature: string) => boolean;
 
     async function loadModules() {
@@ -267,9 +276,9 @@ for (const dialect of TEST_DIALECTS) {
       isSQLite = clientMod.isSQLite;
 
       auth = (await import("@/lib/auth")).auth;
-      finalizePOST = (await import("./route")).POST as RouteHandler;
-      statusGET = (await import("../status/[id]/route")).GET as RouteHandler;
-      authPOST = (await import("../../../auth/[...all]/route")).POST as RouteHandler;
+      finalizePOST = (await import("./route")).POST as SubmissionRouteHandler;
+      statusGET = (await import("../status/[id]/route")).GET as SubmissionRouteHandler;
+      authPOST = (await import("../../../auth/[...all]/route")).POST as SubmissionRouteHandler;
       verifyRevision = (await import("@/lib/integrity")).verifyRevision;
     }
 
@@ -511,6 +520,85 @@ for (const dialect of TEST_DIALECTS) {
           .where(eq(schema.submissionStatusEvents.submissionId, pkgId));
         expect(events).toHaveLength(1);
         expect(events[0].status).toBe("waiting_for_agent_review");
+      });
+
+      it("survives module-state recreation and still opens detail and the authorized panel", async () => {
+        const pkgId = "pkg-lifecycle";
+        const agent = await provisionSeller("lifecycle-agent@test.com", "agent");
+        const response = await finalizePOST(
+          buildFinalizeRequest(createValidExportPayload(pkgId), sellerCookie, "k-lifecycle"),
+        );
+        expect(response.status).toBe(200);
+
+        const receipt = (await response.json()) as { revisionId: string };
+        const before = await db.query.submissionRevisions.findFirst({
+          where: (r: any, { eq: e }: any) => e(r.id, receipt.revisionId),
+        });
+        expect(before).toBeTruthy();
+
+        // Recreate every imported database, integrity, auth, detail, and route
+        // module while retaining only the configured secret and durable stores.
+        vi.resetModules();
+        const freshClient = await import("@/db/client");
+        freshClient.initializeDatabase(process.env.DATABASE_URL as string);
+        const { buildSubmissionDetail } = await import("@/server/submissions/detail");
+        const freshPanelGET = (
+          await import("../../../agent/submissions/[id]/panels/[panelId]/route")
+        ).GET as PanelRouteHandler;
+
+        const after = await freshClient.db.query.submissionRevisions.findFirst({
+          where: (r: any, { eq: e }: any) => e(r.id, receipt.revisionId),
+        });
+        expect(after?.canonicalJson).toBe(before?.canonicalJson);
+        expect(after?.integritySignature).toBe(before?.integritySignature);
+        expect(Buffer.byteLength(after?.canonicalJson ?? "", "utf8")).toBe(
+          Buffer.byteLength(before?.canonicalJson ?? "", "utf8"),
+        );
+
+        const detail = await buildSubmissionDetail(pkgId);
+        expect(detail.ok).toBe(true);
+        if (!detail.ok) throw new Error(`Unexpected detail failure: ${detail.reason}`);
+        expect(detail.view.revision.integrityVerified).toBe(true);
+
+        const panelResponse = await freshPanelGET(
+          new Request(`http://localhost:3000/api/agent/submissions/${pkgId}/panels/${PANEL_ID}`, {
+            headers: { Cookie: agent.cookie },
+          }),
+          { params: Promise.resolve({ id: pkgId, panelId: PANEL_ID }) },
+        );
+        expect(panelResponse.status).toBe(200);
+        expect(Buffer.from(await panelResponse.arrayBuffer())).toEqual(PANEL_BYTES);
+
+        // Restore the suite's handles for cleanup and subsequent cases.
+        await loadModules();
+      });
+
+      it("round-trips a valid canonical snapshot larger than the MySQL TEXT ceiling", async () => {
+        const pkgId = "pkg-large-canonical";
+        const payload = createValidExportPayload(pkgId);
+        payload.applicationBuild = { syntheticPadding: "Synthetic build padding ".repeat(4_000) };
+        resign(payload);
+
+        const payloadWithoutIntegrity = { ...payload } as Record<string, unknown>;
+        delete payloadWithoutIntegrity.integrity;
+        const expectedCanonical = canonicalStringify(payloadWithoutIntegrity);
+        expect(Buffer.byteLength(expectedCanonical, "utf8")).toBeGreaterThan(65_535);
+
+        const response = await finalizePOST(
+          buildFinalizeRequest(payload, sellerCookie, "k-large-canonical"),
+        );
+        expect(response.status).toBe(200);
+
+        const revision = await db.query.submissionRevisions.findFirst({
+          where: (r: any, { eq: e }: any) => e(r.submissionId, pkgId),
+        });
+        expect(Buffer.byteLength(revision?.canonicalJson ?? "", "utf8")).toBe(
+          Buffer.byteLength(expectedCanonical, "utf8"),
+        );
+        expect(sha256Hex(revision?.canonicalJson ?? "")).toBe(sha256Hex(expectedCanonical));
+        expect(
+          verifyRevision(revision?.canonicalJson ?? "", revision?.integritySignature ?? ""),
+        ).toBe(true);
       });
 
       it("refuses a local-download-only export (transmission-truth boundary)", async () => {

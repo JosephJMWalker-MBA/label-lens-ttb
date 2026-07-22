@@ -14,6 +14,14 @@ import { runBootstrap } from "@/server/auth/bootstrap";
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) throw new Error("DATABASE_URL is required to seed the e2e database.");
 
+const INTEGRITY_ENV_KEY = "LABEL_LENS_INTEGRITY_SECRET";
+const integritySecret = process.env[INTEGRITY_ENV_KEY];
+if (!integritySecret || integritySecret.length < 32) {
+  throw new Error(
+    `${INTEGRITY_ENV_KEY} must be configured with at least 32 characters for e2e seeding.`,
+  );
+}
+
 async function main() {
   const isSqlite = !/^mysql2?:\/\//.test(DATABASE_URL!);
   if (isSqlite) {
