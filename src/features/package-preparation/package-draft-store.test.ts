@@ -40,8 +40,9 @@ class FakeObjectStore {
     this.lastGet = r;
     return r;
   }
-  put() {
+  put(value: unknown) {
     const r = new FakeRequest<unknown>();
+    this.lastPutValue = value;
     this.lastPut = r;
     return r;
   }
@@ -52,6 +53,7 @@ class FakeObjectStore {
   }
   lastGet: FakeRequest<unknown> | null = null;
   lastPut: FakeRequest<unknown> | null = null;
+  lastPutValue: unknown = undefined;
   lastDelete: FakeRequest<unknown> | null = null;
 }
 
@@ -79,12 +81,15 @@ class FakeOpenRequest {
 }
 
 let lastOpen: FakeOpenRequest | null = null;
+let openRequests: FakeOpenRequest[] = [];
 
 function installFakeIndexedDB() {
   lastOpen = null;
+  openRequests = [];
   vi.stubGlobal("indexedDB", {
     open: () => {
       lastOpen = new FakeOpenRequest();
+      openRequests.push(lastOpen);
       return lastOpen;
     },
   });
@@ -105,6 +110,15 @@ const validDraft: StoredPackageDraft = {
     analysisRuns: [],
   } as unknown as StoredPackageDraft["draft"],
   panelFiles: [],
+};
+
+const revisionContext = {
+  kind: "requested_changes_response" as const,
+  submissionId: "pkg-1",
+  baseRevisionId: "revision-parent",
+  baseRevisionNumber: 1,
+  respondedToDecisionId: "decision-1",
+  expectedSubmissionVersion: 3,
 };
 
 beforeEach(() => {
@@ -221,6 +235,19 @@ describe("package-draft-store", () => {
     await expect(promise).resolves.toEqual(validDraft);
   });
 
+  it("returns a valid stored revision-response draft with wrapper-level context", async () => {
+    const stored = { ...validDraft, revisionContext };
+    const promise = loadPackageDraftLocally();
+    await tick();
+    lastOpen!.onsuccess?.();
+    await tick();
+    const db = lastOpen!.result;
+    db.store.lastGet!.result = stored;
+    db.store.lastGet!.onsuccess?.();
+    db.lastTransaction!.oncomplete?.();
+    await expect(promise).resolves.toEqual(stored);
+  });
+
   it("treats a malformed stored draft as MALFORMED without deleting it", async () => {
     const malformed = {
       draft: { schemaVersion: "wrong-version" },
@@ -243,13 +270,54 @@ describe("package-draft-store", () => {
   it("saves via a committed write transaction", async () => {
     const promise = savePackageDraftLocally(validDraft);
     await tick();
-    lastOpen!.onsuccess?.();
+    openRequests[0].onsuccess?.();
     await tick();
-    const db = lastOpen!.result;
+    const readDb = openRequests[0].result;
+    readDb.store.lastGet!.result = undefined;
+    readDb.store.lastGet!.onsuccess?.();
+    readDb.lastTransaction!.oncomplete?.();
+    await tick();
+    await tick();
+
+    openRequests[1].onsuccess?.();
+    await tick();
+    const db = openRequests[1].result;
     db.store.lastPut!.result = "current-package";
     db.store.lastPut!.onsuccess?.();
     db.lastTransaction!.oncomplete?.();
     await expect(promise).resolves.toBeUndefined();
     expect(db.closed).toBe(true);
+  });
+
+  it("preserves existing wrapper-level revision context when saving the same package", async () => {
+    const existing = { ...validDraft, revisionContext };
+    const next: StoredPackageDraft = {
+      ...validDraft,
+      draft: {
+        ...validDraft.draft,
+        updatedAt: "2026-07-19T00:05:00.000Z",
+      },
+    };
+
+    const promise = savePackageDraftLocally(next);
+    await tick();
+    openRequests[0].onsuccess?.();
+    await tick();
+    const readDb = openRequests[0].result;
+    readDb.store.lastGet!.result = existing;
+    readDb.store.lastGet!.onsuccess?.();
+    readDb.lastTransaction!.oncomplete?.();
+
+    await tick();
+    await tick();
+    openRequests[1].onsuccess?.();
+    await tick();
+    const writeDb = openRequests[1].result;
+    writeDb.store.lastPut!.result = "current-package";
+    writeDb.store.lastPut!.onsuccess?.();
+    writeDb.lastTransaction!.oncomplete?.();
+
+    await expect(promise).resolves.toBeUndefined();
+    expect(writeDb.store.lastPutValue).toEqual({ ...next, revisionContext });
   });
 });

@@ -9,6 +9,12 @@ import { authClient } from "@/lib/auth-client";
 import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
 
 import { AGENT_REVIEW_RECEIVER, AGENT_REVIEW_TRANSMISSION } from "./agent-submission-contract";
+import {
+  normalizeSubmissionReceipt,
+  parseSubmissionErrorMessage,
+  safeSubmissionErrorMessage,
+  type AgentReviewSubmissionReceipt,
+} from "./agent-review-submission-response";
 import { loadPackageDraftLocally, type StoredPackageDraft } from "./package-draft-store";
 import {
   buildSellerPackageExport,
@@ -17,15 +23,6 @@ import {
 } from "./package-model";
 
 type SubmissionPhase = "idle" | "submitting" | "submitted" | "error";
-
-interface SubmissionReceipt {
-  submissionId: string;
-  revisionId: string;
-  revisionNumber: number;
-  status: string;
-  receivingAgent: string;
-  recordedAt: string;
-}
 
 interface SubmissionStatusResponse {
   submissionId: string;
@@ -82,7 +79,7 @@ export function AgentReviewSubmissionDock() {
   const [submitter, setSubmitter] = useState("");
   const [phase, setPhase] = useState<SubmissionPhase>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [receipt, setReceipt] = useState<SubmissionReceipt | null>(null);
+  const [receipt, setReceipt] = useState<AgentReviewSubmissionReceipt | null>(null);
   const [knownServerStatus, setKnownServerStatus] = useState<string | null>(null);
   const attemptRef = useRef<SubmissionAttempt | null>(null);
 
@@ -117,6 +114,8 @@ export function AgentReviewSubmissionDock() {
 
   const draft = stored?.draft ?? null;
   const latestRun = draft?.analysisRuns.at(-1);
+  const revisionContext = stored?.revisionContext ?? null;
+  const revisionContextFingerprint = revisionContext ? canonicalStringify(revisionContext) : null;
   const ready = Boolean(
     stored &&
     packageReadyForAgentReview(stored.draft) &&
@@ -129,11 +128,19 @@ export function AgentReviewSubmissionDock() {
     setReceipt(null);
     setPhase("idle");
     setErrorMessage(null);
-  }, [draft?.packageId, draft?.updatedAt, latestRun?.analysisRunId, submitter]);
+  }, [
+    draft?.packageId,
+    draft?.updatedAt,
+    latestRun?.analysisRunId,
+    revisionContextFingerprint,
+    submitter,
+  ]);
 
   useEffect(() => {
     const packageId = draft?.packageId;
-    if (!packageId || !sellerSignedIn || phase === "submitting" || receipt) return;
+    if (!packageId || revisionContext || !sellerSignedIn || phase === "submitting" || receipt) {
+      return;
+    }
 
     let cancelled = false;
     void fetch(`/api/package/submit/status/${encodeURIComponent(packageId)}`, {
@@ -152,7 +159,6 @@ export function AgentReviewSubmissionDock() {
           revisionId: latestRevision?.id ?? "recorded",
           revisionNumber: latestRevision?.revisionNumber ?? 1,
           status: value.currentStatus,
-          receivingAgent: AGENT_REVIEW_RECEIVER,
           recordedAt: latestRevision?.submittedAt ?? value.createdAt,
         });
         setPhase("submitted");
@@ -164,7 +170,14 @@ export function AgentReviewSubmissionDock() {
     return () => {
       cancelled = true;
     };
-  }, [draft?.packageId, phase, receipt, sellerSignedIn]);
+  }, [
+    draft?.packageId,
+    phase,
+    receipt,
+    revisionContext,
+    revisionContextFingerprint,
+    sellerSignedIn,
+  ]);
 
   const summary = useMemo(() => readinessMessage(stored), [stored]);
 
@@ -183,6 +196,7 @@ export function AgentReviewSubmissionDock() {
         currentDraft.packageId,
         currentDraft.updatedAt,
         currentRun.analysisRunId,
+        revisionContextFingerprint ?? "initial-finalize",
         submitter.trim(),
       ].join(":");
 
@@ -223,30 +237,36 @@ export function AgentReviewSubmissionDock() {
 
       const body = new FormData();
       body.set("packageExport", canonicalStringify(attempt.payload));
+      if (revisionContext) {
+        body.set("revisionContext", canonicalStringify(revisionContext));
+      }
       for (const { panelId, file } of stored.panelFiles) {
         body.append(panelId, file, file.name);
       }
 
-      const response = await fetch("/api/package/submit/finalize", {
-        method: "POST",
-        headers: { "X-Idempotency-Key": attempt.idempotencyKey },
-        body,
-      });
-      const result = (await response.json().catch(() => ({}))) as
-        SubmissionReceipt | { error?: string };
+      const response = await fetch(
+        revisionContext
+          ? `/api/package/submit/resubmit/${encodeURIComponent(revisionContext.submissionId)}`
+          : "/api/package/submit/finalize",
+        {
+          method: "POST",
+          headers: { "X-Idempotency-Key": attempt.idempotencyKey },
+          body,
+        },
+      );
+      const result = await response.json().catch(() => ({}));
 
       if (!response.ok) {
         if (response.status === 401) {
           throw new Error("Sign in with a seller account before submitting this package.");
         }
-        throw new Error(
-          "error" in result && result.error
-            ? result.error
-            : "The package could not be placed in the agent review queue.",
-        );
+        throw new Error(parseSubmissionErrorMessage(result));
       }
 
-      const submitted = result as SubmissionReceipt;
+      const submitted = normalizeSubmissionReceipt(result);
+      if (!submitted) {
+        throw new Error(safeSubmissionErrorMessage());
+      }
       setReceipt(submitted);
       setKnownServerStatus(submitted.status);
       setPhase("submitted");
@@ -279,13 +299,18 @@ export function AgentReviewSubmissionDock() {
           <p className="mt-1 text-sm text-muted-foreground">
             {alreadySubmitted
               ? "The package documents and panel images are stored in the internal queue for agent review."
-              : loadError
-                ? "The browser-local package could not be read. Restore the draft before submission."
-                : summary}
+              : revisionContext
+                ? "This local draft responds to requested changes. Run analysis after edits, then resubmit it to the internal agent queue."
+                : loadError
+                  ? "The browser-local package could not be read. Restore the draft before submission."
+                  : summary}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
             This sends records to Label Lens internal review only. It does not submit anything to
             TTB.
+            {revisionContext
+              ? " Revision context is sent separately from the seller evidence package."
+              : ""}
           </p>
         </div>
 

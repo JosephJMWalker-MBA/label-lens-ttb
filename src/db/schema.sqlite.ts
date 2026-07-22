@@ -247,7 +247,45 @@ export const agentDecisions = sqliteTable(
   }),
 );
 
-// 13. Idempotency Records Table
+// 13. Submission Revision Responses Table
+export const submissionRevisionResponses = sqliteTable(
+  "submission_revision_responses",
+  {
+    id: text("id").primaryKey(),
+    submissionId: text("submission_id")
+      .references(() => submissions.id)
+      .notNull(),
+    parentRevisionId: text("parent_revision_id")
+      .references(() => submissionRevisions.id)
+      .notNull(),
+    parentRevisionNumber: integer("parent_revision_number").notNull(),
+    respondedToDecisionId: text("responded_to_decision_id")
+      .references(() => agentDecisions.id)
+      .notNull(),
+    childRevisionId: text("child_revision_id")
+      .references(() => submissionRevisions.id)
+      .notNull(),
+    childRevisionNumber: integer("child_revision_number").notNull(),
+    sellerId: text("seller_id")
+      .references(() => users.id)
+      .notNull(),
+    idempotencyRecordKey: text("idempotency_record_key").notNull(),
+    recordedAt: integer("recorded_at", { mode: "timestamp" }).notNull(),
+  },
+  (table) => ({
+    childRevisionIdx: uniqueIndex("submission_revision_responses_child_revision_idx").on(
+      table.childRevisionId,
+    ),
+    decisionResponseIdx: uniqueIndex("submission_revision_responses_decision_idx").on(
+      table.respondedToDecisionId,
+    ),
+    idempotencyResponseIdx: uniqueIndex(
+      "submission_revision_responses_idempotency_record_key_idx",
+    ).on(table.idempotencyRecordKey),
+  }),
+);
+
+// 14. Idempotency Records Table
 export const idempotencyRecords = sqliteTable("idempotency_records", {
   key: text("key").primaryKey(),
   requestHash: text("request_hash").notNull(),

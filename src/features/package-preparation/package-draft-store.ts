@@ -1,4 +1,6 @@
 import type { SellerPackageDraft } from "./package-model";
+import { parseRevisionResponseContext } from "./revision-context";
+import type { RevisionResponseContext } from "./revision-context";
 
 const DATABASE_NAME = "label-lens-seller-package-v1";
 const DATABASE_VERSION = 1;
@@ -39,6 +41,7 @@ export interface StoredPackagePanelFile {
 export interface StoredPackageDraft {
   draft: SellerPackageDraft;
   panelFiles: StoredPackagePanelFile[];
+  revisionContext?: RevisionResponseContext;
 }
 
 /**
@@ -185,11 +188,36 @@ async function withStore<T>(
 }
 
 export async function savePackageDraftLocally(value: StoredPackageDraft): Promise<void> {
-  await withStore("readwrite", (store) => store.put(value, CURRENT_KEY));
+  let next = value;
+  if (!next.revisionContext) {
+    try {
+      const existing = await withStore<StoredPackageDraft | undefined>("readonly", (store) =>
+        store.get(CURRENT_KEY),
+      );
+      if (
+        existing &&
+        isValidStoredDraft(existing) &&
+        existing.revisionContext &&
+        existing.draft.packageId === value.draft.packageId
+      ) {
+        next = { ...value, revisionContext: existing.revisionContext };
+      }
+    } catch {
+      // Saving the explicit value is still valid; the caller will surface any
+      // write failure below. A failed preservation read must not block a save.
+    }
+  }
+  await withStore("readwrite", (store) => store.put(next, CURRENT_KEY));
 }
 
 function isValidStoredDraft(stored: StoredPackageDraft | undefined): stored is StoredPackageDraft {
   if (!stored || stored.draft?.schemaVersion !== "seller-package-draft.v1") return false;
+  if (
+    stored.revisionContext !== undefined &&
+    !parseRevisionResponseContext(stored.revisionContext).ok
+  ) {
+    return false;
+  }
   const panelIds = new Set(stored.draft.panels.map((panel) => panel.panelId));
   return (
     Array.isArray(stored.panelFiles) &&

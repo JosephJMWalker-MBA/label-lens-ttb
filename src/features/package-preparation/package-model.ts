@@ -85,7 +85,8 @@ export type SellerPackageChangeAction =
   | "region_removed"
   | "draft_saved"
   | "analysis_completed"
-  | "agent_package_exported";
+  | "agent_package_exported"
+  | "revision_response_started";
 
 export interface SellerPackageChange {
   changeId: string;

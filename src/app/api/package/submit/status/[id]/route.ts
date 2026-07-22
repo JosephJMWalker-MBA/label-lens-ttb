@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { db, schema } from "@/db/client";
 
 export const runtime = "nodejs";
@@ -70,8 +70,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     .where(eq(schema.submissionStatusEvents.submissionId, submissionId))
     .orderBy(asc(schema.submissionStatusEvents.recordedAt));
 
+  const latestRevision = revisions.at(-1);
   const changeRequestRows =
-    submission.currentStatus === "changes_requested"
+    submission.currentStatus === "changes_requested" && latestRevision
       ? ((await db
           .select({
             revisionNumber: schema.agentDecisions.revisionNumber,
@@ -82,10 +83,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
           .where(
             and(
               eq(schema.agentDecisions.submissionId, submissionId),
+              eq(schema.agentDecisions.revisionId, latestRevision.id),
               eq(schema.agentDecisions.decisionType, "changes_requested"),
             ),
           )
-          .orderBy(desc(schema.agentDecisions.recordedAt))
           .limit(1)) as {
           revisionNumber: number;
           rationale: string;

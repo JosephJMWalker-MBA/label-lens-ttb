@@ -227,7 +227,7 @@ describe("applyMigrations", () => {
 });
 
 describe("agent decision migration metadata", () => {
-  it("journals 0002 and carries the durable claim/decision tables plus immutability triggers", () => {
+  it("journals the durable claim/decision migrations and carries the review tables plus immutability triggers", () => {
     const source = path.join(process.cwd(), MIGRATIONS_REL);
     const journal = JSON.parse(
       readFileSync(path.join(source, "meta", "_journal.json"), "utf8"),
@@ -238,6 +238,7 @@ describe("agent decision migration metadata", () => {
       "0000_smooth_felicia_hardy",
       "0001_tiny_marauders",
       "0002_issue_165_agent_decisions",
+      "0003_issue_167_seller_resubmissions",
     ]);
 
     const migrationSql = readFileSync(
@@ -258,6 +259,33 @@ describe("agent decision migration metadata", () => {
     expect(migrationSql).toMatch(/prevent_reviewer_claims_identity_update/);
     expect(migrationSql).toMatch(/prevent_agent_decisions_update/);
     expect(migrationSql).toMatch(/prevent_agent_decisions_delete/);
+  });
+
+  it("journals 0003 with append-only seller resubmission lineage and user-owned seller ids", () => {
+    const source = path.join(process.cwd(), MIGRATIONS_REL);
+    const migrationSql = readFileSync(
+      path.join(source, "0003_issue_167_seller_resubmissions.sql"),
+      "utf8",
+    );
+    expect(migrationSql).toMatch(/CREATE TABLE `submission_revision_responses`/);
+    expect(migrationSql).toMatch(/`parent_revision_id` varchar\(36\) NOT NULL/);
+    expect(migrationSql).toMatch(/`responded_to_decision_id` varchar\(36\) NOT NULL/);
+    expect(migrationSql).toMatch(/`child_revision_id` varchar\(36\) NOT NULL/);
+    expect(migrationSql).toMatch(/`seller_id` varchar\(36\) NOT NULL/);
+    expect(migrationSql).toMatch(/`idempotency_record_key` varchar\(255\) NOT NULL/);
+    expect(migrationSql).toMatch(
+      /CONSTRAINT `submission_revision_responses_child_revision_idx` UNIQUE/,
+    );
+    expect(migrationSql).toMatch(/CONSTRAINT `submission_revision_responses_decision_idx` UNIQUE/);
+    expect(migrationSql).toMatch(
+      /CONSTRAINT `submission_revision_responses_idempotency_record_key_idx` UNIQUE/,
+    );
+    expect(migrationSql).toMatch(/FOREIGN KEY \(`seller_id`\) REFERENCES `users`\(`id`\)/);
+    expect(migrationSql).not.toMatch(
+      /submission_revision_responses_idempotency_record_key_.*FOREIGN KEY/,
+    );
+    expect(migrationSql).toMatch(/prevent_submission_revision_responses_update/);
+    expect(migrationSql).toMatch(/prevent_submission_revision_responses_delete/);
   });
 });
 

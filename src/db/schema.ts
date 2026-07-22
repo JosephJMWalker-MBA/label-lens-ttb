@@ -262,7 +262,45 @@ export const agentDecisions = mysqlTable(
   }),
 );
 
-// 13. Idempotency Records Table
+// 13. Submission Revision Responses Table
+export const submissionRevisionResponses = mysqlTable(
+  "submission_revision_responses",
+  {
+    id: varchar("id", { length: 36 }).primaryKey(),
+    submissionId: varchar("submission_id", { length: 255 })
+      .references(() => submissions.id)
+      .notNull(),
+    parentRevisionId: varchar("parent_revision_id", { length: 36 })
+      .references(() => submissionRevisions.id)
+      .notNull(),
+    parentRevisionNumber: int("parent_revision_number").notNull(),
+    respondedToDecisionId: varchar("responded_to_decision_id", { length: 36 })
+      .references(() => agentDecisions.id)
+      .notNull(),
+    childRevisionId: varchar("child_revision_id", { length: 36 })
+      .references(() => submissionRevisions.id)
+      .notNull(),
+    childRevisionNumber: int("child_revision_number").notNull(),
+    sellerId: varchar("seller_id", { length: 36 })
+      .references(() => users.id)
+      .notNull(),
+    idempotencyRecordKey: varchar("idempotency_record_key", { length: 255 }).notNull(),
+    recordedAt: timestamp("recorded_at").notNull(),
+  },
+  (table) => ({
+    childRevisionIdx: uniqueIndex("submission_revision_responses_child_revision_idx").on(
+      table.childRevisionId,
+    ),
+    decisionResponseIdx: uniqueIndex("submission_revision_responses_decision_idx").on(
+      table.respondedToDecisionId,
+    ),
+    idempotencyResponseIdx: uniqueIndex(
+      "submission_revision_responses_idempotency_record_key_idx",
+    ).on(table.idempotencyRecordKey),
+  }),
+);
+
+// 14. Idempotency Records Table
 export const idempotencyRecords = mysqlTable("idempotency_records", {
   key: varchar("key", { length: 255 }).primaryKey(),
   requestHash: varchar("request_hash", { length: 64 }).notNull(),

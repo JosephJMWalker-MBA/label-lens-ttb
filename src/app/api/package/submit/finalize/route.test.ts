@@ -246,6 +246,11 @@ function buildFinalizeRequest(
 
 const TEST_DIALECTS = RUN_MYSQL_TESTS ? (["mysql"] as const) : (["sqlite"] as const);
 
+if (RUN_MYSQL_TESTS) {
+  await import("../resubmit/route.test");
+  await import("../revision-seed/route.test");
+}
+
 for (const dialect of TEST_DIALECTS) {
   describe(`Bounded Slice 1 — Finalize & Status (${dialect})`, () => {
     // Re-imported fresh per dialect after resetModules.
@@ -292,6 +297,8 @@ for (const dialect of TEST_DIALECTS) {
       "prevent_reviewer_claims_delete",
       "prevent_agent_decisions_update",
       "prevent_agent_decisions_delete",
+      "prevent_submission_revision_responses_update",
+      "prevent_submission_revision_responses_delete",
     ];
 
     async function dropTriggers() {
@@ -349,6 +356,12 @@ for (const dialect of TEST_DIALECTS) {
           BEGIN SELECT RAISE(FAIL, 'Agent decisions are immutable.'); END;`);
         db.run(sql`CREATE TRIGGER prevent_agent_decisions_delete BEFORE DELETE ON agent_decisions
           BEGIN SELECT RAISE(FAIL, 'Agent decisions are immutable.'); END;`);
+        db.run(sql`CREATE TRIGGER prevent_submission_revision_responses_update
+          BEFORE UPDATE ON submission_revision_responses
+          BEGIN SELECT RAISE(FAIL, 'Submission revision response rows are immutable and cannot be updated.'); END;`);
+        db.run(sql`CREATE TRIGGER prevent_submission_revision_responses_delete
+          BEFORE DELETE ON submission_revision_responses
+          BEGIN SELECT RAISE(FAIL, 'Submission revision response rows are immutable and cannot be deleted.'); END;`);
       } else {
         await db.execute(
           sql.raw(`
@@ -426,11 +439,22 @@ for (const dialect of TEST_DIALECTS) {
           CREATE TRIGGER prevent_agent_decisions_delete BEFORE DELETE ON agent_decisions FOR EACH ROW
           BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Agent decisions are immutable.'; END`),
         );
+        await db.execute(
+          sql.raw(`
+          CREATE TRIGGER prevent_submission_revision_responses_update BEFORE UPDATE ON submission_revision_responses FOR EACH ROW
+          BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Submission revision response rows are immutable and cannot be updated.'; END`),
+        );
+        await db.execute(
+          sql.raw(`
+          CREATE TRIGGER prevent_submission_revision_responses_delete BEFORE DELETE ON submission_revision_responses FOR EACH ROW
+          BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Submission revision response rows are immutable and cannot be deleted.'; END`),
+        );
       }
     }
 
     async function clearTables() {
       await db.delete(schema.idempotencyRecords);
+      await db.delete(schema.submissionRevisionResponses);
       await db.delete(schema.agentDecisions);
       await db.delete(schema.reviewerClaims);
       await db.delete(schema.machineAnalysisSnapshots);

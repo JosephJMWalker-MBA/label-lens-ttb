@@ -48,6 +48,19 @@ export interface MachineAnalysisView {
   categories: unknown[];
 }
 
+export interface PanelChecksumCountView {
+  role: string;
+  checksumSha256: string;
+  count: number;
+}
+
+export interface ReplacedPanelChecksumCountView {
+  role: string;
+  priorChecksumSha256: string;
+  resultingChecksumSha256: string;
+  count: number;
+}
+
 export interface SubmissionDetailView {
   submission: { id: string; status: string; isDemo: boolean; version: number };
   revision: {
@@ -86,6 +99,44 @@ export interface SubmissionDetailView {
     rationale: string;
     recordedAt: string;
   } | null;
+  revisionComparison: {
+    parentRevision: {
+      id: string;
+      revisionNumber: number;
+      integrityVerified: true;
+    };
+    childRevision: {
+      id: string;
+      revisionNumber: number;
+      integrityVerified: true;
+    };
+    respondedToDecision: {
+      id: string;
+      rationale: string;
+      recordedAt: string;
+    };
+    panelChanges: {
+      unchanged: PanelChecksumCountView[];
+      replaced: ReplacedPanelChecksumCountView[];
+      added: PanelChecksumCountView[];
+      removed: PanelChecksumCountView[];
+    };
+    sellerEvidenceChanges: Array<{
+      categoryId: string;
+      priorDecision: string | null;
+      resultingDecision: string | null;
+      priorExpectedValue: string | null;
+      resultingExpectedValue: string | null;
+      priorRegionCount: number;
+      resultingRegionCount: number;
+    }>;
+    machineAnalysis: {
+      priorAnalysisRunId: string | null;
+      resultingAnalysisRunId: string | null;
+      priorReadiness: string | null;
+      resultingReadiness: string | null;
+    };
+  } | null;
 }
 
 export type SubmissionDetailResult =
@@ -98,6 +149,11 @@ function safeParse(value: string): unknown {
   } catch {
     return null;
   }
+}
+
+function regionsFrom(value: string): unknown[] {
+  const parsed = safeParse(value);
+  return Array.isArray(parsed) ? parsed : [];
 }
 
 /**
@@ -315,6 +371,14 @@ export async function buildSubmissionDetail(submissionId: string): Promise<Submi
 
   const activeClaim = activeClaimRows[0] ?? null;
   const latestDecision = latestDecisionRows[0] ?? null;
+  const revisionComparison = await buildRevisionComparisonForLatest({
+    submissionId,
+    childRevisionId: revision.id,
+    childRevisionNumber: revision.revisionNumber,
+  });
+  if (revisionComparison === "integrity_failed") {
+    return { ok: false, reason: "integrity_failed" };
+  }
 
   return {
     ok: true,
@@ -365,8 +429,266 @@ export async function buildSubmissionDetail(submissionId: string): Promise<Submi
             recordedAt: latestDecision.recordedAt.toISOString(),
           }
         : null,
+      revisionComparison,
     },
   };
+}
+
+async function buildRevisionComparisonForLatest(args: {
+  submissionId: string;
+  childRevisionId: string;
+  childRevisionNumber: number;
+}): Promise<SubmissionDetailView["revisionComparison"] | "integrity_failed"> {
+  const responseRows = (await db
+    .select({
+      parentRevisionId: schema.submissionRevisionResponses.parentRevisionId,
+      parentRevisionNumber: schema.submissionRevisionResponses.parentRevisionNumber,
+      respondedToDecisionId: schema.submissionRevisionResponses.respondedToDecisionId,
+    })
+    .from(schema.submissionRevisionResponses)
+    .where(eq(schema.submissionRevisionResponses.childRevisionId, args.childRevisionId))
+    .limit(1)) as Array<{
+    parentRevisionId: string;
+    parentRevisionNumber: number;
+    respondedToDecisionId: string;
+  }>;
+  const response = responseRows[0];
+  if (!response) return null;
+
+  const parentRows = (await db
+    .select({
+      id: schema.submissionRevisions.id,
+      revisionNumber: schema.submissionRevisions.revisionNumber,
+      canonicalJson: schema.submissionRevisions.canonicalJson,
+      integritySignature: schema.submissionRevisions.integritySignature,
+    })
+    .from(schema.submissionRevisions)
+    .where(eq(schema.submissionRevisions.id, response.parentRevisionId))
+    .limit(1)) as Array<{
+    id: string;
+    revisionNumber: number;
+    canonicalJson: string;
+    integritySignature: string;
+  }>;
+  const parent = parentRows[0];
+  if (!parent || !verifyRevision(parent.canonicalJson, parent.integritySignature)) {
+    return "integrity_failed";
+  }
+
+  const decisionRows = (await db
+    .select({
+      id: schema.agentDecisions.id,
+      rationale: schema.agentDecisions.rationale,
+      recordedAt: schema.agentDecisions.recordedAt,
+    })
+    .from(schema.agentDecisions)
+    .where(eq(schema.agentDecisions.id, response.respondedToDecisionId))
+    .limit(1)) as Array<{ id: string; rationale: string; recordedAt: Date }>;
+  const decision = decisionRows[0];
+  if (!decision) return null;
+
+  const [parentPanels, childPanels, parentEvidence, childEvidence, parentMachine, childMachine] =
+    await Promise.all([
+      panelRowsForRevision(parent.id),
+      panelRowsForRevision(args.childRevisionId),
+      evidenceRowsForRevision(parent.id),
+      evidenceRowsForRevision(args.childRevisionId),
+      machineRowForRevision(parent.id),
+      machineRowForRevision(args.childRevisionId),
+    ]);
+
+  return {
+    parentRevision: {
+      id: parent.id,
+      revisionNumber: parent.revisionNumber,
+      integrityVerified: true,
+    },
+    childRevision: {
+      id: args.childRevisionId,
+      revisionNumber: args.childRevisionNumber,
+      integrityVerified: true,
+    },
+    respondedToDecision: {
+      id: decision.id,
+      rationale: decision.rationale,
+      recordedAt: decision.recordedAt.toISOString(),
+    },
+    panelChanges: comparePanels(parentPanels, childPanels),
+    sellerEvidenceChanges: compareEvidence(parentEvidence, childEvidence),
+    machineAnalysis: {
+      priorAnalysisRunId: parentMachine?.analysisRunId ?? null,
+      resultingAnalysisRunId: childMachine?.analysisRunId ?? null,
+      priorReadiness: parentMachine?.readiness ?? null,
+      resultingReadiness: childMachine?.readiness ?? null,
+    },
+  };
+}
+
+async function panelRowsForRevision(revisionId: string) {
+  return (await db
+    .select({
+      role: schema.submittedPanels.role,
+      checksumSha256: schema.submittedPanels.checksumSha256,
+    })
+    .from(schema.submittedPanels)
+    .where(eq(schema.submittedPanels.revisionId, revisionId))) as Array<{
+    role: string;
+    checksumSha256: string;
+  }>;
+}
+
+async function evidenceRowsForRevision(revisionId: string) {
+  return (await db
+    .select({
+      categoryId: schema.sellerEvidenceSnapshots.categoryId,
+      decision: schema.sellerEvidenceSnapshots.decision,
+      expectedValue: schema.sellerEvidenceSnapshots.expectedValue,
+      regions: schema.sellerEvidenceSnapshots.regions,
+    })
+    .from(schema.sellerEvidenceSnapshots)
+    .where(eq(schema.sellerEvidenceSnapshots.revisionId, revisionId))) as Array<{
+    categoryId: string;
+    decision: string;
+    expectedValue: string | null;
+    regions: string;
+  }>;
+}
+
+async function machineRowForRevision(revisionId: string) {
+  const rows = (await db
+    .select({
+      analysisRunId: schema.machineAnalysisSnapshots.analysisRunId,
+      readiness: schema.machineAnalysisSnapshots.readiness,
+    })
+    .from(schema.machineAnalysisSnapshots)
+    .where(eq(schema.machineAnalysisSnapshots.revisionId, revisionId))
+    .orderBy(desc(schema.machineAnalysisSnapshots.sequence))
+    .limit(1)) as Array<{ analysisRunId: string; readiness: string }>;
+  return rows[0] ?? null;
+}
+
+function comparePanels(
+  parentPanels: Array<{ role: string; checksumSha256: string }>,
+  childPanels: Array<{ role: string; checksumSha256: string }>,
+) {
+  const parentCounts = panelCounts(parentPanels);
+  const childCounts = panelCounts(childPanels);
+  const roles = new Set([...parentCounts.keys(), ...childCounts.keys()]);
+  const unchanged: PanelChecksumCountView[] = [];
+  const replaced: ReplacedPanelChecksumCountView[] = [];
+  const added: PanelChecksumCountView[] = [];
+  const removed: PanelChecksumCountView[] = [];
+
+  for (const role of roles) {
+    const parentByChecksum = parentCounts.get(role) ?? new Map<string, number>();
+    const childByChecksum = childCounts.get(role) ?? new Map<string, number>();
+    for (const checksum of [
+      ...new Set([...parentByChecksum.keys(), ...childByChecksum.keys()]),
+    ].sort()) {
+      const overlap = Math.min(
+        parentByChecksum.get(checksum) ?? 0,
+        childByChecksum.get(checksum) ?? 0,
+      );
+      if (overlap > 0) {
+        unchanged.push({ role, checksumSha256: checksum, count: overlap });
+        decrementPanelCount(parentByChecksum, checksum, overlap);
+        decrementPanelCount(childByChecksum, checksum, overlap);
+      }
+    }
+
+    const parentRemainder = checksumRemainder(parentByChecksum);
+    const childRemainder = checksumRemainder(childByChecksum);
+    while (parentRemainder.length > 0 && childRemainder.length > 0) {
+      const parent = parentRemainder[0];
+      const child = childRemainder[0];
+      const count = Math.min(parent.count, child.count);
+      replaced.push({
+        role,
+        priorChecksumSha256: parent.checksumSha256,
+        resultingChecksumSha256: child.checksumSha256,
+        count,
+      });
+      parent.count -= count;
+      child.count -= count;
+      if (parent.count === 0) parentRemainder.shift();
+      if (child.count === 0) childRemainder.shift();
+    }
+    removed.push(...parentRemainder.map((entry) => ({ role, ...entry })));
+    added.push(...childRemainder.map((entry) => ({ role, ...entry })));
+  }
+
+  return {
+    unchanged: sortPanelCounts(unchanged),
+    replaced: replaced.sort(
+      (a, b) =>
+        a.role.localeCompare(b.role) ||
+        a.priorChecksumSha256.localeCompare(b.priorChecksumSha256) ||
+        a.resultingChecksumSha256.localeCompare(b.resultingChecksumSha256),
+    ),
+    added: sortPanelCounts(added),
+    removed: sortPanelCounts(removed),
+  };
+}
+
+function panelCounts(panels: Array<{ role: string; checksumSha256: string }>) {
+  const counts = new Map<string, Map<string, number>>();
+  for (const panel of panels) {
+    const roleCounts = counts.get(panel.role) ?? new Map<string, number>();
+    roleCounts.set(panel.checksumSha256, (roleCounts.get(panel.checksumSha256) ?? 0) + 1);
+    counts.set(panel.role, roleCounts);
+  }
+  return counts;
+}
+
+function decrementPanelCount(counts: Map<string, number>, checksum: string, count: number) {
+  const next = (counts.get(checksum) ?? 0) - count;
+  if (next > 0) counts.set(checksum, next);
+  else counts.delete(checksum);
+}
+
+function checksumRemainder(counts: Map<string, number>) {
+  return [...counts.entries()]
+    .map(([checksumSha256, count]) => ({ checksumSha256, count }))
+    .filter((entry) => entry.count > 0)
+    .sort((a, b) => a.checksumSha256.localeCompare(b.checksumSha256));
+}
+
+function sortPanelCounts<T extends PanelChecksumCountView>(entries: T[]): T[] {
+  return entries.sort(
+    (a, b) => a.role.localeCompare(b.role) || a.checksumSha256.localeCompare(b.checksumSha256),
+  );
+}
+
+function compareEvidence(
+  parentEvidence: Array<{
+    categoryId: string;
+    decision: string;
+    expectedValue: string | null;
+    regions: string;
+  }>,
+  childEvidence: Array<{
+    categoryId: string;
+    decision: string;
+    expectedValue: string | null;
+    regions: string;
+  }>,
+) {
+  const parentByCategory = new Map(parentEvidence.map((row) => [row.categoryId, row]));
+  const childByCategory = new Map(childEvidence.map((row) => [row.categoryId, row]));
+  const categoryIds = [...new Set([...parentByCategory.keys(), ...childByCategory.keys()])].sort();
+  return categoryIds.map((categoryId) => {
+    const parent = parentByCategory.get(categoryId);
+    const child = childByCategory.get(categoryId);
+    return {
+      categoryId,
+      priorDecision: parent?.decision ?? null,
+      resultingDecision: child?.decision ?? null,
+      priorExpectedValue: parent?.expectedValue ?? null,
+      resultingExpectedValue: child?.expectedValue ?? null,
+      priorRegionCount: parent ? regionsFrom(parent.regions).length : 0,
+      resultingRegionCount: child ? regionsFrom(child.regions).length : 0,
+    };
+  });
 }
 
 /** Resolve the durable storage key for a panel that belongs to a submission. */

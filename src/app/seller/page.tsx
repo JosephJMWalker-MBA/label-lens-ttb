@@ -66,9 +66,17 @@ export default async function SellerPage() {
                       </div>
                     ) : null}
                   </div>
-                  <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium">
-                    {statusLabel(submission.currentStatus)}
-                  </span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium">
+                      {statusLabel(submission.currentStatus)}
+                    </span>
+                    <Link
+                      className="rounded-md border border-border px-3 py-1 text-xs font-medium hover:bg-muted"
+                      href={`/seller/submissions/${encodeURIComponent(submission.id)}`}
+                    >
+                      Details
+                    </Link>
+                  </div>
                 </li>
               ))}
             </ul>

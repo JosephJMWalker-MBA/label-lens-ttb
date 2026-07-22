@@ -86,6 +86,8 @@ for (const dialect of DIALECTS) {
       "prevent_reviewer_claims_delete",
       "prevent_agent_decisions_update",
       "prevent_agent_decisions_delete",
+      "prevent_submission_revision_responses_update",
+      "prevent_submission_revision_responses_delete",
       "force_version_race_after_agent_decision_insert",
       "force_agent_decision_unique_race",
     ];
@@ -142,6 +144,12 @@ for (const dialect of DIALECTS) {
           BEGIN SELECT RAISE(FAIL, 'Agent decisions are immutable.'); END;`);
         db.run(sql`CREATE TRIGGER prevent_agent_decisions_delete BEFORE DELETE ON agent_decisions
           BEGIN SELECT RAISE(FAIL, 'Agent decisions are immutable.'); END;`);
+        db.run(sql`CREATE TRIGGER prevent_submission_revision_responses_update
+          BEFORE UPDATE ON submission_revision_responses
+          BEGIN SELECT RAISE(FAIL, 'Submission revision response rows are immutable and cannot be updated.'); END;`);
+        db.run(sql`CREATE TRIGGER prevent_submission_revision_responses_delete
+          BEFORE DELETE ON submission_revision_responses
+          BEGIN SELECT RAISE(FAIL, 'Submission revision response rows are immutable and cannot be deleted.'); END;`);
       } else {
         await db.execute(
           sql.raw(`
@@ -219,6 +227,16 @@ for (const dialect of DIALECTS) {
           CREATE TRIGGER prevent_agent_decisions_delete BEFORE DELETE ON agent_decisions FOR EACH ROW
           BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Agent decisions are immutable.'; END`),
         );
+        await db.execute(
+          sql.raw(`
+          CREATE TRIGGER prevent_submission_revision_responses_update BEFORE UPDATE ON submission_revision_responses FOR EACH ROW
+          BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Submission revision response rows are immutable and cannot be updated.'; END`),
+        );
+        await db.execute(
+          sql.raw(`
+          CREATE TRIGGER prevent_submission_revision_responses_delete BEFORE DELETE ON submission_revision_responses FOR EACH ROW
+          BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Submission revision response rows are immutable and cannot be deleted.'; END`),
+        );
       }
     }
 
@@ -226,6 +244,7 @@ for (const dialect of DIALECTS) {
       await dropTriggers();
       for (const table of [
         schema.idempotencyRecords,
+        schema.submissionRevisionResponses,
         schema.agentDecisions,
         schema.reviewerClaims,
         schema.machineAnalysisSnapshots,

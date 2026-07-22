@@ -40,25 +40,30 @@ export async function listOwnedSubmissions(userId: string): Promise<OwnedSubmiss
   const revisionRows = (await db
     .select({
       submissionId: schema.submissionRevisions.submissionId,
+      revisionId: schema.submissionRevisions.id,
       revisionNumber: schema.submissionRevisions.revisionNumber,
     })
     .from(schema.submissionRevisions)
     .where(inArray(schema.submissionRevisions.submissionId, submissionIds))
     .orderBy(desc(schema.submissionRevisions.revisionNumber))) as {
     submissionId: string;
+    revisionId: string;
     revisionNumber: number;
   }[];
 
   const latestRevisionBySubmission = new Map<string, number>();
+  const latestRevisionIdBySubmission = new Map<string, string>();
   for (const revision of revisionRows) {
     if (!latestRevisionBySubmission.has(revision.submissionId)) {
       latestRevisionBySubmission.set(revision.submissionId, revision.revisionNumber);
+      latestRevisionIdBySubmission.set(revision.submissionId, revision.revisionId);
     }
   }
 
   const changeDecisionRows = (await db
     .select({
       submissionId: schema.agentDecisions.submissionId,
+      revisionId: schema.agentDecisions.revisionId,
       revisionNumber: schema.agentDecisions.revisionNumber,
       rationale: schema.agentDecisions.rationale,
       recordedAt: schema.agentDecisions.recordedAt,
@@ -72,6 +77,7 @@ export async function listOwnedSubmissions(userId: string): Promise<OwnedSubmiss
     )
     .orderBy(desc(schema.agentDecisions.recordedAt))) as {
     submissionId: string;
+    revisionId: string;
     revisionNumber: number;
     rationale: string;
     recordedAt: Date;
@@ -79,6 +85,9 @@ export async function listOwnedSubmissions(userId: string): Promise<OwnedSubmiss
 
   const feedbackBySubmission = new Map<string, OwnedSubmission["changesRequestedFeedback"]>();
   for (const decision of changeDecisionRows) {
+    if (latestRevisionIdBySubmission.get(decision.submissionId) !== decision.revisionId) {
+      continue;
+    }
     if (!feedbackBySubmission.has(decision.submissionId)) {
       feedbackBySubmission.set(decision.submissionId, {
         revisionNumber: decision.revisionNumber,
@@ -96,6 +105,116 @@ export async function listOwnedSubmissions(userId: string): Promise<OwnedSubmiss
   }));
 
   return submissions.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+}
+
+export interface OwnedSubmissionDetail {
+  id: string;
+  currentStatus: string;
+  version: number;
+  isDemo: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  revisions: Array<{
+    id: string;
+    revisionNumber: number;
+    profileId: string;
+    profileVersion: string;
+    submittedBy: string;
+    submittedAt: Date;
+  }>;
+  events: Array<{ status: string; recordedAt: Date }>;
+  changesRequestedFeedback: {
+    decisionId: string;
+    revisionId: string;
+    revisionNumber: number;
+    rationale: string;
+    recordedAt: Date;
+    alreadyAnswered: boolean;
+  } | null;
+}
+
+export async function getOwnedSubmissionDetail(
+  userId: string,
+  submissionId: string,
+): Promise<OwnedSubmissionDetail | null> {
+  const rows = (await db
+    .select({
+      id: schema.submissions.id,
+      currentStatus: schema.submissions.currentStatus,
+      version: schema.submissions.version,
+      isDemo: schema.submissions.isDemo,
+      createdAt: schema.submissions.createdAt,
+      updatedAt: schema.submissions.updatedAt,
+    })
+    .from(schema.submissions)
+    .where(and(eq(schema.submissions.id, submissionId), eq(schema.submissions.creatorId, userId)))
+    .limit(1)) as Array<
+    Omit<OwnedSubmissionDetail, "revisions" | "events" | "changesRequestedFeedback">
+  >;
+  const submission = rows[0];
+  if (!submission) return null;
+
+  const revisions = (await db
+    .select({
+      id: schema.submissionRevisions.id,
+      revisionNumber: schema.submissionRevisions.revisionNumber,
+      profileId: schema.submissionRevisions.profileId,
+      profileVersion: schema.submissionRevisions.profileVersion,
+      submittedBy: schema.submissionRevisions.submittedBy,
+      submittedAt: schema.submissionRevisions.submittedAt,
+    })
+    .from(schema.submissionRevisions)
+    .where(eq(schema.submissionRevisions.submissionId, submissionId))
+    .orderBy(asc(schema.submissionRevisions.revisionNumber))) as OwnedSubmissionDetail["revisions"];
+  const latestRevision = revisions.at(-1);
+
+  const events = (await db
+    .select({
+      status: schema.submissionStatusEvents.status,
+      recordedAt: schema.submissionStatusEvents.recordedAt,
+    })
+    .from(schema.submissionStatusEvents)
+    .where(eq(schema.submissionStatusEvents.submissionId, submissionId))
+    .orderBy(asc(schema.submissionStatusEvents.recordedAt))) as OwnedSubmissionDetail["events"];
+
+  let changesRequestedFeedback: OwnedSubmissionDetail["changesRequestedFeedback"] = null;
+  if (submission.currentStatus === "changes_requested" && latestRevision) {
+    const decisionRows = (await db
+      .select({
+        decisionId: schema.agentDecisions.id,
+        revisionId: schema.agentDecisions.revisionId,
+        revisionNumber: schema.agentDecisions.revisionNumber,
+        rationale: schema.agentDecisions.rationale,
+        recordedAt: schema.agentDecisions.recordedAt,
+      })
+      .from(schema.agentDecisions)
+      .where(
+        and(
+          eq(schema.agentDecisions.submissionId, submissionId),
+          eq(schema.agentDecisions.revisionId, latestRevision.id),
+          eq(schema.agentDecisions.decisionType, "changes_requested"),
+        ),
+      )
+      .limit(1)) as Array<
+      Omit<NonNullable<OwnedSubmissionDetail["changesRequestedFeedback"]>, "alreadyAnswered">
+    >;
+    const decision = decisionRows[0];
+    if (decision) {
+      const responseRows = await db
+        .select({ id: schema.submissionRevisionResponses.id })
+        .from(schema.submissionRevisionResponses)
+        .where(eq(schema.submissionRevisionResponses.respondedToDecisionId, decision.decisionId))
+        .limit(1);
+      changesRequestedFeedback = { ...decision, alreadyAnswered: responseRows.length > 0 };
+    }
+  }
+
+  return {
+    ...submission,
+    revisions,
+    events,
+    changesRequestedFeedback,
+  };
 }
 
 // ---- Agent queue ----
