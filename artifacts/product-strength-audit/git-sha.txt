@@ -1,0 +1,5 @@
+repository: JosephJMWalker-MBA/label-lens-ttb
+baseline-ref: origin/main
+baseline-sha: ebd039bb779c0e85de700148cafa0c5a80e40091
+branch: codex/issue-158-product-strength-audit
+audit-date: 2026-07-21
