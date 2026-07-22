@@ -22,7 +22,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   if (!result.ok) {
     if (result.reason === "integrity_failed") {
       // Fail closed without leaking internal tamper details.
-      return NextResponse.json({ error: "Submission integrity check failed." }, { status: 500 });
+      return NextResponse.json(
+        {
+          error: {
+            code: "REVISION_INTEGRITY_FAILED",
+            message: "Submission revision integrity failed. Reload or contact an administrator.",
+          },
+        },
+        { status: 409 },
+      );
     }
     return NextResponse.json({ error: "Submission not found." }, { status: 404 });
   }

@@ -198,6 +198,41 @@ describe("applyMigrations", () => {
   });
 });
 
+describe("agent decision migration metadata", () => {
+  it("journals 0002 and carries the durable claim/decision tables plus immutability triggers", () => {
+    const source = path.join(process.cwd(), MIGRATIONS_REL);
+    const journal = JSON.parse(
+      readFileSync(path.join(source, "meta", "_journal.json"), "utf8"),
+    ) as {
+      entries: Array<{ tag: string }>;
+    };
+    expect(journal.entries.map((entry) => entry.tag)).toEqual([
+      "0000_smooth_felicia_hardy",
+      "0001_tiny_marauders",
+      "0002_issue_165_agent_decisions",
+    ]);
+
+    const migrationSql = readFileSync(
+      path.join(source, "0002_issue_165_agent_decisions.sql"),
+      "utf8",
+    );
+    expect(migrationSql).toMatch(/CREATE TABLE `reviewer_claims`/);
+    expect(migrationSql).toMatch(/CREATE TABLE `agent_decisions`/);
+    expect(migrationSql).toMatch(/`prior_status` varchar\(50\) NOT NULL/);
+    expect(migrationSql).toMatch(/`resulting_status` varchar\(50\) NOT NULL/);
+    expect(migrationSql).toMatch(/`idempotency_record_key` varchar\(255\) NOT NULL/);
+    expect(migrationSql).toMatch(/CONSTRAINT `reviewer_claims_active_submission_idx` UNIQUE/);
+    expect(migrationSql).toMatch(/CONSTRAINT `agent_decisions_revision_idx` UNIQUE/);
+    expect(migrationSql).toMatch(/CONSTRAINT `agent_decisions_claim_idx` UNIQUE/);
+    expect(migrationSql).toMatch(/CONSTRAINT `agent_decisions_idempotency_record_key_idx` UNIQUE/);
+    expect(migrationSql).not.toMatch(/agent_decisions_idempotency_record_key_.*FOREIGN KEY/);
+    expect(migrationSql).toMatch(/prevent_reviewer_claims_closed_update/);
+    expect(migrationSql).toMatch(/prevent_reviewer_claims_identity_update/);
+    expect(migrationSql).toMatch(/prevent_agent_decisions_update/);
+    expect(migrationSql).toMatch(/prevent_agent_decisions_delete/);
+  });
+});
+
 if (RUN_MYSQL_TESTS) {
   if (!MYSQL_DATABASE_URL || !/^mysql2?:\/\//.test(MYSQL_DATABASE_URL)) {
     throw new Error("RUN_MYSQL_TESTS=1 requires a mysql:// DATABASE_URL");

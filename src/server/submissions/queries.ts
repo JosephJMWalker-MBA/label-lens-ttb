@@ -10,6 +10,12 @@ export interface OwnedSubmission {
   version: number;
   isDemo: boolean;
   updatedAt: Date;
+  latestRevisionNumber: number | null;
+  changesRequestedFeedback: {
+    revisionNumber: number;
+    rationale: string;
+    recordedAt: Date;
+  } | null;
 }
 
 /** Submissions created by a specific seller. Never returns other sellers' rows. */
@@ -23,9 +29,73 @@ export async function listOwnedSubmissions(userId: string): Promise<OwnedSubmiss
       updatedAt: schema.submissions.updatedAt,
     })
     .from(schema.submissions)
-    .where(eq(schema.submissions.creatorId, userId))) as OwnedSubmission[];
+    .where(eq(schema.submissions.creatorId, userId))) as Omit<
+    OwnedSubmission,
+    "latestRevisionNumber" | "changesRequestedFeedback"
+  >[];
 
-  return rows.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+  if (rows.length === 0) return [];
+
+  const submissionIds = rows.map((row) => row.id);
+  const revisionRows = (await db
+    .select({
+      submissionId: schema.submissionRevisions.submissionId,
+      revisionNumber: schema.submissionRevisions.revisionNumber,
+    })
+    .from(schema.submissionRevisions)
+    .where(inArray(schema.submissionRevisions.submissionId, submissionIds))
+    .orderBy(desc(schema.submissionRevisions.revisionNumber))) as {
+    submissionId: string;
+    revisionNumber: number;
+  }[];
+
+  const latestRevisionBySubmission = new Map<string, number>();
+  for (const revision of revisionRows) {
+    if (!latestRevisionBySubmission.has(revision.submissionId)) {
+      latestRevisionBySubmission.set(revision.submissionId, revision.revisionNumber);
+    }
+  }
+
+  const changeDecisionRows = (await db
+    .select({
+      submissionId: schema.agentDecisions.submissionId,
+      revisionNumber: schema.agentDecisions.revisionNumber,
+      rationale: schema.agentDecisions.rationale,
+      recordedAt: schema.agentDecisions.recordedAt,
+    })
+    .from(schema.agentDecisions)
+    .where(
+      and(
+        inArray(schema.agentDecisions.submissionId, submissionIds),
+        eq(schema.agentDecisions.decisionType, "changes_requested"),
+      ),
+    )
+    .orderBy(desc(schema.agentDecisions.recordedAt))) as {
+    submissionId: string;
+    revisionNumber: number;
+    rationale: string;
+    recordedAt: Date;
+  }[];
+
+  const feedbackBySubmission = new Map<string, OwnedSubmission["changesRequestedFeedback"]>();
+  for (const decision of changeDecisionRows) {
+    if (!feedbackBySubmission.has(decision.submissionId)) {
+      feedbackBySubmission.set(decision.submissionId, {
+        revisionNumber: decision.revisionNumber,
+        rationale: decision.rationale,
+        recordedAt: decision.recordedAt,
+      });
+    }
+  }
+
+  const submissions: OwnedSubmission[] = rows.map((row) => ({
+    ...row,
+    latestRevisionNumber: latestRevisionBySubmission.get(row.id) ?? null,
+    changesRequestedFeedback:
+      row.currentStatus === "changes_requested" ? (feedbackBySubmission.get(row.id) ?? null) : null,
+  }));
+
+  return submissions.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
 }
 
 // ---- Agent queue ----

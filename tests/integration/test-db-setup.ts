@@ -160,6 +160,57 @@ export function createTestSqliteDb(filepath: string, forceDelete = false) {
     );
   `);
 
+  // Reviewer Claims table
+  sqliteDb.exec(`
+    CREATE TABLE IF NOT EXISTS reviewer_claims (
+      id TEXT PRIMARY KEY,
+      submission_id TEXT NOT NULL REFERENCES submissions(id),
+      revision_id TEXT NOT NULL REFERENCES submission_revisions(id),
+      revision_number INTEGER NOT NULL,
+      reviewer_id TEXT NOT NULL REFERENCES users(id),
+      reviewer_role TEXT NOT NULL,
+      state TEXT NOT NULL,
+      active_submission_id TEXT REFERENCES submissions(id),
+      claimed_submission_version INTEGER NOT NULL,
+      claimed_at INTEGER NOT NULL,
+      released_at INTEGER,
+      released_by TEXT REFERENCES users(id),
+      released_by_role TEXT,
+      release_reason TEXT,
+      decided_at INTEGER,
+      created_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL
+    );
+  `);
+
+  sqliteDb.exec(`
+    CREATE UNIQUE INDEX IF NOT EXISTS reviewer_claims_active_submission_idx
+    ON reviewer_claims(active_submission_id);
+  `);
+
+  // Agent Decisions table
+  sqliteDb.exec(`
+    CREATE TABLE IF NOT EXISTS agent_decisions (
+      id TEXT PRIMARY KEY,
+      submission_id TEXT NOT NULL REFERENCES submissions(id),
+      revision_id TEXT NOT NULL REFERENCES submission_revisions(id),
+      revision_number INTEGER NOT NULL,
+      claim_id TEXT NOT NULL REFERENCES reviewer_claims(id),
+      reviewer_id TEXT NOT NULL REFERENCES users(id),
+      reviewer_role TEXT NOT NULL,
+      decision_type TEXT NOT NULL,
+      prior_status TEXT NOT NULL,
+      resulting_status TEXT NOT NULL,
+      rationale TEXT NOT NULL,
+      submission_version_before INTEGER NOT NULL,
+      submission_version_after INTEGER NOT NULL,
+      idempotency_record_key TEXT NOT NULL,
+      recorded_at INTEGER NOT NULL,
+      UNIQUE(revision_id),
+      UNIQUE(claim_id),
+      UNIQUE(idempotency_record_key)
+    );
+  `);
+
   // Idempotency Records table
   sqliteDb.exec(`
     CREATE TABLE IF NOT EXISTS idempotency_records (
@@ -204,6 +255,66 @@ export function createTestSqliteDb(filepath: string, forceDelete = false) {
     BEFORE DELETE ON submission_revisions
     BEGIN
       SELECT RAISE(FAIL, 'Submission revisions are immutable and cannot be deleted.');
+    END;
+  `);
+
+  // Reviewer claims can close exactly once; closed rows cannot be reused.
+  sqliteDb.exec(`
+    CREATE TRIGGER IF NOT EXISTS prevent_reviewer_claims_closed_update
+    BEFORE UPDATE ON reviewer_claims
+    WHEN OLD.state != 'active'
+    BEGIN
+      SELECT RAISE(FAIL, 'Closed reviewer claim rows are immutable.');
+    END;
+  `);
+
+  sqliteDb.exec(`
+    CREATE TRIGGER IF NOT EXISTS prevent_reviewer_claims_identity_update
+    BEFORE UPDATE ON reviewer_claims
+    WHEN OLD.id != NEW.id
+      OR OLD.submission_id != NEW.submission_id
+      OR OLD.revision_id != NEW.revision_id
+      OR OLD.revision_number != NEW.revision_number
+      OR OLD.reviewer_id != NEW.reviewer_id
+      OR OLD.reviewer_role != NEW.reviewer_role
+      OR OLD.claimed_submission_version != NEW.claimed_submission_version
+      OR OLD.claimed_at != NEW.claimed_at
+      OR OLD.created_at != NEW.created_at
+      OR (NEW.state = 'active' AND (
+        OLD.active_submission_id IS NOT NEW.active_submission_id
+        OR OLD.released_at IS NOT NEW.released_at
+        OR OLD.released_by IS NOT NEW.released_by
+        OR OLD.released_by_role IS NOT NEW.released_by_role
+        OR OLD.release_reason IS NOT NEW.release_reason
+        OR OLD.decided_at IS NOT NEW.decided_at
+      ))
+    BEGIN
+      SELECT RAISE(FAIL, 'Reviewer claim identity fields cannot be updated.');
+    END;
+  `);
+
+  sqliteDb.exec(`
+    CREATE TRIGGER IF NOT EXISTS prevent_reviewer_claims_delete
+    BEFORE DELETE ON reviewer_claims
+    BEGIN
+      SELECT RAISE(FAIL, 'Reviewer claim rows cannot be deleted.');
+    END;
+  `);
+
+  // Agent decision records are append-only.
+  sqliteDb.exec(`
+    CREATE TRIGGER IF NOT EXISTS prevent_agent_decisions_update
+    BEFORE UPDATE ON agent_decisions
+    BEGIN
+      SELECT RAISE(FAIL, 'Agent decisions are immutable and cannot be updated.');
+    END;
+  `);
+
+  sqliteDb.exec(`
+    CREATE TRIGGER IF NOT EXISTS prevent_agent_decisions_delete
+    BEFORE DELETE ON agent_decisions
+    BEGIN
+      SELECT RAISE(FAIL, 'Agent decisions are immutable and cannot be deleted.');
     END;
   `);
 

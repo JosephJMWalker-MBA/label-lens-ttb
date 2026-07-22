@@ -2,10 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PortalHeader } from "@/components/layout/PortalHeader";
-import { requireRolePage } from "@/server/auth/guards";
+import { requireRolePage, type SessionUser } from "@/server/auth/guards";
 import { isValidSubmissionId } from "@/server/submissions/access";
 import { buildSubmissionDetail, type SubmissionDetailView } from "@/server/submissions/detail";
 import { INTERNAL_REVIEW_RECORD_NOTICE, statusLabel } from "@/lib/product-language";
+import { AgentReviewActions } from "./AgentReviewActions";
 
 export const dynamic = "force-dynamic";
 
@@ -46,14 +47,14 @@ export default async function AgentSubmissionPage({ params }: { params: Promise<
             </p>
           </div>
         ) : (
-          <Detail view={result.view} />
+          <Detail view={result.view} user={user} />
         )}
       </main>
     </>
   );
 }
 
-function Detail({ view }: { view: SubmissionDetailView }) {
+function Detail({ view, user }: { view: SubmissionDetailView; user: SessionUser }) {
   return (
     <>
       <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -70,6 +71,18 @@ function Detail({ view }: { view: SubmissionDetailView }) {
       <p className="mt-2 rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
         {INTERNAL_REVIEW_RECORD_NOTICE}
       </p>
+
+      <AgentReviewActions
+        submissionId={view.submission.id}
+        currentStatus={view.submission.status}
+        submissionVersion={view.submission.version}
+        revisionId={view.revision.id}
+        revisionNumber={view.revision.revisionNumber}
+        currentUserId={user.id}
+        currentUserRole={user.role === "admin" ? "admin" : "agent"}
+        activeClaim={view.activeClaim}
+        latestDecision={view.latestDecision}
+      />
 
       <section className="mt-8">
         <h2 className="text-lg font-semibold tracking-tight">Immutable revision</h2>

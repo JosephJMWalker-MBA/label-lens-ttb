@@ -287,6 +287,11 @@ for (const dialect of TEST_DIALECTS) {
       "prevent_submissions_delete",
       "prevent_revisions_update",
       "prevent_revisions_delete",
+      "prevent_reviewer_claims_closed_update",
+      "prevent_reviewer_claims_identity_update",
+      "prevent_reviewer_claims_delete",
+      "prevent_agent_decisions_update",
+      "prevent_agent_decisions_delete",
     ];
 
     async function dropTriggers() {
@@ -316,6 +321,34 @@ for (const dialect of TEST_DIALECTS) {
           BEGIN SELECT RAISE(FAIL, 'Submission revisions are immutable.'); END;`);
         db.run(sql`CREATE TRIGGER prevent_revisions_delete BEFORE DELETE ON submission_revisions
           BEGIN SELECT RAISE(FAIL, 'Submission revisions are immutable.'); END;`);
+        db.run(sql`CREATE TRIGGER prevent_reviewer_claims_closed_update BEFORE UPDATE ON reviewer_claims
+          WHEN OLD.state != 'active'
+          BEGIN SELECT RAISE(FAIL, 'Closed reviewer claim rows are immutable.'); END;`);
+        db.run(sql`CREATE TRIGGER prevent_reviewer_claims_identity_update BEFORE UPDATE ON reviewer_claims
+          WHEN OLD.id != NEW.id
+            OR OLD.submission_id != NEW.submission_id
+            OR OLD.revision_id != NEW.revision_id
+            OR OLD.revision_number != NEW.revision_number
+            OR OLD.reviewer_id != NEW.reviewer_id
+            OR OLD.reviewer_role != NEW.reviewer_role
+            OR OLD.claimed_submission_version != NEW.claimed_submission_version
+            OR OLD.claimed_at != NEW.claimed_at
+            OR OLD.created_at != NEW.created_at
+            OR (NEW.state = 'active' AND (
+              OLD.active_submission_id IS NOT NEW.active_submission_id
+              OR OLD.released_at IS NOT NEW.released_at
+              OR OLD.released_by IS NOT NEW.released_by
+              OR OLD.released_by_role IS NOT NEW.released_by_role
+              OR OLD.release_reason IS NOT NEW.release_reason
+              OR OLD.decided_at IS NOT NEW.decided_at
+            ))
+          BEGIN SELECT RAISE(FAIL, 'Reviewer claim identity fields cannot be updated.'); END;`);
+        db.run(sql`CREATE TRIGGER prevent_reviewer_claims_delete BEFORE DELETE ON reviewer_claims
+          BEGIN SELECT RAISE(FAIL, 'Reviewer claim rows cannot be deleted.'); END;`);
+        db.run(sql`CREATE TRIGGER prevent_agent_decisions_update BEFORE UPDATE ON agent_decisions
+          BEGIN SELECT RAISE(FAIL, 'Agent decisions are immutable.'); END;`);
+        db.run(sql`CREATE TRIGGER prevent_agent_decisions_delete BEFORE DELETE ON agent_decisions
+          BEGIN SELECT RAISE(FAIL, 'Agent decisions are immutable.'); END;`);
       } else {
         await db.execute(
           sql.raw(`
@@ -342,11 +375,64 @@ for (const dialect of TEST_DIALECTS) {
           CREATE TRIGGER prevent_revisions_delete BEFORE DELETE ON submission_revisions FOR EACH ROW
           BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Submission revisions are immutable.'; END`),
         );
+        await db.execute(
+          sql.raw(`
+          CREATE TRIGGER prevent_reviewer_claims_closed_update BEFORE UPDATE ON reviewer_claims FOR EACH ROW
+          BEGIN
+            IF OLD.state <> 'active' THEN
+              SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Closed reviewer claim rows are immutable.';
+            END IF;
+          END`),
+        );
+        await db.execute(
+          sql.raw(`
+          CREATE TRIGGER prevent_reviewer_claims_identity_update BEFORE UPDATE ON reviewer_claims FOR EACH ROW
+          BEGIN
+            IF NOT (OLD.id <=> NEW.id)
+                OR NOT (OLD.submission_id <=> NEW.submission_id)
+                OR NOT (OLD.revision_id <=> NEW.revision_id)
+                OR NOT (OLD.revision_number <=> NEW.revision_number)
+                OR NOT (OLD.reviewer_id <=> NEW.reviewer_id)
+                OR NOT (OLD.reviewer_role <=> NEW.reviewer_role)
+                OR NOT (OLD.claimed_submission_version <=> NEW.claimed_submission_version)
+                OR NOT (OLD.claimed_at <=> NEW.claimed_at)
+                OR NOT (OLD.created_at <=> NEW.created_at) THEN
+              SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Reviewer claim identity fields cannot be updated.';
+            END IF;
+            IF NEW.state = 'active' AND (
+                NOT (OLD.active_submission_id <=> NEW.active_submission_id)
+                OR NOT (OLD.released_at <=> NEW.released_at)
+                OR NOT (OLD.released_by <=> NEW.released_by)
+                OR NOT (OLD.released_by_role <=> NEW.released_by_role)
+                OR NOT (OLD.release_reason <=> NEW.release_reason)
+                OR NOT (OLD.decided_at <=> NEW.decided_at)
+            ) THEN
+              SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Active reviewer claims cannot be edited.';
+            END IF;
+          END`),
+        );
+        await db.execute(
+          sql.raw(`
+          CREATE TRIGGER prevent_reviewer_claims_delete BEFORE DELETE ON reviewer_claims FOR EACH ROW
+          BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Reviewer claim rows cannot be deleted.'; END`),
+        );
+        await db.execute(
+          sql.raw(`
+          CREATE TRIGGER prevent_agent_decisions_update BEFORE UPDATE ON agent_decisions FOR EACH ROW
+          BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Agent decisions are immutable.'; END`),
+        );
+        await db.execute(
+          sql.raw(`
+          CREATE TRIGGER prevent_agent_decisions_delete BEFORE DELETE ON agent_decisions FOR EACH ROW
+          BEGIN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Agent decisions are immutable.'; END`),
+        );
       }
     }
 
     async function clearTables() {
       await db.delete(schema.idempotencyRecords);
+      await db.delete(schema.agentDecisions);
+      await db.delete(schema.reviewerClaims);
       await db.delete(schema.machineAnalysisSnapshots);
       await db.delete(schema.sellerEvidenceSnapshots);
       await db.delete(schema.submittedPanels);
@@ -467,7 +553,7 @@ for (const dialect of TEST_DIALECTS) {
         expect((await finalizePOST(request)).status).toBe(401);
       });
 
-      it("commits atomically and returns a durable, signed receipt", async () => {
+      it("commits atomically and returns a durable receipt without exposing the signature", async () => {
         const pkgId = "pkg-finalize-ok";
         const request = buildFinalizeRequest(createValidExportPayload(pkgId), sellerCookie, "k-ok");
         const response = await finalizePOST(request);
@@ -477,12 +563,12 @@ for (const dialect of TEST_DIALECTS) {
           submissionId: string;
           revisionId: string;
           status: string;
-          signature: string;
           receivingAgent: string;
+          signature?: string;
         };
         expect(receipt.submissionId).toBe(pkgId);
         expect(receipt.status).toBe("waiting_for_agent_review");
-        expect(receipt.signature).toContain("v1:");
+        expect(receipt.signature).toBeUndefined();
         expect(receipt.receivingAgent).toBe("label-lens-internal-agent-queue");
 
         const sub = await db.query.submissions.findFirst({
@@ -494,7 +580,7 @@ for (const dialect of TEST_DIALECTS) {
         const rev = await db.query.submissionRevisions.findFirst({
           where: (r: any, { eq: e }: any) => e(r.submissionId, pkgId),
         });
-        expect(rev?.integritySignature).toBe(receipt.signature);
+        expect(rev?.integritySignature).toContain("v1:");
         expect(verifyRevision(rev?.canonicalJson ?? "", rev?.integritySignature ?? "")).toBe(true);
 
         // Server-owned durable storage key, not any client-supplied path.
@@ -1005,7 +1091,7 @@ for (const dialect of TEST_DIALECTS) {
         expect(response.status).toBe(404);
       });
 
-      it("fails closed (500) when revision HMAC verification fails", async () => {
+      it("fails closed with a controlled 409 when revision HMAC verification fails", async () => {
         // Tamper the stored canonical json bypassing the immutability trigger.
         if (isSQLite) {
           db.run(sql`DROP TRIGGER IF EXISTS prevent_revisions_update`);
@@ -1033,10 +1119,10 @@ for (const dialect of TEST_DIALECTS) {
         const response = await statusGET(request, {
           params: Promise.resolve({ id: submissionId }),
         });
-        expect(response.status).toBe(500);
-        expect(((await response.json()) as { error: string }).error).toContain(
-          "integrity check failed",
-        );
+        expect(response.status).toBe(409);
+        expect((await response.json()) as unknown).toMatchObject({
+          error: { code: "REVISION_INTEGRITY_FAILED" },
+        });
       });
     });
   });

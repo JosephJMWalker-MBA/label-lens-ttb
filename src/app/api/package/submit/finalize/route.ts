@@ -331,8 +331,8 @@ export async function POST(request: Request) {
   }
 
   // 10. Server-authoritative receipt + revision fields. Nothing here is trusted
-  //     from the client: revision id, timestamps, receipt status, and signature
-  //     are all generated server-side.
+  //     from the client: revision id, timestamps, receipt status, and the stored
+  //     integrity signature are all generated server-side.
   const requestHash = createHash("sha256").update(canonicalStringify(exportPayload)).digest("hex");
   const revisionId = randomUUID();
   const signature = signRevision(canonicalString);
@@ -344,7 +344,6 @@ export async function POST(request: Request) {
     revisionNumber: 1,
     status: "waiting_for_agent_review" as const,
     receivingAgent: exportPayload.receivingAgent,
-    signature,
     recordedAt: recordedAt.toISOString(),
   };
 

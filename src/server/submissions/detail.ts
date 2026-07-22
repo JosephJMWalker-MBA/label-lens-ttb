@@ -69,6 +69,22 @@ export interface SubmissionDetailView {
     reasonComment: string | null;
     recordedAt: string;
   }[];
+  activeClaim: {
+    id: string;
+    reviewerId: string;
+    reviewerRole: string;
+    revisionId: string;
+    revisionNumber: number;
+    claimedAt: string;
+  } | null;
+  latestDecision: {
+    id: string;
+    decisionType: string;
+    revisionId: string;
+    revisionNumber: number;
+    reviewerRole: string;
+    recordedAt: string;
+  } | null;
 }
 
 export type SubmissionDetailResult =
@@ -253,6 +269,50 @@ export async function buildSubmissionDetail(submissionId: string): Promise<Submi
     recordedAt: Date;
   }[];
 
+  const activeClaimRows = (await db
+    .select({
+      id: schema.reviewerClaims.id,
+      reviewerId: schema.reviewerClaims.reviewerId,
+      reviewerRole: schema.reviewerClaims.reviewerRole,
+      revisionId: schema.reviewerClaims.revisionId,
+      revisionNumber: schema.reviewerClaims.revisionNumber,
+      claimedAt: schema.reviewerClaims.claimedAt,
+    })
+    .from(schema.reviewerClaims)
+    .where(eq(schema.reviewerClaims.activeSubmissionId, submissionId))
+    .limit(1)) as {
+    id: string;
+    reviewerId: string;
+    reviewerRole: string;
+    revisionId: string;
+    revisionNumber: number;
+    claimedAt: Date;
+  }[];
+
+  const latestDecisionRows = (await db
+    .select({
+      id: schema.agentDecisions.id,
+      decisionType: schema.agentDecisions.decisionType,
+      revisionId: schema.agentDecisions.revisionId,
+      revisionNumber: schema.agentDecisions.revisionNumber,
+      reviewerRole: schema.agentDecisions.reviewerRole,
+      recordedAt: schema.agentDecisions.recordedAt,
+    })
+    .from(schema.agentDecisions)
+    .where(eq(schema.agentDecisions.revisionId, revision.id))
+    .orderBy(desc(schema.agentDecisions.recordedAt))
+    .limit(1)) as {
+    id: string;
+    decisionType: string;
+    revisionId: string;
+    revisionNumber: number;
+    reviewerRole: string;
+    recordedAt: Date;
+  }[];
+
+  const activeClaim = activeClaimRows[0] ?? null;
+  const latestDecision = latestDecisionRows[0] ?? null;
+
   return {
     ok: true,
     view: {
@@ -281,6 +341,26 @@ export async function buildSubmissionDetail(submissionId: string): Promise<Submi
         reasonComment: e.reasonComment,
         recordedAt: e.recordedAt.toISOString(),
       })),
+      activeClaim: activeClaim
+        ? {
+            id: activeClaim.id,
+            reviewerId: activeClaim.reviewerId,
+            reviewerRole: activeClaim.reviewerRole,
+            revisionId: activeClaim.revisionId,
+            revisionNumber: activeClaim.revisionNumber,
+            claimedAt: activeClaim.claimedAt.toISOString(),
+          }
+        : null,
+      latestDecision: latestDecision
+        ? {
+            id: latestDecision.id,
+            decisionType: latestDecision.decisionType,
+            revisionId: latestDecision.revisionId,
+            revisionNumber: latestDecision.revisionNumber,
+            reviewerRole: latestDecision.reviewerRole,
+            recordedAt: latestDecision.recordedAt.toISOString(),
+          }
+        : null,
     },
   };
 }
