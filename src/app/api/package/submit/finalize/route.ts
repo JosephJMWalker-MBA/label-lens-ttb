@@ -30,6 +30,33 @@ interface CachedIdempotencyRecord {
   responsePayload: string;
 }
 
+function summarizeFinalizeCommitError(err: unknown) {
+  const chain: Array<{
+    name?: string;
+    code?: string;
+    errno?: number;
+    sqlState?: string;
+  }> = [];
+  let current: unknown = err;
+  for (let depth = 0; current && depth < 5; depth++) {
+    const e = current as {
+      name?: string;
+      code?: string;
+      errno?: number;
+      sqlState?: string;
+      cause?: unknown;
+    };
+    chain.push({
+      name: e.name,
+      code: e.code,
+      errno: e.errno,
+      sqlState: e.sqlState,
+    });
+    current = e.cause;
+  }
+  return { causeChain: chain };
+}
+
 export async function POST(request: Request) {
   // 1. Authenticate: inline session + role check (not middleware). Provisioned seller only.
   const session = await auth.api.getSession({ headers: request.headers });
@@ -603,7 +630,7 @@ export async function POST(request: Request) {
       );
     }
 
-    console.error("[Finalize Route Error]", err);
+    console.error("[Finalize Route Error]", summarizeFinalizeCommitError(err));
     return NextResponse.json(
       { error: "Internal server error during finalization commit" },
       { status: 500 },

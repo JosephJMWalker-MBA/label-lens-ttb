@@ -1,0 +1,1 @@
+ALTER TABLE `submission_revisions` MODIFY COLUMN `canonical_json` mediumtext NOT NULL;

@@ -1,9 +1,11 @@
 // @vitest-environment node
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+/* eslint-disable @typescript-eslint/no-explicit-any -- MySQL upgrade path drives dynamic Drizzle handles across manual schema resets */
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { sql } from "drizzle-orm";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { applyMigrations, resolveMigrationsDir } from "./migrate";
 
@@ -15,6 +17,8 @@ import { applyMigrations, resolveMigrationsDir } from "./migrate";
  */
 
 const MIGRATIONS_REL = path.join("src", "db", "migrations");
+const RUN_MYSQL_TESTS = process.env.RUN_MYSQL_TESTS === "1";
+const MYSQL_DATABASE_URL = process.env.DATABASE_URL;
 let tmp: string;
 
 function makeMigrationsAt(root: string): string {
@@ -25,6 +29,71 @@ function makeMigrationsAt(root: string): string {
     JSON.stringify({ version: "7", dialect: "mysql", entries: [] }),
   );
   return dir;
+}
+
+function makeMigrationSubsetAt(root: string, tags: string[]): string {
+  const source = path.join(process.cwd(), MIGRATIONS_REL);
+  const dir = path.join(root, MIGRATIONS_REL);
+  mkdirSync(path.join(dir, "meta"), { recursive: true });
+
+  for (const tag of tags) {
+    writeFileSync(
+      path.join(dir, `${tag}.sql`),
+      readFileSync(path.join(source, `${tag}.sql`), "utf8"),
+    );
+  }
+
+  const journal = JSON.parse(readFileSync(path.join(source, "meta", "_journal.json"), "utf8")) as {
+    version: string;
+    dialect: string;
+    entries: Array<{ tag: string }>;
+  };
+  writeFileSync(
+    path.join(dir, "meta", "_journal.json"),
+    JSON.stringify({
+      ...journal,
+      entries: journal.entries.filter((entry) => tags.includes(entry.tag)),
+    }),
+  );
+
+  return dir;
+}
+
+function quoteIdentifier(name: string): string {
+  return `\`${name.replaceAll("`", "``")}\``;
+}
+
+async function dropAllMysqlTables(dbUrl: string) {
+  const mysql = (await import("mysql2/promise")).default;
+  const connection = await mysql.createConnection(dbUrl);
+  try {
+    const [rows] = await connection.query(
+      "SELECT TABLE_NAME AS tableName FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_TYPE = 'BASE TABLE'",
+    );
+    await connection.query("SET FOREIGN_KEY_CHECKS = 0");
+    for (const row of rows as Array<{ tableName: string }>) {
+      await connection.query(`DROP TABLE IF EXISTS ${quoteIdentifier(row.tableName)}`);
+    }
+    await connection.query("SET FOREIGN_KEY_CHECKS = 1");
+  } finally {
+    await connection.end();
+  }
+}
+
+async function mysqlColumnType(dbUrl: string): Promise<{
+  dataType: string;
+  characterMaximumLength: number;
+}> {
+  const mysql = (await import("mysql2/promise")).default;
+  const connection = await mysql.createConnection(dbUrl);
+  try {
+    const [rows] = await connection.execute(
+      "SELECT DATA_TYPE AS dataType, CHARACTER_MAXIMUM_LENGTH AS characterMaximumLength FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'submission_revisions' AND COLUMN_NAME = 'canonical_json'",
+    );
+    return (rows as Array<{ dataType: string; characterMaximumLength: number }>)[0]!;
+  } finally {
+    await connection.end();
+  }
 }
 
 beforeEach(() => {
@@ -128,3 +197,141 @@ describe("applyMigrations", () => {
     }
   });
 });
+
+if (RUN_MYSQL_TESTS) {
+  if (!MYSQL_DATABASE_URL || !/^mysql2?:\/\//.test(MYSQL_DATABASE_URL)) {
+    throw new Error("RUN_MYSQL_TESTS=1 requires a mysql:// DATABASE_URL");
+  }
+
+  describe("applyMigrations (mysql upgrade path)", () => {
+    it("preserves an existing valid signed revision when canonical_json upgrades from TEXT to MEDIUMTEXT", async () => {
+      const previousMigrationsDir = process.env.LABEL_LENS_MIGRATIONS_DIR;
+      const previousIntegritySecret = process.env.LABEL_LENS_INTEGRITY_SECRET;
+      const previousDialect = process.env.LABEL_LENS_DB_DIALECT;
+
+      try {
+        process.env.LABEL_LENS_INTEGRITY_SECRET =
+          "test-only-upgrade-integrity-secret-at-least-32-chars";
+        process.env.LABEL_LENS_DB_DIALECT = "mysql";
+
+        await dropAllMysqlTables(MYSQL_DATABASE_URL);
+        process.env.LABEL_LENS_MIGRATIONS_DIR = makeMigrationSubsetAt(tmp, [
+          "0000_smooth_felicia_hardy",
+        ]);
+        await applyMigrations(MYSQL_DATABASE_URL);
+
+        expect(await mysqlColumnType(MYSQL_DATABASE_URL)).toEqual({
+          dataType: "text",
+          characterMaximumLength: 65_535,
+        });
+
+        delete process.env.LABEL_LENS_MIGRATIONS_DIR;
+        process.env.DATABASE_URL = MYSQL_DATABASE_URL;
+        vi.resetModules();
+        const clientMod = await import("@/db/client");
+        clientMod.initializeDatabase(MYSQL_DATABASE_URL);
+        const { db, schema } = clientMod;
+        const { signRevision } = await import("@/lib/integrity");
+        const { buildSubmissionDetail } = await import("@/server/submissions/detail");
+
+        const submissionId = "pkg-upgrade-valid";
+        const revisionId = "11111111-1111-4111-8111-111111111111";
+        const userId = "22222222-2222-4222-8222-222222222222";
+        const canonicalJson = JSON.stringify({
+          submissionId,
+          revision: 1,
+          purpose: "mysql-upgrade-preservation",
+        });
+        const signature = signRevision(canonicalJson);
+        const now = new Date("2026-07-22T00:00:00.000Z");
+
+        await db.insert(schema.users).values({
+          id: userId,
+          email: "upgrade-seller@example.test",
+          name: "Upgrade Seller",
+          role: "seller",
+          createdAt: now,
+          updatedAt: now,
+        });
+        await db.insert(schema.submissions).values({
+          id: submissionId,
+          creatorId: userId,
+          currentStatus: "waiting_for_agent_review",
+          isDemo: false,
+          version: 1,
+          createdAt: now,
+          updatedAt: now,
+        });
+        await db.insert(schema.submissionRevisions).values({
+          id: revisionId,
+          submissionId,
+          revisionNumber: 1,
+          profileId: "wine-label-requirements",
+          profileVersion: "1.0.0",
+          submittedBy: "upgrade-seller@example.test",
+          submittedAt: now,
+          canonicalJson,
+          integritySignature: signature,
+        });
+        await db.insert(schema.submissionStatusEvents).values({
+          id: "33333333-3333-4333-8333-333333333333",
+          submissionId,
+          status: "waiting_for_agent_review",
+          actorId: userId,
+          actorRole: "seller",
+          reasonComment: "upgrade-path fixture",
+          recordedAt: now,
+        });
+
+        const beforeDetail = await buildSubmissionDetail(submissionId);
+        expect(beforeDetail.ok).toBe(true);
+
+        const before = await db.query.submissionRevisions.findFirst({
+          where: (r: any, { eq }: any) => eq(r.id, revisionId),
+        });
+        expect(before?.canonicalJson).toBe(canonicalJson);
+        expect(before?.integritySignature).toBe(signature);
+
+        await applyMigrations(MYSQL_DATABASE_URL);
+        expect(await mysqlColumnType(MYSQL_DATABASE_URL)).toEqual({
+          dataType: "mediumtext",
+          characterMaximumLength: 16_777_215,
+        });
+
+        vi.resetModules();
+        const freshClient = await import("@/db/client");
+        freshClient.initializeDatabase(MYSQL_DATABASE_URL);
+        const { buildSubmissionDetail: buildFreshSubmissionDetail } =
+          await import("@/server/submissions/detail");
+
+        const after = await freshClient.db.query.submissionRevisions.findFirst({
+          where: (r: any, { eq }: any) => eq(r.id, revisionId),
+        });
+        expect(after?.canonicalJson).toBe(before?.canonicalJson);
+        expect(after?.integritySignature).toBe(before?.integritySignature);
+
+        const afterDetail = await buildFreshSubmissionDetail(submissionId);
+        expect(afterDetail.ok).toBe(true);
+
+        await freshClient.db.execute(sql.raw("DROP TRIGGER IF EXISTS prevent_revisions_update"));
+        await freshClient.db.execute(
+          sql`UPDATE submission_revisions SET canonical_json = ${canonicalJson.slice(0, -1)} WHERE id = ${revisionId}`,
+        );
+
+        const truncatedDetail = await buildFreshSubmissionDetail(submissionId);
+        expect(truncatedDetail).toEqual({ ok: false, reason: "integrity_failed" });
+      } finally {
+        delete process.env.LABEL_LENS_MIGRATIONS_DIR;
+        await dropAllMysqlTables(MYSQL_DATABASE_URL);
+        await applyMigrations(MYSQL_DATABASE_URL);
+
+        if (previousMigrationsDir === undefined) delete process.env.LABEL_LENS_MIGRATIONS_DIR;
+        else process.env.LABEL_LENS_MIGRATIONS_DIR = previousMigrationsDir;
+        if (previousIntegritySecret === undefined) delete process.env.LABEL_LENS_INTEGRITY_SECRET;
+        else process.env.LABEL_LENS_INTEGRITY_SECRET = previousIntegritySecret;
+        if (previousDialect === undefined) delete process.env.LABEL_LENS_DB_DIALECT;
+        else process.env.LABEL_LENS_DB_DIALECT = previousDialect;
+      }
+    });
+  });
+}
