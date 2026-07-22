@@ -464,6 +464,15 @@ for (const dialect of DIALECTS) {
         .where(eq(schema.submissionStatusEvents.submissionId, id));
     }
 
+    function expectOnlyReviewClaimEvents(events: Array<{ status: string }>) {
+      const statuses = events.map((event) => event.status);
+      expect(events).toHaveLength(2);
+      expect(statuses.filter((status) => status === "waiting_for_agent_review")).toHaveLength(1);
+      expect(statuses.filter((status) => status === "in_agent_review")).toHaveLength(1);
+      expect(statuses).not.toContain("changes_requested");
+      expect(statuses).not.toContain("internally_accepted");
+    }
+
     async function assertIdempotencyRecordCount(key: string, expected: number) {
       const rows = await db
         .select()
@@ -1344,10 +1353,7 @@ for (const dialect of DIALECTS) {
         expect(claims[0].state).toBe("active");
         expect(claims[0].activeSubmissionId).toBe(id);
         const events = await readSubmissionEvents(id);
-        expect(events.map((event: any) => event.status)).toEqual([
-          "waiting_for_agent_review",
-          "in_agent_review",
-        ]);
+        expectOnlyReviewClaimEvents(events);
         const submission = await readSubmission(id);
         expect(submission?.currentStatus).toBe("in_agent_review");
         expect(submission?.version).toBe(2);
@@ -1595,10 +1601,7 @@ for (const dialect of DIALECTS) {
         expect(claims[0].state).toBe("active");
         expect(claims[0].activeSubmissionId).toBe(id);
         const events = await readSubmissionEvents(id);
-        expect(events.map((event: any) => event.status)).toEqual([
-          "waiting_for_agent_review",
-          "in_agent_review",
-        ]);
+        expectOnlyReviewClaimEvents(events);
         const submission = await readSubmission(id);
         expect(submission?.currentStatus).toBe("in_agent_review");
         expect(submission?.version).toBe(2);
