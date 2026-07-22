@@ -1,0 +1,20 @@
+{
+  "schema": "wine-brand-identity.controls.v1",
+  "selectedBefore": "any case-level role assessment or conclusion",
+  "rule": "two fixtures per required control archetype, chosen from the committed manifest by brand-truth shape, kept separate from the primary 13",
+  "controlCount": 10,
+  "archetypes": {
+    "non_company_marketed_brand_plus_separate_name_address": [
+      "approved-wine-046",
+      "approved-wine-048"
+    ],
+    "clear_fanciful_or_product_name": ["approved-wine-013", "approved-wine-061"],
+    "varietal_or_class_type_prominent": ["approved-wine-006", "approved-wine-069"],
+    "brand_absent": ["approved-wine-022", "approved-wine-082"],
+    "imported_with_importer_text": ["approved-wine-031", "approved-wine-091"]
+  },
+  "notes": {
+    "approved-wine-082": "Brand-absent, but forbids 'Rio Steves Winery'/'3 Steves Winery' — the same winery name that IS the brand on three-steves-winery and approved-wine-086. Direct evidence that the same company name is brand-or-not-brand by context.",
+    "approved-wine-058": "Considered but not selected; forbids 'Lenz Moser' (a producer). Raises the fallback-brand-on-a-brand-absent-label question addressed in unresolved-evidence.md."
+  }
+}

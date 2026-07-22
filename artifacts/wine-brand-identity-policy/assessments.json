@@ -1,0 +1,525 @@
+{
+  "_meta": "Per-element two-axis assessments from visual inspection of the artwork this session. Roles/statuses use two-axis-model.md. This is analysis for review, not a fixture change.",
+  "patricia-green-cellars": {
+    "imageType": "back",
+    "elements": [
+      {
+        "text": "Patty's Block / Estate Vineyard",
+        "role": "SERIES_OR_VERSION",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "prominent header, but a vineyard-block/bottling designation, not the house brand"
+      },
+      {
+        "text": "Willamette Valley",
+        "role": "APPELLATION",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "origin (§4.34)"
+      },
+      {
+        "text": "Patricia Green Cellars",
+        "role": "RESPONSIBLE_PERSON_NAME",
+        "brandStatus": "FALLBACK_DEEMED_BRAND",
+        "rationale": "appears only in the URL and 'PRODUCED & BOTTLED BY' line; no separate marketed brand shown, so §4.33(a) deems the responsible person the brand"
+      }
+    ],
+    "truthDefensible": "yes-as-fallback",
+    "requiresHumanReview": true,
+    "needsPermitFacts": false,
+    "artworkSupports": "Patricia Green Cellars as the responsible person; a block-designation as the prominent text",
+    "artworkCannotEstablish": "whether the wine is marketed under a separate brand not shown on this back panel",
+    "notes": "Textbook §4.33(a) fallback. genuinelyAmbiguous=true is appropriate. Two-axis representation would record it as RESPONSIBLE_PERSON + FALLBACK_DEEMED_BRAND rather than a bare OBSERVED value."
+  },
+  "approved-wine-049": {
+    "imageType": "back",
+    "elements": [
+      {
+        "text": "Cabernet Sauvignon",
+        "role": "VARIETAL",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "grape type (§4.34)"
+      },
+      {
+        "text": "Caywood Vineyard",
+        "role": "UNRESOLVED_ROLE",
+        "brandStatus": "UNRESOLVED_FROM_ARTWORK",
+        "rationale": "presented as a vineyard designation directly under the varietal; could be the marketed brand OR a single-vineyard designation"
+      },
+      {
+        "text": "Damiani Wine Cellars",
+        "role": "RESPONSIBLE_PERSON_NAME",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "'PRODUCED & BOTTLED BY DAMIANI WINE CELLARS'; a Wine Cellars responsible person, correctly forbidden as brand here"
+      }
+    ],
+    "truthDefensible": "uncertain",
+    "requiresHumanReview": true,
+    "needsPermitFacts": true,
+    "artworkSupports": "Damiani Wine Cellars as responsible person; Caywood Vineyard as a vineyard name",
+    "artworkCannotEstablish": "whether 'Caywood Vineyard' is the marketed brand or a single-vineyard designation of the Damiani brand",
+    "notes": "The corpus applies rule B correctly (responsible person forbidden) but the brand truth 'Caywood Vineyard' may itself be a vineyard-designation rather than a brand. Needs Joseph."
+  },
+  "approved-wine-052": {
+    "imageType": "front",
+    "elements": [
+      {
+        "text": "MOUNTAIN VALLEY winery",
+        "role": "MARKETED_BRAND_MARK",
+        "brandStatus": "EXPLICIT_MARKETED_BRAND",
+        "rationale": "large stylized header identity; also the 'bottled by' name — brand and responsible person are the same entity (§24.257 'if different')"
+      },
+      {
+        "text": "Old Vine Zinfandel",
+        "role": "VARIETAL",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "grape type (§4.34), correctly forbidden"
+      }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": false,
+    "needsPermitFacts": false,
+    "artworkSupports": "Mountain Valley Winery as the marketed brand and the bottler",
+    "artworkCannotEstablish": "n/a",
+    "notes": "Clean explicit brand that is also the responsible person. Company designator 'winery' present but the name is genuinely the marketed identity, not merely a bottler line."
+  },
+  "approved-wine-053": {
+    "imageType": "front",
+    "elements": [
+      {
+        "text": "goldenroad vineyards",
+        "role": "MARKETED_BRAND_MARK",
+        "brandStatus": "EXPLICIT_MARKETED_BRAND",
+        "rationale": "prominent gold-boxed front identity"
+      },
+      {
+        "text": "Uisce Beatha",
+        "role": "FANCIFUL_OR_PRODUCT_NAME",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "secondary fanciful bottling name under the brand; forbidden"
+      },
+      {
+        "text": "Round Peak Vineyards",
+        "role": "RESPONSIBLE_PERSON_NAME",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "'Produced and bottled by Round Peak Vineyards ... for Golden Road Vineyards' — the bottler is a DIFFERENT vineyard than the brand"
+      },
+      { "text": "Traminette", "role": "VARIETAL", "brandStatus": "NOT_BRAND" },
+      { "text": "Yadkin Valley", "role": "APPELLATION", "brandStatus": "NOT_BRAND" }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": false,
+    "needsPermitFacts": false,
+    "artworkSupports": "Golden Road Vineyards as brand; Round Peak Vineyards as the (different) responsible person",
+    "artworkCannotEstablish": "n/a",
+    "notes": "Two 'Vineyards' names, only one is the brand. The 'for Golden Road Vineyards' trade-name phrase distinguishes them. Strong support for rule B."
+  },
+  "three-steves-winery": {
+    "imageType": "back",
+    "elements": [
+      {
+        "text": "3 STEVES WINERY",
+        "role": "MARKETED_BRAND_MARK",
+        "brandStatus": "EXPLICIT_MARKETED_BRAND",
+        "rationale": "prominent header identity; also 'Bottled By 3 Steves Winery' — brand = responsible person"
+      },
+      { "text": "Chardonnay / Livermore", "role": "VARIETAL", "brandStatus": "NOT_BRAND" }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": false,
+    "needsPermitFacts": false,
+    "artworkSupports": "3 Steves Winery as marketed brand and bottler",
+    "artworkCannotEstablish": "n/a",
+    "notes": "One of four current OBSERVED cases. Winery name IS the marketed brand (prominent header), not merely a bottler."
+  },
+  "approved-wine-073": {
+    "imageType": "back-multi-panel",
+    "elements": [
+      {
+        "text": "Mike's Farm, Inc.",
+        "role": "MARKETED_BRAND_MARK",
+        "brandStatus": "EXPLICIT_MARKETED_BRAND",
+        "rationale": "prominent top-panel identity with its own address block"
+      },
+      {
+        "text": "Hinnant Farms Vineyard",
+        "role": "RESPONSIBLE_PERSON_NAME",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "'PRODUCED AND BOTTLED BY HINNANT FARMS VINEYARD' — a DIFFERENT entity than the brand; forbidden"
+      }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": false,
+    "needsPermitFacts": false,
+    "artworkSupports": "Mike's Farm, Inc. as the marketed brand; Hinnant as a separate responsible person",
+    "artworkCannotEstablish": "n/a",
+    "notes": "Explicit company brand with a SEPARATE responsible person. One of four OBSERVED. Not a fallback case: the brand and responsible person are different entities."
+  },
+  "approved-wine-074": {
+    "imageType": "back-multi-panel",
+    "elements": [
+      {
+        "text": "Mike's Farm, Inc.",
+        "role": "MARKETED_BRAND_MARK",
+        "brandStatus": "EXPLICIT_MARKETED_BRAND",
+        "rationale": "prominent top-panel identity with its own address block, same layout as approved-wine-073"
+      },
+      {
+        "text": "Hinnant Vineyards",
+        "role": "RESPONSIBLE_PERSON_NAME",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "'PRODUCED AND BOTTLED BY HINNANT VINEYARDS' — a different responsible person; forbidden"
+      }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": true,
+    "needsPermitFacts": false,
+    "artworkSupports": "Mike's Farm, Inc. as marketed brand; Hinnant as separate responsible person",
+    "artworkCannotEstablish": "n/a",
+    "notes": "SPECIAL CASE. Corrects the region-round hypothesis of 'presence: absent'. 'Mike's Farm, Inc.' is displayed as the brand identity (its own panel), NOT merely a bottler line, and the bottler is a different entity (Hinnant). Current truth 'Mike's Farm' is DEFENSIBLE. The earlier 'no other brand-like text -> absent' reasoning was wrong: the company name is the explicit brand here. Do NOT redirect to Hinnant. Review recommended only to confirm this reversal."
+  },
+  "approved-wine-083": {
+    "imageType": "front",
+    "elements": [
+      {
+        "text": "Barn Sill Wine Co.",
+        "role": "UNRESOLVED_ROLE",
+        "brandStatus": "UNRESOLVED_FROM_ARTWORK",
+        "rationale": "green script top mark; could be the marketed brand OR a company/responsible-person name"
+      },
+      {
+        "text": "Christmas Hayride",
+        "role": "FANCIFUL_OR_PRODUCT_NAME",
+        "brandStatus": "UNRESOLVED_FROM_ARTWORK",
+        "rationale": "large dark-red script center mark, at least as prominent as Barn Sill; a fanciful/product name that may be the marketed brand"
+      },
+      {
+        "text": "North Carolina Muscadine Wine",
+        "role": "CLASS_OR_TYPE",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "kind-of-wine designation (muscadine); correctly forbidden"
+      }
+    ],
+    "truthDefensible": "contested",
+    "requiresHumanReview": true,
+    "needsPermitFacts": true,
+    "artworkSupports": "two competing brand-candidate marks (Barn Sill Wine Co. and Christmas Hayride) plus a class/type line",
+    "artworkCannotEstablish": "which of Barn Sill Wine Co. and Christmas Hayride is the marketed brand vs a product/series name",
+    "notes": "SPECIAL CASE 2. The prior decision forbids BOTH Christmas Hayride and NC Muscadine Wine, keeping Barn Sill Wine Co. The artwork alone does not resolve Barn Sill (company) vs Christmas Hayride (fanciful) as the brand. Genuinely UNRESOLVED_FROM_ARTWORK; the forbidden-Christmas-Hayride decision may be too strong. Needs Joseph + possibly permit/COLA facts."
+  },
+  "approved-wine-086": {
+    "imageType": "back",
+    "elements": [
+      {
+        "text": "3 STEVES WINERY",
+        "role": "MARKETED_BRAND_MARK",
+        "brandStatus": "EXPLICIT_MARKETED_BRAND",
+        "rationale": "prominent header identity; same brand family as three-steves-winery"
+      },
+      {
+        "text": "Fume Blanc / Ghielmetti Vineyard",
+        "role": "VARIETAL",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "type + source-vineyard reference in prose"
+      }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": false,
+    "needsPermitFacts": false,
+    "artworkSupports": "3 Steves Winery as marketed brand",
+    "artworkCannotEstablish": "n/a",
+    "notes": "One of four OBSERVED. forbidden 'Curious' looks like a cross-label guard; not central."
+  },
+  "m-cellars-baseline": {
+    "imageType": "front",
+    "elements": [
+      {
+        "text": "M CELLARS (stylized M + CELLARS-registered)",
+        "role": "MARKETED_BRAND_MARK",
+        "brandStatus": "EXPLICIT_MARKETED_BRAND",
+        "rationale": "large stylized house mark with registered-trademark symbol; also 'PRODUCED & BOTTLED BY M CELLARS' and MCELLARS.COM"
+      },
+      { "text": "Teroldego", "role": "VARIETAL", "brandStatus": "NOT_BRAND" },
+      { "text": "Lake Erie", "role": "APPELLATION", "brandStatus": "NOT_BRAND" },
+      {
+        "text": "Matt & Tara Meineke, Proprietors",
+        "role": "RESPONSIBLE_PERSON_NAME",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "proprietor names, not the brand"
+      }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": true,
+    "needsPermitFacts": false,
+    "artworkSupports": "M Cellars as the marketed brand and bottler",
+    "artworkCannotEstablish": "whether the registered mark is 'M Cellars' or the standalone glyph 'M'",
+    "notes": "genuinelyAmbiguous=true likely because the dominant glyph is a stylized 'M'. Truth 'M Cellars' defensible. Review only to confirm the mark wording."
+  },
+  "wine-multi-artifact-04": {
+    "imageType": "front-multi-panel",
+    "elements": [
+      {
+        "text": "Dry Cellar",
+        "role": "MARKETED_BRAND_MARK",
+        "brandStatus": "EXPLICIT_MARKETED_BRAND",
+        "rationale": "front-panel script identity, repeated as the back-panel header"
+      },
+      {
+        "text": "Sauvignon Blanc",
+        "role": "VARIETAL",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "grape type; correctly forbidden"
+      },
+      {
+        "text": "Donovan Vineyards",
+        "role": "RESPONSIBLE_PERSON_NAME",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "source/producer vineyard named on the front"
+      }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": false,
+    "needsPermitFacts": false,
+    "artworkSupports": "Dry Cellar as marketed brand; a varietal and a source vineyard as non-brand",
+    "artworkCannotEstablish": "n/a",
+    "notes": "The reference case for the varietal-vs-brand principle applied to wine-multi-artifact-07."
+  },
+  "wine-multi-artifact-07": {
+    "imageType": "front-multi-panel",
+    "elements": [
+      {
+        "text": "MIKE'S FARM",
+        "role": "MARKETED_BRAND_MARK",
+        "brandStatus": "EXPLICIT_MARKETED_BRAND",
+        "rationale": "front-panel orange display identity"
+      },
+      {
+        "text": "Scuppernong White",
+        "role": "VARIETAL",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "'Scuppernong' is a muscadine grape cultivar and 'White' a colour; a varietal/type designation, structurally parallel to 'Sauvignon Blanc' on wine-multi-artifact-04"
+      },
+      {
+        "text": "North Carolina Muscadine Wine",
+        "role": "CLASS_OR_TYPE",
+        "brandStatus": "NOT_BRAND"
+      },
+      {
+        "text": "Mike's Farm, Inc. (back panel)",
+        "role": "RESPONSIBLE_PERSON_NAME",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "back-panel responsible-person restatement of the same brand entity"
+      }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": true,
+    "needsPermitFacts": false,
+    "artworkSupports": "Mike's Farm as marketed brand; Scuppernong White as varietal/type",
+    "artworkCannotEstablish": "n/a beyond the varietal reading being a judgment",
+    "notes": "SPECIAL CASE 3. Apply the wine-multi-artifact-04 principle: 'Scuppernong White' is varietal/type, not the brand. Current truth 'Mike's Farm' is DEFENSIBLE. Review recommended only to confirm consistency with wma-04."
+  },
+  "wine-multi-artifact-09": {
+    "imageType": "front-multi-panel",
+    "elements": [
+      {
+        "text": "DUCK WALK VINEYARDS",
+        "role": "MARKETED_BRAND_MARK",
+        "brandStatus": "EXPLICIT_MARKETED_BRAND",
+        "rationale": "large front header identity; also 'PRODUCED AND BOTTLED BY DUCK WALK VINEYARDS'"
+      },
+      {
+        "text": "Chardonnay",
+        "role": "VARIETAL",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "grape type; correctly forbidden"
+      },
+      { "text": "Long Island", "role": "APPELLATION", "brandStatus": "NOT_BRAND" }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": false,
+    "needsPermitFacts": false,
+    "artworkSupports": "Duck Walk Vineyards as marketed brand and bottler",
+    "artworkCannotEstablish": "n/a",
+    "notes": "One of four OBSERVED. Vineyards name IS the marketed brand (prominent header)."
+  },
+
+  "approved-wine-046": {
+    "imageType": "front",
+    "elements": [
+      {
+        "text": "Curious",
+        "role": "FANCIFUL_OR_PRODUCT_NAME",
+        "brandStatus": "EXPLICIT_MARKETED_BRAND"
+      },
+      { "text": "Macchia", "role": "RESPONSIBLE_PERSON_NAME", "brandStatus": "NOT_BRAND" },
+      { "text": "Red Wine Blend", "role": "CLASS_OR_TYPE", "brandStatus": "NOT_BRAND" }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": false,
+    "needsPermitFacts": false,
+    "artworkSupports": "a non-company fanciful brand with a separate producer name",
+    "artworkCannotEstablish": "n/a",
+    "notes": "Control: clear non-company marketed brand + separate name/address."
+  },
+  "approved-wine-048": {
+    "imageType": "front",
+    "elements": [
+      {
+        "text": "Pacha",
+        "role": "FANCIFUL_OR_PRODUCT_NAME",
+        "brandStatus": "EXPLICIT_MARKETED_BRAND"
+      },
+      {
+        "text": "Andes Wine Imports",
+        "role": "RESPONSIBLE_PERSON_NAME",
+        "brandStatus": "NOT_BRAND"
+      },
+      { "text": "Carmenere", "role": "VARIETAL", "brandStatus": "NOT_BRAND" }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": false,
+    "needsPermitFacts": false,
+    "artworkSupports": "fanciful brand + importer",
+    "artworkCannotEstablish": "n/a",
+    "notes": "Control: importer text present."
+  },
+  "approved-wine-013": {
+    "imageType": "front",
+    "elements": [
+      {
+        "text": "Afflicted",
+        "role": "FANCIFUL_OR_PRODUCT_NAME",
+        "brandStatus": "EXPLICIT_MARKETED_BRAND"
+      },
+      { "text": "Player's Heart", "role": "SERIES_OR_VERSION", "brandStatus": "NOT_BRAND" },
+      { "text": "Reserva / Cabernet", "role": "VARIETAL", "brandStatus": "NOT_BRAND" }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": false,
+    "needsPermitFacts": false,
+    "artworkSupports": "clear fanciful brand",
+    "artworkCannotEstablish": "n/a",
+    "notes": "Control: fanciful/product name."
+  },
+  "approved-wine-061": {
+    "imageType": "front",
+    "elements": [
+      {
+        "text": "Aphrodite",
+        "role": "FANCIFUL_OR_PRODUCT_NAME",
+        "brandStatus": "EXPLICIT_MARKETED_BRAND"
+      },
+      { "text": "Gewurztraminer", "role": "VARIETAL", "brandStatus": "NOT_BRAND" }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": false,
+    "needsPermitFacts": false,
+    "artworkSupports": "clear fanciful brand + varietal",
+    "artworkCannotEstablish": "n/a",
+    "notes": "Control: fanciful name."
+  },
+  "approved-wine-006": {
+    "imageType": "front",
+    "elements": [
+      {
+        "text": "Dark Horse",
+        "role": "MARKETED_BRAND_MARK",
+        "brandStatus": "EXPLICIT_MARKETED_BRAND"
+      },
+      { "text": "varietal/class prominent", "role": "VARIETAL", "brandStatus": "NOT_BRAND" }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": false,
+    "needsPermitFacts": false,
+    "artworkSupports": "non-company brand with prominent varietal",
+    "artworkCannotEstablish": "n/a",
+    "notes": "Control: varietal prominent."
+  },
+  "approved-wine-069": {
+    "imageType": "front",
+    "elements": [
+      {
+        "text": "AltaCima",
+        "role": "MARKETED_BRAND_MARK",
+        "brandStatus": "EXPLICIT_MARKETED_BRAND"
+      },
+      { "text": "Chardonnay / Reserva", "role": "VARIETAL", "brandStatus": "NOT_BRAND" }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": false,
+    "needsPermitFacts": false,
+    "artworkSupports": "brand + varietal",
+    "artworkCannotEstablish": "n/a",
+    "notes": "Control: class/type prominent."
+  },
+  "approved-wine-022": {
+    "imageType": "unknown",
+    "elements": [
+      { "text": "Marble Creek Acres", "role": "UNRESOLVED_ROLE", "brandStatus": "NOT_BRAND" },
+      { "text": "Concord", "role": "VARIETAL", "brandStatus": "NOT_BRAND" }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": false,
+    "needsPermitFacts": true,
+    "artworkSupports": "no clear marketed brand on the shown panel",
+    "artworkCannotEstablish": "whether a brand exists on another panel; whether Marble Creek Acres is the responsible person (and thus a fallback brand)",
+    "notes": "Control: brand-absent. Raises the same fallback question as unresolved-evidence.md — is a forbidden name actually the §4.33(a) fallback brand?"
+  },
+  "approved-wine-082": {
+    "imageType": "back",
+    "elements": [
+      {
+        "text": "3 Steves Winery",
+        "role": "RESPONSIBLE_PERSON_NAME",
+        "brandStatus": "NOT_BRAND",
+        "rationale": "appears here as a sourced-from / producer reference, NOT as the brand identity of THIS product"
+      },
+      { "text": "Chardonnay", "role": "VARIETAL", "brandStatus": "NOT_BRAND" }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": false,
+    "needsPermitFacts": true,
+    "artworkSupports": "3 Steves Winery mentioned but not as this product's brand",
+    "artworkCannotEstablish": "this product's actual brand from the shown panel",
+    "notes": "KEY CONTROL: the same 'winery' name that IS the brand on 060/086 is here NOT the brand. Proves brand status is contextual, not lexical."
+  },
+  "approved-wine-031": {
+    "imageType": "back",
+    "elements": [
+      {
+        "text": "embeleso",
+        "role": "MARKETED_BRAND_MARK",
+        "brandStatus": "EXPLICIT_MARKETED_BRAND"
+      },
+      {
+        "text": "Votto Vines Importing",
+        "role": "RESPONSIBLE_PERSON_NAME",
+        "brandStatus": "NOT_BRAND"
+      },
+      { "text": "Crianza / Tempranillo", "role": "VARIETAL", "brandStatus": "NOT_BRAND" }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": false,
+    "needsPermitFacts": false,
+    "artworkSupports": "fanciful brand + importer",
+    "artworkCannotEstablish": "n/a",
+    "notes": "Control: imported, importer text visible."
+  },
+  "approved-wine-091": {
+    "imageType": "front",
+    "elements": [
+      { "text": "Rias", "role": "MARKETED_BRAND_MARK", "brandStatus": "EXPLICIT_MARKETED_BRAND" },
+      {
+        "text": "Buta Distributors",
+        "role": "RESPONSIBLE_PERSON_NAME",
+        "brandStatus": "NOT_BRAND"
+      },
+      { "text": "Tenute Gregu", "role": "RESPONSIBLE_PERSON_NAME", "brandStatus": "NOT_BRAND" },
+      { "text": "Vermentino di Gallura", "role": "APPELLATION", "brandStatus": "NOT_BRAND" }
+    ],
+    "truthDefensible": "yes",
+    "requiresHumanReview": false,
+    "needsPermitFacts": false,
+    "artworkSupports": "brand + importer + foreign producer + appellation",
+    "artworkCannotEstablish": "n/a",
+    "notes": "Control: imported, importer + foreign producer visible."
+  }
+}
