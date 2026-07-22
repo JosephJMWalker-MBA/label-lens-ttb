@@ -108,6 +108,68 @@ function Detail({ view, user }: { view: SubmissionDetailView; user: SessionUser 
         </dl>
       </section>
 
+      {view.revisionComparison ? (
+        <section className="mt-8 rounded-md border border-blue-500/30 bg-blue-500/5 p-4">
+          <h2 className="text-lg font-semibold tracking-tight">Revision response summary</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Revision v{view.revisionComparison.childRevision.revisionNumber} responds to requested
+            changes on revision v{view.revisionComparison.parentRevision.revisionNumber}.
+          </p>
+          <blockquote className="mt-3 rounded border-l-4 border-blue-500/50 bg-background px-3 py-2 text-sm">
+            {view.revisionComparison.respondedToDecision.rationale}
+          </blockquote>
+          <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
+            <Field
+              label="Panels unchanged"
+              value={view.revisionComparison.panelChanges.unchangedRoles.join(", ") || "None"}
+            />
+            <Field
+              label="Panels changed"
+              value={view.revisionComparison.panelChanges.changedRoles.join(", ") || "None"}
+            />
+            <Field
+              label="Panels added"
+              value={view.revisionComparison.panelChanges.addedRoles.join(", ") || "None"}
+            />
+            <Field
+              label="Panels removed"
+              value={view.revisionComparison.panelChanges.removedRoles.join(", ") || "None"}
+            />
+            <Field
+              label="Prior analysis"
+              value={
+                view.revisionComparison.machineAnalysis.priorAnalysisRunId
+                  ? `${view.revisionComparison.machineAnalysis.priorAnalysisRunId} · ${view.revisionComparison.machineAnalysis.priorReadiness}`
+                  : "None"
+              }
+            />
+            <Field
+              label="Revision analysis"
+              value={
+                view.revisionComparison.machineAnalysis.resultingAnalysisRunId
+                  ? `${view.revisionComparison.machineAnalysis.resultingAnalysisRunId} · ${view.revisionComparison.machineAnalysis.resultingReadiness}`
+                  : "None"
+              }
+            />
+          </dl>
+          <ul className="mt-3 grid gap-2">
+            {view.revisionComparison.sellerEvidenceChanges.map((change) => (
+              <li
+                key={change.categoryId}
+                className="rounded border border-border/50 px-3 py-2 text-xs"
+              >
+                <p className="font-medium">{change.categoryId}</p>
+                <p className="text-muted-foreground">
+                  {change.priorDecision ?? "none"} → {change.resultingDecision ?? "none"} ·{" "}
+                  {change.priorRegionCount} → {change.resultingRegionCount} seller region
+                  {change.resultingRegionCount === 1 ? "" : "s"}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       <section className="mt-8">
         <h2 className="text-lg font-semibold tracking-tight">Panels</h2>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">

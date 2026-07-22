@@ -211,6 +211,25 @@ export function createTestSqliteDb(filepath: string, forceDelete = false) {
     );
   `);
 
+  // Submission Revision Responses table
+  sqliteDb.exec(`
+    CREATE TABLE IF NOT EXISTS submission_revision_responses (
+      id TEXT PRIMARY KEY,
+      submission_id TEXT NOT NULL REFERENCES submissions(id),
+      parent_revision_id TEXT NOT NULL REFERENCES submission_revisions(id),
+      parent_revision_number INTEGER NOT NULL,
+      responded_to_decision_id TEXT NOT NULL REFERENCES agent_decisions(id),
+      child_revision_id TEXT NOT NULL REFERENCES submission_revisions(id),
+      child_revision_number INTEGER NOT NULL,
+      seller_id TEXT NOT NULL REFERENCES users(id),
+      idempotency_record_key TEXT NOT NULL,
+      recorded_at INTEGER NOT NULL,
+      UNIQUE(child_revision_id),
+      UNIQUE(responded_to_decision_id),
+      UNIQUE(idempotency_record_key)
+    );
+  `);
+
   // Idempotency Records table
   sqliteDb.exec(`
     CREATE TABLE IF NOT EXISTS idempotency_records (
@@ -315,6 +334,23 @@ export function createTestSqliteDb(filepath: string, forceDelete = false) {
     BEFORE DELETE ON agent_decisions
     BEGIN
       SELECT RAISE(FAIL, 'Agent decisions are immutable and cannot be deleted.');
+    END;
+  `);
+
+  // Submission revision response records are append-only lineage rows.
+  sqliteDb.exec(`
+    CREATE TRIGGER IF NOT EXISTS prevent_submission_revision_responses_update
+    BEFORE UPDATE ON submission_revision_responses
+    BEGIN
+      SELECT RAISE(FAIL, 'Submission revision response rows are immutable and cannot be updated.');
+    END;
+  `);
+
+  sqliteDb.exec(`
+    CREATE TRIGGER IF NOT EXISTS prevent_submission_revision_responses_delete
+    BEFORE DELETE ON submission_revision_responses
+    BEGIN
+      SELECT RAISE(FAIL, 'Submission revision response rows are immutable and cannot be deleted.');
     END;
   `);
 

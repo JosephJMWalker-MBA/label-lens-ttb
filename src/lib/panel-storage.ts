@@ -66,6 +66,21 @@ export function panelStorageKey(
   return `submissions/${packageId}/panels/${panelId}-${checksumSha256}`;
 }
 
+/**
+ * Compute a resubmission storage key with a server-generated child revision
+ * namespace. Concurrent losers clean up only their own namespace, so cleanup can
+ * never delete another request's committed assets for the same
+ * packageId/panelId/checksum.
+ */
+export function resubmissionPanelStorageKey(
+  packageId: string,
+  childRevisionId: string,
+  panelId: string,
+  checksumSha256: string,
+): string {
+  return `submissions/${packageId}/revisions/${childRevisionId}/panels/${panelId}-${checksumSha256}`;
+}
+
 /** Persist verified panel bytes under a server-owned storage key. */
 export function persistPanelAsset(storageKey: string, bytes: Buffer): PanelStorageResult {
   const resolved = resolveStorageRoot();
@@ -80,6 +95,22 @@ export function persistPanelAsset(storageKey: string, bytes: Buffer): PanelStora
     return { ok: false, error: PANEL_STORAGE_UNAVAILABLE };
   }
   return { ok: true, storageKey, durability: resolved.durability };
+}
+
+/** Best-effort deletion for uncommitted assets owned by the current attempt. */
+export function deletePanelAsset(storageKey: string): void {
+  const resolved = resolveStorageRoot();
+  if (!resolved.ok) return;
+
+  const root = path.resolve(resolved.root);
+  const filePath = path.resolve(root, storageKey);
+  if (filePath === root || !filePath.startsWith(root + path.sep)) return;
+  try {
+    fs.rmSync(filePath, { force: true });
+  } catch {
+    // Best-effort cleanup only; callers must not convert this into a user-visible
+    // storage or transaction error.
+  }
 }
 
 export type PanelReadResult =

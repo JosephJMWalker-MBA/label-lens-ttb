@@ -93,6 +93,24 @@ describe("hardened processing routes", () => {
     const packageAnalysisRoute = join(apiDir, "package", "analyze", "route.ts");
     const confirmationRoute = join(apiDir, "precheck", "confirmation", "route.ts");
     const statusRoute = join(apiDir, "package", "submit", "status", "[id]", "route.ts");
+    const revisionSeedRoute = join(
+      apiDir,
+      "package",
+      "submit",
+      "revision-seed",
+      "[id]",
+      "route.ts",
+    );
+    const revisionSeedPanelRoute = join(
+      apiDir,
+      "package",
+      "submit",
+      "revision-seed",
+      "[id]",
+      "panels",
+      "[panelId]",
+      "route.ts",
+    );
     const authRoute = join(apiDir, "auth", "[...all]", "route.ts");
     // Agent review routes (agent/admin authorized).
     const agentQueueRoute = join(apiDir, "agent", "submissions", "route.ts");
@@ -127,6 +145,8 @@ describe("hardened processing routes", () => {
     const getOnlyRoutes = new Set([
       healthRoute,
       statusRoute,
+      revisionSeedRoute,
+      revisionSeedPanelRoute,
       authRoute,
       agentQueueRoute,
       agentDetailRoute,
@@ -138,6 +158,9 @@ describe("hardened processing routes", () => {
         healthRoute,
         packageAnalysisRoute,
         join(apiDir, "package", "submit", "finalize", "route.ts"),
+        join(apiDir, "package", "submit", "resubmit", "[id]", "route.ts"),
+        revisionSeedRoute,
+        revisionSeedPanelRoute,
         statusRoute,
         agentClaimRoute,
         agentQueueRoute,
@@ -158,7 +181,13 @@ describe("hardened processing routes", () => {
       expect(readFileSync(route, "utf8")).toMatch(/export\s+async\s+function\s+POST/);
     }
     // The read-only agent review routes are GET handlers, never POST.
-    for (const route of [agentQueueRoute, agentDetailRoute, agentPanelRoute]) {
+    for (const route of [
+      agentQueueRoute,
+      agentDetailRoute,
+      agentPanelRoute,
+      revisionSeedRoute,
+      revisionSeedPanelRoute,
+    ]) {
       const source = readFileSync(route, "utf8");
       expect(source).toMatch(/export\s+async\s+function\s+GET/);
       expect(source).not.toMatch(/export\s+async\s+function\s+POST/);
@@ -210,6 +239,9 @@ describe("hardened processing routes", () => {
       "precheck/disposition/route.ts",
       "precheck/confirmation/route.ts",
       "package/submit/finalize/route.ts",
+      "package/submit/resubmit/[id]/route.ts",
+      "package/submit/revision-seed/[id]/route.ts",
+      "package/submit/revision-seed/[id]/panels/[panelId]/route.ts",
       "package/submit/status/[id]/route.ts",
     ]) {
       const source = readFileSync(join(apiDir, rel), "utf8");
