@@ -919,6 +919,18 @@ for (const dialect of DIALECTS) {
           rationale: decisionsAfterReplay[0].rationale,
         }).toEqual(immutableBeforeReplay);
 
+        const agentDetail = await detailGET(req(`/api/agent/submissions/${id}`, agent.cookie), {
+          params: Promise.resolve({ id }),
+        });
+        expect(agentDetail.status).toBe(200);
+        const agentDetailBody = await agentDetail.json();
+        expect(agentDetailBody.latestDecision).toMatchObject({
+          decisionType: "changes_requested",
+          revisionId,
+          revisionNumber: 1,
+          rationale,
+        });
+
         const sellerStatus = await sellerStatusGET(
           req(`/api/package/submit/status/${id}`, seller.cookie),
           params(id),
@@ -992,6 +1004,18 @@ for (const dialect of DIALECTS) {
           `agent-review:internal_accept:${agent.userId}:k-accept`,
         );
         expect(decisions[0].rationale).toBe(rationale);
+
+        const agentDetail = await detailGET(req(`/api/agent/submissions/${id}`, agent.cookie), {
+          params: Promise.resolve({ id }),
+        });
+        expect(agentDetail.status).toBe(200);
+        const agentDetailBody = await agentDetail.json();
+        expect(agentDetailBody.latestDecision).toMatchObject({
+          decisionType: "internally_accepted",
+          revisionId,
+          revisionNumber: 1,
+          rationale,
+        });
 
         const sellerStatus = await sellerStatusGET(
           req(`/api/package/submit/status/${id}`, seller.cookie),

@@ -83,6 +83,7 @@ export interface SubmissionDetailView {
     revisionId: string;
     revisionNumber: number;
     reviewerRole: string;
+    rationale: string;
     recordedAt: string;
   } | null;
 }
@@ -296,6 +297,7 @@ export async function buildSubmissionDetail(submissionId: string): Promise<Submi
       revisionId: schema.agentDecisions.revisionId,
       revisionNumber: schema.agentDecisions.revisionNumber,
       reviewerRole: schema.agentDecisions.reviewerRole,
+      rationale: schema.agentDecisions.rationale,
       recordedAt: schema.agentDecisions.recordedAt,
     })
     .from(schema.agentDecisions)
@@ -307,6 +309,7 @@ export async function buildSubmissionDetail(submissionId: string): Promise<Submi
     revisionId: string;
     revisionNumber: number;
     reviewerRole: string;
+    rationale: string;
     recordedAt: Date;
   }[];
 
@@ -358,6 +361,7 @@ export async function buildSubmissionDetail(submissionId: string): Promise<Submi
             revisionId: latestDecision.revisionId,
             revisionNumber: latestDecision.revisionNumber,
             reviewerRole: latestDecision.reviewerRole,
+            rationale: latestDecision.rationale,
             recordedAt: latestDecision.recordedAt.toISOString(),
           }
         : null,

@@ -22,6 +22,7 @@ interface LatestDecision {
   revisionId: string;
   revisionNumber: number;
   reviewerRole: string;
+  rationale: string;
   recordedAt: string;
 }
 
@@ -133,6 +134,7 @@ export function AgentReviewActions({
             {statusLabel(latestDecision.decisionType)} · revision v{latestDecision.revisionNumber} ·{" "}
             {new Date(latestDecision.recordedAt).toLocaleString()}
           </p>
+          <p className="mt-2 whitespace-pre-wrap text-sm">{latestDecision.rationale}</p>
         </div>
       ) : null}
 
