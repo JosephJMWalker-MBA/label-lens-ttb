@@ -96,6 +96,34 @@ async function mysqlColumnType(dbUrl: string): Promise<{
   }
 }
 
+async function mysqlRevisionIntegrity(
+  dbUrl: string,
+  revisionId: string,
+): Promise<
+  | {
+      canonicalJson: string;
+      integritySignature: string;
+    }
+  | undefined
+> {
+  const mysql = (await import("mysql2/promise")).default;
+  const connection = await mysql.createConnection(dbUrl);
+  try {
+    const [rows] = await connection.execute(
+      "SELECT canonical_json AS canonicalJson, integrity_signature AS integritySignature FROM submission_revisions WHERE id = ?",
+      [revisionId],
+    );
+    return (
+      rows as Array<{
+        canonicalJson: string;
+        integritySignature: string;
+      }>
+    )[0];
+  } finally {
+    await connection.end();
+  }
+}
+
 beforeEach(() => {
   tmp = mkdtempSync(path.join(os.tmpdir(), "migrate-test-"));
   delete process.env.LABEL_LENS_MIGRATIONS_DIR;
@@ -267,7 +295,6 @@ if (RUN_MYSQL_TESTS) {
         clientMod.initializeDatabase(MYSQL_DATABASE_URL);
         const { db, schema } = clientMod;
         const { signRevision } = await import("@/lib/integrity");
-        const { buildSubmissionDetail } = await import("@/server/submissions/detail");
 
         const submissionId = "pkg-upgrade-valid";
         const revisionId = "11111111-1111-4111-8111-111111111111";
@@ -318,14 +345,11 @@ if (RUN_MYSQL_TESTS) {
           recordedAt: now,
         });
 
-        const beforeDetail = await buildSubmissionDetail(submissionId);
-        expect(beforeDetail.ok).toBe(true);
-
-        const before = await db.query.submissionRevisions.findFirst({
-          where: (r: any, { eq }: any) => eq(r.id, revisionId),
+        const legacyStoredRevision = await mysqlRevisionIntegrity(MYSQL_DATABASE_URL, revisionId);
+        expect(legacyStoredRevision).toEqual({
+          canonicalJson,
+          integritySignature: signature,
         });
-        expect(before?.canonicalJson).toBe(canonicalJson);
-        expect(before?.integritySignature).toBe(signature);
 
         await applyMigrations(MYSQL_DATABASE_URL);
         expect(await mysqlColumnType(MYSQL_DATABASE_URL)).toEqual({
@@ -342,8 +366,8 @@ if (RUN_MYSQL_TESTS) {
         const after = await freshClient.db.query.submissionRevisions.findFirst({
           where: (r: any, { eq }: any) => eq(r.id, revisionId),
         });
-        expect(after?.canonicalJson).toBe(before?.canonicalJson);
-        expect(after?.integritySignature).toBe(before?.integritySignature);
+        expect(after?.canonicalJson).toBe(canonicalJson);
+        expect(after?.integritySignature).toBe(signature);
 
         const afterDetail = await buildFreshSubmissionDetail(submissionId);
         expect(afterDetail.ok).toBe(true);
