@@ -5,19 +5,11 @@ export const dynamic = "force-dynamic";
 
 import { readPanelAsset } from "@/lib/panel-storage";
 import { readSessionFromHeaders } from "@/server/auth/guards";
+import { validatePanelIdentity } from "@/server/submissions/panel-identity";
 import { isValidSubmissionId } from "@/server/submissions/access";
 import { resolveRevisionSeedPanelAsset } from "@/server/submissions/revision-seed";
 
 const ALLOWED_CONTENT_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
-
-function isValidPanelId(value: unknown): value is string {
-  return (
-    typeof value === "string" &&
-    value.length > 0 &&
-    value.length <= 255 &&
-    /^[A-Za-z0-9._-]+$/.test(value)
-  );
-}
 
 function conflict(code: string, message: string) {
   return NextResponse.json({ error: { code, message } }, { status: 409 });
@@ -35,8 +27,8 @@ export async function GET(
     return NextResponse.json({ error: "Seller access required." }, { status: 403 });
   }
 
-  const { id, panelId } = await params;
-  if (!isValidSubmissionId(id) || !isValidPanelId(panelId)) {
+  const { id, panelId: assetPanelId } = await params;
+  if (!isValidSubmissionId(id) || !validatePanelIdentity(assetPanelId).ok) {
     return new NextResponse(null, { status: 404 });
   }
 
@@ -44,7 +36,7 @@ export async function GET(
     submissionId: id,
     sellerId: user.id,
     sellerRole: user.role,
-    panelId,
+    assetPanelId,
   });
   if (!panel.ok) {
     switch (panel.reason) {
@@ -68,6 +60,11 @@ export async function GET(
         return conflict(
           "CHANGE_REQUEST_ALREADY_ANSWERED",
           "The latest requested-change decision already has a seller response.",
+        );
+      case "panel_identity_inconsistent":
+        return conflict(
+          "PANEL_IDENTITY_INCONSISTENT",
+          "A stored panel identity could not be reconciled safely. No revision draft was created.",
         );
     }
   }

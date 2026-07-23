@@ -4,6 +4,7 @@ import {
   SELLER_PACKAGE_EXPORT_VERSION,
   type SellerPackageDraft,
 } from "./package-model";
+import { MAX_PANEL_ID_LENGTH, PANEL_IDENTITY_PATTERN } from "./panel-identity-constraints";
 
 /**
  * Shared, server-safe runtime parser for the agent-review submission boundary.
@@ -40,10 +41,16 @@ const PanelRoleSchema = z.enum(["front", "back", "neck", "side", "other"]);
 const PanelRotationSchema = z.union([z.literal(0), z.literal(90), z.literal(180), z.literal(270)]);
 const CategoryPreparationDecisionSchema = z.enum(["provided", "unresolved", "not_present"]);
 const PackageReadinessSchema = z.enum(["needs_seller_review", "ready_for_agent_submission"]);
+const PanelIdentitySchema = z
+  .string()
+  .min(1)
+  .max(MAX_PANEL_ID_LENGTH)
+  .regex(PANEL_IDENTITY_PATTERN)
+  .refine((value) => !value.includes(".."));
 
 // Mirrors PackagePanelMetadata. No storageKey: durable keys are server-assigned.
 const PackagePanelMetadataSchema = z.object({
-  panelId: z.string().min(1),
+  panelId: PanelIdentitySchema,
   order: z.number(),
   role: PanelRoleSchema,
   displayName: z.string().min(1),
@@ -59,7 +66,7 @@ const PackagePanelMetadataSchema = z.object({
 const SellerEvidenceRegionSchema = z.object({
   regionId: z.string().min(1),
   categoryId: z.string().min(1),
-  panelId: z.string().min(1),
+  panelId: PanelIdentitySchema,
   unit: z.literal("normalized-panel-relative"),
   provenance: z.literal("seller-selected-region"),
   x: z.number(),
@@ -87,7 +94,7 @@ const SellerPackageChangeSchema = z.object({
   recordedAt: z.string(),
   action: z.string().min(1),
   categoryId: z.string().optional(),
-  panelId: z.string().optional(),
+  panelId: PanelIdentitySchema.optional(),
   regionId: z.string().optional(),
   panelSnapshot: PackagePanelMetadataSchema.optional(),
   categorySnapshot: z
@@ -105,13 +112,13 @@ const PackageCategoryAnalysisSchema = z.object({
   categoryId: z.string().min(1),
   state: z.enum(["clearly_readable", "needs_review", "not_found", "not_applicable"]),
   observedValue: z.string().nullable(),
-  supportingPanelIds: z.array(z.string()),
+  supportingPanelIds: z.array(PanelIdentitySchema),
   supportingRegionIds: z.array(z.string()),
   reason: z.string(),
 });
 
 const PackagePanelMachineRunSchema = z.object({
-  panelId: z.string().min(1),
+  panelId: PanelIdentitySchema,
   machineResultId: z.string().min(1),
   exportJson: z.string(),
   observations: z.unknown(),

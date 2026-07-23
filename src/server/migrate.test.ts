@@ -7,6 +7,7 @@ import path from "node:path";
 import { sql } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { panelStorageKey, resubmissionPanelStorageKey } from "@/lib/panel-storage";
 import { applyMigrations, resolveMigrationsDir } from "./migrate";
 
 /**
@@ -91,6 +92,33 @@ async function mysqlColumnType(dbUrl: string): Promise<{
       "SELECT DATA_TYPE AS dataType, CHARACTER_MAXIMUM_LENGTH AS characterMaximumLength FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'submission_revisions' AND COLUMN_NAME = 'canonical_json'",
     );
     return (rows as Array<{ dataType: string; characterMaximumLength: number }>)[0]!;
+  } finally {
+    await connection.end();
+  }
+}
+
+async function mysqlSubmittedPanelColumnType(
+  dbUrl: string,
+  columnName: "id" | "storage_key",
+): Promise<{
+  dataType: string;
+  characterMaximumLength: number;
+  columnKey: string;
+}> {
+  const mysql = (await import("mysql2/promise")).default;
+  const connection = await mysql.createConnection(dbUrl);
+  try {
+    const [rows] = await connection.execute(
+      "SELECT DATA_TYPE AS dataType, CHARACTER_MAXIMUM_LENGTH AS characterMaximumLength, COLUMN_KEY AS columnKey FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'submitted_panels' AND COLUMN_NAME = ?",
+      [columnName],
+    );
+    return (
+      rows as Array<{
+        dataType: string;
+        characterMaximumLength: number;
+        columnKey: string;
+      }>
+    )[0]!;
   } finally {
     await connection.end();
   }
@@ -239,6 +267,7 @@ describe("agent decision migration metadata", () => {
       "0001_tiny_marauders",
       "0002_issue_165_agent_decisions",
       "0003_issue_167_seller_resubmissions",
+      "0004_issue_167_panel_identity_preservation",
     ]);
 
     const migrationSql = readFileSync(
@@ -287,6 +316,19 @@ describe("agent decision migration metadata", () => {
     expect(migrationSql).toMatch(/prevent_submission_revision_responses_update/);
     expect(migrationSql).toMatch(/prevent_submission_revision_responses_delete/);
   });
+
+  it("journals 0004 with bounded panel identity preservation", () => {
+    const source = path.join(process.cwd(), MIGRATIONS_REL);
+    const migrationSql = readFileSync(
+      path.join(source, "0004_issue_167_panel_identity_preservation.sql"),
+      "utf8",
+    );
+    expect(migrationSql).toMatch(
+      /ALTER TABLE `submitted_panels`\s+MODIFY COLUMN `id` varchar\(255\) NOT NULL/,
+    );
+    expect(migrationSql).toMatch(/MODIFY COLUMN `storage_key` varchar\(1024\) NOT NULL/);
+    expect(migrationSql).not.toMatch(/canonical_json|integrity_signature|seller_evidence/i);
+  });
 });
 
 if (RUN_MYSQL_TESTS) {
@@ -295,6 +337,235 @@ if (RUN_MYSQL_TESTS) {
   }
 
   describe("applyMigrations (mysql upgrade path)", () => {
+    it("widens submitted panel identity and storage keys without rewriting existing values", async () => {
+      const previousMigrationsDir = process.env.LABEL_LENS_MIGRATIONS_DIR;
+      const previousDialect = process.env.LABEL_LENS_DB_DIALECT;
+      const mysql = (await import("mysql2/promise")).default;
+      let connection: Awaited<ReturnType<typeof mysql.createConnection>> | undefined;
+
+      try {
+        process.env.LABEL_LENS_DB_DIALECT = "mysql";
+
+        await dropAllMysqlTables(MYSQL_DATABASE_URL);
+        process.env.LABEL_LENS_MIGRATIONS_DIR = makeMigrationSubsetAt(tmp, [
+          "0000_smooth_felicia_hardy",
+          "0001_tiny_marauders",
+          "0002_issue_165_agent_decisions",
+          "0003_issue_167_seller_resubmissions",
+        ]);
+        await applyMigrations(MYSQL_DATABASE_URL);
+
+        expect(await mysqlSubmittedPanelColumnType(MYSQL_DATABASE_URL, "id")).toEqual({
+          dataType: "varchar",
+          characterMaximumLength: 36,
+          columnKey: "PRI",
+        });
+        expect(await mysqlSubmittedPanelColumnType(MYSQL_DATABASE_URL, "storage_key")).toEqual({
+          dataType: "varchar",
+          characterMaximumLength: 500,
+          columnKey: "",
+        });
+
+        connection = await mysql.createConnection(MYSQL_DATABASE_URL);
+        const now = new Date("2026-07-22T00:00:00.000Z");
+        const userId = "44444444-4444-4444-8444-444444444444";
+        const existingSubmissionId = "pkg-existing-panel";
+        const existingRevisionId = "55555555-5555-4555-8555-555555555555";
+        const existingPanelId = "panel-existing";
+        const existingStorageKey = `submissions/${existingSubmissionId}/panels/${existingPanelId}-${"a".repeat(64)}`;
+
+        await connection.execute(
+          "INSERT INTO users (id, email, name, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+          [userId, "panel-upgrade@example.test", "Panel Upgrade", "seller", now, now],
+        );
+        await connection.execute(
+          "INSERT INTO submissions (id, creator_id, current_status, is_demo, version, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          [existingSubmissionId, userId, "waiting_for_agent_review", false, 1, now, now],
+        );
+        await connection.execute(
+          "INSERT INTO submission_revisions (id, submission_id, revision_number, profile_id, profile_version, submitted_by, submitted_at, canonical_json, integrity_signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+          [
+            existingRevisionId,
+            existingSubmissionId,
+            1,
+            "wine-label-requirements",
+            "1.0.0",
+            "panel-upgrade@example.test",
+            now,
+            "{}",
+            `v1:${"b".repeat(64)}`,
+          ],
+        );
+        await connection.execute(
+          "INSERT INTO submitted_panels (id, revision_id, role, display_name, media_type, byte_size, checksum_sha256, width, height, rotation, storage_key) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+          [
+            existingPanelId,
+            existingRevisionId,
+            "front",
+            "front.png",
+            "image/png",
+            1,
+            "a".repeat(64),
+            1,
+            1,
+            0,
+            existingStorageKey,
+          ],
+        );
+        await connection.end();
+        connection = undefined;
+
+        delete process.env.LABEL_LENS_MIGRATIONS_DIR;
+        await applyMigrations(MYSQL_DATABASE_URL);
+        await applyMigrations(MYSQL_DATABASE_URL);
+
+        expect(await mysqlSubmittedPanelColumnType(MYSQL_DATABASE_URL, "id")).toEqual({
+          dataType: "varchar",
+          characterMaximumLength: 255,
+          columnKey: "PRI",
+        });
+        expect(await mysqlSubmittedPanelColumnType(MYSQL_DATABASE_URL, "storage_key")).toEqual({
+          dataType: "varchar",
+          characterMaximumLength: 1024,
+          columnKey: "",
+        });
+
+        connection = await mysql.createConnection(MYSQL_DATABASE_URL);
+        const [preservedRows] = await connection.execute(
+          "SELECT storage_key AS storageKey FROM submitted_panels WHERE id = ?",
+          [existingPanelId],
+        );
+        expect((preservedRows as Array<{ storageKey: string }>)[0]?.storageKey).toBe(
+          existingStorageKey,
+        );
+
+        const checksum = "c".repeat(64);
+        const maxInitialSubmissionId = "i".repeat(255);
+        const maxInitialRevisionId = "66666666-6666-4666-8666-666666666666";
+        const maxInitialPanelId = "f".repeat(190);
+        const maxInitialKey = panelStorageKey(maxInitialSubmissionId, maxInitialPanelId, checksum);
+        const maxResubmissionId = "r".repeat(255);
+        const maxChildRevisionId = "77777777-7777-4777-8777-777777777777";
+        const maxResubmissionPanelId = "s".repeat(190);
+        const maxResubmissionKey = resubmissionPanelStorageKey(
+          maxResubmissionId,
+          maxChildRevisionId,
+          maxResubmissionPanelId,
+          checksum,
+        );
+        expect(maxInitialKey.length).toBeGreaterThan(500);
+        expect(maxResubmissionKey.length).toBeGreaterThan(500);
+
+        await connection.execute(
+          "INSERT INTO submissions (id, creator_id, current_status, is_demo, version, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?)",
+          [
+            maxInitialSubmissionId,
+            userId,
+            "waiting_for_agent_review",
+            false,
+            1,
+            now,
+            now,
+            maxResubmissionId,
+            userId,
+            "waiting_for_agent_review",
+            false,
+            1,
+            now,
+            now,
+          ],
+        );
+        await connection.execute(
+          "INSERT INTO submission_revisions (id, submission_id, revision_number, profile_id, profile_version, submitted_by, submitted_at, canonical_json, integrity_signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+          [
+            maxInitialRevisionId,
+            maxInitialSubmissionId,
+            1,
+            "wine-label-requirements",
+            "1.0.0",
+            "panel-upgrade@example.test",
+            now,
+            "{}",
+            `v1:${"d".repeat(64)}`,
+            maxChildRevisionId,
+            maxResubmissionId,
+            2,
+            "wine-label-requirements",
+            "1.0.0",
+            "panel-upgrade@example.test",
+            now,
+            "{}",
+            `v1:${"e".repeat(64)}`,
+          ],
+        );
+        await connection.execute(
+          "INSERT INTO submitted_panels (id, revision_id, role, display_name, media_type, byte_size, checksum_sha256, width, height, rotation, storage_key) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+          [
+            maxInitialPanelId,
+            maxInitialRevisionId,
+            "front",
+            "front.png",
+            "image/png",
+            1,
+            checksum,
+            1,
+            1,
+            0,
+            maxInitialKey,
+            maxResubmissionPanelId,
+            maxChildRevisionId,
+            "front",
+            "front.png",
+            "image/png",
+            1,
+            checksum,
+            1,
+            1,
+            0,
+            maxResubmissionKey,
+          ],
+        );
+
+        const [maxRows] = await connection.execute(
+          "SELECT id, storage_key AS storageKey, CHAR_LENGTH(storage_key) AS storageKeyLength FROM submitted_panels WHERE id IN (?, ?) ORDER BY id",
+          [maxInitialPanelId, maxResubmissionPanelId],
+        );
+        const normalizedMaxRows = (
+          maxRows as Array<{
+            id: string;
+            storageKey: string;
+            storageKeyLength: number;
+          }>
+        ).map((row) => ({
+          id: row.id,
+          storageKey: row.storageKey,
+          storageKeyLength: row.storageKeyLength,
+        }));
+        expect(normalizedMaxRows).toEqual([
+          {
+            id: maxInitialPanelId,
+            storageKey: maxInitialKey,
+            storageKeyLength: maxInitialKey.length,
+          },
+          {
+            id: maxResubmissionPanelId,
+            storageKey: maxResubmissionKey,
+            storageKeyLength: maxResubmissionKey.length,
+          },
+        ]);
+      } finally {
+        if (connection) await connection.end();
+        delete process.env.LABEL_LENS_MIGRATIONS_DIR;
+        await dropAllMysqlTables(MYSQL_DATABASE_URL);
+        await applyMigrations(MYSQL_DATABASE_URL);
+
+        if (previousMigrationsDir === undefined) delete process.env.LABEL_LENS_MIGRATIONS_DIR;
+        else process.env.LABEL_LENS_MIGRATIONS_DIR = previousMigrationsDir;
+        if (previousDialect === undefined) delete process.env.LABEL_LENS_DB_DIALECT;
+        else process.env.LABEL_LENS_DB_DIALECT = previousDialect;
+      }
+    });
+
     it("preserves an existing valid signed revision when canonical_json upgrades from TEXT to MEDIUMTEXT", async () => {
       const previousMigrationsDir = process.env.LABEL_LENS_MIGRATIONS_DIR;
       const previousIntegritySecret = process.env.LABEL_LENS_INTEGRITY_SECRET;
@@ -383,6 +654,11 @@ if (RUN_MYSQL_TESTS) {
         expect(await mysqlColumnType(MYSQL_DATABASE_URL)).toEqual({
           dataType: "mediumtext",
           characterMaximumLength: 16_777_215,
+        });
+        expect(await mysqlSubmittedPanelColumnType(MYSQL_DATABASE_URL, "id")).toEqual({
+          dataType: "varchar",
+          characterMaximumLength: 255,
+          columnKey: "PRI",
         });
 
         vi.resetModules();

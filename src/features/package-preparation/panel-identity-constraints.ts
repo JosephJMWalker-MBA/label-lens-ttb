@@ -1,0 +1,5 @@
+export const MAX_PANEL_ID_LENGTH = 190;
+export const PANEL_IDENTITY_PATTERN = /^[A-Za-z0-9._:-]+$/;
+export const PANEL_STORAGE_CHECKSUM_LENGTH = 64;
+export const PANEL_STORAGE_FILENAME_MAX_ASCII_BYTES = 255;
+export const PANEL_STORAGE_KEY_MAX_LENGTH = 1024;

@@ -21,6 +21,7 @@ import type { RevisionResponseContext } from "./revision-context";
 
 interface SeedPanel {
   panelId: string;
+  assetPanelId: string;
   order: number;
   role: string;
   displayName: string;
@@ -104,7 +105,7 @@ async function hydrateFromSeed(seed: RevisionSeedResponse): Promise<StoredPackag
       const mappedPanelId = panelIdMap.get(basePanel.panelId);
       if (!mappedPanelId) throw new Error("REVISION_SEED_PANEL_MAP_MISSING");
       const response = await fetch(
-        `/api/package/submit/revision-seed/${encodeURIComponent(seed.submissionId)}/panels/${encodeURIComponent(basePanel.panelId)}`,
+        `/api/package/submit/revision-seed/${encodeURIComponent(seed.submissionId)}/panels/${encodeURIComponent(basePanel.assetPanelId)}`,
         { cache: "no-store" },
       );
       if (!response.ok) throw new Error("REVISION_SEED_PANEL_RESTORE_FAILED");
@@ -210,10 +211,14 @@ export function RevisionSeedHydrator({ submissionId }: { submissionId: string })
       );
     } catch (error) {
       setState("error");
+      const rawMessage = error instanceof Error ? error.message : "";
       setMessage(
-        error instanceof Error && error.message
-          ? error.message
-          : "Could not prepare the revision response draft.",
+        rawMessage === "REVISION_SEED_REGION_PANEL_MISSING" ||
+          rawMessage === "REVISION_SEED_PANEL_MAP_MISSING"
+          ? "A stored panel identity could not be reconciled safely. No revision draft was created."
+          : rawMessage
+            ? rawMessage
+            : "Could not prepare the revision response draft.",
       );
     }
   }

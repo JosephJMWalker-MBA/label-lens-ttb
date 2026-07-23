@@ -31,6 +31,7 @@ import {
 import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
 import { verifyAppendToken } from "@/server/append-token";
 import { readSessionFromHeaders, type SessionUser } from "@/server/auth/guards";
+import { validatePanelIdentityList } from "@/server/submissions/panel-identity";
 import { isValidSubmissionId } from "@/server/submissions/access";
 
 const MAX_PANEL_BYTES = 15 * 1024 * 1024;
@@ -188,23 +189,6 @@ async function readIdempotentResponse(
   return null;
 }
 
-function assertValidPanelIdentityList(panelIds: string[]) {
-  const seen = new Set<string>();
-  for (const panelId of panelIds) {
-    if (!/^[A-Za-z0-9._:-]+$/.test(panelId) || panelId.length > 255) {
-      throw new ResubmitError(
-        400,
-        "INVALID_PANEL_ID",
-        "Panel IDs must be bounded path-safe tokens.",
-      );
-    }
-    if (seen.has(panelId)) {
-      throw new ResubmitError(400, "DUPLICATE_PANEL_ID", "Panel IDs must be unique.");
-    }
-    seen.add(panelId);
-  }
-}
-
 function validatePackagePayload(rawPayload: unknown) {
   const rawBoundary = (rawPayload as { boundary?: { transmission?: unknown } })?.boundary;
   if (rawBoundary?.transmission === LOCAL_DOWNLOAD_ONLY_TRANSMISSION) {
@@ -246,7 +230,10 @@ function validatePackagePayload(rawPayload: unknown) {
     );
   }
 
-  assertValidPanelIdentityList(draft.panels.map((panel) => panel.panelId));
+  const panelIdentityCheck = validatePanelIdentityList(draft.panels.map((panel) => panel.panelId));
+  if (!panelIdentityCheck.ok) {
+    throw new ResubmitError(400, panelIdentityCheck.code, panelIdentityCheck.message);
+  }
 
   for (const panelRun of latestRun.panelRuns) {
     let parsedExport: {
