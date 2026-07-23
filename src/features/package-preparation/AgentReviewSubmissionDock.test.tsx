@@ -38,6 +38,7 @@ vi.mock("./package-model", async (importOriginal) => {
 
 import { AgentReviewSubmissionDock } from "./AgentReviewSubmissionDock";
 import type { StoredPackageDraft } from "./package-draft-store";
+import type { PackagePanelMachineRun } from "./package-model";
 
 const revisionContext = {
   kind: "requested_changes_response" as const,
@@ -252,5 +253,273 @@ describe("AgentReviewSubmissionDock", () => {
 
     expect(await screen.findByText("Waiting For Agent Review")).toBeInTheDocument();
     expect(screen.getByText("Revision v1 is recorded.")).toBeInTheDocument();
+  });
+
+  it("invalidates stale cached attempt on front-panel replacement or evidence change", async () => {
+    const initialStored = storedDraft({ revision: true });
+    initialStored.draft.categories = [
+      {
+        categoryId: "brandName",
+        decision: "provided",
+        expectedValue: "Issue 167 Base Brand",
+        regions: [],
+      },
+    ];
+    initialStored.draft.analysisRuns = [
+      {
+        analysisRunId: "analysis-1",
+        sequence: 1,
+        sellerChangeSequence: 0,
+        recordedAt: "2026-07-22T00:04:00.000Z",
+        panelRuns: [],
+        categories: [
+          {
+            categoryId: "brandName",
+            state: "clearly_readable",
+            observedValue: "Issue 167 Base Brand",
+            supportingPanelIds: ["panel-front"],
+            supportingRegionIds: [],
+            reason: "OK",
+          },
+        ],
+        readiness: "ready_for_agent_submission",
+      },
+    ];
+
+    store.load.mockResolvedValue(initialStored);
+    model.buildSellerPackageExport.mockImplementation(async ({ draft }) => {
+      return exportedPayload({ ...initialStored, draft });
+    });
+
+    const fetchCalls: Array<{ url: string; formData: FormData; idempotencyKey: string }> = [];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const method = init?.method ?? "GET";
+        if (method === "GET") return new Response(null, { status: 404 });
+        const url = String(input);
+        const formData = init?.body as FormData;
+        const idempotencyKey =
+          (init?.headers as Record<string, string>)?.["X-Idempotency-Key"] ?? "";
+        fetchCalls.push({ url, formData, idempotencyKey });
+        return Response.json({
+          action: "resubmit_revision",
+          submissionId: "pkg-resubmit",
+          parentRevisionId: "revision-parent",
+          parentRevisionNumber: 1,
+          revisionId: `revision-child-${fetchCalls.length}`,
+          revisionNumber: 2,
+          respondedToDecisionId: "decision-change",
+          currentStatus: "waiting_for_agent_review",
+          submissionVersion: 4,
+          recordedAt: "2026-07-22T00:10:00.000Z",
+        });
+      }),
+    );
+
+    render(<AgentReviewSubmissionDock />);
+    await submit();
+
+    await waitFor(() => expect(fetchCalls).toHaveLength(1));
+    const firstExport = JSON.parse(fetchCalls[0].formData.get("packageExport") as string);
+    expect(firstExport.package.panels[0].panelId).toBe("panel-front");
+
+    // Replace front panel and update seller evidence
+    const replacementStored: StoredPackageDraft = {
+      ...initialStored,
+      draft: {
+        ...initialStored.draft,
+        panels: [
+          {
+            panelId: "panel-front-replacement",
+            order: 0,
+            role: "front",
+            displayName: "front_new.png",
+            mediaType: "image/png",
+            byteSize: 9,
+            checksumSha256: "b".repeat(64),
+            width: 2,
+            height: 2,
+            rotation: 0,
+          },
+        ],
+        categories: [
+          {
+            categoryId: "brandName",
+            decision: "provided",
+            expectedValue: "Issue 167 Revised Brand",
+            regions: [],
+          },
+        ],
+        analysisRuns: [
+          {
+            analysisRunId: "analysis-2",
+            sequence: 2,
+            sellerChangeSequence: 0,
+            recordedAt: "2026-07-22T00:08:00.000Z",
+            panelRuns: [
+              {
+                panelId: "panel-front-replacement",
+                machineResultId: "m1",
+                exportJson: "{}",
+                observations: {} as unknown as PackagePanelMachineRun["observations"],
+              },
+            ],
+            categories: [
+              {
+                categoryId: "brandName",
+                state: "clearly_readable",
+                observedValue: "Issue 167 Revised Brand",
+                supportingPanelIds: ["panel-front-replacement"],
+                supportingRegionIds: [],
+                reason: "OK",
+              },
+            ],
+            readiness: "ready_for_agent_submission",
+          },
+        ],
+      },
+      panelFiles: [
+        {
+          panelId: "panel-front-replacement",
+          file: new File(["front_new"], "front_new.png", { type: "image/png" }),
+        },
+      ],
+    };
+
+    store.load.mockResolvedValue(replacementStored);
+    fireEvent.focus(window);
+
+    await submit();
+
+    await waitFor(() => expect(fetchCalls).toHaveLength(2));
+    const secondExport = JSON.parse(fetchCalls[1].formData.get("packageExport") as string);
+    expect(secondExport.package.panels[0].panelId).toBe("panel-front-replacement");
+    expect(secondExport.package.panels[0].checksumSha256).toBe("b".repeat(64));
+    expect(secondExport.package.categories[0].expectedValue).toBe("Issue 167 Revised Brand");
+    expect(fetchCalls[1].formData.get("panel-front-replacement")).toBeTruthy();
+    expect(fetchCalls[1].formData.get("panel-front")).toBeNull();
+  });
+
+  it("reuses idempotency key on unchanged retry of an identical draft", async () => {
+    const stored = storedDraft({ revision: true });
+    stored.draft.categories = [
+      {
+        categoryId: "brandName",
+        decision: "provided",
+        expectedValue: "Issue 167 Base Brand",
+        regions: [],
+      },
+    ];
+    stored.draft.analysisRuns = [
+      {
+        analysisRunId: "analysis-1",
+        sequence: 1,
+        sellerChangeSequence: 0,
+        recordedAt: "2026-07-22T00:04:00.000Z",
+        panelRuns: [],
+        categories: [
+          {
+            categoryId: "brandName",
+            state: "clearly_readable",
+            observedValue: "Issue 167 Base Brand",
+            supportingPanelIds: ["panel-front"],
+            supportingRegionIds: [],
+            reason: "OK",
+          },
+        ],
+        readiness: "ready_for_agent_submission",
+      },
+    ];
+
+    store.load.mockResolvedValue(stored);
+    model.buildSellerPackageExport.mockResolvedValue(exportedPayload(stored));
+
+    const fetchCalls: Array<{ url: string; idempotencyKey: string }> = [];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const method = init?.method ?? "GET";
+        if (method === "GET") return new Response(null, { status: 404 });
+        const idempotencyKey =
+          (init?.headers as Record<string, string>)?.["X-Idempotency-Key"] ?? "";
+        fetchCalls.push({ url: String(input), idempotencyKey });
+        // Return 500 error first time to allow retry
+        if (fetchCalls.length === 1) {
+          return Response.json({ error: "Network error" }, { status: 500 });
+        }
+        return Response.json({
+          action: "resubmit_revision",
+          submissionId: "pkg-resubmit",
+          parentRevisionId: "revision-parent",
+          parentRevisionNumber: 1,
+          revisionId: "revision-child",
+          revisionNumber: 2,
+          respondedToDecisionId: "decision-change",
+          currentStatus: "waiting_for_agent_review",
+          submissionVersion: 4,
+          recordedAt: "2026-07-22T00:10:00.000Z",
+        });
+      }),
+    );
+
+    render(<AgentReviewSubmissionDock />);
+    await submit();
+
+    await waitFor(() => expect(fetchCalls).toHaveLength(1));
+
+    // Submit retry without changing draft
+    await submit();
+
+    await waitFor(() => expect(fetchCalls).toHaveLength(2));
+    expect(fetchCalls[0].idempotencyKey).toBe(fetchCalls[1].idempotencyKey);
+  });
+
+  it("fails closed before network transmission if a panel file is missing or mismatched", async () => {
+    const stored = storedDraft({ revision: true });
+    stored.draft.categories = [
+      {
+        categoryId: "brandName",
+        decision: "provided",
+        expectedValue: "Issue 167 Base Brand",
+        regions: [],
+      },
+    ];
+    stored.draft.analysisRuns = [
+      {
+        analysisRunId: "analysis-1",
+        sequence: 1,
+        sellerChangeSequence: 0,
+        recordedAt: "2026-07-22T00:04:00.000Z",
+        panelRuns: [],
+        categories: [
+          {
+            categoryId: "brandName",
+            state: "clearly_readable",
+            observedValue: "Issue 167 Base Brand",
+            supportingPanelIds: ["panel-front"],
+            supportingRegionIds: [],
+            reason: "OK",
+          },
+        ],
+        readiness: "ready_for_agent_submission",
+      },
+    ];
+
+    // Remove panel file from stored
+    stored.panelFiles = [];
+
+    store.load.mockResolvedValue(stored);
+    model.buildSellerPackageExport.mockResolvedValue(exportedPayload(stored));
+
+    const fetchSpy = vi.fn();
+    vi.stubGlobal("fetch", fetchSpy);
+
+    render(<AgentReviewSubmissionDock />);
+
+    // Since stored.panelFiles.length !== stored.draft.panels.length, ready is false so submit button is disabled
+    const button = await screen.findByRole("button", { name: /submit for agent review/i });
+    expect(button).toBeDisabled();
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 });
