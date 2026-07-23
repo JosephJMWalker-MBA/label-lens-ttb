@@ -116,11 +116,46 @@ export function AgentReviewSubmissionDock() {
   const latestRun = draft?.analysisRuns.at(-1);
   const revisionContext = stored?.revisionContext ?? null;
   const revisionContextFingerprint = revisionContext ? canonicalStringify(revisionContext) : null;
-  const ready = Boolean(
-    stored &&
-    packageReadyForAgentReview(stored.draft) &&
-    stored.panelFiles.length === stored.draft.panels.length,
-  );
+
+  const draftFingerprint = useMemo(() => {
+    if (!draft) return "";
+    const panelSig = draft.panels
+      .map(
+        (p) =>
+          `${p.panelId}:${p.role}:${p.order}:${p.checksumSha256}:${p.byteSize}:${p.width}x${p.height}:${p.rotation}`,
+      )
+      .join("|");
+    const categorySig = draft.categories
+      .map(
+        (c) =>
+          `${c.categoryId}:${c.decision}:${c.expectedValue}:${c.regions
+            .map((r) => `${r.regionId}@${r.panelId}:${r.x},${r.y},${r.width},${r.height}`)
+            .join(",")}`,
+      )
+      .join("|");
+
+    return [
+      draft.packageId,
+      draft.updatedAt,
+      latestRun?.analysisRunId ?? "no-run",
+      panelSig,
+      categorySig,
+      revisionContextFingerprint ?? "initial-finalize",
+      submitter.trim(),
+    ].join("::");
+  }, [draft, latestRun?.analysisRunId, revisionContextFingerprint, submitter]);
+
+  const panelFilesCoherent = useMemo(() => {
+    if (!stored) return false;
+    if (stored.panelFiles.length !== stored.draft.panels.length) return false;
+    const fileMap = new Map(stored.panelFiles.map((pf) => [pf.panelId, pf.file]));
+    return stored.draft.panels.every((panel) => {
+      const file = fileMap.get(panel.panelId);
+      return Boolean(file && file.size === panel.byteSize);
+    });
+  }, [stored]);
+
+  const ready = Boolean(stored && packageReadyForAgentReview(stored.draft) && panelFilesCoherent);
 
   useEffect(() => {
     attemptRef.current = null;
@@ -128,13 +163,7 @@ export function AgentReviewSubmissionDock() {
     setReceipt(null);
     setPhase("idle");
     setErrorMessage(null);
-  }, [
-    draft?.packageId,
-    draft?.updatedAt,
-    latestRun?.analysisRunId,
-    revisionContextFingerprint,
-    submitter,
-  ]);
+  }, [draftFingerprint]);
 
   useEffect(() => {
     const packageId = draft?.packageId;
@@ -192,13 +221,28 @@ export function AgentReviewSubmissionDock() {
       const currentRun = currentDraft.analysisRuns.at(-1);
       if (!currentRun) throw new Error("The package has no completed pre-check.");
 
-      const fingerprint = [
-        currentDraft.packageId,
-        currentDraft.updatedAt,
-        currentRun.analysisRunId,
-        revisionContextFingerprint ?? "initial-finalize",
-        submitter.trim(),
-      ].join(":");
+      if (stored.panelFiles.length !== currentDraft.panels.length) {
+        throw new Error(
+          "PACKAGE_PANEL_FILE_COUNT_MISMATCH: Saved panel files do not match draft panel count.",
+        );
+      }
+
+      const storedFileMap = new Map(stored.panelFiles.map((pf) => [pf.panelId, pf.file]));
+      for (const panel of currentDraft.panels) {
+        const file = storedFileMap.get(panel.panelId);
+        if (!file) {
+          throw new Error(
+            `PACKAGE_PANEL_FILE_MISSING: Saved file for panel ${panel.panelId} is unavailable.`,
+          );
+        }
+        if (file.size !== panel.byteSize) {
+          throw new Error(
+            `PACKAGE_PANEL_FILE_SIZE_MISMATCH: Saved file size for panel ${panel.panelId} (${file.size}) does not match draft byte size (${panel.byteSize}).`,
+          );
+        }
+      }
+
+      const fingerprint = draftFingerprint;
 
       let attempt = attemptRef.current;
       if (!attempt || attempt.fingerprint !== fingerprint) {
@@ -240,8 +284,9 @@ export function AgentReviewSubmissionDock() {
       if (revisionContext) {
         body.set("revisionContext", canonicalStringify(revisionContext));
       }
-      for (const { panelId, file } of stored.panelFiles) {
-        body.append(panelId, file, file.name);
+      for (const panel of currentDraft.panels) {
+        const file = storedFileMap.get(panel.panelId)!;
+        body.append(panel.panelId, file, file.name);
       }
 
       const response = await fetch(

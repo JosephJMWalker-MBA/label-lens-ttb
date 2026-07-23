@@ -1,5 +1,6 @@
 // @vitest-environment node
 /* eslint-disable @typescript-eslint/no-explicit-any -- integration test drives dual-dialect Drizzle handles and Next route handlers */
+import { createHash } from "node:crypto";
 import fs, { existsSync, readdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 
@@ -1224,6 +1225,107 @@ for (const dialect of DIALECTS) {
         ).rejects.toThrow();
       }
       expect(await db.select().from(schema.submissionRevisionResponses)).toHaveLength(1);
+    });
+
+    it("persists replaced panel and revised seller brand evidence on revision 2 and preserves revision 1", async () => {
+      const { seller, submissionId, revisionContext } = await seedRequestedChanges();
+
+      // Front replacement panel bytes & checksum B (valid PNG header)
+      const panelBBytes = Buffer.concat([PANEL_BYTES, Buffer.from("-revised-167")]);
+      const panelBChecksum = createHash("sha256").update(panelBBytes).digest("hex");
+      const panelBId = "front-replacement-167";
+
+      const v2Payload = childPayload(submissionId);
+      v2Payload.package.panels = [
+        {
+          panelId: panelBId,
+          order: 0,
+          role: "front",
+          displayName: "front_revised.png",
+          mediaType: "image/png",
+          byteSize: panelBBytes.length,
+          checksumSha256: panelBChecksum,
+          width: 1,
+          height: 1,
+          rotation: 0,
+        },
+      ];
+      v2Payload.package.categories = [
+        {
+          categoryId: "brandName",
+          decision: "provided",
+          expectedValue: "Issue 167 Revised Brand",
+          regions: [],
+        },
+      ];
+      await resign(v2Payload);
+
+      const resubmitRes = await resubmitPOST(
+        resubmitRequest({
+          submissionId,
+          cookie: seller.cookie,
+          idempotencyKey: "k-issue-167-revised",
+          payload: v2Payload,
+          revisionContext,
+          panelId: panelBId,
+          files: { [panelBId]: new Blob([panelBBytes], { type: "image/png" }) },
+        }),
+        params(submissionId),
+      );
+
+      const errBody = resubmitRes.status !== 200 ? await resubmitRes.clone().json() : null;
+      expect(errBody).toBeNull();
+      expect(resubmitRes.status).toBe(200);
+      const resubmitData = await resubmitRes.json();
+      expect(resubmitData).toMatchObject({
+        action: "resubmit_revision",
+        submissionId,
+        parentRevisionId: expect.any(String),
+        parentRevisionNumber: 1,
+        revisionNumber: 2,
+        currentStatus: "waiting_for_agent_review",
+      });
+
+      // Verify DB revisions
+      const revisions = await readRevisionRows(submissionId);
+      expect(revisions).toHaveLength(2);
+      const v1 = revisions.find((r: any) => r.revisionNumber === 1)!;
+      const v2 = revisions.find((r: any) => r.revisionNumber === 2)!;
+
+      const v1Package = JSON.parse(v1.canonicalJson).package;
+      const v2Package = JSON.parse(v2.canonicalJson).package;
+
+      // Rev 1 remains unchanged
+      expect(v1Package.panels[0].checksumSha256).not.toBe(panelBChecksum);
+
+      // Rev 2 has panel B and revised brand
+      expect(v2Package.panels[0].panelId).toBe(panelBId);
+      expect(v2Package.panels[0].checksumSha256).toBe(panelBChecksum);
+      expect(v2Package.categories[0].expectedValue).toBe("Issue 167 Revised Brand");
+
+      const v2Panels = await db
+        .select()
+        .from(schema.submittedPanels)
+        .where(eq(schema.submittedPanels.revisionId, v2.id));
+      expect(v2Panels[0].checksumSha256).toBe(panelBChecksum);
+
+      // Agent detail comparison check
+      const agentUser = await provision("agent-167@test.com", "agent");
+      const detailRes = await detailGET(
+        new Request(`http://localhost/api/agent/submissions/${submissionId}`, {
+          headers: { cookie: agentUser.cookie },
+        }),
+        params(submissionId),
+      );
+      expect(detailRes.status).toBe(200);
+      const detailData = await detailRes.json();
+
+      expect(detailData.revisionComparison).toBeTruthy();
+      expect(detailData.revisionComparison.panelChanges.replaced).toHaveLength(1);
+      const brandChange = detailData.revisionComparison.sellerEvidenceChanges.find(
+        (c: any) => c.categoryId === "brandName",
+      );
+      expect(brandChange?.resultingExpectedValue).toBe("Issue 167 Revised Brand");
     });
   });
 }
