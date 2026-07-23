@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useState } from "react";
 
 import {
-  loadPackageDraftLocally,
+  listPackageDraftsLocally,
   savePackageDraftLocally,
+  setActivePackageDraftIdLocally,
   type StoredPackageDraft,
 } from "./package-draft-store";
 import type {
@@ -186,22 +187,17 @@ export function RevisionSeedHydrator({ submissionId }: { submissionId: string })
         throw new Error(body.error?.message || "The requested-change seed is unavailable.");
       }
       const seed = (await seedResponse.json()) as RevisionSeedResponse;
-      const existing = await loadPackageDraftLocally();
-      if (existing && sameContext(existing.revisionContext, seed.revisionContext)) {
+      const allDrafts = await listPackageDraftsLocally();
+      const existingMatch = allDrafts.find((item) =>
+        sameContext(item.revisionContext, seed.revisionContext),
+      );
+      if (existingMatch) {
+        await setActivePackageDraftIdLocally(existingMatch.draft.packageId);
         setState("ready");
         setMessage(
           "An existing revision response draft is already stored in this browser. Resume it in Review.",
         );
         return;
-      }
-      if (existing && !sameContext(existing.revisionContext, seed.revisionContext)) {
-        const confirmed = window.confirm(
-          "Replace your current browser-local draft with this requested-change response draft?",
-        );
-        if (!confirmed) {
-          setState("idle");
-          return;
-        }
       }
 
       const stored = await hydrateFromSeed(seed);

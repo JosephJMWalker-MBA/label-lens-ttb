@@ -5,6 +5,8 @@ import { requireRolePage } from "@/server/auth/guards";
 import { listOwnedSubmissions } from "@/server/submissions/queries";
 import { PORTAL_DISCLAIMER, statusLabel } from "@/lib/product-language";
 
+import { StartNewPackageButton } from "@/features/package-preparation/StartNewPackageButton";
+
 export const dynamic = "force-dynamic";
 
 export default async function SellerPage() {
@@ -21,12 +23,13 @@ export default async function SellerPage() {
           Signed in as {user.name?.trim() || user.email}.
         </p>
 
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="mt-6 flex flex-wrap items-start gap-3">
+          <StartNewPackageButton />
           <Link
             href="/review"
-            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            className="rounded-md border border-border px-4 py-2 text-sm font-medium hover:bg-muted"
           >
-            Prepare a package in Review
+            Resume active package in Review
           </Link>
         </div>
 

@@ -1,34 +1,54 @@
+import { parseRevisionResponseContext, type RevisionResponseContext } from "./revision-context";
+
 import type { SellerPackageDraft } from "./package-model";
-import { parseRevisionResponseContext } from "./revision-context";
-import type { RevisionResponseContext } from "./revision-context";
+import { WINE_PACKAGE_CATEGORY_DEFINITIONS, WINE_PACKAGE_PROFILE } from "./package-profile";
+
+export function newDraft(): SellerPackageDraft {
+  const recordedAt = new Date().toISOString();
+  return {
+    schemaVersion: "seller-package-draft.v1",
+    packageId: `seller-package-${crypto.randomUUID()}`,
+    createdAt: recordedAt,
+    updatedAt: recordedAt,
+    profile: WINE_PACKAGE_PROFILE,
+    panelDecisions: { back: "unresolved", additional: "unresolved" },
+    panels: [],
+    categories: WINE_PACKAGE_CATEGORY_DEFINITIONS.map((definition) => ({
+      categoryId: definition.categoryId,
+      decision: "provided",
+      expectedValue: "",
+      regions: [],
+    })),
+    sellerChangeHistory: [],
+    analysisRuns: [],
+  };
+}
 
 const DATABASE_NAME = "label-lens-seller-package-v1";
-const DATABASE_VERSION = 1;
+const DATABASE_VERSION = 2;
 const STORE_NAME = "drafts";
-const CURRENT_KEY = "current-package";
+const LEGACY_CURRENT_KEY = "current-package";
+const ACTIVE_KEY = "meta:active-package-id";
 
-/**
- * Bounded deadlines so a single operation can never hang the caller. These are
- * intentionally shorter than the workspace's own restoration deadline, so the
- * storage layer usually fails first with a typed reason.
- */
-const OPEN_TIMEOUT_MS = 4000;
-const TXN_TIMEOUT_MS = 4000;
+export const MAX_LOCAL_DRAFTS = 20;
 
-export type DraftStoreFailureReason =
+const OPEN_TIMEOUT_MS = 3_000;
+const TXN_TIMEOUT_MS = 3_000;
+
+export type DraftStoreReason =
   | "LOCAL_DRAFT_STORAGE_UNAVAILABLE"
   | "LOCAL_DRAFT_STORAGE_OPEN_FAILED"
   | "LOCAL_DRAFT_STORAGE_BLOCKED"
   | "LOCAL_DRAFT_STORAGE_OPEN_TIMEOUT"
-  | "LOCAL_DRAFT_STORAGE_FAILED"
-  | "LOCAL_DRAFT_STORAGE_ABORTED"
   | "LOCAL_DRAFT_STORAGE_TXN_TIMEOUT"
-  | "LOCAL_DRAFT_MALFORMED";
+  | "LOCAL_DRAFT_STORAGE_ABORTED"
+  | "LOCAL_DRAFT_STORAGE_FAILED"
+  | "LOCAL_DRAFT_MALFORMED"
+  | "LOCAL_DRAFT_LIMIT_REACHED";
 
-/** A typed, domain-specific failure for local draft persistence. */
 export class DraftStoreError extends Error {
-  constructor(public readonly reason: DraftStoreFailureReason) {
-    super(reason);
+  constructor(public readonly reason: DraftStoreReason) {
+    super(`Local draft storage failed: ${reason}`);
     this.name = "DraftStoreError";
   }
 }
@@ -69,50 +89,63 @@ function openDatabase(timeoutMs = OPEN_TIMEOUT_MS): Promise<IDBDatabase> {
       reject(new DraftStoreError("LOCAL_DRAFT_STORAGE_OPEN_TIMEOUT"));
     }, timeoutMs);
 
-    request.onupgradeneeded = () => {
+    request.onupgradeneeded = (event) => {
       const database = request.result;
-      if (!database.objectStoreNames.contains(STORE_NAME)) database.createObjectStore(STORE_NAME);
+      if (!database.objectStoreNames.contains(STORE_NAME)) {
+        database.createObjectStore(STORE_NAME);
+      }
+      const oldVersion = event.oldVersion;
+      if (oldVersion > 0 && oldVersion < 2 && request.transaction) {
+        const store = request.transaction.objectStore(STORE_NAME);
+        const legacyGetReq = store.get(LEGACY_CURRENT_KEY);
+        legacyGetReq.onsuccess = () => {
+          const legacyDraft = legacyGetReq.result as StoredPackageDraft | undefined;
+          if (legacyDraft && isValidStoredDraft(legacyDraft) && legacyDraft.draft?.packageId) {
+            store.put(legacyDraft, legacyDraft.draft.packageId);
+            store.put(legacyDraft.draft.packageId, ACTIVE_KEY);
+            store.delete(LEGACY_CURRENT_KEY);
+          }
+        };
+      }
     };
+
     request.onsuccess = () => {
+      clearTimeout(timer);
       if (settled) {
-        // Opened after the deadline already rejected; close to avoid a leak.
         try {
           request.result.close();
         } catch {
-          // ignore
+          // best-effort cleanup on late open
         }
         return;
       }
       settled = true;
-      clearTimeout(timer);
       resolve(request.result);
     };
+
     request.onerror = () => {
+      clearTimeout(timer);
       if (settled) return;
       settled = true;
-      clearTimeout(timer);
       reject(new DraftStoreError("LOCAL_DRAFT_STORAGE_OPEN_FAILED"));
     };
+
     request.onblocked = () => {
+      clearTimeout(timer);
       if (settled) return;
       settled = true;
-      clearTimeout(timer);
       reject(new DraftStoreError("LOCAL_DRAFT_STORAGE_BLOCKED"));
     };
   });
 }
 
 /**
- * Run a single object-store operation inside a bounded transaction. A read
- * resolves only after the request has succeeded AND the transaction has
- * committed (so a transaction that aborts after the request event never looks
- * successful). The database is closed exactly once, and the promise settles
- * exactly once, even on abort, error, or timeout.
+ * Execute an IndexedDB operation against the drafts store with a bounded transaction
+ * deadline. Resolves with the operation's request result on `transaction.oncomplete`.
  */
 async function withStore<T>(
   mode: IDBTransactionMode,
   operation: (store: IDBObjectStore) => IDBRequest<T>,
-  timeoutMs = TXN_TIMEOUT_MS,
 ): Promise<T> {
   const database = await openDatabase();
   let closed = false;
@@ -129,25 +162,14 @@ async function withStore<T>(
   try {
     return await new Promise<T>((resolve, reject) => {
       let settled = false;
-      let hasResult = false;
-      let result: T;
-
-      const timer = setTimeout(() => {
+      const finishResolve = (value: T) => {
         if (settled) return;
         settled = true;
-        reject(new DraftStoreError("LOCAL_DRAFT_STORAGE_TXN_TIMEOUT"));
-      }, timeoutMs);
-
-      const finishResolve = () => {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timer);
-        resolve(result);
+        resolve(value);
       };
-      const finishReject = (reason: DraftStoreFailureReason) => {
+      const finishReject = (reason: DraftStoreReason) => {
         if (settled) return;
         settled = true;
-        clearTimeout(timer);
         reject(new DraftStoreError(reason));
       };
 
@@ -159,58 +181,44 @@ async function withStore<T>(
         return;
       }
 
+      const timer = setTimeout(() => {
+        finishReject("LOCAL_DRAFT_STORAGE_TXN_TIMEOUT");
+      }, TXN_TIMEOUT_MS);
+
       let request: IDBRequest<T>;
       try {
         request = operation(transaction.objectStore(STORE_NAME));
       } catch {
+        clearTimeout(timer);
         finishReject("LOCAL_DRAFT_STORAGE_FAILED");
         return;
       }
 
-      request.onsuccess = () => {
-        result = request.result;
-        hasResult = true;
+      request.onerror = () => {
+        clearTimeout(timer);
+        finishReject("LOCAL_DRAFT_STORAGE_FAILED");
       };
-      request.onerror = () => finishReject("LOCAL_DRAFT_STORAGE_FAILED");
       transaction.oncomplete = () => {
-        // Commit succeeded. Only treat it as success if the request itself
-        // produced a result; otherwise the transaction completed without the
-        // operation actually happening.
-        if (hasResult) finishResolve();
-        else finishReject("LOCAL_DRAFT_STORAGE_FAILED");
+        clearTimeout(timer);
+        finishResolve(request.result);
       };
-      transaction.onerror = () => finishReject("LOCAL_DRAFT_STORAGE_FAILED");
-      transaction.onabort = () => finishReject("LOCAL_DRAFT_STORAGE_ABORTED");
+      transaction.onerror = () => {
+        clearTimeout(timer);
+        finishReject("LOCAL_DRAFT_STORAGE_FAILED");
+      };
+      transaction.onabort = () => {
+        clearTimeout(timer);
+        finishReject("LOCAL_DRAFT_STORAGE_ABORTED");
+      };
     });
   } finally {
     closeOnce();
   }
 }
 
-export async function savePackageDraftLocally(value: StoredPackageDraft): Promise<void> {
-  let next = value;
-  if (!next.revisionContext) {
-    try {
-      const existing = await withStore<StoredPackageDraft | undefined>("readonly", (store) =>
-        store.get(CURRENT_KEY),
-      );
-      if (
-        existing &&
-        isValidStoredDraft(existing) &&
-        existing.revisionContext &&
-        existing.draft.packageId === value.draft.packageId
-      ) {
-        next = { ...value, revisionContext: existing.revisionContext };
-      }
-    } catch {
-      // Saving the explicit value is still valid; the caller will surface any
-      // write failure below. A failed preservation read must not block a save.
-    }
-  }
-  await withStore("readwrite", (store) => store.put(next, CURRENT_KEY));
-}
-
-function isValidStoredDraft(stored: StoredPackageDraft | undefined): stored is StoredPackageDraft {
+export function isValidStoredDraft(
+  stored: StoredPackageDraft | undefined,
+): stored is StoredPackageDraft {
   if (!stored || stored.draft?.schemaVersion !== "seller-package-draft.v1") return false;
   if (
     stored.revisionContext !== undefined &&
@@ -218,7 +226,7 @@ function isValidStoredDraft(stored: StoredPackageDraft | undefined): stored is S
   ) {
     return false;
   }
-  const panelIds = new Set(stored.draft.panels.map((panel) => panel.panelId));
+  const panelIds = new Set(stored.draft.panels.map((panel: { panelId: string }) => panel.panelId));
   return (
     Array.isArray(stored.panelFiles) &&
     stored.panelFiles.length === stored.draft.panels.length &&
@@ -227,30 +235,157 @@ function isValidStoredDraft(stored: StoredPackageDraft | undefined): stored is S
   );
 }
 
-/**
- * Load the current local draft.
- *
- * Returns `null` when there is simply no stored draft (a normal first visit).
- * Throws `DraftStoreError("LOCAL_DRAFT_MALFORMED")` when a record exists but
- * fails schema/file validation — the caller shows a warning and opens a new
- * draft, but the malformed record is never deleted automatically. Storage
- * failures (unavailable, blocked, timeout, abort) reject with their own reason.
- */
-export async function loadPackageDraftLocally(): Promise<StoredPackageDraft | null> {
-  const stored = await withStore<StoredPackageDraft | undefined>("readonly", (store) =>
-    store.get(CURRENT_KEY),
-  );
-  if (stored === undefined || stored === null) return null;
-  if (!isValidStoredDraft(stored)) {
-    throw new DraftStoreError("LOCAL_DRAFT_MALFORMED");
+export async function getActivePackageDraftIdLocally(): Promise<string | null> {
+  try {
+    const active = await withStore<unknown>("readonly", (store) => store.get(ACTIVE_KEY));
+    return typeof active === "string" ? active : null;
+  } catch {
+    return null;
   }
+}
+
+export async function setActivePackageDraftIdLocally(packageId: string): Promise<void> {
+  await withStore("readwrite", (store) => store.put(packageId, ACTIVE_KEY));
+}
+
+export async function createAndActivateNewDraftLocally(): Promise<StoredPackageDraft> {
+  const existing = await listPackageDraftsLocally();
+  if (existing.length >= MAX_LOCAL_DRAFTS) {
+    throw new DraftStoreError("LOCAL_DRAFT_LIMIT_REACHED");
+  }
+  const initial = newDraft();
+  const stored: StoredPackageDraft = {
+    draft: initial,
+    panelFiles: [],
+  };
+  await savePackageDraftLocally(stored);
   return stored;
 }
 
+export async function savePackageDraftLocally(value: StoredPackageDraft): Promise<void> {
+  const packageId = value.draft.packageId;
+  const existingList = await listPackageDraftsLocally();
+  const alreadyExists = existingList.some((d) => d.draft.packageId === packageId);
+  if (!alreadyExists && existingList.length >= MAX_LOCAL_DRAFTS) {
+    throw new DraftStoreError("LOCAL_DRAFT_LIMIT_REACHED");
+  }
+  let next = value;
+  if (!next.revisionContext) {
+    try {
+      const existing = await withStore<StoredPackageDraft | undefined>("readonly", (store) =>
+        store.get(packageId),
+      );
+      if (
+        existing &&
+        isValidStoredDraft(existing) &&
+        existing.revisionContext &&
+        existing.draft.packageId === packageId
+      ) {
+        next = { ...value, revisionContext: existing.revisionContext };
+      }
+    } catch {
+      // Preservation read fallback
+    }
+  }
+  await withStore("readwrite", (store) => {
+    store.put(next, packageId);
+    store.put(packageId, ACTIVE_KEY);
+    return store.get(packageId);
+  });
+}
+
 /**
- * Explicitly delete the stored draft. Only ever called from a deliberate user
- * action — malformed records are never cleared automatically.
+ * Load a local draft by packageId, or load the active/most recent local draft.
  */
-export async function clearPackageDraftLocally(): Promise<void> {
-  await withStore("readwrite", (store) => store.delete(CURRENT_KEY));
+export async function loadPackageDraftLocally(
+  packageId?: string,
+): Promise<StoredPackageDraft | null> {
+  let targetId = packageId;
+  if (!targetId) {
+    targetId = (await getActivePackageDraftIdLocally()) ?? undefined;
+  }
+
+  if (targetId) {
+    const stored = await withStore<StoredPackageDraft | undefined>("readonly", (store) =>
+      store.get(targetId!),
+    );
+    if (stored !== undefined && stored !== null) {
+      if (!isValidStoredDraft(stored)) {
+        throw new DraftStoreError("LOCAL_DRAFT_MALFORMED");
+      }
+      await setActivePackageDraftIdLocally(stored.draft.packageId);
+      return stored;
+    }
+  }
+
+  // Check legacy key if targetId was not found or not specified
+  const legacyStored = await withStore<StoredPackageDraft | undefined>("readonly", (store) =>
+    store.get(LEGACY_CURRENT_KEY),
+  );
+  if (legacyStored !== undefined && legacyStored !== null) {
+    if (!isValidStoredDraft(legacyStored)) {
+      throw new DraftStoreError("LOCAL_DRAFT_MALFORMED");
+    }
+    await withStore("readwrite", (store) => {
+      store.put(legacyStored, legacyStored.draft.packageId);
+      store.put(legacyStored.draft.packageId, ACTIVE_KEY);
+      store.delete(LEGACY_CURRENT_KEY);
+      return store.get(legacyStored.draft.packageId);
+    });
+    return legacyStored;
+  }
+
+  // If still no target draft, list all drafts and pick the most recent
+  const allDrafts = await listPackageDraftsLocally();
+  if (allDrafts.length > 0) {
+    const first = allDrafts[0];
+    await setActivePackageDraftIdLocally(first.draft.packageId);
+    return first;
+  }
+
+  return null;
+}
+
+/**
+ * List all valid stored package drafts sorted by draft.updatedAt descending.
+ */
+export async function listPackageDraftsLocally(): Promise<StoredPackageDraft[]> {
+  const allValues = await withStore<unknown[]>("readonly", (store) => store.getAll());
+  const validDrafts: StoredPackageDraft[] = [];
+  for (const item of allValues) {
+    if (
+      typeof item === "object" &&
+      item !== null &&
+      isValidStoredDraft(item as StoredPackageDraft)
+    ) {
+      validDrafts.push(item as StoredPackageDraft);
+    }
+  }
+  validDrafts.sort((a, b) => {
+    const timeA = new Date(a.draft.updatedAt).getTime();
+    const timeB = new Date(b.draft.updatedAt).getTime();
+    return timeB - timeA;
+  });
+  return validDrafts;
+}
+
+export async function deletePackageDraftLocally(packageId: string): Promise<void> {
+  await withStore("readwrite", (store) => store.delete(packageId));
+  const activeId = await getActivePackageDraftIdLocally();
+  if (activeId === packageId) {
+    const remaining = await listPackageDraftsLocally();
+    if (remaining.length > 0) {
+      await setActivePackageDraftIdLocally(remaining[0].draft.packageId);
+    } else {
+      await clearPackageDraftLocally();
+    }
+  }
+}
+
+export async function clearPackageDraftLocally(packageId?: string): Promise<void> {
+  if (packageId) {
+    await deletePackageDraftLocally(packageId);
+  } else {
+    await withStore("readwrite", (store) => store.delete(ACTIVE_KEY));
+  }
 }

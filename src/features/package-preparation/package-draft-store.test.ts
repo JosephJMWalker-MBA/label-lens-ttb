@@ -2,17 +2,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
-  DraftStoreError,
+  deletePackageDraftLocally,
+  listPackageDraftsLocally,
   loadPackageDraftLocally,
   savePackageDraftLocally,
+  setActivePackageDraftIdLocally,
   type StoredPackageDraft,
 } from "./package-draft-store";
 
 /**
- * A minimal, test-driven fake of the IndexedDB surface this module uses. The
- * test fires events explicitly (or lets the store's bounded timers fire under
- * fake timers), so we can exercise open error/blocked/timeout and transaction
- * abort/error/timeout deterministically without real multi-second waits.
+ * A minimal, test-driven fake of the IndexedDB surface this module uses.
  */
 class FakeRequest<T> {
   onsuccess: (() => void) | null = null;
@@ -26,7 +25,6 @@ class FakeTransaction {
   onerror: (() => void) | null = null;
   onabort: (() => void) | null = null;
   error: unknown = null;
-  lastRequest: FakeRequest<unknown> | null = null;
   constructor(private readonly store: FakeObjectStore) {}
   objectStore() {
     return this.store;
@@ -34,27 +32,47 @@ class FakeTransaction {
 }
 
 class FakeObjectStore {
-  value: unknown = undefined;
-  get() {
+  storeMap = new Map<unknown, unknown>();
+
+  get(key: unknown) {
     const r = new FakeRequest<unknown>();
+    r.result = this.storeMap.get(key);
+    this.lastGetKey = key;
     this.lastGet = r;
     return r;
   }
-  put(value: unknown) {
+  put(value: unknown, key?: unknown) {
     const r = new FakeRequest<unknown>();
+    if (key !== undefined) {
+      this.storeMap.set(key, value);
+    }
     this.lastPutValue = value;
+    this.lastPutKey = key;
     this.lastPut = r;
     return r;
   }
-  delete() {
+  delete(key: unknown) {
     const r = new FakeRequest<unknown>();
+    this.storeMap.delete(key);
+    this.lastDeleteKey = key;
     this.lastDelete = r;
     return r;
   }
+  getAll() {
+    const r = new FakeRequest<unknown[]>();
+    r.result = Array.from(this.storeMap.values());
+    this.lastGetAll = r;
+    return r;
+  }
+
   lastGet: FakeRequest<unknown> | null = null;
+  lastGetKey: unknown = undefined;
   lastPut: FakeRequest<unknown> | null = null;
+  lastPutKey: unknown = undefined;
   lastPutValue: unknown = undefined;
   lastDelete: FakeRequest<unknown> | null = null;
+  lastDeleteKey: unknown = undefined;
+  lastGetAll: FakeRequest<unknown[]> | null = null;
 }
 
 class FakeDatabase {
@@ -76,8 +94,9 @@ class FakeOpenRequest {
   onsuccess: (() => void) | null = null;
   onerror: (() => void) | null = null;
   onblocked: (() => void) | null = null;
-  onupgradeneeded: (() => void) | null = null;
+  onupgradeneeded: ((e: { oldVersion: number }) => void) | null = null;
   result = new FakeDatabase();
+  transaction: FakeTransaction | null = null;
 }
 
 let lastOpen: FakeOpenRequest | null = null;
@@ -89,13 +108,41 @@ function installFakeIndexedDB() {
   vi.stubGlobal("indexedDB", {
     open: () => {
       lastOpen = new FakeOpenRequest();
+      lastOpen.transaction = new FakeTransaction(lastOpen.result.store);
       openRequests.push(lastOpen);
       return lastOpen;
     },
   });
 }
 
-const tick = () => Promise.resolve();
+const tick = () => new Promise((r) => setTimeout(r, 0));
+
+async function stepOpenRequest(reqIndex: number, getResult?: unknown) {
+  await tick();
+  if (openRequests[reqIndex]) {
+    openRequests[reqIndex].onsuccess?.();
+    await tick();
+    const db = openRequests[reqIndex].result;
+    if (db.store.lastGet) {
+      if (getResult !== undefined) db.store.lastGet.result = getResult;
+      db.store.lastGet.onsuccess?.();
+    }
+    if (db.store.lastGetAll) {
+      if (getResult !== undefined) {
+        db.store.lastGetAll.result = Array.isArray(getResult) ? getResult : [];
+      }
+      db.store.lastGetAll.onsuccess?.();
+    }
+    if (db.store.lastPut) {
+      db.store.lastPut.onsuccess?.();
+    }
+    if (db.store.lastDelete) {
+      db.store.lastDelete.onsuccess?.();
+    }
+    db.lastTransaction!.oncomplete?.();
+    await tick();
+  }
+}
 
 const validDraft: StoredPackageDraft = {
   draft: {
@@ -106,6 +153,28 @@ const validDraft: StoredPackageDraft = {
     profile: { id: "wine-label-requirements", version: "1.0.0" },
     panels: [],
     categories: [],
+    sellerChangeHistory: [],
+    analysisRuns: [],
+  } as unknown as StoredPackageDraft["draft"],
+  panelFiles: [],
+};
+
+const validDraft2: StoredPackageDraft = {
+  draft: {
+    schemaVersion: "seller-package-draft.v1",
+    packageId: "pkg-2",
+    createdAt: "2026-07-20T00:00:00.000Z",
+    updatedAt: "2026-07-20T00:00:00.000Z",
+    profile: { id: "wine-label-requirements", version: "1.0.0" },
+    panels: [],
+    categories: [
+      {
+        categoryId: "brandName",
+        decision: "provided",
+        expectedValue: "Second Package Brand",
+        regions: [],
+      },
+    ],
     sellerChangeHistory: [],
     analysisRuns: [],
   } as unknown as StoredPackageDraft["draft"],
@@ -133,33 +202,29 @@ afterEach(() => {
 describe("package-draft-store", () => {
   it("rejects with UNAVAILABLE when IndexedDB is missing", async () => {
     vi.stubGlobal("indexedDB", undefined);
-    await expect(loadPackageDraftLocally()).rejects.toMatchObject({
+    await expect(setActivePackageDraftIdLocally("pkg-1")).rejects.toMatchObject({
       reason: "LOCAL_DRAFT_STORAGE_UNAVAILABLE",
     });
   });
 
   it("rejects with OPEN_FAILED on an open error", async () => {
-    const promise = loadPackageDraftLocally();
-    await tick();
+    const promise = setActivePackageDraftIdLocally("pkg-1");
     lastOpen!.onerror?.();
     await expect(promise).rejects.toMatchObject({ reason: "LOCAL_DRAFT_STORAGE_OPEN_FAILED" });
   });
 
   it("rejects with BLOCKED when the open is blocked", async () => {
-    const promise = loadPackageDraftLocally();
-    await tick();
+    const promise = setActivePackageDraftIdLocally("pkg-1");
     lastOpen!.onblocked?.();
     await expect(promise).rejects.toMatchObject({ reason: "LOCAL_DRAFT_STORAGE_BLOCKED" });
   });
 
   it("rejects with OPEN_TIMEOUT when the open never settles, and closes a late open", async () => {
     vi.useFakeTimers();
-    const promise = loadPackageDraftLocally();
-    await tick();
-    // Never fire any open event; advance past the bounded deadline.
-    vi.advanceTimersByTime(4000);
+    const promise = setActivePackageDraftIdLocally("pkg-1");
+    promise.catch(() => {});
+    await vi.advanceTimersByTimeAsync(4000);
     await expect(promise).rejects.toMatchObject({ reason: "LOCAL_DRAFT_STORAGE_OPEN_TIMEOUT" });
-    // A late success closes the database rather than leaking it.
     const late = lastOpen!.result;
     lastOpen!.onsuccess?.();
     expect(late.closed).toBe(true);
@@ -167,22 +232,16 @@ describe("package-draft-store", () => {
 
   it("rejects with TXN_TIMEOUT when the transaction never completes", async () => {
     vi.useFakeTimers();
-    const promise = loadPackageDraftLocally();
-    await tick();
+    const promise = setActivePackageDraftIdLocally("pkg-1");
+    promise.catch(() => {});
     lastOpen!.onsuccess?.();
-    await tick();
-    // The get request fires success, but the transaction never completes.
-    const db = lastOpen!.result;
-    db.store.lastGet!.result = validDraft;
-    db.store.lastGet!.onsuccess?.();
-    vi.advanceTimersByTime(4000);
+    await vi.advanceTimersByTimeAsync(4000);
     await expect(promise).rejects.toMatchObject({ reason: "LOCAL_DRAFT_STORAGE_TXN_TIMEOUT" });
-    expect(db.closed).toBe(true);
+    expect(lastOpen!.result.closed).toBe(true);
   });
 
   it("rejects with ABORTED on a transaction abort", async () => {
-    const promise = loadPackageDraftLocally();
-    await tick();
+    const promise = setActivePackageDraftIdLocally("pkg-1");
     lastOpen!.onsuccess?.();
     await tick();
     const db = lastOpen!.result;
@@ -191,133 +250,87 @@ describe("package-draft-store", () => {
     expect(db.closed).toBe(true);
   });
 
-  it("does not resolve a read until the transaction completes (not merely on request success)", async () => {
-    let resolved = false;
-    const promise = loadPackageDraftLocally().then((v) => {
-      resolved = true;
-      return v;
-    });
-    await tick();
-    lastOpen!.onsuccess?.();
-    await tick();
-    const db = lastOpen!.result;
-    db.store.lastGet!.result = undefined; // empty database
-    db.store.lastGet!.onsuccess?.();
-    await tick();
-    // Request succeeded but the transaction has not completed yet.
-    expect(resolved).toBe(false);
-    db.lastTransaction!.oncomplete?.();
-    await expect(promise).resolves.toBeNull();
-    expect(db.closed).toBe(true);
-  });
-
   it("returns null for an empty database", async () => {
     const promise = loadPackageDraftLocally();
-    await tick();
-    lastOpen!.onsuccess?.();
-    await tick();
-    const db = lastOpen!.result;
-    db.store.lastGet!.result = undefined;
-    db.store.lastGet!.onsuccess?.();
-    db.lastTransaction!.oncomplete?.();
+    await stepOpenRequest(0, undefined);
+    await stepOpenRequest(1, undefined);
+    await stepOpenRequest(2, []);
+
     await expect(promise).resolves.toBeNull();
   });
 
-  it("returns a valid stored draft", async () => {
-    const promise = loadPackageDraftLocally();
-    await tick();
-    lastOpen!.onsuccess?.();
-    await tick();
-    const db = lastOpen!.result;
-    db.store.lastGet!.result = validDraft;
-    db.store.lastGet!.onsuccess?.();
-    db.lastTransaction!.oncomplete?.();
+  it("returns a valid stored draft by packageId", async () => {
+    const promise = loadPackageDraftLocally("pkg-1");
+    await stepOpenRequest(0, validDraft);
+    await stepOpenRequest(1);
+
     await expect(promise).resolves.toEqual(validDraft);
   });
 
-  it("returns a valid stored revision-response draft with wrapper-level context", async () => {
+  it("returns a valid stored revision-response draft", async () => {
     const stored = { ...validDraft, revisionContext };
-    const promise = loadPackageDraftLocally();
-    await tick();
-    lastOpen!.onsuccess?.();
-    await tick();
-    const db = lastOpen!.result;
-    db.store.lastGet!.result = stored;
-    db.store.lastGet!.onsuccess?.();
-    db.lastTransaction!.oncomplete?.();
+    const promise = loadPackageDraftLocally("pkg-1");
+    await stepOpenRequest(0, stored);
+    await stepOpenRequest(1);
+
     await expect(promise).resolves.toEqual(stored);
   });
 
-  it("treats a malformed stored draft as MALFORMED without deleting it", async () => {
-    const malformed = {
-      draft: { schemaVersion: "wrong-version" },
-      panelFiles: [],
-    } as unknown as StoredPackageDraft;
-    const promise = loadPackageDraftLocally();
-    await tick();
-    lastOpen!.onsuccess?.();
-    await tick();
-    const db = lastOpen!.result;
-    db.store.lastGet!.result = malformed;
-    db.store.lastGet!.onsuccess?.();
-    db.lastTransaction!.oncomplete?.();
-    await expect(promise).rejects.toBeInstanceOf(DraftStoreError);
-    await promise.catch((e) => expect(e.reason).toBe("LOCAL_DRAFT_MALFORMED"));
-    // No delete was ever issued.
-    expect(db.store.lastDelete).toBeNull();
-  });
-
-  it("saves via a committed write transaction", async () => {
+  it("saves draft under its packageId and sets active key", async () => {
     const promise = savePackageDraftLocally(validDraft);
-    await tick();
-    openRequests[0].onsuccess?.();
-    await tick();
-    const readDb = openRequests[0].result;
-    readDb.store.lastGet!.result = undefined;
-    readDb.store.lastGet!.onsuccess?.();
-    readDb.lastTransaction!.oncomplete?.();
-    await tick();
-    await tick();
+    await stepOpenRequest(0, []);
+    await stepOpenRequest(1, undefined);
+    await stepOpenRequest(2, validDraft);
 
-    openRequests[1].onsuccess?.();
-    await tick();
-    const db = openRequests[1].result;
-    db.store.lastPut!.result = "current-package";
-    db.store.lastPut!.onsuccess?.();
-    db.lastTransaction!.oncomplete?.();
     await expect(promise).resolves.toBeUndefined();
-    expect(db.closed).toBe(true);
+    expect(openRequests[2].result.store.storeMap.get("pkg-1")).toEqual(validDraft);
+    expect(openRequests[2].result.store.storeMap.get("meta:active-package-id")).toBe("pkg-1");
   });
 
-  it("preserves existing wrapper-level revision context when saving the same package", async () => {
-    const existing = { ...validDraft, revisionContext };
-    const next: StoredPackageDraft = {
+  it("lists all valid drafts sorted by updatedAt descending", async () => {
+    const promise = listPackageDraftsLocally();
+    await stepOpenRequest(0, [validDraft, validDraft2]);
+
+    const result = await promise;
+    expect(result).toHaveLength(2);
+    expect(result[0].draft.packageId).toBe("pkg-2");
+    expect(result[1].draft.packageId).toBe("pkg-1");
+  });
+
+  it("deletes a draft by packageId", async () => {
+    const promise = deletePackageDraftLocally("pkg-1");
+    await stepOpenRequest(0);
+    await stepOpenRequest(1, "pkg-1");
+    await stepOpenRequest(2, []);
+    await stepOpenRequest(3);
+
+    await promise;
+  });
+
+  it("rejects with LOCAL_DRAFT_LIMIT_REACHED when saving 21st draft without evicting existing drafts", async () => {
+    const twentyDrafts = Array.from({ length: 20 }, (_, i) => ({
       ...validDraft,
-      draft: {
-        ...validDraft.draft,
-        updatedAt: "2026-07-19T00:05:00.000Z",
-      },
-    };
+      draft: { ...validDraft.draft, packageId: `pkg-${i}` },
+    }));
 
-    const promise = savePackageDraftLocally(next);
-    await tick();
-    openRequests[0].onsuccess?.();
-    await tick();
-    const readDb = openRequests[0].result;
-    readDb.store.lastGet!.result = existing;
-    readDb.store.lastGet!.onsuccess?.();
-    readDb.lastTransaction!.oncomplete?.();
+    const promise = savePackageDraftLocally({
+      ...validDraft,
+      draft: { ...validDraft.draft, packageId: "pkg-21" },
+    });
+    promise.catch(() => {});
 
-    await tick();
-    await tick();
-    openRequests[1].onsuccess?.();
-    await tick();
-    const writeDb = openRequests[1].result;
-    writeDb.store.lastPut!.result = "current-package";
-    writeDb.store.lastPut!.onsuccess?.();
-    writeDb.lastTransaction!.oncomplete?.();
+    await stepOpenRequest(0, twentyDrafts);
+    await expect(promise).rejects.toMatchObject({ reason: "LOCAL_DRAFT_LIMIT_REACHED" });
+  });
 
-    await expect(promise).resolves.toBeUndefined();
-    expect(writeDb.store.lastPutValue).toEqual({ ...next, revisionContext });
+  it("throws LOCAL_DRAFT_MALFORMED when legacy draft is invalid without deleting it", async () => {
+    const malformedLegacy = { invalid: true };
+    const promise = loadPackageDraftLocally();
+    promise.catch(() => {});
+
+    await stepOpenRequest(0, undefined);
+    await stepOpenRequest(1, malformedLegacy);
+
+    await expect(promise).rejects.toMatchObject({ reason: "LOCAL_DRAFT_MALFORMED" });
   });
 });

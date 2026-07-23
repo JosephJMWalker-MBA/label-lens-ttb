@@ -8,11 +8,15 @@ import type { StoredPackageDraft } from "./package-draft-store";
 const store = vi.hoisted(() => ({
   load: vi.fn(),
   save: vi.fn(),
+  list: vi.fn(),
+  setActive: vi.fn(),
 }));
 
 vi.mock("./package-draft-store", () => ({
+  listPackageDraftsLocally: store.list,
   loadPackageDraftLocally: store.load,
   savePackageDraftLocally: store.save,
+  setActivePackageDraftIdLocally: store.setActive,
 }));
 
 import { RevisionSeedHydrator } from "./RevisionSeedHydrator";
@@ -131,6 +135,9 @@ function existingStoredDraft(
 beforeEach(() => {
   store.load.mockReset();
   store.save.mockReset();
+  store.list.mockReset();
+  store.setActive.mockReset();
+  store.list.mockResolvedValue([]);
   store.save.mockResolvedValue(undefined);
   let uuidCounter = 0;
   vi.stubGlobal("crypto", {
@@ -222,19 +229,31 @@ describe("RevisionSeedHydrator", () => {
     expect(saved.revisionContext).toEqual(revisionContext);
   });
 
-  it("does not overwrite an unrelated local draft when the seller declines confirmation", async () => {
-    store.load.mockResolvedValue(existingStoredDraft());
-    vi.stubGlobal(
-      "confirm",
-      vi.fn(() => false),
-    );
+  it("saves a revision response draft alongside existing drafts without requiring confirmation", async () => {
+    store.list.mockResolvedValue([existingStoredDraft()]);
+    const confirmSpy = vi.fn();
+    vi.stubGlobal("confirm", confirmSpy);
     render(<RevisionSeedHydrator submissionId="pkg-seed" />);
 
     fireEvent.click(screen.getByRole("button", { name: /prepare local revision draft/i }));
 
-    await waitFor(() => expect(confirm).toHaveBeenCalledTimes(1));
+    expect(await screen.findByText(/revision response draft is ready/i)).toBeInTheDocument();
+    expect(confirmSpy).not.toHaveBeenCalled();
+    expect(store.save).toHaveBeenCalled();
+  });
+
+  it("activates existing draft when exact revision context is found in local storage", async () => {
+    const exactMatchingDraft = { ...existingStoredDraft(), revisionContext };
+    store.list.mockResolvedValue([exactMatchingDraft]);
+    render(<RevisionSeedHydrator submissionId="pkg-seed" />);
+
+    fireEvent.click(screen.getByRole("button", { name: /prepare local revision draft/i }));
+
+    expect(
+      await screen.findByText(/an existing revision response draft is already stored/i),
+    ).toBeInTheDocument();
+    expect(store.setActive).toHaveBeenCalledWith("pkg-seed");
     expect(store.save).not.toHaveBeenCalled();
-    expect(screen.queryByText(/revision response draft is ready/i)).toBeNull();
   });
 
   it("does not save a draft when stored panel identity cannot be reconciled safely", async () => {
@@ -341,6 +360,7 @@ describe("RevisionSeedHydrator", () => {
       },
     ];
     store.load.mockResolvedValue(existing);
+    store.list.mockResolvedValue([existing]);
     render(<RevisionSeedHydrator submissionId="pkg-seed" />);
 
     fireEvent.click(screen.getByRole("button", { name: /prepare local revision draft/i }));

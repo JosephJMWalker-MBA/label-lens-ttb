@@ -6,12 +6,22 @@ import type { SellerPackageDraft } from "./package-model";
 const store = vi.hoisted(() => ({
   load: vi.fn(),
   save: vi.fn(),
+  list: vi.fn(),
+  create: vi.fn(),
+  delete: vi.fn(),
 }));
 
-vi.mock("./package-draft-store", () => ({
-  loadPackageDraftLocally: store.load,
-  savePackageDraftLocally: store.save,
-}));
+vi.mock("./package-draft-store", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("./package-draft-store")>();
+  return {
+    ...actual,
+    loadPackageDraftLocally: store.load,
+    savePackageDraftLocally: store.save,
+    listPackageDraftsLocally: store.list,
+    createAndActivateNewDraftLocally: store.create,
+    deletePackageDraftLocally: store.delete,
+  };
+});
 
 import { PackagePreparationWorkspace } from "./PackagePreparationWorkspace";
 
@@ -192,6 +202,10 @@ async function drawActiveRegion() {
 beforeEach(() => {
   store.load.mockReset();
   store.save.mockReset();
+  store.list.mockReset();
+  store.create.mockReset();
+  store.delete.mockReset();
+  store.list.mockResolvedValue([]);
   store.save.mockResolvedValue(undefined);
   vi.stubGlobal("URL", {
     ...URL,
@@ -506,5 +520,48 @@ describe("guided category acceptance", () => {
     expect(screen.getByText(/analysis did not complete: OCR unavailable/i)).toBeInTheDocument();
     expect(store.save).not.toHaveBeenCalled();
     expect(value.analysisRuns).toHaveLength(0);
+  });
+
+  it("renders draft manager toolbar and supports starting a new package", async () => {
+    const value = fullyAcceptedDraft();
+    store.load.mockResolvedValue(stored(value));
+    render(<PackagePreparationWorkspace />);
+
+    expect(await screen.findByTestId("draft-manager-toolbar")).toBeInTheDocument();
+    expect(screen.getByTestId("create-new-package-btn")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("create-new-package-btn"));
+    // New draft should have a fresh packageId
+    expect(await screen.findByTestId("draft-selector")).toBeInTheDocument();
+  });
+
+  it("cancels draft switch when workspace is dirty and user rejects confirmation", async () => {
+    const draft1 = {
+      ...fullyAcceptedDraft(),
+      sellerChangeHistory: [
+        {
+          changeId: "ch-1",
+          sequence: 1,
+          action: "category_updated" as const,
+          recordedAt: "2026-07-23T00:00:00Z",
+          detail: "Edit",
+        },
+      ],
+    };
+    const draft2 = { ...fullyAcceptedDraft(), packageId: "pkg-other" };
+    store.load.mockResolvedValue(stored(draft1));
+    store.list.mockResolvedValue([stored(draft1), stored(draft2)]);
+    const confirmSpy = vi.fn(() => false);
+    vi.stubGlobal("confirm", confirmSpy);
+
+    render(<PackagePreparationWorkspace />);
+
+    expect(await screen.findByTestId("draft-manager-toolbar")).toBeInTheDocument();
+
+    // Attempt to switch draft to second draft while saveState is unsaved
+    const selector = screen.getByTestId("draft-selector");
+    fireEvent.change(selector, { target: { value: "pkg-other" } });
+
+    expect(confirmSpy).toHaveBeenCalledWith(expect.stringMatching(/Switch to another draft\?/i));
   });
 });
