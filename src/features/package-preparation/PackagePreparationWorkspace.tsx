@@ -776,7 +776,7 @@ export function PackagePreparationWorkspace() {
     const decisions = packagePanelDecisions(currentDraft);
     if (decision === "upload") {
       updateDraft(
-        { ...currentDraft, panelDecisions: { ...decisions, back: "upload" } },
+        { ...currentDraft, updatedAt: now(), panelDecisions: { ...decisions, back: "upload" } },
         "Choose a PNG or JPEG back-label image, or select No back label.",
       );
       return;
@@ -851,7 +851,7 @@ export function PackagePreparationWorkspace() {
     const decisions = packagePanelDecisions(currentDraft);
     if (decision === "add") {
       updateDraft(
-        { ...currentDraft, panelDecisions: { ...decisions, additional: "add" } },
+        { ...currentDraft, updatedAt: now(), panelDecisions: { ...decisions, additional: "add" } },
         "Choose the additional panel role and image, or select No additional panels.",
       );
       return;
