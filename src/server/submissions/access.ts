@@ -23,7 +23,11 @@ export type SubmissionAccess =
 /** A submission id must be a short, bounded, path-safe token. */
 export function isValidSubmissionId(id: unknown): id is string {
   return (
-    typeof id === "string" && id.length > 0 && id.length <= 255 && /^[A-Za-z0-9._-]+$/.test(id)
+    typeof id === "string" &&
+    id.length > 0 &&
+    id.length <= 255 &&
+    /^[A-Za-z0-9._-]+$/.test(id) &&
+    !id.includes("..")
   );
 }
 

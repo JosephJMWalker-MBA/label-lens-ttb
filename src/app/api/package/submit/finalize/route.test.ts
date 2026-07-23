@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- integration test exercises loosely-typed dual-dialect Drizzle handles and deliberately malformed payloads */
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createHash } from "node:crypto";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { eq, sql } from "drizzle-orm";
 
 // Configure database/auth environment before importing client/auth modules.
@@ -39,6 +41,7 @@ import { createTestSqliteDb } from "../../../../../../tests/integration/test-db-
 import { issueAppendToken } from "@/server/append-token";
 import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
 import { panelStorageKey } from "@/lib/panel-storage";
+import { MAX_PANEL_ID_LENGTH } from "@/features/package-preparation/panel-identity-constraints";
 
 type SubmissionRouteHandler = (
   request: Request,
@@ -91,10 +94,14 @@ function resign<T extends { integrity: { value: string } }>(payload: T): T {
 }
 
 /** Build a fully valid, signed agent-review submission envelope. */
-function createValidExportPayload(packageId: string, email = "seller@test.com") {
+function createValidExportPayload(
+  packageId: string,
+  email = "seller@test.com",
+  panelId = PANEL_ID,
+) {
   const observations = {
     provenance: {
-      artifactRef: `package-panel-${PANEL_ID}`,
+      artifactRef: `package-panel-${panelId}`,
       derivativeSha256: PANEL_SHA,
       extractionAdapterId: "test-adapter",
       extractionAdapterVersion: "1",
@@ -108,7 +115,7 @@ function createValidExportPayload(packageId: string, email = "seller@test.com") 
   };
 
   const panel = {
-    panelId: PANEL_ID,
+    panelId,
     order: 0,
     role: "front" as const,
     displayName: "front.png",
@@ -157,13 +164,13 @@ function createValidExportPayload(packageId: string, email = "seller@test.com") 
     sequence: 1,
     sellerChangeSequence: 0,
     recordedAt: new Date().toISOString(),
-    panelRuns: [{ panelId: PANEL_ID, machineResultId, exportJson, observations }],
+    panelRuns: [{ panelId, machineResultId, exportJson, observations }],
     categories: [
       {
         categoryId: "brandName",
         state: "clearly_readable" as const,
         observedValue: "Test Brand",
-        supportingPanelIds: [PANEL_ID],
+        supportingPanelIds: [panelId],
         supportingRegionIds: [],
         reason: "Matched brand name.",
       },
@@ -187,7 +194,7 @@ function createValidExportPayload(packageId: string, email = "seller@test.com") 
           {
             regionId: "reg-brand-1",
             categoryId: "brandName",
-            panelId: PANEL_ID,
+            panelId,
             unit: "normalized-panel-relative" as const,
             provenance: "seller-selected-region" as const,
             x: 0.1,
@@ -577,6 +584,37 @@ for (const dialect of TEST_DIALECTS) {
         expect((await finalizePOST(request)).status).toBe(401);
       });
 
+      it("rejects traversal-like package IDs before files, rows, or idempotency are written", async () => {
+        const packageId = "pkg..example";
+        const response = await finalizePOST(
+          buildFinalizeRequest(
+            createValidExportPayload(packageId),
+            sellerCookie,
+            "k-dotdot-package",
+          ),
+        );
+        expect(response.status).toBe(400);
+        expect(((await response.json()) as { error: string }).error).toContain("Package ID");
+        expect(
+          await db.select().from(schema.submissions).where(eq(schema.submissions.id, packageId)),
+        ).toHaveLength(0);
+        expect(
+          await db
+            .select()
+            .from(schema.submittedPanels)
+            .where(eq(schema.submittedPanels.id, PANEL_ID)),
+        ).toHaveLength(0);
+        expect(
+          await db
+            .select()
+            .from(schema.idempotencyRecords)
+            .where(eq(schema.idempotencyRecords.key, `finalize:${sellerUserId}:k-dotdot-package`)),
+        ).toHaveLength(0);
+        expect(existsSync(join(process.cwd(), ".local", "storage", "submissions", packageId))).toBe(
+          false,
+        );
+      });
+
       it("commits atomically and returns a durable receipt without exposing the signature", async () => {
         const pkgId = "pkg-finalize-ok";
         const request = buildFinalizeRequest(createValidExportPayload(pkgId), sellerCookie, "k-ok");
@@ -729,6 +767,95 @@ for (const dialect of TEST_DIALECTS) {
         expect(
           (await finalizePOST(buildFinalizeRequest(payload, sellerCookie, "k-badschema"))).status,
         ).toBe(400);
+      });
+
+      it("accepts the maximum storage-safe panel ID and stores the full generated key", async () => {
+        const packageId = "p".repeat(255);
+        const maxPanelId = "x".repeat(MAX_PANEL_ID_LENGTH);
+        const payload = createValidExportPayload(packageId, "seller@test.com", maxPanelId);
+
+        const response = await finalizePOST(
+          buildFinalizeRequest(payload, sellerCookie, "k-max-panel-id", {
+            [maxPanelId]: panelBlob(),
+          }),
+        );
+        expect(response.status).toBe(200);
+
+        const panels = await db
+          .select()
+          .from(schema.submittedPanels)
+          .where(eq(schema.submittedPanels.id, maxPanelId));
+        const expectedStorageKey = panelStorageKey(packageId, maxPanelId, PANEL_SHA);
+        expect(expectedStorageKey.length).toBeGreaterThan(500);
+        expect(panels).toHaveLength(1);
+        expect(panels[0].storageKey).toBe(expectedStorageKey);
+      });
+
+      it("rejects a 191-character panel ID before rows or assets are written", async () => {
+        const packageId = "pkg-invalid-panel-id";
+        const invalidPanelId = "x".repeat(MAX_PANEL_ID_LENGTH + 1);
+        const payload = createValidExportPayload(packageId, "seller@test.com", invalidPanelId);
+
+        const response = await finalizePOST(
+          buildFinalizeRequest(payload, sellerCookie, "k-invalid-panel-id", {
+            [invalidPanelId]: panelBlob(),
+          }),
+        );
+        expect(response.status).toBe(400);
+        expect(
+          await db.select().from(schema.submissions).where(eq(schema.submissions.id, packageId)),
+        ).toHaveLength(0);
+        expect(
+          await db
+            .select()
+            .from(schema.submittedPanels)
+            .where(eq(schema.submittedPanels.id, invalidPanelId)),
+        ).toHaveLength(0);
+        expect(existsSync(join(process.cwd(), ".local", "storage", "submissions", packageId))).toBe(
+          false,
+        );
+      });
+
+      it("rejects unsafe panel IDs before rows or assets are written", async () => {
+        const packageId = "pkg-unsafe-panel-id";
+        const unsafePanelId = "front/panel";
+        const payload = createValidExportPayload(packageId, "seller@test.com", unsafePanelId);
+
+        const response = await finalizePOST(
+          buildFinalizeRequest(payload, sellerCookie, "k-unsafe-panel-id", {
+            [unsafePanelId]: panelBlob(),
+          }),
+        );
+        expect(response.status).toBe(400);
+        expect(
+          await db.select().from(schema.submissions).where(eq(schema.submissions.id, packageId)),
+        ).toHaveLength(0);
+        expect(existsSync(join(process.cwd(), ".local", "storage", "submissions", packageId))).toBe(
+          false,
+        );
+      });
+
+      it("rejects duplicate panel IDs before rows or assets are written", async () => {
+        const packageId = "pkg-duplicate-panel-id";
+        const payload = createValidExportPayload(packageId) as any;
+        payload.package.panels.push({
+          ...payload.package.panels[0],
+          order: 1,
+          role: "back",
+          displayName: "back.png",
+        });
+        resign(payload);
+
+        const response = await finalizePOST(
+          buildFinalizeRequest(payload, sellerCookie, "k-duplicate-panel-id"),
+        );
+        expect(response.status).toBe(400);
+        expect(
+          await db.select().from(schema.submissions).where(eq(schema.submissions.id, packageId)),
+        ).toHaveLength(0);
+        expect(existsSync(join(process.cwd(), ".local", "storage", "submissions", packageId))).toBe(
+          false,
+        );
       });
 
       it("rejects a tampered integrity value", async () => {

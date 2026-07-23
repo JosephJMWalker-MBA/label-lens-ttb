@@ -1,6 +1,6 @@
 // @vitest-environment node
 /* eslint-disable @typescript-eslint/no-explicit-any -- integration test drives dual-dialect Drizzle handles and Next route handlers */
-import { existsSync, readdirSync, rmSync } from "node:fs";
+import fs, { existsSync, readdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 
 import { eq, sql } from "drizzle-orm";
@@ -37,6 +37,7 @@ import {
 } from "../../../../../../tests/integration/package-submit-fixtures";
 import { verifyRevision } from "@/lib/integrity";
 import { readPanelAsset, resubmissionPanelStorageKey } from "@/lib/panel-storage";
+import { MAX_PANEL_ID_LENGTH } from "@/features/package-preparation/panel-identity-constraints";
 
 type RouteHandler = (
   request: Request,
@@ -221,10 +222,10 @@ for (const dialect of DIALECTS) {
       return new Request(`http://localhost:3000${url}`, { headers: { Cookie: cookie } });
     }
 
-    async function seedRequestedChanges() {
+    async function seedRequestedChanges(args: { submissionId?: string } = {}) {
       const seller = await provision("seller@test.com");
       const agent = await provision("agent@test.com", "agent");
-      const submissionId = "pkg-resubmit";
+      const submissionId = args.submissionId ?? "pkg-resubmit";
       const parentPayload = createValidAgentReviewPayload({
         packageId: submissionId,
         email: seller.email,
@@ -521,6 +522,105 @@ for (const dialect of DIALECTS) {
       expect(JSON.stringify(detail)).not.toMatch(
         /canonicalJson|canonical_json|integritySignature|storageKey|storage_key|appendToken|\.local\/test-storage/i,
       );
+    });
+
+    it("accepts the maximum storage-safe child panel ID and stores the full resubmission key", async () => {
+      const submissionId = "s".repeat(180);
+      const maxPanelId = "r".repeat(MAX_PANEL_ID_LENGTH);
+      const { seller, revisionContext } = await seedRequestedChanges({ submissionId });
+      const payload = childPayload(submissionId, maxPanelId);
+
+      const response = await resubmitPOST(
+        resubmitRequest({
+          submissionId,
+          cookie: seller.cookie,
+          idempotencyKey: "k-max-resubmit-panel-id",
+          payload,
+          revisionContext,
+          panelId: maxPanelId,
+        }),
+        params(submissionId),
+      );
+      expect(response.status).toBe(200);
+      const receipt = (await response.json()) as { revisionId: string };
+      const expectedStorageKey = resubmissionPanelStorageKey(
+        submissionId,
+        receipt.revisionId,
+        maxPanelId,
+        PANEL_SHA,
+      );
+      expect(expectedStorageKey.length).toBeGreaterThan(500);
+
+      const panels = await db
+        .select()
+        .from(schema.submittedPanels)
+        .where(eq(schema.submittedPanels.revisionId, receipt.revisionId));
+      expect(panels).toHaveLength(1);
+      expect(panels[0].id).toBe(maxPanelId);
+      expect(panels[0].storageKey).toBe(expectedStorageKey);
+      expect(readPanelAsset(expectedStorageKey)).toEqual({ ok: true, bytes: PANEL_BYTES });
+    });
+
+    it("rejects a 191-character child panel ID before rows or assets are written", async () => {
+      const { seller, submissionId, revisionContext } = await seedRequestedChanges();
+      const invalidPanelId = "r".repeat(MAX_PANEL_ID_LENGTH + 1);
+      const payload = childPayload(submissionId, invalidPanelId);
+
+      const response = await resubmitPOST(
+        resubmitRequest({
+          submissionId,
+          cookie: seller.cookie,
+          idempotencyKey: "k-reject-overwidth-panel-id",
+          payload,
+          revisionContext,
+          panelId: invalidPanelId,
+        }),
+        params(submissionId),
+      );
+      expect(response.status).toBe(400);
+      const revisions = await readRevisionRows(submissionId);
+      expect(revisions).toHaveLength(1);
+      expect(revisionStorageFileCount(submissionId)).toBe(0);
+    });
+
+    it("rejects traversal-like route submission IDs before files, rows, or idempotency are written", async () => {
+      const seller = await provision("seller-dotdot@test.com");
+      const submissionId = "pkg..example";
+      const response = await resubmitPOST(
+        resubmitRequest({
+          submissionId,
+          cookie: seller.cookie,
+          idempotencyKey: "k-dotdot-resubmit",
+          payload: childPayload(submissionId),
+          revisionContext: {
+            kind: "requested_changes_response",
+            submissionId,
+            baseRevisionId: "11111111-1111-4111-8111-111111111111",
+            baseRevisionNumber: 1,
+            respondedToDecisionId: "22222222-2222-4222-8222-222222222222",
+            expectedSubmissionVersion: 3,
+          },
+        }),
+        params(submissionId),
+      );
+      expect(response.status).toBe(404);
+      expect(await response.json()).toEqual({ error: "Submission not found." });
+      expect(
+        await db.select().from(schema.submissions).where(eq(schema.submissions.id, submissionId)),
+      ).toHaveLength(0);
+      expect(await readRevisionRows(submissionId)).toHaveLength(0);
+      expect(
+        await db
+          .select()
+          .from(schema.idempotencyRecords)
+          .where(
+            eq(
+              schema.idempotencyRecords.key,
+              `resubmit:${seller.userId}:${submissionId}:k-dotdot-resubmit`,
+            ),
+          ),
+      ).toHaveLength(0);
+      expect(storageFileCount(join(TEST_STORAGE_DIR, "submissions", submissionId))).toBe(0);
     });
 
     it("compares repeated panel roles by checksum counts", async () => {
@@ -853,32 +953,43 @@ for (const dialect of DIALECTS) {
 
     it("cleans the first persisted panel when a later panel storage write fails", async () => {
       const { seller, submissionId, revisionContext } = await seedRequestedChanges();
-      const longPanelId = "x".repeat(255);
+      const secondPanelId = "revision-panel-storage-failure";
       const payload = withExtraPanel(childPayload(submissionId), {
-        panelId: longPanelId,
+        panelId: secondPanelId,
         role: "back",
       });
 
-      const response = await resubmitPOST(
-        resubmitRequest({
-          submissionId,
-          cookie: seller.cookie,
-          idempotencyKey: "k-clean-storage-failure",
-          payload,
-          revisionContext,
-          files: {
-            "revision-panel-front": panelBlob(),
-            [longPanelId]: panelBlob(),
-          },
-        }),
-        params(submissionId),
-      );
-      expect(response.status).toBe(500);
-      expect(await response.json()).toMatchObject({
-        error: { code: "PANEL_STORAGE_UNAVAILABLE" },
+      const originalWriteFileSync = fs.writeFileSync;
+      let writes = 0;
+      const writeSpy = vi.spyOn(fs, "writeFileSync").mockImplementation((...args: any[]) => {
+        writes += 1;
+        if (writes === 2) throw new Error("forced second panel write failure");
+        return (originalWriteFileSync as any)(...args);
       });
-      expect(revisionStorageFileCount(submissionId)).toBe(0);
-      expect(storageFileCount()).toBe(1);
+      try {
+        const response = await resubmitPOST(
+          resubmitRequest({
+            submissionId,
+            cookie: seller.cookie,
+            idempotencyKey: "k-clean-storage-failure",
+            payload,
+            revisionContext,
+            files: {
+              "revision-panel-front": panelBlob(),
+              [secondPanelId]: panelBlob(),
+            },
+          }),
+          params(submissionId),
+        );
+        expect(response.status).toBe(500);
+        expect(await response.json()).toMatchObject({
+          error: { code: "PANEL_STORAGE_UNAVAILABLE" },
+        });
+        expect(revisionStorageFileCount(submissionId)).toBe(0);
+        expect(storageFileCount()).toBe(1);
+      } finally {
+        writeSpy.mockRestore();
+      }
     });
 
     it("rolls back partial child rows when the final projection update fails", async () => {

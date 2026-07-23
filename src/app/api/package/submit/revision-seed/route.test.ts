@@ -3,7 +3,7 @@
 import { rmSync } from "node:fs";
 import { join } from "node:path";
 
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const TEST_DB_FILE = ".local/test-revision-seed.db";
@@ -28,10 +28,14 @@ import { createTestSqliteDb } from "../../../../../../tests/integration/test-db-
 import {
   DEFAULT_PANEL_ID,
   PANEL_BYTES,
+  PANEL_SHA,
   buildMultipartRequest,
   createValidAgentReviewPayload,
+  panelBlob,
+  resign,
 } from "../../../../../../tests/integration/package-submit-fixtures";
 import { signRevision } from "@/lib/integrity";
+import { MAX_PANEL_ID_LENGTH } from "@/features/package-preparation/panel-identity-constraints";
 
 type RouteHandler = (
   request: Request,
@@ -41,6 +45,7 @@ type PanelRouteHandler = (
   request: Request,
   context: { params: Promise<{ id: string; panelId: string }> },
 ) => Promise<Response>;
+const BROWSER_STYLE_PANEL_ID = "package-panel-11111111-1111-4111-8111-111111111111";
 
 const DIALECTS = RUN_MYSQL_TESTS ? (["mysql"] as const) : (["sqlite"] as const);
 
@@ -53,6 +58,7 @@ for (const dialect of DIALECTS) {
     let finalizePOST: RouteHandler;
     let claimPOST: RouteHandler;
     let requestChangesPOST: RouteHandler;
+    let resubmitPOST: RouteHandler;
     let seedGET: RouteHandler;
     let seedPanelGET: PanelRouteHandler;
 
@@ -80,6 +86,7 @@ for (const dialect of DIALECTS) {
         .POST as RouteHandler;
       requestChangesPOST = (await import("../../../agent/submissions/[id]/request-changes/route"))
         .POST as RouteHandler;
+      resubmitPOST = (await import("../resubmit/[id]/route")).POST as RouteHandler;
       seedGET = (await import("./[id]/route")).GET as RouteHandler;
       seedPanelGET = (await import("./[id]/panels/[panelId]/route")).GET as PanelRouteHandler;
 
@@ -169,16 +176,23 @@ for (const dialect of DIALECTS) {
       return { params: Promise.resolve({ id }) };
     }
 
-    async function seedRequestedChanges() {
+    async function seedRequestedChanges(args: { submissionId?: string; panelId?: string } = {}) {
       const seller = await provision("seller@test.com");
       const agent = await provision("agent@test.com", "agent");
-      const submissionId = "pkg-revision-seed";
+      const submissionId = args.submissionId ?? "pkg-revision-seed";
+      const panelId = args.panelId ?? DEFAULT_PANEL_ID;
       const finalizeResponse = await finalizePOST(
         buildMultipartRequest({
           url: "http://localhost:3000/api/package/submit/finalize",
-          payload: createValidAgentReviewPayload({ packageId: submissionId, email: seller.email }),
+          payload: createValidAgentReviewPayload({
+            packageId: submissionId,
+            email: seller.email,
+            panelId,
+            analysisRunId: "run-revision-seed",
+          }),
           cookie: seller.cookie,
           idempotencyKey: "k-finalize",
+          files: { [panelId]: panelBlob() },
         }),
       );
       expect(finalizeResponse.status).toBe(200);
@@ -213,7 +227,7 @@ for (const dialect of DIALECTS) {
       const decision = (await decisionResponse.json()) as {
         decision: { id: string; reviewedRevisionId: string };
       };
-      return { seller, agent, submissionId, receipt, decision, rationale };
+      return { seller, agent, submissionId, receipt, decision, rationale, panelId };
     }
 
     beforeEach(loadModules);
@@ -292,6 +306,339 @@ for (const dialect of DIALECTS) {
         { params: Promise.resolve({ id: submissionId, panelId: DEFAULT_PANEL_ID }) },
       );
       expect(hidden.status).toBe(404);
+    });
+
+    it("preserves browser-style panel identities through finalization, seed, asset restore, and revision 2 resubmission", async () => {
+      expect(BROWSER_STYLE_PANEL_ID).toHaveLength(50);
+      expect(BROWSER_STYLE_PANEL_ID.length).toBeLessThanOrEqual(MAX_PANEL_ID_LENGTH);
+
+      const { seller, submissionId, receipt } = await seedRequestedChanges({
+        submissionId: "pkg-long-panel-identity",
+        panelId: BROWSER_STYLE_PANEL_ID,
+      });
+
+      const panelRows = await db
+        .select({
+          id: schema.submittedPanels.id,
+          revisionId: schema.submittedPanels.revisionId,
+          storageKey: schema.submittedPanels.storageKey,
+        })
+        .from(schema.submittedPanels)
+        .where(eq(schema.submittedPanels.revisionId, receipt.revisionId));
+      expect(panelRows).toEqual([
+        expect.objectContaining({
+          id: BROWSER_STYLE_PANEL_ID,
+          revisionId: receipt.revisionId,
+        }),
+      ]);
+      expect(panelRows[0].storageKey).toContain(`/${BROWSER_STYLE_PANEL_ID}-`);
+
+      const seedResponse = await seedGET(
+        req(`/api/package/submit/revision-seed/${submissionId}`, seller.cookie),
+        { params: Promise.resolve({ id: submissionId }) },
+      );
+      expect(seedResponse.status).toBe(200);
+      const seed = await seedResponse.json();
+      expect(seed.baseRevision.panels).toEqual([
+        expect.objectContaining({
+          panelId: BROWSER_STYLE_PANEL_ID,
+          assetPanelId: BROWSER_STYLE_PANEL_ID,
+        }),
+      ]);
+      const brandEvidence = seed.baseRevision.sellerEvidence.find(
+        (item: { categoryId: string }) => item.categoryId === "brandName",
+      );
+      expect(brandEvidence.regions).toEqual([
+        expect.objectContaining({ panelId: BROWSER_STYLE_PANEL_ID }),
+      ]);
+      expect(JSON.stringify(seed)).not.toMatch(/storageKey|storage_key|canonicalJson|signature/i);
+
+      const panel = await seedPanelGET(
+        req(
+          `/api/package/submit/revision-seed/${submissionId}/panels/${BROWSER_STYLE_PANEL_ID}`,
+          seller.cookie,
+        ),
+        { params: Promise.resolve({ id: submissionId, panelId: BROWSER_STYLE_PANEL_ID }) },
+      );
+      expect(panel.status).toBe(200);
+      expect(Buffer.from(await panel.arrayBuffer())).toEqual(PANEL_BYTES);
+
+      const childPanelId = "package-panel-22222222-2222-4222-8222-222222222222";
+      const childPayload = createValidAgentReviewPayload({
+        packageId: submissionId,
+        email: seller.email,
+        panelId: childPanelId,
+        analysisRunId: "run-revision-child",
+        sellerChangeSequence: 1,
+        expectedValue: "Revised Test Brand",
+        regionId: "revision-region-child",
+      });
+      childPayload.package.sellerChangeHistory.push({
+        changeId: "seller-change-revision-started",
+        sequence: 1,
+        recordedAt: new Date().toISOString(),
+        action: "revision_response_started",
+        detail: "Revision response draft started from the requested-change seed.",
+      });
+
+      resign(childPayload);
+
+      const resubmission = await resubmitPOST(
+        buildMultipartRequest({
+          url: `http://localhost:3000/api/package/submit/resubmit/${submissionId}`,
+          payload: childPayload,
+          cookie: seller.cookie,
+          idempotencyKey: "k-resubmit-long-panel",
+          revisionContext: seed.revisionContext,
+          files: { [childPanelId]: panelBlob() },
+        }),
+        { params: Promise.resolve({ id: submissionId }) },
+      );
+      expect(resubmission.status).toBe(200);
+      expect(await resubmission.json()).toMatchObject({
+        submissionId,
+        revisionNumber: 2,
+        currentStatus: "waiting_for_agent_review",
+      });
+      const childRows = await db
+        .select({ id: schema.submittedPanels.id })
+        .from(schema.submittedPanels)
+        .where(eq(schema.submittedPanels.id, childPanelId));
+      expect(childRows).toEqual([{ id: childPanelId }]);
+    });
+
+    it("reconciles legacy truncated panel rows from storage-key identity without mutating them", async () => {
+      const legacyAssetPanelId = BROWSER_STYLE_PANEL_ID.slice(0, 36);
+      const { seller, submissionId, receipt } = await seedRequestedChanges({
+        submissionId: "pkg-legacy-truncated-panel",
+        panelId: BROWSER_STYLE_PANEL_ID,
+      });
+      if (isSQLite) {
+        db.run(
+          sql`UPDATE submitted_panels SET id = ${legacyAssetPanelId} WHERE revision_id = ${receipt.revisionId}`,
+        );
+      } else {
+        await db.execute(
+          sql`UPDATE submitted_panels SET id = ${legacyAssetPanelId} WHERE revision_id = ${receipt.revisionId}`,
+        );
+      }
+
+      const beforeRows = await db
+        .select({
+          id: schema.submittedPanels.id,
+          storageKey: schema.submittedPanels.storageKey,
+        })
+        .from(schema.submittedPanels)
+        .where(eq(schema.submittedPanels.revisionId, receipt.revisionId));
+      expect(beforeRows).toEqual([
+        expect.objectContaining({
+          id: legacyAssetPanelId,
+        }),
+      ]);
+      expect(beforeRows[0].storageKey).toContain(`/${BROWSER_STYLE_PANEL_ID}-`);
+
+      const seedResponse = await seedGET(
+        req(`/api/package/submit/revision-seed/${submissionId}`, seller.cookie),
+        { params: Promise.resolve({ id: submissionId }) },
+      );
+      expect(seedResponse.status).toBe(200);
+      const seed = await seedResponse.json();
+      expect(seed.baseRevision.panels).toEqual([
+        expect.objectContaining({
+          panelId: BROWSER_STYLE_PANEL_ID,
+          assetPanelId: legacyAssetPanelId,
+        }),
+      ]);
+      const brandEvidence = seed.baseRevision.sellerEvidence.find(
+        (item: { categoryId: string }) => item.categoryId === "brandName",
+      );
+      expect(brandEvidence.regions).toEqual([
+        expect.objectContaining({ panelId: BROWSER_STYLE_PANEL_ID }),
+      ]);
+      expect(JSON.stringify(seed)).not.toMatch(/storageKey|storage_key|canonicalJson|signature/i);
+
+      const restored = await seedPanelGET(
+        req(
+          `/api/package/submit/revision-seed/${submissionId}/panels/${legacyAssetPanelId}`,
+          seller.cookie,
+        ),
+        { params: Promise.resolve({ id: submissionId, panelId: legacyAssetPanelId }) },
+      );
+      expect(restored.status).toBe(200);
+      expect(Buffer.from(await restored.arrayBuffer())).toEqual(PANEL_BYTES);
+
+      const afterRows = await db
+        .select({
+          id: schema.submittedPanels.id,
+          storageKey: schema.submittedPanels.storageKey,
+        })
+        .from(schema.submittedPanels)
+        .where(eq(schema.submittedPanels.revisionId, receipt.revisionId));
+      expect(afterRows).toEqual(beforeRows);
+      expect(afterRows).not.toEqual([
+        expect.objectContaining({
+          id: BROWSER_STYLE_PANEL_ID,
+        }),
+      ]);
+    });
+
+    it("rejects duplicate recovered legacy panel identities instead of returning an ambiguous seed", async () => {
+      const legacyAssetPanelId = BROWSER_STYLE_PANEL_ID.slice(0, 36);
+      const duplicateAssetPanelId = "legacy-duplicate-panel-asset";
+      const duplicateChecksum = "b".repeat(64);
+      const { seller, submissionId, receipt } = await seedRequestedChanges({
+        submissionId: "pkg-duplicate-recovered-panel",
+        panelId: BROWSER_STYLE_PANEL_ID,
+      });
+      if (isSQLite) {
+        db.run(
+          sql`UPDATE submitted_panels SET id = ${legacyAssetPanelId} WHERE revision_id = ${receipt.revisionId}`,
+        );
+      } else {
+        await db.execute(
+          sql`UPDATE submitted_panels SET id = ${legacyAssetPanelId} WHERE revision_id = ${receipt.revisionId}`,
+        );
+      }
+      await db.insert(schema.submittedPanels).values({
+        id: duplicateAssetPanelId,
+        revisionId: receipt.revisionId,
+        role: "back",
+        displayName: "duplicate-back.png",
+        mediaType: "image/png",
+        byteSize: PANEL_BYTES.length,
+        checksumSha256: duplicateChecksum,
+        width: 1,
+        height: 1,
+        rotation: 0,
+        storageKey: `submissions/${submissionId}/panels/${BROWSER_STYLE_PANEL_ID}-${duplicateChecksum}`,
+      });
+
+      const response = await seedGET(
+        req(`/api/package/submit/revision-seed/${submissionId}`, seller.cookie),
+        { params: Promise.resolve({ id: submissionId }) },
+      );
+      expect(response.status).toBe(409);
+      const body = await response.json();
+      expect(body).toEqual({
+        error: {
+          code: "PANEL_IDENTITY_INCONSISTENT",
+          message:
+            "A stored panel identity could not be reconciled safely. No revision draft was created.",
+        },
+      });
+      expect(JSON.stringify(body)).not.toMatch(/storageKey|storage_key|submissions\/|canonical/i);
+
+      const afterRows = await db
+        .select({
+          id: schema.submittedPanels.id,
+          storageKey: schema.submittedPanels.storageKey,
+        })
+        .from(schema.submittedPanels)
+        .where(eq(schema.submittedPanels.revisionId, receipt.revisionId));
+      expect(afterRows).toHaveLength(2);
+      expect(afterRows).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: legacyAssetPanelId }),
+          expect.objectContaining({ id: duplicateAssetPanelId }),
+        ]),
+      );
+    });
+
+    it("rejects legacy storage-key identities longer than the accepted panel ID maximum", async () => {
+      const legacyAssetPanelId = BROWSER_STYLE_PANEL_ID.slice(0, 36);
+      const recoveredPanelId = "x".repeat(MAX_PANEL_ID_LENGTH + 1);
+      const { seller, submissionId, receipt } = await seedRequestedChanges({
+        submissionId: "pkg-overwidth-recovered-panel",
+        panelId: BROWSER_STYLE_PANEL_ID,
+      });
+      const storageKey = `submissions/${submissionId}/panels/${recoveredPanelId}-${PANEL_SHA}`;
+      if (isSQLite) {
+        db.run(
+          sql`UPDATE submitted_panels SET id = ${legacyAssetPanelId}, storage_key = ${storageKey} WHERE revision_id = ${receipt.revisionId}`,
+        );
+      } else {
+        await db.execute(
+          sql`UPDATE submitted_panels SET id = ${legacyAssetPanelId}, storage_key = ${storageKey} WHERE revision_id = ${receipt.revisionId}`,
+        );
+      }
+
+      const response = await seedGET(
+        req(`/api/package/submit/revision-seed/${submissionId}`, seller.cookie),
+        { params: Promise.resolve({ id: submissionId }) },
+      );
+      expect(response.status).toBe(409);
+      const body = await response.json();
+      expect(body).toEqual({
+        error: {
+          code: "PANEL_IDENTITY_INCONSISTENT",
+          message:
+            "A stored panel identity could not be reconciled safely. No revision draft was created.",
+        },
+      });
+      expect(JSON.stringify(body)).not.toMatch(/storageKey|storage_key|submissions\/|canonical/i);
+    });
+
+    it("rejects legacy storage keys without the fixed checksum suffix", async () => {
+      const { seller, submissionId, receipt } = await seedRequestedChanges({
+        submissionId: "pkg-bad-panel-suffix",
+        panelId: BROWSER_STYLE_PANEL_ID,
+      });
+      const storageKey = `submissions/${submissionId}/panels/${BROWSER_STYLE_PANEL_ID}-${"a".repeat(64)}`;
+      if (isSQLite) {
+        db.run(
+          sql`UPDATE submitted_panels SET storage_key = ${storageKey} WHERE revision_id = ${receipt.revisionId}`,
+        );
+      } else {
+        await db.execute(
+          sql`UPDATE submitted_panels SET storage_key = ${storageKey} WHERE revision_id = ${receipt.revisionId}`,
+        );
+      }
+
+      const response = await seedGET(
+        req(`/api/package/submit/revision-seed/${submissionId}`, seller.cookie),
+        { params: Promise.resolve({ id: submissionId }) },
+      );
+      expect(response.status).toBe(409);
+      const body = await response.json();
+      expect(body).toEqual({
+        error: {
+          code: "PANEL_IDENTITY_INCONSISTENT",
+          message:
+            "A stored panel identity could not be reconciled safely. No revision draft was created.",
+        },
+      });
+      expect(JSON.stringify(body)).not.toMatch(/storageKey|storage_key|submissions\/|canonical/i);
+    });
+
+    it("fails closed without leaking storage details when a stored panel identity is inconsistent", async () => {
+      const { seller, submissionId, receipt } = await seedRequestedChanges({
+        submissionId: "pkg-inconsistent-panel-identity",
+        panelId: BROWSER_STYLE_PANEL_ID,
+      });
+      if (isSQLite) {
+        db.run(
+          sql`UPDATE submitted_panels SET storage_key = ${"submissions/wrong-package/panels/" + BROWSER_STYLE_PANEL_ID + "-" + PANEL_SHA} WHERE revision_id = ${receipt.revisionId}`,
+        );
+      } else {
+        await db.execute(
+          sql`UPDATE submitted_panels SET storage_key = ${"submissions/wrong-package/panels/" + BROWSER_STYLE_PANEL_ID + "-" + PANEL_SHA} WHERE revision_id = ${receipt.revisionId}`,
+        );
+      }
+
+      const response = await seedGET(
+        req(`/api/package/submit/revision-seed/${submissionId}`, seller.cookie),
+        { params: Promise.resolve({ id: submissionId }) },
+      );
+      expect(response.status).toBe(409);
+      const body = await response.json();
+      expect(body).toEqual({
+        error: {
+          code: "PANEL_IDENTITY_INCONSISTENT",
+          message:
+            "A stored panel identity could not be reconciled safely. No revision draft was created.",
+        },
+      });
+      expect(JSON.stringify(body)).not.toMatch(/storageKey|storage_key|submissions\/|canonical/i);
     });
 
     it("refuses a seed after the exact requested-change decision has been answered", async () => {

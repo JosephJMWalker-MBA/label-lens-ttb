@@ -20,6 +20,8 @@ import {
 } from "@/features/package-preparation/agent-submission-contract";
 import { panelStorageKey, persistPanelAsset } from "@/lib/panel-storage";
 import { detectImage } from "@/lib/image-signature";
+import { validatePanelIdentityList } from "@/server/submissions/panel-identity";
+import { isValidSubmissionId } from "@/server/submissions/access";
 
 /** Durable-asset ingest limits enforced server-side. */
 const MAX_PANEL_BYTES = 15 * 1024 * 1024;
@@ -118,6 +120,19 @@ export async function POST(request: Request) {
   }
   const exportPayload = parsed.value;
   const draft = exportPayload.package;
+  if (!isValidSubmissionId(draft.packageId)) {
+    return NextResponse.json(
+      { error: "Bad Request: Package ID must be a bounded path-safe token." },
+      { status: 400 },
+    );
+  }
+  const panelIdentityCheck = validatePanelIdentityList(draft.panels.map((panel) => panel.panelId));
+  if (!panelIdentityCheck.ok) {
+    return NextResponse.json(
+      { error: `Bad Request: ${panelIdentityCheck.message}` },
+      { status: 400 },
+    );
+  }
 
   // 6. Verify the client-declared integrity value against the canonical payload,
   //    hashed with the SAME canonicalization the merged model uses to sign it.

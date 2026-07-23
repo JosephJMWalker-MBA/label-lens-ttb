@@ -17,6 +17,7 @@ import {
 import { getExecutableProvenance } from "@/server/runtime-provenance";
 import { ALLOWED_MEDIA_TYPES, MAX_IMAGE_BYTES } from "@/server/resource-policy";
 import { issueAppendToken } from "@/server/append-token";
+import { validatePanelIdentityList } from "@/server/submissions/panel-identity";
 
 export const runtime = "nodejs";
 
@@ -43,7 +44,9 @@ function parseDraft(value: FormDataEntryValue | null): SellerPackageDraft | null
       return null;
     }
     if (draft.panels.length < 1 || draft.panels.length > MAX_PACKAGE_PANELS) return null;
-    const panelIds = new Set(draft.panels.map((panel) => panel.panelId));
+    const draftPanelIds = draft.panels.map((panel) => panel.panelId);
+    if (!validatePanelIdentityList(draftPanelIds).ok) return null;
+    const panelIds = new Set(draftPanelIds);
     if (panelIds.size !== draft.panels.length) return null;
     if (new Set(draft.panels.map((panel) => panel.order)).size !== draft.panels.length) return null;
     const categoryIds = draft.categories.map((category) => category.categoryId);

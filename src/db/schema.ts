@@ -113,7 +113,7 @@ export const submissionRevisions = mysqlTable(
 export const submittedPanels = mysqlTable(
   "submitted_panels",
   {
-    id: varchar("id", { length: 36 }).primaryKey(),
+    id: varchar("id", { length: 255 }).primaryKey(),
     revisionId: varchar("revision_id", { length: 36 }).notNull(),
     role: varchar("role", { length: 50 }).notNull(),
     displayName: varchar("display_name", { length: 255 }).notNull(),
@@ -123,7 +123,7 @@ export const submittedPanels = mysqlTable(
     width: int("width").notNull(),
     height: int("height").notNull(),
     rotation: int("rotation").notNull(),
-    storageKey: varchar("storage_key", { length: 500 }).notNull(),
+    storageKey: varchar("storage_key", { length: 1024 }).notNull(),
   },
   (table) => ({
     fk: foreignKey({

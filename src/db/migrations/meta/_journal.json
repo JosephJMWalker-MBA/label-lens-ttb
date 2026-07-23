@@ -29,6 +29,13 @@
       "when": 1784700000000,
       "tag": "0003_issue_167_seller_resubmissions",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1784774400000,
+      "tag": "0004_issue_167_panel_identity_preservation",
+      "breakpoints": true
     }
   ]
 }

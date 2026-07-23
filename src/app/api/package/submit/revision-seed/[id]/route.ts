@@ -58,5 +58,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         "CHANGE_REQUEST_ALREADY_ANSWERED",
         "The latest requested-change decision already has a seller response.",
       );
+    case "panel_identity_inconsistent":
+      return controlledConflict(
+        "PANEL_IDENTITY_INCONSISTENT",
+        "A stored panel identity could not be reconciled safely. No revision draft was created.",
+      );
   }
 }

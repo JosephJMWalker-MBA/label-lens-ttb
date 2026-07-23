@@ -5,6 +5,7 @@ import { and, asc, desc, eq } from "drizzle-orm";
 import { db, schema } from "@/db/client";
 import { verifyRevision } from "@/lib/integrity";
 import type { RevisionResponseContext } from "@/features/package-preparation/revision-context";
+import { reconcilePanelSourceIdentity } from "./panel-identity";
 
 export interface RevisionSeedView {
   submissionId: string;
@@ -19,6 +20,7 @@ export interface RevisionSeedView {
     submittedAt: string;
     panels: Array<{
       panelId: string;
+      assetPanelId: string;
       order: number;
       role: string;
       displayName: string;
@@ -59,7 +61,8 @@ type RevisionSeedFailureReason =
   | "not_changes_requested"
   | "integrity_failed"
   | "change_request_missing"
-  | "change_request_already_answered";
+  | "change_request_already_answered"
+  | "panel_identity_inconsistent";
 
 function safeArrayFromJson(value: string): unknown[] {
   try {
@@ -181,6 +184,7 @@ export async function buildRevisionSeedForSeller(args: {
       width: schema.submittedPanels.width,
       height: schema.submittedPanels.height,
       rotation: schema.submittedPanels.rotation,
+      storageKey: schema.submittedPanels.storageKey,
     })
     .from(schema.submittedPanels)
     .where(eq(schema.submittedPanels.revisionId, revision.id))
@@ -194,7 +198,39 @@ export async function buildRevisionSeedForSeller(args: {
     width: number;
     height: number;
     rotation: number;
+    storageKey: string;
   }>;
+
+  const seedPanels: RevisionSeedView["baseRevision"]["panels"] = [];
+  const recoveredPanelIds = new Set<string>();
+  for (const [index, panel] of panelRows.entries()) {
+    const identity = reconcilePanelSourceIdentity({
+      submissionId: submission.id,
+      revisionId: revision.id,
+      revisionNumber: revision.revisionNumber,
+      storedPanelId: panel.id,
+      storageKey: panel.storageKey,
+      checksumSha256: panel.checksumSha256,
+    });
+    if (!identity.ok) return { ok: false, reason: "panel_identity_inconsistent" };
+    if (recoveredPanelIds.has(identity.panelId)) {
+      return { ok: false, reason: "panel_identity_inconsistent" };
+    }
+    recoveredPanelIds.add(identity.panelId);
+    seedPanels.push({
+      panelId: identity.panelId,
+      assetPanelId: identity.assetPanelId,
+      order: index,
+      role: panel.role,
+      displayName: panel.displayName,
+      mediaType: panel.mediaType,
+      byteSize: panel.byteSize,
+      checksumSha256: panel.checksumSha256,
+      width: panel.width,
+      height: panel.height,
+      rotation: panel.rotation,
+    });
+  }
 
   const evidenceRows = (await db
     .select({
@@ -211,6 +247,21 @@ export async function buildRevisionSeedForSeller(args: {
     expectedValue: string | null;
     regions: string;
   }>;
+  const seedPanelIds = new Set(seedPanels.map((panel) => panel.panelId));
+  const sellerEvidence = evidenceRows.map((evidence) => ({
+    categoryId: evidence.categoryId,
+    decision: evidence.decision,
+    expectedValue: evidence.expectedValue,
+    regions: safeArrayFromJson(evidence.regions),
+  }));
+  for (const evidence of sellerEvidence) {
+    for (const region of evidence.regions) {
+      const panelId = (region as { panelId?: unknown })?.panelId;
+      if (typeof panelId !== "string" || !seedPanelIds.has(panelId)) {
+        return { ok: false, reason: "panel_identity_inconsistent" };
+      }
+    }
+  }
 
   const revisionContext: RevisionResponseContext = {
     kind: "requested_changes_response",
@@ -234,24 +285,8 @@ export async function buildRevisionSeedForSeller(args: {
         profileVersion: revision.profileVersion,
         submittedBy: revision.submittedBy,
         submittedAt: revision.submittedAt.toISOString(),
-        panels: panelRows.map((panel, index) => ({
-          panelId: panel.id,
-          order: index,
-          role: panel.role,
-          displayName: panel.displayName,
-          mediaType: panel.mediaType,
-          byteSize: panel.byteSize,
-          checksumSha256: panel.checksumSha256,
-          width: panel.width,
-          height: panel.height,
-          rotation: panel.rotation,
-        })),
-        sellerEvidence: evidenceRows.map((evidence) => ({
-          categoryId: evidence.categoryId,
-          decision: evidence.decision,
-          expectedValue: evidence.expectedValue,
-          regions: safeArrayFromJson(evidence.regions),
-        })),
+        panels: seedPanels,
+        sellerEvidence,
       },
       changeRequest: {
         decisionId: decision.id,
@@ -269,7 +304,7 @@ export async function resolveRevisionSeedPanelAsset(args: {
   submissionId: string;
   sellerId: string;
   sellerRole: string;
-  panelId: string;
+  assetPanelId: string;
 }): Promise<
   | { ok: true; storageKey: string; mediaType: string }
   | { ok: false; reason: RevisionSeedFailureReason }
@@ -277,7 +312,7 @@ export async function resolveRevisionSeedPanelAsset(args: {
   const seed = await buildRevisionSeedForSeller(args);
   if (!seed.ok) return seed;
   const requestedPanel = seed.seed.baseRevision.panels.find(
-    (panel) => panel.panelId === args.panelId,
+    (panel) => panel.assetPanelId === args.assetPanelId,
   );
   if (!requestedPanel) return { ok: false, reason: "not_found" };
 
@@ -289,7 +324,7 @@ export async function resolveRevisionSeedPanelAsset(args: {
     .from(schema.submittedPanels)
     .where(
       and(
-        eq(schema.submittedPanels.id, args.panelId),
+        eq(schema.submittedPanels.id, args.assetPanelId),
         eq(schema.submittedPanels.revisionId, seed.seed.baseRevision.id),
       ),
     )

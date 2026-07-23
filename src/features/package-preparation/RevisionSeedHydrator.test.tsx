@@ -37,6 +37,7 @@ function seedResponse() {
       panels: [
         {
           panelId: "old-front",
+          assetPanelId: "old-front-truncated-asset",
           order: 0,
           role: "front",
           displayName: "front.png",
@@ -49,6 +50,7 @@ function seedResponse() {
         },
         {
           panelId: "old-back",
+          assetPanelId: "old-back-truncated-asset",
           order: 1,
           role: "back",
           displayName: "back.png",
@@ -145,10 +147,10 @@ beforeEach(() => {
       if (url.endsWith("/api/package/submit/revision-seed/pkg-seed")) {
         return Response.json(seedResponse());
       }
-      if (url.includes("/panels/old-front")) {
+      if (url.includes("/panels/old-front-truncated-asset")) {
         return new Response(new Blob(["front"], { type: "image/png" }));
       }
-      if (url.includes("/panels/old-back")) {
+      if (url.includes("/panels/old-back-truncated-asset")) {
         return new Response(new Blob(["back"], { type: "image/png" }));
       }
       return new Response(null, { status: 404 });
@@ -190,6 +192,8 @@ describe("RevisionSeedHydrator", () => {
     expect(new Set(panelIds).size).toBe(2);
     expect(panelIds).not.toContain("old-front");
     expect(panelIds).not.toContain("old-back");
+    expect(panelIds).not.toContain("old-front-truncated-asset");
+    expect(panelIds).not.toContain("old-back-truncated-asset");
     expect(saved.panelFiles.map((item: { panelId: string }) => item.panelId)).toEqual(panelIds);
 
     const remappedRegionPanelIds = saved.draft.categories.flatMap(
@@ -198,7 +202,15 @@ describe("RevisionSeedHydrator", () => {
     );
     expect(remappedRegionPanelIds.sort()).toEqual(panelIds.sort());
     expect(JSON.stringify(saved.draft)).not.toMatch(
-      /old-front|old-back|old-brand-region|old-alcohol-region|machineResultId|appendToken|analysisRunId/,
+      /old-front|old-back|old-front-truncated-asset|old-back-truncated-asset|old-brand-region|old-alcohol-region|machineResultId|appendToken|analysisRunId/,
+    );
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/panels/old-front-truncated-asset"),
+      { cache: "no-store" },
+    );
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/panels/old-back-truncated-asset"),
+      { cache: "no-store" },
     );
     const serializedDraft = canonicalStringify(saved.draft);
     expect(serializedDraft).not.toContain(revisionContext.baseRevisionId);
@@ -223,6 +235,68 @@ describe("RevisionSeedHydrator", () => {
     await waitFor(() => expect(confirm).toHaveBeenCalledTimes(1));
     expect(store.save).not.toHaveBeenCalled();
     expect(screen.queryByText(/revision response draft is ready/i)).toBeNull();
+  });
+
+  it("does not save a draft when stored panel identity cannot be reconciled safely", async () => {
+    store.load.mockResolvedValue(null);
+    vi.mocked(fetch).mockImplementationOnce(async () =>
+      Response.json(
+        {
+          error: {
+            code: "PANEL_IDENTITY_INCONSISTENT",
+            message:
+              "A stored panel identity could not be reconciled safely. No revision draft was created.",
+          },
+        },
+        { status: 409 },
+      ),
+    );
+    render(<RevisionSeedHydrator submissionId="pkg-seed" />);
+
+    fireEvent.click(screen.getByRole("button", { name: /prepare local revision draft/i }));
+
+    expect(
+      await screen.findByText(
+        "A stored panel identity could not be reconciled safely. No revision draft was created.",
+      ),
+    ).toBeInTheDocument();
+    expect(store.save).not.toHaveBeenCalled();
+    expect(store.load).not.toHaveBeenCalled();
+  });
+
+  it("maps local identity failures to the same bounded seller-facing message", async () => {
+    store.load.mockResolvedValue(null);
+    const mismatched = seedResponse();
+    mismatched.baseRevision.sellerEvidence[0].regions[0].panelId = "missing-panel";
+    vi.mocked(fetch).mockImplementationOnce(async () => Response.json(mismatched));
+    render(<RevisionSeedHydrator submissionId="pkg-seed" />);
+
+    fireEvent.click(screen.getByRole("button", { name: /prepare local revision draft/i }));
+
+    expect(
+      await screen.findByText(
+        "A stored panel identity could not be reconciled safely. No revision draft was created.",
+      ),
+    ).toBeInTheDocument();
+    expect(store.save).not.toHaveBeenCalled();
+  });
+
+  it("does not save a draft if a malformed seed contains duplicate recovered panel IDs", async () => {
+    store.load.mockResolvedValue(null);
+    const duplicate = seedResponse();
+    duplicate.baseRevision.panels[1].panelId = duplicate.baseRevision.panels[0].panelId;
+    vi.mocked(fetch).mockImplementationOnce(async () => Response.json(duplicate));
+    render(<RevisionSeedHydrator submissionId="pkg-seed" />);
+
+    fireEvent.click(screen.getByRole("button", { name: /prepare local revision draft/i }));
+
+    expect(
+      await screen.findByText(
+        "A stored panel identity could not be reconciled safely. No revision draft was created.",
+      ),
+    ).toBeInTheDocument();
+    expect(store.save).not.toHaveBeenCalled();
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 
   it("resumes an existing same-context draft without overwriting seller edits", async () => {
