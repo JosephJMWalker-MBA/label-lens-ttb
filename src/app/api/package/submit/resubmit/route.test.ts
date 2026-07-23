@@ -583,6 +583,46 @@ for (const dialect of DIALECTS) {
       expect(revisionStorageFileCount(submissionId)).toBe(0);
     });
 
+    it("rejects traversal-like route submission IDs before files, rows, or idempotency are written", async () => {
+      const seller = await provision("seller-dotdot@test.com");
+      const submissionId = "pkg..example";
+      const response = await resubmitPOST(
+        resubmitRequest({
+          submissionId,
+          cookie: seller.cookie,
+          idempotencyKey: "k-dotdot-resubmit",
+          payload: childPayload(submissionId),
+          revisionContext: {
+            kind: "requested_changes_response",
+            submissionId,
+            baseRevisionId: "11111111-1111-4111-8111-111111111111",
+            baseRevisionNumber: 1,
+            respondedToDecisionId: "22222222-2222-4222-8222-222222222222",
+            expectedSubmissionVersion: 3,
+          },
+        }),
+        params(submissionId),
+      );
+      expect(response.status).toBe(404);
+      expect(await response.json()).toEqual({ error: "Submission not found." });
+      expect(
+        await db.select().from(schema.submissions).where(eq(schema.submissions.id, submissionId)),
+      ).toHaveLength(0);
+      expect(await readRevisionRows(submissionId)).toHaveLength(0);
+      expect(
+        await db
+          .select()
+          .from(schema.idempotencyRecords)
+          .where(
+            eq(
+              schema.idempotencyRecords.key,
+              `resubmit:${seller.userId}:${submissionId}:k-dotdot-resubmit`,
+            ),
+          ),
+      ).toHaveLength(0);
+      expect(storageFileCount(join(TEST_STORAGE_DIR, "submissions", submissionId))).toBe(0);
+    });
+
     it("compares repeated panel roles by checksum counts", async () => {
       const { seller, agent, submissionId, parentRevision, revisionContext } =
         await seedRequestedChanges();

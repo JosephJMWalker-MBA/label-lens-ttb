@@ -281,6 +281,24 @@ describe("RevisionSeedHydrator", () => {
     expect(store.save).not.toHaveBeenCalled();
   });
 
+  it("does not save a draft if a malformed seed contains duplicate recovered panel IDs", async () => {
+    store.load.mockResolvedValue(null);
+    const duplicate = seedResponse();
+    duplicate.baseRevision.panels[1].panelId = duplicate.baseRevision.panels[0].panelId;
+    vi.mocked(fetch).mockImplementationOnce(async () => Response.json(duplicate));
+    render(<RevisionSeedHydrator submissionId="pkg-seed" />);
+
+    fireEvent.click(screen.getByRole("button", { name: /prepare local revision draft/i }));
+
+    expect(
+      await screen.findByText(
+        "A stored panel identity could not be reconciled safely. No revision draft was created.",
+      ),
+    ).toBeInTheDocument();
+    expect(store.save).not.toHaveBeenCalled();
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
   it("resumes an existing same-context draft without overwriting seller edits", async () => {
     const existing = existingStoredDraft(revisionContext);
     existing.draft.panels = [

@@ -202,6 +202,7 @@ export async function buildRevisionSeedForSeller(args: {
   }>;
 
   const seedPanels: RevisionSeedView["baseRevision"]["panels"] = [];
+  const recoveredPanelIds = new Set<string>();
   for (const [index, panel] of panelRows.entries()) {
     const identity = reconcilePanelSourceIdentity({
       submissionId: submission.id,
@@ -212,6 +213,10 @@ export async function buildRevisionSeedForSeller(args: {
       checksumSha256: panel.checksumSha256,
     });
     if (!identity.ok) return { ok: false, reason: "panel_identity_inconsistent" };
+    if (recoveredPanelIds.has(identity.panelId)) {
+      return { ok: false, reason: "panel_identity_inconsistent" };
+    }
+    recoveredPanelIds.add(identity.panelId);
     seedPanels.push({
       panelId: identity.panelId,
       assetPanelId: identity.assetPanelId,

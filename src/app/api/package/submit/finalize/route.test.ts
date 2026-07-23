@@ -584,6 +584,37 @@ for (const dialect of TEST_DIALECTS) {
         expect((await finalizePOST(request)).status).toBe(401);
       });
 
+      it("rejects traversal-like package IDs before files, rows, or idempotency are written", async () => {
+        const packageId = "pkg..example";
+        const response = await finalizePOST(
+          buildFinalizeRequest(
+            createValidExportPayload(packageId),
+            sellerCookie,
+            "k-dotdot-package",
+          ),
+        );
+        expect(response.status).toBe(400);
+        expect(((await response.json()) as { error: string }).error).toContain("Package ID");
+        expect(
+          await db.select().from(schema.submissions).where(eq(schema.submissions.id, packageId)),
+        ).toHaveLength(0);
+        expect(
+          await db
+            .select()
+            .from(schema.submittedPanels)
+            .where(eq(schema.submittedPanels.id, PANEL_ID)),
+        ).toHaveLength(0);
+        expect(
+          await db
+            .select()
+            .from(schema.idempotencyRecords)
+            .where(eq(schema.idempotencyRecords.key, `finalize:${sellerUserId}:k-dotdot-package`)),
+        ).toHaveLength(0);
+        expect(existsSync(join(process.cwd(), ".local", "storage", "submissions", packageId))).toBe(
+          false,
+        );
+      });
+
       it("commits atomically and returns a durable receipt without exposing the signature", async () => {
         const pkgId = "pkg-finalize-ok";
         const request = buildFinalizeRequest(createValidExportPayload(pkgId), sellerCookie, "k-ok");

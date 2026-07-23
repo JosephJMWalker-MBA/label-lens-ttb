@@ -482,6 +482,68 @@ for (const dialect of DIALECTS) {
       ]);
     });
 
+    it("rejects duplicate recovered legacy panel identities instead of returning an ambiguous seed", async () => {
+      const legacyAssetPanelId = BROWSER_STYLE_PANEL_ID.slice(0, 36);
+      const duplicateAssetPanelId = "legacy-duplicate-panel-asset";
+      const duplicateChecksum = "b".repeat(64);
+      const { seller, submissionId, receipt } = await seedRequestedChanges({
+        submissionId: "pkg-duplicate-recovered-panel",
+        panelId: BROWSER_STYLE_PANEL_ID,
+      });
+      if (isSQLite) {
+        db.run(
+          sql`UPDATE submitted_panels SET id = ${legacyAssetPanelId} WHERE revision_id = ${receipt.revisionId}`,
+        );
+      } else {
+        await db.execute(
+          sql`UPDATE submitted_panels SET id = ${legacyAssetPanelId} WHERE revision_id = ${receipt.revisionId}`,
+        );
+      }
+      await db.insert(schema.submittedPanels).values({
+        id: duplicateAssetPanelId,
+        revisionId: receipt.revisionId,
+        role: "back",
+        displayName: "duplicate-back.png",
+        mediaType: "image/png",
+        byteSize: PANEL_BYTES.length,
+        checksumSha256: duplicateChecksum,
+        width: 1,
+        height: 1,
+        rotation: 0,
+        storageKey: `submissions/${submissionId}/panels/${BROWSER_STYLE_PANEL_ID}-${duplicateChecksum}`,
+      });
+
+      const response = await seedGET(
+        req(`/api/package/submit/revision-seed/${submissionId}`, seller.cookie),
+        { params: Promise.resolve({ id: submissionId }) },
+      );
+      expect(response.status).toBe(409);
+      const body = await response.json();
+      expect(body).toEqual({
+        error: {
+          code: "PANEL_IDENTITY_INCONSISTENT",
+          message:
+            "A stored panel identity could not be reconciled safely. No revision draft was created.",
+        },
+      });
+      expect(JSON.stringify(body)).not.toMatch(/storageKey|storage_key|submissions\/|canonical/i);
+
+      const afterRows = await db
+        .select({
+          id: schema.submittedPanels.id,
+          storageKey: schema.submittedPanels.storageKey,
+        })
+        .from(schema.submittedPanels)
+        .where(eq(schema.submittedPanels.revisionId, receipt.revisionId));
+      expect(afterRows).toHaveLength(2);
+      expect(afterRows).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: legacyAssetPanelId }),
+          expect.objectContaining({ id: duplicateAssetPanelId }),
+        ]),
+      );
+    });
+
     it("rejects legacy storage-key identities longer than the accepted panel ID maximum", async () => {
       const legacyAssetPanelId = BROWSER_STYLE_PANEL_ID.slice(0, 36);
       const recoveredPanelId = "x".repeat(MAX_PANEL_ID_LENGTH + 1);

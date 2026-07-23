@@ -84,6 +84,7 @@ function remapRegion(region: unknown, panelIdMap: Map<string, string>): SellerEv
 async function hydrateFromSeed(seed: RevisionSeedResponse): Promise<StoredPackageDraft> {
   const panelIdMap = new Map<string, string>();
   const panels: PackagePanelMetadata[] = seed.baseRevision.panels.map((panel, index) => {
+    if (panelIdMap.has(panel.panelId)) throw new Error("REVISION_SEED_DUPLICATE_PANEL_ID");
     const panelId = makeId("package-panel");
     panelIdMap.set(panel.panelId, panelId);
     return {
@@ -214,7 +215,8 @@ export function RevisionSeedHydrator({ submissionId }: { submissionId: string })
       const rawMessage = error instanceof Error ? error.message : "";
       setMessage(
         rawMessage === "REVISION_SEED_REGION_PANEL_MISSING" ||
-          rawMessage === "REVISION_SEED_PANEL_MAP_MISSING"
+          rawMessage === "REVISION_SEED_PANEL_MAP_MISSING" ||
+          rawMessage === "REVISION_SEED_DUPLICATE_PANEL_ID"
           ? "A stored panel identity could not be reconciled safely. No revision draft was created."
           : rawMessage
             ? rawMessage
