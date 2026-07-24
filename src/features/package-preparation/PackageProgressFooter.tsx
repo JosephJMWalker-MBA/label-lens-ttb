@@ -24,6 +24,7 @@ export interface PackageFooterAction {
   disabled?: boolean;
   reason?: string;
   pending?: boolean;
+  emphasized?: boolean;
 }
 
 export function PackageProgressFooter({
@@ -106,14 +107,26 @@ export function PackageProgressFooter({
           </div>
         </div>
         <div
-          className="min-w-0 rounded-md border border-blue-600/40 bg-blue-50 p-2.5 shadow-[0_0_18px_rgba(37,99,235,0.12)] lg:w-[20rem]"
+          className={`min-w-0 rounded-md border p-2.5 transition-all motion-reduce:transition-none lg:w-[20rem] ${
+            displayedAction.emphasized
+              ? "border-blue-600 bg-blue-100/95 ring-2 ring-blue-600 ring-offset-2 shadow-md dark:bg-blue-950/95 dark:text-blue-50"
+              : "border-blue-600/40 bg-blue-50 shadow-[0_0_18px_rgba(37,99,235,0.12)]"
+          }`}
           data-testid="footer-stage-action"
+          data-emphasized={displayedAction.emphasized ? "true" : undefined}
         >
           <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-blue-900">
+            <p className="text-xs font-semibold uppercase tracking-wide text-blue-900 dark:text-blue-200">
               Complete this stage
             </p>
-            {displayedAction.pending && elapsedLabel ? (
+            {displayedAction.emphasized ? (
+              <span
+                data-testid="footer-ready-badge"
+                className="rounded bg-blue-700 px-1.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider text-white"
+              >
+                Ready to save
+              </span>
+            ) : displayedAction.pending && elapsedLabel ? (
               <span className="font-mono text-xs text-blue-950">{elapsedLabel}</span>
             ) : null}
           </div>
@@ -138,14 +151,19 @@ export function PackageProgressFooter({
             )}
           </Button>
           {displayedAction.reason ? (
-            <p id="footer-action-reason" className="mt-1.5 text-xs text-blue-950/80">
+            <p
+              id="footer-action-reason"
+              className="mt-1.5 text-xs text-blue-950/80 dark:text-blue-200/90"
+            >
               {displayedAction.reason}
             </p>
           ) : null}
-          <p className="sr-only" aria-live="polite">
-            {displayedAction.pending && elapsedLabel
-              ? `${displayedAction.label} ${elapsedLabel}`
-              : displayedAction.label}
+          <p className="sr-only" aria-live="polite" data-testid="footer-aria-live">
+            {displayedAction.emphasized
+              ? `${displayedAction.label} evidence is ready to save.`
+              : displayedAction.pending && elapsedLabel
+                ? `${displayedAction.label} ${elapsedLabel}`
+                : displayedAction.label}
           </p>
         </div>
       </div>

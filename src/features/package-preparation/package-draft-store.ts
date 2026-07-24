@@ -44,6 +44,7 @@ export type DraftStoreReason =
   | "LOCAL_DRAFT_STORAGE_ABORTED"
   | "LOCAL_DRAFT_STORAGE_FAILED"
   | "LOCAL_DRAFT_MALFORMED"
+  | "LOCAL_DRAFT_NOT_FOUND"
   | "LOCAL_DRAFT_LIMIT_REACHED";
 
 export class DraftStoreError extends Error {
@@ -387,5 +388,126 @@ export async function clearPackageDraftLocally(packageId?: string): Promise<void
     await deletePackageDraftLocally(packageId);
   } else {
     await withStore("readwrite", (store) => store.delete(ACTIVE_KEY));
+  }
+}
+
+/**
+ * Atomically updates only the draft.submitter property of a stored package draft,
+ * preserving all panel files, categories, evidence regions, analysis runs, seller
+ * history, and revision context within a single IndexedDB readwrite transaction.
+ */
+export async function updatePackageSubmitterLocally(
+  packageId: string,
+  submitter: string,
+): Promise<StoredPackageDraft> {
+  const database = await openDatabase();
+  let closed = false;
+  const closeOnce = () => {
+    if (closed) return;
+    closed = true;
+    try {
+      database.close();
+    } catch {
+      // ignore
+    }
+  };
+
+  try {
+    return await new Promise<StoredPackageDraft>((resolve, reject) => {
+      let settled = false;
+      let updatedRecord: StoredPackageDraft | null = null;
+
+      const finishResolve = (value: StoredPackageDraft) => {
+        if (settled) return;
+        settled = true;
+        resolve(value);
+      };
+      const finishReject = (reason: DraftStoreReason) => {
+        if (settled) return;
+        settled = true;
+        reject(new DraftStoreError(reason));
+      };
+
+      let transaction: IDBTransaction;
+      try {
+        transaction = database.transaction(STORE_NAME, "readwrite");
+      } catch {
+        finishReject("LOCAL_DRAFT_STORAGE_FAILED");
+        return;
+      }
+
+      const timer = setTimeout(() => {
+        finishReject("LOCAL_DRAFT_STORAGE_TXN_TIMEOUT");
+      }, TXN_TIMEOUT_MS);
+
+      let store: IDBObjectStore;
+      let getReq: IDBRequest;
+      try {
+        store = transaction.objectStore(STORE_NAME);
+        getReq = store.get(packageId);
+      } catch {
+        clearTimeout(timer);
+        finishReject("LOCAL_DRAFT_STORAGE_FAILED");
+        return;
+      }
+
+      getReq.onsuccess = () => {
+        try {
+          const existing = getReq.result as StoredPackageDraft | undefined;
+          if (!existing) {
+            clearTimeout(timer);
+            finishReject("LOCAL_DRAFT_NOT_FOUND");
+            return;
+          }
+          if (!isValidStoredDraft(existing)) {
+            clearTimeout(timer);
+            finishReject("LOCAL_DRAFT_MALFORMED");
+            return;
+          }
+          updatedRecord = {
+            ...existing,
+            draft: {
+              ...existing.draft,
+              submitter,
+              updatedAt: new Date().toISOString(),
+            },
+          };
+          const putReq = store.put(updatedRecord, packageId);
+          putReq.onerror = () => {
+            clearTimeout(timer);
+            finishReject("LOCAL_DRAFT_STORAGE_FAILED");
+          };
+        } catch {
+          clearTimeout(timer);
+          finishReject("LOCAL_DRAFT_STORAGE_FAILED");
+        }
+      };
+
+      getReq.onerror = () => {
+        clearTimeout(timer);
+        finishReject("LOCAL_DRAFT_STORAGE_FAILED");
+      };
+
+      transaction.oncomplete = () => {
+        clearTimeout(timer);
+        if (updatedRecord) {
+          finishResolve(updatedRecord);
+        } else {
+          finishReject("LOCAL_DRAFT_STORAGE_FAILED");
+        }
+      };
+
+      transaction.onerror = () => {
+        clearTimeout(timer);
+        finishReject("LOCAL_DRAFT_STORAGE_FAILED");
+      };
+
+      transaction.onabort = () => {
+        clearTimeout(timer);
+        finishReject("LOCAL_DRAFT_STORAGE_ABORTED");
+      };
+    });
+  } finally {
+    closeOnce();
   }
 }

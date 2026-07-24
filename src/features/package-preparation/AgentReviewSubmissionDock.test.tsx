@@ -30,6 +30,7 @@ function mockValidDraft(packageId = "pkg-1") {
       packageId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      submitter: undefined as string | undefined,
       profile: { id: "wine", version: "1.0.0" },
       panelDecisions: { back: "absent", additional: "none" },
       panels: [
@@ -115,7 +116,11 @@ describe("AgentReviewSubmissionDock", () => {
     });
 
     const { rerender } = render(
-      <AgentReviewSubmissionDock activePackageId="pkg-1" selectionToken={1} />,
+      <AgentReviewSubmissionDock
+        activePackageId="pkg-1"
+        selectionToken={1}
+        submitter="Test Seller"
+      />,
     );
 
     await waitFor(() => {
@@ -189,6 +194,7 @@ describe("AgentReviewSubmissionDock", () => {
       <AgentReviewSubmissionDock
         activePackageId="pkg-1"
         onStartAnotherPackage={onStartAnotherPackage}
+        submitter="Test Seller"
       />,
     );
 
@@ -208,5 +214,19 @@ describe("AgentReviewSubmissionDock", () => {
 
     fireEvent.click(screen.getByTestId("start-another-package-btn"));
     expect(onStartAnotherPackage).toHaveBeenCalledTimes(1);
+  });
+
+  it("displays controlled submitter prop when passed to dock", async () => {
+    render(<AgentReviewSubmissionDock submitter="Test Seller" />);
+
+    const input = (await screen.findByLabelText("Seller or submitter name")) as HTMLInputElement;
+    expect(input.value).toBe("Test Seller");
+  });
+
+  it("displays package-specific submitter name when controlled by parent container", async () => {
+    render(<AgentReviewSubmissionDock submitter="Custom Estate Winery" />);
+
+    const input = (await screen.findByLabelText("Seller or submitter name")) as HTMLInputElement;
+    expect(input.value).toBe("Custom Estate Winery");
   });
 });

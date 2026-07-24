@@ -7,6 +7,7 @@ import {
   loadPackageDraftLocally,
   savePackageDraftLocally,
   setActivePackageDraftIdLocally,
+  updatePackageSubmitterLocally,
   type StoredPackageDraft,
 } from "./package-draft-store";
 
@@ -332,5 +333,190 @@ describe("package-draft-store", () => {
     await stepOpenRequest(1, malformedLegacy);
 
     await expect(promise).rejects.toMatchObject({ reason: "LOCAL_DRAFT_MALFORMED" });
+  });
+
+  it("atomically updates submitter preserving panels, panel files, categories/evidence, analysis runs, seller history, and revision context", async () => {
+    const richDraft: StoredPackageDraft = {
+      ...validDraft,
+      draft: {
+        ...validDraft.draft,
+        panels: [
+          {
+            panelId: "p-1",
+            order: 0,
+            role: "front",
+            displayName: "front.png",
+            mediaType: "image/png",
+            byteSize: 100,
+            checksumSha256: "abc",
+            width: 100,
+            height: 100,
+            rotation: 0,
+          },
+        ],
+        categories: [
+          {
+            categoryId: "brandName",
+            decision: "provided",
+            expectedValue: "M CELLARS",
+            regions: [
+              {
+                regionId: "r-1",
+                categoryId: "brandName",
+                panelId: "p-1",
+                x: 10,
+                y: 10,
+                width: 50,
+                height: 20,
+                unit: "normalized-panel-relative",
+                provenance: "seller-selected-region",
+              },
+            ],
+          },
+        ],
+        sellerChangeHistory: [
+          {
+            changeId: "ch-1",
+            sequence: 1,
+            recordedAt: "2026-07-24T00:00:00.000Z",
+            action: "category_updated",
+            detail: "test",
+          },
+        ],
+        analysisRuns: [
+          {
+            analysisRunId: "run-1",
+          } as unknown as StoredPackageDraft["draft"]["analysisRuns"][number],
+        ],
+      },
+      panelFiles: [{ panelId: "p-1", file: new File(["data"], "front.png") }],
+      revisionContext,
+    };
+
+    const promise = updatePackageSubmitterLocally("pkg-1", "Atomic Submitter LLC");
+    await tick();
+    const req0 = openRequests[0];
+    if (req0 && req0.result) {
+      req0.onsuccess?.();
+      await tick();
+      if (req0.result.store.lastGet) {
+        req0.result.store.lastGet.result = richDraft;
+        req0.result.store.lastGet.onsuccess?.();
+      }
+      req0.result.lastTransaction?.oncomplete?.();
+      await tick();
+    }
+
+    const updated = await promise;
+    expect(updated.draft.submitter).toBe("Atomic Submitter LLC");
+    expect(updated.draft.panels).toEqual(richDraft.draft.panels);
+    expect(updated.panelFiles).toHaveLength(1);
+    expect(updated.panelFiles[0].panelId).toBe("p-1");
+    expect(updated.draft.categories).toEqual(richDraft.draft.categories);
+    expect(updated.draft.sellerChangeHistory).toEqual(richDraft.draft.sellerChangeHistory);
+    expect(updated.draft.analysisRuns).toEqual(richDraft.draft.analysisRuns);
+    expect(updated.revisionContext).toEqual(richDraft.revisionContext);
+  });
+
+  it("rejects LOCAL_DRAFT_NOT_FOUND when package ID does not exist in store", async () => {
+    const promise = updatePackageSubmitterLocally("non-existent-pkg", "Test Submitter");
+    promise.catch(() => {});
+
+    await tick();
+    const req0 = openRequests[0];
+    if (req0 && req0.result) {
+      req0.onsuccess?.();
+      await tick();
+      if (req0.result.store.lastGet) {
+        req0.result.store.lastGet.result = undefined;
+        req0.result.store.lastGet.onsuccess?.();
+      }
+    }
+
+    await expect(promise).rejects.toMatchObject({ reason: "LOCAL_DRAFT_NOT_FOUND" });
+  });
+
+  it("rejects LOCAL_DRAFT_MALFORMED when stored package draft is invalid", async () => {
+    const promise = updatePackageSubmitterLocally("malformed-pkg", "Test Submitter");
+    promise.catch(() => {});
+
+    await tick();
+    const req0 = openRequests[0];
+    if (req0 && req0.result) {
+      req0.onsuccess?.();
+      await tick();
+      if (req0.result.store.lastGet) {
+        req0.result.store.lastGet.result = { invalid: true };
+        req0.result.store.lastGet.onsuccess?.();
+      }
+    }
+
+    await expect(promise).rejects.toMatchObject({ reason: "LOCAL_DRAFT_MALFORMED" });
+  });
+
+  it("rejects LOCAL_DRAFT_STORAGE_FAILED when get request errors", async () => {
+    const promise = updatePackageSubmitterLocally("pkg-1", "Test Submitter");
+    promise.catch(() => {});
+
+    await tick();
+    const req0 = openRequests[0];
+    if (req0 && req0.result) {
+      req0.onsuccess?.();
+      await tick();
+      if (req0.result.store.lastGet) {
+        req0.result.store.lastGet.onerror?.();
+      }
+    }
+
+    await expect(promise).rejects.toMatchObject({ reason: "LOCAL_DRAFT_STORAGE_FAILED" });
+  });
+
+  it("rejects LOCAL_DRAFT_STORAGE_ABORTED when transaction aborts", async () => {
+    const promise = updatePackageSubmitterLocally("pkg-1", "Test Submitter");
+    promise.catch(() => {});
+
+    await tick();
+    const req0 = openRequests[0];
+    if (req0 && req0.result) {
+      req0.onsuccess?.();
+      await tick();
+      req0.result.lastTransaction?.onabort?.();
+    }
+
+    await expect(promise).rejects.toMatchObject({ reason: "LOCAL_DRAFT_STORAGE_ABORTED" });
+  });
+
+  it("rejects LOCAL_DRAFT_STORAGE_FAILED when put request errors asynchronously", async () => {
+    const promise = updatePackageSubmitterLocally("pkg-1", "Test Submitter");
+    promise.catch(() => {});
+
+    await tick();
+    const req0 = openRequests[0];
+    if (req0 && req0.result) {
+      req0.onsuccess?.();
+      await tick();
+      if (req0.result.store.lastGet) {
+        req0.result.store.lastGet.result = validDraft;
+        req0.result.store.lastGet.onsuccess?.();
+        await tick();
+      }
+      if (req0.result.store.lastPut) {
+        req0.result.store.lastPut.onerror?.();
+      } else {
+        req0.result.lastTransaction?.onerror?.();
+      }
+    }
+
+    await expect(promise).rejects.toMatchObject({ reason: "LOCAL_DRAFT_STORAGE_FAILED" });
+  });
+
+  it("rejects LOCAL_DRAFT_STORAGE_TXN_TIMEOUT when transaction never completes", async () => {
+    vi.useFakeTimers();
+    const promise = updatePackageSubmitterLocally("pkg-1", "Test Submitter");
+    promise.catch(() => {});
+
+    lastOpen!.onsuccess?.();
+    await vi.advanceTimersByTimeAsync(4000);
+    await expect(promise).rejects.toMatchObject({ reason: "LOCAL_DRAFT_STORAGE_TXN_TIMEOUT" });
   });
 });

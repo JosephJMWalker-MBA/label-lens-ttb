@@ -48,13 +48,31 @@ export function IntentHub() {
 
 /** An intent that leads somewhere. The whole card is one link. */
 function AvailableCard({ intent }: { intent: AvailableIntent }) {
+  const isPrimaryWorkflow = intent.id === "review";
   return (
-    <li className="proof-card flex">
+    <li
+      className={`proof-card flex ${
+        isPrimaryWorkflow
+          ? "border-blue-600/60 bg-blue-50/40 shadow-sm ring-1 ring-blue-600/30 dark:bg-blue-950/20"
+          : ""
+      }`}
+      data-testid={isPrimaryWorkflow ? "primary-intent-card" : undefined}
+    >
       <Link
         href={intent.href}
         className="group flex w-full flex-col gap-2 rounded-md p-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       >
-        <span className="text-base font-semibold group-hover:underline">{intent.title}</span>
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-base font-semibold group-hover:underline">{intent.title}</span>
+          {isPrimaryWorkflow ? (
+            <span
+              className="rounded bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-900 dark:bg-blue-900/60 dark:text-blue-100"
+              data-testid="primary-workflow-badge"
+            >
+              Primary package workflow
+            </span>
+          ) : null}
+        </div>
         <span className="text-sm text-muted-foreground">{intent.summary}</span>
         <span className="mt-auto pt-2 text-sm font-medium">
           {intent.action}
