@@ -214,18 +214,50 @@ async function expectPanelContained(page: Page) {
 async function readCurrentDraft(page: Page) {
   return await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open("label-lens-seller-package-v1", 1);
+      const request = indexedDB.open("label-lens-seller-package-v1");
       request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
+      request.onerror = () => reject(request.error ?? new Error("Failed to open IndexedDB"));
     });
-    return await new Promise<{
-      sellerChangeHistory: Array<{ action: string }>;
-      analysisRuns: Array<{ analysisRunId: string; panelRuns: unknown[] }>;
-    }>((resolve, reject) => {
-      const request = database.transaction("drafts").objectStore("drafts").get("current-package");
-      request.onsuccess = () => resolve(request.result.draft);
-      request.onerror = () => reject(request.error);
-    });
+
+    try {
+      return await new Promise<{
+        sellerChangeHistory: Array<{ action: string }>;
+        analysisRuns: Array<{ analysisRunId: string; panelRuns: unknown[] }>;
+      }>((resolve, reject) => {
+        const txn = database.transaction("drafts", "readonly");
+        const store = txn.objectStore("drafts");
+
+        txn.onerror = () => reject(txn.error ?? new Error("IndexedDB transaction error"));
+        txn.onabort = () => reject(txn.error ?? new Error("IndexedDB transaction aborted"));
+
+        const activeReq = store.get("meta:active-package-id");
+        activeReq.onerror = () =>
+          reject(activeReq.error ?? new Error("Failed to get active package ID"));
+        activeReq.onsuccess = () => {
+          const activePackageId = activeReq.result;
+          if (typeof activePackageId !== "string" || !activePackageId.trim()) {
+            reject(new Error("No active package ID found in IndexedDB"));
+            return;
+          }
+          const draftReq = store.get(activePackageId);
+          draftReq.onerror = () =>
+            reject(
+              draftReq.error ??
+                new Error(`Failed to get draft for active package ID: ${activePackageId}`),
+            );
+          draftReq.onsuccess = () => {
+            const stored = draftReq.result;
+            if (!stored || !stored.draft) {
+              reject(new Error(`No draft record found for active package ID: ${activePackageId}`));
+              return;
+            }
+            resolve(stored.draft);
+          };
+        };
+      });
+    } finally {
+      database.close();
+    }
   });
 }
 
@@ -444,4 +476,154 @@ test("390px clean start keeps the fitted label, Guide, and footer CTA accessible
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
   );
   expect(overflow).toBeLessThanOrEqual(1);
+});
+
+test("isolates multiple browser-local drafts and allows switching without overwriting", async ({
+  page,
+}) => {
+  page.on("dialog", (dialog) => void dialog.accept());
+  await page.goto("/review");
+  await page.getByLabel(/upload front label/i).setInputFiles(PORTRAIT_FIXTURE);
+  await page.getByRole("button", { name: /no back label/i }).click();
+  await page.getByRole("button", { name: /no additional panels/i }).click();
+  await page.getByLabel(/what the label says/i).fill("BRAND A");
+  await dragRegion(page);
+  await page.getByRole("button", { name: "Save Brand name" }).click();
+  await expect(page.getByText(/Brand name saved/i)).toBeVisible();
+
+  const stateA = await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("label-lens-seller-package-v1");
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    try {
+      return await new Promise<{
+        activePackageId: string;
+        allPackageIds: string[];
+      }>((resolve, reject) => {
+        const txn = database.transaction("drafts", "readonly");
+        const store = txn.objectStore("drafts");
+        txn.onerror = () => reject(txn.error);
+
+        const activeReq = store.get("meta:active-package-id");
+        activeReq.onsuccess = () => {
+          const activePackageId = activeReq.result as string;
+          const getAllReq = store.getAll();
+          getAllReq.onsuccess = () => {
+            const allItems = getAllReq.result || [];
+            const allPackageIds = allItems
+              .filter(
+                (item: any) =>
+                  item && typeof item !== "string" && item.draft && item.draft.packageId,
+              )
+              .map((item: any) => item.draft.packageId);
+            resolve({ activePackageId, allPackageIds });
+          };
+          getAllReq.onerror = () => reject(getAllReq.error);
+        };
+        activeReq.onerror = () => reject(activeReq.error);
+      });
+    } finally {
+      database.close();
+    }
+  });
+
+  const packageAId = stateA.activePackageId;
+  expect(packageAId).toBeTruthy();
+
+  await page
+    .getByRole("button", { name: /start another package/i })
+    .first()
+    .click();
+
+  await expect(page.getByLabel(/upload front label/i)).toBeVisible();
+
+  const stateB = await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("label-lens-seller-package-v1");
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    try {
+      return await new Promise<{
+        activePackageId: string;
+        allPackageIds: string[];
+      }>((resolve, reject) => {
+        const txn = database.transaction("drafts", "readonly");
+        const store = txn.objectStore("drafts");
+        txn.onerror = () => reject(txn.error);
+
+        const activeReq = store.get("meta:active-package-id");
+        activeReq.onsuccess = () => {
+          const activePackageId = activeReq.result as string;
+          const getAllReq = store.getAll();
+          getAllReq.onsuccess = () => {
+            const allItems = getAllReq.result || [];
+            const allPackageIds = allItems
+              .filter(
+                (item: any) =>
+                  item && typeof item !== "string" && item.draft && item.draft.packageId,
+              )
+              .map((item: any) => item.draft.packageId);
+            resolve({ activePackageId, allPackageIds });
+          };
+          getAllReq.onerror = () => reject(getAllReq.error);
+        };
+        activeReq.onerror = () => reject(activeReq.error);
+      });
+    } finally {
+      database.close();
+    }
+  });
+
+  const packageBId = stateB.activePackageId;
+  expect(packageBId).toBeTruthy();
+  expect(packageBId).not.toBe(packageAId);
+
+  expect(stateB.allPackageIds).toContain(packageAId);
+  expect(stateB.allPackageIds).toContain(packageBId);
+  expect(stateB.activePackageId).toBe(packageBId);
+
+  await page.getByLabel(/upload front label/i).setInputFiles(PORTRAIT_FIXTURE);
+  await page.getByRole("button", { name: /no back label/i }).click();
+  await page.getByRole("button", { name: /no additional panels/i }).click();
+  await page.getByLabel(/what the label says/i).fill("BRAND B");
+  await dragRegion(page);
+  await page.getByRole("button", { name: "Save Brand name" }).click();
+  await expect(page.getByText(/Brand name saved/i)).toBeVisible();
+
+  const selector = page.getByTestId("draft-selector");
+  await selector.selectOption(packageAId);
+
+  await page
+    .getByLabel("Category progress")
+    .getByRole("button", { name: /brand name/i })
+    .click();
+  await expect(page.getByLabel(/what the label says/i)).toHaveValue("BRAND A");
+
+  const stateRestored = await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("label-lens-seller-package-v1");
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    try {
+      return await new Promise<{
+        activePackageId: string;
+      }>((resolve, reject) => {
+        const txn = database.transaction("drafts", "readonly");
+        const store = txn.objectStore("drafts");
+        txn.onerror = () => reject(txn.error);
+
+        const activeReq = store.get("meta:active-package-id");
+        activeReq.onsuccess = () => resolve({ activePackageId: activeReq.result as string });
+        activeReq.onerror = () => reject(activeReq.error);
+      });
+    } finally {
+      database.close();
+    }
+  });
+
+  expect(stateRestored.activePackageId).toBe(packageAId);
 });
