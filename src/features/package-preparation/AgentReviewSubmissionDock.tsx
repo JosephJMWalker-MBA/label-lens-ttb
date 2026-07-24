@@ -72,7 +72,17 @@ function statusLabel(status: string): string {
     .join(" ");
 }
 
-export function AgentReviewSubmissionDock() {
+interface AgentReviewSubmissionDockProps {
+  activePackageId?: string | null;
+  selectionToken?: number;
+  onStartAnotherPackage?: () => void;
+}
+
+export function AgentReviewSubmissionDock({
+  activePackageId,
+  selectionToken,
+  onStartAnotherPackage,
+}: AgentReviewSubmissionDockProps = {}) {
   const { data: session, isPending: sessionPending } = authClient.useSession();
   const [stored, setStored] = useState<StoredPackageDraft | null>(null);
   const [loadError, setLoadError] = useState(false);
@@ -83,15 +93,23 @@ export function AgentReviewSubmissionDock() {
   const [knownServerStatus, setKnownServerStatus] = useState<string | null>(null);
   const attemptRef = useRef<SubmissionAttempt | null>(null);
 
+  useEffect(() => {
+    setPhase("idle");
+    setErrorMessage(null);
+    setReceipt(null);
+    setKnownServerStatus(null);
+    attemptRef.current = null;
+  }, [activePackageId, selectionToken]);
+
   const refreshLocalPackage = useCallback(async () => {
     try {
-      const value = await loadPackageDraftLocally();
+      const value = await loadPackageDraftLocally(activePackageId ?? undefined);
       setStored(value);
       setLoadError(false);
     } catch {
       setLoadError(true);
     }
-  }, []);
+  }, [activePackageId]);
 
   useEffect(() => {
     void refreshLocalPackage();
@@ -121,15 +139,45 @@ export function AgentReviewSubmissionDock() {
     if (!draft) return "";
     const panelSig = draft.panels
       .map(
-        (p) =>
+        (p: {
+          panelId: string;
+          role: string;
+          order: number;
+          checksumSha256: string;
+          byteSize: number;
+          width: number;
+          height: number;
+          rotation: number;
+        }) =>
           `${p.panelId}:${p.role}:${p.order}:${p.checksumSha256}:${p.byteSize}:${p.width}x${p.height}:${p.rotation}`,
       )
       .join("|");
     const categorySig = draft.categories
       .map(
-        (c) =>
+        (c: {
+          categoryId: string;
+          decision: string;
+          expectedValue: string;
+          regions: Array<{
+            regionId: string;
+            panelId: string;
+            x: number;
+            y: number;
+            width: number;
+            height: number;
+          }>;
+        }) =>
           `${c.categoryId}:${c.decision}:${c.expectedValue}:${c.regions
-            .map((r) => `${r.regionId}@${r.panelId}:${r.x},${r.y},${r.width},${r.height}`)
+            .map(
+              (r: {
+                regionId: string;
+                panelId: string;
+                x: number;
+                y: number;
+                width: number;
+                height: number;
+              }) => `${r.regionId}@${r.panelId}:${r.x},${r.y},${r.width},${r.height}`,
+            )
             .join(",")}`,
       )
       .join("|");
@@ -149,7 +197,7 @@ export function AgentReviewSubmissionDock() {
     if (!stored) return false;
     if (stored.panelFiles.length !== stored.draft.panels.length) return false;
     const fileMap = new Map(stored.panelFiles.map((pf) => [pf.panelId, pf.file]));
-    return stored.draft.panels.every((panel) => {
+    return stored.draft.panels.every((panel: { panelId: string; byteSize: number }) => {
       const file = fileMap.get(panel.panelId);
       return Boolean(file && file.size === panel.byteSize);
     });
@@ -365,12 +413,21 @@ export function AgentReviewSubmissionDock() {
               <p className="font-semibold">{statusLabel(receipt.status)}</p>
               <p className="mt-1 font-mono text-xs">{receipt.submissionId}</p>
               <p className="mt-1 text-xs">Revision v{receipt.revisionNumber} is recorded.</p>
-              <Link
-                className="mt-2 inline-block font-medium underline underline-offset-4"
-                href="/seller"
-              >
-                Open my submissions
-              </Link>
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <Link className="font-medium underline underline-offset-4" href="/seller">
+                  Open my submissions
+                </Link>
+                {onStartAnotherPackage ? (
+                  <button
+                    type="button"
+                    data-testid="start-another-package-btn"
+                    onClick={onStartAnotherPackage}
+                    className="rounded-md border border-emerald-700/40 bg-background px-3 py-1 text-xs font-medium text-foreground hover:bg-muted"
+                  >
+                    Start another package
+                  </button>
+                ) : null}
+              </div>
             </div>
           ) : sellerSignedIn ? (
             <div className="grid gap-2">

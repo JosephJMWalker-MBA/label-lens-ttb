@@ -1,7 +1,6 @@
 import { SkipLink } from "@/components/a11y/SkipLink";
 import { AppHeader } from "@/components/layout/AppHeader";
-import { AgentReviewSubmissionDock } from "@/features/package-preparation/AgentReviewSubmissionDock";
-import { PackagePreparationWorkspace } from "@/features/package-preparation/PackagePreparationWorkspace";
+import { ReviewWorkspaceContainer } from "@/features/package-preparation/ReviewWorkspaceContainer";
 
 import { AppProviders } from "../AppProviders";
 
@@ -44,8 +43,7 @@ export default function ReviewPage() {
         </header>
 
         <main id="main-content" className="min-w-0">
-          <AgentReviewSubmissionDock />
-          <PackagePreparationWorkspace />
+          <ReviewWorkspaceContainer />
         </main>
       </div>
     </AppProviders>

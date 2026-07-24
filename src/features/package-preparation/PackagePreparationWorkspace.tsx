@@ -1,6 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 // Run layout effects synchronously in the browser/jsdom, but fall back to a
 // passive effect during server prerender (where `useLayoutEffect` is a no-op and
@@ -18,8 +27,12 @@ import { PackageUploadDecisions } from "./PackageUploadDecisions";
 import { PackageWorkstationControls } from "./PackageWorkstationControls";
 import { ProfileExampleLabelMap } from "./ProfileExampleLabelMap";
 import {
+  createAndActivateNewDraftLocally,
+  deletePackageDraftLocally,
   DraftStoreError,
+  listPackageDraftsLocally,
   loadPackageDraftLocally,
+  newDraft,
   savePackageDraftLocally,
   type StoredPackageDraft,
   type StoredPackagePanelFile,
@@ -47,7 +60,6 @@ import {
 import {
   WINE_PACKAGE_CATEGORY_DEFINITIONS,
   WINE_PACKAGE_CATEGORY_INSTRUCTIONS,
-  WINE_PACKAGE_PROFILE,
 } from "./package-profile";
 import { deriveGuidedPackageWorkflow, type PackageSaveState } from "./package-workflow";
 
@@ -118,25 +130,11 @@ const RESTORATION_WARNING =
 const RESTORED_AVAILABLE_NOTICE =
   "A previously saved local draft is available. You have already started a new package, so it was not loaded automatically. Loading it will replace your current unsaved work.";
 
-function newDraft(): SellerPackageDraft {
-  const recordedAt = now();
-  return {
-    schemaVersion: "seller-package-draft.v1",
-    packageId: makeId("seller-package"),
-    createdAt: recordedAt,
-    updatedAt: recordedAt,
-    profile: WINE_PACKAGE_PROFILE,
-    panelDecisions: { back: "unresolved", additional: "unresolved" },
-    panels: [],
-    categories: WINE_PACKAGE_CATEGORY_DEFINITIONS.map((definition) => ({
-      categoryId: definition.categoryId,
-      decision: "provided",
-      expectedValue: "",
-      regions: [],
-    })),
-    sellerChangeHistory: [],
-    analysisRuns: [],
-  };
+function draftName(draft: SellerPackageDraft): string {
+  const brand = draft.categories.find((c) => c.categoryId === "brandName");
+  const value = brand?.expectedValue?.trim();
+  if (value) return value;
+  return "Untitled Package";
 }
 
 async function checksumSha256(file: File): Promise<string> {
@@ -239,7 +237,18 @@ function sameRegion(left: SellerEvidenceRegion, right: SellerEvidenceRegion): bo
   );
 }
 
-export function PackagePreparationWorkspace() {
+export interface PackagePreparationWorkspaceProps {
+  onActivePackageChange?: (packageId: string | null) => void;
+}
+
+export interface PackagePreparationWorkspaceRef {
+  startAnotherPackage: () => void;
+}
+
+export const PackagePreparationWorkspace = forwardRef<
+  PackagePreparationWorkspaceRef,
+  PackagePreparationWorkspaceProps
+>(function PackagePreparationWorkspace({ onActivePackageChange }, ref) {
   const [draft, setDraft] = useState<SellerPackageDraft | null>(null);
   const [runtimePanels, setRuntimePanels] = useState<RuntimePanel[]>([]);
   const [activePanelId, setActivePanelId] = useState<string | null>(null);
@@ -267,6 +276,10 @@ export function PackagePreparationWorkspace() {
   const [restorationPending, setRestorationPending] = useState(false);
   const [restorationWarning, setRestorationWarning] = useState<string | null>(null);
   const [restorationDiagnostic, setRestorationDiagnostic] = useState<string | null>(null);
+  const [localDrafts, setLocalDrafts] = useState<StoredPackageDraft[]>([]);
+  const [currentRevisionContext, setCurrentRevisionContext] =
+    useState<StoredPackageDraft["revisionContext"]>(undefined);
+
   const objectUrlsRef = useRef<Set<string>>(new Set());
   const draftRef = useRef<SellerPackageDraft | null>(null);
   const runtimePanelsRef = useRef<RuntimePanel[]>([]);
@@ -276,6 +289,15 @@ export function PackagePreparationWorkspace() {
   const restoreAttemptRef = useRef(0);
   const restoreDeadlineRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const restoreCancelledRef = useRef(false);
+
+  const refreshLocalDrafts = useCallback(async () => {
+    try {
+      const list = await listPackageDraftsLocally();
+      setLocalDrafts(list);
+    } catch {
+      // best effort
+    }
+  }, []);
 
   const revokeAllObjectUrls = useCallback(() => {
     for (const url of objectUrlsRef.current) URL.revokeObjectURL(url);
@@ -294,45 +316,70 @@ export function PackagePreparationWorkspace() {
   // Open a fresh, immediately usable draft. Called at mount so the workspace
   // renders and is interactive right away — its availability never depends on
   // IndexedDB. `warning`/`diagnostic` are surfaced only as a non-blocking banner.
-  const openNewDraft = useCallback((warning: string | null, diagnostic: string | null) => {
-    const initial = newDraft();
-    draftRef.current = initial;
-    fallbackBaselineRef.current = initial;
-    runtimePanelsRef.current = [];
-    setDraft(initial);
-    setRuntimePanels([]);
-    setActivePanelId(null);
-    setSaveState("unsaved");
-    setAnalysisState("idle");
-    setRestorationWarning(warning);
-    setRestorationDiagnostic(diagnostic);
-    if (!warning) {
-      setMessage("Resolve the panel choices, then prepare each supported category.");
-    }
-  }, []);
+  const openNewDraft = useCallback(
+    (warning: string | null, diagnostic: string | null) => {
+      revokeAllObjectUrls();
+      const initial = newDraft();
+      draftRef.current = initial;
+      fallbackBaselineRef.current = initial;
+      runtimePanelsRef.current = [];
+      setDraft(initial);
+      setRuntimePanels([]);
+      setActivePanelId(null);
+      setActiveCategoryId("brandName");
+      setActiveRegionId(null);
+      setWorkingRegion(null);
+      setWorkingValue("");
+      setEditingCategory(false);
+      setAcceptingCategory(false);
+      setEditingPanels(false);
+      setReviewingEvidence(false);
+      setSaveState("unsaved");
+      setAnalysisState("idle");
+      setCurrentRevisionContext(undefined);
+      setRestorationWarning(warning);
+      setRestorationDiagnostic(diagnostic);
+      if (!warning) {
+        setMessage("Resolve the panel choices, then prepare each supported category.");
+      }
+      onActivePackageChange?.(initial.packageId);
+    },
+    [onActivePackageChange, revokeAllObjectUrls],
+  );
 
-  const applyRestoredDraft = useCallback((stored: StoredPackageDraft) => {
-    const runtime = stored.panelFiles.map(({ panelId, file }) => {
-      const imageUrl = URL.createObjectURL(file);
-      objectUrlsRef.current.add(imageUrl);
-      return { panelId, file, imageUrl };
-    });
-    draftRef.current = stored.draft;
-    fallbackBaselineRef.current = null;
-    runtimePanelsRef.current = runtime;
-    setDraft(stored.draft);
-    setRuntimePanels(runtime);
-    setActivePanelId(stored.draft.panels[0]?.panelId ?? null);
-    setSaveState(restoredSaveState(stored.draft));
-    setAnalysisState(stored.draft.analysisRuns.length > 0 ? "complete" : "idle");
-    setMessage("Restored the last locally saved seller package draft in this browser.");
-    setRestorationWarning(null);
-    setRestorationDiagnostic(null);
-  }, []);
+  const applyRestoredDraft = useCallback(
+    (stored: StoredPackageDraft) => {
+      revokeAllObjectUrls();
+      const runtime = stored.panelFiles.map(({ panelId, file }) => {
+        const imageUrl = URL.createObjectURL(file);
+        objectUrlsRef.current.add(imageUrl);
+        return { panelId, file, imageUrl };
+      });
+      draftRef.current = stored.draft;
+      fallbackBaselineRef.current = null;
+      runtimePanelsRef.current = runtime;
+      setDraft(stored.draft);
+      setRuntimePanels(runtime);
+      setActivePanelId(stored.draft.panels[0]?.panelId ?? null);
+      setActiveCategoryId("brandName");
+      setActiveRegionId(null);
+      setWorkingRegion(null);
+      setWorkingValue("");
+      setEditingCategory(false);
+      setAcceptingCategory(false);
+      setEditingPanels(false);
+      setReviewingEvidence(false);
+      setSaveState(restoredSaveState(stored.draft));
+      setAnalysisState(stored.draft.analysisRuns.length > 0 ? "complete" : "idle");
+      setCurrentRevisionContext(stored.revisionContext);
+      setMessage("Restored the last locally saved seller package draft in this browser.");
+      setRestorationWarning(null);
+      setRestorationDiagnostic(null);
+      onActivePackageChange?.(stored.draft.packageId);
+    },
+    [onActivePackageChange, revokeAllObjectUrls],
+  );
 
-  // A local-draft failure must never block preparation or discard in-progress
-  // work: the fresh draft opened at mount stays in place and usable; we only
-  // surface a truthful, non-destructive warning + retry.
   const warnRestorationFailed = useCallback(
     (diagnostic: string) => {
       diagnose(diagnostic);
@@ -349,13 +396,8 @@ export function PackagePreparationWorkspace() {
     [],
   );
 
-  // Background restoration: enhances the already-open workspace. Never gates the
-  // page. A stored draft only replaces the fresh draft when the seller has not
-  // already started new work; failures surface a non-destructive warning.
   const runRestore = useCallback(() => {
     const attempt = ++restoreAttemptRef.current;
-    // Discard any object URLs from a previous attempt before starting a new one,
-    // so a retry never leaks or duplicates image URLs. At mount this set is empty.
     revokeAllObjectUrls();
     setRestorationPending(true);
     setRestorationWarning(null);
@@ -379,17 +421,26 @@ export function PackagePreparationWorkspace() {
       warnRestorationFailed("timeout");
     }, RESTORE_DEADLINE_MS);
 
-    loadPackageDraftLocally()
+    const searchParams =
+      typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+    const urlPackageId = searchParams?.get("packageId");
+    const isNewExplicit = searchParams?.get("new") === "true";
+
+    if (isNewExplicit) {
+      finish();
+      void refreshLocalDrafts();
+      return;
+    }
+
+    loadPackageDraftLocally(urlPackageId ?? undefined)
       .then((stored) => {
         if (!isCurrent()) return;
         finish();
+        void refreshLocalDrafts();
         if (!stored) {
-          // No stored draft (a normal first visit): keep the fresh draft, no warning.
           return;
         }
         if (sellerHasEdited()) {
-          // A valid saved draft exists, but the seller already began new work.
-          // Do not overwrite it; offer explicit restoration via the retry action.
           setRestorationWarning(RESTORED_AVAILABLE_NOTICE);
           setRestorationDiagnostic("superseded-by-active-edit");
           return;
@@ -399,14 +450,20 @@ export function PackagePreparationWorkspace() {
       .catch((error: unknown) => {
         if (!isCurrent()) return;
         finish();
+        void refreshLocalDrafts();
         const reason =
           error instanceof DraftStoreError ? error.reason : "LOCAL_DRAFT_STORAGE_FAILED";
         warnRestorationFailed(reason);
       });
-  }, [applyRestoredDraft, revokeAllObjectUrls, sellerHasEdited, warnRestorationFailed]);
+  }, [
+    applyRestoredDraft,
+    refreshLocalDrafts,
+    revokeAllObjectUrls,
+    sellerHasEdited,
+    warnRestorationFailed,
+  ]);
 
   const retryRestore = useCallback(() => {
-    // Never overwrite active seller work without an explicit confirmation.
     if (sellerHasEdited() && typeof window !== "undefined") {
       const confirmed = window.confirm(
         "Replace your current unsaved package with the restored draft? Your current changes will be discarded.",
@@ -415,6 +472,102 @@ export function PackagePreparationWorkspace() {
     }
     runRestore();
   }, [runRestore, sellerHasEdited]);
+
+  const handleCreateNewPackage = useCallback(async () => {
+    if (saveState === "unsaved" && sellerHasEdited() && typeof window !== "undefined") {
+      const confirmed = window.confirm(
+        "Start a new package? Your unsaved changes on the current draft will be discarded unless saved.",
+      );
+      if (!confirmed) return;
+    }
+    try {
+      const created = await createAndActivateNewDraftLocally();
+      applyRestoredDraft(created);
+      if (typeof window !== "undefined" && window.history) {
+        window.history.replaceState({}, "", window.location.pathname);
+      }
+      void refreshLocalDrafts();
+    } catch (err: unknown) {
+      if (err instanceof DraftStoreError && err.reason === "LOCAL_DRAFT_LIMIT_REACHED") {
+        setMessage(
+          "Local draft limit reached (maximum 20 drafts). Please delete an existing draft before starting a new package.",
+        );
+      } else {
+        openNewDraft(null, null);
+        if (typeof window !== "undefined" && window.history) {
+          window.history.replaceState({}, "", window.location.pathname);
+        }
+        void refreshLocalDrafts();
+      }
+    }
+  }, [applyRestoredDraft, openNewDraft, refreshLocalDrafts, saveState, sellerHasEdited]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      startAnotherPackage: () => {
+        void handleCreateNewPackage();
+      },
+    }),
+    [handleCreateNewPackage],
+  );
+
+  const handleSwitchDraft = useCallback(
+    (packageId: string) => {
+      if (draft?.packageId === packageId) return;
+      if ((saveState === "unsaved" || sellerHasEdited()) && typeof window !== "undefined") {
+        const confirmed = window.confirm(
+          "Switch to another draft? Your unsaved changes on the current draft will be discarded unless saved.",
+        );
+        if (!confirmed) return;
+      }
+      loadPackageDraftLocally(packageId)
+        .then((stored) => {
+          if (stored) {
+            applyRestoredDraft(stored);
+            if (typeof window !== "undefined" && window.history) {
+              window.history.replaceState(
+                {},
+                "",
+                `${window.location.pathname}?packageId=${encodeURIComponent(packageId)}`,
+              );
+            }
+            void refreshLocalDrafts();
+          }
+        })
+        .catch(() => {
+          // surface error
+        });
+    },
+    [applyRestoredDraft, draft?.packageId, refreshLocalDrafts, saveState, sellerHasEdited],
+  );
+
+  const handleDeleteDraft = useCallback(
+    (targetPackageId: string) => {
+      if (typeof window !== "undefined") {
+        const confirmed = window.confirm(
+          "Are you sure you want to delete this local package draft from this browser?",
+        );
+        if (!confirmed) return;
+      }
+      deletePackageDraftLocally(targetPackageId)
+        .then(async () => {
+          if (draft?.packageId === targetPackageId) {
+            const remaining = await listPackageDraftsLocally();
+            if (remaining.length > 0) {
+              applyRestoredDraft(remaining[0]);
+            } else {
+              openNewDraft(null, null);
+            }
+          }
+          void refreshLocalDrafts();
+        })
+        .catch(() => {
+          // surface error
+        });
+    },
+    [applyRestoredDraft, draft?.packageId, openNewDraft, refreshLocalDrafts],
+  );
 
   useEffect(() => {
     restoreCancelledRef.current = false;
@@ -1444,6 +1597,65 @@ export function PackagePreparationWorkspace() {
           </button>
         </div>
       ) : null}
+      <div
+        className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border/70 bg-card p-3 shadow-sm"
+        data-testid="draft-manager-toolbar"
+      >
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Local Package Draft:
+          </span>
+          <select
+            aria-label="Select local draft"
+            data-testid="draft-selector"
+            value={draft?.packageId ?? ""}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === "__new__") {
+                handleCreateNewPackage();
+              } else if (val && val !== draft?.packageId) {
+                handleSwitchDraft(val);
+              }
+            }}
+            className="rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          >
+            {draft ? (
+              <option value={draft.packageId}>
+                {draftName(draft)} ({draft.packageId.slice(0, 16)})
+                {currentRevisionContext ? " · [Revision Response]" : ""}
+              </option>
+            ) : null}
+            {localDrafts
+              .filter((d) => d.draft.packageId !== draft?.packageId)
+              .map((storedItem) => (
+                <option key={storedItem.draft.packageId} value={storedItem.draft.packageId}>
+                  {draftName(storedItem.draft)} ({storedItem.draft.packageId.slice(0, 16)})
+                  {storedItem.revisionContext ? " · [Revision Response]" : ""}
+                </option>
+              ))}
+          </select>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            data-testid="create-new-package-btn"
+            onClick={handleCreateNewPackage}
+            className="rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-muted"
+          >
+            + Start Another Package
+          </button>
+          {draft ? (
+            <button
+              type="button"
+              data-testid="delete-current-draft-btn"
+              onClick={() => handleDeleteDraft(draft.packageId)}
+              className="rounded-md border border-destructive/40 bg-destructive/5 px-3 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10"
+            >
+              Delete Draft
+            </button>
+          ) : null}
+        </div>
+      </div>
       <div className="grid min-w-0 items-start gap-4 lg:grid-cols-[15rem_minmax(0,1fr)_19rem]">
         <PackageWorkstationControls
           draft={draft}
@@ -1745,4 +1957,4 @@ export function PackagePreparationWorkspace() {
       />
     </section>
   );
-}
+});
