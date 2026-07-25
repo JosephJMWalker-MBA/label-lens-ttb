@@ -135,6 +135,7 @@ export interface SellerPackageDraft {
   createdAt: string;
   updatedAt: string;
   profile: { id: string; version: string };
+  submitter?: string;
   panelDecisions?: PackagePanelDecisions;
   panels: PackagePanelMetadata[];
   categories: PackageCategoryDraft[];

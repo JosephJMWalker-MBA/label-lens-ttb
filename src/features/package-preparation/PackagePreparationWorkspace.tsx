@@ -239,6 +239,8 @@ function sameRegion(left: SellerEvidenceRegion, right: SellerEvidenceRegion): bo
 
 export interface PackagePreparationWorkspaceProps {
   onActivePackageChange?: (packageId: string | null) => void;
+  submitter?: string;
+  onSubmitterChange?: (value: string) => void;
 }
 
 export interface PackagePreparationWorkspaceRef {
@@ -248,7 +250,10 @@ export interface PackagePreparationWorkspaceRef {
 export const PackagePreparationWorkspace = forwardRef<
   PackagePreparationWorkspaceRef,
   PackagePreparationWorkspaceProps
->(function PackagePreparationWorkspace({ onActivePackageChange }, ref) {
+>(function PackagePreparationWorkspace(
+  { onActivePackageChange, submitter: controlledSubmitter, onSubmitterChange },
+  ref,
+) {
   const [draft, setDraft] = useState<SellerPackageDraft | null>(null);
   const [runtimePanels, setRuntimePanels] = useState<RuntimePanel[]>([]);
   const [activePanelId, setActivePanelId] = useState<string | null>(null);
@@ -267,7 +272,14 @@ export const PackagePreparationWorkspace = forwardRef<
   const [saveState, setSaveState] = useState<PackageSaveState>("unsaved");
   const [analysisState, setAnalysisState] = useState<AnalysisState>("idle");
   const [analysisElapsedSeconds, setAnalysisElapsedSeconds] = useState(0);
-  const [submitter, setSubmitter] = useState("");
+  const [localSubmitter, setLocalSubmitter] = useState("");
+  const submitter = controlledSubmitter ?? draft?.submitter ?? localSubmitter;
+
+  useEffect(() => {
+    if (draft?.submitter !== undefined && onSubmitterChange) {
+      onSubmitterChange(draft.submitter);
+    }
+  }, [draft?.packageId, draft?.submitter, onSubmitterChange]);
   const [message, setMessage] = useState(
     "Resolve the panel choices, then prepare each supported category.",
   );
@@ -1464,6 +1476,7 @@ export const PackagePreparationWorkspace = forwardRef<
         ? `Saving ${activeDefinition.label}…`
         : `Save ${activeDefinition.label}`,
       disabled: !categoryReadyToSave,
+      emphasized: categoryReadyToSave,
       onClick: () => void acceptActiveCategory(),
       reason: acceptingCategory
         ? `${activeDefinition.label} evidence is being saved in this browser.`
@@ -1793,7 +1806,16 @@ export const PackagePreparationWorkspace = forwardRef<
                 <Input
                   id="package-submitter"
                   value={submitter}
-                  onChange={(event) => setSubmitter(event.target.value)}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setLocalSubmitter(value);
+                    onSubmitterChange?.(value);
+                    if (draftRef.current) {
+                      const nextDraft = { ...draftRef.current, submitter: value };
+                      draftRef.current = nextDraft;
+                      setDraft(nextDraft);
+                    }
+                  }}
                 />
                 <p className="mt-2 text-xs text-muted-foreground">
                   Use the persistent “Prepare agent package” action after entering the name.

@@ -72,21 +72,24 @@ function statusLabel(status: string): string {
     .join(" ");
 }
 
-interface AgentReviewSubmissionDockProps {
+export interface AgentReviewSubmissionDockProps {
   activePackageId?: string | null;
   selectionToken?: number;
   onStartAnotherPackage?: () => void;
+  submitter?: string;
+  onSubmitterChange?: (value: string) => void;
 }
 
 export function AgentReviewSubmissionDock({
   activePackageId,
   selectionToken,
   onStartAnotherPackage,
+  submitter: controlledSubmitter,
+  onSubmitterChange,
 }: AgentReviewSubmissionDockProps = {}) {
   const { data: session, isPending: sessionPending } = authClient.useSession();
   const [stored, setStored] = useState<StoredPackageDraft | null>(null);
   const [loadError, setLoadError] = useState(false);
-  const [submitter, setSubmitter] = useState("");
   const [phase, setPhase] = useState<SubmissionPhase>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [receipt, setReceipt] = useState<AgentReviewSubmissionReceipt | null>(null);
@@ -125,10 +128,7 @@ export function AgentReviewSubmissionDock({
   const sessionRole = session?.user?.role;
   const sellerSignedIn = sessionRole === "seller";
 
-  useEffect(() => {
-    if (submitter.trim() !== "" || !session?.user) return;
-    setSubmitter(session.user.name?.trim() || session.user.email);
-  }, [session, submitter]);
+  const submitter = controlledSubmitter ?? "";
 
   const draft = stored?.draft ?? null;
   const latestRun = draft?.analysisRuns.at(-1);
@@ -436,7 +436,9 @@ export function AgentReviewSubmissionDock({
                 <Input
                   id="agent-submission-name"
                   value={submitter}
-                  onChange={(event) => setSubmitter(event.target.value)}
+                  onChange={(event) => {
+                    if (onSubmitterChange) onSubmitterChange(event.target.value);
+                  }}
                   disabled={phase === "submitting"}
                 />
                 <button

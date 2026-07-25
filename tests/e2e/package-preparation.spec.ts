@@ -47,6 +47,25 @@ function packageDraftFromMultipart(route: Route) {
 }
 
 async function mockPackageAnalysis(page: Page) {
+  await page.route("**/api/auth/get-session*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        user: {
+          id: "e2e-seller-id",
+          email: "e2e-seller@example.test",
+          name: "Continuity Seller LLC",
+          role: "seller",
+        },
+        session: {
+          id: "e2e-session-id",
+          userId: "e2e-seller-id",
+        },
+      }),
+    });
+  });
+
   await page.route("**/api/package/analyze", async (route) => {
     const draft = packageDraftFromMultipart(route);
     const front = draft.panels.find((panel: { role: string }) => panel.role === "front");
@@ -182,9 +201,11 @@ async function dragRegion(page: Page) {
   const canvas = page.getByRole("img", { name: /label annotation image/i });
   await canvas.scrollIntoViewIfNeeded();
   const box = await canvas.boundingBox();
-  expect(box).not.toBeNull();
   const existingRegionCount = await page.locator("g[data-region-id]").count();
-  await page.getByRole("button", { name: /draw region/i }).click();
+  const drawButton = page.getByRole("button", { name: /draw region/i });
+  if ((await drawButton.getAttribute("aria-pressed")) !== "true") {
+    await drawButton.click();
+  }
   await canvas.hover({ position: { x: box!.width * 0.12, y: box!.height * 0.12 } });
   await page.mouse.down();
   await canvas.hover({
@@ -392,7 +413,7 @@ test("footer-driven workstation exits correction, fits panels, and preserves imm
   await expectSingleStageAction(page, /Running pre-check/);
   await expect(page.getByTestId("prepare-workspace")).toBeVisible();
 
-  await page.getByLabel(/seller or submitter name/i).fill("Seller E2E");
+  await page.locator("#package-submitter").fill("Seller E2E");
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Prepare agent package" }).click();
   expect((await downloadPromise).suggestedFilename()).toMatch(/seller-agent-package\.json$/);
@@ -626,4 +647,48 @@ test("isolates multiple browser-local drafts and allows switching without overwr
   });
 
   expect(stateRestored.activePackageId).toBe(packageAId);
+});
+
+test("evidence save guidance activates on valid region & text, clears on save, and propagates submitter name to submission dock", async ({
+  page,
+}) => {
+  await mockPackageAnalysis(page);
+  await page.goto("/review");
+  await page.getByLabel(/upload front label/i).setInputFiles(PORTRAIT_FIXTURE);
+  await page.getByRole("button", { name: /no back label/i }).click();
+  await page.getByRole("button", { name: /no additional panels/i }).click();
+  await expect(page.getByTestId("annotation-workspace")).toBeVisible();
+
+  // Before valid region and text, save action is disabled and not emphasized
+  const footerAction = page.getByTestId("footer-stage-action");
+  await expect(footerAction).not.toHaveAttribute("data-emphasized", "true");
+
+  await page.getByLabel(/what the label says/i).fill("M CELLARS");
+  await dragRegion(page);
+
+  // When valid region and text are present, footer action is emphasized with visible Ready to save badge
+  await expect(footerAction).toHaveAttribute("data-emphasized", "true");
+  await expect(page.getByTestId("footer-ready-badge")).toBeVisible();
+
+  // Clicking save saves the evidence and clears emphasis immediately
+  await page.getByRole("button", { name: "Save Brand name" }).click();
+  await expect(footerAction).not.toHaveAttribute("data-emphasized", "true");
+
+  // Complete alcohol statement category evidence
+  await dragRegion(page);
+  await page.getByLabel(/what the label says/i).fill("12.5");
+  await expect(page.getByRole("button", { name: "Save Alcohol statement" })).toBeEnabled();
+  await page.getByRole("button", { name: "Save Alcohol statement" }).click();
+
+  // Save package and run pre-check
+  await page.getByRole("button", { name: "Save draft locally" }).click();
+  await page.getByRole("button", { name: "Run pre-check" }).click();
+
+  // Type submitter name in preparation workstation input
+  await page.locator("#package-submitter").fill("Continuity Seller LLC");
+
+  // Submitter name is synchronized with submission dock
+  const dockInput = page.locator("#agent-submission-name");
+  await expect(dockInput).toBeVisible();
+  await expect(dockInput).toHaveValue("Continuity Seller LLC");
 });

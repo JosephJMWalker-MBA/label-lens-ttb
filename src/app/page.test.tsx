@@ -89,4 +89,13 @@ describe("HomePage — intent hub", () => {
     // front door. It stays replayable from the appearance settings.
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
+
+  it("visually emphasizes the Prepare a package card with a primary workflow text cue", () => {
+    render(<HomePage />);
+    const primaryCard = screen.getByTestId("primary-intent-card");
+    expect(primaryCard).toBeInTheDocument();
+    expect(screen.getByTestId("primary-workflow-badge")).toHaveTextContent(
+      "Primary package workflow",
+    );
+  });
 });
