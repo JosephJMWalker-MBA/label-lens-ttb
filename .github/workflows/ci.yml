@@ -130,6 +130,9 @@ jobs:
       # start), where the pre-check route requires an append signing key and
       # returns 500 without it. The dev server did not enforce this.
       LABEL_LENS_APPEND_SIGNING_KEY: e2e-append-signing-secret-at-least-32-chars
+      # Real server submission (finalize/resubmit) persists panel assets to
+      # durable storage and fails closed in production without this set.
+      LABEL_LENS_STORAGE_DIR: .local/e2e-panel-storage
       LABEL_LENS_BOOTSTRAP_ADMIN_EMAIL: e2e-admin@example.test
       LABEL_LENS_BOOTSTRAP_ADMIN_PASSWORD: e2e-only-admin-password-1234
       LABEL_LENS_BOOTSTRAP_AGENT_EMAIL: e2e-agent@example.test
