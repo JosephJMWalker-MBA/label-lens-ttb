@@ -42,6 +42,16 @@ async function removeIndexedDb(page: Page) {
 }
 
 test.describe("resilience: /review cold load is reliable on the production build", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      try {
+        window.localStorage.setItem("label-lens.onboarding.seen.v2", "true");
+      } catch {
+        /* storage unavailable */
+      }
+    });
+  });
+
   test("1+9. fresh context, hard load /review with empty IndexedDB — usable, no warning", async ({
     page,
   }) => {
@@ -100,7 +110,7 @@ test.describe("resilience: /review cold load is reliable on the production build
     // The legacy route auto-opens the pre-check introduction for a first-time
     // visitor, whose overlay would intercept the navigation click.
     await page.addInitScript(() =>
-      window.localStorage.setItem("label-lens.onboarding.seen.v1", "true"),
+      window.localStorage.setItem("label-lens.onboarding.seen.v2", "true"),
     );
     await page.goto("/review/legacy");
     await page.getByRole("link", { name: "Prepare a package" }).first().click();
@@ -110,6 +120,16 @@ test.describe("resilience: /review cold load is reliable on the production build
 });
 
 test.describe("resilience: public Sign in stays available", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      try {
+        window.localStorage.setItem("label-lens.onboarding.seen.v2", "true");
+      } catch {
+        /* storage unavailable */
+      }
+    });
+  });
+
   test("Sign in stays visible while /api/auth/get-session is delayed", async ({ page }) => {
     await page.route("**/api/auth/get-session*", async (route) => {
       await new Promise((r) => setTimeout(r, 4000));

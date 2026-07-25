@@ -17,6 +17,9 @@ describe("seller package review route", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: /prepare a seller label package/i }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("dialog", { name: /upload label panels and record seller evidence/i }),
+    ).toBeInTheDocument();
     expect(await screen.findByTestId("seller-workstation")).toBeInTheDocument();
     expect(screen.getByTestId("workstation-controls")).toBeInTheDocument();
     expect(screen.getByTestId("cycling-workspace")).toBeInTheDocument();
@@ -26,7 +29,14 @@ describe("seller package review route", () => {
     expect(screen.getByRole("button", { name: /no back label/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /no additional panels/i })).toBeInTheDocument();
     expect(screen.queryByTestId("example-label-map")).toBeNull();
-    expect(screen.getByText(/nothing is submitted to TTB/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /drafts remain in this browser until you submit for internal review\. machine observations remain separate from seller evidence\. nothing is submitted to ttb, and no result is an approval or legal determination\./i,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /open the legacy single-image pre-check/i }),
+    ).toHaveAttribute("href", "/review/legacy");
     expect(screen.queryByText(/TTB submission complete/i)).toBeNull();
   });
 

@@ -13,10 +13,10 @@ import { PreferencesProvider } from "./preferences";
  * tests share one provider tree. The onboarding dialog lives here so it can
  * overlay any page content and be replayed from the settings surface.
  *
- * `introOnFirstVisit` is set only by the route that owns the pre-check workflow
- * the introduction actually describes. Elsewhere the dialog stays mounted and
- * replayable — so "view introduction again" is never a dead control — but it is
- * not forced in front of a first-time visitor.
+ * `introOnFirstVisit` is set on entry routes (/ and /review) that offer the
+ * product workflow described by the introduction. Elsewhere the dialog stays
+ * mounted and replayable — so "view introduction again" is never a dead
+ * control — but it is not forced in front of a first-time visitor.
  */
 export function AppProviders({
   children,

@@ -9,6 +9,9 @@ import { expect, test } from "@playwright/test";
 test("the hub asks what you want to do and offers the upload-or-build promise", async ({
   page,
 }) => {
+  await page.addInitScript(() =>
+    window.localStorage.setItem("label-lens.onboarding.seen.v2", "true"),
+  );
   await page.goto("/");
   await expect(
     page.getByRole("heading", { level: 1, name: /what would you like to do today\?/i }),
@@ -21,6 +24,9 @@ test("the hub asks what you want to do and offers the upload-or-build promise", 
 });
 
 test("all six intents appear, and the four active paths are offered", async ({ page }) => {
+  await page.addInitScript(() =>
+    window.localStorage.setItem("label-lens.onboarding.seen.v2", "true"),
+  );
   await page.goto("/");
 
   // Scope to the intent list: some titles intentionally match a header nav link
@@ -30,7 +36,7 @@ test("all six intents appear, and the four active paths are offered", async ({ p
     "Create a new label",
     "Improve an existing draft",
     "Prepare a package",
-    "Run a single-image pre-check",
+    "Legacy single-image pre-check",
     "Learn labeling requirements",
     "Find professional help",
   ]) {
@@ -51,7 +57,7 @@ test("all six intents appear, and the four active paths are offered", async ({ p
 
 test("both active intents navigate, and the package review workflow loads", async ({ page }) => {
   await page.addInitScript(() =>
-    window.localStorage.setItem("label-lens.onboarding.seen.v1", "true"),
+    window.localStorage.setItem("label-lens.onboarding.seen.v2", "true"),
   );
 
   await page.goto("/");
@@ -102,6 +108,9 @@ test("the requirements explorer shows real rules, their sources, and the limits"
 test("the hub is keyboard navigable and the mark is not a certification badge", async ({
   page,
 }) => {
+  await page.addInitScript(() =>
+    window.localStorage.setItem("label-lens.onboarding.seen.v2", "true"),
+  );
   await page.goto("/");
 
   // The skip link is the first stop, then the header, then the intents.
@@ -124,6 +133,7 @@ test("the hub is keyboard navigable and the mark is not a certification badge", 
 
 test("the hub renders in dark mode with the intents intact", async ({ page }) => {
   await page.addInitScript(() => {
+    window.localStorage.setItem("label-lens.onboarding.seen.v2", "true");
     window.localStorage.setItem(
       "label-lens.preferences.v1",
       JSON.stringify({ theme: "dark", fontScale: "default", motion: "system" }),

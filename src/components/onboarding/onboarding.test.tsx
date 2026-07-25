@@ -33,9 +33,12 @@ afterEach(() => vi.restoreAllMocks());
 
 describe("first-use onboarding", () => {
   it("shows the introduction only for a first-time user", () => {
+    expect(localStorage.getItem(ONBOARDING_STORAGE_KEY)).toBeNull();
     render(<Shell />);
-    expect(screen.getByRole("dialog", { name: /upload a wine label/i })).toBeInTheDocument();
-    expect(screen.getByText(/step 1 of 5/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("dialog", { name: /upload label panels and record seller evidence/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/step 1 of 4/i)).toBeInTheDocument();
   });
 
   it("does not show the introduction once it has been seen", () => {
@@ -44,8 +47,9 @@ describe("first-use onboarding", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
-  it("skips, remembers completion, and can be replayed", () => {
+  it("skips, remembers completion in v2 key, and can be replayed", () => {
     render(<Shell />);
+    expect(localStorage.getItem(ONBOARDING_STORAGE_KEY)).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: /skip introduction/i }));
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(localStorage.getItem(ONBOARDING_STORAGE_KEY)).toBe("true");
@@ -54,14 +58,15 @@ describe("first-use onboarding", () => {
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
-  it("advances through steps and finishes", () => {
+  it("advances through 4 steps and finishes", () => {
     render(<Shell />);
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 3; i++) {
       fireEvent.click(screen.getByRole("button", { name: /continue/i }));
     }
-    expect(screen.getByText(/step 5 of 5/i)).toBeInTheDocument();
+    expect(screen.getByText(/step 4 of 4/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /start using label lens/i }));
     expect(screen.queryByRole("dialog")).toBeNull();
+    expect(localStorage.getItem(ONBOARDING_STORAGE_KEY)).toBe("true");
   });
 
   it("closes on Escape (treated as skip)", () => {
@@ -74,15 +79,28 @@ describe("first-use onboarding", () => {
     render(<Shell />);
     const dialog = screen.getByRole("dialog");
     expect(dialog).toHaveAttribute("aria-modal", "true");
-    expect(screen.getByRole("heading", { name: /upload a wine label/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /upload label panels and record seller evidence/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("does not clear, delete, or rewrite old v1 key, preferences, or unrelated browser storage", () => {
+    localStorage.setItem("label-lens.onboarding.seen.v1", "true");
+    localStorage.setItem("label-lens.preferences.v1", '{"theme":"dark"}');
+    localStorage.setItem("unrelated_app_key", "custom_value");
+
+    render(<Shell />);
+    fireEvent.click(screen.getByRole("button", { name: /skip introduction/i }));
+
+    expect(localStorage.getItem(ONBOARDING_STORAGE_KEY)).toBe("true");
+    expect(localStorage.getItem("label-lens.onboarding.seen.v1")).toBe("true");
+    expect(localStorage.getItem("label-lens.preferences.v1")).toBe('{"theme":"dark"}');
+    expect(localStorage.getItem("unrelated_app_key")).toBe("custom_value");
   });
 });
 
 describe("auto-open is opt-in", () => {
   it("does not greet a first-time visitor on a route that did not ask for it", () => {
-    // The intent hub mounts the provider so "view introduction again" stays a
-    // real control, but the introduction describes the pre-check workflow and
-    // must never be forced in front of someone who has not chosen it.
     render(
       <OnboardingProvider>
         <Replay />
@@ -100,7 +118,9 @@ describe("auto-open is opt-in", () => {
       </OnboardingProvider>,
     );
     fireEvent.click(screen.getByRole("button", { name: /view introduction again/i }));
-    expect(screen.getByRole("dialog", { name: /upload a wine label/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("dialog", { name: /upload label panels and record seller evidence/i }),
+    ).toBeInTheDocument();
   });
 });
 

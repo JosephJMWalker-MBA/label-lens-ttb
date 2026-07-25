@@ -71,11 +71,19 @@ describe("AppearanceSettings surface", () => {
 
   it("replays the introduction from the settings surface", async () => {
     renderSettings();
-    expect(screen.queryByRole("dialog", { name: /upload a wine label/i })).toBeNull();
+    expect(
+      screen.queryByRole("dialog", {
+        name: /upload label panels and record seller evidence/i,
+      }),
+    ).toBeNull();
     openPanel();
     fireEvent.click(screen.getByRole("button", { name: /view introduction again/i }));
     await waitFor(() =>
-      expect(screen.getByRole("dialog", { name: /upload a wine label/i })).toBeInTheDocument(),
+      expect(
+        screen.getByRole("dialog", {
+          name: /upload label panels and record seller evidence/i,
+        }),
+      ).toBeInTheDocument(),
     );
   });
 
