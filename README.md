@@ -10,7 +10,7 @@ Label Lens TTB is a **domestic-wine label prescreen and internal-review prototyp
 
 - Primary deployment: **<https://ttb-test.com>**
 - Sign in: **<https://ttb-test.com/login>**
-- Legacy one-image review: <https://ttb-test.com/review/legacy>
+- Legacy one-image prescreen: <https://ttb-test.com/review/legacy>
 - Secondary deployment: <https://label-lens-ttb.onrender.com>
 
 ### Demonstration accounts
@@ -34,10 +34,13 @@ The public deployment is not a COLA integration, production authorization, gover
 - Front and back label panels, plus optional additional panels.
 - Seller-entered facts, uncertainty, and absence states.
 - Multi-region, panel-relative evidence mapping.
-- Browser-local draft restoration.
+- Multiple browser-local package drafts with restoration.
+- Explicit new-package flow without overwriting an existing draft.
 - Immutable package-analysis runs.
 - Authenticated package finalization.
 - Persisted status receipts and immutable revision history.
+- Requested-change continuity that seeds a corrected seller revision without rewriting the prior submission.
+- Resubmission of the current corrected draft as a new immutable revision.
 
 ### Authenticated review portal
 
@@ -48,11 +51,12 @@ The public deployment is not a COLA integration, production authorization, gover
 - MySQL-authoritative persistence with committed Drizzle migrations.
 - Immutable submission revisions with server-recomputed integrity.
 - Durable, idempotent package finalization.
-- Authenticated agent queue and read-only submission detail.
+- Authenticated agent queue and submission detail.
+- Durable reviewer claim locking.
+- Append-only internal decisions for request changes and internal acceptance.
+- Seller-visible decision guidance and preserved review history.
 - Authorized artwork-panel streaming without public object URLs.
 - Role-aware navigation, logout, and unauthorized handling.
-
-Reviewer claim locking and append-only request-changes/internal-accept decision writes are intentionally deferred to the next review slice.
 
 ### OCR and deterministic checks
 
@@ -76,7 +80,8 @@ Finding states include `PASS`, `WARN`, `FAIL`, `NEEDS_REVIEW`, and `not_run`. Th
 - Canonical JSON export and readable HTML report.
 - SHA-256 integrity blocks.
 - HMAC-signed immutable revision metadata.
-- Append-only internal disposition history in the one-image path.
+- Append-only reviewer claims, internal decisions, status events, and revision history in the package workflow.
+- Append-only internal disposition history in the legacy one-image path.
 
 ---
 
@@ -86,21 +91,27 @@ Finding states include `PASS`, `WARN`, `FAIL`, `NEEDS_REVIEW`, and `not_run`. Th
 
 1. Open <https://ttb-test.com/login>.
 2. Sign in as `agent@ttb-test.com` using the shared reviewer-demo password.
-3. Open the agent queue.
-4. Select a submission and inspect its immutable revision, declared facts, checks, and authorized artwork panels.
-5. Confirm that the interface uses internal-review language and makes no government-approval claim.
+3. Open the agent queue and select a submitted package.
+4. Inspect the immutable revision, seller-declared facts, machine observations, deterministic findings, and authorized artwork panels.
+5. Claim the package so the active reviewer identity is recorded durably.
+6. Choose **Request changes** or **Internally accept** and record the internal rationale.
+7. Verify that the resulting decision is appended to the package history without changing the submitted revision.
+8. Confirm that the interface uses internal-review language and makes no government-approval claim.
 
 ### Seller
 
 1. Open <https://ttb-test.com/login>.
 2. Sign in as `seller@ttb-test.com` using the shared reviewer-demo password.
-3. Prepare or inspect a package.
-4. Finalize it and verify that the resulting status is persisted.
-5. Confirm that direct access to `/agent` is denied.
+3. Open **Prepare a package**, create or restore a browser-local draft, and add the required panel artwork and seller evidence.
+4. Run the package analysis and submit the current draft for internal review.
+5. Verify that the submitted revision and status receipt are persisted and that direct access to `/agent` is denied.
+6. After a reviewer requests changes, reopen the package and verify that Label Lens creates a corrected draft while preserving the prior immutable revision and decision history.
+7. Save the corrected evidence and resubmit it as a new revision.
+8. Confirm that nothing is described as a TTB submission, approval, rejection, or legal determination.
 
-### One-image prescreen
+### Legacy one-image prescreen
 
-1. Open <https://ttb-test.com>.
+1. Open <https://ttb-test.com/review/legacy>.
 2. Load the verified **M Cellars** sample, or upload a supported wine-label image.
 3. Enter the application brand name and alcohol value.
 4. Run the prescreen.
@@ -120,6 +131,9 @@ Browser artwork + declared facts
   → governed findings
   → immutable package revision + integrity record
   → authenticated internal review queue
+  → durable reviewer claim
+  → append-only request-changes or internal-accept decision
+  → corrected seller draft and immutable resubmission when required
 ```
 
 Production infrastructure includes:
@@ -199,6 +213,7 @@ Production prechecks fail closed when `LABEL_LENS_APPEND_SIGNING_KEY` is missing
 - Authentication and signing secrets do not enter the browser bundle.
 - Sessions are database-backed and revocable.
 - Package revisions are immutable and integrity-signed.
+- Reviewer claims and internal decisions are append-only records rather than edits to submitted evidence.
 - Errors are bounded to avoid leaking paths, credentials, or environment values.
 - Shared demo credentials are unsuitable for sensitive information.
 - The public demo is not a hardened production environment.
@@ -213,7 +228,7 @@ See [`docs/compliance-readiness-boundary.md`](docs/compliance-readiness-boundary
 - Overall compliance verdict.
 - COLA or government-system integration.
 - Government authentication or authorization.
-- Agent or government transmission.
+- Transmission to TTB or another government system.
 - Beer, malt-beverage, or distilled-spirits scoring.
 - FedRAMP authorization, ATO, certification, or government endorsement.
 
