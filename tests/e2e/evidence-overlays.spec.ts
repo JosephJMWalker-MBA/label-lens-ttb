@@ -11,7 +11,7 @@ const FIXTURE = "tests/fixtures/precheck/m-cellars-24205001000905/label-ocr-sour
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     try {
-      window.localStorage.setItem("label-lens.onboarding.seen.v1", "true");
+      window.localStorage.setItem("label-lens.onboarding.seen.v2", "true");
     } catch {
       /* storage unavailable */
     }

@@ -7,7 +7,7 @@ import { AppProviders } from "../../AppProviders";
 /** Compatibility route for the unchanged single-image pre-check workflow. */
 export default function LegacyReviewPage() {
   return (
-    <AppProviders introOnFirstVisit>
+    <AppProviders>
       <SkipLink />
       <AppHeader current="legacy" />
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-10 sm:px-6 sm:py-14">

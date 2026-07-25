@@ -7,35 +7,114 @@ import { expect, test } from "@playwright/test";
  * behavior is asserted here.
  */
 
-test("first-use onboarding appears, is skippable, and can be replayed", async ({ page }) => {
-  // The introduction describes the pre-check workflow, so it greets a first-time
-  // visitor on the route that offers that workflow — not on the intent hub.
-  await page.goto("/review/legacy");
+test("first-use onboarding appears on entry route /, is skippable, sets v2 storage, and can be replayed", async ({
+  page,
+}) => {
+  await page.goto("/");
 
-  const dialog = page.getByRole("dialog", { name: /upload a wine label/i });
+  const dialog = page.getByRole("dialog", {
+    name: /upload label panels and record seller evidence/i,
+  });
   await expect(dialog).toBeVisible();
-  await expect(page.getByText(/step 1 of 5/i)).toBeVisible();
+  await expect(page.getByText(/step 1 of 4/i)).toBeVisible();
 
-  // Skip returns to the workflow; the intro does not block the primary upload.
+  // Before dismissal, v2 key is absent.
+  const beforeSeen = await page.evaluate(() =>
+    window.localStorage.getItem("label-lens.onboarding.seen.v2"),
+  );
+  expect(beforeSeen).toBeNull();
+
+  // Skip returns to the page; completion is remembered in v2.
   await page.getByRole("button", { name: /skip introduction/i }).click();
   await expect(dialog).toBeHidden();
-  await expect(page.getByLabel(/select one label image/i)).toBeVisible();
 
-  // A reload does not show it again (completion is remembered locally).
+  const afterSeen = await page.evaluate(() =>
+    window.localStorage.getItem("label-lens.onboarding.seen.v2"),
+  );
+  expect(afterSeen).toBe("true");
+
+  // Reload does not show it again.
   await page.reload();
-  await expect(page.getByRole("dialog", { name: /upload a wine label/i })).toBeHidden();
+  await expect(
+    page.getByRole("dialog", { name: /upload label panels and record seller evidence/i }),
+  ).toBeHidden();
 
-  // It can be replayed from the settings surface.
+  // Replay from Display Settings surface works.
   await page.getByRole("button", { name: /display settings/i }).click();
   await page.getByRole("button", { name: /view introduction again/i }).click();
-  await expect(page.getByRole("dialog", { name: /upload a wine label/i })).toBeVisible();
+  await expect(
+    page.getByRole("dialog", { name: /upload label panels and record seller evidence/i }),
+  ).toBeVisible();
+});
+
+test("dismissing onboarding on / prevents auto-open on /review while /review/legacy never auto-opens", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /skip introduction/i }).click();
+
+  // Direct visit to /review after dismissal stays clean.
+  await page.goto("/review");
+  await expect(page.getByRole("dialog")).toBeHidden();
+
+  // Direct visit to /review/legacy never auto-opens onboarding even with clean storage.
+  await page.addInitScript(() => window.localStorage.removeItem("label-lens.onboarding.seen.v2"));
+  await page.goto("/review/legacy");
+  await expect(page.getByRole("dialog")).toBeHidden();
+});
+
+test("v2 onboarding migration preserves old v1 key, preferences, and unrelated storage byte-for-byte", async ({
+  page,
+}) => {
+  const fullPrefs = JSON.stringify({ theme: "dark", fontScale: "default", motion: "system" });
+  await page.addInitScript((prefsJson) => {
+    window.localStorage.setItem("label-lens.onboarding.seen.v1", "true");
+    window.localStorage.setItem("label-lens.preferences.v1", prefsJson);
+    window.localStorage.setItem("unrelated_app_data", "preserved_exact");
+  }, fullPrefs);
+
+  await page.goto("/");
+  await page.getByRole("button", { name: /skip introduction/i }).click();
+
+  const storage = await page.evaluate(() => ({
+    v1: window.localStorage.getItem("label-lens.onboarding.seen.v1"),
+    v2: window.localStorage.getItem("label-lens.onboarding.seen.v2"),
+    prefs: window.localStorage.getItem("label-lens.preferences.v1"),
+    unrelated: window.localStorage.getItem("unrelated_app_data"),
+  }));
+
+  expect(storage.v1).toBe("true");
+  expect(storage.v2).toBe("true");
+  expect(storage.prefs).toBe(fullPrefs);
+  expect(storage.unrelated).toBe("preserved_exact");
+});
+
+test("public header wraps cleanly without horizontal scroll at 390x844", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() =>
+    window.localStorage.setItem("label-lens.onboarding.seen.v2", "true"),
+  );
+  await page.goto("/");
+
+  const header = page.getByRole("banner");
+  await expect(header).toBeVisible();
+
+  // Navigation links are ordered Prepare a package -> Create a label -> Learn requirements
+  const sectionNav = page.getByRole("navigation", { name: /sections/i });
+  await expect(sectionNav.getByRole("link", { name: /prepare a package/i })).toBeVisible();
+  await expect(sectionNav.getByRole("link", { name: /create a label/i })).toBeVisible();
+  await expect(sectionNav.getByRole("link", { name: /learn requirements/i })).toBeVisible();
+  await expect(sectionNav.getByRole("link", { name: /single-image pre-check/i })).toHaveCount(0);
+
+  const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+  expect(scrollWidth).toBeLessThanOrEqual(390);
 });
 
 test("appearance settings switch theme and text size and persist across reload", async ({
   page,
 }) => {
   await page.addInitScript(() =>
-    window.localStorage.setItem("label-lens.onboarding.seen.v1", "true"),
+    window.localStorage.setItem("label-lens.onboarding.seen.v2", "true"),
   );
   await page.goto("/");
 

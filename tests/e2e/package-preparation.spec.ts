@@ -8,6 +8,16 @@ const SCREENSHOT_DIRECTORY = "docs/reviews/issue-140";
 
 test.use({ deviceScaleFactor: 2 });
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    try {
+      window.localStorage.setItem("label-lens.onboarding.seen.v2", "true");
+    } catch {
+      /* storage unavailable */
+    }
+  });
+});
+
 async function capture(
   page: Page,
   locator: ReturnType<Page["locator"]>,

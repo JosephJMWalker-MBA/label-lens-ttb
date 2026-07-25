@@ -83,11 +83,20 @@ describe("HomePage — intent hub", () => {
     expect(container.textContent).not.toMatch(/\bscore\b|\breadiness\b|\bgrade\b/i);
   });
 
-  it("does not auto-open the pre-check introduction on the hub", () => {
+  it("auto-opens the product-level introduction on the hub for a first-time visitor", () => {
     render(<HomePage />);
-    // The introduction describes the review workflow and must not hijack the
-    // front door. It stays replayable from the appearance settings.
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("dialog", { name: /upload label panels and record seller evidence/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("renders global navigation in primary order and excludes the legacy link", () => {
+    render(<HomePage />);
+    const nav = screen.getByRole("navigation", { name: /sections/i });
+    const links = within(nav).getAllByRole("link");
+    const hrefs = links.map((a) => a.getAttribute("href"));
+    expect(hrefs.slice(0, 3)).toEqual(["/review", "/create", "/learn"]);
+    expect(hrefs).not.toContain("/review/legacy");
   });
 
   it("visually emphasizes the Prepare a package card with a primary workflow text cue", () => {

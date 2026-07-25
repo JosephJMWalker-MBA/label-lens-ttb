@@ -40,14 +40,11 @@ export function AppHeader({
             a phone is a real place to use this. */}
           <div className="flex flex-wrap items-center justify-end gap-x-1.5 gap-y-2">
             <nav aria-label="Sections" className="flex flex-wrap items-center gap-1">
-              <HeaderLink href="/create" active={current === "create"}>
-                Create a label
-              </HeaderLink>
               <HeaderLink href="/review" active={current === "review"}>
                 Prepare a package
               </HeaderLink>
-              <HeaderLink href="/review/legacy" active={current === "legacy"}>
-                Single-image pre-check
+              <HeaderLink href="/create" active={current === "create"}>
+                Create a label
               </HeaderLink>
               <HeaderLink href="/learn" active={current === "learn"}>
                 Learn requirements

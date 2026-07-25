@@ -17,7 +17,7 @@ import {
  * never delayed or obscured.
  */
 
-export const ONBOARDING_STORAGE_KEY = "label-lens.onboarding.seen.v1";
+export const ONBOARDING_STORAGE_KEY = "label-lens.onboarding.seen.v2";
 
 interface OnboardingContextValue {
   isOpen: boolean;
@@ -35,11 +35,12 @@ export function OnboardingProvider({
   /**
    * Whether a first-time visitor is shown the introduction automatically.
    *
-   * The introduction explains the pre-check workflow (upload, evidence,
-   * declared facts), so it auto-opens only on the route that offers that
-   * workflow. On other routes the provider is still mounted — so the "view
-   * introduction again" control remains a real, working control rather than a
-   * dead button — but nothing is forced in front of the visitor.
+   * The introduction explains the product-level workflow (seller evidence,
+   * machine observations, internal human review, and preparation boundary), so
+   * it auto-opens on entry routes (/ and /review). On other routes the provider
+   * is still mounted — so the "view introduction again" control remains a real,
+   * working control rather than a dead button — but nothing is forced in front
+   * of the visitor.
    */
   autoOpenOnFirstVisit = false,
 }: {

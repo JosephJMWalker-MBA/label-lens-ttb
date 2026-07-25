@@ -21,24 +21,20 @@ interface Step {
 
 const STEPS: Step[] = [
   {
-    title: "Upload a wine label",
-    body: "Choose one PNG or JPEG of a wine label, or load the bundled sample. The image is processed for this check only and is not stored.",
+    title: "Upload label panels and record seller evidence",
+    body: "Add artwork for front, back, and additional panels. Record your declared facts and mark evidence locations directly on your label artwork.",
   },
   {
-    title: "Label Lens reads the artwork",
-    body: "Local OCR reads brand and alcohol evidence directly from the label image.",
+    title: "Machine reads artwork independently",
+    body: "OCR and visual analysis inspect panel artwork for brand and alcohol evidence. Machine observations preserve uncertainty and never overwrite seller evidence.",
   },
   {
-    title: "Application facts stay separate",
-    body: "The brand and alcohol values you enter are your application facts. They are compared against the evidence, never mixed into what OCR read.",
+    title: "Submit to internal human review queue",
+    body: "When ready, submit your package record, seller evidence, artwork images, and machine observations to the internal review queue, where human reviewers remain authoritative.",
   },
   {
-    title: "Uncertainty is shown, not hidden",
-    body: "When evidence is weak or competing, the result says so plainly instead of guessing a confident answer.",
-  },
-  {
-    title: "Preparation and review only",
-    body: "The result supports preparation and review. It is not TTB approval and issues no approve-or-reject decision.",
+    title: "Preparation tool only — no TTB submission",
+    body: "Label Lens supports preparation and internal review only. Nothing is submitted to TTB. Label Lens does not issue government or legal determinations and does not approve or reject labels.",
   },
 ];
 

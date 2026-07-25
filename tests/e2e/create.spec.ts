@@ -12,7 +12,7 @@ import { canonicalStringify } from "../../src/pipeline/export/json/canonical-str
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() =>
-    window.localStorage.setItem("label-lens.onboarding.seen.v1", "true"),
+    window.localStorage.setItem("label-lens.onboarding.seen.v2", "true"),
   );
 });
 

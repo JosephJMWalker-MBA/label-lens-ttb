@@ -68,7 +68,7 @@ export const INTENTS: readonly Intent[] = [
   },
   {
     id: "legacy",
-    title: "Run a single-image pre-check",
+    title: "Legacy single-image pre-check",
     summary:
       "Check one finished label image on its own. The system reads it, compares it with the facts you state, and shows you the evidence.",
     status: "available",

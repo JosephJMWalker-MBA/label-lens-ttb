@@ -8,14 +8,13 @@ import { AppProviders } from "./AppProviders";
  * The intent hub: the product's front door.
  *
  * It asks what the visitor wants to do before assuming they arrived with a
- * finished label. The pre-check introduction is deliberately not auto-opened
- * here — it explains the review workflow, and this page is not that workflow. It
- * stays replayable from the appearance settings, and it still greets a
- * first-time visitor on /review.
+ * finished label. The product-level introduction greets a first-time visitor
+ * here to explain seller evidence, machine observations, internal human review,
+ * and the preparation boundary.
  */
 export default function HomePage() {
   return (
-    <AppProviders>
+    <AppProviders introOnFirstVisit>
       <SkipLink />
       <AppHeader current="home" />
       <main id="main-content" className="mx-auto max-w-5xl px-6 py-14">

@@ -11,7 +11,7 @@ import { AppProviders } from "../AppProviders";
  */
 export default function ReviewPage() {
   return (
-    <AppProviders introOnFirstVisit={false}>
+    <AppProviders introOnFirstVisit>
       <SkipLink />
       <AppHeader current="review" />
       <div className="mx-auto flex max-w-[96rem] min-w-0 flex-col gap-10 px-4 py-8 sm:px-6 sm:py-12">
@@ -25,18 +25,14 @@ export default function ReviewPage() {
             observations without overwriting either record.
           </p>
           <p className="max-w-4xl rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
-            Drafts are saved only in this browser. Analysis is a preparation aid. Downloads are
-            local records; nothing is submitted to TTB and no result is an approval or legal
-            determination.
-          </p>
-          <p className="max-w-4xl rounded-md border border-emerald-700/40 bg-emerald-50 p-3 text-sm text-emerald-950 dark:bg-emerald-950/40 dark:text-emerald-100">
-            When the package is ready, Submit for agent review sends its record, seller evidence,
-            machine observations, and uploaded panel images to the Label Lens internal review queue.
+            Drafts remain in this browser until you submit for internal review. Machine observations
+            remain separate from seller evidence. Nothing is submitted to TTB, and no result is an
+            approval or legal determination.
           </p>
           <p className="text-sm text-muted-foreground">
             Need the established one-image pre-check?{" "}
             <a className="underline underline-offset-4" href="/review/legacy">
-              Open the single-image workflow
+              Open the Legacy single-image pre-check
             </a>
             .
           </p>
