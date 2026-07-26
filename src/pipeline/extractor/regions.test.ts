@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import type { OcrWord, RegionOcrResult, RegionTransform } from "./extractor.types";
-import { planRecoveryOcrPasses } from "./regions";
+import {
+  planRecoveryOcrPasses,
+  planSellerRegionOcrPass,
+  sellerRegionCrop,
+  sellerRegionCropPlan,
+} from "./regions";
 
 const TRANSFORM: RegionTransform = {
   crop: { left: 0, top: 0, width: 1000, height: 800 },
@@ -119,5 +124,77 @@ describe("planRecoveryOcrPasses", () => {
     for (const pass of planned.filter((entry) => entry.passKind.includes("edge-strip"))) {
       expect(pass.transform.crop.height).toBe(64);
     }
+  });
+});
+
+describe("seller-region OCR planning", () => {
+  const target = {
+    categoryId: "brandName" as const,
+    regionId: "brand-a",
+    panelId: "front",
+    region: {
+      unit: "normalized-panel-relative" as const,
+      provenance: "seller-selected-region" as const,
+      x: 0.1,
+      y: 0.2,
+      width: 0.25,
+      height: 0.1,
+    },
+  };
+
+  it("maps normalized seller geometry to a deterministic padded original-pixel crop", () => {
+    expect(sellerRegionCrop(target, 1000, 800)).toEqual({
+      left: 92,
+      top: 156,
+      width: 266,
+      height: 88,
+    });
+  });
+
+  it("records deterministic crop padding and maps selected coordinates to original pixels", () => {
+    expect(sellerRegionCropPlan(target, 1000, 800)).toEqual({
+      selectedRegionPixelGeometry: {
+        left: 100,
+        top: 160,
+        width: 250,
+        height: 80,
+      },
+      crop: {
+        left: 92,
+        top: 156,
+        width: 266,
+        height: 88,
+      },
+      padding: {
+        left: 8,
+        top: 4,
+        right: 8,
+        bottom: 4,
+      },
+      scale: 3,
+    });
+  });
+
+  it("plans a category-specific bounded OCR pass without changing full-panel eligibility", () => {
+    const pass = planSellerRegionOcrPass(
+      { ...target, categoryId: "alcoholStatement" },
+      1000,
+      800,
+      7,
+    );
+
+    expect(pass).toMatchObject({
+      passId: "pass-7-seller-region-alcoholStatement-brand-a",
+      passKind: "seller-region",
+      triggerReasons: ["seller-region-target"],
+      fieldEligibility: { brand: false, alcohol: true },
+      transform: { crop: { left: 92, top: 156, width: 266, height: 88 } },
+    });
+  });
+
+  it("rejects invalid seller regions before OCR", () => {
+    expect(
+      sellerRegionCrop({ ...target, region: { ...target.region, x: 0.95, width: 0.1 } }, 1000, 800),
+    ).toBeNull();
   });
 });

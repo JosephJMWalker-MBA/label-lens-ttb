@@ -13,6 +13,7 @@ import type {
   RegionOcrResult,
   RegionTransform,
   RotationDegrees,
+  SellerRegionOcrTarget,
 } from "./extractor.types";
 
 /**
@@ -46,6 +47,18 @@ export interface PlannedOcrPass {
   transform: RegionTransform;
 }
 
+export interface SellerRegionCropPlan {
+  selectedRegionPixelGeometry: RegionTransform["crop"];
+  crop: RegionTransform["crop"];
+  padding: {
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+  };
+  scale: number;
+}
+
 interface WordComponent {
   words: MappedWord[];
   geometry: EvidenceGeometry;
@@ -71,6 +84,10 @@ const FOCUS_MIN_AREA_RATIO = 0.08;
 const FOCUS_MAX_AREA_RATIO = 0.82;
 const FOCUS_PADDING_RATIO = 0.08;
 const FOCUS_MIN_PADDING_PX = 24;
+const SELLER_REGION_SCALE = 3;
+const SELLER_REGION_PADDING_RATIO = 0.03;
+const SELLER_REGION_MIN_PADDING_PX = 4;
+const SELLER_REGION_MIN_DIMENSION_PX = 4;
 
 const PRIMARY_TEMPLATE: PassTemplate = {
   regionName: "full-image",
@@ -142,6 +159,16 @@ const FOCUS_RIGHT_EDGE_TEMPLATE: PassTemplate = {
   fieldEligibility: { brand: false, alcohol: true },
 };
 
+const SELLER_REGION_TEMPLATE: PassTemplate = {
+  regionName: "seller-region",
+  passKind: "seller-region",
+  rotate: 0,
+  scale: SELLER_REGION_SCALE,
+  pageSegMode: PAGE_SEG.SPARSE_TEXT,
+  preprocessing: ["crop:seller-region", "grayscale", "normalise", "scale:3"],
+  fieldEligibility: { brand: true, alcohol: true },
+};
+
 const TEMPLATE_BY_REGION = new Map(
   [
     PRIMARY_TEMPLATE,
@@ -151,6 +178,7 @@ const TEMPLATE_BY_REGION = new Map(
     FOCUS_TEMPLATE,
     FOCUS_LEFT_EDGE_TEMPLATE,
     FOCUS_RIGHT_EDGE_TEMPLATE,
+    SELLER_REGION_TEMPLATE,
   ].map((template) => [template.regionName, template]),
 );
 
@@ -449,6 +477,107 @@ export function planRecoveryOcrPasses(input: {
   }
 
   return planned;
+}
+
+export function sellerRegionCrop(
+  target: SellerRegionOcrTarget,
+  originalWidth: number,
+  originalHeight: number,
+): RegionTransform["crop"] | null {
+  return sellerRegionCropPlan(target, originalWidth, originalHeight)?.crop ?? null;
+}
+
+export function sellerRegionCropPlan(
+  target: SellerRegionOcrTarget,
+  originalWidth: number,
+  originalHeight: number,
+): SellerRegionCropPlan | null {
+  const { region } = target;
+  const values = [region.x, region.y, region.width, region.height];
+  if (
+    !values.every(Number.isFinite) ||
+    region.x < 0 ||
+    region.y < 0 ||
+    region.width <= 0 ||
+    region.height <= 0 ||
+    region.x + region.width > 1 ||
+    region.y + region.height > 1 ||
+    originalWidth <= 0 ||
+    originalHeight <= 0
+  ) {
+    return null;
+  }
+
+  const rawLeft = region.x * originalWidth;
+  const rawTop = region.y * originalHeight;
+  const left = Math.floor(rawLeft);
+  const top = Math.floor(rawTop);
+  const right = Math.ceil(rawLeft + region.width * originalWidth);
+  const bottom = Math.ceil(rawTop + region.height * originalHeight);
+  const width = right - left;
+  const height = bottom - top;
+  if (width < SELLER_REGION_MIN_DIMENSION_PX || height < SELLER_REGION_MIN_DIMENSION_PX) {
+    return null;
+  }
+
+  const padX = Math.max(
+    SELLER_REGION_MIN_PADDING_PX,
+    Math.round(width * SELLER_REGION_PADDING_RATIO),
+  );
+  const padY = Math.max(
+    SELLER_REGION_MIN_PADDING_PX,
+    Math.round(height * SELLER_REGION_PADDING_RATIO),
+  );
+  const paddedLeft = clamp(left - padX, 0, originalWidth - 1);
+  const paddedTop = clamp(top - padY, 0, originalHeight - 1);
+  const paddedRight = clamp(right + padX, paddedLeft + 1, originalWidth);
+  const paddedBottom = clamp(bottom + padY, paddedTop + 1, originalHeight);
+  const crop = {
+    left: paddedLeft,
+    top: paddedTop,
+    width: paddedRight - paddedLeft,
+    height: paddedBottom - paddedTop,
+  };
+  if (crop.width < SELLER_REGION_MIN_DIMENSION_PX || crop.height < SELLER_REGION_MIN_DIMENSION_PX) {
+    return null;
+  }
+  return {
+    selectedRegionPixelGeometry: { left, top, width, height },
+    crop,
+    padding: {
+      left: left - paddedLeft,
+      top: top - paddedTop,
+      right: paddedRight - right,
+      bottom: paddedBottom - bottom,
+    },
+    scale: SELLER_REGION_SCALE,
+  };
+}
+
+export function planSellerRegionOcrPass(
+  target: SellerRegionOcrTarget,
+  originalWidth: number,
+  originalHeight: number,
+  index: number,
+): PlannedOcrPass | null {
+  const crop = sellerRegionCrop(target, originalWidth, originalHeight);
+  if (!crop) return null;
+  const template: PassTemplate = {
+    ...SELLER_REGION_TEMPLATE,
+    regionName: `seller-region-${target.categoryId}-${target.regionId}`,
+    fieldEligibility: {
+      brand: target.categoryId === "brandName",
+      alcohol: target.categoryId === "alcoholStatement",
+    },
+  };
+  return planFromTemplate(
+    template,
+    crop,
+    originalWidth,
+    originalHeight,
+    ["seller-region-target"],
+    index,
+  );
 }
 
 async function preprocess(

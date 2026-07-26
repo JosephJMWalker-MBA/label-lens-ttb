@@ -125,6 +125,8 @@ function recoveryPassKindLabel(kind: EvalRecoveryPassContributionBucket["key"]):
       return "Focus left edge strip 270°";
     case "focus-edge-strip-rot90":
       return "Focus right edge strip 90°";
+    case "seller-region":
+      return "Seller region";
   }
 }
 

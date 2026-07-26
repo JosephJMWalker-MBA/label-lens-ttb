@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { PrecheckServiceResponse } from "@/server/precheck-service.types";
+import type { SellerRegionMachineReading } from "@/pipeline/extractor/extractor.types";
 import {
   CANONICAL_GOVERNMENT_WARNING,
   deriveAnchoredGovernmentWarningTranscript,
@@ -179,6 +180,59 @@ function warningObservation(panelId: string, rawTranscript = CANONICAL_GOVERNMEN
   };
 }
 
+function sellerRegionReading(
+  overrides: Partial<SellerRegionMachineReading> &
+    Pick<SellerRegionMachineReading, "categoryId" | "regionId" | "panelId">,
+): SellerRegionMachineReading {
+  const { categoryId, regionId, panelId, ...rest } = overrides;
+  return {
+    categoryId,
+    regionId,
+    panelId,
+    sellerRegion: {
+      unit: "normalized-panel-relative",
+      provenance: "seller-selected-region",
+      x: 0.1,
+      y: 0.1,
+      width: 0.4,
+      height: 0.2,
+    },
+    cropGeometry: {
+      left: 90,
+      top: 90,
+      width: 430,
+      height: 230,
+      imageWidth: 1000,
+      imageHeight: 1500,
+    },
+    selectedRegionPixelGeometry: {
+      left: 100,
+      top: 100,
+      width: 400,
+      height: 200,
+      imageWidth: 1000,
+      imageHeight: 1500,
+    },
+    cropPadding: { left: 10, top: 10, right: 20, bottom: 20 },
+    scaleFactor: 3,
+    rawTranscript: overrides.observedValue ?? "",
+    observedValue: overrides.observedValue ?? null,
+    ocrEvidenceScore: overrides.ocrEvidenceScore ?? 0.9,
+    evidenceState: overrides.evidenceState ?? "OBSERVED",
+    observationState: overrides.observationState ?? "OBSERVED",
+    passProvenance: null,
+    extractionProvenance: {
+      extractionAdapterId: "test",
+      extractionAdapterVersion: "1",
+      ocrEngine: { kind: "not_applicable" },
+      parserId: "test-parser",
+      parserVersion: "1",
+      processedAt: "2026-07-18T00:00:00.000Z",
+    },
+    ...rest,
+  };
+}
+
 describe("seller package model", () => {
   it("treats front and back as one package without combining their coordinate frames", () => {
     const value = draft();
@@ -267,6 +321,250 @@ describe("seller package model", () => {
     const result = deriveCategoryAnalysis(category, [panelRun("front-1"), panelRun("back-1")]);
     expect(category.regions).toHaveLength(1);
     expect(result.state).toBe("not_found");
+  });
+
+  it("marks agreement when bounded seller-region OCR and independent discovery match", () => {
+    const category = draft().categories[0];
+    const result = deriveCategoryAnalysis(category, [
+      {
+        ...panelRun("front-1", {
+          brandName: {
+            state: "OBSERVED",
+            value: "M CELLARS",
+            confidence: 0.94,
+            ocrEvidenceScore: 0.94,
+            alternates: [],
+          },
+        }),
+        sellerRegionReadings: [
+          sellerRegionReading({
+            categoryId: "brandName",
+            regionId: "brand-front",
+            panelId: "front-1",
+            observedValue: "M CELLARS",
+          }),
+        ],
+      },
+    ]);
+
+    expect(result.state).toBe("clearly_readable");
+    expect(result.comparison).toMatchObject({
+      outcome: "AGREEMENT",
+      supportingPanelIds: ["front-1"],
+      supportingRegionIds: ["brand-front"],
+    });
+  });
+
+  it("preserves conflict when seller-region OCR and independent discovery differ", () => {
+    const category = draft().categories[0];
+    const result = deriveCategoryAnalysis(category, [
+      {
+        ...panelRun("front-1", {
+          brandName: {
+            state: "OBSERVED",
+            value: "PRODUCER ELSEWHERE",
+            confidence: 0.94,
+            ocrEvidenceScore: 0.94,
+            alternates: [],
+          },
+        }),
+        sellerRegionReadings: [
+          sellerRegionReading({
+            categoryId: "brandName",
+            regionId: "brand-front",
+            panelId: "front-1",
+            observedValue: "M CELLARS",
+          }),
+        ],
+      },
+    ]);
+
+    expect(result.state).toBe("needs_review");
+    expect(result.observedValue).toBe("PRODUCER ELSEWHERE");
+    expect(result.comparison).toMatchObject({
+      outcome: "CONFLICT",
+      conflictingPanelIds: ["front-1"],
+      conflictingRegionIds: ["brand-front"],
+    });
+    expect(result.comparison?.sellerRegionReadings[0].observedValue).toBe("M CELLARS");
+    expect(result.comparison?.machineDiscoveredReading?.observedValue).toBe("PRODUCER ELSEWHERE");
+  });
+
+  it("treats a likely stylized bounded brand substitution as seller-region insufficient", () => {
+    const category = { ...draft().categories[0], expectedValue: "Minneapolis" };
+    const result = deriveCategoryAnalysis(category, [
+      {
+        ...panelRun("front-1", {
+          brandName: {
+            state: "OBSERVED",
+            value: "Blueberry Wine",
+            confidence: 0.94,
+            ocrEvidenceScore: 0.94,
+            alternates: [],
+          },
+        }),
+        sellerRegionReadings: [
+          sellerRegionReading({
+            categoryId: "brandName",
+            regionId: "brand-front",
+            panelId: "front-1",
+            rawTranscript: "MINNEADOLIS",
+            observedValue: "MINNEADOLIS",
+            ocrEvidenceScore: 0.86,
+          }),
+        ],
+      },
+    ]);
+
+    expect(result.state).toBe("needs_review");
+    expect(result.comparison?.outcome).toBe("SELLER_REGION_INSUFFICIENT");
+    expect(result.comparison?.outcome).not.toBe("CONFLICT");
+    expect(result.comparison?.machineDiscoveredReading?.observedValue).toBe("Blueberry Wine");
+    expect(result.comparison?.sellerRegionReadings[0].observedValue).toBe("MINNEADOLIS");
+    expect(result.comparison?.sellerRegionReliability?.[0]).toMatchObject({
+      reliabilityState: "UNRELIABLE",
+      reason:
+        "Bounded OCR is a near-miss for the seller-entered text, so it is treated as a likely stylized-text OCR substitution.",
+    });
+  });
+
+  it("preserves conflict when reliable bounded brand reading and reliable discovery differ", () => {
+    const category = { ...draft().categories[0], expectedValue: "Minneapolis" };
+    const result = deriveCategoryAnalysis(category, [
+      {
+        ...panelRun("front-1", {
+          brandName: {
+            state: "OBSERVED",
+            value: "Blueberry Wine",
+            confidence: 0.94,
+            ocrEvidenceScore: 0.94,
+            alternates: [],
+          },
+        }),
+        sellerRegionReadings: [
+          sellerRegionReading({
+            categoryId: "brandName",
+            regionId: "brand-front",
+            panelId: "front-1",
+            rawTranscript: "MINNEAPOLIS",
+            observedValue: "MINNEAPOLIS",
+            ocrEvidenceScore: 0.93,
+          }),
+        ],
+      },
+    ]);
+
+    expect(result.state).toBe("needs_review");
+    expect(result.comparison?.outcome).toBe("CONFLICT");
+    expect(result.comparison?.conflictingRegionIds).toEqual(["brand-front"]);
+  });
+
+  it("treats a low-resolution bounded crop with outside brand discovery as insufficient", () => {
+    const category = { ...draft().categories[0], expectedValue: "Minneapolis" };
+    const result = deriveCategoryAnalysis(category, [
+      {
+        ...panelRun("front-1", {
+          brandName: {
+            state: "OBSERVED",
+            value: "Blueberry Wine",
+            confidence: 0.94,
+            ocrEvidenceScore: 0.94,
+            alternates: [],
+          },
+        }),
+        sellerRegionReadings: [
+          sellerRegionReading({
+            categoryId: "brandName",
+            regionId: "brand-front",
+            panelId: "front-1",
+            rawTranscript: "MINNEAPOLIS",
+            observedValue: "MINNEAPOLIS",
+            ocrEvidenceScore: 0.93,
+            selectedRegionPixelGeometry: {
+              left: 100,
+              top: 100,
+              width: 18,
+              height: 9,
+              imageWidth: 1000,
+              imageHeight: 1500,
+            },
+          }),
+        ],
+      },
+    ]);
+
+    expect(result.comparison?.outcome).toBe("SELLER_REGION_INSUFFICIENT");
+    expect(result.comparison?.sellerRegionReliability?.[0].reason).toContain(
+      "too small for deterministic bounded comparison",
+    );
+  });
+
+  it("applies the same reliability policy to alcohol statement comparisons", () => {
+    const category = draft().categories[1];
+    const result = deriveCategoryAnalysis(category, [
+      {
+        ...panelRun("back-1", {
+          alcoholStatement: {
+            state: "OBSERVED",
+            value: "13.5% ALC./VOL.",
+            confidence: 0.94,
+            ocrEvidenceScore: 0.94,
+            alternates: [],
+          },
+        }),
+        sellerRegionReadings: [
+          sellerRegionReading({
+            categoryId: "alcoholStatement",
+            regionId: "alcohol-back",
+            panelId: "back-1",
+            rawTranscript: "12.5% ALC./VOL.",
+            observedValue: "12.5% ALC./VOL.",
+            normalizedValue: "12.5",
+            ocrEvidenceScore: 0.55,
+            evidenceState: "LOW_CONFIDENCE",
+            observationState: "LOW_CONFIDENCE",
+          }),
+        ],
+      },
+    ]);
+
+    expect(result.comparison?.outcome).toBe("SELLER_REGION_INSUFFICIENT");
+    expect(result.comparison?.sellerRegionReadings[0].observedValue).toBe("12.5% ALC./VOL.");
+    expect(result.comparison?.machineDiscoveredReading?.observedValue).toBe("13.5% ALC./VOL.");
+  });
+
+  it("does not let outside discovery replace an unreadable seller region", () => {
+    const category = draft().categories[1];
+    const result = deriveCategoryAnalysis(category, [
+      {
+        ...panelRun("back-1", {
+          alcoholStatement: {
+            state: "OBSERVED",
+            value: "13.5% ALC./VOL.",
+            confidence: 0.94,
+            ocrEvidenceScore: 0.94,
+            alternates: [],
+          },
+        }),
+        sellerRegionReadings: [
+          sellerRegionReading({
+            categoryId: "alcoholStatement",
+            regionId: "alcohol-back",
+            panelId: "back-1",
+            observedValue: null,
+            rawTranscript: "",
+            evidenceState: "NOT_OBSERVED",
+            observationState: "NOT_OBSERVED",
+            ocrEvidenceScore: 0,
+          }),
+        ],
+      },
+    ]);
+
+    expect(result.state).toBe("needs_review");
+    expect(result.comparison?.outcome).toBe("SELLER_REGION_INSUFFICIENT");
+    expect(result.comparison?.machineDiscoveredReading?.observedValue).toBe("13.5% ALC./VOL.");
+    expect(result.comparison?.sellerRegionReadings[0].observedValue).toBeNull();
   });
 
   it("requires clear machine evidence, value agreement, and seller-region overlap", () => {

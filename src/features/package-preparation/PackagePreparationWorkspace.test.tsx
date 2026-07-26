@@ -11,6 +11,7 @@ import {
   normalizeGovernmentWarningForComparison,
   type GovernmentWarningPackageFinding,
 } from "@/domain/rules/government-warning.rule";
+import type { SellerRegionMachineReading } from "@/pipeline/extractor/extractor.types";
 import type { SellerPackageDraft } from "./package-model";
 
 const store = vi.hoisted(() => ({
@@ -170,7 +171,9 @@ function machinePanelRun(panelId: string) {
   };
 }
 
-function analysisRun(readiness: "needs_seller_review" | "ready_for_agent_submission") {
+function analysisRun(
+  readiness: "needs_seller_review" | "ready_for_agent_submission",
+): SellerPackageDraft["analysisRuns"][number] {
   return {
     analysisRunId: `analysis-${readiness}`,
     sequence: 1,
@@ -192,6 +195,47 @@ function analysisRun(readiness: "needs_seller_review" | "ready_for_agent_submiss
           : "Seller and machine evidence agree.",
     })),
     readiness,
+  };
+}
+
+function sellerRegionReading(
+  overrides: Partial<SellerRegionMachineReading> = {},
+): SellerRegionMachineReading {
+  return {
+    categoryId: "brandName",
+    regionId: "brand-region",
+    panelId: "front-panel",
+    sellerRegion: {
+      unit: "normalized-panel-relative",
+      provenance: "seller-selected-region",
+      x: 0.1,
+      y: 0.2,
+      width: 0.5,
+      height: 0.2,
+    },
+    cropGeometry: {
+      left: 90,
+      top: 290,
+      width: 530,
+      height: 320,
+      imageWidth: 1000,
+      imageHeight: 1500,
+    },
+    rawTranscript: "CEDAR RIDGE",
+    observedValue: "CEDAR RIDGE",
+    ocrEvidenceScore: 0.91,
+    evidenceState: "OBSERVED",
+    observationState: "OBSERVED",
+    passProvenance: null,
+    extractionProvenance: {
+      extractionAdapterId: "test",
+      extractionAdapterVersion: "1",
+      ocrEngine: { kind: "not_applicable" as const },
+      parserId: "test",
+      parserVersion: "1",
+      processedAt: "2026-07-18T01:00:00.000Z",
+    },
+    ...overrides,
   };
 }
 
@@ -445,7 +489,7 @@ describe("guided category acceptance", () => {
     render(<PackagePreparationWorkspace />);
 
     expect(await screen.findByRole("heading", { name: "Brand name" })).toBeInTheDocument();
-    expect(screen.getByText("You confirmed")).toBeInTheDocument();
+    expect(screen.getByText("Seller says")).toBeInTheDocument();
     expect(screen.getByText("Machine detected")).toBeInTheDocument();
     expect(document.querySelector("[data-machine-observation]")).toBeNull();
     expect(screen.getByRole("button", { name: "Keep my evidence" })).toBeEnabled();
@@ -567,6 +611,111 @@ describe("guided category acceptance", () => {
     fireEvent.click(screen.getByTestId("create-new-package-btn"));
     // New draft should have a fresh packageId
     expect(await screen.findByTestId("draft-selector")).toBeInTheDocument();
+  });
+
+  it("mounts the review workspace with an older analysis run that has no seller-region fields", async () => {
+    const value = fullyAcceptedDraft();
+    value.analysisRuns = [analysisRun("needs_seller_review")];
+    store.load.mockResolvedValue(stored(value));
+
+    render(<PackagePreparationWorkspace />);
+
+    expect(await screen.findByRole("heading", { name: "Brand name" })).toBeInTheDocument();
+    expect(screen.getByText("Machine detected")).toBeInTheDocument();
+  });
+
+  it("mounts the review workspace with bounded readings saved before reliability metadata existed", async () => {
+    const value = fullyAcceptedDraft();
+    const run = analysisRun("needs_seller_review");
+    run.categories[0] = {
+      ...run.categories[0],
+      observedValue: "BLUEBERRY WINE",
+      comparison: {
+        categoryId: "brandName",
+        sellerDeclaredValue: "CEDAR RIDGE",
+        sellerRegionReadings: [sellerRegionReading()],
+        machineDiscoveredReading: {
+          panelId: "front-panel",
+          observedValue: "BLUEBERRY WINE",
+          state: "OBSERVED",
+          ocrEvidenceScore: 0.94,
+          confidence: 0.94,
+          source: "machine-discovered-reading",
+        },
+        outcome: "CONFLICT",
+        reason:
+          "The seller-region machine reading conflicts with the independent machine-discovered reading.",
+        supportingPanelIds: [],
+        supportingRegionIds: [],
+        conflictingPanelIds: ["front-panel"],
+        conflictingRegionIds: ["brand-region"],
+      },
+    };
+    value.analysisRuns = [run];
+    store.load.mockResolvedValue(stored(value));
+
+    render(<PackagePreparationWorkspace />);
+
+    expect(await screen.findByText("Machine read inside selected location")).toBeInTheDocument();
+    expect(screen.getByText("Bounded pass technical details")).toBeInTheDocument();
+    expect(screen.getByText(/No reliability reason recorded/i)).toBeInTheDocument();
+  });
+
+  it("mounts the review workspace with a fresh seller-region insufficient comparison", async () => {
+    const value = fullyAcceptedDraft();
+    const run = analysisRun("needs_seller_review");
+    run.categories[0] = {
+      ...run.categories[0],
+      observedValue: "Blueberry Wine",
+      reason:
+        "Text was detected inside the selected location, but the bounded reading was not reliable enough to compare against the independent machine reading.",
+      comparison: {
+        categoryId: "brandName",
+        sellerDeclaredValue: "CEDAR RIDGE",
+        sellerRegionReadings: [
+          sellerRegionReading({
+            rawTranscript: "CEDAR RIDGE",
+            observedValue: "CEDAR RIDGE",
+            reliabilityState: "UNRELIABLE",
+            reliabilityReason: "Bounded OCR did not produce a high-confidence observed value.",
+          }),
+        ],
+        sellerRegionReliability: [
+          {
+            regionId: "brand-region",
+            panelId: "front-panel",
+            reliabilityState: "UNRELIABLE",
+            reason: "Bounded OCR did not produce a high-confidence observed value.",
+          },
+        ],
+        machineDiscoveredReading: {
+          panelId: "front-panel",
+          observedValue: "Blueberry Wine",
+          state: "OBSERVED",
+          ocrEvidenceScore: 0.94,
+          confidence: 0.94,
+          source: "machine-discovered-reading",
+        },
+        outcome: "SELLER_REGION_INSUFFICIENT",
+        reason:
+          "Text was detected inside the selected location, but the bounded reading was not reliable enough to compare against the independent machine reading.",
+        supportingPanelIds: [],
+        supportingRegionIds: [],
+        conflictingPanelIds: ["front-panel"],
+        conflictingRegionIds: [],
+      },
+    };
+    value.analysisRuns = [run];
+    store.load.mockResolvedValue(stored(value));
+
+    render(<PackagePreparationWorkspace />);
+
+    expect(await screen.findByText("Seller-region insufficient")).toBeInTheDocument();
+    expect(
+      screen.getAllByText(
+        "Text was detected inside the selected location, but the bounded reading was not reliable enough to compare against the independent machine reading.",
+      ).length,
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it("shows government warning as a package-level check and focuses its evidence section", async () => {

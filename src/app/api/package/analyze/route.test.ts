@@ -5,6 +5,7 @@ import { createHash } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SellerPackageDraft } from "@/features/package-preparation/package-model";
+import type { SellerRegionMachineReading } from "@/pipeline/extractor/extractor.types";
 
 const mocks = vi.hoisted(() => ({
   extract: vi.fn(),
@@ -22,6 +23,35 @@ import { POST } from "./route";
 
 const PANEL_BYTES = new TextEncoder().encode("bounded-test-panel");
 const PANEL_SHA = createHash("sha256").update(PANEL_BYTES).digest("hex");
+
+const boundedReading: SellerRegionMachineReading = {
+  categoryId: "brandName",
+  regionId: "brand-region",
+  panelId: "front",
+  sellerRegion: {
+    unit: "normalized-panel-relative",
+    provenance: "seller-selected-region",
+    x: 0.1,
+    y: 0.1,
+    width: 0.8,
+    height: 0.3,
+  },
+  cropGeometry: { left: 8, top: 18, width: 84, height: 64, imageWidth: 100, imageHeight: 200 },
+  rawTranscript: "M CELLARS",
+  observedValue: "M CELLARS",
+  ocrEvidenceScore: 0.91,
+  evidenceState: "OBSERVED",
+  observationState: "OBSERVED",
+  passProvenance: null,
+  extractionProvenance: {
+    extractionAdapterId: "test-adapter",
+    extractionAdapterVersion: "1",
+    ocrEngine: { kind: "not_applicable" },
+    parserId: "test-parser",
+    parserVersion: "1",
+    processedAt: "2026-07-18T00:00:00.000Z",
+  },
+};
 
 function draft(): SellerPackageDraft {
   return {
@@ -163,6 +193,7 @@ beforeEach(() => {
         primarySelections: {},
         finalSelections: {},
       },
+      sellerRegionReadings: [],
     },
   });
 });
@@ -186,6 +217,72 @@ describe("package analysis route", () => {
       ruleId: "government-warning-prescribed-text-v1",
     });
     expect(mocks.extract).toHaveBeenCalledTimes(2);
+    expect(mocks.extract.mock.calls[0][0].sellerRegionTargets).toEqual([
+      expect.objectContaining({
+        categoryId: "brandName",
+        regionId: "brand-region",
+        panelId: "front",
+      }),
+    ]);
+    expect(mocks.extract.mock.calls[1][0].sellerRegionTargets).toEqual([
+      expect.objectContaining({
+        categoryId: "alcoholStatement",
+        regionId: "alcohol-region",
+        panelId: "back",
+      }),
+    ]);
+  });
+
+  it("persists bounded seller-region readings independently from full-panel observations", async () => {
+    mocks.extract.mockResolvedValueOnce({
+      ok: true,
+      value: {
+        response: {
+          provenance: {
+            artifactRef: "front",
+            derivativeSha256: PANEL_SHA,
+            extractionAdapterId: "test-adapter",
+            extractionAdapterVersion: "1",
+            ocrEngine: { kind: "not_applicable" },
+            parserId: "test-parser",
+            parserVersion: "1",
+            processedAt: "2026-07-18T00:00:00.000Z",
+          },
+          fields: {
+            brandName: {
+              state: "OBSERVED",
+              value: "PRODUCER ELSEWHERE",
+              confidence: 0.95,
+              ocrEvidenceScore: 0.95,
+              alternates: [],
+            },
+            alcoholStatement: {
+              state: "NOT_OBSERVED",
+              value: null,
+              confidence: 0,
+              ocrEvidenceScore: 0,
+              alternates: [],
+            },
+          },
+        },
+        debug: {
+          decoded: { width: 100, height: 200 },
+          passes: [],
+          primarySelections: {},
+          finalSelections: {},
+        },
+        sellerRegionReadings: [boundedReading],
+      },
+    });
+
+    const response = await POST(requestFor(draft()));
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.data.analysisRun.panelRuns[0].sellerRegionReadings).toEqual([boundedReading]);
+    expect(JSON.parse(body.data.analysisRun.panelRuns[0].exportJson)).toMatchObject({
+      sellerRegionReadings: [expect.objectContaining({ observedValue: "M CELLARS" })],
+      observations: { brandName: expect.objectContaining({ value: "PRODUCER ELSEWHERE" }) },
+    });
   });
 
   it("analyzes one real front panel after explicit back and additional-panel absence", async () => {

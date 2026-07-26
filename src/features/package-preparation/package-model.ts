@@ -12,6 +12,7 @@ import {
 } from "@/domain/rules/wine-alcohol-parse";
 import type { AnalyzerFieldObservation } from "@/pipeline/analyzer/analyzer.types";
 import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
+import type { SellerRegionMachineReading } from "@/pipeline/extractor/extractor.types";
 import type { PrecheckServiceResponse } from "@/server/precheck-service.types";
 
 export const SELLER_PACKAGE_SCHEMA_VERSION = "seller-package-draft.v1" as const;
@@ -28,6 +29,12 @@ export type CategoryAnalysisState =
 export type PackageReadiness = "needs_seller_review" | "ready_for_agent_submission";
 export type BrandMachineEvidenceState =
   "SUPPORTED" | "CONFLICTING" | "NOT_LOCATED" | "INSUFFICIENT_EVIDENCE";
+export type CategoryTwoStreamOutcome =
+  | "AGREEMENT"
+  | "CONFLICT"
+  | "SELLER_REGION_INSUFFICIENT"
+  | "MACHINE_DISCOVERY_NOT_FOUND"
+  | "BOTH_INSUFFICIENT";
 
 export interface PackageCategoryDefinition {
   categoryId: PackageCategoryId;
@@ -117,6 +124,7 @@ export interface PackageCategoryAnalysis {
   supportingPanelIds: string[];
   supportingRegionIds: string[];
   reason: string;
+  comparison?: CategoryTwoStreamComparison;
 }
 
 export interface PackagePanelMachineRun {
@@ -125,6 +133,37 @@ export interface PackagePanelMachineRun {
   exportJson: string;
   observations: PrecheckServiceResponse["observations"];
   governmentWarning?: GovernmentWarningObservation;
+  sellerRegionReadings?: SellerRegionMachineReading[];
+}
+
+export interface MachineDiscoveredReading {
+  panelId: string;
+  observedValue: string | null;
+  normalizedValue?: string | null;
+  state: AnalyzerFieldObservation["state"];
+  geometry?: AnalyzerFieldObservation["geometry"];
+  ocrEvidenceScore: number;
+  confidence: number;
+  source: "machine-discovered-reading";
+}
+
+export interface CategoryTwoStreamComparison {
+  categoryId: PackageCategoryId;
+  sellerDeclaredValue: string;
+  sellerRegionReadings: SellerRegionMachineReading[];
+  sellerRegionReliability?: {
+    regionId: string;
+    panelId: string;
+    reliabilityState: "RELIABLE" | "UNRELIABLE";
+    reason: string;
+  }[];
+  machineDiscoveredReading: MachineDiscoveredReading | null;
+  outcome: CategoryTwoStreamOutcome;
+  reason: string;
+  supportingPanelIds: string[];
+  supportingRegionIds: string[];
+  conflictingPanelIds: string[];
+  conflictingRegionIds: string[];
 }
 
 export interface PackageBrandIdentityEvidence {
@@ -339,6 +378,187 @@ function valuesAgree(
   return compareText(expected, observation.value).equivalence !== "different";
 }
 
+function valuesEquivalent(categoryId: PackageCategoryId, left: string, right: string): boolean {
+  const observation: AnalyzerFieldObservation = {
+    state: "OBSERVED",
+    value: right,
+    normalizedValue: right,
+    confidence: 1,
+    ocrEvidenceScore: 1,
+    alternates: [],
+  };
+  return valuesAgree(categoryId, left, observation);
+}
+
+const RELIABLE_STREAM_CONFIDENCE_FLOOR = 0.8;
+const LIKELY_OCR_SUBSTITUTION_SIMILARITY = 0.8;
+const MIN_RELIABLE_SELECTED_REGION_WIDTH_PX = 24;
+const MIN_RELIABLE_SELECTED_REGION_HEIGHT_PX = 10;
+
+function readableSellerRegionReading(reading: SellerRegionMachineReading): boolean {
+  return (
+    reading.observedValue !== null &&
+    (reading.evidenceState === "OBSERVED" ||
+      reading.evidenceState === "LOW_CONFIDENCE" ||
+      reading.evidenceState === "AMBIGUOUS")
+  );
+}
+
+function reliableMachineDiscoveredReading(reading: MachineDiscoveredReading | null): boolean {
+  return (
+    reading !== null &&
+    reading.observedValue !== null &&
+    reading.state === "OBSERVED" &&
+    reading.ocrEvidenceScore >= RELIABLE_STREAM_CONFIDENCE_FLOOR
+  );
+}
+
+function sellerRegionReliabilityReason(
+  category: PackageCategoryDraft,
+  reading: SellerRegionMachineReading,
+): string | null {
+  if (reading.observedValue === null) {
+    return "No bounded OCR value was recovered inside the seller-selected region.";
+  }
+  if (reading.evidenceState !== "OBSERVED") {
+    return `Bounded OCR state ${reading.evidenceState} is not reliable enough for deterministic comparison.`;
+  }
+  if (reading.ocrEvidenceScore < RELIABLE_STREAM_CONFIDENCE_FLOOR) {
+    return `Bounded OCR confidence ${reading.ocrEvidenceScore.toFixed(2)} is below the ${RELIABLE_STREAM_CONFIDENCE_FLOOR.toFixed(2)} comparison floor.`;
+  }
+  const selected = reading.selectedRegionPixelGeometry;
+  if (
+    selected &&
+    (selected.width < MIN_RELIABLE_SELECTED_REGION_WIDTH_PX ||
+      selected.height < MIN_RELIABLE_SELECTED_REGION_HEIGHT_PX)
+  ) {
+    return `Selected crop ${selected.width}x${selected.height}px is too small for deterministic bounded comparison.`;
+  }
+  if (!valuesEquivalent(category.categoryId, category.expectedValue, reading.observedValue)) {
+    if (category.categoryId === "brandName") {
+      const comparison = compareText(category.expectedValue, reading.observedValue);
+      if (comparison.similarity >= LIKELY_OCR_SUBSTITUTION_SIMILARITY) {
+        return "Bounded OCR is a near-miss for the seller-entered text, so it is treated as a likely stylized-text OCR substitution.";
+      }
+    }
+    return "Bounded OCR did not support the seller-entered text strongly enough to compare against independent discovery.";
+  }
+  return null;
+}
+
+function reliableSellerRegionReading(
+  category: PackageCategoryDraft,
+  reading: SellerRegionMachineReading,
+): boolean {
+  return sellerRegionReliabilityReason(category, reading) === null;
+}
+
+function firstReadableSellerRegionValue(readings: readonly SellerRegionMachineReading[]) {
+  return readings.find(readableSellerRegionReading)?.observedValue ?? null;
+}
+
+function machineDiscoveredReadingFor(
+  categoryId: PackageCategoryId,
+  panelRuns: readonly PackagePanelMachineRun[],
+): MachineDiscoveredReading | null {
+  for (const panelRun of panelRuns) {
+    const observation = panelRun.observations[categoryId];
+    if (observation.state === "NOT_OBSERVED") continue;
+    return {
+      panelId: panelRun.panelId,
+      observedValue: observation.value,
+      normalizedValue: observation.normalizedValue,
+      state: observation.state,
+      geometry: observation.geometry,
+      ocrEvidenceScore: observation.ocrEvidenceScore,
+      confidence: observation.confidence,
+      source: "machine-discovered-reading",
+    };
+  }
+  return null;
+}
+
+function deriveTwoStreamComparison(
+  category: PackageCategoryDraft,
+  panelRuns: readonly PackagePanelMachineRun[],
+): CategoryTwoStreamComparison | null {
+  const sellerRegionReadings = panelRuns.flatMap((panelRun) =>
+    (panelRun.sellerRegionReadings ?? []).filter(
+      (reading) => reading.categoryId === category.categoryId,
+    ),
+  );
+  if (sellerRegionReadings.length === 0) return null;
+  const sellerRegionReliability = sellerRegionReadings.map((reading) => {
+    const unreliableReason = sellerRegionReliabilityReason(category, reading);
+    return {
+      regionId: reading.regionId,
+      panelId: reading.panelId,
+      reliabilityState: unreliableReason === null ? ("RELIABLE" as const) : ("UNRELIABLE" as const),
+      reason: unreliableReason ?? "Bounded OCR is reliable enough for deterministic comparison.",
+    };
+  });
+
+  const machineDiscoveredReading = machineDiscoveredReadingFor(category.categoryId, panelRuns);
+  const reliableRegionReadings = sellerRegionReadings.filter((reading) =>
+    reliableSellerRegionReading(category, reading),
+  );
+  const bestSellerRegionReading = reliableRegionReadings[0] ?? null;
+  const sellerValue = bestSellerRegionReading?.observedValue ?? null;
+  const machineValue = machineDiscoveredReading?.observedValue ?? null;
+  const machineReadable = reliableMachineDiscoveredReading(machineDiscoveredReading);
+
+  let outcome: CategoryTwoStreamOutcome;
+  let reason: string;
+  let supportingPanelIds: string[] = [];
+  let supportingRegionIds: string[] = [];
+  let conflictingPanelIds: string[] = [];
+  let conflictingRegionIds: string[] = [];
+
+  if (sellerValue && machineValue && machineReadable && machineDiscoveredReading) {
+    if (valuesEquivalent(category.categoryId, sellerValue, machineValue)) {
+      outcome = "AGREEMENT";
+      supportingPanelIds = [machineDiscoveredReading.panelId];
+      supportingRegionIds = reliableRegionReadings.map((reading) => reading.regionId);
+      reason =
+        "The seller-region machine reading agrees with the independent machine-discovered reading.";
+    } else {
+      outcome = "CONFLICT";
+      conflictingPanelIds = [machineDiscoveredReading.panelId];
+      conflictingRegionIds = reliableRegionReadings.map((reading) => reading.regionId);
+      reason =
+        "The seller-region machine reading conflicts with the independent machine-discovered reading.";
+    }
+  } else if (!sellerValue && machineValue && machineDiscoveredReading) {
+    outcome = "SELLER_REGION_INSUFFICIENT";
+    conflictingPanelIds = [machineDiscoveredReading.panelId];
+    reason =
+      "Text was detected inside the selected location, but the bounded reading was not reliable enough to compare against the independent machine reading.";
+  } else if (sellerValue && !machineValue) {
+    outcome = "MACHINE_DISCOVERY_NOT_FOUND";
+    supportingRegionIds = reliableRegionReadings.map((reading) => reading.regionId);
+    reason =
+      "The selected seller region produced a usable machine reading, but independent full-panel discovery did not find the field.";
+  } else {
+    outcome = "BOTH_INSUFFICIENT";
+    reason =
+      "Neither the selected seller region nor independent machine discovery established a usable value.";
+  }
+
+  return {
+    categoryId: category.categoryId,
+    sellerDeclaredValue: category.expectedValue,
+    sellerRegionReadings,
+    sellerRegionReliability,
+    machineDiscoveredReading,
+    outcome,
+    reason,
+    supportingPanelIds,
+    supportingRegionIds,
+    conflictingPanelIds,
+    conflictingRegionIds,
+  };
+}
+
 export function deriveCategoryAnalysis(
   category: PackageCategoryDraft,
   panelRuns: readonly PackagePanelMachineRun[],
@@ -375,6 +595,21 @@ export function deriveCategoryAnalysis(
   }
 
   if (observed.length === 0) {
+    const comparison = deriveTwoStreamComparison(category, panelRuns);
+    if (comparison) {
+      return {
+        categoryId: category.categoryId,
+        state: comparison.outcome === "AGREEMENT" ? "clearly_readable" : "needs_review",
+        observedValue:
+          comparison.machineDiscoveredReading?.observedValue ??
+          firstReadableSellerRegionValue(comparison.sellerRegionReadings) ??
+          null,
+        supportingPanelIds: comparison.supportingPanelIds,
+        supportingRegionIds: comparison.supportingRegionIds,
+        reason: comparison.reason,
+        comparison,
+      };
+    }
     return {
       categoryId: category.categoryId,
       state: "not_found",
@@ -382,6 +617,34 @@ export function deriveCategoryAnalysis(
       supportingPanelIds: [],
       supportingRegionIds: [],
       reason: "No machine observation was recovered from any supplied panel.",
+    };
+  }
+
+  const comparison = deriveTwoStreamComparison(category, panelRuns);
+  if (comparison) {
+    const machineObservedValue = comparison.machineDiscoveredReading?.observedValue ?? null;
+    const sellerDeclaredSupported =
+      comparison.outcome === "AGREEMENT" &&
+      comparison.sellerRegionReadings
+        .filter((reading) => reliableSellerRegionReading(category, reading))
+        .some(
+          (reading) =>
+            reading.observedValue !== null &&
+            valuesEquivalent(category.categoryId, category.expectedValue, reading.observedValue),
+        ) &&
+      machineObservedValue !== null &&
+      comparison.machineDiscoveredReading?.state === "OBSERVED";
+    return {
+      categoryId: category.categoryId,
+      state: sellerDeclaredSupported ? "clearly_readable" : "needs_review",
+      observedValue:
+        comparison.machineDiscoveredReading?.observedValue ??
+        firstReadableSellerRegionValue(comparison.sellerRegionReadings) ??
+        null,
+      supportingPanelIds: comparison.supportingPanelIds,
+      supportingRegionIds: comparison.supportingRegionIds,
+      reason: comparison.reason,
+      comparison,
     };
   }
 
