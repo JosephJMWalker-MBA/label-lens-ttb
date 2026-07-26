@@ -19,6 +19,7 @@ const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffec
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { triggerDownload } from "@/features/precheck/download";
+import type { EvidenceGeometry } from "@/pipeline/analyzer/analyzer.types";
 
 import { GuidedCategoryTask } from "./GuidedCategoryTask";
 import { PackageAnnotationCanvas, type MachinePackageRegion } from "./PackageAnnotationCanvas";
@@ -46,6 +47,7 @@ import {
   packagePanelDecisions,
   serializeSellerPackageExport,
   validNormalizedRegion,
+  CANONICAL_GOVERNMENT_WARNING,
   type CategoryAnalysisState,
   type PackageCategoryDraft,
   type PackageCategoryId,
@@ -98,6 +100,13 @@ const ANALYSIS_LABEL: Record<CategoryAnalysisState, string> = {
   not_applicable: "Not applicable",
 };
 
+const WARNING_RESULT_LABEL = {
+  PASS: "PASS",
+  FAIL: "FAIL",
+  NEEDS_REVIEW: "Needs review",
+  not_run: "Not run",
+} as const;
+
 function now(): string {
   return new Date().toISOString();
 }
@@ -112,6 +121,26 @@ function formatElapsedTime(seconds: number): string {
     .padStart(2, "0");
   const remainder = (seconds % 60).toString().padStart(2, "0");
   return `${minutes}:${remainder}`;
+}
+
+function warningGeometryText(geometry: EvidenceGeometry | undefined): string {
+  if (!geometry) return "No highlighted region";
+  return `x ${geometry.x}, y ${geometry.y}, ${geometry.width} x ${geometry.height} of ${geometry.imageWidth} x ${geometry.imageHeight}`;
+}
+
+function warningDiffPreview(
+  warning: SellerPackageDraft["analysisRuns"][number]["governmentWarning"] | undefined,
+): string {
+  if (!warning) return "No warning rule has run.";
+  const changed = warning.diff.filter((token) => token.status !== "equal").slice(0, 12);
+  if (changed.length === 0) return "Exact token match.";
+  return changed
+    .map((token) => {
+      if (token.status === "missing") return `missing ${token.expected}`;
+      if (token.status === "extra") return `extra ${token.observed}`;
+      return `${token.expected} -> ${token.observed}`;
+    })
+    .join("; ");
 }
 
 /**
@@ -614,6 +643,10 @@ export const PackagePreparationWorkspace = forwardRef<
   const activeCategoryDecision = activeCategory?.decision;
   const latestRun = draft?.analysisRuns.at(-1);
   const analysisCurrent = draft ? latestAnalysisIsCurrent(draft) : false;
+  const latestGovernmentWarningObservation =
+    latestRun?.panelRuns.find(
+      (panelRun) => panelRun.panelId === latestRun.governmentWarning?.observedPanelId,
+    )?.governmentWarning ?? null;
   const latestCategoryResult = latestRun?.categories.find(
     (category) => category.categoryId === activeCategoryId,
   );
@@ -1828,6 +1861,92 @@ export const PackagePreparationWorkspace = forwardRef<
               {latestRun ? (
                 <div className="mt-5" aria-label="Latest pre-check results">
                   <h3 className="font-semibold">Latest pre-check results</h3>
+                  <div className="mt-3 rounded border border-border p-3 text-sm">
+                    <p className="font-semibold">Seller declaration</p>
+                    <p className="text-muted-foreground">
+                      Package identity:{" "}
+                      {latestRun.brandIdentity?.declaredBrandName || draftName(draft)}. Machine
+                      brand evidence: {latestRun.brandIdentity?.state ?? "INSUFFICIENT_EVIDENCE"}.
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {latestRun.brandIdentity?.rationale ??
+                        "Seller-declared brand is package identity; this older analysis run does not include machine brand support/conflict classification."}
+                    </p>
+                  </div>
+                  {latestRun.governmentWarning ? (
+                    <section
+                      className="mt-3 rounded border border-border p-3 text-sm"
+                      aria-labelledby="government-warning-heading"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h4 id="government-warning-heading" className="font-semibold">
+                          Government Warning
+                        </h4>
+                        <span className="font-mono text-xs">
+                          {WARNING_RESULT_LABEL[latestRun.governmentWarning.result]}
+                        </span>
+                      </div>
+                      <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+                        <div>
+                          <dt className="font-medium">Source panel</dt>
+                          <dd className="text-muted-foreground">
+                            {latestRun.governmentWarning.observedPanelId ?? "No panel evidence"}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="font-medium">Detected orientation</dt>
+                          <dd className="text-muted-foreground">
+                            {latestRun.governmentWarning.observedOrientation ?? "Not detected"}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="font-medium">Evidence quality</dt>
+                          <dd className="text-muted-foreground">
+                            {latestGovernmentWarningObservation
+                              ? latestGovernmentWarningObservation.evidenceState
+                              : "not_observed"}{" "}
+                            · OCR{" "}
+                            {latestGovernmentWarningObservation
+                              ? latestGovernmentWarningObservation.ocrEvidenceScore.toFixed(2)
+                              : "0.00"}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="font-medium">Highlighted original-image region</dt>
+                          <dd className="text-muted-foreground">
+                            {warningGeometryText(latestGovernmentWarningObservation?.geometry)}
+                          </dd>
+                        </div>
+                      </dl>
+                      <div className="mt-3 grid gap-3">
+                        <div>
+                          <p className="font-medium">Raw OCR transcript</p>
+                          <p className="mt-1 max-h-24 overflow-auto rounded bg-muted/40 p-2 font-mono text-xs">
+                            {latestRun.governmentWarning.observedText ?? "No transcript"}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="font-medium">Expected text</p>
+                          <p className="mt-1 rounded bg-muted/40 p-2 text-xs">
+                            {CANONICAL_GOVERNMENT_WARNING}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="font-medium">Exact diff</p>
+                          <p className="mt-1 rounded bg-muted/40 p-2 font-mono text-xs">
+                            {warningDiffPreview(latestRun.governmentWarning)}
+                          </p>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {latestRun.governmentWarning.rationale} Rule{" "}
+                          {latestRun.governmentWarning.ruleId}@
+                          {latestRun.governmentWarning.ruleVersion}; authority{" "}
+                          {latestRun.governmentWarning.authority.citation}, retrieved{" "}
+                          {latestRun.governmentWarning.authoritySource.retrievalDate}.
+                        </p>
+                      </div>
+                    </section>
+                  ) : null}
                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
                     {latestRun.categories.map((category) => (
                       <div

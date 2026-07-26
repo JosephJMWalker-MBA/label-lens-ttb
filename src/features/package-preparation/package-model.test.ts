@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import type { PrecheckServiceResponse } from "@/server/precheck-service.types";
+import {
+  CANONICAL_GOVERNMENT_WARNING,
+  governmentWarningMatchSignals,
+  normalizeGovernmentWarningForComparison,
+  type GovernmentWarningObservation,
+} from "@/domain/rules/government-warning.rule";
 
 import {
   appendSellerChange,
@@ -116,6 +122,7 @@ function draft(): SellerPackageDraft {
 function panelRun(
   panelId: string,
   fields: Partial<PrecheckServiceResponse["observations"]> = {},
+  governmentWarning?: GovernmentWarningObservation,
 ): PackagePanelMachineRun {
   const notObserved = {
     state: "NOT_OBSERVED" as const,
@@ -151,6 +158,20 @@ function panelRun(
       alcoholStatement: notObserved,
       ...fields,
     },
+    governmentWarning,
+  };
+}
+
+function warningObservation(panelId: string, rawTranscript = CANONICAL_GOVERNMENT_WARNING) {
+  return {
+    panelId,
+    evidenceState: "observed" as const,
+    rawTranscript,
+    normalizedComparisonText: normalizeGovernmentWarningForComparison(rawTranscript),
+    ocrEvidenceScore: 0.94,
+    detectedOrientation: 270 as const,
+    extractionProvenance: null,
+    match: governmentWarningMatchSignals(rawTranscript),
   };
 }
 
@@ -330,12 +351,18 @@ describe("seller package model", () => {
       draft: value,
       panelRuns: [
         panelRun("front-1", { brandName: observedBrand }),
-        panelRun("back-1", { alcoholStatement: observedAlcohol }),
+        panelRun("back-1", { alcoholStatement: observedAlcohol }, warningObservation("back-1")),
       ],
       analysisRunId: "analysis-ready",
       recordedAt: "2026-07-18T04:00:00.000Z",
     });
     expect(run.readiness).toBe("ready_for_agent_submission");
+    expect(run.governmentWarning).toMatchObject({
+      result: "PASS",
+      observedPanelId: "back-1",
+      observedOrientation: 270,
+    });
+    expect(run.brandIdentity?.state).toBe("SUPPORTED");
 
     const exportValue = await buildSellerPackageExport({
       draft: { ...value, analysisRuns: [run] },

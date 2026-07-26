@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 
 import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
 import { extractLabelEvidenceDetailed } from "@/pipeline/extractor/extractor";
+import { selectGovernmentWarningObservation } from "@/pipeline/extractor/government-warning";
 import type { ExtractionInput } from "@/pipeline/extractor/extractor.types";
 import {
   createAnalysisRun,
@@ -178,12 +179,17 @@ export async function POST(request: Request): Promise<Response> {
       brandName: extracted.value.response.fields.brandName,
       alcoholStatement: extracted.value.response.fields.alcoholStatement,
     };
+    const governmentWarning = selectGovernmentWarningObservation(
+      panel.panelId,
+      extracted.value.debug.passes,
+    );
     const machinePayload = {
       schemaVersion: "package-panel-machine-record.v1",
       packageId: draft.packageId,
       panel,
       sourceSha256: sha,
       observations,
+      governmentWarning,
       versionManifest: executable,
     };
     const machineResultId = createHash("sha256")
@@ -205,6 +211,7 @@ export async function POST(request: Request): Promise<Response> {
       panelId: panel.panelId,
       machineResultId,
       observations,
+      governmentWarning,
       exportJson: canonicalStringify({
         ...machinePayload,
         appendToken,
