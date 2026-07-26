@@ -1,5 +1,7 @@
 import {
+  CANONICAL_GOVERNMENT_WARNING,
   deriveAnchoredGovernmentWarningTranscript,
+  governmentWarningContaminationSignals,
   governmentWarningMatchSignals,
   normalizeGovernmentWarningForComparison,
   type GovernmentWarningObservation,
@@ -52,6 +54,21 @@ function readingOrder(words: OcrWord[]): OcrWord[] {
   });
 }
 
+function normalizedWord(value: string): string {
+  return normalizeGovernmentWarningForComparison(value).replace(/[^a-z0-9]/g, "");
+}
+
+function boundedWarningWords(words: OcrWord[], exactTextMatch: boolean): OcrWord[] {
+  const anchorIndex = words.findIndex(
+    (word, index) =>
+      normalizedWord(word.text) === "government" &&
+      normalizedWord(words[index + 1]?.text ?? "") === "warning",
+  );
+  if (anchorIndex < 0) return words;
+  const expectedTokenCount = CANONICAL_GOVERNMENT_WARNING.split(/\s+/).filter(Boolean).length;
+  return words.slice(anchorIndex, anchorIndex + expectedTokenCount + (exactTextMatch ? 0 : 6));
+}
+
 function provenanceOf(pass: RegionOcrResult): AnalyzerCandidateProvenance {
   return {
     passId: pass.passId,
@@ -83,6 +100,12 @@ function candidateFromPass(
     return null;
   }
 
+  const warningWords = boundedWarningWords(words, match.exactTextMatch);
+  const geometry = unionGeometry(warningWords.map((word) => word.originalGeometry!));
+  const contamination = governmentWarningContaminationSignals(
+    anchored.anchoredTranscript,
+    geometry,
+  );
   const evidenceState =
     match.exactTextMatch || (match.anchorFound && match.canonicalTokenCoverage >= 0.9)
       ? "observed"
@@ -98,8 +121,9 @@ function candidateFromPass(
     ocrEvidenceScore: ocrEvidenceScore(words),
     ocrConfidence: ocrConfidenceOf(words),
     detectedOrientation: pass.transform.rotate,
-    geometry: unionGeometry(words.map((word) => word.originalGeometry!)),
+    geometry,
     extractionProvenance: provenanceOf(pass),
+    contamination,
     match,
   };
 }
@@ -114,6 +138,7 @@ export function selectGovernmentWarningObservation(
     .sort(
       (left, right) =>
         Number(right.match.exactTextMatch) - Number(left.match.exactTextMatch) ||
+        Number(left.contamination?.detected) - Number(right.contamination?.detected) ||
         right.match.canonicalTokenCoverage - left.match.canonicalTokenCoverage ||
         right.ocrEvidenceScore - left.ocrEvidenceScore,
     );

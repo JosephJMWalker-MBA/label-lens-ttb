@@ -7,7 +7,7 @@ import type {
 } from "@/pipeline/analyzer/analyzer.types";
 
 export const GOVERNMENT_WARNING_RULE_ID = "government-warning-prescribed-text-v1";
-export const GOVERNMENT_WARNING_RULE_VERSION = "1.0.0";
+export const GOVERNMENT_WARNING_RULE_VERSION = "1.0.1";
 export const GOVERNMENT_WARNING_PROFILE_ID = "wine-precheck";
 export const GOVERNMENT_WARNING_PROFILE_VERSION = "1.0.0";
 
@@ -41,6 +41,21 @@ export type GovernmentWarningEvidenceState = (typeof GOVERNMENT_WARNING_EVIDENCE
 
 export type GovernmentWarningRuleResult = "PASS" | "FAIL" | "NEEDS_REVIEW" | "not_run";
 
+export const GOVERNMENT_WARNING_CONTAMINATION_REASONS = [
+  "large-panel-coverage",
+  "net-contents-or-abv",
+  "producer-or-brand-text",
+  "address-like-text",
+  "severe-token-displacement",
+] as const;
+export type GovernmentWarningContaminationReason =
+  (typeof GOVERNMENT_WARNING_CONTAMINATION_REASONS)[number];
+
+export interface GovernmentWarningContamination {
+  detected: boolean;
+  reasons: GovernmentWarningContaminationReason[];
+}
+
 export interface GovernmentWarningObservation {
   panelId: string;
   evidenceState: GovernmentWarningEvidenceState;
@@ -53,6 +68,7 @@ export interface GovernmentWarningObservation {
   detectedOrientation: 0 | 90 | 180 | 270 | null;
   geometry?: EvidenceGeometry;
   extractionProvenance: AnalyzerCandidateProvenance | null;
+  contamination?: GovernmentWarningContamination;
   match: {
     anchorFound: boolean;
     anchorUncertain: boolean;
@@ -82,6 +98,7 @@ export interface GovernmentWarningPackageFinding {
   observedText: string | null;
   normalizedObservedText: string | null;
   diff: GovernmentWarningDiffToken[];
+  comparisonStatus?: "reliable" | "contaminated";
   rationale: string;
 }
 
@@ -123,6 +140,76 @@ function rawTokens(value: string): string[] {
   return value.split(/\s+/).filter(Boolean);
 }
 
+function wordTokens(value: string): string[] {
+  return normalizeGovernmentWarningForComparison(value).match(/[a-z0-9]+/g) ?? [];
+}
+
+function longestCommonSubsequenceLength(left: readonly string[], right: readonly string[]): number {
+  const previous = new Array<number>(right.length + 1).fill(0);
+  const current = new Array<number>(right.length + 1).fill(0);
+  for (const leftToken of left) {
+    for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
+      current[rightIndex] =
+        leftToken === right[rightIndex - 1]
+          ? previous[rightIndex - 1] + 1
+          : Math.max(previous[rightIndex], current[rightIndex - 1]);
+    }
+    for (let index = 0; index <= right.length; index += 1) {
+      previous[index] = current[index];
+      current[index] = 0;
+    }
+  }
+  return previous[right.length];
+}
+
+export function governmentWarningContaminationSignals(
+  observed: string | null,
+  geometry?: EvidenceGeometry,
+): GovernmentWarningContamination {
+  if (!observed) return { detected: false, reasons: [] };
+
+  const normalized = normalizeGovernmentWarningForComparison(observed);
+  const reasons: GovernmentWarningContaminationReason[] = [];
+  const geometryArea = geometry ? geometry.width * geometry.height : 0;
+  const imageArea = geometry ? geometry.imageWidth * geometry.imageHeight : 0;
+  if (imageArea > 0 && geometryArea / imageArea >= 0.65) {
+    reasons.push("large-panel-coverage");
+  }
+  if (
+    /\b\d+(?:\.\d+)?\s*(?:ml|cl|l)\b/.test(normalized) ||
+    /\b(?:alc(?:ohol)?\.?\s*\/?\s*vol|alcohol\s+by\s+volume)\b/.test(normalized) ||
+    /%\s*(?:alc|alcohol)/.test(normalized)
+  ) {
+    reasons.push("net-contents-or-abv");
+  }
+  if (/\b(?:wines?|winery|vineyards?|cellars?|estate|bottled|produced)\b/.test(normalized)) {
+    reasons.push("producer-or-brand-text");
+  }
+  if (
+    /,\s*(?:al|ak|az|ar|ca|co|ct|de|fl|ga|hi|id|il|in|ia|ks|ky|la|me|md|ma|mi|mn|ms|mo|mt|ne|nv|nh|nj|nm|ny|nc|nd|oh|ok|or|pa|ri|sc|sd|tn|tx|ut|vt|va|wa|wv|wi|wy)\b/.test(
+      normalized,
+    )
+  ) {
+    reasons.push("address-like-text");
+  }
+
+  const expectedTokens = wordTokens(CANONICAL_GOVERNMENT_WARNING);
+  const observedTokens = wordTokens(observed);
+  const orderedCoverage =
+    expectedTokens.length === 0
+      ? 0
+      : longestCommonSubsequenceLength(expectedTokens, observedTokens) / expectedTokens.length;
+  if (
+    tokenCoverage(observed) >= 0.8 &&
+    orderedCoverage >= 0.7 &&
+    observedTokens.length >= expectedTokens.length + 4
+  ) {
+    reasons.push("severe-token-displacement");
+  }
+
+  return { detected: reasons.length > 0, reasons };
+}
+
 function boundedTokenSegment(value: string): string {
   const expectedTokenCount = rawTokens(CANONICAL_GOVERNMENT_WARNING).length;
   return rawTokens(value)
@@ -135,6 +222,7 @@ function anchoredFromObservation(observation: GovernmentWarningObservation): {
   rawTranscript: string | null;
   anchoredTranscript: string | null;
   normalizedAnchoredComparisonText: string | null;
+  contamination: GovernmentWarningContamination;
   match: GovernmentWarningObservation["match"];
 } {
   if (!observation.rawTranscript) {
@@ -142,6 +230,7 @@ function anchoredFromObservation(observation: GovernmentWarningObservation): {
       rawTranscript: null,
       anchoredTranscript: null,
       normalizedAnchoredComparisonText: null,
+      contamination: observation.contamination ?? { detected: false, reasons: [] },
       match: observation.match,
     };
   }
@@ -164,6 +253,7 @@ function anchoredFromObservation(observation: GovernmentWarningObservation): {
     rawTranscript: observation.rawTranscript,
     anchoredTranscript,
     normalizedAnchoredComparisonText,
+    contamination: governmentWarningContaminationSignals(anchoredTranscript, observation.geometry),
     match: {
       anchorFound: derived.anchorFound || observation.match.anchorFound,
       anchorUncertain: derived.anchorUncertain || observation.match.anchorUncertain,
@@ -285,6 +375,7 @@ export function evaluateGovernmentWarningPackage(
     diff: diffGovernmentWarning(
       best?.anchored.anchoredTranscript ?? best?.anchored.rawTranscript ?? null,
     ),
+    comparisonStatus: "reliable" as const,
   } as const;
 
   if (observations.length === 0) {
@@ -324,6 +415,24 @@ export function evaluateGovernmentWarningPackage(
       ruleExecutionStatus: "executed",
       rationale:
         "NEEDS_REVIEW: likely government-warning evidence exists, but the warning anchor is corrupted or uncertain.",
+    };
+  }
+
+  const broadExactEvidence =
+    best.anchored.match.exactTextMatch &&
+    best.anchored.contamination.reasons.includes("large-panel-coverage");
+  if (
+    best.anchored.contamination.detected &&
+    (!best.anchored.match.exactTextMatch || broadExactEvidence)
+  ) {
+    return {
+      ...base,
+      result: "NEEDS_REVIEW",
+      ruleExecutionStatus: "executed",
+      diff: [],
+      comparisonStatus: "contaminated",
+      rationale:
+        "NEEDS_REVIEW: warning text was detected, but surrounding label text was interleaved with the OCR result. Human review is required.",
     };
   }
 

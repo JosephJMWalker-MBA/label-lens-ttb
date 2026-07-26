@@ -40,6 +40,8 @@ function observation(
 
 const STAGING_PREFIX =
   "BA BAVOL 0106 BOTTLED AND PRODUCED BY ESTATE ARTWORK LINE VERTICAL EDGE TEXT";
+const STAGING_CONTAMINATED_WARNING =
+  "GOVERNMENT WARNING: (1) ACCORDING T0 THE NOCKING POINT WINES SURGEON GENERAL, WOMEN SHOULD, NOT DRINK QUINCY, WA ALCOHOLIC BEVERAGES DURING PREGNANCY BECAUSE OF THE “RISK-. OF BIRTH DEFECTS (2) CONSUMPTION OF “ALCOHOLIC BEVERAGES IMPAIRS YOUR ABILITY TO DRIVEA CAR OR OPERATE 750mL&13.5%alc./vol MACHINERY, AND MAY CAUSE HEALTH PROBLEMS";
 
 describe("government warning prescribed text rule", () => {
   it("passes only exact readable prescribed text", () => {
@@ -93,6 +95,41 @@ describe("government warning prescribed text rule", () => {
       status: "substituted",
     });
     expect(finding.diff.some((token) => token.observed === "ba")).toBe(false);
+  });
+
+  it("routes staging-style interleaved label text to review without a confident defect diff", () => {
+    const finding = evaluateGovernmentWarningPackage([
+      observation(STAGING_CONTAMINATED_WARNING, {
+        geometry: {
+          imageIndex: 0,
+          x: 0,
+          y: 30,
+          width: 976,
+          height: 1057,
+          imageWidth: 976,
+          imageHeight: 1126,
+        },
+      }),
+    ]);
+
+    expect(finding.result).toBe("NEEDS_REVIEW");
+    expect(finding.comparisonStatus).toBe("contaminated");
+    expect(finding.diff).toEqual([]);
+    expect(finding.rationale).toBe(
+      "NEEDS_REVIEW: warning text was detected, but surrounding label text was interleaved with the OCR result. Human review is required.",
+    );
+  });
+
+  it("keeps a clean isolated one-word substitution as a definite fail", () => {
+    const altered = CANONICAL_GOVERNMENT_WARNING.replace("Surgeon General", "Surgeon Gemeral");
+    const finding = evaluateGovernmentWarningPackage([observation(altered)]);
+    expect(finding.result).toBe("FAIL");
+    expect(finding.comparisonStatus).toBe("reliable");
+    expect(finding.diff).toContainEqual({
+      expected: "general",
+      observed: "gemeral",
+      status: "substituted",
+    });
   });
 
   it("ignores unrelated trailing artwork when the prescribed warning is exact", () => {

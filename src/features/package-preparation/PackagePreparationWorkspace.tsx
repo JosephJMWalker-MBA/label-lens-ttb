@@ -133,6 +133,9 @@ function warningDiffPreview(
   warning: SellerPackageDraft["analysisRuns"][number]["governmentWarning"] | undefined,
 ): string {
   if (!warning) return "No warning rule has run.";
+  if (warning.comparisonStatus === "contaminated") {
+    return "Warning text was detected, but surrounding label text was interleaved with the OCR result. Human review is required.";
+  }
   const changed = warning.diff.filter((token) => token.status !== "equal").slice(0, 12);
   if (changed.length === 0) return "Exact token match.";
   return changed
@@ -702,16 +705,13 @@ export const PackagePreparationWorkspace = forwardRef<
         saveState,
       })
     : null;
-  const packageMachineChecks =
-    workflow?.panelDecisionsComplete === true
-      ? [
-          {
-            id: "governmentWarning" as const,
-            label: "Government Warning",
-            status: WARNING_RESULT_LABEL[latestRun?.governmentWarning?.result ?? "not_run"],
-          },
-        ]
-      : [];
+  const packageMachineChecks = [
+    {
+      id: "governmentWarning" as const,
+      label: "Government Warning",
+      status: WARNING_RESULT_LABEL[latestRun?.governmentWarning?.result ?? "not_run"],
+    },
+  ];
   const reviewingAcceptedEvidence = Boolean(
     workflow && reviewingEvidence && !workflow.focusCategoryIds.includes(activeCategoryId),
   );

@@ -7,6 +7,8 @@ import type { RegionOcrResult } from "./extractor.types";
 
 const STAGING_PREFIX =
   "BA BAVOL 0106 BOTTLED AND PRODUCED BY ESTATE ARTWORK LINE VERTICAL EDGE TEXT";
+const STAGING_CONTAMINATED_WARNING =
+  "GOVERNMENT WARNING: (1) ACCORDING T0 THE NOCKING POINT WINES SURGEON GENERAL, WOMEN SHOULD, NOT DRINK QUINCY, WA ALCOHOLIC BEVERAGES DURING PREGNANCY BECAUSE OF THE “RISK-. OF BIRTH DEFECTS (2) CONSUMPTION OF “ALCOHOLIC BEVERAGES IMPAIRS YOUR ABILITY TO DRIVEA CAR OR OPERATE 750mL&13.5%alc./vol MACHINERY, AND MAY CAUSE HEALTH PROBLEMS";
 
 function pass(
   text: string,
@@ -102,6 +104,20 @@ describe("government warning OCR selection", () => {
       observation.normalizedComparisonText,
     );
     expect(observation.match.canonicalTokenCoverage).toBeGreaterThan(0.9);
+  });
+
+  it("retains vertical orientation and provenance for contaminated warning evidence", () => {
+    const observation = selectGovernmentWarningObservation("back", [
+      pass(STAGING_CONTAMINATED_WARNING, 90),
+    ]);
+    expect(observation.detectedOrientation).toBe(90);
+    expect(observation.extractionProvenance?.passKind).toBe("right-edge-strip-rot90");
+    expect(observation.rawTranscript).toBe(STAGING_CONTAMINATED_WARNING);
+    expect(observation.anchoredTranscript).toBe(STAGING_CONTAMINATED_WARNING);
+    expect(observation.contamination).toMatchObject({
+      detected: true,
+      reasons: expect.arrayContaining(["net-contents-or-abv", "producer-or-brand-text"]),
+    });
   });
 
   it("routes cropped warning evidence as partial, not as a pass or absence", () => {
