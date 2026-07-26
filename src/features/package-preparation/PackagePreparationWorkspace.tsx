@@ -330,6 +330,7 @@ export const PackagePreparationWorkspace = forwardRef<
   const restoreAttemptRef = useRef(0);
   const restoreDeadlineRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const restoreCancelledRef = useRef(false);
+  const governmentWarningSectionRef = useRef<HTMLElement | null>(null);
 
   const refreshLocalDrafts = useCallback(async () => {
     try {
@@ -658,6 +659,16 @@ export const PackagePreparationWorkspace = forwardRef<
         saveState,
       })
     : null;
+  const packageMachineChecks =
+    workflow?.panelDecisionsComplete === true
+      ? [
+          {
+            id: "governmentWarning" as const,
+            label: "Government Warning",
+            status: WARNING_RESULT_LABEL[latestRun?.governmentWarning?.result ?? "not_run"],
+          },
+        ]
+      : [];
   const reviewingAcceptedEvidence = Boolean(
     workflow && reviewingEvidence && !workflow.focusCategoryIds.includes(activeCategoryId),
   );
@@ -666,10 +677,7 @@ export const PackagePreparationWorkspace = forwardRef<
     analysisState !== "analyzing" &&
     draft?.panels.length === runtimePanels.length;
   const canExport =
-    latestRun?.readiness === "ready_for_agent_submission" &&
-    analysisCurrent &&
-    saveState === "saved" &&
-    submitter.trim() !== "";
+    workflow?.readyForAgentPackage === true && saveState === "saved" && submitter.trim() !== "";
 
   // A render-synced mirror of `workingRegion` so the reset effect below can read
   // the current in-progress edit without taking it as a dependency.
@@ -1610,6 +1618,17 @@ export const PackagePreparationWorkspace = forwardRef<
     };
   }
 
+  function selectPackageMachineCheck(checkId: "governmentWarning") {
+    if (checkId !== "governmentWarning") return;
+    setGuideOpen(false);
+    setEditingPanels(false);
+    setReviewingEvidence(false);
+    window.setTimeout(() => {
+      governmentWarningSectionRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+      governmentWarningSectionRef.current?.focus({ preventScroll: true });
+    }, 0);
+  }
+
   return (
     <section
       className="min-w-0 pb-64 lg:pb-44"
@@ -1711,6 +1730,7 @@ export const PackagePreparationWorkspace = forwardRef<
           guideOpen={guideOpen}
           editingPanels={editingPanels}
           reviewingEvidence={reviewingAcceptedEvidence}
+          packageMachineChecks={packageMachineChecks}
           message={message}
           showCategoryControls={workflow.panelDecisionsComplete && !editingPanels}
           onSelectPanel={(panelId) => {
@@ -1726,6 +1746,7 @@ export const PackagePreparationWorkspace = forwardRef<
             setReviewingEvidence(!workflow.focusCategoryIds.includes(categoryId));
             selectCategory(categoryId);
           }}
+          onSelectPackageMachineCheck={selectPackageMachineCheck}
           onToggleGuide={() => setGuideOpen((open) => !open)}
           onTogglePanels={() => {
             setGuideOpen(false);
@@ -1875,6 +1896,9 @@ export const PackagePreparationWorkspace = forwardRef<
                   </div>
                   {latestRun.governmentWarning ? (
                     <section
+                      ref={governmentWarningSectionRef}
+                      tabIndex={-1}
+                      data-testid="government-warning-section"
                       className="mt-3 rounded border border-border p-3 text-sm"
                       aria-labelledby="government-warning-heading"
                     >
@@ -1922,7 +1946,15 @@ export const PackagePreparationWorkspace = forwardRef<
                         <div>
                           <p className="font-medium">Raw OCR transcript</p>
                           <p className="mt-1 max-h-24 overflow-auto rounded bg-muted/40 p-2 font-mono text-xs">
-                            {latestRun.governmentWarning.observedText ?? "No transcript"}
+                            {latestGovernmentWarningObservation?.rawTranscript ??
+                              latestRun.governmentWarning.observedText ??
+                              "No transcript"}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="font-medium">Anchored warning transcript</p>
+                          <p className="mt-1 max-h-24 overflow-auto rounded bg-muted/40 p-2 font-mono text-xs">
+                            {latestRun.governmentWarning.observedText ?? "No anchored transcript"}
                           </p>
                         </div>
                         <div>

@@ -1,6 +1,16 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+  CANONICAL_GOVERNMENT_WARNING,
+  GOVERNMENT_WARNING_AUTHORITY,
+  GOVERNMENT_WARNING_AUTHORITY_SOURCE,
+  GOVERNMENT_WARNING_RULE_ID,
+  GOVERNMENT_WARNING_RULE_VERSION,
+  diffGovernmentWarning,
+  normalizeGovernmentWarningForComparison,
+  type GovernmentWarningPackageFinding,
+} from "@/domain/rules/government-warning.rule";
 import type { SellerPackageDraft } from "./package-model";
 
 const store = vi.hoisted(() => ({
@@ -182,6 +192,27 @@ function analysisRun(readiness: "needs_seller_review" | "ready_for_agent_submiss
           : "Seller and machine evidence agree.",
     })),
     readiness,
+  };
+}
+
+function governmentWarningFinding(
+  result: "PASS" | "FAIL" | "NEEDS_REVIEW",
+): GovernmentWarningPackageFinding {
+  return {
+    ruleId: GOVERNMENT_WARNING_RULE_ID,
+    ruleVersion: GOVERNMENT_WARNING_RULE_VERSION,
+    authority: GOVERNMENT_WARNING_AUTHORITY,
+    authoritySource: GOVERNMENT_WARNING_AUTHORITY_SOURCE,
+    result,
+    ruleExecutionStatus: "executed" as const,
+    expectedText: CANONICAL_GOVERNMENT_WARNING,
+    normalizedExpectedText: normalizeGovernmentWarningForComparison(CANONICAL_GOVERNMENT_WARNING),
+    observedPanelId: "back-panel",
+    observedOrientation: 90 as const,
+    observedText: CANONICAL_GOVERNMENT_WARNING,
+    normalizedObservedText: normalizeGovernmentWarningForComparison(CANONICAL_GOVERNMENT_WARNING),
+    diff: diffGovernmentWarning(CANONICAL_GOVERNMENT_WARNING),
+    rationale: `${result}: test government-warning finding.`,
   };
 }
 
@@ -533,6 +564,64 @@ describe("guided category acceptance", () => {
     fireEvent.click(screen.getByTestId("create-new-package-btn"));
     // New draft should have a fresh packageId
     expect(await screen.findByTestId("draft-selector")).toBeInTheDocument();
+  });
+
+  it("shows government warning as a package-level check and focuses its evidence section", async () => {
+    const value = fullyAcceptedDraft();
+    const run: SellerPackageDraft["analysisRuns"][number] = {
+      ...analysisRun("needs_seller_review"),
+      categories: analysisRun("ready_for_agent_submission").categories,
+      governmentWarning: governmentWarningFinding("FAIL"),
+      panelRuns: [
+        {
+          ...machinePanelRun("back-panel"),
+          governmentWarning: {
+            panelId: "back-panel",
+            evidenceState: "observed" as const,
+            rawTranscript: `BA ARTWORK ${CANONICAL_GOVERNMENT_WARNING}`,
+            normalizedComparisonText: normalizeGovernmentWarningForComparison(
+              `BA ARTWORK ${CANONICAL_GOVERNMENT_WARNING}`,
+            ),
+            anchoredTranscript: CANONICAL_GOVERNMENT_WARNING,
+            normalizedAnchoredComparisonText: normalizeGovernmentWarningForComparison(
+              CANONICAL_GOVERNMENT_WARNING,
+            ),
+            ocrEvidenceScore: 0.91,
+            detectedOrientation: 90 as const,
+            extractionProvenance: null,
+            match: {
+              anchorFound: true,
+              anchorUncertain: false,
+              canonicalTokenCoverage: 1,
+              exactTextMatch: true,
+              distinctivePhraseHits: [],
+            },
+          },
+        },
+      ],
+    };
+    value.analysisRuns = [run];
+    store.load.mockResolvedValue(stored(value));
+    const scrollIntoView = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+      configurable: true,
+      value: scrollIntoView,
+    });
+    render(<PackagePreparationWorkspace submitter="Taylor Seller" />);
+
+    const packageChecks = await screen.findByLabelText("Package-level machine checks");
+    const warningButton = within(packageChecks).getByRole("button", {
+      name: /Government Warning/i,
+    });
+    expect(warningButton).toHaveTextContent("FAIL");
+    expect(screen.getByLabelText("Category progress")).toHaveTextContent("Brand name");
+    expect(screen.getByLabelText("Category progress")).toHaveTextContent("Alcohol statement");
+
+    fireEvent.click(warningButton);
+    await waitFor(() => expect(scrollIntoView).toHaveBeenCalled());
+    expect(screen.getByTestId("government-warning-section")).toHaveFocus();
+    expect(screen.getByText(/BA ARTWORK GOVERNMENT WARNING/)).toBeInTheDocument();
+    expect(screen.getByText("Exact token match.")).toBeInTheDocument();
   });
 
   it("cancels draft switch when workspace is dirty and user rejects confirmation", async () => {

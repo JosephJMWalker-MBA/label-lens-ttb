@@ -46,6 +46,8 @@ export interface GovernmentWarningObservation {
   evidenceState: GovernmentWarningEvidenceState;
   rawTranscript: string | null;
   normalizedComparisonText: string | null;
+  anchoredTranscript: string | null;
+  normalizedAnchoredComparisonText: string | null;
   ocrEvidenceScore: number;
   ocrConfidence?: AnalyzerOcrConfidence;
   detectedOrientation: 0 | 90 | 180 | 270 | null;
@@ -53,6 +55,7 @@ export interface GovernmentWarningObservation {
   extractionProvenance: AnalyzerCandidateProvenance | null;
   match: {
     anchorFound: boolean;
+    anchorUncertain: boolean;
     canonicalTokenCoverage: number;
     exactTextMatch: boolean;
     distinctivePhraseHits: string[];
@@ -116,15 +119,60 @@ function tokenCoverage(observed: string): number {
   return expected.length === 0 ? 0 : covered / expected.length;
 }
 
+function rawTokens(value: string): string[] {
+  return value.split(/\s+/).filter(Boolean);
+}
+
+function boundedTokenSegment(value: string): string {
+  const expectedTokenCount = rawTokens(CANONICAL_GOVERNMENT_WARNING).length;
+  return rawTokens(value)
+    .slice(0, expectedTokenCount + 6)
+    .join(" ")
+    .trim();
+}
+
+export function deriveAnchoredGovernmentWarningTranscript(rawTranscript: string): {
+  anchoredTranscript: string | null;
+  normalizedAnchoredComparisonText: string | null;
+  anchorFound: boolean;
+  anchorUncertain: boolean;
+} {
+  const normalizedRaw = normalizeGovernmentWarningForComparison(rawTranscript);
+  const anchor = /government\s+warning\b[:\s]*/i.exec(rawTranscript);
+  if (anchor?.index !== undefined) {
+    const anchoredTranscript = boundedTokenSegment(rawTranscript.slice(anchor.index));
+    return {
+      anchoredTranscript,
+      normalizedAnchoredComparisonText: normalizeGovernmentWarningForComparison(anchoredTranscript),
+      anchorFound: true,
+      anchorUncertain: false,
+    };
+  }
+
+  const anchorUncertain =
+    /\bgovernment\b/.test(normalizedRaw) &&
+    (/\bwarn[a-z0-9]*\b/.test(normalizedRaw) || /\bwarning\b/.test(normalizedRaw));
+  return {
+    anchoredTranscript: null,
+    normalizedAnchoredComparisonText: null,
+    anchorFound: false,
+    anchorUncertain,
+  };
+}
+
 export function governmentWarningMatchSignals(
   rawTranscript: string,
 ): GovernmentWarningObservation["match"] {
-  const normalized = normalizeGovernmentWarningForComparison(rawTranscript);
+  const anchor = deriveAnchoredGovernmentWarningTranscript(rawTranscript);
+  const normalized =
+    anchor.normalizedAnchoredComparisonText ??
+    normalizeGovernmentWarningForComparison(rawTranscript);
   const normalizedExpected = normalizeGovernmentWarningForComparison(CANONICAL_GOVERNMENT_WARNING);
   const distinctivePhraseHits = DISTINCTIVE_PHRASES.filter((phrase) => normalized.includes(phrase));
   return {
-    anchorFound: normalized.includes("government warning"),
-    canonicalTokenCoverage: tokenCoverage(rawTranscript),
+    anchorFound: anchor.anchorFound,
+    anchorUncertain: anchor.anchorUncertain,
+    canonicalTokenCoverage: tokenCoverage(anchor.anchoredTranscript ?? rawTranscript),
     exactTextMatch: normalized === normalizedExpected || normalized.includes(normalizedExpected),
     distinctivePhraseHits,
   };
@@ -132,7 +180,14 @@ export function governmentWarningMatchSignals(
 
 export function diffGovernmentWarning(observed: string | null): GovernmentWarningDiffToken[] {
   const expectedTokens = comparisonTokens(CANONICAL_GOVERNMENT_WARNING);
-  const observedTokens = observed ? comparisonTokens(observed) : [];
+  const normalizedExpected = normalizeGovernmentWarningForComparison(CANONICAL_GOVERNMENT_WARNING);
+  const normalizedObserved = observed ? normalizeGovernmentWarningForComparison(observed) : "";
+  const observedTokens =
+    observed && normalizedObserved.startsWith(normalizedExpected)
+      ? expectedTokens
+      : observed
+        ? comparisonTokens(observed)
+        : [];
   const out: GovernmentWarningDiffToken[] = [];
   const max = Math.max(expectedTokens.length, observedTokens.length);
   for (let index = 0; index < max; index += 1) {
@@ -176,9 +231,10 @@ export function evaluateGovernmentWarningPackage(
     normalizedExpectedText: normalizeGovernmentWarningForComparison(CANONICAL_GOVERNMENT_WARNING),
     observedPanelId: best?.panelId ?? null,
     observedOrientation: best?.detectedOrientation ?? null,
-    observedText: best?.rawTranscript ?? null,
-    normalizedObservedText: best?.normalizedComparisonText ?? null,
-    diff: diffGovernmentWarning(best?.rawTranscript ?? null),
+    observedText: best?.anchoredTranscript ?? best?.rawTranscript ?? null,
+    normalizedObservedText:
+      best?.normalizedAnchoredComparisonText ?? best?.normalizedComparisonText ?? null,
+    diff: diffGovernmentWarning(best?.anchoredTranscript ?? best?.rawTranscript ?? null),
   } as const;
 
   if (observations.length === 0) {
@@ -208,6 +264,16 @@ export function evaluateGovernmentWarningPackage(
       ruleExecutionStatus: "executed",
       rationale:
         "NEEDS_REVIEW: multiple plausible government-warning candidates were observed and no deterministic winner is safe.",
+    };
+  }
+
+  if (best.match.anchorUncertain) {
+    return {
+      ...base,
+      result: "NEEDS_REVIEW",
+      ruleExecutionStatus: "executed",
+      rationale:
+        "NEEDS_REVIEW: likely government-warning evidence exists, but the warning anchor is corrupted or uncertain.",
     };
   }
 

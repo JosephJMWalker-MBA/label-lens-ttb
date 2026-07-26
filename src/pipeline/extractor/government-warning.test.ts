@@ -75,6 +75,17 @@ describe("government warning OCR selection", () => {
     expect(observation.extractionProvenance?.passKind).toBe("left-edge-strip-rot270");
   });
 
+  it("retains vertical raw provenance while anchoring comparison after unrelated crop text", () => {
+    const observation = selectGovernmentWarningObservation("back", [
+      pass(`BA ARTWORK TEXT ${CANONICAL_GOVERNMENT_WARNING}`, 270),
+    ]);
+    expect(observation.evidenceState).toBe("observed");
+    expect(observation.detectedOrientation).toBe(270);
+    expect(observation.rawTranscript).toMatch(/^BA ARTWORK TEXT GOVERNMENT WARNING/);
+    expect(observation.anchoredTranscript).toBe(CANONICAL_GOVERNMENT_WARNING);
+    expect(observation.match.exactTextMatch).toBe(true);
+  });
+
   it("routes cropped warning evidence as partial, not as a pass or absence", () => {
     const observation = selectGovernmentWarningObservation("side", [
       pass("GOVERNMENT WARNING According to the Surgeon General pregnancy risk", 90),

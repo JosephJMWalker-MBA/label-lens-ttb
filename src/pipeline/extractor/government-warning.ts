@@ -1,4 +1,5 @@
 import {
+  deriveAnchoredGovernmentWarningTranscript,
   governmentWarningMatchSignals,
   normalizeGovernmentWarningForComparison,
   type GovernmentWarningObservation,
@@ -71,9 +72,11 @@ function candidateFromPass(
   const words = readingOrder(pass.words).filter((word) => word.originalGeometry !== undefined);
   if (words.length === 0) return null;
   const rawTranscript = words.map((word) => word.text).join(" ");
+  const anchored = deriveAnchoredGovernmentWarningTranscript(rawTranscript);
   const match = governmentWarningMatchSignals(rawTranscript);
   if (
     !match.anchorFound &&
+    !match.anchorUncertain &&
     match.distinctivePhraseHits.length === 0 &&
     match.canonicalTokenCoverage < 0.35
   ) {
@@ -90,6 +93,8 @@ function candidateFromPass(
     evidenceState,
     rawTranscript,
     normalizedComparisonText: normalizeGovernmentWarningForComparison(rawTranscript),
+    anchoredTranscript: anchored.anchoredTranscript,
+    normalizedAnchoredComparisonText: anchored.normalizedAnchoredComparisonText,
     ocrEvidenceScore: ocrEvidenceScore(words),
     ocrConfidence: ocrConfidenceOf(words),
     detectedOrientation: pass.transform.rotate,
@@ -120,11 +125,14 @@ export function selectGovernmentWarningObservation(
       evidenceState: "not_observed",
       rawTranscript: null,
       normalizedComparisonText: null,
+      anchoredTranscript: null,
+      normalizedAnchoredComparisonText: null,
       ocrEvidenceScore: 0,
       detectedOrientation: null,
       extractionProvenance: null,
       match: {
         anchorFound: false,
+        anchorUncertain: false,
         canonicalTokenCoverage: 0,
         exactTextMatch: false,
         distinctivePhraseHits: [],

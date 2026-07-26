@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { PrecheckServiceResponse } from "@/server/precheck-service.types";
 import {
   CANONICAL_GOVERNMENT_WARNING,
+  deriveAnchoredGovernmentWarningTranscript,
   governmentWarningMatchSignals,
   normalizeGovernmentWarningForComparison,
   type GovernmentWarningObservation,
@@ -163,11 +164,14 @@ function panelRun(
 }
 
 function warningObservation(panelId: string, rawTranscript = CANONICAL_GOVERNMENT_WARNING) {
+  const anchored = deriveAnchoredGovernmentWarningTranscript(rawTranscript);
   return {
     panelId,
     evidenceState: "observed" as const,
     rawTranscript,
     normalizedComparisonText: normalizeGovernmentWarningForComparison(rawTranscript),
+    anchoredTranscript: anchored.anchoredTranscript,
+    normalizedAnchoredComparisonText: anchored.normalizedAnchoredComparisonText,
     ocrEvidenceScore: 0.94,
     detectedOrientation: 270 as const,
     extractionProvenance: null,

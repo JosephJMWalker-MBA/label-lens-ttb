@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   CANONICAL_GOVERNMENT_WARNING,
+  deriveAnchoredGovernmentWarningTranscript,
   diffGovernmentWarning,
   evaluateGovernmentWarningPackage,
   governmentWarningMatchSignals,
@@ -14,6 +15,12 @@ function observation(
   overrides: Partial<GovernmentWarningObservation> = {},
 ): GovernmentWarningObservation {
   const match = governmentWarningMatchSignals(rawTranscript ?? "");
+  const anchored = rawTranscript
+    ? deriveAnchoredGovernmentWarningTranscript(rawTranscript)
+    : {
+        anchoredTranscript: null,
+        normalizedAnchoredComparisonText: null,
+      };
   return {
     panelId: "back",
     evidenceState: rawTranscript ? "observed" : "not_observed",
@@ -21,6 +28,8 @@ function observation(
     normalizedComparisonText: rawTranscript
       ? normalizeGovernmentWarningForComparison(rawTranscript)
       : null,
+    anchoredTranscript: anchored.anchoredTranscript,
+    normalizedAnchoredComparisonText: anchored.normalizedAnchoredComparisonText,
     ocrEvidenceScore: 0.92,
     detectedOrientation: 0,
     extractionProvenance: null,
@@ -36,6 +45,31 @@ describe("government warning prescribed text rule", () => {
     expect(finding.ruleId).toBe("government-warning-prescribed-text-v1");
     expect(finding.authority.citation).toContain("27 CFR 16.21");
     expect(finding.diff.every((token) => token.status === "equal")).toBe(true);
+  });
+
+  it("passes exact prescribed text after unrelated crop text and keeps the raw transcript separate", () => {
+    const raw = `BA BARREL ART NAPA VALLEY ${CANONICAL_GOVERNMENT_WARNING}`;
+    const finding = evaluateGovernmentWarningPackage([observation(raw)]);
+    expect(finding.result).toBe("PASS");
+    expect(finding.observedText).toBe(CANONICAL_GOVERNMENT_WARNING);
+    expect(finding.diff.every((token) => token.status === "equal")).toBe(true);
+  });
+
+  it("ignores unrelated trailing artwork when the prescribed warning is exact", () => {
+    const raw = `${CANONICAL_GOVERNMENT_WARNING} ESTATE BOTTLED LOT 24`;
+    const finding = evaluateGovernmentWarningPackage([observation(raw)]);
+    expect(finding.result).toBe("PASS");
+    expect(finding.diff.every((token) => token.status === "equal")).toBe(true);
+  });
+
+  it("routes corrupted or uncertain warning anchors to review instead of a definite fail", () => {
+    const corrupted = CANONICAL_GOVERNMENT_WARNING.replace(
+      "GOVERNMENT WARNING",
+      "GOVERNMENT WARNlNG",
+    );
+    const finding = evaluateGovernmentWarningPackage([observation(corrupted)]);
+    expect(finding.result).toBe("NEEDS_REVIEW");
+    expect(finding.rationale).toMatch(/anchor is corrupted or uncertain/i);
   });
 
   it("fails when a readable warning is missing a word", () => {
@@ -79,6 +113,7 @@ describe("government warning prescribed text rule", () => {
           evidenceState: "not_observed",
           match: {
             anchorFound: false,
+            anchorUncertain: false,
             canonicalTokenCoverage: 0,
             exactTextMatch: false,
             distinctivePhraseHits: [],
