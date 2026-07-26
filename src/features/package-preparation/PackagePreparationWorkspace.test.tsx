@@ -445,7 +445,7 @@ describe("guided category acceptance", () => {
     render(<PackagePreparationWorkspace />);
 
     expect(await screen.findByRole("heading", { name: "Brand name" })).toBeInTheDocument();
-    expect(screen.getByText("You confirmed")).toBeInTheDocument();
+    expect(screen.getByText("Seller says")).toBeInTheDocument();
     expect(screen.getByText("Machine detected")).toBeInTheDocument();
     expect(document.querySelector("[data-machine-observation]")).toBeNull();
     expect(screen.getByRole("button", { name: "Keep my evidence" })).toBeEnabled();

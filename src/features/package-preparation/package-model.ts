@@ -12,6 +12,7 @@ import {
 } from "@/domain/rules/wine-alcohol-parse";
 import type { AnalyzerFieldObservation } from "@/pipeline/analyzer/analyzer.types";
 import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
+import type { SellerRegionMachineReading } from "@/pipeline/extractor/extractor.types";
 import type { PrecheckServiceResponse } from "@/server/precheck-service.types";
 
 export const SELLER_PACKAGE_SCHEMA_VERSION = "seller-package-draft.v1" as const;
@@ -28,6 +29,12 @@ export type CategoryAnalysisState =
 export type PackageReadiness = "needs_seller_review" | "ready_for_agent_submission";
 export type BrandMachineEvidenceState =
   "SUPPORTED" | "CONFLICTING" | "NOT_LOCATED" | "INSUFFICIENT_EVIDENCE";
+export type CategoryTwoStreamOutcome =
+  | "AGREEMENT"
+  | "CONFLICT"
+  | "SELLER_REGION_INSUFFICIENT"
+  | "MACHINE_DISCOVERY_NOT_FOUND"
+  | "BOTH_INSUFFICIENT";
 
 export interface PackageCategoryDefinition {
   categoryId: PackageCategoryId;
@@ -117,6 +124,7 @@ export interface PackageCategoryAnalysis {
   supportingPanelIds: string[];
   supportingRegionIds: string[];
   reason: string;
+  comparison?: CategoryTwoStreamComparison;
 }
 
 export interface PackagePanelMachineRun {
@@ -125,6 +133,31 @@ export interface PackagePanelMachineRun {
   exportJson: string;
   observations: PrecheckServiceResponse["observations"];
   governmentWarning?: GovernmentWarningObservation;
+  sellerRegionReadings?: SellerRegionMachineReading[];
+}
+
+export interface MachineDiscoveredReading {
+  panelId: string;
+  observedValue: string | null;
+  normalizedValue?: string | null;
+  state: AnalyzerFieldObservation["state"];
+  geometry?: AnalyzerFieldObservation["geometry"];
+  ocrEvidenceScore: number;
+  confidence: number;
+  source: "machine-discovered-reading";
+}
+
+export interface CategoryTwoStreamComparison {
+  categoryId: PackageCategoryId;
+  sellerDeclaredValue: string;
+  sellerRegionReadings: SellerRegionMachineReading[];
+  machineDiscoveredReading: MachineDiscoveredReading | null;
+  outcome: CategoryTwoStreamOutcome;
+  reason: string;
+  supportingPanelIds: string[];
+  supportingRegionIds: string[];
+  conflictingPanelIds: string[];
+  conflictingRegionIds: string[];
 }
 
 export interface PackageBrandIdentityEvidence {
@@ -339,6 +372,122 @@ function valuesAgree(
   return compareText(expected, observation.value).equivalence !== "different";
 }
 
+function valuesEquivalent(categoryId: PackageCategoryId, left: string, right: string): boolean {
+  const observation: AnalyzerFieldObservation = {
+    state: "OBSERVED",
+    value: right,
+    normalizedValue: right,
+    confidence: 1,
+    ocrEvidenceScore: 1,
+    alternates: [],
+  };
+  return valuesAgree(categoryId, left, observation);
+}
+
+function readableSellerRegionReading(reading: SellerRegionMachineReading): boolean {
+  return (
+    reading.observedValue !== null &&
+    (reading.evidenceState === "OBSERVED" ||
+      reading.evidenceState === "LOW_CONFIDENCE" ||
+      reading.evidenceState === "AMBIGUOUS")
+  );
+}
+
+function machineDiscoveredReadingFor(
+  categoryId: PackageCategoryId,
+  panelRuns: readonly PackagePanelMachineRun[],
+): MachineDiscoveredReading | null {
+  for (const panelRun of panelRuns) {
+    const observation = panelRun.observations[categoryId];
+    if (observation.state === "NOT_OBSERVED") continue;
+    return {
+      panelId: panelRun.panelId,
+      observedValue: observation.value,
+      normalizedValue: observation.normalizedValue,
+      state: observation.state,
+      geometry: observation.geometry,
+      ocrEvidenceScore: observation.ocrEvidenceScore,
+      confidence: observation.confidence,
+      source: "machine-discovered-reading",
+    };
+  }
+  return null;
+}
+
+function deriveTwoStreamComparison(
+  category: PackageCategoryDraft,
+  panelRuns: readonly PackagePanelMachineRun[],
+): CategoryTwoStreamComparison | null {
+  const sellerRegionReadings = panelRuns.flatMap((panelRun) =>
+    (panelRun.sellerRegionReadings ?? []).filter(
+      (reading) => reading.categoryId === category.categoryId,
+    ),
+  );
+  if (sellerRegionReadings.length === 0) return null;
+
+  const machineDiscoveredReading = machineDiscoveredReadingFor(category.categoryId, panelRuns);
+  const readableRegionReadings = sellerRegionReadings.filter(readableSellerRegionReading);
+  const bestSellerRegionReading = readableRegionReadings[0] ?? null;
+  const sellerValue = bestSellerRegionReading?.observedValue ?? null;
+  const machineValue = machineDiscoveredReading?.observedValue ?? null;
+  const machineReadable =
+    machineDiscoveredReading !== null &&
+    machineValue !== null &&
+    (machineDiscoveredReading.state === "OBSERVED" ||
+      machineDiscoveredReading.state === "LOW_CONFIDENCE" ||
+      machineDiscoveredReading.state === "AMBIGUOUS");
+
+  let outcome: CategoryTwoStreamOutcome;
+  let reason: string;
+  let supportingPanelIds: string[] = [];
+  let supportingRegionIds: string[] = [];
+  let conflictingPanelIds: string[] = [];
+  let conflictingRegionIds: string[] = [];
+
+  if (sellerValue && machineValue && machineReadable && machineDiscoveredReading) {
+    if (valuesEquivalent(category.categoryId, sellerValue, machineValue)) {
+      outcome = "AGREEMENT";
+      supportingPanelIds = [machineDiscoveredReading.panelId];
+      supportingRegionIds = readableRegionReadings.map((reading) => reading.regionId);
+      reason =
+        "The seller-region machine reading agrees with the independent machine-discovered reading.";
+    } else {
+      outcome = "CONFLICT";
+      conflictingPanelIds = [machineDiscoveredReading.panelId];
+      conflictingRegionIds = readableRegionReadings.map((reading) => reading.regionId);
+      reason =
+        "The seller-region machine reading conflicts with the independent machine-discovered reading.";
+    }
+  } else if (!sellerValue && machineValue && machineDiscoveredReading) {
+    outcome = "SELLER_REGION_INSUFFICIENT";
+    conflictingPanelIds = [machineDiscoveredReading.panelId];
+    reason =
+      "The selected seller region did not produce a usable machine reading; outside machine-discovered text was preserved separately.";
+  } else if (sellerValue && !machineValue) {
+    outcome = "MACHINE_DISCOVERY_NOT_FOUND";
+    supportingRegionIds = readableRegionReadings.map((reading) => reading.regionId);
+    reason =
+      "The selected seller region produced a usable machine reading, but independent full-panel discovery did not find the field.";
+  } else {
+    outcome = "BOTH_INSUFFICIENT";
+    reason =
+      "Neither the selected seller region nor independent machine discovery established a usable value.";
+  }
+
+  return {
+    categoryId: category.categoryId,
+    sellerDeclaredValue: category.expectedValue,
+    sellerRegionReadings,
+    machineDiscoveredReading,
+    outcome,
+    reason,
+    supportingPanelIds,
+    supportingRegionIds,
+    conflictingPanelIds,
+    conflictingRegionIds,
+  };
+}
+
 export function deriveCategoryAnalysis(
   category: PackageCategoryDraft,
   panelRuns: readonly PackagePanelMachineRun[],
@@ -375,6 +524,21 @@ export function deriveCategoryAnalysis(
   }
 
   if (observed.length === 0) {
+    const comparison = deriveTwoStreamComparison(category, panelRuns);
+    if (comparison) {
+      return {
+        categoryId: category.categoryId,
+        state: comparison.outcome === "AGREEMENT" ? "clearly_readable" : "needs_review",
+        observedValue:
+          comparison.machineDiscoveredReading?.observedValue ??
+          comparison.sellerRegionReadings.find(readableSellerRegionReading)?.observedValue ??
+          null,
+        supportingPanelIds: comparison.supportingPanelIds,
+        supportingRegionIds: comparison.supportingRegionIds,
+        reason: comparison.reason,
+        comparison,
+      };
+    }
     return {
       categoryId: category.categoryId,
       state: "not_found",
@@ -382,6 +546,34 @@ export function deriveCategoryAnalysis(
       supportingPanelIds: [],
       supportingRegionIds: [],
       reason: "No machine observation was recovered from any supplied panel.",
+    };
+  }
+
+  const comparison = deriveTwoStreamComparison(category, panelRuns);
+  if (comparison) {
+    const machineObservedValue = comparison.machineDiscoveredReading?.observedValue ?? null;
+    const sellerDeclaredSupported =
+      comparison.outcome === "AGREEMENT" &&
+      comparison.sellerRegionReadings
+        .filter(readableSellerRegionReading)
+        .some(
+          (reading) =>
+            reading.observedValue !== null &&
+            valuesEquivalent(category.categoryId, category.expectedValue, reading.observedValue),
+        ) &&
+      machineObservedValue !== null &&
+      comparison.machineDiscoveredReading?.state === "OBSERVED";
+    return {
+      categoryId: category.categoryId,
+      state: sellerDeclaredSupported ? "clearly_readable" : "needs_review",
+      observedValue:
+        comparison.machineDiscoveredReading?.observedValue ??
+        comparison.sellerRegionReadings.find(readableSellerRegionReading)?.observedValue ??
+        null,
+      supportingPanelIds: comparison.supportingPanelIds,
+      supportingRegionIds: comparison.supportingRegionIds,
+      reason: comparison.reason,
+      comparison,
     };
   }
 

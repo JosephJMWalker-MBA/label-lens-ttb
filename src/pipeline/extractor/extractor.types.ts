@@ -21,7 +21,24 @@ export interface ExtractionInput {
   ocrEngine: AnalyzerOcrEngine;
   parserId: string;
   parserVersion: string;
+  sellerRegionTargets?: SellerRegionOcrTarget[];
   diagnostics?: PrecheckDiagnosticTrace;
+}
+
+export type SellerRegionTargetCategoryId = "brandName" | "alcoholStatement";
+
+export interface SellerRegionOcrTarget {
+  categoryId: SellerRegionTargetCategoryId;
+  regionId: string;
+  panelId: string;
+  region: {
+    unit: "normalized-panel-relative";
+    provenance: "seller-selected-region";
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
 }
 
 export type ExtractionErrorCode =
@@ -51,6 +68,7 @@ export const OCR_PASS_KINDS = [
   "focus-crop",
   "focus-edge-strip-rot270",
   "focus-edge-strip-rot90",
+  "seller-region",
 ] as const;
 export type OcrPassKind = (typeof OCR_PASS_KINDS)[number];
 
@@ -62,6 +80,7 @@ export const OCR_PASS_TRIGGER_REASONS = [
   "edge-text-heuristic",
   "focus-crop-distinct",
   "orientation-fallback",
+  "seller-region-target",
 ] as const;
 export type OcrPassTriggerReason = (typeof OCR_PASS_TRIGGER_REASONS)[number];
 
@@ -117,6 +136,51 @@ export interface RegionOcrResult {
   discardedWordCount: number;
   timings: OcrPassTimings;
   words: OcrWord[];
+}
+
+export const SELLER_REGION_READING_STATES = [
+  "OBSERVED",
+  "LOW_CONFIDENCE",
+  "AMBIGUOUS",
+  "NOT_OBSERVED",
+  "INVALID_REGION",
+  "UNREADABLE",
+] as const;
+export type SellerRegionReadingState = (typeof SELLER_REGION_READING_STATES)[number];
+
+export interface SellerRegionMachineReading {
+  categoryId: SellerRegionTargetCategoryId;
+  regionId: string;
+  panelId: string;
+  sellerRegion: SellerRegionOcrTarget["region"];
+  cropGeometry: RegionTransform["crop"] & { imageWidth: number; imageHeight: number };
+  rawTranscript: string;
+  observedValue: string | null;
+  normalizedValue?: string | null;
+  ocrEvidenceScore: number;
+  evidenceState: SellerRegionReadingState;
+  failureReason?: string;
+  observationState?: string;
+  selectedGeometry?: EvidenceGeometry;
+  passProvenance: {
+    passId: string;
+    passKind: OcrPassKind;
+    regionName: string;
+    triggerReasons: OcrPassTriggerReason[];
+    preprocessing: string[];
+    pageSegMode: number;
+    transform: RegionTransform;
+    transformedSize: { width: number; height: number };
+    timings: OcrPassTimings;
+  } | null;
+  extractionProvenance: {
+    extractionAdapterId: string;
+    extractionAdapterVersion: string;
+    ocrEngine: AnalyzerOcrEngine;
+    parserId: string;
+    parserVersion: string;
+    processedAt: string;
+  };
 }
 
 /** Records how a selected field was obtained, for honest provenance. */

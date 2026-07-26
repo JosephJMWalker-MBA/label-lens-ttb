@@ -388,7 +388,7 @@ test("footer-driven workstation exits correction, fits panels, and preserves imm
   await expect(page.getByRole("heading", { name: "Brand name" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Return to current phase" })).toHaveCount(0);
 
-  await expect(page.getByText("You confirmed")).toBeVisible();
+  await expect(page.getByText("Seller says")).toBeVisible();
   await expect(page.getByText("Machine detected")).toBeVisible();
   await expect(page.locator("[data-machine-observation]")).toHaveCount(0);
   await expectSingleStageAction(page, "Keep my evidence");

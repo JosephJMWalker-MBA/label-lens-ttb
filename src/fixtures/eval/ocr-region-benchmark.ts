@@ -1063,6 +1063,7 @@ export function buildSyntheticDetailedResult(input: {
       primarySelections,
       finalSelections,
     },
+    sellerRegionReadings: [],
   };
 }
 

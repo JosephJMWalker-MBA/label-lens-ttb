@@ -115,6 +115,7 @@ const PackageCategoryAnalysisSchema = z.object({
   supportingPanelIds: z.array(PanelIdentitySchema),
   supportingRegionIds: z.array(z.string()),
   reason: z.string(),
+  comparison: z.unknown().optional(),
 });
 
 const PackagePanelMachineRunSchema = z.object({
@@ -122,6 +123,8 @@ const PackagePanelMachineRunSchema = z.object({
   machineResultId: z.string().min(1),
   exportJson: z.string(),
   observations: z.unknown(),
+  governmentWarning: z.unknown().optional(),
+  sellerRegionReadings: z.array(z.unknown()).optional(),
 });
 
 const PackageAnalysisRunSchema = z.object({
@@ -131,6 +134,8 @@ const PackageAnalysisRunSchema = z.object({
   recordedAt: z.string(),
   panelRuns: z.array(PackagePanelMachineRunSchema),
   categories: z.array(PackageCategoryAnalysisSchema),
+  brandIdentity: z.unknown().optional(),
+  governmentWarning: z.unknown().optional(),
   readiness: PackageReadinessSchema,
 });
 

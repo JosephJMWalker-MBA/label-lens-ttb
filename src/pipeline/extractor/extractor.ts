@@ -13,7 +13,18 @@ import {
 } from "./field-selection";
 import { verifyAndDecode } from "./image-integrity";
 import { createLocalOcrEngine } from "./ocr-engine";
-import { planPrimaryOcrPass, planRecoveryOcrPasses, runOcrPass } from "./regions";
+import {
+  planPrimaryOcrPass,
+  planRecoveryOcrPasses,
+  planSellerRegionOcrPass,
+  runOcrPass,
+  sellerRegionCrop,
+} from "./regions";
+import type {
+  RegionOcrResult,
+  SellerRegionMachineReading,
+  SellerRegionOcrTarget,
+} from "./extractor.types";
 
 export interface ExtractionDebug {
   decoded: { width: number; height: number; format: string };
@@ -25,6 +36,7 @@ export interface ExtractionDebug {
 export interface DetailedExtractionResult {
   response: AnalyzerEvidenceResponse;
   debug: ExtractionDebug;
+  sellerRegionReadings: SellerRegionMachineReading[];
 }
 
 /**
@@ -75,6 +87,7 @@ export async function extractLabelEvidenceDetailed(
   let primaryBrand: FieldSelection;
   let primaryAlcohol: FieldSelection;
   let passes: Awaited<ReturnType<typeof runOcrPass>>[] = [];
+  let sellerRegionReadings: SellerRegionMachineReading[] = [];
   try {
     const primaryPass = await runOcrPass(
       input.imageBytes,
@@ -101,6 +114,25 @@ export async function extractLabelEvidenceDetailed(
       primaryAlcohol.observation.state === "NOT_OBSERVED"
         ? selectAlcoholObservation(passes)
         : primaryAlcohol;
+    sellerRegionReadings = [];
+    for (const [targetIndex, target] of (input.sellerRegionTargets ?? []).entries()) {
+      const pass = planSellerRegionOcrPass(
+        target,
+        decoded.value.width,
+        decoded.value.height,
+        passes.length + targetIndex + 1,
+      );
+      if (!pass) {
+        sellerRegionReadings.push(invalidSellerRegionReading(input, target, decoded.value));
+        continue;
+      }
+      const result = await runOcrPass(input.imageBytes, pass, engine, input.diagnostics);
+      const selection =
+        target.categoryId === "brandName"
+          ? selectBrandObservation([result])
+          : selectAlcoholObservation([result]);
+      sellerRegionReadings.push(sellerRegionReadingFromSelection(input, target, result, selection));
+    }
     input.diagnostics?.reach("field-selection-completed", undefined, { once: true });
   } catch (cause) {
     // A recognition or preprocessing failure after worker creation is a safe,
@@ -163,7 +195,118 @@ export async function extractLabelEvidenceDetailed(
       primarySelections: { brand: primaryBrand, alcohol: primaryAlcohol },
       finalSelections: { brand, alcohol },
     },
+    sellerRegionReadings,
   });
+}
+
+function wordsInOriginalOrder(result: RegionOcrResult) {
+  return [...result.words].sort((a, b) => {
+    const ay = a.originalGeometry
+      ? a.originalGeometry.y + a.originalGeometry.height / 2
+      : a.bbox.y0;
+    const by = b.originalGeometry
+      ? b.originalGeometry.y + b.originalGeometry.height / 2
+      : b.bbox.y0;
+    if (Math.abs(ay - by) > 20) return ay - by;
+    const ax = a.originalGeometry ? a.originalGeometry.x : a.bbox.x0;
+    const bx = b.originalGeometry ? b.originalGeometry.x : b.bbox.x0;
+    return ax - bx;
+  });
+}
+
+function extractionProvenance(
+  input: ExtractionInput,
+): SellerRegionMachineReading["extractionProvenance"] {
+  return {
+    extractionAdapterId: input.extractionAdapterId,
+    extractionAdapterVersion: input.extractionAdapterVersion,
+    ocrEngine: input.ocrEngine,
+    parserId: input.parserId,
+    parserVersion: input.parserVersion,
+    processedAt: input.processedAt,
+  };
+}
+
+function invalidSellerRegionReading(
+  input: ExtractionInput,
+  target: SellerRegionOcrTarget,
+  decoded: { width: number; height: number },
+): SellerRegionMachineReading {
+  const crop = sellerRegionCrop(target, decoded.width, decoded.height) ?? {
+    left: 0,
+    top: 0,
+    width: 0,
+    height: 0,
+  };
+  return {
+    categoryId: target.categoryId,
+    regionId: target.regionId,
+    panelId: target.panelId,
+    sellerRegion: target.region,
+    cropGeometry: { ...crop, imageWidth: decoded.width, imageHeight: decoded.height },
+    rawTranscript: "",
+    observedValue: null,
+    ocrEvidenceScore: 0,
+    evidenceState: "INVALID_REGION",
+    failureReason: "Seller-selected region could not be mapped to a usable OCR crop.",
+    passProvenance: null,
+    extractionProvenance: extractionProvenance(input),
+  };
+}
+
+function sellerRegionReadingFromSelection(
+  input: ExtractionInput,
+  target: SellerRegionOcrTarget,
+  result: RegionOcrResult,
+  selection: FieldSelection,
+): SellerRegionMachineReading {
+  const observation = selection.observation;
+  const rawTranscript = wordsInOriginalOrder(result)
+    .map((word) => word.text)
+    .join(" ")
+    .trim();
+  const evidenceState =
+    observation.state === "OBSERVED" ||
+    observation.state === "LOW_CONFIDENCE" ||
+    observation.state === "AMBIGUOUS"
+      ? observation.state
+      : rawTranscript
+        ? "UNREADABLE"
+        : "NOT_OBSERVED";
+  return {
+    categoryId: target.categoryId,
+    regionId: target.regionId,
+    panelId: target.panelId,
+    sellerRegion: target.region,
+    cropGeometry: {
+      ...result.transform.crop,
+      imageWidth: result.transform.originalWidth,
+      imageHeight: result.transform.originalHeight,
+    },
+    rawTranscript,
+    observedValue: observation.value,
+    normalizedValue: observation.normalizedValue,
+    ocrEvidenceScore: observation.ocrEvidenceScore,
+    evidenceState,
+    failureReason:
+      evidenceState === "UNREADABLE" || evidenceState === "NOT_OBSERVED"
+        ? "Bounded OCR did not establish a usable value inside the seller-selected region."
+        : undefined,
+    observationState: observation.state,
+    selectedGeometry: observation.geometry,
+    passProvenance: {
+      passId: result.passId,
+      passKind: result.passKind,
+      regionName: result.regionName,
+      triggerReasons: result.triggerReasons,
+      preprocessing: result.preprocessing,
+      pageSegMode: result.pageSegMode,
+      transform: result.transform,
+      transformedSize: result.transformedSize,
+      timings: result.timings,
+    },
+    extractionProvenance: extractionProvenance(input),
+  };
 }
 
 /**

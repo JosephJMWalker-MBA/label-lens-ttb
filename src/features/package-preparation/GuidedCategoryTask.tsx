@@ -16,6 +16,21 @@ const ANALYSIS_LABEL = {
   not_applicable: "Not applicable",
 } as const;
 
+const COMPARISON_LABEL = {
+  AGREEMENT: "Agreement",
+  CONFLICT: "Conflict",
+  SELLER_REGION_INSUFFICIENT: "Seller-region insufficient",
+  MACHINE_DISCOVERY_NOT_FOUND: "Machine discovery not found",
+  BOTH_INSUFFICIENT: "Both insufficient",
+} as const;
+
+function firstSellerRegionValue(analysis: PackageCategoryAnalysis): string | null {
+  return (
+    analysis.comparison?.sellerRegionReadings.find((reading) => reading.observedValue !== null)
+      ?.observedValue ?? null
+  );
+}
+
 export function GuidedCategoryTask({
   definition,
   instruction,
@@ -86,20 +101,55 @@ export function GuidedCategoryTask({
         <div className="grid gap-2 text-sm" data-testid="correction-comparison">
           <div className="rounded-md border border-orange-700/40 bg-orange-50 p-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-orange-950">
-              You confirmed
+              Seller says
             </p>
             <p className="mt-1 font-semibold text-orange-950">
               {category.expectedValue || "No seller-confirmed text"}
             </p>
           </div>
-          <div className="rounded-md border border-slate-400 bg-slate-50 p-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">
-              Machine detected
-            </p>
-            <p className="mt-1 font-semibold text-slate-900">
-              {analysis.observedValue ?? "No machine text recovered"}
-            </p>
-          </div>
+          {analysis.comparison ? (
+            <>
+              <div className="rounded-md border border-blue-500/50 bg-blue-50 p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-blue-950">
+                  Machine read inside selected location
+                </p>
+                <p className="mt-1 font-semibold text-blue-950">
+                  {firstSellerRegionValue(analysis) ?? "No selected-location text recovered"}
+                </p>
+                <p className="mt-1 text-xs text-blue-950">
+                  {analysis.comparison.sellerRegionReadings.length} seller-region reading
+                  {analysis.comparison.sellerRegionReadings.length === 1 ? "" : "s"} preserved.
+                </p>
+              </div>
+              <div className="rounded-md border border-slate-400 bg-slate-50 p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">
+                  Machine independently found
+                </p>
+                <p className="mt-1 font-semibold text-slate-900">
+                  {analysis.comparison.machineDiscoveredReading?.observedValue ??
+                    "No independent machine text recovered"}
+                </p>
+              </div>
+              <div className="rounded-md border border-amber-500/50 bg-amber-50 p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-amber-950">
+                  Comparison state
+                </p>
+                <p className="mt-1 font-semibold text-amber-950">
+                  {COMPARISON_LABEL[analysis.comparison.outcome]}
+                </p>
+                <p className="mt-1 text-amber-950">{analysis.comparison.reason}</p>
+              </div>
+            </>
+          ) : (
+            <div className="rounded-md border border-slate-400 bg-slate-50 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">
+                Machine detected
+              </p>
+              <p className="mt-1 font-semibold text-slate-900">
+                {analysis.observedValue ?? "No machine text recovered"}
+              </p>
+            </div>
+          )}
           <div className="rounded-md border border-amber-500/50 bg-amber-50 p-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-amber-950">
               Why this was flagged

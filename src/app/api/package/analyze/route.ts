@@ -154,6 +154,16 @@ export async function POST(request: Request): Promise<Response> {
       ocrEngine: executable.ocrEngine,
       parserId: executable.parserId,
       parserVersion: executable.parserVersion,
+      sellerRegionTargets: draft.categories.flatMap((category) =>
+        category.regions
+          .filter((region) => region.panelId === panel.panelId)
+          .map((region) => ({
+            categoryId: category.categoryId,
+            regionId: region.regionId,
+            panelId: panel.panelId,
+            region,
+          })),
+      ),
     };
     const extracted = await extractLabelEvidenceDetailed(input);
     if (!extracted.ok) {
@@ -183,6 +193,7 @@ export async function POST(request: Request): Promise<Response> {
       panel.panelId,
       extracted.value.debug.passes,
     );
+    const sellerRegionReadings = extracted.value.sellerRegionReadings;
     const machinePayload = {
       schemaVersion: "package-panel-machine-record.v1",
       packageId: draft.packageId,
@@ -190,6 +201,7 @@ export async function POST(request: Request): Promise<Response> {
       sourceSha256: sha,
       observations,
       governmentWarning,
+      sellerRegionReadings,
       versionManifest: executable,
     };
     const machineResultId = createHash("sha256")
@@ -212,6 +224,7 @@ export async function POST(request: Request): Promise<Response> {
       machineResultId,
       observations,
       governmentWarning,
+      sellerRegionReadings,
       exportJson: canonicalStringify({
         ...machinePayload,
         appendToken,
