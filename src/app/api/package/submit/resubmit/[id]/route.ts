@@ -242,6 +242,7 @@ function validatePackagePayload(rawPayload: unknown) {
       panel?: unknown;
       sourceSha256?: unknown;
       observations?: unknown;
+      governmentWarning?: unknown;
       versionManifest?: unknown;
       appendToken?: unknown;
     };
@@ -261,6 +262,7 @@ function validatePackagePayload(rawPayload: unknown) {
       panel: parsedExport.panel,
       sourceSha256: parsedExport.sourceSha256,
       observations: parsedExport.observations,
+      governmentWarning: parsedExport.governmentWarning,
       versionManifest: parsedExport.versionManifest,
     };
     const recomputedMachineId = createHash("sha256")

@@ -183,6 +183,7 @@ export async function POST(request: Request) {
       panel?: unknown;
       sourceSha256?: unknown;
       observations?: unknown;
+      governmentWarning?: unknown;
       versionManifest?: unknown;
       appendToken?: unknown;
     };
@@ -202,6 +203,7 @@ export async function POST(request: Request) {
       panel: parsedExport.panel,
       sourceSha256: parsedExport.sourceSha256,
       observations: parsedExport.observations,
+      governmentWarning: parsedExport.governmentWarning,
       versionManifest: parsedExport.versionManifest,
     };
     const recomputedMachineId = createHash("sha256")
