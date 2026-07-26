@@ -87,7 +87,7 @@ describe("hardened processing routes", () => {
     return found;
   }
 
-  it("exposes exactly two bounded processing routes, two append routes, an inert health probe, and authenticated submission routes", () => {
+  it("exposes exactly two bounded processing routes, two append routes, an inert health probe, authenticated submission routes, and the temporary gated proxy diagnostic (issue #183)", () => {
     const routes = routeFiles(apiDir).sort();
     const healthRoute = join(apiDir, "health", "route.ts");
     const packageAnalysisRoute = join(apiDir, "package", "analyze", "route.ts");
@@ -142,6 +142,10 @@ describe("hardened processing routes", () => {
       "internal-accept",
       "route.ts",
     );
+    // TEMPORARY (issue #183): must be removed once Hostinger proxy-header
+    // evidence has been collected and documented — see
+    // docs/deployment.md "Temporary Hostinger proxy header diagnostic".
+    const proxyDiagnosticRoute = join(apiDir, "admin", "proxy-diagnostic", "route.ts");
     const getOnlyRoutes = new Set([
       healthRoute,
       statusRoute,
@@ -151,6 +155,7 @@ describe("hardened processing routes", () => {
       agentQueueRoute,
       agentDetailRoute,
       agentPanelRoute,
+      proxyDiagnosticRoute,
     ]);
     expect(routes).toEqual(
       [
@@ -170,6 +175,7 @@ describe("hardened processing routes", () => {
         agentReleaseRoute,
         agentRequestChangesRoute,
         confirmationRoute,
+        proxyDiagnosticRoute,
         join(apiDir, "precheck", "disposition", "route.ts"),
         join(apiDir, "precheck", "route.ts"),
       ].sort(),
@@ -187,6 +193,7 @@ describe("hardened processing routes", () => {
       agentPanelRoute,
       revisionSeedRoute,
       revisionSeedPanelRoute,
+      proxyDiagnosticRoute,
     ]) {
       const source = readFileSync(route, "utf8");
       expect(source).toMatch(/export\s+async\s+function\s+GET/);

@@ -42,6 +42,7 @@ but `ttb-test.com` is the current custom-domain deployment documented here.
 | `RENDER_GIT_COMMIT` | Automatic on Render only | Used for export provenance when `LABEL_LENS_BUILD_COMMIT` is absent or blank. Hostinger does not currently supply this Render-specific variable. |
 | `LABEL_LENS_OCR_ASSET_DIR`, `LABEL_LENS_OCR_CORE_DIR` | Optional | Override OCR asset locations. Not needed — assets resolve deployment-relative by default. |
 | `LABEL_LENS_TRUSTED_IP_HEADERS`, `LABEL_LENS_TRUSTED_PROXIES` | Optional | See [Trusted client IP behind the Hostinger proxy](#trusted-client-ip-behind-the-hostinger-proxy) below. Leave unset until the values are verified — do not guess them. |
+| `LABEL_LENS_PROXY_DIAGNOSTIC`, `LABEL_LENS_PROXY_DIAGNOSTIC_TOKEN`, `LABEL_LENS_PROXY_DIAGNOSTIC_HMAC_SECRET` | Optional, **temporary** | See [Temporary Hostinger proxy header diagnostic](#temporary-hostinger-proxy-header-diagnostic-issue-183) below. Leave unset by default; enable only for the one bounded evidence-gathering round, then disable and remove the code. |
 
 **No secrets are committed to the repository.** Set the signing key only in the
 hosting platform's secret store. The build commit is not a secret.
@@ -83,9 +84,10 @@ Leaving both unset is byte-for-byte the same as omitting `advanced.ipAddress`
 **Before setting either variable in production**, confirm the real values —
 do not guess:
 
-1. Add a temporary, admin-only diagnostic (or ask Hostinger support directly)
-   to observe what header(s) a live request actually carries, and whether
-   Hostinger's edge consistently forwards from one internal IP or IP range.
+1. Use the temporary, privacy-preserving diagnostic below (issue #183) — or
+   ask Hostinger support directly — to observe what header(s) a live request
+   actually carries, and whether Hostinger's edge consistently forwards from
+   one internal IP or IP range.
 2. Set `LABEL_LENS_TRUSTED_PROXIES` to that confirmed range (as narrow as
    possible — a single IP or the smallest CIDR that covers Hostinger's proxy
    layer) and, only if Hostinger uses a non-default header, set
@@ -98,6 +100,88 @@ do not guess:
    trust boundary — Better Auth drops invalid CIDR entries and degrades to
    "no trusted proxies configured," the same safe fallback as leaving it
    unset.
+
+## Temporary Hostinger proxy header diagnostic (issue #183)
+
+**This section, and the code it documents, must not exist once the evidence
+below has been collected.** It is scaffolding for exactly one deployment
+round to observe Hostinger's live reverse-proxy header behavior — never a
+permanent debug endpoint. Do not leave it enabled, and do not leave the route
+in the tree, once step 6 is done.
+
+### What it is
+
+`GET /api/admin/proxy-diagnostic` (`src/app/api/admin/proxy-diagnostic/route.ts`,
+logic in `src/lib/proxy-diagnostic.ts`) returns a small, fixed-shape JSON
+report: for each candidate proxy header (`x-forwarded-for`, `x-real-ip`,
+`forwarded`, `cf-connecting-ip`, `true-client-ip`, `x-client-ip`,
+`fastly-client-ip`, `x-cluster-client-ip`) it reports only whether the header
+is present, how many comma-separated hops it contains, and one keyed
+HMAC-SHA256 digest per hop — enough to tell whether two observations are the
+**same** value without ever exposing what that value **is**. It also reports
+`peerAddressAvailable: false` / `peerAddressDigest: null` always: Next.js
+Route Handlers only ever see a standard Web `Request`, with no access to the
+underlying TCP socket, so the direct peer address genuinely cannot be
+observed from this runtime layer — that limitation is recorded explicitly
+rather than approximated.
+
+It never inspects, retains, or returns cookies, `authorization`, session
+values, query strings, the request body, or any header outside the fixed
+candidate list above. `src/lib/proxy-diagnostic.test.ts` and
+`src/app/api/admin/proxy-diagnostic/route.test.ts` assert this directly —
+including planting a raw IP, a session cookie, and a bearer token in request
+headers and proving none of them appear anywhere in the response.
+
+### Gating (defense in depth, disabled by default)
+
+1. `LABEL_LENS_PROXY_DIAGNOSTIC` must be the literal string `true`, or the
+   route responds `404` — indistinguishable from a route that doesn't exist.
+2. `LABEL_LENS_PROXY_DIAGNOSTIC_TOKEN` (≥ 20 chars) and
+   `LABEL_LENS_PROXY_DIAGNOSTIC_HMAC_SECRET` (≥ 32 chars) must both be set,
+   or the route responds `503` without revealing which is missing. Neither
+   has a default; there is no fallback secret.
+3. The caller must send the exact token via the `X-Diagnostic-Token` header,
+   compared in constant time (`verifyDiagnosticToken`, digest-then-compare so
+   neither length nor content is leaked through timing). A missing or wrong
+   token responds `404`, the same as the route being disabled — an attacker
+   who reaches this endpoint learns nothing about *why* it refused them.
+
+### Operator steps
+
+1. **Deploy with the diagnostic disabled** (leave `LABEL_LENS_PROXY_DIAGNOSTIC`
+   unset). This ships as inert code — no behavior changes until it's turned on.
+2. **Temporarily enable it**: set `LABEL_LENS_PROXY_DIAGNOSTIC=true`, a fresh
+   `LABEL_LENS_PROXY_DIAGNOSTIC_TOKEN` (e.g. `openssl rand -hex 24`), and a
+   fresh `LABEL_LENS_PROXY_DIAGNOSTIC_HMAC_SECRET` (e.g. `openssl rand -hex 32`)
+   in the hosting platform's secret store, then redeploy.
+3. **Make controlled requests** from at least two known external networks
+   where practical, e.g.:
+   ```bash
+   curl -s -H "X-Diagnostic-Token: <token>" https://ttb-test.com/api/admin/proxy-diagnostic
+   ```
+   Repeat from a second network/device. Compare the two JSON responses:
+   matching `hopDigests` for the *last* hop across both requests, with
+   different digests for the earlier hop(s), is the signature of a stable
+   proxy hop sitting in front of varying real clients.
+4. **Inspect Hostinger's runtime logs** for the deployed process, if
+   available, as a cross-check — the diagnostic itself does not write
+   anything server-side; it only returns the report in the HTTP response.
+5. **Record only the redacted comparison results** (never raw digests
+   correlated with real IPs you happen to know) in the issue/PR: which
+   header(s) were present, the hop count, and whether the same hop's digest
+   repeated across independent requests/networks.
+6. **Disable the diagnostic** (unset `LABEL_LENS_PROXY_DIAGNOSTIC` or set it to
+   anything other than `true`) and **remove this temporary code** —
+   `src/lib/proxy-diagnostic.ts`, its tests, `src/app/api/admin/proxy-diagnostic/`,
+   and this section — in the same PR that acts on the evidence, or in a
+   guaranteed immediate follow-up. Do not merge a permanent
+   `LABEL_LENS_TRUSTED_PROXIES`/`LABEL_LENS_TRUSTED_IP_HEADERS` configuration
+   change in the same commit as leaving this diagnostic in place.
+
+If the evidence is ambiguous — no stable repeating hop, or the candidate
+headers are all absent — leave `LABEL_LENS_TRUSTED_PROXIES` and
+`LABEL_LENS_TRUSTED_IP_HEADERS` unset and document that explicitly; the
+existing shared-bucket fallback from the previous section remains in effect.
 
 ## Database dialect graphs (`better-sqlite3` is never required in production)
 
