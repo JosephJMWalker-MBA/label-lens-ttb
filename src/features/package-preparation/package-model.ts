@@ -151,7 +151,7 @@ export interface CategoryTwoStreamComparison {
   categoryId: PackageCategoryId;
   sellerDeclaredValue: string;
   sellerRegionReadings: SellerRegionMachineReading[];
-  sellerRegionReliability: {
+  sellerRegionReliability?: {
     regionId: string;
     panelId: string;
     reliabilityState: "RELIABLE" | "UNRELIABLE";

@@ -421,7 +421,7 @@ describe("seller package model", () => {
     expect(result.comparison?.outcome).not.toBe("CONFLICT");
     expect(result.comparison?.machineDiscoveredReading?.observedValue).toBe("Blueberry Wine");
     expect(result.comparison?.sellerRegionReadings[0].observedValue).toBe("MINNEADOLIS");
-    expect(result.comparison?.sellerRegionReliability[0]).toMatchObject({
+    expect(result.comparison?.sellerRegionReliability?.[0]).toMatchObject({
       reliabilityState: "UNRELIABLE",
       reason:
         "Bounded OCR is a near-miss for the seller-entered text, so it is treated as a likely stylized-text OCR substitution.",
@@ -494,7 +494,7 @@ describe("seller package model", () => {
     ]);
 
     expect(result.comparison?.outcome).toBe("SELLER_REGION_INSUFFICIENT");
-    expect(result.comparison?.sellerRegionReliability[0].reason).toContain(
+    expect(result.comparison?.sellerRegionReliability?.[0].reason).toContain(
       "too small for deterministic bounded comparison",
     );
   });

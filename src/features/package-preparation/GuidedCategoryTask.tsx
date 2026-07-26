@@ -31,6 +31,10 @@ function firstSellerRegionValue(analysis: PackageCategoryAnalysis): string | nul
   );
 }
 
+function firstSellerRegionReliability(analysis: PackageCategoryAnalysis) {
+  return analysis.comparison?.sellerRegionReliability?.[0] ?? null;
+}
+
 function formatCrop(crop: { left: number; top: number; width: number; height: number }) {
   return `left ${crop.left}, top ${crop.top}, ${crop.width}x${crop.height}px`;
 }
@@ -231,11 +235,11 @@ export function GuidedCategoryTask({
                     <div>
                       <dt className="font-medium text-foreground">Reliability</dt>
                       <dd>
-                        {analysis.comparison.sellerRegionReliability[0]?.reliabilityState ??
+                        {firstSellerRegionReliability(analysis)?.reliabilityState ??
                           analysis.comparison.sellerRegionReadings[0].reliabilityState ??
                           "Unknown"}{" "}
                         ·{" "}
-                        {analysis.comparison.sellerRegionReliability[0]?.reason ??
+                        {firstSellerRegionReliability(analysis)?.reason ??
                           analysis.comparison.sellerRegionReadings[0].reliabilityReason ??
                           "No reliability reason recorded."}
                       </dd>
