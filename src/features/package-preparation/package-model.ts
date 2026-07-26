@@ -478,14 +478,18 @@ export function packageReadyForAgentReview(draft: SellerPackageDraft): boolean {
   const latestRun = draft.analysisRuns.at(-1);
   if (!latestRun || !latestAnalysisIsCurrent(draft)) return false;
   if (latestRun.readiness === "ready_for_agent_submission") return true;
-  if (latestRun.governmentWarning && latestRun.governmentWarning.result !== "PASS") return false;
 
   const flaggedCategoryIds = latestRun.categories
     .filter(
       (category) => category.state !== "clearly_readable" && category.state !== "not_applicable",
     )
     .map((category) => category.categoryId);
-  if (flaggedCategoryIds.length === 0) return false;
+  if (flaggedCategoryIds.length === 0) {
+    return (
+      latestRun.governmentWarning?.result === "FAIL" ||
+      latestRun.governmentWarning?.result === "NEEDS_REVIEW"
+    );
+  }
 
   return flaggedCategoryIds.every((categoryId) =>
     draft.sellerChangeHistory.some(
