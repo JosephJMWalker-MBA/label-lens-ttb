@@ -5,6 +5,9 @@ import { CANONICAL_GOVERNMENT_WARNING } from "@/domain/rules/government-warning.
 import { selectGovernmentWarningObservation } from "./government-warning";
 import type { RegionOcrResult } from "./extractor.types";
 
+const STAGING_PREFIX =
+  "BA BAVOL 0106 BOTTLED AND PRODUCED BY ESTATE ARTWORK LINE VERTICAL EDGE TEXT";
+
 function pass(
   text: string,
   rotate: RegionOcrResult["transform"]["rotate"],
@@ -84,6 +87,21 @@ describe("government warning OCR selection", () => {
     expect(observation.rawTranscript).toMatch(/^BA ARTWORK TEXT GOVERNMENT WARNING/);
     expect(observation.anchoredTranscript).toBe(CANONICAL_GOVERNMENT_WARNING);
     expect(observation.match.exactTextMatch).toBe(true);
+  });
+
+  it("persists a distinct anchor for staging-style prefix noise and body OCR misspelling", () => {
+    const ocrWarning = CANONICAL_GOVERNMENT_WARNING.replace("Surgeon General", "SURGEON GEMERAL");
+    const observation = selectGovernmentWarningObservation("back", [
+      pass(`${STAGING_PREFIX} ${ocrWarning}`, 270),
+    ]);
+    expect(observation.evidenceState).toBe("observed");
+    expect(observation.rawTranscript).toContain(STAGING_PREFIX);
+    expect(observation.anchoredTranscript).toBe(ocrWarning);
+    expect(observation.anchoredTranscript).not.toBe(observation.rawTranscript);
+    expect(observation.normalizedAnchoredComparisonText).not.toBe(
+      observation.normalizedComparisonText,
+    );
+    expect(observation.match.canonicalTokenCoverage).toBeGreaterThan(0.9);
   });
 
   it("routes cropped warning evidence as partial, not as a pass or absence", () => {

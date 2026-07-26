@@ -18,6 +18,7 @@ const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffec
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { deriveAnchoredGovernmentWarningTranscript } from "@/domain/rules/government-warning.rule";
 import { triggerDownload } from "@/features/precheck/download";
 import type { EvidenceGeometry } from "@/pipeline/analyzer/analyzer.types";
 
@@ -141,6 +142,40 @@ function warningDiffPreview(
       return `${token.expected} -> ${token.observed}`;
     })
     .join("; ");
+}
+
+function warningAnchoredTranscriptForDisplay(
+  observation:
+    SellerPackageDraft["analysisRuns"][number]["panelRuns"][number]["governmentWarning"] | null,
+  warning: SellerPackageDraft["analysisRuns"][number]["governmentWarning"] | undefined,
+): string | null {
+  if (
+    observation?.anchoredTranscript &&
+    observation.anchoredTranscript !== observation.rawTranscript
+  ) {
+    return observation.anchoredTranscript;
+  }
+  if (observation?.rawTranscript) {
+    const derived = deriveAnchoredGovernmentWarningTranscript(observation.rawTranscript);
+    if (derived.anchoredTranscript) return derived.anchoredTranscript;
+  }
+  return warning?.observedText ?? null;
+}
+
+function warningAnalysisNeedsAnchoredRerun(
+  observation:
+    SellerPackageDraft["analysisRuns"][number]["panelRuns"][number]["governmentWarning"] | null,
+  warning: SellerPackageDraft["analysisRuns"][number]["governmentWarning"] | undefined,
+): boolean {
+  if (!observation?.rawTranscript || !warning?.observedText) return false;
+  const derived = deriveAnchoredGovernmentWarningTranscript(observation.rawTranscript);
+  return Boolean(
+    derived.anchoredTranscript &&
+    derived.anchoredTranscript !== observation.rawTranscript &&
+    (observation.anchoredTranscript == null ||
+      observation.anchoredTranscript === observation.rawTranscript ||
+      warning.observedText === observation.rawTranscript),
+  );
 }
 
 /**
@@ -648,6 +683,14 @@ export const PackagePreparationWorkspace = forwardRef<
     latestRun?.panelRuns.find(
       (panelRun) => panelRun.panelId === latestRun.governmentWarning?.observedPanelId,
     )?.governmentWarning ?? null;
+  const latestGovernmentWarningAnchoredTranscript = warningAnchoredTranscriptForDisplay(
+    latestGovernmentWarningObservation,
+    latestRun?.governmentWarning,
+  );
+  const latestGovernmentWarningNeedsAnchoredRerun = warningAnalysisNeedsAnchoredRerun(
+    latestGovernmentWarningObservation,
+    latestRun?.governmentWarning,
+  );
   const latestCategoryResult = latestRun?.categories.find(
     (category) => category.categoryId === activeCategoryId,
   );
@@ -1943,6 +1986,13 @@ export const PackagePreparationWorkspace = forwardRef<
                         </div>
                       </dl>
                       <div className="mt-3 grid gap-3">
+                        {latestGovernmentWarningNeedsAnchoredRerun ? (
+                          <p className="rounded border border-amber-500/50 bg-amber-50 p-2 text-xs text-amber-950">
+                            This saved pre-check was produced before a distinct anchored warning
+                            transcript was persisted. Run pre-check again after deployment to
+                            refresh the Government Warning result and exact diff.
+                          </p>
+                        ) : null}
                         <div>
                           <p className="font-medium">Raw OCR transcript</p>
                           <p className="mt-1 max-h-24 overflow-auto rounded bg-muted/40 p-2 font-mono text-xs">
@@ -1954,7 +2004,7 @@ export const PackagePreparationWorkspace = forwardRef<
                         <div>
                           <p className="font-medium">Anchored warning transcript</p>
                           <p className="mt-1 max-h-24 overflow-auto rounded bg-muted/40 p-2 font-mono text-xs">
-                            {latestRun.governmentWarning.observedText ?? "No anchored transcript"}
+                            {latestGovernmentWarningAnchoredTranscript ?? "No anchored transcript"}
                           </p>
                         </div>
                         <div>

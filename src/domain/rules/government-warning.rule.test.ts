@@ -38,6 +38,9 @@ function observation(
   };
 }
 
+const STAGING_PREFIX =
+  "BA BAVOL 0106 BOTTLED AND PRODUCED BY ESTATE ARTWORK LINE VERTICAL EDGE TEXT";
+
 describe("government warning prescribed text rule", () => {
   it("passes only exact readable prescribed text", () => {
     const finding = evaluateGovernmentWarningPackage([observation(CANONICAL_GOVERNMENT_WARNING)]);
@@ -53,6 +56,43 @@ describe("government warning prescribed text rule", () => {
     expect(finding.result).toBe("PASS");
     expect(finding.observedText).toBe(CANONICAL_GOVERNMENT_WARNING);
     expect(finding.diff.every((token) => token.status === "equal")).toBe(true);
+  });
+
+  it("re-anchors a staging-style prefixed persisted observation before comparing and diffing", () => {
+    const ocrWarning = CANONICAL_GOVERNMENT_WARNING.replace("Surgeon General", "SURGEON GEMERAL");
+    const raw = `${STAGING_PREFIX} ${ocrWarning}`;
+    const derived = deriveAnchoredGovernmentWarningTranscript(raw);
+    expect(derived.anchoredTranscript).not.toBe(raw);
+    expect(derived.anchoredTranscript).toMatch(/^GOVERNMENT WARNING/);
+
+    const finding = evaluateGovernmentWarningPackage([
+      observation(raw, {
+        anchoredTranscript: raw,
+        normalizedAnchoredComparisonText: normalizeGovernmentWarningForComparison(raw),
+        match: {
+          anchorFound: true,
+          anchorUncertain: false,
+          canonicalTokenCoverage: 0.98,
+          exactTextMatch: false,
+          distinctivePhraseHits: ["during pregnancy", "risk of birth defects"],
+        },
+      }),
+    ]);
+
+    expect(finding.result).toBe("FAIL");
+    expect(finding.observedText).toBe(derived.anchoredTranscript);
+    expect(finding.observedText).not.toContain(STAGING_PREFIX);
+    expect(finding.diff[0]).toMatchObject({
+      expected: "government",
+      observed: "government",
+      status: "equal",
+    });
+    expect(finding.diff).toContainEqual({
+      expected: "general",
+      observed: "gemeral",
+      status: "substituted",
+    });
+    expect(finding.diff.some((token) => token.observed === "ba")).toBe(false);
   });
 
   it("ignores unrelated trailing artwork when the prescribed warning is exact", () => {

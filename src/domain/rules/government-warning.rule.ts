@@ -131,6 +131,49 @@ function boundedTokenSegment(value: string): string {
     .trim();
 }
 
+function anchoredFromObservation(observation: GovernmentWarningObservation): {
+  rawTranscript: string | null;
+  anchoredTranscript: string | null;
+  normalizedAnchoredComparisonText: string | null;
+  match: GovernmentWarningObservation["match"];
+} {
+  if (!observation.rawTranscript) {
+    return {
+      rawTranscript: null,
+      anchoredTranscript: null,
+      normalizedAnchoredComparisonText: null,
+      match: observation.match,
+    };
+  }
+
+  const derived = deriveAnchoredGovernmentWarningTranscript(observation.rawTranscript);
+  const anchoredTranscript =
+    derived.anchoredTranscript && derived.anchoredTranscript !== observation.rawTranscript
+      ? derived.anchoredTranscript
+      : (observation.anchoredTranscript ?? derived.anchoredTranscript);
+  const normalizedAnchoredComparisonText = anchoredTranscript
+    ? normalizeGovernmentWarningForComparison(anchoredTranscript)
+    : null;
+  const normalized =
+    normalizedAnchoredComparisonText ??
+    normalizeGovernmentWarningForComparison(observation.rawTranscript);
+  const normalizedExpected = normalizeGovernmentWarningForComparison(CANONICAL_GOVERNMENT_WARNING);
+  const distinctivePhraseHits = DISTINCTIVE_PHRASES.filter((phrase) => normalized.includes(phrase));
+
+  return {
+    rawTranscript: observation.rawTranscript,
+    anchoredTranscript,
+    normalizedAnchoredComparisonText,
+    match: {
+      anchorFound: derived.anchorFound || observation.match.anchorFound,
+      anchorUncertain: derived.anchorUncertain || observation.match.anchorUncertain,
+      canonicalTokenCoverage: tokenCoverage(anchoredTranscript ?? observation.rawTranscript),
+      exactTextMatch: normalized === normalizedExpected || normalized.includes(normalizedExpected),
+      distinctivePhraseHits,
+    },
+  };
+}
+
 export function deriveAnchoredGovernmentWarningTranscript(rawTranscript: string): {
   anchoredTranscript: string | null;
   normalizedAnchoredComparisonText: string | null;
@@ -209,16 +252,19 @@ export function diffGovernmentWarning(observed: string | null): GovernmentWarnin
 export function evaluateGovernmentWarningPackage(
   observations: readonly GovernmentWarningObservation[],
 ): GovernmentWarningPackageFinding {
-  const candidates = observations.filter(
-    (observation) => observation.evidenceState !== "not_observed",
-  );
-  const exact = candidates.find((observation) => observation.match.exactTextMatch);
+  const candidates = observations
+    .filter((observation) => observation.evidenceState !== "not_observed")
+    .map((observation) => ({
+      observation,
+      anchored: anchoredFromObservation(observation),
+    }));
+  const exact = candidates.find((candidate) => candidate.anchored.match.exactTextMatch);
   const best =
     exact ??
     [...candidates].sort(
       (left, right) =>
-        right.match.canonicalTokenCoverage - left.match.canonicalTokenCoverage ||
-        right.ocrEvidenceScore - left.ocrEvidenceScore,
+        right.anchored.match.canonicalTokenCoverage - left.anchored.match.canonicalTokenCoverage ||
+        right.observation.ocrEvidenceScore - left.observation.ocrEvidenceScore,
     )[0] ??
     null;
 
@@ -229,12 +275,16 @@ export function evaluateGovernmentWarningPackage(
     authoritySource: GOVERNMENT_WARNING_AUTHORITY_SOURCE,
     expectedText: CANONICAL_GOVERNMENT_WARNING,
     normalizedExpectedText: normalizeGovernmentWarningForComparison(CANONICAL_GOVERNMENT_WARNING),
-    observedPanelId: best?.panelId ?? null,
-    observedOrientation: best?.detectedOrientation ?? null,
-    observedText: best?.anchoredTranscript ?? best?.rawTranscript ?? null,
+    observedPanelId: best?.observation.panelId ?? null,
+    observedOrientation: best?.observation.detectedOrientation ?? null,
+    observedText: best?.anchored.anchoredTranscript ?? best?.anchored.rawTranscript ?? null,
     normalizedObservedText:
-      best?.normalizedAnchoredComparisonText ?? best?.normalizedComparisonText ?? null,
-    diff: diffGovernmentWarning(best?.anchoredTranscript ?? best?.rawTranscript ?? null),
+      best?.anchored.normalizedAnchoredComparisonText ??
+      best?.observation.normalizedComparisonText ??
+      null,
+    diff: diffGovernmentWarning(
+      best?.anchored.anchoredTranscript ?? best?.anchored.rawTranscript ?? null,
+    ),
   } as const;
 
   if (observations.length === 0) {
@@ -257,7 +307,7 @@ export function evaluateGovernmentWarningPackage(
     };
   }
 
-  if (best.evidenceState === "ambiguous") {
+  if (best.observation.evidenceState === "ambiguous") {
     return {
       ...base,
       result: "NEEDS_REVIEW",
@@ -267,7 +317,7 @@ export function evaluateGovernmentWarningPackage(
     };
   }
 
-  if (best.match.anchorUncertain) {
+  if (best.anchored.match.anchorUncertain) {
     return {
       ...base,
       result: "NEEDS_REVIEW",
@@ -277,7 +327,7 @@ export function evaluateGovernmentWarningPackage(
     };
   }
 
-  if (best.match.exactTextMatch) {
+  if (best.anchored.match.exactTextMatch) {
     return {
       ...base,
       result: "PASS",
@@ -286,7 +336,10 @@ export function evaluateGovernmentWarningPackage(
     };
   }
 
-  if (best.evidenceState === "observed" && best.match.canonicalTokenCoverage >= 0.9) {
+  if (
+    best.observation.evidenceState === "observed" &&
+    best.anchored.match.canonicalTokenCoverage >= 0.9
+  ) {
     return {
       ...base,
       result: "FAIL",
