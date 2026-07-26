@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db, schema, isSQLite } from "@/db/client";
+import { resolveTrustedIpAddressConfig } from "@/lib/trusted-ip-config";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -28,5 +29,11 @@ export const auth = betterAuth({
         defaultValue: "seller",
       },
     },
+  },
+  advanced: {
+    ipAddress: resolveTrustedIpAddressConfig({
+      LABEL_LENS_TRUSTED_IP_HEADERS: process.env.LABEL_LENS_TRUSTED_IP_HEADERS,
+      LABEL_LENS_TRUSTED_PROXIES: process.env.LABEL_LENS_TRUSTED_PROXIES,
+    }),
   },
 });

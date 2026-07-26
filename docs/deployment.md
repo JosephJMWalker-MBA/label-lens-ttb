@@ -41,9 +41,63 @@ but `ttb-test.com` is the current custom-domain deployment documented here.
 | `PORT` | Set by platform | The server binds to it. |
 | `RENDER_GIT_COMMIT` | Automatic on Render only | Used for export provenance when `LABEL_LENS_BUILD_COMMIT` is absent or blank. Hostinger does not currently supply this Render-specific variable. |
 | `LABEL_LENS_OCR_ASSET_DIR`, `LABEL_LENS_OCR_CORE_DIR` | Optional | Override OCR asset locations. Not needed — assets resolve deployment-relative by default. |
+| `LABEL_LENS_TRUSTED_IP_HEADERS`, `LABEL_LENS_TRUSTED_PROXIES` | Optional | See [Trusted client IP behind the Hostinger proxy](#trusted-client-ip-behind-the-hostinger-proxy) below. Leave unset until the values are verified — do not guess them. |
 
 **No secrets are committed to the repository.** Set the signing key only in the
 hosting platform's secret store. The build commit is not a secret.
+
+## Trusted client IP behind the Hostinger proxy
+
+Better Auth's default rate limiter needs a trustworthy client IP to key its
+per-path buckets. Behind any reverse proxy — Hostinger's managed "Web App"
+product included — the raw socket address seen by the Node process is the
+proxy's own address, not the visitor's, so Better Auth reads it from a
+forwarded header instead (`x-forwarded-for` by default). Without a configured
+**trusted proxy boundary**, Better Auth will only trust that header when it
+contains exactly one hop; behind most reverse proxies it is null, and every
+visitor collapses into a single shared per-path rate-limit bucket. That is the
+non-blocking startup warning:
+
+> Rate limiting could not determine a client IP and is falling back to a
+> single shared per-path bucket…
+
+**Hostinger does not publish a documented, stable reverse-proxy header or IP
+contract for its managed "Web App" Node.js hosting product** (checked
+Hostinger's own Node.js Web App hosting support docs and hPanel
+documentation). Committing a guessed proxy IP/CIDR or header name as source
+would satisfy the warning message without any guarantee it reflects reality,
+and a wrong trusted-proxy entry is worse than the current fallback: it could
+let a forged header be trusted as the real client. So this repository does
+**not** hardcode a value. Instead, `src/lib/trusted-ip-config.ts` reads two
+optional environment variables and wires them into Better Auth's
+`advanced.ipAddress` option (see `src/lib/auth.ts`):
+
+| Name | Format | Effect |
+|---|---|---|
+| `LABEL_LENS_TRUSTED_IP_HEADERS` | comma-separated header names | Overrides which header(s) Better Auth reads the client IP from (default: `x-forwarded-for` only). |
+| `LABEL_LENS_TRUSTED_PROXIES` | comma-separated IP/CIDR entries | The proxy hop(s) Better Auth is allowed to strip from a forwarded-for chain to find the real client. Required for a multi-hop chain to resolve at all. |
+
+Leaving both unset is byte-for-byte the same as omitting `advanced.ipAddress`
+— today's fallback behavior (and its warning) is unchanged.
+
+**Before setting either variable in production**, confirm the real values —
+do not guess:
+
+1. Add a temporary, admin-only diagnostic (or ask Hostinger support directly)
+   to observe what header(s) a live request actually carries, and whether
+   Hostinger's edge consistently forwards from one internal IP or IP range.
+2. Set `LABEL_LENS_TRUSTED_PROXIES` to that confirmed range (as narrow as
+   possible — a single IP or the smallest CIDR that covers Hostinger's proxy
+   layer) and, only if Hostinger uses a non-default header, set
+   `LABEL_LENS_TRUSTED_IP_HEADERS` to match.
+3. Confirm the startup warning disappears under real traffic and that
+   `npm test -- trusted-ip` still passes (it exercises Better Auth's real
+   `getIp`/`trustedProxies` resolution against representative header values,
+   including a spoofed extra hop, without needing network access).
+4. A malformed or empty `LABEL_LENS_TRUSTED_PROXIES` entry does not open a
+   trust boundary — Better Auth drops invalid CIDR entries and degrades to
+   "no trusted proxies configured," the same safe fallback as leaving it
+   unset.
 
 ## Database dialect graphs (`better-sqlite3` is never required in production)
 
