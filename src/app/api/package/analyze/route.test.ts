@@ -157,7 +157,12 @@ beforeEach(() => {
           },
         },
       },
-      debug: { decoded: { width: 100, height: 200 } },
+      debug: {
+        decoded: { width: 100, height: 200 },
+        passes: [],
+        primarySelections: {},
+        finalSelections: {},
+      },
     },
   });
 });
@@ -175,6 +180,11 @@ describe("package analysis route", () => {
       ]),
     );
     expect(body.data.analysisRun.readiness).toBe("needs_seller_review");
+    expect(body.data.analysisRun.governmentWarning).toMatchObject({
+      result: "FAIL",
+      observedPanelId: null,
+      ruleId: "government-warning-prescribed-text-v1",
+    });
     expect(mocks.extract).toHaveBeenCalledTimes(2);
   });
 

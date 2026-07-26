@@ -18,7 +18,9 @@ const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffec
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { deriveAnchoredGovernmentWarningTranscript } from "@/domain/rules/government-warning.rule";
 import { triggerDownload } from "@/features/precheck/download";
+import type { EvidenceGeometry } from "@/pipeline/analyzer/analyzer.types";
 
 import { GuidedCategoryTask } from "./GuidedCategoryTask";
 import { PackageAnnotationCanvas, type MachinePackageRegion } from "./PackageAnnotationCanvas";
@@ -46,6 +48,7 @@ import {
   packagePanelDecisions,
   serializeSellerPackageExport,
   validNormalizedRegion,
+  CANONICAL_GOVERNMENT_WARNING,
   type CategoryAnalysisState,
   type PackageCategoryDraft,
   type PackageCategoryId,
@@ -98,6 +101,13 @@ const ANALYSIS_LABEL: Record<CategoryAnalysisState, string> = {
   not_applicable: "Not applicable",
 };
 
+const WARNING_RESULT_LABEL = {
+  PASS: "PASS",
+  FAIL: "FAIL",
+  NEEDS_REVIEW: "Needs review",
+  not_run: "Not run",
+} as const;
+
 function now(): string {
   return new Date().toISOString();
 }
@@ -112,6 +122,63 @@ function formatElapsedTime(seconds: number): string {
     .padStart(2, "0");
   const remainder = (seconds % 60).toString().padStart(2, "0");
   return `${minutes}:${remainder}`;
+}
+
+function warningGeometryText(geometry: EvidenceGeometry | undefined): string {
+  if (!geometry) return "No highlighted region";
+  return `x ${geometry.x}, y ${geometry.y}, ${geometry.width} x ${geometry.height} of ${geometry.imageWidth} x ${geometry.imageHeight}`;
+}
+
+function warningDiffPreview(
+  warning: SellerPackageDraft["analysisRuns"][number]["governmentWarning"] | undefined,
+): string {
+  if (!warning) return "No warning rule has run.";
+  if (warning.comparisonStatus === "contaminated") {
+    return "Warning text was detected, but surrounding label text was interleaved with the OCR result. Human review is required.";
+  }
+  const changed = warning.diff.filter((token) => token.status !== "equal").slice(0, 12);
+  if (changed.length === 0) return "Exact token match.";
+  return changed
+    .map((token) => {
+      if (token.status === "missing") return `missing ${token.expected}`;
+      if (token.status === "extra") return `extra ${token.observed}`;
+      return `${token.expected} -> ${token.observed}`;
+    })
+    .join("; ");
+}
+
+function warningAnchoredTranscriptForDisplay(
+  observation:
+    SellerPackageDraft["analysisRuns"][number]["panelRuns"][number]["governmentWarning"] | null,
+  warning: SellerPackageDraft["analysisRuns"][number]["governmentWarning"] | undefined,
+): string | null {
+  if (
+    observation?.anchoredTranscript &&
+    observation.anchoredTranscript !== observation.rawTranscript
+  ) {
+    return observation.anchoredTranscript;
+  }
+  if (observation?.rawTranscript) {
+    const derived = deriveAnchoredGovernmentWarningTranscript(observation.rawTranscript);
+    if (derived.anchoredTranscript) return derived.anchoredTranscript;
+  }
+  return warning?.observedText ?? null;
+}
+
+function warningAnalysisNeedsAnchoredRerun(
+  observation:
+    SellerPackageDraft["analysisRuns"][number]["panelRuns"][number]["governmentWarning"] | null,
+  warning: SellerPackageDraft["analysisRuns"][number]["governmentWarning"] | undefined,
+): boolean {
+  if (!observation?.rawTranscript || !warning?.observedText) return false;
+  const derived = deriveAnchoredGovernmentWarningTranscript(observation.rawTranscript);
+  return Boolean(
+    derived.anchoredTranscript &&
+    derived.anchoredTranscript !== observation.rawTranscript &&
+    (observation.anchoredTranscript == null ||
+      observation.anchoredTranscript === observation.rawTranscript ||
+      warning.observedText === observation.rawTranscript),
+  );
 }
 
 /**
@@ -301,6 +368,7 @@ export const PackagePreparationWorkspace = forwardRef<
   const restoreAttemptRef = useRef(0);
   const restoreDeadlineRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const restoreCancelledRef = useRef(false);
+  const governmentWarningSectionRef = useRef<HTMLElement | null>(null);
 
   const refreshLocalDrafts = useCallback(async () => {
     try {
@@ -614,6 +682,18 @@ export const PackagePreparationWorkspace = forwardRef<
   const activeCategoryDecision = activeCategory?.decision;
   const latestRun = draft?.analysisRuns.at(-1);
   const analysisCurrent = draft ? latestAnalysisIsCurrent(draft) : false;
+  const latestGovernmentWarningObservation =
+    latestRun?.panelRuns.find(
+      (panelRun) => panelRun.panelId === latestRun.governmentWarning?.observedPanelId,
+    )?.governmentWarning ?? null;
+  const latestGovernmentWarningAnchoredTranscript = warningAnchoredTranscriptForDisplay(
+    latestGovernmentWarningObservation,
+    latestRun?.governmentWarning,
+  );
+  const latestGovernmentWarningNeedsAnchoredRerun = warningAnalysisNeedsAnchoredRerun(
+    latestGovernmentWarningObservation,
+    latestRun?.governmentWarning,
+  );
   const latestCategoryResult = latestRun?.categories.find(
     (category) => category.categoryId === activeCategoryId,
   );
@@ -625,6 +705,13 @@ export const PackagePreparationWorkspace = forwardRef<
         saveState,
       })
     : null;
+  const packageMachineChecks = [
+    {
+      id: "governmentWarning" as const,
+      label: "Government Warning",
+      status: WARNING_RESULT_LABEL[latestRun?.governmentWarning?.result ?? "not_run"],
+    },
+  ];
   const reviewingAcceptedEvidence = Boolean(
     workflow && reviewingEvidence && !workflow.focusCategoryIds.includes(activeCategoryId),
   );
@@ -633,10 +720,7 @@ export const PackagePreparationWorkspace = forwardRef<
     analysisState !== "analyzing" &&
     draft?.panels.length === runtimePanels.length;
   const canExport =
-    latestRun?.readiness === "ready_for_agent_submission" &&
-    analysisCurrent &&
-    saveState === "saved" &&
-    submitter.trim() !== "";
+    workflow?.readyForAgentPackage === true && saveState === "saved" && submitter.trim() !== "";
 
   // A render-synced mirror of `workingRegion` so the reset effect below can read
   // the current in-progress edit without taking it as a dependency.
@@ -1577,6 +1661,17 @@ export const PackagePreparationWorkspace = forwardRef<
     };
   }
 
+  function selectPackageMachineCheck(checkId: "governmentWarning") {
+    if (checkId !== "governmentWarning") return;
+    setGuideOpen(false);
+    setEditingPanels(false);
+    setReviewingEvidence(false);
+    window.setTimeout(() => {
+      governmentWarningSectionRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+      governmentWarningSectionRef.current?.focus({ preventScroll: true });
+    }, 0);
+  }
+
   return (
     <section
       className="min-w-0 pb-64 lg:pb-44"
@@ -1678,6 +1773,7 @@ export const PackagePreparationWorkspace = forwardRef<
           guideOpen={guideOpen}
           editingPanels={editingPanels}
           reviewingEvidence={reviewingAcceptedEvidence}
+          packageMachineChecks={packageMachineChecks}
           message={message}
           showCategoryControls={workflow.panelDecisionsComplete && !editingPanels}
           onSelectPanel={(panelId) => {
@@ -1693,6 +1789,7 @@ export const PackagePreparationWorkspace = forwardRef<
             setReviewingEvidence(!workflow.focusCategoryIds.includes(categoryId));
             selectCategory(categoryId);
           }}
+          onSelectPackageMachineCheck={selectPackageMachineCheck}
           onToggleGuide={() => setGuideOpen((open) => !open)}
           onTogglePanels={() => {
             setGuideOpen(false);
@@ -1828,6 +1925,110 @@ export const PackagePreparationWorkspace = forwardRef<
               {latestRun ? (
                 <div className="mt-5" aria-label="Latest pre-check results">
                   <h3 className="font-semibold">Latest pre-check results</h3>
+                  <div className="mt-3 rounded border border-border p-3 text-sm">
+                    <p className="font-semibold">Seller declaration</p>
+                    <p className="text-muted-foreground">
+                      Package identity:{" "}
+                      {latestRun.brandIdentity?.declaredBrandName || draftName(draft)}. Machine
+                      brand evidence: {latestRun.brandIdentity?.state ?? "INSUFFICIENT_EVIDENCE"}.
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {latestRun.brandIdentity?.rationale ??
+                        "Seller-declared brand is package identity; this older analysis run does not include machine brand support/conflict classification."}
+                    </p>
+                  </div>
+                  {latestRun.governmentWarning ? (
+                    <section
+                      ref={governmentWarningSectionRef}
+                      tabIndex={-1}
+                      data-testid="government-warning-section"
+                      className="mt-3 rounded border border-border p-3 text-sm"
+                      aria-labelledby="government-warning-heading"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h4 id="government-warning-heading" className="font-semibold">
+                          Government Warning
+                        </h4>
+                        <span className="font-mono text-xs">
+                          {WARNING_RESULT_LABEL[latestRun.governmentWarning.result]}
+                        </span>
+                      </div>
+                      <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+                        <div>
+                          <dt className="font-medium">Source panel</dt>
+                          <dd className="text-muted-foreground">
+                            {latestRun.governmentWarning.observedPanelId ?? "No panel evidence"}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="font-medium">Detected orientation</dt>
+                          <dd className="text-muted-foreground">
+                            {latestRun.governmentWarning.observedOrientation ?? "Not detected"}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="font-medium">Evidence quality</dt>
+                          <dd className="text-muted-foreground">
+                            {latestGovernmentWarningObservation
+                              ? latestGovernmentWarningObservation.evidenceState
+                              : "not_observed"}{" "}
+                            · OCR{" "}
+                            {latestGovernmentWarningObservation
+                              ? latestGovernmentWarningObservation.ocrEvidenceScore.toFixed(2)
+                              : "0.00"}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="font-medium">Highlighted original-image region</dt>
+                          <dd className="text-muted-foreground">
+                            {warningGeometryText(latestGovernmentWarningObservation?.geometry)}
+                          </dd>
+                        </div>
+                      </dl>
+                      <div className="mt-3 grid gap-3">
+                        {latestGovernmentWarningNeedsAnchoredRerun ? (
+                          <p className="rounded border border-amber-500/50 bg-amber-50 p-2 text-xs text-amber-950">
+                            This saved pre-check was produced before a distinct anchored warning
+                            transcript was persisted. Run pre-check again after deployment to
+                            refresh the Government Warning result and exact diff.
+                          </p>
+                        ) : null}
+                        <div>
+                          <p className="font-medium">Raw OCR transcript</p>
+                          <p className="mt-1 max-h-24 overflow-auto rounded bg-muted/40 p-2 font-mono text-xs">
+                            {latestGovernmentWarningObservation?.rawTranscript ??
+                              latestRun.governmentWarning.observedText ??
+                              "No transcript"}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="font-medium">Anchored warning transcript</p>
+                          <p className="mt-1 max-h-24 overflow-auto rounded bg-muted/40 p-2 font-mono text-xs">
+                            {latestGovernmentWarningAnchoredTranscript ?? "No anchored transcript"}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="font-medium">Expected text</p>
+                          <p className="mt-1 rounded bg-muted/40 p-2 text-xs">
+                            {CANONICAL_GOVERNMENT_WARNING}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="font-medium">Exact diff</p>
+                          <p className="mt-1 rounded bg-muted/40 p-2 font-mono text-xs">
+                            {warningDiffPreview(latestRun.governmentWarning)}
+                          </p>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {latestRun.governmentWarning.rationale} Rule{" "}
+                          {latestRun.governmentWarning.ruleId}@
+                          {latestRun.governmentWarning.ruleVersion}; authority{" "}
+                          {latestRun.governmentWarning.authority.citation}, retrieved{" "}
+                          {latestRun.governmentWarning.authoritySource.retrievalDate}.
+                        </p>
+                      </div>
+                    </section>
+                  ) : null}
                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
                     {latestRun.categories.map((category) => (
                       <div

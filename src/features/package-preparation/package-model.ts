@@ -1,6 +1,12 @@
 import type { LabelRequirementFieldId } from "@/domain/requirements/requirement.types";
 import { compareText } from "@/domain/compare/semantic";
 import {
+  CANONICAL_GOVERNMENT_WARNING,
+  evaluateGovernmentWarningPackage,
+  type GovernmentWarningObservation,
+  type GovernmentWarningPackageFinding,
+} from "@/domain/rules/government-warning.rule";
+import {
   parseDeclaredAlcoholValue,
   parseWineAlcoholStatement,
 } from "@/domain/rules/wine-alcohol-parse";
@@ -20,6 +26,8 @@ export type CategoryPreparationDecision = "provided" | "unresolved" | "not_prese
 export type CategoryAnalysisState =
   "clearly_readable" | "needs_review" | "not_found" | "not_applicable";
 export type PackageReadiness = "needs_seller_review" | "ready_for_agent_submission";
+export type BrandMachineEvidenceState =
+  "SUPPORTED" | "CONFLICTING" | "NOT_LOCATED" | "INSUFFICIENT_EVIDENCE";
 
 export interface PackageCategoryDefinition {
   categoryId: PackageCategoryId;
@@ -116,6 +124,16 @@ export interface PackagePanelMachineRun {
   machineResultId: string;
   exportJson: string;
   observations: PrecheckServiceResponse["observations"];
+  governmentWarning?: GovernmentWarningObservation;
+}
+
+export interface PackageBrandIdentityEvidence {
+  declaredBrandName: string;
+  state: BrandMachineEvidenceState;
+  observedValue: string | null;
+  supportingPanelIds: string[];
+  conflictingPanelIds: string[];
+  rationale: string;
 }
 
 export interface PackageAnalysisRun {
@@ -126,6 +144,8 @@ export interface PackageAnalysisRun {
   recordedAt: string;
   panelRuns: PackagePanelMachineRun[];
   categories: PackageCategoryAnalysis[];
+  brandIdentity?: PackageBrandIdentityEvidence;
+  governmentWarning?: GovernmentWarningPackageFinding;
   readiness: PackageReadiness;
 }
 
@@ -399,13 +419,15 @@ export function deriveCategoryAnalysis(
 
 export function derivePackageReadiness(
   categoryResults: readonly PackageCategoryAnalysis[],
+  governmentWarning?: GovernmentWarningPackageFinding,
 ): PackageReadiness {
-  return categoryResults.length > 0 &&
+  const categoriesReady =
+    categoryResults.length > 0 &&
     categoryResults.every(
       (category) => category.state === "clearly_readable" || category.state === "not_applicable",
-    )
-    ? "ready_for_agent_submission"
-    : "needs_seller_review";
+    );
+  const warningReady = governmentWarning ? governmentWarning.result === "PASS" : true;
+  return categoriesReady && warningReady ? "ready_for_agent_submission" : "needs_seller_review";
 }
 
 const NON_MATERIAL_POST_ANALYSIS_ACTIONS: ReadonlySet<SellerPackageChangeAction> = new Set([
@@ -462,7 +484,12 @@ export function packageReadyForAgentReview(draft: SellerPackageDraft): boolean {
       (category) => category.state !== "clearly_readable" && category.state !== "not_applicable",
     )
     .map((category) => category.categoryId);
-  if (flaggedCategoryIds.length === 0) return false;
+  if (flaggedCategoryIds.length === 0) {
+    return (
+      latestRun.governmentWarning?.result === "FAIL" ||
+      latestRun.governmentWarning?.result === "NEEDS_REVIEW"
+    );
+  }
 
   return flaggedCategoryIds.every((categoryId) =>
     draft.sellerChangeHistory.some(
@@ -471,6 +498,87 @@ export function packageReadyForAgentReview(draft: SellerPackageDraft): boolean {
         change.categoryId === categoryId &&
         isSellerDiscrepancyAcknowledgement(change),
     ),
+  );
+}
+
+export function deriveBrandIdentityEvidence(
+  draft: SellerPackageDraft,
+  panelRuns: readonly PackagePanelMachineRun[],
+): PackageBrandIdentityEvidence {
+  const declaredBrandName =
+    draft.categories
+      .find((category) => category.categoryId === "brandName")
+      ?.expectedValue.trim() ?? "";
+  const brandObservations = panelRuns
+    .map((run) => ({ panelId: run.panelId, observation: run.observations.brandName }))
+    .filter(({ observation }) => observation.state !== "NOT_OBSERVED");
+
+  if (brandObservations.length === 0) {
+    return {
+      declaredBrandName,
+      state: "NOT_LOCATED",
+      observedValue: null,
+      supportingPanelIds: [],
+      conflictingPanelIds: [],
+      rationale:
+        "Seller-declared brand is package identity; OCR brand text was not located and remains non-authoritative.",
+    };
+  }
+
+  const supportingPanelIds: string[] = [];
+  const conflictingPanelIds: string[] = [];
+  for (const { panelId, observation } of brandObservations) {
+    if (!observation.value || observation.state !== "OBSERVED") {
+      continue;
+    }
+    if (compareText(declaredBrandName, observation.value).equivalence === "different") {
+      conflictingPanelIds.push(panelId);
+    } else {
+      supportingPanelIds.push(panelId);
+    }
+  }
+
+  const first = brandObservations[0]?.observation.value ?? null;
+  if (conflictingPanelIds.length > 0) {
+    return {
+      declaredBrandName,
+      state: "CONFLICTING",
+      observedValue: first,
+      supportingPanelIds,
+      conflictingPanelIds,
+      rationale:
+        "Seller-declared brand remains package identity; OCR brand text conflicts on at least one panel and is supporting evidence only.",
+    };
+  }
+  if (supportingPanelIds.length > 0) {
+    return {
+      declaredBrandName,
+      state: "SUPPORTED",
+      observedValue: first,
+      supportingPanelIds,
+      conflictingPanelIds,
+      rationale:
+        "Seller-declared brand remains package identity; OCR brand text supports it but does not define package identity.",
+    };
+  }
+  return {
+    declaredBrandName,
+    state: "INSUFFICIENT_EVIDENCE",
+    observedValue: first,
+    supportingPanelIds,
+    conflictingPanelIds,
+    rationale:
+      "Seller-declared brand remains package identity; OCR brand evidence exists but is not clear enough to support or conflict.",
+  };
+}
+
+export function deriveGovernmentWarningFinding(
+  panelRuns: readonly PackagePanelMachineRun[],
+): GovernmentWarningPackageFinding {
+  return evaluateGovernmentWarningPackage(
+    panelRuns
+      .map((run) => run.governmentWarning)
+      .filter((warning): warning is GovernmentWarningObservation => warning !== undefined),
   );
 }
 
@@ -483,6 +591,7 @@ export function createAnalysisRun(args: {
   const categories = args.draft.categories.map((category) =>
     deriveCategoryAnalysis(category, args.panelRuns),
   );
+  const governmentWarning = deriveGovernmentWarningFinding(args.panelRuns);
   return {
     analysisRunId: args.analysisRunId,
     sequence: args.draft.analysisRuns.length + 1,
@@ -490,9 +599,13 @@ export function createAnalysisRun(args: {
     recordedAt: args.recordedAt,
     panelRuns: args.panelRuns,
     categories,
-    readiness: derivePackageReadiness(categories),
+    brandIdentity: deriveBrandIdentityEvidence(args.draft, args.panelRuns),
+    governmentWarning,
+    readiness: derivePackageReadiness(categories, governmentWarning),
   };
 }
+
+export { CANONICAL_GOVERNMENT_WARNING };
 
 function applicationBuildFromRun(run: PackageAnalysisRun | undefined): unknown {
   const firstExport = run?.panelRuns[0]?.exportJson;

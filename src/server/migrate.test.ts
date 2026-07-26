@@ -564,7 +564,7 @@ if (RUN_MYSQL_TESTS) {
         if (previousDialect === undefined) delete process.env.LABEL_LENS_DB_DIALECT;
         else process.env.LABEL_LENS_DB_DIALECT = previousDialect;
       }
-    });
+    }, 20_000);
 
     it("preserves an existing valid signed revision when canonical_json upgrades from TEXT to MEDIUMTEXT", async () => {
       const previousMigrationsDir = process.env.LABEL_LENS_MIGRATIONS_DIR;

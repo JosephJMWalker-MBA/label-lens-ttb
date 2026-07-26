@@ -1,6 +1,16 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+  CANONICAL_GOVERNMENT_WARNING,
+  GOVERNMENT_WARNING_AUTHORITY,
+  GOVERNMENT_WARNING_AUTHORITY_SOURCE,
+  GOVERNMENT_WARNING_RULE_ID,
+  GOVERNMENT_WARNING_RULE_VERSION,
+  diffGovernmentWarning,
+  normalizeGovernmentWarningForComparison,
+  type GovernmentWarningPackageFinding,
+} from "@/domain/rules/government-warning.rule";
 import type { SellerPackageDraft } from "./package-model";
 
 const store = vi.hoisted(() => ({
@@ -182,6 +192,30 @@ function analysisRun(readiness: "needs_seller_review" | "ready_for_agent_submiss
           : "Seller and machine evidence agree.",
     })),
     readiness,
+  };
+}
+
+function governmentWarningFinding(
+  result: "PASS" | "FAIL" | "NEEDS_REVIEW",
+  overrides: Partial<GovernmentWarningPackageFinding> = {},
+): GovernmentWarningPackageFinding {
+  return {
+    ruleId: GOVERNMENT_WARNING_RULE_ID,
+    ruleVersion: GOVERNMENT_WARNING_RULE_VERSION,
+    authority: GOVERNMENT_WARNING_AUTHORITY,
+    authoritySource: GOVERNMENT_WARNING_AUTHORITY_SOURCE,
+    result,
+    ruleExecutionStatus: "executed" as const,
+    expectedText: CANONICAL_GOVERNMENT_WARNING,
+    normalizedExpectedText: normalizeGovernmentWarningForComparison(CANONICAL_GOVERNMENT_WARNING),
+    observedPanelId: "back-panel",
+    observedOrientation: 90 as const,
+    observedText: CANONICAL_GOVERNMENT_WARNING,
+    normalizedObservedText: normalizeGovernmentWarningForComparison(CANONICAL_GOVERNMENT_WARNING),
+    diff: diffGovernmentWarning(CANONICAL_GOVERNMENT_WARNING),
+    comparisonStatus: "reliable",
+    rationale: `${result}: test government-warning finding.`,
+    ...overrides,
   };
 }
 
@@ -533,6 +567,97 @@ describe("guided category acceptance", () => {
     fireEvent.click(screen.getByTestId("create-new-package-btn"));
     // New draft should have a fresh packageId
     expect(await screen.findByTestId("draft-selector")).toBeInTheDocument();
+  });
+
+  it("shows government warning as a package-level check and focuses its evidence section", async () => {
+    const contaminatedTranscript =
+      "GOVERNMENT WARNING: (1) ACCORDING T0 THE NOCKING POINT WINES SURGEON GENERAL, WOMEN SHOULD NOT DRINK QUINCY, WA ALCOHOLIC BEVERAGES DURING PREGNANCY 750mL&13.5%alc./vol";
+    const value = fullyAcceptedDraft();
+    const run: SellerPackageDraft["analysisRuns"][number] = {
+      ...analysisRun("needs_seller_review"),
+      categories: analysisRun("ready_for_agent_submission").categories,
+      governmentWarning: governmentWarningFinding("NEEDS_REVIEW", {
+        observedText: contaminatedTranscript,
+        normalizedObservedText: normalizeGovernmentWarningForComparison(contaminatedTranscript),
+        diff: [],
+        comparisonStatus: "contaminated",
+        rationale:
+          "NEEDS_REVIEW: warning text was detected, but surrounding label text was interleaved with the OCR result. Human review is required.",
+      }),
+      panelRuns: [
+        {
+          ...machinePanelRun("back-panel"),
+          governmentWarning: {
+            panelId: "back-panel",
+            evidenceState: "observed" as const,
+            rawTranscript: contaminatedTranscript,
+            normalizedComparisonText:
+              normalizeGovernmentWarningForComparison(contaminatedTranscript),
+            anchoredTranscript: contaminatedTranscript,
+            normalizedAnchoredComparisonText:
+              normalizeGovernmentWarningForComparison(contaminatedTranscript),
+            ocrEvidenceScore: 0.91,
+            detectedOrientation: 90 as const,
+            extractionProvenance: null,
+            contamination: {
+              detected: true,
+              reasons: ["net-contents-or-abv", "producer-or-brand-text"],
+            },
+            match: {
+              anchorFound: true,
+              anchorUncertain: false,
+              canonicalTokenCoverage: 1,
+              exactTextMatch: true,
+              distinctivePhraseHits: [],
+            },
+          },
+        },
+      ],
+    };
+    value.analysisRuns = [run];
+    store.load.mockResolvedValue(stored(value));
+    const scrollIntoView = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+      configurable: true,
+      value: scrollIntoView,
+    });
+    render(<PackagePreparationWorkspace submitter="Taylor Seller" />);
+
+    const packageChecks = await screen.findByLabelText("Package-level machine checks");
+    const warningButton = within(packageChecks).getByRole("button", {
+      name: /Government Warning/i,
+    });
+    expect(warningButton).toHaveTextContent("Needs review");
+    expect(screen.getByLabelText("Category progress")).toHaveTextContent("Brand name");
+    expect(screen.getByLabelText("Category progress")).toHaveTextContent("Alcohol statement");
+
+    fireEvent.click(warningButton);
+    await waitFor(() => expect(scrollIntoView).toHaveBeenCalled());
+    expect(screen.getByTestId("government-warning-section")).toHaveFocus();
+    expect(screen.getAllByText(/NOCKING POINT WINES/).length).toBeGreaterThan(0);
+    expect(
+      screen.getByText(
+        "Warning text was detected, but surrounding label text was interleaved with the OCR result. Human review is required.",
+      ),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Alcohol statement" }));
+    expect(await screen.findByRole("heading", { name: "Alcohol statement" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Brand name" }));
+    expect(await screen.findByRole("heading", { name: "Brand name" })).toBeInTheDocument();
+  });
+
+  it("keeps the package-level Government Warning item visible as Not run before analysis", async () => {
+    const value = storedDraft();
+    value.panels = value.panels.filter((panel) => panel.role === "front");
+    store.load.mockResolvedValue(stored(value));
+    render(<PackagePreparationWorkspace />);
+
+    const packageChecks = await screen.findByLabelText("Package-level machine checks");
+    expect(
+      within(packageChecks).getByRole("button", { name: /Government Warning/i }),
+    ).toHaveTextContent("Not run");
+    expect(screen.getByLabelText("Package panels")).toHaveTextContent("Front");
   });
 
   it("cancels draft switch when workspace is dirty and user rejects confirmation", async () => {

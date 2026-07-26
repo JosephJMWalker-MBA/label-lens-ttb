@@ -24,6 +24,12 @@ const PHASE_LABEL = {
   prepare: "Prepare local package",
 } as const;
 
+export interface PackageMachineCheckNavItem {
+  id: "governmentWarning";
+  label: string;
+  status: "PASS" | "FAIL" | "Needs review" | "Not run";
+}
+
 export function PackageWorkstationControls({
   draft,
   workflow,
@@ -32,11 +38,13 @@ export function PackageWorkstationControls({
   guideOpen,
   editingPanels,
   reviewingEvidence,
+  packageMachineChecks,
   message,
   showCategoryControls,
   onSelectPanel,
   onSelectMissingPanel,
   onSelectCategory,
+  onSelectPackageMachineCheck,
   onToggleGuide,
   onTogglePanels,
   onToggleEvidence,
@@ -48,11 +56,13 @@ export function PackageWorkstationControls({
   guideOpen: boolean;
   editingPanels: boolean;
   reviewingEvidence: boolean;
+  packageMachineChecks: readonly PackageMachineCheckNavItem[];
   message: string;
   showCategoryControls: boolean;
   onSelectPanel: (panelId: string) => void;
   onSelectMissingPanel: (role: "front" | "back") => void;
   onSelectCategory: (categoryId: PackageCategoryId) => void;
+  onSelectPackageMachineCheck: (checkId: PackageMachineCheckNavItem["id"]) => void;
   onToggleGuide: () => void;
   onTogglePanels: () => void;
   onToggleEvidence: () => void;
@@ -130,7 +140,7 @@ export function PackageWorkstationControls({
       {showCategoryControls ? (
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Category
+            Seller-marked categories
           </p>
           <div className="mt-2 grid gap-2" aria-label="Category progress">
             {workflow.categoryStatuses.map((status) => (
@@ -160,6 +170,31 @@ export function PackageWorkstationControls({
           >
             {guideOpen ? "Close Guide" : "Open Guide"}
           </Button>
+        </div>
+      ) : null}
+
+      {packageMachineChecks.length > 0 ? (
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Package-level machine checks
+          </p>
+          <div className="mt-2 grid gap-2" aria-label="Package-level machine checks">
+            {packageMachineChecks.map((check) => (
+              <Button
+                key={check.id}
+                type="button"
+                size="sm"
+                variant="outline"
+                className="justify-between"
+                onClick={() => onSelectPackageMachineCheck(check.id)}
+              >
+                <span>{check.label}</span>
+                <span className="font-mono text-xs" aria-hidden="true">
+                  {check.status}
+                </span>
+              </Button>
+            ))}
+          </div>
         </div>
       ) : null}
 

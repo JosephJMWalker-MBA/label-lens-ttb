@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import type { ExecutableProvenance } from "@/domain/run/version-manifest.types";
+import { GOVERNMENT_WARNING_AUTHORITY } from "@/domain/rules/government-warning.rule";
 import { resolveLangPath } from "@/pipeline/extractor/ocr-engine";
 import { winePrecheckRegistry } from "@/pipeline/precheck/wine-precheck.profile";
 import type { PrecheckDiagnosticTrace } from "@/shared/precheck-diagnostics";
@@ -37,6 +38,7 @@ const RENDER_BUILD_COMMIT_ENV = "RENDER_GIT_COMMIT";
 const AUTHORITIES = [
   { citation: "27 CFR 4.32; 27 CFR 4.33", snapshotDate: "2026-07-10" },
   { citation: "27 CFR 4.36", snapshotDate: "2026-07-10" },
+  GOVERNMENT_WARNING_AUTHORITY,
 ] as const;
 
 let cached: ExecutableProvenance | null = null;

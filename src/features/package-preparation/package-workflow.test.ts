@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
 
+import {
+  CANONICAL_GOVERNMENT_WARNING,
+  GOVERNMENT_WARNING_AUTHORITY,
+  GOVERNMENT_WARNING_AUTHORITY_SOURCE,
+  GOVERNMENT_WARNING_RULE_ID,
+  GOVERNMENT_WARNING_RULE_VERSION,
+  normalizeGovernmentWarningForComparison,
+  type GovernmentWarningPackageFinding,
+} from "@/domain/rules/government-warning.rule";
 import type { SellerPackageDraft } from "./package-model";
 import {
   WINE_PACKAGE_CATEGORY_DEFINITIONS,
@@ -61,6 +70,26 @@ function acceptCategories(value: SellerPackageDraft) {
       },
     ],
   }));
+}
+
+function governmentWarningFailure(): GovernmentWarningPackageFinding {
+  return {
+    ruleId: GOVERNMENT_WARNING_RULE_ID,
+    ruleVersion: GOVERNMENT_WARNING_RULE_VERSION,
+    authority: GOVERNMENT_WARNING_AUTHORITY,
+    authoritySource: GOVERNMENT_WARNING_AUTHORITY_SOURCE,
+    result: "FAIL",
+    ruleExecutionStatus: "executed",
+    expectedText: CANONICAL_GOVERNMENT_WARNING,
+    normalizedExpectedText: normalizeGovernmentWarningForComparison(CANONICAL_GOVERNMENT_WARNING),
+    observedPanelId: null,
+    observedOrientation: null,
+    observedText: null,
+    normalizedObservedText: null,
+    diff: [],
+    rationale:
+      "FAIL: sufficient supplied panel evidence was searched and no government-warning anchor or prescribed-warning phrase evidence was observed.",
+  };
 }
 
 function project(value: SellerPackageDraft, saveState: "unsaved" | "saved") {
@@ -335,6 +364,75 @@ describe("guided package workflow projection", () => {
       readyForAgentPackage: true,
       recommendedAction: "Prepare the local-only agent package",
     });
+  });
+
+  it("allows agent handoff for a current package with only a government-warning finding", () => {
+    const value = draft();
+    value.panelDecisions = { back: "absent", additional: "none" };
+    value.panels = [
+      {
+        panelId: "front-panel",
+        order: 0,
+        role: "front",
+        displayName: "front.png",
+        mediaType: "image/png",
+        byteSize: 10,
+        checksumSha256: "0".repeat(64),
+        width: 1000,
+        height: 1500,
+        rotation: 0,
+      },
+    ];
+    value.categories = value.categories.map((category) => ({
+      ...category,
+      expectedValue: category.categoryId === "brandName" ? "CEDAR RIDGE" : "12.5",
+      regions: [
+        {
+          regionId: `${category.categoryId}-front-region`,
+          categoryId: category.categoryId,
+          panelId: "front-panel",
+          unit: "normalized-panel-relative",
+          provenance: "seller-selected-region",
+          x: 0.1,
+          y: 0.2,
+          width: 0.5,
+          height: 0.2,
+        },
+      ],
+    }));
+    value.analysisRuns = [
+      {
+        analysisRunId: "analysis-government-warning",
+        sequence: 1,
+        sellerChangeSequence: 0,
+        recordedAt: "2026-07-26T16:00:00.000Z",
+        panelRuns: [],
+        categories: WINE_PACKAGE_CATEGORY_DEFINITIONS.map((definition) => ({
+          categoryId: definition.categoryId,
+          state: "clearly_readable",
+          observedValue: "clear",
+          supportingPanelIds: ["front-panel"],
+          supportingRegionIds: [`${definition.categoryId}-front-region`],
+          reason: "Clear.",
+        })),
+        governmentWarning: governmentWarningFailure(),
+        readiness: "needs_seller_review",
+      },
+    ];
+
+    expect(project(value, "saved")).toMatchObject({
+      phase: "prepare",
+      analysisCurrent: true,
+      readyForPrecheck: true,
+      readyForAgentPackage: true,
+      recommendedAction: "Prepare the local-only agent package",
+    });
+    expect(project(value, "saved").progressStages).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "precheck", status: "needs_attention" }),
+        expect.objectContaining({ id: "prepare", status: "current" }),
+      ]),
+    );
   });
 
   it("distinguishes stale readiness from a current local-export-ready run", () => {
