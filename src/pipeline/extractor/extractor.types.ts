@@ -148,17 +148,33 @@ export const SELLER_REGION_READING_STATES = [
 ] as const;
 export type SellerRegionReadingState = (typeof SELLER_REGION_READING_STATES)[number];
 
+export const SELLER_REGION_RELIABILITY_STATES = ["RELIABLE", "UNRELIABLE"] as const;
+export type SellerRegionReliabilityState = (typeof SELLER_REGION_RELIABILITY_STATES)[number];
+
 export interface SellerRegionMachineReading {
   categoryId: SellerRegionTargetCategoryId;
   regionId: string;
   panelId: string;
   sellerRegion: SellerRegionOcrTarget["region"];
+  selectedRegionPixelGeometry?: RegionTransform["crop"] & {
+    imageWidth: number;
+    imageHeight: number;
+  };
+  cropPadding?: {
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+  };
+  scaleFactor?: number;
   cropGeometry: RegionTransform["crop"] & { imageWidth: number; imageHeight: number };
   rawTranscript: string;
   observedValue: string | null;
   normalizedValue?: string | null;
   ocrEvidenceScore: number;
   evidenceState: SellerRegionReadingState;
+  reliabilityState?: SellerRegionReliabilityState;
+  reliabilityReason?: string;
   failureReason?: string;
   observationState?: string;
   selectedGeometry?: EvidenceGeometry;

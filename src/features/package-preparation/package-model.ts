@@ -151,6 +151,12 @@ export interface CategoryTwoStreamComparison {
   categoryId: PackageCategoryId;
   sellerDeclaredValue: string;
   sellerRegionReadings: SellerRegionMachineReading[];
+  sellerRegionReliability: {
+    regionId: string;
+    panelId: string;
+    reliabilityState: "RELIABLE" | "UNRELIABLE";
+    reason: string;
+  }[];
   machineDiscoveredReading: MachineDiscoveredReading | null;
   outcome: CategoryTwoStreamOutcome;
   reason: string;
@@ -384,6 +390,11 @@ function valuesEquivalent(categoryId: PackageCategoryId, left: string, right: st
   return valuesAgree(categoryId, left, observation);
 }
 
+const RELIABLE_STREAM_CONFIDENCE_FLOOR = 0.8;
+const LIKELY_OCR_SUBSTITUTION_SIMILARITY = 0.8;
+const MIN_RELIABLE_SELECTED_REGION_WIDTH_PX = 24;
+const MIN_RELIABLE_SELECTED_REGION_HEIGHT_PX = 10;
+
 function readableSellerRegionReading(reading: SellerRegionMachineReading): boolean {
   return (
     reading.observedValue !== null &&
@@ -391,6 +402,59 @@ function readableSellerRegionReading(reading: SellerRegionMachineReading): boole
       reading.evidenceState === "LOW_CONFIDENCE" ||
       reading.evidenceState === "AMBIGUOUS")
   );
+}
+
+function reliableMachineDiscoveredReading(reading: MachineDiscoveredReading | null): boolean {
+  return (
+    reading !== null &&
+    reading.observedValue !== null &&
+    reading.state === "OBSERVED" &&
+    reading.ocrEvidenceScore >= RELIABLE_STREAM_CONFIDENCE_FLOOR
+  );
+}
+
+function sellerRegionReliabilityReason(
+  category: PackageCategoryDraft,
+  reading: SellerRegionMachineReading,
+): string | null {
+  if (reading.observedValue === null) {
+    return "No bounded OCR value was recovered inside the seller-selected region.";
+  }
+  if (reading.evidenceState !== "OBSERVED") {
+    return `Bounded OCR state ${reading.evidenceState} is not reliable enough for deterministic comparison.`;
+  }
+  if (reading.ocrEvidenceScore < RELIABLE_STREAM_CONFIDENCE_FLOOR) {
+    return `Bounded OCR confidence ${reading.ocrEvidenceScore.toFixed(2)} is below the ${RELIABLE_STREAM_CONFIDENCE_FLOOR.toFixed(2)} comparison floor.`;
+  }
+  const selected = reading.selectedRegionPixelGeometry;
+  if (
+    selected &&
+    (selected.width < MIN_RELIABLE_SELECTED_REGION_WIDTH_PX ||
+      selected.height < MIN_RELIABLE_SELECTED_REGION_HEIGHT_PX)
+  ) {
+    return `Selected crop ${selected.width}x${selected.height}px is too small for deterministic bounded comparison.`;
+  }
+  if (!valuesEquivalent(category.categoryId, category.expectedValue, reading.observedValue)) {
+    if (category.categoryId === "brandName") {
+      const comparison = compareText(category.expectedValue, reading.observedValue);
+      if (comparison.similarity >= LIKELY_OCR_SUBSTITUTION_SIMILARITY) {
+        return "Bounded OCR is a near-miss for the seller-entered text, so it is treated as a likely stylized-text OCR substitution.";
+      }
+    }
+    return "Bounded OCR did not support the seller-entered text strongly enough to compare against independent discovery.";
+  }
+  return null;
+}
+
+function reliableSellerRegionReading(
+  category: PackageCategoryDraft,
+  reading: SellerRegionMachineReading,
+): boolean {
+  return sellerRegionReliabilityReason(category, reading) === null;
+}
+
+function firstReadableSellerRegionValue(readings: readonly SellerRegionMachineReading[]) {
+  return readings.find(readableSellerRegionReading)?.observedValue ?? null;
 }
 
 function machineDiscoveredReadingFor(
@@ -424,18 +488,24 @@ function deriveTwoStreamComparison(
     ),
   );
   if (sellerRegionReadings.length === 0) return null;
+  const sellerRegionReliability = sellerRegionReadings.map((reading) => {
+    const unreliableReason = sellerRegionReliabilityReason(category, reading);
+    return {
+      regionId: reading.regionId,
+      panelId: reading.panelId,
+      reliabilityState: unreliableReason === null ? ("RELIABLE" as const) : ("UNRELIABLE" as const),
+      reason: unreliableReason ?? "Bounded OCR is reliable enough for deterministic comparison.",
+    };
+  });
 
   const machineDiscoveredReading = machineDiscoveredReadingFor(category.categoryId, panelRuns);
-  const readableRegionReadings = sellerRegionReadings.filter(readableSellerRegionReading);
-  const bestSellerRegionReading = readableRegionReadings[0] ?? null;
+  const reliableRegionReadings = sellerRegionReadings.filter((reading) =>
+    reliableSellerRegionReading(category, reading),
+  );
+  const bestSellerRegionReading = reliableRegionReadings[0] ?? null;
   const sellerValue = bestSellerRegionReading?.observedValue ?? null;
   const machineValue = machineDiscoveredReading?.observedValue ?? null;
-  const machineReadable =
-    machineDiscoveredReading !== null &&
-    machineValue !== null &&
-    (machineDiscoveredReading.state === "OBSERVED" ||
-      machineDiscoveredReading.state === "LOW_CONFIDENCE" ||
-      machineDiscoveredReading.state === "AMBIGUOUS");
+  const machineReadable = reliableMachineDiscoveredReading(machineDiscoveredReading);
 
   let outcome: CategoryTwoStreamOutcome;
   let reason: string;
@@ -448,13 +518,13 @@ function deriveTwoStreamComparison(
     if (valuesEquivalent(category.categoryId, sellerValue, machineValue)) {
       outcome = "AGREEMENT";
       supportingPanelIds = [machineDiscoveredReading.panelId];
-      supportingRegionIds = readableRegionReadings.map((reading) => reading.regionId);
+      supportingRegionIds = reliableRegionReadings.map((reading) => reading.regionId);
       reason =
         "The seller-region machine reading agrees with the independent machine-discovered reading.";
     } else {
       outcome = "CONFLICT";
       conflictingPanelIds = [machineDiscoveredReading.panelId];
-      conflictingRegionIds = readableRegionReadings.map((reading) => reading.regionId);
+      conflictingRegionIds = reliableRegionReadings.map((reading) => reading.regionId);
       reason =
         "The seller-region machine reading conflicts with the independent machine-discovered reading.";
     }
@@ -462,10 +532,10 @@ function deriveTwoStreamComparison(
     outcome = "SELLER_REGION_INSUFFICIENT";
     conflictingPanelIds = [machineDiscoveredReading.panelId];
     reason =
-      "The selected seller region did not produce a usable machine reading; outside machine-discovered text was preserved separately.";
+      "Text was detected inside the selected location, but the bounded reading was not reliable enough to compare against the independent machine reading.";
   } else if (sellerValue && !machineValue) {
     outcome = "MACHINE_DISCOVERY_NOT_FOUND";
-    supportingRegionIds = readableRegionReadings.map((reading) => reading.regionId);
+    supportingRegionIds = reliableRegionReadings.map((reading) => reading.regionId);
     reason =
       "The selected seller region produced a usable machine reading, but independent full-panel discovery did not find the field.";
   } else {
@@ -478,6 +548,7 @@ function deriveTwoStreamComparison(
     categoryId: category.categoryId,
     sellerDeclaredValue: category.expectedValue,
     sellerRegionReadings,
+    sellerRegionReliability,
     machineDiscoveredReading,
     outcome,
     reason,
@@ -531,7 +602,7 @@ export function deriveCategoryAnalysis(
         state: comparison.outcome === "AGREEMENT" ? "clearly_readable" : "needs_review",
         observedValue:
           comparison.machineDiscoveredReading?.observedValue ??
-          comparison.sellerRegionReadings.find(readableSellerRegionReading)?.observedValue ??
+          firstReadableSellerRegionValue(comparison.sellerRegionReadings) ??
           null,
         supportingPanelIds: comparison.supportingPanelIds,
         supportingRegionIds: comparison.supportingRegionIds,
@@ -555,7 +626,7 @@ export function deriveCategoryAnalysis(
     const sellerDeclaredSupported =
       comparison.outcome === "AGREEMENT" &&
       comparison.sellerRegionReadings
-        .filter(readableSellerRegionReading)
+        .filter((reading) => reliableSellerRegionReading(category, reading))
         .some(
           (reading) =>
             reading.observedValue !== null &&
@@ -568,7 +639,7 @@ export function deriveCategoryAnalysis(
       state: sellerDeclaredSupported ? "clearly_readable" : "needs_review",
       observedValue:
         comparison.machineDiscoveredReading?.observedValue ??
-        comparison.sellerRegionReadings.find(readableSellerRegionReading)?.observedValue ??
+        firstReadableSellerRegionValue(comparison.sellerRegionReadings) ??
         null,
       supportingPanelIds: comparison.supportingPanelIds,
       supportingRegionIds: comparison.supportingRegionIds,

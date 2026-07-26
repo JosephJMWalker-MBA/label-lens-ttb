@@ -31,6 +31,10 @@ function firstSellerRegionValue(analysis: PackageCategoryAnalysis): string | nul
   );
 }
 
+function formatCrop(crop: { left: number; top: number; width: number; height: number }) {
+  return `left ${crop.left}, top ${crop.top}, ${crop.width}x${crop.height}px`;
+}
+
 export function GuidedCategoryTask({
   definition,
   instruction,
@@ -109,6 +113,12 @@ export function GuidedCategoryTask({
           </div>
           {analysis.comparison ? (
             <>
+              {analysis.comparison.outcome === "SELLER_REGION_INSUFFICIENT" ? (
+                <div className="rounded-md border border-amber-500/50 bg-amber-50 p-3 text-sm text-amber-950">
+                  Text was detected inside the selected location, but the bounded reading was not
+                  reliable enough to compare against the independent machine reading.
+                </div>
+              ) : null}
               <div className="rounded-md border border-blue-500/50 bg-blue-50 p-3">
                 <p className="text-xs font-semibold uppercase tracking-wide text-blue-950">
                   Machine read inside selected location
@@ -139,6 +149,100 @@ export function GuidedCategoryTask({
                 </p>
                 <p className="mt-1 text-amber-950">{analysis.comparison.reason}</p>
               </div>
+              {analysis.comparison.sellerRegionReadings[0] ? (
+                <details className="rounded-md border border-border bg-background p-3 text-xs text-muted-foreground">
+                  <summary className="cursor-pointer font-semibold text-foreground">
+                    Bounded pass technical details
+                  </summary>
+                  <dl className="mt-2 grid gap-1">
+                    <div>
+                      <dt className="font-medium text-foreground">Selected region</dt>
+                      <dd>
+                        x {analysis.comparison.sellerRegionReadings[0].sellerRegion.x}, y{" "}
+                        {analysis.comparison.sellerRegionReadings[0].sellerRegion.y}, width{" "}
+                        {analysis.comparison.sellerRegionReadings[0].sellerRegion.width}, height{" "}
+                        {analysis.comparison.sellerRegionReadings[0].sellerRegion.height}
+                      </dd>
+                    </div>
+                    {analysis.comparison.sellerRegionReadings[0].selectedRegionPixelGeometry ? (
+                      <div>
+                        <dt className="font-medium text-foreground">Selected crop pixels</dt>
+                        <dd>
+                          {formatCrop(
+                            analysis.comparison.sellerRegionReadings[0].selectedRegionPixelGeometry,
+                          )}
+                        </dd>
+                      </div>
+                    ) : null}
+                    <div>
+                      <dt className="font-medium text-foreground">Padded OCR crop</dt>
+                      <dd>
+                        {formatCrop(analysis.comparison.sellerRegionReadings[0].cropGeometry)}
+                      </dd>
+                    </div>
+                    {analysis.comparison.sellerRegionReadings[0].cropPadding ? (
+                      <div>
+                        <dt className="font-medium text-foreground">Padding</dt>
+                        <dd>
+                          left {analysis.comparison.sellerRegionReadings[0].cropPadding.left}, top{" "}
+                          {analysis.comparison.sellerRegionReadings[0].cropPadding.top}, right{" "}
+                          {analysis.comparison.sellerRegionReadings[0].cropPadding.right}, bottom{" "}
+                          {analysis.comparison.sellerRegionReadings[0].cropPadding.bottom}
+                        </dd>
+                      </div>
+                    ) : null}
+                    <div>
+                      <dt className="font-medium text-foreground">Scale factor</dt>
+                      <dd>
+                        {analysis.comparison.sellerRegionReadings[0].scaleFactor ?? "Unknown"}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="font-medium text-foreground">Orientation/pass</dt>
+                      <dd>
+                        {analysis.comparison.sellerRegionReadings[0].passProvenance?.passKind ??
+                          "Unknown"}{" "}
+                        · rotate{" "}
+                        {analysis.comparison.sellerRegionReadings[0].passProvenance?.transform
+                          .rotate ?? "unknown"}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="font-medium text-foreground">Preprocessing</dt>
+                      <dd>
+                        {analysis.comparison.sellerRegionReadings[0].passProvenance?.preprocessing.join(
+                          ", ",
+                        ) ?? "Unknown"}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="font-medium text-foreground">Raw bounded transcript</dt>
+                      <dd>
+                        {analysis.comparison.sellerRegionReadings[0].rawTranscript ||
+                          "No transcript"}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="font-medium text-foreground">Confidence</dt>
+                      <dd>
+                        {analysis.comparison.sellerRegionReadings[0].ocrEvidenceScore.toFixed(2)}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="font-medium text-foreground">Reliability</dt>
+                      <dd>
+                        {analysis.comparison.sellerRegionReliability[0]?.reliabilityState ??
+                          analysis.comparison.sellerRegionReadings[0].reliabilityState ??
+                          "Unknown"}{" "}
+                        ·{" "}
+                        {analysis.comparison.sellerRegionReliability[0]?.reason ??
+                          analysis.comparison.sellerRegionReadings[0].reliabilityReason ??
+                          "No reliability reason recorded."}
+                      </dd>
+                    </div>
+                  </dl>
+                </details>
+              ) : null}
             </>
           ) : (
             <div className="rounded-md border border-slate-400 bg-slate-50 p-3">

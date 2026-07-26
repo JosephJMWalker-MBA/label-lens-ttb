@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import type { OcrWord, RegionOcrResult, RegionTransform } from "./extractor.types";
-import { planRecoveryOcrPasses, planSellerRegionOcrPass, sellerRegionCrop } from "./regions";
+import {
+  planRecoveryOcrPasses,
+  planSellerRegionOcrPass,
+  sellerRegionCrop,
+  sellerRegionCropPlan,
+} from "./regions";
 
 const TRANSFORM: RegionTransform = {
   crop: { left: 0, top: 0, width: 1000, height: 800 },
@@ -143,6 +148,30 @@ describe("seller-region OCR planning", () => {
       top: 156,
       width: 266,
       height: 88,
+    });
+  });
+
+  it("records deterministic crop padding and maps selected coordinates to original pixels", () => {
+    expect(sellerRegionCropPlan(target, 1000, 800)).toEqual({
+      selectedRegionPixelGeometry: {
+        left: 100,
+        top: 160,
+        width: 250,
+        height: 80,
+      },
+      crop: {
+        left: 92,
+        top: 156,
+        width: 266,
+        height: 88,
+      },
+      padding: {
+        left: 8,
+        top: 4,
+        right: 8,
+        bottom: 4,
+      },
+      scale: 3,
     });
   });
 

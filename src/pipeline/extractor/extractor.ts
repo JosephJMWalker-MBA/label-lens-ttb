@@ -19,6 +19,7 @@ import {
   planSellerRegionOcrPass,
   runOcrPass,
   sellerRegionCrop,
+  sellerRegionCropPlan,
 } from "./regions";
 import type {
   RegionOcrResult,
@@ -238,16 +239,28 @@ function invalidSellerRegionReading(
     width: 0,
     height: 0,
   };
+  const cropPlan = sellerRegionCropPlan(target, decoded.width, decoded.height);
   return {
     categoryId: target.categoryId,
     regionId: target.regionId,
     panelId: target.panelId,
     sellerRegion: target.region,
+    selectedRegionPixelGeometry: cropPlan
+      ? {
+          ...cropPlan.selectedRegionPixelGeometry,
+          imageWidth: decoded.width,
+          imageHeight: decoded.height,
+        }
+      : undefined,
+    cropPadding: cropPlan?.padding,
+    scaleFactor: cropPlan?.scale,
     cropGeometry: { ...crop, imageWidth: decoded.width, imageHeight: decoded.height },
     rawTranscript: "",
     observedValue: null,
     ocrEvidenceScore: 0,
     evidenceState: "INVALID_REGION",
+    reliabilityState: "UNRELIABLE",
+    reliabilityReason: "Seller-selected region could not be mapped to a usable OCR crop.",
     failureReason: "Seller-selected region could not be mapped to a usable OCR crop.",
     passProvenance: null,
     extractionProvenance: extractionProvenance(input),
@@ -265,6 +278,11 @@ function sellerRegionReadingFromSelection(
     .map((word) => word.text)
     .join(" ")
     .trim();
+  const cropPlan = sellerRegionCropPlan(
+    target,
+    result.transform.originalWidth,
+    result.transform.originalHeight,
+  );
   const evidenceState =
     observation.state === "OBSERVED" ||
     observation.state === "LOW_CONFIDENCE" ||
@@ -278,6 +296,15 @@ function sellerRegionReadingFromSelection(
     regionId: target.regionId,
     panelId: target.panelId,
     sellerRegion: target.region,
+    selectedRegionPixelGeometry: cropPlan
+      ? {
+          ...cropPlan.selectedRegionPixelGeometry,
+          imageWidth: result.transform.originalWidth,
+          imageHeight: result.transform.originalHeight,
+        }
+      : undefined,
+    cropPadding: cropPlan?.padding,
+    scaleFactor: result.transform.scale,
     cropGeometry: {
       ...result.transform.crop,
       imageWidth: result.transform.originalWidth,
@@ -288,6 +315,14 @@ function sellerRegionReadingFromSelection(
     normalizedValue: observation.normalizedValue,
     ocrEvidenceScore: observation.ocrEvidenceScore,
     evidenceState,
+    reliabilityState:
+      evidenceState === "OBSERVED" && observation.ocrEvidenceScore >= 0.8
+        ? "RELIABLE"
+        : "UNRELIABLE",
+    reliabilityReason:
+      evidenceState === "OBSERVED" && observation.ocrEvidenceScore >= 0.8
+        ? "Bounded OCR produced an observed value above the machine confidence floor."
+        : "Bounded OCR did not produce a high-confidence observed value.",
     failureReason:
       evidenceState === "UNREADABLE" || evidenceState === "NOT_OBSERVED"
         ? "Bounded OCR did not establish a usable value inside the seller-selected region."

@@ -47,6 +47,18 @@ export interface PlannedOcrPass {
   transform: RegionTransform;
 }
 
+export interface SellerRegionCropPlan {
+  selectedRegionPixelGeometry: RegionTransform["crop"];
+  crop: RegionTransform["crop"];
+  padding: {
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+  };
+  scale: number;
+}
+
 interface WordComponent {
   words: MappedWord[];
   geometry: EvidenceGeometry;
@@ -472,6 +484,14 @@ export function sellerRegionCrop(
   originalWidth: number,
   originalHeight: number,
 ): RegionTransform["crop"] | null {
+  return sellerRegionCropPlan(target, originalWidth, originalHeight)?.crop ?? null;
+}
+
+export function sellerRegionCropPlan(
+  target: SellerRegionOcrTarget,
+  originalWidth: number,
+  originalHeight: number,
+): SellerRegionCropPlan | null {
   const { region } = target;
   const values = [region.x, region.y, region.width, region.height];
   if (
@@ -518,10 +538,20 @@ export function sellerRegionCrop(
     width: paddedRight - paddedLeft,
     height: paddedBottom - paddedTop,
   };
-  return crop.width >= SELLER_REGION_MIN_DIMENSION_PX &&
-    crop.height >= SELLER_REGION_MIN_DIMENSION_PX
-    ? crop
-    : null;
+  if (crop.width < SELLER_REGION_MIN_DIMENSION_PX || crop.height < SELLER_REGION_MIN_DIMENSION_PX) {
+    return null;
+  }
+  return {
+    selectedRegionPixelGeometry: { left, top, width, height },
+    crop,
+    padding: {
+      left: left - paddedLeft,
+      top: top - paddedTop,
+      right: paddedRight - right,
+      bottom: paddedBottom - bottom,
+    },
+    scale: SELLER_REGION_SCALE,
+  };
 }
 
 export function planSellerRegionOcrPass(
