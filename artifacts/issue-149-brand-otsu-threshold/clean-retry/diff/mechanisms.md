@@ -1,0 +1,20 @@
+# Otsu mechanism review
+
+All 11 primary control/treatment preprocessed pairs were retained for
+full-resolution inspection. Every behaviorally changed case has exactly one
+primary classification. Visible binarization evidence is separated from OCR
+movement; transcript movement alone is not treated as causal evidence.
+
+| Changed case | Paired artifact | Classification | Visual and metric evidence | Thin stroke | Contrast | Outline/shadow | Background |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| approved-wine-004 | [pair](paired-preprocessed/approved-wine-004.png) | `OTSU_REMOVED_BACKGROUND_NOISE` | Fresh clean-pair review shows the normalized gray field becoming uniform white while the principal La Fattoria strokes remain continuous; OCR closes the internal FATTORIA space but still does not recover the full fixed Brand truth. | yes | high | absent | clean |
+| approved-wine-005 | [pair](paired-preprocessed/approved-wine-005.png) | `OTSU_CHANGED_CONFIDENCE_ONLY` | Fresh clean-pair review shows stable principal letterforms; transcript, candidates, selection, and authority are identical, with mean confidence changing only from 26.5 to 26.0. | yes | high | absent | clean |
+| approved-wine-023 | [pair](paired-preprocessed/approved-wine-023.png) | `OTSU_FRAGMENTED_CHARACTERS` | Fresh clean-pair review shows white gaps and dotted breaks across multiple fine script loops and connectors; OCR changes to a different wrong candidate without truth recovery. | yes | high | absent | clean |
+| approved-wine-027 | [pair](paired-preprocessed/approved-wine-027.png) | `OTSU_LOST_THIN_STROKES` | Fresh clean-pair review shows the fine gray Girls word and multiple decorative rose strokes disappearing while the heavy GOLDEN letters survive; the new candidate remains wrong. | yes | mixed | present | textured |
+| approved-wine-031 | [pair](paired-preprocessed/approved-wine-031.png) | `OTSU_CHANGED_CONFIDENCE_ONLY` | Fresh clean-pair review shows intact main letterforms; transcript and candidate stay enheesO while mean confidence falls from 35 to 26. | yes | high | absent | clean |
+| approved-wine-035 | [pair](paired-preprocessed/approved-wine-035.png) | `OTSU_REMOVED_BACKGROUND_NOISE` | Fresh clean-pair review shows the mottled gray field becoming uniform white while the Hubert Lamy script remains visibly continuous; the wrong transcript changes without truth gain. | yes | high | absent | textured |
+| approved-wine-085 | [pair](paired-preprocessed/approved-wine-085.png) | `OTSU_FRAGMENTED_CHARACTERS` | Fresh clean-pair review shows gaps and hard discontinuities in the low-contrast script and leading flourish; the control candidate is replaced by another wrong candidate. | yes | low | absent | textured |
+| approved-wine-091 | [pair](paired-preprocessed/approved-wine-091.png) | `OTSU_CHANGED_CONFIDENCE_ONLY` | Fresh clean-pair review shows stable stacked letterforms; transcript, empty candidate state, and authority are unchanged while mean confidence rises from 74.5 to 76.5. | yes | high | absent | clean |
+| la-fattoria-rotated | [pair](paired-preprocessed/la-fattoria-rotated.png) | `OTSU_REMOVED_BACKGROUND_NOISE` | Fresh clean-pair review shows the same gray-field removal as the matching La Fattoria artwork while principal strokes remain continuous; OCR spacing changes without recovering the full Brand truth. | yes | high | absent | clean |
+| wine-multi-artifact-04-region-1 | [pair](paired-preprocessed/wine-multi-artifact-04-region-1.png) | `OTSU_REMOVED_BACKGROUND_NOISE` | Fresh clean-pair review shows gray background and anti-aliasing removed while the large Dry Cellar strokes remain continuous; OCR changes from EA, to Ex, without producing a candidate or truth gain. | yes | high | absent | clean |
+| wine-multi-artifact-04-region-2 | [pair](paired-preprocessed/wine-multi-artifact-04-region-2.png) | `OTSU_FRAGMENTED_CHARACTERS` | Fresh clean-pair review shows conspicuous white breaks in the small capital loops and connecting script strokes; OCR changes from Colles Dig to Colla Diy without truth gain. | yes | high | absent | clean |

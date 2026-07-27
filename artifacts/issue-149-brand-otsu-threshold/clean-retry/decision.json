@@ -1,0 +1,51 @@
+{
+  "decision": "KILL",
+  "successCriteria": {
+    "atLeastTwoRegionsImprove": false,
+    "atLeastTwoChecksumFamiliesImprove": false,
+    "normalizedTop1AccuracyImproves": false,
+    "candidateListOrTop3RecallImproves": false,
+    "noPreviouslyCorrectRegionRegresses": true,
+    "falseReliableReadsRemainZero": true,
+    "wrongReliableReadsRemainZero": true,
+    "emptyOcrDoesNotIncrease": true,
+    "noCleanHighContrastRegression": true,
+    "latencyWithinCeilings": true,
+    "reproducible": true,
+    "controlBaselineReproduced": true,
+    "onlyThresholdMethodChanged": true,
+    "otsuNotCombinedWithClaheOrSharpening": true,
+    "sellerTruthNotPassedToOcr": true,
+    "noProductionOrPr195PathChanges": true,
+    "implementationVerified": true,
+    "outputIsolationVerified": true
+  },
+  "killReasons": [
+    "zero or one governed region improved",
+    "improvement did not span two source checksum families",
+    "normalized top-one accuracy did not improve in both runs",
+    "candidate-list or top-three truth recall did not improve in both runs"
+  ],
+  "incompleteEvidence": [],
+  "improvedCaseIds": [],
+  "regressedCaseIds": [],
+  "improvementChecksumFamilies": [],
+  "improvementIndependenceFamilies": [],
+  "regressionChecksumFamilies": [],
+  "regressionIndependenceFamilies": [],
+  "primaryLatencyRatios": { "median": 0.8501344519111099, "p95": 1.1608702572529148 },
+  "repeatLatencyRatios": { "median": 0.8355351084156957, "p95": 1.1807250413587782 },
+  "reproducible": true,
+  "nextRecommendation": "Adaptive thresholding: preregister one evaluation-only, default-off treatment on the same locked corpus and control, with an exact local-window algorithm and parameters frozen before any OCR output.",
+  "isolation": {
+    "changedVariables": ["thresholdMethod"],
+    "valid": true,
+    "reason": "Treatment differs from control only in thresholdMethod."
+  },
+  "implementationId": "histogram-between-class-variance-lower-tie-single-channel-v1",
+  "outputAdapterId": "rgb-rgba-alpha-preserving-png-v1",
+  "implementationVerified": true,
+  "outputIsolationVerified": true,
+  "treatmentDefaultOff": true,
+  "productionEnabled": false
+}

@@ -76,6 +76,29 @@ export const ocrConfigurationSchema = z
         path: ["localContrast"],
       });
     }
+    if (configuration.thresholdMethod === "otsu") {
+      if (configuration.grayscaleMethod !== "sharp-grayscale") {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "OTSU_REQUIRES_GRAYSCALE",
+          path: ["grayscaleMethod"],
+        });
+      }
+      if (configuration.localContrast !== "none") {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "OTSU_AND_LOCAL_CONTRAST_MUTUALLY_EXCLUSIVE",
+          path: ["localContrast"],
+        });
+      }
+      if (configuration.sharpening !== "none") {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "OTSU_AND_SHARPENING_MUTUALLY_EXCLUSIVE",
+          path: ["sharpening"],
+        });
+      }
+    }
   });
 
 export type OcrConfiguration = z.infer<typeof ocrConfigurationSchema>;
@@ -123,6 +146,10 @@ export const LOCAL_CONTRAST_CLAHE_PARAMETERS = Object.freeze({
   height: 3,
   maxSlope: 3,
 });
+
+export const OTSU_IMPLEMENTATION_ID =
+  "histogram-between-class-variance-lower-tie-single-channel-v1" as const;
+export const OTSU_OUTPUT_ADAPTER_ID = "rgb-rgba-alpha-preserving-png-v1" as const;
 
 export interface ConfigurationIsolation {
   changedVariables: ExperimentVariable[];
@@ -398,37 +425,266 @@ function preprocessingLabels(configuration: OcrConfiguration): string[] {
   return labels;
 }
 
-function otsuThreshold(raw: Buffer): number {
-  const histogram = new Array<number>(256).fill(0);
-  for (const byte of raw) histogram[byte] += 1;
-  const total = raw.length;
-  let sum = 0;
-  for (let index = 0; index < 256; index += 1) sum += index * histogram[index];
+export function selectOtsuThreshold(grayscale: Uint8Array): number {
+  if (grayscale.length === 0) {
+    throw new Error("OTSU_REQUIRES_NON_EMPTY_GRAYSCALE");
+  }
+  const histogram = new Uint32Array(256);
+  for (const byte of grayscale) histogram[byte] += 1;
+  const total = grayscale.length;
+  let weightedIntensitySum = 0;
+  for (let intensity = 0; intensity < 256; intensity += 1) {
+    weightedIntensitySum += intensity * histogram[intensity];
+  }
   let backgroundWeight = 0;
-  let backgroundSum = 0;
-  let bestVariance = -1;
-  let bestThreshold = 128;
+  let backgroundIntensitySum = 0;
+  let bestBetweenClassVariance = -1;
+  let bestThreshold: number | null = null;
   for (let threshold = 0; threshold < 256; threshold += 1) {
     backgroundWeight += histogram[threshold];
     if (backgroundWeight === 0) continue;
     const foregroundWeight = total - backgroundWeight;
     if (foregroundWeight === 0) break;
-    backgroundSum += threshold * histogram[threshold];
-    const backgroundMean = backgroundSum / backgroundWeight;
-    const foregroundMean = (sum - backgroundSum) / foregroundWeight;
-    const variance =
+    backgroundIntensitySum += threshold * histogram[threshold];
+    const backgroundMean = backgroundIntensitySum / backgroundWeight;
+    const foregroundMean = (weightedIntensitySum - backgroundIntensitySum) / foregroundWeight;
+    const betweenClassVariance =
       backgroundWeight *
       foregroundWeight *
       (backgroundMean - foregroundMean) *
       (backgroundMean - foregroundMean);
-    if (variance > bestVariance) {
-      bestVariance = variance;
+    if (betweenClassVariance > bestBetweenClassVariance) {
+      bestBetweenClassVariance = betweenClassVariance;
       bestThreshold = threshold;
     }
+  }
+  if (bestThreshold === null) {
+    throw new Error("OTSU_REQUIRES_AT_LEAST_TWO_GRAYSCALE_LEVELS");
   }
   return bestThreshold;
 }
 
+export function binarizeGrayscaleWithOtsu(grayscale: Uint8Array): {
+  threshold: number;
+  data: Buffer;
+} {
+  const threshold = selectOtsuThreshold(grayscale);
+  const data = Buffer.allocUnsafe(grayscale.length);
+  for (let index = 0; index < grayscale.length; index += 1) {
+    data[index] = grayscale[index] > threshold ? 255 : 0;
+  }
+  return { threshold, data };
+}
+
+type RgbChannels = 3 | 4;
+
+interface PngChunk {
+  type: string;
+  bytes: Buffer;
+}
+
+const PNG_SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+
+function rgbLuminance(red: number, green: number, blue: number): number {
+  return Math.floor((2126 * red + 7152 * green + 722 * blue + 5000) / 10_000);
+}
+
+function parsePngChunks(png: Buffer): PngChunk[] {
+  if (png.length < PNG_SIGNATURE.length || !png.subarray(0, 8).equals(PNG_SIGNATURE)) {
+    throw new Error("OTSU_REQUIRES_PNG_INPUT");
+  }
+  const chunks: PngChunk[] = [];
+  let offset = PNG_SIGNATURE.length;
+  while (offset < png.length) {
+    if (offset + 12 > png.length) throw new Error("OTSU_INVALID_PNG_CHUNK");
+    const dataLength = png.readUInt32BE(offset);
+    const end = offset + 12 + dataLength;
+    if (end > png.length) throw new Error("OTSU_INVALID_PNG_CHUNK");
+    const type = png.toString("ascii", offset + 4, offset + 8);
+    chunks.push({ type, bytes: Buffer.from(png.subarray(offset, end)) });
+    offset = end;
+  }
+  if (
+    chunks[0]?.type !== "IHDR" ||
+    chunks.at(-1)?.type !== "IEND" ||
+    !chunks.some((chunk) => chunk.type === "IDAT")
+  ) {
+    throw new Error("OTSU_INVALID_PNG_STRUCTURE");
+  }
+  return chunks;
+}
+
+function isCriticalPngChunk(type: string): boolean {
+  const first = type.charCodeAt(0);
+  return first >= 65 && first <= 90;
+}
+
+function preservePngStructureAndMetadata(sourcePng: Buffer, encodedPng: Buffer): Buffer {
+  const sourceChunks = parsePngChunks(sourcePng);
+  const encodedChunks = parsePngChunks(encodedPng);
+  const unexpectedCritical = sourceChunks.filter(
+    (chunk) =>
+      isCriticalPngChunk(chunk.type) &&
+      chunk.type !== "IHDR" &&
+      chunk.type !== "IDAT" &&
+      chunk.type !== "IEND",
+  );
+  if (unexpectedCritical.length > 0) {
+    throw new Error(
+      `OTSU_UNSUPPORTED_PNG_CRITICAL_CHUNK: ${unexpectedCritical
+        .map((chunk) => chunk.type)
+        .join(",")}`,
+    );
+  }
+  const sourceHeader = sourceChunks.find((chunk) => chunk.type === "IHDR");
+  const encodedHeader = encodedChunks.find((chunk) => chunk.type === "IHDR");
+  if (!sourceHeader || !encodedHeader || !sourceHeader.bytes.equals(encodedHeader.bytes)) {
+    throw new Error("OTSU_PNG_HEADER_CHANGED");
+  }
+  const encodedImageData = encodedChunks.filter((chunk) => chunk.type === "IDAT");
+  const outputChunks: Buffer[] = [];
+  let insertedImageData = false;
+  for (const chunk of sourceChunks) {
+    if (chunk.type === "IHDR") {
+      outputChunks.push(encodedHeader.bytes);
+    } else if (chunk.type === "IDAT") {
+      if (!insertedImageData) {
+        outputChunks.push(...encodedImageData.map((item) => item.bytes));
+        insertedImageData = true;
+      }
+    } else {
+      outputChunks.push(chunk.bytes);
+    }
+  }
+  if (!insertedImageData) throw new Error("OTSU_INVALID_PNG_STRUCTURE");
+  const png = Buffer.concat([PNG_SIGNATURE, ...outputChunks]);
+  const outputNonImageData = parsePngChunks(png)
+    .filter((chunk) => chunk.type !== "IDAT")
+    .map((chunk) => chunk.bytes);
+  const sourceNonImageData = sourceChunks
+    .filter((chunk) => chunk.type !== "IDAT")
+    .map((chunk) => chunk.bytes);
+  if (
+    outputNonImageData.length !== sourceNonImageData.length ||
+    outputNonImageData.some((chunk, index) => !chunk.equals(sourceNonImageData[index]))
+  ) {
+    throw new Error("OTSU_PNG_NON_IMAGE_CHUNKS_CHANGED");
+  }
+  return png;
+}
+
+function exposedPngMetadata(metadata: Awaited<ReturnType<ReturnType<typeof sharp>["metadata"]>>) {
+  return {
+    format: metadata.format,
+    width: metadata.width,
+    height: metadata.height,
+    space: metadata.space,
+    channels: metadata.channels,
+    depth: metadata.depth,
+    density: metadata.density,
+    isProgressive: metadata.isProgressive,
+    isPalette: metadata.isPalette,
+    bitsPerSample: metadata.bitsPerSample,
+    hasProfile: metadata.hasProfile,
+    hasAlpha: metadata.hasAlpha,
+    orientation: metadata.orientation,
+    resolutionUnit: metadata.resolutionUnit,
+  };
+}
+
+export function binarizeRgbOrRgbaWithOtsu(
+  pixels: Uint8Array,
+  width: number,
+  height: number,
+  channels: RgbChannels,
+): { threshold: number; data: Buffer } {
+  if (pixels.length !== width * height * channels) {
+    throw new Error("OTSU_PIXEL_BUFFER_SIZE_MISMATCH");
+  }
+  const grayscale = Buffer.allocUnsafe(width * height);
+  for (let pixel = 0; pixel < width * height; pixel += 1) {
+    const offset = pixel * channels;
+    grayscale[pixel] = rgbLuminance(pixels[offset], pixels[offset + 1], pixels[offset + 2]);
+  }
+  const threshold = selectOtsuThreshold(grayscale);
+  const data = Buffer.allocUnsafe(pixels.length);
+  for (let pixel = 0; pixel < width * height; pixel += 1) {
+    const offset = pixel * channels;
+    const binary = grayscale[pixel] > threshold ? 255 : 0;
+    data[offset] = binary;
+    data[offset + 1] = binary;
+    data[offset + 2] = binary;
+    if (channels === 4) data[offset + 3] = pixels[offset + 3];
+  }
+  return { threshold, data };
+}
+
+export async function encodeChannelPreservingOtsuPng(controlEquivalentPng: Buffer): Promise<{
+  threshold: number;
+  png: Buffer;
+}> {
+  const source = sharp(controlEquivalentPng);
+  const sourceMetadata = await source.metadata();
+  if (
+    sourceMetadata.format !== "png" ||
+    sourceMetadata.depth !== "uchar" ||
+    sourceMetadata.bitsPerSample !== 8 ||
+    sourceMetadata.isPalette === true ||
+    (sourceMetadata.channels !== 3 && sourceMetadata.channels !== 4)
+  ) {
+    throw new Error("OTSU_REQUIRES_EIGHT_BIT_RGB_OR_RGBA_PNG");
+  }
+  const { data, info } = await source.raw().toBuffer({ resolveWithObject: true });
+  if (
+    info.width !== sourceMetadata.width ||
+    info.height !== sourceMetadata.height ||
+    info.channels !== sourceMetadata.channels
+  ) {
+    throw new Error("OTSU_PNG_DECODE_LAYOUT_MISMATCH");
+  }
+  const binary = binarizeRgbOrRgbaWithOtsu(
+    data,
+    info.width,
+    info.height,
+    info.channels as RgbChannels,
+  );
+  const encoded = await sharp(binary.data, {
+    raw: { width: info.width, height: info.height, channels: info.channels as RgbChannels },
+  })
+    .png({ progressive: sourceMetadata.isProgressive === true, palette: false })
+    .toBuffer();
+  const png = preservePngStructureAndMetadata(controlEquivalentPng, encoded);
+  const outputMetadata = await sharp(png).metadata();
+  if (
+    JSON.stringify(exposedPngMetadata(outputMetadata)) !==
+    JSON.stringify(exposedPngMetadata(sourceMetadata))
+  ) {
+    throw new Error("OTSU_PNG_METADATA_CHANGED");
+  }
+  const output = await sharp(png).raw().toBuffer({ resolveWithObject: true });
+  if (
+    output.info.width !== info.width ||
+    output.info.height !== info.height ||
+    output.info.channels !== info.channels
+  ) {
+    throw new Error("OTSU_PNG_OUTPUT_LAYOUT_CHANGED");
+  }
+  for (let index = 0; index < output.data.length; index += 1) {
+    const channel = index % info.channels;
+    if (channel < 3 && output.data[index] !== 0 && output.data[index] !== 255) {
+      throw new Error("OTSU_PNG_OUTPUT_NOT_BINARY");
+    }
+    if (channel === 3 && output.data[index] !== data[index]) {
+      throw new Error("OTSU_PNG_ALPHA_CHANGED");
+    }
+  }
+  return { threshold: binary.threshold, png };
+}
+
+/*
+ * Otsu preprocessing is intentionally implemented here, inside the
+ * evaluation-only fixture module. Production OCR must not import this module.
+ */
 async function preprocess(
   bytes: Buffer,
   crop: RegionTransform["crop"],
@@ -463,18 +719,16 @@ async function preprocess(
   }
   if (configuration.inversion) pipeline = pipeline.negate();
   if (configuration.thresholdMethod === "global-128") pipeline = pipeline.threshold(128);
+  let preprocessedPng: Buffer;
   if (configuration.thresholdMethod === "otsu") {
-    const { data, info } = await pipeline.clone().grayscale().raw().toBuffer({
-      resolveWithObject: true,
-    });
-    const threshold = otsuThreshold(data);
-    pipeline = sharp(data, {
-      raw: { width: info.width, height: info.height, channels: info.channels },
-    }).threshold(threshold);
+    const controlEquivalentPng = await pipeline.clone().png().toBuffer();
+    preprocessedPng = (await encodeChannelPreservingOtsuPng(controlEquivalentPng)).png;
+  } else {
+    preprocessedPng = await pipeline.png().toBuffer();
   }
   return {
     cropPng,
-    preprocessedPng: await pipeline.png().toBuffer(),
+    preprocessedPng,
     transformedSize: { width, height },
   };
 }

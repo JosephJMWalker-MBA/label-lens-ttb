@@ -1,0 +1,76 @@
+{
+  "status": "PASS",
+  "evidenceSource": "fresh full-resolution inspection of clean-retry paired artifacts",
+  "invalidRunReviewReused": false,
+  "reviewedCaseCount": 11,
+  "changedCaseCount": 11,
+  "unreviewedChangedCaseCount": 0,
+  "classifications": [
+    {
+      "caseId": "approved-wine-004",
+      "outputChanged": true,
+      "mechanism": "OTSU_REMOVED_BACKGROUND_NOISE",
+      "evidence": "Fresh clean-pair review shows the normalized gray field becoming uniform white while the principal La Fattoria strokes remain continuous; OCR closes the internal FATTORIA space but still does not recover the full fixed Brand truth."
+    },
+    {
+      "caseId": "approved-wine-005",
+      "outputChanged": true,
+      "mechanism": "OTSU_CHANGED_CONFIDENCE_ONLY",
+      "evidence": "Fresh clean-pair review shows stable principal letterforms; transcript, candidates, selection, and authority are identical, with mean confidence changing only from 26.5 to 26.0."
+    },
+    {
+      "caseId": "approved-wine-023",
+      "outputChanged": true,
+      "mechanism": "OTSU_FRAGMENTED_CHARACTERS",
+      "evidence": "Fresh clean-pair review shows white gaps and dotted breaks across multiple fine script loops and connectors; OCR changes to a different wrong candidate without truth recovery."
+    },
+    {
+      "caseId": "approved-wine-027",
+      "outputChanged": true,
+      "mechanism": "OTSU_LOST_THIN_STROKES",
+      "evidence": "Fresh clean-pair review shows the fine gray Girls word and multiple decorative rose strokes disappearing while the heavy GOLDEN letters survive; the new candidate remains wrong."
+    },
+    {
+      "caseId": "approved-wine-031",
+      "outputChanged": true,
+      "mechanism": "OTSU_CHANGED_CONFIDENCE_ONLY",
+      "evidence": "Fresh clean-pair review shows intact main letterforms; transcript and candidate stay enheesO while mean confidence falls from 35 to 26."
+    },
+    {
+      "caseId": "approved-wine-035",
+      "outputChanged": true,
+      "mechanism": "OTSU_REMOVED_BACKGROUND_NOISE",
+      "evidence": "Fresh clean-pair review shows the mottled gray field becoming uniform white while the Hubert Lamy script remains visibly continuous; the wrong transcript changes without truth gain."
+    },
+    {
+      "caseId": "approved-wine-085",
+      "outputChanged": true,
+      "mechanism": "OTSU_FRAGMENTED_CHARACTERS",
+      "evidence": "Fresh clean-pair review shows gaps and hard discontinuities in the low-contrast script and leading flourish; the control candidate is replaced by another wrong candidate."
+    },
+    {
+      "caseId": "approved-wine-091",
+      "outputChanged": true,
+      "mechanism": "OTSU_CHANGED_CONFIDENCE_ONLY",
+      "evidence": "Fresh clean-pair review shows stable stacked letterforms; transcript, empty candidate state, and authority are unchanged while mean confidence rises from 74.5 to 76.5."
+    },
+    {
+      "caseId": "la-fattoria-rotated",
+      "outputChanged": true,
+      "mechanism": "OTSU_REMOVED_BACKGROUND_NOISE",
+      "evidence": "Fresh clean-pair review shows the same gray-field removal as the matching La Fattoria artwork while principal strokes remain continuous; OCR spacing changes without recovering the full Brand truth."
+    },
+    {
+      "caseId": "wine-multi-artifact-04-region-1",
+      "outputChanged": true,
+      "mechanism": "OTSU_REMOVED_BACKGROUND_NOISE",
+      "evidence": "Fresh clean-pair review shows gray background and anti-aliasing removed while the large Dry Cellar strokes remain continuous; OCR changes from EA, to Ex, without producing a candidate or truth gain."
+    },
+    {
+      "caseId": "wine-multi-artifact-04-region-2",
+      "outputChanged": true,
+      "mechanism": "OTSU_FRAGMENTED_CHARACTERS",
+      "evidence": "Fresh clean-pair review shows conspicuous white breaks in the small capital loops and connecting script strokes; OCR changes from Colles Dig to Colla Diy without truth gain."
+    }
+  ]
+}
