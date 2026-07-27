@@ -2,8 +2,8 @@
 
 | Field | Cases | Exact | Normalized | Readable recall | Insufficient routing | False reliable | Geometry | Median bounded ms | P95 bounded ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| brand | 4 | 0 | 0.5 | 1 | n/a | 0 | 1 | 153.3 | 247.4 |
-| alcohol | 3 | 0 | 0.3333 | 1 | 1 | 0 | 1 | 106.5 | 1928.8 |
+| brand | 4 | 0 | 0.5 | 1 | n/a | 0 | 1 | 153.0 | 246.8 |
+| alcohol | 3 | 0 | 0.3333 | 1 | 1 | 0 | 1 | 104.9 | 1972.1 |
 
 ## Per-case classification
 

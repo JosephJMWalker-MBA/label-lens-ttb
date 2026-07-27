@@ -908,6 +908,26 @@ Corpus policy: committed non-private fixtures are used where they cover the requ
 `;
 }
 
+function renderStagingObservation(): string {
+  return `# Staging observation
+
+Environment: pr143.ttb-test.com
+
+Observation date: 2026-07-26
+
+This is a real-world observation recorded after the baseline branch was tested in staging. It is not a treatment result and does not change the OCR baseline.
+
+- The full package workflow completed successfully.
+- Government Warning returned FAIL because no warning evidence was located.
+- The seller-marked Brand region did not yield the intended brand.
+- Machine evidence remained INSUFFICIENT_EVIDENCE.
+
+Interpretation: PR #190 behaved as intended for an instrumentation-only baseline. These reading failures are not fixed in this branch; they remain evidence for follow-up experiments.
+
+OCR behavior confirmation: no OCR padding, scale factor, preprocessing, Tesseract PSM, orientation policy, confidence threshold, candidate ranking, comparison outcome, or UI behavior was changed for this observation.
+`;
+}
+
 function currentGitSha(): string {
   if (process.env.GIT_SHA_OVERRIDE) return process.env.GIT_SHA_OVERRIDE;
   try {
@@ -939,6 +959,7 @@ export async function generateIssue149BoundedBaseline(): Promise<BaselineOutputs
   }
   const outputs = deterministicArtifactPayload(records);
   writeFileSync(path.join(dir, "config.md"), renderConfig());
+  writeFileSync(path.join(dir, "staging-observation.md"), renderStagingObservation());
   writeFileSync(
     path.join(dir, "commands.sh"),
     "#!/usr/bin/env bash\nset -euo pipefail\nnpm run eval:issue-149-bounded-baseline\n",
