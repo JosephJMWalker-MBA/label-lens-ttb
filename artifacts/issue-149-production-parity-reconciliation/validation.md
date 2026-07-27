@@ -54,4 +54,15 @@ checked again before publication.
 
 ## Clean-worktree gate
 
-Pending the committed-head isolated-worktree `npm run eval:baseline` proof.
+PASS. A fresh detached worktree at reconciliation commit `49c69c9` had no
+tracked changes before execution. It reused the repository dependency tree
+through an untracked `node_modules` symlink and ran `npm run eval:baseline`:
+
+- 1/1 generator test passed in 196.226 seconds.
+- Exact production parity passed 115/115 with zero mismatches.
+- Base commit remained
+  `552d30352e76dd412bd75ceb319878ab2d2747bb`.
+- The generated report changed only its two committed derived report files.
+- After removing the explicitly environment-dependent median and p95 latency
+  fields, the complete generated aggregate and semantic-survival report was
+  byte-identical to the development-worktree report.
