@@ -1,0 +1,59 @@
+# Failure-mechanism hypotheses
+
+Risk scale: false-positive and latency risk are `low`, `medium`, or `high`. Complexity is implementation effort; rollback describes how cleanly evaluation code can be removed or disabled.
+
+## Brand
+
+| Hypothesis | Supporting evidence | Contradicting evidence | Testable now / additional data | Expected benefit | False-positive risk | Latency | Complexity | Rollback |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Crop pixel density is insufficient | Six of eight PR #195 staging Brands were recognition misses; ten governed approved regions all failed the 3× bounded control | Regions are already 3× cubic-upscaled; many transformed crops are hundreds of pixels wide | Yes on 10 governed regions; 4× was tested | Was plausible for thin strokes | Low, because authority is unchanged | Medium | Low | Trivial config removal |
+| 4× scale improves recognition | More pixels can help small glyph detection | 4× improved 0/11, produced two empty OCR outputs, median +93.18 ms, p95 +293.58 ms in the recorded run | Tested; killed | None measured | No increase measured | High relative cost | Low | Complete: evaluation-only |
+| Padding clips contextual glyphs | Current padding is only 3%/4 px; curved/outlined marks may approach edges | Approved regions already include modest human padding; 3× failures occur throughout the crop | Testable on 10 regions; add explicit edge-contact labels | Possible on clipped marks | Medium: extra non-Brand text can become candidates | Low to medium | Low | Config-only |
+| Padding adds contaminating text | Larger padded crops can pull varietal/appellation text into line grouping | Current selected regions were approved to exclude such text; no padding treatment has run | Testable on 10 regions | Cleaner transcripts if padding is reduced | Medium: too little padding clips marks | Low | Low | Config-only |
+| Cubic resize/anti-aliasing blurs outlines | Decorative, outlined, shadowed, script, and low-contrast cases dominate the approved regions | Cubic is stable and already used across production; failure may be glyph-model mismatch | Requires a resampling-kernel variable and fixed corpus | Could improve edge definition | Low | Low | Low | Config-only |
+| Grayscale conversion destroys chromatic contrast | Mosaikon is gold on pale background; grayscale can collapse hue contrast | Other failures are black/dark decorative text; current grayscale works broadly elsewhere | Testable; add color-contrast slices | Targeted improvement | Low | Low | Low | Config-only |
+| Local contrast normalisation amplifies texture or erases fine strokes | Background texture/compression and thin script are present | Normalise helps many ordinary labels; no paired evidence yet | Test normalise vs none on 10 regions | Medium on low contrast | Low | Low | Low | Config-only |
+| Global or Otsu threshold isolates foreground | Three earlier covered regions had zero text boxes; thresholding can help text detection | Decorative gradients, shadows, and gold may be damaged | Testable; representation exists, but treatment not yet selected | Medium on bimodal crops | Medium | Medium | Medium | Evaluation module only |
+| Adaptive threshold handles uneven backgrounds | Label texture and lighting vary locally | Not implemented in the runner; can fragment outlines and introduce noise | Needs a deterministic local algorithm plus artifact review | Potentially high on uneven backgrounds | Medium to high | Medium | Medium | Evaluation module only |
+| Mild sharpening recovers thin strokes | Several cases have thin script/outline effects; scale alone failed | Sharpening can enhance compression halos and texture | Testable on 10 regions; strongest next treatment candidate after scale rejection | Medium | Medium | Low to medium | Low | Config-only |
+| Inversion helps light-on-dark marks | Some corpus cases contain inverse text | Most approved failure regions are not uniformly inverse | Needs slice annotation; do not apply broadly | High on narrow inverse slice | High if broad | Low | Low | Config-only |
+| Denoising reduces compression/background texture | JPEG artifacts and pale textured fields appear in corpus | Median filters can erase script strokes | Testable after classifying texture/compression | Low to medium | Medium | Medium | Low | Config-only |
+| PSM mismatch prevents line recognition | Earlier taxonomy found five segmentation-like failures; PSM 11 is generic sparse text | Broad PSM 7 and Alcohol-layout PSM 7 experiments were rejected; Brand cases can be multi-line | Current broad evidence says do not repeat PSM 7; a multi-line-specific PSM would need its own pre-registered slice | Uncertain | Medium | Medium | Low | Config-only |
+| Fixed processed-pixel line tolerance misgroups scaled words | `lines()` uses 20 processed pixels, so scale changes effective grouping | Many failures occur before usable words exist | Testable with stored raw boxes without changing OCR | Medium for fragmented multi-line marks | Medium if production ranking changes | None | Medium | Pure evaluation first |
+| Curved baseline defeats Tesseract line model | Decorative and curved Brand marks are represented | Exact curved-baseline labels are not separately annotated in the 10-region corpus | Add curved-baseline slice labels | Medium | Low | None to medium | Medium | Evaluation-only |
+| English model lacks decorative glyph coverage | Severe substitutions persist at 3× and 4× | Ordinary Latin Brand text succeeds elsewhere; failure may be segmentation/preprocessing | Needs controlled alternate local model; not authorized as production | Potentially high | Medium | High memory/runtime | High | Default-off adapter |
+| Confidence is misinterpreted | Some malformed strings have moderate/high token confidence | Staging had zero false reliable Brand reads; current conservative gates behave safely | Testable, but calibration is not justified until OCR is correct | No recognition benefit | High if thresholds weaken | None | Medium | Do not run now |
+| Orientation metadata is lost | No canonical EXIF auto-orientation exists | Governed approved-region files have verified pixel dimensions and current crops align | Needs EXIF-tagged fixtures 1–8 | High for affected uploads only | Low | Low | Medium | Derivative-stage toggle |
+
+## Government Warning
+
+| Hypothesis | Supporting evidence | Contradicting evidence | Testable now / additional data | Expected benefit | False-positive risk | Latency | Complexity | Rollback |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Search region is too broad | Two staging warnings were contaminated; selection can union most of a panel | One exact staging warning passed | Not validly testable: zero governed exact-warning fixtures | High | Low if it only narrows evidence | Medium | Medium | Evaluation-only |
+| Warning-specific localization is absent | Warning uses Brand/Alcohol passes and has no recovery trigger | Full-image primary can read a clean horizontal warning | Requires at least six whole-label fixtures with exact text/presence truth and regions | High for vertical/back-panel warnings | Low | Medium | Medium | Isolated planner |
+| Anchor search is too brittle | Two staging anchor misses; exact `government warning` is required for a clean anchor | Uncertain-anchor path and distinctive phrases already prevent total loss | Needs governed raw images/transcripts | Medium | Low to medium | None | Low | Selector-only |
+| Anchor search is too permissive | `government` plus warning-like corruption can create uncertain evidence | Uncertain anchors produce review, not PASS | Needs warning-absent whole-label negatives | Safety only | Medium | None | Low | Selector-only |
+| Reading order interleaves label text | Two contaminated cases; fixed 20-pixel order ignores Tesseract line hierarchy | Bounding from anchor limits token count | Needs stored raw boxes and exact warning geometry | High | Medium | None | Medium | Evaluation-only first |
+| Orientation selection misses the warning | General pass planning is Alcohol-driven; two staging regions were not found | Edge rotations exist when Alcohol fails | Needs vertical warning fixtures and independent warning trigger | High | Low | Medium/high | Medium | Planner flag |
+| Search strips omit the true warning | Existing edge width and focus logic are not warning-specific | Full-image primary covers the geometry, though not necessarily effective text resolution | Needs annotated warning regions | High | Low | Medium | Medium | Planner flag |
+| Warning present but unreadable is collapsed into absence/FAIL | No candidate after panels were searched becomes FAIL | `not_run` is used only when no observations exist | Requires search-adequacy state and whole-label truth | High safety/semantics benefit | Low | None | Medium | Schema-compatible additive state needed |
+| Warning truly absent | The rule needs absence negatives to validate FAIL | Current corpus has no governed whole-label absence truth | Acquire at least three independently reviewed absence fixtures | Required for specificity | N/A | N/A | Data work | N/A |
+| Exact-token assembly is too literal | One OCR recognition miss and possible punctuation/ordering errors | Exact prescribed text must remain deterministic; near-exact evidence already becomes review/fail | Needs exact governed truth before changes | Medium | High if normalization broadens PASS | None | Medium | Selector/rule revert |
+| Contamination detector overfires | Large geometry plus exact text can still route to review | This is intentionally conservative and prevents false PASS | Needs clean/contaminated paired fixtures | Potential review reduction | High | None | Low | Rule revert |
+
+## Alcohol
+
+| Hypothesis | Supporting evidence | Contradicting evidence | Testable now / additional data | Expected benefit | False-positive risk | Latency | Complexity | Rollback |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Current eight-case staging cannot evaluate Alcohol | All eight were `ALCOHOL_NOT_EVALUATED` | Repository has 103 governed full-image Alcohol truth cases | Existing corpus can measure legacy full-image extraction, but not the eight package-staging observations | Data clarity | None | None | Data work | N/A |
+| Recovery trigger misses low-confidence/ambiguous primary results | Only `NOT_OBSERVED` triggers reselection | Existing baseline recovery already improves many cases | Testable on 103 truth cases, but not selected because Brand recognition is the current package bottleneck | Medium | Medium | High | Planner flag |
+| Edge/rotation recovery is expensive | Full-corpus p95 and extra-pass waste are documented | It recovers valid Alcohol evidence | Testable now | Runtime reduction | Risk of recall loss | Benefit | Medium | Planner flag |
+| Candidate parser/normalization misses remain | Baseline records 4 parser failures and 34 filtering failures | Recent parser already handles many bounded OCR confusions | Testable on governed full-image truth | Medium | Medium | None | Selector-only |
+| Final reselection ignores useful low-confidence recovery | Primary is retained unless `NOT_OBSERVED` | Preserves stable evidence and prevents recovery noise from overriding | Needs case-level analysis before treatment | Uncertain | High | None | Medium | Selector-only |
+
+## Derived priority
+
+1. The 4× bounded Brand scale treatment is rejected.
+2. The next treatment candidate is mild sharpening on the same 10-fixture/11-region corpus, but only after recording a pre-registered kill rule for new empty outputs, false reliable reads, and latency.
+3. Government Warning work is data-blocked: acquire exact, whole-label warning truth and regions before localization or anchor changes.
+4. Alcohol remains lower priority for this package-focused round despite the separate 103-case full-image truth corpus.

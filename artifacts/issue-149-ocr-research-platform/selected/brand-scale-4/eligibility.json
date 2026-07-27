@@ -1,0 +1,6 @@
+{
+  "allowed": true,
+  "governedEvaluableFixtureCount": 10,
+  "knownControlFailureCount": 11,
+  "reasons": []
+}

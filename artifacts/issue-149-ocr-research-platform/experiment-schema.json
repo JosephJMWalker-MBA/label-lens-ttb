@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Label Lens OCR one-variable experiment",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "experimentId",
+    "design",
+    "declaredVariable",
+    "control",
+    "treatment"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "ocr-research-experiment.v1"
+    },
+    "experimentId": {
+      "type": "string"
+    },
+    "design": {
+      "const": "one-variable-at-a-time"
+    },
+    "declaredVariable": {
+      "enum": [
+        "none",
+        "scale",
+        "padding",
+        "grayscaleMethod",
+        "contrastMethod",
+        "thresholdMethod",
+        "sharpening",
+        "inversion",
+        "denoising",
+        "psm",
+        "rotation",
+        "cropSource",
+        "fieldType"
+      ]
+    },
+    "control": {
+      "$ref": "#/$defs/configuration"
+    },
+    "treatment": {
+      "$ref": "#/$defs/configuration"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "configuration": {
+      "type": "object",
+      "required": [
+        "scale",
+        "padding",
+        "grayscaleMethod",
+        "contrastMethod",
+        "thresholdMethod",
+        "sharpening",
+        "inversion",
+        "denoising",
+        "psm",
+        "rotation",
+        "cropSource",
+        "fieldType"
+      ],
+      "properties": {
+        "scale": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 8
+        },
+        "padding": {
+          "type": "object",
+          "required": ["ratio", "minPx"],
+          "properties": {
+            "ratio": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 0.5
+            },
+            "minPx": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 512
+            }
+          },
+          "additionalProperties": false
+        },
+        "grayscaleMethod": {
+          "enum": ["sharp-grayscale", "none"]
+        },
+        "contrastMethod": {
+          "enum": ["normalise", "none"]
+        },
+        "thresholdMethod": {
+          "enum": ["none", "global-128", "otsu", "adaptive"]
+        },
+        "sharpening": {
+          "enum": ["none", "mild"]
+        },
+        "inversion": {
+          "type": "boolean"
+        },
+        "denoising": {
+          "enum": ["none", "median-3"]
+        },
+        "psm": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 13
+        },
+        "rotation": {
+          "enum": [0, 90, 180, 270]
+        },
+        "cropSource": {
+          "enum": ["governed-brand-region", "seller-region", "full-image"]
+        },
+        "fieldType": {
+          "enum": ["brandName", "governmentWarning", "alcoholStatement"]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,4201 @@
+{
+  "schemaVersion": "ocr-research-report.v1",
+  "experimentId": "issue-149-bounded-brand-scale-4",
+  "arm": "treatment",
+  "configuration": {
+    "scale": 4,
+    "padding": {
+      "ratio": 0.03,
+      "minPx": 4
+    },
+    "grayscaleMethod": "sharp-grayscale",
+    "contrastMethod": "normalise",
+    "thresholdMethod": "none",
+    "sharpening": "none",
+    "inversion": false,
+    "denoising": "none",
+    "psm": 11,
+    "rotation": 0,
+    "cropSource": "governed-brand-region",
+    "fieldType": "brandName"
+  },
+  "configurationHash": "35a28d6034697da22f7afd441128fa21d1943d5ac7e779101afa687fc303ea27",
+  "behaviorHash": "3cb3788b0f426cea0241c4e1e6c78b02e346bd91ee93a6fb1b0b78a8e5f2907b",
+  "gitSha": "e267bdda67293f34131b1c51af556a3f2add91a0",
+  "environment": {
+    "node": "v22.17.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "sharp": "0.35.3",
+    "ocrEngine": "tesseract.js@7.0.0/eng/OEM1"
+  },
+  "metrics": {
+    "governedFixtureCount": 10,
+    "caseCount": 11,
+    "correctCount": 0,
+    "failureCount": 11,
+    "accuracy": 0,
+    "accuracyWilson95": {
+      "confidenceLevel": 0.95,
+      "lower": 0,
+      "upper": 0.2588329669680317
+    },
+    "falseCertaintyCount": 0,
+    "falseCertaintyRate": 0,
+    "falseCertaintyWilson95": {
+      "confidenceLevel": 0.95,
+      "lower": 0,
+      "upper": 0.2588329669680317
+    },
+    "medianLatencyMs": 173.04491700000017,
+    "p95LatencyMs": 551.9697499999993,
+    "medianRssDeltaBytes": 196608,
+    "failureClassCounts": {
+      "OCR_EMPTY": 2,
+      "OCR_RECOGNITION_MISS": 9
+    },
+    "sliceMetrics": {
+      "crop-min-dimension:large": {
+        "caseCount": 4,
+        "correctCount": 0,
+        "accuracy": 0,
+        "accuracyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.4898908364545973
+        },
+        "falseCertaintyCount": 0,
+        "falseCertaintyRate": 0,
+        "falseCertaintyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.4898908364545973
+        },
+        "medianLatencyMs": 318.84302049999997,
+        "p95LatencyMs": 551.9697499999993,
+        "failureClassCounts": {
+          "OCR_RECOGNITION_MISS": 4
+        }
+      },
+      "crop-min-dimension:medium": {
+        "caseCount": 6,
+        "correctCount": 0,
+        "accuracy": 0,
+        "accuracyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.39033428790216534
+        },
+        "falseCertaintyCount": 0,
+        "falseCertaintyRate": 0,
+        "falseCertaintyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.39033428790216534
+        },
+        "medianLatencyMs": 67.14881199999991,
+        "p95LatencyMs": 199.59591699999964,
+        "failureClassCounts": {
+          "OCR_EMPTY": 1,
+          "OCR_RECOGNITION_MISS": 5
+        }
+      },
+      "crop-min-dimension:small": {
+        "caseCount": 1,
+        "correctCount": 0,
+        "accuracy": 0,
+        "accuracyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.7934506856227626
+        },
+        "falseCertaintyCount": 0,
+        "falseCertaintyRate": 0,
+        "falseCertaintyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.7934506856227626
+        },
+        "medianLatencyMs": 24.485625000000255,
+        "p95LatencyMs": 24.485625000000255,
+        "failureClassCounts": {
+          "OCR_EMPTY": 1
+        }
+      },
+      "field:brandName": {
+        "caseCount": 11,
+        "correctCount": 0,
+        "accuracy": 0,
+        "accuracyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        },
+        "falseCertaintyCount": 0,
+        "falseCertaintyRate": 0,
+        "falseCertaintyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        },
+        "medianLatencyMs": 173.04491700000017,
+        "p95LatencyMs": 551.9697499999993,
+        "failureClassCounts": {
+          "OCR_EMPTY": 2,
+          "OCR_RECOGNITION_MISS": 9
+        }
+      },
+      "fixture-mode:committable": {
+        "caseCount": 11,
+        "correctCount": 0,
+        "accuracy": 0,
+        "accuracyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        },
+        "falseCertaintyCount": 0,
+        "falseCertaintyRate": 0,
+        "falseCertaintyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        },
+        "medianLatencyMs": 173.04491700000017,
+        "p95LatencyMs": 551.9697499999993,
+        "failureClassCounts": {
+          "OCR_EMPTY": 2,
+          "OCR_RECOGNITION_MISS": 9
+        }
+      },
+      "image-orientation:landscape": {
+        "caseCount": 2,
+        "correctCount": 0,
+        "accuracy": 0,
+        "accuracyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.6576197724933469
+        },
+        "falseCertaintyCount": 0,
+        "falseCertaintyRate": 0,
+        "falseCertaintyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.6576197724933469
+        },
+        "medianLatencyMs": 217.2728545,
+        "p95LatencyMs": 234.94979200000034,
+        "failureClassCounts": {
+          "OCR_RECOGNITION_MISS": 2
+        }
+      },
+      "image-orientation:portrait": {
+        "caseCount": 9,
+        "correctCount": 0,
+        "accuracy": 0,
+        "accuracyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 2.7755575615628914e-17,
+          "upper": 0.29914504841954404
+        },
+        "falseCertaintyCount": 0,
+        "falseCertaintyRate": 0,
+        "falseCertaintyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 2.7755575615628914e-17,
+          "upper": 0.29914504841954404
+        },
+        "medianLatencyMs": 68.03479100000004,
+        "p95LatencyMs": 551.9697499999993,
+        "failureClassCounts": {
+          "OCR_EMPTY": 2,
+          "OCR_RECOGNITION_MISS": 7
+        }
+      },
+      "region-provenance:human-approved-region": {
+        "caseCount": 11,
+        "correctCount": 0,
+        "accuracy": 0,
+        "accuracyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        },
+        "falseCertaintyCount": 0,
+        "falseCertaintyRate": 0,
+        "falseCertaintyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        },
+        "medianLatencyMs": 173.04491700000017,
+        "p95LatencyMs": 551.9697499999993,
+        "failureClassCounts": {
+          "OCR_EMPTY": 2,
+          "OCR_RECOGNITION_MISS": 9
+        }
+      },
+      "truth-source:human-approved-region": {
+        "caseCount": 11,
+        "correctCount": 0,
+        "accuracy": 0,
+        "accuracyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        },
+        "falseCertaintyCount": 0,
+        "falseCertaintyRate": 0,
+        "falseCertaintyWilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        },
+        "medianLatencyMs": 173.04491700000017,
+        "p95LatencyMs": 551.9697499999993,
+        "failureClassCounts": {
+          "OCR_EMPTY": 2,
+          "OCR_RECOGNITION_MISS": 9
+        }
+      }
+    }
+  },
+  "cases": [
+    {
+      "caseId": "approved-wine-004",
+      "fixtureId": "approved-wine-004",
+      "slices": [
+        "crop-min-dimension:large",
+        "field:brandName",
+        "fixture-mode:committable",
+        "image-orientation:portrait",
+        "region-provenance:human-approved-region",
+        "truth-source:human-approved-region"
+      ],
+      "expectedValues": ["La Fattoria"],
+      "rawTranscript": "0 —_ (PAT TORIA FAT",
+      "rawWords": [
+        {
+          "text": "0",
+          "rawConfidence": 28,
+          "bbox": {
+            "x0": 1416,
+            "y0": 384,
+            "x1": 1611,
+            "y1": 583
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 684,
+            "y": 447,
+            "width": 49,
+            "height": 50,
+            "imageWidth": 1350,
+            "imageHeight": 1650
+          }
+        },
+        {
+          "text": "—_",
+          "rawConfidence": 28,
+          "bbox": {
+            "x0": 1734,
+            "y0": 380,
+            "x1": 2282,
+            "y1": 678
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 764,
+            "y": 446,
+            "width": 137,
+            "height": 75,
+            "imageWidth": 1350,
+            "imageHeight": 1650
+          }
+        },
+        {
+          "text": "(PAT",
+          "rawConfidence": 46,
+          "bbox": {
+            "x0": 147,
+            "y0": 445,
+            "x1": 1152,
+            "y1": 1232
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 367,
+            "y": 462,
+            "width": 251,
+            "height": 197,
+            "imageWidth": 1350,
+            "imageHeight": 1650
+          }
+        },
+        {
+          "text": "FAT",
+          "rawConfidence": 45,
+          "bbox": {
+            "x0": 401,
+            "y0": 821,
+            "x1": 1014,
+            "y1": 1232
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 430,
+            "y": 556,
+            "width": 154,
+            "height": 103,
+            "imageWidth": 1350,
+            "imageHeight": 1650
+          }
+        },
+        {
+          "text": "TORIA",
+          "rawConfidence": 45,
+          "bbox": {
+            "x0": 1116,
+            "y0": 825,
+            "x1": 2208,
+            "y1": 1152
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 609,
+            "y": 557,
+            "width": 273,
+            "height": 82,
+            "imageWidth": 1350,
+            "imageHeight": 1650
+          }
+        }
+      ],
+      "meanConfidence": 38.4,
+      "selectedValue": "TORIA",
+      "selectedState": "AMBIGUOUS",
+      "reliable": false,
+      "correct": false,
+      "falseCertainty": false,
+      "failureClass": "OCR_RECOGNITION_MISS",
+      "candidateTrace": {
+        "lines": [
+          {
+            "rawText": "0",
+            "cleanedValue": "0",
+            "confidence": 0.28,
+            "prominence": 50,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-004",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "—_",
+            "cleanedValue": null,
+            "confidence": 0.28,
+            "prominence": 75,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-004",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "(PAT",
+            "cleanedValue": "PAT",
+            "confidence": 0.46,
+            "prominence": 197,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-004",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "low-information-fragment"
+          },
+          {
+            "rawText": "TORIA",
+            "cleanedValue": "TORIA",
+            "confidence": 0.45,
+            "prominence": 82,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-004",
+            "passKind": "seller-region",
+            "kept": true,
+            "reason": "candidate-plausible"
+          },
+          {
+            "rawText": "FAT",
+            "cleanedValue": "FAT",
+            "confidence": 0.45,
+            "prominence": 103,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-004",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "low-information-fragment"
+          }
+        ],
+        "candidates": [
+          {
+            "rawText": "0",
+            "cleanedValue": "0",
+            "confidence": 0.28,
+            "ocrEvidenceScore": 0.28,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [28],
+              "rawMean": 28,
+              "rawMin": 28,
+              "rawMax": 28,
+              "missingTokenCount": 0
+            },
+            "prominence": 50,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-004",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-004"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-004",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-004"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [0],
+            "kept": false,
+            "filterReason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "—_",
+            "cleanedValue": null,
+            "confidence": 0.28,
+            "ocrEvidenceScore": 0.28,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [28],
+              "rawMean": 28,
+              "rawMin": 28,
+              "rawMax": 28,
+              "missingTokenCount": 0
+            },
+            "prominence": 75,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-004",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-004"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-004",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-004"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [1],
+            "kept": false,
+            "filterReason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "(PAT",
+            "cleanedValue": "PAT",
+            "confidence": 0.46,
+            "ocrEvidenceScore": 0.46,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [46],
+              "rawMean": 46,
+              "rawMin": 46,
+              "rawMax": 46,
+              "missingTokenCount": 0
+            },
+            "prominence": 197,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-004",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-004"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-004",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-004"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [2],
+            "kept": false,
+            "filterReason": "low-information-fragment"
+          },
+          {
+            "rawText": "TORIA",
+            "cleanedValue": "TORIA",
+            "confidence": 0.45,
+            "ocrEvidenceScore": 0.45,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [45],
+              "rawMean": 45,
+              "rawMin": 45,
+              "rawMax": 45,
+              "missingTokenCount": 0
+            },
+            "prominence": 82,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-004",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-004"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-004",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-004"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [3],
+            "kept": true,
+            "filterReason": "candidate-plausible",
+            "decision": "selected",
+            "score": {
+              "positiveSignal": 0,
+              "meaningfulChars": 0.35714285714285715,
+              "structure": 0.25,
+              "ocrEvidenceScore": 0.45,
+              "prominence": 1,
+              "area": 1,
+              "centrality": 0.8102020202020201,
+              "alignment": 1,
+              "lineProximity": 1,
+              "lowInformationPenalty": 0,
+              "residualPenalty": 0,
+              "total": 3.4144891774891777
+            },
+            "ranking": {
+              "strategy": "brand-mixed-prominence-score",
+              "orderingMode": "score-first",
+              "comparator": [
+                {
+                  "id": "score-eligibility",
+                  "direction": "desc",
+                  "value": true
+                },
+                {
+                  "id": "ranking-score",
+                  "direction": "desc",
+                  "value": 3.4144891774891777
+                },
+                {
+                  "id": "prominence",
+                  "direction": "desc",
+                  "value": 82
+                },
+                {
+                  "id": "ocr-evidence-score",
+                  "direction": "desc",
+                  "value": 0.45
+                },
+                {
+                  "id": "normalized-value-key",
+                  "direction": "asc",
+                  "value": "toria"
+                }
+              ],
+              "rankingScore": 3.4144891774891777,
+              "scoreFactors": [
+                {
+                  "id": "positive-signal",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "meaningful-chars",
+                  "value": 0.35714285714285715,
+                  "contribution": 0.5714285714285715,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "structure",
+                  "value": 0.25,
+                  "contribution": 0.3,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "ocr-evidence-score",
+                  "value": 0.45,
+                  "contribution": 0.45,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "prominence",
+                  "value": 1,
+                  "contribution": 0.8,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "area",
+                  "value": 1,
+                  "contribution": 0.6,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "centrality",
+                  "value": 0.8102020202020201,
+                  "contribution": 0.24306060606060603,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "alignment",
+                  "value": 1,
+                  "contribution": 0.25,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "line-proximity",
+                  "value": 1,
+                  "contribution": 0.2,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "low-information-penalty",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "penalty"
+                },
+                {
+                  "id": "residual-penalty",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "penalty"
+                }
+              ]
+            }
+          },
+          {
+            "rawText": "FAT",
+            "cleanedValue": "FAT",
+            "confidence": 0.45,
+            "ocrEvidenceScore": 0.45,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [45],
+              "rawMean": 45,
+              "rawMin": 45,
+              "rawMax": 45,
+              "missingTokenCount": 0
+            },
+            "prominence": 103,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-004",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-004"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-004",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-004"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [4],
+            "kept": false,
+            "filterReason": "low-information-fragment"
+          }
+        ],
+        "abstentionReason": "unsupported-candidates-only"
+      },
+      "warningAnchorTrace": null,
+      "warningResult": null,
+      "crop": {
+        "left": 330,
+        "top": 351,
+        "width": 690,
+        "height": 308
+      },
+      "transformedSize": {
+        "width": 2760,
+        "height": 1232
+      },
+      "preprocessing": [
+        "crop:governed-brand-region",
+        "rotate:0",
+        "scale:4",
+        "grayscale:sharp-grayscale",
+        "contrast:normalise",
+        "threshold:none",
+        "sharpening:none",
+        "inversion:false",
+        "denoising:none",
+        "psm:11"
+      ],
+      "latencyMs": {
+        "preprocess": 79.15991699999995,
+        "ocr": 295.9655409999996,
+        "selection": 0.1790000000000873,
+        "total": 375.6199999999999
+      },
+      "memory": {
+        "rssBefore": 407830528,
+        "rssAfter": 469090304,
+        "rssDelta": 61259776
+      },
+      "artifactPaths": {
+        "crop": "treatment/crops/approved-wine-004.png",
+        "preprocessed": "treatment/preprocessed/approved-wine-004.png",
+        "transcript": "treatment/transcripts/approved-wine-004.txt"
+      }
+    },
+    {
+      "caseId": "approved-wine-005",
+      "fixtureId": "approved-wine-005",
+      "slices": [
+        "crop-min-dimension:large",
+        "field:brandName",
+        "fixture-mode:committable",
+        "image-orientation:landscape",
+        "region-provenance:human-approved-region",
+        "truth-source:human-approved-region"
+      ],
+      "expectedValues": ["La Fattoria"],
+      "rawTranscript": "0 —_ GATT ORIA",
+      "rawWords": [
+        {
+          "text": "0",
+          "rawConfidence": 17,
+          "bbox": {
+            "x0": 1167,
+            "y0": 301,
+            "x1": 1323,
+            "y1": 483
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 771,
+            "y": 307,
+            "width": 39,
+            "height": 46,
+            "imageWidth": 1500,
+            "imageHeight": 1140
+          }
+        },
+        {
+          "text": "—_",
+          "rawConfidence": 17,
+          "bbox": {
+            "x0": 1458,
+            "y0": 297,
+            "x1": 1937,
+            "y1": 570
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 844,
+            "y": 306,
+            "width": 119,
+            "height": 69,
+            "imageWidth": 1500,
+            "imageHeight": 1140
+          }
+        },
+        {
+          "text": "GATT",
+          "rawConfidence": 7,
+          "bbox": {
+            "x0": 15,
+            "y0": 358,
+            "x1": 1030,
+            "y1": 1144
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 483,
+            "y": 322,
+            "width": 254,
+            "height": 196,
+            "imageWidth": 1500,
+            "imageHeight": 1140
+          }
+        },
+        {
+          "text": "ORIA",
+          "rawConfidence": 88,
+          "bbox": {
+            "x0": 1015,
+            "y0": 703,
+            "x1": 1887,
+            "y1": 1000
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 733,
+            "y": 408,
+            "width": 218,
+            "height": 74,
+            "imageWidth": 1500,
+            "imageHeight": 1140
+          }
+        }
+      ],
+      "meanConfidence": 32.25,
+      "selectedValue": "GATT",
+      "selectedState": "AMBIGUOUS",
+      "reliable": false,
+      "correct": false,
+      "falseCertainty": false,
+      "failureClass": "OCR_RECOGNITION_MISS",
+      "candidateTrace": {
+        "lines": [
+          {
+            "rawText": "0",
+            "cleanedValue": "0",
+            "confidence": 0.17,
+            "prominence": 46,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-005",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "—_",
+            "cleanedValue": null,
+            "confidence": 0.17,
+            "prominence": 69,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-005",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "GATT",
+            "cleanedValue": "GATT",
+            "confidence": 0.07,
+            "prominence": 196,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-005",
+            "passKind": "seller-region",
+            "kept": true,
+            "reason": "candidate-plausible"
+          },
+          {
+            "rawText": "ORIA",
+            "cleanedValue": "ORIA",
+            "confidence": 0.88,
+            "prominence": 74,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-005",
+            "passKind": "seller-region",
+            "kept": true,
+            "reason": "candidate-plausible"
+          }
+        ],
+        "candidates": [
+          {
+            "rawText": "0",
+            "cleanedValue": "0",
+            "confidence": 0.17,
+            "ocrEvidenceScore": 0.17,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [17],
+              "rawMean": 17,
+              "rawMin": 17,
+              "rawMax": 17,
+              "missingTokenCount": 0
+            },
+            "prominence": 46,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-005",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-005"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-005",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-005"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [0],
+            "kept": false,
+            "filterReason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "—_",
+            "cleanedValue": null,
+            "confidence": 0.17,
+            "ocrEvidenceScore": 0.17,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [17],
+              "rawMean": 17,
+              "rawMin": 17,
+              "rawMax": 17,
+              "missingTokenCount": 0
+            },
+            "prominence": 69,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-005",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-005"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-005",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-005"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [1],
+            "kept": false,
+            "filterReason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "GATT",
+            "cleanedValue": "GATT",
+            "confidence": 0.07,
+            "ocrEvidenceScore": 0.07,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [7],
+              "rawMean": 7,
+              "rawMin": 7,
+              "rawMax": 7,
+              "missingTokenCount": 0
+            },
+            "prominence": 196,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-005",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-005"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-005",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-005"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [2],
+            "kept": true,
+            "filterReason": "candidate-plausible",
+            "decision": "selected",
+            "score": {
+              "positiveSignal": 0,
+              "meaningfulChars": 0.2857142857142857,
+              "structure": 0.25,
+              "ocrEvidenceScore": 0.07,
+              "prominence": 1,
+              "area": 1,
+              "centrality": 0.7750877192982456,
+              "alignment": 1,
+              "lineProximity": 1,
+              "lowInformationPenalty": 0,
+              "residualPenalty": 0,
+              "total": 2.909669172932331
+            },
+            "ranking": {
+              "strategy": "brand-mixed-prominence-score",
+              "orderingMode": "score-first",
+              "comparator": [
+                {
+                  "id": "score-eligibility",
+                  "direction": "desc",
+                  "value": true
+                },
+                {
+                  "id": "ranking-score",
+                  "direction": "desc",
+                  "value": 2.909669172932331
+                },
+                {
+                  "id": "prominence",
+                  "direction": "desc",
+                  "value": 196
+                },
+                {
+                  "id": "ocr-evidence-score",
+                  "direction": "desc",
+                  "value": 0.07
+                },
+                {
+                  "id": "normalized-value-key",
+                  "direction": "asc",
+                  "value": "gatt"
+                }
+              ],
+              "rankingScore": 2.909669172932331,
+              "scoreFactors": [
+                {
+                  "id": "positive-signal",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "meaningful-chars",
+                  "value": 0.2857142857142857,
+                  "contribution": 0.45714285714285713,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "structure",
+                  "value": 0.25,
+                  "contribution": 0.3,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "ocr-evidence-score",
+                  "value": 0.07,
+                  "contribution": 0.07,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "prominence",
+                  "value": 1,
+                  "contribution": 0.8,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "area",
+                  "value": 1,
+                  "contribution": 0.6,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "centrality",
+                  "value": 0.7750877192982456,
+                  "contribution": 0.23252631578947366,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "alignment",
+                  "value": 1,
+                  "contribution": 0.25,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "line-proximity",
+                  "value": 1,
+                  "contribution": 0.2,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "low-information-penalty",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "penalty"
+                },
+                {
+                  "id": "residual-penalty",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "penalty"
+                }
+              ]
+            }
+          },
+          {
+            "rawText": "ORIA",
+            "cleanedValue": "ORIA",
+            "confidence": 0.88,
+            "ocrEvidenceScore": 0.88,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [88],
+              "rawMean": 88,
+              "rawMin": 88,
+              "rawMax": 88,
+              "missingTokenCount": 0
+            },
+            "prominence": 74,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-005",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-005"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-005",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-005"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [3],
+            "kept": true,
+            "filterReason": "candidate-plausible",
+            "decision": "alternate",
+            "score": {
+              "positiveSignal": 0,
+              "meaningfulChars": 0.2857142857142857,
+              "structure": 0.25,
+              "ocrEvidenceScore": 0.88,
+              "prominence": 0.37755102040816324,
+              "area": 0.32403985216133696,
+              "centrality": 0.8290175438596491,
+              "alignment": 1,
+              "lineProximity": 1,
+              "lowInformationPenalty": 0,
+              "residualPenalty": 0,
+              "total": 2.8323128479240847
+            },
+            "ranking": {
+              "strategy": "brand-mixed-prominence-score",
+              "orderingMode": "prominence-first",
+              "comparator": [
+                {
+                  "id": "score-eligibility",
+                  "direction": "desc",
+                  "value": false
+                },
+                {
+                  "id": "prominence",
+                  "direction": "desc",
+                  "value": 74
+                },
+                {
+                  "id": "ocr-evidence-score",
+                  "direction": "desc",
+                  "value": 0.88
+                },
+                {
+                  "id": "ranking-score",
+                  "direction": "desc",
+                  "value": 2.8323128479240847
+                },
+                {
+                  "id": "normalized-value-key",
+                  "direction": "asc",
+                  "value": "oria"
+                }
+              ],
+              "rankingScore": 2.8323128479240847,
+              "scoreFactors": [
+                {
+                  "id": "positive-signal",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "meaningful-chars",
+                  "value": 0.2857142857142857,
+                  "contribution": 0.45714285714285713,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "structure",
+                  "value": 0.25,
+                  "contribution": 0.3,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "ocr-evidence-score",
+                  "value": 0.88,
+                  "contribution": 0.88,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "prominence",
+                  "value": 0.37755102040816324,
+                  "contribution": 0.3020408163265306,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "area",
+                  "value": 0.32403985216133696,
+                  "contribution": 0.19442391129680217,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "centrality",
+                  "value": 0.8290175438596491,
+                  "contribution": 0.2487052631578947,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "alignment",
+                  "value": 1,
+                  "contribution": 0.25,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "line-proximity",
+                  "value": 1,
+                  "contribution": 0.2,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "low-information-penalty",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "penalty"
+                },
+                {
+                  "id": "residual-penalty",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "penalty"
+                }
+              ]
+            }
+          }
+        ],
+        "abstentionReason": "unsupported-candidates-only"
+      },
+      "warningAnchorTrace": null,
+      "warningResult": null,
+      "crop": {
+        "left": 479,
+        "top": 232,
+        "width": 553,
+        "height": 286
+      },
+      "transformedSize": {
+        "width": 2212,
+        "height": 1144
+      },
+      "preprocessing": [
+        "crop:governed-brand-region",
+        "rotate:0",
+        "scale:4",
+        "grayscale:sharp-grayscale",
+        "contrast:normalise",
+        "threshold:none",
+        "sharpening:none",
+        "inversion:false",
+        "denoising:none",
+        "psm:11"
+      ],
+      "latencyMs": {
+        "preprocess": 87.85350000000017,
+        "ocr": 146.8051660000001,
+        "selection": 0.10741700000016863,
+        "total": 234.94979200000034
+      },
+      "memory": {
+        "rssBefore": 469090304,
+        "rssAfter": 501350400,
+        "rssDelta": 32260096
+      },
+      "artifactPaths": {
+        "crop": "treatment/crops/approved-wine-005.png",
+        "preprocessed": "treatment/preprocessed/approved-wine-005.png",
+        "transcript": "treatment/transcripts/approved-wine-005.txt"
+      }
+    },
+    {
+      "caseId": "approved-wine-023",
+      "fixtureId": "approved-wine-023",
+      "slices": [
+        "crop-min-dimension:medium",
+        "field:brandName",
+        "fixture-mode:committable",
+        "image-orientation:portrait",
+        "region-provenance:human-approved-region",
+        "truth-source:human-approved-region"
+      ],
+      "expectedValues": ["Podere don Cataldo", "Podere Don Cataldo"],
+      "rawTranscript": "(Fa rye Cralirtid”",
+      "rawWords": [
+        {
+          "text": "(Fa",
+          "rawConfidence": 48,
+          "bbox": {
+            "x0": 884,
+            "y0": 168,
+            "x1": 1312,
+            "y1": 317
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 502,
+            "y": 96,
+            "width": 107,
+            "height": 37,
+            "imageWidth": 988,
+            "imageHeight": 1253
+          }
+        },
+        {
+          "text": "rye",
+          "rawConfidence": 51,
+          "bbox": {
+            "x0": 83,
+            "y0": 354,
+            "x1": 439,
+            "y1": 553
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 302,
+            "y": 143,
+            "width": 89,
+            "height": 49,
+            "imageWidth": 988,
+            "imageHeight": 1253
+          }
+        },
+        {
+          "text": "Cralirtid”",
+          "rawConfidence": 0,
+          "bbox": {
+            "x0": 546,
+            "y0": 326,
+            "x1": 1673,
+            "y1": 629
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 418,
+            "y": 136,
+            "width": 281,
+            "height": 75,
+            "imageWidth": 988,
+            "imageHeight": 1253
+          }
+        }
+      ],
+      "meanConfidence": 33,
+      "selectedValue": "Cralirtid",
+      "selectedState": "AMBIGUOUS",
+      "reliable": false,
+      "correct": false,
+      "falseCertainty": false,
+      "failureClass": "OCR_RECOGNITION_MISS",
+      "candidateTrace": {
+        "lines": [
+          {
+            "rawText": "(Fa",
+            "cleanedValue": "Fa",
+            "confidence": 0.48,
+            "prominence": 37,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-023",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "low-information-fragment"
+          },
+          {
+            "rawText": "rye",
+            "cleanedValue": "rye",
+            "confidence": 0.51,
+            "prominence": 49,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-023",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "low-information-fragment"
+          },
+          {
+            "rawText": "Cralirtid”",
+            "cleanedValue": "Cralirtid",
+            "confidence": 0,
+            "prominence": 75,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-023",
+            "passKind": "seller-region",
+            "kept": true,
+            "reason": "candidate-plausible"
+          }
+        ],
+        "candidates": [
+          {
+            "rawText": "(Fa",
+            "cleanedValue": "Fa",
+            "confidence": 0.48,
+            "ocrEvidenceScore": 0.48,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [48],
+              "rawMean": 48,
+              "rawMin": 48,
+              "rawMax": 48,
+              "missingTokenCount": 0
+            },
+            "prominence": 37,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-023",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-023"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-023",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-023"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [0],
+            "kept": false,
+            "filterReason": "low-information-fragment"
+          },
+          {
+            "rawText": "rye",
+            "cleanedValue": "rye",
+            "confidence": 0.51,
+            "ocrEvidenceScore": 0.51,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [51],
+              "rawMean": 51,
+              "rawMin": 51,
+              "rawMax": 51,
+              "missingTokenCount": 0
+            },
+            "prominence": 49,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-023",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-023"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-023",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-023"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [1],
+            "kept": false,
+            "filterReason": "low-information-fragment"
+          },
+          {
+            "rawText": "Cralirtid”",
+            "cleanedValue": "Cralirtid",
+            "confidence": 0,
+            "ocrEvidenceScore": 0,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [0],
+              "rawMean": 0,
+              "rawMin": 0,
+              "rawMax": 0,
+              "missingTokenCount": 0
+            },
+            "prominence": 75,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-023",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-023"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-023",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-023"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [2],
+            "kept": true,
+            "filterReason": "candidate-plausible",
+            "decision": "selected",
+            "score": {
+              "positiveSignal": 0,
+              "meaningfulChars": 0.6428571428571429,
+              "structure": 0.25,
+              "ocrEvidenceScore": 0,
+              "prominence": 1,
+              "area": 1,
+              "centrality": 0.5731842767641062,
+              "alignment": 1,
+              "lineProximity": 1,
+              "lowInformationPenalty": 0,
+              "residualPenalty": 0,
+              "total": 3.350526711600661
+            },
+            "ranking": {
+              "strategy": "brand-mixed-prominence-score",
+              "orderingMode": "score-first",
+              "comparator": [
+                {
+                  "id": "score-eligibility",
+                  "direction": "desc",
+                  "value": true
+                },
+                {
+                  "id": "ranking-score",
+                  "direction": "desc",
+                  "value": 3.350526711600661
+                },
+                {
+                  "id": "prominence",
+                  "direction": "desc",
+                  "value": 75
+                },
+                {
+                  "id": "ocr-evidence-score",
+                  "direction": "desc",
+                  "value": 0
+                },
+                {
+                  "id": "normalized-value-key",
+                  "direction": "asc",
+                  "value": "cralirtid"
+                }
+              ],
+              "rankingScore": 3.350526711600661,
+              "scoreFactors": [
+                {
+                  "id": "positive-signal",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "meaningful-chars",
+                  "value": 0.6428571428571429,
+                  "contribution": 1.0285714285714287,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "structure",
+                  "value": 0.25,
+                  "contribution": 0.3,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "ocr-evidence-score",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "prominence",
+                  "value": 1,
+                  "contribution": 0.8,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "area",
+                  "value": 1,
+                  "contribution": 0.6,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "centrality",
+                  "value": 0.5731842767641062,
+                  "contribution": 0.17195528302923185,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "alignment",
+                  "value": 1,
+                  "contribution": 0.25,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "line-proximity",
+                  "value": 1,
+                  "contribution": 0.2,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "low-information-penalty",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "penalty"
+                },
+                {
+                  "id": "residual-penalty",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "penalty"
+                }
+              ]
+            }
+          }
+        ],
+        "abstentionReason": "unsupported-candidates-only"
+      },
+      "warningAnchorTrace": null,
+      "warningResult": null,
+      "crop": {
+        "left": 281,
+        "top": 54,
+        "width": 427,
+        "height": 173
+      },
+      "transformedSize": {
+        "width": 1708,
+        "height": 692
+      },
+      "preprocessing": [
+        "crop:governed-brand-region",
+        "rotate:0",
+        "scale:4",
+        "grayscale:sharp-grayscale",
+        "contrast:normalise",
+        "threshold:none",
+        "sharpening:none",
+        "inversion:false",
+        "denoising:none",
+        "psm:11"
+      ],
+      "latencyMs": {
+        "preprocess": 47.15283399999953,
+        "ocr": 125.11091600000054,
+        "selection": 0.3428329999997004,
+        "total": 173.04491700000017
+      },
+      "memory": {
+        "rssBefore": 501383168,
+        "rssAfter": 501530624,
+        "rssDelta": 147456
+      },
+      "artifactPaths": {
+        "crop": "treatment/crops/approved-wine-023.png",
+        "preprocessed": "treatment/preprocessed/approved-wine-023.png",
+        "transcript": "treatment/transcripts/approved-wine-023.txt"
+      }
+    },
+    {
+      "caseId": "approved-wine-027",
+      "fixtureId": "approved-wine-027",
+      "slices": [
+        "crop-min-dimension:large",
+        "field:brandName",
+        "fixture-mode:committable",
+        "image-orientation:portrait",
+        "region-provenance:human-approved-region",
+        "truth-source:human-approved-region"
+      ],
+      "expectedValues": ["The Golden Girls", "Golden Girls"],
+      "rawTranscript": "~~ 4 — = 4 [I] 0] + A —",
+      "rawWords": [
+        {
+          "text": "~~",
+          "rawConfidence": 0,
+          "bbox": {
+            "x0": 1962,
+            "y0": 220,
+            "x1": 2383,
+            "y1": 394
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 543,
+            "y": 116,
+            "width": 105,
+            "height": 44,
+            "imageWidth": 976,
+            "imageHeight": 1126
+          }
+        },
+        {
+          "text": "4",
+          "rawConfidence": 20,
+          "bbox": {
+            "x0": 2910,
+            "y0": 433,
+            "x1": 2918,
+            "y1": 451
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 780,
+            "y": 169,
+            "width": 2,
+            "height": 5,
+            "imageWidth": 976,
+            "imageHeight": 1126
+          }
+        },
+        {
+          "text": "—",
+          "rawConfidence": 21,
+          "bbox": {
+            "x0": 2641,
+            "y0": 467,
+            "x1": 2700,
+            "y1": 470
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 712,
+            "y": 178,
+            "width": 15,
+            "height": 1,
+            "imageWidth": 976,
+            "imageHeight": 1126
+          }
+        },
+        {
+          "text": "=",
+          "rawConfidence": 49,
+          "bbox": {
+            "x0": 2742,
+            "y0": 465,
+            "x1": 2756,
+            "y1": 468
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 738,
+            "y": 177,
+            "width": 3,
+            "height": 1,
+            "imageWidth": 976,
+            "imageHeight": 1126
+          }
+        },
+        {
+          "text": "4",
+          "rawConfidence": 28,
+          "bbox": {
+            "x0": 2919,
+            "y0": 446,
+            "x1": 2931,
+            "y1": 474
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 782,
+            "y": 173,
+            "width": 3,
+            "height": 7,
+            "imageWidth": 976,
+            "imageHeight": 1126
+          }
+        },
+        {
+          "text": "[I]",
+          "rawConfidence": 25,
+          "bbox": {
+            "x0": 2951,
+            "y0": 573,
+            "x1": 2958,
+            "y1": 593
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 790,
+            "y": 204,
+            "width": 2,
+            "height": 5,
+            "imageWidth": 976,
+            "imageHeight": 1126
+          }
+        },
+        {
+          "text": "0]",
+          "rawConfidence": 80,
+          "bbox": {
+            "x0": 721,
+            "y0": 274,
+            "x1": 1521,
+            "y1": 1036
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 232,
+            "y": 130,
+            "width": 200,
+            "height": 190,
+            "imageWidth": 976,
+            "imageHeight": 1126
+          }
+        },
+        {
+          "text": "+",
+          "rawConfidence": 0,
+          "bbox": {
+            "x0": 122,
+            "y0": 1089,
+            "x1": 3366,
+            "y1": 1112
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 83,
+            "y": 333,
+            "width": 811,
+            "height": 6,
+            "imageWidth": 976,
+            "imageHeight": 1126
+          }
+        },
+        {
+          "text": "A",
+          "rawConfidence": 46,
+          "bbox": {
+            "x0": 1429,
+            "y0": 1085,
+            "x1": 1583,
+            "y1": 1119
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 409,
+            "y": 332,
+            "width": 39,
+            "height": 9,
+            "imageWidth": 976,
+            "imageHeight": 1126
+          }
+        },
+        {
+          "text": "—",
+          "rawConfidence": 6,
+          "bbox": {
+            "x0": 1716,
+            "y0": 1085,
+            "x1": 1742,
+            "y1": 1119
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 481,
+            "y": 332,
+            "width": 7,
+            "height": 9,
+            "imageWidth": 976,
+            "imageHeight": 1126
+          }
+        }
+      ],
+      "meanConfidence": 27.5,
+      "selectedValue": null,
+      "selectedState": "NOT_OBSERVED",
+      "reliable": false,
+      "correct": false,
+      "falseCertainty": false,
+      "failureClass": "OCR_RECOGNITION_MISS",
+      "candidateTrace": {
+        "lines": [
+          {
+            "rawText": "~~",
+            "cleanedValue": null,
+            "confidence": 0,
+            "prominence": 44,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-027",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "4 4",
+            "cleanedValue": "4 4",
+            "confidence": 0.24000000000000002,
+            "prominence": 11,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-027",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "— =",
+            "cleanedValue": null,
+            "confidence": 0.35,
+            "prominence": 2,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-027",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "[I]",
+            "cleanedValue": "I",
+            "confidence": 0.25,
+            "prominence": 5,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-027",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "0]",
+            "cleanedValue": "0",
+            "confidence": 0.8,
+            "prominence": 190,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-027",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "+ A —",
+            "cleanedValue": "A",
+            "confidence": 0.17333333333333334,
+            "prominence": 9,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-027",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "no-letters-or-too-short"
+          }
+        ],
+        "candidates": [
+          {
+            "rawText": "~~",
+            "cleanedValue": null,
+            "confidence": 0,
+            "ocrEvidenceScore": 0,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [0],
+              "rawMean": 0,
+              "rawMin": 0,
+              "rawMax": 0,
+              "missingTokenCount": 0
+            },
+            "prominence": 44,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-027",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-027"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-027",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-027"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [0],
+            "kept": false,
+            "filterReason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "4 4",
+            "cleanedValue": "4 4",
+            "confidence": 0.24000000000000002,
+            "ocrEvidenceScore": 0.24000000000000002,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [20, 28],
+              "rawMean": 24,
+              "rawMin": 20,
+              "rawMax": 28,
+              "missingTokenCount": 0
+            },
+            "prominence": 11,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-027",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-027"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-027",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-027"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [1],
+            "kept": false,
+            "filterReason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "— =",
+            "cleanedValue": null,
+            "confidence": 0.35,
+            "ocrEvidenceScore": 0.35,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [21, 49],
+              "rawMean": 35,
+              "rawMin": 21,
+              "rawMax": 49,
+              "missingTokenCount": 0
+            },
+            "prominence": 2,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-027",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-027"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-027",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-027"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [2],
+            "kept": false,
+            "filterReason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "[I]",
+            "cleanedValue": "I",
+            "confidence": 0.25,
+            "ocrEvidenceScore": 0.25,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [25],
+              "rawMean": 25,
+              "rawMin": 25,
+              "rawMax": 25,
+              "missingTokenCount": 0
+            },
+            "prominence": 5,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-027",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-027"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-027",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-027"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [3],
+            "kept": false,
+            "filterReason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "0]",
+            "cleanedValue": "0",
+            "confidence": 0.8,
+            "ocrEvidenceScore": 0.8,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [80],
+              "rawMean": 80,
+              "rawMin": 80,
+              "rawMax": 80,
+              "missingTokenCount": 0
+            },
+            "prominence": 190,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-027",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-027"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-027",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-027"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [4],
+            "kept": false,
+            "filterReason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "+ A —",
+            "cleanedValue": "A",
+            "confidence": 0.17333333333333334,
+            "ocrEvidenceScore": 0.17333333333333334,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [0, 46, 6],
+              "rawMean": 17.333333333333332,
+              "rawMin": 0,
+              "rawMax": 46,
+              "missingTokenCount": 0
+            },
+            "prominence": 9,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-027",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-027"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-027",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-027"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [5],
+            "kept": false,
+            "filterReason": "no-letters-or-too-short"
+          }
+        ],
+        "abstentionReason": "unsupported-candidates-only"
+      },
+      "warningAnchorTrace": null,
+      "warningResult": null,
+      "crop": {
+        "left": 52,
+        "top": 61,
+        "width": 872,
+        "height": 361
+      },
+      "transformedSize": {
+        "width": 3488,
+        "height": 1444
+      },
+      "preprocessing": [
+        "crop:governed-brand-region",
+        "rotate:0",
+        "scale:4",
+        "grayscale:sharp-grayscale",
+        "contrast:normalise",
+        "threshold:none",
+        "sharpening:none",
+        "inversion:false",
+        "denoising:none",
+        "psm:11"
+      ],
+      "latencyMs": {
+        "preprocess": 74.35000000000036,
+        "ocr": 477.21833400000014,
+        "selection": 0.06937500000003638,
+        "total": 551.9697499999993
+      },
+      "memory": {
+        "rssBefore": 501530624,
+        "rssAfter": 501694464,
+        "rssDelta": 163840
+      },
+      "artifactPaths": {
+        "crop": "treatment/crops/approved-wine-027.png",
+        "preprocessed": "treatment/preprocessed/approved-wine-027.png",
+        "transcript": "treatment/transcripts/approved-wine-027.txt"
+      }
+    },
+    {
+      "caseId": "approved-wine-031",
+      "fixtureId": "approved-wine-031",
+      "slices": [
+        "crop-min-dimension:medium",
+        "field:brandName",
+        "fixture-mode:committable",
+        "image-orientation:portrait",
+        "region-provenance:human-approved-region",
+        "truth-source:human-approved-region"
+      ],
+      "expectedValues": ["embeleso"],
+      "rawTranscript": "enheesO",
+      "rawWords": [
+        {
+          "text": "enheesO",
+          "rawConfidence": 36,
+          "bbox": {
+            "x0": 52,
+            "y0": 0,
+            "x1": 1334,
+            "y1": 291
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 166,
+            "y": 34,
+            "width": 321,
+            "height": 73,
+            "imageWidth": 646,
+            "imageHeight": 1171
+          }
+        }
+      ],
+      "meanConfidence": 36,
+      "selectedValue": "enheesO",
+      "selectedState": "AMBIGUOUS",
+      "reliable": false,
+      "correct": false,
+      "falseCertainty": false,
+      "failureClass": "OCR_RECOGNITION_MISS",
+      "candidateTrace": {
+        "lines": [
+          {
+            "rawText": "enheesO",
+            "cleanedValue": "enheesO",
+            "confidence": 0.36,
+            "prominence": 73,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-031",
+            "passKind": "seller-region",
+            "kept": true,
+            "reason": "candidate-plausible"
+          }
+        ],
+        "candidates": [
+          {
+            "rawText": "enheesO",
+            "cleanedValue": "enheesO",
+            "confidence": 0.36,
+            "ocrEvidenceScore": 0.36,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [36],
+              "rawMean": 36,
+              "rawMin": 36,
+              "rawMax": 36,
+              "missingTokenCount": 0
+            },
+            "prominence": 73,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-031",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-031"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-031",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-031"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [0],
+            "kept": true,
+            "filterReason": "candidate-plausible",
+            "decision": "selected",
+            "score": {
+              "positiveSignal": 0,
+              "meaningfulChars": 0.5,
+              "structure": 0.25,
+              "ocrEvidenceScore": 0.36,
+              "prominence": 1,
+              "area": 1,
+              "centrality": 0.5547869963752502,
+              "alignment": 1,
+              "lineProximity": 1,
+              "lowInformationPenalty": 0,
+              "residualPenalty": 0,
+              "total": 3.476436098912575
+            },
+            "ranking": {
+              "strategy": "brand-mixed-prominence-score",
+              "orderingMode": "score-first",
+              "comparator": [
+                {
+                  "id": "score-eligibility",
+                  "direction": "desc",
+                  "value": true
+                },
+                {
+                  "id": "ranking-score",
+                  "direction": "desc",
+                  "value": 3.476436098912575
+                },
+                {
+                  "id": "prominence",
+                  "direction": "desc",
+                  "value": 73
+                },
+                {
+                  "id": "ocr-evidence-score",
+                  "direction": "desc",
+                  "value": 0.36
+                },
+                {
+                  "id": "normalized-value-key",
+                  "direction": "asc",
+                  "value": "enheeso"
+                }
+              ],
+              "rankingScore": 3.476436098912575,
+              "scoreFactors": [
+                {
+                  "id": "positive-signal",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "meaningful-chars",
+                  "value": 0.5,
+                  "contribution": 0.8,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "structure",
+                  "value": 0.25,
+                  "contribution": 0.3,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "ocr-evidence-score",
+                  "value": 0.36,
+                  "contribution": 0.36,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "prominence",
+                  "value": 1,
+                  "contribution": 0.8,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "area",
+                  "value": 1,
+                  "contribution": 0.6,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "centrality",
+                  "value": 0.5547869963752502,
+                  "contribution": 0.16643609891257505,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "alignment",
+                  "value": 1,
+                  "contribution": 0.25,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "line-proximity",
+                  "value": 1,
+                  "contribution": 0.2,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "low-information-penalty",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "penalty"
+                },
+                {
+                  "id": "residual-penalty",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "penalty"
+                }
+              ]
+            }
+          }
+        ],
+        "abstentionReason": "unsupported-candidates-only"
+      },
+      "warningAnchorTrace": null,
+      "warningResult": null,
+      "crop": {
+        "left": 153,
+        "top": 34,
+        "width": 350,
+        "height": 85
+      },
+      "transformedSize": {
+        "width": 1400,
+        "height": 340
+      },
+      "preprocessing": [
+        "crop:governed-brand-region",
+        "rotate:0",
+        "scale:4",
+        "grayscale:sharp-grayscale",
+        "contrast:normalise",
+        "threshold:none",
+        "sharpening:none",
+        "inversion:false",
+        "denoising:none",
+        "psm:11"
+      ],
+      "latencyMs": {
+        "preprocess": 12.63891700000022,
+        "ocr": 52.637291999999434,
+        "selection": 0.4569580000006681,
+        "total": 66.26283299999977
+      },
+      "memory": {
+        "rssBefore": 501694464,
+        "rssAfter": 501710848,
+        "rssDelta": 16384
+      },
+      "artifactPaths": {
+        "crop": "treatment/crops/approved-wine-031.png",
+        "preprocessed": "treatment/preprocessed/approved-wine-031.png",
+        "transcript": "treatment/transcripts/approved-wine-031.txt"
+      }
+    },
+    {
+      "caseId": "approved-wine-035",
+      "fixtureId": "approved-wine-035",
+      "slices": [
+        "crop-min-dimension:medium",
+        "field:brandName",
+        "fixture-mode:committable",
+        "image-orientation:landscape",
+        "region-provenance:human-approved-region",
+        "truth-source:human-approved-region"
+      ],
+      "expectedValues": ["Hubert Lamy"],
+      "rawTranscript": "Aotonit",
+      "rawWords": [
+        {
+          "text": "Aotonit",
+          "rawConfidence": 0,
+          "bbox": {
+            "x0": 15,
+            "y0": 27,
+            "x1": 1424,
+            "y1": 400
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 51,
+            "y": 45,
+            "width": 352,
+            "height": 93,
+            "imageWidth": 557,
+            "imageHeight": 471
+          }
+        }
+      ],
+      "meanConfidence": 0,
+      "selectedValue": "Aotonit",
+      "selectedState": "AMBIGUOUS",
+      "reliable": false,
+      "correct": false,
+      "falseCertainty": false,
+      "failureClass": "OCR_RECOGNITION_MISS",
+      "candidateTrace": {
+        "lines": [
+          {
+            "rawText": "Aotonit",
+            "cleanedValue": "Aotonit",
+            "confidence": 0,
+            "prominence": 93,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-035",
+            "passKind": "seller-region",
+            "kept": true,
+            "reason": "candidate-plausible"
+          }
+        ],
+        "candidates": [
+          {
+            "rawText": "Aotonit",
+            "cleanedValue": "Aotonit",
+            "confidence": 0,
+            "ocrEvidenceScore": 0,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [0],
+              "rawMean": 0,
+              "rawMin": 0,
+              "rawMax": 0,
+              "missingTokenCount": 0
+            },
+            "prominence": 93,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-035",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-035"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-035",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-035"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [0],
+            "kept": true,
+            "filterReason": "candidate-plausible",
+            "decision": "selected",
+            "score": {
+              "positiveSignal": 0,
+              "meaningfulChars": 0.5,
+              "structure": 0.25,
+              "ocrEvidenceScore": 0,
+              "prominence": 1,
+              "area": 1,
+              "centrality": 0.6018079108966369,
+              "alignment": 1,
+              "lineProximity": 1,
+              "lowInformationPenalty": 0,
+              "residualPenalty": 0,
+              "total": 3.1305423732689914
+            },
+            "ranking": {
+              "strategy": "brand-mixed-prominence-score",
+              "orderingMode": "score-first",
+              "comparator": [
+                {
+                  "id": "score-eligibility",
+                  "direction": "desc",
+                  "value": true
+                },
+                {
+                  "id": "ranking-score",
+                  "direction": "desc",
+                  "value": 3.1305423732689914
+                },
+                {
+                  "id": "prominence",
+                  "direction": "desc",
+                  "value": 93
+                },
+                {
+                  "id": "ocr-evidence-score",
+                  "direction": "desc",
+                  "value": 0
+                },
+                {
+                  "id": "normalized-value-key",
+                  "direction": "asc",
+                  "value": "aotonit"
+                }
+              ],
+              "rankingScore": 3.1305423732689914,
+              "scoreFactors": [
+                {
+                  "id": "positive-signal",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "meaningful-chars",
+                  "value": 0.5,
+                  "contribution": 0.8,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "structure",
+                  "value": 0.25,
+                  "contribution": 0.3,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "ocr-evidence-score",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "prominence",
+                  "value": 1,
+                  "contribution": 0.8,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "area",
+                  "value": 1,
+                  "contribution": 0.6,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "centrality",
+                  "value": 0.6018079108966369,
+                  "contribution": 0.18054237326899106,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "alignment",
+                  "value": 1,
+                  "contribution": 0.25,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "line-proximity",
+                  "value": 1,
+                  "contribution": 0.2,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "low-information-penalty",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "penalty"
+                },
+                {
+                  "id": "residual-penalty",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "penalty"
+                }
+              ]
+            }
+          }
+        ],
+        "abstentionReason": "unsupported-candidates-only"
+      },
+      "warningAnchorTrace": null,
+      "warningResult": null,
+      "crop": {
+        "left": 47,
+        "top": 38,
+        "width": 386,
+        "height": 100
+      },
+      "transformedSize": {
+        "width": 1544,
+        "height": 400
+      },
+      "preprocessing": [
+        "crop:governed-brand-region",
+        "rotate:0",
+        "scale:4",
+        "grayscale:sharp-grayscale",
+        "contrast:normalise",
+        "threshold:none",
+        "sharpening:none",
+        "inversion:false",
+        "denoising:none",
+        "psm:11"
+      ],
+      "latencyMs": {
+        "preprocess": 74.16779099999985,
+        "ocr": 125.07591700000012,
+        "selection": 0.06412499999987631,
+        "total": 199.59591699999964
+      },
+      "memory": {
+        "rssBefore": 501710848,
+        "rssAfter": 501907456,
+        "rssDelta": 196608
+      },
+      "artifactPaths": {
+        "crop": "treatment/crops/approved-wine-035.png",
+        "preprocessed": "treatment/preprocessed/approved-wine-035.png",
+        "transcript": "treatment/transcripts/approved-wine-035.txt"
+      }
+    },
+    {
+      "caseId": "approved-wine-085",
+      "fixtureId": "approved-wine-085",
+      "slices": [
+        "crop-min-dimension:small",
+        "field:brandName",
+        "fixture-mode:committable",
+        "image-orientation:portrait",
+        "region-provenance:human-approved-region",
+        "truth-source:human-approved-region"
+      ],
+      "expectedValues": ["Mosaikon"],
+      "rawTranscript": "",
+      "rawWords": [],
+      "meanConfidence": null,
+      "selectedValue": null,
+      "selectedState": "NOT_OBSERVED",
+      "reliable": false,
+      "correct": false,
+      "falseCertainty": false,
+      "failureClass": "OCR_EMPTY",
+      "candidateTrace": {
+        "lines": [],
+        "candidates": [],
+        "abstentionReason": "no-brand-region-text"
+      },
+      "warningAnchorTrace": null,
+      "warningResult": null,
+      "crop": {
+        "left": 80,
+        "top": 14,
+        "width": 267,
+        "height": 58
+      },
+      "transformedSize": {
+        "width": 1068,
+        "height": 232
+      },
+      "preprocessing": [
+        "crop:governed-brand-region",
+        "rotate:0",
+        "scale:4",
+        "grayscale:sharp-grayscale",
+        "contrast:normalise",
+        "threshold:none",
+        "sharpening:none",
+        "inversion:false",
+        "denoising:none",
+        "psm:11"
+      ],
+      "latencyMs": {
+        "preprocess": 11.446917000000212,
+        "ocr": 12.884334000000308,
+        "selection": 0.009250000000065484,
+        "total": 24.485625000000255
+      },
+      "memory": {
+        "rssBefore": 501907456,
+        "rssAfter": 501923840,
+        "rssDelta": 16384
+      },
+      "artifactPaths": {
+        "crop": "treatment/crops/approved-wine-085.png",
+        "preprocessed": "treatment/preprocessed/approved-wine-085.png",
+        "transcript": "treatment/transcripts/approved-wine-085.txt"
+      }
+    },
+    {
+      "caseId": "approved-wine-091",
+      "fixtureId": "approved-wine-091",
+      "slices": [
+        "crop-min-dimension:medium",
+        "field:brandName",
+        "fixture-mode:committable",
+        "image-orientation:portrait",
+        "region-provenance:human-approved-region",
+        "truth-source:human-approved-region"
+      ],
+      "expectedValues": ["Rias"],
+      "rawTranscript": "RI dS",
+      "rawWords": [
+        {
+          "text": "dS",
+          "rawConfidence": 80,
+          "bbox": {
+            "x0": 45,
+            "y0": 320,
+            "x1": 352,
+            "y1": 590
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 26,
+            "y": 81,
+            "width": 77,
+            "height": 68,
+            "imageWidth": 303,
+            "imageHeight": 598
+          }
+        },
+        {
+          "text": "RI",
+          "rawConfidence": 94,
+          "bbox": {
+            "x0": 45,
+            "y0": 128,
+            "x1": 360,
+            "y1": 365
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 26,
+            "y": 33,
+            "width": 79,
+            "height": 59,
+            "imageWidth": 303,
+            "imageHeight": 598
+          }
+        }
+      ],
+      "meanConfidence": 87,
+      "selectedValue": null,
+      "selectedState": "NOT_OBSERVED",
+      "reliable": false,
+      "correct": false,
+      "falseCertainty": false,
+      "failureClass": "OCR_RECOGNITION_MISS",
+      "candidateTrace": {
+        "lines": [
+          {
+            "rawText": "RI",
+            "cleanedValue": "RI",
+            "confidence": 0.94,
+            "prominence": 59,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-091",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "low-information-fragment"
+          },
+          {
+            "rawText": "dS",
+            "cleanedValue": "dS",
+            "confidence": 0.8,
+            "prominence": 68,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-091",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "low-information-fragment"
+          }
+        ],
+        "candidates": [
+          {
+            "rawText": "RI",
+            "cleanedValue": "RI",
+            "confidence": 0.94,
+            "ocrEvidenceScore": 0.94,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [94],
+              "rawMean": 94,
+              "rawMin": 94,
+              "rawMax": 94,
+              "missingTokenCount": 0
+            },
+            "prominence": 59,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-091",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-091"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-091",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-091"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [0],
+            "kept": false,
+            "filterReason": "low-information-fragment"
+          },
+          {
+            "rawText": "dS",
+            "cleanedValue": "dS",
+            "confidence": 0.8,
+            "ocrEvidenceScore": 0.8,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [80],
+              "rawMean": 80,
+              "rawMin": 80,
+              "rawMax": 80,
+              "missingTokenCount": 0
+            },
+            "prominence": 68,
+            "regionName": "governed-brand-region",
+            "passId": "research-approved-wine-091",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-approved-wine-091"],
+            "candidateProvenance": {
+              "passId": "research-approved-wine-091",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-approved-wine-091"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [1],
+            "kept": false,
+            "filterReason": "low-information-fragment"
+          }
+        ],
+        "abstentionReason": "unsupported-candidates-only"
+      },
+      "warningAnchorTrace": null,
+      "warningResult": null,
+      "crop": {
+        "left": 15,
+        "top": 1,
+        "width": 102,
+        "height": 160
+      },
+      "transformedSize": {
+        "width": 408,
+        "height": 640
+      },
+      "preprocessing": [
+        "crop:governed-brand-region",
+        "rotate:0",
+        "scale:4",
+        "grayscale:sharp-grayscale",
+        "contrast:normalise",
+        "threshold:none",
+        "sharpening:none",
+        "inversion:false",
+        "denoising:none",
+        "psm:11"
+      ],
+      "latencyMs": {
+        "preprocess": 10.172207999999955,
+        "ocr": 29.07183299999997,
+        "selection": 0.0527910000000702,
+        "total": 39.42270800000006
+      },
+      "memory": {
+        "rssBefore": 501923840,
+        "rssAfter": 502022144,
+        "rssDelta": 98304
+      },
+      "artifactPaths": {
+        "crop": "treatment/crops/approved-wine-091.png",
+        "preprocessed": "treatment/preprocessed/approved-wine-091.png",
+        "transcript": "treatment/transcripts/approved-wine-091.txt"
+      }
+    },
+    {
+      "caseId": "la-fattoria-rotated",
+      "fixtureId": "la-fattoria-rotated",
+      "slices": [
+        "crop-min-dimension:large",
+        "field:brandName",
+        "fixture-mode:committable",
+        "image-orientation:portrait",
+        "region-provenance:human-approved-region",
+        "truth-source:human-approved-region"
+      ],
+      "expectedValues": ["La Fattoria"],
+      "rawTranscript": "0 —_ (PAT TORIA FAT",
+      "rawWords": [
+        {
+          "text": "0",
+          "rawConfidence": 28,
+          "bbox": {
+            "x0": 1416,
+            "y0": 384,
+            "x1": 1611,
+            "y1": 583
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 684,
+            "y": 447,
+            "width": 49,
+            "height": 50,
+            "imageWidth": 1350,
+            "imageHeight": 1650
+          }
+        },
+        {
+          "text": "—_",
+          "rawConfidence": 28,
+          "bbox": {
+            "x0": 1734,
+            "y0": 380,
+            "x1": 2282,
+            "y1": 678
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 764,
+            "y": 446,
+            "width": 137,
+            "height": 75,
+            "imageWidth": 1350,
+            "imageHeight": 1650
+          }
+        },
+        {
+          "text": "(PAT",
+          "rawConfidence": 46,
+          "bbox": {
+            "x0": 147,
+            "y0": 445,
+            "x1": 1152,
+            "y1": 1232
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 367,
+            "y": 462,
+            "width": 251,
+            "height": 197,
+            "imageWidth": 1350,
+            "imageHeight": 1650
+          }
+        },
+        {
+          "text": "FAT",
+          "rawConfidence": 45,
+          "bbox": {
+            "x0": 401,
+            "y0": 821,
+            "x1": 1014,
+            "y1": 1232
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 430,
+            "y": 556,
+            "width": 154,
+            "height": 103,
+            "imageWidth": 1350,
+            "imageHeight": 1650
+          }
+        },
+        {
+          "text": "TORIA",
+          "rawConfidence": 45,
+          "bbox": {
+            "x0": 1116,
+            "y0": 825,
+            "x1": 2208,
+            "y1": 1152
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 609,
+            "y": 557,
+            "width": 273,
+            "height": 82,
+            "imageWidth": 1350,
+            "imageHeight": 1650
+          }
+        }
+      ],
+      "meanConfidence": 38.4,
+      "selectedValue": "TORIA",
+      "selectedState": "AMBIGUOUS",
+      "reliable": false,
+      "correct": false,
+      "falseCertainty": false,
+      "failureClass": "OCR_RECOGNITION_MISS",
+      "candidateTrace": {
+        "lines": [
+          {
+            "rawText": "0",
+            "cleanedValue": "0",
+            "confidence": 0.28,
+            "prominence": 50,
+            "regionName": "governed-brand-region",
+            "passId": "research-la-fattoria-rotated",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "—_",
+            "cleanedValue": null,
+            "confidence": 0.28,
+            "prominence": 75,
+            "regionName": "governed-brand-region",
+            "passId": "research-la-fattoria-rotated",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "(PAT",
+            "cleanedValue": "PAT",
+            "confidence": 0.46,
+            "prominence": 197,
+            "regionName": "governed-brand-region",
+            "passId": "research-la-fattoria-rotated",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "low-information-fragment"
+          },
+          {
+            "rawText": "TORIA",
+            "cleanedValue": "TORIA",
+            "confidence": 0.45,
+            "prominence": 82,
+            "regionName": "governed-brand-region",
+            "passId": "research-la-fattoria-rotated",
+            "passKind": "seller-region",
+            "kept": true,
+            "reason": "candidate-plausible"
+          },
+          {
+            "rawText": "FAT",
+            "cleanedValue": "FAT",
+            "confidence": 0.45,
+            "prominence": 103,
+            "regionName": "governed-brand-region",
+            "passId": "research-la-fattoria-rotated",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "low-information-fragment"
+          }
+        ],
+        "candidates": [
+          {
+            "rawText": "0",
+            "cleanedValue": "0",
+            "confidence": 0.28,
+            "ocrEvidenceScore": 0.28,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [28],
+              "rawMean": 28,
+              "rawMin": 28,
+              "rawMax": 28,
+              "missingTokenCount": 0
+            },
+            "prominence": 50,
+            "regionName": "governed-brand-region",
+            "passId": "research-la-fattoria-rotated",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-la-fattoria-rotated"],
+            "candidateProvenance": {
+              "passId": "research-la-fattoria-rotated",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-la-fattoria-rotated"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [0],
+            "kept": false,
+            "filterReason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "—_",
+            "cleanedValue": null,
+            "confidence": 0.28,
+            "ocrEvidenceScore": 0.28,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [28],
+              "rawMean": 28,
+              "rawMin": 28,
+              "rawMax": 28,
+              "missingTokenCount": 0
+            },
+            "prominence": 75,
+            "regionName": "governed-brand-region",
+            "passId": "research-la-fattoria-rotated",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-la-fattoria-rotated"],
+            "candidateProvenance": {
+              "passId": "research-la-fattoria-rotated",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-la-fattoria-rotated"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [1],
+            "kept": false,
+            "filterReason": "no-letters-or-too-short"
+          },
+          {
+            "rawText": "(PAT",
+            "cleanedValue": "PAT",
+            "confidence": 0.46,
+            "ocrEvidenceScore": 0.46,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [46],
+              "rawMean": 46,
+              "rawMin": 46,
+              "rawMax": 46,
+              "missingTokenCount": 0
+            },
+            "prominence": 197,
+            "regionName": "governed-brand-region",
+            "passId": "research-la-fattoria-rotated",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-la-fattoria-rotated"],
+            "candidateProvenance": {
+              "passId": "research-la-fattoria-rotated",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-la-fattoria-rotated"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [2],
+            "kept": false,
+            "filterReason": "low-information-fragment"
+          },
+          {
+            "rawText": "TORIA",
+            "cleanedValue": "TORIA",
+            "confidence": 0.45,
+            "ocrEvidenceScore": 0.45,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [45],
+              "rawMean": 45,
+              "rawMin": 45,
+              "rawMax": 45,
+              "missingTokenCount": 0
+            },
+            "prominence": 82,
+            "regionName": "governed-brand-region",
+            "passId": "research-la-fattoria-rotated",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-la-fattoria-rotated"],
+            "candidateProvenance": {
+              "passId": "research-la-fattoria-rotated",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-la-fattoria-rotated"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [3],
+            "kept": true,
+            "filterReason": "candidate-plausible",
+            "decision": "selected",
+            "score": {
+              "positiveSignal": 0,
+              "meaningfulChars": 0.35714285714285715,
+              "structure": 0.25,
+              "ocrEvidenceScore": 0.45,
+              "prominence": 1,
+              "area": 1,
+              "centrality": 0.8102020202020201,
+              "alignment": 1,
+              "lineProximity": 1,
+              "lowInformationPenalty": 0,
+              "residualPenalty": 0,
+              "total": 3.4144891774891777
+            },
+            "ranking": {
+              "strategy": "brand-mixed-prominence-score",
+              "orderingMode": "score-first",
+              "comparator": [
+                {
+                  "id": "score-eligibility",
+                  "direction": "desc",
+                  "value": true
+                },
+                {
+                  "id": "ranking-score",
+                  "direction": "desc",
+                  "value": 3.4144891774891777
+                },
+                {
+                  "id": "prominence",
+                  "direction": "desc",
+                  "value": 82
+                },
+                {
+                  "id": "ocr-evidence-score",
+                  "direction": "desc",
+                  "value": 0.45
+                },
+                {
+                  "id": "normalized-value-key",
+                  "direction": "asc",
+                  "value": "toria"
+                }
+              ],
+              "rankingScore": 3.4144891774891777,
+              "scoreFactors": [
+                {
+                  "id": "positive-signal",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "meaningful-chars",
+                  "value": 0.35714285714285715,
+                  "contribution": 0.5714285714285715,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "structure",
+                  "value": 0.25,
+                  "contribution": 0.3,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "ocr-evidence-score",
+                  "value": 0.45,
+                  "contribution": 0.45,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "prominence",
+                  "value": 1,
+                  "contribution": 0.8,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "area",
+                  "value": 1,
+                  "contribution": 0.6,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "centrality",
+                  "value": 0.8102020202020201,
+                  "contribution": 0.24306060606060603,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "alignment",
+                  "value": 1,
+                  "contribution": 0.25,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "line-proximity",
+                  "value": 1,
+                  "contribution": 0.2,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "low-information-penalty",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "penalty"
+                },
+                {
+                  "id": "residual-penalty",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "penalty"
+                }
+              ]
+            }
+          },
+          {
+            "rawText": "FAT",
+            "cleanedValue": "FAT",
+            "confidence": 0.45,
+            "ocrEvidenceScore": 0.45,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [45],
+              "rawMean": 45,
+              "rawMin": 45,
+              "rawMax": 45,
+              "missingTokenCount": 0
+            },
+            "prominence": 103,
+            "regionName": "governed-brand-region",
+            "passId": "research-la-fattoria-rotated",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-la-fattoria-rotated"],
+            "candidateProvenance": {
+              "passId": "research-la-fattoria-rotated",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-la-fattoria-rotated"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [4],
+            "kept": false,
+            "filterReason": "low-information-fragment"
+          }
+        ],
+        "abstentionReason": "unsupported-candidates-only"
+      },
+      "warningAnchorTrace": null,
+      "warningResult": null,
+      "crop": {
+        "left": 330,
+        "top": 351,
+        "width": 690,
+        "height": 308
+      },
+      "transformedSize": {
+        "width": 2760,
+        "height": 1232
+      },
+      "preprocessing": [
+        "crop:governed-brand-region",
+        "rotate:0",
+        "scale:4",
+        "grayscale:sharp-grayscale",
+        "contrast:normalise",
+        "threshold:none",
+        "sharpening:none",
+        "inversion:false",
+        "denoising:none",
+        "psm:11"
+      ],
+      "latencyMs": {
+        "preprocess": 75.44208299999991,
+        "ocr": 186.26266599999963,
+        "selection": 0.1587920000001759,
+        "total": 262.06604100000004
+      },
+      "memory": {
+        "rssBefore": 502022144,
+        "rssAfter": 545832960,
+        "rssDelta": 43810816
+      },
+      "artifactPaths": {
+        "crop": "treatment/crops/la-fattoria-rotated.png",
+        "preprocessed": "treatment/preprocessed/la-fattoria-rotated.png",
+        "transcript": "treatment/transcripts/la-fattoria-rotated.txt"
+      }
+    },
+    {
+      "caseId": "wine-multi-artifact-04-region-1",
+      "fixtureId": "wine-multi-artifact-04",
+      "slices": [
+        "crop-min-dimension:medium",
+        "field:brandName",
+        "fixture-mode:committable",
+        "image-orientation:portrait",
+        "region-provenance:human-approved-region",
+        "truth-source:human-approved-region"
+      ],
+      "expectedValues": ["Dry Cellar"],
+      "rawTranscript": "",
+      "rawWords": [],
+      "meanConfidence": null,
+      "selectedValue": null,
+      "selectedState": "NOT_OBSERVED",
+      "reliable": false,
+      "correct": false,
+      "falseCertainty": false,
+      "failureClass": "OCR_EMPTY",
+      "candidateTrace": {
+        "lines": [],
+        "candidates": [],
+        "abstentionReason": "no-brand-region-text"
+      },
+      "warningAnchorTrace": null,
+      "warningResult": null,
+      "crop": {
+        "left": 46,
+        "top": 119,
+        "width": 244,
+        "height": 148
+      },
+      "transformedSize": {
+        "width": 976,
+        "height": 592
+      },
+      "preprocessing": [
+        "crop:governed-brand-region",
+        "rotate:0",
+        "scale:4",
+        "grayscale:sharp-grayscale",
+        "contrast:normalise",
+        "threshold:none",
+        "sharpening:none",
+        "inversion:false",
+        "denoising:none",
+        "psm:11"
+      ],
+      "latencyMs": {
+        "preprocess": 30.580917000000227,
+        "ocr": 37.02691700000014,
+        "selection": 0.007459000000380911,
+        "total": 68.03479100000004
+      },
+      "memory": {
+        "rssBefore": 545832960,
+        "rssAfter": 546455552,
+        "rssDelta": 622592
+      },
+      "artifactPaths": {
+        "crop": "treatment/crops/wine-multi-artifact-04-region-1.png",
+        "preprocessed": "treatment/preprocessed/wine-multi-artifact-04-region-1.png",
+        "transcript": "treatment/transcripts/wine-multi-artifact-04-region-1.txt"
+      }
+    },
+    {
+      "caseId": "wine-multi-artifact-04-region-2",
+      "fixtureId": "wine-multi-artifact-04",
+      "slices": [
+        "crop-min-dimension:medium",
+        "field:brandName",
+        "fixture-mode:committable",
+        "image-orientation:portrait",
+        "region-provenance:human-approved-region",
+        "truth-source:human-approved-region"
+      ],
+      "expectedValues": ["Dry Cellar"],
+      "rawTranscript": "Colla 2",
+      "rawWords": [
+        {
+          "text": "2",
+          "rawConfidence": 18,
+          "bbox": {
+            "x0": 50,
+            "y0": 63,
+            "x1": 289,
+            "y1": 205
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 181,
+            "y": 993,
+            "width": 59,
+            "height": 35,
+            "imageWidth": 674,
+            "imageHeight": 1522
+          }
+        },
+        {
+          "text": "Colla",
+          "rawConfidence": 41,
+          "bbox": {
+            "x0": 327,
+            "y0": 48,
+            "x1": 614,
+            "y1": 152
+          },
+          "originalGeometry": {
+            "imageIndex": 0,
+            "x": 250,
+            "y": 989,
+            "width": 72,
+            "height": 26,
+            "imageWidth": 674,
+            "imageHeight": 1522
+          }
+        }
+      ],
+      "meanConfidence": 29.5,
+      "selectedValue": "Colla",
+      "selectedState": "AMBIGUOUS",
+      "reliable": false,
+      "correct": false,
+      "falseCertainty": false,
+      "failureClass": "OCR_RECOGNITION_MISS",
+      "candidateTrace": {
+        "lines": [
+          {
+            "rawText": "Colla",
+            "cleanedValue": "Colla",
+            "confidence": 0.41,
+            "prominence": 26,
+            "regionName": "governed-brand-region",
+            "passId": "research-wine-multi-artifact-04-region-2",
+            "passKind": "seller-region",
+            "kept": true,
+            "reason": "candidate-plausible"
+          },
+          {
+            "rawText": "2",
+            "cleanedValue": "2",
+            "confidence": 0.18,
+            "prominence": 35,
+            "regionName": "governed-brand-region",
+            "passId": "research-wine-multi-artifact-04-region-2",
+            "passKind": "seller-region",
+            "kept": false,
+            "reason": "no-letters-or-too-short"
+          }
+        ],
+        "candidates": [
+          {
+            "rawText": "Colla",
+            "cleanedValue": "Colla",
+            "confidence": 0.41,
+            "ocrEvidenceScore": 0.41,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [41],
+              "rawMean": 41,
+              "rawMin": 41,
+              "rawMax": 41,
+              "missingTokenCount": 0
+            },
+            "prominence": 26,
+            "regionName": "governed-brand-region",
+            "passId": "research-wine-multi-artifact-04-region-2",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-wine-multi-artifact-04-region-2"],
+            "candidateProvenance": {
+              "passId": "research-wine-multi-artifact-04-region-2",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-wine-multi-artifact-04-region-2"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [0],
+            "kept": true,
+            "filterReason": "candidate-plausible",
+            "decision": "selected",
+            "score": {
+              "positiveSignal": 0,
+              "meaningfulChars": 0.35714285714285715,
+              "structure": 0.25,
+              "ocrEvidenceScore": 0.41,
+              "prominence": 1,
+              "area": 1,
+              "centrality": 0.7659880603765934,
+              "alignment": 1,
+              "lineProximity": 1,
+              "lowInformationPenalty": 0,
+              "residualPenalty": 0,
+              "total": 3.3612249895415496
+            },
+            "ranking": {
+              "strategy": "brand-mixed-prominence-score",
+              "orderingMode": "score-first",
+              "comparator": [
+                {
+                  "id": "score-eligibility",
+                  "direction": "desc",
+                  "value": true
+                },
+                {
+                  "id": "ranking-score",
+                  "direction": "desc",
+                  "value": 3.3612249895415496
+                },
+                {
+                  "id": "prominence",
+                  "direction": "desc",
+                  "value": 26
+                },
+                {
+                  "id": "ocr-evidence-score",
+                  "direction": "desc",
+                  "value": 0.41
+                },
+                {
+                  "id": "normalized-value-key",
+                  "direction": "asc",
+                  "value": "colla"
+                }
+              ],
+              "rankingScore": 3.3612249895415496,
+              "scoreFactors": [
+                {
+                  "id": "positive-signal",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "meaningful-chars",
+                  "value": 0.35714285714285715,
+                  "contribution": 0.5714285714285715,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "structure",
+                  "value": 0.25,
+                  "contribution": 0.3,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "ocr-evidence-score",
+                  "value": 0.41,
+                  "contribution": 0.41,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "prominence",
+                  "value": 1,
+                  "contribution": 0.8,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "area",
+                  "value": 1,
+                  "contribution": 0.6,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "centrality",
+                  "value": 0.7659880603765934,
+                  "contribution": 0.22979641811297802,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "alignment",
+                  "value": 1,
+                  "contribution": 0.25,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "line-proximity",
+                  "value": 1,
+                  "contribution": 0.2,
+                  "direction": "benefit"
+                },
+                {
+                  "id": "low-information-penalty",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "penalty"
+                },
+                {
+                  "id": "residual-penalty",
+                  "value": 0,
+                  "contribution": 0,
+                  "direction": "penalty"
+                }
+              ]
+            }
+          },
+          {
+            "rawText": "2",
+            "cleanedValue": "2",
+            "confidence": 0.18,
+            "ocrEvidenceScore": 0.18,
+            "ocrConfidence": {
+              "aggregation": "mean",
+              "rawScale": "0-100",
+              "rawTokenConfidences": [18],
+              "rawMean": 18,
+              "rawMin": 18,
+              "rawMax": 18,
+              "missingTokenCount": 0
+            },
+            "prominence": 35,
+            "regionName": "governed-brand-region",
+            "passId": "research-wine-multi-artifact-04-region-2",
+            "passKind": "seller-region",
+            "supportPassIds": ["research-wine-multi-artifact-04-region-2"],
+            "candidateProvenance": {
+              "passId": "research-wine-multi-artifact-04-region-2",
+              "passKind": "seller-region",
+              "triggerReasons": ["seller-region-target"],
+              "preprocessing": [
+                "crop:governed-brand-region",
+                "rotate:0",
+                "scale:4",
+                "grayscale:sharp-grayscale",
+                "contrast:normalise",
+                "threshold:none",
+                "sharpening:none",
+                "inversion:false",
+                "denoising:none",
+                "psm:11"
+              ],
+              "regionName": "governed-brand-region",
+              "supportingPassIds": ["research-wine-multi-artifact-04-region-2"],
+              "supportingPassKinds": ["seller-region"],
+              "recoveryPassUsed": true
+            },
+            "assembly": "whole-line",
+            "lineIndexes": [1],
+            "kept": false,
+            "filterReason": "no-letters-or-too-short"
+          }
+        ],
+        "abstentionReason": "unsupported-candidates-only"
+      },
+      "warningAnchorTrace": null,
+      "warningResult": null,
+      "crop": {
+        "left": 168,
+        "top": 977,
+        "width": 166,
+        "height": 64
+      },
+      "transformedSize": {
+        "width": 664,
+        "height": 256
+      },
+      "preprocessing": [
+        "crop:governed-brand-region",
+        "rotate:0",
+        "scale:4",
+        "grayscale:sharp-grayscale",
+        "contrast:normalise",
+        "threshold:none",
+        "sharpening:none",
+        "inversion:false",
+        "denoising:none",
+        "psm:11"
+      ],
+      "latencyMs": {
+        "preprocess": 15.659209000000374,
+        "ocr": 26.667374999999993,
+        "selection": 0.07495899999958056,
+        "total": 42.789999999999964
+      },
+      "memory": {
+        "rssBefore": 546455552,
+        "rssAfter": 546701312,
+        "rssDelta": 245760
+      },
+      "artifactPaths": {
+        "crop": "treatment/crops/wine-multi-artifact-04-region-2.png",
+        "preprocessed": "treatment/preprocessed/wine-multi-artifact-04-region-2.png",
+        "transcript": "treatment/transcripts/wine-multi-artifact-04-region-2.txt"
+      }
+    }
+  ]
+}
