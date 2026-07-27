@@ -1,0 +1,22 @@
+{
+  "scale": 3,
+  "padding": { "ratio": 0.03, "minPx": 4 },
+  "grayscaleMethod": "sharp-grayscale",
+  "contrastMethod": "normalise",
+  "thresholdMethod": "none",
+  "sharpening": "mild",
+  "inversion": false,
+  "denoising": "none",
+  "psm": 11,
+  "rotation": 0,
+  "cropSource": "governed-brand-region",
+  "fieldType": "brandName",
+  "sharpeningParameters": {
+    "sigma": 1,
+    "m1": 1,
+    "m2": 2,
+    "x1": 2,
+    "y2": 10,
+    "y3": 20
+  }
+}

@@ -1,0 +1,187 @@
+{
+  "primary": {
+    "controlBehaviorHash": "b3db6f91ea925a60aee0adc043994a5fef1e57df3cb6df03860f038cc16ffb41",
+    "treatmentBehaviorHash": "f3247f506e0b2a80190a1d12c6f4de44026e2e91861b676ec6b2cf47c31f51f0"
+  },
+  "repeat": {
+    "controlBehaviorHash": "b3db6f91ea925a60aee0adc043994a5fef1e57df3cb6df03860f038cc16ffb41",
+    "treatmentBehaviorHash": "f3247f506e0b2a80190a1d12c6f4de44026e2e91861b676ec6b2cf47c31f51f0"
+  },
+  "reproducible": true,
+  "repeatMetrics": {
+    "control": {
+      "caseCount": 11,
+      "exactAccuracy": {
+        "count": 0,
+        "rate": 0,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        }
+      },
+      "normalizedAccuracy": {
+        "count": 0,
+        "rate": 0,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        }
+      },
+      "rawOcrTruthRecall": {
+        "count": 0,
+        "rate": 0,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        }
+      },
+      "candidateListTruthRecall": {
+        "count": 0,
+        "rate": 0,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        }
+      },
+      "top3TruthRecall": {
+        "count": 0,
+        "rate": 0,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        }
+      },
+      "falseReliableReads": {
+        "count": 0,
+        "rate": 0,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        }
+      },
+      "emptyOcr": {
+        "count": 0,
+        "rate": 0,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        }
+      },
+      "wrongReliableReads": {
+        "count": 0,
+        "rate": 0,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        }
+      },
+      "correctButConservative": {
+        "count": 0,
+        "rate": 0,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        }
+      },
+      "medianLatencyMs": 80.14633299999969,
+      "p95LatencyMs": 219.94579199999998,
+      "medianRssDeltaBytes": 49152
+    },
+    "treatment": {
+      "caseCount": 11,
+      "exactAccuracy": {
+        "count": 0,
+        "rate": 0,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        }
+      },
+      "normalizedAccuracy": {
+        "count": 0,
+        "rate": 0,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        }
+      },
+      "rawOcrTruthRecall": {
+        "count": 0,
+        "rate": 0,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        }
+      },
+      "candidateListTruthRecall": {
+        "count": 0,
+        "rate": 0,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        }
+      },
+      "top3TruthRecall": {
+        "count": 0,
+        "rate": 0,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        }
+      },
+      "falseReliableReads": {
+        "count": 0,
+        "rate": 0,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        }
+      },
+      "emptyOcr": {
+        "count": 1,
+        "rate": 0.09090909090909091,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0.016232172885884855,
+          "upper": 0.37735843645159567
+        }
+      },
+      "wrongReliableReads": {
+        "count": 0,
+        "rate": 0,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        }
+      },
+      "correctButConservative": {
+        "count": 0,
+        "rate": 0,
+        "wilson95": {
+          "confidenceLevel": 0.95,
+          "lower": 0,
+          "upper": 0.2588329669680317
+        }
+      },
+      "medianLatencyMs": 94.05783299999985,
+      "p95LatencyMs": 271.43325000000004,
+      "medianRssDeltaBytes": 1769472
+    }
+  }
+}

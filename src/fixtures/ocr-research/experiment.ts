@@ -97,6 +97,15 @@ export const PRODUCTION_BOUNDED_BRAND_CONTROL: OcrConfiguration = {
   fieldType: "brandName",
 };
 
+export const MILD_SHARPENING_PARAMETERS = Object.freeze({
+  sigma: 1,
+  m1: 1,
+  m2: 2,
+  x1: 2,
+  y2: 10,
+  y3: 20,
+});
+
 export interface ConfigurationIsolation {
   changedVariables: ExperimentVariable[];
   valid: boolean;
@@ -424,7 +433,9 @@ async function preprocess(
   if (configuration.grayscaleMethod === "sharp-grayscale") pipeline = pipeline.grayscale();
   if (configuration.contrastMethod === "normalise") pipeline = pipeline.normalise();
   if (configuration.denoising === "median-3") pipeline = pipeline.median(3);
-  if (configuration.sharpening === "mild") pipeline = pipeline.sharpen({ sigma: 1 });
+  if (configuration.sharpening === "mild") {
+    pipeline = pipeline.sharpen(MILD_SHARPENING_PARAMETERS);
+  }
   if (configuration.inversion) pipeline = pipeline.negate();
   if (configuration.thresholdMethod === "global-128") pipeline = pipeline.threshold(128);
   if (configuration.thresholdMethod === "otsu") {
