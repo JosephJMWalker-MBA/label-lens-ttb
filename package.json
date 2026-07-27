@@ -27,6 +27,7 @@
     "eval:baseline": "EVAL_BASELINE=1 vitest run src/fixtures/eval/baseline-report.gen.test.ts",
     "eval:production-parity": "EVAL_PRODUCTION_PARITY=1 vitest run src/fixtures/eval/production-parity.gen.test.ts",
     "eval:production-parity:capture": "EVAL_CAPTURE_PRODUCTION_PARITY=1 vitest run src/fixtures/eval/production-parity.gen.test.ts",
+    "eval:production-parity:reconcile": "npx vite-node --config vitest.config.ts scripts/eval/capture-production-parity-reconciliation.ts",
     "eval:ocr-region-benchmark": "EVAL_REGION_BENCHMARK=1 vitest run src/fixtures/eval/ocr-region-benchmark.gen.test.ts",
     "eval:issue-149-bounded-baseline": "npx vite-node --config vitest.config.ts scripts/eval/run-issue-149-bounded-baseline.ts",
     "eval:issue-149-segmentation-experiment": "npx vite-node --config vitest.config.ts scripts/eval/run-issue-149-segmentation-experiment.ts",

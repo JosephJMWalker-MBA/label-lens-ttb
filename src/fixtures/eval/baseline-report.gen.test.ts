@@ -12,6 +12,7 @@ import { LIVE_BASELINE } from "./live-baseline";
 import {
   buildProductionAnalyzerParityFixture,
   buildProductionAnalyzerParityProof,
+  formatProductionParityMismatchInventory,
   ISSUE_131_BASE_COMMIT,
   PRODUCTION_PARITY_FIXTURE_PATH,
   type ProductionAnalyzerParityFixture,
@@ -67,6 +68,11 @@ async function writeFormattedJson(filePath: string, value: unknown) {
         parityInputs,
       );
       const productionParity = buildProductionAnalyzerParityProof(expectedParity, actualParity);
+      if (productionParity.status === "FAIL") {
+        process.stderr.write(
+          `\n[production-parity-mismatch-inventory]\n${formatProductionParityMismatchInventory(productionParity)}\n`,
+        );
+      }
       expect(productionParity.status).toBe("PASS");
       expect(productionParity.mismatches).toEqual([]);
       const report = buildReport(cases, manifest, productionParity);
