@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "ocr-research-experiment.v1",
+  "experimentId": "issue-149-bounded-brand-no-op",
+  "design": "one-variable-at-a-time",
+  "declaredVariable": "none",
+  "control": {
+    "scale": 3,
+    "padding": {
+      "ratio": 0.03,
+      "minPx": 4
+    },
+    "grayscaleMethod": "sharp-grayscale",
+    "contrastMethod": "normalise",
+    "thresholdMethod": "none",
+    "sharpening": "none",
+    "inversion": false,
+    "denoising": "none",
+    "psm": 11,
+    "rotation": 0,
+    "cropSource": "governed-brand-region",
+    "fieldType": "brandName"
+  },
+  "treatment": {
+    "scale": 3,
+    "padding": {
+      "ratio": 0.03,
+      "minPx": 4
+    },
+    "grayscaleMethod": "sharp-grayscale",
+    "contrastMethod": "normalise",
+    "thresholdMethod": "none",
+    "sharpening": "none",
+    "inversion": false,
+    "denoising": "none",
+    "psm": 11,
+    "rotation": 0,
+    "cropSource": "governed-brand-region",
+    "fieldType": "brandName"
+  }
+}

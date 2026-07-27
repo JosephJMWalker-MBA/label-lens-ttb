@@ -1,0 +1,296 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Label Lens OCR experiment report",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "experimentId",
+    "arm",
+    "configuration",
+    "configurationHash",
+    "behaviorHash",
+    "gitSha",
+    "environment",
+    "metrics",
+    "cases"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "ocr-research-report.v1"
+    },
+    "experimentId": {
+      "type": "string"
+    },
+    "arm": {
+      "enum": ["control", "treatment"]
+    },
+    "configuration": {
+      "type": "object"
+    },
+    "configurationHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "behaviorHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "gitSha": {
+      "type": "string"
+    },
+    "environment": {
+      "type": "object",
+      "required": ["node", "platform", "architecture", "sharp", "ocrEngine"],
+      "properties": {
+        "node": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        },
+        "architecture": {
+          "type": "string"
+        },
+        "sharp": {
+          "type": "string"
+        },
+        "ocrEngine": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "required": [
+        "governedFixtureCount",
+        "caseCount",
+        "correctCount",
+        "accuracy",
+        "accuracyWilson95",
+        "falseCertaintyCount",
+        "falseCertaintyRate",
+        "falseCertaintyWilson95",
+        "medianLatencyMs",
+        "p95LatencyMs",
+        "failureClassCounts",
+        "failureCount",
+        "medianRssDeltaBytes",
+        "sliceMetrics"
+      ],
+      "properties": {
+        "governedFixtureCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failureCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "medianRssDeltaBytes": {
+          "type": ["number", "null"]
+        },
+        "caseCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "correctCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "accuracy": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "accuracyWilson95": {
+          "type": "object",
+          "required": ["confidenceLevel", "lower", "upper"],
+          "properties": {
+            "confidenceLevel": {
+              "const": 0.95
+            },
+            "lower": {
+              "type": ["number", "null"],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "upper": {
+              "type": ["number", "null"],
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "falseCertaintyCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "falseCertaintyRate": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "falseCertaintyWilson95": {
+          "type": "object",
+          "required": ["confidenceLevel", "lower", "upper"],
+          "properties": {
+            "confidenceLevel": {
+              "const": 0.95
+            },
+            "lower": {
+              "type": ["number", "null"],
+              "minimum": 0,
+              "maximum": 1
+            },
+            "upper": {
+              "type": ["number", "null"],
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "medianLatencyMs": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "p95LatencyMs": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "failureClassCounts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "sliceMetrics": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "caseCount",
+              "correctCount",
+              "accuracy",
+              "accuracyWilson95",
+              "falseCertaintyCount",
+              "falseCertaintyRate",
+              "falseCertaintyWilson95",
+              "medianLatencyMs",
+              "p95LatencyMs",
+              "failureClassCounts"
+            ],
+            "properties": {
+              "caseCount": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "correctCount": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "accuracy": {
+                "type": ["number", "null"],
+                "minimum": 0,
+                "maximum": 1
+              },
+              "accuracyWilson95": {
+                "type": "object",
+                "required": ["confidenceLevel", "lower", "upper"],
+                "properties": {
+                  "confidenceLevel": {
+                    "const": 0.95
+                  },
+                  "lower": {
+                    "type": ["number", "null"],
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "upper": {
+                    "type": ["number", "null"],
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "falseCertaintyCount": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "falseCertaintyRate": {
+                "type": ["number", "null"],
+                "minimum": 0,
+                "maximum": 1
+              },
+              "falseCertaintyWilson95": {
+                "type": "object",
+                "required": ["confidenceLevel", "lower", "upper"],
+                "properties": {
+                  "confidenceLevel": {
+                    "const": 0.95
+                  },
+                  "lower": {
+                    "type": ["number", "null"],
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "upper": {
+                    "type": ["number", "null"],
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "additionalProperties": false
+              },
+              "medianLatencyMs": {
+                "type": ["number", "null"],
+                "minimum": 0
+              },
+              "p95LatencyMs": {
+                "type": ["number", "null"],
+                "minimum": 0
+              },
+              "failureClassCounts": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "caseId",
+          "fixtureId",
+          "slices",
+          "expectedValues",
+          "rawTranscript",
+          "rawWords",
+          "selectedValue",
+          "selectedState",
+          "reliable",
+          "correct",
+          "falseCertainty",
+          "failureClass",
+          "latencyMs",
+          "memory",
+          "artifactPaths"
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}

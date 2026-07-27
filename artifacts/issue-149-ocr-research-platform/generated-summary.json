@@ -1,0 +1,918 @@
+{
+  "manifestFixtureCount": 10,
+  "inventory": {
+    "imageCount": 361,
+    "uniqueChecksumCount": 289,
+    "duplicateImageCount": 72,
+    "governedSourceLabelCount": 132,
+    "boundedBrandEvaluableCount": 10,
+    "fullImageBrandEvaluableCount": 105,
+    "warningPresenceEvaluableCount": 2,
+    "warningExactEvaluableCount": 0,
+    "alcoholEvaluableCount": 103
+  },
+  "noOp": {
+    "eligibility": {
+      "allowed": true,
+      "governedEvaluableFixtureCount": 10,
+      "knownControlFailureCount": 11,
+      "reasons": []
+    },
+    "metrics": {
+      "governedFixtureCount": 10,
+      "caseCount": 11,
+      "correctCount": 0,
+      "failureCount": 11,
+      "accuracy": 0,
+      "accuracyWilson95": {
+        "confidenceLevel": 0.95,
+        "lower": 0,
+        "upper": 0.2588329669680317
+      },
+      "falseCertaintyCount": 0,
+      "falseCertaintyRate": 0,
+      "falseCertaintyWilson95": {
+        "confidenceLevel": 0.95,
+        "lower": 0,
+        "upper": 0.2588329669680317
+      },
+      "medianLatencyMs": 81.55454099999997,
+      "p95LatencyMs": 225.85037499999999,
+      "medianRssDeltaBytes": 1523712,
+      "failureClassCounts": {
+        "OCR_RECOGNITION_MISS": 11
+      },
+      "sliceMetrics": {
+        "crop-min-dimension:large": {
+          "caseCount": 4,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.4898908364545973
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.4898908364545973
+          },
+          "medianLatencyMs": 205.97172899999998,
+          "p95LatencyMs": 225.85037499999999,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 4
+          }
+        },
+        "crop-min-dimension:medium": {
+          "caseCount": 6,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.39033428790216534
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.39033428790216534
+          },
+          "medianLatencyMs": 58.983249500000056,
+          "p95LatencyMs": 122.61974999999995,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 6
+          }
+        },
+        "crop-min-dimension:small": {
+          "caseCount": 1,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.7934506856227626
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.7934506856227626
+          },
+          "medianLatencyMs": 42.679124999999885,
+          "p95LatencyMs": 42.679124999999885,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 1
+          }
+        },
+        "field:brandName": {
+          "caseCount": 11,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "medianLatencyMs": 81.55454099999997,
+          "p95LatencyMs": 225.85037499999999,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 11
+          }
+        },
+        "fixture-mode:committable": {
+          "caseCount": 11,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "medianLatencyMs": 81.55454099999997,
+          "p95LatencyMs": 225.85037499999999,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 11
+          }
+        },
+        "image-orientation:landscape": {
+          "caseCount": 2,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.6576197724933469
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.6576197724933469
+          },
+          "medianLatencyMs": 105.79593749999998,
+          "p95LatencyMs": 130.037334,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 2
+          }
+        },
+        "image-orientation:portrait": {
+          "caseCount": 9,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 2.7755575615628914e-17,
+            "upper": 0.29914504841954404
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 2.7755575615628914e-17,
+            "upper": 0.29914504841954404
+          },
+          "medianLatencyMs": 75.37320799999998,
+          "p95LatencyMs": 225.85037499999999,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 9
+          }
+        },
+        "region-provenance:human-approved-region": {
+          "caseCount": 11,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "medianLatencyMs": 81.55454099999997,
+          "p95LatencyMs": 225.85037499999999,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 11
+          }
+        },
+        "truth-source:human-approved-region": {
+          "caseCount": 11,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "medianLatencyMs": 81.55454099999997,
+          "p95LatencyMs": 225.85037499999999,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 11
+          }
+        }
+      }
+    },
+    "diff": {
+      "experimentId": "issue-149-bounded-brand-no-op",
+      "declaredVariable": "none",
+      "changedVariables": [],
+      "noOp": true,
+      "behavioralDeltaCount": 0,
+      "correctDelta": 0,
+      "falseCertaintyDelta": 0,
+      "medianLatencyDeltaMs": 41.026584000000184,
+      "p95LatencyDeltaMs": -2.8923329999997804,
+      "caseDeltas": [
+        {
+          "caseId": "approved-wine-004",
+          "controlValue": "FAT TORIA",
+          "treatmentValue": "FAT TORIA",
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": false
+        },
+        {
+          "caseId": "approved-wine-005",
+          "controlValue": "GATT",
+          "treatmentValue": "GATT",
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": false
+        },
+        {
+          "caseId": "approved-wine-023",
+          "controlValue": null,
+          "treatmentValue": null,
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": false
+        },
+        {
+          "caseId": "approved-wine-027",
+          "controlValue": null,
+          "treatmentValue": null,
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": false
+        },
+        {
+          "caseId": "approved-wine-031",
+          "controlValue": "enheesO",
+          "treatmentValue": "enheesO",
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": false
+        },
+        {
+          "caseId": "approved-wine-035",
+          "controlValue": "Hokoniites",
+          "treatmentValue": "Hokoniites",
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": false
+        },
+        {
+          "caseId": "approved-wine-085",
+          "controlValue": "AH sasaki",
+          "treatmentValue": "AH sasaki",
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": false
+        },
+        {
+          "caseId": "approved-wine-091",
+          "controlValue": null,
+          "treatmentValue": null,
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": false
+        },
+        {
+          "caseId": "la-fattoria-rotated",
+          "controlValue": "FAT TORIA",
+          "treatmentValue": "FAT TORIA",
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": false
+        },
+        {
+          "caseId": "wine-multi-artifact-04-region-1",
+          "controlValue": null,
+          "treatmentValue": null,
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": false
+        },
+        {
+          "caseId": "wine-multi-artifact-04-region-2",
+          "controlValue": "Colles",
+          "treatmentValue": "Colles",
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": false
+        }
+      ],
+      "decision": "NO_OP_CONFIRMED",
+      "decisionReason": "Identical configurations produced zero behavioral deltas."
+    }
+  },
+  "selected": {
+    "eligibility": {
+      "allowed": true,
+      "governedEvaluableFixtureCount": 10,
+      "knownControlFailureCount": 11,
+      "reasons": []
+    },
+    "controlMetrics": {
+      "governedFixtureCount": 10,
+      "caseCount": 11,
+      "correctCount": 0,
+      "failureCount": 11,
+      "accuracy": 0,
+      "accuracyWilson95": {
+        "confidenceLevel": 0.95,
+        "lower": 0,
+        "upper": 0.2588329669680317
+      },
+      "falseCertaintyCount": 0,
+      "falseCertaintyRate": 0,
+      "falseCertaintyWilson95": {
+        "confidenceLevel": 0.95,
+        "lower": 0,
+        "upper": 0.2588329669680317
+      },
+      "medianLatencyMs": 79.86654099999987,
+      "p95LatencyMs": 258.39300000000003,
+      "medianRssDeltaBytes": 65536,
+      "failureClassCounts": {
+        "OCR_RECOGNITION_MISS": 11
+      },
+      "sliceMetrics": {
+        "crop-min-dimension:large": {
+          "caseCount": 4,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.4898908364545973
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.4898908364545973
+          },
+          "medianLatencyMs": 190.2951455,
+          "p95LatencyMs": 258.39300000000003,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 4
+          }
+        },
+        "crop-min-dimension:medium": {
+          "caseCount": 6,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.39033428790216534
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.39033428790216534
+          },
+          "medianLatencyMs": 57.00956250000013,
+          "p95LatencyMs": 128.22745900000018,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 6
+          }
+        },
+        "crop-min-dimension:small": {
+          "caseCount": 1,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.7934506856227626
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.7934506856227626
+          },
+          "medianLatencyMs": 42.228415999999925,
+          "p95LatencyMs": 42.228415999999925,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 1
+          }
+        },
+        "field:brandName": {
+          "caseCount": 11,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "medianLatencyMs": 79.86654099999987,
+          "p95LatencyMs": 258.39300000000003,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 11
+          }
+        },
+        "fixture-mode:committable": {
+          "caseCount": 11,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "medianLatencyMs": 79.86654099999987,
+          "p95LatencyMs": 258.39300000000003,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 11
+          }
+        },
+        "image-orientation:landscape": {
+          "caseCount": 2,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.6576197724933469
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.6576197724933469
+          },
+          "medianLatencyMs": 105.89527049999992,
+          "p95LatencyMs": 131.92399999999998,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 2
+          }
+        },
+        "image-orientation:portrait": {
+          "caseCount": 9,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 2.7755575615628914e-17,
+            "upper": 0.29914504841954404
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 2.7755575615628914e-17,
+            "upper": 0.29914504841954404
+          },
+          "medianLatencyMs": 73.60291700000016,
+          "p95LatencyMs": 258.39300000000003,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 9
+          }
+        },
+        "region-provenance:human-approved-region": {
+          "caseCount": 11,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "medianLatencyMs": 79.86654099999987,
+          "p95LatencyMs": 258.39300000000003,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 11
+          }
+        },
+        "truth-source:human-approved-region": {
+          "caseCount": 11,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "medianLatencyMs": 79.86654099999987,
+          "p95LatencyMs": 258.39300000000003,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 11
+          }
+        }
+      }
+    },
+    "treatmentMetrics": {
+      "governedFixtureCount": 10,
+      "caseCount": 11,
+      "correctCount": 0,
+      "failureCount": 11,
+      "accuracy": 0,
+      "accuracyWilson95": {
+        "confidenceLevel": 0.95,
+        "lower": 0,
+        "upper": 0.2588329669680317
+      },
+      "falseCertaintyCount": 0,
+      "falseCertaintyRate": 0,
+      "falseCertaintyWilson95": {
+        "confidenceLevel": 0.95,
+        "lower": 0,
+        "upper": 0.2588329669680317
+      },
+      "medianLatencyMs": 173.04491700000017,
+      "p95LatencyMs": 551.9697499999993,
+      "medianRssDeltaBytes": 196608,
+      "failureClassCounts": {
+        "OCR_EMPTY": 2,
+        "OCR_RECOGNITION_MISS": 9
+      },
+      "sliceMetrics": {
+        "crop-min-dimension:large": {
+          "caseCount": 4,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.4898908364545973
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.4898908364545973
+          },
+          "medianLatencyMs": 318.84302049999997,
+          "p95LatencyMs": 551.9697499999993,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 4
+          }
+        },
+        "crop-min-dimension:medium": {
+          "caseCount": 6,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.39033428790216534
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.39033428790216534
+          },
+          "medianLatencyMs": 67.14881199999991,
+          "p95LatencyMs": 199.59591699999964,
+          "failureClassCounts": {
+            "OCR_EMPTY": 1,
+            "OCR_RECOGNITION_MISS": 5
+          }
+        },
+        "crop-min-dimension:small": {
+          "caseCount": 1,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.7934506856227626
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.7934506856227626
+          },
+          "medianLatencyMs": 24.485625000000255,
+          "p95LatencyMs": 24.485625000000255,
+          "failureClassCounts": {
+            "OCR_EMPTY": 1
+          }
+        },
+        "field:brandName": {
+          "caseCount": 11,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "medianLatencyMs": 173.04491700000017,
+          "p95LatencyMs": 551.9697499999993,
+          "failureClassCounts": {
+            "OCR_EMPTY": 2,
+            "OCR_RECOGNITION_MISS": 9
+          }
+        },
+        "fixture-mode:committable": {
+          "caseCount": 11,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "medianLatencyMs": 173.04491700000017,
+          "p95LatencyMs": 551.9697499999993,
+          "failureClassCounts": {
+            "OCR_EMPTY": 2,
+            "OCR_RECOGNITION_MISS": 9
+          }
+        },
+        "image-orientation:landscape": {
+          "caseCount": 2,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.6576197724933469
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.6576197724933469
+          },
+          "medianLatencyMs": 217.2728545,
+          "p95LatencyMs": 234.94979200000034,
+          "failureClassCounts": {
+            "OCR_RECOGNITION_MISS": 2
+          }
+        },
+        "image-orientation:portrait": {
+          "caseCount": 9,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 2.7755575615628914e-17,
+            "upper": 0.29914504841954404
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 2.7755575615628914e-17,
+            "upper": 0.29914504841954404
+          },
+          "medianLatencyMs": 68.03479100000004,
+          "p95LatencyMs": 551.9697499999993,
+          "failureClassCounts": {
+            "OCR_EMPTY": 2,
+            "OCR_RECOGNITION_MISS": 7
+          }
+        },
+        "region-provenance:human-approved-region": {
+          "caseCount": 11,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "medianLatencyMs": 173.04491700000017,
+          "p95LatencyMs": 551.9697499999993,
+          "failureClassCounts": {
+            "OCR_EMPTY": 2,
+            "OCR_RECOGNITION_MISS": 9
+          }
+        },
+        "truth-source:human-approved-region": {
+          "caseCount": 11,
+          "correctCount": 0,
+          "accuracy": 0,
+          "accuracyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "falseCertaintyCount": 0,
+          "falseCertaintyRate": 0,
+          "falseCertaintyWilson95": {
+            "confidenceLevel": 0.95,
+            "lower": 0,
+            "upper": 0.2588329669680317
+          },
+          "medianLatencyMs": 173.04491700000017,
+          "p95LatencyMs": 551.9697499999993,
+          "failureClassCounts": {
+            "OCR_EMPTY": 2,
+            "OCR_RECOGNITION_MISS": 9
+          }
+        }
+      }
+    },
+    "diff": {
+      "experimentId": "issue-149-bounded-brand-scale-4",
+      "declaredVariable": "scale",
+      "changedVariables": ["scale"],
+      "noOp": false,
+      "behavioralDeltaCount": 8,
+      "correctDelta": 0,
+      "falseCertaintyDelta": 0,
+      "medianLatencyDeltaMs": 93.1783760000003,
+      "p95LatencyDeltaMs": 293.57674999999927,
+      "caseDeltas": [
+        {
+          "caseId": "approved-wine-004",
+          "controlValue": "FAT TORIA",
+          "treatmentValue": "TORIA",
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": true
+        },
+        {
+          "caseId": "approved-wine-005",
+          "controlValue": "GATT",
+          "treatmentValue": "GATT",
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": false
+        },
+        {
+          "caseId": "approved-wine-023",
+          "controlValue": null,
+          "treatmentValue": "Cralirtid",
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": true
+        },
+        {
+          "caseId": "approved-wine-027",
+          "controlValue": null,
+          "treatmentValue": null,
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": true
+        },
+        {
+          "caseId": "approved-wine-031",
+          "controlValue": "enheesO",
+          "treatmentValue": "enheesO",
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": false
+        },
+        {
+          "caseId": "approved-wine-035",
+          "controlValue": "Hokoniites",
+          "treatmentValue": "Aotonit",
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": true
+        },
+        {
+          "caseId": "approved-wine-085",
+          "controlValue": "AH sasaki",
+          "treatmentValue": null,
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_EMPTY",
+          "behavioralChange": true
+        },
+        {
+          "caseId": "approved-wine-091",
+          "controlValue": null,
+          "treatmentValue": null,
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": false
+        },
+        {
+          "caseId": "la-fattoria-rotated",
+          "controlValue": "FAT TORIA",
+          "treatmentValue": "TORIA",
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": true
+        },
+        {
+          "caseId": "wine-multi-artifact-04-region-1",
+          "controlValue": null,
+          "treatmentValue": null,
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_EMPTY",
+          "behavioralChange": true
+        },
+        {
+          "caseId": "wine-multi-artifact-04-region-2",
+          "controlValue": "Colles",
+          "treatmentValue": "Colla",
+          "controlClass": "OCR_RECOGNITION_MISS",
+          "treatmentClass": "OCR_RECOGNITION_MISS",
+          "behavioralChange": true
+        }
+      ],
+      "decision": "KILL",
+      "decisionReason": "Kill criterion hit: no fixed-truth improvement."
+    }
+  }
+}

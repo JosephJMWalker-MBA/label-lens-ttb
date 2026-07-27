@@ -1,0 +1,103 @@
+{
+  "experimentId": "issue-149-bounded-brand-scale-4",
+  "declaredVariable": "scale",
+  "changedVariables": ["scale"],
+  "noOp": false,
+  "behavioralDeltaCount": 8,
+  "correctDelta": 0,
+  "falseCertaintyDelta": 0,
+  "medianLatencyDeltaMs": 93.1783760000003,
+  "p95LatencyDeltaMs": 293.57674999999927,
+  "caseDeltas": [
+    {
+      "caseId": "approved-wine-004",
+      "controlValue": "FAT TORIA",
+      "treatmentValue": "TORIA",
+      "controlClass": "OCR_RECOGNITION_MISS",
+      "treatmentClass": "OCR_RECOGNITION_MISS",
+      "behavioralChange": true
+    },
+    {
+      "caseId": "approved-wine-005",
+      "controlValue": "GATT",
+      "treatmentValue": "GATT",
+      "controlClass": "OCR_RECOGNITION_MISS",
+      "treatmentClass": "OCR_RECOGNITION_MISS",
+      "behavioralChange": false
+    },
+    {
+      "caseId": "approved-wine-023",
+      "controlValue": null,
+      "treatmentValue": "Cralirtid",
+      "controlClass": "OCR_RECOGNITION_MISS",
+      "treatmentClass": "OCR_RECOGNITION_MISS",
+      "behavioralChange": true
+    },
+    {
+      "caseId": "approved-wine-027",
+      "controlValue": null,
+      "treatmentValue": null,
+      "controlClass": "OCR_RECOGNITION_MISS",
+      "treatmentClass": "OCR_RECOGNITION_MISS",
+      "behavioralChange": true
+    },
+    {
+      "caseId": "approved-wine-031",
+      "controlValue": "enheesO",
+      "treatmentValue": "enheesO",
+      "controlClass": "OCR_RECOGNITION_MISS",
+      "treatmentClass": "OCR_RECOGNITION_MISS",
+      "behavioralChange": false
+    },
+    {
+      "caseId": "approved-wine-035",
+      "controlValue": "Hokoniites",
+      "treatmentValue": "Aotonit",
+      "controlClass": "OCR_RECOGNITION_MISS",
+      "treatmentClass": "OCR_RECOGNITION_MISS",
+      "behavioralChange": true
+    },
+    {
+      "caseId": "approved-wine-085",
+      "controlValue": "AH sasaki",
+      "treatmentValue": null,
+      "controlClass": "OCR_RECOGNITION_MISS",
+      "treatmentClass": "OCR_EMPTY",
+      "behavioralChange": true
+    },
+    {
+      "caseId": "approved-wine-091",
+      "controlValue": null,
+      "treatmentValue": null,
+      "controlClass": "OCR_RECOGNITION_MISS",
+      "treatmentClass": "OCR_RECOGNITION_MISS",
+      "behavioralChange": false
+    },
+    {
+      "caseId": "la-fattoria-rotated",
+      "controlValue": "FAT TORIA",
+      "treatmentValue": "TORIA",
+      "controlClass": "OCR_RECOGNITION_MISS",
+      "treatmentClass": "OCR_RECOGNITION_MISS",
+      "behavioralChange": true
+    },
+    {
+      "caseId": "wine-multi-artifact-04-region-1",
+      "controlValue": null,
+      "treatmentValue": null,
+      "controlClass": "OCR_RECOGNITION_MISS",
+      "treatmentClass": "OCR_EMPTY",
+      "behavioralChange": true
+    },
+    {
+      "caseId": "wine-multi-artifact-04-region-2",
+      "controlValue": "Colles",
+      "treatmentValue": "Colla",
+      "controlClass": "OCR_RECOGNITION_MISS",
+      "treatmentClass": "OCR_RECOGNITION_MISS",
+      "behavioralChange": true
+    }
+  ],
+  "decision": "KILL",
+  "decisionReason": "Kill criterion hit: no fixed-truth improvement."
+}
