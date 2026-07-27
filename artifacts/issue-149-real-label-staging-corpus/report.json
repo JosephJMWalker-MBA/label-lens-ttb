@@ -1,0 +1,693 @@
+{
+  "schemaVersion": "issue-149-real-label-staging-corpus.v1",
+  "config": {
+    "productionBehaviorChanged": false,
+    "sourceImagesCommitted": false,
+    "expectedSellerTextUsedAsProductionInput": false,
+    "source": "manual-pr-195-staging-results"
+  },
+  "cases": [
+    {
+      "caseId": "m-cellars",
+      "displayName": "M Cellars",
+      "sourceType": "manual-pr-195-staging",
+      "sourceAvailability": "GOVERNED_FIXTURE_AVAILABLE",
+      "governedFixturePath": {
+        "value": "tests/fixtures/precheck/m-cellars-24205001000905/label-ocr-source.jpeg",
+        "missingReason": null
+      },
+      "stagingEnvironment": "manual PR #195 package-analysis staging",
+      "prNumber": 195,
+      "testDate": "2026-07-27",
+      "expectedSellerBrand": "M CELLARS",
+      "sellerSelectedRegion": {
+        "value": null,
+        "missingReason": "Seller-selected region geometry was not exported from staging."
+      },
+      "provenance": {
+        "source": "PR #195 manual staging conversation and attached local label images",
+        "prNumber": 195,
+        "sourceImagesCommitted": false,
+        "productionBehaviorChanged": false
+      },
+      "missingDataReasons": [
+        "Manual PR #195 staging notes did not record the bounded OCR word list."
+      ],
+      "rawBoundedOcrWords": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record raw bounded OCR words."
+      },
+      "boundedTranscript": {
+        "value": null,
+        "missingReason": "Manual result recorded no coherent full Brand candidate."
+      },
+      "independentTranscript": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record independent Brand transcript."
+      },
+      "selectedCandidate": {
+        "value": null,
+        "missingReason": "Manual result recorded no coherent full Brand candidate."
+      },
+      "candidateList": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record candidate list."
+      },
+      "confidence": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record Brand confidence."
+      },
+      "reliability": "UNRELIABLE",
+      "authorityState": "AMBIGUOUS",
+      "comparisonOutcome": { "value": "SELLER_REGION_INSUFFICIENT", "missingReason": null },
+      "brandPrimaryClassification": "BRAND_OCR_RECOGNITION_MISS",
+      "brandSecondaryNotes": [
+        "Existing synthetic issue: designator-only CELLARS previously outranked fuller M CELLARS.",
+        "Manual staging result did not produce a coherent full Brand candidate."
+      ],
+      "warningStatus": "FAIL",
+      "warningRegionStatus": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record warning region status."
+      },
+      "warningOrientation": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record warning orientation."
+      },
+      "warningAnchorStatus": {
+        "value": null,
+        "missingReason": "Manual result recorded warning failure without a recovered anchor."
+      },
+      "warningRawTranscript": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record warning raw transcript."
+      },
+      "warningAnchoredTranscript": {
+        "value": null,
+        "missingReason": "No anchored warning transcript was recorded."
+      },
+      "warningOcrConfidence": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record warning OCR confidence."
+      },
+      "warningPrimaryClassification": "WARNING_ANCHOR_NOT_FOUND",
+      "alcoholObservation": "NOT_EVALUATED",
+      "alcoholPrimaryClassification": "ALCOHOL_NOT_EVALUATED",
+      "humanReviewRequired": true
+    },
+    {
+      "caseId": "garden-city-beach",
+      "displayName": "Garden City Beach",
+      "sourceType": "manual-pr-195-staging",
+      "sourceAvailability": "UNAVAILABLE_BROWSER_LOCAL",
+      "governedFixturePath": {
+        "value": null,
+        "missingReason": "Manual staging source image was supplied through browser/local temporary state and is not a governed redistributable repository fixture."
+      },
+      "stagingEnvironment": "manual PR #195 package-analysis staging",
+      "prNumber": 195,
+      "testDate": "2026-07-27",
+      "expectedSellerBrand": "GARDEN CITY BEACH",
+      "sellerSelectedRegion": {
+        "value": null,
+        "missingReason": "Seller-selected region geometry was not exported from staging."
+      },
+      "provenance": {
+        "source": "PR #195 manual staging conversation and attached local label images",
+        "prNumber": 195,
+        "sourceImagesCommitted": false,
+        "productionBehaviorChanged": false
+      },
+      "missingDataReasons": [
+        "Manual staging source image was supplied through browser/local temporary state and is not a governed redistributable repository fixture."
+      ],
+      "rawBoundedOcrWords": { "value": ["CARDEN", "CITY", "LBEACK"], "missingReason": null },
+      "boundedTranscript": { "value": "CARDEN CITY LBEACK", "missingReason": null },
+      "independentTranscript": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record independent Brand transcript."
+      },
+      "selectedCandidate": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record selected Brand candidate."
+      },
+      "candidateList": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record candidate list."
+      },
+      "confidence": { "value": 0.55, "missingReason": null },
+      "reliability": "UNRELIABLE",
+      "authorityState": "AMBIGUOUS",
+      "comparisonOutcome": { "value": "SELLER_REGION_INSUFFICIENT", "missingReason": null },
+      "brandPrimaryClassification": "BRAND_OCR_RECOGNITION_MISS",
+      "brandSecondaryNotes": ["Bounded OCR visibly differs from expected Brand before grouping."],
+      "warningStatus": "FAIL",
+      "warningRegionStatus": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record warning region status."
+      },
+      "warningOrientation": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record warning orientation."
+      },
+      "warningAnchorStatus": {
+        "value": null,
+        "missingReason": "Manual result recorded warning failure without a recovered anchor."
+      },
+      "warningRawTranscript": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record warning raw transcript."
+      },
+      "warningAnchoredTranscript": {
+        "value": null,
+        "missingReason": "No anchored warning transcript was recorded."
+      },
+      "warningOcrConfidence": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record warning OCR confidence."
+      },
+      "warningPrimaryClassification": "WARNING_ANCHOR_NOT_FOUND",
+      "alcoholObservation": "NOT_EVALUATED",
+      "alcoholPrimaryClassification": "ALCOHOL_NOT_EVALUATED",
+      "humanReviewRequired": true
+    },
+    {
+      "caseId": "minneapolis",
+      "displayName": "Minneapolis",
+      "sourceType": "manual-pr-195-staging",
+      "sourceAvailability": "UNAVAILABLE_BROWSER_LOCAL",
+      "governedFixturePath": {
+        "value": null,
+        "missingReason": "Manual staging source image was supplied through browser/local temporary state and is not a governed redistributable repository fixture."
+      },
+      "stagingEnvironment": "manual PR #195 package-analysis staging",
+      "prNumber": 195,
+      "testDate": "2026-07-27",
+      "expectedSellerBrand": "MINNEAPOLIS",
+      "sellerSelectedRegion": {
+        "value": null,
+        "missingReason": "Seller-selected region geometry was not exported from staging."
+      },
+      "provenance": {
+        "source": "PR #195 manual staging conversation and attached local label images",
+        "prNumber": 195,
+        "sourceImagesCommitted": false,
+        "productionBehaviorChanged": false
+      },
+      "missingDataReasons": [
+        "Manual staging source image was supplied through browser/local temporary state and is not a governed redistributable repository fixture."
+      ],
+      "rawBoundedOcrWords": { "value": ["MINNEADPOLIS"], "missingReason": null },
+      "boundedTranscript": { "value": "MINNEADPOLIS", "missingReason": null },
+      "independentTranscript": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record independent Brand transcript."
+      },
+      "selectedCandidate": { "value": "MINNEADPOLIS", "missingReason": null },
+      "candidateList": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record candidate list."
+      },
+      "confidence": { "value": 0, "missingReason": null },
+      "reliability": "UNRELIABLE",
+      "authorityState": "AMBIGUOUS",
+      "comparisonOutcome": { "value": "SELLER_REGION_INSUFFICIENT", "missingReason": null },
+      "brandPrimaryClassification": "BRAND_OCR_RECOGNITION_MISS",
+      "brandSecondaryNotes": [
+        "OCR inserted an extra D before grouping/ranking could recover the Brand."
+      ],
+      "warningStatus": "FAIL",
+      "warningRegionStatus": { "value": "FOUND", "missingReason": null },
+      "warningOrientation": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record warning orientation."
+      },
+      "warningAnchorStatus": { "value": "ANCHOR_FOUND_WITH_OCR_ERROR", "missingReason": null },
+      "warningRawTranscript": {
+        "value": "Government Warning example included GENERAL -> GEMERAL",
+        "missingReason": null
+      },
+      "warningAnchoredTranscript": { "value": "GENERAL -> GEMERAL", "missingReason": null },
+      "warningOcrConfidence": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record warning OCR confidence."
+      },
+      "warningPrimaryClassification": "WARNING_OCR_RECOGNITION_MISS",
+      "alcoholObservation": "NOT_EVALUATED",
+      "alcoholPrimaryClassification": "ALCOHOL_NOT_EVALUATED",
+      "humanReviewRequired": true
+    },
+    {
+      "caseId": "luigi-giovanni",
+      "displayName": "Luigi & Giovanni",
+      "sourceType": "manual-pr-195-staging",
+      "sourceAvailability": "UNAVAILABLE_BROWSER_LOCAL",
+      "governedFixturePath": {
+        "value": null,
+        "missingReason": "Manual staging source image was supplied through browser/local temporary state and is not a governed redistributable repository fixture."
+      },
+      "stagingEnvironment": "manual PR #195 package-analysis staging",
+      "prNumber": 195,
+      "testDate": "2026-07-27",
+      "expectedSellerBrand": "LUIGI & GIOVANNI",
+      "sellerSelectedRegion": {
+        "value": null,
+        "missingReason": "Seller-selected region geometry was not exported from staging."
+      },
+      "provenance": {
+        "source": "PR #195 manual staging conversation and attached local label images",
+        "prNumber": 195,
+        "sourceImagesCommitted": false,
+        "productionBehaviorChanged": false
+      },
+      "missingDataReasons": [
+        "Manual staging source image was supplied through browser/local temporary state and is not a governed redistributable repository fixture."
+      ],
+      "rawBoundedOcrWords": { "value": ["fli?", "GIANNI"], "missingReason": null },
+      "boundedTranscript": { "value": "fli? GIANNI", "missingReason": null },
+      "independentTranscript": { "value": "VANNI", "missingReason": null },
+      "selectedCandidate": { "value": "GIANNI", "missingReason": null },
+      "candidateList": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record candidate list."
+      },
+      "confidence": { "value": 0.05, "missingReason": null },
+      "reliability": "UNRELIABLE",
+      "authorityState": "AMBIGUOUS",
+      "comparisonOutcome": { "value": "SELLER_REGION_INSUFFICIENT", "missingReason": null },
+      "brandPrimaryClassification": "BRAND_OCR_RECOGNITION_MISS",
+      "brandSecondaryNotes": [
+        "Selected-region and independent reads both lost LUIGI and disagreed on GIOVANNI."
+      ],
+      "warningStatus": "FAIL",
+      "warningRegionStatus": { "value": "CONTAMINATED_INTERLEAVED", "missingReason": null },
+      "warningOrientation": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record warning orientation."
+      },
+      "warningAnchorStatus": { "value": "ANCHOR_CONTAMINATED", "missingReason": null },
+      "warningRawTranscript": {
+        "value": "Government Warning region was contaminated/interleaved.",
+        "missingReason": null
+      },
+      "warningAnchoredTranscript": {
+        "value": null,
+        "missingReason": "No clean anchored warning transcript was recorded."
+      },
+      "warningOcrConfidence": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record warning OCR confidence."
+      },
+      "warningPrimaryClassification": "WARNING_REGION_CONTAMINATED",
+      "alcoholObservation": "NOT_OBSERVED",
+      "alcoholPrimaryClassification": "ALCOHOL_NOT_EVALUATED",
+      "humanReviewRequired": true
+    },
+    {
+      "caseId": "the-golden-girls",
+      "displayName": "The Golden Girls",
+      "sourceType": "manual-pr-195-staging",
+      "sourceAvailability": "UNAVAILABLE_BROWSER_LOCAL",
+      "governedFixturePath": {
+        "value": null,
+        "missingReason": "Manual staging source image was supplied through browser/local temporary state and is not a governed redistributable repository fixture."
+      },
+      "stagingEnvironment": "manual PR #195 package-analysis staging",
+      "prNumber": 195,
+      "testDate": "2026-07-27",
+      "expectedSellerBrand": "THE GOLDEN GIRLS",
+      "sellerSelectedRegion": {
+        "value": null,
+        "missingReason": "Seller-selected region geometry was not exported from staging."
+      },
+      "provenance": {
+        "source": "PR #195 manual staging conversation and attached local label images",
+        "prNumber": 195,
+        "sourceImagesCommitted": false,
+        "productionBehaviorChanged": false
+      },
+      "missingDataReasons": [
+        "Manual staging source image was supplied through browser/local temporary state and is not a governed redistributable repository fixture."
+      ],
+      "rawBoundedOcrWords": {
+        "value": ["mR,", "HEL”", "XT", "0]", "AUTEN", "TE"],
+        "missingReason": null
+      },
+      "boundedTranscript": { "value": "mR, HEL” XT 0] AUTEN TE", "missingReason": null },
+      "independentTranscript": { "value": "N Gy A001", "missingReason": null },
+      "selectedCandidate": { "value": "AUTEN TE", "missingReason": null },
+      "candidateList": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record candidate list."
+      },
+      "confidence": { "value": 0, "missingReason": null },
+      "reliability": "UNRELIABLE",
+      "authorityState": "AMBIGUOUS",
+      "comparisonOutcome": { "value": "SELLER_REGION_INSUFFICIENT", "missingReason": null },
+      "brandPrimaryClassification": "BRAND_OCR_RECOGNITION_MISS",
+      "brandSecondaryNotes": [
+        "Selected-region and independent reads were both unrelated to the expected Brand."
+      ],
+      "warningStatus": "FAIL",
+      "warningRegionStatus": { "value": "CONTAMINATED_INTERLEAVED", "missingReason": null },
+      "warningOrientation": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record warning orientation."
+      },
+      "warningAnchorStatus": { "value": "ANCHOR_CONTAMINATED", "missingReason": null },
+      "warningRawTranscript": {
+        "value": "Government Warning region contained unrelated interleaved text.",
+        "missingReason": null
+      },
+      "warningAnchoredTranscript": {
+        "value": null,
+        "missingReason": "No clean anchored warning transcript was recorded."
+      },
+      "warningOcrConfidence": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record warning OCR confidence."
+      },
+      "warningPrimaryClassification": "WARNING_REGION_CONTAMINATED",
+      "alcoholObservation": "NOT_OBSERVED",
+      "alcoholPrimaryClassification": "ALCOHOL_NOT_EVALUATED",
+      "humanReviewRequired": true
+    },
+    {
+      "caseId": "hubert-lamy",
+      "displayName": "Hubert Lamy",
+      "sourceType": "manual-pr-195-staging",
+      "sourceAvailability": "UNAVAILABLE_BROWSER_LOCAL",
+      "governedFixturePath": {
+        "value": null,
+        "missingReason": "Manual staging source image was supplied through browser/local temporary state and is not a governed redistributable repository fixture."
+      },
+      "stagingEnvironment": "manual PR #195 package-analysis staging",
+      "prNumber": 195,
+      "testDate": "2026-07-27",
+      "expectedSellerBrand": "HUBERT LAMY",
+      "sellerSelectedRegion": {
+        "value": null,
+        "missingReason": "Seller-selected region geometry was not exported from staging."
+      },
+      "provenance": {
+        "source": "PR #195 manual staging conversation and attached local label images",
+        "prNumber": 195,
+        "sourceImagesCommitted": false,
+        "productionBehaviorChanged": false
+      },
+      "missingDataReasons": [
+        "Manual staging source image was supplied through browser/local temporary state and is not a governed redistributable repository fixture."
+      ],
+      "rawBoundedOcrWords": { "value": ["Sacnt-Aubin"], "missingReason": null },
+      "boundedTranscript": { "value": "Sacnt-Aubin", "missingReason": null },
+      "independentTranscript": {
+        "value": "CHASSAGNE-MONTRACHET La Goujonne",
+        "missingReason": null
+      },
+      "selectedCandidate": { "value": "Sacnt-Aubin", "missingReason": null },
+      "candidateList": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record candidate list."
+      },
+      "confidence": { "value": 0.28, "missingReason": null },
+      "reliability": "UNRELIABLE",
+      "authorityState": "AMBIGUOUS",
+      "comparisonOutcome": { "value": "SELLER_REGION_INSUFFICIENT", "missingReason": null },
+      "brandPrimaryClassification": "BRAND_REGION_WRONG",
+      "brandSecondaryNotes": [
+        "Manual staging indicated Brand localization and/or OCR recognition failure.",
+        "Bounded OCR targeted Saint-Aubin rather than Hubert Lamy."
+      ],
+      "warningStatus": "FAIL",
+      "warningRegionStatus": { "value": "NOT_FOUND", "missingReason": null },
+      "warningOrientation": {
+        "value": null,
+        "missingReason": "No warning source region was detected."
+      },
+      "warningAnchorStatus": { "value": "ANCHOR_NOT_FOUND", "missingReason": null },
+      "warningRawTranscript": {
+        "value": null,
+        "missingReason": "No warning source region or transcript was detected."
+      },
+      "warningAnchoredTranscript": {
+        "value": null,
+        "missingReason": "No warning source region or transcript was detected."
+      },
+      "warningOcrConfidence": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record warning OCR confidence."
+      },
+      "warningPrimaryClassification": "WARNING_REGION_NOT_FOUND",
+      "alcoholObservation": "NOT_OBSERVED",
+      "alcoholPrimaryClassification": "ALCOHOL_NOT_EVALUATED",
+      "humanReviewRequired": true
+    },
+    {
+      "caseId": "aphrodite",
+      "displayName": "Aphrodite",
+      "sourceType": "manual-pr-195-staging",
+      "sourceAvailability": "UNAVAILABLE_BROWSER_LOCAL",
+      "governedFixturePath": {
+        "value": null,
+        "missingReason": "Manual staging source image was supplied through browser/local temporary state and is not a governed redistributable repository fixture."
+      },
+      "stagingEnvironment": "manual PR #195 package-analysis staging",
+      "prNumber": 195,
+      "testDate": "2026-07-27",
+      "expectedSellerBrand": "APHRODITE",
+      "sellerSelectedRegion": {
+        "value": null,
+        "missingReason": "Seller-selected region geometry was not exported from staging."
+      },
+      "provenance": {
+        "source": "PR #195 manual staging conversation and attached local label images",
+        "prNumber": 195,
+        "sourceImagesCommitted": false,
+        "productionBehaviorChanged": false
+      },
+      "missingDataReasons": [
+        "Manual staging source image was supplied through browser/local temporary state and is not a governed redistributable repository fixture."
+      ],
+      "rawBoundedOcrWords": { "value": ["APHRODITE"], "missingReason": null },
+      "boundedTranscript": { "value": "APHRODITE", "missingReason": null },
+      "independentTranscript": { "value": "APHRODITE", "missingReason": null },
+      "selectedCandidate": { "value": "APHRODITE", "missingReason": null },
+      "candidateList": { "value": ["APHRODITE"], "missingReason": null },
+      "confidence": { "value": 0.91, "missingReason": null },
+      "reliability": "UNRELIABLE",
+      "authorityState": "AMBIGUOUS",
+      "comparisonOutcome": { "value": "SELLER_REGION_INSUFFICIENT", "missingReason": null },
+      "brandPrimaryClassification": "BRAND_CORRECT_READ_CONSERVATIVE_GATE",
+      "brandSecondaryNotes": [
+        "Correct OCR read stayed conservative under authority/reliability gating."
+      ],
+      "warningStatus": "FAIL",
+      "warningRegionStatus": { "value": "NOT_FOUND", "missingReason": null },
+      "warningOrientation": {
+        "value": null,
+        "missingReason": "No warning source region was detected."
+      },
+      "warningAnchorStatus": { "value": "ANCHOR_NOT_FOUND", "missingReason": null },
+      "warningRawTranscript": {
+        "value": null,
+        "missingReason": "No warning source region or transcript was detected."
+      },
+      "warningAnchoredTranscript": {
+        "value": null,
+        "missingReason": "No warning source region or transcript was detected."
+      },
+      "warningOcrConfidence": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record warning OCR confidence."
+      },
+      "warningPrimaryClassification": "WARNING_REGION_NOT_FOUND",
+      "alcoholObservation": "NOT_OBSERVED",
+      "alcoholPrimaryClassification": "ALCOHOL_NOT_EVALUATED",
+      "humanReviewRequired": true
+    },
+    {
+      "caseId": "christmas-hayride",
+      "displayName": "Christmas Hayride",
+      "sourceType": "manual-pr-195-staging",
+      "sourceAvailability": "UNAVAILABLE_BROWSER_LOCAL",
+      "governedFixturePath": {
+        "value": null,
+        "missingReason": "Manual staging source image was supplied through browser/local temporary state and is not a governed redistributable repository fixture."
+      },
+      "stagingEnvironment": "manual PR #195 package-analysis staging",
+      "prNumber": 195,
+      "testDate": "2026-07-27",
+      "expectedSellerBrand": "CHRISTMAS HAYRIDE",
+      "sellerSelectedRegion": {
+        "value": null,
+        "missingReason": "Seller-selected region geometry was not exported from staging."
+      },
+      "provenance": {
+        "source": "PR #195 manual staging conversation and attached local label images",
+        "prNumber": 195,
+        "sourceImagesCommitted": false,
+        "productionBehaviorChanged": false
+      },
+      "missingDataReasons": [
+        "Manual staging source image was supplied through browser/local temporary state and is not a governed redistributable repository fixture."
+      ],
+      "rawBoundedOcrWords": { "value": ["Chistuas", "Gari"], "missingReason": null },
+      "boundedTranscript": { "value": "Chistuas Gari", "missingReason": null },
+      "independentTranscript": { "value": "Bam il", "missingReason": null },
+      "selectedCandidate": { "value": "Chistuas Gari", "missingReason": null },
+      "candidateList": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record candidate list."
+      },
+      "confidence": { "value": 0.32, "missingReason": null },
+      "reliability": "UNRELIABLE",
+      "authorityState": "AMBIGUOUS",
+      "comparisonOutcome": { "value": "SELLER_REGION_INSUFFICIENT", "missingReason": null },
+      "brandPrimaryClassification": "BRAND_OCR_RECOGNITION_MISS",
+      "brandSecondaryNotes": ["Bounded OCR did not preserve CHRISTMAS HAYRIDE before ranking."],
+      "warningStatus": "PASS",
+      "warningRegionStatus": { "value": "FOUND", "missingReason": null },
+      "warningOrientation": {
+        "value": null,
+        "missingReason": "Manual PR #195 staging notes did not record warning orientation."
+      },
+      "warningAnchorStatus": { "value": "EXACT_TOKEN_MATCH", "missingReason": null },
+      "warningRawTranscript": {
+        "value": "Exact token match to anchored Government Warning text.",
+        "missingReason": null
+      },
+      "warningAnchoredTranscript": {
+        "value": "Exact token match to anchored Government Warning text.",
+        "missingReason": null
+      },
+      "warningOcrConfidence": { "value": 0.89, "missingReason": null },
+      "warningPrimaryClassification": "WARNING_CORRECT_PASS",
+      "alcoholObservation": "NOT_OBSERVED",
+      "alcoholPrimaryClassification": "ALCOHOL_NOT_EVALUATED",
+      "humanReviewRequired": true
+    }
+  ],
+  "metrics": {
+    "brand": {
+      "totalCases": 8,
+      "evaluableCases": 8,
+      "sourceUnavailable": 7,
+      "regionMissingOrWrong": 1,
+      "ocrRecognitionMiss": 6,
+      "groupingMiss": 0,
+      "generationFilteringRankingMiss": 0,
+      "correctReadConservativeGate": 1,
+      "wrongReliableRead": 0,
+      "correctReliableRead": 0,
+      "humanReviewRequired": 8,
+      "classificationCounts": {
+        "BRAND_SOURCE_IMAGE_UNAVAILABLE": 0,
+        "BRAND_REGION_MISSING": 0,
+        "BRAND_REGION_WRONG": 1,
+        "BRAND_OCR_EMPTY": 0,
+        "BRAND_OCR_RECOGNITION_MISS": 6,
+        "BRAND_TOKEN_GROUPING_MISS": 0,
+        "BRAND_LINE_GROUPING_MISS": 0,
+        "BRAND_CANDIDATE_GENERATION_MISS": 0,
+        "BRAND_FILTERING_MISS": 0,
+        "BRAND_RANKING_MISS": 0,
+        "BRAND_CORRECT_READ_CONSERVATIVE_GATE": 1,
+        "BRAND_WRONG_RELIABLE_READ": 0,
+        "BRAND_CORRECT_RELIABLE_READ": 0,
+        "BRAND_INSUFFICIENT_SOURCE_IMAGE": 0,
+        "BRAND_NOT_EVALUATED": 0
+      }
+    },
+    "warning": {
+      "totalCases": 8,
+      "evaluableCases": 8,
+      "regionNotFound": 2,
+      "regionWrong": 0,
+      "regionContaminated": 2,
+      "orientationMiss": 0,
+      "anchorMiss": 2,
+      "ocrRecognitionMiss": 1,
+      "exactMismatch": 0,
+      "falsePass": 0,
+      "correctPass": 1,
+      "needsReview": 7,
+      "fail": 7,
+      "classificationCounts": {
+        "WARNING_SOURCE_IMAGE_UNAVAILABLE": 0,
+        "WARNING_REGION_NOT_FOUND": 2,
+        "WARNING_REGION_WRONG": 0,
+        "WARNING_REGION_CONTAMINATED": 2,
+        "WARNING_ORIENTATION_MISS": 0,
+        "WARNING_ANCHOR_NOT_FOUND": 2,
+        "WARNING_ANCHOR_WRONG": 0,
+        "WARNING_OCR_RECOGNITION_MISS": 1,
+        "WARNING_EXACT_TEXT_MISMATCH": 0,
+        "WARNING_FALSE_PASS": 0,
+        "WARNING_CORRECT_PASS": 1,
+        "WARNING_NOT_PRESENT": 0,
+        "WARNING_NOT_EVALUATED": 0
+      }
+    },
+    "alcohol": {
+      "totalCases": 8,
+      "evaluableCases": 0,
+      "regionNotSearched": 0,
+      "regionNotFound": 0,
+      "ocrMiss": 0,
+      "parseMiss": 0,
+      "selectorMiss": 0,
+      "correctRead": 0,
+      "wrongReliableRead": 0,
+      "notEvaluated": 8,
+      "classificationCounts": {
+        "ALCOHOL_SOURCE_IMAGE_UNAVAILABLE": 0,
+        "ALCOHOL_REGION_NOT_SEARCHED": 0,
+        "ALCOHOL_REGION_NOT_FOUND": 0,
+        "ALCOHOL_OCR_EMPTY": 0,
+        "ALCOHOL_OCR_RECOGNITION_MISS": 0,
+        "ALCOHOL_PARSE_MISS": 0,
+        "ALCOHOL_SELECTOR_MISS": 0,
+        "ALCOHOL_WRONG_RELIABLE_READ": 0,
+        "ALCOHOL_CORRECT_READ": 0,
+        "ALCOHOL_NOT_PRESENT": 0,
+        "ALCOHOL_NOT_EVALUATED": 8
+      }
+    },
+    "summary": {
+      "mostFrequentBrandFailureClass": "BRAND_OCR_RECOGNITION_MISS",
+      "mostFrequentWarningFailureClass": "WARNING_ANCHOR_NOT_FOUND",
+      "mostFrequentAlcoholFailureClass": "ALCOHOL_NOT_EVALUATED",
+      "missingGovernedSourceImages": 7,
+      "failuresAttributableToSelectionRanking": 0,
+      "failuresAttributableToRecognitionLocalization": 7,
+      "failuresAttributableOnlyToConservativeAuthority": 1,
+      "falseReliableBrandReads": 0,
+      "falseGovernmentWarningPasses": 0,
+      "falseReliableAlcoholReads": 0
+    }
+  },
+  "analysis": {
+    "brandGroupingRankingDominant": false,
+    "rawOcrRecognitionDominantBrandFailure": true,
+    "warningDominantFailureMode": "WARNING_ANCHOR_NOT_FOUND",
+    "alcoholPerformanceEvaluable": false,
+    "recommendedNextExperiment": "CORPUS_EXPANSION_REQUIRED",
+    "recommendationReason": "Most real-label staging cases are metadata-only, so the next governed step is importing redistributable source images before tuning OCR behavior.",
+    "deferredExperiments": [
+      "BRAND_BOUNDED_PREPROCESSING",
+      "BRAND_SCALE_EXPERIMENT",
+      "WARNING_REGION_LOCALIZATION",
+      "WARNING_REGION_DECONTAMINATION",
+      "ALCOHOL_RECOVERY_TRIGGER",
+      "ALCOHOL_RESELECTION"
+    ],
+    "answers": {
+      "brandGroupingDominance": "Brand grouping/ranking is not the dominant real-label failure in this staging corpus.",
+      "brandRecognitionDominance": "Raw OCR recognition is the dominant Brand failure class.",
+      "warningFailureMode": "Government Warning failures split across missing anchors, contaminated regions, missing regions, and OCR transcription; exact comparison is proven only by the Christmas Hayride pass.",
+      "alcoholEvaluability": "Alcohol performance cannot be evaluated from the current staging evidence because every Alcohol result is metadata-only or not evaluated.",
+      "nextExperiment": "Most real-label staging cases are metadata-only, so the next governed step is importing redistributable source images before tuning OCR behavior.",
+      "deferred": "OCR tuning, warning tuning, and Alcohol recovery experiments should be deferred until governed real-label source images are available for most cases."
+    }
+  }
+}
