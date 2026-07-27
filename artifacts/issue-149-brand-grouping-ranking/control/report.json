@@ -1,0 +1,2958 @@
+{
+  "schemaVersion": "issue-149-brand-grouping-ranking.v1",
+  "arm": "control",
+  "config": {
+    "singleVariableChanged": "Control uses current production Brand grouping/ranking.",
+    "treatmentEnabledInProduction": false,
+    "ocrEngineChanged": false,
+    "cropGeometryChanged": false,
+    "paddingChanged": false,
+    "clippingChanged": false,
+    "scaleFactorChanged": false,
+    "preprocessingChanged": false,
+    "psmChanged": false,
+    "orientationPolicyChanged": false,
+    "confidenceThresholdsChanged": false,
+    "authorityGateChanged": false,
+    "sellerDeclarationUsedForRanking": false,
+    "alcoholBehaviorChanged": false,
+    "governmentWarningBehaviorChanged": false,
+    "twoStreamComparisonChanged": false
+  },
+  "metrics": {
+    "overall": {
+      "caseCount": 9,
+      "rawOcrTruthRecall": 0.7778,
+      "candidateListTruthRecall": 0.5556,
+      "top3TruthRecall": 0.4444,
+      "top1NormalizedAccuracy": 0.4444,
+      "exactTop1Accuracy": 0,
+      "authorityStateHistogram": { "AMBIGUOUS": 5, "OBSERVED": 3, "NOT_OBSERVED": 1 },
+      "correctTop1ButConservativeCount": 2,
+      "rankingMisses": 0,
+      "groupingMisses": 2,
+      "filteringMisses": 0,
+      "wrongAcceptedCandidates": 1,
+      "falseReliableReadRate": 0.1111,
+      "readableRawOcrTruthRecall": 0.875,
+      "medianBoundedOcrLatencyMs": 213.5361670000002,
+      "p95BoundedOcrLatencyMs": 307.35970900000007,
+      "medianSelectionLatencyMs": 0.19345900000007532,
+      "p95SelectionLatencyMs": 1.9291670000000067,
+      "failureClassHistogram": {
+        "CORRECT_TOP1_CONSERVATIVE_STATE": 2,
+        "CANDIDATE_GENERATION_MISS": 2,
+        "OCR_MISS": 1,
+        "WRONG_ACCEPTED_CANDIDATE": 1,
+        "CORRECT_READ": 2,
+        "INSUFFICIENT_SOURCE_IMAGE": 1
+      }
+    },
+    "bySlice": {
+      "cleanTypography": {
+        "caseCount": 6,
+        "rawOcrTruthRecall": 1,
+        "candidateListTruthRecall": 0.6667,
+        "top3TruthRecall": 0.5,
+        "top1NormalizedAccuracy": 0.5,
+        "exactTop1Accuracy": 0,
+        "authorityStateHistogram": { "AMBIGUOUS": 3, "OBSERVED": 3 },
+        "correctTop1ButConservativeCount": 1,
+        "rankingMisses": 0,
+        "groupingMisses": 2,
+        "filteringMisses": 0,
+        "wrongAcceptedCandidates": 1,
+        "falseReliableReadRate": 0.1667,
+        "readableRawOcrTruthRecall": 1,
+        "medianBoundedOcrLatencyMs": 214.05370850000008,
+        "p95BoundedOcrLatencyMs": 247.42616700000008,
+        "medianSelectionLatencyMs": 0.17477099999996426,
+        "p95SelectionLatencyMs": 1.9291670000000067,
+        "failureClassHistogram": {
+          "CORRECT_TOP1_CONSERVATIVE_STATE": 1,
+          "CANDIDATE_GENERATION_MISS": 2,
+          "WRONG_ACCEPTED_CANDIDATE": 1,
+          "CORRECT_READ": 2
+        }
+      },
+      "stylizedTypography": {
+        "caseCount": 1,
+        "rawOcrTruthRecall": 0,
+        "candidateListTruthRecall": 0,
+        "top3TruthRecall": 0,
+        "top1NormalizedAccuracy": 0,
+        "exactTop1Accuracy": 0,
+        "authorityStateHistogram": { "AMBIGUOUS": 1 },
+        "correctTop1ButConservativeCount": 0,
+        "rankingMisses": 0,
+        "groupingMisses": 0,
+        "filteringMisses": 0,
+        "wrongAcceptedCandidates": 0,
+        "falseReliableReadRate": 0,
+        "readableRawOcrTruthRecall": 0,
+        "medianBoundedOcrLatencyMs": 307.35970900000007,
+        "p95BoundedOcrLatencyMs": 307.35970900000007,
+        "medianSelectionLatencyMs": 0.8162500000000819,
+        "p95SelectionLatencyMs": 0.8162500000000819,
+        "failureClassHistogram": { "OCR_MISS": 1 }
+      },
+      "multiLineBrand": {
+        "caseCount": 2,
+        "rawOcrTruthRecall": 1,
+        "candidateListTruthRecall": 0,
+        "top3TruthRecall": 0,
+        "top1NormalizedAccuracy": 0,
+        "exactTop1Accuracy": 0,
+        "authorityStateHistogram": { "AMBIGUOUS": 2 },
+        "correctTop1ButConservativeCount": 0,
+        "rankingMisses": 0,
+        "groupingMisses": 2,
+        "filteringMisses": 0,
+        "wrongAcceptedCandidates": 0,
+        "falseReliableReadRate": 0,
+        "readableRawOcrTruthRecall": 1,
+        "medianBoundedOcrLatencyMs": 236.4770625,
+        "p95BoundedOcrLatencyMs": 247.42616700000008,
+        "medianSelectionLatencyMs": 0.9227500000000646,
+        "p95SelectionLatencyMs": 1.7150410000001557,
+        "failureClassHistogram": { "CANDIDATE_GENERATION_MISS": 2 }
+      },
+      "lowResolutionBrand": {
+        "caseCount": 1,
+        "rawOcrTruthRecall": 1,
+        "candidateListTruthRecall": 1,
+        "top3TruthRecall": 1,
+        "top1NormalizedAccuracy": 1,
+        "exactTop1Accuracy": 0,
+        "authorityStateHistogram": { "AMBIGUOUS": 1 },
+        "correctTop1ButConservativeCount": 1,
+        "rankingMisses": 0,
+        "groupingMisses": 0,
+        "filteringMisses": 0,
+        "wrongAcceptedCandidates": 0,
+        "falseReliableReadRate": 0,
+        "readableRawOcrTruthRecall": 1,
+        "medianBoundedOcrLatencyMs": 65.16212500000006,
+        "p95BoundedOcrLatencyMs": 65.16212500000006,
+        "medianSelectionLatencyMs": 0.19345900000007532,
+        "p95SelectionLatencyMs": 0.19345900000007532,
+        "failureClassHistogram": { "CORRECT_TOP1_CONSERVATIVE_STATE": 1 }
+      },
+      "adjacentProductText": {
+        "caseCount": 1,
+        "rawOcrTruthRecall": 1,
+        "candidateListTruthRecall": 1,
+        "top3TruthRecall": 1,
+        "top1NormalizedAccuracy": 1,
+        "exactTop1Accuracy": 0,
+        "authorityStateHistogram": { "OBSERVED": 1 },
+        "correctTop1ButConservativeCount": 0,
+        "rankingMisses": 0,
+        "groupingMisses": 0,
+        "filteringMisses": 0,
+        "wrongAcceptedCandidates": 0,
+        "falseReliableReadRate": 0,
+        "readableRawOcrTruthRecall": 1,
+        "medianBoundedOcrLatencyMs": 214.57124999999996,
+        "p95BoundedOcrLatencyMs": 214.57124999999996,
+        "medianSelectionLatencyMs": 0.1040419999999358,
+        "p95SelectionLatencyMs": 0.1040419999999358,
+        "failureClassHistogram": { "CORRECT_READ": 1 }
+      },
+      "adjacentLocationText": {
+        "caseCount": 1,
+        "rawOcrTruthRecall": 1,
+        "candidateListTruthRecall": 1,
+        "top3TruthRecall": 1,
+        "top1NormalizedAccuracy": 1,
+        "exactTop1Accuracy": 0,
+        "authorityStateHistogram": { "OBSERVED": 1 },
+        "correctTop1ButConservativeCount": 0,
+        "rankingMisses": 0,
+        "groupingMisses": 0,
+        "filteringMisses": 0,
+        "wrongAcceptedCandidates": 0,
+        "falseReliableReadRate": 0,
+        "readableRawOcrTruthRecall": 1,
+        "medianBoundedOcrLatencyMs": 213.5361670000002,
+        "p95BoundedOcrLatencyMs": 213.5361670000002,
+        "medianSelectionLatencyMs": 0.09999999999990905,
+        "p95SelectionLatencyMs": 0.09999999999990905,
+        "failureClassHistogram": { "CORRECT_READ": 1 }
+      }
+    }
+  },
+  "cases": [
+    {
+      "caseId": "brand-minneapolis-synthetic",
+      "arm": "control",
+      "expectedBrand": "Minneapolis",
+      "slices": ["cleanTypography"],
+      "rawBoundedOcrWords": ["MINNEAPOLIS"],
+      "rawBoundedOcrTranscript": "MINNEAPOLIS",
+      "normalizedTranscript": "minneapolis",
+      "generatedTokenGroups": [["MINNEAPOLIS"]],
+      "generatedLineGroups": ["MINNEAPOLIS"],
+      "allCandidatesBeforeFiltering": [
+        {
+          "rawText": "MINNEAPOLIS",
+          "cleanedValue": "MINNEAPOLIS",
+          "assembly": "whole-line",
+          "lineIndexes": [0],
+          "kept": true,
+          "filterReason": "candidate-plausible"
+        }
+      ],
+      "allCandidatesAfterFiltering": [
+        {
+          "rawText": "MINNEAPOLIS",
+          "cleanedValue": "MINNEAPOLIS",
+          "assembly": "whole-line",
+          "lineIndexes": [0],
+          "kept": true,
+          "filterReason": "candidate-plausible",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.7857142857142857,
+            "structure": 0.25,
+            "ocrEvidenceScore": 0.95,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.7961111111111111,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 4.595976190476191
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 4.595976190476191 },
+              { "id": "prominence", "direction": "desc", "value": 80 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.95 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "minneapolis" }
+            ],
+            "rankingScore": 4.595976190476191,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.7857142857142857,
+                "contribution": 1.2571428571428571,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.25, "contribution": 0.3, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.95,
+                "contribution": 0.95,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.7961111111111111,
+                "contribution": 0.23883333333333331,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "selected"
+        }
+      ],
+      "candidateScores": [
+        {
+          "value": "MINNEAPOLIS",
+          "rawText": "MINNEAPOLIS",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.7857142857142857,
+            "structure": 0.25,
+            "ocrEvidenceScore": 0.95,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.7961111111111111,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 4.595976190476191
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 4.595976190476191 },
+              { "id": "prominence", "direction": "desc", "value": 80 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.95 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "minneapolis" }
+            ],
+            "rankingScore": 4.595976190476191,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.7857142857142857,
+                "contribution": 1.2571428571428571,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.25, "contribution": 0.3, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.95,
+                "contribution": 0.95,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.7961111111111111,
+                "contribution": 0.23883333333333331,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "selected"
+        }
+      ],
+      "top3": [
+        {
+          "value": "MINNEAPOLIS",
+          "decision": "selected",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.7857142857142857,
+            "structure": 0.25,
+            "ocrEvidenceScore": 0.95,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.7961111111111111,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 4.595976190476191
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 4.595976190476191 },
+              { "id": "prominence", "direction": "desc", "value": 80 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.95 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "minneapolis" }
+            ],
+            "rankingScore": 4.595976190476191,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.7857142857142857,
+                "contribution": 1.2571428571428571,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.25, "contribution": 0.3, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.95,
+                "contribution": 0.95,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.7961111111111111,
+                "contribution": 0.23883333333333331,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          }
+        }
+      ],
+      "selectedLikelyBrand": "MINNEAPOLIS",
+      "authorityState": "AMBIGUOUS",
+      "reliabilityState": "UNRELIABLE",
+      "reliabilityReason": "Bounded Brand OCR did not produce a high-confidence OBSERVED value under the unchanged authority and reliability gates.",
+      "expectedTruthInRawOcr": true,
+      "expectedTruthInAnyCandidate": true,
+      "expectedTruthInTop3": true,
+      "expectedTruthRankedFirst": true,
+      "authorityGateAlonePreventedObserved": true,
+      "primaryFailureClass": "CORRECT_TOP1_CONSERVATIVE_STATE",
+      "falseReliableRead": false,
+      "exactTop1Correct": false,
+      "normalizedTop1Correct": true,
+      "cropGeometrySha256": "c391dc3d117c6f8e7f00de5c2cea2410f119029314692b5123b8c71e2bac88e7",
+      "finalOcrInputSha256": "f249747205f89d85ca7be1a7a083c4b55056a3df1796cf0861dda7e022cf9730",
+      "rawOcrWordsSha256": "c052a840aeda0f716cf152d67053c25954c67bedd550d240354d84a2adf0b6f0",
+      "cropGeometryMatchesControl": true,
+      "finalOcrInputMatchesControl": true,
+      "rawOcrOutputMatchesControl": true,
+      "preprocessingMatchesControl": true,
+      "pageSegMode": 11,
+      "preprocessingSteps": ["crop:seller-region", "grayscale", "normalise", "scale:3"],
+      "latencyMs": { "boundedOcr": 193.15379100000007, "selection": 1.9291670000000067 },
+      "artifacts": {
+        "boundedCrop": "representative-bounded-crops/control/brand-minneapolis-synthetic.png",
+        "finalOcrInput": "representative-ocr-inputs/control/brand-minneapolis-synthetic.png",
+        "transcript": "transcripts/control/brand-minneapolis-synthetic.txt"
+      }
+    },
+    {
+      "caseId": "brand-garden-city-beach-synthetic",
+      "arm": "control",
+      "expectedBrand": "Garden City Beach",
+      "slices": ["cleanTypography", "multiLineBrand"],
+      "rawBoundedOcrWords": ["GARDEN", "CITY", "BEACH"],
+      "rawBoundedOcrTranscript": "GARDEN CITY BEACH",
+      "normalizedTranscript": "garden city beach",
+      "generatedTokenGroups": [["GARDEN"], ["CITY"], ["BEACH"]],
+      "generatedLineGroups": ["GARDEN CITY", "BEACH"],
+      "allCandidatesBeforeFiltering": [
+        {
+          "rawText": "GARDEN CITY",
+          "cleanedValue": "GARDEN CITY",
+          "assembly": "whole-line",
+          "lineIndexes": [0],
+          "kept": true,
+          "filterReason": "candidate-plausible"
+        },
+        {
+          "rawText": "BEACH",
+          "cleanedValue": "BEACH",
+          "assembly": "whole-line",
+          "lineIndexes": [1],
+          "kept": true,
+          "filterReason": "candidate-plausible"
+        }
+      ],
+      "allCandidatesAfterFiltering": [
+        {
+          "rawText": "GARDEN CITY",
+          "cleanedValue": "GARDEN CITY",
+          "assembly": "whole-line",
+          "lineIndexes": [0],
+          "kept": true,
+          "filterReason": "candidate-plausible",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.7142857142857143,
+            "structure": 0.75,
+            "ocrEvidenceScore": 0.95,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.7463541666666667,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 5.066763392857142
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 5.066763392857142 },
+              { "id": "prominence", "direction": "desc", "value": 74 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.95 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "gardencity" }
+            ],
+            "rankingScore": 5.066763392857142,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.7142857142857143,
+                "contribution": 1.142857142857143,
+                "direction": "benefit"
+              },
+              {
+                "id": "structure",
+                "value": 0.75,
+                "contribution": 0.8999999999999999,
+                "direction": "benefit"
+              },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.95,
+                "contribution": 0.95,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.7463541666666667,
+                "contribution": 0.22390625,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "selected"
+        },
+        {
+          "rawText": "BEACH",
+          "cleanedValue": "BEACH",
+          "assembly": "whole-line",
+          "lineIndexes": [1],
+          "kept": true,
+          "filterReason": "candidate-plausible",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.35714285714285715,
+            "structure": 0.25,
+            "ocrEvidenceScore": 0.96,
+            "prominence": 0.9864864864864865,
+            "area": 0.4804979398002654,
+            "centrality": 0.87265625,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 3.62071339949792
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 3.62071339949792 },
+              { "id": "prominence", "direction": "desc", "value": 73 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.96 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "beach" }
+            ],
+            "rankingScore": 3.62071339949792,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.35714285714285715,
+                "contribution": 0.5714285714285715,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.25, "contribution": 0.3, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.96,
+                "contribution": 0.96,
+                "direction": "benefit"
+              },
+              {
+                "id": "prominence",
+                "value": 0.9864864864864865,
+                "contribution": 0.7891891891891892,
+                "direction": "benefit"
+              },
+              {
+                "id": "area",
+                "value": 0.4804979398002654,
+                "contribution": 0.28829876388015924,
+                "direction": "benefit"
+              },
+              {
+                "id": "centrality",
+                "value": 0.87265625,
+                "contribution": 0.261796875,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "ambiguous-rival"
+        }
+      ],
+      "candidateScores": [
+        {
+          "value": "GARDEN CITY",
+          "rawText": "GARDEN CITY",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.7142857142857143,
+            "structure": 0.75,
+            "ocrEvidenceScore": 0.95,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.7463541666666667,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 5.066763392857142
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 5.066763392857142 },
+              { "id": "prominence", "direction": "desc", "value": 74 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.95 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "gardencity" }
+            ],
+            "rankingScore": 5.066763392857142,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.7142857142857143,
+                "contribution": 1.142857142857143,
+                "direction": "benefit"
+              },
+              {
+                "id": "structure",
+                "value": 0.75,
+                "contribution": 0.8999999999999999,
+                "direction": "benefit"
+              },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.95,
+                "contribution": 0.95,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.7463541666666667,
+                "contribution": 0.22390625,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "selected"
+        },
+        {
+          "value": "BEACH",
+          "rawText": "BEACH",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.35714285714285715,
+            "structure": 0.25,
+            "ocrEvidenceScore": 0.96,
+            "prominence": 0.9864864864864865,
+            "area": 0.4804979398002654,
+            "centrality": 0.87265625,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 3.62071339949792
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 3.62071339949792 },
+              { "id": "prominence", "direction": "desc", "value": 73 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.96 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "beach" }
+            ],
+            "rankingScore": 3.62071339949792,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.35714285714285715,
+                "contribution": 0.5714285714285715,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.25, "contribution": 0.3, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.96,
+                "contribution": 0.96,
+                "direction": "benefit"
+              },
+              {
+                "id": "prominence",
+                "value": 0.9864864864864865,
+                "contribution": 0.7891891891891892,
+                "direction": "benefit"
+              },
+              {
+                "id": "area",
+                "value": 0.4804979398002654,
+                "contribution": 0.28829876388015924,
+                "direction": "benefit"
+              },
+              {
+                "id": "centrality",
+                "value": 0.87265625,
+                "contribution": 0.261796875,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "ambiguous-rival"
+        }
+      ],
+      "top3": [
+        {
+          "value": "GARDEN CITY",
+          "decision": "selected",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.7142857142857143,
+            "structure": 0.75,
+            "ocrEvidenceScore": 0.95,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.7463541666666667,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 5.066763392857142
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 5.066763392857142 },
+              { "id": "prominence", "direction": "desc", "value": 74 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.95 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "gardencity" }
+            ],
+            "rankingScore": 5.066763392857142,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.7142857142857143,
+                "contribution": 1.142857142857143,
+                "direction": "benefit"
+              },
+              {
+                "id": "structure",
+                "value": 0.75,
+                "contribution": 0.8999999999999999,
+                "direction": "benefit"
+              },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.95,
+                "contribution": 0.95,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.7463541666666667,
+                "contribution": 0.22390625,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          }
+        },
+        {
+          "value": "BEACH",
+          "decision": "ambiguous-rival",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.35714285714285715,
+            "structure": 0.25,
+            "ocrEvidenceScore": 0.96,
+            "prominence": 0.9864864864864865,
+            "area": 0.4804979398002654,
+            "centrality": 0.87265625,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 3.62071339949792
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 3.62071339949792 },
+              { "id": "prominence", "direction": "desc", "value": 73 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.96 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "beach" }
+            ],
+            "rankingScore": 3.62071339949792,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.35714285714285715,
+                "contribution": 0.5714285714285715,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.25, "contribution": 0.3, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.96,
+                "contribution": 0.96,
+                "direction": "benefit"
+              },
+              {
+                "id": "prominence",
+                "value": 0.9864864864864865,
+                "contribution": 0.7891891891891892,
+                "direction": "benefit"
+              },
+              {
+                "id": "area",
+                "value": 0.4804979398002654,
+                "contribution": 0.28829876388015924,
+                "direction": "benefit"
+              },
+              {
+                "id": "centrality",
+                "value": 0.87265625,
+                "contribution": 0.261796875,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          }
+        }
+      ],
+      "selectedLikelyBrand": "GARDEN CITY",
+      "authorityState": "AMBIGUOUS",
+      "reliabilityState": "UNRELIABLE",
+      "reliabilityReason": "Bounded Brand OCR did not produce a high-confidence OBSERVED value under the unchanged authority and reliability gates.",
+      "expectedTruthInRawOcr": true,
+      "expectedTruthInAnyCandidate": false,
+      "expectedTruthInTop3": false,
+      "expectedTruthRankedFirst": false,
+      "authorityGateAlonePreventedObserved": false,
+      "primaryFailureClass": "CANDIDATE_GENERATION_MISS",
+      "falseReliableRead": false,
+      "exactTop1Correct": false,
+      "normalizedTop1Correct": false,
+      "cropGeometrySha256": "9bb9db6a07c4ae8f9a16b30085c9b5b072e951d7736adefe2b5841a6cbbb595b",
+      "finalOcrInputSha256": "5741d04cd224ea2b2901974ec5a72552e04073aa6d88c8ab5dd02cc8160b6c5d",
+      "rawOcrWordsSha256": "b4a5574d2730bc1b2571bff5a4a97d7dc2047b00a15f7dc6ea4a6d6f0ba8272c",
+      "cropGeometryMatchesControl": true,
+      "finalOcrInputMatchesControl": true,
+      "rawOcrOutputMatchesControl": true,
+      "preprocessingMatchesControl": true,
+      "pageSegMode": 11,
+      "preprocessingSteps": ["crop:seller-region", "grayscale", "normalise", "scale:3"],
+      "latencyMs": { "boundedOcr": 225.5279579999999, "selection": 1.7150410000001557 },
+      "artifacts": {
+        "boundedCrop": "representative-bounded-crops/control/brand-garden-city-beach-synthetic.png",
+        "finalOcrInput": "representative-ocr-inputs/control/brand-garden-city-beach-synthetic.png",
+        "transcript": "transcripts/control/brand-garden-city-beach-synthetic.txt"
+      }
+    },
+    {
+      "caseId": "brand-golden-girls-approved-region",
+      "arm": "control",
+      "expectedBrand": "The Golden Girls",
+      "slices": ["stylizedTypography"],
+      "rawBoundedOcrWords": ["EL", "J", "—", "i", "\\", "i", "0]", "ANSE", "WE"],
+      "rawBoundedOcrTranscript": "EL \\ J — i i 0] ANSE WE",
+      "normalizedTranscript": "el j i i 0 anse we",
+      "generatedTokenGroups": [
+        ["EL"],
+        ["J"],
+        ["—"],
+        ["i"],
+        ["\\"],
+        ["i"],
+        ["0]"],
+        ["ANSE"],
+        ["WE"]
+      ],
+      "generatedLineGroups": ["EL", "J — i", "\\", "i", "0]", "ANSE WE"],
+      "allCandidatesBeforeFiltering": [
+        {
+          "rawText": "EL",
+          "cleanedValue": "EL",
+          "assembly": "whole-line",
+          "lineIndexes": [0],
+          "kept": false,
+          "filterReason": "low-information-fragment"
+        },
+        {
+          "rawText": "J — i",
+          "cleanedValue": "J i",
+          "assembly": "whole-line",
+          "lineIndexes": [1],
+          "kept": false,
+          "filterReason": "low-information-fragment"
+        },
+        {
+          "rawText": "\\",
+          "cleanedValue": null,
+          "assembly": "whole-line",
+          "lineIndexes": [2],
+          "kept": false,
+          "filterReason": "no-letters-or-too-short"
+        },
+        {
+          "rawText": "i",
+          "cleanedValue": "i",
+          "assembly": "whole-line",
+          "lineIndexes": [3],
+          "kept": false,
+          "filterReason": "no-letters-or-too-short"
+        },
+        {
+          "rawText": "0]",
+          "cleanedValue": "0",
+          "assembly": "whole-line",
+          "lineIndexes": [4],
+          "kept": false,
+          "filterReason": "no-letters-or-too-short"
+        },
+        {
+          "rawText": "ANSE WE",
+          "cleanedValue": "ANSE WE",
+          "assembly": "whole-line",
+          "lineIndexes": [5],
+          "kept": true,
+          "filterReason": "candidate-plausible"
+        }
+      ],
+      "allCandidatesAfterFiltering": [
+        {
+          "rawText": "ANSE WE",
+          "cleanedValue": "ANSE WE",
+          "assembly": "whole-line",
+          "lineIndexes": [5],
+          "kept": true,
+          "filterReason": "candidate-plausible",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.42857142857142855,
+            "structure": 0.5,
+            "ocrEvidenceScore": 0.205,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.7784601301575285,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0.5,
+            "residualPenalty": 0.5,
+            "total": 1.9742523247615444
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 1.9742523247615444 },
+              { "id": "prominence", "direction": "desc", "value": 9 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.205 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "ansewe" }
+            ],
+            "rankingScore": 1.9742523247615444,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.42857142857142855,
+                "contribution": 0.6857142857142857,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.5, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.205,
+                "contribution": 0.205,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.7784601301575285,
+                "contribution": 0.23353803904725853,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0.5,
+                "contribution": 0.9,
+                "direction": "penalty"
+              },
+              {
+                "id": "residual-penalty",
+                "value": 0.5,
+                "contribution": 0.7,
+                "direction": "penalty"
+              }
+            ]
+          },
+          "decision": "selected"
+        }
+      ],
+      "candidateScores": [
+        {
+          "value": "ANSE WE",
+          "rawText": "ANSE WE",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.42857142857142855,
+            "structure": 0.5,
+            "ocrEvidenceScore": 0.205,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.7784601301575285,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0.5,
+            "residualPenalty": 0.5,
+            "total": 1.9742523247615444
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 1.9742523247615444 },
+              { "id": "prominence", "direction": "desc", "value": 9 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.205 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "ansewe" }
+            ],
+            "rankingScore": 1.9742523247615444,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.42857142857142855,
+                "contribution": 0.6857142857142857,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.5, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.205,
+                "contribution": 0.205,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.7784601301575285,
+                "contribution": 0.23353803904725853,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0.5,
+                "contribution": 0.9,
+                "direction": "penalty"
+              },
+              {
+                "id": "residual-penalty",
+                "value": 0.5,
+                "contribution": 0.7,
+                "direction": "penalty"
+              }
+            ]
+          },
+          "decision": "selected"
+        }
+      ],
+      "top3": [
+        {
+          "value": "ANSE WE",
+          "decision": "selected",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.42857142857142855,
+            "structure": 0.5,
+            "ocrEvidenceScore": 0.205,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.7784601301575285,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0.5,
+            "residualPenalty": 0.5,
+            "total": 1.9742523247615444
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 1.9742523247615444 },
+              { "id": "prominence", "direction": "desc", "value": 9 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.205 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "ansewe" }
+            ],
+            "rankingScore": 1.9742523247615444,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.42857142857142855,
+                "contribution": 0.6857142857142857,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.5, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.205,
+                "contribution": 0.205,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.7784601301575285,
+                "contribution": 0.23353803904725853,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0.5,
+                "contribution": 0.9,
+                "direction": "penalty"
+              },
+              {
+                "id": "residual-penalty",
+                "value": 0.5,
+                "contribution": 0.7,
+                "direction": "penalty"
+              }
+            ]
+          }
+        }
+      ],
+      "selectedLikelyBrand": "ANSE WE",
+      "authorityState": "AMBIGUOUS",
+      "reliabilityState": "UNRELIABLE",
+      "reliabilityReason": "Bounded Brand OCR did not produce a high-confidence OBSERVED value under the unchanged authority and reliability gates.",
+      "expectedTruthInRawOcr": false,
+      "expectedTruthInAnyCandidate": false,
+      "expectedTruthInTop3": false,
+      "expectedTruthRankedFirst": false,
+      "authorityGateAlonePreventedObserved": false,
+      "primaryFailureClass": "OCR_MISS",
+      "falseReliableRead": false,
+      "exactTop1Correct": false,
+      "normalizedTop1Correct": false,
+      "cropGeometrySha256": "dd6b93cc54e6c9bda1a8204b6ed235fbac962e324f0c507a730f6d2ef55550d5",
+      "finalOcrInputSha256": "bdfccd478dc924ee5e5adc5608849c560bf990cdd01cb896216dbba8826aea33",
+      "rawOcrWordsSha256": "91e23763eb067051cbcdc6c8286877b2c3a15741c5f1f9f997765dbdfee2a8e8",
+      "cropGeometryMatchesControl": true,
+      "finalOcrInputMatchesControl": true,
+      "rawOcrOutputMatchesControl": true,
+      "preprocessingMatchesControl": true,
+      "pageSegMode": 11,
+      "preprocessingSteps": ["crop:seller-region", "grayscale", "normalise", "scale:3"],
+      "latencyMs": { "boundedOcr": 307.35970900000007, "selection": 0.8162500000000819 },
+      "artifacts": {
+        "boundedCrop": "representative-bounded-crops/control/brand-golden-girls-approved-region.png",
+        "finalOcrInput": "representative-ocr-inputs/control/brand-golden-girls-approved-region.png",
+        "transcript": "transcripts/control/brand-golden-girls-approved-region.txt"
+      }
+    },
+    {
+      "caseId": "brand-arandano-synthetic-lowres",
+      "arm": "control",
+      "expectedBrand": "Arandano",
+      "slices": ["lowResolutionBrand"],
+      "rawBoundedOcrWords": ["ARANDANO"],
+      "rawBoundedOcrTranscript": "ARANDANO",
+      "normalizedTranscript": "arandano",
+      "generatedTokenGroups": [["ARANDANO"]],
+      "generatedLineGroups": ["ARANDANO"],
+      "allCandidatesBeforeFiltering": [
+        {
+          "rawText": "ARANDANO",
+          "cleanedValue": "ARANDANO",
+          "assembly": "whole-line",
+          "lineIndexes": [0],
+          "kept": true,
+          "filterReason": "candidate-plausible"
+        }
+      ],
+      "allCandidatesAfterFiltering": [
+        {
+          "rawText": "ARANDANO",
+          "cleanedValue": "ARANDANO",
+          "assembly": "whole-line",
+          "lineIndexes": [0],
+          "kept": true,
+          "filterReason": "candidate-plausible",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.5714285714285714,
+            "structure": 0.25,
+            "ocrEvidenceScore": 0.92,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.835,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 4.234785714285715
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 4.234785714285715 },
+              { "id": "prominence", "direction": "desc", "value": 47 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.92 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "arandano" }
+            ],
+            "rankingScore": 4.234785714285715,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.5714285714285714,
+                "contribution": 0.9142857142857143,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.25, "contribution": 0.3, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.92,
+                "contribution": 0.92,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.835,
+                "contribution": 0.2505,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "selected"
+        }
+      ],
+      "candidateScores": [
+        {
+          "value": "ARANDANO",
+          "rawText": "ARANDANO",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.5714285714285714,
+            "structure": 0.25,
+            "ocrEvidenceScore": 0.92,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.835,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 4.234785714285715
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 4.234785714285715 },
+              { "id": "prominence", "direction": "desc", "value": 47 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.92 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "arandano" }
+            ],
+            "rankingScore": 4.234785714285715,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.5714285714285714,
+                "contribution": 0.9142857142857143,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.25, "contribution": 0.3, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.92,
+                "contribution": 0.92,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.835,
+                "contribution": 0.2505,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "selected"
+        }
+      ],
+      "top3": [
+        {
+          "value": "ARANDANO",
+          "decision": "selected",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.5714285714285714,
+            "structure": 0.25,
+            "ocrEvidenceScore": 0.92,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.835,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 4.234785714285715
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 4.234785714285715 },
+              { "id": "prominence", "direction": "desc", "value": 47 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.92 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "arandano" }
+            ],
+            "rankingScore": 4.234785714285715,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.5714285714285714,
+                "contribution": 0.9142857142857143,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.25, "contribution": 0.3, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.92,
+                "contribution": 0.92,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.835,
+                "contribution": 0.2505,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          }
+        }
+      ],
+      "selectedLikelyBrand": "ARANDANO",
+      "authorityState": "AMBIGUOUS",
+      "reliabilityState": "UNRELIABLE",
+      "reliabilityReason": "Bounded Brand OCR did not produce a high-confidence OBSERVED value under the unchanged authority and reliability gates.",
+      "expectedTruthInRawOcr": true,
+      "expectedTruthInAnyCandidate": true,
+      "expectedTruthInTop3": true,
+      "expectedTruthRankedFirst": true,
+      "authorityGateAlonePreventedObserved": true,
+      "primaryFailureClass": "CORRECT_TOP1_CONSERVATIVE_STATE",
+      "falseReliableRead": false,
+      "exactTop1Correct": false,
+      "normalizedTop1Correct": true,
+      "cropGeometrySha256": "718344e42dd6e86558d0220fa7a35757a612ca50f15b65fb83091d63bbc546b7",
+      "finalOcrInputSha256": "c151a7a01b5752b699c15f6e8215e9b9b753c3597f54b5959055625d22738244",
+      "rawOcrWordsSha256": "6ba69e3ac122d731093c1254e8c3d750d165a44d1d9e2f0d36c229de65618fa6",
+      "cropGeometryMatchesControl": true,
+      "finalOcrInputMatchesControl": true,
+      "rawOcrOutputMatchesControl": true,
+      "preprocessingMatchesControl": true,
+      "pageSegMode": 11,
+      "preprocessingSteps": ["crop:seller-region", "grayscale", "normalise", "scale:3"],
+      "latencyMs": { "boundedOcr": 65.16212500000006, "selection": 0.19345900000007532 },
+      "artifacts": {
+        "boundedCrop": "representative-bounded-crops/control/brand-arandano-synthetic-lowres.png",
+        "finalOcrInput": "representative-ocr-inputs/control/brand-arandano-synthetic-lowres.png",
+        "transcript": "transcripts/control/brand-arandano-synthetic-lowres.txt"
+      }
+    },
+    {
+      "caseId": "brand-m-cellars-clean-designator",
+      "arm": "control",
+      "expectedBrand": "M Cellars",
+      "slices": ["cleanTypography"],
+      "rawBoundedOcrWords": ["M", "CELLARS"],
+      "rawBoundedOcrTranscript": "M CELLARS",
+      "normalizedTranscript": "m cellars",
+      "generatedTokenGroups": [["M"], ["CELLARS"]],
+      "generatedLineGroups": ["M CELLARS"],
+      "allCandidatesBeforeFiltering": [
+        {
+          "rawText": "M CELLARS",
+          "cleanedValue": "M CELLARS",
+          "assembly": "whole-line",
+          "lineIndexes": [0],
+          "kept": true,
+          "filterReason": "candidate-positive"
+        },
+        {
+          "rawText": "M",
+          "cleanedValue": "M",
+          "assembly": "line-window",
+          "lineIndexes": [0],
+          "kept": false,
+          "filterReason": "no-letters-or-too-short"
+        },
+        {
+          "rawText": "CELLARS",
+          "cleanedValue": "CELLARS",
+          "assembly": "line-window",
+          "lineIndexes": [0],
+          "kept": true,
+          "filterReason": "candidate-positive"
+        }
+      ],
+      "allCandidatesAfterFiltering": [
+        {
+          "rawText": "M CELLARS",
+          "cleanedValue": "M CELLARS",
+          "assembly": "whole-line",
+          "lineIndexes": [0],
+          "kept": true,
+          "filterReason": "candidate-positive",
+          "score": {
+            "positiveSignal": 1,
+            "meaningfulChars": 0.5714285714285714,
+            "structure": 0.75,
+            "ocrEvidenceScore": 0.94,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.8202380952380952,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0.5,
+            "residualPenalty": 0.5,
+            "total": 5.250357142857142
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 5.250357142857142 },
+              { "id": "prominence", "direction": "desc", "value": 108 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.94 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "mcellars" }
+            ],
+            "rankingScore": 5.250357142857142,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 1, "contribution": 2, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.5714285714285714,
+                "contribution": 0.9142857142857143,
+                "direction": "benefit"
+              },
+              {
+                "id": "structure",
+                "value": 0.75,
+                "contribution": 0.8999999999999999,
+                "direction": "benefit"
+              },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.94,
+                "contribution": 0.94,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.8202380952380952,
+                "contribution": 0.24607142857142855,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0.5,
+                "contribution": 0.9,
+                "direction": "penalty"
+              },
+              {
+                "id": "residual-penalty",
+                "value": 0.5,
+                "contribution": 0.7,
+                "direction": "penalty"
+              }
+            ]
+          }
+        },
+        {
+          "rawText": "CELLARS",
+          "cleanedValue": "CELLARS",
+          "assembly": "line-window",
+          "lineIndexes": [0],
+          "kept": true,
+          "filterReason": "candidate-positive",
+          "score": {
+            "positiveSignal": 1,
+            "meaningfulChars": 0.5,
+            "structure": 0.5,
+            "ocrEvidenceScore": 0.95,
+            "prominence": 1,
+            "area": 0.7866666666666666,
+            "centrality": 0.7313492063492064,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 6.291404761904762
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 6.291404761904762 },
+              { "id": "prominence", "direction": "desc", "value": 108 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.95 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "cellars" }
+            ],
+            "rankingScore": 6.291404761904762,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 1, "contribution": 2, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.5,
+                "contribution": 0.8,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.5, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.95,
+                "contribution": 0.95,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              {
+                "id": "area",
+                "value": 0.7866666666666666,
+                "contribution": 0.472,
+                "direction": "benefit"
+              },
+              {
+                "id": "centrality",
+                "value": 0.7313492063492064,
+                "contribution": 0.2194047619047619,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "selected"
+        }
+      ],
+      "candidateScores": [
+        {
+          "value": "M CELLARS",
+          "rawText": "M CELLARS",
+          "score": {
+            "positiveSignal": 1,
+            "meaningfulChars": 0.5714285714285714,
+            "structure": 0.75,
+            "ocrEvidenceScore": 0.94,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.8202380952380952,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0.5,
+            "residualPenalty": 0.5,
+            "total": 5.250357142857142
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 5.250357142857142 },
+              { "id": "prominence", "direction": "desc", "value": 108 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.94 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "mcellars" }
+            ],
+            "rankingScore": 5.250357142857142,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 1, "contribution": 2, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.5714285714285714,
+                "contribution": 0.9142857142857143,
+                "direction": "benefit"
+              },
+              {
+                "id": "structure",
+                "value": 0.75,
+                "contribution": 0.8999999999999999,
+                "direction": "benefit"
+              },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.94,
+                "contribution": 0.94,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.8202380952380952,
+                "contribution": 0.24607142857142855,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0.5,
+                "contribution": 0.9,
+                "direction": "penalty"
+              },
+              {
+                "id": "residual-penalty",
+                "value": 0.5,
+                "contribution": 0.7,
+                "direction": "penalty"
+              }
+            ]
+          }
+        },
+        {
+          "value": "CELLARS",
+          "rawText": "CELLARS",
+          "score": {
+            "positiveSignal": 1,
+            "meaningfulChars": 0.5,
+            "structure": 0.5,
+            "ocrEvidenceScore": 0.95,
+            "prominence": 1,
+            "area": 0.7866666666666666,
+            "centrality": 0.7313492063492064,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 6.291404761904762
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 6.291404761904762 },
+              { "id": "prominence", "direction": "desc", "value": 108 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.95 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "cellars" }
+            ],
+            "rankingScore": 6.291404761904762,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 1, "contribution": 2, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.5,
+                "contribution": 0.8,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.5, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.95,
+                "contribution": 0.95,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              {
+                "id": "area",
+                "value": 0.7866666666666666,
+                "contribution": 0.472,
+                "direction": "benefit"
+              },
+              {
+                "id": "centrality",
+                "value": 0.7313492063492064,
+                "contribution": 0.2194047619047619,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "selected"
+        }
+      ],
+      "top3": [
+        {
+          "value": "CELLARS",
+          "decision": "selected",
+          "score": {
+            "positiveSignal": 1,
+            "meaningfulChars": 0.5,
+            "structure": 0.5,
+            "ocrEvidenceScore": 0.95,
+            "prominence": 1,
+            "area": 0.7866666666666666,
+            "centrality": 0.7313492063492064,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 6.291404761904762
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 6.291404761904762 },
+              { "id": "prominence", "direction": "desc", "value": 108 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.95 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "cellars" }
+            ],
+            "rankingScore": 6.291404761904762,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 1, "contribution": 2, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.5,
+                "contribution": 0.8,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.5, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.95,
+                "contribution": 0.95,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              {
+                "id": "area",
+                "value": 0.7866666666666666,
+                "contribution": 0.472,
+                "direction": "benefit"
+              },
+              {
+                "id": "centrality",
+                "value": 0.7313492063492064,
+                "contribution": 0.2194047619047619,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          }
+        }
+      ],
+      "selectedLikelyBrand": "CELLARS",
+      "authorityState": "OBSERVED",
+      "reliabilityState": "RELIABLE",
+      "reliabilityReason": "Bounded Brand OCR produced an OBSERVED value above the unchanged reliability floor.",
+      "expectedTruthInRawOcr": true,
+      "expectedTruthInAnyCandidate": true,
+      "expectedTruthInTop3": false,
+      "expectedTruthRankedFirst": false,
+      "authorityGateAlonePreventedObserved": false,
+      "primaryFailureClass": "WRONG_ACCEPTED_CANDIDATE",
+      "falseReliableRead": true,
+      "exactTop1Correct": false,
+      "normalizedTop1Correct": false,
+      "cropGeometrySha256": "bc9a0ecef0e802edd655e2145d53bdfff7e21cafab82b1e7d7d608728bd13595",
+      "finalOcrInputSha256": "c526e3ed530dd6462f3782b3c1ebbe2437f82bb8b82ef3123291d2bfc7c847be",
+      "rawOcrWordsSha256": "c11db36fa488638cc403b09d8b33b32af0ab2419b4526dc1b0bbb1b129acea82",
+      "cropGeometryMatchesControl": true,
+      "finalOcrInputMatchesControl": true,
+      "rawOcrOutputMatchesControl": true,
+      "preprocessingMatchesControl": true,
+      "pageSegMode": 11,
+      "preprocessingSteps": ["crop:seller-region", "grayscale", "normalise", "scale:3"],
+      "latencyMs": { "boundedOcr": 177.64941699999986, "selection": 0.21908299999995506 },
+      "artifacts": {
+        "boundedCrop": "representative-bounded-crops/control/brand-m-cellars-clean-designator.png",
+        "finalOcrInput": "representative-ocr-inputs/control/brand-m-cellars-clean-designator.png",
+        "transcript": "transcripts/control/brand-m-cellars-clean-designator.txt"
+      }
+    },
+    {
+      "caseId": "brand-north-star-multiline-synthetic",
+      "arm": "control",
+      "expectedBrand": "North Star",
+      "slices": ["cleanTypography", "multiLineBrand"],
+      "rawBoundedOcrWords": ["NORTH", "STAR"],
+      "rawBoundedOcrTranscript": "NORTH STAR",
+      "normalizedTranscript": "north star",
+      "generatedTokenGroups": [["NORTH"], ["STAR"]],
+      "generatedLineGroups": ["NORTH", "STAR"],
+      "allCandidatesBeforeFiltering": [
+        {
+          "rawText": "NORTH",
+          "cleanedValue": "NORTH",
+          "assembly": "whole-line",
+          "lineIndexes": [0],
+          "kept": true,
+          "filterReason": "candidate-plausible"
+        },
+        {
+          "rawText": "STAR",
+          "cleanedValue": "STAR",
+          "assembly": "whole-line",
+          "lineIndexes": [1],
+          "kept": true,
+          "filterReason": "candidate-plausible"
+        }
+      ],
+      "allCandidatesAfterFiltering": [
+        {
+          "rawText": "NORTH",
+          "cleanedValue": "NORTH",
+          "assembly": "whole-line",
+          "lineIndexes": [0],
+          "kept": true,
+          "filterReason": "candidate-plausible",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.35714285714285715,
+            "structure": 0.25,
+            "ocrEvidenceScore": 0.96,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.8508814703675919,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 3.9366930125388495
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 3.9366930125388495 },
+              { "id": "prominence", "direction": "desc", "value": 106 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.96 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "north" }
+            ],
+            "rankingScore": 3.9366930125388495,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.35714285714285715,
+                "contribution": 0.5714285714285715,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.25, "contribution": 0.3, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.96,
+                "contribution": 0.96,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.8508814703675919,
+                "contribution": 0.2552644411102776,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "selected"
+        },
+        {
+          "rawText": "STAR",
+          "cleanedValue": "STAR",
+          "assembly": "whole-line",
+          "lineIndexes": [1],
+          "kept": true,
+          "filterReason": "candidate-plausible",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.2857142857142857,
+            "structure": 0.25,
+            "ocrEvidenceScore": 0.96,
+            "prominence": 1,
+            "area": 0.7221269296740995,
+            "centrality": 0.8121342835708927,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 3.6440593000185846
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 3.6440593000185846 },
+              { "id": "prominence", "direction": "desc", "value": 106 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.96 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "star" }
+            ],
+            "rankingScore": 3.6440593000185846,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.2857142857142857,
+                "contribution": 0.45714285714285713,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.25, "contribution": 0.3, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.96,
+                "contribution": 0.96,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              {
+                "id": "area",
+                "value": 0.7221269296740995,
+                "contribution": 0.4332761578044597,
+                "direction": "benefit"
+              },
+              {
+                "id": "centrality",
+                "value": 0.8121342835708927,
+                "contribution": 0.24364028507126778,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "ambiguous-rival"
+        }
+      ],
+      "candidateScores": [
+        {
+          "value": "NORTH",
+          "rawText": "NORTH",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.35714285714285715,
+            "structure": 0.25,
+            "ocrEvidenceScore": 0.96,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.8508814703675919,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 3.9366930125388495
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 3.9366930125388495 },
+              { "id": "prominence", "direction": "desc", "value": 106 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.96 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "north" }
+            ],
+            "rankingScore": 3.9366930125388495,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.35714285714285715,
+                "contribution": 0.5714285714285715,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.25, "contribution": 0.3, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.96,
+                "contribution": 0.96,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.8508814703675919,
+                "contribution": 0.2552644411102776,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "selected"
+        },
+        {
+          "value": "STAR",
+          "rawText": "STAR",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.2857142857142857,
+            "structure": 0.25,
+            "ocrEvidenceScore": 0.96,
+            "prominence": 1,
+            "area": 0.7221269296740995,
+            "centrality": 0.8121342835708927,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 3.6440593000185846
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 3.6440593000185846 },
+              { "id": "prominence", "direction": "desc", "value": 106 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.96 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "star" }
+            ],
+            "rankingScore": 3.6440593000185846,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.2857142857142857,
+                "contribution": 0.45714285714285713,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.25, "contribution": 0.3, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.96,
+                "contribution": 0.96,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              {
+                "id": "area",
+                "value": 0.7221269296740995,
+                "contribution": 0.4332761578044597,
+                "direction": "benefit"
+              },
+              {
+                "id": "centrality",
+                "value": 0.8121342835708927,
+                "contribution": 0.24364028507126778,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "ambiguous-rival"
+        }
+      ],
+      "top3": [
+        {
+          "value": "NORTH",
+          "decision": "selected",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.35714285714285715,
+            "structure": 0.25,
+            "ocrEvidenceScore": 0.96,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.8508814703675919,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 3.9366930125388495
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 3.9366930125388495 },
+              { "id": "prominence", "direction": "desc", "value": 106 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.96 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "north" }
+            ],
+            "rankingScore": 3.9366930125388495,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.35714285714285715,
+                "contribution": 0.5714285714285715,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.25, "contribution": 0.3, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.96,
+                "contribution": 0.96,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.8508814703675919,
+                "contribution": 0.2552644411102776,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          }
+        },
+        {
+          "value": "STAR",
+          "decision": "ambiguous-rival",
+          "score": {
+            "positiveSignal": 0,
+            "meaningfulChars": 0.2857142857142857,
+            "structure": 0.25,
+            "ocrEvidenceScore": 0.96,
+            "prominence": 1,
+            "area": 0.7221269296740995,
+            "centrality": 0.8121342835708927,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 3.6440593000185846
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 3.6440593000185846 },
+              { "id": "prominence", "direction": "desc", "value": 106 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.96 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "star" }
+            ],
+            "rankingScore": 3.6440593000185846,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 0, "contribution": 0, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.2857142857142857,
+                "contribution": 0.45714285714285713,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 0.25, "contribution": 0.3, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.96,
+                "contribution": 0.96,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              {
+                "id": "area",
+                "value": 0.7221269296740995,
+                "contribution": 0.4332761578044597,
+                "direction": "benefit"
+              },
+              {
+                "id": "centrality",
+                "value": 0.8121342835708927,
+                "contribution": 0.24364028507126778,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          }
+        }
+      ],
+      "selectedLikelyBrand": "NORTH",
+      "authorityState": "AMBIGUOUS",
+      "reliabilityState": "UNRELIABLE",
+      "reliabilityReason": "Bounded Brand OCR did not produce a high-confidence OBSERVED value under the unchanged authority and reliability gates.",
+      "expectedTruthInRawOcr": true,
+      "expectedTruthInAnyCandidate": false,
+      "expectedTruthInTop3": false,
+      "expectedTruthRankedFirst": false,
+      "authorityGateAlonePreventedObserved": false,
+      "primaryFailureClass": "CANDIDATE_GENERATION_MISS",
+      "falseReliableRead": false,
+      "exactTop1Correct": false,
+      "normalizedTop1Correct": false,
+      "cropGeometrySha256": "388d46a3fced5206bffbd04a6bea810641f55d8c111ae2a157fd1c1d51f521e9",
+      "finalOcrInputSha256": "4bbbda0b74924e989998b184bd51fcd2a8ac38e224aa8c4962fdccd3c73502c5",
+      "rawOcrWordsSha256": "b034d82263582bdb3b06e752b98b67da5e167ec344d918d40fa42572f37604b9",
+      "cropGeometryMatchesControl": true,
+      "finalOcrInputMatchesControl": true,
+      "rawOcrOutputMatchesControl": true,
+      "preprocessingMatchesControl": true,
+      "pageSegMode": 11,
+      "preprocessingSteps": ["crop:seller-region", "grayscale", "normalise", "scale:3"],
+      "latencyMs": { "boundedOcr": 247.42616700000008, "selection": 0.13045899999997346 },
+      "artifacts": {
+        "boundedCrop": "representative-bounded-crops/control/brand-north-star-multiline-synthetic.png",
+        "finalOcrInput": "representative-ocr-inputs/control/brand-north-star-multiline-synthetic.png",
+        "transcript": "transcripts/control/brand-north-star-multiline-synthetic.txt"
+      }
+    },
+    {
+      "caseId": "brand-ridge-cellars-adjacent-product",
+      "arm": "control",
+      "expectedBrand": "Ridge Cellars",
+      "slices": ["cleanTypography", "adjacentProductText"],
+      "rawBoundedOcrWords": ["RIDGE", "CELLARS", "CABERNET", "SAUVIGNON"],
+      "rawBoundedOcrTranscript": "RIDGE CELLARS CABERNET SAUVIGNON",
+      "normalizedTranscript": "ridge cellars cabernet sauvignon",
+      "generatedTokenGroups": [["RIDGE"], ["CELLARS"], ["CABERNET"], ["SAUVIGNON"]],
+      "generatedLineGroups": ["RIDGE CELLARS", "CABERNET SAUVIGNON"],
+      "allCandidatesBeforeFiltering": [
+        {
+          "rawText": "RIDGE CELLARS",
+          "cleanedValue": "RIDGE CELLARS",
+          "assembly": "whole-line",
+          "lineIndexes": [0],
+          "kept": true,
+          "filterReason": "candidate-positive"
+        },
+        {
+          "rawText": "CABERNET SAUVIGNON",
+          "cleanedValue": "CABERNET SAUVIGNON",
+          "assembly": "whole-line",
+          "lineIndexes": [1],
+          "kept": false,
+          "filterReason": "varietal-or-designation"
+        }
+      ],
+      "allCandidatesAfterFiltering": [
+        {
+          "rawText": "RIDGE CELLARS",
+          "cleanedValue": "RIDGE CELLARS",
+          "assembly": "whole-line",
+          "lineIndexes": [0],
+          "kept": true,
+          "filterReason": "candidate-positive",
+          "score": {
+            "positiveSignal": 1,
+            "meaningfulChars": 0.8571428571428571,
+            "structure": 1,
+            "ocrEvidenceScore": 0.96,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.7748284145504462,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 7.613877095793705
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 7.613877095793705 },
+              { "id": "prominence", "direction": "desc", "value": 69 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.96 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "ridgecellars" }
+            ],
+            "rankingScore": 7.613877095793705,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 1, "contribution": 2, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.8571428571428571,
+                "contribution": 1.3714285714285714,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 1, "contribution": 1.2, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.96,
+                "contribution": 0.96,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.7748284145504462,
+                "contribution": 0.23244852436513383,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "selected"
+        }
+      ],
+      "candidateScores": [
+        {
+          "value": "RIDGE CELLARS",
+          "rawText": "RIDGE CELLARS",
+          "score": {
+            "positiveSignal": 1,
+            "meaningfulChars": 0.8571428571428571,
+            "structure": 1,
+            "ocrEvidenceScore": 0.96,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.7748284145504462,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 7.613877095793705
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 7.613877095793705 },
+              { "id": "prominence", "direction": "desc", "value": 69 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.96 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "ridgecellars" }
+            ],
+            "rankingScore": 7.613877095793705,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 1, "contribution": 2, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.8571428571428571,
+                "contribution": 1.3714285714285714,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 1, "contribution": 1.2, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.96,
+                "contribution": 0.96,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.7748284145504462,
+                "contribution": 0.23244852436513383,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "selected"
+        }
+      ],
+      "top3": [
+        {
+          "value": "RIDGE CELLARS",
+          "decision": "selected",
+          "score": {
+            "positiveSignal": 1,
+            "meaningfulChars": 0.8571428571428571,
+            "structure": 1,
+            "ocrEvidenceScore": 0.96,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.7748284145504462,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 7.613877095793705
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 7.613877095793705 },
+              { "id": "prominence", "direction": "desc", "value": 69 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.96 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "ridgecellars" }
+            ],
+            "rankingScore": 7.613877095793705,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 1, "contribution": 2, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.8571428571428571,
+                "contribution": 1.3714285714285714,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 1, "contribution": 1.2, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.96,
+                "contribution": 0.96,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.7748284145504462,
+                "contribution": 0.23244852436513383,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          }
+        }
+      ],
+      "selectedLikelyBrand": "RIDGE CELLARS",
+      "authorityState": "OBSERVED",
+      "reliabilityState": "RELIABLE",
+      "reliabilityReason": "Bounded Brand OCR produced an OBSERVED value above the unchanged reliability floor.",
+      "expectedTruthInRawOcr": true,
+      "expectedTruthInAnyCandidate": true,
+      "expectedTruthInTop3": true,
+      "expectedTruthRankedFirst": true,
+      "authorityGateAlonePreventedObserved": false,
+      "primaryFailureClass": "CORRECT_READ",
+      "falseReliableRead": false,
+      "exactTop1Correct": false,
+      "normalizedTop1Correct": true,
+      "cropGeometrySha256": "4c46adc51a8c3d22d5829755c2af8a26dbc588c6e1392f340adfad72f651f655",
+      "finalOcrInputSha256": "acfe33991065188d62bc61f7f12dc0b8ba61afa481f1d78b7b21df8408c6424a",
+      "rawOcrWordsSha256": "f87965882871dcba58276de048b56168b7648679b74a9d1d36f0dc8dac79cf32",
+      "cropGeometryMatchesControl": true,
+      "finalOcrInputMatchesControl": true,
+      "rawOcrOutputMatchesControl": true,
+      "preprocessingMatchesControl": true,
+      "pageSegMode": 11,
+      "preprocessingSteps": ["crop:seller-region", "grayscale", "normalise", "scale:3"],
+      "latencyMs": { "boundedOcr": 214.57124999999996, "selection": 0.1040419999999358 },
+      "artifacts": {
+        "boundedCrop": "representative-bounded-crops/control/brand-ridge-cellars-adjacent-product.png",
+        "finalOcrInput": "representative-ocr-inputs/control/brand-ridge-cellars-adjacent-product.png",
+        "transcript": "transcripts/control/brand-ridge-cellars-adjacent-product.txt"
+      }
+    },
+    {
+      "caseId": "brand-harbor-cellars-adjacent-location",
+      "arm": "control",
+      "expectedBrand": "Harbor Cellars",
+      "slices": ["cleanTypography", "adjacentLocationText"],
+      "rawBoundedOcrWords": ["HARBOR", "CELLARS", "NAPA", "VALLEY"],
+      "rawBoundedOcrTranscript": "HARBOR CELLARS NAPA VALLEY",
+      "normalizedTranscript": "harbor cellars napa valley",
+      "generatedTokenGroups": [["HARBOR"], ["CELLARS"], ["NAPA"], ["VALLEY"]],
+      "generatedLineGroups": ["HARBOR CELLARS", "NAPA VALLEY"],
+      "allCandidatesBeforeFiltering": [
+        {
+          "rawText": "HARBOR CELLARS",
+          "cleanedValue": "HARBOR CELLARS",
+          "assembly": "whole-line",
+          "lineIndexes": [0],
+          "kept": true,
+          "filterReason": "candidate-positive"
+        },
+        {
+          "rawText": "NAPA VALLEY",
+          "cleanedValue": "NAPA VALLEY",
+          "assembly": "whole-line",
+          "lineIndexes": [1],
+          "kept": false,
+          "filterReason": "location-or-appellation"
+        }
+      ],
+      "allCandidatesAfterFiltering": [
+        {
+          "rawText": "HARBOR CELLARS",
+          "cleanedValue": "HARBOR CELLARS",
+          "assembly": "whole-line",
+          "lineIndexes": [0],
+          "kept": true,
+          "filterReason": "candidate-positive",
+          "score": {
+            "positiveSignal": 1,
+            "meaningfulChars": 0.9285714285714286,
+            "structure": 1,
+            "ocrEvidenceScore": 0.7749999999999999,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.7394646533973919,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 7.532553681733503
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 7.532553681733503 },
+              { "id": "prominence", "direction": "desc", "value": 72 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.7749999999999999 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "harborcellars" }
+            ],
+            "rankingScore": 7.532553681733503,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 1, "contribution": 2, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.9285714285714286,
+                "contribution": 1.4857142857142858,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 1, "contribution": 1.2, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.7749999999999999,
+                "contribution": 0.7749999999999999,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.7394646533973919,
+                "contribution": 0.22183939601921757,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "selected"
+        }
+      ],
+      "candidateScores": [
+        {
+          "value": "HARBOR CELLARS",
+          "rawText": "HARBOR CELLARS",
+          "score": {
+            "positiveSignal": 1,
+            "meaningfulChars": 0.9285714285714286,
+            "structure": 1,
+            "ocrEvidenceScore": 0.7749999999999999,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.7394646533973919,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 7.532553681733503
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 7.532553681733503 },
+              { "id": "prominence", "direction": "desc", "value": 72 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.7749999999999999 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "harborcellars" }
+            ],
+            "rankingScore": 7.532553681733503,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 1, "contribution": 2, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.9285714285714286,
+                "contribution": 1.4857142857142858,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 1, "contribution": 1.2, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.7749999999999999,
+                "contribution": 0.7749999999999999,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.7394646533973919,
+                "contribution": 0.22183939601921757,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          },
+          "decision": "selected"
+        }
+      ],
+      "top3": [
+        {
+          "value": "HARBOR CELLARS",
+          "decision": "selected",
+          "score": {
+            "positiveSignal": 1,
+            "meaningfulChars": 0.9285714285714286,
+            "structure": 1,
+            "ocrEvidenceScore": 0.7749999999999999,
+            "prominence": 1,
+            "area": 1,
+            "centrality": 0.7394646533973919,
+            "alignment": 1,
+            "lineProximity": 1,
+            "lowInformationPenalty": 0,
+            "residualPenalty": 0,
+            "total": 7.532553681733503
+          },
+          "ranking": {
+            "strategy": "brand-mixed-prominence-score",
+            "orderingMode": "score-first",
+            "comparator": [
+              { "id": "score-eligibility", "direction": "desc", "value": true },
+              { "id": "ranking-score", "direction": "desc", "value": 7.532553681733503 },
+              { "id": "prominence", "direction": "desc", "value": 72 },
+              { "id": "ocr-evidence-score", "direction": "desc", "value": 0.7749999999999999 },
+              { "id": "normalized-value-key", "direction": "asc", "value": "harborcellars" }
+            ],
+            "rankingScore": 7.532553681733503,
+            "scoreFactors": [
+              { "id": "positive-signal", "value": 1, "contribution": 2, "direction": "benefit" },
+              {
+                "id": "meaningful-chars",
+                "value": 0.9285714285714286,
+                "contribution": 1.4857142857142858,
+                "direction": "benefit"
+              },
+              { "id": "structure", "value": 1, "contribution": 1.2, "direction": "benefit" },
+              {
+                "id": "ocr-evidence-score",
+                "value": 0.7749999999999999,
+                "contribution": 0.7749999999999999,
+                "direction": "benefit"
+              },
+              { "id": "prominence", "value": 1, "contribution": 0.8, "direction": "benefit" },
+              { "id": "area", "value": 1, "contribution": 0.6, "direction": "benefit" },
+              {
+                "id": "centrality",
+                "value": 0.7394646533973919,
+                "contribution": 0.22183939601921757,
+                "direction": "benefit"
+              },
+              { "id": "alignment", "value": 1, "contribution": 0.25, "direction": "benefit" },
+              { "id": "line-proximity", "value": 1, "contribution": 0.2, "direction": "benefit" },
+              {
+                "id": "low-information-penalty",
+                "value": 0,
+                "contribution": 0,
+                "direction": "penalty"
+              },
+              { "id": "residual-penalty", "value": 0, "contribution": 0, "direction": "penalty" }
+            ]
+          }
+        }
+      ],
+      "selectedLikelyBrand": "HARBOR CELLARS",
+      "authorityState": "OBSERVED",
+      "reliabilityState": "UNRELIABLE",
+      "reliabilityReason": "Bounded Brand OCR did not produce a high-confidence OBSERVED value under the unchanged authority and reliability gates.",
+      "expectedTruthInRawOcr": true,
+      "expectedTruthInAnyCandidate": true,
+      "expectedTruthInTop3": true,
+      "expectedTruthRankedFirst": true,
+      "authorityGateAlonePreventedObserved": false,
+      "primaryFailureClass": "CORRECT_READ",
+      "falseReliableRead": false,
+      "exactTop1Correct": false,
+      "normalizedTop1Correct": true,
+      "cropGeometrySha256": "3de383b1154661aebc5ebba5c82011012199590b9a0574263852edbdd8112720",
+      "finalOcrInputSha256": "6059f2737915310a0db615c11f9e128e0133e7ed4030d5efd947f66361493527",
+      "rawOcrWordsSha256": "c52223ccf4c8a98241a4ce6af2c7643afe961fa169914f504540a8256e28e4d8",
+      "cropGeometryMatchesControl": true,
+      "finalOcrInputMatchesControl": true,
+      "rawOcrOutputMatchesControl": true,
+      "preprocessingMatchesControl": true,
+      "pageSegMode": 11,
+      "preprocessingSteps": ["crop:seller-region", "grayscale", "normalise", "scale:3"],
+      "latencyMs": { "boundedOcr": 213.5361670000002, "selection": 0.09999999999990905 },
+      "artifacts": {
+        "boundedCrop": "representative-bounded-crops/control/brand-harbor-cellars-adjacent-location.png",
+        "finalOcrInput": "representative-ocr-inputs/control/brand-harbor-cellars-adjacent-location.png",
+        "transcript": "transcripts/control/brand-harbor-cellars-adjacent-location.txt"
+      }
+    },
+    {
+      "caseId": "brand-unreadable-selected-region",
+      "arm": "control",
+      "expectedBrand": "Hidden Brand",
+      "slices": ["unreadableSelectedRegion"],
+      "rawBoundedOcrWords": [],
+      "rawBoundedOcrTranscript": "",
+      "normalizedTranscript": "",
+      "generatedTokenGroups": [],
+      "generatedLineGroups": [],
+      "allCandidatesBeforeFiltering": [],
+      "allCandidatesAfterFiltering": [],
+      "candidateScores": [],
+      "top3": [],
+      "selectedLikelyBrand": null,
+      "authorityState": "NOT_OBSERVED",
+      "reliabilityState": "UNRELIABLE",
+      "reliabilityReason": "Bounded Brand OCR did not produce a high-confidence OBSERVED value under the unchanged authority and reliability gates.",
+      "expectedTruthInRawOcr": false,
+      "expectedTruthInAnyCandidate": false,
+      "expectedTruthInTop3": false,
+      "expectedTruthRankedFirst": false,
+      "authorityGateAlonePreventedObserved": false,
+      "primaryFailureClass": "INSUFFICIENT_SOURCE_IMAGE",
+      "falseReliableRead": false,
+      "exactTop1Correct": false,
+      "normalizedTop1Correct": false,
+      "cropGeometrySha256": "e677056ae9c3820e48e772cea4091c65b48d1c78978732cc22ddc96e74407800",
+      "finalOcrInputSha256": "35b8778f3b011ba742f6b6997e67baf1e6fcfcdd4cea09074e39f0efd87a51ae",
+      "rawOcrWordsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "cropGeometryMatchesControl": true,
+      "finalOcrInputMatchesControl": true,
+      "rawOcrOutputMatchesControl": true,
+      "preprocessingMatchesControl": true,
+      "pageSegMode": 11,
+      "preprocessingSteps": ["crop:seller-region", "grayscale", "normalise", "scale:3"],
+      "latencyMs": { "boundedOcr": 119.44220799999994, "selection": 0.020292000000154076 },
+      "artifacts": {
+        "boundedCrop": "representative-bounded-crops/control/brand-unreadable-selected-region.png",
+        "finalOcrInput": "representative-ocr-inputs/control/brand-unreadable-selected-region.png",
+        "transcript": "transcripts/control/brand-unreadable-selected-region.txt"
+      }
+    }
+  ]
+}
