@@ -2,13 +2,18 @@ import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "nod
 import os from "node:os";
 import path from "node:path";
 
+import sharp from "sharp";
 import { afterEach, describe, expect, it } from "vitest";
 
 import type { OcrEngine } from "@/pipeline/extractor/ocr-engine";
 
 import {
   PRODUCTION_BOUNDED_BRAND_CONTROL,
+  binarizeGrayscaleWithOtsu,
+  binarizeRgbOrRgbaWithOtsu,
+  encodeChannelPreservingOtsuPng,
   runOcrExperiment,
+  selectOtsuThreshold,
   validateConfigurationIsolation,
   wilson95,
   type OcrExecutionInput,
@@ -162,6 +167,141 @@ function noOpDefinition() {
 }
 
 describe("OCR research experiment isolation and reporting", () => {
+  it("selects the deterministic lower Otsu threshold for known synthetic histograms", () => {
+    expect(selectOtsuThreshold(Uint8Array.from([0, 0, 255, 255]))).toBe(0);
+    expect(selectOtsuThreshold(Uint8Array.from([0, 0, 10, 10, 200, 200, 255, 255]))).toBe(10);
+    const grayscale = Uint8Array.from([0, 1, 1, 2, 128, 220, 254, 255]);
+    expect(selectOtsuThreshold(grayscale)).toBe(selectOtsuThreshold(grayscale));
+  });
+
+  it("fails closed for empty or uniform input instead of using a fixed threshold", () => {
+    expect(() => selectOtsuThreshold(new Uint8Array())).toThrow(
+      /OTSU_REQUIRES_NON_EMPTY_GRAYSCALE/,
+    );
+    expect(() => selectOtsuThreshold(Uint8Array.from([73, 73, 73]))).toThrow(
+      /OTSU_REQUIRES_AT_LEAST_TWO_GRAYSCALE_LEVELS/,
+    );
+  });
+
+  it("binarizes with the Otsu split boundary into deterministic one-channel bytes", () => {
+    const result = binarizeGrayscaleWithOtsu(Uint8Array.from([0, 0, 10, 10, 200, 200, 255, 255]));
+    expect(result.threshold).toBe(10);
+    expect([...result.data]).toEqual([0, 0, 0, 0, 255, 255, 255, 255]);
+    expect(binarizeGrayscaleWithOtsu(Uint8Array.from([0, 0, 255, 255]))).toEqual({
+      threshold: 0,
+      data: Buffer.from([0, 0, 255, 255]),
+    });
+  });
+
+  it("preserves RGB layout while changing only RGB values to binary output", () => {
+    const source = Uint8Array.from([0, 0, 0, 64, 32, 16, 180, 200, 220, 255, 255, 255]);
+    const result = binarizeRgbOrRgbaWithOtsu(source, 2, 2, 3);
+    expect(result.data).toHaveLength(source.length);
+    expect([...result.data].every((value) => value === 0 || value === 255)).toBe(true);
+  });
+
+  it("preserves RGBA alpha bytes exactly and changes only RGB values", () => {
+    const source = Uint8Array.from([
+      0, 0, 0, 0, 64, 32, 16, 17, 180, 200, 220, 128, 255, 255, 255, 255,
+    ]);
+    const result = binarizeRgbOrRgbaWithOtsu(source, 2, 2, 4);
+    expect([result.data[3], result.data[7], result.data[11], result.data[15]]).toEqual([
+      0, 17, 128, 255,
+    ]);
+    for (let index = 0; index < result.data.length; index += 1) {
+      if (index % 4 === 3) {
+        expect(result.data[index]).toBe(source[index]);
+      } else {
+        expect([0, 255]).toContain(result.data[index]);
+      }
+    }
+  });
+
+  it("round-trips a synthetic RGB PNG without adding alpha or changing layout metadata", async () => {
+    const source = await sharp(Buffer.from([0, 0, 0, 32, 32, 32, 192, 192, 192, 255, 255, 255]), {
+      raw: { width: 2, height: 2, channels: 3 },
+    })
+      .png()
+      .withMetadata({ density: 144 })
+      .toBuffer();
+    const result = await encodeChannelPreservingOtsuPng(source);
+    const sourceMetadata = await sharp(source).metadata();
+    const outputMetadata = await sharp(result.png).metadata();
+    expect(outputMetadata).toMatchObject({
+      width: sourceMetadata.width,
+      height: sourceMetadata.height,
+      channels: 3,
+      hasAlpha: false,
+      depth: sourceMetadata.depth,
+      space: sourceMetadata.space,
+      density: sourceMetadata.density,
+      bitsPerSample: sourceMetadata.bitsPerSample,
+      hasProfile: sourceMetadata.hasProfile,
+    });
+    const output = await sharp(result.png).raw().toBuffer({ resolveWithObject: true });
+    expect(output.info).toMatchObject({ width: 2, height: 2, channels: 3 });
+    expect([...output.data].every((value) => value === 0 || value === 255)).toBe(true);
+  });
+
+  it("round-trips a synthetic RGBA PNG with byte-identical alpha and stable dimensions", async () => {
+    const originalAlpha = [0, 17, 128, 255];
+    const source = await sharp(
+      Buffer.from([
+        0,
+        0,
+        0,
+        originalAlpha[0],
+        32,
+        32,
+        32,
+        originalAlpha[1],
+        192,
+        192,
+        192,
+        originalAlpha[2],
+        255,
+        255,
+        255,
+        originalAlpha[3],
+      ]),
+      { raw: { width: 2, height: 2, channels: 4 } },
+    )
+      .png()
+      .withMetadata({ density: 300 })
+      .toBuffer();
+    const first = await encodeChannelPreservingOtsuPng(source);
+    const second = await encodeChannelPreservingOtsuPng(source);
+    expect(first.threshold).toBe(second.threshold);
+    expect(first.png.equals(second.png)).toBe(true);
+    const sourceDecoded = await sharp(source).raw().toBuffer({ resolveWithObject: true });
+    const outputDecoded = await sharp(first.png).raw().toBuffer({ resolveWithObject: true });
+    expect(outputDecoded.info).toMatchObject({ width: 2, height: 2, channels: 4 });
+    for (let pixel = 0; pixel < 4; pixel += 1) {
+      const offset = pixel * 4;
+      expect(outputDecoded.data[offset + 3]).toBe(sourceDecoded.data[offset + 3]);
+      expect([0, 255]).toContain(outputDecoded.data[offset]);
+      expect(outputDecoded.data[offset + 1]).toBe(outputDecoded.data[offset]);
+      expect(outputDecoded.data[offset + 2]).toBe(outputDecoded.data[offset]);
+    }
+  });
+
+  it("keeps the Otsu arm free of Sharp thresholding and channel conversion", () => {
+    const implementation = readFileSync(
+      path.join(process.cwd(), "src/fixtures/ocr-research/experiment.ts"),
+      "utf8",
+    );
+    const otsuBranch = implementation
+      .split('if (configuration.thresholdMethod === "otsu") {')
+      .at(-1)
+      ?.split("\n  return {")[0];
+    expect(otsuBranch).toBeDefined();
+    expect(otsuBranch).not.toContain(".threshold(");
+    expect(otsuBranch).not.toMatch(
+      /\.(?:grayscale|removeAlpha|ensureAlpha|flatten|toColourspace)\(/,
+    );
+    expect(otsuBranch).toContain("encodeChannelPreservingOtsuPng(controlEquivalentPng)");
+  });
+
   it("rejects multiple changed variables and accepts exactly the declared variable", () => {
     expect(() =>
       validateConfigurationIsolation({

@@ -1,0 +1,672 @@
+{
+  "status": "PASS",
+  "expectedPairCount": 22,
+  "auditedPairCount": 22,
+  "outputIsolationVerified": true,
+  "changedConfigurationVariables": ["thresholdMethod"],
+  "repeatChangedConfigurationVariables": ["thresholdMethod"],
+  "selectorImplementationId": "histogram-between-class-variance-lower-tie-single-channel-v1",
+  "outputAdapterId": "rgb-rgba-alpha-preserving-png-v1",
+  "pairs": [
+    {
+      "run": "primary",
+      "caseId": "approved-wine-004",
+      "passed": true,
+      "control": {
+        "width": 2070,
+        "height": 924,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 300
+      },
+      "treatment": {
+        "width": 2070,
+        "height": 924,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 300
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "primary",
+      "caseId": "approved-wine-005",
+      "passed": true,
+      "control": {
+        "width": 1659,
+        "height": 858,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 300
+      },
+      "treatment": {
+        "width": 1659,
+        "height": 858,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 300
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "primary",
+      "caseId": "approved-wine-023",
+      "passed": true,
+      "control": {
+        "width": 1281,
+        "height": 519,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 144
+      },
+      "treatment": {
+        "width": 1281,
+        "height": 519,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 144
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "primary",
+      "caseId": "approved-wine-027",
+      "passed": true,
+      "control": {
+        "width": 2616,
+        "height": 1083,
+        "channels": 3,
+        "hasAlpha": false,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 300
+      },
+      "treatment": {
+        "width": 2616,
+        "height": 1083,
+        "channels": 3,
+        "hasAlpha": false,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 300
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "primary",
+      "caseId": "approved-wine-031",
+      "passed": true,
+      "control": {
+        "width": 1050,
+        "height": 255,
+        "channels": 3,
+        "hasAlpha": false,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 72
+      },
+      "treatment": {
+        "width": 1050,
+        "height": 255,
+        "channels": 3,
+        "hasAlpha": false,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 72
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "primary",
+      "caseId": "approved-wine-035",
+      "passed": true,
+      "control": {
+        "width": 1158,
+        "height": 300,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 96
+      },
+      "treatment": {
+        "width": 1158,
+        "height": 300,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 96
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "primary",
+      "caseId": "approved-wine-085",
+      "passed": true,
+      "control": {
+        "width": 801,
+        "height": 174,
+        "channels": 3,
+        "hasAlpha": false,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 150
+      },
+      "treatment": {
+        "width": 801,
+        "height": 174,
+        "channels": 3,
+        "hasAlpha": false,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 150
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "primary",
+      "caseId": "approved-wine-091",
+      "passed": true,
+      "control": {
+        "width": 306,
+        "height": 480,
+        "channels": 3,
+        "hasAlpha": false,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 150
+      },
+      "treatment": {
+        "width": 306,
+        "height": 480,
+        "channels": 3,
+        "hasAlpha": false,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 150
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "primary",
+      "caseId": "la-fattoria-rotated",
+      "passed": true,
+      "control": {
+        "width": 2070,
+        "height": 924,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 300
+      },
+      "treatment": {
+        "width": 2070,
+        "height": 924,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 300
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "primary",
+      "caseId": "wine-multi-artifact-04-region-1",
+      "passed": true,
+      "control": {
+        "width": 732,
+        "height": 444,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 144
+      },
+      "treatment": {
+        "width": 732,
+        "height": 444,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 144
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "primary",
+      "caseId": "wine-multi-artifact-04-region-2",
+      "passed": true,
+      "control": {
+        "width": 498,
+        "height": 192,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 144
+      },
+      "treatment": {
+        "width": 498,
+        "height": 192,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 144
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "repeat",
+      "caseId": "approved-wine-004",
+      "passed": true,
+      "control": {
+        "width": 2070,
+        "height": 924,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 300
+      },
+      "treatment": {
+        "width": 2070,
+        "height": 924,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 300
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "repeat",
+      "caseId": "approved-wine-005",
+      "passed": true,
+      "control": {
+        "width": 1659,
+        "height": 858,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 300
+      },
+      "treatment": {
+        "width": 1659,
+        "height": 858,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 300
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "repeat",
+      "caseId": "approved-wine-023",
+      "passed": true,
+      "control": {
+        "width": 1281,
+        "height": 519,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 144
+      },
+      "treatment": {
+        "width": 1281,
+        "height": 519,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 144
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "repeat",
+      "caseId": "approved-wine-027",
+      "passed": true,
+      "control": {
+        "width": 2616,
+        "height": 1083,
+        "channels": 3,
+        "hasAlpha": false,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 300
+      },
+      "treatment": {
+        "width": 2616,
+        "height": 1083,
+        "channels": 3,
+        "hasAlpha": false,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 300
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "repeat",
+      "caseId": "approved-wine-031",
+      "passed": true,
+      "control": {
+        "width": 1050,
+        "height": 255,
+        "channels": 3,
+        "hasAlpha": false,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 72
+      },
+      "treatment": {
+        "width": 1050,
+        "height": 255,
+        "channels": 3,
+        "hasAlpha": false,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 72
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "repeat",
+      "caseId": "approved-wine-035",
+      "passed": true,
+      "control": {
+        "width": 1158,
+        "height": 300,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 96
+      },
+      "treatment": {
+        "width": 1158,
+        "height": 300,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 96
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "repeat",
+      "caseId": "approved-wine-085",
+      "passed": true,
+      "control": {
+        "width": 801,
+        "height": 174,
+        "channels": 3,
+        "hasAlpha": false,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 150
+      },
+      "treatment": {
+        "width": 801,
+        "height": 174,
+        "channels": 3,
+        "hasAlpha": false,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 150
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "repeat",
+      "caseId": "approved-wine-091",
+      "passed": true,
+      "control": {
+        "width": 306,
+        "height": 480,
+        "channels": 3,
+        "hasAlpha": false,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 150
+      },
+      "treatment": {
+        "width": 306,
+        "height": 480,
+        "channels": 3,
+        "hasAlpha": false,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 150
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "repeat",
+      "caseId": "la-fattoria-rotated",
+      "passed": true,
+      "control": {
+        "width": 2070,
+        "height": 924,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 300
+      },
+      "treatment": {
+        "width": 2070,
+        "height": 924,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 300
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "repeat",
+      "caseId": "wine-multi-artifact-04-region-1",
+      "passed": true,
+      "control": {
+        "width": 732,
+        "height": 444,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 144
+      },
+      "treatment": {
+        "width": 732,
+        "height": 444,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 144
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    },
+    {
+      "run": "repeat",
+      "caseId": "wine-multi-artifact-04-region-2",
+      "passed": true,
+      "control": {
+        "width": 498,
+        "height": 192,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 144
+      },
+      "treatment": {
+        "width": 498,
+        "height": 192,
+        "channels": 4,
+        "hasAlpha": true,
+        "depth": "uchar",
+        "bitsPerSample": 8,
+        "space": "srgb",
+        "density": 144
+      },
+      "metadataIdentical": true,
+      "nonImagePngChunksIdentical": true,
+      "alphaBytesIdentical": true,
+      "treatmentRgbBinary": true,
+      "treatmentRgbNeutral": true
+    }
+  ]
+}

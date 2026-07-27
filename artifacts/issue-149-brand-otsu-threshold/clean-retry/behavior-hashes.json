@@ -1,0 +1,13 @@
+{
+  "primary": {
+    "control": "b3db6f91ea925a60aee0adc043994a5fef1e57df3cb6df03860f038cc16ffb41",
+    "treatment": "f792a17c359dd8dfedc1b2c5754e816807d88e4036ee8f0de9b1b270107a3b47"
+  },
+  "repeat": {
+    "control": "b3db6f91ea925a60aee0adc043994a5fef1e57df3cb6df03860f038cc16ffb41",
+    "treatment": "f792a17c359dd8dfedc1b2c5754e816807d88e4036ee8f0de9b1b270107a3b47"
+  },
+  "reproducible": true,
+  "baselineControlExpected": "b3db6f91ea925a60aee0adc043994a5fef1e57df3cb6df03860f038cc16ffb41",
+  "baselineControlReproduced": true
+}

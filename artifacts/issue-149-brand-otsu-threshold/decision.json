@@ -1,0 +1,53 @@
+{
+  "decision": "KILL",
+  "successCriteria": {
+    "atLeastTwoRegionsImprove": false,
+    "atLeastTwoChecksumFamiliesImprove": false,
+    "normalizedTop1AccuracyImproves": false,
+    "candidateListOrTop3RecallImproves": false,
+    "noPreviouslyCorrectRegionRegresses": true,
+    "falseReliableReadsRemainZero": true,
+    "wrongReliableReadsRemainZero": true,
+    "emptyOcrDoesNotIncrease": false,
+    "noCleanHighContrastRegression": false,
+    "latencyWithinCeilings": false,
+    "reproducible": true,
+    "controlBaselineReproduced": true,
+    "onlyThresholdMethodChanged": true,
+    "otsuNotCombinedWithClaheOrSharpening": true,
+    "sellerTruthNotPassedToOcr": true,
+    "noProductionOrPr195PathChanges": true,
+    "implementationVerified": true
+  },
+  "killReasons": [
+    "zero or one governed region improved",
+    "improvement did not span two source checksum families",
+    "normalized top-one accuracy did not improve in both runs",
+    "candidate-list or top-three truth recall did not improve in both runs",
+    "empty OCR increased",
+    "a clean-background or high-contrast case materially regressed",
+    "median or p95 latency exceeded a preregistered ceiling"
+  ],
+  "incompleteEvidence": [],
+  "improvedCaseIds": [],
+  "regressedCaseIds": ["wine-multi-artifact-04-region-1"],
+  "improvementChecksumFamilies": [],
+  "improvementIndependenceFamilies": [],
+  "regressionChecksumFamilies": [
+    "sha256:445d39b8f73d04cd05bb35e03f9678f6ba9e81f6a6f01d5469306ec43c9c5887"
+  ],
+  "regressionIndependenceFamilies": ["dry-cellar"],
+  "primaryLatencyRatios": { "median": 0.8068299795076033, "p95": 1.8353182351719688 },
+  "repeatLatencyRatios": { "median": 0.6082975222375935, "p95": 1.8881935888773558 },
+  "reproducible": true,
+  "nextRecommendation": "Adaptive thresholding: preregister one evaluation-only, default-off treatment on the same locked corpus and control, with an exact local-window algorithm and parameters frozen before any OCR output.",
+  "isolation": {
+    "changedVariables": ["thresholdMethod"],
+    "valid": true,
+    "reason": "Treatment differs from control only in thresholdMethod."
+  },
+  "implementationId": "histogram-between-class-variance-lower-tie-single-channel-v1",
+  "implementationVerified": true,
+  "treatmentDefaultOff": true,
+  "productionEnabled": false
+}

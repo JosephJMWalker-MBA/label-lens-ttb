@@ -1,0 +1,35 @@
+{
+  "scale": 3,
+  "padding": { "ratio": 0.03, "minPx": 4 },
+  "grayscaleMethod": "sharp-grayscale",
+  "contrastMethod": "normalise",
+  "localContrast": "none",
+  "thresholdMethod": "otsu",
+  "sharpening": "none",
+  "inversion": false,
+  "denoising": "none",
+  "psm": 11,
+  "rotation": 0,
+  "cropSource": "governed-brand-region",
+  "fieldType": "brandName",
+  "implementation": {
+    "id": "histogram-between-class-variance-lower-tie-single-channel-v1",
+    "selector": "selectOtsuThreshold",
+    "channelPreservingBinarizer": "binarizeRgbOrRgbaWithOtsu",
+    "outputAdapter": {
+      "id": "rgb-rgba-alpha-preserving-png-v1",
+      "function": "encodeChannelPreservingOtsuPng"
+    },
+    "histogramBins": 256,
+    "objective": "wB * wF * (meanB - meanF)^2",
+    "tieBreak": "lowest threshold",
+    "luminance": "floor((2126*R + 7152*G + 722*B + 5000) / 10000)",
+    "background": "luminance <= threshold -> RGB 0,0,0",
+    "foreground": "luminance > threshold -> RGB 255,255,255",
+    "alpha": "copied byte-for-byte for RGBA; absent for RGB",
+    "pngNonImageChunks": "copied byte-for-byte from control-equivalent PNG",
+    "degenerateInput": "fail closed",
+    "sharpThresholding": false,
+    "sharpChannelConversion": false
+  }
+}
