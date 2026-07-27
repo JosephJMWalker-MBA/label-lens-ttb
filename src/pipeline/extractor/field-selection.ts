@@ -101,6 +101,14 @@ interface Candidate {
   ranking?: AnalyzerCandidateRanking;
 }
 
+interface BrandSelectionOptions {
+  allowCoherentPlausibleLineMerge: boolean;
+}
+
+const DEFAULT_BRAND_SELECTION_OPTIONS: BrandSelectionOptions = {
+  allowCoherentPlausibleLineMerge: false,
+};
+
 /** An observation plus the region the selected value came from (for provenance). */
 export interface FieldSelection {
   observation: AnalyzerFieldObservation;
@@ -2185,7 +2193,10 @@ function brandRanking(
   };
 }
 
-export function selectBrandObservation(results: RegionOcrResult[]): FieldSelection {
+function selectBrandObservationWithOptions(
+  results: RegionOcrResult[],
+  options: BrandSelectionOptions,
+): FieldSelection {
   const candidates: Candidate[] = [];
   const lineDiagnostics: BrandLineDiagnostic[] = [];
   const candidateDiagnostics: BrandCandidateDiagnosticInternal[] = [];
@@ -2230,7 +2241,9 @@ export function selectBrandObservation(results: RegionOcrResult[]): FieldSelecti
 
       for (const upper of upperSeeds) {
         for (const lower of lowerSeeds) {
-          if (upper.brandClass !== "positive" && lower.brandClass !== "positive") continue;
+          const hasPositiveLine =
+            upper.brandClass === "positive" || lower.brandClass === "positive";
+          if (!hasPositiveLine && !options.allowCoherentPlausibleLineMerge) continue;
           const alignment = mergeAlignment(upper, lower);
           const proximity = mergeLineProximity(upper, lower);
           if (alignment < 0.3 || proximity <= 0) continue;
@@ -2259,6 +2272,18 @@ export function selectBrandObservation(results: RegionOcrResult[]): FieldSelecti
     lines: lineDiagnostics,
     candidates: candidateDiagnostics,
     abstentionReason: sawBrandRegionText ? "unsupported-candidates-only" : "no-brand-region-text",
+  });
+}
+
+export function selectBrandObservation(results: RegionOcrResult[]): FieldSelection {
+  return selectBrandObservationWithOptions(results, DEFAULT_BRAND_SELECTION_OPTIONS);
+}
+
+export function selectBrandObservationWithCoherentLineMergeTreatment(
+  results: RegionOcrResult[],
+): FieldSelection {
+  return selectBrandObservationWithOptions(results, {
+    allowCoherentPlausibleLineMerge: true,
   });
 }
 
