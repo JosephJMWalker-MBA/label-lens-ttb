@@ -29,6 +29,7 @@
     "eval:production-parity:capture": "EVAL_CAPTURE_PRODUCTION_PARITY=1 vitest run src/fixtures/eval/production-parity.gen.test.ts",
     "eval:ocr-region-benchmark": "EVAL_REGION_BENCHMARK=1 vitest run src/fixtures/eval/ocr-region-benchmark.gen.test.ts",
     "eval:issue-149-bounded-baseline": "npx vite-node --config vitest.config.ts scripts/eval/run-issue-149-bounded-baseline.ts",
+    "eval:issue-149-segmentation-experiment": "npx vite-node --config vitest.config.ts scripts/eval/run-issue-149-segmentation-experiment.ts",
     "eval:vision-region-benchmark": "npx vite-node --config vitest.config.ts scripts/eval/run-vision-region-benchmark.ts",
     "eval:local-vlm-smoke": "npx vite-node --config vitest.config.ts scripts/eval/run-local-vlm-smoke.ts",
     "eval:local-vlm-contamination": "npx vite-node --config vitest.config.ts scripts/eval/run-local-vlm-contamination.ts",
