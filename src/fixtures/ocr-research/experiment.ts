@@ -34,6 +34,7 @@ export const OCR_EXPERIMENT_VARIABLES = [
   "padding",
   "grayscaleMethod",
   "contrastMethod",
+  "localContrast",
   "thresholdMethod",
   "sharpening",
   "inversion",
@@ -56,6 +57,7 @@ export const ocrConfigurationSchema = z
       .strict(),
     grayscaleMethod: z.enum(["sharp-grayscale", "none"]),
     contrastMethod: z.enum(["normalise", "none"]),
+    localContrast: z.enum(["none", "clahe-3x3-slope-3"]),
     thresholdMethod: z.enum(["none", "global-128", "otsu", "adaptive"]),
     sharpening: z.enum(["none", "mild"]),
     inversion: z.boolean(),
@@ -65,7 +67,16 @@ export const ocrConfigurationSchema = z
     cropSource: z.enum(["governed-brand-region", "seller-region", "full-image"]),
     fieldType: z.enum(["brandName", "governmentWarning", "alcoholStatement"]),
   })
-  .strict();
+  .strict()
+  .superRefine((configuration, context) => {
+    if (configuration.localContrast !== "none" && configuration.sharpening !== "none") {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "CLAHE_AND_SHARPENING_MUTUALLY_EXCLUSIVE",
+        path: ["localContrast"],
+      });
+    }
+  });
 
 export type OcrConfiguration = z.infer<typeof ocrConfigurationSchema>;
 
@@ -87,6 +98,7 @@ export const PRODUCTION_BOUNDED_BRAND_CONTROL: OcrConfiguration = {
   padding: { ratio: 0.03, minPx: 4 },
   grayscaleMethod: "sharp-grayscale",
   contrastMethod: "normalise",
+  localContrast: "none",
   thresholdMethod: "none",
   sharpening: "none",
   inversion: false,
@@ -104,6 +116,12 @@ export const MILD_SHARPENING_PARAMETERS = Object.freeze({
   x1: 2,
   y2: 10,
   y3: 20,
+});
+
+export const LOCAL_CONTRAST_CLAHE_PARAMETERS = Object.freeze({
+  width: 3,
+  height: 3,
+  maxSlope: 3,
 });
 
 export interface ConfigurationIsolation {
@@ -362,7 +380,7 @@ function cropFor(
 }
 
 function preprocessingLabels(configuration: OcrConfiguration): string[] {
-  return [
+  const labels = [
     `crop:${configuration.cropSource}`,
     `rotate:${configuration.rotation}`,
     `scale:${configuration.scale}`,
@@ -374,6 +392,10 @@ function preprocessingLabels(configuration: OcrConfiguration): string[] {
     `denoising:${configuration.denoising}`,
     `psm:${configuration.psm}`,
   ];
+  if (configuration.localContrast !== "none") {
+    labels.splice(5, 0, `local-contrast:${configuration.localContrast}`);
+  }
+  return labels;
 }
 
 function otsuThreshold(raw: Buffer): number {
@@ -432,6 +454,9 @@ async function preprocess(
   pipeline = pipeline.resize({ width, height, kernel: "cubic" });
   if (configuration.grayscaleMethod === "sharp-grayscale") pipeline = pipeline.grayscale();
   if (configuration.contrastMethod === "normalise") pipeline = pipeline.normalise();
+  if (configuration.localContrast === "clahe-3x3-slope-3") {
+    pipeline = pipeline.clahe(LOCAL_CONTRAST_CLAHE_PARAMETERS);
+  }
   if (configuration.denoising === "median-3") pipeline = pipeline.median(3);
   if (configuration.sharpening === "mild") {
     pipeline = pipeline.sharpen(MILD_SHARPENING_PARAMETERS);
@@ -1186,6 +1211,7 @@ export function experimentSchemaJson(): Record<string, unknown> {
           },
           grayscaleMethod: { enum: ["sharp-grayscale", "none"] },
           contrastMethod: { enum: ["normalise", "none"] },
+          localContrast: { enum: ["none", "clahe-3x3-slope-3"] },
           thresholdMethod: { enum: ["none", "global-128", "otsu", "adaptive"] },
           sharpening: { enum: ["none", "mild"] },
           inversion: { type: "boolean" },

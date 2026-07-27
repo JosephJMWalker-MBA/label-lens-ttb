@@ -1,0 +1,54 @@
+{
+  "decision": "KILL",
+  "successCriteria": {
+    "atLeastTwoRegionsImprove": false,
+    "atLeastTwoChecksumFamiliesImprove": false,
+    "atLeastTwoIndependenceFamiliesImprove": false,
+    "normalizedTop1AccuracyImproves": false,
+    "candidateListOrTop3RecallImproves": false,
+    "noPreviouslyCorrectRegionRegresses": true,
+    "falseReliableReadsRemainZero": true,
+    "wrongReliableReadsRemainZero": true,
+    "emptyOcrDoesNotIncrease": true,
+    "noCleanHighContrastRegression": true,
+    "latencyWithinCeilings": false,
+    "reproducible": true,
+    "onlyLocalContrastChanged": true,
+    "claheAndSharpeningNotCombined": true,
+    "sellerTruthNotPassedToOcr": true,
+    "noProductionOrPr195PathChanges": true
+  },
+  "killReasons": [
+    "zero or one governed region improved",
+    "improvement did not span two source checksum families",
+    "improvement did not span two independence families",
+    "normalized top-one accuracy did not improve in both runs",
+    "candidate-list or top-three truth recall did not improve in both runs",
+    "median or p95 latency exceeded a preregistered ceiling"
+  ],
+  "incompleteEvidence": [],
+  "improvedCaseIds": [],
+  "regressedCaseIds": [],
+  "improvementChecksumFamilies": [],
+  "improvementIndependenceFamilies": [],
+  "regressionChecksumFamilies": [],
+  "regressionIndependenceFamilies": [],
+  "primaryLatencyRatios": {
+    "median": 4.178592341342665,
+    "p95": 2.66692968350416
+  },
+  "repeatLatencyRatios": {
+    "median": 2.9398429141144384,
+    "p95": 2.7510229064427785
+  },
+  "reproducible": true,
+  "nextRecommendation": "Otsu thresholding: run one separately preregistered treatment using the runner's deterministic Otsu threshold after the same 3x grayscale/normalise control, with no CLAHE or sharpening.",
+  "isolation": {
+    "changedVariables": ["localContrast"],
+    "valid": true,
+    "reason": "Treatment differs from control only in localContrast."
+  },
+  "treatmentParameters": { "width": 3, "height": 3, "maxSlope": 3 },
+  "treatmentDefaultOff": true,
+  "productionEnabled": false
+}
