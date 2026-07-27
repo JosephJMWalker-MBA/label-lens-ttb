@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Issue 149 real-label staging corpus case",
+  "type": "object",
+  "required": [
+    "caseId",
+    "displayName",
+    "sourceType",
+    "sourceAvailability",
+    "governedFixturePath",
+    "stagingEnvironment",
+    "prNumber",
+    "testDate",
+    "expectedSellerBrand",
+    "sellerSelectedRegion",
+    "rawBoundedOcrWords",
+    "boundedTranscript",
+    "independentTranscript",
+    "selectedCandidate",
+    "candidateList",
+    "confidence",
+    "reliability",
+    "authorityState",
+    "comparisonOutcome",
+    "brandPrimaryClassification",
+    "brandSecondaryNotes",
+    "warningStatus",
+    "warningRegionStatus",
+    "warningOrientation",
+    "warningAnchorStatus",
+    "warningRawTranscript",
+    "warningAnchoredTranscript",
+    "warningOcrConfidence",
+    "warningPrimaryClassification",
+    "alcoholObservation",
+    "alcoholPrimaryClassification",
+    "humanReviewRequired",
+    "provenance",
+    "missingDataReasons"
+  ],
+  "properties": {
+    "caseId": { "type": "string" },
+    "displayName": { "type": "string" },
+    "sourceType": { "const": "manual-pr-195-staging" },
+    "sourceAvailability": {
+      "enum": ["GOVERNED_FIXTURE_AVAILABLE", "UNAVAILABLE_BROWSER_LOCAL", "METADATA_ONLY"]
+    },
+    "governedFixturePath": {
+      "type": "object",
+      "required": ["value", "missingReason"],
+      "properties": {
+        "value": { "type": ["string", "null"] },
+        "missingReason": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "stagingEnvironment": { "type": "string" },
+    "prNumber": { "const": 195 },
+    "testDate": { "type": "string" },
+    "expectedSellerBrand": { "type": "string" },
+    "sellerSelectedRegion": { "type": "object" },
+    "rawBoundedOcrWords": { "type": "object" },
+    "boundedTranscript": {
+      "type": "object",
+      "required": ["value", "missingReason"],
+      "properties": {
+        "value": { "type": ["string", "null"] },
+        "missingReason": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "independentTranscript": {
+      "type": "object",
+      "required": ["value", "missingReason"],
+      "properties": {
+        "value": { "type": ["string", "null"] },
+        "missingReason": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "selectedCandidate": {
+      "type": "object",
+      "required": ["value", "missingReason"],
+      "properties": {
+        "value": { "type": ["string", "null"] },
+        "missingReason": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "candidateList": { "type": "object" },
+    "confidence": { "type": "object" },
+    "reliability": { "enum": ["RELIABLE", "UNRELIABLE", "NOT_EVALUATED"] },
+    "authorityState": { "enum": ["OBSERVED", "AMBIGUOUS", "LOW_CONFIDENCE", "NOT_OBSERVED", null] },
+    "comparisonOutcome": {
+      "type": "object",
+      "required": ["value", "missingReason"],
+      "properties": {
+        "value": { "type": ["string", "null"] },
+        "missingReason": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "brandPrimaryClassification": {
+      "enum": [
+        "BRAND_SOURCE_IMAGE_UNAVAILABLE",
+        "BRAND_REGION_MISSING",
+        "BRAND_REGION_WRONG",
+        "BRAND_OCR_EMPTY",
+        "BRAND_OCR_RECOGNITION_MISS",
+        "BRAND_TOKEN_GROUPING_MISS",
+        "BRAND_LINE_GROUPING_MISS",
+        "BRAND_CANDIDATE_GENERATION_MISS",
+        "BRAND_FILTERING_MISS",
+        "BRAND_RANKING_MISS",
+        "BRAND_CORRECT_READ_CONSERVATIVE_GATE",
+        "BRAND_WRONG_RELIABLE_READ",
+        "BRAND_CORRECT_RELIABLE_READ",
+        "BRAND_INSUFFICIENT_SOURCE_IMAGE",
+        "BRAND_NOT_EVALUATED"
+      ]
+    },
+    "brandSecondaryNotes": { "type": "array", "items": { "type": "string" } },
+    "warningStatus": { "enum": ["PASS", "FAIL", "NOT_EVALUATED"] },
+    "warningRegionStatus": {
+      "type": "object",
+      "required": ["value", "missingReason"],
+      "properties": {
+        "value": { "type": ["string", "null"] },
+        "missingReason": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "warningOrientation": { "type": "object" },
+    "warningAnchorStatus": {
+      "type": "object",
+      "required": ["value", "missingReason"],
+      "properties": {
+        "value": { "type": ["string", "null"] },
+        "missingReason": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "warningRawTranscript": {
+      "type": "object",
+      "required": ["value", "missingReason"],
+      "properties": {
+        "value": { "type": ["string", "null"] },
+        "missingReason": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "warningAnchoredTranscript": {
+      "type": "object",
+      "required": ["value", "missingReason"],
+      "properties": {
+        "value": { "type": ["string", "null"] },
+        "missingReason": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "warningOcrConfidence": { "type": "object" },
+    "warningPrimaryClassification": {
+      "enum": [
+        "WARNING_SOURCE_IMAGE_UNAVAILABLE",
+        "WARNING_REGION_NOT_FOUND",
+        "WARNING_REGION_WRONG",
+        "WARNING_REGION_CONTAMINATED",
+        "WARNING_ORIENTATION_MISS",
+        "WARNING_ANCHOR_NOT_FOUND",
+        "WARNING_ANCHOR_WRONG",
+        "WARNING_OCR_RECOGNITION_MISS",
+        "WARNING_EXACT_TEXT_MISMATCH",
+        "WARNING_FALSE_PASS",
+        "WARNING_CORRECT_PASS",
+        "WARNING_NOT_PRESENT",
+        "WARNING_NOT_EVALUATED"
+      ]
+    },
+    "alcoholObservation": { "enum": ["OBSERVED", "NOT_OBSERVED", "NOT_EVALUATED"] },
+    "alcoholPrimaryClassification": {
+      "enum": [
+        "ALCOHOL_SOURCE_IMAGE_UNAVAILABLE",
+        "ALCOHOL_REGION_NOT_SEARCHED",
+        "ALCOHOL_REGION_NOT_FOUND",
+        "ALCOHOL_OCR_EMPTY",
+        "ALCOHOL_OCR_RECOGNITION_MISS",
+        "ALCOHOL_PARSE_MISS",
+        "ALCOHOL_SELECTOR_MISS",
+        "ALCOHOL_WRONG_RELIABLE_READ",
+        "ALCOHOL_CORRECT_READ",
+        "ALCOHOL_NOT_PRESENT",
+        "ALCOHOL_NOT_EVALUATED"
+      ]
+    },
+    "humanReviewRequired": { "type": "boolean" },
+    "provenance": { "type": "object" },
+    "missingDataReasons": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

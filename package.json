@@ -32,6 +32,7 @@
     "eval:issue-149-segmentation-experiment": "npx vite-node --config vitest.config.ts scripts/eval/run-issue-149-segmentation-experiment.ts",
     "eval:issue-149-alcohol-layout-segmentation": "npx vite-node --config vitest.config.ts scripts/eval/run-issue-149-alcohol-layout-segmentation.ts",
     "eval:issue-149-brand-grouping-ranking": "npx vite-node --config vitest.config.ts scripts/eval/run-issue-149-brand-grouping-ranking.ts",
+    "eval:issue-149-real-label-staging-corpus": "npx vite-node --config vitest.config.ts scripts/eval/run-issue-149-real-label-staging-corpus.ts",
     "eval:vision-region-benchmark": "npx vite-node --config vitest.config.ts scripts/eval/run-vision-region-benchmark.ts",
     "eval:local-vlm-smoke": "npx vite-node --config vitest.config.ts scripts/eval/run-local-vlm-smoke.ts",
     "eval:local-vlm-contamination": "npx vite-node --config vitest.config.ts scripts/eval/run-local-vlm-contamination.ts",
