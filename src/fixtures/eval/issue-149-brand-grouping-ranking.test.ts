@@ -10,9 +10,12 @@ import {
   type PixelBox,
 } from "@/fixtures/eval/issue-149-bounded-baseline";
 import {
+  selectAlcoholObservation,
   selectBrandObservation,
+  selectBrandObservationLegacyGroupingControl,
   selectBrandObservationWithCoherentLineMergeTreatment,
 } from "@/pipeline/extractor/field-selection";
+import { selectGovernmentWarningObservation } from "@/pipeline/extractor/government-warning";
 import type { OcrWord, RegionOcrResult } from "@/pipeline/extractor/extractor.types";
 import { PAGE_SEG } from "@/pipeline/extractor/ocr-engine";
 import { planSellerRegionOcrPass } from "@/pipeline/extractor/regions";
@@ -41,14 +44,17 @@ function word(text: string, rawConfidence: number, x: number, y: number, width =
   };
 }
 
-function result(words: OcrWord[]): RegionOcrResult {
+function result(
+  words: OcrWord[],
+  fieldEligibility: RegionOcrResult["fieldEligibility"] = { brand: true, alcohol: false },
+): RegionOcrResult {
   return {
     passId: "seller-region-1",
     regionName: "seller-region",
     passKind: "seller-region",
     triggerReasons: ["seller-region-target"],
     preprocessing: ["crop:seller-region", "grayscale", "normalise", "scale:3"],
-    fieldEligibility: { brand: true, alcohol: false },
+    fieldEligibility,
     transform: {
       crop: { left: 90, top: 100, width: 500, height: 240 },
       rotate: 0,
@@ -66,12 +72,12 @@ function result(words: OcrWord[]): RegionOcrResult {
 }
 
 describe("Issue #149 Brand grouping/ranking treatment", () => {
-  it("uses identical OCR input and output between control and treatment", () => {
+  it("uses identical OCR input and output between legacy control and production", () => {
     const boundedOcr = result([word("NORTH", 91, 110, 140, 150), word("STAR", 90, 118, 204, 120)]);
     const before = JSON.stringify(boundedOcr);
 
     selectBrandObservation([boundedOcr]);
-    selectBrandObservationWithCoherentLineMergeTreatment([boundedOcr]);
+    selectBrandObservationLegacyGroupingControl([boundedOcr]);
 
     expect(JSON.stringify(boundedOcr)).toBe(before);
   });
@@ -110,31 +116,144 @@ describe("Issue #149 Brand grouping/ranking treatment", () => {
     }
   });
 
-  it("does not pass seller-entered text into OCR or Brand ranking", () => {
-    const source = readFileSync(
+  it("does not pass seller-entered text into production Brand selection", () => {
+    const selectorSource = readFileSync(
+      join(process.cwd(), "src/pipeline/extractor/field-selection.ts"),
+      "utf8",
+    );
+    const productionFunction = selectorSource.slice(
+      selectorSource.indexOf("export function selectBrandObservation("),
+      selectorSource.indexOf(
+        "export function selectBrandObservationWithCoherentLineMergeTreatment",
+      ),
+    );
+    const evalSource = readFileSync(
       join(process.cwd(), "src/fixtures/eval/issue-149-brand-grouping-ranking.ts"),
       "utf8",
     );
-    const treatmentFunction = source.slice(
-      source.indexOf("function runSelector"),
-      source.indexOf("async function runCaseArm"),
-    );
 
-    expect(treatmentFunction).not.toMatch(/expectedSellerValue|expectedBrand|seller/i);
-    expect(treatmentFunction).toMatch(/selectBrandObservationWithCoherentLineMergeTreatment/);
+    expect(productionFunction).not.toMatch(/expectedSellerValue|expectedBrand|seller/i);
+    expect(evalSource).toMatch(/expectedSellerValue/);
   });
 
-  it("improves coherent multi-line likely-candidate ranking without producing OBSERVED", () => {
+  it("enables coherent multi-line likely-candidate ranking without producing OBSERVED", () => {
     const boundedOcr = result([word("NORTH", 91, 110, 140, 150), word("STAR", 90, 118, 204, 120)]);
 
-    const control = selectBrandObservation([boundedOcr]).observation;
+    const control = selectBrandObservationLegacyGroupingControl([boundedOcr]).observation;
+    const production = selectBrandObservation([boundedOcr]).observation;
     const treatment = selectBrandObservationWithCoherentLineMergeTreatment([
       boundedOcr,
     ]).observation;
 
     expect(control.value).toBe("NORTH");
-    expect(treatment.value).toBe("NORTH STAR");
-    expect(treatment.state).toBe("AMBIGUOUS");
+    expect(production.value).toBe("NORTH STAR");
+    expect(production.state).toBe("AMBIGUOUS");
+    expect(treatment).toMatchObject(production);
+  });
+
+  it("forms the Garden City Beach adjacent-line candidate in production", () => {
+    const boundedOcr = result([
+      word("GARDEN", 91, 110, 140, 170),
+      word("CITY", 90, 118, 204, 110),
+      word("BEACH", 92, 250, 204, 150),
+    ]);
+
+    const production = selectBrandObservation([boundedOcr]).observation;
+
+    expect(production.value).toBe("GARDEN CITY BEACH");
+    expect(production.state).toBe("AMBIGUOUS");
+  });
+
+  it("forms the North Star adjacent-line candidate in production", () => {
+    const boundedOcr = result([word("NORTH", 91, 110, 140, 150), word("STAR", 90, 118, 204, 120)]);
+
+    const production = selectBrandObservation([boundedOcr]).observation;
+
+    expect(production.value).toBe("NORTH STAR");
+    expect(production.state).toBe("AMBIGUOUS");
+  });
+
+  it.each([
+    ["M CELLARS", [word("M", 74, 110, 140, 44), word("CELLARS", 96, 176, 140, 180)], "CELLARS"],
+    [
+      "NORTH STAR WINERY",
+      [
+        word("NORTH", 92, 110, 140, 150),
+        word("STAR", 93, 280, 140, 120),
+        word("WINERY", 96, 420, 140, 170),
+        word("•", 40, 606, 140, 24),
+        word("™", 40, 652, 140, 24),
+      ],
+      "WINERY",
+    ],
+    [
+      "BLUE RIDGE ESTATE",
+      [
+        word("BLUE", 92, 110, 140, 120),
+        word("RIDGE", 93, 252, 140, 150),
+        word("ESTATE", 96, 424, 140, 170),
+        word("•", 40, 612, 140, 24),
+        word("™", 40, 658, 140, 24),
+      ],
+      "ESTATE",
+    ],
+  ])("prefers the fuller Brand over designator-only %s", (expected, words, designator) => {
+    const selection = selectBrandObservation([result(words)]);
+    const designatorOnlyCandidate = selection.brandDiagnostics?.candidates.find(
+      (candidate) =>
+        candidate.kept &&
+        candidate.cleanedValue === designator &&
+        candidate.assembly === "line-window",
+    );
+
+    expect(selection.observation.value).toBe(expected);
+    expect(designatorOnlyCandidate?.cleanedValue).toBe(designator);
+    expect(designatorOnlyCandidate?.decision).not.toBe("selected");
+  });
+
+  it("leaves a designator-only Brand candidate eligible when no fuller candidate exists", () => {
+    const selection = selectBrandObservation([
+      result([word("WINERY", 95, 110, 140, 170)]),
+    ]).observation;
+
+    expect(selection.value).toBe("WINERY");
+    expect(selection.state).toBe("OBSERVED");
+  });
+
+  it("does not merge distant adjacent plausible lines", () => {
+    const boundedOcr = result([word("NORTH", 91, 110, 120, 150), word("STAR", 90, 118, 340, 120)]);
+
+    const production = selectBrandObservation([boundedOcr]).observation;
+
+    expect(production.value).not.toBe("NORTH STAR");
+  });
+
+  it("does not merge unrelated prose into a Brand candidate", () => {
+    const boundedOcr = result([
+      word("NORTH", 91, 110, 140, 150),
+      word("crafted", 88, 118, 204, 140),
+      word("daily", 88, 280, 204, 100),
+    ]);
+
+    const production = selectBrandObservation([boundedOcr]).observation;
+
+    expect(production.value).toBe("NORTH");
+    expect(production.value).not.toMatch(/crafted|daily/i);
+  });
+
+  it("keeps existing single-line Brand selection unchanged", () => {
+    const boundedOcr = result([
+      word("GARDEN", 91, 110, 140, 170),
+      word("CITY", 90, 300, 140, 110),
+      word("BEACH", 92, 430, 140, 150),
+    ]);
+
+    const legacy = selectBrandObservationLegacyGroupingControl([boundedOcr]).observation;
+    const production = selectBrandObservation([boundedOcr]).observation;
+
+    expect(production).toMatchObject(legacy);
+    expect(production.value).toBe("GARDEN CITY BEACH");
+    expect(production.state).toBe("AMBIGUOUS");
   });
 
   it("does not promote product designation text over a coherent Brand line", () => {
@@ -145,9 +264,7 @@ describe("Issue #149 Brand grouping/ranking treatment", () => {
       word("SAUVIGNON", 95, 338, 210, 220),
     ]);
 
-    const treatment = selectBrandObservationWithCoherentLineMergeTreatment([
-      boundedOcr,
-    ]).observation;
+    const treatment = selectBrandObservation([boundedOcr]).observation;
 
     expect(treatment.value).toBe("RIDGE CELLARS");
     expect(treatment.value).not.toMatch(/CABERNET|SAUVIGNON/);
@@ -161,27 +278,45 @@ describe("Issue #149 Brand grouping/ranking treatment", () => {
       word("VALLEY", 95, 258, 210, 150),
     ]);
 
-    const treatment = selectBrandObservationWithCoherentLineMergeTreatment([
-      boundedOcr,
-    ]).observation;
+    const treatment = selectBrandObservation([boundedOcr]).observation;
 
     expect(treatment.value).toBe("HARBOR CELLARS");
     expect(treatment.value).not.toMatch(/NAPA|VALLEY/);
   });
 
-  it("keeps multi-word Brand lines intact when appropriate", () => {
-    const boundedOcr = result([
-      word("GARDEN", 91, 110, 140, 170),
-      word("CITY", 90, 300, 140, 110),
-      word("BEACH", 92, 430, 140, 150),
-    ]);
-
-    const treatment = selectBrandObservationWithCoherentLineMergeTreatment([
-      boundedOcr,
+  it("leaves Alcohol selection unchanged", () => {
+    const alcohol = selectAlcoholObservation([
+      result([word("12.5%", 94, 110, 140, 120), word("ALC./VOL.", 93, 250, 140, 180)], {
+        brand: false,
+        alcohol: true,
+      }),
     ]).observation;
 
-    expect(treatment.value).toBe("GARDEN CITY BEACH");
-    expect(treatment.state).toBe("AMBIGUOUS");
+    expect(alcohol.state).toBe("OBSERVED");
+    expect(alcohol.value).toBe("12.5% ALC./VOL.");
+  });
+
+  it("leaves Government Warning selection on the dedicated selector", () => {
+    const warning = selectGovernmentWarningObservation("back", [
+      {
+        ...result([
+          word("GOVERNMENT", 94, 110, 140, 190),
+          word("WARNING:", 94, 322, 140, 180),
+          word("ACCORDING", 94, 524, 140, 190),
+          word("TO", 94, 110, 204, 60),
+          word("THE", 94, 190, 204, 80),
+          word("SURGEON", 94, 290, 204, 150),
+          word("GENERAL", 94, 462, 204, 150),
+        ]),
+        passKind: "full-image-primary",
+        regionName: "full-image",
+        triggerReasons: ["primary-pass"],
+        fieldEligibility: { brand: false, alcohol: true },
+      },
+    ]);
+
+    expect(warning.evidenceState).toBe("partial");
+    expect(warning.rawTranscript).toMatch(/^GOVERNMENT WARNING/);
   });
 
   it("keeps artifact projections deterministic apart from latency", () => {

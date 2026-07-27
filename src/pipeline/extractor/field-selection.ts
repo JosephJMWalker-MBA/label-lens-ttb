@@ -103,10 +103,12 @@ interface Candidate {
 
 interface BrandSelectionOptions {
   allowCoherentPlausibleLineMerge: boolean;
+  preferFullerCandidateOverDesignatorOnly: boolean;
 }
 
 const DEFAULT_BRAND_SELECTION_OPTIONS: BrandSelectionOptions = {
-  allowCoherentPlausibleLineMerge: false,
+  allowCoherentPlausibleLineMerge: true,
+  preferFullerCandidateOverDesignatorOnly: true,
 };
 
 /** An observation plus the region the selected value came from (for provenance). */
@@ -1338,6 +1340,7 @@ const GENERIC_PRODUCT_TOKEN = new Set([
  */
 const LOCATION_OR_APPELLATION_PHRASE = new Set([
   "boca raton",
+  "collio",
   "delle venezie",
   "delray beach fl",
   "delray beach",
@@ -1987,7 +1990,51 @@ function candidateFamilyKey(candidate: Candidate): string {
   return candidate.id ?? key(candidate.value);
 }
 
-function bestFamilyCandidates(candidates: Candidate[]): Candidate[] {
+function isDesignatorOnlyCandidate(candidate: Candidate): boolean {
+  const tokens = brandTokens(candidate.value).filter((token) => /[a-z]/.test(token));
+  return tokens.length === 1 && BRAND_DESIGNATOR.has(tokens[0]!);
+}
+
+function containsDesignatorOnlyCandidate(fuller: Candidate, designatorOnly: Candidate): boolean {
+  const designator = brandTokens(designatorOnly.value).find((token) => BRAND_DESIGNATOR.has(token));
+  return Boolean(designator && brandTokens(fuller.value).includes(designator));
+}
+
+function shouldPreferOverFamilyCandidate(
+  candidate: Candidate,
+  existing: Candidate,
+  options: BrandSelectionOptions,
+): boolean {
+  if (options.preferFullerCandidateOverDesignatorOnly) {
+    const candidateIsDesignatorOnly = isDesignatorOnlyCandidate(candidate);
+    const existingIsDesignatorOnly = isDesignatorOnlyCandidate(existing);
+    if (
+      existingIsDesignatorOnly &&
+      !candidateIsDesignatorOnly &&
+      containsDesignatorOnlyCandidate(candidate, existing)
+    ) {
+      return true;
+    }
+    if (
+      candidateIsDesignatorOnly &&
+      !existingIsDesignatorOnly &&
+      containsDesignatorOnlyCandidate(existing, candidate)
+    ) {
+      return false;
+    }
+  }
+  const candidateScore = candidate.score?.total ?? candidate.ocrEvidenceScore;
+  const existingScore = existing.score?.total ?? existing.ocrEvidenceScore;
+  return (
+    candidateScore > existingScore ||
+    (candidateScore === existingScore && candidate.ocrEvidenceScore > existing.ocrEvidenceScore)
+  );
+}
+
+function bestFamilyCandidates(
+  candidates: Candidate[],
+  options: BrandSelectionOptions,
+): Candidate[] {
   const byFamily = new Map<string, Candidate>();
   for (const candidate of candidates) {
     const familyKey = candidateFamilyKey(candidate);
@@ -1996,12 +2043,7 @@ function bestFamilyCandidates(candidates: Candidate[]): Candidate[] {
       byFamily.set(familyKey, candidate);
       continue;
     }
-    const candidateScore = candidate.score?.total ?? candidate.ocrEvidenceScore;
-    const existingScore = existing.score?.total ?? existing.ocrEvidenceScore;
-    if (
-      candidateScore > existingScore ||
-      (candidateScore === existingScore && candidate.ocrEvidenceScore > existing.ocrEvidenceScore)
-    ) {
+    if (shouldPreferOverFamilyCandidate(candidate, existing, options)) {
       byFamily.set(familyKey, candidate);
     }
   }
@@ -2268,11 +2310,15 @@ function selectBrandObservationWithOptions(
       }
     }
   }
-  return buildBrandObservation(candidates, {
-    lines: lineDiagnostics,
-    candidates: candidateDiagnostics,
-    abstentionReason: sawBrandRegionText ? "unsupported-candidates-only" : "no-brand-region-text",
-  });
+  return buildBrandObservation(
+    candidates,
+    {
+      lines: lineDiagnostics,
+      candidates: candidateDiagnostics,
+      abstentionReason: sawBrandRegionText ? "unsupported-candidates-only" : "no-brand-region-text",
+    },
+    options,
+  );
 }
 
 export function selectBrandObservation(results: RegionOcrResult[]): FieldSelection {
@@ -2284,6 +2330,16 @@ export function selectBrandObservationWithCoherentLineMergeTreatment(
 ): FieldSelection {
   return selectBrandObservationWithOptions(results, {
     allowCoherentPlausibleLineMerge: true,
+    preferFullerCandidateOverDesignatorOnly: true,
+  });
+}
+
+export function selectBrandObservationLegacyGroupingControl(
+  results: RegionOcrResult[],
+): FieldSelection {
+  return selectBrandObservationWithOptions(results, {
+    allowCoherentPlausibleLineMerge: false,
+    preferFullerCandidateOverDesignatorOnly: false,
   });
 }
 
@@ -2295,6 +2351,7 @@ export function selectBrandObservationWithCoherentLineMergeTreatment(
 function buildBrandObservation(
   candidates: Candidate[],
   diagnostics: BrandSelectionDiagnosticsInternal,
+  options: BrandSelectionOptions,
 ): FieldSelection {
   const publicDiagnostics = (): BrandSelectionDiagnostics => ({
     lines: diagnostics.lines,
@@ -2360,7 +2417,9 @@ function buildBrandObservation(
     }
   }
 
-  const ranked = dedupeBestCandidates(bestFamilyCandidates(scored)).sort(compareCandidateRanking);
+  const ranked = dedupeBestCandidates(bestFamilyCandidates(scored, options)).sort(
+    compareCandidateRanking,
+  );
   const best = ranked[0];
   const distinctAlternates = ranked
     .slice(1)
