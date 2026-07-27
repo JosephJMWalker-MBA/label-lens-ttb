@@ -57,7 +57,7 @@ export const FAILURE_TAXONOMY = [
 
 export type FailureTaxonomy = (typeof FAILURE_TAXONOMY)[number];
 
-type FieldType = "brandName" | "alcoholStatement";
+export type FieldType = "brandName" | "alcoholStatement";
 type NextVariable = "padding" | "upscaling" | "segmentation mode" | "preprocessing" | "orientation";
 
 export interface PixelBox {
@@ -67,21 +67,21 @@ export interface PixelBox {
   height: number;
 }
 
-interface SyntheticImage {
+export interface SyntheticImage {
   kind: "synthetic";
   width: number;
   height: number;
   svg: string;
 }
 
-interface ExistingImage {
+export interface ExistingImage {
   kind: "existing";
   imagePath: string;
 }
 
-type ImageSource = SyntheticImage | ExistingImage;
+export type ImageSource = SyntheticImage | ExistingImage;
 
-interface BaselineCaseDefinition {
+export interface BaselineCaseDefinition {
   caseId: string;
   fieldType: FieldType;
   expectedSellerValue: string;
@@ -326,7 +326,7 @@ function ensureCleanDir(dir: string): void {
   mkdirSync(path.join(dir, "transcripts"), { recursive: true });
 }
 
-function normalizedTranscript(text: string): string {
+export function normalizedTranscript(text: string): string {
   return text
     .normalize("NFKD")
     .toLowerCase()
@@ -336,7 +336,7 @@ function normalizedTranscript(text: string): string {
     .replace(/\s+/g, " ");
 }
 
-function normalizedRegion(
+export function normalizedRegion(
   box: PixelBox,
   width: number,
   height: number,
@@ -370,7 +370,7 @@ export function cropPlanForCase(
   );
 }
 
-function equivalent(
+export function boundedValueEquivalent(
   fieldType: FieldType,
   expected: string,
   observed: string | null | undefined,
@@ -550,7 +550,7 @@ function summarizeMetrics(records: BaselineCaseRecord[]) {
   };
 }
 
-async function sourceBytes(source: ImageSource): Promise<Uint8Array> {
+export async function sourceBytes(source: ImageSource): Promise<Uint8Array> {
   if (source.kind === "existing") return new Uint8Array(readFileSync(source.imagePath));
   const buffer = await sharp(Buffer.from(source.svg)).png().toBuffer();
   return new Uint8Array(buffer);
@@ -721,7 +721,7 @@ async function runOne(definition: BaselineCaseDefinition): Promise<BaselineCaseR
   const category = analysisRun.categories[0];
   const fullPanel = extraction.value.response.fields[definition.fieldType];
   const exactBoundedRead = reading.observedValue === definition.expectedSellerValue;
-  const normalizedBoundedRead = equivalent(
+  const normalizedBoundedRead = boundedValueEquivalent(
     definition.fieldType,
     definition.expectedSellerValue,
     reading.observedValue,
