@@ -281,8 +281,14 @@ describe("committed full-corpus report candidate-filtering coverage", () => {
     expect(
       strictRepresentative.matchedProposalCounts.byTarget.every(({ count }) => count <= 1),
     ).toBe(true);
-    expect(permissive.matchedProposalCounts.maximumTargetIds).toContain(
-      "patricia-green-cellars:target:brand",
+    const maximumMatchedCount = Math.max(
+      ...permissive.matchedProposalCounts.byTarget.map(({ count }) => count),
+    );
+    expect(permissive.matchedProposalCounts.maximumTargetIds).toEqual(
+      permissive.matchedProposalCounts.byTarget
+        .filter(({ count }) => count === maximumMatchedCount)
+        .map(({ targetId }) => targetId)
+        .sort(),
     );
   });
 
@@ -312,10 +318,11 @@ describe("committed full-corpus report candidate-filtering coverage", () => {
     }
   });
 
-  it("proves exact analyzer parity and preserves pre-diagnostic aggregate outcomes", () => {
+  it("proves exact analyzer parity and records the approved current aggregate outcomes", () => {
     const report = loadCommittedReport();
     expect(report.semanticRegionSurvival.productionParity).toMatchObject({
       status: "PASS",
+      baseCommit: "552d30352e76dd412bd75ceb319878ab2d2747bb",
       expectedCaseCount: 115,
       actualCaseCount: 115,
       matchedCaseCount: 115,
@@ -327,10 +334,10 @@ describe("committed full-corpus report candidate-filtering coverage", () => {
       determinateBrandCount: 101,
       brandExactMatchRate: 0.26732673267326734,
       brandTop3Recall: 0.32673267326732675,
-      presentAlcoholCount: 102,
-      alcoholDetectionRecall: 0.6078431372549019,
-      alcoholParsedValueAccuracy: 0.5686274509803921,
-      alcoholFalseCertaintyRate: 0.008695652173913044,
+      presentAlcoholCount: 103,
+      alcoholDetectionRecall: 0.6796116504854369,
+      alcoholParsedValueAccuracy: 0.6601941747572816,
+      alcoholFalseCertaintyRate: 0,
     });
   });
 });

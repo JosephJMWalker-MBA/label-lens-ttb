@@ -1,0 +1,209 @@
+{
+  "schemaVersion": "issue-149-production-parity-mismatch-inventory.v1",
+  "productionBaseSha": "552d30352e76dd412bd75ceb319878ab2d2747bb",
+  "oldFixtureSha256": "31a30c138d7a0bc8263b5c911419d8429f98e1948c544b86a6f72f2b9235efa5",
+  "newFixtureSha256": "4ec2851ebe4c65bc41fd17983236f3236fb436e2df9eb0a6814f5d4543c8fb73",
+  "expectedCaseCount": 115,
+  "actualCaseCount": 115,
+  "mismatchCount": 7,
+  "classificationCounts": {
+    "intentional-production-behavior-change": 7,
+    "serialization-or-order-change": 0,
+    "nondeterminism": 0,
+    "stale-truth-or-fixture-data": 0,
+    "environment-or-configuration-drift": 0,
+    "unknown": 0
+  },
+  "records": [
+    {
+      "caseId": "approved-wine-013",
+      "expectedSha256": "f64f076265287c2f6b0e455b587d147b0b9d2d69174ba5104626c311ba336fe6",
+      "actualSha256": "7e16e2ad25424e952c838195b0968aeaef920dbbe783d3a72d44424f33040f1f",
+      "firstDifference": {
+        "jsonPath": "$.fields.alcoholStatement.state",
+        "byteOffset": 4645,
+        "expectedValue": "NOT_OBSERVED",
+        "actualValue": "OBSERVED",
+        "fieldCategory": "alcoholStatement"
+      },
+      "expectedAlcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "confidence": 0
+      },
+      "actualAlcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% BY VOL.",
+        "confidence": 0.955
+      },
+      "brandIdentical": true,
+      "cause": "intentional-production-behavior-change",
+      "originatingPr": 151,
+      "originatingCommit": "8827ec2ce8b901a38f6b136cbb35f1ac7a76437c",
+      "evidence": "PR #151 intentionally recognized the already-observed whole-token ABV marker; its corpus artifact names this case as the only changed output."
+    },
+    {
+      "caseId": "patricia-green-cellars",
+      "expectedSha256": "265654343bbcbdadad57e08ebe460dfb54ffe52ae2d9cd42e43b4f9ba521284f",
+      "actualSha256": "502d4fbea3703192b52ab0cc696321e6239425ea8743b1c5c49a8c8533cdfd84",
+      "firstDifference": {
+        "jsonPath": "$.fields.alcoholStatement.state",
+        "byteOffset": 8680,
+        "expectedValue": "NOT_OBSERVED",
+        "actualValue": "LOW_CONFIDENCE",
+        "fieldCategory": "alcoholStatement"
+      },
+      "expectedAlcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "confidence": 0
+      },
+      "actualAlcohol": {
+        "state": "LOW_CONFIDENCE",
+        "value": "13.8% ALC./VOL.",
+        "confidence": 0.43
+      },
+      "brandIdentical": true,
+      "cause": "intentional-production-behavior-change",
+      "originatingPr": 150,
+      "originatingCommit": "5edec007cbef17fc86baac2d48ee902cb6c14df9",
+      "evidence": "PR #150 intentionally split a dotted fused Alcohol prefix; its corpus artifact names this correct conservative recovery."
+    },
+    {
+      "caseId": "approved-wine-055",
+      "expectedSha256": "c9aac178af9ff3c2550b19ce8196ce218af0d9d0ad162bebeed075cd9a360cc8",
+      "actualSha256": "449f7ee4b5d7617451904344cb0551f4ecc5509bc68df12110ee9665a424e7ee",
+      "firstDifference": {
+        "jsonPath": "$.fields.alcoholStatement.state",
+        "byteOffset": 15155,
+        "expectedValue": "NOT_OBSERVED",
+        "actualValue": "OBSERVED",
+        "fieldCategory": "alcoholStatement"
+      },
+      "expectedAlcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "confidence": 0
+      },
+      "actualAlcohol": {
+        "state": "OBSERVED",
+        "value": "13% ALC./VOL.",
+        "confidence": 0.9433333333333334
+      },
+      "brandIdentical": true,
+      "cause": "intentional-production-behavior-change",
+      "originatingPr": 150,
+      "originatingCommit": "5edec007cbef17fc86baac2d48ee902cb6c14df9",
+      "evidence": "PR #150 intentionally split a dotted fused Alcohol prefix and documented this exact correct case."
+    },
+    {
+      "caseId": "approved-wine-077",
+      "expectedSha256": "374fd618998f7862d5a4dfebdae2899d4f70925c11bb6c851f8e15a4a162e252",
+      "actualSha256": "86c392a8e4be65a82abeb9d72355fb2a669c6f679dc480e04a5018cc6e76e7ed",
+      "firstDifference": {
+        "jsonPath": "$.fields.alcoholStatement.state",
+        "byteOffset": 2590,
+        "expectedValue": "NOT_OBSERVED",
+        "actualValue": "OBSERVED",
+        "fieldCategory": "alcoholStatement"
+      },
+      "expectedAlcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "confidence": 0
+      },
+      "actualAlcohol": {
+        "state": "OBSERVED",
+        "value": "13.5% ALC./VOL.",
+        "confidence": 0.89
+      },
+      "brandIdentical": true,
+      "cause": "intentional-production-behavior-change",
+      "originatingPr": 150,
+      "originatingCommit": "5edec007cbef17fc86baac2d48ee902cb6c14df9",
+      "evidence": "PR #150 intentionally split a dotted fused Alcohol prefix and documented this exact correct case."
+    },
+    {
+      "caseId": "approved-wine-095",
+      "expectedSha256": "d9c429ef79657f7f7e22453bc4f3b4c5c636665d27a964efeb2ee2404ceb8bf8",
+      "actualSha256": "8ce9dd606bc8c8b3d72ef611d810ad568134af88f41fe18acd4565adf7401873",
+      "firstDifference": {
+        "jsonPath": "$.fields.alcoholStatement.state",
+        "byteOffset": 587,
+        "expectedValue": "NOT_OBSERVED",
+        "actualValue": "OBSERVED",
+        "fieldCategory": "alcoholStatement"
+      },
+      "expectedAlcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "confidence": 0
+      },
+      "actualAlcohol": {
+        "state": "OBSERVED",
+        "value": "12% ALC./VOL.",
+        "confidence": 0.8266666666666665
+      },
+      "brandIdentical": true,
+      "cause": "intentional-production-behavior-change",
+      "originatingPr": 150,
+      "originatingCommit": "5edec007cbef17fc86baac2d48ee902cb6c14df9",
+      "evidence": "PR #150 intentionally split a dotted fused Alcohol prefix and documented this exact correct case."
+    },
+    {
+      "caseId": "approved-wine-096",
+      "expectedSha256": "fc6429723da30822b2e8c67f9b82a75aa7640a953bd891b0102af7ac77eb4c32",
+      "actualSha256": "3f95060c338606a9e81813044a3d14ab19b8205b664713d33af544d89f280772",
+      "firstDifference": {
+        "jsonPath": "$.fields.alcoholStatement.state",
+        "byteOffset": 587,
+        "expectedValue": "NOT_OBSERVED",
+        "actualValue": "OBSERVED",
+        "fieldCategory": "alcoholStatement"
+      },
+      "expectedAlcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "confidence": 0
+      },
+      "actualAlcohol": {
+        "state": "OBSERVED",
+        "value": "12% ALC./VOL.",
+        "confidence": 0.8733333333333334
+      },
+      "brandIdentical": true,
+      "cause": "intentional-production-behavior-change",
+      "originatingPr": 150,
+      "originatingCommit": "5edec007cbef17fc86baac2d48ee902cb6c14df9",
+      "evidence": "PR #150 intentionally split a dotted fused Alcohol prefix and documented this exact correct case."
+    },
+    {
+      "caseId": "approved-wine-097",
+      "expectedSha256": "8f82cc2ad57c492665f8132b9a9b01237610adb24616c3ab352b98cc0b1edd2a",
+      "actualSha256": "039703ec1727adc59a219c4f266f27f753e2e0352bfae1c86d780dd39333e92e",
+      "firstDifference": {
+        "jsonPath": "$.fields.alcoholStatement.state",
+        "byteOffset": 587,
+        "expectedValue": "NOT_OBSERVED",
+        "actualValue": "LOW_CONFIDENCE",
+        "fieldCategory": "alcoholStatement"
+      },
+      "expectedAlcohol": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "confidence": 0
+      },
+      "actualAlcohol": {
+        "state": "LOW_CONFIDENCE",
+        "value": "12% ALC./VOL.",
+        "confidence": 0.4566666666666667
+      },
+      "brandIdentical": true,
+      "cause": "intentional-production-behavior-change",
+      "originatingPr": 150,
+      "originatingCommit": "5edec007cbef17fc86baac2d48ee902cb6c14df9",
+      "evidence": "PR #150 intentionally split a dotted fused Alcohol prefix; confidence remains conservative and the case is documented as correct."
+    }
+  ],
+  "completeByteRangeEvidence": "See parity.mismatches[].firstDifference in determinism-run-1.json; determinism-run-2.json is byte-identical."
+}

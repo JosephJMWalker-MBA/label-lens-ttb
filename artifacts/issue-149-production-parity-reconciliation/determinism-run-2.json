@@ -1,0 +1,894 @@
+{
+  "schemaVersion": "production-parity-reconciliation-run.v1",
+  "instrumentationCommitSha": "21c5a6db365549078946b84f500e5e14738dbde4",
+  "productionBaseSha": "552d30352e76dd412bd75ceb319878ab2d2747bb",
+  "environment": {
+    "nodeVersion": "v22.17.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "processedAtValues": ["2026-07-12T00:00:00Z"],
+    "networkDependency": "none; local committed image bytes, Sharp, and bundled Tesseract model only"
+  },
+  "expectedFixture": {
+    "path": "src/fixtures/eval/production-analyzer-parity.baseline.json",
+    "sha256": "31a30c138d7a0bc8263b5c911419d8429f98e1948c544b86a6f72f2b9235efa5",
+    "baseCommit": "d54e3b2506de9220d2f0cd602d44b3a82c42fd58",
+    "caseCount": 115
+  },
+  "actual": {
+    "caseCount": 115,
+    "caseOrderSha256": "1548ca1313e28fd946bb3dc13f9500d8f579be0484a2d541d8abeb60c9035ba3",
+    "responseSetSha256": "c956dcae53f67113028b528cce5e6cec891160a0bbd0c72ca7d079ef1c108d2d",
+    "records": [
+      {
+        "caseId": "luigi-giovanni-live",
+        "extractionError": null,
+        "sha256": "dedcde3c515ac0a88403ccdb2affb298ca7b4a701b8c12e9979d9433cf1f8f81",
+        "byteLength": 4914
+      },
+      {
+        "caseId": "alfredos-wine",
+        "extractionError": null,
+        "sha256": "73008f1d3a0cc2e8280209d374071cac0dfa622e6a5dc1a394566c225e9cc058",
+        "byteLength": 4778
+      },
+      {
+        "caseId": "la-fattoria-rotated",
+        "extractionError": null,
+        "sha256": "4de68d8d1da6993d245de374761d657b37abb22750dedd411de5b07a77416222",
+        "byteLength": 10791
+      },
+      {
+        "caseId": "approved-wine-004",
+        "extractionError": null,
+        "sha256": "cdbd76949d30ac854354cf0c28c43dd8b9b91aa2bef8f209c7f416fe554da17b",
+        "byteLength": 23033
+      },
+      {
+        "caseId": "approved-wine-005",
+        "extractionError": null,
+        "sha256": "5764f1377f801bc996397f36380d1c82aba61e850ee102db5b548e0d03ba6f7a",
+        "byteLength": 17349
+      },
+      {
+        "caseId": "approved-wine-006",
+        "extractionError": null,
+        "sha256": "1fda92f683b8f85f90c3f09f8d06efe3a8f0582659775572d541385647764997",
+        "byteLength": 12025
+      },
+      {
+        "caseId": "casanova-della-spinetta",
+        "extractionError": null,
+        "sha256": "2a19eaabfa92188e289d5fc7487c402dd1c1f95820b6f99d6ac596a0efae42e0",
+        "byteLength": 14177
+      },
+      {
+        "caseId": "approved-wine-008",
+        "extractionError": null,
+        "sha256": "d9444f25815972fa4be0e794038b265345dd3e893d7e5377cf23ef9bcac6d788",
+        "byteLength": 24429
+      },
+      {
+        "caseId": "approved-wine-009",
+        "extractionError": null,
+        "sha256": "2c8cc16dc93fb5be85af88af69525a46fb060f7776f1538538f8c426c638c3da",
+        "byteLength": 24375
+      },
+      {
+        "caseId": "domaine-follin-arbelet",
+        "extractionError": null,
+        "sha256": "e75c89fefb228349b1fbae8a4b74feec499105b537c14c8cb0d81da83e202e25",
+        "byteLength": 13948
+      },
+      {
+        "caseId": "approved-wine-011",
+        "extractionError": null,
+        "sha256": "69333129d7e666751c992e432f285d2f86a142e6dd08c7ed4d66ef87c2ab3c6b",
+        "byteLength": 4849
+      },
+      {
+        "caseId": "approved-wine-012",
+        "extractionError": null,
+        "sha256": "12f6271c9326d96beab9b50ec9c7a13acfa301da24850d3b9dd4cda3a7779e74",
+        "byteLength": 8020
+      },
+      {
+        "caseId": "approved-wine-013",
+        "extractionError": null,
+        "sha256": "7e16e2ad25424e952c838195b0968aeaef920dbbe783d3a72d44424f33040f1f",
+        "byteLength": 5785
+      },
+      {
+        "caseId": "approved-wine-014",
+        "extractionError": null,
+        "sha256": "06d28217a7af24d954b68c5fd5b35e57cf5b4c57d093b42d4eb94e9638fa843c",
+        "byteLength": 6899
+      },
+      {
+        "caseId": "patricia-green-cellars",
+        "extractionError": null,
+        "sha256": "502d4fbea3703192b52ab0cc696321e6239425ea8743b1c5c49a8c8533cdfd84",
+        "byteLength": 9829
+      },
+      {
+        "caseId": "approved-wine-016",
+        "extractionError": null,
+        "sha256": "2f96a0ee774a93140ea5d953799c142ec6515b7f5458b72686e1c448a3a7ea9e",
+        "byteLength": 3878
+      },
+      {
+        "caseId": "approved-wine-017",
+        "extractionError": null,
+        "sha256": "d5aeb3bcbed9bfafa770d8bc9d93ccc289dc8141a8d35a2b5758a5a7600ff0b1",
+        "byteLength": 16063
+      },
+      {
+        "caseId": "approved-wine-018",
+        "extractionError": null,
+        "sha256": "feaef54481f69318fc81db5dc41587c45ad5e686e008f1126c6c858c389e3729",
+        "byteLength": 7979
+      },
+      {
+        "caseId": "approved-wine-019",
+        "extractionError": null,
+        "sha256": "dc0607cff29e8764cf32d2e76e896f8a14b4c31d94b77b3d5905801c48705c40",
+        "byteLength": 4913
+      },
+      {
+        "caseId": "approved-wine-020",
+        "extractionError": null,
+        "sha256": "05a8af7588d024196ef0593ed260166fa02b01322476a11898257272d2e0f46d",
+        "byteLength": 12117
+      },
+      {
+        "caseId": "saker",
+        "extractionError": null,
+        "sha256": "2fc476e19e02c447dee41e747d48010181e0ccfc22a2c05668ba68033ba27ff8",
+        "byteLength": 5756
+      },
+      {
+        "caseId": "approved-wine-022",
+        "extractionError": null,
+        "sha256": "8c91488e361342008eaacf0c696e21e238277f2cd157457a4495f27c6e4d12a9",
+        "byteLength": 1905
+      },
+      {
+        "caseId": "approved-wine-023",
+        "extractionError": null,
+        "sha256": "15a4091904b93c471e5b39cfcc118c1ce5dbc83be054c94c97d7f9bbb3661e81",
+        "byteLength": 11899
+      },
+      {
+        "caseId": "approved-wine-024",
+        "extractionError": null,
+        "sha256": "503289192f19ff86d80228d236f2dac498d806a74ab880e18ee41406add28d77",
+        "byteLength": 9175
+      },
+      {
+        "caseId": "nebla-mencia",
+        "extractionError": null,
+        "sha256": "f10e0a7589caaa21c4e19ac42132cf862334aadc9fbc709bd4af5761e4bb4911",
+        "byteLength": 14165
+      },
+      {
+        "caseId": "approved-wine-026",
+        "extractionError": null,
+        "sha256": "48b31aa9fe46636a47a869a3b541e92c25839442e974b910bbbbb09e413a5f3c",
+        "byteLength": 22603
+      },
+      {
+        "caseId": "approved-wine-027",
+        "extractionError": null,
+        "sha256": "b00ad9dd5d2cd92e63dbffb2cd9a6c7f77c9e2c878a9116cf4941c3689a8d4be",
+        "byteLength": 2853
+      },
+      {
+        "caseId": "approved-wine-028",
+        "extractionError": null,
+        "sha256": "1416a73bb3ec2ab27d31e2a6a51552fe04120a231e8f7dc4874690f09f0b4979",
+        "byteLength": 3866
+      },
+      {
+        "caseId": "approved-wine-031",
+        "extractionError": null,
+        "sha256": "beeba258acf1e14111b1caf72fd0ff9020bd636f4ac9883d78ae71d5a6d1f9f6",
+        "byteLength": 12049
+      },
+      {
+        "caseId": "approved-wine-032",
+        "extractionError": null,
+        "sha256": "eb0729cb9e2d1120a61605d90406dfc1d0f3890ebcfb15aa6446505179343de8",
+        "byteLength": 7857
+      },
+      {
+        "caseId": "approved-wine-033",
+        "extractionError": null,
+        "sha256": "45a20df6067929bd0989465af8e94ff0835a50cfa3427f659c89d52506f71c79",
+        "byteLength": 5796
+      },
+      {
+        "caseId": "approved-wine-034",
+        "extractionError": null,
+        "sha256": "615c0e2ee66b4a4cf05ecf746c30844d21f5ce0e3ee02820afe9e2d647b42754",
+        "byteLength": 9976
+      },
+      {
+        "caseId": "approved-wine-035",
+        "extractionError": null,
+        "sha256": "3f5f1e6a440d012aa697c0a1b3d3f49834e8dd547c51fffef414f6fa8afc4626",
+        "byteLength": 10939
+      },
+      {
+        "caseId": "approved-wine-037",
+        "extractionError": null,
+        "sha256": "75fae77a775b5a0341e08b22189ade9d6fef0d74de29accf7be095bd1b3326f2",
+        "byteLength": 5872
+      },
+      {
+        "caseId": "approved-wine-038",
+        "extractionError": null,
+        "sha256": "45e37c814c5b39d1a21e32183fbbcb5abcce7143a79202c19bc103f8f8bab79f",
+        "byteLength": 3801
+      },
+      {
+        "caseId": "approved-wine-039",
+        "extractionError": null,
+        "sha256": "fdfc635c35b68685d08e94c56205ab23101dbb4fff850e9e6d3fa9b7ff0cdf51",
+        "byteLength": 10164
+      },
+      {
+        "caseId": "chateau-bonneau",
+        "extractionError": null,
+        "sha256": "541e59ae00ec8fa0520a6665155426d381ea24dcfc43b8c44b36469334fbe56c",
+        "byteLength": 19176
+      },
+      {
+        "caseId": "approved-wine-041",
+        "extractionError": null,
+        "sha256": "3699fce752f53deb76d5d38501d7221f56c9e5de1d771815ec17b3ded0219676",
+        "byteLength": 12170
+      },
+      {
+        "caseId": "approved-wine-042",
+        "extractionError": null,
+        "sha256": "c04aab776ad2827d440764622eb43ecd44a77e6a09cb78759c4e16248d5b5280",
+        "byteLength": 5848
+      },
+      {
+        "caseId": "approved-wine-043",
+        "extractionError": null,
+        "sha256": "3435119c7603481ae41aebcdf4e97a9a301cb0543b63618ef155b72603dad683",
+        "byteLength": 11884
+      },
+      {
+        "caseId": "approved-wine-044",
+        "extractionError": null,
+        "sha256": "2b061efc461f63d389dcafb2f14382a53b9841f46791e8ab23f790f69941ce5f",
+        "byteLength": 7769
+      },
+      {
+        "caseId": "approved-wine-045",
+        "extractionError": null,
+        "sha256": "605272afd88d1fcb617e16e14bd16af691990c72da9803864aef0174ded23337",
+        "byteLength": 3829
+      },
+      {
+        "caseId": "approved-wine-046",
+        "extractionError": null,
+        "sha256": "929985c7ec5ef83eedafaddbb4343f9bd18b37c1e2887b8a1fb20ed2e4d36e5b",
+        "byteLength": 6955
+      },
+      {
+        "caseId": "approved-wine-047",
+        "extractionError": null,
+        "sha256": "d7f1dbb97e8c63946b3ad5bfa4b5cd1fca6b2c2bdfdeca536ab92703f984090d",
+        "byteLength": 29414
+      },
+      {
+        "caseId": "approved-wine-048",
+        "extractionError": null,
+        "sha256": "40fb9bb39d71ce0e968be5f12b877960cf262ab8570eb32a84b14ae23939519f",
+        "byteLength": 11996
+      },
+      {
+        "caseId": "approved-wine-049",
+        "extractionError": null,
+        "sha256": "aadfc9368ab51ae92fb78f99596a4c82b7d0a9c077f11d5ad94e7b879e7a4ebf",
+        "byteLength": 14292
+      },
+      {
+        "caseId": "le-temps-des-fleurs",
+        "extractionError": null,
+        "sha256": "bb53d2679bc1c65c01499f201401cc5da4c76b63a425a8cd6315fd19bae54ae6",
+        "byteLength": 5851
+      },
+      {
+        "caseId": "approved-wine-051",
+        "extractionError": null,
+        "sha256": "0e6d2691a3b9499e41f892f6eadb7e33eb1760e4a1b0efd017ca170417908367",
+        "byteLength": 8943
+      },
+      {
+        "caseId": "approved-wine-052",
+        "extractionError": null,
+        "sha256": "2e538909e24457592dd02c2e3882cc97a6f9d2fd9f60f849c72c31179ae4a0f4",
+        "byteLength": 12919
+      },
+      {
+        "caseId": "approved-wine-053",
+        "extractionError": null,
+        "sha256": "d50bb329bfc7908522581a4fd6bf8a62245bacb69dfb3e346845bec5442e09c9",
+        "byteLength": 12354
+      },
+      {
+        "caseId": "approved-wine-054",
+        "extractionError": null,
+        "sha256": "c098340a18157990ccc2f5827f444b164b19b171b72d21e78ab570dbc2813e8a",
+        "byteLength": 29687
+      },
+      {
+        "caseId": "approved-wine-055",
+        "extractionError": null,
+        "sha256": "449f7ee4b5d7617451904344cb0551f4ecc5509bc68df12110ee9665a424e7ee",
+        "byteLength": 16353
+      },
+      {
+        "caseId": "approved-wine-056",
+        "extractionError": null,
+        "sha256": "aae01216c7fdf21dac61651d10dbfc995956b3cb55bd25150c8bef0283ec7432",
+        "byteLength": 10068
+      },
+      {
+        "caseId": "approved-wine-057",
+        "extractionError": null,
+        "sha256": "1d4db49914637572e55194fcd37e3ecac8141da09fffbf878a3c02f46fbf3f95",
+        "byteLength": 14299
+      },
+      {
+        "caseId": "approved-wine-058",
+        "extractionError": null,
+        "sha256": "bf3b27caeb19af7734c63c8a660ded4936844f04b3a3fcf30958a4f1088cebdc",
+        "byteLength": 941
+      },
+      {
+        "caseId": "approved-wine-059",
+        "extractionError": null,
+        "sha256": "35f3c8b38abc77e8b612fa35a7808a719ec53411603346317e888a23f2c871b1",
+        "byteLength": 2907
+      },
+      {
+        "caseId": "three-steves-winery",
+        "extractionError": null,
+        "sha256": "a9cf90dff9d172f8d56b8be73eb11fb6991c201baa1df08ae66b9266c8ebc407",
+        "byteLength": 2746
+      },
+      {
+        "caseId": "approved-wine-061",
+        "extractionError": null,
+        "sha256": "c9fbd435e37b4f401527c8c6d1f071c9aa666db35ab635aaf0a40a7017851307",
+        "byteLength": 4819
+      },
+      {
+        "caseId": "approved-wine-062",
+        "extractionError": null,
+        "sha256": "f3c7dd05540adc9ddef358a0727ae60ccbaadd54d0e9067821c2fe8960843324",
+        "byteLength": 897
+      },
+      {
+        "caseId": "approved-wine-063",
+        "extractionError": null,
+        "sha256": "6410cba1eefee03f8c4b3c0d39d0b5c8e0c2830c88924b9fc2329db1c919a497",
+        "byteLength": 11010
+      },
+      {
+        "caseId": "approved-wine-064",
+        "extractionError": null,
+        "sha256": "f317a9ae5619ca79a1e499f4ec044fdc4893bfba8c3d7849de701092ded9bea3",
+        "byteLength": 15144
+      },
+      {
+        "caseId": "approved-wine-065",
+        "extractionError": null,
+        "sha256": "e729b267346ac79a6ff7c3ee4a4bdeca458d59d99e692dfa8a9ac8fd34e4a9e1",
+        "byteLength": 11078
+      },
+      {
+        "caseId": "approved-wine-066",
+        "extractionError": null,
+        "sha256": "baec8650a4966748d8bebf09de3c3fd77ea16df3b2c78eba14441e573cae9010",
+        "byteLength": 12078
+      },
+      {
+        "caseId": "approved-wine-067",
+        "extractionError": null,
+        "sha256": "0c01a64b98318e2005607bfae33da9ddda71c5fe1466f40d474145292633ff04",
+        "byteLength": 8042
+      },
+      {
+        "caseId": "approved-wine-068",
+        "extractionError": null,
+        "sha256": "af0cf0093eaf0d90e01c3c06a2dd493b7242cc847ea8818b7ffa3eb900b4a8e4",
+        "byteLength": 14022
+      },
+      {
+        "caseId": "approved-wine-069",
+        "extractionError": null,
+        "sha256": "836d39318cf76d2d1134b85e13a852c75c2ac39613b092b3ce051c83101d9287",
+        "byteLength": 4905
+      },
+      {
+        "caseId": "altacima",
+        "extractionError": null,
+        "sha256": "789250ec1825ad0e805e4c0b7437bd42d80a7079e4d9a3d3c5e966f9374f3eed",
+        "byteLength": 7081
+      },
+      {
+        "caseId": "approved-wine-071",
+        "extractionError": null,
+        "sha256": "dd11937aa0e58e57e5104fbe4495f9bb2430a0235cf7c70afdc393e930eca91c",
+        "byteLength": 6976
+      },
+      {
+        "caseId": "approved-wine-072",
+        "extractionError": null,
+        "sha256": "ae37949ca504fc7cffadaac28d1b09d8d42ec025b801767e280a3d5add4f07fc",
+        "byteLength": 4927
+      },
+      {
+        "caseId": "approved-wine-073",
+        "extractionError": null,
+        "sha256": "d03d8b9a4ba9f880b30efac384f1177ca6be080a3c2485e3ad52b17c3c2dc665",
+        "byteLength": 9082
+      },
+      {
+        "caseId": "approved-wine-074",
+        "extractionError": null,
+        "sha256": "a30f52e75c8ac8ff3553e2c7c83c765ea01416df7e9cd2bf978a9bec65f22c87",
+        "byteLength": 6874
+      },
+      {
+        "caseId": "approved-wine-075",
+        "extractionError": null,
+        "sha256": "69d0f00eeb57d56ed21a866eda07fb87d9d342b3c531f5397a5811b66e1c9175",
+        "byteLength": 968
+      },
+      {
+        "caseId": "approved-wine-076",
+        "extractionError": null,
+        "sha256": "ce4259e23f7f890a491931f898cf10f85adccdcb9b04c7afce0c425a8a7589ba",
+        "byteLength": 11866
+      },
+      {
+        "caseId": "approved-wine-077",
+        "extractionError": null,
+        "sha256": "86c392a8e4be65a82abeb9d72355fb2a669c6f679dc480e04a5018cc6e76e7ed",
+        "byteLength": 3733
+      },
+      {
+        "caseId": "approved-wine-078",
+        "extractionError": null,
+        "sha256": "59b9bd4683162631dc54abbc7c2f1ebccb9e7e5287df6523f4d020f0ce05dc3e",
+        "byteLength": 5769
+      },
+      {
+        "caseId": "approved-wine-079",
+        "extractionError": null,
+        "sha256": "7f130c497a8c7ce31d7714eda71e7a2a48fe9ea2f77589e9a2218362d7c205d3",
+        "byteLength": 7788
+      },
+      {
+        "caseId": "le-caniette",
+        "extractionError": null,
+        "sha256": "93a71bcc9b349af42440afc1a0c5f2276a1d135141179853a0e6c38e291c7aea",
+        "byteLength": 9899
+      },
+      {
+        "caseId": "approved-wine-081",
+        "extractionError": null,
+        "sha256": "e56e661a13d97c48c98a50b7c501f94b68eca6cbdb1cb4db18e03784b6dc9160",
+        "byteLength": 3734
+      },
+      {
+        "caseId": "approved-wine-082",
+        "extractionError": null,
+        "sha256": "23f9a0b9f4d6b5f536c1c63cc30bacd10d17723e344c26e02d68eacae77d8ea3",
+        "byteLength": 1899
+      },
+      {
+        "caseId": "approved-wine-083",
+        "extractionError": null,
+        "sha256": "4776c410ef5589b20759ad42edf447992f601c49985031385ab49a91e0e94a0d",
+        "byteLength": 11139
+      },
+      {
+        "caseId": "approved-wine-084",
+        "extractionError": null,
+        "sha256": "c3fefb3dc17939a05adadd909a1392e6d5c7e5b5df3d446b5747de5ce3eba726",
+        "byteLength": 12131
+      },
+      {
+        "caseId": "approved-wine-085",
+        "extractionError": null,
+        "sha256": "4fc70ec0f9c4b45d4f53858bdf07ce0c1f337bf1e99c5709c36cfc694e349aee",
+        "byteLength": 6931
+      },
+      {
+        "caseId": "approved-wine-086",
+        "extractionError": null,
+        "sha256": "aa27d5d41e08f1f00ad9c999f3f28358c1ec6f54c2381c74a59a97739d7b75ff",
+        "byteLength": 2744
+      },
+      {
+        "caseId": "approved-wine-087",
+        "extractionError": null,
+        "sha256": "ff190383c7db7c2b994925db55c7ddff900f5dc1d6aafc052c62f9644ac9c07f",
+        "byteLength": 9856
+      },
+      {
+        "caseId": "approved-wine-088",
+        "extractionError": null,
+        "sha256": "7034b2ce75f956948ad1886fdc5d805001a09a65b8e0ba239fcd08bc88f54ec3",
+        "byteLength": 14163
+      },
+      {
+        "caseId": "approved-wine-089",
+        "extractionError": null,
+        "sha256": "3d21359f5afee378abc5fc535c5b8cbbd0cc6add5e9b013b6bc0a9f04fb713cf",
+        "byteLength": 12083
+      },
+      {
+        "caseId": "approved-wine-090",
+        "extractionError": null,
+        "sha256": "e07c766bcce119fce5c510b122c44f62a3be7cf3b3da77145d0a0786a2ed3d8a",
+        "byteLength": 14238
+      },
+      {
+        "caseId": "approved-wine-091",
+        "extractionError": null,
+        "sha256": "d44146c57eb09a7ee8647c6c36a0d13fb79a41db57e5ff39d50382fdfc6e98d6",
+        "byteLength": 18289
+      },
+      {
+        "caseId": "approved-wine-092",
+        "extractionError": null,
+        "sha256": "2a47457734463adc8886ef306617aba523d87a8758abe7dfe747338154b0fc75",
+        "byteLength": 8122
+      },
+      {
+        "caseId": "approved-wine-093",
+        "extractionError": null,
+        "sha256": "53bcca409cba899a35feb63ca4df0e4e1ff81a79c745955859fc2d08461933ec",
+        "byteLength": 14079
+      },
+      {
+        "caseId": "approved-wine-094",
+        "extractionError": null,
+        "sha256": "2d2014c5239c68244703f0719933e8d02ab82dec704bf5d89c4f9280a4c38648",
+        "byteLength": 14003
+      },
+      {
+        "caseId": "approved-wine-095",
+        "extractionError": null,
+        "sha256": "8ce9dd606bc8c8b3d72ef611d810ad568134af88f41fe18acd4565adf7401873",
+        "byteLength": 1917
+      },
+      {
+        "caseId": "approved-wine-096",
+        "extractionError": null,
+        "sha256": "3f95060c338606a9e81813044a3d14ab19b8205b664713d33af544d89f280772",
+        "byteLength": 1937
+      },
+      {
+        "caseId": "approved-wine-097",
+        "extractionError": null,
+        "sha256": "039703ec1727adc59a219c4f266f27f753e2e0352bfae1c86d780dd39333e92e",
+        "byteLength": 1932
+      },
+      {
+        "caseId": "approved-wine-098",
+        "extractionError": null,
+        "sha256": "d19e65f0e1ff6b59d0c2e91ee9f39d30bb66f21068836799f1eeb94c1fcbba6c",
+        "byteLength": 947
+      },
+      {
+        "caseId": "approved-wine-099",
+        "extractionError": null,
+        "sha256": "06eb3c8c22e5588d0714ffc05c4ff647dd8eb4ea23917933ac96c9fff12cc396",
+        "byteLength": 14114
+      },
+      {
+        "caseId": "amuninni-ferracane",
+        "extractionError": null,
+        "sha256": "6b228f38410e260a6c200f7c7e3009f391ff6e60376e637f4f5c1f4bd3057f38",
+        "byteLength": 7829
+      },
+      {
+        "caseId": "approved-wine-101",
+        "extractionError": null,
+        "sha256": "e820b9c8b89538888ea02e95b27669be8a3e5e0bd554edd8cb8121dc27e5db02",
+        "byteLength": 941
+      },
+      {
+        "caseId": "approved-wine-102",
+        "extractionError": null,
+        "sha256": "ea204d973f84193869b66b1380c4f6d46f311be9142e9c0e236bacda38da76cc",
+        "byteLength": 5969
+      },
+      {
+        "caseId": "approved-wine-103",
+        "extractionError": null,
+        "sha256": "1b55a609d257e46de7c8441fd40740ac046129a1f0d99b0fe889c98be2957a9a",
+        "byteLength": 8881
+      },
+      {
+        "caseId": "approved-wine-104",
+        "extractionError": null,
+        "sha256": "8409bd01a3dbffbf342e632a97fd9632b988cf3ae82631a9f932136040734773",
+        "byteLength": 8832
+      },
+      {
+        "caseId": "approved-wine-105",
+        "extractionError": null,
+        "sha256": "ed1830edb0ae85c8687ccc0bac9cbe8a4abffd19a7f16ee1af128b96e931ed34",
+        "byteLength": 6882
+      },
+      {
+        "caseId": "approved-wine-106",
+        "extractionError": null,
+        "sha256": "7f61f3d6b942741359027c505072d288447c70dce0bbc17db1d34f7116701ede",
+        "byteLength": 4841
+      },
+      {
+        "caseId": "approved-wine-107",
+        "extractionError": null,
+        "sha256": "a2bd956aafe1ec4f619a44b888f900268f727a276f5e6f8f3e3c6fd7ad0d5b4b",
+        "byteLength": 8944
+      },
+      {
+        "caseId": "approved-wine-108",
+        "extractionError": null,
+        "sha256": "8c6307633ba4bff0afbc1c44616655477a71aecca9f2ac2c238f4534d98b1657",
+        "byteLength": 11274
+      },
+      {
+        "caseId": "approved-wine-109",
+        "extractionError": null,
+        "sha256": "5a10524bc8f056b03ed99fe621b6cdcfad3af415762d4ec5c6c1818b868c1b7e",
+        "byteLength": 5753
+      },
+      {
+        "caseId": "approved-wine-110",
+        "extractionError": null,
+        "sha256": "2e826c8db2388a327fe9cbde99c4c04f15a1536d7eaad15dde3a8a0fd605d136",
+        "byteLength": 12059
+      },
+      {
+        "caseId": "m-cellars-baseline",
+        "extractionError": null,
+        "sha256": "018304d2613fb511fb6d2099206862e5a90442c9e8149adde894414ab502dff5",
+        "byteLength": 10151
+      },
+      {
+        "caseId": "wine-multi-artifact-04",
+        "extractionError": null,
+        "sha256": "8d8d1f1b8685128f8cc3e13879e186289dca0bf13f00ce9de65ac3add8887ed3",
+        "byteLength": 13119
+      },
+      {
+        "caseId": "wine-multi-artifact-05",
+        "extractionError": null,
+        "sha256": "47d790d9b5729f0b6bc1688579a01a355c03644dd76b96e1b681153b2f316832",
+        "byteLength": 30554
+      },
+      {
+        "caseId": "wine-multi-artifact-06",
+        "extractionError": null,
+        "sha256": "094e00dde2f3aa67ede5b899894bd00965563c351390cebb92166f4bd0fd092c",
+        "byteLength": 16146
+      },
+      {
+        "caseId": "wine-multi-artifact-07",
+        "extractionError": null,
+        "sha256": "d6db90a6859fbb69e826eaef325fb46df021ed5464fa42836ffdfb645e1fa4ec",
+        "byteLength": 12036
+      },
+      {
+        "caseId": "wine-multi-artifact-08",
+        "extractionError": null,
+        "sha256": "2f5b6cd5348bb75142f1fd9da5d4b96ed678c44f739a65fca752f83854910c2b",
+        "byteLength": 15974
+      },
+      {
+        "caseId": "wine-multi-artifact-09",
+        "extractionError": null,
+        "sha256": "7c6470e6d0d7bf006401bcb80b51315b170d5dbf2d8e11d029f8b5b501d6ca66",
+        "byteLength": 7862
+      },
+      {
+        "caseId": "wine-multi-artifact-10",
+        "extractionError": null,
+        "sha256": "277d37460300d5ac4f56d1b35cc0442bcac14b3a13a9115edd474ecf9e088e24",
+        "byteLength": 6862
+      }
+    ]
+  },
+  "parity": {
+    "status": "FAIL",
+    "fixtureSchemaVersion": "production-analyzer-parity.v1",
+    "baseCommit": "d54e3b2506de9220d2f0cd602d44b3a82c42fd58",
+    "expectedCaseCount": 115,
+    "actualCaseCount": 115,
+    "matchedCaseCount": 108,
+    "mismatches": [
+      {
+        "caseId": "approved-wine-013",
+        "reason": "response-bytes-changed",
+        "expectedSha256": "f64f076265287c2f6b0e455b587d147b0b9d2d69174ba5104626c311ba336fe6",
+        "actualSha256": "7e16e2ad25424e952c838195b0968aeaef920dbbe783d3a72d44424f33040f1f",
+        "firstDifference": {
+          "kind": "json-value-change",
+          "jsonPath": "$.fields.alcoholStatement.state",
+          "expectedValue": "NOT_OBSERVED",
+          "actualValue": "OBSERVED",
+          "byteOffset": 4645,
+          "expectedByteRange": {
+            "start": 4565,
+            "end": 4725,
+            "text": ",\"ambiguityReason\":\"single_unconfirmed_candidate\"},\"alcoholStatement\":{\"state\":\"NOT_OBSERVED\",\"value\":null,\"confidence\":0,\"ocrEvidenceScore\":0,\"alternates\":[]}}"
+          },
+          "actualByteRange": {
+            "start": 4565,
+            "end": 4725,
+            "text": ",\"ambiguityReason\":\"single_unconfirmed_candidate\"},\"alcoholStatement\":{\"state\":\"OBSERVED\",\"value\":\"13.5% BY VOL.\",\"normalizedValue\":\"13.5% BY VOL.\",\"rawText\":\"1"
+          },
+          "fieldCategory": "alcoholStatement"
+        }
+      },
+      {
+        "caseId": "patricia-green-cellars",
+        "reason": "response-bytes-changed",
+        "expectedSha256": "265654343bbcbdadad57e08ebe460dfb54ffe52ae2d9cd42e43b4f9ba521284f",
+        "actualSha256": "502d4fbea3703192b52ab0cc696321e6239425ea8743b1c5c49a8c8533cdfd84",
+        "firstDifference": {
+          "kind": "json-value-change",
+          "jsonPath": "$.fields.alcoholStatement.state",
+          "expectedValue": "NOT_OBSERVED",
+          "actualValue": "LOW_CONFIDENCE",
+          "byteOffset": 8680,
+          "expectedByteRange": {
+            "start": 8600,
+            "end": 8760,
+            "text": "\":400}}],\"ambiguityReason\":\"competing_candidates\"},\"alcoholStatement\":{\"state\":\"NOT_OBSERVED\",\"value\":null,\"confidence\":0,\"ocrEvidenceScore\":0,\"alternates\":[]}}"
+          },
+          "actualByteRange": {
+            "start": 8600,
+            "end": 8760,
+            "text": "\":400}}],\"ambiguityReason\":\"competing_candidates\"},\"alcoholStatement\":{\"state\":\"LOW_CONFIDENCE\",\"value\":\"13.8% ALC./VOL.\",\"normalizedValue\":\"13.8% ALC./VOL.\",\"r"
+          },
+          "fieldCategory": "alcoholStatement"
+        }
+      },
+      {
+        "caseId": "approved-wine-055",
+        "reason": "response-bytes-changed",
+        "expectedSha256": "c9aac178af9ff3c2550b19ce8196ce218af0d9d0ad162bebeed075cd9a360cc8",
+        "actualSha256": "449f7ee4b5d7617451904344cb0551f4ecc5509bc68df12110ee9665a424e7ee",
+        "firstDifference": {
+          "kind": "json-value-change",
+          "jsonPath": "$.fields.alcoholStatement.state",
+          "expectedValue": "NOT_OBSERVED",
+          "actualValue": "OBSERVED",
+          "byteOffset": 15155,
+          "expectedByteRange": {
+            "start": 15075,
+            "end": 15235,
+            "text": "\":839}}],\"ambiguityReason\":\"competing_candidates\"},\"alcoholStatement\":{\"state\":\"NOT_OBSERVED\",\"value\":null,\"confidence\":0,\"ocrEvidenceScore\":0,\"alternates\":[]}}"
+          },
+          "actualByteRange": {
+            "start": 15075,
+            "end": 15235,
+            "text": "\":839}}],\"ambiguityReason\":\"competing_candidates\"},\"alcoholStatement\":{\"state\":\"OBSERVED\",\"value\":\"13% ALC./VOL.\",\"normalizedValue\":\"13% ALC./VOL.\",\"rawText\":\"A"
+          },
+          "fieldCategory": "alcoholStatement"
+        }
+      },
+      {
+        "caseId": "approved-wine-077",
+        "reason": "response-bytes-changed",
+        "expectedSha256": "374fd618998f7862d5a4dfebdae2899d4f70925c11bb6c851f8e15a4a162e252",
+        "actualSha256": "86c392a8e4be65a82abeb9d72355fb2a669c6f679dc480e04a5018cc6e76e7ed",
+        "firstDifference": {
+          "kind": "json-value-change",
+          "jsonPath": "$.fields.alcoholStatement.state",
+          "expectedValue": "NOT_OBSERVED",
+          "actualValue": "OBSERVED",
+          "byteOffset": 2590,
+          "expectedByteRange": {
+            "start": 2510,
+            "end": 2670,
+            "text": ",\"ambiguityReason\":\"single_unconfirmed_candidate\"},\"alcoholStatement\":{\"state\":\"NOT_OBSERVED\",\"value\":null,\"confidence\":0,\"ocrEvidenceScore\":0,\"alternates\":[]}}"
+          },
+          "actualByteRange": {
+            "start": 2510,
+            "end": 2670,
+            "text": ",\"ambiguityReason\":\"single_unconfirmed_candidate\"},\"alcoholStatement\":{\"state\":\"OBSERVED\",\"value\":\"13.5% ALC./VOL.\",\"normalizedValue\":\"13.5% ALC./VOL.\",\"rawText"
+          },
+          "fieldCategory": "alcoholStatement"
+        }
+      },
+      {
+        "caseId": "approved-wine-095",
+        "reason": "response-bytes-changed",
+        "expectedSha256": "d9c429ef79657f7f7e22453bc4f3b4c5c636665d27a964efeb2ee2404ceb8bf8",
+        "actualSha256": "8ce9dd606bc8c8b3d72ef611d810ad568134af88f41fe18acd4565adf7401873",
+        "firstDifference": {
+          "kind": "json-value-change",
+          "jsonPath": "$.fields.alcoholStatement.state",
+          "expectedValue": "NOT_OBSERVED",
+          "actualValue": "OBSERVED",
+          "byteOffset": 587,
+          "expectedByteRange": {
+            "start": 507,
+            "end": 667,
+            "text": "onfidence\":0,\"ocrEvidenceScore\":0,\"alternates\":[]},\"alcoholStatement\":{\"state\":\"NOT_OBSERVED\",\"value\":null,\"confidence\":0,\"ocrEvidenceScore\":0,\"alternates\":[]}}"
+          },
+          "actualByteRange": {
+            "start": 507,
+            "end": 667,
+            "text": "onfidence\":0,\"ocrEvidenceScore\":0,\"alternates\":[]},\"alcoholStatement\":{\"state\":\"OBSERVED\",\"value\":\"12% ALC./VOL.\",\"normalizedValue\":\"12% ALC./VOL.\",\"rawText\":\"A"
+          },
+          "fieldCategory": "alcoholStatement"
+        }
+      },
+      {
+        "caseId": "approved-wine-096",
+        "reason": "response-bytes-changed",
+        "expectedSha256": "fc6429723da30822b2e8c67f9b82a75aa7640a953bd891b0102af7ac77eb4c32",
+        "actualSha256": "3f95060c338606a9e81813044a3d14ab19b8205b664713d33af544d89f280772",
+        "firstDifference": {
+          "kind": "json-value-change",
+          "jsonPath": "$.fields.alcoholStatement.state",
+          "expectedValue": "NOT_OBSERVED",
+          "actualValue": "OBSERVED",
+          "byteOffset": 587,
+          "expectedByteRange": {
+            "start": 507,
+            "end": 667,
+            "text": "onfidence\":0,\"ocrEvidenceScore\":0,\"alternates\":[]},\"alcoholStatement\":{\"state\":\"NOT_OBSERVED\",\"value\":null,\"confidence\":0,\"ocrEvidenceScore\":0,\"alternates\":[]}}"
+          },
+          "actualByteRange": {
+            "start": 507,
+            "end": 667,
+            "text": "onfidence\":0,\"ocrEvidenceScore\":0,\"alternates\":[]},\"alcoholStatement\":{\"state\":\"OBSERVED\",\"value\":\"12% ALC./VOL.\",\"normalizedValue\":\"12% ALC./VOL.\",\"rawText\":\"A"
+          },
+          "fieldCategory": "alcoholStatement"
+        }
+      },
+      {
+        "caseId": "approved-wine-097",
+        "reason": "response-bytes-changed",
+        "expectedSha256": "8f82cc2ad57c492665f8132b9a9b01237610adb24616c3ab352b98cc0b1edd2a",
+        "actualSha256": "039703ec1727adc59a219c4f266f27f753e2e0352bfae1c86d780dd39333e92e",
+        "firstDifference": {
+          "kind": "json-value-change",
+          "jsonPath": "$.fields.alcoholStatement.state",
+          "expectedValue": "NOT_OBSERVED",
+          "actualValue": "LOW_CONFIDENCE",
+          "byteOffset": 587,
+          "expectedByteRange": {
+            "start": 507,
+            "end": 667,
+            "text": "onfidence\":0,\"ocrEvidenceScore\":0,\"alternates\":[]},\"alcoholStatement\":{\"state\":\"NOT_OBSERVED\",\"value\":null,\"confidence\":0,\"ocrEvidenceScore\":0,\"alternates\":[]}}"
+          },
+          "actualByteRange": {
+            "start": 507,
+            "end": 667,
+            "text": "onfidence\":0,\"ocrEvidenceScore\":0,\"alternates\":[]},\"alcoholStatement\":{\"state\":\"LOW_CONFIDENCE\",\"value\":\"12% ALC./VOL.\",\"normalizedValue\":\"12% ALC./VOL.\",\"rawTe"
+          },
+          "fieldCategory": "alcoholStatement"
+        }
+      }
+    ],
+    "comparisonBasis": "exact-serialized-analyzer-response-bytes"
+  }
+}

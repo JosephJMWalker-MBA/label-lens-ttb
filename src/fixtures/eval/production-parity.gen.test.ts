@@ -10,7 +10,7 @@ import { loadEvalManifest } from "./eval-loader";
 import {
   buildProductionAnalyzerParityFixture,
   compareProductionAnalyzerParity,
-  ISSUE_131_BASE_COMMIT,
+  PRODUCTION_PARITY_BASE_COMMIT,
   PRODUCTION_PARITY_FIXTURE_PATH,
   type ProductionAnalyzerParityFixture,
   type ProductionAnalyzerParityInput,
@@ -33,8 +33,8 @@ async function writeFormattedJson(filePath: string, value: unknown) {
 (RUN ? describe : describe.skip)("production analyzer full-corpus byte parity", () => {
   it(
     CAPTURE
-      ? "captures the immutable Issue #131 pre-change analyzer responses"
-      : "matches every analyzer response byte-for-byte against the Issue #131 baseline",
+      ? "captures the approval-gated current production analyzer responses"
+      : "matches every analyzer response byte-for-byte against the approved production baseline",
     async () => {
       const manifest = loadEvalManifest();
       const inputs: ProductionAnalyzerParityInput[] = [];
@@ -46,7 +46,7 @@ async function writeFormattedJson(filePath: string, value: unknown) {
           extractionError: artifacts.extractionError,
         });
       }
-      const actual = buildProductionAnalyzerParityFixture(ISSUE_131_BASE_COMMIT, inputs);
+      const actual = buildProductionAnalyzerParityFixture(PRODUCTION_PARITY_BASE_COMMIT, inputs);
 
       if (CAPTURE) {
         await writeFormattedJson(PRODUCTION_PARITY_FIXTURE_PATH, actual);

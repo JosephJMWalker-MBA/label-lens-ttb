@@ -2,7 +2,8 @@ import { createHash } from "node:crypto";
 import { join } from "node:path";
 
 export const PRODUCTION_ANALYZER_PARITY_SCHEMA_VERSION = "production-analyzer-parity.v1" as const;
-export const ISSUE_131_BASE_COMMIT = "d54e3b2506de9220d2f0cd602d44b3a82c42fd58" as const;
+export const PRODUCTION_PARITY_ORIGIN_COMMIT = "d54e3b2506de9220d2f0cd602d44b3a82c42fd58" as const;
+export const PRODUCTION_PARITY_BASE_COMMIT = "552d30352e76dd412bd75ceb319878ab2d2747bb" as const;
 
 export const PRODUCTION_PARITY_FIXTURE_PATH = join(
   process.cwd(),

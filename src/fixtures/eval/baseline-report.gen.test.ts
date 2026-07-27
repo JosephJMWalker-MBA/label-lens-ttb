@@ -13,7 +13,7 @@ import {
   buildProductionAnalyzerParityFixture,
   buildProductionAnalyzerParityProof,
   formatProductionParityMismatchInventory,
-  ISSUE_131_BASE_COMMIT,
+  PRODUCTION_PARITY_BASE_COMMIT,
   PRODUCTION_PARITY_FIXTURE_PATH,
   type ProductionAnalyzerParityFixture,
   type ProductionAnalyzerParityInput,
@@ -64,7 +64,7 @@ async function writeFormattedJson(filePath: string, value: unknown) {
         readFileSync(PRODUCTION_PARITY_FIXTURE_PATH, "utf8"),
       ) as ProductionAnalyzerParityFixture;
       const actualParity = buildProductionAnalyzerParityFixture(
-        ISSUE_131_BASE_COMMIT,
+        PRODUCTION_PARITY_BASE_COMMIT,
         parityInputs,
       );
       const productionParity = buildProductionAnalyzerParityProof(expectedParity, actualParity);

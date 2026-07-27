@@ -10,6 +10,8 @@ import {
   compareProductionAnalyzerParity,
   firstProductionParityDifference,
   formatProductionParityMismatchInventory,
+  PRODUCTION_PARITY_BASE_COMMIT,
+  PRODUCTION_PARITY_ORIGIN_COMMIT,
   PRODUCTION_ANALYZER_PARITY_SCHEMA_VERSION,
   PRODUCTION_PARITY_FIXTURE_PATH,
   productionParityBytes,
@@ -26,7 +28,8 @@ describe("production analyzer parity fixture", () => {
     const fixture = loadFixture();
     const manifest = loadEvalManifest();
     expect(fixture.schemaVersion).toBe(PRODUCTION_ANALYZER_PARITY_SCHEMA_VERSION);
-    expect(fixture.baseCommit).toBe("d54e3b2506de9220d2f0cd602d44b3a82c42fd58");
+    expect(PRODUCTION_PARITY_ORIGIN_COMMIT).toBe("d54e3b2506de9220d2f0cd602d44b3a82c42fd58");
+    expect(fixture.baseCommit).toBe(PRODUCTION_PARITY_BASE_COMMIT);
     expect(fixture.caseCount).toBe(manifest.cases.length);
     expect(new Set(fixture.records.map((record) => record.caseId)).size).toBe(fixture.caseCount);
     expect(fixture.records.map((record) => record.caseId)).toEqual(
