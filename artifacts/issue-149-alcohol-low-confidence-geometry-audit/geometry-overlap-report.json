@@ -1,0 +1,92 @@
+[
+  {
+    "caseId": "patricia-green-cellars",
+    "truth_geometry_normalized": {
+      "x0": 0.62,
+      "x1": 0.93,
+      "y0": 0.93,
+      "y1": 0.98
+    },
+    "truth_geometry_confidence": "high",
+    "left_overlap_pct": 0.0,
+    "right_overlap_pct": 100.0,
+    "alcohol_region_fully_contained": true,
+    "planner_targeted_region": "right",
+    "reviewer_agreement": "single-session self-annotation only; not independently verified by a second reader"
+  },
+  {
+    "caseId": "approved-wine-020",
+    "truth_geometry_normalized": {
+      "x0": 0.06,
+      "x1": 0.27,
+      "y0": 0.9,
+      "y1": 0.94
+    },
+    "truth_geometry_confidence": "high",
+    "left_overlap_pct": 100.0,
+    "right_overlap_pct": 0.0,
+    "alcohol_region_fully_contained": true,
+    "planner_targeted_region": "left",
+    "reviewer_agreement": "single-session self-annotation only; not independently verified by a second reader"
+  },
+  {
+    "caseId": "approved-wine-023",
+    "truth_geometry_normalized": {
+      "x0": 0.06,
+      "x1": 0.24,
+      "y0": 0.9,
+      "y1": 0.94
+    },
+    "truth_geometry_confidence": "high",
+    "left_overlap_pct": 100.0,
+    "right_overlap_pct": 0.0,
+    "alcohol_region_fully_contained": true,
+    "planner_targeted_region": "left",
+    "reviewer_agreement": "single-session self-annotation only; not independently verified by a second reader"
+  },
+  {
+    "caseId": "approved-wine-034",
+    "truth_geometry_normalized": {
+      "x0": 0.45,
+      "x1": 0.68,
+      "y0": 0.51,
+      "y1": 0.545
+    },
+    "truth_geometry_confidence": "low-moderate",
+    "left_overlap_pct": 0.0,
+    "right_overlap_pct": 52.3,
+    "alcohol_region_fully_contained": false,
+    "planner_targeted_region": "partial/split",
+    "reviewer_agreement": "single-session self-annotation only; not independently verified by a second reader"
+  },
+  {
+    "caseId": "approved-wine-079",
+    "truth_geometry_normalized": {
+      "x0": 0.6,
+      "x1": 0.95,
+      "y0": 0.14,
+      "y1": 0.17
+    },
+    "truth_geometry_confidence": "high",
+    "left_overlap_pct": 0.0,
+    "right_overlap_pct": 100.0,
+    "alcohol_region_fully_contained": true,
+    "planner_targeted_region": "right",
+    "reviewer_agreement": "single-session self-annotation only; not independently verified by a second reader"
+  },
+  {
+    "caseId": "approved-wine-097",
+    "truth_geometry_normalized": {
+      "x0": 0.04,
+      "x1": 0.29,
+      "y0": 0.91,
+      "y1": 0.95
+    },
+    "truth_geometry_confidence": "high",
+    "left_overlap_pct": 100.0,
+    "right_overlap_pct": 0.0,
+    "alcohol_region_fully_contained": true,
+    "planner_targeted_region": "left",
+    "reviewer_agreement": "single-session self-annotation only; not independently verified by a second reader"
+  }
+]
