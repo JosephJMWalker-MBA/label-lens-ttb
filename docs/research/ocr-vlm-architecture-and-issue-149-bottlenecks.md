@@ -29,7 +29,7 @@ Each produced:
 - visually different outputs
 - truth-blind behavior
 
-This is not merely a sequence of failed tweaks. It is evidence that pixel preprocessing is unlikely to be the dominant Brand bottleneck on the governed corpus.
+It is evidence that pixel preprocessing is unlikely to be the dominant Brand bottleneck on the specific 11 regions tested — a sample deliberately drawn from known, catastrophic control failures. This has not been tested on marginal or near-threshold Brand cases, where preprocessing could plausibly still matter; the claim should not be extended beyond the hard-failure population it was measured on.
 
 The region-coverage diagnostic is especially important:
 
@@ -40,7 +40,7 @@ The region-coverage diagnostic is especially important:
   - `ORIENTATION_OR_SEGMENTATION_FAILURE`: 5
   - `REGION_COVERED_SEVERE_GLYPH_MISRECOGNITION`: 2
 
-The crop is reaching the correct location. The failure occurs later, during line grouping, orientation handling, or glyph decoding.
+On the 10 cases examined in the region-coverage study, the crop reached the correct location in every case; the failure occurred later, during line grouping, orientation handling, or glyph decoding. This has not been verified on images with non-identity EXIF orientation, and should not be read as a general claim about crop-mapping correctness across arbitrary incoming images.
 
 Alcohol Experiment A (#202) also produced a clean negative result:
 
@@ -53,31 +53,25 @@ Alcohol Experiment A (#202) also produced a clean negative result:
 - Brand, Warning, OCR trace, and production response remained unchanged
 - production parity remained 115/115
 
-Therefore, Alcohol reselection logic is not the current bottleneck.
+PR #202 established that the specific proposed reselection change (using all-pass evidence when recovery exists) already matches current production behavior for cases eligible under today's `NOT_OBSERVED`-only trigger. This is not yet established for an expanded-eligibility population, and does not rule out a different reselection strategy performing better than the current all-pass approach. Reselection logic should be re-examined once, and only if, trigger eligibility is expanded.
 
-## Most likely remaining bottlenecks
+## Most likely remaining hypotheses
 
 ### 1. Brand text-line segmentation and orientation grouping
 
-This is the largest classified Brand failure bucket: 5 of 10 diagnostic cases.
+Five of 10 diagnostic cases were classified `ORIENTATION_OR_SEGMENTATION_FAILURE`, the largest bucket in this sample. This is a visual classification, not a validated mechanism. It has not yet been established by intervention that these cases are fixable by segmentation-mode changes, nor has orientation failure been separated from segmentation failure within this bucket. Treat this as the top candidate for further diagnostic work, not as a confirmed leading bottleneck.
 
-The relevant variable is not whether the pixels are sharper or higher contrast. The relevant variable is how the OCR engine groups the region into a line, word, or sparse-text structure, and whether orientation is handled correctly.
+### 2. Brand glyph recognition: capability ceiling or configuration issue
 
-### 2. Brand glyph-recognition ceiling on stylized typefaces
+Two cases show severe glyph misrecognition consistent with a possible model-capability ceiling on decorative typography. This has been reached largely by elimination rather than direct test, and has not been distinguished from a configuration issue, such as traineddata-pack or engine-mode selection, that a simple model-file swap could resolve at much lower cost. Treat capability ceiling as an untested hypothesis until that configuration test has been run.
 
-Two cases are already classified as severe glyph misrecognition, and some of the three no-text cases may belong to the same underlying class.
+### 3. Alcohol recovery eligibility and recovery-strip read quality
 
-Decorative wine and spirits typography may sit outside the effective recognition vocabulary of the shipped Tesseract model. If so, no amount of additional sharpening, contrast adjustment, denoising, or thresholding will solve the problem because the recognizer cannot map the visible shapes to the correct characters.
+Recovery-eligibility expansion to `LOW_CONFIDENCE` affects exactly six governed cases. Expansion to `AMBIGUOUS` affects zero, since no Alcohol case in the 115-case corpus has reached that state.
 
-### 3. Alcohol recovery eligibility and trigger scope
+A six-case diagnostic audit has completed with a preliminary `STOP`, but that result is not yet final. The harness classification predates the later preregistered tiered comparison rule, and the six cases must also be checked for truth freshness against pending or landed truth corrections before the decision is accepted.
 
-PR #202 established that final reselection is already functioning as designed.
-
-The remaining Alcohol bottleneck is therefore upstream:
-
-- which cases receive a recovery pass
-- whether `LOW_CONFIDENCE` and `AMBIGUOUS` cases should be eligible in addition to `NOT_OBSERVED`
-- whether narrow or rotated recovery strips are readable once recovery is invoked
+At this scale, no claim about trigger scope as the next lever is supported. Corpus expansion to at least 20 independent `LOW_CONFIDENCE` cases is required before this hypothesis can support a population-level claim. `AMBIGUOUS` should be treated as untestable under current production behavior.
 
 ## Why the completed experiments could not move the metrics
 
@@ -85,36 +79,33 @@ The remaining Alcohol bottleneck is therefore upstream:
 
 Scaling, sharpening, CLAHE, and Otsu all modify pixels before recognition.
 
-The diagnostic study located the observed failures downstream of image acquisition and crop coverage:
+The diagnostic study located the observed failures downstream of image acquisition and crop coverage in the 10 examined cases:
 
 - segmentation/orientation
 - no text recognized despite region coverage
 - severe glyph misrecognition
 
-Those experiments were still necessary because they ruled out the hypothesis that Brand failure was primarily a simple image-quality problem.
+Those experiments were still necessary because they ruled out these treatments as fixes for the catastrophic Brand failures in the governed hard-failure sample.
 
 ### Alcohol Experiment A
 
-Experiment A tested a proposed reselection change against behavior that was already present in production.
+Experiment A tested a proposed reselection change against behavior that was already present in production for the currently eligible population.
 
 Because there was no actual control/treatment logic delta, the metric could not move.
 
 ## Minimum discriminating experiment set
 
-### Brand experiment: single-line PSM versus current sparse-text behavior
+### Brand mechanism-attribution audit
 
-Scope this experiment only to the five cases classified as `ORIENTATION_OR_SEGMENTATION_FAILURE`.
+The five cases currently labeled `ORIENTATION_OR_SEGMENTATION_FAILURE` should first be sub-labeled from geometry alone as:
 
-The question is:
+- `ORIENTATION_SUSPECTED`
+- `SEGMENTATION_SUSPECTED`
+- `AMBIGUOUS_SUBLABEL`
 
-> Does forcing single-line segmentation recover correct raw Brand transcripts where sparse-text mode fails?
+The labels must be frozen before treatment OCR. Orientation and segmentation must be tested with mechanism-matched interventions rather than pooled under one PSM change.
 
-Interpretation:
-
-- If correct transcripts appear, segmentation is confirmed as a fixable bottleneck.
-- If the transcripts remain wrong or absent, the evidence shifts toward a glyph-recognition ceiling.
-
-This experiment should not include additional preprocessing changes. The segmentation variable must be isolated.
+This is a five-case mechanism-attribution study, not a population-rate experiment. Its output should be a per-case map of orientation-fixable, segmentation-fixable, unresolved glyph decode, or case-specific noise.
 
 ### Brand audit: stylized-font inspection
 
@@ -132,15 +123,61 @@ Record whether they use:
 
 This is an observational audit, not a production change. Its purpose is to determine whether future work should target Tesseract configuration or recognizer capability.
 
-### Alcohol experiment: trigger expansion
+### Tesseract configuration test
 
-Test recovery eligibility for `LOW_CONFIDENCE` and `AMBIGUOUS` cases in addition to `NOT_OBSERVED`.
+Before declaring a capability ceiling, run one preregistered stronger Tesseract traineddata configuration on the mechanism-attributed severe-glyph cases, with all other variables fixed.
 
-This experiment should occur before tuning Alcohol recovery-strip PSM because trigger expansion determines which weak cases are even searched.
+Do not sweep multiple traineddata packs or engine modes in one round. A single fixed comparison is sufficient to distinguish a plausible configuration ceiling from a more fundamental recognizer ceiling.
 
-The question is:
+### Alcohol Stage 1: LOW_CONFIDENCE recovery-evidence audit
 
-> Does broader recovery eligibility improve governed Alcohol accuracy without increasing false reliable reads, wrong reliable reads, or absence false positives?
+The six governed `LOW_CONFIDENCE` Alcohol cases are:
+
+- `patricia-green-cellars`
+- `approved-wine-020`
+- `approved-wine-023`
+- `approved-wine-034`
+- `approved-wine-079`
+- `approved-wine-097`
+
+Recovery passes may be forced in a standalone evaluation harness, but recovery output must not enter final reselection in Stage 1.
+
+The decision rule must be applied only after raw outputs are frozen. It must distinguish:
+
+- exact numeric match
+- right number without a valid alcohol-unit anchor
+- right unit with the wrong number
+- no useful candidate
+- disagreement among recovery passes
+- nondeterminism
+- parser miss versus OCR miss
+
+The current preliminary `STOP` must not be accepted until:
+
+1. the frozen artifacts are reclassified under the actual preregistered tiered rule;
+2. the six truth records are checked against pending or landed truth corrections;
+3. any raw transcript containing truth that the parser failed to select is marked `PARSER_MISS` rather than `OCR_MISS`;
+4. planner crop overlap with the known alcohol-statement region is documented;
+5. materially overlapping recovery crops are not treated as independent evidence.
+
+### Alcohol Stage 2: coupled trigger and reselection eligibility
+
+Stage 2 is authorized only if Stage 1 finds at least one deterministic, non-artifactual case where recovery evidence is genuinely better than primary evidence.
+
+Both gates must change together:
+
+- recovery trigger eligibility
+- reselection eligibility
+
+The treatment is:
+
+`NOT_OBSERVED` → `NOT_OBSERVED || LOW_CONFIDENCE`
+
+at both gates. `AMBIGUOUS` remains excluded because the governed corpus contains zero evaluable cases.
+
+Candidate ranking, thresholds, parser behavior, Brand, Warning, and recovery-pass templates remain fixed.
+
+Any result at n=6 supports only further research and corpus expansion, never a production proposal.
 
 ## Experiments not worth running now
 
@@ -152,11 +189,11 @@ Do not run additional Brand preprocessing variants such as:
 - denoising permutations
 - repeated scaling combinations
 
-Four orthogonal pixel-domain interventions already produced identical zero-gain results, and the diagnostic evidence places the failure after crop coverage and basic pixel quality.
+Four orthogonal pixel-domain interventions already produced identical zero-gain results on the governed hard-failure sample.
 
 Do not change Brand candidate ranking before determining whether OCR can produce a usable correct token. Ranking cannot promote text that was never recognized.
 
-Do not run further Alcohol reselection tuning. PR #202 established that reselection already matches the proposed treatment.
+Do not run further Alcohol reselection tuning against the current `NOT_OBSERVED`-only population. PR #202 established that the specific proposed reselection change already matches current production there. Reselection must be re-evaluated only if the eligible population changes.
 
 ## Architecture direction
 
@@ -178,8 +215,8 @@ Use Tesseract or another lightweight local recognizer as the normal evidence sou
 Invoke a stronger local or self-hosted recognizer only for narrowly eligible failures, such as:
 
 - region covered but no text recognized
-- segmentation/orientation failure
-- severe glyph misrecognition
+- mechanism-attributed segmentation/orientation failure
+- severe glyph misrecognition after configuration checks
 
 The fallback must be evaluated separately and must not silently replace the primary OCR path.
 
@@ -206,13 +243,14 @@ Deterministic rules compare all evidence, enforce confidence and provenance boun
 
 A full replacement would be premature because:
 
-- the Brand segmentation hypothesis has not yet been tested directly
-- Alcohol trigger expansion has not yet been tested
+- the Brand orientation/segmentation mechanism has not yet been attributed by intervention
+- a Tesseract configuration ceiling has not yet been distinguished from a model-capability ceiling
+- Alcohol trigger expansion affects only six governed cases and has not produced a final interpretable Stage 1 result
 - stronger models increase compute, latency, deployment complexity, and cost
 - multimodal models can hallucinate text or infer plausible-but-unobserved content
 - Label Lens requires evidence discipline, not merely fluent transcription
 
-The appropriate next step is not a platform rewrite. It is a sequence of narrow experiments that determine whether the remaining failures arise from segmentation, recognizer capability, or recovery eligibility.
+The appropriate next step is not a platform rewrite. It is a sequence of narrow audits and experiments that determine whether the remaining failures arise from segmentation, orientation, recognizer configuration, recognizer capability, recovery eligibility, or recovery-strip read quality.
 
 ## Evidence threshold for declaring a Tesseract capability ceiling
 
@@ -340,26 +378,46 @@ The first category worth benchmarking is a locally deployable, open-weight trans
 
 This is the cleanest test of whether stronger learned glyph representations outperform the current Tesseract configuration while preserving local deployment, single-shot decoding, and a smaller governance and hallucination surface.
 
-Cloud OCR introduces data-governance questions. A VLM introduces fabricated-but-plausible text as a separate risk class. Those should be evaluated only after a local scene-text recognizer fails or after a separate governance decision. A VLM must remain advisory Tier 3 evidence, never an authority or automatic replacement candidate.
+Cloud OCR introduces data-governance questions. A VLM introduces fabricated-but-plausible text as a separate risk class. Those should be evaluated only after a local scene-text recognizer fails to resolve the question.
+
+## Governed corpus expansion for rare Alcohol states
+
+Source only new, previously unseen real label images through a broad, outcome-blind intake process. Do not search specifically for spectacular failures or alter thresholds to manufacture target states.
+
+Requirements:
+
+- run each candidate once through the frozen production pipeline before outcome review
+- preserve source and rights provenance
+- exclude exact duplicate checksums
+- tag near-duplicate visual/producer families
+- require two independent human truth passes before acceptance
+- annotate truth from the raw image before showing pipeline output
+- exclude human-illegible cases rather than forcing a truth value
+- preserve a deterministic held-out split before analysis or tuning
+
+Target minimums:
+
+- at least 20 independent `LOW_CONFIDENCE` cases across at least three layout slices and 15 visual families
+- at least 15 independent `NOT_OBSERVED`-despite-recovery cases where alcohol text is visibly present
+- at least 30 correct `OBSERVED` controls
+- no forced quota for `AMBIGUOUS`
+
+After a preregistered intake of at least 300 new deduplicated candidates, if fewer than five independent Alcohol cases naturally reach `AMBIGUOUS`, treat that state as too rare under current production behavior for a dedicated rate-based experiment. Future work must then wait for organic accumulation or explicitly acknowledge that it remains untested.
 
 ## Research conclusion
 
-Issue #149 has already demonstrated that deterministic experimentation can eliminate entire classes of hypotheses.
+Issue #149 has already demonstrated that deterministic experimentation can eliminate classes of hypotheses, but every conclusion must remain scoped to the population actually tested.
 
-The governed corpus now supports rejecting the following as dominant bottlenecks:
+On the governed hard-failure sample, image scaling, sharpening, CLAHE contrast enhancement, and Otsu thresholding produced no recall gain. This rules them out as fixes for catastrophic Brand failures in this sample, not as a general claim about preprocessing value elsewhere in the pipeline.
 
-- image scaling
-- sharpening
-- CLAHE contrast enhancement
-- Otsu thresholding
-- Alcohol reselection logic
+The specific proposed Alcohol reselection change is confirmed inert for the currently eligible population. This does not extend to an expanded-eligibility population, which remains untested at adequate scale.
 
-The remaining search space is narrower and better defined:
+The remaining hypotheses, none yet confirmed by direct intervention, are:
 
-- Brand segmentation and orientation
-- Brand stylized-glyph recognition
-- Alcohol recovery trigger scope
-- Alcohol recovery-strip read quality
+- whether Brand segmentation and orientation failures are separable and independently fixable
+- whether Brand glyph misrecognition is a capability ceiling or a configuration issue
+- whether Alcohol trigger-scope expansion helps a population currently measured at only six eligible governed cases
+- whether Alcohol recovery-strip planning and read quality are adequate for that population
 
 The central principle remains:
 
