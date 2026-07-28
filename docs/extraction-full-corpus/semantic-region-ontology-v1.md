@@ -60,7 +60,7 @@ The dependency direction is strictly:
 production artifacts -> evaluation adapter -> semantic diagnostic
 ```
 
-Evaluation annotations, expected values, semantic hypotheses, and target traces are never imported by the production extractor. The exact serialized production analyzer response is captured before semantic diagnostic assembly and compared byte-for-byte with the immutable Issue #131 baseline.
+Evaluation annotations, expected values, semantic hypotheses, and target traces are never imported by the production extractor. The exact serialized production analyzer response is captured before semantic diagnostic assembly and compared byte-for-byte with the approval-gated current-production baseline. Issue #131 and PR #132 established the original snapshot at `d54e3b2506de9220d2f0cd602d44b3a82c42fd58`; later intentional production changes may update the baseline only through an explicit reconciliation that proves determinism, maps every changed response to approved merged behavior, and preserves the old hashes in an audit artifact. The comparator itself remains exact and does not ignore or normalize differences.
 
 The existing per-case harness remains bounded by default. Semantic scene assembly is an explicit full-report opt-in, so callers that need only the existing case report do not pay the diagnostic payload cost.
 

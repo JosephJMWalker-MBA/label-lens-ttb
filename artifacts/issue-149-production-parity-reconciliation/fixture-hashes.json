@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "issue-149-production-parity-fixture-hashes.v1",
+  "old": {
+    "baseCommit": "d54e3b2506de9220d2f0cd602d44b3a82c42fd58",
+    "sha256": "31a30c138d7a0bc8263b5c911419d8429f98e1948c544b86a6f72f2b9235efa5"
+  },
+  "new": {
+    "baseCommit": "552d30352e76dd412bd75ceb319878ab2d2747bb",
+    "sha256": "4ec2851ebe4c65bc41fd17983236f3236fb436e2df9eb0a6814f5d4543c8fb73"
+  },
+  "exactComparisonPreserved": true
+}

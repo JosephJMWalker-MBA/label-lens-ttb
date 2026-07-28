@@ -27,7 +27,7 @@ import type {
 } from "./eval-report.types";
 import { EVAL_ADAPTER } from "./eval-harness";
 import {
-  ISSUE_131_BASE_COMMIT,
+  PRODUCTION_PARITY_BASE_COMMIT,
   PRODUCTION_ANALYZER_PARITY_SCHEMA_VERSION,
   type ProductionAnalyzerParityProof,
 } from "./production-parity";
@@ -742,7 +742,7 @@ function parityNotRun(caseCount: number): ProductionAnalyzerParityProof {
   return {
     status: "not_run",
     fixtureSchemaVersion: PRODUCTION_ANALYZER_PARITY_SCHEMA_VERSION,
-    baseCommit: ISSUE_131_BASE_COMMIT,
+    baseCommit: PRODUCTION_PARITY_BASE_COMMIT,
     expectedCaseCount: caseCount,
     actualCaseCount: 0,
     matchedCaseCount: 0,
