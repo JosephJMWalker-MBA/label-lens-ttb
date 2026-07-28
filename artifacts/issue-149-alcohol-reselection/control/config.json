@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "issue-149-alcohol-reselection.config.v1",
+  "experiment": "A",
+  "arm": "control",
+  "enabledInProduction": false,
+  "baseSha": "5d22a6be0407e8df4870983aab9107bc89f7c5d0",
+  "preregistrationSha256": "19a9f649271265fee0369363b32e30bb9a4419b35d2a4f6b50d47db5779eb102",
+  "selector": "selectAlcoholObservation",
+  "selectionInput": "primary when primary state is not NOT_OBSERVED; otherwise all already-collected passes",
+  "passOrder": "extractor execution order",
+  "corpus": "all 115 included eval-manifest records",
+  "evaluableSubset": "all 50 cases with at least one production recovery pass",
+  "truthAvailableToSelection": false,
+  "timingScope": "end-to-end real extractor per case",
+  "behaviorHashExcludesTiming": true
+}
