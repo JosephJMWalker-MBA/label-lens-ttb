@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "issue-149-alcohol-reselection.decision.v1",
+  "deterministic": true,
+  "baseSha": "5d22a6be0407e8df4870983aab9107bc89f7c5d0",
+  "preregistrationSha256": "19a9f649271265fee0369363b32e30bb9a4419b35d2a4f6b50d47db5779eb102",
+  "decisionInput": {
+    "eligibilityPassed": true,
+    "improvedCaseCount": 0,
+    "improvementChecksumFamilyCount": 0,
+    "detectionRecallImproved": false,
+    "parsedAccuracyImproved": false,
+    "recoveryTruthPromotionCount": 0,
+    "correctRegressionCount": 0,
+    "falseReliableReadIncrease": 0,
+    "wrongReliableReadIncrease": 0,
+    "absenceFalsePositiveCount": 0,
+    "brandChangedCaseCount": 0,
+    "warningChangedCaseCount": 0,
+    "medianLatencyIncreasePercent": 3.6013961671935504,
+    "p95LatencyIncreasePercent": 0.43375855476254177,
+    "isolationViolationCount": 0,
+    "sellerTruthLeak": false,
+    "behaviorReproduced": true,
+    "behaviorallyIdenticalEveryEvaluableCase": true
+  },
+  "decision": "KILL",
+  "reasons": [
+    "Zero or one governed case improved.",
+    "Improvements covered at most one checksum family.",
+    "Neither detection recall nor parsed-value accuracy improved.",
+    "No improvement promoted truth already present in recovery evidence.",
+    "Control and treatment were behaviorally identical in every evaluable case."
+  ],
+  "nextRecommendation": "Corpus expansion: add governed cases that naturally produce Brand-only recovery while primary Alcohol is OBSERVED, LOW_CONFIDENCE, or AMBIGUOUS, so the selector-input condition becomes observable without changing production recovery triggers.",
+  "noProductionEnablement": true
+}

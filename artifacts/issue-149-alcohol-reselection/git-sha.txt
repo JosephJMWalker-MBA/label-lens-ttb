@@ -1,0 +1,7 @@
+branch=codex/issue-149-alcohol-reselection
+base=5d22a6be0407e8df4870983aab9107bc89f7c5d0
+base_subject=Reconcile stale full-corpus production parity baseline (#201)
+production_parity_fixture_base=552d30352e76dd412bd75ceb319878ab2d2747bb
+preregistration_sha256=19a9f649271265fee0369363b32e30bb9a4419b35d2a4f6b50d47db5779eb102
+pr_195_frozen_head=79f628c2dd3d915325986a1e6c012fe12fe6ac15
+production_enabled=false

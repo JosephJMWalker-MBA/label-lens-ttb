@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "issue-149-alcohol-reselection.baseline-reproduction.v1",
+  "baseSha": "5d22a6be0407e8df4870983aab9107bc89f7c5d0",
+  "runCount": 2,
+  "caseCountPerRun": 115,
+  "run1": {
+    "productionParity": "PASS",
+    "matchedCases": 115,
+    "mismatches": 0,
+    "fullReportSha256": "3491940b099052611f180b18e09b73aae7c7953506ab4f58f7741bad1533bec8",
+    "durationMs": 196482
+  },
+  "run2": {
+    "productionParity": "PASS",
+    "matchedCases": 115,
+    "mismatches": 0,
+    "fullReportSha256": "752461b766f97931c0e35c4ed22fec85e7b046b1fa238071952acaa52dc8cc30",
+    "durationMs": 199880
+  },
+  "timingExcludedBehaviorSha256": "adb14e004e3e9f1a9bb7902e9b11c52b317c38b25f393a78f8e07fe17abfbe82",
+  "timingExcludedReportsEqual": true,
+  "timingExclusion": "recursively excludes keys matching timing, latency, timeMs, costMs, executionTime, and performance",
+  "comparisonBasis": "exact serialized production responses for parity; canonical report behavior with measured timing fields excluded for determinism"
+}
