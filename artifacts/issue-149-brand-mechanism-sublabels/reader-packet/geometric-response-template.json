@@ -1,0 +1,42 @@
+{
+  "auditId": "geometry",
+  "annotatorId": "<fill in>",
+  "completedOn": "<YYYY-MM-DD>",
+  "responses": [
+    {
+      "itemId": "item-0b2b6dbd",
+      "label": "<ORIENTATION_SUSPECTED | SEGMENTATION_SUSPECTED | AMBIGUOUS_SUBLABEL>",
+      "estimatedBaselineDegreesFromHorizontal": "<number>",
+      "confidence": "<high | medium | low>",
+      "rationale": "<geometry-only rationale>"
+    },
+    {
+      "itemId": "item-178774e8",
+      "label": "<ORIENTATION_SUSPECTED | SEGMENTATION_SUSPECTED | AMBIGUOUS_SUBLABEL>",
+      "estimatedBaselineDegreesFromHorizontal": "<number>",
+      "confidence": "<high | medium | low>",
+      "rationale": "<geometry-only rationale>"
+    },
+    {
+      "itemId": "item-595e3dbf",
+      "label": "<ORIENTATION_SUSPECTED | SEGMENTATION_SUSPECTED | AMBIGUOUS_SUBLABEL>",
+      "estimatedBaselineDegreesFromHorizontal": "<number>",
+      "confidence": "<high | medium | low>",
+      "rationale": "<geometry-only rationale>"
+    },
+    {
+      "itemId": "item-d490b7c1",
+      "label": "<ORIENTATION_SUSPECTED | SEGMENTATION_SUSPECTED | AMBIGUOUS_SUBLABEL>",
+      "estimatedBaselineDegreesFromHorizontal": "<number>",
+      "confidence": "<high | medium | low>",
+      "rationale": "<geometry-only rationale>"
+    },
+    {
+      "itemId": "item-f8708117",
+      "label": "<ORIENTATION_SUSPECTED | SEGMENTATION_SUSPECTED | AMBIGUOUS_SUBLABEL>",
+      "estimatedBaselineDegreesFromHorizontal": "<number>",
+      "confidence": "<high | medium | low>",
+      "rationale": "<geometry-only rationale>"
+    }
+  ]
+}

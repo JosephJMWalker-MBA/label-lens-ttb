@@ -1,0 +1,22 @@
+{
+  "experimentId": "issue-149-brand-mechanism-sublabels",
+  "source": "artifacts/brand-region-coverage-diagnosis/classifications.json",
+  "sourceSha256": "857ba7edbdca31ee3340b719230102f59d7d464b2bb43cdbeac0e38c5bf96710",
+  "frozenCaseCount": 10,
+  "audits": {
+    "geometric": [
+      "approved-wine-023",
+      "approved-wine-027",
+      "approved-wine-035",
+      "approved-wine-085",
+      "approved-wine-091"
+    ],
+    "stylization": [
+      "approved-wine-004",
+      "approved-wine-005",
+      "approved-wine-031",
+      "la-fattoria-rotated",
+      "wine-multi-artifact-04"
+    ]
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "auditId": "typography",
+  "annotatorId": "<fill in>",
+  "completedOn": "<YYYY-MM-DD>",
+  "responses": [
+    {
+      "itemId": "item-143eeddd",
+      "decorativeScript": "<Y|N>",
+      "condensedOrExpanded": "<Y|N>",
+      "customLogotype": "<Y|N>",
+      "outlineOrShadow": "<Y|N>",
+      "archedOrCurvedBaseline": "<Y|N>",
+      "unusualLigature": "<Y|N>",
+      "extremeTextureOrContrast": "<Y|N>",
+      "overallStylized": "<Y|N>",
+      "confidence": "<high | medium | low>",
+      "rationale": "<appearance-only rationale>"
+    },
+    {
+      "itemId": "item-2b2a2bcd",
+      "decorativeScript": "<Y|N>",
+      "condensedOrExpanded": "<Y|N>",
+      "customLogotype": "<Y|N>",
+      "outlineOrShadow": "<Y|N>",
+      "archedOrCurvedBaseline": "<Y|N>",
+      "unusualLigature": "<Y|N>",
+      "extremeTextureOrContrast": "<Y|N>",
+      "overallStylized": "<Y|N>",
+      "confidence": "<high | medium | low>",
+      "rationale": "<appearance-only rationale>"
+    },
+    {
+      "itemId": "item-420f6dc9",
+      "decorativeScript": "<Y|N>",
+      "condensedOrExpanded": "<Y|N>",
+      "customLogotype": "<Y|N>",
+      "outlineOrShadow": "<Y|N>",
+      "archedOrCurvedBaseline": "<Y|N>",
+      "unusualLigature": "<Y|N>",
+      "extremeTextureOrContrast": "<Y|N>",
+      "overallStylized": "<Y|N>",
+      "confidence": "<high | medium | low>",
+      "rationale": "<appearance-only rationale>"
+    },
+    {
+      "itemId": "item-b648b866",
+      "decorativeScript": "<Y|N>",
+      "condensedOrExpanded": "<Y|N>",
+      "customLogotype": "<Y|N>",
+      "outlineOrShadow": "<Y|N>",
+      "archedOrCurvedBaseline": "<Y|N>",
+      "unusualLigature": "<Y|N>",
+      "extremeTextureOrContrast": "<Y|N>",
+      "overallStylized": "<Y|N>",
+      "confidence": "<high | medium | low>",
+      "rationale": "<appearance-only rationale>"
+    },
+    {
+      "itemId": "item-df250e25",
+      "decorativeScript": "<Y|N>",
+      "condensedOrExpanded": "<Y|N>",
+      "customLogotype": "<Y|N>",
+      "outlineOrShadow": "<Y|N>",
+      "archedOrCurvedBaseline": "<Y|N>",
+      "unusualLigature": "<Y|N>",
+      "extremeTextureOrContrast": "<Y|N>",
+      "overallStylized": "<Y|N>",
+      "confidence": "<high | medium | low>",
+      "rationale": "<appearance-only rationale>"
+    },
+    {
+      "itemId": "item-f7d08e38",
+      "decorativeScript": "<Y|N>",
+      "condensedOrExpanded": "<Y|N>",
+      "customLogotype": "<Y|N>",
+      "outlineOrShadow": "<Y|N>",
+      "archedOrCurvedBaseline": "<Y|N>",
+      "unusualLigature": "<Y|N>",
+      "extremeTextureOrContrast": "<Y|N>",
+      "overallStylized": "<Y|N>",
+      "confidence": "<high | medium | low>",
+      "rationale": "<appearance-only rationale>"
+    }
+  ]
+}
