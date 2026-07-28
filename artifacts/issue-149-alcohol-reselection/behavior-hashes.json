@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "issue-149-alcohol-reselection.behavior-hashes.v1",
+  "primaryControl": {
+    "armBehaviorSha256": "60cffe421856168335f999362b5c68b94d2def05c5c8bea2e61fbeadfd9bf451",
+    "ocrTraceSetSha256": "0eb6dc0ae6245f4fae9bd905f1d98783f6c73c0ebd4fbbb6631f600467ad8116",
+    "brandBehaviorSetSha256": "028a08479ba6615e42a669181ff1f0beb55bf61fb0e8012923550f7c3a2e3113",
+    "warningBehaviorSetSha256": "9545b433b5f7048d6c0d0267b1532edfea4d4d2ce3260fbfbb4dee22d326de87",
+    "productionResponseSetSha256": "4a6221bb0710a20de1947b9099eb07ad709140f694f75da978037f188f6c656c"
+  },
+  "primaryTreatment": {
+    "armBehaviorSha256": "60cffe421856168335f999362b5c68b94d2def05c5c8bea2e61fbeadfd9bf451",
+    "ocrTraceSetSha256": "0eb6dc0ae6245f4fae9bd905f1d98783f6c73c0ebd4fbbb6631f600467ad8116",
+    "brandBehaviorSetSha256": "028a08479ba6615e42a669181ff1f0beb55bf61fb0e8012923550f7c3a2e3113",
+    "warningBehaviorSetSha256": "9545b433b5f7048d6c0d0267b1532edfea4d4d2ce3260fbfbb4dee22d326de87",
+    "productionResponseSetSha256": "4a6221bb0710a20de1947b9099eb07ad709140f694f75da978037f188f6c656c"
+  },
+  "repeatControl": {
+    "armBehaviorSha256": "60cffe421856168335f999362b5c68b94d2def05c5c8bea2e61fbeadfd9bf451",
+    "ocrTraceSetSha256": "0eb6dc0ae6245f4fae9bd905f1d98783f6c73c0ebd4fbbb6631f600467ad8116",
+    "brandBehaviorSetSha256": "028a08479ba6615e42a669181ff1f0beb55bf61fb0e8012923550f7c3a2e3113",
+    "warningBehaviorSetSha256": "9545b433b5f7048d6c0d0267b1532edfea4d4d2ce3260fbfbb4dee22d326de87",
+    "productionResponseSetSha256": "4a6221bb0710a20de1947b9099eb07ad709140f694f75da978037f188f6c656c"
+  },
+  "repeatTreatment": {
+    "armBehaviorSha256": "60cffe421856168335f999362b5c68b94d2def05c5c8bea2e61fbeadfd9bf451",
+    "ocrTraceSetSha256": "0eb6dc0ae6245f4fae9bd905f1d98783f6c73c0ebd4fbbb6631f600467ad8116",
+    "brandBehaviorSetSha256": "028a08479ba6615e42a669181ff1f0beb55bf61fb0e8012923550f7c3a2e3113",
+    "warningBehaviorSetSha256": "9545b433b5f7048d6c0d0267b1532edfea4d4d2ce3260fbfbb4dee22d326de87",
+    "productionResponseSetSha256": "4a6221bb0710a20de1947b9099eb07ad709140f694f75da978037f188f6c656c"
+  },
+  "primaryRepeatControlMatch": true,
+  "primaryRepeatTreatmentMatch": true,
+  "controlTreatmentBehaviorallyIdenticalEveryEvaluableCase": true,
+  "brandChangedCaseCount": 0,
+  "warningChangedCaseCount": 0,
+  "traceChangedCaseCount": 0,
+  "responseChangedCaseCount": 0
+}

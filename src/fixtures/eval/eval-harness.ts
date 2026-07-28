@@ -920,6 +920,8 @@ export interface EvalCaseArtifacts {
   report: CaseReport;
   productionResponseBytes: string | null;
   extractionError: string | null;
+  /** Evaluation-only trace from the real extractor; never serialized by production. */
+  extractionDebug: ExtractionDebug | null;
 }
 
 export interface EvalCaseRunOptions {
@@ -957,6 +959,7 @@ export async function runCaseArtifacts(
     report,
     productionResponseBytes,
     extractionError: result.ok ? null : result.error.code,
+    extractionDebug: result.ok ? result.value.debug : null,
   };
 }
 

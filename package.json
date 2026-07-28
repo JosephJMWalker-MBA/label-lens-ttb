@@ -40,6 +40,8 @@
     "eval:issue-149-brand-mild-sharpening": "npx vite-node --config vitest.config.ts scripts/eval/run-issue-149-brand-mild-sharpening.ts",
     "eval:issue-149-brand-local-contrast": "npx vite-node --config vitest.config.ts scripts/eval/run-issue-149-brand-local-contrast.ts",
     "eval:issue-149-brand-otsu-threshold": "npx vite-node --config vitest.config.ts scripts/eval/run-issue-149-brand-otsu-threshold.ts",
+    "eval:issue-149-alcohol-reselection": "npx vite-node --config vitest.config.ts scripts/eval/run-issue-149-alcohol-reselection.ts",
+    "eval:issue-149-alcohol-reselection:finalize": "npx vite-node --config vitest.config.ts scripts/eval/finalize-issue-149-alcohol-reselection.ts",
     "eval:vision-region-benchmark": "npx vite-node --config vitest.config.ts scripts/eval/run-vision-region-benchmark.ts",
     "eval:local-vlm-smoke": "npx vite-node --config vitest.config.ts scripts/eval/run-local-vlm-smoke.ts",
     "eval:local-vlm-contamination": "npx vite-node --config vitest.config.ts scripts/eval/run-local-vlm-contamination.ts",
