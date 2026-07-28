@@ -1,0 +1,66 @@
+{
+  "purpose": "Evaluation-only, human-reviewed approximate Alcohol-statement geometry for the six frozen LOW_CONFIDENCE cases. Not used as OCR input, not used for ranking. Existing this-repository provenance style (annotatedBy/annotatedOn/method) applied per case.",
+  "annotationMethod": "Two-pass visual estimation against the exact, code-derived crop-rectangle overlay (crop-geometry.json), performed in a single review session (not an independent second reader). Pass 1: locate the alcohol statement and estimate a normalized bounding box. Pass 2: re-check the box against the drawn left/right crop-boundary lines (whose pixel positions are known exactly, not estimated) and confirm or revise. Flagged as single-session self-annotation, not independent two-reader adjudication.",
+  "cases": [
+    {
+      "caseId": "patricia-green-cellars",
+      "normalizedBox": { "x0": 0.62, "x1": 0.93, "y0": 0.93, "y1": 0.98 },
+      "notes": "Bottom line, right portion, following '750 ML'.",
+      "pass1Estimate": "right-of-center, bottom row",
+      "pass2Confirmation": "confirmed clearly right of the blue (right-crop) boundary line",
+      "annotatedBy": "single-session-review",
+      "annotatedOn": "2026-07-28",
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-020",
+      "normalizedBox": { "x0": 0.06, "x1": 0.27, "y0": 0.9, "y1": 0.94 },
+      "notes": "Bottom-left line, isolated from barcode block to its right.",
+      "pass1Estimate": "left region, bottom row",
+      "pass2Confirmation": "confirmed clearly left of the red (left-crop) boundary line",
+      "annotatedBy": "single-session-review",
+      "annotatedOn": "2026-07-28",
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-023",
+      "normalizedBox": { "x0": 0.06, "x1": 0.24, "y0": 0.9, "y1": 0.94 },
+      "notes": "Bottom-left, above 'NET CONT. 750ML' line.",
+      "pass1Estimate": "left region, bottom row",
+      "pass2Confirmation": "confirmed clearly left of the red (left-crop) boundary line",
+      "annotatedBy": "single-session-review",
+      "annotatedOn": "2026-07-28",
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-034",
+      "normalizedBox": { "x0": 0.45, "x1": 0.68, "y0": 0.51, "y1": 0.545 },
+      "notes": "Not bottom-of-label; sits mid-body next to QR code, straddling the gap between crops. Lowest-confidence annotation of the six -- box boundary is close to both crop-edge lines and this case's location differs structurally from the other five (mid-label vs bottom-of-label).",
+      "pass1Estimate": "straddling gap between crop bands",
+      "pass2Confirmation": "left edge of box appears at or just past the red line; right edge appears to enter the blue crop -- confirmed as split/partial, not confirmed as cleanly on one side",
+      "annotatedBy": "single-session-review",
+      "annotatedOn": "2026-07-28",
+      "confidence": "low-moderate"
+    },
+    {
+      "caseId": "approved-wine-079",
+      "normalizedBox": { "x0": 0.6, "x1": 0.95, "y0": 0.14, "y1": 0.17 },
+      "notes": "Not bottom-of-label; sits in upper-middle body text, far right, in the 'NET CONTENT 750 ML - ALCOHOL ... BY VOLUME' line.",
+      "pass1Estimate": "right region, upper-middle row",
+      "pass2Confirmation": "confirmed clearly right of the blue (right-crop) boundary line",
+      "annotatedBy": "single-session-review",
+      "annotatedOn": "2026-07-28",
+      "confidence": "high"
+    },
+    {
+      "caseId": "approved-wine-097",
+      "normalizedBox": { "x0": 0.04, "x1": 0.29, "y0": 0.91, "y1": 0.95 },
+      "notes": "Bottom-left line, above the 'L9175' line.",
+      "pass1Estimate": "left region, bottom row",
+      "pass2Confirmation": "confirmed clearly left of the red (left-crop) boundary line",
+      "annotatedBy": "single-session-review",
+      "annotatedOn": "2026-07-28",
+      "confidence": "high"
+    }
+  ]
+}

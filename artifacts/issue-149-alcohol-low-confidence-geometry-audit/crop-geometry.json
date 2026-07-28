@@ -1,0 +1,140 @@
+[
+  {
+    "caseId": "patricia-green-cellars",
+    "imageWidth": 406,
+    "imageHeight": 400,
+    "primaryCrop": {
+      "left": 0,
+      "top": 0,
+      "width": 406,
+      "height": 400
+    },
+    "leftCrop": {
+      "left": 0,
+      "top": 0,
+      "width": 179,
+      "height": 400
+    },
+    "rightCrop": {
+      "left": 227,
+      "top": 0,
+      "width": 179,
+      "height": 400
+    }
+  },
+  {
+    "caseId": "approved-wine-020",
+    "imageWidth": 1017,
+    "imageHeight": 1160,
+    "primaryCrop": {
+      "left": 0,
+      "top": 0,
+      "width": 1017,
+      "height": 1160
+    },
+    "leftCrop": {
+      "left": 0,
+      "top": 0,
+      "width": 447,
+      "height": 1160
+    },
+    "rightCrop": {
+      "left": 570,
+      "top": 0,
+      "width": 447,
+      "height": 1160
+    }
+  },
+  {
+    "caseId": "approved-wine-023",
+    "imageWidth": 988,
+    "imageHeight": 1253,
+    "primaryCrop": {
+      "left": 0,
+      "top": 0,
+      "width": 988,
+      "height": 1253
+    },
+    "leftCrop": {
+      "left": 0,
+      "top": 0,
+      "width": 435,
+      "height": 1253
+    },
+    "rightCrop": {
+      "left": 553,
+      "top": 0,
+      "width": 435,
+      "height": 1253
+    }
+  },
+  {
+    "caseId": "approved-wine-034",
+    "imageWidth": 1447,
+    "imageHeight": 2747,
+    "primaryCrop": {
+      "left": 0,
+      "top": 0,
+      "width": 1447,
+      "height": 2747
+    },
+    "leftCrop": {
+      "left": 0,
+      "top": 0,
+      "width": 637,
+      "height": 2747
+    },
+    "rightCrop": {
+      "left": 810,
+      "top": 0,
+      "width": 637,
+      "height": 2747
+    }
+  },
+  {
+    "caseId": "approved-wine-079",
+    "imageWidth": 411,
+    "imageHeight": 593,
+    "primaryCrop": {
+      "left": 0,
+      "top": 0,
+      "width": 411,
+      "height": 593
+    },
+    "leftCrop": {
+      "left": 0,
+      "top": 0,
+      "width": 181,
+      "height": 593
+    },
+    "rightCrop": {
+      "left": 230,
+      "top": 0,
+      "width": 181,
+      "height": 593
+    }
+  },
+  {
+    "caseId": "approved-wine-097",
+    "imageWidth": 835,
+    "imageHeight": 1016,
+    "primaryCrop": {
+      "left": 0,
+      "top": 0,
+      "width": 835,
+      "height": 1016
+    },
+    "leftCrop": {
+      "left": 0,
+      "top": 0,
+      "width": 367,
+      "height": 1016
+    },
+    "rightCrop": {
+      "left": 468,
+      "top": 0,
+      "width": 367,
+      "height": 1016
+    }
+  }
+]

@@ -1,0 +1,45 @@
+{
+  "experimentId": "issue-149-alcohol-low-confidence-recovery-audit",
+  "frozenCaseIds": [
+    "patricia-green-cellars",
+    "approved-wine-020",
+    "approved-wine-023",
+    "approved-wine-034",
+    "approved-wine-079",
+    "approved-wine-097"
+  ],
+  "decision": "STOP",
+  "rule": "PROCEED_TO_STAGE_2 if at least one of the six cases classifies as recovery-truth-present-and-better with determinismPass=true; otherwise STOP. This is a case-level diagnostic on n=6 and supports no population-level claim.",
+  "cases": [
+    {
+      "caseId": "patricia-green-cellars",
+      "classification": "recovery-truth-present-not-better",
+      "determinismPass": true
+    },
+    {
+      "caseId": "approved-wine-020",
+      "classification": "recovery-truth-present-not-better",
+      "determinismPass": true
+    },
+    {
+      "caseId": "approved-wine-023",
+      "classification": "recovery-truth-present-not-better",
+      "determinismPass": true
+    },
+    {
+      "caseId": "approved-wine-034",
+      "classification": "recovery-truth-present-not-better",
+      "determinismPass": true
+    },
+    {
+      "caseId": "approved-wine-079",
+      "classification": "recovery-truth-present-not-better",
+      "determinismPass": true
+    },
+    {
+      "caseId": "approved-wine-097",
+      "classification": "recovery-truth-present-not-better",
+      "determinismPass": true
+    }
+  ]
+}

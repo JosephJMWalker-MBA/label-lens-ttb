@@ -1,0 +1,28 @@
+{
+  "caseId": "approved-wine-023",
+  "imageSha256": "ab9f888e0673afed9e08d6db30f6d5623c0c30a9bb69fc55e028ac82381fd010",
+  "arm": "treatment (0 degree rotation)",
+  "reason": "boundary-confidence stability check: primary-pass confidence 0.58 is within 0.02 of the 0.6 LOW_CONFIDENCE threshold, and the treatment candidate reached OBSERVED",
+  "extraRepeats": 2,
+  "observations": [
+    {
+      "repeatIndex": 1,
+      "rawTranscript": "¢ PRI SA INDICAZION RED WINE GOVERNMENT WARNING: (1) WOMAN SHOULD NOT OR PREGNANCY BECAUSE OF THI OF ALCOHOLIC BEVERAGES I\\ OPERATE MACHINERY, AND M. gUT TLED BY: ANGELO ROCC/ Bl \\porTiDs i - Ls PENNSYLVA NN » 2% 30/0 BRI [=] : : CONT ANS SULPHITES ALC. 14% BY VOL NE GON. /50ML",
+      "rawWordCount": 54,
+      "candidate": "14% ALC./VOL.",
+      "candidateState": "OBSERVED",
+      "candidateConfidence": 0.8075,
+      "candidateCorrect": true
+    },
+    {
+      "repeatIndex": 2,
+      "rawTranscript": "¢ PRI SA INDICAZION RED WINE GOVERNMENT WARNING: (1) WOMAN SHOULD NOT OR PREGNANCY BECAUSE OF THI OF ALCOHOLIC BEVERAGES I\\ OPERATE MACHINERY, AND M. gUT TLED BY: ANGELO ROCC/ Bl \\porTiDs i - Ls PENNSYLVA NN » 2% 30/0 BRI [=] : : CONT ANS SULPHITES ALC. 14% BY VOL NE GON. /50ML",
+      "rawWordCount": 54,
+      "candidate": "14% ALC./VOL.",
+      "candidateState": "OBSERVED",
+      "candidateConfidence": 0.8075,
+      "candidateCorrect": true
+    }
+  ],
+  "allExtraRepeatsIdentical": true
+}
