@@ -1,0 +1,58 @@
+{
+  "artifact": "resource-report",
+  "experimentId": "issue-149-native-tesseract-float-compatibility-attempt-3",
+  "attempt": 3,
+  "nativeAmd64Runner": true,
+  "emulationUsed": false,
+  "interpretation": "Measured on a native linux/amd64 GitHub-hosted runner. Diagnostic only: these figures do not establish Render production performance.",
+  "perInvocation": [
+    {
+      "id": "control-positive-primary",
+      "wallClockMs": 267,
+      "maxResidentKb": 39440,
+      "timedOut": false
+    },
+    {
+      "id": "control-positive-repeat",
+      "wallClockMs": 268,
+      "maxResidentKb": 39224,
+      "timedOut": false
+    },
+    {
+      "id": "control-blank-primary",
+      "wallClockMs": 241,
+      "maxResidentKb": 38100,
+      "timedOut": false
+    },
+    {
+      "id": "control-blank-repeat",
+      "wallClockMs": 246,
+      "maxResidentKb": 38000,
+      "timedOut": false
+    },
+    {
+      "id": "treatment-positive-primary",
+      "wallClockMs": 281,
+      "maxResidentKb": 61296,
+      "timedOut": false
+    },
+    {
+      "id": "treatment-positive-repeat",
+      "wallClockMs": 284,
+      "maxResidentKb": 61312,
+      "timedOut": false
+    },
+    {
+      "id": "treatment-blank-primary",
+      "wallClockMs": 250,
+      "maxResidentKb": 61192,
+      "timedOut": false
+    },
+    {
+      "id": "treatment-blank-repeat",
+      "wallClockMs": 239,
+      "maxResidentKb": 61228,
+      "timedOut": false
+    }
+  ]
+}

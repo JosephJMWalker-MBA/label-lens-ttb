@@ -1,0 +1,13 @@
+{
+  "artifact": "treatment-model-provenance",
+  "experimentId": "issue-149-native-tesseract-float-compatibility-attempt-3",
+  "attempt": 3,
+  "path": ".local/ocr-research/traineddata/tessdata-best/eng.traineddata",
+  "sha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+  "byteSize": 15400601,
+  "retrievalScript": "scripts/eval/fetch-issue-149-tessdata-best.mjs",
+  "upstreamCommit": "9ddc24e750eec0994223a9edc3fcb434a2244f3b",
+  "license": "Apache-2.0",
+  "committedToGit": false,
+  "modified": false
+}

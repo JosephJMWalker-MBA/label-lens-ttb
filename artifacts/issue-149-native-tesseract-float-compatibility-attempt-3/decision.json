@@ -1,0 +1,107 @@
+{
+  "artifact": "decision",
+  "experimentId": "issue-149-native-tesseract-float-compatibility-attempt-3",
+  "attempt": 3,
+  "evaluationOnly": true,
+  "syntheticOnly": true,
+  "corpusAccessed": false,
+  "productionChanged": false,
+  "verdict": "INCONCLUSIVE_OUTPUT",
+  "rationale": "An arm executed but TSV was invalid, the sentinel was not exact, the blank emitted text, or the failure could not be attributed to model compatibility.",
+  "gates": [
+    {
+      "gate": "preregistration-frozen",
+      "status": "PASS",
+      "detail": "expected e78db0f87fc7448f9e03a55fc007402c6b9e35f3c616033b05fa62ea30916640"
+    },
+    {
+      "gate": "runner-native-amd64",
+      "status": "PASS",
+      "detail": "uname -m = x86_64"
+    },
+    {
+      "gate": "control-model-integrity",
+      "status": "PASS",
+      "detail": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747 / 5199098"
+    },
+    {
+      "gate": "treatment-model-integrity",
+      "status": "PASS",
+      "detail": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba / 15400601"
+    },
+    {
+      "gate": "synthetic-input-hashes",
+      "status": "PASS",
+      "detail": "positive 9f079b48bcc7ba5a71a0e1b84f946c621e6709739ecd260549075a0c38e3b49d"
+    },
+    {
+      "gate": "no-production-or-fixture-changes",
+      "status": "PASS",
+      "detail": "clean"
+    },
+    {
+      "gate": "base-image-digest-reproduced",
+      "status": "PASS",
+      "detail": "sha256:bd16adabad7619222d4d0ab2d61f48391dacde03ad93f54d344683e326cbd0e2"
+    },
+    {
+      "gate": "package-pins-reproduced",
+      "status": "PASS",
+      "detail": "liblept5=1.82.0-3+b3 libtesseract5=5.3.0-2 tesseract-ocr=5.3.0-2 time=1.9-0.2"
+    },
+    {
+      "gate": "tesseract-binary-identity",
+      "status": "PASS",
+      "detail": "1e8c7ce7f27d2d1c902fb648efed443483f2a8fc7b60c48a5d3b61d647a2649e"
+    },
+    {
+      "gate": "staged-tsv-configs-byte-identical",
+      "status": "PASS",
+      "detail": "{\"control\":\"59d079bb75d8b3d7c839a3564580cb559e362c93a9d70f234e421c0c3e767e04\",\"treatment\":\"59d079bb75d8b3d7c839a3564580cb559e362c93a9d70f234e421c0c3e767e04\"}"
+    }
+  ],
+  "allExitZero": true,
+  "allValidTsv": true,
+  "plainTextFallbackDetected": false,
+  "positivesExact": false,
+  "blanksEmpty": true,
+  "allDeterministic": true,
+  "anyTimeout": false,
+  "anySignal": false,
+  "expectedPositiveTranscript": "LABEL LENS 123",
+  "transcripts": [
+    {
+      "id": "control-positive-primary",
+      "normalizedTranscript": "LHEEL LENS 124"
+    },
+    {
+      "id": "control-positive-repeat",
+      "normalizedTranscript": "LHEEL LENS 124"
+    },
+    {
+      "id": "control-blank-primary",
+      "normalizedTranscript": ""
+    },
+    {
+      "id": "control-blank-repeat",
+      "normalizedTranscript": ""
+    },
+    {
+      "id": "treatment-positive-primary",
+      "normalizedTranscript": "LHEEL LENS 124"
+    },
+    {
+      "id": "treatment-positive-repeat",
+      "normalizedTranscript": "LHEEL LENS 124"
+    },
+    {
+      "id": "treatment-blank-primary",
+      "normalizedTranscript": ""
+    },
+    {
+      "id": "treatment-blank-repeat",
+      "normalizedTranscript": ""
+    }
+  ],
+  "frozenVerdictRulesModified": false
+}
