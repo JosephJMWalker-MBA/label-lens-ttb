@@ -1,0 +1,86 @@
+# Issue #149 — native Tesseract float-model compatibility probe.
+# Research-only, manual. Never runs on push or pull_request, and is never part
+# of the CI required checks. It touches no production path.
+#
+# Two explicitly separate modes. A single dispatch runs exactly one of them, so
+# discovery can be reviewed and its pins frozen before any OCR happens.
+name: Issue 149 native Tesseract probe
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "discover = environment/package discovery only (no OCR). execute = the eight preregistered invocations."
+        required: true
+        type: choice
+        options:
+          - discover
+          - execute
+
+permissions:
+  contents: read
+
+jobs:
+  discover:
+    name: Discover (no OCR)
+    if: inputs.mode == 'discover'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assert native linux/amd64 runner
+        run: |
+          set -eu
+          arch="$(uname -m)"
+          echo "runner arch: ${arch}"
+          test "${arch}" = "x86_64" || { echo "NOT_NATIVE_AMD64: ${arch}" >&2; exit 1; }
+
+      - name: Record runner and Docker identity, discover package versions
+        run: node scripts/eval/issue-149-native-probe-discovery.mjs
+
+      - name: Upload discovery artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-149-discovery
+          path: artifacts/issue-149-native-tesseract-float-compatibility/attempt-2/discovery.json
+          if-no-files-found: error
+
+  execute:
+    name: Execute the eight preregistered invocations
+    if: inputs.mode == 'execute'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assert native linux/amd64 runner
+        run: |
+          set -eu
+          arch="$(uname -m)"
+          echo "runner arch: ${arch}"
+          test "${arch}" = "x86_64" || { echo "NOT_NATIVE_AMD64: ${arch}" >&2; exit 1; }
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Reuses the PR #208 retrieval mechanism. Verifies size and full sha256 and
+      # fails closed on mismatch. The model lands in an untracked cache and is
+      # never committed and never baked into the image.
+      - name: Retrieve pinned treatment model
+        run: node scripts/eval/fetch-issue-149-tessdata-best.mjs
+
+      # Gates, image build, runtime inventory, and the eight fixed invocations.
+      # Refuses to run unless every pin, hash, and freeze verifies.
+      - name: Run probe
+        run: node --import tsx scripts/eval/run-issue-149-native-tesseract-probe-execute.ts
+
+      - name: Upload result package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-149-attempt-2-results
+          path: artifacts/issue-149-native-tesseract-float-compatibility/attempt-2/
+          if-no-files-found: error
