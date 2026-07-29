@@ -44,19 +44,25 @@ dependency, and **no byte-identity claim is made**.
 Training-data provenance is recorded separately in `training-data-provenance.md`
 and remains **unresolved**. `trainingDataProductionReviewRequired = true`.
 
-## Code, runtime and container — frozen from discovery run 30498464410
+## Code, runtime and container — frozen from discovery run 30499089181
 
 | Field | Value |
 | --- | --- |
 | Code | `baudm/parseq` @ `1902db043c029a7e03a3818c616c06600af574be`, Apache-2.0 + NOTICE |
 | Base image | `python:3.11-slim-bookworm@sha256:b18992999dbe963a45a8a4da40ac2b1975be1a776d939d098c647482bcad5cba` |
-| Built image | `sha256:1770bb301d4449ba73f7a7402914e64027c4a860a7dd048b6d9e645f4a792b56` |
+| Built image | `sha256:c29fb8cc7041b07022c9f44c368a42b42c906d0781fcada4b5c395976f6288a1` |
 | Python | 3.11.15 |
 | torch / torchvision | `2.2.1+cpu` / `0.17.1+cpu` |
 | pytorch-lightning / timm | `2.2.0.post0` / `0.9.16` |
 | numpy / Pillow / nltk | `1.26.4` / `10.2.0` / `3.8.1` |
+| lmdb | `1.4.1` — required transitively by `strhub.data.module`; pin from upstream `requirements/test.txt` |
 | Dependency source | upstream `requirements/core.txt` at the pinned commit, used verbatim |
 | Font | `fonts-dejavu-core=2.37-6`, `DejaVuSans.ttf`, sha256 `abdc775b21b1bc47…`, DejaVu Fonts License |
+
+Discovery was re-run after a pre-inference import failure revealed the missing
+transitive `lmdb` dependency; no inference had run and no result existed at that
+point. Synthetic input hashes were byte-identical across the two independent
+container rebuilds.
 
 Full inventory in `dependency-lock.json`, `container-provenance.json`,
 `runtime-provenance.json`, `font-provenance.json`. Build args have no defaults, so

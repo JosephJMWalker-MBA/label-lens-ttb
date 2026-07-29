@@ -6,7 +6,7 @@
   "baseManifestListDigest": "sha256:b18992999dbe963a45a8a4da40ac2b1975be1a776d939d098c647482bcad5cba",
   "baseAmd64ManifestDigest": "sha256:28255a3ace7eb4c48bc1b57b90af29e1bc82b4fd6c60614a8e3dce61b87ff941",
   "targetPlatform": "linux/amd64",
-  "builtImageId": "sha256:1770bb301d4449ba73f7a7402914e64027c4a860a7dd048b6d9e645f4a792b56",
+  "builtImageId": "sha256:c29fb8cc7041b07022c9f44c368a42b42c906d0781fcada4b5c395976f6288a1",
   "buildArgs": {
     "FONT_PACKAGE_VERSION": "2.37-6",
     "PARSEQ_COMMIT": "1902db043c029a7e03a3818c616c06600af574be"
@@ -25,5 +25,10 @@
     "uname": "x86_64"
   },
   "networkDuringBuild": "permitted, to fetch pinned packages and pinned source",
-  "networkDuringInference": "disabled (--network=none)"
+  "networkDuringInference": "disabled (--network=none)",
+  "discoveryRunId": 30499089181,
+  "additionalPin": {
+    "lmdb": "1.4.1",
+    "reason": "strhub.data.module transitively imports lmdb at module load; pin taken from upstream requirements/test.txt"
+  }
 }

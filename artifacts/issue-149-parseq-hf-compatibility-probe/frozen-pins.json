@@ -2,7 +2,7 @@
   "artifact": "frozen-pins",
   "experimentId": "issue-149-parseq-hf-compatibility-probe",
   "frozenAfterDiscovery": true,
-  "discoveryRunId": 30498464410,
+  "discoveryRunId": 30499089181,
   "fontPackageVersion": "2.37-6",
   "parseqCommit": "1902db043c029a7e03a3818c616c06600af574be",
   "baseDigest": "sha256:b18992999dbe963a45a8a4da40ac2b1975be1a776d939d098c647482bcad5cba",
@@ -10,5 +10,9 @@
   "checkpointBytes": 95392675,
   "syntheticPositiveSha256": "265aaae73d65a04fe58441ccc1e1c67e15ca707b89fe312ca80c8aceb85831a0",
   "syntheticBlankSha256": "26daf63d1830f5af6375d1be855f6ce7a7daba20994a667951d38da0d604fd48",
-  "resolvedPackagesHash": "512ec8258b64b311ace0eddf436383a8de3e6a91e373b145b48ef50ea1e715ff"
+  "resolvedPackagesHash": "6e944f9a4423b1bc411f160d8ae5107fe586ec0aecda9f25faf1633dd949487d",
+  "builtImageId": "sha256:c29fb8cc7041b07022c9f44c368a42b42c906d0781fcada4b5c395976f6288a1",
+  "lmdb": "1.4.1",
+  "syntheticInputsStableAcrossRebuilds": true,
+  "preregistrationSha256": "5fb13f8f59ca1efaf40018834d9621a1303a701856c66db3e0e7ea2f41df1f25"
 }

@@ -2,12 +2,12 @@
   "artifact": "runtime-provenance",
   "experimentId": "issue-149-parseq-hf-compatibility-probe",
   "executionHost": "GitHub-hosted ubuntu-latest, native linux/amd64",
-  "discoveryRunId": 30498464410,
+  "discoveryRunId": 30499089181,
   "python": "Python 3.11.15",
   "torch": "2.2.1+cpu",
   "torchvision": "0.17.1+cpu",
   "parseqCommit": "1902db043c029a7e03a3818c616c06600af574be",
-  "builtImageId": "sha256:1770bb301d4449ba73f7a7402914e64027c4a860a7dd048b6d9e645f4a792b56",
+  "builtImageId": "sha256:c29fb8cc7041b07022c9f44c368a42b42c906d0781fcada4b5c395976f6288a1",
   "evaluationOnly": true,
   "deterministicSettings": {
     "torchManualSeed": 0,
@@ -40,5 +40,7 @@
     "renderConfig": false,
     "nextConfig": false,
     "applicationDependencies": false
-  }
+  },
+  "lmdb": "1.4.1",
+  "resolvedPackagesHash": "6e944f9a4423b1bc411f160d8ae5107fe586ec0aecda9f25faf1633dd949487d"
 }
