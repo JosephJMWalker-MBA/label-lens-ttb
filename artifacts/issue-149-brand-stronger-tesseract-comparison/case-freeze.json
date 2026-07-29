@@ -1,0 +1,16 @@
+{
+  "experimentId": "issue-149-brand-stronger-tesseract-comparison",
+  "frozenBeforeOcr": true,
+  "baseSha": "94c28bb86f26e288801c6298d3193fbb29ed3fa5",
+  "historicalCaseCount": 5,
+  "ocrItemCount": 6,
+  "cases": [
+    "approved-wine-004",
+    "approved-wine-005",
+    "approved-wine-031",
+    "la-fattoria-rotated",
+    "wine-multi-artifact-04"
+  ],
+  "note": "wine-multi-artifact-04 has two committed approved Brand regions and contributes two OCR items, so there are six OCR items over five historical cases.",
+  "mutationPolicy": "No case may be added, substituted, dropped, or re-scored after results are seen. The treatment may not change after results are seen, and no second arm may be added."
+}

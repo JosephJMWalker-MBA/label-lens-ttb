@@ -1,0 +1,38 @@
+{
+  "experimentId": "issue-149-brand-stronger-tesseract-comparison",
+  "basis": "PR #207 adjudication (DISTINCT_SOURCE_SAME_CROP).",
+  "historicalCases": 5,
+  "cropClusters": [
+    {
+      "cropClusterId": "C1",
+      "members": ["approved-wine-004", "la-fattoria-rotated"],
+      "cropSha256": "fab1b411c7e06258c41c884d3f0777039219f171fca37febd32597fabd5b108c"
+    },
+    {
+      "cropClusterId": "C2",
+      "members": ["approved-wine-005"],
+      "cropSha256": "d189130bea28dc36278958da8301539afb7a72ff2f1b80195139170dd3556c08"
+    },
+    {
+      "cropClusterId": "C3",
+      "members": ["approved-wine-031"],
+      "cropSha256": "2998fea6a8a7bddfc12b418c5207151920e0ed03940b349de8f4968323dd85c8"
+    },
+    { "cropClusterId": "C4", "members": ["wine-multi-artifact-04"], "cropSha256": null }
+  ],
+  "designClusters": [
+    {
+      "designClusterId": "D1",
+      "members": ["approved-wine-004", "la-fattoria-rotated", "approved-wine-005"]
+    },
+    { "designClusterId": "D2", "members": ["wine-multi-artifact-04"] },
+    { "designClusterId": "D3", "members": ["approved-wine-031"] }
+  ],
+  "distinctCropImageDenominator": 4,
+  "distinctDesignDenominator": 3,
+  "duplicateCropClusterVerified": true,
+  "countingRules": [
+    "A duplicated crop may not count twice toward PROCEED.",
+    "A repeated design at a different scale may not count as two independent design-level successes."
+  ]
+}

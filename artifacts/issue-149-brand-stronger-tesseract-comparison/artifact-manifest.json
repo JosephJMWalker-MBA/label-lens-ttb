@@ -1,0 +1,122 @@
+{
+  "artifact": "artifact-manifest",
+  "experimentId": "issue-149-brand-stronger-tesseract-comparison",
+  "issue": 149,
+  "evaluationOnly": true,
+  "outcome": "BLOCKED_TREATMENT_INCOMPATIBLE",
+  "comparisonDataProduced": false,
+  "ocrRunOnCorpusCrops": false,
+  "noOcrResultExists": true,
+  "productionChanged": false,
+  "fixtureChanged": false,
+  "truthChanged": false,
+  "pr195Untouched": true,
+  "baseSha": "94c28bb86f26e288801c6298d3193fbb29ed3fa5",
+  "runner": "scripts/eval/run-issue-149-brand-stronger-tesseract-comparison.ts",
+  "runnerSha256": "d44e77e010231febe6f609694cb6767966d967146c25d19df962f8bc98ae99e8",
+  "retrievalScript": "scripts/eval/fetch-issue-149-tessdata-best.mjs",
+  "retrievalScriptSha256": "b07b530720d75600e023fd72ca808952132ef30bc0e2df7484f2c486a945bc80",
+  "treatmentModel": {
+    "vendoredInGit": false,
+    "inspectedDuringInvestigation": true,
+    "upstreamRepository": "https://github.com/tesseract-ocr/tessdata_best",
+    "upstreamCommit": "9ddc24e750eec0994223a9edc3fcb434a2244f3b",
+    "upstreamUrl": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_best/9ddc24e750eec0994223a9edc3fcb434a2244f3b/eng.traineddata",
+    "expectedSha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+    "expectedByteSize": 15400601,
+    "cachePath": ".local/ocr-research/traineddata/tessdata-best/eng.traineddata",
+    "cacheUntracked": true
+  },
+  "absentByDesign": [
+    "primary-run-raw.json",
+    "repeat-run-raw.json",
+    "per-case-results.json",
+    "crop-cluster-results.json",
+    "design-cluster-results.json"
+  ],
+  "absentReason": "The compatibility gate failed closed before either arm produced data. These files are deliberately absent rather than emitted empty or synthesised.",
+  "fileCount": 16,
+  "files": [
+    {
+      "path": "case-freeze.json",
+      "sizeBytes": 704,
+      "sha256": "be388e2d3297569a5e41563d3a4855f043ef485fa97a18620b8fa05f703910c1"
+    },
+    {
+      "path": "commands.sh",
+      "sizeBytes": 2492,
+      "sha256": "91506fba621189e9591ed176cc818384f0fe7f5447696f813c8bfa4c6d5a925c"
+    },
+    {
+      "path": "compatibility/compatibility-report.json",
+      "sizeBytes": 5532,
+      "sha256": "1338d65fd5b08fd05f150825f73ad6b2ce8fa663516faf072ae25467dffbce39"
+    },
+    {
+      "path": "compatibility/probe-child.mjs",
+      "sizeBytes": 1498,
+      "sha256": "109654c408eb758b35c2b95b1737bbfd6dd18f25e1ac6140a7f8a8da84478afc"
+    },
+    {
+      "path": "control-configuration.json",
+      "sizeBytes": 1685,
+      "sha256": "eca5ce6c7b52d45f5dec7b33fa47a60dcd26f9e2d80f4a5f9cc6c4e532f47c03"
+    },
+    {
+      "path": "decision.json",
+      "sizeBytes": 4846,
+      "sha256": "7fd1f05cf094caf80a465671b118561988c12519af5731f3ff95b334f0cf505f"
+    },
+    {
+      "path": "git-sha.txt",
+      "sizeBytes": 100,
+      "sha256": "a9a01df83bee79b03a45619072ce540a0c6cfbe9110ab8bf3411f1d4e37ecd91"
+    },
+    {
+      "path": "independence-groups.json",
+      "sizeBytes": 1394,
+      "sha256": "41318af744faccfc9b7a047113e2bf770f5f820586e6fefd39f2a05c3c63c31f"
+    },
+    {
+      "path": "license-notes.md",
+      "sizeBytes": 5048,
+      "sha256": "94ecb8bf1339cab65a884c07d265efa29cea0bcedf0effe2f4bdec79cc6979e5"
+    },
+    {
+      "path": "limitations.md",
+      "sizeBytes": 4897,
+      "sha256": "3ce8fd175b6f2734e6d15227849b714475c862466830c2232ea3ec3c8ac3b996"
+    },
+    {
+      "path": "preregistration-addendum.md",
+      "sizeBytes": 2495,
+      "sha256": "aa4a783c63bfa82f450efb4acb496d5e8d3080da4999a1dc25ce6867d1feeede"
+    },
+    {
+      "path": "preregistration.md",
+      "sizeBytes": 10264,
+      "sha256": "d2e8f7fc4d96f9b8e4565db7be1773c3d2780ead13d517f3e97c5c3dda61f708"
+    },
+    {
+      "path": "source-and-crop-provenance.json",
+      "sizeBytes": 3212,
+      "sha256": "5be6f9725621ae93606845d9c9e1bd425229b3bd4f5b712a23658f6bba9a56d9"
+    },
+    {
+      "path": "traineddata-provenance.json",
+      "sizeBytes": 2387,
+      "sha256": "02e458e5522f56fbc0267be3e5fc52233116391284785baa75ac4984946c90a3"
+    },
+    {
+      "path": "treatment-configuration.json",
+      "sizeBytes": 1860,
+      "sha256": "c1a5514cde749515ffbad988b4cdc4bdb181395526e8d80fefff2ff93565d5ce"
+    },
+    {
+      "path": "vendor/tessdata-best/LICENSE",
+      "sizeBytes": 10173,
+      "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9"
+    }
+  ],
+  "verify": "shasum -a 256 -c artifacts/issue-149-brand-stronger-tesseract-comparison/artifact-manifest.sha256"
+}

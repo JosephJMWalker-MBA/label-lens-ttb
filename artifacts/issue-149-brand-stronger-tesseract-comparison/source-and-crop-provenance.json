@@ -1,0 +1,61 @@
+{
+  "experimentId": "issue-149-brand-stronger-tesseract-comparison",
+  "verifiedAgainst": "PR #207 crop provenance",
+  "allCropsMatchPr207": true,
+  "items": [
+    {
+      "itemId": "approved-wine-004",
+      "caseId": "approved-wine-004",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-004/label.png",
+      "sourceImageSha256": "02c272bc23e836befc6024a0c7fa1e3b448dc7d31b2e691cdff1f37457377aa5",
+      "committedCropPath": "artifacts/issue-149-brand-otsu-threshold/control/crops/approved-wine-004.png",
+      "cropSha256": "fab1b411c7e06258c41c884d3f0777039219f171fca37febd32597fabd5b108c",
+      "matchesPr207Provenance": true
+    },
+    {
+      "itemId": "approved-wine-005",
+      "caseId": "approved-wine-005",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-005/label.png",
+      "sourceImageSha256": "4098ba3ddd706354a51ac55015aac04cd1a67a12aaa1947cfef59a523fd13ef9",
+      "committedCropPath": "artifacts/issue-149-brand-otsu-threshold/control/crops/approved-wine-005.png",
+      "cropSha256": "d189130bea28dc36278958da8301539afb7a72ff2f1b80195139170dd3556c08",
+      "matchesPr207Provenance": true
+    },
+    {
+      "itemId": "approved-wine-031",
+      "caseId": "approved-wine-031",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-031/label.jpeg",
+      "sourceImageSha256": "512afcf475b691396481d289dbcb461f6880cb81c03ec02e8db4a54faea6a4b2",
+      "committedCropPath": "artifacts/issue-149-brand-otsu-threshold/control/crops/approved-wine-031.png",
+      "cropSha256": "2998fea6a8a7bddfc12b418c5207151920e0ed03940b349de8f4968323dd85c8",
+      "matchesPr207Provenance": true
+    },
+    {
+      "itemId": "la-fattoria-rotated",
+      "caseId": "la-fattoria-rotated",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-003/label.png",
+      "sourceImageSha256": "78a45dc3df09a29615ebb19687803d4c0b9e50c0ffdcea833d6cc332bd3ee4e8",
+      "committedCropPath": "artifacts/issue-149-brand-otsu-threshold/control/crops/la-fattoria-rotated.png",
+      "cropSha256": "fab1b411c7e06258c41c884d3f0777039219f171fca37febd32597fabd5b108c",
+      "matchesPr207Provenance": true
+    },
+    {
+      "itemId": "wine-multi-artifact-04-region-1",
+      "caseId": "wine-multi-artifact-04",
+      "sourceImagePath": "tests/fixtures/precheck/wine-multi-artifact-04/label.png",
+      "sourceImageSha256": "445d39b8f73d04cd05bb35e03f9678f6ba9e81f6a6f01d5469306ec43c9c5887",
+      "committedCropPath": "artifacts/issue-149-brand-otsu-threshold/control/crops/wine-multi-artifact-04-region-1.png",
+      "cropSha256": "d46fe950184f98042c724d261d884434a6cf5eab63b138e53a9299992d2c9fea",
+      "matchesPr207Provenance": true
+    },
+    {
+      "itemId": "wine-multi-artifact-04-region-2",
+      "caseId": "wine-multi-artifact-04",
+      "sourceImagePath": "tests/fixtures/precheck/wine-multi-artifact-04/label.png",
+      "sourceImageSha256": "445d39b8f73d04cd05bb35e03f9678f6ba9e81f6a6f01d5469306ec43c9c5887",
+      "committedCropPath": "artifacts/issue-149-brand-otsu-threshold/control/crops/wine-multi-artifact-04-region-2.png",
+      "cropSha256": "c338c020db6cf940a363153d58b1f5f6b24ef9dfba450e6d3b17e673e2e5b4ac",
+      "matchesPr207Provenance": true
+    }
+  ]
+}
