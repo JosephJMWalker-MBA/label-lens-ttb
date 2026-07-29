@@ -1,0 +1,7 @@
+{
+  "experimentId": "issue-149-native-tesseract-float-compatibility",
+  "assessable": false,
+  "reason": "Determinism requires the primary and repeat invocations to run. Neither ran.",
+  "syntheticInputRegenerationDeterministic": true,
+  "ocrDeterminism": null
+}

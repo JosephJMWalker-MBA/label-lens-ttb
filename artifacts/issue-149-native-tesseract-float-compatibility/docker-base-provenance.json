@@ -1,0 +1,13 @@
+{
+  "experimentId": "issue-149-native-tesseract-float-compatibility",
+  "dockerfile": "scripts/eval/docker/issue-149-native-tesseract-probe.Dockerfile",
+  "baseImage": "node:22-bookworm-slim",
+  "baseImageFamily": "Debian Bookworm (same family as the production deployment path)",
+  "manifestListDigest": "sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3",
+  "amd64ManifestDigest": "sha256:8607a9064d4a571140998ae9e52a3b3fcf9cff361d04642d5971e6cd76d39e27",
+  "targetPlatform": "linux/amd64",
+  "digestResolvedVia": "Docker Hub registry v2 manifest query from the host",
+  "digestVerifiedByBuild": false,
+  "productionDockerfileModified": false,
+  "note": "The base is pinned by immutable digest. Package versions are required build args with no defaults, so the image cannot build with an unpinned recognizer version."
+}

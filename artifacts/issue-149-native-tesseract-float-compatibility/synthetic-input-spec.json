@@ -1,0 +1,34 @@
+{
+  "experimentId": "issue-149-native-tesseract-float-compatibility",
+  "generator": "scripts/eval/run-issue-149-native-tesseract-float-compatibility.ts",
+  "method": "Glyphs are composed from explicit integer-coordinate rectangles and rasterised directly into a raw RGB buffer, then PNG-encoded by sharp. No system font and no SVG renderer participate, so pixel content cannot drift with a font or renderer upgrade.",
+  "fontIdentity": "none — vector rectangle strokes defined in `glyphRects()`; the stepped diagonal of 'N' is computed with integer arithmetic",
+  "canvas": { "width": 1240, "height": 220, "marginX": 60, "marginY": 60 },
+  "glyphMetrics": { "width": 60, "height": 100, "stroke": 12, "advance": 80 },
+  "pngEncoding": { "compressionLevel": 9, "adaptiveFiltering": false, "palette": false },
+  "sharpVersion": "0.35.3",
+  "deterministicRegenerationVerified": true,
+  "images": [
+    {
+      "name": "positive.png",
+      "kind": "positive sentinel",
+      "text": "LABEL LENS 149",
+      "rotationDegrees": 0,
+      "stylized": false,
+      "sha256": "bfba28eec8422a5e1dc69a6e3e6aefdfaa4f68a71cae85d385d9877d88a0e2ab",
+      "byteSize": 3045
+    },
+    {
+      "name": "blank.png",
+      "kind": "blank negative",
+      "text": null,
+      "rotationDegrees": 0,
+      "stylized": false,
+      "sha256": "8b5531768177d1a62c9e7780a1edfd5231f46681a474ad359313a979aa4d3e9d",
+      "byteSize": 1201,
+      "note": "identical dimensions and background to the positive image, with no glyphs painted"
+    }
+  ],
+  "knownTextPermitted": "The sentinel text is known because this is a synthetic runtime validation, not a blinded capability benchmark.",
+  "additionalVariantsCreatedAfterResults": false
+}

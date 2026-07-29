@@ -1,0 +1,54 @@
+{
+  "artifact": "attempt-2-decision",
+  "experimentId": "issue-149-native-tesseract-float-compatibility",
+  "attempt": 2,
+  "evaluationOnly": true,
+  "syntheticOnly": true,
+  "corpusAccessed": false,
+  "productionChanged": false,
+  "verdict": "INCONCLUSIVE_ENVIRONMENT",
+  "rationale": "The native control model did not execute cleanly, so the runtime itself is not established as sound.",
+  "controlAllSucceeded": false,
+  "treatmentAllSucceeded": false,
+  "treatmentPositiveExactMatch": false,
+  "treatmentBlankEmpty": true,
+  "allDeterministic": true,
+  "anyTimeout": false,
+  "anySignal": false,
+  "transcripts": [
+    {
+      "id": "control-positive-primary",
+      "normalizedTranscript": ""
+    },
+    {
+      "id": "control-positive-repeat",
+      "normalizedTranscript": ""
+    },
+    {
+      "id": "control-blank-primary",
+      "normalizedTranscript": ""
+    },
+    {
+      "id": "control-blank-repeat",
+      "normalizedTranscript": ""
+    },
+    {
+      "id": "treatment-positive-primary",
+      "normalizedTranscript": ""
+    },
+    {
+      "id": "treatment-positive-repeat",
+      "normalizedTranscript": ""
+    },
+    {
+      "id": "treatment-blank-primary",
+      "normalizedTranscript": ""
+    },
+    {
+      "id": "treatment-blank-repeat",
+      "normalizedTranscript": ""
+    }
+  ],
+  "expectedSentinel": "LABEL LENS 149",
+  "frozenVerdictRulesModified": false
+}

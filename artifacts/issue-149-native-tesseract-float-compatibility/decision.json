@@ -1,0 +1,32 @@
+{
+  "experimentId": "issue-149-native-tesseract-float-compatibility",
+  "evaluationOnly": true,
+  "syntheticOnly": true,
+  "corpusAccessed": false,
+  "productionChanged": false,
+  "productionDockerfileChanged": false,
+  "pr195Untouched": true,
+  "verdict": "INCONCLUSIVE_ENVIRONMENT",
+  "verdictRationale": "No container runtime is available on this host, so the pinned native runtime could not be built, inventoried, or executed. The probe stopped before OCR, as preregistered.",
+  "ocrInvoked": false,
+  "plannedInvocations": 8,
+  "executedInvocations": 0,
+  "blockingGates": ["container-runtime-available"],
+  "whatWasEstablished": [
+    "Both model assets verified by full sha256 and byte size.",
+    "Synthetic inputs generated deterministically and hashed, with regeneration verified in-run.",
+    "The research Dockerfile is pinned to an immutable base digest and fails closed without explicit package-version build args.",
+    "The production Dockerfile, production source, fixtures, and the PR #195 baseline are unchanged."
+  ],
+  "whatWasNotEstablished": [
+    "Whether native Tesseract can load and execute the float model. No invocation ran.",
+    "Native tesseract, libtesseract, and Leptonica versions; the executable sha256; ldd output; and the built image digest.",
+    "Any determinism, latency, or memory figure."
+  ],
+  "claimsNotMade": [
+    "No claim that native Tesseract cannot run tessdata_best. The environment was never able to try.",
+    "No recognition-capability, accuracy, or production-suitability claim.",
+    "No Tesseract capability-ceiling claim."
+  ],
+  "requiredNextStep": "Provide a host with a working container runtime, then resolve the three package-version build args from `apt-cache policy` inside the pinned base, freeze them into the preregistration, and re-run. Nothing else about the design changes."
+}

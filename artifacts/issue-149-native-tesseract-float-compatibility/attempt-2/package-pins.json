@@ -1,0 +1,14 @@
+{
+  "artifact": "package-pins",
+  "experimentId": "issue-149-native-tesseract-float-compatibility",
+  "attempt": 2,
+  "resolvedFrom": "discovery workflow run 30474266684, apt-cache inside the pinned linux/amd64 base",
+  "packageNamesDiscoveredNotGuessed": true,
+  "baseImageReference": "node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3",
+  "baseImageResolvedAmd64Id": "sha256:bd16adabad7619222d4d0ab2d61f48391dacde03ad93f54d344683e326cbd0e2",
+  "debianVersion": "12.15",
+  "tesseract": { "package": "tesseract-ocr", "version": "5.3.0-2" },
+  "libtesseract": { "package": "libtesseract5", "version": "5.3.0-2" },
+  "leptonica": { "package": "liblept5", "version": "1.82.0-3+b3" },
+  "time": { "package": "time", "version": "1.9-0.2", "presentInBase": false }
+}

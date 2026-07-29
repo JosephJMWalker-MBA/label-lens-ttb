@@ -1,0 +1,101 @@
+{
+  "experimentId": "issue-149-native-tesseract-float-compatibility",
+  "plannedInvocations": 8,
+  "executedInvocations": 0,
+  "fixedParameters": {
+    "language": "eng",
+    "oem": 1,
+    "psm": 11,
+    "dpi": 300,
+    "outputMode": "tsv",
+    "environment": { "LC_ALL": "C", "LANG": "C", "OMP_THREAD_LIMIT": "1", "OMP_NUM_THREADS": "1" },
+    "timeoutSeconds": 120,
+    "containerCpus": "1",
+    "containerMemory": "2g",
+    "network": "none"
+  },
+  "onlyDifferenceBetweenArms": "the read-only TESSDATA_PREFIX directory (control model vs float treatment model)",
+  "containerHardening": {
+    "network": "none",
+    "modelMountMode": "read-only",
+    "inputMountMode": "read-only",
+    "repositoryRootMounted": false,
+    "corpusOrFixturePathMounted": false,
+    "writableOutputDirectory": "raw output and metrics only"
+  },
+  "matrix": [
+    {
+      "id": "control-positive-primary",
+      "arm": "control",
+      "image": "positive",
+      "run": "primary",
+      "status": "NOT_EXECUTED",
+      "reason": "Preflight failed before any OCR invocation; see decision.json.",
+      "rawOutputPresent": false
+    },
+    {
+      "id": "control-positive-repeat",
+      "arm": "control",
+      "image": "positive",
+      "run": "repeat",
+      "status": "NOT_EXECUTED",
+      "reason": "Preflight failed before any OCR invocation; see decision.json.",
+      "rawOutputPresent": false
+    },
+    {
+      "id": "control-blank-primary",
+      "arm": "control",
+      "image": "blank",
+      "run": "primary",
+      "status": "NOT_EXECUTED",
+      "reason": "Preflight failed before any OCR invocation; see decision.json.",
+      "rawOutputPresent": false
+    },
+    {
+      "id": "control-blank-repeat",
+      "arm": "control",
+      "image": "blank",
+      "run": "repeat",
+      "status": "NOT_EXECUTED",
+      "reason": "Preflight failed before any OCR invocation; see decision.json.",
+      "rawOutputPresent": false
+    },
+    {
+      "id": "treatment-positive-primary",
+      "arm": "treatment",
+      "image": "positive",
+      "run": "primary",
+      "status": "NOT_EXECUTED",
+      "reason": "Preflight failed before any OCR invocation; see decision.json.",
+      "rawOutputPresent": false
+    },
+    {
+      "id": "treatment-positive-repeat",
+      "arm": "treatment",
+      "image": "positive",
+      "run": "repeat",
+      "status": "NOT_EXECUTED",
+      "reason": "Preflight failed before any OCR invocation; see decision.json.",
+      "rawOutputPresent": false
+    },
+    {
+      "id": "treatment-blank-primary",
+      "arm": "treatment",
+      "image": "blank",
+      "run": "primary",
+      "status": "NOT_EXECUTED",
+      "reason": "Preflight failed before any OCR invocation; see decision.json.",
+      "rawOutputPresent": false
+    },
+    {
+      "id": "treatment-blank-repeat",
+      "arm": "treatment",
+      "image": "blank",
+      "run": "repeat",
+      "status": "NOT_EXECUTED",
+      "reason": "Preflight failed before any OCR invocation; see decision.json.",
+      "rawOutputPresent": false
+    }
+  ],
+  "retryPolicy": "No retries beyond the preregistered exact repeat. No third tie-breaker run."
+}

@@ -1,0 +1,136 @@
+# Issue #149 — native Tesseract float-model compatibility probe.
+#
+# Research-only. Not part of the required CI checks and it touches no
+# production path.
+#
+# TRANSPORT NOTE. The preregistered design specified `workflow_dispatch`.
+# GitHub only dispatches workflow_dispatch workflows that exist on the default
+# branch, and this experiment must not modify `main`. The trigger is therefore a
+# push scoped to this one research branch, with the phase selected by a
+# committed mode file. This is a transport change only: the experimental phases,
+# preregistration, synthetic inputs, model identities, invocation parameters,
+# invocation matrix, and verdict rules are all unchanged.
+#
+# `pull_request_target` is deliberately not used.
+#
+# Phase selection is explicit and reviewed: each phase requires its own commit
+# to the mode file, so discovery and execution can never run in one invocation,
+# and an ordinary code or artifact commit cannot retrigger OCR because the path
+# filter admits only the workflow file and the mode file.
+name: Issue 149 native Tesseract probe
+
+on:
+  push:
+    branches:
+      - research/issue-149-native-tesseract-float-compatibility
+    paths:
+      - .github/workflows/issue-149-native-tesseract-probe.yml
+      - artifacts/issue-149-native-tesseract-float-compatibility/workflow-mode.txt
+
+permissions:
+  contents: read
+
+env:
+  MODE_FILE: artifacts/issue-149-native-tesseract-float-compatibility/workflow-mode.txt
+
+jobs:
+  resolve-mode:
+    name: Resolve declared mode
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.mode.outputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read and validate mode
+        id: mode
+        run: |
+          set -eu
+          test -f "${MODE_FILE}" || { echo "MODE_FILE_MISSING: ${MODE_FILE}" >&2; exit 1; }
+          mode="$(tr -d '[:space:]' < "${MODE_FILE}")"
+          echo "declared mode: '${mode}'"
+          case "${mode}" in
+            discover|execute|complete) ;;
+            *) echo "INVALID_MODE: '${mode}' (allowed: discover, execute, complete)" >&2; exit 1 ;;
+          esac
+          echo "mode=${mode}" >> "$GITHUB_OUTPUT"
+
+  discover:
+    name: Discover (no OCR)
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'discover'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assert native linux/amd64 runner
+        run: |
+          set -eu
+          arch="$(uname -m)"
+          echo "runner arch: ${arch}"
+          test "${arch}" = "x86_64" || { echo "NOT_NATIVE_AMD64: ${arch}" >&2; exit 1; }
+
+      # Environment and apt discovery inside the already-pinned base. Invokes no
+      # OCR, reads no corpus, inspects no Brand truth.
+      - name: Record runner identity and discover package versions
+        run: node scripts/eval/issue-149-native-probe-discovery.mjs
+
+      - name: Upload discovery artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-149-discovery
+          path: artifacts/issue-149-native-tesseract-float-compatibility/attempt-2/discovery.json
+          if-no-files-found: error
+
+  execute:
+    name: Execute the eight preregistered invocations
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'execute'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assert native linux/amd64 runner
+        run: |
+          set -eu
+          arch="$(uname -m)"
+          echo "runner arch: ${arch}"
+          test "${arch}" = "x86_64" || { echo "NOT_NATIVE_AMD64: ${arch}" >&2; exit 1; }
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Reuses the PR #208 retrieval mechanism. Verifies size and full sha256 and
+      # fails closed on mismatch. The model lands in an untracked cache; it is
+      # never committed and never baked into the image.
+      - name: Retrieve pinned treatment model
+        run: node scripts/eval/fetch-issue-149-tessdata-best.mjs
+
+      # Gates, image build, runtime inventory, and the eight fixed invocations.
+      # Refuses to run unless every pin, hash, and freeze verifies.
+      - name: Run probe
+        run: node --import tsx scripts/eval/run-issue-149-native-tesseract-probe-execute.ts
+
+      - name: Upload result package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-149-attempt-2-results
+          path: artifacts/issue-149-native-tesseract-float-compatibility/attempt-2/
+          if-no-files-found: error
+
+  complete:
+    name: Complete (no experiment run)
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'complete'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm the experiment is sealed
+        run: |
+          echo "Mode is 'complete': the experiment is finished and this workflow"
+          echo "will not run discovery or OCR. Results are committed to the branch."

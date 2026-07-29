@@ -1,0 +1,78 @@
+{
+  "artifact": "discovery",
+  "experimentId": "issue-149-native-tesseract-float-compatibility",
+  "attempt": 2,
+  "mode": "discover",
+  "ocrInvoked": false,
+  "corpusAccessed": false,
+  "brandTruthInspected": false,
+  "collectedAtUtc": "2026-07-29T17:12:56Z",
+  "executionHost": {
+    "platform": "github-hosted runner",
+    "runnerOs": "Linux",
+    "runnerArch": "X64",
+    "runnerName": "GitHub Actions 1000001041",
+    "imageOs": "ubuntu24",
+    "imageVersion": "20260720.247.2",
+    "githubRunId": "30474266684",
+    "githubWorkflowRef": "JosephJMWalker-MBA/label-lens-ttb/.github/workflows/issue-149-native-tesseract-probe.yml@refs/heads/research/issue-149-native-tesseract-float-compatibility",
+    "unameMachine": "x86_64",
+    "unameAll": "Linux runnervmvrwv9 6.17.0-1020-azure #20~24.04.1-Ubuntu SMP Fri Jun 19 20:09:14 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+    "osRelease": "PRETTY_NAME=\"Ubuntu 24.04.4 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.4 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo",
+    "kernel": "6.17.0-1020-azure",
+    "nproc": "4",
+    "cpuModel": "model name\t: AMD EPYC 7763 64-Core Processor",
+    "memoryBytes": "16766423040",
+    "nativeAmd64": true,
+    "emulationUsed": false
+  },
+  "docker": {
+    "versionJson": "{\"Client\":{\"Platform\":{\"Name\":\"Docker Engine - Community\"},\"Version\":\"28.0.4\",\"ApiVersion\":\"1.48\",\"DefaultAPIVersion\":\"1.48\",\"GitCommit\":\"b8034c0\",\"GoVersion\":\"go1.23.7\",\"Os\":\"linux\",\"Arch\":\"amd64\",\"BuildTime\":\"Tue Mar 25 15:07:16 2025\",\"Context\":\"default\"},\"Server\":{\"Platform\":{\"Name\":\"Docker Engine - Community\"},\"Components\":[{\"Name\":\"Engine\",\"Version\":\"28.0.4\",\"Details\":{\"ApiVersion\":\"1.48\",\"Arch\":\"amd64\",\"BuildTime\":\"Tue Mar 25 15:07:16 2025\",\"Experimental\":\"false\",\"GitCommit\":\"6430e49\",\"GoVersion\":\"go1.23.7\",\"KernelVersion\":\"6.17.0-1020-azure\",\"MinAPIVersion\":\"1.24\",\"Os\":\"linux\"}},{\"Name\":\"containerd\",\"Version\":\"v2.2.6\",\"Details\":{\"GitCommit\":\"11ce9d5f3c68c941867e82890e93e815c1304f1b\"}},{\"Name\":\"runc\",\"Version\":\"1.3.6\",\"Details\":{\"GitCommit\":\"v1.3.6-0-g491b69ba\"}},{\"Name\":\"docker-init\",\"Version\":\"0.19.0\",\"Details\":{\"GitCommit\":\"de40ad0\"}}],\"Version\":\"28.0.4\",\"ApiVersion\":\"1.48\",\"MinAPIVersion\":\"1.24\",\"GitCommit\":\"6430e49\",\"GoVersion\":\"go1.23.7\",\"Os\":\"linux\",\"Arch\":\"amd64\",\"KernelVersion\":\"6.17.0-1020-azure\",\"BuildTime\":\"2025-03-25T15:07:16.000000000+00:00\"}}"
+  },
+  "baseImage": {
+    "reference": "node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3",
+    "image": "node:22-bookworm-slim",
+    "manifestListDigest": "sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3",
+    "platform": "linux/amd64",
+    "pullOutputTail": "Digest: sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3\nStatus: Downloaded newer image for node@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3\ndocker.io/library/node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3",
+    "imageId": "sha256:bd16adabad7619222d4d0ab2d61f48391dacde03ad93f54d344683e326cbd0e2",
+    "imageArchitecture": "amd64",
+    "imageOs": "linux",
+    "repoDigest": "node@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3"
+  },
+  "packages": {
+    "discoveredNotGuessed": true,
+    "tesseract": {
+      "package": "tesseract-ocr",
+      "candidate": "5.3.0-2"
+    },
+    "libtesseract": {
+      "package": "libtesseract5",
+      "candidate": "5.3.0-2"
+    },
+    "leptonica": {
+      "package": "liblept5",
+      "candidate": "1.82.0-3+b3"
+    },
+    "time": {
+      "package": "time",
+      "candidate": "1.9-0.2",
+      "usrBinTimePresentInBase": "no"
+    }
+  },
+  "containerArchitecture": {
+    "dpkgArchitecture": "amd64",
+    "unameMachine": "x86_64",
+    "debianVersion": "12.15"
+  },
+  "rawAptOutput": {
+    "policy_tesseract": "tesseract-ocr:\n  Installed: (none)\n  Candidate: 5.3.0-2\n  Version table:\n     5.3.0-2 500\n        500 http://deb.debian.org/debian bookworm/main amd64 Packages",
+    "depends_tesseract": "tesseract-ocr\n  Depends: libarchive13\n  Depends: libc6\n  Depends: libcairo2\n  Depends: libcurl4\n  Depends: libfontconfig1\n  Depends: libgcc-s1\n  Depends: libglib2.0-0\n  Depends: libharfbuzz0b\n  Depends: libicu72\n  Depends: liblept5\n  Depends: libpango-1.0-0\n  Depends: libpangocairo-1.0-0\n  Depends: libstdc++6\n  Depends: libtesseract5\n  Depends: tesseract-ocr-eng\n  Depends: tesseract-ocr-osd\n  Replaces: <tesseract-ocr-data>",
+    "policy_libtesseract": "libtesseract5:\n  Installed: (none)\n  Candidate: 5.3.0-2\n  Version table:\n     5.3.0-2 500\n        500 http://deb.debian.org/debian bookworm/main amd64 Packages",
+    "policy_leptonica": "liblept5:\n  Installed: (none)\n  Candidate: 1.82.0-3+b3\n  Version table:\n     1.82.0-3+b3 500\n        500 http://deb.debian.org/debian bookworm/main amd64 Packages",
+    "policy_time": "time:\n  Installed: (none)\n  Candidate: 1.9-0.2\n  Version table:\n     1.9-0.2 500\n        500 http://deb.debian.org/debian bookworm/main amd64 Packages",
+    "os_release": "PRETTY_NAME=\"Debian GNU/Linux 12 (bookworm)\"\nNAME=\"Debian GNU/Linux\"\nVERSION_ID=\"12\"\nVERSION=\"12 (bookworm)\"\nVERSION_CODENAME=bookworm\nID=debian\nHOME_URL=\"https://www.debian.org/\"\nSUPPORT_URL=\"https://www.debian.org/support\"\nBUG_REPORT_URL=\"https://bugs.debian.org/\""
+  },
+  "pinsComplete": true,
+  "nextStep": "Update the research Dockerfile with these exact package names and versions, write and hash preregistration-runtime-addendum.md, commit and push, then dispatch mode=execute."
+}

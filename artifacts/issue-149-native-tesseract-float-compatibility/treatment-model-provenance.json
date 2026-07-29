@@ -1,0 +1,21 @@
+{
+  "experimentId": "issue-149-native-tesseract-float-compatibility",
+  "role": "native float treatment",
+  "path": ".local/ocr-research/traineddata/tessdata-best/eng.traineddata",
+  "expectedSha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+  "observedSha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+  "expectedByteSize": 15400601,
+  "observedByteSize": 15400601,
+  "integrityVerified": true,
+  "variant": "official tessdata_best float LSTM",
+  "upstreamRepository": "https://github.com/tesseract-ocr/tessdata_best",
+  "upstreamCommit": "9ddc24e750eec0994223a9edc3fcb434a2244f3b",
+  "license": "Apache-2.0",
+  "retrievalScript": "scripts/eval/fetch-issue-149-tessdata-best.mjs",
+  "retrievalMechanismReused": true,
+  "competingDownloadSystemCreated": false,
+  "mountMode": "read-only",
+  "committedToGit": false,
+  "inDockerImage": false,
+  "note": "Reuses the PR #208 retrieval mechanism and untracked cache. The binary never enters Git or the image."
+}

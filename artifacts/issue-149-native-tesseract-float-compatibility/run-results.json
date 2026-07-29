@@ -1,0 +1,188 @@
+{
+  "experimentId": "issue-149-native-tesseract-float-compatibility",
+  "ocrInvoked": false,
+  "emptyTsvSynthesised": false,
+  "preflight": [
+    {
+      "gate": "branch-based-on-merged-pr-208",
+      "status": "PASS",
+      "detail": "HEAD 887c4df34efc844a69edb87514e5c97432869166; expected base 887c4df34efc844a69edb87514e5c97432869166"
+    },
+    {
+      "gate": "preregistration-frozen",
+      "status": "PASS",
+      "detail": "matches the frozen sha256 ad905275e2727aaeb0c266e3f4ca5ca2b6f5aa6490b2b8222a48bbae3f45c43b"
+    },
+    {
+      "gate": "production-and-pr195-unchanged",
+      "status": "PASS",
+      "detail": "all guarded production paths match, including the PR #195 baseline file"
+    },
+    {
+      "gate": "control-model-integrity",
+      "status": "PASS",
+      "detail": "sha256 5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747, bytes 5199098"
+    },
+    {
+      "gate": "treatment-model-integrity",
+      "status": "PASS",
+      "detail": "sha256 8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba, bytes 15400601"
+    },
+    {
+      "gate": "synthetic-input-deterministic-regeneration",
+      "status": "PASS",
+      "detail": "two independent generations produced byte-identical PNGs"
+    },
+    {
+      "gate": "container-runtime-available",
+      "status": "FAIL",
+      "detail": "no container runtime binary on PATH and no reachable Docker daemon"
+    }
+  ],
+  "results": [
+    {
+      "id": "control-positive-primary",
+      "arm": "control",
+      "image": "positive",
+      "run": "primary",
+      "status": "NOT_EXECUTED",
+      "failureStage": "preflight",
+      "absentOutputMarker": true,
+      "rawTsvPath": null,
+      "rawStderrPath": null,
+      "exitStatus": null,
+      "terminatingSignal": null,
+      "timedOut": null,
+      "wallClockMs": null,
+      "maxResidentBytes": null,
+      "normalizedTranscript": null,
+      "note": "No OCR was invoked. No TSV was synthesised for this row."
+    },
+    {
+      "id": "control-positive-repeat",
+      "arm": "control",
+      "image": "positive",
+      "run": "repeat",
+      "status": "NOT_EXECUTED",
+      "failureStage": "preflight",
+      "absentOutputMarker": true,
+      "rawTsvPath": null,
+      "rawStderrPath": null,
+      "exitStatus": null,
+      "terminatingSignal": null,
+      "timedOut": null,
+      "wallClockMs": null,
+      "maxResidentBytes": null,
+      "normalizedTranscript": null,
+      "note": "No OCR was invoked. No TSV was synthesised for this row."
+    },
+    {
+      "id": "control-blank-primary",
+      "arm": "control",
+      "image": "blank",
+      "run": "primary",
+      "status": "NOT_EXECUTED",
+      "failureStage": "preflight",
+      "absentOutputMarker": true,
+      "rawTsvPath": null,
+      "rawStderrPath": null,
+      "exitStatus": null,
+      "terminatingSignal": null,
+      "timedOut": null,
+      "wallClockMs": null,
+      "maxResidentBytes": null,
+      "normalizedTranscript": null,
+      "note": "No OCR was invoked. No TSV was synthesised for this row."
+    },
+    {
+      "id": "control-blank-repeat",
+      "arm": "control",
+      "image": "blank",
+      "run": "repeat",
+      "status": "NOT_EXECUTED",
+      "failureStage": "preflight",
+      "absentOutputMarker": true,
+      "rawTsvPath": null,
+      "rawStderrPath": null,
+      "exitStatus": null,
+      "terminatingSignal": null,
+      "timedOut": null,
+      "wallClockMs": null,
+      "maxResidentBytes": null,
+      "normalizedTranscript": null,
+      "note": "No OCR was invoked. No TSV was synthesised for this row."
+    },
+    {
+      "id": "treatment-positive-primary",
+      "arm": "treatment",
+      "image": "positive",
+      "run": "primary",
+      "status": "NOT_EXECUTED",
+      "failureStage": "preflight",
+      "absentOutputMarker": true,
+      "rawTsvPath": null,
+      "rawStderrPath": null,
+      "exitStatus": null,
+      "terminatingSignal": null,
+      "timedOut": null,
+      "wallClockMs": null,
+      "maxResidentBytes": null,
+      "normalizedTranscript": null,
+      "note": "No OCR was invoked. No TSV was synthesised for this row."
+    },
+    {
+      "id": "treatment-positive-repeat",
+      "arm": "treatment",
+      "image": "positive",
+      "run": "repeat",
+      "status": "NOT_EXECUTED",
+      "failureStage": "preflight",
+      "absentOutputMarker": true,
+      "rawTsvPath": null,
+      "rawStderrPath": null,
+      "exitStatus": null,
+      "terminatingSignal": null,
+      "timedOut": null,
+      "wallClockMs": null,
+      "maxResidentBytes": null,
+      "normalizedTranscript": null,
+      "note": "No OCR was invoked. No TSV was synthesised for this row."
+    },
+    {
+      "id": "treatment-blank-primary",
+      "arm": "treatment",
+      "image": "blank",
+      "run": "primary",
+      "status": "NOT_EXECUTED",
+      "failureStage": "preflight",
+      "absentOutputMarker": true,
+      "rawTsvPath": null,
+      "rawStderrPath": null,
+      "exitStatus": null,
+      "terminatingSignal": null,
+      "timedOut": null,
+      "wallClockMs": null,
+      "maxResidentBytes": null,
+      "normalizedTranscript": null,
+      "note": "No OCR was invoked. No TSV was synthesised for this row."
+    },
+    {
+      "id": "treatment-blank-repeat",
+      "arm": "treatment",
+      "image": "blank",
+      "run": "repeat",
+      "status": "NOT_EXECUTED",
+      "failureStage": "preflight",
+      "absentOutputMarker": true,
+      "rawTsvPath": null,
+      "rawStderrPath": null,
+      "exitStatus": null,
+      "terminatingSignal": null,
+      "timedOut": null,
+      "wallClockMs": null,
+      "maxResidentBytes": null,
+      "normalizedTranscript": null,
+      "note": "No OCR was invoked. No TSV was synthesised for this row."
+    }
+  ]
+}
