@@ -1,0 +1,58 @@
+{
+  "experimentId": "issue-149-brand-stronger-tesseract-comparison",
+  "control": {
+    "path": "src/pipeline/extractor/assets/eng.traineddata",
+    "byteSize": 5199098,
+    "sha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+    "versionString": "4.00.00alpha:eng:synth20170629:[1,36,0,1Ct3,3,16Mp3,3Lfys64Lfx96Lrx96Lfx512O1c1]",
+    "components": {
+      "lstm": 1487596,
+      "lstm_punc_dawg": 4322,
+      "lstm_word_dawg": 3694794,
+      "lstm_number_dawg": 4738,
+      "lstm_unicharset": 6360,
+      "lstm_recoder": 1012,
+      "version": 80
+    },
+    "legacyComponentsPresent": false,
+    "variant": "tessdata_fast (integer-quantized LSTM)",
+    "origin": "already vendored in this repository"
+  },
+  "treatment": {
+    "path": ".local/ocr-research/traineddata/tessdata-best/eng.traineddata",
+    "byteSize": 15400601,
+    "sha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+    "versionString": "4.00.00alpha:eng:synth20170629:[1,36,0,1Ct3,3,16Mp3,3Lfys64Lfx96Lrx96Lfx512O1c1]",
+    "components": {
+      "lstm": 11689099,
+      "lstm_punc_dawg": 4322,
+      "lstm_word_dawg": 3694794,
+      "lstm_number_dawg": 4738,
+      "lstm_unicharset": 6360,
+      "lstm_recoder": 1012,
+      "version": 80
+    },
+    "legacyComponentsPresent": false,
+    "variant": "tessdata_best (float LSTM)",
+    "origin": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_best/9ddc24e750eec0994223a9edc3fcb434a2244f3b/eng.traineddata",
+    "upstreamCommit": "9ddc24e750eec0994223a9edc3fcb434a2244f3b",
+    "vendoredInGit": false,
+    "retrievedBy": "scripts/eval/fetch-issue-149-tessdata-best.mjs",
+    "retrievedOn": "2026-07-28",
+    "license": "Apache-2.0",
+    "licenseFile": "vendor/tessdata-best/LICENSE",
+    "licenseFileSha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+    "retrievalAuthorized": true,
+    "committedUnmodified": true
+  },
+  "singleDimensionCheck": {
+    "versionStringIdentical": true,
+    "networkArchitectureIdentical": true,
+    "sharedComponentsIdentical": true,
+    "legacyComponentsAbsentInBoth": true,
+    "onlyDifferingComponent": "lstm",
+    "controlLstmBytes": 1487596,
+    "treatmentLstmBytes": 11689099,
+    "verdict": "Only the recognizer weights differ. Charset, recoder, dictionaries, network architecture, and version string are byte-identical in size and value."
+  }
+}

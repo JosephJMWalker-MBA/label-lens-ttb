@@ -1,0 +1,54 @@
+{
+  "experimentId": "issue-149-brand-stronger-tesseract-comparison",
+  "arm": "treatment",
+  "description": "Identical to control in every dimension except the English traineddata variant.",
+  "traineddata": {
+    "path": ".local/ocr-research/traineddata/tessdata-best/eng.traineddata",
+    "byteSize": 15400601,
+    "sha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+    "versionString": "4.00.00alpha:eng:synth20170629:[1,36,0,1Ct3,3,16Mp3,3Lfys64Lfx96Lrx96Lfx512O1c1]",
+    "components": {
+      "lstm": 11689099,
+      "lstm_punc_dawg": 4322,
+      "lstm_word_dawg": 3694794,
+      "lstm_number_dawg": 4738,
+      "lstm_unicharset": 6360,
+      "lstm_recoder": 1012,
+      "version": 80
+    },
+    "legacyComponentsPresent": false
+  },
+  "variant": "tessdata_best (float LSTM)",
+  "assetDir": ".local/ocr-research/traineddata/tessdata-best",
+  "selectedVia": "LABEL_LENS_OCR_ASSET_DIR operator override, already supported by resolveLangPath()",
+  "productionSourceModified": false,
+  "ocrEngine": "tesseract.js@7.0.0/eng/OEM1",
+  "tesseractJs": "7.0.0",
+  "tesseractJsCore": "7.0.0",
+  "oem": 1,
+  "oemLabel": "LSTM_ONLY",
+  "language": "eng",
+  "sharp": "0.35.3",
+  "node": "v22.17.0",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "psm": 11,
+  "scale": 3,
+  "padding": { "ratio": 0.03, "minPx": 4 },
+  "preprocessing": {
+    "grayscaleMethod": "sharp-grayscale",
+    "contrastMethod": "normalise",
+    "localContrast": "none",
+    "thresholdMethod": "none",
+    "sharpening": "none",
+    "inversion": false,
+    "denoising": "none",
+    "rotation": 0
+  },
+  "parserAndSelection": {
+    "module": "src/pipeline/extractor/field-selection.ts",
+    "sha256": "3e84fa8a043570713991643830c7b95e0f7189a4ed037b737c783353d519106d",
+    "reliabilityRule": "state OBSERVED and ocrEvidenceScore >= 0.8",
+    "unchanged": true
+  }
+}

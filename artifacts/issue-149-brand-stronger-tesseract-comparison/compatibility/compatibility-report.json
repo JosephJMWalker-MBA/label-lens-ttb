@@ -1,0 +1,80 @@
+{
+  "artifact": "compatibility-report",
+  "experimentId": "issue-149-brand-stronger-tesseract-comparison",
+  "issue": 149,
+  "outcome": "TREATMENT_INCOMPATIBLE_WITH_LOCKED_RUNTIME",
+  "summary": "The preregistered treatment model cannot be executed by the locked tesseract.js runtime. The compatibility gate failed closed before either arm produced data, exactly as preregistered. No comparison result exists.",
+  "rootCause": {
+    "finding": "Every LSTM-only Tesseract WASM core shipped by tesseract.js-core 7.0.0 is integer-only. Running a float (tessdata_best) model under one aborts on a missing float dot-product symbol.",
+    "abortSymbol": "_ZN9tesseract13DotProductSSEEPKfS1_i",
+    "abortMessage": "RuntimeError: Aborted(missing function: _ZN9tesseract13DotProductSSEEPKfS1_i)",
+    "corroboration": "tesseract.js's own node worker defaults lstmOnly language data to the '4.0.0_best_int' (integer-quantized) dataset, which is consistent with the LSTM-only cores supporting integer weights only.",
+    "coreSelection": "src/worker-script/node/getCore.js ignores the caller's corePath and selects a core by runtime SIMD feature detection. On this machine relaxedSimd=true, so tesseract-core-relaxedsimd-lstm was loaded.",
+    "floatCapableCores": "The float-capable full cores (tesseract-core, tesseract-core-simd, tesseract-core-relaxedsimd) are selected only when OEM is not DEFAULT/LSTM_ONLY, i.e. for the legacy-capable modes. Neither model in this experiment carries legacy components, so those OEM values cannot initialize either."
+  },
+  "probeMethod": {
+    "image": "synthetic 420x120 PNG rendered from an SVG containing the single word SYNTHETIC",
+    "corpusDataUsed": false,
+    "brandTruthRead": false,
+    "producesExperimentalEvidence": false,
+    "note": "Diagnostic only. A synthetic image was used specifically so that characterising the blocker could not touch corpus crops or contaminate the frozen protocol.",
+    "isolation": "each configuration run in its own process, because tesseract.js caches the loaded core at module scope",
+    "script": "compatibility/probe-child.mjs"
+  },
+  "environment": {
+    "node": "v22.17.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "tesseractJs": "7.0.0",
+    "tesseractJsCore": "7.0.0",
+    "simd": true,
+    "relaxedSimd": true,
+    "coreLoadedByDetection": "tesseract-core-relaxedsimd-lstm"
+  },
+  "probeMatrix": [
+    {
+      "model": "control (integer-quantized eng, sha256 5dc5d8d6\u2026)",
+      "legacyCore": false,
+      "coreFamily": "LSTM-only",
+      "initialized": true,
+      "recognized": true,
+      "wordsReturned": 1,
+      "verdict": "WORKS \u2014 establishes the runtime and probe are sound; the failure below is specific to the float model, not the environment"
+    },
+    {
+      "model": "treatment (tessdata_best float eng, sha256 8280aed0\u2026)",
+      "legacyCore": false,
+      "coreFamily": "LSTM-only",
+      "initialized": false,
+      "recognized": false,
+      "verdict": "FAILS \u2014 aborts on the missing float dot-product symbol inside the frozen run; hangs without completing in the isolated probe"
+    },
+    {
+      "model": "treatment (tessdata_best float eng, sha256 8280aed0\u2026)",
+      "legacyCore": true,
+      "coreFamily": "full (float-capable)",
+      "initialized": false,
+      "recognized": false,
+      "verdict": "NOT ESTABLISHED \u2014 the probe hung and was terminated after a bounded wait; this path is neither confirmed working nor confirmed broken"
+    }
+  ],
+  "whatWasNotDone": {
+    "coreSubstitution": "Forcing a float-capable core would change the WASM core build, a second dimension the preregistration holds fixed. Not done.",
+    "oemChange": "Changing OEM would be a second dimension and is impossible against models with no legacy components. Not done.",
+    "treatmentSubstitution": "Swapping in a different, weaker treatment after the gate failed would be post-hoc treatment substitution. Not done.",
+    "secondArm": "Adding a second traineddata/config arm is forbidden. Not done.",
+    "rationale": "The preregistration fixed one variable and specified that the run fails closed if the gate fails. It failed closed. Reporting a blocker is the correct outcome; improvising a runnable variant would have produced a result the design did not authorise."
+  },
+  "followUpPath": {
+    "status": "requires a separate preregistration; not authorised by this package",
+    "option": "Run the float model under a float-capable full core, which necessarily changes two dimensions relative to today's control (traineddata variant AND WASM core build). A clean design would therefore need either a three-arm decomposition or an explicit statement that the core build is part of the treatment definition.",
+    "openQuestion": "Whether tesseract.js 7.0.0 can pair a float LSTM model with a full core in Node at all was not established here \u2014 the bounded probe hung rather than answering.",
+    "alternative": "Vendor the integer-quantized variant of a different official model, which would stay inside the integer-only core constraint, if any such variant is genuinely stronger than the current one."
+  },
+  "modelRetention": {
+    "treatmentModelVendoredInGit": false,
+    "inspectedDuringInvestigation": true,
+    "retrievalScript": "scripts/eval/fetch-issue-149-tessdata-best.mjs",
+    "note": "The probe matrix below was produced against the pinned upstream bytes (sha256 8280aed0\u2026, 15,400,601 B). Those bytes are reproducible on demand and are not retained in Git."
+  }
+}

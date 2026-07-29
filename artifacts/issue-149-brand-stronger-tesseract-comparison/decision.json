@@ -1,0 +1,79 @@
+{
+  "artifact": "decision",
+  "experimentId": "issue-149-brand-stronger-tesseract-comparison",
+  "issue": 149,
+  "evaluationOnly": true,
+  "productionChanged": false,
+  "fixtureChanged": false,
+  "truthChanged": false,
+  "pr195Untouched": true,
+  "priorMergedArtifactsUnchanged": true,
+  "decision": "BLOCKED_TREATMENT_INCOMPATIBLE",
+  "reason": "The preregistered compatibility gate failed closed before either arm produced data. The locked tesseract.js runtime cannot execute the preregistered treatment model, so the comparison did not run and no hypothesis result exists.",
+  "hypothesisResult": null,
+  "comparisonDataProduced": false,
+  "ocrRunOnCorpusCrops": false,
+  "truthRead": false,
+  "whatWasEstablished": [
+    "The exact current control recognizer configuration, identified from the repository rather than assumed.",
+    "That OEM 0 and OEM 2 are impossible against the vendored model, which carries no legacy components.",
+    "That the one genuinely stronger official English variant, tessdata_best, differs from the current model in exactly one dimension: the recognizer weights.",
+    "That every LSTM-only WASM core in tesseract.js-core 7.0.0 is integer-only and cannot execute a float model."
+  ],
+  "whatWasNotEstablished": [
+    "Whether a stronger Tesseract configuration improves Brand evidence on this subset. The experiment did not run.",
+    "Any per-case, per-crop-cluster, or per-design-cluster classification.",
+    "Any determinism result, since neither arm completed."
+  ],
+  "absentArtifacts": {
+    "primary-run-raw.json": "not produced \u2014 no arm completed",
+    "repeat-run-raw.json": "not produced \u2014 no arm completed",
+    "per-case-results.json": "not produced \u2014 no comparison data exists",
+    "crop-cluster-results.json": "not produced \u2014 no comparison data exists",
+    "design-cluster-results.json": "not produced \u2014 no comparison data exists",
+    "policy": "These files are deliberately absent rather than emitted empty or synthesised. Nothing in this package reports a result that was not measured."
+  },
+  "frozenStructure": {
+    "historicalCaseCount": 5,
+    "ocrItemCount": 6,
+    "distinctCropImageDenominator": 4,
+    "distinctDesignDenominator": 3,
+    "duplicateCropCountedOnce": true,
+    "sharedDesignCountedOnce": true,
+    "note": "The independence structure was frozen and verified against PR #207 provenance before the gate failed. It carries forward unchanged to any follow-up."
+  },
+  "determinismPass": null,
+  "treatmentFalseReliableReads": null,
+  "capabilityCeilingPrerequisites": {
+    "deterministicFailureUnderStrongerConfiguration": false,
+    "positiveStylizationAudit": true,
+    "orientationAndSegmentationRuledOutPerCase": false,
+    "preprocessingNullOnFinalSubset": false,
+    "largerIndependentlySourcedCorpus": false,
+    "newlySatisfiedByThisExperiment": "none",
+    "note": "A runtime incompatibility is not a recognizer failure. Nothing here moves the capability-ceiling question forward, and an unrun experiment must never be counted as a null result."
+  },
+  "claimsNotMade": [
+    "No Tesseract capability-ceiling claim.",
+    "No claim that the stronger model would or would not have helped.",
+    "No prevalence or production-rate claim.",
+    "No authorization to replace Tesseract, change the production model, change the WASM core, or enable anything in production."
+  ],
+  "requiredNextStep": "A separate preregistration. Running the float model requires a float-capable core, which changes a second dimension relative to today's control; that design must be written and reviewed before any run, not improvised here. Retrieve the pinned model first with scripts/eval/fetch-issue-149-tessdata-best.mjs. See compatibility/compatibility-report.json.",
+  "binaryRetentionPolicy": {
+    "treatmentModelVendoredInGit": false,
+    "reason": "The model was inspected during this blocked investigation but no experiment consumed it. A 15.4 MB binary is not retained in Git history for an experiment that produced no result.",
+    "inspectedDuringInvestigation": true,
+    "retrievalReproducible": true,
+    "retrievalScript": "scripts/eval/fetch-issue-149-tessdata-best.mjs",
+    "upstreamRepository": "https://github.com/tesseract-ocr/tessdata_best",
+    "upstreamCommit": "9ddc24e750eec0994223a9edc3fcb434a2244f3b",
+    "upstreamUrl": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_best/9ddc24e750eec0994223a9edc3fcb434a2244f3b/eng.traineddata",
+    "expectedSha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+    "expectedByteSize": 15400601,
+    "cachePath": ".local/ocr-research/traineddata/tessdata-best/eng.traineddata",
+    "cacheUntracked": true,
+    "licenseTextRetained": "artifacts/issue-149-brand-stronger-tesseract-comparison/vendor/tessdata-best/LICENSE",
+    "noOcrResultExists": true
+  }
+}
