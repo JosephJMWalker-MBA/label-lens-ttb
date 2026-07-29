@@ -1,0 +1,66 @@
+{
+  "artifact": "attempt-lineage",
+  "experimentId": "issue-149-native-tesseract-float-compatibility-attempt-3",
+  "issue": 149,
+  "thisAttempt": 3,
+  "priorAttemptsAltered": false,
+  "priorAttemptArtifactsEdited": false,
+  "isRerunOfSameProtocol": false,
+  "characterization": "A separately preregistered harness-correction attempt addressing two known probe defects. Not a rerun of the same exact protocol.",
+  "attempts": [
+    {
+      "attempt": 1,
+      "pr": 209,
+      "host": "authoring host (darwin/arm64)",
+      "verdict": "INCONCLUSIVE_ENVIRONMENT",
+      "ocrInvocations": 0,
+      "reason": "No local container runtime.",
+      "artifactsLocation": "artifacts/issue-149-native-tesseract-float-compatibility/",
+      "preserved": true
+    },
+    {
+      "attempt": 2,
+      "pr": 209,
+      "host": "GitHub-hosted native linux/amd64",
+      "verdict": "INCONCLUSIVE_OUTPUT",
+      "ocrInvocations": 8,
+      "established": [
+        "Native Tesseract 5.3.0 loaded and executed both the integer-quantized control model and the pinned float tessdata_best treatment model.",
+        "All eight invocations exited 0.",
+        "No timeout, signal, ABI error, loader error, or unsupported-model error.",
+        "All primary/repeat pairs were byte-identical."
+      ],
+      "harnessDefects": [
+        "Bare model directories omitted Tesseract's configs/tsv, so the requested TSV renderer did not engage and output fell back to plain text.",
+        "The synthetic final 9 glyph was read as H by both models."
+      ],
+      "defectsAreModelDefects": false,
+      "artifactsLocation": "artifacts/issue-149-native-tesseract-float-compatibility/attempt-2/",
+      "preserved": true
+    },
+    {
+      "attempt": 3,
+      "host": "GitHub-hosted native linux/amd64",
+      "corrections": [
+        "Harness correction 1: each ephemeral tessdata mount carries the pinned runtime's own configs/tsv; a plain-text fallback is a failed output condition.",
+        "Harness correction 2: the positive sentinel is LABEL LENS 123, whose digits are unambiguous."
+      ],
+      "unchangedFromAttempt2": [
+        "runtime and package pins",
+        "base image digest",
+        "OEM 1",
+        "PSM 11",
+        "DPI 300",
+        "locale",
+        "thread limits",
+        "CPU and memory limits",
+        "timeout",
+        "models and their hashes",
+        "eight-invocation matrix",
+        "container hardening"
+      ],
+      "artifactsLocation": "artifacts/issue-149-native-tesseract-float-compatibility-attempt-3/"
+    }
+  ],
+  "failureSemantics": "An Attempt 3 failure would not erase the fact that Attempt 2 loaded and ran both models."
+}

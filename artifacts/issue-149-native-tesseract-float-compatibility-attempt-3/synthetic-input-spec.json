@@ -1,0 +1,51 @@
+{
+  "artifact": "synthetic-input-spec",
+  "experimentId": "issue-149-native-tesseract-float-compatibility-attempt-3",
+  "attempt": 3,
+  "harnessCorrection": "Attempt 2's sentinel ended in 9, which both models read as H. The digits are now 1, 2 and 3, each built from unambiguous rectangle strokes. Letters are unchanged from Attempt 2, where all of them were read correctly.",
+  "generator": "scripts/eval/issue-149-attempt-3-generate-inputs.mjs",
+  "method": "Explicit integer-coordinate rectangles rasterised directly into a raw RGB buffer, then PNG-encoded by sharp. No system font, no SVG renderer, no corpus-derived pixels.",
+  "fontIdentity": "none — vector rectangle strokes defined in glyphRects()",
+  "canvas": {
+    "width": 1240,
+    "height": 220,
+    "marginX": 60,
+    "marginY": 60
+  },
+  "glyphMetrics": {
+    "width": 60,
+    "height": 100,
+    "stroke": 12,
+    "advance": 80
+  },
+  "pngEncoding": {
+    "compressionLevel": 9,
+    "adaptiveFiltering": false,
+    "palette": false
+  },
+  "sharpVersion": "0.35.3",
+  "deterministicRegenerationVerified": true,
+  "expectedPositiveTranscript": "LABEL LENS 123",
+  "expectedBlankTranscript": "",
+  "images": [
+    {
+      "name": "positive.png",
+      "kind": "positive sentinel",
+      "text": "LABEL LENS 123",
+      "rotationDegrees": 0,
+      "stylized": false,
+      "sha256": "9f079b48bcc7ba5a71a0e1b84f946c621e6709739ecd260549075a0c38e3b49d",
+      "byteSize": 3015
+    },
+    {
+      "name": "blank.png",
+      "kind": "blank negative",
+      "text": null,
+      "rotationDegrees": 0,
+      "stylized": false,
+      "sha256": "8b5531768177d1a62c9e7780a1edfd5231f46681a474ad359313a979aa4d3e9d",
+      "byteSize": 1201,
+      "note": "identical dimensions and background to the positive image, with no glyphs painted"
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+# Issue #149 Attempt 3 — native Tesseract + tessdata_best compatibility probe.
+#
+# Research-only, scoped to exactly one branch. Not part of the required CI
+# checks and it touches no production path.
+#
+# TRANSPORT NOTE. GitHub only dispatches workflow_dispatch workflows that exist
+# on the default branch, and this experiment must not modify main outside its
+# eventual reviewed PR. The trigger is therefore a push scoped to this single
+# Attempt 3 branch, with the phase selected by a committed mode file and a path
+# filter admitting only the workflow file and that mode file. An ordinary code
+# or artifact commit cannot retrigger OCR.
+#
+# pull_request_target, schedule, repository_dispatch, and unscoped push triggers
+# are all deliberately unused.
+name: Issue 149 native Tesseract attempt 3
+
+on:
+  push:
+    branches:
+      - research/issue-149-native-tesseract-float-compatibility-attempt-3
+    paths:
+      - .github/workflows/issue-149-native-tesseract-attempt-3.yml
+      - artifacts/issue-149-native-tesseract-float-compatibility-attempt-3/workflow-mode.txt
+
+permissions:
+  contents: read
+
+env:
+  MODE_FILE: artifacts/issue-149-native-tesseract-float-compatibility-attempt-3/workflow-mode.txt
+
+jobs:
+  resolve-mode:
+    name: Resolve declared mode
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.mode.outputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read and validate mode
+        id: mode
+        run: |
+          set -eu
+          test -f "${MODE_FILE}" || { echo "MODE_FILE_MISSING: ${MODE_FILE}" >&2; exit 1; }
+          mode="$(tr -d '[:space:]' < "${MODE_FILE}")"
+          echo "declared mode: '${mode}'"
+          case "${mode}" in
+            execute|complete) ;;
+            *) echo "INVALID_MODE: '${mode}' (allowed: execute, complete)" >&2; exit 1 ;;
+          esac
+          echo "mode=${mode}" >> "$GITHUB_OUTPUT"
+
+  execute:
+    name: Execute the eight preregistered invocations
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'execute'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assert native linux/amd64 runner
+        run: |
+          set -eu
+          arch="$(uname -m)"
+          echo "runner arch: ${arch}"
+          test "${arch}" = "x86_64" || { echo "NOT_NATIVE_AMD64: ${arch}" >&2; exit 1; }
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Reuses the PR #208 retrieval mechanism. Verifies size and full sha256 and
+      # fails closed on mismatch. Never committed, never baked into the image.
+      - name: Retrieve pinned treatment model
+        run: node scripts/eval/fetch-issue-149-tessdata-best.mjs
+
+      - name: Run Attempt 3 probe
+        run: node --import tsx scripts/eval/run-issue-149-native-tesseract-attempt-3.ts
+
+      - name: Upload result package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-149-attempt-3-results
+          path: artifacts/issue-149-native-tesseract-float-compatibility-attempt-3/
+          if-no-files-found: error
+
+  complete:
+    name: Complete (no experiment run)
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'complete'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm the experiment is sealed
+        run: |
+          echo "Mode is 'complete': Attempt 3 is finished and this workflow will"
+          echo "not run OCR. Results are committed to the branch."
