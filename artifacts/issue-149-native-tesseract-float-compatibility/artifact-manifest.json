@@ -5,38 +5,250 @@
   "evaluationOnly": true,
   "syntheticOnly": true,
   "corpusAccessed": false,
-  "verdict": "INCONCLUSIVE_ENVIRONMENT",
-  "ocrInvoked": false,
-  "plannedInvocations": 8,
-  "executedInvocations": 0,
+  "attempts": [
+    {
+      "attempt": 1,
+      "host": "authoring host",
+      "verdict": "INCONCLUSIVE_ENVIRONMENT",
+      "ocrInvocations": 0,
+      "preserved": true
+    },
+    {
+      "attempt": 2,
+      "host": "github-hosted native amd64",
+      "discoveryRunId": 30474266684,
+      "executionRunId": 30475034606,
+      "machineVerdict": "INCONCLUSIVE_ENVIRONMENT",
+      "adjudicatedVerdict": "INCONCLUSIVE_OUTPUT",
+      "ocrInvocations": 8
+    }
+  ],
+  "finalVerdict": "INCONCLUSIVE_OUTPUT",
   "productionChanged": false,
   "productionDockerfileChanged": false,
   "fixtureChanged": false,
   "truthChanged": false,
   "pr195Untouched": true,
-  "baseSha": "887c4df34efc844a69edb87514e5c97432869166",
-  "runner": "scripts/eval/run-issue-149-native-tesseract-float-compatibility.ts",
-  "runnerSha256": "6bb574ee0014dc42b7ed89152fc2ac1252a8836ffa3456c61fe644dbb9b78bd8",
+  "runners": {
+    "execute": "scripts/eval/run-issue-149-native-tesseract-probe-execute.ts",
+    "discovery": "scripts/eval/issue-149-native-probe-discovery.mjs",
+    "attempt1": "scripts/eval/run-issue-149-native-tesseract-float-compatibility.ts"
+  },
   "researchDockerfile": "scripts/eval/docker/issue-149-native-tesseract-probe.Dockerfile",
-  "researchDockerfileSha256": "0d730e5d59150a6f8fccea2129a658253148e82b5d9600c1d58b996626a08647",
+  "workflow": ".github/workflows/issue-149-native-tesseract-probe.yml",
   "modelBinaries": {
     "committedToGit": false,
-    "controlModel": {
-      "path": "src/pipeline/extractor/assets/eng.traineddata",
-      "preexistingProductionAsset": true,
-      "modifiedByThisBranch": false
-    },
-    "treatmentModel": {
-      "path": ".local/ocr-research/traineddata/tessdata-best/eng.traineddata",
-      "untracked": true,
-      "retrievalScript": "scripts/eval/fetch-issue-149-tessdata-best.mjs",
-      "inDockerImage": false
-    },
-    "proof": "The largest file in this artifact package is 10142 bytes (preregistration.md). No traineddata binary entered the branch."
+    "proof": "Largest file in this package is 17075 bytes (attempt-2/run-results.json). No traineddata binary and no Docker layer entered Git."
   },
-  "largestArtifactBytes": 10142,
-  "fileCount": 20,
+  "largestArtifactBytes": 17075,
+  "emptyTsvSynthesised": false,
+  "fileCount": 65,
   "files": [
+    {
+      "path": "attempt-2/decision.json",
+      "sizeBytes": 1383,
+      "sha256": "4fe005521767179c5185c4450cf67c32e6f288d7d1e52140cd69f1164ed60a3a"
+    },
+    {
+      "path": "attempt-2/determinism-report.json",
+      "sizeBytes": 976,
+      "sha256": "708bbaa641394ea6240346f7ea67c5a9b2d44428fe7a1aa746b903b0f56e597d"
+    },
+    {
+      "path": "attempt-2/discovery.json",
+      "sizeBytes": 6053,
+      "sha256": "f30ce05555b8680e4de6c229592525ca16a4836dc9f67c01bee5394aabf136ee"
+    },
+    {
+      "path": "attempt-2/docker-image-provenance.json",
+      "sizeBytes": 7150,
+      "sha256": "8ce34cc76233d8822937b6ae43c4d27051608b1238cc59de95064939cc073490"
+    },
+    {
+      "path": "attempt-2/execute-gates.json",
+      "sizeBytes": 1886,
+      "sha256": "d569482cc9e56a9e3d549818411bf4a6d66f40d7339089df117d87be3274b233"
+    },
+    {
+      "path": "attempt-2/package-pins.json",
+      "sizeBytes": 805,
+      "sha256": "6786550753d91223c9b1bf48cb97a6ad8a4ee025427ec0bf28e666e6ba542ce9"
+    },
+    {
+      "path": "attempt-2/raw/control-blank-primary.exit",
+      "sizeBytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "attempt-2/raw/control-blank-primary.stderr",
+      "sizeBytes": 33,
+      "sha256": "a60fe862edf4bbbee4b97df4082b129c4f55243034ca8cf780326f4a68af2fe2"
+    },
+    {
+      "path": "attempt-2/raw/control-blank-primary.time",
+      "sizeBytes": 799,
+      "sha256": "1f633784bee8e010021facf0e58fb2b7dcb993ecc039013c1865ee09b16da78f"
+    },
+    {
+      "path": "attempt-2/raw/control-blank-primary.tsv",
+      "sizeBytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "attempt-2/raw/control-blank-repeat.exit",
+      "sizeBytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "attempt-2/raw/control-blank-repeat.stderr",
+      "sizeBytes": 33,
+      "sha256": "a60fe862edf4bbbee4b97df4082b129c4f55243034ca8cf780326f4a68af2fe2"
+    },
+    {
+      "path": "attempt-2/raw/control-blank-repeat.time",
+      "sizeBytes": 799,
+      "sha256": "46d4dab24565cf9983eef86c8ef58c818cf303a63ff5a0337da6f9ee34d2216f"
+    },
+    {
+      "path": "attempt-2/raw/control-blank-repeat.tsv",
+      "sizeBytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "attempt-2/raw/control-positive-primary.exit",
+      "sizeBytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "attempt-2/raw/control-positive-primary.stderr",
+      "sizeBytes": 33,
+      "sha256": "a60fe862edf4bbbee4b97df4082b129c4f55243034ca8cf780326f4a68af2fe2"
+    },
+    {
+      "path": "attempt-2/raw/control-positive-primary.time",
+      "sizeBytes": 803,
+      "sha256": "5083781c9912856d1ad992135fe1c67db5a2729bff304a1beb500a1e52a19f79"
+    },
+    {
+      "path": "attempt-2/raw/control-positive-primary.tsv",
+      "sizeBytes": 15,
+      "sha256": "7eb52c1e0449b528f35a0c38bebc5d915afeb5672c00cd32411e5c3a05f9d960"
+    },
+    {
+      "path": "attempt-2/raw/control-positive-repeat.exit",
+      "sizeBytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "attempt-2/raw/control-positive-repeat.stderr",
+      "sizeBytes": 33,
+      "sha256": "a60fe862edf4bbbee4b97df4082b129c4f55243034ca8cf780326f4a68af2fe2"
+    },
+    {
+      "path": "attempt-2/raw/control-positive-repeat.time",
+      "sizeBytes": 803,
+      "sha256": "8d23381f4f6e9fc3d77cad19d43afba0ae3dd9b4d3c2e1a630b038e10b89123d"
+    },
+    {
+      "path": "attempt-2/raw/control-positive-repeat.tsv",
+      "sizeBytes": 15,
+      "sha256": "7eb52c1e0449b528f35a0c38bebc5d915afeb5672c00cd32411e5c3a05f9d960"
+    },
+    {
+      "path": "attempt-2/raw/treatment-blank-primary.exit",
+      "sizeBytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "attempt-2/raw/treatment-blank-primary.stderr",
+      "sizeBytes": 33,
+      "sha256": "a60fe862edf4bbbee4b97df4082b129c4f55243034ca8cf780326f4a68af2fe2"
+    },
+    {
+      "path": "attempt-2/raw/treatment-blank-primary.time",
+      "sizeBytes": 799,
+      "sha256": "34981f4757453f5f3e6228256f579231475f0f063bd3bda05d37a72ca2b38a20"
+    },
+    {
+      "path": "attempt-2/raw/treatment-blank-primary.tsv",
+      "sizeBytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "attempt-2/raw/treatment-blank-repeat.exit",
+      "sizeBytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "attempt-2/raw/treatment-blank-repeat.stderr",
+      "sizeBytes": 33,
+      "sha256": "a60fe862edf4bbbee4b97df4082b129c4f55243034ca8cf780326f4a68af2fe2"
+    },
+    {
+      "path": "attempt-2/raw/treatment-blank-repeat.time",
+      "sizeBytes": 800,
+      "sha256": "53911812449a8dcf7f428a6020ee38c9b978d80cc5c938e5406ec3d20af523e7"
+    },
+    {
+      "path": "attempt-2/raw/treatment-blank-repeat.tsv",
+      "sizeBytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "attempt-2/raw/treatment-positive-primary.exit",
+      "sizeBytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "attempt-2/raw/treatment-positive-primary.stderr",
+      "sizeBytes": 33,
+      "sha256": "a60fe862edf4bbbee4b97df4082b129c4f55243034ca8cf780326f4a68af2fe2"
+    },
+    {
+      "path": "attempt-2/raw/treatment-positive-primary.time",
+      "sizeBytes": 803,
+      "sha256": "5ede5c9fb261bdc07188d395444cc70da85ae1057c133fadbd9c2ecf7e532e84"
+    },
+    {
+      "path": "attempt-2/raw/treatment-positive-primary.tsv",
+      "sizeBytes": 15,
+      "sha256": "7eb52c1e0449b528f35a0c38bebc5d915afeb5672c00cd32411e5c3a05f9d960"
+    },
+    {
+      "path": "attempt-2/raw/treatment-positive-repeat.exit",
+      "sizeBytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "attempt-2/raw/treatment-positive-repeat.stderr",
+      "sizeBytes": 33,
+      "sha256": "a60fe862edf4bbbee4b97df4082b129c4f55243034ca8cf780326f4a68af2fe2"
+    },
+    {
+      "path": "attempt-2/raw/treatment-positive-repeat.time",
+      "sizeBytes": 803,
+      "sha256": "f5102faaf8f6661b28ea8680f1ffd1b92ca9035c7aa84e754e8a18186b38b0c3"
+    },
+    {
+      "path": "attempt-2/raw/treatment-positive-repeat.tsv",
+      "sizeBytes": 15,
+      "sha256": "7eb52c1e0449b528f35a0c38bebc5d915afeb5672c00cd32411e5c3a05f9d960"
+    },
+    {
+      "path": "attempt-2/resource-report.json",
+      "sizeBytes": 1435,
+      "sha256": "95226b9875eff8c96e2b6c75f3dafe7157f3448e5ac9f166b2175dfbcd318810"
+    },
+    {
+      "path": "attempt-2/run-results.json",
+      "sizeBytes": 17075,
+      "sha256": "8d0c8085f31d56f7aedb1f6129ec35256589121d58047af881ca002337cb2de3"
+    },
+    {
+      "path": "attempt-2/verdict-adjudication.json",
+      "sizeBytes": 4830,
+      "sha256": "de73305042723045f5a219458a238d3c851b586dab3c4c3d39b75ff8a523bcc4"
+    },
     {
       "path": "commands.sh",
       "sizeBytes": 3415,
@@ -63,6 +275,11 @@
       "sha256": "a9b22b37ba3061257694ea2003abd60ead6967c8fa0f5237f0d5509afdff7040"
     },
     {
+      "path": "final-decision.json",
+      "sizeBytes": 4270,
+      "sha256": "2e9dcff9403352d2570234afb82d2d3e3d211ba0d09df696a0f31f849f3c6a5d"
+    },
+    {
       "path": "git-sha.txt",
       "sizeBytes": 100,
       "sha256": "ec7f97a2ab1a3d9ceaa9853d1f3f3956f40a56e62a1d37b7ecf3d23888f98bcd"
@@ -74,8 +291,18 @@
     },
     {
       "path": "limitations.md",
-      "sizeBytes": 4908,
-      "sha256": "134cda9776caef7e06f230013761d47ce47ce4ac9d46652ddb79cf6a6ccf99c8"
+      "sizeBytes": 8790,
+      "sha256": "33d121498fc4ea311f5ea17acb3a8ee34001759f83dd3c44bcef5e0042273923"
+    },
+    {
+      "path": "preregistration-runtime-addendum.md",
+      "sizeBytes": 5364,
+      "sha256": "abd3adfc4d3624586fb9ad192e5755040948d3b3287c04c975368d659a03731b"
+    },
+    {
+      "path": "preregistration-runtime-addendum.sha256",
+      "sizeBytes": 102,
+      "sha256": "ebde7ba4a9f714903ad793a506f1e4a40988b0376cba5759bf16cea509d281d4"
     },
     {
       "path": "preregistration.md",
@@ -136,6 +363,11 @@
       "path": "treatment-model-provenance.json",
       "sizeBytes": 1012,
       "sha256": "560c04b64af418ddb7c3f7df96726aecd55a355935bc66b1e737408f917c45db"
+    },
+    {
+      "path": "workflow-mode.txt",
+      "sizeBytes": 9,
+      "sha256": "37a40f08d8548dba289b9b0bb35bcf63b359f6d37ee86044ebc6b6da080b9ec1"
     }
   ],
   "verify": "shasum -a 256 -c artifacts/issue-149-native-tesseract-float-compatibility/artifact-manifest.sha256"

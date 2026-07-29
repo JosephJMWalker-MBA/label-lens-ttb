@@ -1,0 +1,40 @@
+{
+  "gates": [
+    {
+      "gate": "original-preregistration-hash",
+      "status": "PASS",
+      "detail": "expected ad905275e2727aaeb0c266e3f4ca5ca2b6f5aa6490b2b8222a48bbae3f45c43b"
+    },
+    {
+      "gate": "runtime-addendum-frozen",
+      "status": "PASS",
+      "detail": "expected abd3adfc4d3624586fb9ad192e5755040948d3b3287c04c975368d659a03731b"
+    },
+    {
+      "gate": "package-pins-concrete",
+      "status": "PASS",
+      "detail": "{\"artifact\":\"package-pins\",\"experimentId\":\"issue-149-native-tesseract-float-compatibility\",\"attempt\":2,\"resolvedFrom\":\"discovery workflow run 30474266684, apt-cache inside the pinned linux/amd64 base\",\"packageNamesDiscoveredNotGuessed\":true,\"baseImageReference\":\"node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3\",\"baseImageResolvedAmd64Id\":\"sha256:bd16adabad7619222d4d0ab2d61f48391dacde03ad93f54d344683e326cbd0e2\",\"debianVersion\":\"12.15\",\"tesseract\":{\"package\":\"tesseract-ocr\",\"version\":\"5.3.0-2\"},\"libtesseract\":{\"package\":\"libtesseract5\",\"version\":\"5.3.0-2\"},\"leptonica\":{\"package\":\"liblept5\",\"version\":\"1.82.0-3+b3\"},\"time\":{\"package\":\"time\",\"version\":\"1.9-0.2\",\"presentInBase\":false}}"
+    },
+    {
+      "gate": "control-model-integrity",
+      "status": "PASS",
+      "detail": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747 / 5199098"
+    },
+    {
+      "gate": "treatment-model-integrity",
+      "status": "PASS",
+      "detail": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba / 15400601"
+    },
+    {
+      "gate": "synthetic-input-hashes",
+      "status": "PASS",
+      "detail": "positive and blank PNG sha256 must match Attempt 1"
+    },
+    {
+      "gate": "no-production-or-fixture-changes",
+      "status": "PASS",
+      "detail": "clean"
+    }
+  ],
+  "blocked": false
+}

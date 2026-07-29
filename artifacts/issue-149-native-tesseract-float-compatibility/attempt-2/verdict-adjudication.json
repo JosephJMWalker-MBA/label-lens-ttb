@@ -1,0 +1,58 @@
+{
+  "artifact": "verdict-adjudication",
+  "experimentId": "issue-149-native-tesseract-float-compatibility",
+  "attempt": 2,
+  "purpose": "Apply the frozen verdict rule text to the Attempt 2 run. The runner's automatic classifier emitted a different label; this file records the discrepancy openly rather than rewriting the machine output.",
+  "machineEmittedVerdict": "INCONCLUSIVE_ENVIRONMENT",
+  "machineClassifierDefect": "The runner keyed `controlAllSucceeded` on TSV validity. Because no arm produced valid TSV (see root cause 1), it concluded the control could not execute and fell through to INCONCLUSIVE_ENVIRONMENT. The control did in fact execute: exit 0, 282 ms, recognition output produced.",
+  "adjudicatedVerdict": "INCONCLUSIVE_OUTPUT",
+  "adjudicationBasis": {
+    "whyNotInconclusiveEnvironment": [
+      "The native control executed: exit 0, no signal, no timeout, recognition output produced.",
+      "Docker built reproducibly from the pinned digest with fully pinned packages.",
+      "The runner ran the declared architecture natively (x86_64, no emulation).",
+      "Model and input integrity were established: every hash and byte size verified.",
+      "The runtime inventory is complete: versions, executable sha256, and ldd were all captured."
+    ],
+    "whyInconclusiveOutput": [
+      "Frozen rule: 'treatment initializes and exits but does not produce valid TSV'. The treatment initialized and exited 0 but emitted plain text, not TSV.",
+      "Frozen rule: 'treatment produces incorrect or empty text on the trivial positive sentinel'. The treatment read 'LABEL LENS 14H' rather than 'LABEL LENS 149'.",
+      "Frozen rule: 'compatibility cannot be separated from another failure'. Two harness-side defects sit between this run and a compatibility answer."
+    ],
+    "frozenRulesModified": false,
+    "thresholdsChangedAfterResults": false
+  },
+  "rootCauses": [
+    {
+      "id": "tsv-config-unavailable",
+      "severity": "invalidates the canonical output format",
+      "attribution": "harness defect, authored here — not a model or runtime property",
+      "detail": "Tesseract's `tsv` output mode is a config file loaded from $TESSDATA_PREFIX/configs/tsv. The probe mounts a bare directory containing only eng.traineddata as TESSDATA_PREFIX, so that config file does not exist inside the container. Tesseract reported `read_params_file: Can't open tsv` on every invocation and fell back to plain-text output.",
+      "evidence": "All eight stderr files contain exactly `read_params_file: Can't open tsv`; positive-image outputs are 15 bytes of plain text rather than a TSV table.",
+      "fix": "Mount the model directory alongside Tesseract's stock tessdata configs, or pass --tessdata-dir for the model while leaving TESSDATA_PREFIX pointing at the packaged tessdata tree. Requires a new preregistered attempt."
+    },
+    {
+      "id": "sentinel-glyph-ambiguity",
+      "severity": "prevents an exact sentinel match",
+      "attribution": "synthetic input design, authored here — not a model or runtime property",
+      "detail": "Both models read the final digit 9 as H, producing 'LABEL LENS 14H'. The rectangle-built 9 glyph is ambiguous to Tesseract.",
+      "evidence": "control and treatment produced byte-identical output on the positive image.",
+      "fix": "Redesign the 9 glyph. The synthetic PNG bytes are frozen, so this also requires a new preregistered attempt; they were deliberately not altered here."
+    }
+  ],
+  "whatTheRunDidEstablish": [
+    "The pinned research image builds reproducibly on a native linux/amd64 runner with fully pinned packages.",
+    "Native Tesseract 5.3.0 with Leptonica 1.82.0 loaded BOTH models and exited 0 on all eight invocations, with no timeout, no signal, and no ABI, loader, or unsupported-model error in any stderr.",
+    "The float treatment model produced recognition output byte-identical to the control's, and its peak RSS was ~61 MB against the control's ~38 MB — consistent with the larger float model actually being resident.",
+    "All four primary/repeat pairs were byte-identical: the runtime is deterministic here."
+  ],
+  "whatTheRunDidNotEstablish": [
+    "A COMPATIBLE verdict. The frozen criteria require valid TSV and an exact sentinel transcript; neither was met.",
+    "That the float model is incompatible. Nothing observed suggests that, and the evidence points the other way — but pointing the other way is not the frozen bar.",
+    "Any recognition-capability, accuracy, or production claim."
+  ],
+  "noRetryPerformed": {
+    "policy": "The frozen protocol allows no retries beyond the preregistered exact repeat and no altered settings after a failure.",
+    "action": "No settings were changed and no third run was attempted. Fixing either root cause requires a separately preregistered attempt."
+  }
+}

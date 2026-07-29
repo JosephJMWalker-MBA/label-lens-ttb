@@ -1,5 +1,10 @@
 # Limitations — native Tesseract float-model compatibility probe
 
+> **Attempt 2 update.** The sections below describe Attempt 1 on the authoring
+> host and remain accurate for it. Attempt 2 ran all eight invocations on a
+> GitHub-hosted native amd64 runner; its limitations are recorded at the end of
+> this file under "Attempt 2".
+
 Synthetic compatibility experiment only. No corpus access, no fixture or fixture
 truth change, no production behaviour change, no native Tesseract installed into
 the production application or production Dockerfile. PR #195 untouched.
@@ -95,3 +100,77 @@ Even a clean `COMPATIBLE` says nothing about whether a native Tesseract binary
 can or should exist in the Render deployment. Production installation, production
 Dockerfile changes, Render configuration, a production engine factory, replacing
 Tesseract.js, and shadow deployment all remain unauthorized and unexamined.
+
+
+## Attempt 2 — GitHub-hosted native amd64 runner
+
+### The compatibility question is still open
+
+All eight invocations ran, exited 0, produced no timeout or signal, and were
+byte-identical across every primary/repeat pair. Both models loaded. But the
+frozen `COMPATIBLE` criteria were not met, so the adjudicated verdict is
+`INCONCLUSIVE_OUTPUT`. Two defects sit in the way, and **both are mine**, not
+properties of the model or the runtime.
+
+### Defect 1 — the canonical output format never engaged
+
+Tesseract's `tsv` output is a config file read from
+`$TESSDATA_PREFIX/configs/tsv`. The probe mounts a bare directory containing only
+`eng.traineddata` as `TESSDATA_PREFIX`, so that file does not exist in the
+container. Every invocation logged `read_params_file: Can't open tsv` and fell
+back to plain text.
+
+The preregistration named TSV as the canonical raw output precisely so text,
+confidence, and geometry would all survive. This run produced none of the
+confidence or geometry evidence the protocol asked for.
+
+### Defect 2 — the sentinel glyph is ambiguous
+
+Both models read the final digit `9` as `H`, giving `LABEL LENS 14H`. The
+rectangle-built `9` is not distinct enough. This was foreseen in Attempt 1's
+limitations — a glyph the recognizer dislikes yields `INCONCLUSIVE_OUTPUT`, not a
+model incompatibility — and it is what happened.
+
+### Neither defect was repaired in place
+
+The frozen protocol allows no retries beyond the exact repeat and no altered
+settings or inputs after a failure. Repairing either defect and re-running would
+be exactly the result-shopping those rules exist to prevent, so no third run was
+attempted and the synthetic PNG bytes were not touched. Both fixes require a
+separately preregistered Attempt 3.
+
+### The evidence points toward compatibility, which is not the same as compatible
+
+The float model was resident (peak RSS ~61 MB against the control's ~38 MB),
+executed to completion on every invocation, produced output identical to the
+control's, and emitted no ABI, loader, or unsupported-model error anywhere in
+stderr. That is inconsistent with `INCOMPATIBLE_FLOAT_MODEL` and consistent with
+compatibility.
+
+It is still not a `COMPATIBLE` verdict, and it must not be reported as one. The
+frozen bar requires valid TSV and an exact sentinel transcript. Reading a
+suggestive partial result as the verdict it resembles is the failure mode this
+whole protocol is built to prevent.
+
+### The machine classifier mislabelled its own result
+
+The runner emitted `INCONCLUSIVE_ENVIRONMENT` because it keyed control success on
+TSV validity. Under the frozen rule text the correct label is
+`INCONCLUSIVE_OUTPUT`: the control did execute, Docker built reproducibly, the
+architecture was native, integrity was established, and the inventory is
+complete. The machine output was committed unaltered and the discrepancy is
+recorded in `attempt-2/verdict-adjudication.json` rather than quietly corrected.
+
+### Performance figures are diagnostic
+
+Latency 257-300 ms and peak RSS ~38-61 MB are real measurements for a native
+linux/amd64 GitHub-hosted runner (AMD EPYC 7763, 4 vCPU, 16.77 GB). They say
+nothing about Render production performance.
+
+### Transport moved; the treatment did not
+
+Execution moved from `workflow_dispatch` to a push-triggered workflow scoped to
+this branch, because GitHub only dispatches workflows present on the default
+branch and this experiment must not modify `main`. Synthetic inputs, model
+identities and hashes, base digest, architecture, OEM, PSM, DPI, locale, thread
+limits, invocation matrix, timeout, and verdict rules are all unchanged.

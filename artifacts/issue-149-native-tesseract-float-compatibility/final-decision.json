@@ -1,0 +1,70 @@
+{
+  "artifact": "final-decision",
+  "experimentId": "issue-149-native-tesseract-float-compatibility",
+  "issue": 149,
+  "evaluationOnly": true,
+  "syntheticOnly": true,
+  "corpusAccessed": false,
+  "productionChanged": false,
+  "productionDockerfileChanged": false,
+  "fixtureChanged": false,
+  "truthChanged": false,
+  "pr195Untouched": true,
+  "modelBinaryCommitted": false,
+  "separationOfConcerns": {
+    "authoringHostExecutionAvailability": "RESOLVED — the authoring host had no container runtime; a GitHub-hosted native amd64 runner did. The environmental blocker recorded in Attempt 1 is superseded for the purpose of running the experiment.",
+    "candidateRuntimeModelCompatibility": "NOT RESOLVED — the compatibility question remains open. Two harness-side defects, both authored here, sit between this run and an answer.",
+    "note": "These are deliberately separate axes. Attempt 2 answers the first and leaves the second open."
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "host": "authoring host (darwin/arm64)",
+      "verdict": "INCONCLUSIVE_ENVIRONMENT",
+      "reason": "No local container runtime: no docker/podman/nerdctl/finch/colima/limactl binary, and a stale /var/run/docker.sock with no daemon behind it.",
+      "ocrInvocations": 0,
+      "stillValid": true,
+      "supersededForResearchQuestion": true,
+      "notMadeFalseBy": "Attempt 2. Attempt 1 remains a true statement about that host and is preserved byte-for-byte."
+    },
+    {
+      "attempt": 2,
+      "host": "GitHub-hosted ubuntu-latest, native linux/amd64, no emulation",
+      "discoveryRunId": 30474266684,
+      "executionRunId": 30475034606,
+      "workflowConclusion": "success",
+      "ocrInvocations": 8,
+      "machineEmittedVerdict": "INCONCLUSIVE_ENVIRONMENT",
+      "adjudicatedVerdict": "INCONCLUSIVE_OUTPUT",
+      "adjudication": "attempt-2/verdict-adjudication.json",
+      "reason": "All eight invocations ran, exited 0, and were deterministic, but no arm produced valid TSV because the probe mounted TESSDATA_PREFIX without Tesseract's configs directory, and the sentinel read 'LABEL LENS 14H' because the hand-built 9 glyph is ambiguous. Both defects are harness-side."
+    }
+  ],
+  "finalVerdict": "INCONCLUSIVE_OUTPUT",
+  "finalVerdictScope": "candidate runtime/model compatibility",
+  "frozenVerdictRulesModified": false,
+  "thresholdsOrInterpretationsChangedAfterResults": false,
+  "evidenceShortOfTheFrozenBar": {
+    "bothModelsLoadedAndExecuted": true,
+    "allEightExitZero": true,
+    "anyTimeout": false,
+    "anySignal": false,
+    "anyAbiLoaderOrUnsupportedModelError": false,
+    "allRepeatsByteIdentical": true,
+    "treatmentPeakRssKb": 61340,
+    "controlPeakRssKb": 39156,
+    "interpretation": "The float model was resident and produced output identical to the control's. This is consistent with compatibility and inconsistent with INCOMPATIBLE_FLOAT_MODEL, but it does not meet the frozen COMPATIBLE criteria, which require valid TSV and an exact sentinel transcript. The frozen bar governs."
+  },
+  "claimsNotMade": [
+    "No COMPATIBLE claim.",
+    "No INCOMPATIBLE_FLOAT_MODEL claim.",
+    "No recognition-capability, accuracy, or CER claim.",
+    "No production-suitability, Render-performance, or production-determinism claim.",
+    "No Tesseract capability-ceiling claim.",
+    "No authorization to replace Tesseract.js, change the production model or core, or deploy anything."
+  ],
+  "frozenCropBenchmarkAuthorized": false,
+  "frozenCropBenchmarkReason": "A governed frozen-crop benchmark requires a COMPATIBLE verdict plus its own preregistration. Neither exists.",
+  "requiredNextStep": "A separately preregistered Attempt 3 that fixes both harness defects: make Tesseract's tsv config reachable (mount the stock tessdata configs, or use --tessdata-dir for the model while leaving TESSDATA_PREFIX on the packaged tree), and redesign the ambiguous 9 glyph. The frozen protocol forbids altering settings or inputs after a failure, so neither fix may be applied to this attempt.",
+  "performanceInterpretation": "Latency (257-300 ms) and peak RSS (~38 MB control, ~61 MB treatment) are measurements for the GitHub-hosted native amd64 runner. They are diagnostic only and do not establish Render production performance."
+}
