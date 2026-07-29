@@ -1,1 +1,1 @@
-execute
+discover

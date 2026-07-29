@@ -39,6 +39,13 @@ RUN curl -fsSL -o /tmp/core.txt \
  && pip install --no-cache-dir -r /tmp/core.txt \
  && rm /tmp/core.txt
 
+# `strhub.data.module` transitively imports `strhub.data.dataset`, which imports
+# lmdb. lmdb is absent from upstream's core lock because it is only needed for
+# dataset access, but the import runs at module load and so is required to reach
+# the official `SceneTextDataModule.get_transform`. The pin is taken from
+# upstream's own requirements/test.txt at the same commit rather than invented.
+RUN pip install --no-cache-dir "lmdb==1.4.1"
+
 # Pinned PARSeq source. The tarball is extracted rather than pip-installed so the
 # `configs/` tree the official loader reads stays on disk at a known root.
 RUN curl -fsSL -o /tmp/parseq.tar.gz \
