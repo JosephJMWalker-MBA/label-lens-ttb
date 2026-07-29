@@ -1,0 +1,46 @@
+{
+  "artifact": "normalization-spec",
+  "experimentId": "issue-149-brand-native-tesseract-model-attribution",
+  "frozenBeforeOcr": true,
+  "appliedOnlyAfterRawFreeze": true,
+  "transcriptAssembly": {
+    "rule": "Word-level recognized text in reading order. Words are sorted by vertical centre, and by left edge when vertical centres are within 20 px, which is the repository's existing reading-order rule.",
+    "appliesToAllArms": true
+  },
+  "textNormalization": {
+    "steps": [
+      "Unicode NFKD",
+      "strip combining diacritical marks",
+      "lowercase",
+      "replace every character outside [a-z0-9 ] with a space",
+      "collapse runs of whitespace to one ASCII space",
+      "trim"
+    ],
+    "fuzzyMatching": false,
+    "characterSubstitution": false,
+    "editDistanceAllowance": false
+  },
+  "collapsedForm": "the normalized string with all spaces removed; used for substring and character-error-rate comparisons",
+  "metrics": {
+    "exactNormalizedMatch": "normalized transcript equals a normalized acceptable truth value",
+    "characterErrorRate": "Levenshtein(collapsed hypothesis, collapsed truth) / length(collapsed truth); best over acceptable truth values",
+    "usefulTokenRecall": "truth tokens of length >= 3 after normalization; fraction appearing as substrings of the collapsed hypothesis",
+    "truthPresentInRaw": "collapsed truth is a substring of the collapsed raw transcript",
+    "truthBearingFragmentCount": "count of matched truth tokens of length >= 3",
+    "emptyOutput": "zero recognized words",
+    "hallucinatedText": "not automatically adjudicable; left null with an explicit note rather than guessed"
+  },
+  "improvementThresholds": {
+    "materialUsefulTokenRecallDelta": 0.25,
+    "materialCharacterErrorRateDelta": 0.1,
+    "rule": "Improvement requires truth-bearing gain: a newly exact normalized match, truth newly present in the raw transcript, a useful-token-recall gain of at least 0.25 that also adds at least one whole truth token, or a character-error-rate reduction of at least 0.10. More characters, higher confidence, non-empty output, or merely different output never count as improvement."
+  },
+  "confidenceHandling": {
+    "originalEngineConfidencePreserved": true,
+    "crossRuntimeNormalizedConfidenceEmitted": false,
+    "reason": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no normalized confidence field is fabricated.",
+    "productionConfidenceHandlingChanged": false,
+    "authorityStateStatus": "exploratory",
+    "engineConfidenceBecomesComplianceFinding": false
+  }
+}

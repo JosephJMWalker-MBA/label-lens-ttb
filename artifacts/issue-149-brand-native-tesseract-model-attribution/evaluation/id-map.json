@@ -1,0 +1,50 @@
+{
+  "artifact": "id-map",
+  "experimentId": "issue-149-brand-native-tesseract-model-attribution",
+  "availableToOcr": false,
+  "purpose": "Post-inference evaluation only: maps opaque item id back to historical case.",
+  "map": [
+    {
+      "opaqueItemId": "item-cb35adee2cf8",
+      "ocrItemId": "approved-wine-004",
+      "caseId": "approved-wine-004",
+      "cropClusterId": "C1",
+      "designClusterId": "D1"
+    },
+    {
+      "opaqueItemId": "item-64a8d5e551a5",
+      "ocrItemId": "approved-wine-005",
+      "caseId": "approved-wine-005",
+      "cropClusterId": "C2",
+      "designClusterId": "D1"
+    },
+    {
+      "opaqueItemId": "item-710d87caca47",
+      "ocrItemId": "approved-wine-031",
+      "caseId": "approved-wine-031",
+      "cropClusterId": "C3",
+      "designClusterId": "D3"
+    },
+    {
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "ocrItemId": "la-fattoria-rotated",
+      "caseId": "la-fattoria-rotated",
+      "cropClusterId": "C1",
+      "designClusterId": "D1"
+    },
+    {
+      "opaqueItemId": "item-79aa3241d939",
+      "ocrItemId": "wine-multi-artifact-04-region-1",
+      "caseId": "wine-multi-artifact-04",
+      "cropClusterId": "C4",
+      "designClusterId": "D2"
+    },
+    {
+      "opaqueItemId": "item-6db972c3416b",
+      "ocrItemId": "wine-multi-artifact-04-region-2",
+      "caseId": "wine-multi-artifact-04",
+      "cropClusterId": "C4",
+      "designClusterId": "D2"
+    }
+  ]
+}
