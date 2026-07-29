@@ -1,0 +1,42 @@
+{
+  "artifact": "code-provenance",
+  "experimentId": "issue-149-parseq-hf-compatibility-probe",
+  "codeRepository": "https://github.com/baudm/parseq",
+  "codeCommit": "1902db043c029a7e03a3818c616c06600af574be",
+  "codeCommitVerified": true,
+  "codeCommitDate": "2024-04-24T15:32:34Z",
+  "floatingMainUsed": false,
+  "codeLicense": "Apache-2.0",
+  "codeLicenseEvidence": "LICENSE at the pinned commit; NOTICE for attribution; strhub/models/abinet/LICENSE (BSD) and strhub/models/crnn/LICENSE (MIT) for bundled components.",
+  "retainedLicenseFiles": ["vendor-license/LICENSE-Apache-2.0.txt", "vendor-license/NOTICE.txt"],
+  "dependencyLockSource": "requirements/core.txt at the pinned commit — upstream's own fully-pinned CPU lock, used verbatim rather than hand-invented pins",
+  "officialLoadingSemanticsVerified": {
+    "source": "strhub/models/utils.py at the pinned commit",
+    "createModel": "create_model('parseq', pretrained=False) builds the system from configs/main.yaml + configs/charset/94_full.yaml + configs/model/parseq.yaml",
+    "stateDictTarget": "for parseq experiments the released state dict targets the inner `model` attribute: `m = model.model if 'parseq' in experiment else model`",
+    "note": "The upstream pretrained=True path fetches the GitHub Release file. This probe applies the same loading semantics to the explicitly licensed Hugging Face state dictionary instead."
+  },
+  "architectureFrozenFromSource": {
+    "imgSizeHeightWidth": [32, 128],
+    "patchSizeHeightWidth": [4, 8],
+    "embedDim": 384,
+    "maxLabelLength": 25,
+    "encDepth": 12,
+    "encNumHeads": 6,
+    "decDepth": 1,
+    "decNumHeads": 12,
+    "charsetTrainLength": 94,
+    "charsetComposition": "62 case-sensitive alphanumeric + 32 punctuation",
+    "decodeAr": true,
+    "refineIters": 1,
+    "verifiedFrom": [
+      "configs/main.yaml",
+      "configs/model/parseq.yaml",
+      "configs/charset/94_full.yaml"
+    ]
+  },
+  "transformFrozenFromSource": {
+    "source": "strhub/data/module.py, SceneTextDataModule.get_transform",
+    "steps": ["RGB", "Resize((32,128), BICUBIC)", "ToTensor()", "Normalize(0.5, 0.5)"]
+  }
+}

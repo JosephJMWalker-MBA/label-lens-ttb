@@ -1,0 +1,7 @@
+python=Python 3.11.15
+font_pkg=fonts-dejavu-core=2.37-6
+font_path=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+font_sha256=abdc775b21b1bc470d50c97e790d276f2054b7504e56e5bd3e64f48d68582322
+parseq_commit=1902db043c029a7e03a3818c616c06600af574be
+arch=amd64
+uname=x86_64

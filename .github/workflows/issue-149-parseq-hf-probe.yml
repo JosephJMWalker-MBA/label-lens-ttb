@@ -1,0 +1,176 @@
+# Issue #149 — PARSeq-small compatibility and sequence-evidence probe.
+#
+# Research-only, scoped to exactly one branch. Not part of the required CI checks
+# and it touches no production path. No pull_request_target, no schedule, no
+# repository_dispatch, no unscoped branch trigger, and no workflow committed to
+# main outside this PR.
+name: Issue 149 PARSeq HF probe
+
+on:
+  push:
+    branches:
+      - research/issue-149-parseq-hf-compatibility-probe
+    paths:
+      - .github/workflows/issue-149-parseq-hf-probe.yml
+      - artifacts/issue-149-parseq-hf-compatibility-probe/workflow-mode.txt
+
+permissions:
+  contents: read
+
+env:
+  MODE_FILE: artifacts/issue-149-parseq-hf-compatibility-probe/workflow-mode.txt
+  ART: artifacts/issue-149-parseq-hf-compatibility-probe
+  PARSEQ_COMMIT: 1902db043c029a7e03a3818c616c06600af574be
+  BASE_DIGEST: sha256:b18992999dbe963a45a8a4da40ac2b1975be1a776d939d098c647482bcad5cba
+  IMAGE_TAG: issue-149-parseq-probe:cpu
+
+jobs:
+  resolve-mode:
+    name: Resolve declared mode
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.mode.outputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: mode
+        run: |
+          set -eu
+          test -f "${MODE_FILE}" || { echo "MODE_FILE_MISSING" >&2; exit 1; }
+          mode="$(tr -d '[:space:]' < "${MODE_FILE}")"
+          echo "declared mode: '${mode}'"
+          case "${mode}" in
+            discover|execute|complete) ;;
+            *) echo "INVALID_MODE: '${mode}'" >&2; exit 1 ;;
+          esac
+          echo "mode=${mode}" >> "$GITHUB_OUTPUT"
+
+  discover:
+    name: Discover (no inference)
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'discover'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert native linux/amd64
+        run: |
+          set -eu
+          test "$(uname -m)" = "x86_64" || { echo "NOT_NATIVE_AMD64" >&2; exit 1; }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+
+      # Retrieve and verify the explicitly licensed checkpoint. Fail-closed.
+      - name: Retrieve and verify checkpoint
+        run: node scripts/eval/fetch-issue-149-parseq-hf-checkpoint.mjs
+
+      - name: Resolve pinned font package version inside the pinned base
+        id: font
+        run: |
+          set -eu
+          v="$(docker run --rm --platform=linux/amd64 "python:3.11-slim-bookworm@${BASE_DIGEST}" \
+                sh -lc 'apt-get update -qq >/dev/null 2>&1 && apt-cache policy fonts-dejavu-core | awk "/Candidate:/ {print \$2}"')"
+          echo "resolved fonts-dejavu-core=${v}"
+          test -n "${v}" || { echo "FONT_VERSION_UNRESOLVED" >&2; exit 1; }
+          echo "version=${v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build research container
+        run: |
+          set -eu
+          docker build --platform=linux/amd64 \
+            -f scripts/eval/docker/issue-149-parseq-probe.Dockerfile \
+            --build-arg "FONT_PACKAGE_VERSION=${{ steps.font.outputs.version }}" \
+            --build-arg "PARSEQ_COMMIT=${PARSEQ_COMMIT}" \
+            -t "${IMAGE_TAG}" .
+
+      - name: Generate synthetic inputs and record inventories
+        run: |
+          set -eu
+          mkdir -p "${ART}/synthetic" "${ART}/discovery"
+          docker run --rm --platform=linux/amd64 --network=none \
+            -v "$PWD/${ART}/synthetic:/out" \
+            "${IMAGE_TAG}" python /opt/probe/generate_synthetic_inputs.py /out
+          docker run --rm --platform=linux/amd64 --network=none "${IMAGE_TAG}" \
+            cat /probe/runtime-inventory.txt > "${ART}/discovery/runtime-inventory.txt"
+          docker run --rm --platform=linux/amd64 --network=none "${IMAGE_TAG}" \
+            cat /probe/pip-freeze.txt > "${ART}/discovery/pip-freeze.txt"
+          docker image inspect "${IMAGE_TAG}" --format '{{.Id}}' > "${ART}/discovery/image-id.txt"
+          echo "fonts-dejavu-core=${{ steps.font.outputs.version }}" > "${ART}/discovery/font-package.txt"
+          mv "${ART}/synthetic/synthetic-input-spec.json" "${ART}/synthetic-input-spec.json"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-149-parseq-discovery
+          path: artifacts/issue-149-parseq-hf-compatibility-probe/
+          if-no-files-found: error
+
+  execute:
+    name: Execute the four preregistered invocations
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'execute'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Assert native linux/amd64
+        run: |
+          set -eu
+          test "$(uname -m)" = "x86_64" || { echo "NOT_NATIVE_AMD64" >&2; exit 1; }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+
+      - name: Verify frozen identities
+        run: |
+          set -eu
+          ( cd "${ART}" && shasum -a 256 -c preregistration.sha256 )
+          ( cd "${ART}/synthetic" && shasum -a 256 -c positive.png.sha256 && shasum -a 256 -c blank.png.sha256 )
+          test -f "${ART}/frozen-pins.json" || { echo "FROZEN_PINS_MISSING" >&2; exit 1; }
+          cat "${ART}/frozen-pins.json"
+
+      - name: Retrieve and verify checkpoint
+        run: node scripts/eval/fetch-issue-149-parseq-hf-checkpoint.mjs
+
+      - name: Rebuild the frozen research container
+        run: |
+          set -eu
+          font="$(node -e 'console.log(require("./"+process.env.ART+"/frozen-pins.json").fontPackageVersion)')"
+          echo "frozen font pin: ${font}"
+          docker build --platform=linux/amd64 \
+            -f scripts/eval/docker/issue-149-parseq-probe.Dockerfile \
+            --build-arg "FONT_PACKAGE_VERSION=${font}" \
+            --build-arg "PARSEQ_COMMIT=${PARSEQ_COMMIT}" \
+            -t "${IMAGE_TAG}" .
+          docker image inspect "${IMAGE_TAG}" --format '{{.Id}}' > "${ART}/raw/image-id.txt" 2>/dev/null || {
+            mkdir -p "${ART}/raw"; docker image inspect "${IMAGE_TAG}" --format '{{.Id}}' > "${ART}/raw/image-id.txt"; }
+
+      # Offline inference: network disabled, model and inputs read-only, no repo
+      # root mounted, no corpus or fixture truth mounted.
+      - name: Run the four invocations offline
+        run: |
+          set -eu
+          mkdir -p "${ART}/raw"
+          docker run --rm --platform=linux/amd64 --network=none \
+            --cpus 2 --memory 6g \
+            -v "$PWD/.local/ocr-research/models/parseq-small:/model:ro" \
+            -v "$PWD/${ART}/synthetic:/inputs:ro" \
+            -v "$PWD/${ART}/raw:/out" \
+            -e OMP_NUM_THREADS=1 -e MKL_NUM_THREADS=1 \
+            "${IMAGE_TAG}" python /opt/probe/run_probe.py
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-149-parseq-results
+          path: artifacts/issue-149-parseq-hf-compatibility-probe/
+          if-no-files-found: error
+
+  complete:
+    name: Complete (no inference)
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'complete'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Mode is 'complete': the probe is finished and this workflow will"
+          echo "not run inference. Results are committed to the branch."

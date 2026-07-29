@@ -1,0 +1,27 @@
+{
+  "artifact": "transform-spec",
+  "experimentId": "issue-149-parseq-hf-compatibility-probe",
+  "verifiedFromPinnedSource": true,
+  "source": "strhub/data/module.py, SceneTextDataModule.get_transform, at code commit 1902db043c029a7e03a3818c616c06600af574be",
+  "modelNativeTransform": {
+    "convertToRgb": true,
+    "resize": { "height": 32, "width": 128, "interpolation": "BICUBIC" },
+    "toTensor": true,
+    "normalize": { "mean": 0.5, "std": 0.5 }
+  },
+  "orderConfirmedInSource": [
+    "T.Resize(img_size, BICUBIC)",
+    "T.ToTensor()",
+    "T.Normalize(0.5, 0.5)"
+  ],
+  "imgSizeFromConfig": { "heightFirst": true, "value": [32, 128], "source": "configs/main.yaml" },
+  "augmentationApplied": false,
+  "rotationApplied": false,
+  "honestDescription": "The model does NOT receive unchanged pixels. It receives the same approved source image, followed by its required frozen model-native transform: RGB conversion, an intrinsic bicubic resize to 32x128, tensor conversion, and normalization with mean 0.5 and standard deviation 0.5. The intrinsic resize is a property of the model, not a preprocessing choice made by this probe.",
+  "recordedPerInvocation": [
+    "original PNG sha256 and dimensions",
+    "transformed tensor shape",
+    "transformed tensor dtype",
+    "transformed tensor sha256 (deterministic: computed over the contiguous float32 buffer)"
+  ]
+}

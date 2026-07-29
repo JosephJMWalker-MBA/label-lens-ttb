@@ -1,0 +1,43 @@
+{
+  "artifact": "checkpoint-provenance",
+  "experimentId": "issue-149-parseq-hf-compatibility-probe",
+  "selectedArtifact": "pytorch_model.bin",
+  "retrievalUrl": "https://huggingface.co/baudm/parseq-small/resolve/a1526c3d63740e460153987f9aaf6b86aa199dc1/pytorch_model.bin",
+  "modelRepository": "baudm/parseq-small",
+  "modelCommit": "a1526c3d63740e460153987f9aaf6b86aa199dc1",
+  "expectedSha256": "bb5792a68e367476abca029cbf8699abc805f3d3dc7e57aae45c8ec4f7b7cd00",
+  "expectedByteSize": 95392675,
+  "hashAttestedBeforeRetrievalBy": "git-lfs pointer at the pinned revision (retained at vendor-license/pytorch_model.bin.lfs-pointer.txt)",
+  "retrievalScript": "scripts/eval/fetch-issue-149-parseq-hf-checkpoint.mjs",
+  "retrievalScriptProperties": {
+    "callerSuppliedUrlAccepted": false,
+    "callerSuppliedModelAccepted": false,
+    "callerSuppliedRevisionAccepted": false,
+    "singlePinnedUrlOnly": true,
+    "verifiesFullSha256": true,
+    "verifiesExactByteSize": true,
+    "deletesAndExitsNonZeroOnMismatch": true,
+    "reverifiesCachedBytesEveryInvocation": true,
+    "inferenceAfterMismatch": "impossible — the script exits non-zero and the workflow step fails"
+  },
+  "cachePath": ".local/ocr-research/models/parseq-small/pytorch_model.bin",
+  "cacheUntracked": true,
+  "committedToGit": false,
+  "gitLfsUsedInLabelLens": false,
+  "notRetrieved": [
+    "parseq-bb5792a6.pt (the PR #212 GitHub Release artifact)",
+    "torchscript_model.bin",
+    "PARSeq tiny",
+    "PARSeq patch16",
+    "any other Hugging Face revision",
+    "any other model candidate"
+  ],
+  "supportiveProvenanceOnly": {
+    "sha256PrefixMatchesGithubFilenameShortHash": "bb5792a6",
+    "byteSizeMatchesGithubReleaseAsset": 95392675,
+    "byteIdenticalityClaimed": false,
+    "isLicenseBasis": false,
+    "isExperimentalDependency": false,
+    "note": "Recorded because it is real and relevant provenance, but no equality claim is made and nothing in the experiment depends on it. Proving byte-identity would need an authorized post-retrieval comparison that this probe does not perform."
+  }
+}

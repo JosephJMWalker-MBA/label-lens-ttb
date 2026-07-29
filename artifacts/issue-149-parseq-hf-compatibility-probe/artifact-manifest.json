@@ -1,0 +1,270 @@
+{
+  "artifact": "artifact-manifest",
+  "experimentId": "issue-149-parseq-hf-compatibility-probe",
+  "issue": 149,
+  "evaluationOnly": true,
+  "compatibilityVerdict": "COMPATIBLE",
+  "invocations": 4,
+  "discoveryRunIds": [30498464410, 30499089181],
+  "executionRunId": 30499358487,
+  "corpusAccessed": false,
+  "fixtureTruthAccessed": false,
+  "productionChanged": false,
+  "pr195Untouched": true,
+  "modelWeightsCommitted": false,
+  "fontBinaryCommitted": false,
+  "gitLfsUsed": false,
+  "largestArtifactBytes": 11358,
+  "proof": "Largest file is 11358 bytes (vendor-license/LICENSE-Apache-2.0.txt). The 95.4 MB checkpoint and the font binary never entered Git; the checkpoint lives only in the untracked .local cache.",
+  "rawLogitsRetained": true,
+  "rawLogitsFormat": "unrounded float32 .npy plus JSON descriptor",
+  "fileCount": 49,
+  "files": [
+    {
+      "path": "candidate-lineage.md",
+      "sizeBytes": 2911,
+      "sha256": "1c6953cccfae89532fe09b6cad10501f7ed636262f46bc104417bdb92bd5eb48"
+    },
+    {
+      "path": "checkpoint-provenance.json",
+      "sizeBytes": 2078,
+      "sha256": "c86b39c067f0877000a1d4553ee93acd8a1447577fc2cf9e6c3cdb0c0b587473"
+    },
+    {
+      "path": "code-provenance.json",
+      "sizeBytes": 2130,
+      "sha256": "e401e49d2f656ae1d5322e345510a90b3ea7f4a9f81e7e630a22a17d77001040"
+    },
+    {
+      "path": "commands.sh",
+      "sizeBytes": 2314,
+      "sha256": "660226f24d78fe1273a70406ce09f03a65ee53dd79c3d98c3bcb3b61b3b1d2fd"
+    },
+    {
+      "path": "container-provenance.json",
+      "sizeBytes": 1519,
+      "sha256": "8f15d29f64a77548462a717dbe229017c55585445d1ee6328d812eb90023c7cc"
+    },
+    {
+      "path": "decision.json",
+      "sizeBytes": 3533,
+      "sha256": "14d83aff255ffb1d09ec1df3e0282ce5450f9602c43b3c032f2ea34dcde6f2f0"
+    },
+    {
+      "path": "dependency-lock.json",
+      "sizeBytes": 2033,
+      "sha256": "1e7d5cd8b4d0567c33ab06e229eeebfe9e04259828dd1f82925e6ad5fa1e096e"
+    },
+    {
+      "path": "determinism-report.json",
+      "sizeBytes": 1147,
+      "sha256": "c81c5a19919766dd0f0be82cfcd5e27529239b68294f7891df8216872ede97e3"
+    },
+    {
+      "path": "discovery/font-package.txt",
+      "sizeBytes": 25,
+      "sha256": "b46e1aab494cc7e154b17ffcb85342cd62415182ea4b2a943604a20547bc05c9"
+    },
+    {
+      "path": "discovery/image-id.txt",
+      "sizeBytes": 72,
+      "sha256": "860db0a5a70f845a6e8b975e8ca2a2a7dc0836c6ba2a6017030e91ebae3cfd82"
+    },
+    {
+      "path": "discovery/pip-freeze.txt",
+      "sizeBytes": 650,
+      "sha256": "6e944f9a4423b1bc411f160d8ae5107fe586ec0aecda9f25faf1633dd949487d"
+    },
+    {
+      "path": "discovery/runtime-inventory.txt",
+      "sizeBytes": 270,
+      "sha256": "f83e639a985b5a6630dc6c7f6c9871f7edbba79d6e2bd9ea532ac319ad633a07"
+    },
+    {
+      "path": "evidence-schema.json",
+      "sizeBytes": 3536,
+      "sha256": "b6ce125a3b62ec5ee856188ed9d9d45e6fc7bbb1da8c5322b116a1d15aa58850"
+    },
+    {
+      "path": "font-provenance.json",
+      "sizeBytes": 765,
+      "sha256": "763bebdc461170eb1c19cda1ecc99085abb7ee7d91142dc337b27476369c41d7"
+    },
+    {
+      "path": "frozen-pins.json",
+      "sizeBytes": 1005,
+      "sha256": "b11d303fce32c8a1ddad9a2aa76231055f2f1d346ee152b37771a3ab9c99236c"
+    },
+    {
+      "path": "git-sha.txt",
+      "sizeBytes": 100,
+      "sha256": "4ddb73ad8021c2816f85b84afa977a15960cf279a81c6d3303baa42a8d329511"
+    },
+    {
+      "path": "invocation-matrix.json",
+      "sizeBytes": 1205,
+      "sha256": "5e77bad25a5c6c8e8581a9f3e5cb09ef2d5459a3936dd765ee8d32e6308e6780"
+    },
+    {
+      "path": "license-audit.md",
+      "sizeBytes": 4561,
+      "sha256": "1350abc6bb3cbe3cbe474779273657913ce62bf2d4ca6ea0ab72acf260d7b432"
+    },
+    {
+      "path": "limitations.md",
+      "sizeBytes": 5023,
+      "sha256": "de29eb8cead93d1fae9f01f6078a27f541d74cf33d964fc43b31271f846cb3bf"
+    },
+    {
+      "path": "model-repository-provenance.json",
+      "sizeBytes": 1716,
+      "sha256": "a617af6b523da030a53ea8cb4e4bcc17c9f1518f47eeefb17aa6415892e46791"
+    },
+    {
+      "path": "normalized-evidence.json",
+      "sizeBytes": 10340,
+      "sha256": "35cc52622dbb3974fc631a9a17cbc203c729170930f809bb7740a220d93f9a9e"
+    },
+    {
+      "path": "output-risk-report.json",
+      "sizeBytes": 2431,
+      "sha256": "d8d8cbb4529b95a239a82f4b1537ef07361f0b9cd4718556a527c12257b36100"
+    },
+    {
+      "path": "preregistration.md",
+      "sizeBytes": 9927,
+      "sha256": "5fb13f8f59ca1efaf40018834d9621a1303a701856c66db3e0e7ea2f41df1f25"
+    },
+    {
+      "path": "preregistration.sha256",
+      "sizeBytes": 85,
+      "sha256": "48801d38812ac38b7b6849c648db2cfb3df37305a20f0482375b00798836989c"
+    },
+    {
+      "path": "raw/blank-primary.descriptor.json",
+      "sizeBytes": 1149,
+      "sha256": "85a93355399e6bbacaac1613e84d9e3b45c03530cd4311e80bed3f5a683b4e26"
+    },
+    {
+      "path": "raw/blank-primary.logits.npy",
+      "sizeBytes": 10008,
+      "sha256": "96398f82c8a7faa035934f733ecefe0dfffea192111a1381cfa70682e55bf2a5"
+    },
+    {
+      "path": "raw/blank-repeat.descriptor.json",
+      "sizeBytes": 1146,
+      "sha256": "d41ee433e17cda8bcbb920ebd1cbec49d46ba3e664f2fdb77d484913ab1397f5"
+    },
+    {
+      "path": "raw/blank-repeat.logits.npy",
+      "sizeBytes": 10008,
+      "sha256": "96398f82c8a7faa035934f733ecefe0dfffea192111a1381cfa70682e55bf2a5"
+    },
+    {
+      "path": "raw/image-id.txt",
+      "sizeBytes": 72,
+      "sha256": "62df2c84a67c1204c315de2634d3a4cdb6c89eca664a100a8cdd4c36274037a3"
+    },
+    {
+      "path": "raw/positive-primary.descriptor.json",
+      "sizeBytes": 1472,
+      "sha256": "b2c43f9ba64a5b77f96cbcfec40421ee296c68f99ddd634da60d7083988114c2"
+    },
+    {
+      "path": "raw/positive-primary.logits.npy",
+      "sizeBytes": 10008,
+      "sha256": "35aeda0abbbf5b13c382e55da67c5357c98bf30319daf8eb7fb63a5153730fef"
+    },
+    {
+      "path": "raw/positive-repeat.descriptor.json",
+      "sizeBytes": 1469,
+      "sha256": "cffb9ada562401584342f7f9ed1e54eda1dc3dbc1c913d79e0254200a7384670"
+    },
+    {
+      "path": "raw/positive-repeat.logits.npy",
+      "sizeBytes": 10008,
+      "sha256": "35aeda0abbbf5b13c382e55da67c5357c98bf30319daf8eb7fb63a5153730fef"
+    },
+    {
+      "path": "raw/run-results.json",
+      "sizeBytes": 6064,
+      "sha256": "db58576bf378b804cee417bfa34be6da8bec8956ac3d1b523495f1cc0ebcf5ae"
+    },
+    {
+      "path": "raw/safe-loading-report.json",
+      "sizeBytes": 7924,
+      "sha256": "20d9ab6e0d447f4cfb44a81a94f3a7f4648f75bab9b003af7826512faefa0b88"
+    },
+    {
+      "path": "resource-report.json",
+      "sizeBytes": 1094,
+      "sha256": "28b3a3237389985d54b2961100f5f0ee797e70fa335ebf271ab5b2aafe8023a9"
+    },
+    {
+      "path": "runtime-provenance.json",
+      "sizeBytes": 1386,
+      "sha256": "1a54deddc91b3f3e673d7127037cec685b053848510da9e80b8230e28f53252e"
+    },
+    {
+      "path": "synthetic-input-spec.json",
+      "sizeBytes": 1277,
+      "sha256": "95719769253007ca11c169d8c029a8ba32fb1bae6a936470aed960b1e02e1df4"
+    },
+    {
+      "path": "synthetic/blank.png",
+      "sizeBytes": 384,
+      "sha256": "26daf63d1830f5af6375d1be855f6ce7a7daba20994a667951d38da0d604fd48"
+    },
+    {
+      "path": "synthetic/blank.png.sha256",
+      "sizeBytes": 76,
+      "sha256": "5e66d0a4e6d516c92074f2bc0e2f04b2a0fc77f72cc1dfa7aaae08a72e00837e"
+    },
+    {
+      "path": "synthetic/positive.png",
+      "sizeBytes": 5029,
+      "sha256": "265aaae73d65a04fe58441ccc1e1c67e15ca707b89fe312ca80c8aceb85831a0"
+    },
+    {
+      "path": "synthetic/positive.png.sha256",
+      "sizeBytes": 79,
+      "sha256": "9aaffb5d594996d52f99939c7f67f9479b7e2ba5edbc722e94ee6124cca51043"
+    },
+    {
+      "path": "training-data-provenance.md",
+      "sizeBytes": 2064,
+      "sha256": "df213efd322c3738b33936e330184424fd0494f2a43c43f9c61cc07547f4ae9b"
+    },
+    {
+      "path": "transform-spec.json",
+      "sizeBytes": 1372,
+      "sha256": "88bd1d98ffe5666425861df6054d74420d87d5b2dba55242a418adfee3a0c2d1"
+    },
+    {
+      "path": "vendor-license/LICENSE-Apache-2.0.txt",
+      "sizeBytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "vendor-license/MODEL-CARD-parseq-small.md",
+      "sizeBytes": 1273,
+      "sha256": "9159b955256b8b5542dce7cf256f2c3435875c36396ff3efa10399b77207708b"
+    },
+    {
+      "path": "vendor-license/NOTICE.txt",
+      "sizeBytes": 712,
+      "sha256": "0b0a09b6a5321a43a7cf06e5194ce51e3855e42297930f7bad9421fcb39a93b5"
+    },
+    {
+      "path": "vendor-license/pytorch_model.bin.lfs-pointer.txt",
+      "sizeBytes": 133,
+      "sha256": "260adab9bd214da242cc1562e20f9ea790a8064b294c8adcb47b7876b4c74798"
+    },
+    {
+      "path": "workflow-mode.txt",
+      "sizeBytes": 9,
+      "sha256": "37a40f08d8548dba289b9b0bb35bcf63b359f6d37ee86044ebc6b6da080b9ec1"
+    }
+  ],
+  "verify": "shasum -a 256 -c artifacts/issue-149-parseq-hf-compatibility-probe/artifact-manifest.sha256"
+}

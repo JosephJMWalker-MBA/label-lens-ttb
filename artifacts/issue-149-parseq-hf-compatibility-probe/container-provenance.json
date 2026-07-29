@@ -1,0 +1,34 @@
+{
+  "artifact": "container-provenance",
+  "experimentId": "issue-149-parseq-hf-compatibility-probe",
+  "dockerfile": "scripts/eval/docker/issue-149-parseq-probe.Dockerfile",
+  "baseImage": "python:3.11-slim-bookworm",
+  "baseManifestListDigest": "sha256:b18992999dbe963a45a8a4da40ac2b1975be1a776d939d098c647482bcad5cba",
+  "baseAmd64ManifestDigest": "sha256:28255a3ace7eb4c48bc1b57b90af29e1bc82b4fd6c60614a8e3dce61b87ff941",
+  "targetPlatform": "linux/amd64",
+  "builtImageId": "sha256:c29fb8cc7041b07022c9f44c368a42b42c906d0781fcada4b5c395976f6288a1",
+  "buildArgs": {
+    "FONT_PACKAGE_VERSION": "2.37-6",
+    "PARSEQ_COMMIT": "1902db043c029a7e03a3818c616c06600af574be"
+  },
+  "buildArgsHaveNoDefaults": true,
+  "parseqSource": "codeload tarball at the pinned commit, extracted to /opt/parseq (configs tree retained for the official loader)",
+  "containsCorpus": false,
+  "containsFixtures": false,
+  "containsFixtureTruth": false,
+  "containsModelWeights": false,
+  "modelMountedAtRuntime": "read-only at /model",
+  "productionDockerfileModified": false,
+  "pythonInstalledIntoProduction": false,
+  "containerArchitecture": {
+    "dpkg": "amd64",
+    "uname": "x86_64"
+  },
+  "networkDuringBuild": "permitted, to fetch pinned packages and pinned source",
+  "networkDuringInference": "disabled (--network=none)",
+  "discoveryRunId": 30499089181,
+  "additionalPin": {
+    "lmdb": "1.4.1",
+    "reason": "strhub.data.module transitively imports lmdb at module load; pin taken from upstream requirements/test.txt"
+  }
+}

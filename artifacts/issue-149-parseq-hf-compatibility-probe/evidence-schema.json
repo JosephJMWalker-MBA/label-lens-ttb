@@ -1,0 +1,93 @@
+{
+  "artifact": "evidence-schema",
+  "experimentId": "issue-149-parseq-hf-compatibility-probe",
+  "typescriptInterface": "ParseqRecognitionEvidence",
+  "sequenceOnly": true,
+  "geometryFieldsPresent": false,
+  "fields": {
+    "opaqueItemId": "string",
+    "engine": {
+      "engineId": "parseq",
+      "codeCommit": "string",
+      "runtimeId": "string",
+      "runtimePackagesHash": "string"
+    },
+    "model": {
+      "modelId": "parseq-small",
+      "modelRepository": "baudm/parseq-small",
+      "modelCommit": "string",
+      "checkpointFile": "pytorch_model.bin",
+      "checkpointSha256": "string",
+      "checkpointBytes": "number",
+      "modelLicense": "Apache-2.0"
+    },
+    "input": {
+      "sourceImageSha256": "string",
+      "sourceWidth": "number",
+      "sourceHeight": "number",
+      "modelInputHeight": 32,
+      "modelInputWidth": 128,
+      "transformDescription": "string",
+      "transformedTensorSha256": "string",
+      "transformedTensorShape": "number[]",
+      "transformedTensorDtype": "string"
+    },
+    "output": {
+      "rawLogitsArtifact": "string",
+      "logitsShape": "number[]",
+      "logitsSha256": "string",
+      "logitsAllFinite": "boolean",
+      "rawTokenIds": "number[]",
+      "rawTokens": "string[]",
+      "rawTranscript": "string",
+      "normalizedTranscript": "string",
+      "eosIndex": "number | null",
+      "characterProbabilities": "number[]",
+      "nativeSequenceScore": "number | null",
+      "emptyTranscript": "boolean"
+    },
+    "execution": {
+      "decodeAr": true,
+      "refineIterations": 1,
+      "decodingMode": "greedy-argmax",
+      "latencyMs": "number",
+      "modelLoadMs": "number",
+      "modelLoadIncludedInLatency": false,
+      "peakMemoryBytes": "number | null",
+      "warnings": "string[]",
+      "errors": "string[]",
+      "outputFingerprint": "string"
+    }
+  },
+  "nativeSequenceScoreFormula": {
+    "definition": "product of the per-position maximum softmax probabilities over decoded positions up to and including the first EOS position; null when no position is decoded",
+    "range": "0..1",
+    "specifiedBeforeInference": true
+  },
+  "normalizationRule": {
+    "steps": [
+      "Unicode NFKD",
+      "strip combining diacritics",
+      "lowercase",
+      "replace characters outside [a-z0-9 ] with a space",
+      "collapse whitespace to one ASCII space",
+      "trim"
+    ],
+    "fuzzyMatching": false,
+    "editDistanceAllowance": false
+  },
+  "prohibitionsHeld": {
+    "ocrWordObjectsCreated": false,
+    "selectBrandObservationCalled": false,
+    "boundingBoxesFabricated": false,
+    "wordGeometryFabricated": false,
+    "lineGeometryFabricated": false,
+    "characterGeometryFabricated": false,
+    "tesseractStyleConfidenceFabricated": false,
+    "labelLensAuthorityFabricated": false,
+    "probabilitiesRescaledToPercent": false,
+    "probabilitiesComparedToAuthorityThresholds": false,
+    "explanation": "Held by construction: the schema declares no geometry field at all, keeps probabilities in 0..1, and is wired to no Label Lens selector or threshold."
+  },
+  "charsetNote": "The model's token inventory is the 94-character train charset (62 case-sensitive alphanumeric + 32 punctuation). Upstream's test-time CharsetAdapter would additionally filter predictions to configs/main.yaml's 36-character lowercase charset_test; this probe records the tokenizer's own decode as the raw transcript and does not apply that downstream filter, so the recorded output is the model's sequence output rather than a filtered view of it."
+}

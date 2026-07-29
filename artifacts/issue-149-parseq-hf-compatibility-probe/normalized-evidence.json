@@ -1,0 +1,241 @@
+{
+  "artifact": "normalized-evidence",
+  "experimentId": "issue-149-parseq-hf-compatibility-probe",
+  "schema": "evidence-schema.json (ParseqRecognitionEvidence)",
+  "geometryFabricated": false,
+  "ocrWordObjectsCreated": false,
+  "selectBrandObservationCalled": false,
+  "probabilitiesNativeRange": "0..1",
+  "probabilitiesRescaled": false,
+  "comparedToAuthorityThresholds": false,
+  "records": [
+    {
+      "opaqueItemId": "positive-primary",
+      "engine": {
+        "engineId": "parseq",
+        "codeCommit": "1902db043c029a7e03a3818c616c06600af574be",
+        "runtimeId": "sha256:5e7ba8e8f8517273f831d4e9b5750d99c0dd08d23d1415757edfa75a64281810",
+        "runtimePackagesHash": "6e944f9a4423b1bc411f160d8ae5107fe586ec0aecda9f25faf1633dd949487d"
+      },
+      "model": {
+        "modelId": "parseq-small",
+        "modelRepository": "baudm/parseq-small",
+        "modelCommit": "a1526c3d63740e460153987f9aaf6b86aa199dc1",
+        "checkpointFile": "pytorch_model.bin",
+        "checkpointSha256": "bb5792a68e367476abca029cbf8699abc805f3d3dc7e57aae45c8ec4f7b7cd00",
+        "checkpointBytes": 95392675,
+        "modelLicense": "Apache-2.0"
+      },
+      "input": {
+        "sourceImageSha256": "265aaae73d65a04fe58441ccc1e1c67e15ca707b89fe312ca80c8aceb85831a0",
+        "sourceWidth": 640,
+        "sourceHeight": 96,
+        "modelInputHeight": 32,
+        "modelInputWidth": 128,
+        "transformDescription": "RGB, bicubic resize to 32x128, ToTensor, Normalize(0.5,0.5)",
+        "transformedTensorSha256": "98d61539100391aa383a9403ac56d263a95724b1860681b6768cbffc5d62809f",
+        "transformedTensorShape": [1, 3, 32, 128],
+        "transformedTensorDtype": "torch.float32"
+      },
+      "output": {
+        "rawLogitsArtifact": "raw/positive-primary.logits.npy",
+        "logitsShape": [1, 26, 95],
+        "logitsSha256": "35aeda0abbbf5b13c382e55da67c5357c98bf30319daf8eb7fb63a5153730fef",
+        "logitsAllFinite": true,
+        "rawTokenIds": [48, 37, 38, 41, 48, 48, 41, 50, 55, 2, 3, 4],
+        "rawTokens": ["L", "A", "B", "E", "L", "L", "E", "N", "S", "1", "2", "3"],
+        "rawTranscript": "LABELLENS123",
+        "normalizedTranscript": "labellens123",
+        "eosIndex": 12,
+        "characterProbabilities": [
+          0.9988079071044922, 0.9997488856315613, 0.9994083642959595, 0.9998372793197632,
+          0.9986979961395264, 0.9990069270133972, 0.9995517134666443, 0.9991387128829956,
+          0.9697872996330261, 0.9991206526756287, 0.9986622333526611, 0.9974856376647949
+        ],
+        "nativeSequenceScore": 0.2564357817173004,
+        "emptyTranscript": false
+      },
+      "execution": {
+        "decodeAr": true,
+        "refineIterations": 1,
+        "decodingMode": "greedy-argmax",
+        "latencyMs": 122.54437600000756,
+        "modelLoadMs": 1835.8366719999992,
+        "modelLoadIncludedInLatency": false,
+        "peakMemoryBytes": 540971008,
+        "warnings": [],
+        "errors": [],
+        "outputFingerprint": "7bf74b885bd0f5b2182effaab0ae8204b7d28ec1759d413155fa50e8e6800d72"
+      }
+    },
+    {
+      "opaqueItemId": "positive-repeat",
+      "engine": {
+        "engineId": "parseq",
+        "codeCommit": "1902db043c029a7e03a3818c616c06600af574be",
+        "runtimeId": "sha256:5e7ba8e8f8517273f831d4e9b5750d99c0dd08d23d1415757edfa75a64281810",
+        "runtimePackagesHash": "6e944f9a4423b1bc411f160d8ae5107fe586ec0aecda9f25faf1633dd949487d"
+      },
+      "model": {
+        "modelId": "parseq-small",
+        "modelRepository": "baudm/parseq-small",
+        "modelCommit": "a1526c3d63740e460153987f9aaf6b86aa199dc1",
+        "checkpointFile": "pytorch_model.bin",
+        "checkpointSha256": "bb5792a68e367476abca029cbf8699abc805f3d3dc7e57aae45c8ec4f7b7cd00",
+        "checkpointBytes": 95392675,
+        "modelLicense": "Apache-2.0"
+      },
+      "input": {
+        "sourceImageSha256": "265aaae73d65a04fe58441ccc1e1c67e15ca707b89fe312ca80c8aceb85831a0",
+        "sourceWidth": 640,
+        "sourceHeight": 96,
+        "modelInputHeight": 32,
+        "modelInputWidth": 128,
+        "transformDescription": "RGB, bicubic resize to 32x128, ToTensor, Normalize(0.5,0.5)",
+        "transformedTensorSha256": "98d61539100391aa383a9403ac56d263a95724b1860681b6768cbffc5d62809f",
+        "transformedTensorShape": [1, 3, 32, 128],
+        "transformedTensorDtype": "torch.float32"
+      },
+      "output": {
+        "rawLogitsArtifact": "raw/positive-repeat.logits.npy",
+        "logitsShape": [1, 26, 95],
+        "logitsSha256": "35aeda0abbbf5b13c382e55da67c5357c98bf30319daf8eb7fb63a5153730fef",
+        "logitsAllFinite": true,
+        "rawTokenIds": [48, 37, 38, 41, 48, 48, 41, 50, 55, 2, 3, 4],
+        "rawTokens": ["L", "A", "B", "E", "L", "L", "E", "N", "S", "1", "2", "3"],
+        "rawTranscript": "LABELLENS123",
+        "normalizedTranscript": "labellens123",
+        "eosIndex": 12,
+        "characterProbabilities": [
+          0.9988079071044922, 0.9997488856315613, 0.9994083642959595, 0.9998372793197632,
+          0.9986979961395264, 0.9990069270133972, 0.9995517134666443, 0.9991387128829956,
+          0.9697872996330261, 0.9991206526756287, 0.9986622333526611, 0.9974856376647949
+        ],
+        "nativeSequenceScore": 0.2564357817173004,
+        "emptyTranscript": false
+      },
+      "execution": {
+        "decodeAr": true,
+        "refineIterations": 1,
+        "decodingMode": "greedy-argmax",
+        "latencyMs": 118.55743399999596,
+        "modelLoadMs": 1835.8366719999992,
+        "modelLoadIncludedInLatency": false,
+        "peakMemoryBytes": 542674944,
+        "warnings": [],
+        "errors": [],
+        "outputFingerprint": "7bf74b885bd0f5b2182effaab0ae8204b7d28ec1759d413155fa50e8e6800d72"
+      }
+    },
+    {
+      "opaqueItemId": "blank-primary",
+      "engine": {
+        "engineId": "parseq",
+        "codeCommit": "1902db043c029a7e03a3818c616c06600af574be",
+        "runtimeId": "sha256:5e7ba8e8f8517273f831d4e9b5750d99c0dd08d23d1415757edfa75a64281810",
+        "runtimePackagesHash": "6e944f9a4423b1bc411f160d8ae5107fe586ec0aecda9f25faf1633dd949487d"
+      },
+      "model": {
+        "modelId": "parseq-small",
+        "modelRepository": "baudm/parseq-small",
+        "modelCommit": "a1526c3d63740e460153987f9aaf6b86aa199dc1",
+        "checkpointFile": "pytorch_model.bin",
+        "checkpointSha256": "bb5792a68e367476abca029cbf8699abc805f3d3dc7e57aae45c8ec4f7b7cd00",
+        "checkpointBytes": 95392675,
+        "modelLicense": "Apache-2.0"
+      },
+      "input": {
+        "sourceImageSha256": "26daf63d1830f5af6375d1be855f6ce7a7daba20994a667951d38da0d604fd48",
+        "sourceWidth": 640,
+        "sourceHeight": 96,
+        "modelInputHeight": 32,
+        "modelInputWidth": 128,
+        "transformDescription": "RGB, bicubic resize to 32x128, ToTensor, Normalize(0.5,0.5)",
+        "transformedTensorSha256": "42bd22a7ff7abb6fc4b3a3acd20c9a5d7900742b1fc8b229c19b22af9e0fde3e",
+        "transformedTensorShape": [1, 3, 32, 128],
+        "transformedTensorDtype": "torch.float32"
+      },
+      "output": {
+        "rawLogitsArtifact": "raw/blank-primary.logits.npy",
+        "logitsShape": [1, 26, 95],
+        "logitsSha256": "96398f82c8a7faa035934f733ecefe0dfffea192111a1381cfa70682e55bf2a5",
+        "logitsAllFinite": true,
+        "rawTokenIds": [2, 1],
+        "rawTokens": ["1", "0"],
+        "rawTranscript": "10",
+        "normalizedTranscript": "10",
+        "eosIndex": 2,
+        "characterProbabilities": [0.31324273347854614, 0.1972750872373581],
+        "nativeSequenceScore": 0.020832331851124763,
+        "emptyTranscript": false
+      },
+      "execution": {
+        "decodeAr": true,
+        "refineIterations": 1,
+        "decodingMode": "greedy-argmax",
+        "latencyMs": 98.59421299999838,
+        "modelLoadMs": 1835.8366719999992,
+        "modelLoadIncludedInLatency": false,
+        "peakMemoryBytes": 542674944,
+        "warnings": [],
+        "errors": [],
+        "outputFingerprint": "9760001f0703007cf9e3ce005c4c2ac9a96d0055426c349ca90210cd9fd281dd"
+      }
+    },
+    {
+      "opaqueItemId": "blank-repeat",
+      "engine": {
+        "engineId": "parseq",
+        "codeCommit": "1902db043c029a7e03a3818c616c06600af574be",
+        "runtimeId": "sha256:5e7ba8e8f8517273f831d4e9b5750d99c0dd08d23d1415757edfa75a64281810",
+        "runtimePackagesHash": "6e944f9a4423b1bc411f160d8ae5107fe586ec0aecda9f25faf1633dd949487d"
+      },
+      "model": {
+        "modelId": "parseq-small",
+        "modelRepository": "baudm/parseq-small",
+        "modelCommit": "a1526c3d63740e460153987f9aaf6b86aa199dc1",
+        "checkpointFile": "pytorch_model.bin",
+        "checkpointSha256": "bb5792a68e367476abca029cbf8699abc805f3d3dc7e57aae45c8ec4f7b7cd00",
+        "checkpointBytes": 95392675,
+        "modelLicense": "Apache-2.0"
+      },
+      "input": {
+        "sourceImageSha256": "26daf63d1830f5af6375d1be855f6ce7a7daba20994a667951d38da0d604fd48",
+        "sourceWidth": 640,
+        "sourceHeight": 96,
+        "modelInputHeight": 32,
+        "modelInputWidth": 128,
+        "transformDescription": "RGB, bicubic resize to 32x128, ToTensor, Normalize(0.5,0.5)",
+        "transformedTensorSha256": "42bd22a7ff7abb6fc4b3a3acd20c9a5d7900742b1fc8b229c19b22af9e0fde3e",
+        "transformedTensorShape": [1, 3, 32, 128],
+        "transformedTensorDtype": "torch.float32"
+      },
+      "output": {
+        "rawLogitsArtifact": "raw/blank-repeat.logits.npy",
+        "logitsShape": [1, 26, 95],
+        "logitsSha256": "96398f82c8a7faa035934f733ecefe0dfffea192111a1381cfa70682e55bf2a5",
+        "logitsAllFinite": true,
+        "rawTokenIds": [2, 1],
+        "rawTokens": ["1", "0"],
+        "rawTranscript": "10",
+        "normalizedTranscript": "10",
+        "eosIndex": 2,
+        "characterProbabilities": [0.31324273347854614, 0.1972750872373581],
+        "nativeSequenceScore": 0.020832331851124763,
+        "emptyTranscript": false
+      },
+      "execution": {
+        "decodeAr": true,
+        "refineIterations": 1,
+        "decodingMode": "greedy-argmax",
+        "latencyMs": 99.08434400000488,
+        "modelLoadMs": 1835.8366719999992,
+        "modelLoadIncludedInLatency": false,
+        "peakMemoryBytes": 543461376,
+        "warnings": [],
+        "errors": [],
+        "outputFingerprint": "9760001f0703007cf9e3ce005c4c2ac9a96d0055426c349ca90210cd9fd281dd"
+      }
+    }
+  ]
+}

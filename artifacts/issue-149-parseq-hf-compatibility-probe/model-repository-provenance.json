@@ -1,0 +1,48 @@
+{
+  "artifact": "model-repository-provenance",
+  "experimentId": "issue-149-parseq-hf-compatibility-probe",
+  "modelRepository": "baudm/parseq-small",
+  "modelRepositoryUrl": "https://huggingface.co/baudm/parseq-small",
+  "modelCommit": "a1526c3d63740e460153987f9aaf6b86aa199dc1",
+  "modelCommitVerified": true,
+  "modelCommitDate": "2022-08-28T18:35:24.000Z",
+  "modelCommitTitle": "Initial commit of weights",
+  "modelLicense": "Apache-2.0",
+  "modelLicenseEvidence": "README.md front-matter `license: apache-2.0` at the pinned revision; HF API cardData reports the same.",
+  "modelCardIdentity": {
+    "title": "PARSeq small v1.0",
+    "imageSize": "128x32",
+    "patchSize": "8x4",
+    "script": "Latin scene-text recognition",
+    "characters": "62 case-sensitive alphanumeric + 32 punctuation"
+  },
+  "commitHistory": [
+    {
+      "commit": "3c59be4cb0870048c5739478df2275c4d02f6f87",
+      "date": "2022-08-28T18:31:18.000Z",
+      "title": "initial commit",
+      "files": [".gitattributes"],
+      "readmePresent": false,
+      "weightsPresent": false
+    },
+    {
+      "commit": "a1526c3d63740e460153987f9aaf6b86aa199dc1",
+      "date": "2022-08-28T18:35:24.000Z",
+      "title": "Initial commit of weights",
+      "files": [".gitattributes", "README.md", "pytorch_model.bin", "torchscript_model.bin"],
+      "readmePresent": true,
+      "weightsPresent": true
+    }
+  ],
+  "cardAndWeightsInSameCommit": true,
+  "filesAtPinnedRevision": [
+    ".gitattributes",
+    "README.md",
+    "pytorch_model.bin",
+    "torchscript_model.bin"
+  ],
+  "retainedModelCard": "vendor-license/MODEL-CARD-parseq-small.md",
+  "torchScriptFileSelected": false,
+  "otherRevisionsUsed": false,
+  "otherCandidatesUsed": false
+}
