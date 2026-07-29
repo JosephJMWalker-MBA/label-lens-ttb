@@ -1,0 +1,30 @@
+{
+  "artifact": "transform-spec",
+  "experimentId": "issue-149-parseq-compatibility-probe",
+  "verifiedFromPinnedSource": true,
+  "sourceFile": "strhub/data/module.py",
+  "sourceFunction": "SceneTextDataModule.get_transform",
+  "pinnedCommit": "1902db043c029a7e03a3818c616c06600af574be",
+  "verificationMethod": "Read directly from the pinned upstream source rather than copied from the task description.",
+  "intrinsicTransform": {
+    "colorSpace": "RGB",
+    "resize": { "height": 32, "width": 128, "interpolation": "BICUBIC" },
+    "toTensor": true,
+    "normalize": { "mean": 0.5, "std": 0.5 },
+    "augmentationApplied": false,
+    "rotationApplied": false
+  },
+  "confirmedOrder": [
+    "T.Resize(img_size, T.InterpolationMode.BICUBIC)",
+    "T.ToTensor()",
+    "T.Normalize(0.5, 0.5)"
+  ],
+  "modelInputDimensionsFromHubconf": {
+    "imgSize": "128x32",
+    "patchSize": "8x4",
+    "dModel": 384,
+    "source": "hubconf.py docstring for the `parseq` entry"
+  },
+  "matchesExpectedTransform": true,
+  "note": "The expected transform stated in the probe design is confirmed by the pinned source. This artifact records design verification only; no tensor was ever produced, because inference never ran."
+}

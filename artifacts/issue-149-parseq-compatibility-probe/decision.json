@@ -1,0 +1,70 @@
+{
+  "artifact": "decision",
+  "experimentId": "issue-149-parseq-compatibility-probe",
+  "issue": 149,
+  "evaluationOnly": true,
+  "gateOutcome": "BLOCKED_MODEL_LICENSE",
+  "compatibilityVerdict": null,
+  "compatibilityVerdictReason": "No compatibility verdict exists. The licensing gate precedes retrieval and it blocked, so the checkpoint was never downloaded and inference never ran. BLOCKED_MODEL_LICENSE is a gate outcome, not one of the four compatibility verdicts, and it is not evidence about the runtime.",
+  "checkpointRetrieved": false,
+  "containerBuilt": false,
+  "syntheticInputsGenerated": false,
+  "inferenceInvocations": 0,
+  "plannedInferenceInvocations": 4,
+  "licenseConclusion": {
+    "codeLicensing": "ESTABLISHED — Apache-2.0 with NOTICE attribution; bundled abinet and crnn components under BSD and MIT.",
+    "checkpointLicensing": "NOT ESTABLISHED for the exact selected artifact parseq-bb5792a6.pt.",
+    "repositoryLicenseFileAloneUsedAsInference": false,
+    "readmeLicenseSentenceScope": "code",
+    "releaseBodyLicenseStatement": false,
+    "modelCardInRepository": false,
+    "authorHuggingFaceCardsApache2": true,
+    "authorHuggingFaceCardsCoverSelectedArtifact": false,
+    "gapDescription": "The author's Apache-2.0 model cards attach to baudm/parseq-small and baudm/parseq-tiny, whose files are pytorch_model.bin and torchscript_model.bin. The selected artifact is the GitHub release asset parseq-bb5792a6.pt. Bridging them requires inferring across three naming systems (hubconf `parseq` base d_model=384, paper PARSeq-S, HF `parseq-small`) and a container-format change, which cannot be confirmed without downloading the forbidden substitute and would not establish identity even then."
+  },
+  "separateConcernRecorded": {
+    "trainingCorpusTerms": "The v1.0.0 release names COCO, RCTW17, Uber, ArT, LSVT, MLT19, ReCTS, TextOCR and OpenVINO as training data. Several datasets in that family carry research-only or non-commercial terms. An Apache-2.0 grant on the weights would not by itself resolve whether such weights may be used in a regulatory compliance product.",
+    "resolvedHere": false
+  },
+  "verifiedFindings": [
+    "Pinned code revision 1902db043c029a7e03a3818c616c06600af574be exists and is dated 2024-04-24.",
+    "The v1.0.0 tag targets commit 315d19be8ef473a864950ab497a649a69e37c6a4, confirming the corrected value and refuting 315d19b88931758c5c36395b086e115049386d49.",
+    "The release asset parseq-bb5792a6.pt is published at 95,392,675 bytes.",
+    "The pinned tree contains exactly four licence-bearing files and no model card.",
+    "The intrinsic transform is confirmed from the pinned source: RGB, resize 32x128 bicubic, ToTensor, Normalize(0.5, 0.5)."
+  ],
+  "absentArtifacts": {
+    "runtime-provenance.json": "not produced — no container was built",
+    "dependency-lock.json": "not produced — no dependency resolution ran",
+    "container-provenance.json": "not produced — no container was built",
+    "font-provenance.json": "not produced — no font package was installed",
+    "synthetic-input-spec.json": "not produced — no image was generated",
+    "synthetic/positive.png": "not produced",
+    "synthetic/blank.png": "not produced",
+    "invocation-matrix.json": "not produced — no invocation ran",
+    "raw logits and descriptors": "not produced — no inference ran",
+    "token/probability output": "not produced — no inference ran",
+    "run-results.json": "not produced",
+    "determinism-report.json": "not produced — determinism requires two runs, and none ran",
+    "output-risk-report.json": "not produced — no output exists to assess",
+    "resource-report.json": "not produced — no latency or memory was measured",
+    "policy": "These are deliberately absent rather than emitted empty or synthesised. Nothing in this package reports a measurement that was not taken."
+  },
+  "outputRiskFlags": {
+    "positiveTranscriptExact": null,
+    "blankTranscriptEmpty": null,
+    "blankProducedUnsupportedText": null,
+    "modelHasNaturalAbstention": null,
+    "confidenceInterpretationKnown": null,
+    "note": "All null: no inference ran, so none of these is assessable. modelHasNaturalAbstention and confidenceInterpretationKnown in particular remain open design questions about PARSeq that this probe did not reach."
+  },
+  "frozenBrandBenchmarkEligible": false,
+  "frozenBrandBenchmarkReason": "Eligibility requires a COMPATIBLE verdict. None exists.",
+  "claimsNotMade": [
+    "No claim that PARSeq is or is not compatible with a pinned CPU runtime.",
+    "No claim about PARSeq recognition capability, Brand accuracy, or comparison with Tesseract.",
+    "No claim that the weights are unlicensed — only that an explicit grant could not be tied to the exact artifact.",
+    "No production suitability, latency, or authorization claim of any kind."
+  ],
+  "requiredNextStep": "An owner decision on licensing. See license-audit.md for the four unblocking paths, in decreasing order of strength. Nothing further should be built until one of them is taken."
+}
