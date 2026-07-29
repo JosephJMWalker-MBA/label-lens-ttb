@@ -1,0 +1,41 @@
+{
+  "invocation": "A-item-7b5cdce6d1ff-repeat",
+  "arm": "A",
+  "engine": "tesseract.js@7.0.0/eng/OEM1",
+  "psm": 11,
+  "opaqueItemId": "item-7b5cdce6d1ff",
+  "inputSha256": "ce5b99dc782cf2d893c35be8dea88e7bcddc09f0859183e8ff13f4dc3e6a67a1",
+  "words": [
+    {
+      "text": "FAT",
+      "confidence": 38,
+      "bbox": {
+        "x0": 301,
+        "y0": 627,
+        "x1": 698,
+        "y1": 864
+      }
+    },
+    {
+      "text": "TORIA",
+      "confidence": 38,
+      "bbox": {
+        "x0": 842,
+        "y0": 619,
+        "x1": 1656,
+        "y1": 864
+      }
+    },
+    {
+      "text": "Lo",
+      "confidence": 22,
+      "bbox": {
+        "x0": 754,
+        "y0": 83,
+        "x1": 1707,
+        "y1": 561
+      }
+    }
+  ],
+  "rawTranscript": "Lo FAT TORIA"
+}

@@ -1,0 +1,31 @@
+{
+  "invocation": "A-item-6db972c3416b-repeat",
+  "arm": "A",
+  "engine": "tesseract.js@7.0.0/eng/OEM1",
+  "psm": 11,
+  "opaqueItemId": "item-6db972c3416b",
+  "inputSha256": "8746c2c0a4f73b9fd1208cd941aece76519c76a162086eecb0063c150ebabdb9",
+  "words": [
+    {
+      "text": "Dig",
+      "confidence": 62,
+      "bbox": {
+        "x0": 37,
+        "y0": 47,
+        "x1": 218,
+        "y1": 154
+      }
+    },
+    {
+      "text": "Colles",
+      "confidence": 24,
+      "bbox": {
+        "x0": 245,
+        "y0": 36,
+        "x1": 461,
+        "y1": 116
+      }
+    }
+  ],
+  "rawTranscript": "Colles Dig"
+}

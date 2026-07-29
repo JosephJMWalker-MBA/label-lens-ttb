@@ -1,0 +1,81 @@
+{
+  "artifact": "decision",
+  "experimentId": "issue-149-brand-native-tesseract-model-attribution",
+  "evaluationOnly": true,
+  "corpusScope": "frozen governed stylized Brand subset only",
+  "productionChanged": false,
+  "gates": [
+    {
+      "gate": "preregistration-frozen",
+      "status": "PASS",
+      "detail": "expected b1ffe9839839cb7711fc7d3f5eced820b73fa3585d76f002b50d434bfda20144"
+    },
+    {
+      "gate": "runner-native-amd64",
+      "status": "PASS",
+      "detail": "uname -m = x86_64"
+    },
+    {
+      "gate": "integer-model-integrity",
+      "status": "PASS",
+      "detail": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747"
+    },
+    {
+      "gate": "float-model-integrity",
+      "status": "PASS",
+      "detail": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba"
+    },
+    {
+      "gate": "inference-input-hashes",
+      "status": "PASS",
+      "detail": "6 inputs verified against the freeze"
+    },
+    {
+      "gate": "no-production-or-fixture-changes",
+      "status": "PASS",
+      "detail": "clean"
+    }
+  ],
+  "counts": {
+    "historicalCases": 5,
+    "ocrItems": 6,
+    "distinctPreprocessedPixelSetsAtItemLevel": 5,
+    "distinctCropImagesAtCaseLevel": 4,
+    "distinctBrandDesigns": 3
+  },
+  "runtimeContrast": {
+    "decision": "RUNTIME_NO_EVIDENCE_OF_GAIN",
+    "improvedCropClusters": 0,
+    "improvedDesignClusters": 0,
+    "regression": false,
+    "classifications": {
+      "NATIVE_RUNTIME_NO_EFFECT": 6
+    }
+  },
+  "modelContrast": {
+    "decision": "FLOAT_MODEL_NO_EVIDENCE_OF_GAIN",
+    "improvedCropClusters": 0,
+    "improvedDesignClusters": 0,
+    "regression": false,
+    "classifications": {
+      "FLOAT_MODEL_NO_EFFECT": 6
+    }
+  },
+  "bundledStackComparison": {
+    "arms": ["A", "C"],
+    "reportedDescriptivelyOnly": true,
+    "causalClaim": false
+  },
+  "overallNextStep": "STOP_TESSERACT_TUNING_ON_THIS_SUBSET_AUTHORIZE_MODERN_RECOGNIZER_PLANNING",
+  "allDeterministic": true,
+  "anyProcessFailure": false,
+  "newFalseReliableReadsVersusIncumbent": 0,
+  "falseReliableReadIsPrimaryVeto": true,
+  "claimsNotMade": [
+    "No population accuracy, prevalence, or production-rate claim.",
+    "No final engine-selection decision.",
+    "No production suitability or Render resource claim.",
+    "No universal Tesseract capability ceiling.",
+    "No authorization for production replacement or shadow mode."
+  ]
+}

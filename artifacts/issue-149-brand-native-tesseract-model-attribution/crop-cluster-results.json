@@ -1,0 +1,66 @@
+{
+  "artifact": "crop-cluster-results",
+  "experimentId": "issue-149-brand-native-tesseract-model-attribution",
+  "distinctCropImagesAtCaseLevel": 4,
+  "rule": "Duplicate crop evidence counts once.",
+  "runtimeContrast": [
+    {
+      "clusterId": "C1",
+      "members": ["item-cb35adee2cf8", "item-7b5cdce6d1ff"],
+      "memberClassifications": ["NATIVE_RUNTIME_NO_EFFECT", "NATIVE_RUNTIME_NO_EFFECT"],
+      "clusterClassification": "NATIVE_RUNTIME_NO_EFFECT",
+      "countsOnce": true
+    },
+    {
+      "clusterId": "C2",
+      "members": ["item-64a8d5e551a5"],
+      "memberClassifications": ["NATIVE_RUNTIME_NO_EFFECT"],
+      "clusterClassification": "NATIVE_RUNTIME_NO_EFFECT",
+      "countsOnce": true
+    },
+    {
+      "clusterId": "C3",
+      "members": ["item-710d87caca47"],
+      "memberClassifications": ["NATIVE_RUNTIME_NO_EFFECT"],
+      "clusterClassification": "NATIVE_RUNTIME_NO_EFFECT",
+      "countsOnce": true
+    },
+    {
+      "clusterId": "C4",
+      "members": ["item-79aa3241d939", "item-6db972c3416b"],
+      "memberClassifications": ["NATIVE_RUNTIME_NO_EFFECT", "NATIVE_RUNTIME_NO_EFFECT"],
+      "clusterClassification": "NATIVE_RUNTIME_NO_EFFECT",
+      "countsOnce": true
+    }
+  ],
+  "modelContrast": [
+    {
+      "clusterId": "C1",
+      "members": ["item-cb35adee2cf8", "item-7b5cdce6d1ff"],
+      "memberClassifications": ["FLOAT_MODEL_NO_EFFECT", "FLOAT_MODEL_NO_EFFECT"],
+      "clusterClassification": "FLOAT_MODEL_NO_EFFECT",
+      "countsOnce": true
+    },
+    {
+      "clusterId": "C2",
+      "members": ["item-64a8d5e551a5"],
+      "memberClassifications": ["FLOAT_MODEL_NO_EFFECT"],
+      "clusterClassification": "FLOAT_MODEL_NO_EFFECT",
+      "countsOnce": true
+    },
+    {
+      "clusterId": "C3",
+      "members": ["item-710d87caca47"],
+      "memberClassifications": ["FLOAT_MODEL_NO_EFFECT"],
+      "clusterClassification": "FLOAT_MODEL_NO_EFFECT",
+      "countsOnce": true
+    },
+    {
+      "clusterId": "C4",
+      "members": ["item-79aa3241d939", "item-6db972c3416b"],
+      "memberClassifications": ["FLOAT_MODEL_NO_EFFECT", "FLOAT_MODEL_NO_EFFECT"],
+      "clusterClassification": "FLOAT_MODEL_NO_EFFECT",
+      "countsOnce": true
+    }
+  ]
+}

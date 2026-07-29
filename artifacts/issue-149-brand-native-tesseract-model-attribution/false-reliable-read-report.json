@@ -1,0 +1,159 @@
+{
+  "artifact": "false-reliable-read-report",
+  "experimentId": "issue-149-brand-native-tesseract-model-attribution",
+  "status": "exploratory — derived from the existing selector; cross-runtime confidence comparability is not proven",
+  "perArmItem": [
+    {
+      "opaqueItemId": "item-cb35adee2cf8",
+      "caseId": "approved-wine-004",
+      "arm": "A",
+      "selectedCandidate": "FAT TORIA",
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    },
+    {
+      "opaqueItemId": "item-cb35adee2cf8",
+      "caseId": "approved-wine-004",
+      "arm": "B",
+      "selectedCandidate": "FAT TORIA",
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    },
+    {
+      "opaqueItemId": "item-cb35adee2cf8",
+      "caseId": "approved-wine-004",
+      "arm": "C",
+      "selectedCandidate": "FAT TORIA",
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    },
+    {
+      "opaqueItemId": "item-64a8d5e551a5",
+      "caseId": "approved-wine-005",
+      "arm": "A",
+      "selectedCandidate": "GATT",
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    },
+    {
+      "opaqueItemId": "item-64a8d5e551a5",
+      "caseId": "approved-wine-005",
+      "arm": "B",
+      "selectedCandidate": "GATT",
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    },
+    {
+      "opaqueItemId": "item-64a8d5e551a5",
+      "caseId": "approved-wine-005",
+      "arm": "C",
+      "selectedCandidate": "GATT",
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    },
+    {
+      "opaqueItemId": "item-710d87caca47",
+      "caseId": "approved-wine-031",
+      "arm": "A",
+      "selectedCandidate": "enheesO",
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    },
+    {
+      "opaqueItemId": "item-710d87caca47",
+      "caseId": "approved-wine-031",
+      "arm": "B",
+      "selectedCandidate": "enheesO",
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    },
+    {
+      "opaqueItemId": "item-710d87caca47",
+      "caseId": "approved-wine-031",
+      "arm": "C",
+      "selectedCandidate": "enheesO",
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    },
+    {
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "caseId": "la-fattoria-rotated",
+      "arm": "A",
+      "selectedCandidate": "FAT TORIA",
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    },
+    {
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "caseId": "la-fattoria-rotated",
+      "arm": "B",
+      "selectedCandidate": "FAT TORIA",
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    },
+    {
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "caseId": "la-fattoria-rotated",
+      "arm": "C",
+      "selectedCandidate": "FAT TORIA",
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    },
+    {
+      "opaqueItemId": "item-79aa3241d939",
+      "caseId": "wine-multi-artifact-04",
+      "arm": "A",
+      "selectedCandidate": null,
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    },
+    {
+      "opaqueItemId": "item-79aa3241d939",
+      "caseId": "wine-multi-artifact-04",
+      "arm": "B",
+      "selectedCandidate": null,
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    },
+    {
+      "opaqueItemId": "item-79aa3241d939",
+      "caseId": "wine-multi-artifact-04",
+      "arm": "C",
+      "selectedCandidate": null,
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    },
+    {
+      "opaqueItemId": "item-6db972c3416b",
+      "caseId": "wine-multi-artifact-04",
+      "arm": "A",
+      "selectedCandidate": "Colles",
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    },
+    {
+      "opaqueItemId": "item-6db972c3416b",
+      "caseId": "wine-multi-artifact-04",
+      "arm": "B",
+      "selectedCandidate": "Colles",
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    },
+    {
+      "opaqueItemId": "item-6db972c3416b",
+      "caseId": "wine-multi-artifact-04",
+      "arm": "C",
+      "selectedCandidate": "Colles",
+      "candidateCorrect": false,
+      "falseReliableRead": false
+    }
+  ],
+  "countsByArm": {
+    "A": 0,
+    "B": 0,
+    "C": 0
+  },
+  "newFalseReliableReadsVersusIncumbent": 0,
+  "newEntries": [],
+  "isPrimarySafetyVeto": true
+}

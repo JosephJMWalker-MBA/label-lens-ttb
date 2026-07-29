@@ -1,0 +1,49 @@
+{
+  "artifact": "configuration-isolation",
+  "experimentId": "issue-149-brand-native-tesseract-model-attribution",
+  "contrasts": [
+    {
+      "id": "runtime",
+      "arms": ["A", "B"],
+      "changedDimension": "recognition runtime (tesseract.js WASM -> native Tesseract)",
+      "heldConstant": [
+        "preprocessed crop PNG bytes",
+        "traineddata bytes",
+        "OEM 1",
+        "PSM 11",
+        "no DPI flag",
+        "language eng"
+      ],
+      "singleVariable": true
+    },
+    {
+      "id": "model",
+      "arms": ["B", "C"],
+      "changedDimension": "traineddata weights (integer-quantized -> float tessdata_best)",
+      "heldConstant": [
+        "native runtime and binary",
+        "preprocessed crop PNG bytes",
+        "OEM 1",
+        "PSM 11",
+        "no DPI flag",
+        "configs/tsv",
+        "container limits, locale, thread limits"
+      ],
+      "singleVariable": true
+    },
+    {
+      "id": "bundled-stack",
+      "arms": ["A", "C"],
+      "changedDimension": "runtime AND weights together",
+      "singleVariable": false,
+      "reportingRule": "Descriptive only. Arm A versus Arm C is a bundled stack comparison and is never treated as a single-variable causal contrast."
+    }
+  ],
+  "noFourthArm": true,
+  "noModelSweep": true,
+  "noPsmSweep": true,
+  "noPreprocessingVariant": true,
+  "noScaleVariant": true,
+  "noEnsemble": true,
+  "noBestOfN": true
+}

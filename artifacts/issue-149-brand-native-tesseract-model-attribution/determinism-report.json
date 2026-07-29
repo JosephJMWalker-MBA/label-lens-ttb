@@ -1,0 +1,97 @@
+{
+  "artifact": "determinism-report",
+  "experimentId": "issue-149-brand-native-tesseract-model-attribution",
+  "perArmItem": [
+    {
+      "opaqueItemId": "item-cb35adee2cf8",
+      "arm": "A",
+      "deterministic": true
+    },
+    {
+      "opaqueItemId": "item-cb35adee2cf8",
+      "arm": "B",
+      "deterministic": true
+    },
+    {
+      "opaqueItemId": "item-cb35adee2cf8",
+      "arm": "C",
+      "deterministic": true
+    },
+    {
+      "opaqueItemId": "item-64a8d5e551a5",
+      "arm": "A",
+      "deterministic": true
+    },
+    {
+      "opaqueItemId": "item-64a8d5e551a5",
+      "arm": "B",
+      "deterministic": true
+    },
+    {
+      "opaqueItemId": "item-64a8d5e551a5",
+      "arm": "C",
+      "deterministic": true
+    },
+    {
+      "opaqueItemId": "item-710d87caca47",
+      "arm": "A",
+      "deterministic": true
+    },
+    {
+      "opaqueItemId": "item-710d87caca47",
+      "arm": "B",
+      "deterministic": true
+    },
+    {
+      "opaqueItemId": "item-710d87caca47",
+      "arm": "C",
+      "deterministic": true
+    },
+    {
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "arm": "A",
+      "deterministic": true
+    },
+    {
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "arm": "B",
+      "deterministic": true
+    },
+    {
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "arm": "C",
+      "deterministic": true
+    },
+    {
+      "opaqueItemId": "item-79aa3241d939",
+      "arm": "A",
+      "deterministic": true
+    },
+    {
+      "opaqueItemId": "item-79aa3241d939",
+      "arm": "B",
+      "deterministic": true
+    },
+    {
+      "opaqueItemId": "item-79aa3241d939",
+      "arm": "C",
+      "deterministic": true
+    },
+    {
+      "opaqueItemId": "item-6db972c3416b",
+      "arm": "A",
+      "deterministic": true
+    },
+    {
+      "opaqueItemId": "item-6db972c3416b",
+      "arm": "B",
+      "deterministic": true
+    },
+    {
+      "opaqueItemId": "item-6db972c3416b",
+      "arm": "C",
+      "deterministic": true
+    }
+  ],
+  "allDeterministic": true
+}

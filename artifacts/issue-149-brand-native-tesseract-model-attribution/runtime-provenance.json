@@ -1,0 +1,50 @@
+{
+  "artifact": "runtime-provenance",
+  "experimentId": "issue-149-brand-native-tesseract-model-attribution",
+  "armA": {
+    "engine": "tesseract.js@7.0.0 / tesseract.js-core@7.0.0",
+    "oem": 1,
+    "psm": 11,
+    "dpiFlag": "none — the incumbent evaluation path sets no DPI, so no arm sets one",
+    "executionPath": "in-process on the runner, via createLocalOcrEngine().recognizeWords"
+  },
+  "armsBC": {
+    "engine": "native Tesseract 5.3.0",
+    "oem": 1,
+    "psm": 11,
+    "dpiFlag": "none",
+    "imageTag": "issue-149-brand-attribution:native",
+    "imageId": "sha256:ecdb113ce0880163f2487bf2c769810f61115fb7d336796e62cba58926b97bf8",
+    "baseReference": "node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3",
+    "baseAmd64ImageId": "sha256:bd16adabad7619222d4d0ab2d61f48391dacde03ad93f54d344683e326cbd0e2",
+    "binarySha256": "1e8c7ce7f27d2d1c902fb648efed443483f2a8fc7b60c48a5d3b61d647a2649e",
+    "binaryMatchesAttempt3": true,
+    "dpkgVersions": "liblept5=1.82.0-3+b3\nlibtesseract5=5.3.0-2\ntesseract-ocr=5.3.0-2\ntime=1.9-0.2",
+    "pinsReproduced": true,
+    "tsvConfigPath": "/usr/share/tesseract-ocr/5/tessdata/configs/tsv",
+    "tsvConfigSha256": "59d079bb75d8b3d7c839a3564580cb559e362c93a9d70f234e421c0c3e767e04",
+    "tsvConfigMatchesAttempt3": true,
+    "container": {
+      "cpus": "1",
+      "memory": "2g",
+      "timeoutSeconds": 120,
+      "network": "none",
+      "env": {
+        "LC_ALL": "C",
+        "LANG": "C",
+        "OMP_THREAD_LIMIT": "1",
+        "OMP_NUM_THREADS": "1"
+      }
+    }
+  },
+  "runner": {
+    "arch": "x86_64",
+    "nativeAmd64": true,
+    "unameAll": "Linux runnervmvrwv9 6.17.0-1020-azure #20~24.04.1-Ubuntu SMP Fri Jun 19 20:09:14 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+    "nproc": "4",
+    "memoryBytes": "16766423040",
+    "imageOs": "ubuntu24",
+    "imageVersion": "20260720.247.2",
+    "githubRunId": "30493158551"
+  }
+}
