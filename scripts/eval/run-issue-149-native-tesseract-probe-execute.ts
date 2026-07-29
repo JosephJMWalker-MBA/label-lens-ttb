@@ -176,7 +176,7 @@ function main() {
   const pins = pinsPresent ? JSON.parse(readFileSync(PINS_FILE, "utf8")) : null;
   const pinsConcrete =
     pinsPresent &&
-    [pins.tesseract, pins.libtesseract, pins.leptonica].every(
+    [pins.tesseract, pins.libtesseract, pins.leptonica, pins.time].every(
       (entry: { package?: string; version?: string } | undefined) =>
         Boolean(entry?.package) &&
         Boolean(entry?.version) &&
@@ -253,6 +253,8 @@ function main() {
     `LIBTESSERACT_VERSION=${pins.libtesseract.version}`,
     "--build-arg",
     `LEPTONICA_VERSION=${pins.leptonica.version}`,
+    "--build-arg",
+    `TIME_VERSION=${pins.time.version}`,
     "-t",
     IMAGE_TAG,
     ".",

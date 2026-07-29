@@ -22,16 +22,22 @@ FROM --platform=linux/amd64 node:22-bookworm-slim@sha256:6c74791e557ce11fc957704
 # policy` run inside this pinned base. An unpinned `apt-get install` would
 # silently float the recognizer version between builds, which would void the
 # "one pinned native runtime" property this probe exists to establish.
+# Package NAMES were discovered from `apt-cache depends` inside this exact
+# pinned base (discovery run 30474266684), not guessed. The runtime Leptonica
+# package in bookworm is `liblept5`, not a -dev package.
 ARG TESSERACT_VERSION
 ARG LIBTESSERACT_VERSION
 ARG LEPTONICA_VERSION
+ARG TIME_VERSION
 
 RUN test -n "${TESSERACT_VERSION}" \
       || (echo "BUILD_ARG_REQUIRED: TESSERACT_VERSION" >&2; exit 1) \
  && test -n "${LIBTESSERACT_VERSION}" \
       || (echo "BUILD_ARG_REQUIRED: LIBTESSERACT_VERSION" >&2; exit 1) \
  && test -n "${LEPTONICA_VERSION}" \
-      || (echo "BUILD_ARG_REQUIRED: LEPTONICA_VERSION" >&2; exit 1)
+      || (echo "BUILD_ARG_REQUIRED: LEPTONICA_VERSION" >&2; exit 1) \
+ && test -n "${TIME_VERSION}" \
+      || (echo "BUILD_ARG_REQUIRED: TIME_VERSION" >&2; exit 1)
 
 # Exactly one native Tesseract package version. No language packs are installed:
 # the probe supplies `eng` itself through a read-only TESSDATA_PREFIX mount, so
@@ -40,8 +46,8 @@ RUN apt-get update \
  && apt-get install --no-install-recommends -y \
       "tesseract-ocr=${TESSERACT_VERSION}" \
       "libtesseract5=${LIBTESSERACT_VERSION}" \
-      "libleptonica-dev=${LEPTONICA_VERSION}" \
-      time \
+      "liblept5=${LEPTONICA_VERSION}" \
+      "time=${TIME_VERSION}" \
  && rm -rf /var/lib/apt/lists/*
 
 # Record the runtime inventory inside the image so it can be read back out
@@ -54,7 +60,7 @@ RUN set -eu; \
       echo "tesseract_sha256=$(sha256sum "$(command -v tesseract)" | cut -d' ' -f1)"; \
       echo "ldd<<EOF"; ldd "$(command -v tesseract)" 2>&1; echo "EOF"; \
       echo "dpkg<<EOF"; dpkg-query -W -f='${Package}=${Version}\n' \
-        tesseract-ocr libtesseract5 libleptonica-dev time 2>&1; echo "EOF"; \
+        tesseract-ocr libtesseract5 liblept5 time 2>&1; echo "EOF"; \
       echo "arch=$(dpkg --print-architecture)"; \
       echo "uname=$(uname -m)"; \
     } > /probe/runtime-inventory.txt
