@@ -1,0 +1,44 @@
+{
+  "artifact": "synthetic-input-spec",
+  "experimentId": "issue-149-parseq-hf-compatibility-probe",
+  "generator": "scripts/eval/parseq/generate_synthetic_inputs.py",
+  "renderer": "Pillow ImageDraw.text with a real TrueType font",
+  "manuallyConstructedGlyphs": false,
+  "font": {
+    "package": "fonts-dejavu-core",
+    "path": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    "sha256": "abdc775b21b1bc470d50c97e790d276f2054b7504e56e5bd3e64f48d68582322",
+    "license": "DejaVu Fonts License (Bitstream Vera derived), permissive"
+  },
+  "canvas": {
+    "width": 640,
+    "height": 96
+  },
+  "fontSize": 48,
+  "textOrigin": {
+    "x": 24,
+    "y": 20
+  },
+  "background": [255, 255, 255],
+  "foreground": [0, 0, 0],
+  "pngEncoding": {
+    "optimize": false,
+    "compress_level": 9
+  },
+  "pillowVersion": "10.2.0",
+  "deterministicRegenerationVerified": true,
+  "expectedPositiveTranscript": "LABEL LENS 123",
+  "expectedBlankTranscript": "",
+  "images": {
+    "positive": {
+      "sha256": "265aaae73d65a04fe58441ccc1e1c67e15ca707b89fe312ca80c8aceb85831a0",
+      "bytes": 5029,
+      "text": "LABEL LENS 123"
+    },
+    "blank": {
+      "sha256": "26daf63d1830f5af6375d1be855f6ce7a7daba20994a667951d38da0d604fd48",
+      "bytes": 384,
+      "text": null
+    }
+  }
+}

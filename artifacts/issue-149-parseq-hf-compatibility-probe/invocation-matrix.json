@@ -1,0 +1,50 @@
+{
+  "artifact": "invocation-matrix",
+  "experimentId": "issue-149-parseq-hf-compatibility-probe",
+  "plannedInvocations": 4,
+  "matrix": [
+    {
+      "image": "positive",
+      "run": "primary"
+    },
+    {
+      "image": "positive",
+      "run": "repeat"
+    },
+    {
+      "image": "blank",
+      "run": "primary"
+    },
+    {
+      "image": "blank",
+      "run": "repeat"
+    }
+  ],
+  "decoding": {
+    "decodeAr": true,
+    "refineIters": 1,
+    "mode": "greedy-argmax",
+    "evalMode": true,
+    "device": "cpu",
+    "sampling": false,
+    "beamSearch": false,
+    "bestOfN": false,
+    "alternateDecodingArm": false
+  },
+  "modelLoadPolicy": "One model load per container invocation of run_probe.py; all four invocations share that single loaded model. modelLoadMs is recorded and is explicitly EXCLUDED from per-invocation latencyMs.",
+  "prohibited": [
+    "third invocation",
+    "retry with changed settings",
+    "alternate model",
+    "alternate transform",
+    "alternate decoder"
+  ],
+  "hardening": {
+    "network": "none",
+    "modelMount": "read-only",
+    "inputMount": "read-only",
+    "repositoryRootMounted": false,
+    "corpusMounted": false,
+    "fixtureTruthMounted": false
+  }
+}

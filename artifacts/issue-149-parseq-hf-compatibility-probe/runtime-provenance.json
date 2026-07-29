@@ -1,0 +1,44 @@
+{
+  "artifact": "runtime-provenance",
+  "experimentId": "issue-149-parseq-hf-compatibility-probe",
+  "executionHost": "GitHub-hosted ubuntu-latest, native linux/amd64",
+  "discoveryRunId": 30498464410,
+  "python": "Python 3.11.15",
+  "torch": "2.2.1+cpu",
+  "torchvision": "0.17.1+cpu",
+  "parseqCommit": "1902db043c029a7e03a3818c616c06600af574be",
+  "builtImageId": "sha256:1770bb301d4449ba73f7a7402914e64027c4a860a7dd048b6d9e645f4a792b56",
+  "evaluationOnly": true,
+  "deterministicSettings": {
+    "torchManualSeed": 0,
+    "numpySeed": 0,
+    "useDeterministicAlgorithms": true,
+    "torchNumThreads": 1,
+    "cudnnBenchmark": false,
+    "PYTHONHASHSEED": 0,
+    "OMP_NUM_THREADS": 1,
+    "MKL_NUM_THREADS": 1,
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8"
+  },
+  "inferenceHardening": {
+    "network": "none",
+    "modelMount": "read-only",
+    "inputMount": "read-only",
+    "repositoryRootMounted": false,
+    "corpusMounted": false,
+    "fixtureTruthMounted": false,
+    "cpus": "2",
+    "memory": "6g"
+  },
+  "offlineFlags": {
+    "HF_HUB_OFFLINE": "1",
+    "TRANSFORMERS_OFFLINE": "1"
+  },
+  "productionUnchanged": {
+    "srcDir": false,
+    "productionDockerfile": false,
+    "renderConfig": false,
+    "nextConfig": false,
+    "applicationDependencies": false
+  }
+}

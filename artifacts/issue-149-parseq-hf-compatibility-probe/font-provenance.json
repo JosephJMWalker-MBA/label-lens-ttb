@@ -1,0 +1,15 @@
+{
+  "artifact": "font-provenance",
+  "experimentId": "issue-149-parseq-hf-compatibility-probe",
+  "package": "fonts-dejavu-core",
+  "packageVersion": "2.37-6",
+  "resolvedInsidePinnedBase": true,
+  "fontPath": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+  "fontSha256": "abdc775b21b1bc470d50c97e790d276f2054b7504e56e5bd3e64f48d68582322",
+  "fontLicense": "DejaVu Fonts License (Bitstream Vera derived) — permissive, license-compatible",
+  "realFontUsed": true,
+  "manuallyConstructedGlyphs": false,
+  "renderer": "Pillow 10.2.0 ImageDraw.text with ImageFont.truetype",
+  "fontBinaryCommittedToGit": false,
+  "note": "The font ships in the pinned Debian package inside the research container. Its bytes are hashed but never committed to this repository."
+}
