@@ -1,0 +1,71 @@
+{
+  "experimentId": "issue-149-brand-duplicate-crop-adjudication",
+  "evaluationOnly": true,
+  "ocrRun": false,
+  "fixtureChanged": false,
+  "fixtureTruthChanged": false,
+  "productionChanged": false,
+  "priorFrozenArtifactsUnchanged": true,
+  "pr195Untouched": true,
+  "classification": "DISTINCT_SOURCE_SAME_CROP",
+  "evidenceConfidence": "high",
+  "rationale": "The two cases have different source images, each committed crop reproduces exactly from its own source and geometry, and the two independent recomputations land on identical pixels.",
+  "areSourceImagesIdentical": false,
+  "areCropRectanglesIdentical": true,
+  "areCommittedCropsIdentical": true,
+  "areRecomputedCropsIdentical": true,
+  "committedMatchesOwnRecomputation": { "approved-wine-004": true, "la-fattoria-rotated": true },
+  "isEitherCaseStaleOrMisMapped": false,
+  "mayBothCasesRemainInLaterExperiment": true,
+  "eligibleDistinctImageDenominator": {
+    "stylizationAuditCases": 5,
+    "distinctSourceImages": 5,
+    "distinctCommittedCropImages": 4,
+    "note": "The five stylization cases have five distinct source images but only four distinct Brand crop images, because two cases crop to identical pixels.",
+    "denominatorForIndependentCropEvidence": 4,
+    "designLevelObservation": {
+      "distinctBrandDesigns": 3,
+      "basis": "Visual inspection of the recomputed crops, not a hash: approved-wine-004, la-fattoria-rotated, and approved-wine-005 all render the same producer's Brand mark. The first two are pixel-identical; the third is the same artwork at a different image scale, so it is a genuinely distinct crop image but not an independent Brand design.",
+      "caution": "A recognizer comparison over the stylization subset therefore sees 4 distinct crop images spanning only 3 distinct Brand designs. Treat design-level independence, not just crop-level distinctness, when sizing any later claim.",
+      "hashEvidence": false
+    }
+  },
+  "requiredCorrectiveAction": "None to fixtures or artifacts. Future analysis must count these two cases as one independent crop observation, and any experiment design over the stylization subset must state a distinct-crop denominator of 4.",
+  "supportingEvidence": {
+    "regionGeometryIdentical": true,
+    "sourcePixelsIdentical": false,
+    "sourceDifferenceAnalysis": {
+      "comparable": true,
+      "decodedSize": { "width": 1350, "height": 1650, "channels": 4 },
+      "totalPixels": 2227500,
+      "differingPixels": 179430,
+      "differingPixelPercent": 8.0552,
+      "cropPixels": 212520,
+      "differingPixelsInsideApprovedCrop": 0,
+      "approvedCropRegionPixelIdentical": true,
+      "differenceBoundingBox": { "left": 49, "top": 53, "right": 1312, "bottom": 1588 },
+      "cropRect": { "left": 330, "top": 351, "width": 690, "height": 308 },
+      "interpretation": "The two labels are different images that share a pixel-identical approved Brand region; they differ only outside it."
+    },
+    "mirrorValidation": {
+      "totalGovernedCrops": 11,
+      "reproducedByteForByte": 11,
+      "failedToReproduce": [],
+      "missingCommittedCrop": [],
+      "mirrorFaithful": true
+    },
+    "visualComparison": [
+      "artifacts/issue-149-brand-duplicate-crop-adjudication/visual-comparison/01-source-images.png",
+      "artifacts/issue-149-brand-duplicate-crop-adjudication/visual-comparison/02-approved-region-overlays.png",
+      "artifacts/issue-149-brand-duplicate-crop-adjudication/visual-comparison/03-committed-crops.png",
+      "artifacts/issue-149-brand-duplicate-crop-adjudication/visual-comparison/04-recomputed-crops.png"
+    ]
+  },
+  "boundaries": [
+    "Does not revisit the blinded reader's labels.",
+    "Does not change the historical 5/5 case-level audit result from PR #205.",
+    "Determines only how many independent images are eligible for future OCR experiments.",
+    "No prevalence, causal, or capability-ceiling claim.",
+    "No production behavior change."
+  ]
+}

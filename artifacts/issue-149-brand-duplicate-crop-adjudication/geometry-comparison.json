@@ -1,0 +1,38 @@
+{
+  "experimentId": "issue-149-brand-duplicate-crop-adjudication",
+  "caseA": {
+    "caseId": "approved-wine-004",
+    "sourceImageSize": { "width": 1350, "height": 1650 },
+    "sourceImageByteSize": 263094,
+    "region": {
+      "unit": "normalized-panel-relative",
+      "provenance": "human-approved-region",
+      "x": 0.25925925925925924,
+      "y": 0.21818181818181817,
+      "width": 0.48148148148148145,
+      "height": 0.17575757575757575,
+      "label": "sole visible brand occurrence"
+    },
+    "cropRect": { "left": 330, "top": 351, "width": 690, "height": 308 }
+  },
+  "caseB": {
+    "caseId": "la-fattoria-rotated",
+    "sourceImageSize": { "width": 1350, "height": 1650 },
+    "sourceImageByteSize": 235030,
+    "region": {
+      "unit": "normalized-panel-relative",
+      "provenance": "human-approved-region",
+      "x": 0.25925925925925924,
+      "y": 0.21818181818181817,
+      "width": 0.48148148148148145,
+      "height": 0.17575757575757575,
+      "label": "sole visible brand occurrence"
+    },
+    "cropRect": { "left": 330, "top": 351, "width": 690, "height": 308 }
+  },
+  "sourceImageSizesIdentical": true,
+  "sourceImageByteSizesIdentical": false,
+  "regionGeometryIdentical": true,
+  "cropRectsIdentical": true,
+  "paddingParameters": { "ratio": 0.03, "minPx": 4 }
+}

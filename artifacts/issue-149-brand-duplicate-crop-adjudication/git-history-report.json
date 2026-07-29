@@ -1,0 +1,93 @@
+{
+  "experimentId": "issue-149-brand-duplicate-crop-adjudication",
+  "method": "git log and pickaxe (-S) over the full history. Read-only; no history was rewritten and no commit was created by this step.",
+  "caseIdIntroduction": {
+    "approved-wine-004": {
+      "pickaxeTerm": "\"fixtureId\": \"approved-wine-004\"",
+      "commitsOldestFirst": [
+        "e9ee283 test(fixtures): add 110 approved wine screenshot assets and inventory",
+        "a63a3e5 Add governed OCR research platform",
+        "4aac539 Add governed OCR research platform (#197)",
+        "21e31cd Evaluate bounded Brand mild sharpening",
+        "2dcc26f Evaluate bounded Brand mild sharpening (#198)",
+        "e895eb4 Evaluate bounded Brand local contrast",
+        "f269a3c Evaluate bounded Brand local contrast (#199)",
+        "3c54849 Evaluate channel-preserving Brand Otsu threshold",
+        "552d303 Evaluate channel-preserving Brand Otsu threshold (#200)"
+      ]
+    },
+    "la-fattoria-rotated": {
+      "pickaxeTerm": "la-fattoria-rotated",
+      "commitsOldestFirst": [
+        "cadf483 feat(eval): measured extraction-accuracy harness and baseline (Issue #57)",
+        "5b35419 feat(eval): reconcile corpus inventory checkpoint",
+        "b937ef3 feat(eval): complete full wine corpus evaluation",
+        "492557d feat(eval): reconcile corpus inventory checkpoint",
+        "adef444 feat(eval): complete full wine corpus evaluation",
+        "71a79de feat(extractor): add bounded orientation and region recovery",
+        "2e0963f Core: add bounded orientation and region recovery (#76)",
+        "d3ab1b3 eval: add phase 5a diagnostic attribution",
+        "b5d9ab8 feat: separate OCR confidence from ranking semantics",
+        "1454bcb eval: add OCR region-isolation benchmark",
+        "c919f11 eval: add additive OCR region evidence",
+        "fff4194 eval: correct OCR benchmark accounting",
+        "e798938 eval: add stateless vision grid contract",
+        "e45c3b3 eval: harden stateless vision observer contract",
+        "f3690d0 fix(eval): unblock governed VLM region benchmark",
+        "bf16492 feat(eval): add semantic region survival diagnostic",
+        "3536762 docs(eval): publish semantic survival findings",
+        "acc4373 fix(eval): derive semantic outcomes from observed survival",
+        "e575ca6 feat(eval): add semantic region survival diagnostic (#132)",
+        "ca01cd6 fix(ocr): normalize dotted fused alcohol prefixes",
+        "5edec00 fix(ocr): normalize dotted fused alcohol prefixes (#150)",
+        "975ebee fix(ocr): recognize explicit ABV statements",
+        "8827ec2 fix(ocr): recognize explicit ABV statements (#151)",
+        "aeea075 docs(research): preserve alcohol OCR diagnosis and kill decision",
+        "a9fe943 docs(research): preserve alcohol OCR diagnosis and kill decision (#153)",
+        "accdaf1 docs(research): preserve brand evidence-path diagnosis",
+        "666fb8c docs(research): preserve brand OCR recognition diagnosis",
+        "152ec9c docs(research): preserve brand region-coverage diagnosis",
+        "a63a3e5 Add governed OCR research platform",
+        "4aac539 Add governed OCR research platform (#197)",
+        "21e31cd Evaluate bounded Brand mild sharpening",
+        "2dcc26f Evaluate bounded Brand mild sharpening (#198)",
+        "e895eb4 Evaluate bounded Brand local contrast",
+        "f269a3c Evaluate bounded Brand local contrast (#199)",
+        "3c54849 Evaluate channel-preserving Brand Otsu threshold",
+        "552d303 Evaluate channel-preserving Brand Otsu threshold (#200)",
+        "49c69c9 Reconcile production parity baseline",
+        "5d22a6b Reconcile stale full-corpus production parity baseline (#201)",
+        "ecf0ec6 Add missing issue-149 alcohol-reselection experiment artifacts",
+        "4fe681a Evaluate Alcohol recovery-pass reselection (#202)",
+        "0bac15e Prepare blinded Brand mechanism audit packet",
+        "8b36245 Prepare blinded Brand mechanism audit packet (#204)",
+        "f0a8644 Record blinded Brand mechanism audit results",
+        "9b02a55 Record blinded Brand mechanism audit results (#205)"
+      ]
+    }
+  },
+  "sourceImageHistory": {
+    "tests/fixtures/precheck/approved-wine-004/label.png": [
+      "e9ee283 test(fixtures): add 110 approved wine screenshot assets and inventory"
+    ],
+    "tests/fixtures/precheck/approved-wine-003/label.png": [
+      "e9ee283 test(fixtures): add 110 approved wine screenshot assets and inventory"
+    ]
+  },
+  "governedManifestHistory": ["4aac539 Add governed OCR research platform (#197)"],
+  "committedCropHistory": ["552d303 Evaluate channel-preserving Brand Otsu threshold (#200)"],
+  "legacyEvaluationManifest": {
+    "path": "src/fixtures/eval/eval-manifest.json",
+    "note": "la-fattoria-rotated is a legacy evaluation case ID that predates the numbered corpus and is bound to tests/fixtures/precheck/approved-wine-003/label.png. No case ID named after that image directory exists in the legacy manifest, so the legacy ID is that image's only case identity.",
+    "history": [
+      "9ecd7b2 fix(corpus): correct three alcohol fixture truths (#152)",
+      "2e0963f Core: add bounded orientation and region recovery (#76)",
+      "1933665 feat(extractor): improve brand reconstruction and ranking",
+      "40621ef fix(eval): expose full corpus report metrics",
+      "adef444 feat(eval): complete full wine corpus evaluation",
+      "863740f feat(eval): expand reviewed wine corpus cases",
+      "492557d feat(eval): reconcile corpus inventory checkpoint",
+      "cadf483 feat(eval): measured extraction-accuracy harness and baseline (Issue #57)"
+    ]
+  }
+}

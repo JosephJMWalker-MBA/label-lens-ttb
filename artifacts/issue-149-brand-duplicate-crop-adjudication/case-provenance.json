@@ -1,0 +1,217 @@
+{
+  "experimentId": "issue-149-brand-duplicate-crop-adjudication",
+  "evaluationOnly": true,
+  "ocrRun": false,
+  "pair": { "caseA": "approved-wine-004", "caseB": "la-fattoria-rotated" },
+  "governedCases": [
+    {
+      "caseId": "approved-wine-004",
+      "fixtureId": "approved-wine-004",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-004/label.png",
+      "sourceImageSha256": "02c272bc23e836befc6024a0c7fa1e3b448dc7d31b2e691cdff1f37457377aa5",
+      "sourceImageSize": { "width": 1350, "height": 1650 },
+      "region": {
+        "unit": "normalized-panel-relative",
+        "provenance": "human-approved-region",
+        "x": 0.25925925925925924,
+        "y": 0.21818181818181817,
+        "width": 0.48148148148148145,
+        "height": 0.17575757575757575,
+        "label": "sole visible brand occurrence"
+      },
+      "cropRect": { "left": 330, "top": 351, "width": 690, "height": 308 },
+      "committedCropSha256": "fab1b411c7e06258c41c884d3f0777039219f171fca37febd32597fabd5b108c",
+      "recomputedCropSha256": "fab1b411c7e06258c41c884d3f0777039219f171fca37febd32597fabd5b108c"
+    },
+    {
+      "caseId": "approved-wine-005",
+      "fixtureId": "approved-wine-005",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-005/label.png",
+      "sourceImageSha256": "4098ba3ddd706354a51ac55015aac04cd1a67a12aaa1947cfef59a523fd13ef9",
+      "sourceImageSize": { "width": 1500, "height": 1140 },
+      "region": {
+        "unit": "normalized-panel-relative",
+        "provenance": "human-approved-region",
+        "x": 0.33,
+        "y": 0.21052631578947367,
+        "width": 0.3466666666666667,
+        "height": 0.23684210526315788,
+        "label": "sole visible brand occurrence"
+      },
+      "cropRect": { "left": 479, "top": 232, "width": 553, "height": 286 },
+      "committedCropSha256": "d189130bea28dc36278958da8301539afb7a72ff2f1b80195139170dd3556c08",
+      "recomputedCropSha256": "d189130bea28dc36278958da8301539afb7a72ff2f1b80195139170dd3556c08"
+    },
+    {
+      "caseId": "approved-wine-023",
+      "fixtureId": "approved-wine-023",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-023/label.png",
+      "sourceImageSha256": "ab9f888e0673afed9e08d6db30f6d5623c0c30a9bb69fc55e028ac82381fd010",
+      "sourceImageSize": { "width": 988, "height": 1253 },
+      "region": {
+        "unit": "normalized-panel-relative",
+        "provenance": "human-approved-region",
+        "x": 0.2965587044534413,
+        "y": 0.047086991221069435,
+        "width": 0.40789473684210525,
+        "height": 0.12928970470869913,
+        "label": "sole visible brand occurrence"
+      },
+      "cropRect": { "left": 281, "top": 54, "width": 427, "height": 173 },
+      "committedCropSha256": "ca93c1389b53dbd250d1e2af624e65d5c666dae4e35b0f840176de297c735406",
+      "recomputedCropSha256": "ca93c1389b53dbd250d1e2af624e65d5c666dae4e35b0f840176de297c735406"
+    },
+    {
+      "caseId": "approved-wine-027",
+      "fixtureId": "approved-wine-027",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-027/label.jpeg",
+      "sourceImageSha256": "76910b129a3b4e0d50892da3f9643ab699510ded8c0f61656afd2a0505a156fe",
+      "sourceImageSize": { "width": 976, "height": 1126 },
+      "region": {
+        "unit": "normalized-panel-relative",
+        "provenance": "human-approved-region",
+        "x": 0.07889344262295082,
+        "y": 0.0630550621669627,
+        "width": 0.8422131147540983,
+        "height": 0.3019538188277087,
+        "label": "sole visible brand occurrence"
+      },
+      "cropRect": { "left": 52, "top": 61, "width": 872, "height": 361 },
+      "committedCropSha256": "8a780a3d3881dac099de9097b0240ce1374bbb7d55bfd87efa447c4b1d5f9615",
+      "recomputedCropSha256": "8a780a3d3881dac099de9097b0240ce1374bbb7d55bfd87efa447c4b1d5f9615"
+    },
+    {
+      "caseId": "approved-wine-031",
+      "fixtureId": "approved-wine-031",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-031/label.jpeg",
+      "sourceImageSha256": "512afcf475b691396481d289dbcb461f6880cb81c03ec02e8db4a54faea6a4b2",
+      "sourceImageSize": { "width": 646, "height": 1171 },
+      "region": {
+        "unit": "normalized-panel-relative",
+        "provenance": "human-approved-region",
+        "x": 0.25232198142414863,
+        "y": 0.032450896669513236,
+        "width": 0.5108359133126935,
+        "height": 0.06490179333902647,
+        "label": "sole visible brand occurrence"
+      },
+      "cropRect": { "left": 153, "top": 34, "width": 350, "height": 85 },
+      "committedCropSha256": "2998fea6a8a7bddfc12b418c5207151920e0ed03940b349de8f4968323dd85c8",
+      "recomputedCropSha256": "2998fea6a8a7bddfc12b418c5207151920e0ed03940b349de8f4968323dd85c8"
+    },
+    {
+      "caseId": "approved-wine-035",
+      "fixtureId": "approved-wine-035",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-035/label.png",
+      "sourceImageSha256": "bf0d8e4ea936e1ddc67ce265345fde413cc29080f2a0b3ba42538912e30dd035",
+      "sourceImageSize": { "width": 557, "height": 471 },
+      "region": {
+        "unit": "normalized-panel-relative",
+        "provenance": "human-approved-region",
+        "x": 0.10412926391382406,
+        "y": 0.08917197452229299,
+        "width": 0.6535008976660682,
+        "height": 0.19532908704883228,
+        "label": "sole visible brand occurrence"
+      },
+      "cropRect": { "left": 47, "top": 38, "width": 386, "height": 100 },
+      "committedCropSha256": "b404b0403afa6df405ef9dd7181080e8a328b701a2494b5b1e3c0a51efc4f12f",
+      "recomputedCropSha256": "b404b0403afa6df405ef9dd7181080e8a328b701a2494b5b1e3c0a51efc4f12f"
+    },
+    {
+      "caseId": "approved-wine-085",
+      "fixtureId": "approved-wine-085",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-085/label.jpeg",
+      "sourceImageSha256": "e9c6de2e35a6f75bf1de128f8c1d2c2f0a824d52628e32fa6e003efb1bb758b6",
+      "sourceImageSize": { "width": 414, "height": 464 },
+      "region": {
+        "unit": "normalized-panel-relative",
+        "provenance": "human-approved-region",
+        "x": 0.21256038647342995,
+        "y": 0.03879310344827586,
+        "width": 0.6038647342995169,
+        "height": 0.10775862068965517,
+        "label": "sole visible brand occurrence"
+      },
+      "cropRect": { "left": 80, "top": 14, "width": 267, "height": 58 },
+      "committedCropSha256": "5e65e3c171f85210f6686cd69467395b3eb63a1511d0fb6b7e7eb7fd6b6f1d04",
+      "recomputedCropSha256": "5e65e3c171f85210f6686cd69467395b3eb63a1511d0fb6b7e7eb7fd6b6f1d04"
+    },
+    {
+      "caseId": "approved-wine-091",
+      "fixtureId": "approved-wine-091",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-091/label.jpeg",
+      "sourceImageSha256": "d3518e47880e39d38cf47d4692ad3a10d194a5b56e67690ab53c0b1d2306ab73",
+      "sourceImageSize": { "width": 303, "height": 598 },
+      "region": {
+        "unit": "normalized-panel-relative",
+        "provenance": "human-approved-region",
+        "x": 0.066006600660066,
+        "y": 0.010033444816053512,
+        "width": 0.30363036303630364,
+        "height": 0.2508361204013378,
+        "label": "sole visible brand occurrence"
+      },
+      "cropRect": { "left": 15, "top": 1, "width": 102, "height": 160 },
+      "committedCropSha256": "0083f7d3d24b42b531d5062b8889ac42d458067da93e80ce7d07d11f8936c501",
+      "recomputedCropSha256": "0083f7d3d24b42b531d5062b8889ac42d458067da93e80ce7d07d11f8936c501"
+    },
+    {
+      "caseId": "la-fattoria-rotated",
+      "fixtureId": "la-fattoria-rotated",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-003/label.png",
+      "sourceImageSha256": "78a45dc3df09a29615ebb19687803d4c0b9e50c0ffdcea833d6cc332bd3ee4e8",
+      "sourceImageSize": { "width": 1350, "height": 1650 },
+      "region": {
+        "unit": "normalized-panel-relative",
+        "provenance": "human-approved-region",
+        "x": 0.25925925925925924,
+        "y": 0.21818181818181817,
+        "width": 0.48148148148148145,
+        "height": 0.17575757575757575,
+        "label": "sole visible brand occurrence"
+      },
+      "cropRect": { "left": 330, "top": 351, "width": 690, "height": 308 },
+      "committedCropSha256": "fab1b411c7e06258c41c884d3f0777039219f171fca37febd32597fabd5b108c",
+      "recomputedCropSha256": "fab1b411c7e06258c41c884d3f0777039219f171fca37febd32597fabd5b108c"
+    },
+    {
+      "caseId": "wine-multi-artifact-04-region-1",
+      "fixtureId": "wine-multi-artifact-04",
+      "sourceImagePath": "tests/fixtures/precheck/wine-multi-artifact-04/label.png",
+      "sourceImageSha256": "445d39b8f73d04cd05bb35e03f9678f6ba9e81f6a6f01d5469306ec43c9c5887",
+      "sourceImageSize": { "width": 674, "height": 1522 },
+      "region": {
+        "unit": "normalized-panel-relative",
+        "provenance": "human-approved-region",
+        "x": 0.07863501483679525,
+        "y": 0.08081471747700394,
+        "width": 0.34124629080118696,
+        "height": 0.09198423127463863,
+        "label": "front panel — 'Dry Cellar' script mark"
+      },
+      "cropRect": { "left": 46, "top": 119, "width": 244, "height": 148 },
+      "committedCropSha256": "d46fe950184f98042c724d261d884434a6cf5eab63b138e53a9299992d2c9fea",
+      "recomputedCropSha256": "d46fe950184f98042c724d261d884434a6cf5eab63b138e53a9299992d2c9fea"
+    },
+    {
+      "caseId": "wine-multi-artifact-04-region-2",
+      "fixtureId": "wine-multi-artifact-04",
+      "sourceImagePath": "tests/fixtures/precheck/wine-multi-artifact-04/label.png",
+      "sourceImageSha256": "445d39b8f73d04cd05bb35e03f9678f6ba9e81f6a6f01d5469306ec43c9c5887",
+      "sourceImageSize": { "width": 674, "height": 1522 },
+      "region": {
+        "unit": "normalized-panel-relative",
+        "provenance": "human-approved-region",
+        "x": 0.25667655786350146,
+        "y": 0.6452036793692509,
+        "width": 0.2314540059347181,
+        "height": 0.03613666228646518,
+        "label": "back panel — 'Dry Cellar' script header"
+      },
+      "cropRect": { "left": 168, "top": 977, "width": 166, "height": 64 },
+      "committedCropSha256": "c338c020db6cf940a363153d58b1f5f6b24ef9dfba450e6d3b17e673e2e5b4ac",
+      "recomputedCropSha256": "c338c020db6cf940a363153d58b1f5f6b24ef9dfba450e6d3b17e673e2e5b4ac"
+    }
+  ]
+}
