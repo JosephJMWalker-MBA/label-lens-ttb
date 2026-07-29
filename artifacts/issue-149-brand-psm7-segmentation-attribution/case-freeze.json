@@ -1,0 +1,52 @@
+{
+  "experimentId": "issue-149-brand-psm7-segmentation-attribution",
+  "frozenBeforeOcr": true,
+  "baseSha": "9b02a55690fe3df61870888ffee4907abc07d5e1",
+  "evidenceBasis": {
+    "mergedPr": 205,
+    "geometryLabel": "SEGMENTATION_SUSPECTED",
+    "geometryLabelCount": "5/5",
+    "psm13Eligible": false,
+    "orientationExperimentAuthorized": false,
+    "annotator": "single isolated model reader; labels provisional"
+  },
+  "caseCount": 5,
+  "cases": [
+    {
+      "caseId": "approved-wine-023",
+      "fixtureId": "approved-wine-023",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-023/label.png",
+      "sourceImageSha256": "ab9f888e0673afed9e08d6db30f6d5623c0c30a9bb69fc55e028ac82381fd010",
+      "brandRegionCount": 1
+    },
+    {
+      "caseId": "approved-wine-027",
+      "fixtureId": "approved-wine-027",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-027/label.jpeg",
+      "sourceImageSha256": "76910b129a3b4e0d50892da3f9643ab699510ded8c0f61656afd2a0505a156fe",
+      "brandRegionCount": 1
+    },
+    {
+      "caseId": "approved-wine-035",
+      "fixtureId": "approved-wine-035",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-035/label.png",
+      "sourceImageSha256": "bf0d8e4ea936e1ddc67ce265345fde413cc29080f2a0b3ba42538912e30dd035",
+      "brandRegionCount": 1
+    },
+    {
+      "caseId": "approved-wine-085",
+      "fixtureId": "approved-wine-085",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-085/label.jpeg",
+      "sourceImageSha256": "e9c6de2e35a6f75bf1de128f8c1d2c2f0a824d52628e32fa6e003efb1bb758b6",
+      "brandRegionCount": 1
+    },
+    {
+      "caseId": "approved-wine-091",
+      "fixtureId": "approved-wine-091",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-091/label.jpeg",
+      "sourceImageSha256": "d3518e47880e39d38cf47d4692ad3a10d194a5b56e67690ab53c0b1d2306ab73",
+      "brandRegionCount": 1
+    }
+  ],
+  "mutationPolicy": "No case may be added, substituted, dropped, or re-scored after results are seen. Post-hoc case selection and best-of-two reporting are prohibited."
+}

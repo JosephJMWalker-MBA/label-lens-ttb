@@ -1,0 +1,35 @@
+{
+  "experimentId": "issue-149-brand-psm7-segmentation-attribution",
+  "evaluationOnly": true,
+  "productionChanged": false,
+  "pr195Untouched": true,
+  "decision": "STOP",
+  "reason": "All five cases were NO_EFFECT: control and treatment are equivalently unsuccessful.",
+  "counts": {
+    "NONDETERMINISTIC": 0,
+    "REGRESSION": 0,
+    "SEGMENTATION_MECHANISM_CONFIRMED": 0,
+    "LEGIBILITY_IMPROVED_NOT_RECOVERED": 0,
+    "NO_EFFECT": 5
+  },
+  "caseCount": 5,
+  "determinismPass": true,
+  "controlFalseReliableReads": 0,
+  "treatmentFalseReliableReads": 0,
+  "newTreatmentFalseReliableReads": 0,
+  "safetyVetoes": {
+    "newTreatmentFalseReliableReadStopsBranch": false,
+    "regressionFromCorrectControlEvidence": false,
+    "confidenceCountedAsImprovement": false,
+    "bestOfTwoUsed": false,
+    "postHocCaseSelectionUsed": false,
+    "frozenCaseSetAltered": false
+  },
+  "claimsNotMade": [
+    "No causal claim that segmentation is the dominant Brand bottleneck.",
+    "No prevalence or production-rate claim; n=5 mechanism-existence test only.",
+    "No Tesseract capability-ceiling claim under any outcome.",
+    "No claim about the separate stylized-typeface subset."
+  ],
+  "authorizedNext": "PSM 7 success authorizes only a separately preregistered policy experiment. Failure moves the question toward recognizer/traineddata capability or another separately preregistered segmentation configuration, not a sweep."
+}

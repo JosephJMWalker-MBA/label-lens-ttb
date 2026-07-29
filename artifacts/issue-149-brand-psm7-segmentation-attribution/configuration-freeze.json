@@ -1,0 +1,72 @@
+{
+  "experimentId": "issue-149-brand-psm7-segmentation-attribution",
+  "frozenBeforeOcr": true,
+  "design": "one-variable-at-a-time",
+  "declaredVariable": "psm",
+  "changedVariables": ["psm"],
+  "control": {
+    "scale": 3,
+    "padding": { "ratio": 0.03, "minPx": 4 },
+    "grayscaleMethod": "sharp-grayscale",
+    "contrastMethod": "normalise",
+    "localContrast": "none",
+    "thresholdMethod": "none",
+    "sharpening": "none",
+    "inversion": false,
+    "denoising": "none",
+    "psm": 11,
+    "rotation": 0,
+    "cropSource": "governed-brand-region",
+    "fieldType": "brandName",
+    "configurationHash": "300f0e6e5bd12fb711f1adccbdef2ba58d099c04970a6f2441fe630e621ef162"
+  },
+  "treatment": {
+    "scale": 3,
+    "padding": { "ratio": 0.03, "minPx": 4 },
+    "grayscaleMethod": "sharp-grayscale",
+    "contrastMethod": "normalise",
+    "localContrast": "none",
+    "thresholdMethod": "none",
+    "sharpening": "none",
+    "inversion": false,
+    "denoising": "none",
+    "psm": 7,
+    "rotation": 0,
+    "cropSource": "governed-brand-region",
+    "fieldType": "brandName",
+    "configurationHash": "2fcfd94766891c67a80bd72ec1c48a0166803edeb4c4d224f195f12af36f0203"
+  },
+  "controlProvenance": "PRODUCTION_BOUNDED_BRAND_CONTROL; psm 11 is PAGE_SEG.SPARSE_TEXT, the mode production uses for governed region passes.",
+  "engine": {
+    "ocrEngine": "tesseract.js@7.0.0/eng/OEM1",
+    "tesseractJs": "7.0.0",
+    "tesseractJsCore": "7.0.0",
+    "sharp": "0.35.3",
+    "node": "v22.17.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "traineddata": {
+      "path": "src/pipeline/extractor/assets/eng.traineddata",
+      "sha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "vendored": true,
+      "networkFetch": false
+    }
+  },
+  "excluded": [
+    "no PSM sweep",
+    "no PSM 13",
+    "no rotation change",
+    "no preprocessing change",
+    "no crop change",
+    "no model or traineddata change",
+    "no parser, ranking, threshold, normalization, or selection change"
+  ],
+  "preflight": {
+    "baseShaMatches": true,
+    "preregistrationFrozen": true,
+    "guardedProductionUnchanged": true,
+    "pr195BaselineUnchanged": true,
+    "frozenEvaluationModulesUnchanged": true,
+    "singleVariableIsolation": { "changedVariables": ["psm"], "declaredVariable": "psm" }
+  }
+}
