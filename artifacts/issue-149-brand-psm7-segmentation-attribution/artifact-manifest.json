@@ -1,0 +1,70 @@
+{
+  "artifact": "artifact-manifest",
+  "experimentId": "issue-149-brand-psm7-segmentation-attribution",
+  "issue": 149,
+  "evaluationOnly": true,
+  "ocrRun": true,
+  "productionChanged": false,
+  "pr195Untouched": true,
+  "baseSha": "9b02a55690fe3df61870888ffee4907abc07d5e1",
+  "runner": "scripts/eval/run-issue-149-brand-psm7-segmentation-attribution.ts",
+  "runnerSha256": "3d203937274ee0146341ee062e2e854d6d176312524061c71bf5db820e9ef09b",
+  "files": [
+    {
+      "path": "case-freeze.json",
+      "sizeBytes": 2096,
+      "sha256": "4d7b84003f19f8557be5c0a6fa0f6790d70c9525b4624cacec6711b765a09df3"
+    },
+    {
+      "path": "commands.sh",
+      "sizeBytes": 1325,
+      "sha256": "4ea6c354542d720c0b8c25adf5f4882fb4b4c262fe2ba79cefcbade4f3ca35e2"
+    },
+    {
+      "path": "configuration-freeze.json",
+      "sizeBytes": 2326,
+      "sha256": "89308687f7fbd5bacfb7f299af24fda495da494e91fc43c6d1eabb69b23af545"
+    },
+    {
+      "path": "crop-provenance.json",
+      "sizeBytes": 4402,
+      "sha256": "59d23970cd4c78888e6b45f423e7fac8258faa26cabe23d0defc3740a86a1ee5"
+    },
+    {
+      "path": "decision.json",
+      "sizeBytes": 1428,
+      "sha256": "e86f9d236a0ce157651fcbff89dac5e556658367b4f2081f3828304ae0ddd4c0"
+    },
+    {
+      "path": "git-sha.txt",
+      "sizeBytes": 100,
+      "sha256": "6880964a6a233b6d1f21a7ac4b32c797721be5606139136f85fecec7d5182bc2"
+    },
+    {
+      "path": "limitations.md",
+      "sizeBytes": 4739,
+      "sha256": "57624b5885ff3a3d7198b63e874a2167ea49b1e7e3a74dac6b8f311131b03678"
+    },
+    {
+      "path": "per-case-results.json",
+      "sizeBytes": 7003,
+      "sha256": "1c33753afb78ab3825bf562b1d6d44ff90d99c308278cfd556b6154adcf6c47f"
+    },
+    {
+      "path": "preregistration.md",
+      "sizeBytes": 8356,
+      "sha256": "df29caeec3b7369763d9769fbc1e0d87f3475d8dbb182a4ae498581fe64cacd4"
+    },
+    {
+      "path": "primary-run-raw.json",
+      "sizeBytes": 7756,
+      "sha256": "7128dc9ef4a2ecc98c27ee8cea4a7138ad47e524068487cb3737483837a15890"
+    },
+    {
+      "path": "repeat-run-raw.json",
+      "sizeBytes": 7747,
+      "sha256": "e0433f1237903ecdb7afe451e632cd5dfaf44fcfbac12b48c95b0da7fd6e21af"
+    }
+  ],
+  "verify": "shasum -a 256 -c artifacts/issue-149-brand-psm7-segmentation-attribution/artifact-manifest.sha256"
+}

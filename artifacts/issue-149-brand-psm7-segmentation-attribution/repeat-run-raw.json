@@ -1,0 +1,250 @@
+{
+  "experimentId": "issue-149-brand-psm7-segmentation-attribution",
+  "run": "repeat",
+  "truthRead": false,
+  "note": "Exact repeat of both arms for determinism, persisted before truth comparison.",
+  "outputs": [
+    {
+      "caseId": "approved-wine-023",
+      "arm": "control",
+      "psm": 11,
+      "cropSha256": "ca93c1389b53dbd250d1e2af624e65d5c666dae4e35b0f840176de297c735406",
+      "preprocessedSha256": "5f5bb224e20b23781f3aff931b0251c9ee12c2f7e50575ddb4ca216667e10d4f",
+      "rawTranscript": "SE An atertite:",
+      "rawWordCount": 3,
+      "meanConfidence": 19,
+      "words": [
+        {
+          "text": "SE",
+          "rawConfidence": 41,
+          "bbox": { "x0": 663, "y0": 126, "x1": 984, "y1": 238 }
+        },
+        {
+          "text": "An",
+          "rawConfidence": 16,
+          "bbox": { "x0": 62, "y0": 266, "x1": 329, "y1": 415 }
+        },
+        {
+          "text": "atertite:",
+          "rawConfidence": 0,
+          "bbox": { "x0": 410, "y0": 244, "x1": 1255, "y1": 472 }
+        }
+      ],
+      "selection": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "ocrEvidenceScore": 0,
+        "reliable": false
+      }
+    },
+    {
+      "caseId": "approved-wine-023",
+      "arm": "treatment",
+      "psm": 7,
+      "cropSha256": "ca93c1389b53dbd250d1e2af624e65d5c666dae4e35b0f840176de297c735406",
+      "preprocessedSha256": "5f5bb224e20b23781f3aff931b0251c9ee12c2f7e50575ddb4ca216667e10d4f",
+      "rawTranscript": "",
+      "rawWordCount": 0,
+      "meanConfidence": null,
+      "words": [],
+      "selection": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "ocrEvidenceScore": 0,
+        "reliable": false
+      }
+    },
+    {
+      "caseId": "approved-wine-027",
+      "arm": "control",
+      "psm": 11,
+      "cropSha256": "8a780a3d3881dac099de9097b0240ce1374bbb7d55bfd87efa447c4b1d5f9615",
+      "preprocessedSha256": "ef106f5e2ea05cde31783306f8929975e456dc8f3e06e02b7eda600faefe35e5",
+      "rawTranscript": "a Y 0] AEE",
+      "rawWordCount": 4,
+      "meanConfidence": 33.5,
+      "words": [
+        {
+          "text": "a",
+          "rawConfidence": 37,
+          "bbox": { "x0": 1353, "y0": 44, "x1": 1790, "y1": 295 }
+        },
+        {
+          "text": "Y",
+          "rawConfidence": 15,
+          "bbox": { "x0": 1292, "y0": 365, "x1": 1298, "y1": 383 }
+        },
+        {
+          "text": "0]",
+          "rawConfidence": 82,
+          "bbox": { "x0": 541, "y0": 206, "x1": 1141, "y1": 777 }
+        },
+        {
+          "text": "AEE",
+          "rawConfidence": 0,
+          "bbox": { "x0": 1097, "y0": 819, "x1": 1503, "y1": 832 }
+        }
+      ],
+      "selection": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "ocrEvidenceScore": 0,
+        "reliable": false
+      }
+    },
+    {
+      "caseId": "approved-wine-027",
+      "arm": "treatment",
+      "psm": 7,
+      "cropSha256": "8a780a3d3881dac099de9097b0240ce1374bbb7d55bfd87efa447c4b1d5f9615",
+      "preprocessedSha256": "ef106f5e2ea05cde31783306f8929975e456dc8f3e06e02b7eda600faefe35e5",
+      "rawTranscript": "",
+      "rawWordCount": 0,
+      "meanConfidence": null,
+      "words": [],
+      "selection": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "ocrEvidenceScore": 0,
+        "reliable": false
+      }
+    },
+    {
+      "caseId": "approved-wine-035",
+      "arm": "control",
+      "psm": 11,
+      "cropSha256": "b404b0403afa6df405ef9dd7181080e8a328b701a2494b5b1e3c0a51efc4f12f",
+      "preprocessedSha256": "acfb05151cc8e4a63b9372c7f7a6f00a650e40f6887ece435265d184e9a75451",
+      "rawTranscript": "Hokoniites",
+      "rawWordCount": 1,
+      "meanConfidence": 0,
+      "words": [
+        {
+          "text": "Hokoniites",
+          "rawConfidence": 0,
+          "bbox": { "x0": 11, "y0": 20, "x1": 1068, "y1": 300 }
+        }
+      ],
+      "selection": {
+        "state": "AMBIGUOUS",
+        "value": "Hokoniites",
+        "ocrEvidenceScore": 0,
+        "reliable": false
+      }
+    },
+    {
+      "caseId": "approved-wine-035",
+      "arm": "treatment",
+      "psm": 7,
+      "cropSha256": "b404b0403afa6df405ef9dd7181080e8a328b701a2494b5b1e3c0a51efc4f12f",
+      "preprocessedSha256": "acfb05151cc8e4a63b9372c7f7a6f00a650e40f6887ece435265d184e9a75451",
+      "rawTranscript": "Hokoniites",
+      "rawWordCount": 1,
+      "meanConfidence": 0,
+      "words": [
+        {
+          "text": "Hokoniites",
+          "rawConfidence": 0,
+          "bbox": { "x0": 11, "y0": 20, "x1": 1068, "y1": 300 }
+        }
+      ],
+      "selection": {
+        "state": "AMBIGUOUS",
+        "value": "Hokoniites",
+        "ocrEvidenceScore": 0,
+        "reliable": false
+      }
+    },
+    {
+      "caseId": "approved-wine-085",
+      "arm": "control",
+      "psm": 11,
+      "cropSha256": "5e65e3c171f85210f6686cd69467395b3eb63a1511d0fb6b7e7eb7fd6b6f1d04",
+      "preprocessedSha256": "45ef310819d1c5b70163916662ac62e5c8978354cb4723ced3e3a1d3bab1231c",
+      "rawTranscript": "AH sasaki",
+      "rawWordCount": 2,
+      "meanConfidence": 20,
+      "words": [
+        { "text": "AH", "rawConfidence": 40, "bbox": { "x0": 0, "y0": 0, "x1": 226, "y1": 153 } },
+        {
+          "text": "sasaki",
+          "rawConfidence": 0,
+          "bbox": { "x0": 291, "y0": 0, "x1": 729, "y1": 159 }
+        }
+      ],
+      "selection": {
+        "state": "AMBIGUOUS",
+        "value": "AH sasaki",
+        "ocrEvidenceScore": 0.2,
+        "reliable": false
+      }
+    },
+    {
+      "caseId": "approved-wine-085",
+      "arm": "treatment",
+      "psm": 7,
+      "cropSha256": "5e65e3c171f85210f6686cd69467395b3eb63a1511d0fb6b7e7eb7fd6b6f1d04",
+      "preprocessedSha256": "45ef310819d1c5b70163916662ac62e5c8978354cb4723ced3e3a1d3bab1231c",
+      "rawTranscript": "HAH on L4 Ax",
+      "rawWordCount": 4,
+      "meanConfidence": 31.25,
+      "words": [
+        { "text": "HAH", "rawConfidence": 34, "bbox": { "x0": 0, "y0": 0, "x1": 275, "y1": 157 } },
+        { "text": "L4", "rawConfidence": 3, "bbox": { "x0": 265, "y0": 82, "x1": 380, "y1": 143 } },
+        {
+          "text": "Ax",
+          "rawConfidence": 59,
+          "bbox": { "x0": 408, "y0": 78, "x1": 492, "y1": 149 }
+        },
+        { "text": "on", "rawConfidence": 29, "bbox": { "x0": 501, "y0": 24, "x1": 748, "y1": 156 } }
+      ],
+      "selection": {
+        "state": "AMBIGUOUS",
+        "value": "HAH on",
+        "ocrEvidenceScore": 0.315,
+        "reliable": false
+      }
+    },
+    {
+      "caseId": "approved-wine-091",
+      "arm": "control",
+      "psm": 11,
+      "cropSha256": "0083f7d3d24b42b531d5062b8889ac42d458067da93e80ce7d07d11f8936c501",
+      "preprocessedSha256": "cedf5cba04f6508db1449e2577143185b3250d4ab45d7bcf4815e6fc1b1a5258",
+      "rawTranscript": "RI dS",
+      "rawWordCount": 2,
+      "meanConfidence": 74.5,
+      "words": [
+        {
+          "text": "dS",
+          "rawConfidence": 78,
+          "bbox": { "x0": 34, "y0": 240, "x1": 264, "y1": 442 }
+        },
+        { "text": "RI", "rawConfidence": 71, "bbox": { "x0": 34, "y0": 96, "x1": 270, "y1": 274 } }
+      ],
+      "selection": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "ocrEvidenceScore": 0,
+        "reliable": false
+      }
+    },
+    {
+      "caseId": "approved-wine-091",
+      "arm": "treatment",
+      "psm": 7,
+      "cropSha256": "0083f7d3d24b42b531d5062b8889ac42d458067da93e80ce7d07d11f8936c501",
+      "preprocessedSha256": "cedf5cba04f6508db1449e2577143185b3250d4ab45d7bcf4815e6fc1b1a5258",
+      "rawTranscript": "",
+      "rawWordCount": 0,
+      "meanConfidence": null,
+      "words": [],
+      "selection": {
+        "state": "NOT_OBSERVED",
+        "value": null,
+        "ocrEvidenceScore": 0,
+        "reliable": false
+      }
+    }
+  ]
+}
