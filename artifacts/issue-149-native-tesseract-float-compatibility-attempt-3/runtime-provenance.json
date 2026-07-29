@@ -1,0 +1,52 @@
+{
+  "artifact": "runtime-provenance",
+  "experimentId": "issue-149-native-tesseract-float-compatibility-attempt-3",
+  "attempt": 3,
+  "reusedFrom": "Attempt 2 (PR #209), reverified rather than rediscovered",
+  "runner": {
+    "unameAll": "Linux runnervmvrwv9 6.17.0-1020-azure #20~24.04.1-Ubuntu SMP Fri Jun 19 20:09:14 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+    "arch": "x86_64",
+    "nativeAmd64": true,
+    "nproc": "4",
+    "memoryBytes": "16766423040",
+    "imageOs": "ubuntu24",
+    "imageVersion": "20260720.247.2",
+    "githubRunId": "30477666648"
+  },
+  "pins": {
+    "tesseract": {
+      "package": "tesseract-ocr",
+      "version": "5.3.0-2"
+    },
+    "libtesseract": {
+      "package": "libtesseract5",
+      "version": "5.3.0-2"
+    },
+    "leptonica": {
+      "package": "liblept5",
+      "version": "1.82.0-3+b3"
+    },
+    "time": {
+      "package": "time",
+      "version": "1.9-0.2"
+    }
+  },
+  "pinsReproduced": true,
+  "invocation": {
+    "language": "eng",
+    "oem": 1,
+    "psm": 11,
+    "dpi": 300,
+    "outputMode": "tsv",
+    "timeoutSeconds": 120,
+    "cpus": "1",
+    "memory": "2g",
+    "network": "none",
+    "env": {
+      "LC_ALL": "C",
+      "LANG": "C",
+      "OMP_THREAD_LIMIT": "1",
+      "OMP_NUM_THREADS": "1"
+    }
+  }
+}

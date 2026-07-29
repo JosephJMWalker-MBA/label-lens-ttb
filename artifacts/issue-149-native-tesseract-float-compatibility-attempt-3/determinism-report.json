@@ -1,0 +1,41 @@
+{
+  "artifact": "determinism-report",
+  "experimentId": "issue-149-native-tesseract-float-compatibility-attempt-3",
+  "attempt": 3,
+  "assessable": true,
+  "pairs": [
+    {
+      "arm": "control",
+      "image": "positive",
+      "rawTsvByteIdentical": true,
+      "parsedRowsBoxesConfidencesIdentical": true,
+      "deterministic": true,
+      "rawDifferenceAttribution": null
+    },
+    {
+      "arm": "control",
+      "image": "blank",
+      "rawTsvByteIdentical": true,
+      "parsedRowsBoxesConfidencesIdentical": true,
+      "deterministic": true,
+      "rawDifferenceAttribution": null
+    },
+    {
+      "arm": "treatment",
+      "image": "positive",
+      "rawTsvByteIdentical": true,
+      "parsedRowsBoxesConfidencesIdentical": true,
+      "deterministic": true,
+      "rawDifferenceAttribution": null
+    },
+    {
+      "arm": "treatment",
+      "image": "blank",
+      "rawTsvByteIdentical": true,
+      "parsedRowsBoxesConfidencesIdentical": true,
+      "deterministic": true,
+      "rawDifferenceAttribution": null
+    }
+  ],
+  "allDeterministic": true
+}

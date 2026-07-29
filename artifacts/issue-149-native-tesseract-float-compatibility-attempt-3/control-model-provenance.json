@@ -1,0 +1,11 @@
+{
+  "artifact": "control-model-provenance",
+  "experimentId": "issue-149-native-tesseract-float-compatibility-attempt-3",
+  "attempt": 3,
+  "path": "src/pipeline/extractor/assets/eng.traineddata",
+  "sha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+  "byteSize": 5199098,
+  "role": "native diagnostic positive control",
+  "committedToGit": false,
+  "modified": false
+}

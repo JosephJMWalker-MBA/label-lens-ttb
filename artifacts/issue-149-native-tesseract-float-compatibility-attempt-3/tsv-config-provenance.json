@@ -1,0 +1,20 @@
+{
+  "artifact": "tsv-config-provenance",
+  "experimentId": "issue-149-native-tesseract-float-compatibility-attempt-3",
+  "attempt": 3,
+  "harnessCorrection": "Attempt 2 mounted bare model directories, so Tesseract's configs/tsv was absent and the renderer silently fell back to plain text. Each ephemeral mount now carries the pinned runtime's own configs/tsv.",
+  "sourcePathInImage": "/usr/share/tesseract-ocr/5/tessdata/configs/tsv",
+  "packageOwnership": "libtesseract5:amd64: /usr/share/tesseract-ocr/5/tessdata/configs/tsv",
+  "sourceSha256": "59d079bb75d8b3d7c839a3564580cb559e362c93a9d70f234e421c0c3e767e04",
+  "sourceByteSize": 22,
+  "contents": "tessedit_create_tsv 1",
+  "stagedCopies": {
+    "control": "59d079bb75d8b3d7c839a3564580cb559e362c93a9d70f234e421c0c3e767e04",
+    "treatment": "59d079bb75d8b3d7c839a3564580cb559e362c93a9d70f234e421c0c3e767e04"
+  },
+  "stagedCopiesByteIdentical": true,
+  "contentsAltered": false,
+  "treatmentSpecificConfigUsed": false,
+  "stagedOutsideGit": true,
+  "stageRoot": "/home/runner/work/_temp/attempt3-tessdata-FzJaQK"
+}
