@@ -1,0 +1,70 @@
+{
+  "experimentId": "issue-149-brand-duplicate-crop-adjudication",
+  "sources": [
+    {
+      "path": "tests/fixtures/precheck/approved-wine-003/label.png",
+      "sha256": "78a45dc3df09a29615ebb19687803d4c0b9e50c0ffdcea833d6cc332bd3ee4e8",
+      "usedByCases": ["la-fattoria-rotated"]
+    },
+    {
+      "path": "tests/fixtures/precheck/approved-wine-004/label.png",
+      "sha256": "02c272bc23e836befc6024a0c7fa1e3b448dc7d31b2e691cdff1f37457377aa5",
+      "usedByCases": ["approved-wine-004"]
+    },
+    {
+      "path": "tests/fixtures/precheck/approved-wine-005/label.png",
+      "sha256": "4098ba3ddd706354a51ac55015aac04cd1a67a12aaa1947cfef59a523fd13ef9",
+      "usedByCases": ["approved-wine-005"]
+    },
+    {
+      "path": "tests/fixtures/precheck/approved-wine-023/label.png",
+      "sha256": "ab9f888e0673afed9e08d6db30f6d5623c0c30a9bb69fc55e028ac82381fd010",
+      "usedByCases": ["approved-wine-023"]
+    },
+    {
+      "path": "tests/fixtures/precheck/approved-wine-027/label.jpeg",
+      "sha256": "76910b129a3b4e0d50892da3f9643ab699510ded8c0f61656afd2a0505a156fe",
+      "usedByCases": ["approved-wine-027"]
+    },
+    {
+      "path": "tests/fixtures/precheck/approved-wine-031/label.jpeg",
+      "sha256": "512afcf475b691396481d289dbcb461f6880cb81c03ec02e8db4a54faea6a4b2",
+      "usedByCases": ["approved-wine-031"]
+    },
+    {
+      "path": "tests/fixtures/precheck/approved-wine-035/label.png",
+      "sha256": "bf0d8e4ea936e1ddc67ce265345fde413cc29080f2a0b3ba42538912e30dd035",
+      "usedByCases": ["approved-wine-035"]
+    },
+    {
+      "path": "tests/fixtures/precheck/approved-wine-085/label.jpeg",
+      "sha256": "e9c6de2e35a6f75bf1de128f8c1d2c2f0a824d52628e32fa6e003efb1bb758b6",
+      "usedByCases": ["approved-wine-085"]
+    },
+    {
+      "path": "tests/fixtures/precheck/approved-wine-091/label.jpeg",
+      "sha256": "d3518e47880e39d38cf47d4692ad3a10d194a5b56e67690ab53c0b1d2306ab73",
+      "usedByCases": ["approved-wine-091"]
+    },
+    {
+      "path": "tests/fixtures/precheck/wine-multi-artifact-04/label.png",
+      "sha256": "445d39b8f73d04cd05bb35e03f9678f6ba9e81f6a6f01d5469306ec43c9c5887",
+      "usedByCases": ["wine-multi-artifact-04-region-1", "wine-multi-artifact-04-region-2"]
+    }
+  ],
+  "pairSourceComparison": {
+    "caseA": {
+      "caseId": "approved-wine-004",
+      "path": "tests/fixtures/precheck/approved-wine-004/label.png",
+      "sha256": "02c272bc23e836befc6024a0c7fa1e3b448dc7d31b2e691cdff1f37457377aa5"
+    },
+    "caseB": {
+      "caseId": "la-fattoria-rotated",
+      "path": "tests/fixtures/precheck/approved-wine-003/label.png",
+      "sha256": "78a45dc3df09a29615ebb19687803d4c0b9e50c0ffdcea833d6cc332bd3ee4e8"
+    },
+    "sourcePathsIdentical": false,
+    "sourceBytesIdentical": false,
+    "sourcePixelsIdentical": false
+  }
+}
