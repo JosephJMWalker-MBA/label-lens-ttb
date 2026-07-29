@@ -1,0 +1,8 @@
+{
+  "experimentId": "issue-149-native-tesseract-float-compatibility",
+  "assessable": false,
+  "reason": "No invocation ran, so no latency or memory figure exists.",
+  "latency": null,
+  "peakResidentMemory": null,
+  "emulationCaveat": "Had figures been collected on this host, the target platform linux/amd64 would have run under emulation on arm64 and the figures would have been diagnostic only."
+}

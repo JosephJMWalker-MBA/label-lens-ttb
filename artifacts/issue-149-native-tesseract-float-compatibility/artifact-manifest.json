@@ -1,0 +1,142 @@
+{
+  "artifact": "artifact-manifest",
+  "experimentId": "issue-149-native-tesseract-float-compatibility",
+  "issue": 149,
+  "evaluationOnly": true,
+  "syntheticOnly": true,
+  "corpusAccessed": false,
+  "verdict": "INCONCLUSIVE_ENVIRONMENT",
+  "ocrInvoked": false,
+  "plannedInvocations": 8,
+  "executedInvocations": 0,
+  "productionChanged": false,
+  "productionDockerfileChanged": false,
+  "fixtureChanged": false,
+  "truthChanged": false,
+  "pr195Untouched": true,
+  "baseSha": "887c4df34efc844a69edb87514e5c97432869166",
+  "runner": "scripts/eval/run-issue-149-native-tesseract-float-compatibility.ts",
+  "runnerSha256": "6bb574ee0014dc42b7ed89152fc2ac1252a8836ffa3456c61fe644dbb9b78bd8",
+  "researchDockerfile": "scripts/eval/docker/issue-149-native-tesseract-probe.Dockerfile",
+  "researchDockerfileSha256": "0d730e5d59150a6f8fccea2129a658253148e82b5d9600c1d58b996626a08647",
+  "modelBinaries": {
+    "committedToGit": false,
+    "controlModel": {
+      "path": "src/pipeline/extractor/assets/eng.traineddata",
+      "preexistingProductionAsset": true,
+      "modifiedByThisBranch": false
+    },
+    "treatmentModel": {
+      "path": ".local/ocr-research/traineddata/tessdata-best/eng.traineddata",
+      "untracked": true,
+      "retrievalScript": "scripts/eval/fetch-issue-149-tessdata-best.mjs",
+      "inDockerImage": false
+    },
+    "proof": "The largest file in this artifact package is 10142 bytes (preregistration.md). No traineddata binary entered the branch."
+  },
+  "largestArtifactBytes": 10142,
+  "fileCount": 20,
+  "files": [
+    {
+      "path": "commands.sh",
+      "sizeBytes": 3415,
+      "sha256": "cfe8d3ac193354c17872da82404cac3083b76ab67d89ceb375f814a097afe646"
+    },
+    {
+      "path": "control-model-provenance.json",
+      "sizeBytes": 747,
+      "sha256": "1d8a3b63939a0d4bb91b96630448d3d435dc0c8f8214e2ae10e86c28cbaaf294"
+    },
+    {
+      "path": "decision.json",
+      "sizeBytes": 1850,
+      "sha256": "4e75bce80d7b8479e366118774fa1c14bfcc247f43aa87cdf7de2aa26a89dc29"
+    },
+    {
+      "path": "determinism-report.json",
+      "sizeBytes": 263,
+      "sha256": "68d82a5a615b0a637648e09c3e0b8d4baa36770b0d197a90e6612252115f1f9d"
+    },
+    {
+      "path": "docker-base-provenance.json",
+      "sizeBytes": 844,
+      "sha256": "a9b22b37ba3061257694ea2003abd60ead6967c8fa0f5237f0d5509afdff7040"
+    },
+    {
+      "path": "git-sha.txt",
+      "sizeBytes": 100,
+      "sha256": "ec7f97a2ab1a3d9ceaa9853d1f3f3956f40a56e62a1d37b7ecf3d23888f98bcd"
+    },
+    {
+      "path": "invocation-matrix.json",
+      "sizeBytes": 3118,
+      "sha256": "7dfd160469e2d2c12f1bba1d238ca8c9267a757176057c296a449435d6908d90"
+    },
+    {
+      "path": "limitations.md",
+      "sizeBytes": 4908,
+      "sha256": "134cda9776caef7e06f230013761d47ce47ce4ac9d46652ddb79cf6a6ccf99c8"
+    },
+    {
+      "path": "preregistration.md",
+      "sizeBytes": 10142,
+      "sha256": "ad905275e2727aaeb0c266e3f4ca5ca2b6f5aa6490b2b8222a48bbae3f45c43b"
+    },
+    {
+      "path": "preregistration.sha256",
+      "sizeBytes": 85,
+      "sha256": "db55662942db205926c6f833761e7e3c6f55e55c51a76eeb114eb9bcacfeced4"
+    },
+    {
+      "path": "raw/ABSENT-OUTPUT.md",
+      "sizeBytes": 476,
+      "sha256": "0a6a92fc48ae6f90fbbf967504dddfb531ab22da8a9d3bc2a781e3c570454ded"
+    },
+    {
+      "path": "resource-report.json",
+      "sizeBytes": 402,
+      "sha256": "6eb58d6ffe15838d7a985d6a962f0c6b8229e62bdc34446426a3ff420fbb0067"
+    },
+    {
+      "path": "run-results.json",
+      "sizeBytes": 5703,
+      "sha256": "60b95620d48eb027d8e74eb47fec82c46a5a7b2712f128c598a46e89c91e99e2"
+    },
+    {
+      "path": "runtime-inventory.json",
+      "sizeBytes": 1611,
+      "sha256": "09faf3351536fb1cded0c82ccd658b89db449e24817a43a88480c0ea6079975c"
+    },
+    {
+      "path": "synthetic-input-spec.json",
+      "sizeBytes": 1711,
+      "sha256": "3357a9cf2fbd12714ed03cef0ddb78e676692b6509fbb3f616be0687f9222a66"
+    },
+    {
+      "path": "synthetic/blank.png",
+      "sizeBytes": 1201,
+      "sha256": "8b5531768177d1a62c9e7780a1edfd5231f46681a474ad359313a979aa4d3e9d"
+    },
+    {
+      "path": "synthetic/blank.png.sha256",
+      "sizeBytes": 76,
+      "sha256": "0f4349e76aa5f4d8e4a6433306d5a71d59023c1f8813a752220298ca333b952f"
+    },
+    {
+      "path": "synthetic/positive.png",
+      "sizeBytes": 3045,
+      "sha256": "bfba28eec8422a5e1dc69a6e3e6aefdfaa4f68a71cae85d385d9877d88a0e2ab"
+    },
+    {
+      "path": "synthetic/positive.png.sha256",
+      "sizeBytes": 79,
+      "sha256": "13d6efcf1f389268817a95d7c30164bff8672a64b28ea89ede84471539630dd0"
+    },
+    {
+      "path": "treatment-model-provenance.json",
+      "sizeBytes": 1012,
+      "sha256": "560c04b64af418ddb7c3f7df96726aecd55a355935bc66b1e737408f917c45db"
+    }
+  ],
+  "verify": "shasum -a 256 -c artifacts/issue-149-native-tesseract-float-compatibility/artifact-manifest.sha256"
+}

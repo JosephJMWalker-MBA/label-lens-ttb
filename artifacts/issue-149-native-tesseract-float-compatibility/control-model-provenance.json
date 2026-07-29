@@ -1,0 +1,15 @@
+{
+  "experimentId": "issue-149-native-tesseract-float-compatibility",
+  "role": "native diagnostic positive control",
+  "path": "src/pipeline/extractor/assets/eng.traineddata",
+  "expectedSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+  "observedSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+  "expectedByteSize": 5199098,
+  "observedByteSize": 5199098,
+  "integrityVerified": true,
+  "variant": "integer-quantized best-lineage LSTM",
+  "mountMode": "read-only",
+  "copiedIntoGitArtifacts": false,
+  "copiedIntoDockerImage": false,
+  "note": "This is a diagnostic positive control for the native runtime. It is not an accuracy comparison against the production tesseract.js runtime."
+}

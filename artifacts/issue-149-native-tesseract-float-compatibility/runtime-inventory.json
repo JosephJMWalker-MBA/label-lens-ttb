@@ -1,0 +1,32 @@
+{
+  "experimentId": "issue-149-native-tesseract-float-compatibility",
+  "collectedAtHost": true,
+  "collectedInContainer": false,
+  "containerInventoryUnavailableReason": "No container runtime, so tesseract/libtesseract/leptonica versions, the executable sha256, and ldd output could not be resolved. Those facts are only obtainable inside the built image.",
+  "host": { "platform": "darwin", "architecture": "arm64", "node": "v22.17.0", "sharp": "0.35.3" },
+  "containerRuntimes": [
+    { "name": "docker", "path": null, "version": null },
+    { "name": "podman", "path": null, "version": null },
+    { "name": "nerdctl", "path": null, "version": null },
+    { "name": "finch", "path": null, "version": null },
+    { "name": "colima", "path": null, "version": null },
+    { "name": "limactl", "path": null, "version": null }
+  ],
+  "dockerSocket": { "path": "/var/run/docker.sock", "exists": true, "daemonReachable": false },
+  "containerRuntimeAvailable": false,
+  "emulationRequiredForTarget": true,
+  "notes": [
+    "No container runtime binary is present on PATH.",
+    "A stale /var/run/docker.sock symlink exists but no daemon answers on it, which is consistent with a removed Docker Desktop installation.",
+    "The probe requires a pinned Linux container. Installing one is a host-level change that this experiment is not authorised to make."
+  ],
+  "unresolvedInContainer": [
+    "native tesseract version",
+    "libtesseract version",
+    "leptonica version",
+    "installed package versions",
+    "sha256 of the tesseract executable",
+    "ldd dependency output",
+    "docker image id/digest"
+  ]
+}
