@@ -1,0 +1,42 @@
+{
+  "auditId": "geometry",
+  "annotatorId": "blinded-annotator-A",
+  "completedOn": "2026-07-28",
+  "responses": [
+    {
+      "itemId": "item-0b2b6dbd",
+      "label": "SEGMENTATION_SUSPECTED",
+      "estimatedBaselineDegreesFromHorizontal": 0,
+      "confidence": "high",
+      "rationale": "All baselines sit parallel to the dashed reference lines, but the crop holds three separate text groups at very different cap heights plus horizontal rules, and the lowest sloping script group overlaps the group above it."
+    },
+    {
+      "itemId": "item-178774e8",
+      "label": "SEGMENTATION_SUSPECTED",
+      "estimatedBaselineDegreesFromHorizontal": 0,
+      "confidence": "medium",
+      "rationale": "Glyphs are upright and sit side by side on two horizontal baselines parallel to the reference lines, but the block is a narrow two-row stack in which an oversized glyph on the lower row rises into and overlaps the row above; low pixel count limits certainty."
+    },
+    {
+      "itemId": "item-595e3dbf",
+      "label": "SEGMENTATION_SUSPECTED",
+      "estimatedBaselineDegreesFromHorizontal": 2,
+      "confidence": "medium",
+      "rationale": "The x-height run tracks the dashed lines to within a couple of degrees, but the strokes are continuously connected with long entry and exit swashes that pass under and beside adjacent forms, blurring where one group ends and the next begins."
+    },
+    {
+      "itemId": "item-d490b7c1",
+      "label": "SEGMENTATION_SUSPECTED",
+      "estimatedBaselineDegreesFromHorizontal": 1,
+      "confidence": "medium",
+      "rationale": "Letter stems carry a strong italic slant, yet the baseline and the underlying rule both run parallel to the dashed references; the connected strokes and the trailing underline swash are the fragmentation risk, not rotation."
+    },
+    {
+      "itemId": "item-f8708117",
+      "label": "SEGMENTATION_SUSPECTED",
+      "estimatedBaselineDegreesFromHorizontal": 2,
+      "confidence": "high",
+      "rationale": "Both baselines lie within a few degrees of the dashed references, but the two rows interlock: a large looping capital on the lower row sweeps up through the upper row and a descender from the upper row crosses down into the lower row."
+    }
+  ]
+}

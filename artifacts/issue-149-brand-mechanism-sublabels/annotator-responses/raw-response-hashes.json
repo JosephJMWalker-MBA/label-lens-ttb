@@ -1,0 +1,30 @@
+{
+  "artifact": "raw-response-hashes",
+  "issue": 149,
+  "purpose": "Freeze the blinded annotator's raw response files before any unblinding, aggregation, or interpretation step reads anonymization-map.json.",
+  "algorithm": "sha256",
+  "frozenAtUtc": "2026-07-29T01:38:56Z",
+  "frozenBeforeUnblinding": true,
+  "files": [
+    {
+      "path": "artifacts/issue-149-brand-mechanism-sublabels/annotator-responses/geometric-response-template.json",
+      "sizeBytes": 2243,
+      "modifiedUtc": "2026-07-28T21:34:14Z",
+      "sha256": "20d3b6be2063461b7686d2b9f060225c3efa6caa67437b75d1eeca404f6e46be"
+    },
+    {
+      "path": "artifacts/issue-149-brand-mechanism-sublabels/annotator-responses/stylization-response-template.json",
+      "sizeBytes": 3563,
+      "modifiedUtc": "2026-07-28T21:34:30Z",
+      "sha256": "fb5ed5779da53ec8f315ea48fa9c733769a6e8c287fb09c5865985706ebc98d2"
+    },
+    {
+      "path": "artifacts/issue-149-brand-mechanism-sublabels/annotator-responses/annotator-provenance.md",
+      "sizeBytes": 2808,
+      "modifiedUtc": "2026-07-28T21:34:49Z",
+      "sha256": "54a0806d2644c964888310dc5bffbcfbbdfc1f97fe99e656bd898f4b4d1d6300"
+    }
+  ],
+  "integrityRule": "These three files are preserved verbatim. Any downstream artifact that restates a label, checklist value, confidence, or rationale must match these files byte-for-byte in content; no downstream step may edit them.",
+  "verifyCommand": "shasum -a 256 -c annotator-responses/annotator-response-manifest.sha256"
+}

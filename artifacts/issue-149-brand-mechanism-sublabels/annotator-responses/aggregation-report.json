@@ -1,0 +1,159 @@
+{
+  "artifact": "aggregation-report",
+  "issue": 149,
+  "experimentId": "issue-149-brand-mechanism-sublabels",
+  "generatedAtUtc": "2026-07-29T01:43:29Z",
+  "basis": "Preregistered rules applied exactly as written in preregistration.md. No rule was added, relaxed, or reinterpreted after seeing the responses.",
+  "geometry": {
+    "n": 5,
+    "unit": "cases (1 reader item per case)",
+    "counts": {
+      "ORIENTATION_SUSPECTED": 0,
+      "SEGMENTATION_SUSPECTED": 5,
+      "AMBIGUOUS_SUBLABEL": 0
+    },
+    "confidenceDistribution": {
+      "high": 2,
+      "medium": 3,
+      "low": 0
+    },
+    "estimatedBaselineDegrees": {
+      "approved-wine-027": 0,
+      "approved-wine-091": 0,
+      "approved-wine-035": 2,
+      "approved-wine-085": 1,
+      "approved-wine-023": 2
+    },
+    "allBaselinesWithinFifteenDegrees": true,
+    "caseSetStatement": "For this frozen set of five cases, the previously bundled \"orientation or segmentation\" category resolves to segmentation-suspected, based on geometry-only blinded review. Every reader-estimated baseline sat within 2 degrees of horizontal; no item met the >15-degree or vertical-text condition for ORIENTATION_SUSPECTED, and no item was called AMBIGUOUS_SUBLABEL.",
+    "prevalenceClaimMade": false,
+    "prevalenceClaimProhibitedBecause": "n=5. This is a case-set mechanism statement, not a rate over the governed corpus or production.",
+    "causalClaimMade": false
+  },
+  "typography": {
+    "readerItems": 6,
+    "cases": 5,
+    "multiRegionRuleApplied": "wine-multi-artifact-04 (two committed approved Brand regions shown as two reader items)",
+    "caseVerdicts": [
+      {
+        "caseId": "approved-wine-004",
+        "itemCount": 1,
+        "multiRegion": false,
+        "itemVerdicts": {
+          "item-f7d08e38": "Y"
+        },
+        "regionsAgree": null,
+        "caseVerdict": "STYLIZED",
+        "inDenominator": true
+      },
+      {
+        "caseId": "approved-wine-005",
+        "itemCount": 1,
+        "multiRegion": false,
+        "itemVerdicts": {
+          "item-420f6dc9": "Y"
+        },
+        "regionsAgree": null,
+        "caseVerdict": "STYLIZED",
+        "inDenominator": true
+      },
+      {
+        "caseId": "approved-wine-031",
+        "itemCount": 1,
+        "multiRegion": false,
+        "itemVerdicts": {
+          "item-df250e25": "Y"
+        },
+        "regionsAgree": null,
+        "caseVerdict": "STYLIZED",
+        "inDenominator": true
+      },
+      {
+        "caseId": "la-fattoria-rotated",
+        "itemCount": 1,
+        "multiRegion": false,
+        "itemVerdicts": {
+          "item-2b2a2bcd": "Y"
+        },
+        "regionsAgree": null,
+        "caseVerdict": "STYLIZED",
+        "inDenominator": true
+      },
+      {
+        "caseId": "wine-multi-artifact-04",
+        "itemCount": 2,
+        "multiRegion": true,
+        "itemVerdicts": {
+          "item-143eeddd": "Y",
+          "item-b648b866": "Y"
+        },
+        "regionsAgree": true,
+        "caseVerdict": "STYLIZED",
+        "inDenominator": true
+      }
+    ],
+    "denominator": 5,
+    "denominatorReducedByDisagreement": false,
+    "stylizedCaseCount": 5,
+    "caseLevelResult": "5/5",
+    "preregisteredBand": "stylization hypothesis remains supported for these cases",
+    "itemLevelChecklistTally": {
+      "decorativeScript": {
+        "Y": 5,
+        "N": 1
+      },
+      "condensedOrExpanded": {
+        "Y": 4,
+        "N": 2
+      },
+      "customLogotype": {
+        "Y": 6,
+        "N": 0
+      },
+      "outlineOrShadow": {
+        "Y": 0,
+        "N": 6
+      },
+      "archedOrCurvedBaseline": {
+        "Y": 1,
+        "N": 5
+      },
+      "unusualLigature": {
+        "Y": 3,
+        "N": 3
+      },
+      "extremeTextureOrContrast": {
+        "Y": 0,
+        "N": 6
+      },
+      "overallStylized": {
+        "Y": 6,
+        "N": 0
+      }
+    },
+    "confidenceDistribution": {
+      "high": 5,
+      "medium": 1,
+      "low": 0
+    },
+    "capabilityCeilingClaimMade": false,
+    "causalClaimMade": false,
+    "prohibitedClaims": [
+      "No Tesseract capability ceiling is claimed or implied.",
+      "No claim that stylization caused OCR failure; no OCR was run in this work.",
+      "No generalization beyond these five frozen cases."
+    ]
+  },
+  "integrityConcerns": [
+    {
+      "id": "duplicate-source-crop-across-two-frozen-cases",
+      "severity": "non-blocking, affects independence not direction",
+      "detail": "fab1b411c7e0… shared by item-2b2a2bcd(la-fattoria-rotated) + item-f7d08e38(approved-wine-004)",
+      "origin": "artifacts/issue-149-brand-otsu-threshold/control/crops — approved-wine-004.png and la-fattoria-rotated.png are byte-identical at source; the packet build faithfully copied both.",
+      "effect": "Two of the five typography cases were scored from the same pixels, so the case-level 5/5 rests on 4 distinct images, not 5. Both were marked stylized, so the direction of the result is unchanged, but the five typography cases are not five independent observations.",
+      "independentlyNoticedByReader": "Yes — annotator-provenance.md records these two items as visually indistinguishable, without repository access.",
+      "actionTaken": "Recorded only. No case was substituted, dropped, or re-scored; the preregistered case set is frozen and the preregistration forbids post-hoc changes to it.",
+      "followUpRequired": "Resolve upstream before any experiment treats these as two cases."
+    }
+  ]
+}
