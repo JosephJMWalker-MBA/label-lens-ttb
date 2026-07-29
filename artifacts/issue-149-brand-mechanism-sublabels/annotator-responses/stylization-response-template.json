@@ -1,0 +1,85 @@
+{
+  "auditId": "typography",
+  "annotatorId": "blinded-annotator-A",
+  "completedOn": "2026-07-28",
+  "responses": [
+    {
+      "itemId": "item-143eeddd",
+      "decorativeScript": "Y",
+      "condensedOrExpanded": "N",
+      "customLogotype": "Y",
+      "outlineOrShadow": "N",
+      "archedOrCurvedBaseline": "Y",
+      "unusualLigature": "Y",
+      "extremeTextureOrContrast": "N",
+      "overallStylized": "Y",
+      "confidence": "high",
+      "rationale": "Heavy calligraphic script with large looping capital swashes; the two rows sit on rising, gently curving baselines and adjacent forms merge into shared looped strokes where the rows overlap."
+    },
+    {
+      "itemId": "item-2b2a2bcd",
+      "decorativeScript": "Y",
+      "condensedOrExpanded": "Y",
+      "customLogotype": "Y",
+      "outlineOrShadow": "N",
+      "archedOrCurvedBaseline": "N",
+      "unusualLigature": "N",
+      "extremeTextureOrContrast": "N",
+      "overallStylized": "Y",
+      "confidence": "high",
+      "rationale": "Two-part lockup: a swashed script word in one colour above a row of narrow, tightly tracked sans capitals in another, both enclosed by a thin oval outline; the capital baseline itself is flat and the strokes are solid and untextured."
+    },
+    {
+      "itemId": "item-420f6dc9",
+      "decorativeScript": "Y",
+      "condensedOrExpanded": "Y",
+      "customLogotype": "Y",
+      "outlineOrShadow": "N",
+      "archedOrCurvedBaseline": "N",
+      "unusualLigature": "N",
+      "extremeTextureOrContrast": "N",
+      "overallStylized": "Y",
+      "confidence": "high",
+      "rationale": "Same style of composite mark seen at a wider framing: looping script over condensed geometric capitals with pointed apexes, ringed by a two-colour oval hairline; letterforms are flat-filled with no outline, shadow or texture."
+    },
+    {
+      "itemId": "item-b648b866",
+      "decorativeScript": "Y",
+      "condensedOrExpanded": "N",
+      "customLogotype": "Y",
+      "outlineOrShadow": "N",
+      "archedOrCurvedBaseline": "N",
+      "unusualLigature": "Y",
+      "extremeTextureOrContrast": "N",
+      "overallStylized": "Y",
+      "confidence": "medium",
+      "rationale": "Single row of ornate connected script with swashed capitals on a flat baseline; a pair of adjacent ascenders appears fused into one looped form, though the small crop and soft edges limit certainty."
+    },
+    {
+      "itemId": "item-df250e25",
+      "decorativeScript": "N",
+      "condensedOrExpanded": "Y",
+      "customLogotype": "Y",
+      "outlineOrShadow": "N",
+      "archedOrCurvedBaseline": "N",
+      "unusualLigature": "Y",
+      "extremeTextureOrContrast": "N",
+      "overallStylized": "Y",
+      "confidence": "high",
+      "rationale": "Upright lowercase forms set so tight that neighbouring bowls and stems touch and share strokes; one glyph is drawn far larger than the rest and small detached wedge shapes float above the right end, indicating a drawn mark rather than typeset text."
+    },
+    {
+      "itemId": "item-f7d08e38",
+      "decorativeScript": "Y",
+      "condensedOrExpanded": "Y",
+      "customLogotype": "Y",
+      "outlineOrShadow": "N",
+      "archedOrCurvedBaseline": "N",
+      "unusualLigature": "N",
+      "extremeTextureOrContrast": "N",
+      "overallStylized": "Y",
+      "confidence": "high",
+      "rationale": "Swashed script element set above narrow, closely spaced sans capitals inside a thin oval device; capitals sit on a straight baseline, strokes are solid single-colour with no outline, shadow or surface texture."
+    }
+  ]
+}

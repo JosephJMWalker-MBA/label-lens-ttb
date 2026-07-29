@@ -1,0 +1,194 @@
+{
+  "artifact": "unblinded-responses",
+  "issue": 149,
+  "experimentId": "issue-149-brand-mechanism-sublabels",
+  "unblindedAtUtc": "2026-07-29T01:43:29Z",
+  "protocol": {
+    "keyUsed": "artifacts/issue-149-brand-mechanism-sublabels/anonymization-map.json",
+    "keyReadOnlyAfterHashFreeze": true,
+    "rawResponseHashes": "annotator-responses/raw-response-hashes.json",
+    "labelsAltered": false,
+    "rationalesAltered": false,
+    "note": "Interpretation-only. Brand truth strings were NOT read into, joined to, or exposed to any ranking, parser, scoring, or inference process. This table exists to attribute reader answers to cases for human reading."
+  },
+  "columns": [
+    "case_id",
+    "region",
+    "anonymous_item_id",
+    "audit",
+    "raw_label/checklist",
+    "confidence",
+    "rationale"
+  ],
+  "rows": [
+    {
+      "case_id": "approved-wine-023",
+      "region": "single-region",
+      "anonymous_item_id": "item-f8708117",
+      "audit": "geometry",
+      "raw_label": "SEGMENTATION_SUSPECTED",
+      "estimated_baseline_degrees_from_horizontal": 2,
+      "confidence": "high",
+      "rationale": "Both baselines lie within a few degrees of the dashed references, but the two rows interlock: a large looping capital on the lower row sweeps up through the upper row and a descender from the upper row crosses down into the lower row.",
+      "crop_file": "approved-wine-023.png"
+    },
+    {
+      "case_id": "approved-wine-027",
+      "region": "single-region",
+      "anonymous_item_id": "item-0b2b6dbd",
+      "audit": "geometry",
+      "raw_label": "SEGMENTATION_SUSPECTED",
+      "estimated_baseline_degrees_from_horizontal": 0,
+      "confidence": "high",
+      "rationale": "All baselines sit parallel to the dashed reference lines, but the crop holds three separate text groups at very different cap heights plus horizontal rules, and the lowest sloping script group overlaps the group above it.",
+      "crop_file": "approved-wine-027.png"
+    },
+    {
+      "case_id": "approved-wine-035",
+      "region": "single-region",
+      "anonymous_item_id": "item-595e3dbf",
+      "audit": "geometry",
+      "raw_label": "SEGMENTATION_SUSPECTED",
+      "estimated_baseline_degrees_from_horizontal": 2,
+      "confidence": "medium",
+      "rationale": "The x-height run tracks the dashed lines to within a couple of degrees, but the strokes are continuously connected with long entry and exit swashes that pass under and beside adjacent forms, blurring where one group ends and the next begins.",
+      "crop_file": "approved-wine-035.png"
+    },
+    {
+      "case_id": "approved-wine-085",
+      "region": "single-region",
+      "anonymous_item_id": "item-d490b7c1",
+      "audit": "geometry",
+      "raw_label": "SEGMENTATION_SUSPECTED",
+      "estimated_baseline_degrees_from_horizontal": 1,
+      "confidence": "medium",
+      "rationale": "Letter stems carry a strong italic slant, yet the baseline and the underlying rule both run parallel to the dashed references; the connected strokes and the trailing underline swash are the fragmentation risk, not rotation.",
+      "crop_file": "approved-wine-085.png"
+    },
+    {
+      "case_id": "approved-wine-091",
+      "region": "single-region",
+      "anonymous_item_id": "item-178774e8",
+      "audit": "geometry",
+      "raw_label": "SEGMENTATION_SUSPECTED",
+      "estimated_baseline_degrees_from_horizontal": 0,
+      "confidence": "medium",
+      "rationale": "Glyphs are upright and sit side by side on two horizontal baselines parallel to the reference lines, but the block is a narrow two-row stack in which an oversized glyph on the lower row rises into and overlaps the row above; low pixel count limits certainty.",
+      "crop_file": "approved-wine-091.png"
+    },
+    {
+      "case_id": "approved-wine-004",
+      "region": "single-region",
+      "anonymous_item_id": "item-f7d08e38",
+      "audit": "typography",
+      "raw_checklist": {
+        "decorativeScript": "Y",
+        "condensedOrExpanded": "Y",
+        "customLogotype": "Y",
+        "outlineOrShadow": "N",
+        "archedOrCurvedBaseline": "N",
+        "unusualLigature": "N",
+        "extremeTextureOrContrast": "N"
+      },
+      "overall_stylized": "Y",
+      "confidence": "high",
+      "rationale": "Swashed script element set above narrow, closely spaced sans capitals inside a thin oval device; capitals sit on a straight baseline, strokes are solid single-colour with no outline, shadow or surface texture.",
+      "crop_file": "approved-wine-004.png"
+    },
+    {
+      "case_id": "approved-wine-005",
+      "region": "single-region",
+      "anonymous_item_id": "item-420f6dc9",
+      "audit": "typography",
+      "raw_checklist": {
+        "decorativeScript": "Y",
+        "condensedOrExpanded": "Y",
+        "customLogotype": "Y",
+        "outlineOrShadow": "N",
+        "archedOrCurvedBaseline": "N",
+        "unusualLigature": "N",
+        "extremeTextureOrContrast": "N"
+      },
+      "overall_stylized": "Y",
+      "confidence": "high",
+      "rationale": "Same style of composite mark seen at a wider framing: looping script over condensed geometric capitals with pointed apexes, ringed by a two-colour oval hairline; letterforms are flat-filled with no outline, shadow or texture.",
+      "crop_file": "approved-wine-005.png"
+    },
+    {
+      "case_id": "approved-wine-031",
+      "region": "single-region",
+      "anonymous_item_id": "item-df250e25",
+      "audit": "typography",
+      "raw_checklist": {
+        "decorativeScript": "N",
+        "condensedOrExpanded": "Y",
+        "customLogotype": "Y",
+        "outlineOrShadow": "N",
+        "archedOrCurvedBaseline": "N",
+        "unusualLigature": "Y",
+        "extremeTextureOrContrast": "N"
+      },
+      "overall_stylized": "Y",
+      "confidence": "high",
+      "rationale": "Upright lowercase forms set so tight that neighbouring bowls and stems touch and share strokes; one glyph is drawn far larger than the rest and small detached wedge shapes float above the right end, indicating a drawn mark rather than typeset text.",
+      "crop_file": "approved-wine-031.png"
+    },
+    {
+      "case_id": "la-fattoria-rotated",
+      "region": "single-region",
+      "anonymous_item_id": "item-2b2a2bcd",
+      "audit": "typography",
+      "raw_checklist": {
+        "decorativeScript": "Y",
+        "condensedOrExpanded": "Y",
+        "customLogotype": "Y",
+        "outlineOrShadow": "N",
+        "archedOrCurvedBaseline": "N",
+        "unusualLigature": "N",
+        "extremeTextureOrContrast": "N"
+      },
+      "overall_stylized": "Y",
+      "confidence": "high",
+      "rationale": "Two-part lockup: a swashed script word in one colour above a row of narrow, tightly tracked sans capitals in another, both enclosed by a thin oval outline; the capital baseline itself is flat and the strokes are solid and untextured.",
+      "crop_file": "la-fattoria-rotated.png"
+    },
+    {
+      "case_id": "wine-multi-artifact-04",
+      "region": "region-1",
+      "anonymous_item_id": "item-143eeddd",
+      "audit": "typography",
+      "raw_checklist": {
+        "decorativeScript": "Y",
+        "condensedOrExpanded": "N",
+        "customLogotype": "Y",
+        "outlineOrShadow": "N",
+        "archedOrCurvedBaseline": "Y",
+        "unusualLigature": "Y",
+        "extremeTextureOrContrast": "N"
+      },
+      "overall_stylized": "Y",
+      "confidence": "high",
+      "rationale": "Heavy calligraphic script with large looping capital swashes; the two rows sit on rising, gently curving baselines and adjacent forms merge into shared looped strokes where the rows overlap.",
+      "crop_file": "wine-multi-artifact-04-region-1.png"
+    },
+    {
+      "case_id": "wine-multi-artifact-04",
+      "region": "region-2",
+      "anonymous_item_id": "item-b648b866",
+      "audit": "typography",
+      "raw_checklist": {
+        "decorativeScript": "Y",
+        "condensedOrExpanded": "N",
+        "customLogotype": "Y",
+        "outlineOrShadow": "N",
+        "archedOrCurvedBaseline": "N",
+        "unusualLigature": "Y",
+        "extremeTextureOrContrast": "N"
+      },
+      "overall_stylized": "Y",
+      "confidence": "medium",
+      "rationale": "Single row of ornate connected script with swashed capitals on a flat baseline; a pair of adjacent ascenders appears fused into one looped form, though the small crop and soft edges limit certainty.",
+      "crop_file": "wine-multi-artifact-04-region-2.png"
+    }
+  ]
+}

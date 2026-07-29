@@ -1,0 +1,138 @@
+{
+  "artifact": "validation-report",
+  "issue": 149,
+  "experimentId": "issue-149-brand-mechanism-sublabels",
+  "validatedAtUtc": "2026-07-29T01:43:29Z",
+  "scope": "Structural validation of the blinded annotator responses. Evaluation-only: no OCR was run, no labels were altered, no preregistered rule was changed.",
+  "rawResponseHashesFrozenBeforeUnblinding": true,
+  "rawResponsesPreservedVerbatim": true,
+  "packetValidator": {
+    "command": "node scripts/eval/validate-issue-149-brand-mechanism-packet.mjs",
+    "rerunBeforeUnblinding": true,
+    "result": "11 passed, 0 failed",
+    "note": "Preregistration requires this to pass again before responses are unblinded. It did."
+  },
+  "expectedItems": {
+    "geometry": [
+      "item-0b2b6dbd",
+      "item-178774e8",
+      "item-595e3dbf",
+      "item-d490b7c1",
+      "item-f8708117"
+    ],
+    "typography": [
+      "item-143eeddd",
+      "item-2b2a2bcd",
+      "item-420f6dc9",
+      "item-b648b866",
+      "item-df250e25",
+      "item-f7d08e38"
+    ]
+  },
+  "checks": [
+    {
+      "id": "geometry-items-exactly-once",
+      "status": "PASS",
+      "severity": "blocking",
+      "detail": "expected 5 unique geometry items; found 5 (5 unique)"
+    },
+    {
+      "id": "stylization-items-exactly-once",
+      "status": "PASS",
+      "severity": "blocking",
+      "detail": "expected 6 unique stylization items; found 6 (6 unique)"
+    },
+    {
+      "id": "no-unexpected-item-ids",
+      "status": "PASS",
+      "severity": "blocking",
+      "detail": "every returned itemId appears in anonymization-map.json under the same audit"
+    },
+    {
+      "id": "no-cross-audit-contamination",
+      "status": "PASS",
+      "severity": "blocking",
+      "detail": "no geometry item answered in the typography audit or vice versa"
+    },
+    {
+      "id": "geometry-labels-valid-enum",
+      "status": "PASS",
+      "severity": "blocking",
+      "detail": "0 invalid label values"
+    },
+    {
+      "id": "confidence-valid-enum",
+      "status": "PASS",
+      "severity": "blocking",
+      "detail": "0 invalid confidence values"
+    },
+    {
+      "id": "checklist-values-valid-enum",
+      "status": "PASS",
+      "severity": "blocking",
+      "detail": "all 48 checklist values are Y or N"
+    },
+    {
+      "id": "required-fields-complete",
+      "status": "PASS",
+      "severity": "blocking",
+      "detail": "all required fields present, no unfilled template placeholders"
+    },
+    {
+      "id": "rationales-non-empty",
+      "status": "PASS",
+      "severity": "blocking",
+      "detail": "every rationale is a substantive sentence"
+    },
+    {
+      "id": "provenance-internally-consistent",
+      "status": "PASS",
+      "severity": "blocking",
+      "detail": "ok: all five exposure declarations present and negative; ok: annotatorId matches both response files; ok: completedOn matches both response files; ok: declared item counts match delivered counts; ok: declared low-resolution confidence cap holds in the data; ok: upscaling disclosed with scope (enlargement only); ok: no OCR claimed or implied; ok: audit order declared (Audit 1 before Audit 2, not revised)"
+    },
+    {
+      "id": "no-unblinding-leakage-in-raw-responses",
+      "status": "PASS",
+      "severity": "blocking",
+      "detail": "no case IDs, crop filenames, or prior failure-class names appear in the reader responses"
+    },
+    {
+      "id": "distinct-frozen-cases-have-distinct-crops",
+      "status": "FAIL",
+      "severity": "non-blocking-integrity-concern",
+      "detail": "fab1b411c7e0… shared by item-2b2a2bcd(la-fattoria-rotated) + item-f7d08e38(approved-wine-004). Byte-identical crops for two DIFFERENT frozen cases; duplication originates upstream in artifacts/issue-149-brand-otsu-threshold/control/crops, not in the packet build."
+    }
+  ],
+  "upscalingDisclosure": {
+    "disclosedBy": "annotator, in annotator-provenance.md, unprompted",
+    "tool": "sips (macOS), 4x resample",
+    "itemsAffected": [
+      "item-143eeddd",
+      "item-178774e8",
+      "item-595e3dbf",
+      "item-b648b866",
+      "item-d490b7c1",
+      "item-df250e25"
+    ],
+    "properties": {
+      "enlargementOnly": true,
+      "crop": false,
+      "rotation": false,
+      "colorChange": false,
+      "ocr": false,
+      "externalLookup": false
+    },
+    "appliedTo": "copies written outside the repository; packet images unmodified",
+    "packetImagesUnmodifiedAfterAnnotation": true,
+    "ruling": "DISCLOSED_VIEWING_AID",
+    "rulingBasis": "A pure resample changes no geometry and adds no information: baseline angle, fragmentation, and letterform attributes are scale-invariant. The annotator disclosed it without being asked and capped confidence on the low-resolution items. Not treated as a contamination failure."
+  },
+  "summary": {
+    "total": 12,
+    "passed": 11,
+    "failed": 1,
+    "blockingFailures": 0,
+    "nonBlockingConcerns": ["distinct-frozen-cases-have-distinct-crops"],
+    "verdict": "RESPONSES ACCEPTED FOR AGGREGATION (with recorded non-blocking integrity concern)"
+  }
+}

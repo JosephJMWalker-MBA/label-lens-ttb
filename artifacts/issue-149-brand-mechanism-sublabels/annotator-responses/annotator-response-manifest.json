@@ -1,0 +1,77 @@
+{
+  "artifact": "annotator-response-manifest",
+  "issue": 149,
+  "experimentId": "issue-149-brand-mechanism-sublabels",
+  "generatedAtUtc": "2026-07-29T01:45:00Z",
+  "scope": "Evaluation-only. No OCR run, no production change, no label altered after recording.",
+  "rawResponseFiles": [
+    "geometric-response-template.json",
+    "stylization-response-template.json",
+    "annotator-provenance.md"
+  ],
+  "derivedFiles": [
+    "aggregation-report.json",
+    "interpretation.md",
+    "limitations.md",
+    "raw-response-hashes.json",
+    "unblinded-responses.json",
+    "validation-report.json"
+  ],
+  "files": [
+    {
+      "path": "aggregation-report.json",
+      "role": "derived",
+      "sizeBytes": 5454,
+      "sha256": "964b1cce097dfa05db1df34ecd537efeb3dab93b148b85a1864f427ef90d9ae0"
+    },
+    {
+      "path": "annotator-provenance.md",
+      "role": "raw-annotator-response",
+      "sizeBytes": 2808,
+      "sha256": "54a0806d2644c964888310dc5bffbcfbbdfc1f97fe99e656bd898f4b4d1d6300"
+    },
+    {
+      "path": "geometric-response-template.json",
+      "role": "raw-annotator-response",
+      "sizeBytes": 2243,
+      "sha256": "20d3b6be2063461b7686d2b9f060225c3efa6caa67437b75d1eeca404f6e46be"
+    },
+    {
+      "path": "interpretation.md",
+      "role": "derived",
+      "sizeBytes": 6714,
+      "sha256": "fac2a4373a38f5f44759976a780cfa0d801cd64ac3c30f87c7bd7137eac1bfdd"
+    },
+    {
+      "path": "limitations.md",
+      "role": "derived",
+      "sizeBytes": 4250,
+      "sha256": "127883b43c00fe854a996d5b31c450721e28f7df50b12366b7a2a896bf1d7e14"
+    },
+    {
+      "path": "raw-response-hashes.json",
+      "role": "derived",
+      "sizeBytes": 1497,
+      "sha256": "d5cd63c649dff0c87a5378af5ea2e738b22f141fd1a8584c02e24d93b8fa8d35"
+    },
+    {
+      "path": "stylization-response-template.json",
+      "role": "raw-annotator-response",
+      "sizeBytes": 3563,
+      "sha256": "fb5ed5779da53ec8f315ea48fa9c733769a6e8c287fb09c5865985706ebc98d2"
+    },
+    {
+      "path": "unblinded-responses.json",
+      "role": "derived",
+      "sizeBytes": 8447,
+      "sha256": "ac4d12588d908d1c3e31b3850434b325f3220c27e7783e9d031f4c1592fbd43b"
+    },
+    {
+      "path": "validation-report.json",
+      "role": "derived",
+      "sizeBytes": 5060,
+      "sha256": "cb775e3720eb8ccdb75a45b1d5b840390c551377c22986349193619b5247d558"
+    }
+  ],
+  "verify": "shasum -a 256 -c annotator-response-manifest.sha256 (run from this directory), then recompute per-file hashes against files[].sha256"
+}
