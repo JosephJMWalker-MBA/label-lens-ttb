@@ -1,0 +1,101 @@
+{
+  "artifact": "artifact-manifest",
+  "experimentId": "issue-149-parseq-compatibility-probe",
+  "issue": 149,
+  "evaluationOnly": true,
+  "gateOutcome": "BLOCKED_MODEL_LICENSE",
+  "compatibilityVerdict": null,
+  "checkpointRetrieved": false,
+  "containerBuilt": false,
+  "inferenceInvocations": 0,
+  "plannedInferenceInvocations": 4,
+  "corpusAccessed": false,
+  "fixtureAccessed": false,
+  "productionChanged": false,
+  "pr195Untouched": true,
+  "modelWeightsCommitted": false,
+  "fontBinaryCommitted": false,
+  "gitLfsUsed": false,
+  "largestArtifactBytes": 9242,
+  "proof": "Largest file is 9242 bytes (preregistration.md). No model checkpoint, font binary, or image entered Git.",
+  "absentByDesign": [
+    "runtime-provenance.json",
+    "dependency-lock.json",
+    "container-provenance.json",
+    "font-provenance.json",
+    "synthetic-input-spec.json",
+    "synthetic/positive.png",
+    "synthetic/blank.png",
+    "invocation-matrix.json",
+    "raw logits + descriptors",
+    "run-results.json",
+    "determinism-report.json",
+    "output-risk-report.json",
+    "resource-report.json"
+  ],
+  "absentReason": "The licensing gate precedes retrieval and it blocked. These are deliberately absent rather than emitted empty or synthesised.",
+  "fileCount": 12,
+  "files": [
+    {
+      "path": "candidate-selection-corrections.md",
+      "sizeBytes": 2429,
+      "sha256": "0bc79cc62b2bb530e8e4355a2a7c791753c9168b4a3b81d9ca4a42436c9750e0"
+    },
+    {
+      "path": "checkpoint-provenance.json",
+      "sizeBytes": 1432,
+      "sha256": "3fc2bd8a474420957fb5d907833be302a2a3e70eb9e06371aa23c08821e150ad"
+    },
+    {
+      "path": "code-provenance.json",
+      "sizeBytes": 1552,
+      "sha256": "5a56c6e1ca8de5ca7b0ae3682ee0fd784087f29b80660d16ec434f175dee5612"
+    },
+    {
+      "path": "commands.sh",
+      "sizeBytes": 2467,
+      "sha256": "0eb7c82de573f8dfd277cfe450592047dae6a47f96aa17f39ae0c69922ad14d8"
+    },
+    {
+      "path": "decision.json",
+      "sizeBytes": 5064,
+      "sha256": "38bd84f4b623fb6a9dbebd5403b83b6454df62c13c7b45fdacd7aea7003b2466"
+    },
+    {
+      "path": "evidence-schema.json",
+      "sizeBytes": 2700,
+      "sha256": "5c1c037f6e53cdc03bf9c458abd60e4cd90e28f4d19f4dce0f356fa7f1063a31"
+    },
+    {
+      "path": "git-sha.txt",
+      "sizeBytes": 100,
+      "sha256": "f8476b8e481edde6e8a81e19d5c40debfeb76218b490fc856524ac67e473c58f"
+    },
+    {
+      "path": "license-audit.md",
+      "sizeBytes": 6678,
+      "sha256": "9c56b513925ae79ad27c6db51764524fc91e59a7ef3959c693fb3754383990c7"
+    },
+    {
+      "path": "limitations.md",
+      "sizeBytes": 4873,
+      "sha256": "7e223c982939e5f0627a702dabd785eecac92e67e0850c090b6b0bae4160c482"
+    },
+    {
+      "path": "preregistration.md",
+      "sizeBytes": 9242,
+      "sha256": "02b0180bcd59d5f68c14a9215e7d55c44ad57ecc146be40ab0ca0e5adafa748b"
+    },
+    {
+      "path": "preregistration.sha256",
+      "sizeBytes": 85,
+      "sha256": "56f70a63b2fdefb949cc6148013bf8d94f9d397f9ef5d858deb3d915bb0fa317"
+    },
+    {
+      "path": "transform-spec.json",
+      "sizeBytes": 1211,
+      "sha256": "f07bd4c86b70d04ad2cc49835be5b81f02dfc7aba6170a000ad857ae8b72d8b0"
+    }
+  ],
+  "verify": "shasum -a 256 -c artifacts/issue-149-parseq-compatibility-probe/artifact-manifest.sha256"
+}

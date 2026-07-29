@@ -1,0 +1,34 @@
+{
+  "artifact": "code-provenance",
+  "experimentId": "issue-149-parseq-compatibility-probe",
+  "verifiedBeforeRetrieval": true,
+  "repository": "https://github.com/baudm/parseq",
+  "pinnedCommit": "1902db043c029a7e03a3818c616c06600af574be",
+  "pinnedCommitVerified": true,
+  "pinnedCommitDate": "2024-04-24T15:32:34Z",
+  "pinnedCommitSubject": "Added PaddleOCR integration info",
+  "floatingMainUsed": false,
+  "releaseTag": "v1.0.0",
+  "releaseTagTargetCommit": "315d19be8ef473a864950ab497a649a69e37c6a4",
+  "releaseTagTargetVerified": true,
+  "refutedPreviouslyReportedCommit": "315d19b88931758c5c36395b086e115049386d49",
+  "licenseFilesInPinnedTree": [
+    { "path": "LICENSE", "license": "Apache-2.0", "scope": "code" },
+    {
+      "path": "NOTICE",
+      "license": "attribution material, not a grant",
+      "scope": "code components"
+    },
+    { "path": "strhub/models/abinet/LICENSE", "license": "BSD", "scope": "abinet component" },
+    { "path": "strhub/models/crnn/LICENSE", "license": "MIT", "scope": "crnn component" }
+  ],
+  "modelCardInRepository": false,
+  "weightsLicenseStatementInRepository": false,
+  "modelIdentifier": {
+    "hubconfEntry": "parseq",
+    "documentedAs": "PARSeq base model (img_size=128x32, patch_size=8x4, d_model=384)",
+    "verifiedFrom": "hubconf.py at the pinned commit"
+  },
+  "codeRetrieved": false,
+  "note": "Provenance was established from upstream metadata and source reads. No source tree and no checkpoint was downloaded into this repository, because the licensing gate blocked before retrieval."
+}

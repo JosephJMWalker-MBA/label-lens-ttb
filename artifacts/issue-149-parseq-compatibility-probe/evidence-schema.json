@@ -1,0 +1,73 @@
+{
+  "artifact": "evidence-schema",
+  "experimentId": "issue-149-parseq-compatibility-probe",
+  "status": "design-only, never exercised — inference did not run",
+  "purpose": "Sequence-only recognition evidence contract for PARSeq. Deliberately carries no geometry, because the model produces none.",
+  "typescriptInterface": "ParseqRecognitionEvidence",
+  "fields": {
+    "opaqueItemId": "string",
+    "engine": {
+      "engineId": "parseq",
+      "codeCommit": "string",
+      "runtimeId": "string",
+      "runtimePackagesHash": "string"
+    },
+    "model": {
+      "modelId": "parseq",
+      "checkpointFile": "string",
+      "checkpointSha256": "string",
+      "checkpointBytes": "number",
+      "checkpointRelease": "v1.0.0"
+    },
+    "input": {
+      "sourceImageSha256": "string",
+      "sourceWidth": "number",
+      "sourceHeight": "number",
+      "modelInputWidth": 128,
+      "modelInputHeight": 32,
+      "transformDescription": "string",
+      "transformedTensorSha256": "string | undefined"
+    },
+    "output": {
+      "rawLogitsArtifact": "string",
+      "logitsShape": "number[]",
+      "rawTokenIds": "number[]",
+      "rawTokens": "string[]",
+      "rawTranscript": "string",
+      "normalizedTranscript": "string",
+      "eosIndex": "number | null",
+      "characterProbabilities": "number[]",
+      "nativeSequenceScore": "number | null",
+      "emptyTranscript": "boolean"
+    },
+    "execution": {
+      "decodeAr": true,
+      "refineIterations": 1,
+      "decodingMode": "greedy-argmax",
+      "latencyMs": "number",
+      "modelLoadMs": "number",
+      "peakMemoryBytes": "number | null",
+      "warnings": "string[]",
+      "errors": "string[]",
+      "outputFingerprint": "string"
+    }
+  },
+  "sequenceScoreFormula": {
+    "definition": "product of the per-position maximum softmax probabilities over the decoded positions up to and including the first EOS, exclusive of padding positions",
+    "range": "0..1",
+    "specifiedBeforeInference": true,
+    "note": "Fixed here so it could not be chosen after seeing outputs. Never computed, because inference did not run."
+  },
+  "prohibitions": {
+    "fabricatedWordBoxes": false,
+    "fabricatedCharacterBoxes": false,
+    "fabricatedLineBoxes": false,
+    "tesseractStyleConfidence": false,
+    "confidenceRescaledToPercent": false,
+    "probabilitiesPassedToAuthorityThresholds": false,
+    "ocrWordObjectsCreated": false,
+    "selectBrandObservationCalled": false,
+    "abstentionCapabilityAsserted": false,
+    "explanation": "Every entry above is false by construction: the contract has no geometry fields at all, keeps native probabilities in 0..1, and is not wired to any Label Lens selector or threshold."
+  }
+}

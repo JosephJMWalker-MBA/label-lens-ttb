@@ -1,0 +1,39 @@
+{
+  "artifact": "checkpoint-provenance",
+  "experimentId": "issue-149-parseq-compatibility-probe",
+  "retrieved": false,
+  "retrievalBlockedBy": "BLOCKED_MODEL_LICENSE",
+  "modelId": "parseq",
+  "checkpointFile": "parseq-bb5792a6.pt",
+  "checkpointUrl": "https://github.com/baudm/parseq/releases/download/v1.0.0/parseq-bb5792a6.pt",
+  "checkpointRelease": "v1.0.0",
+  "releaseTitle": "Pretrained Weights",
+  "releaseTagTargetCommit": "315d19be8ef473a864950ab497a649a69e37c6a4",
+  "publishedByteSize": 95392675,
+  "publishedByteSizeSource": "GitHub release asset metadata",
+  "sha256": null,
+  "sha256Reason": "The checkpoint was not downloaded, so no hash could be computed. The short hash embedded in the filename (bb5792a6) is not a substitute for a full SHA-256 and is not recorded as one.",
+  "embeddedShortHashInFilename": "bb5792a6",
+  "embeddedShortHashTreatedAsIntegrityProof": false,
+  "committedToGit": false,
+  "gitLfsUsed": false,
+  "substitutionsConsidered": {
+    "huggingFaceCheckpoint": "not substituted — forbidden by the probe design",
+    "torchScriptArtifact": "not substituted",
+    "tinyModel": "not substituted",
+    "patch16Model": "not substituted",
+    "otherRelease": "not substituted"
+  },
+  "trainingDatasetsDeclaredInRelease": [
+    "COCO",
+    "RCTW17",
+    "Uber",
+    "ArT",
+    "LSVT",
+    "MLT19",
+    "ReCTS",
+    "TextOCR",
+    "OpenVINO"
+  ],
+  "releaseBodyContainsLicenseStatement": false
+}
