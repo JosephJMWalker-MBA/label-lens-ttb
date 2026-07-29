@@ -1,0 +1,51 @@
+{
+  "invocation": "A-item-64a8d5e551a5-repeat",
+  "arm": "A",
+  "engine": "tesseract.js@7.0.0/eng/OEM1",
+  "psm": 11,
+  "opaqueItemId": "item-64a8d5e551a5",
+  "inputSha256": "8080cb380c7d65e99ed9ae48c3075daf301518b03246ef03e25d8ee74adf3eee",
+  "words": [
+    {
+      "text": "0",
+      "confidence": 8,
+      "bbox": {
+        "x0": 875,
+        "y0": 226,
+        "x1": 992,
+        "y1": 362
+      }
+    },
+    {
+      "text": "—_",
+      "confidence": 8,
+      "bbox": {
+        "x0": 1094,
+        "y0": 222,
+        "x1": 1455,
+        "y1": 428
+      }
+    },
+    {
+      "text": "GATT",
+      "confidence": 1,
+      "bbox": {
+        "x0": 12,
+        "y0": 268,
+        "x1": 773,
+        "y1": 858
+      }
+    },
+    {
+      "text": "ORIA",
+      "confidence": 89,
+      "bbox": {
+        "x0": 761,
+        "y0": 527,
+        "x1": 1416,
+        "y1": 750
+      }
+    }
+  ],
+  "rawTranscript": "0 —_ GATT ORIA"
+}

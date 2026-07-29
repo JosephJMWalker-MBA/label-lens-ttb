@@ -1,0 +1,60 @@
+{
+  "artifact": "design-cluster-results",
+  "experimentId": "issue-149-brand-native-tesseract-model-attribution",
+  "distinctBrandDesigns": 3,
+  "rule": "Shared-design evidence counts once at design level.",
+  "runtimeContrast": [
+    {
+      "clusterId": "D1",
+      "members": ["item-cb35adee2cf8", "item-64a8d5e551a5", "item-7b5cdce6d1ff"],
+      "memberClassifications": [
+        "NATIVE_RUNTIME_NO_EFFECT",
+        "NATIVE_RUNTIME_NO_EFFECT",
+        "NATIVE_RUNTIME_NO_EFFECT"
+      ],
+      "clusterClassification": "NATIVE_RUNTIME_NO_EFFECT",
+      "countsOnce": true
+    },
+    {
+      "clusterId": "D2",
+      "members": ["item-79aa3241d939", "item-6db972c3416b"],
+      "memberClassifications": ["NATIVE_RUNTIME_NO_EFFECT", "NATIVE_RUNTIME_NO_EFFECT"],
+      "clusterClassification": "NATIVE_RUNTIME_NO_EFFECT",
+      "countsOnce": true
+    },
+    {
+      "clusterId": "D3",
+      "members": ["item-710d87caca47"],
+      "memberClassifications": ["NATIVE_RUNTIME_NO_EFFECT"],
+      "clusterClassification": "NATIVE_RUNTIME_NO_EFFECT",
+      "countsOnce": true
+    }
+  ],
+  "modelContrast": [
+    {
+      "clusterId": "D1",
+      "members": ["item-cb35adee2cf8", "item-64a8d5e551a5", "item-7b5cdce6d1ff"],
+      "memberClassifications": [
+        "FLOAT_MODEL_NO_EFFECT",
+        "FLOAT_MODEL_NO_EFFECT",
+        "FLOAT_MODEL_NO_EFFECT"
+      ],
+      "clusterClassification": "FLOAT_MODEL_NO_EFFECT",
+      "countsOnce": true
+    },
+    {
+      "clusterId": "D2",
+      "members": ["item-79aa3241d939", "item-6db972c3416b"],
+      "memberClassifications": ["FLOAT_MODEL_NO_EFFECT", "FLOAT_MODEL_NO_EFFECT"],
+      "clusterClassification": "FLOAT_MODEL_NO_EFFECT",
+      "countsOnce": true
+    },
+    {
+      "clusterId": "D3",
+      "members": ["item-710d87caca47"],
+      "memberClassifications": ["FLOAT_MODEL_NO_EFFECT"],
+      "clusterClassification": "FLOAT_MODEL_NO_EFFECT",
+      "countsOnce": true
+    }
+  ]
+}

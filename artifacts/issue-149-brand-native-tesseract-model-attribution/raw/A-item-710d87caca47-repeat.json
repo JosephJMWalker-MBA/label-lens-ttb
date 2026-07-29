@@ -1,0 +1,21 @@
+{
+  "invocation": "A-item-710d87caca47-repeat",
+  "arm": "A",
+  "engine": "tesseract.js@7.0.0/eng/OEM1",
+  "psm": 11,
+  "opaqueItemId": "item-710d87caca47",
+  "inputSha256": "efd2a2f90dd1ee74da7df9258916f1d253f7948601bdc60f1dfbbbed3cc4fa65",
+  "words": [
+    {
+      "text": "enheesO",
+      "confidence": 35,
+      "bbox": {
+        "x0": 39,
+        "y0": 0,
+        "x1": 1000,
+        "y1": 218
+      }
+    }
+  ],
+  "rawTranscript": "enheesO"
+}

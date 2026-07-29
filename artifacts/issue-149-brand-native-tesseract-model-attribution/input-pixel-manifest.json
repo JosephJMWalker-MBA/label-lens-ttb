@@ -1,0 +1,218 @@
+{
+  "artifact": "input-pixel-manifest",
+  "experimentId": "issue-149-brand-native-tesseract-model-attribution",
+  "frozenBeforeOcr": true,
+  "recoveredNotRegenerated": true,
+  "preprocessedSource": "artifacts/issue-149-brand-otsu-threshold/control/preprocessed",
+  "preprocessingDescription": "Governed bounded-Brand control preprocessing, as committed by the merged Otsu-threshold control arm: approved Brand region crop with padding ratio 0.03 / min 4 px, rotation 0, scale 3 (cubic), sharp grayscale, sharp normalise, no local contrast, no threshold, no sharpening, no inversion, no denoising.",
+  "identicalBytesAcrossAllThreeArms": true,
+  "distinctPreprocessedPixelSets": 5,
+  "items": [
+    {
+      "opaqueItemId": "item-cb35adee2cf8",
+      "ocrItemId": "approved-wine-004",
+      "caseId": "approved-wine-004",
+      "cropClusterId": "C1",
+      "designClusterId": "D1",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-004/label.png",
+      "sourceImageSha256": "02c272bc23e836befc6024a0c7fa1e3b448dc7d31b2e691cdff1f37457377aa5",
+      "sourceImageSize": {
+        "width": 1350,
+        "height": 1650
+      },
+      "approvedRegion": {
+        "unit": "normalized-panel-relative",
+        "provenance": "human-approved-region",
+        "x": 0.25925925925925924,
+        "y": 0.21818181818181817,
+        "width": 0.48148148148148145,
+        "height": 0.17575757575757575,
+        "label": "sole visible brand occurrence"
+      },
+      "cropRect": {
+        "left": 330,
+        "top": 351,
+        "width": 690,
+        "height": 308
+      },
+      "committedCropPath": "artifacts/issue-149-brand-otsu-threshold/control/crops/approved-wine-004.png",
+      "committedCropSha256": "fab1b411c7e06258c41c884d3f0777039219f171fca37febd32597fabd5b108c",
+      "preprocessedSourcePath": "artifacts/issue-149-brand-otsu-threshold/control/preprocessed/approved-wine-004.png",
+      "preprocessedSha256": "ce5b99dc782cf2d893c35be8dea88e7bcddc09f0859183e8ff13f4dc3e6a67a1",
+      "preprocessedByteSize": 188956,
+      "inferenceInputPath": "artifacts/issue-149-brand-native-tesseract-model-attribution/inference-inputs/item-cb35adee2cf8.png"
+    },
+    {
+      "opaqueItemId": "item-64a8d5e551a5",
+      "ocrItemId": "approved-wine-005",
+      "caseId": "approved-wine-005",
+      "cropClusterId": "C2",
+      "designClusterId": "D1",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-005/label.png",
+      "sourceImageSha256": "4098ba3ddd706354a51ac55015aac04cd1a67a12aaa1947cfef59a523fd13ef9",
+      "sourceImageSize": {
+        "width": 1500,
+        "height": 1140
+      },
+      "approvedRegion": {
+        "unit": "normalized-panel-relative",
+        "provenance": "human-approved-region",
+        "x": 0.33,
+        "y": 0.21052631578947367,
+        "width": 0.3466666666666667,
+        "height": 0.23684210526315788,
+        "label": "sole visible brand occurrence"
+      },
+      "cropRect": {
+        "left": 479,
+        "top": 232,
+        "width": 553,
+        "height": 286
+      },
+      "committedCropPath": "artifacts/issue-149-brand-otsu-threshold/control/crops/approved-wine-005.png",
+      "committedCropSha256": "d189130bea28dc36278958da8301539afb7a72ff2f1b80195139170dd3556c08",
+      "preprocessedSourcePath": "artifacts/issue-149-brand-otsu-threshold/control/preprocessed/approved-wine-005.png",
+      "preprocessedSha256": "8080cb380c7d65e99ed9ae48c3075daf301518b03246ef03e25d8ee74adf3eee",
+      "preprocessedByteSize": 161554,
+      "inferenceInputPath": "artifacts/issue-149-brand-native-tesseract-model-attribution/inference-inputs/item-64a8d5e551a5.png"
+    },
+    {
+      "opaqueItemId": "item-710d87caca47",
+      "ocrItemId": "approved-wine-031",
+      "caseId": "approved-wine-031",
+      "cropClusterId": "C3",
+      "designClusterId": "D3",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-031/label.jpeg",
+      "sourceImageSha256": "512afcf475b691396481d289dbcb461f6880cb81c03ec02e8db4a54faea6a4b2",
+      "sourceImageSize": {
+        "width": 646,
+        "height": 1171
+      },
+      "approvedRegion": {
+        "unit": "normalized-panel-relative",
+        "provenance": "human-approved-region",
+        "x": 0.25232198142414863,
+        "y": 0.032450896669513236,
+        "width": 0.5108359133126935,
+        "height": 0.06490179333902647,
+        "label": "sole visible brand occurrence"
+      },
+      "cropRect": {
+        "left": 153,
+        "top": 34,
+        "width": 350,
+        "height": 85
+      },
+      "committedCropPath": "artifacts/issue-149-brand-otsu-threshold/control/crops/approved-wine-031.png",
+      "committedCropSha256": "2998fea6a8a7bddfc12b418c5207151920e0ed03940b349de8f4968323dd85c8",
+      "preprocessedSourcePath": "artifacts/issue-149-brand-otsu-threshold/control/preprocessed/approved-wine-031.png",
+      "preprocessedSha256": "efd2a2f90dd1ee74da7df9258916f1d253f7948601bdc60f1dfbbbed3cc4fa65",
+      "preprocessedByteSize": 105654,
+      "inferenceInputPath": "artifacts/issue-149-brand-native-tesseract-model-attribution/inference-inputs/item-710d87caca47.png"
+    },
+    {
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "ocrItemId": "la-fattoria-rotated",
+      "caseId": "la-fattoria-rotated",
+      "cropClusterId": "C1",
+      "designClusterId": "D1",
+      "sourceImagePath": "tests/fixtures/precheck/approved-wine-003/label.png",
+      "sourceImageSha256": "78a45dc3df09a29615ebb19687803d4c0b9e50c0ffdcea833d6cc332bd3ee4e8",
+      "sourceImageSize": {
+        "width": 1350,
+        "height": 1650
+      },
+      "approvedRegion": {
+        "unit": "normalized-panel-relative",
+        "provenance": "human-approved-region",
+        "x": 0.25925925925925924,
+        "y": 0.21818181818181817,
+        "width": 0.48148148148148145,
+        "height": 0.17575757575757575,
+        "label": "sole visible brand occurrence"
+      },
+      "cropRect": {
+        "left": 330,
+        "top": 351,
+        "width": 690,
+        "height": 308
+      },
+      "committedCropPath": "artifacts/issue-149-brand-otsu-threshold/control/crops/la-fattoria-rotated.png",
+      "committedCropSha256": "fab1b411c7e06258c41c884d3f0777039219f171fca37febd32597fabd5b108c",
+      "preprocessedSourcePath": "artifacts/issue-149-brand-otsu-threshold/control/preprocessed/la-fattoria-rotated.png",
+      "preprocessedSha256": "ce5b99dc782cf2d893c35be8dea88e7bcddc09f0859183e8ff13f4dc3e6a67a1",
+      "preprocessedByteSize": 188956,
+      "inferenceInputPath": "artifacts/issue-149-brand-native-tesseract-model-attribution/inference-inputs/item-7b5cdce6d1ff.png"
+    },
+    {
+      "opaqueItemId": "item-79aa3241d939",
+      "ocrItemId": "wine-multi-artifact-04-region-1",
+      "caseId": "wine-multi-artifact-04",
+      "cropClusterId": "C4",
+      "designClusterId": "D2",
+      "sourceImagePath": "tests/fixtures/precheck/wine-multi-artifact-04/label.png",
+      "sourceImageSha256": "445d39b8f73d04cd05bb35e03f9678f6ba9e81f6a6f01d5469306ec43c9c5887",
+      "sourceImageSize": {
+        "width": 674,
+        "height": 1522
+      },
+      "approvedRegion": {
+        "unit": "normalized-panel-relative",
+        "provenance": "human-approved-region",
+        "x": 0.07863501483679525,
+        "y": 0.08081471747700394,
+        "width": 0.34124629080118696,
+        "height": 0.09198423127463863,
+        "label": "front panel — 'Dry Cellar' script mark"
+      },
+      "cropRect": {
+        "left": 46,
+        "top": 119,
+        "width": 244,
+        "height": 148
+      },
+      "committedCropPath": "artifacts/issue-149-brand-otsu-threshold/control/crops/wine-multi-artifact-04-region-1.png",
+      "committedCropSha256": "d46fe950184f98042c724d261d884434a6cf5eab63b138e53a9299992d2c9fea",
+      "preprocessedSourcePath": "artifacts/issue-149-brand-otsu-threshold/control/preprocessed/wine-multi-artifact-04-region-1.png",
+      "preprocessedSha256": "690fbabb303481406c87542e02a063f1ffbc806d44aa1c3e1f113ac9ab94e309",
+      "preprocessedByteSize": 180777,
+      "inferenceInputPath": "artifacts/issue-149-brand-native-tesseract-model-attribution/inference-inputs/item-79aa3241d939.png"
+    },
+    {
+      "opaqueItemId": "item-6db972c3416b",
+      "ocrItemId": "wine-multi-artifact-04-region-2",
+      "caseId": "wine-multi-artifact-04",
+      "cropClusterId": "C4",
+      "designClusterId": "D2",
+      "sourceImagePath": "tests/fixtures/precheck/wine-multi-artifact-04/label.png",
+      "sourceImageSha256": "445d39b8f73d04cd05bb35e03f9678f6ba9e81f6a6f01d5469306ec43c9c5887",
+      "sourceImageSize": {
+        "width": 674,
+        "height": 1522
+      },
+      "approvedRegion": {
+        "unit": "normalized-panel-relative",
+        "provenance": "human-approved-region",
+        "x": 0.25667655786350146,
+        "y": 0.6452036793692509,
+        "width": 0.2314540059347181,
+        "height": 0.03613666228646518,
+        "label": "back panel — 'Dry Cellar' script header"
+      },
+      "cropRect": {
+        "left": 168,
+        "top": 977,
+        "width": 166,
+        "height": 64
+      },
+      "committedCropPath": "artifacts/issue-149-brand-otsu-threshold/control/crops/wine-multi-artifact-04-region-2.png",
+      "committedCropSha256": "c338c020db6cf940a363153d58b1f5f6b24ef9dfba450e6d3b17e673e2e5b4ac",
+      "preprocessedSourcePath": "artifacts/issue-149-brand-otsu-threshold/control/preprocessed/wine-multi-artifact-04-region-2.png",
+      "preprocessedSha256": "8746c2c0a4f73b9fd1208cd941aece76519c76a162086eecb0063c150ebabdb9",
+      "preprocessedByteSize": 42865,
+      "inferenceInputPath": "artifacts/issue-149-brand-native-tesseract-model-attribution/inference-inputs/item-6db972c3416b.png"
+    }
+  ],
+  "brandTruthPresent": false,
+  "note": "This freeze records case identity and geometry. Brand truth appears nowhere in it, and the inference inputs are named only by opaque item id."
+}

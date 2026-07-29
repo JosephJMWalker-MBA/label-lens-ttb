@@ -1,0 +1,296 @@
+{
+  "artifact": "resource-report",
+  "experimentId": "issue-149-brand-native-tesseract-model-attribution",
+  "nativeAmd64Runner": true,
+  "comparabilityWarning": "Arm A memory is a node process RSS delta; Arms B and C are container peak RSS from /usr/bin/time -v. These are different metrics and must not be compared directly. All figures are diagnostic only and establish nothing about Render production performance.",
+  "perInvocation": [
+    {
+      "arm": "A",
+      "run": "primary",
+      "opaqueItemId": "item-cb35adee2cf8",
+      "latencyMs": 383,
+      "peakMemoryKb": 35356,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)"
+    },
+    {
+      "arm": "A",
+      "run": "primary",
+      "opaqueItemId": "item-64a8d5e551a5",
+      "latencyMs": 195,
+      "peakMemoryKb": 4684,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)"
+    },
+    {
+      "arm": "A",
+      "run": "primary",
+      "opaqueItemId": "item-710d87caca47",
+      "latencyMs": 60,
+      "peakMemoryKb": 0,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)"
+    },
+    {
+      "arm": "A",
+      "run": "primary",
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "latencyMs": 231,
+      "peakMemoryKb": 512,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)"
+    },
+    {
+      "arm": "A",
+      "run": "primary",
+      "opaqueItemId": "item-79aa3241d939",
+      "latencyMs": 97,
+      "peakMemoryKb": 256,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)"
+    },
+    {
+      "arm": "A",
+      "run": "primary",
+      "opaqueItemId": "item-6db972c3416b",
+      "latencyMs": 46,
+      "peakMemoryKb": 128,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)"
+    },
+    {
+      "arm": "A",
+      "run": "repeat",
+      "opaqueItemId": "item-cb35adee2cf8",
+      "latencyMs": 230,
+      "peakMemoryKb": 0,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)"
+    },
+    {
+      "arm": "A",
+      "run": "repeat",
+      "opaqueItemId": "item-64a8d5e551a5",
+      "latencyMs": 184,
+      "peakMemoryKb": 0,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)"
+    },
+    {
+      "arm": "A",
+      "run": "repeat",
+      "opaqueItemId": "item-710d87caca47",
+      "latencyMs": 58,
+      "peakMemoryKb": 0,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)"
+    },
+    {
+      "arm": "A",
+      "run": "repeat",
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "latencyMs": 228,
+      "peakMemoryKb": 0,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)"
+    },
+    {
+      "arm": "A",
+      "run": "repeat",
+      "opaqueItemId": "item-79aa3241d939",
+      "latencyMs": 99,
+      "peakMemoryKb": 0,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)"
+    },
+    {
+      "arm": "A",
+      "run": "repeat",
+      "opaqueItemId": "item-6db972c3416b",
+      "latencyMs": 42,
+      "peakMemoryKb": 128,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)"
+    },
+    {
+      "arm": "B",
+      "run": "primary",
+      "opaqueItemId": "item-cb35adee2cf8",
+      "latencyMs": 425,
+      "peakMemoryKb": 58336,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "B",
+      "run": "primary",
+      "opaqueItemId": "item-64a8d5e551a5",
+      "latencyMs": 383,
+      "peakMemoryKb": 52108,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "B",
+      "run": "primary",
+      "opaqueItemId": "item-710d87caca47",
+      "latencyMs": 290,
+      "peakMemoryKb": 40004,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "B",
+      "run": "primary",
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "latencyMs": 423,
+      "peakMemoryKb": 58356,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "B",
+      "run": "primary",
+      "opaqueItemId": "item-79aa3241d939",
+      "latencyMs": 324,
+      "peakMemoryKb": 40752,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "B",
+      "run": "primary",
+      "opaqueItemId": "item-6db972c3416b",
+      "latencyMs": 264,
+      "peakMemoryKb": 38100,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "B",
+      "run": "repeat",
+      "opaqueItemId": "item-cb35adee2cf8",
+      "latencyMs": 416,
+      "peakMemoryKb": 58192,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "B",
+      "run": "repeat",
+      "opaqueItemId": "item-64a8d5e551a5",
+      "latencyMs": 392,
+      "peakMemoryKb": 52168,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "B",
+      "run": "repeat",
+      "opaqueItemId": "item-710d87caca47",
+      "latencyMs": 296,
+      "peakMemoryKb": 39992,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "B",
+      "run": "repeat",
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "latencyMs": 422,
+      "peakMemoryKb": 58240,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "B",
+      "run": "repeat",
+      "opaqueItemId": "item-79aa3241d939",
+      "latencyMs": 317,
+      "peakMemoryKb": 40880,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "B",
+      "run": "repeat",
+      "opaqueItemId": "item-6db972c3416b",
+      "latencyMs": 269,
+      "peakMemoryKb": 37888,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "C",
+      "run": "primary",
+      "opaqueItemId": "item-cb35adee2cf8",
+      "latencyMs": 440,
+      "peakMemoryKb": 62992,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "C",
+      "run": "primary",
+      "opaqueItemId": "item-64a8d5e551a5",
+      "latencyMs": 411,
+      "peakMemoryKb": 61116,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "C",
+      "run": "primary",
+      "opaqueItemId": "item-710d87caca47",
+      "latencyMs": 309,
+      "peakMemoryKb": 61304,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "C",
+      "run": "primary",
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "latencyMs": 432,
+      "peakMemoryKb": 63072,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "C",
+      "run": "primary",
+      "opaqueItemId": "item-79aa3241d939",
+      "latencyMs": 331,
+      "peakMemoryKb": 61300,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "C",
+      "run": "primary",
+      "opaqueItemId": "item-6db972c3416b",
+      "latencyMs": 289,
+      "peakMemoryKb": 61316,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "C",
+      "run": "repeat",
+      "opaqueItemId": "item-cb35adee2cf8",
+      "latencyMs": 442,
+      "peakMemoryKb": 62912,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "C",
+      "run": "repeat",
+      "opaqueItemId": "item-64a8d5e551a5",
+      "latencyMs": 403,
+      "peakMemoryKb": 61256,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "C",
+      "run": "repeat",
+      "opaqueItemId": "item-710d87caca47",
+      "latencyMs": 308,
+      "peakMemoryKb": 61088,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "C",
+      "run": "repeat",
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "latencyMs": 440,
+      "peakMemoryKb": 62952,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "C",
+      "run": "repeat",
+      "opaqueItemId": "item-79aa3241d939",
+      "latencyMs": 323,
+      "peakMemoryKb": 61048,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    },
+    {
+      "arm": "C",
+      "run": "repeat",
+      "opaqueItemId": "item-6db972c3416b",
+      "latencyMs": 291,
+      "peakMemoryKb": 61404,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v"
+    }
+  ]
+}

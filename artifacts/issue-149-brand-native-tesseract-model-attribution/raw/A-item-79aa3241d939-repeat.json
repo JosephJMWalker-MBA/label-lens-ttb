@@ -1,0 +1,21 @@
+{
+  "invocation": "A-item-79aa3241d939-repeat",
+  "arm": "A",
+  "engine": "tesseract.js@7.0.0/eng/OEM1",
+  "psm": 11,
+  "opaqueItemId": "item-79aa3241d939",
+  "inputSha256": "690fbabb303481406c87542e02a063f1ffbc806d44aa1c3e1f113ac9ab94e309",
+  "words": [
+    {
+      "text": "EA,",
+      "confidence": 3,
+      "bbox": {
+        "x0": 0,
+        "y0": 0,
+        "x1": 651,
+        "y1": 391
+      }
+    }
+  ],
+  "rawTranscript": "EA,"
+}

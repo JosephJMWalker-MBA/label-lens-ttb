@@ -1,0 +1,99 @@
+# Issue #149 — Brand native-runtime / float-model attribution benchmark.
+#
+# Research-only, scoped to exactly one branch. Not part of the required CI
+# checks and it touches no production path.
+#
+# Transport: GitHub only dispatches workflow_dispatch workflows present on the
+# default branch, and this experiment adds no workflow to main. The trigger is a
+# push scoped to this single research branch, with the phase selected by a
+# committed mode file and a path filter admitting only the workflow file and that
+# mode file, so an ordinary artifact commit cannot rerun the experiment.
+#
+# pull_request_target is deliberately unused, as are schedule, repository_dispatch
+# and unscoped branch triggers.
+name: Issue 149 Brand native attribution
+
+on:
+  push:
+    branches:
+      - research/issue-149-brand-native-tesseract-model-attribution
+    paths:
+      - .github/workflows/issue-149-brand-native-attribution.yml
+      - artifacts/issue-149-brand-native-tesseract-model-attribution/workflow-mode.txt
+
+permissions:
+  contents: read
+
+env:
+  MODE_FILE: artifacts/issue-149-brand-native-tesseract-model-attribution/workflow-mode.txt
+
+jobs:
+  resolve-mode:
+    name: Resolve declared mode
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.mode.outputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read and validate mode
+        id: mode
+        run: |
+          set -eu
+          test -f "${MODE_FILE}" || { echo "MODE_FILE_MISSING: ${MODE_FILE}" >&2; exit 1; }
+          mode="$(tr -d '[:space:]' < "${MODE_FILE}")"
+          echo "declared mode: '${mode}'"
+          case "${mode}" in
+            execute|complete) ;;
+            *) echo "INVALID_MODE: '${mode}' (allowed: execute, complete)" >&2; exit 1 ;;
+          esac
+          echo "mode=${mode}" >> "$GITHUB_OUTPUT"
+
+  execute:
+    name: Execute the three-arm benchmark
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'execute'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Assert native linux/amd64 runner
+        run: |
+          set -eu
+          arch="$(uname -m)"
+          echo "runner arch: ${arch}"
+          test "${arch}" = "x86_64" || { echo "NOT_NATIVE_AMD64: ${arch}" >&2; exit 1; }
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Reuses the verified PR #208 retrieval mechanism. Never committed, never
+      # baked into the image.
+      - name: Retrieve pinned float model
+        run: node scripts/eval/fetch-issue-149-tessdata-best.mjs
+
+      - name: Run three-arm attribution benchmark
+        run: node --import tsx scripts/eval/run-issue-149-brand-native-attribution.ts
+
+      - name: Upload result package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-149-brand-attribution-results
+          path: artifacts/issue-149-brand-native-tesseract-model-attribution/
+          if-no-files-found: error
+
+  complete:
+    name: Complete (no experiment run)
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'complete'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Mode is 'complete': the benchmark is finished and this workflow"
+          echo "will not run OCR. Results are committed to the branch."

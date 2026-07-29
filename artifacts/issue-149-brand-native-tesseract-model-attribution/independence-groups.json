@@ -1,0 +1,57 @@
+{
+  "artifact": "independence-groups",
+  "experimentId": "issue-149-brand-native-tesseract-model-attribution",
+  "basis": "PR #207 adjudication (DISTINCT_SOURCE_SAME_CROP)",
+  "counts": {
+    "historicalCases": 5,
+    "ocrItems": 6,
+    "distinctPreprocessedPixelSetsAtItemLevel": 5,
+    "distinctCropImagesAtCaseLevel": 4,
+    "distinctBrandDesigns": 3
+  },
+  "unitNote": "Two counts of 'distinct crop images' coexist and are both reported to avoid ambiguity. At OCR-item level there are 5 distinct preprocessed pixel sets, because approved-wine-004 and la-fattoria-rotated are byte-identical. At case level there are 4 distinct crop clusters, which is the denominator PR #207 recorded, because wine-multi-artifact-04's two regions belong to one case. Cluster decisions in this benchmark use the 4 case-level crop clusters.",
+  "cropClusters": [
+    {
+      "cropClusterId": "C1",
+      "members": ["approved-wine-004", "la-fattoria-rotated"],
+      "ocrItems": ["item-cb35adee2cf8", "item-7b5cdce6d1ff"]
+    },
+    {
+      "cropClusterId": "C2",
+      "members": ["approved-wine-005"],
+      "ocrItems": ["item-64a8d5e551a5"]
+    },
+    {
+      "cropClusterId": "C3",
+      "members": ["approved-wine-031"],
+      "ocrItems": ["item-710d87caca47"]
+    },
+    {
+      "cropClusterId": "C4",
+      "members": ["wine-multi-artifact-04"],
+      "ocrItems": ["item-79aa3241d939", "item-6db972c3416b"]
+    }
+  ],
+  "designClusters": [
+    {
+      "designClusterId": "D1",
+      "members": ["approved-wine-004", "la-fattoria-rotated", "approved-wine-005"],
+      "ocrItems": ["item-cb35adee2cf8", "item-64a8d5e551a5", "item-7b5cdce6d1ff"]
+    },
+    {
+      "designClusterId": "D2",
+      "members": ["wine-multi-artifact-04"],
+      "ocrItems": ["item-79aa3241d939", "item-6db972c3416b"]
+    },
+    {
+      "designClusterId": "D3",
+      "members": ["approved-wine-031"],
+      "ocrItems": ["item-710d87caca47"]
+    }
+  ],
+  "countingRules": [
+    "Duplicate crop evidence counts once.",
+    "Shared-design evidence counts once at design level.",
+    "Historical case, OCR item, distinct crop, and distinct design are reported separately."
+  ]
+}

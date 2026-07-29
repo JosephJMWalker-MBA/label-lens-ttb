@@ -1,0 +1,1304 @@
+{
+  "artifact": "normalized-evidence",
+  "experimentId": "issue-149-brand-native-tesseract-model-attribution",
+  "evaluationOnly": true,
+  "productionConfidenceHandlingChanged": false,
+  "records": [
+    {
+      "opaqueItemId": "item-cb35adee2cf8",
+      "armId": "A",
+      "run": "primary",
+      "engineIdentity": "tesseract.js@7.0.0/eng/OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "Lo FAT TORIA",
+      "normalizedTranscript": "lo fat toria",
+      "orderedWords": ["FAT", "TORIA", "Lo"],
+      "originalConfidences": [38, 38, 22],
+      "originalMeanConfidence": 32.666666666666664,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 301,
+          "y0": 627,
+          "x1": 698,
+          "y1": 864
+        },
+        {
+          "x0": 842,
+          "y0": 619,
+          "x1": 1656,
+          "y1": 864
+        },
+        {
+          "x0": 754,
+          "y0": 83,
+          "x1": 1707,
+          "y1": 561
+        }
+      ],
+      "latencyMs": 383,
+      "peakMemoryKb": 35356,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "a76d43c3a2fc44be4595d00bf006d22d0778e0b7e71f2286bd17c88436c40a8b"
+    },
+    {
+      "opaqueItemId": "item-64a8d5e551a5",
+      "armId": "A",
+      "run": "primary",
+      "engineIdentity": "tesseract.js@7.0.0/eng/OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "0 —_ GATT ORIA",
+      "normalizedTranscript": "0 gatt oria",
+      "orderedWords": ["0", "—_", "GATT", "ORIA"],
+      "originalConfidences": [8, 8, 1, 89],
+      "originalMeanConfidence": 26.5,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 875,
+          "y0": 226,
+          "x1": 992,
+          "y1": 362
+        },
+        {
+          "x0": 1094,
+          "y0": 222,
+          "x1": 1455,
+          "y1": 428
+        },
+        {
+          "x0": 12,
+          "y0": 268,
+          "x1": 773,
+          "y1": 858
+        },
+        {
+          "x0": 761,
+          "y0": 527,
+          "x1": 1416,
+          "y1": 750
+        }
+      ],
+      "latencyMs": 195,
+      "peakMemoryKb": 4684,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "14401703534e4edd426dad0d5ec90659fbb5920b1a2afec1970c671ff2696c54"
+    },
+    {
+      "opaqueItemId": "item-710d87caca47",
+      "armId": "A",
+      "run": "primary",
+      "engineIdentity": "tesseract.js@7.0.0/eng/OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "enheesO",
+      "normalizedTranscript": "enheeso",
+      "orderedWords": ["enheesO"],
+      "originalConfidences": [35],
+      "originalMeanConfidence": 35,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 39,
+          "y0": 0,
+          "x1": 1000,
+          "y1": 218
+        }
+      ],
+      "latencyMs": 60,
+      "peakMemoryKb": 0,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "3147adcce6328bb8ff4c58937fb91c83a279d005c2cc9cf0baa9bafef0731698"
+    },
+    {
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "armId": "A",
+      "run": "primary",
+      "engineIdentity": "tesseract.js@7.0.0/eng/OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "Lo FAT TORIA",
+      "normalizedTranscript": "lo fat toria",
+      "orderedWords": ["FAT", "TORIA", "Lo"],
+      "originalConfidences": [38, 38, 22],
+      "originalMeanConfidence": 32.666666666666664,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 301,
+          "y0": 627,
+          "x1": 698,
+          "y1": 864
+        },
+        {
+          "x0": 842,
+          "y0": 619,
+          "x1": 1656,
+          "y1": 864
+        },
+        {
+          "x0": 754,
+          "y0": 83,
+          "x1": 1707,
+          "y1": 561
+        }
+      ],
+      "latencyMs": 231,
+      "peakMemoryKb": 512,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "a76d43c3a2fc44be4595d00bf006d22d0778e0b7e71f2286bd17c88436c40a8b"
+    },
+    {
+      "opaqueItemId": "item-79aa3241d939",
+      "armId": "A",
+      "run": "primary",
+      "engineIdentity": "tesseract.js@7.0.0/eng/OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "EA,",
+      "normalizedTranscript": "ea",
+      "orderedWords": ["EA,"],
+      "originalConfidences": [3],
+      "originalMeanConfidence": 3,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 0,
+          "y0": 0,
+          "x1": 651,
+          "y1": 391
+        }
+      ],
+      "latencyMs": 97,
+      "peakMemoryKb": 256,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "174680cd11e626237530f16c8d7d2c8d245ff2fd7d44764497a3c82655934715"
+    },
+    {
+      "opaqueItemId": "item-6db972c3416b",
+      "armId": "A",
+      "run": "primary",
+      "engineIdentity": "tesseract.js@7.0.0/eng/OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "Colles Dig",
+      "normalizedTranscript": "colles dig",
+      "orderedWords": ["Dig", "Colles"],
+      "originalConfidences": [62, 24],
+      "originalMeanConfidence": 43,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 37,
+          "y0": 47,
+          "x1": 218,
+          "y1": 154
+        },
+        {
+          "x0": 245,
+          "y0": 36,
+          "x1": 461,
+          "y1": 116
+        }
+      ],
+      "latencyMs": 46,
+      "peakMemoryKb": 128,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "f31d29b8e95efb06176adba2ebe56bc1a5760af7474a4c5ccd72702cd765790e"
+    },
+    {
+      "opaqueItemId": "item-cb35adee2cf8",
+      "armId": "A",
+      "run": "repeat",
+      "engineIdentity": "tesseract.js@7.0.0/eng/OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "Lo FAT TORIA",
+      "normalizedTranscript": "lo fat toria",
+      "orderedWords": ["FAT", "TORIA", "Lo"],
+      "originalConfidences": [38, 38, 22],
+      "originalMeanConfidence": 32.666666666666664,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 301,
+          "y0": 627,
+          "x1": 698,
+          "y1": 864
+        },
+        {
+          "x0": 842,
+          "y0": 619,
+          "x1": 1656,
+          "y1": 864
+        },
+        {
+          "x0": 754,
+          "y0": 83,
+          "x1": 1707,
+          "y1": 561
+        }
+      ],
+      "latencyMs": 230,
+      "peakMemoryKb": 0,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "a76d43c3a2fc44be4595d00bf006d22d0778e0b7e71f2286bd17c88436c40a8b"
+    },
+    {
+      "opaqueItemId": "item-64a8d5e551a5",
+      "armId": "A",
+      "run": "repeat",
+      "engineIdentity": "tesseract.js@7.0.0/eng/OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "0 —_ GATT ORIA",
+      "normalizedTranscript": "0 gatt oria",
+      "orderedWords": ["0", "—_", "GATT", "ORIA"],
+      "originalConfidences": [8, 8, 1, 89],
+      "originalMeanConfidence": 26.5,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 875,
+          "y0": 226,
+          "x1": 992,
+          "y1": 362
+        },
+        {
+          "x0": 1094,
+          "y0": 222,
+          "x1": 1455,
+          "y1": 428
+        },
+        {
+          "x0": 12,
+          "y0": 268,
+          "x1": 773,
+          "y1": 858
+        },
+        {
+          "x0": 761,
+          "y0": 527,
+          "x1": 1416,
+          "y1": 750
+        }
+      ],
+      "latencyMs": 184,
+      "peakMemoryKb": 0,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "14401703534e4edd426dad0d5ec90659fbb5920b1a2afec1970c671ff2696c54"
+    },
+    {
+      "opaqueItemId": "item-710d87caca47",
+      "armId": "A",
+      "run": "repeat",
+      "engineIdentity": "tesseract.js@7.0.0/eng/OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "enheesO",
+      "normalizedTranscript": "enheeso",
+      "orderedWords": ["enheesO"],
+      "originalConfidences": [35],
+      "originalMeanConfidence": 35,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 39,
+          "y0": 0,
+          "x1": 1000,
+          "y1": 218
+        }
+      ],
+      "latencyMs": 58,
+      "peakMemoryKb": 0,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "3147adcce6328bb8ff4c58937fb91c83a279d005c2cc9cf0baa9bafef0731698"
+    },
+    {
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "armId": "A",
+      "run": "repeat",
+      "engineIdentity": "tesseract.js@7.0.0/eng/OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "Lo FAT TORIA",
+      "normalizedTranscript": "lo fat toria",
+      "orderedWords": ["FAT", "TORIA", "Lo"],
+      "originalConfidences": [38, 38, 22],
+      "originalMeanConfidence": 32.666666666666664,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 301,
+          "y0": 627,
+          "x1": 698,
+          "y1": 864
+        },
+        {
+          "x0": 842,
+          "y0": 619,
+          "x1": 1656,
+          "y1": 864
+        },
+        {
+          "x0": 754,
+          "y0": 83,
+          "x1": 1707,
+          "y1": 561
+        }
+      ],
+      "latencyMs": 228,
+      "peakMemoryKb": 0,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "a76d43c3a2fc44be4595d00bf006d22d0778e0b7e71f2286bd17c88436c40a8b"
+    },
+    {
+      "opaqueItemId": "item-79aa3241d939",
+      "armId": "A",
+      "run": "repeat",
+      "engineIdentity": "tesseract.js@7.0.0/eng/OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "EA,",
+      "normalizedTranscript": "ea",
+      "orderedWords": ["EA,"],
+      "originalConfidences": [3],
+      "originalMeanConfidence": 3,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 0,
+          "y0": 0,
+          "x1": 651,
+          "y1": 391
+        }
+      ],
+      "latencyMs": 99,
+      "peakMemoryKb": 0,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "174680cd11e626237530f16c8d7d2c8d245ff2fd7d44764497a3c82655934715"
+    },
+    {
+      "opaqueItemId": "item-6db972c3416b",
+      "armId": "A",
+      "run": "repeat",
+      "engineIdentity": "tesseract.js@7.0.0/eng/OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "Colles Dig",
+      "normalizedTranscript": "colles dig",
+      "orderedWords": ["Dig", "Colles"],
+      "originalConfidences": [62, 24],
+      "originalMeanConfidence": 43,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 37,
+          "y0": 47,
+          "x1": 218,
+          "y1": 154
+        },
+        {
+          "x0": 245,
+          "y0": 36,
+          "x1": 461,
+          "y1": 116
+        }
+      ],
+      "latencyMs": 42,
+      "peakMemoryKb": 128,
+      "memoryMetric": "node process RSS delta around recognize (not comparable to container peak RSS)",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "f31d29b8e95efb06176adba2ebe56bc1a5760af7474a4c5ccd72702cd765790e"
+    },
+    {
+      "opaqueItemId": "item-cb35adee2cf8",
+      "armId": "B",
+      "run": "primary",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "Lo FAT TORIA",
+      "normalizedTranscript": "lo fat toria",
+      "orderedWords": ["FAT", "TORIA", "Lo"],
+      "originalConfidences": [18.545906, 18.545906, 18.213989],
+      "originalMeanConfidence": 18.435267,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 301,
+          "y0": 627,
+          "x1": 698,
+          "y1": 864
+        },
+        {
+          "x0": 842,
+          "y0": 619,
+          "x1": 1656,
+          "y1": 864
+        },
+        {
+          "x0": 754,
+          "y0": 83,
+          "x1": 1707,
+          "y1": 561
+        }
+      ],
+      "latencyMs": 425,
+      "peakMemoryKb": 58336,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": ["Detected 1 diacritics"],
+      "errors": [],
+      "outputFingerprint": "99364bbcf1b62b1ea0ae38f1446d7154cba7ae56b7234bc91708cdbd94a8e215"
+    },
+    {
+      "opaqueItemId": "item-64a8d5e551a5",
+      "armId": "B",
+      "run": "primary",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "0 —_ GATT ORIA",
+      "normalizedTranscript": "0 gatt oria",
+      "orderedWords": ["0", "—_", "GATT", "ORIA"],
+      "originalConfidences": [14.404945, 14.404945, 1.701431, 91.151764],
+      "originalMeanConfidence": 30.41577125,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 875,
+          "y0": 226,
+          "x1": 992,
+          "y1": 362
+        },
+        {
+          "x0": 1094,
+          "y0": 222,
+          "x1": 1455,
+          "y1": 428
+        },
+        {
+          "x0": 12,
+          "y0": 268,
+          "x1": 773,
+          "y1": 858
+        },
+        {
+          "x0": 761,
+          "y0": 527,
+          "x1": 1416,
+          "y1": 750
+        }
+      ],
+      "latencyMs": 383,
+      "peakMemoryKb": 52108,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "8f2efa62f7f361eb53e99cedab18f1b6e72018b282116da2e0256f9cd7f5a901"
+    },
+    {
+      "opaqueItemId": "item-710d87caca47",
+      "armId": "B",
+      "run": "primary",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "enheesO",
+      "normalizedTranscript": "enheeso",
+      "orderedWords": ["enheesO"],
+      "originalConfidences": [44.188858],
+      "originalMeanConfidence": 44.188858,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 39,
+          "y0": 0,
+          "x1": 1000,
+          "y1": 218
+        }
+      ],
+      "latencyMs": 290,
+      "peakMemoryKb": 40004,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "bb7b58ec5ec1d0f69a9262cee181bf09d2d5688a035239c6aaa8c560ebf0d0fa"
+    },
+    {
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "armId": "B",
+      "run": "primary",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "Lo FAT TORIA",
+      "normalizedTranscript": "lo fat toria",
+      "orderedWords": ["FAT", "TORIA", "Lo"],
+      "originalConfidences": [18.545906, 18.545906, 18.213989],
+      "originalMeanConfidence": 18.435267,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 301,
+          "y0": 627,
+          "x1": 698,
+          "y1": 864
+        },
+        {
+          "x0": 842,
+          "y0": 619,
+          "x1": 1656,
+          "y1": 864
+        },
+        {
+          "x0": 754,
+          "y0": 83,
+          "x1": 1707,
+          "y1": 561
+        }
+      ],
+      "latencyMs": 423,
+      "peakMemoryKb": 58356,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": ["Detected 1 diacritics"],
+      "errors": [],
+      "outputFingerprint": "99364bbcf1b62b1ea0ae38f1446d7154cba7ae56b7234bc91708cdbd94a8e215"
+    },
+    {
+      "opaqueItemId": "item-79aa3241d939",
+      "armId": "B",
+      "run": "primary",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "EA,",
+      "normalizedTranscript": "ea",
+      "orderedWords": ["EA,"],
+      "originalConfidences": [5.671158],
+      "originalMeanConfidence": 5.671158,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 0,
+          "y0": 0,
+          "x1": 651,
+          "y1": 391
+        }
+      ],
+      "latencyMs": 324,
+      "peakMemoryKb": 40752,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "833b17ec69774f2d054637a1d0e736c6b54edc91a24d52313ffca4b85800fd2b"
+    },
+    {
+      "opaqueItemId": "item-6db972c3416b",
+      "armId": "B",
+      "run": "primary",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "Colles ey",
+      "normalizedTranscript": "colles ey",
+      "orderedWords": ["ey", "Colles"],
+      "originalConfidences": [15.723938, 52.331181],
+      "originalMeanConfidence": 34.0275595,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 37,
+          "y0": 47,
+          "x1": 218,
+          "y1": 154
+        },
+        {
+          "x0": 245,
+          "y0": 36,
+          "x1": 461,
+          "y1": 116
+        }
+      ],
+      "latencyMs": 264,
+      "peakMemoryKb": 38100,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "78715d37eb0c69a9b73700cf83114c81ebf49b3dc85226ba465cc212a7deeb3b"
+    },
+    {
+      "opaqueItemId": "item-cb35adee2cf8",
+      "armId": "B",
+      "run": "repeat",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "Lo FAT TORIA",
+      "normalizedTranscript": "lo fat toria",
+      "orderedWords": ["FAT", "TORIA", "Lo"],
+      "originalConfidences": [18.545906, 18.545906, 18.213989],
+      "originalMeanConfidence": 18.435267,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 301,
+          "y0": 627,
+          "x1": 698,
+          "y1": 864
+        },
+        {
+          "x0": 842,
+          "y0": 619,
+          "x1": 1656,
+          "y1": 864
+        },
+        {
+          "x0": 754,
+          "y0": 83,
+          "x1": 1707,
+          "y1": 561
+        }
+      ],
+      "latencyMs": 416,
+      "peakMemoryKb": 58192,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": ["Detected 1 diacritics"],
+      "errors": [],
+      "outputFingerprint": "99364bbcf1b62b1ea0ae38f1446d7154cba7ae56b7234bc91708cdbd94a8e215"
+    },
+    {
+      "opaqueItemId": "item-64a8d5e551a5",
+      "armId": "B",
+      "run": "repeat",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "0 —_ GATT ORIA",
+      "normalizedTranscript": "0 gatt oria",
+      "orderedWords": ["0", "—_", "GATT", "ORIA"],
+      "originalConfidences": [14.404945, 14.404945, 1.701431, 91.151764],
+      "originalMeanConfidence": 30.41577125,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 875,
+          "y0": 226,
+          "x1": 992,
+          "y1": 362
+        },
+        {
+          "x0": 1094,
+          "y0": 222,
+          "x1": 1455,
+          "y1": 428
+        },
+        {
+          "x0": 12,
+          "y0": 268,
+          "x1": 773,
+          "y1": 858
+        },
+        {
+          "x0": 761,
+          "y0": 527,
+          "x1": 1416,
+          "y1": 750
+        }
+      ],
+      "latencyMs": 392,
+      "peakMemoryKb": 52168,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "8f2efa62f7f361eb53e99cedab18f1b6e72018b282116da2e0256f9cd7f5a901"
+    },
+    {
+      "opaqueItemId": "item-710d87caca47",
+      "armId": "B",
+      "run": "repeat",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "enheesO",
+      "normalizedTranscript": "enheeso",
+      "orderedWords": ["enheesO"],
+      "originalConfidences": [44.188858],
+      "originalMeanConfidence": 44.188858,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 39,
+          "y0": 0,
+          "x1": 1000,
+          "y1": 218
+        }
+      ],
+      "latencyMs": 296,
+      "peakMemoryKb": 39992,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "bb7b58ec5ec1d0f69a9262cee181bf09d2d5688a035239c6aaa8c560ebf0d0fa"
+    },
+    {
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "armId": "B",
+      "run": "repeat",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "Lo FAT TORIA",
+      "normalizedTranscript": "lo fat toria",
+      "orderedWords": ["FAT", "TORIA", "Lo"],
+      "originalConfidences": [18.545906, 18.545906, 18.213989],
+      "originalMeanConfidence": 18.435267,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 301,
+          "y0": 627,
+          "x1": 698,
+          "y1": 864
+        },
+        {
+          "x0": 842,
+          "y0": 619,
+          "x1": 1656,
+          "y1": 864
+        },
+        {
+          "x0": 754,
+          "y0": 83,
+          "x1": 1707,
+          "y1": 561
+        }
+      ],
+      "latencyMs": 422,
+      "peakMemoryKb": 58240,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": ["Detected 1 diacritics"],
+      "errors": [],
+      "outputFingerprint": "99364bbcf1b62b1ea0ae38f1446d7154cba7ae56b7234bc91708cdbd94a8e215"
+    },
+    {
+      "opaqueItemId": "item-79aa3241d939",
+      "armId": "B",
+      "run": "repeat",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "EA,",
+      "normalizedTranscript": "ea",
+      "orderedWords": ["EA,"],
+      "originalConfidences": [5.671158],
+      "originalMeanConfidence": 5.671158,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 0,
+          "y0": 0,
+          "x1": 651,
+          "y1": 391
+        }
+      ],
+      "latencyMs": 317,
+      "peakMemoryKb": 40880,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "833b17ec69774f2d054637a1d0e736c6b54edc91a24d52313ffca4b85800fd2b"
+    },
+    {
+      "opaqueItemId": "item-6db972c3416b",
+      "armId": "B",
+      "run": "repeat",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+      "rawTranscript": "Colles ey",
+      "normalizedTranscript": "colles ey",
+      "orderedWords": ["ey", "Colles"],
+      "originalConfidences": [15.723938, 52.331181],
+      "originalMeanConfidence": 34.0275595,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 37,
+          "y0": 47,
+          "x1": 218,
+          "y1": 154
+        },
+        {
+          "x0": 245,
+          "y0": 36,
+          "x1": 461,
+          "y1": 116
+        }
+      ],
+      "latencyMs": 269,
+      "peakMemoryKb": 37888,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "78715d37eb0c69a9b73700cf83114c81ebf49b3dc85226ba465cc212a7deeb3b"
+    },
+    {
+      "opaqueItemId": "item-cb35adee2cf8",
+      "armId": "C",
+      "run": "primary",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+      "rawTranscript": "Lo FAT TORIA",
+      "normalizedTranscript": "lo fat toria",
+      "orderedWords": ["FAT", "TORIA", "Lo"],
+      "originalConfidences": [33.945549, 33.945549, 31.932129],
+      "originalMeanConfidence": 33.274409,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 301,
+          "y0": 627,
+          "x1": 698,
+          "y1": 864
+        },
+        {
+          "x0": 842,
+          "y0": 619,
+          "x1": 1656,
+          "y1": 864
+        },
+        {
+          "x0": 754,
+          "y0": 83,
+          "x1": 1707,
+          "y1": 561
+        }
+      ],
+      "latencyMs": 440,
+      "peakMemoryKb": 62992,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": ["Detected 1 diacritics"],
+      "errors": [],
+      "outputFingerprint": "b4f78c540759101412a038fe8ba867e2906e7a774917e68e0bde8048e46aec4e"
+    },
+    {
+      "opaqueItemId": "item-64a8d5e551a5",
+      "armId": "C",
+      "run": "primary",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+      "rawTranscript": "0 —_ GATT ORIA",
+      "normalizedTranscript": "0 gatt oria",
+      "orderedWords": ["0", "—_", "GATT", "ORIA"],
+      "originalConfidences": [15.964195, 15.964195, 8.318367, 91.029953],
+      "originalMeanConfidence": 32.8191775,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 875,
+          "y0": 226,
+          "x1": 992,
+          "y1": 362
+        },
+        {
+          "x0": 1094,
+          "y0": 222,
+          "x1": 1455,
+          "y1": 428
+        },
+        {
+          "x0": 12,
+          "y0": 268,
+          "x1": 773,
+          "y1": 858
+        },
+        {
+          "x0": 761,
+          "y0": 527,
+          "x1": 1416,
+          "y1": 750
+        }
+      ],
+      "latencyMs": 411,
+      "peakMemoryKb": 61116,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "de0f6d1d359fcff90eda2d7c355c1f9516ed096854baf7ec106adebef1ca22d2"
+    },
+    {
+      "opaqueItemId": "item-710d87caca47",
+      "armId": "C",
+      "run": "primary",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+      "rawTranscript": "enheesO",
+      "normalizedTranscript": "enheeso",
+      "orderedWords": ["enheesO"],
+      "originalConfidences": [39.836914],
+      "originalMeanConfidence": 39.836914,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 39,
+          "y0": 0,
+          "x1": 1000,
+          "y1": 218
+        }
+      ],
+      "latencyMs": 309,
+      "peakMemoryKb": 61304,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "648d84e9a6abbd41c018f0393b43825375be27a59aac214ba03e02d151e1ed43"
+    },
+    {
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "armId": "C",
+      "run": "primary",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+      "rawTranscript": "Lo FAT TORIA",
+      "normalizedTranscript": "lo fat toria",
+      "orderedWords": ["FAT", "TORIA", "Lo"],
+      "originalConfidences": [33.945549, 33.945549, 31.932129],
+      "originalMeanConfidence": 33.274409,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 301,
+          "y0": 627,
+          "x1": 698,
+          "y1": 864
+        },
+        {
+          "x0": 842,
+          "y0": 619,
+          "x1": 1656,
+          "y1": 864
+        },
+        {
+          "x0": 754,
+          "y0": 83,
+          "x1": 1707,
+          "y1": 561
+        }
+      ],
+      "latencyMs": 432,
+      "peakMemoryKb": 63072,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": ["Detected 1 diacritics"],
+      "errors": [],
+      "outputFingerprint": "b4f78c540759101412a038fe8ba867e2906e7a774917e68e0bde8048e46aec4e"
+    },
+    {
+      "opaqueItemId": "item-79aa3241d939",
+      "armId": "C",
+      "run": "primary",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+      "rawTranscript": "EA,",
+      "normalizedTranscript": "ea",
+      "orderedWords": ["EA,"],
+      "originalConfidences": [13.904839],
+      "originalMeanConfidence": 13.904839,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 0,
+          "y0": 0,
+          "x1": 651,
+          "y1": 391
+        }
+      ],
+      "latencyMs": 331,
+      "peakMemoryKb": 61300,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "6bb2322c5d499081d36b786aead97586f83844d40294660b1466b3cd5fc99818"
+    },
+    {
+      "opaqueItemId": "item-6db972c3416b",
+      "armId": "C",
+      "run": "primary",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+      "rawTranscript": "Colles ey",
+      "normalizedTranscript": "colles ey",
+      "orderedWords": ["ey", "Colles"],
+      "originalConfidences": [23.032791, 54.277412],
+      "originalMeanConfidence": 38.6551015,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 37,
+          "y0": 47,
+          "x1": 218,
+          "y1": 154
+        },
+        {
+          "x0": 245,
+          "y0": 36,
+          "x1": 461,
+          "y1": 116
+        }
+      ],
+      "latencyMs": 289,
+      "peakMemoryKb": 61316,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "59c946418a94d2ca4058e372258b9d8031c10cad2e8021f26d8521c613dd0ec8"
+    },
+    {
+      "opaqueItemId": "item-cb35adee2cf8",
+      "armId": "C",
+      "run": "repeat",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+      "rawTranscript": "Lo FAT TORIA",
+      "normalizedTranscript": "lo fat toria",
+      "orderedWords": ["FAT", "TORIA", "Lo"],
+      "originalConfidences": [33.945549, 33.945549, 31.932129],
+      "originalMeanConfidence": 33.274409,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 301,
+          "y0": 627,
+          "x1": 698,
+          "y1": 864
+        },
+        {
+          "x0": 842,
+          "y0": 619,
+          "x1": 1656,
+          "y1": 864
+        },
+        {
+          "x0": 754,
+          "y0": 83,
+          "x1": 1707,
+          "y1": 561
+        }
+      ],
+      "latencyMs": 442,
+      "peakMemoryKb": 62912,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": ["Detected 1 diacritics"],
+      "errors": [],
+      "outputFingerprint": "b4f78c540759101412a038fe8ba867e2906e7a774917e68e0bde8048e46aec4e"
+    },
+    {
+      "opaqueItemId": "item-64a8d5e551a5",
+      "armId": "C",
+      "run": "repeat",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+      "rawTranscript": "0 —_ GATT ORIA",
+      "normalizedTranscript": "0 gatt oria",
+      "orderedWords": ["0", "—_", "GATT", "ORIA"],
+      "originalConfidences": [15.964195, 15.964195, 8.318367, 91.029953],
+      "originalMeanConfidence": 32.8191775,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 875,
+          "y0": 226,
+          "x1": 992,
+          "y1": 362
+        },
+        {
+          "x0": 1094,
+          "y0": 222,
+          "x1": 1455,
+          "y1": 428
+        },
+        {
+          "x0": 12,
+          "y0": 268,
+          "x1": 773,
+          "y1": 858
+        },
+        {
+          "x0": 761,
+          "y0": 527,
+          "x1": 1416,
+          "y1": 750
+        }
+      ],
+      "latencyMs": 403,
+      "peakMemoryKb": 61256,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "de0f6d1d359fcff90eda2d7c355c1f9516ed096854baf7ec106adebef1ca22d2"
+    },
+    {
+      "opaqueItemId": "item-710d87caca47",
+      "armId": "C",
+      "run": "repeat",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+      "rawTranscript": "enheesO",
+      "normalizedTranscript": "enheeso",
+      "orderedWords": ["enheesO"],
+      "originalConfidences": [39.836914],
+      "originalMeanConfidence": 39.836914,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 39,
+          "y0": 0,
+          "x1": 1000,
+          "y1": 218
+        }
+      ],
+      "latencyMs": 308,
+      "peakMemoryKb": 61088,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "648d84e9a6abbd41c018f0393b43825375be27a59aac214ba03e02d151e1ed43"
+    },
+    {
+      "opaqueItemId": "item-7b5cdce6d1ff",
+      "armId": "C",
+      "run": "repeat",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+      "rawTranscript": "Lo FAT TORIA",
+      "normalizedTranscript": "lo fat toria",
+      "orderedWords": ["FAT", "TORIA", "Lo"],
+      "originalConfidences": [33.945549, 33.945549, 31.932129],
+      "originalMeanConfidence": 33.274409,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 301,
+          "y0": 627,
+          "x1": 698,
+          "y1": 864
+        },
+        {
+          "x0": 842,
+          "y0": 619,
+          "x1": 1656,
+          "y1": 864
+        },
+        {
+          "x0": 754,
+          "y0": 83,
+          "x1": 1707,
+          "y1": 561
+        }
+      ],
+      "latencyMs": 440,
+      "peakMemoryKb": 62952,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": ["Detected 1 diacritics"],
+      "errors": [],
+      "outputFingerprint": "b4f78c540759101412a038fe8ba867e2906e7a774917e68e0bde8048e46aec4e"
+    },
+    {
+      "opaqueItemId": "item-79aa3241d939",
+      "armId": "C",
+      "run": "repeat",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+      "rawTranscript": "EA,",
+      "normalizedTranscript": "ea",
+      "orderedWords": ["EA,"],
+      "originalConfidences": [13.904839],
+      "originalMeanConfidence": 13.904839,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 0,
+          "y0": 0,
+          "x1": 651,
+          "y1": 391
+        }
+      ],
+      "latencyMs": 323,
+      "peakMemoryKb": 61048,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "6bb2322c5d499081d36b786aead97586f83844d40294660b1466b3cd5fc99818"
+    },
+    {
+      "opaqueItemId": "item-6db972c3416b",
+      "armId": "C",
+      "run": "repeat",
+      "engineIdentity": "native tesseract 5.3.0 / eng / OEM1",
+      "modelSha256": "8280aed0782fe27257a68ea10fe7ef324ca0f8d85bd2fd145d1c2b560bcb66ba",
+      "rawTranscript": "Colles ey",
+      "normalizedTranscript": "colles ey",
+      "orderedWords": ["ey", "Colles"],
+      "originalConfidences": [23.032791, 54.277412],
+      "originalMeanConfidence": 38.6551015,
+      "normalizedConfidenceField": null,
+      "normalizedConfidenceOmittedBecause": "tesseract.js and native Tesseract confidence scales are not proven comparable, so no cross-runtime normalized confidence is emitted.",
+      "boundingBoxes": [
+        {
+          "x0": 37,
+          "y0": 47,
+          "x1": 218,
+          "y1": 154
+        },
+        {
+          "x0": 245,
+          "y0": 36,
+          "x1": 461,
+          "y1": 116
+        }
+      ],
+      "latencyMs": 291,
+      "peakMemoryKb": 61404,
+      "memoryMetric": "container peak RSS from /usr/bin/time -v",
+      "warnings": [],
+      "errors": [],
+      "outputFingerprint": "59c946418a94d2ca4058e372258b9d8031c10cad2e8021f26d8521c613dd0ec8"
+    }
+  ]
+}

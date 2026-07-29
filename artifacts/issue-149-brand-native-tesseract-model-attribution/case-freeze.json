@@ -1,0 +1,16 @@
+{
+  "artifact": "case-freeze",
+  "experimentId": "issue-149-brand-native-tesseract-model-attribution",
+  "frozenBeforeOcr": true,
+  "source": "PRs #204, #205 and #207 (merged)",
+  "historicalCaseCount": 5,
+  "cases": [
+    "approved-wine-004",
+    "approved-wine-005",
+    "approved-wine-031",
+    "la-fattoria-rotated",
+    "wine-multi-artifact-04"
+  ],
+  "verifiedAgainstMergedArtifact": "artifacts/issue-149-brand-mechanism-sublabels/case-freeze.json",
+  "mutationPolicy": "No case may be substituted and the population may not be expanded after results are seen."
+}
