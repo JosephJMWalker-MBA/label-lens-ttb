@@ -1,0 +1,70 @@
+{
+  "artifact": "decision",
+  "experimentId": "issue-149-parseq-hf-compatibility-probe",
+  "issue": 149,
+  "evaluationOnly": true,
+  "compatibilityVerdict": "COMPATIBLE",
+  "verdictRationale": "Licensing and provenance gates passed; the model bytes matched the full expected SHA-256 and byte size; safe state-dictionary loading with weights_only=True succeeded and yielded tensors only; architecture loading succeeded strictly with zero missing and zero unexpected keys; all four invocations completed; logits were finite and structurally valid; decoding succeeded; both repeat pairs were deterministic down to raw logits bytes; inference ran with the network disabled; and no dependency or process failure occurred.",
+  "exactPositiveTranscriptionRequired": false,
+  "gatesPassed": {
+    "licenseGate": true,
+    "provenanceGate": true,
+    "checkpointIntegrity": true,
+    "safeLoading": true,
+    "architectureLoading": true,
+    "offlineInference": true
+  },
+  "blockedModelProvenance": false,
+  "blockedModelLicenseReusedFromPr212": false,
+  "invocations": { "planned": 4, "completed": 4, "errors": 0 },
+  "logits": {
+    "shape": [1, 26, 95],
+    "dtype": "float32",
+    "allFinite": true,
+    "structurallyValid": true
+  },
+  "safeLoading": {
+    "method": "torch.load(map_location='cpu', weights_only=True)",
+    "stateDictKeys": 175,
+    "parameterCount": 23832671,
+    "nonTensorValues": 0,
+    "malformedKeys": 0,
+    "strictLoad": true,
+    "missingKeys": 0,
+    "unexpectedKeys": 0,
+    "torchScriptUsed": false,
+    "arbitraryObjectsExecuted": false
+  },
+  "determinism": {
+    "allDeterministic": true,
+    "rawLogitBytesExactlyEqual": true,
+    "ruleRelaxedAfterResults": false
+  },
+  "transcripts": {
+    "positive-primary": "LABELLENS123",
+    "positive-repeat": "LABELLENS123",
+    "blank-primary": "10",
+    "blank-repeat": "10"
+  },
+  "outputRiskFlags": {
+    "positiveTranscriptExact": false,
+    "blankTranscriptEmpty": false,
+    "blankProducedUnsupportedText": true,
+    "modelHasNaturalAbstention": false,
+    "confidenceInterpretationKnown": false,
+    "trainingDataProductionReviewRequired": true
+  },
+  "outputRiskSummary": "Two findings matter more than the verdict. First, every character of the sentinel was recognised in order, but the model charset contains no space, so it structurally cannot emit word boundaries — 'LABEL LENS 123' came back as 'LABELLENS123'. Second, the blank white image produced the transcript '10': PARSeq has no null class and cannot abstain. Both are output-risk results, and per the preregistration neither makes the runtime incompatible.",
+  "frozenBrandBenchmarkEligible": true,
+  "frozenBrandBenchmarkCondition": "Eligible only as a separately preregistered experiment. The no-space charset and the absence of any abstention must be designed for explicitly before that benchmark is written.",
+  "claimsNotMade": [
+    "No claim of superior Brand recognition or better accuracy than Tesseract.",
+    "No production licensing clearance; training-dataset provenance remains unresolved.",
+    "No production suitability or acceptable production latency claim.",
+    "No authorization to install Python in production.",
+    "No authorization to fabricate geometry.",
+    "No authorization to replace Tesseract.",
+    "No claim that this artifact is byte-identical to the PR #212 GitHub Release file."
+  ],
+  "priorResultPreserved": "PR #212's BLOCKED_MODEL_LICENSE conclusion for the GitHub Release artifact stands unchanged and was neither reopened nor reinterpreted."
+}

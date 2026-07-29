@@ -1,0 +1,39 @@
+{
+  "artifact": "output-risk-report",
+  "experimentId": "issue-149-parseq-hf-compatibility-probe",
+  "note": "These are output-risk results. Per the preregistration none of them makes the runtime incompatible.",
+  "flags": {
+    "positiveTranscriptExact": {
+      "value": false,
+      "expected": "LABEL LENS 123",
+      "rawTranscript": "LABELLENS123",
+      "normalizedTranscript": "labellens123",
+      "normalizedExpected": "label lens 123",
+      "explanation": "Every character was recognised correctly and in order. The transcripts differ only by the two spaces: the model charset is the 94-character set (62 case-sensitive alphanumeric + 32 punctuation) and contains NO space character, so PARSeq structurally cannot emit a word boundary. This is a model property, not a recognition error.",
+      "materialForBrand": "A Brand value such as \"La Fattoria\" could at best come back as \"lafattoria\". Any future Brand benchmark must decide how to score word boundaries the model cannot represent."
+    },
+    "blankTranscriptEmpty": {
+      "value": false,
+      "rawTranscript": "10",
+      "explanation": "The blank white image produced the two-character transcript \"10\"."
+    },
+    "blankProducedUnsupportedText": {
+      "value": true,
+      "characterProbabilities": [0.31324273347854614, 0.1972750872373581],
+      "nativeSequenceScore": 0.020832331851124763,
+      "explanation": "Text with no visual support was emitted from a blank image. Its per-character probabilities (0.313, 0.197) and sequence score (0.0208) are far below the positive case (all >0.96, score 0.256), which is suggestive but is not a calibrated abstention threshold."
+    },
+    "modelHasNaturalAbstention": {
+      "value": false,
+      "explanation": "PARSeq is a fixed-length autoregressive sequence decoder with no null/abstain class. It returns a transcript for whatever it is given, including pure white. Any abstention would have to be imposed outside the model."
+    },
+    "confidenceInterpretationKnown": {
+      "value": false,
+      "explanation": "Native probabilities are preserved in 0..1 and are internally ordered sensibly on this two-image sample, but no calibration study exists and no threshold is justified. They were not compared to Label Lens authority thresholds and must not be."
+    },
+    "trainingDataProductionReviewRequired": {
+      "value": true,
+      "reference": "training-data-provenance.md"
+    }
+  }
+}

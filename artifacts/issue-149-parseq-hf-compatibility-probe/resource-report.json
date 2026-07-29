@@ -1,0 +1,31 @@
+{
+  "artifact": "resource-report",
+  "experimentId": "issue-149-parseq-hf-compatibility-probe",
+  "nativeAmd64Runner": true,
+  "modelLoadMs": 1835.8366719999992,
+  "modelLoadPolicy": "one load shared by all four invocations; EXCLUDED from per-invocation latency",
+  "perInvocation": [
+    {
+      "id": "positive-primary",
+      "latencyMs": 122.54437600000756,
+      "peakMemoryBytes": 540971008
+    },
+    {
+      "id": "positive-repeat",
+      "latencyMs": 118.55743399999596,
+      "peakMemoryBytes": 542674944
+    },
+    {
+      "id": "blank-primary",
+      "latencyMs": 98.59421299999838,
+      "peakMemoryBytes": 542674944
+    },
+    {
+      "id": "blank-repeat",
+      "latencyMs": 99.08434400000488,
+      "peakMemoryBytes": 543461376
+    }
+  ],
+  "peakMemoryMetric": "ru_maxrss of the probe process (whole-process high-water mark, not per-invocation delta)",
+  "interpretation": "Measured on a GitHub-hosted native linux/amd64 runner with 2 CPUs and a 6 GB limit, single-threaded torch. Diagnostic only: establishes nothing about production latency or Render resource suitability."
+}

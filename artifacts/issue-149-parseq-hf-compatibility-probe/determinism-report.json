@@ -1,0 +1,42 @@
+{
+  "artifact": "determinism-report",
+  "experimentId": "issue-149-parseq-hf-compatibility-probe",
+  "ruleRelaxedAfterResults": false,
+  "requiredFields": [
+    "rawTranscript",
+    "normalizedTranscript",
+    "tokenIds",
+    "eosIndex",
+    "characterProbabilities",
+    "rawLogitsBytes",
+    "outputFingerprint"
+  ],
+  "pairs": [
+    {
+      "image": "positive",
+      "rawTranscriptIdentical": true,
+      "normalizedTranscriptIdentical": true,
+      "tokenIdsIdentical": true,
+      "eosIdentical": true,
+      "characterProbabilitiesIdentical": true,
+      "logitsSha256Identical": true,
+      "logitsBytesIdentical": true,
+      "outputFingerprintIdentical": true,
+      "deterministic": true
+    },
+    {
+      "image": "blank",
+      "rawTranscriptIdentical": true,
+      "normalizedTranscriptIdentical": true,
+      "tokenIdsIdentical": true,
+      "eosIdentical": true,
+      "characterProbabilitiesIdentical": true,
+      "logitsSha256Identical": true,
+      "logitsBytesIdentical": true,
+      "outputFingerprintIdentical": true,
+      "deterministic": true
+    }
+  ],
+  "allDeterministic": true,
+  "rawLogitBytesExactlyEqual": true
+}
