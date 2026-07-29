@@ -44,3 +44,6 @@ I answered only from the images provided, and I did not consult project history,
 prior conclusions, or any other repository file while annotating.
 
 Signed: ____________________  Date: __________
+
+Return this completed form together with the response templates, before the
+unblinding key is shared.
