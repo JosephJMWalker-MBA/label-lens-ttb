@@ -1,0 +1,45 @@
+{
+  "artifact": "runtime-provenance",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "executionHost": "GitHub-hosted ubuntu-latest, native linux/amd64",
+  "discoveryRunId": 30514968866,
+  "python": "3.11.15",
+  "onnxruntime": "1.28.0",
+  "onnxruntimeProvidersAvailable": ["AzureExecutionProvider", "CPUExecutionProvider"],
+  "onnxruntimeProvidersUsed": ["CPUExecutionProvider"],
+  "onnxOpsetVersion": 11,
+  "onnxIrVersion": 6,
+  "builtImageId": "sha256:ba752a436b25c49139ba3ebb0beaa60207555d1260011bae5d508a621472ae7c",
+  "evaluationOnly": true,
+  "deterministicSettings": {
+    "intraOpNumThreads": 1,
+    "interOpNumThreads": 1,
+    "executionMode": "ORT_SEQUENTIAL",
+    "graphOptimizationLevel": "default",
+    "PYTHONHASHSEED": 0,
+    "OMP_NUM_THREADS": 1,
+    "OPENBLAS_NUM_THREADS": 1,
+    "MKL_NUM_THREADS": 1
+  },
+  "inferenceHardening": {
+    "network": "none",
+    "modelMount": "read-only",
+    "configMount": "read-only",
+    "dictionaryAuditMount": "read-only",
+    "inputMount": "read-only",
+    "repositoryRootMounted": false,
+    "corpusMounted": false,
+    "fixtureTruthMounted": false,
+    "cpus": "2",
+    "memory": "4g"
+  },
+  "offlineFlags": { "HF_HUB_OFFLINE": "1" },
+  "productionUnchanged": {
+    "srcDir": false,
+    "productionDockerfile": false,
+    "renderConfig": false,
+    "nextConfig": false,
+    "applicationDependencies": false
+  },
+  "resolvedPackagesHash": "b0184945e1d438446fb1b1632c71d57ad78f774e101415401cf7cea45c1a9537"
+}

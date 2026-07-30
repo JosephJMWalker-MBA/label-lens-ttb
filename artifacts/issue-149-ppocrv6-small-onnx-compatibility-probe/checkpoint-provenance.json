@@ -1,0 +1,53 @@
+{
+  "artifact": "checkpoint-provenance",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "modelRepository": "PaddlePaddle/PP-OCRv6_small_rec_onnx",
+  "modelRepositoryUrl": "https://huggingface.co/PaddlePaddle/PP-OCRv6_small_rec_onnx",
+  "modelCommit": "b8f84f0b80c529de40b4fbb3544b84fa7233a513",
+  "pinningMechanism": "explicit resolve URL at the immutable revision: https://huggingface.co/PaddlePaddle/PP-OCRv6_small_rec_onnx/resolve/b8f84f0b80c529de40b4fbb3544b84fa7233a513/inference.onnx",
+  "modelFile": "inference.onnx",
+  "gitBlobOid": "666cee731b98bee55376f02690226d60db9a8187",
+  "expectedSha256": "5435fd747c9e0efe15a96d0b378d5bd157e9492ed8fd80edf08f30d02fa24634",
+  "observedSha256": "5435fd747c9e0efe15a96d0b378d5bd157e9492ed8fd80edf08f30d02fa24634",
+  "sha256Gate": "PASS",
+  "expectedByteSize": 21159378,
+  "observedByteSize": 21159378,
+  "byteSizeGate": "PASS",
+  "sha256ExpectationSource": "git-lfs pointer at the pinned revision, retained verbatim at vendor-license/inference.onnx.lfs-pointer.txt (133 bytes)",
+  "verifiedTwice": [
+    "scripts/eval/fetch-issue-149-ppocrv6-onnx.mjs, fail-closed on download and on every cached reuse",
+    "inside the container before the session is created, by inspect_model.py and again by run_probe.py"
+  ],
+  "modelLicense": "Apache-2.0",
+  "modelLicenseSource": "README.md frontmatter and API cardData.license at the pinned revision",
+  "committedToGit": false,
+  "cacheLocation": ".local/ocr-research/models/ppocrv6-small-rec-onnx/inference.onnx",
+  "cacheLocationIgnored": true,
+  "ciCacheKey": "pp-ocrv6-small-rec-onnx-b8f84f0b-5435fd74",
+  "companionFiles": {
+    "inference.yml": {
+      "role": "PaddleOCR pipeline configuration; supplies the preprocessing shape and PostProcess.character_dict",
+      "sha256": "ab078671bb49f06228eadccd34f1bb501e157f7a047095ffb943ba81512c77d1",
+      "byteSize": 150579,
+      "requiredForInference": false,
+      "committed": "vendor/inference.yml"
+    },
+    "README.md": {
+      "role": "model card; the licence record",
+      "requiredForInference": false,
+      "committed": "vendor/model-card-README.md"
+    },
+    "inference.json": {
+      "role": "PaddlePaddle PIR static graph in JSON form. Not an ONNX Runtime config and not a model.",
+      "gitBlobOid": "89267025ba75ceca5c06787979079406a9d92591",
+      "byteSize": 208004,
+      "requiredForInference": false,
+      "loaded": false,
+      "committed": false
+    }
+  },
+  "paddleNativeWeightsUsed": false,
+  "paddle2onnxConversionPerformed": false,
+  "detectorAdded": false,
+  "trainingDataProductionReviewRequired": true
+}

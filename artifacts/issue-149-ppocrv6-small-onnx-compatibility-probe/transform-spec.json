@@ -1,0 +1,67 @@
+{
+  "artifact": "transform-spec",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "verifiedFromPinnedSource": true,
+  "sources": [
+    "PreProcess.transform_ops in inference.yml at model revision b8f84f0b80c529de40b4fbb3544b84fa7233a513",
+    "ppocr/data/imaug/rec_img_aug.py at PaddleOCR commit 2661c7c0ef5c613e8f93c6e93b2e052399f0f854"
+  ],
+  "channelOrder": "BGR",
+  "note": "ONNX model expects BGR. Source PNG is loaded in BGR channel order. No RGB conversion applied.",
+  "rgbConversionApplied": false,
+  "channelOrderEvidence": "DecodeImage.img_mode: BGR, channel_first: false in inference.yml. cv2.imdecode returns BGR HWC directly, so no conversion step exists in this path at all.",
+  "imageShape": [3, 48, 320],
+  "branchSelected": "resize_norm_img(img, image_shape, padding=True)",
+  "branchSelectionEvidence": "RecResizeImg.__call__ chooses resize_norm_img_chinese only when eval_mode is set, or when infer_mode is set with a character_dict_path. inference.yml sets neither infer_mode nor eval_mode, so the padding branch applies.",
+  "steps": [
+    "cv2.imdecode(bytes, IMREAD_COLOR) -> BGR HWC uint8",
+    "ratio = width / height",
+    "resizedWidth = 320 if ceil(48 * ratio) > 320 else ceil(48 * ratio)",
+    "cv2.resize(img, (resizedWidth, 48)) with the default INTER_LINEAR",
+    "astype(float32)",
+    "transpose(2, 0, 1) / 255.0",
+    "-= 0.5",
+    "/= 0.5",
+    "padding = np.zeros((3, 48, 320), float32); padding[:, :, 0:resizedWidth] = resized",
+    "tensor = padding[np.newaxis, ...] -> [1, 3, 48, 320] float32"
+  ],
+  "normalization": {
+    "formula": "(pixel / 255 - 0.5) / 0.5",
+    "resultingRange": [-1, 1],
+    "perChannelMeanStdUsed": false,
+    "note": "Upstream applies one scalar mean and one scalar standard deviation, not a per-channel [0.5, 0.5, 0.5] vector. Numerically identical, but recorded as implemented."
+  },
+  "interpolation": {
+    "used": "cv2.INTER_LINEAR",
+    "reason": "In the padding branch upstream calls cv2.resize without passing its `interpolation` argument, so the OpenCV default INTER_LINEAR applies. The argument is only threaded through the non-padding branch.",
+    "pillowNotUsedForResize": true,
+    "pillowNotUsedForResizeReason": "Pillow's BILINEAR filter is support-scaled and antialiases on downscale, so it would not reproduce cv2.INTER_LINEAR. Pillow is used only to render the synthetic sentinel."
+  },
+  "padding": {
+    "side": "right",
+    "value": 0.0,
+    "space": "normalized",
+    "pixelEquivalent": 127.5,
+    "note": "Padding is zeros in NORMALIZED space, which corresponds to mid-grey rather than black in pixel space. The tensor width is therefore always 320, not the resized width.",
+    "alwaysPadsToMaxWidth": true
+  },
+  "trainingOnlyOpsExcluded": [
+    "MultiLabelEncode (gtc_encode: NRTRLabelEncode)",
+    "KeepKeys label_ctc",
+    "KeepKeys label_gtc"
+  ],
+  "dynamicAxes": {
+    "declaredInputShape": [-1, 3, 48, -1],
+    "source": "PIR graph input `x`; trt_dynamic_shapes in inference.yml lists [1,3,48,160], [1,3,48,320] and [8,3,48,3200]",
+    "widthUsedByThisProbe": 320
+  },
+  "recordedPerInvocation": [
+    "source PNG sha256, width and height",
+    "resizedWidthBeforePadding and paddingColumnsAdded",
+    "validRatio",
+    "modelInputWidth and modelInputHeight",
+    "channelOrder",
+    "transformed tensor shape, dtype and sha256 over the contiguous float32 buffer"
+  ],
+  "honestDescription": "The model does not receive unchanged pixels. It receives the synthetic PNG followed by the model's own required transform: BGR decode, aspect-preserving resize to height 48 capped at width 320, scaling to [-1, 1], and zero-padding to width 320. That transform is a property of the model, not a preprocessing choice made by this probe; the only choice made here was to reproduce it with the same resampler upstream uses."
+}

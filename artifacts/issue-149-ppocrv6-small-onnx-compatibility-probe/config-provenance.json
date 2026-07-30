@@ -1,0 +1,19 @@
+{
+  "artifact": "config-provenance",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "verifiedAtUtc": "2026-07-30T04:51:43.025Z",
+  "file": "inference.yml",
+  "repository": "PaddlePaddle/PP-OCRv6_small_rec_onnx",
+  "revision": "b8f84f0b80c529de40b4fbb3544b84fa7233a513",
+  "gitBlobOid": "f1887595d177511e6af56fabd0baa25756d33bd8",
+  "expectedByteSize": 150579,
+  "observedByteSize": 150579,
+  "byteSizeGate": "PASS",
+  "sha256": "ab078671bb49f06228eadccd34f1bb501e157f7a047095ffb943ba81512c77d1",
+  "committedCopy": "vendor/inference.yml",
+  "committedVerbatim": true,
+  "prettierIgnored": true,
+  "prettierIgnoreReason": "Committed verbatim from the pinned revision and hashed; reformatting would break its recorded identity.",
+  "roleForInference": "Not loaded by ONNX Runtime. Supplies the preprocessing shape and the PostProcess.character_dict used to build the token-to-character map.",
+  "dictionaryParsedIn": "the pinned container, with pinned PyYAML — see dictionary-audit.json. Not parsed here, because a hand-rolled parse of ~18k quoted scalars would not be trustworthy."
+}

@@ -1,0 +1,143 @@
+{
+  "artifact": "evidence-schema",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "typescriptInterface": "PpOcrV6OnnxRecognitionEvidence",
+  "sequenceOnly": true,
+  "geometryFieldsPresent": false,
+  "absentByDesign": [
+    "per-word bounding boxes",
+    "OcrWord objects",
+    "Tesseract rawConfidence",
+    "authority states or reliable-find flags",
+    "calibrated abstention thresholds",
+    "an EOS field (CTC has no EOS token)"
+  ],
+  "keptNative": [
+    "nativeCtcSequenceScore is in [0, 1] and is never rescaled",
+    "rawTimestepProbabilities are in [0, 1] and are never rescaled"
+  ],
+  "notNumericallyComparableTo": [
+    "PARSeq nativeSequenceScore (product formula, 95-class softmax)",
+    "Tesseract rawConfidence (0-100 scale)"
+  ],
+  "fields": {
+    "opaqueItemId": "string — opaque identifier; never a brand name, filename or producer name",
+    "engine": {
+      "engineId": "pp-ocrv6-onnx",
+      "onnxRuntimeVersion": "string",
+      "runtimeId": "string — Docker image id of the container that ran inference",
+      "runtimePackagesHash": "string — SHA-256 of pip freeze inside the container"
+    },
+    "model": {
+      "modelId": "pp-ocrv6-small-rec-onnx",
+      "modelRepository": "PaddlePaddle/PP-OCRv6_small_rec_onnx",
+      "modelCommit": "string — immutable HF revision, expected b8f84f0b80c529de40b4fbb3544b84fa7233a513",
+      "onnxSha256": "string — expected 5435fd747c9e0efe15a96d0b378d5bd157e9492ed8fd80edf08f30d02fa24634",
+      "onnxByteSize": "number — expected 21159378",
+      "configSha256": "string",
+      "configByteSize": "number — expected 150579",
+      "modelLicense": "Apache-2.0",
+      "vocabSize": "number — total output width including the CTC blank",
+      "ctcBlankTokenId": "number — determined empirically from the postprocessor, not assumed",
+      "asciiSpaceInVocab": "boolean — determined empirically, not assumed",
+      "dictSha256": "string — SHA-256 of the concatenated PostProcess.character_dict"
+    },
+    "input": {
+      "sourceImageSha256": "string",
+      "sourceWidth": "number",
+      "sourceHeight": "number",
+      "modelInputHeight": 48,
+      "modelInputWidth": "number — the padded tensor width; 320 under upstream padding=True",
+      "maxConfiguredWidth": 320,
+      "resizedWidthBeforePadding": "number",
+      "paddingColumnsAdded": "number — zero-padding columns on the right",
+      "validRatio": "number — min(1, resizedWidth / 320), as upstream computes it",
+      "channelOrder": "BGR",
+      "rgbConversionApplied": false,
+      "transformDescription": "string — must document BGR and the resize",
+      "transformedTensorSha256": "string — over the contiguous float32 buffer",
+      "transformedTensorShape": "[1, 3, 48, number]",
+      "transformedTensorDtype": "float32"
+    },
+    "output": {
+      "rawLogitsArtifact": "string — path to the frozen .npy, written before any comparison",
+      "logitsShape": "[1, number, number]",
+      "logitsDtype": "string",
+      "logitsSha256": "string",
+      "logitsAllFinite": "boolean",
+      "modelOutputAlreadyNormalized": "boolean — measured, because the exported graph may already emit probabilities",
+      "modelOutputRowSumMin": "number",
+      "modelOutputRowSumMax": "number",
+      "probabilitySource": "'model output as emitted' | 'softmax over model output'",
+      "rawTimestepTokenIds": "number[] — argmax per time step, before collapsing",
+      "rawTimestepProbabilities": "number[] — argmax probability per time step, in [0, 1]",
+      "rawTimestepProbabilitiesAfterSoftmax": "number[] — reported for completeness",
+      "collapsedTokenIds": "number[] — after consecutive-duplicate removal, blanks retained",
+      "collapsedTokenProbabilities": "number[]",
+      "decodedCharacterIds": "number[] — non-blank collapsed tokens in output order",
+      "decodedCharacterProbabilities": "number[]",
+      "rawTranscript": "string — after duplicate removal and blank removal",
+      "normalizedTranscript": "string — NFKD, strip combining marks, lowercase, non [a-z0-9 ] to space, collapse whitespace, trim",
+      "normalizedTranscriptWhitespaceFree": "string — normalizedTranscript with all spaces stripped",
+      "emptyTranscript": "boolean — structural CTC outcome, NOT governed abstention",
+      "nativeCtcSequenceScore": "number — mean over non-blank time steps of the argmax probability (§6.1 as frozen); 0.0 when emptyTranscript",
+      "upstreamCollapsedMeanScore": "number — mean over duplicate-collapsed non-blank positions, as the pinned upstream decode implements it",
+      "nonBlankTimestepCount": "number",
+      "decodedCharacterCount": "number",
+      "timestepCount": "number"
+    },
+    "execution": {
+      "decodingMode": "greedy-ctc-argmax",
+      "backendUsed": "onnx-runtime",
+      "onnxRuntimeProvidersUsed": "string[]",
+      "onnxInputName": "string",
+      "onnxOutputNames": "string[]",
+      "latencyMs": "number",
+      "modelLoadIncludedInLatency": false,
+      "modelLoadMs": "number",
+      "peakMemoryBytes": "number | null",
+      "warnings": "string[]",
+      "errors": "string[]",
+      "outputFingerprint": "string — SHA-256 of canonical JSON of rawTimestepTokenIds and rawTranscript"
+    },
+    "deterministicRepeat": {
+      "run1Fingerprint": "string",
+      "run2Fingerprint": "string",
+      "logitsSha256Run1": "string",
+      "logitsSha256Run2": "string",
+      "deterministic": "boolean"
+    },
+    "safeLoading": {
+      "method": "onnxruntime.InferenceSession with CPUExecutionProvider",
+      "pickleCalled": false,
+      "arbitraryObjectsExecuted": false,
+      "note": "string"
+    },
+    "dictionaryAudit": {
+      "asciiSpacePresent": "boolean — whether ASCII space is a decodable token",
+      "asciiSpaceInInferenceYmlDict": "boolean — whether it appears in PostProcess.character_dict",
+      "asciiSpaceAppendedByPostprocessor": "boolean",
+      "firstCharacter": "string — expected '!' (0x21)",
+      "nonBlankCharacterCount": "number",
+      "source": "PostProcess.character_dict in inference.yml"
+    },
+    "evaluation": {
+      "applicability": "NOT APPLICABLE to this compatibility probe. There is no governed truth in scope: the inputs are two synthetic images, and the probe does not test Brand recognition capability. The corpus-oriented fields below are defined for the later frozen-crop benchmark and are emitted as null here rather than populated against a sentinel string.",
+      "truthPresentInNormalizedTranscript": "boolean",
+      "truthPresentWhitespaceFree": "boolean",
+      "failureClass": "'CORRECT' | 'OCR_EMPTY' | 'OCR_RECOGNITION_MISS' | 'WRONG_RELIABLE_READ' | 'CONSERVATIVE_AUTHORITY'",
+      "falseCertainty": "boolean — nativeCtcSequenceScore >= 0.8 AND failureClass is wrong",
+      "blankImageEmptyTranscript": "boolean | undefined"
+    },
+    "sentinelComparison": {
+      "note": "Used in place of `evaluation` for this probe. Compares against the sentinel text fixed by the plan, which is an input specification rather than corpus truth.",
+      "expectedIfSpaceDecodable": "BRAND NAME 123",
+      "expectedIfSpaceNotDecodable": "BRANDNAME123",
+      "exactMatch": "boolean",
+      "whitespaceFreeMatch": "boolean"
+    }
+  },
+  "confidenceInterpretationKnown": false,
+  "modelHasNaturalAbstention": false,
+  "trainingDataProductionReviewRequired": true
+}

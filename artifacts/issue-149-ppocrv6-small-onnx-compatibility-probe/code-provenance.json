@@ -1,0 +1,32 @@
+{
+  "artifact": "code-provenance",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "verifiedAtUtc": "2026-07-30T04:51:43.025Z",
+  "codeRepository": "https://github.com/PaddlePaddle/PaddleOCR",
+  "codeCommit": "2661c7c0ef5c613e8f93c6e93b2e052399f0f854",
+  "commitPinProvenance": "Engineering pin chosen during discovery so the confirmation is reproducible. §17 names the files to confirm but names no commit, so this commit is not a value supplied by the plan.",
+  "floatingMainUsed": false,
+  "codeLicense": "Apache-2.0",
+  "codeLicenseEvidence": "LICENSE at the pinned commit, retained at vendor-license/LICENSE-Apache-2.0.txt",
+  "noticeFileInPaddleOcrRepository": false,
+  "inspectedSources": [
+    {
+      "path": "ppocr/data/imaug/rec_img_aug.py",
+      "byteSize": 29050,
+      "sha256": "77607eb2a5e6e5d01829565a97161845ecd85a35a4d827435198f3ed4a32f9ad"
+    },
+    {
+      "path": "ppocr/postprocess/rec_postprocess.py",
+      "byteSize": 58614,
+      "sha256": "a5e5376514991656f7c7977f4a51ac61224ca6939f8ba41bc18e32ce9d15c872"
+    },
+    {
+      "path": "LICENSE",
+      "byteSize": 11376,
+      "sha256": "3840c5c0c61c294264d2dd77b8777be6ddd90121ef4e0e64abcd22edea581d6e"
+    }
+  ],
+  "sourcesCommitted": false,
+  "sourcesCommittedNote": "Only the URL, byte size and SHA-256 of each inspected file are recorded, so the confirmation is reproducible without vendoring 88 kB of upstream Python into this repository.",
+  "purpose": "Confirms the inference-time preprocessing formula and the CTC blank index, which the plan marks as INFERENCE-level and requires discovery to confirm from these files."
+}
