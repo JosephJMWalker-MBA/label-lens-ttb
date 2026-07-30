@@ -1,0 +1,25 @@
+{
+  "artifact": "arm-a-provenance",
+  "experimentId": "issue-149-brand-parseq-small-contrast",
+  "arm": "A",
+  "role": "incumbent",
+  "executionPath": "the exact governed incumbent evaluation path from merged PR #211",
+  "engine": "tesseract.js 7.0.0 / tesseract.js-core 7.0.0",
+  "oem": 1,
+  "psm": 11,
+  "traineddataSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+  "traineddataPath": "src/pipeline/extractor/assets/eng.traineddata",
+  "dpiFlag": "none — the incumbent evaluation path sets none",
+  "inputBytes": "the exact frozen preprocessed Brand crop PNG bytes",
+  "execution": "in-process on the runner via createLocalOcrEngine().recognizeWords",
+  "rawEvidenceRetained": [
+    "raw transcript",
+    "word sequence",
+    "word boxes",
+    "original Tesseract confidence",
+    "warnings",
+    "latency",
+    "output fingerprint"
+  ],
+  "productionBehaviourChanged": false
+}

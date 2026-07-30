@@ -1,0 +1,111 @@
+# Issue #149 — PARSeq-small versus incumbent Tesseract on frozen Brand crops.
+#
+# Research-only, scoped to exactly one branch. Not part of the required CI checks
+# and it touches no production path. No pull_request_target, no schedule, no
+# repository_dispatch, no unscoped branch trigger, and no workflow committed to
+# main outside this PR.
+name: Issue 149 PARSeq Brand contrast
+
+on:
+  push:
+    branches:
+      - research/issue-149-brand-parseq-small-contrast
+    paths:
+      - .github/workflows/issue-149-parseq-contrast.yml
+      - artifacts/issue-149-brand-parseq-small-contrast/workflow-mode.txt
+
+permissions:
+  contents: read
+
+env:
+  MODE_FILE: artifacts/issue-149-brand-parseq-small-contrast/workflow-mode.txt
+  ART: artifacts/issue-149-brand-parseq-small-contrast
+  PARSEQ_COMMIT: 1902db043c029a7e03a3818c616c06600af574be
+  FONT_VERSION: 2.37-6
+  IMAGE_TAG: issue-149-parseq-probe:cpu
+
+jobs:
+  resolve-mode:
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.mode.outputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: mode
+        run: |
+          set -eu
+          mode="$(tr -d '[:space:]' < "${MODE_FILE}")"
+          echo "declared mode: '${mode}'"
+          case "${mode}" in execute|complete) ;; *) echo "INVALID_MODE: '${mode}'" >&2; exit 1 ;; esac
+          echo "mode=${mode}" >> "$GITHUB_OUTPUT"
+
+  execute:
+    name: Execute the two-arm benchmark
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'execute'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Assert native linux/amd64
+        run: |
+          set -eu
+          test "$(uname -m)" = "x86_64" || { echo "NOT_NATIVE_AMD64" >&2; exit 1; }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+
+      - name: Verify frozen preregistration and inputs
+        run: |
+          set -eu
+          ( cd "${ART}" && shasum -a 256 -c preregistration.sha256 )
+
+      - name: Retrieve and verify PARSeq checkpoint
+        run: node scripts/eval/fetch-issue-149-parseq-hf-checkpoint.mjs
+
+      - name: Build the pinned PARSeq container
+        run: |
+          set -eu
+          docker build --platform=linux/amd64 \
+            -f scripts/eval/docker/issue-149-parseq-probe.Dockerfile \
+            --build-arg "FONT_PACKAGE_VERSION=${FONT_VERSION}" \
+            --build-arg "PARSEQ_COMMIT=${PARSEQ_COMMIT}" \
+            -t "${IMAGE_TAG}" .
+
+      # Arm B raw evidence: offline, model and inputs read-only, no repository
+      # root mounted, no corpus or truth mounted, batch size 1.
+      - name: Arm B — PARSeq primary and exact repeat
+        run: |
+          set -eu
+          mkdir -p "${ART}/raw"
+          for run in primary repeat; do
+            docker run --rm --platform=linux/amd64 --network=none \
+              --cpus 2 --memory 6g \
+              -v "$PWD/.local/ocr-research/models/parseq-small:/model:ro" \
+              -v "$PWD/${ART}/inference-inputs:/inputs:ro" \
+              -v "$PWD/${ART}/raw:/out" \
+              -e OMP_NUM_THREADS=1 -e MKL_NUM_THREADS=1 \
+              "${IMAGE_TAG}" python /opt/probe/run_brand_contrast.py "${run}"
+          done
+
+      # Arm A plus evaluation. Truth is loaded only after every raw output is
+      # written and hashed.
+      - name: Arm A — incumbent, and evaluate both arms
+        run: node --import tsx scripts/eval/run-issue-149-parseq-contrast.ts
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-149-parseq-contrast-results
+          path: artifacts/issue-149-brand-parseq-small-contrast/
+          if-no-files-found: error
+
+  complete:
+    name: Complete (no inference)
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'complete'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Mode is 'complete': the benchmark is finished and this workflow"
+          echo "will not run inference. Results are committed to the branch."

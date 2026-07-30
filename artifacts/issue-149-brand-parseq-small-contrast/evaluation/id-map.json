@@ -1,0 +1,49 @@
+{
+  "artifact": "id-map",
+  "experimentId": "issue-149-brand-parseq-small-contrast",
+  "availableToInference": false,
+  "map": [
+    {
+      "opaqueItemId": "item-dcfc22ffeac8",
+      "ocrItemId": "approved-wine-004",
+      "caseId": "approved-wine-004",
+      "cropClusterId": "C1",
+      "designClusterId": "D1"
+    },
+    {
+      "opaqueItemId": "item-311a595a4f66",
+      "ocrItemId": "approved-wine-005",
+      "caseId": "approved-wine-005",
+      "cropClusterId": "C2",
+      "designClusterId": "D1"
+    },
+    {
+      "opaqueItemId": "item-ba86d5527473",
+      "ocrItemId": "approved-wine-031",
+      "caseId": "approved-wine-031",
+      "cropClusterId": "C3",
+      "designClusterId": "D3"
+    },
+    {
+      "opaqueItemId": "item-192b594faff0",
+      "ocrItemId": "la-fattoria-rotated",
+      "caseId": "la-fattoria-rotated",
+      "cropClusterId": "C1",
+      "designClusterId": "D1"
+    },
+    {
+      "opaqueItemId": "item-cea77b8f4af1",
+      "ocrItemId": "wine-multi-artifact-04-region-1",
+      "caseId": "wine-multi-artifact-04",
+      "cropClusterId": "C4",
+      "designClusterId": "D2"
+    },
+    {
+      "opaqueItemId": "item-897b872db6ae",
+      "ocrItemId": "wine-multi-artifact-04-region-2",
+      "caseId": "wine-multi-artifact-04",
+      "cropClusterId": "C4",
+      "designClusterId": "D2"
+    }
+  ]
+}

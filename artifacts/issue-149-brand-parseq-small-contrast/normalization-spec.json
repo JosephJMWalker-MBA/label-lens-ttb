@@ -1,0 +1,70 @@
+{
+  "artifact": "normalization-spec",
+  "experimentId": "issue-149-brand-parseq-small-contrast",
+  "frozenBeforeInference": true,
+  "rationale": "PARSeq's frozen charset cannot emit a space. Three separate representations keep that limitation visible instead of hiding it inside a single normalization.",
+  "representations": {
+    "1_rawTranscript": {
+      "definition": "The exact model-emitted string.",
+      "edited": false,
+      "reportedUnchanged": true
+    },
+    "2_boundaryPreservingNormalized": {
+      "steps": [
+        "Unicode NFKC",
+        "lowercase",
+        "convert every Unicode whitespace run to one ASCII space",
+        "trim outer whitespace"
+      ],
+      "preservesSpaces": true,
+      "preservesPunctuation": true,
+      "purpose": "Exposes PARSeq's inability to represent word boundaries."
+    },
+    "3_whitespaceFreeComparable": {
+      "steps": [
+        "apply the boundary-preserving normalization",
+        "remove every Unicode whitespace character"
+      ],
+      "preservesNonWhitespace": true,
+      "preservesPunctuation": true,
+      "purpose": "The primary architecture-comparable representation, because PARSeq's charset cannot emit a space.",
+      "isRawExactMatching": false
+    }
+  },
+  "prohibited": {
+    "removePunctuation": false,
+    "substituteCharacters": false,
+    "editDistanceCorrection": false,
+    "dictionaryWordSplitting": false,
+    "insertSpacesIntoParseqOutput": false,
+    "useTruthToSegmentOutput": false,
+    "note": "Every entry is false: none of these transformations is applied anywhere."
+  },
+  "primaryMetrics": {
+    "representation": "3_whitespaceFreeComparable",
+    "metrics": [
+      "exact match",
+      "character error rate",
+      "truth present as a contiguous substring",
+      "useful-token recall (tokens of length >= 3, applied identically to both arms)",
+      "empty transcript",
+      "deterministic repeat",
+      "runtime failure"
+    ]
+  },
+  "boundarySensitiveMetrics": {
+    "representation": "2_boundaryPreservingNormalized",
+    "metrics": [
+      "boundary-sensitive exact match",
+      "boundary-sensitive character error rate",
+      "missing or extra whitespace",
+      "punctuation differences"
+    ]
+  },
+  "improvementThresholds": {
+    "materialCharacterErrorRateDelta": 0.1,
+    "materialUsefulTokenRecallDelta": 0.25,
+    "rule": "An improvement requires a truth-bearing gain under the primary whitespace-free metrics: wrong to exact, materially lower CER, truth newly present, or a useful Brand fragment newly recovered. More characters, a higher score, or a merely non-empty output is never an improvement. A change between two equally wrong transcripts is NO_EFFECT unless one has objectively worse primary CER."
+  },
+  "reportingRule": "Both boundary-preserving and whitespace-free results are reported. Whitespace-free matching is never described as raw exact matching."
+}

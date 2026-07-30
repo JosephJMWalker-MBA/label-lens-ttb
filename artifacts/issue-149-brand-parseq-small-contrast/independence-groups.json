@@ -1,0 +1,86 @@
+{
+  "artifact": "independence-groups",
+  "experimentId": "issue-149-brand-parseq-small-contrast",
+  "basis": "merged PR #207 adjudication, as carried by PR #211",
+  "counts": {
+    "historicalCases": 5,
+    "ocrItems": 6,
+    "distinctPreprocessedPixelSetsAtItemLevel": 5,
+    "distinctCropImagesAtCaseLevel": 4,
+    "distinctBrandDesigns": 3
+  },
+  "reportingLevels": [
+    "historical case",
+    "OCR item",
+    "distinct preprocessed pixel set",
+    "case-level crop cluster",
+    "distinct Brand design"
+  ],
+  "cropClusters": [
+    {
+      "cropClusterId": "C1",
+      "members": ["approved-wine-004", "la-fattoria-rotated"],
+      "ocrItems": ["item-cb35adee2cf8", "item-7b5cdce6d1ff"]
+    },
+    {
+      "cropClusterId": "C2",
+      "members": ["approved-wine-005"],
+      "ocrItems": ["item-64a8d5e551a5"]
+    },
+    {
+      "cropClusterId": "C3",
+      "members": ["approved-wine-031"],
+      "ocrItems": ["item-710d87caca47"]
+    },
+    {
+      "cropClusterId": "C4",
+      "members": ["wine-multi-artifact-04"],
+      "ocrItems": ["item-79aa3241d939", "item-6db972c3416b"]
+    }
+  ],
+  "designClusters": [
+    {
+      "designClusterId": "D1",
+      "members": ["approved-wine-004", "la-fattoria-rotated", "approved-wine-005"],
+      "ocrItems": ["item-cb35adee2cf8", "item-64a8d5e551a5", "item-7b5cdce6d1ff"]
+    },
+    {
+      "designClusterId": "D2",
+      "members": ["wine-multi-artifact-04"],
+      "ocrItems": ["item-79aa3241d939", "item-6db972c3416b"]
+    },
+    {
+      "designClusterId": "D3",
+      "members": ["approved-wine-031"],
+      "ocrItems": ["item-710d87caca47"]
+    }
+  ],
+  "pixelSets": [
+    {
+      "pixelSetSha256": "ce5b99dc782cf2d893c35be8dea88e7bcddc09f0859183e8ff13f4dc3e6a67a1",
+      "members": ["item-dcfc22ffeac8", "item-192b594faff0"]
+    },
+    {
+      "pixelSetSha256": "8080cb380c7d65e99ed9ae48c3075daf301518b03246ef03e25d8ee74adf3eee",
+      "members": ["item-311a595a4f66"]
+    },
+    {
+      "pixelSetSha256": "efd2a2f90dd1ee74da7df9258916f1d253f7948601bdc60f1dfbbbed3cc4fa65",
+      "members": ["item-ba86d5527473"]
+    },
+    {
+      "pixelSetSha256": "690fbabb303481406c87542e02a063f1ffbc806d44aa1c3e1f113ac9ab94e309",
+      "members": ["item-cea77b8f4af1"]
+    },
+    {
+      "pixelSetSha256": "8746c2c0a4f73b9fd1208cd941aece76519c76a162086eecb0063c150ebabdb9",
+      "members": ["item-897b872db6ae"]
+    }
+  ],
+  "countingRules": [
+    "Shared crop evidence counts once.",
+    "Repeated Brand-design evidence counts once; a repeated design can contribute only one design-level improvement.",
+    "The two wine-multi-artifact-04 regions remain separate OCR items but one historical case.",
+    "Duplicate crops are never aggregated as independent successes."
+  ]
+}
