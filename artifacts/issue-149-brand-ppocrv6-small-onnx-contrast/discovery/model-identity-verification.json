@@ -1,0 +1,52 @@
+{
+  "artifact": "model-identity-verification",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "verifiedAtUtc": "2026-07-30T15:41:27.866Z",
+  "repository": "PaddlePaddle/PP-OCRv6_small_rec_onnx",
+  "pinnedRevision": "b8f84f0b80c529de40b4fbb3544b84fa7233a513",
+  "pinnedRevisionRetrievable": true,
+  "onnx": {
+    "expectedSha256": "5435fd747c9e0efe15a96d0b378d5bd157e9492ed8fd80edf08f30d02fa24634",
+    "observedLfsOid": "5435fd747c9e0efe15a96d0b378d5bd157e9492ed8fd80edf08f30d02fa24634",
+    "expectedByteSize": 21159378,
+    "observedByteSize": 21159378,
+    "matches": true
+  },
+  "config": {
+    "expectedSha256": "ab078671bb49f06228eadccd34f1bb501e157f7a047095ffb943ba81512c77d1",
+    "observedSha256": "ab078671bb49f06228eadccd34f1bb501e157f7a047095ffb943ba81512c77d1",
+    "expectedByteSize": 150579,
+    "observedByteSize": 150579,
+    "matches": true,
+    "committedCopy": "vendor/inference.yml"
+  },
+  "license": {
+    "expected": "apache-2.0",
+    "readmeFrontmatter": "apache-2.0",
+    "apiCardData": "apache-2.0",
+    "tiedToArtifactAtPinnedRevision": true
+  },
+  "fileInventoryAtPinnedRevision": [
+    {
+      "path": ".gitattributes",
+      "size": 1519
+    },
+    {
+      "path": "README.md",
+      "size": 16585
+    },
+    {
+      "path": "inference.json",
+      "size": 208004
+    },
+    {
+      "path": "inference.onnx",
+      "size": 21159378
+    },
+    {
+      "path": "inference.yml",
+      "size": 150579
+    }
+  ],
+  "brandInferencePerformed": false
+}

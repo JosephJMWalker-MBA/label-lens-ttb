@@ -1,0 +1,67 @@
+{
+  "artifact": "onnx-graph-inspection",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "dryRun": true,
+  "sessionRunCalled": false,
+  "onnxSha256": "5435fd747c9e0efe15a96d0b378d5bd157e9492ed8fd80edf08f30d02fa24634",
+  "onnxByteSize": 21159378,
+  "modelRevision": "b8f84f0b80c529de40b4fbb3544b84fa7233a513",
+  "opsetImports": [
+    {
+      "domain": "ai.onnx",
+      "version": 11
+    }
+  ],
+  "irVersion": 6,
+  "producerName": "",
+  "producerVersion": "",
+  "modelMeta": {
+    "producerName": "",
+    "graphName": "PaddlePaddle Graph in PIR mode",
+    "domain": "",
+    "description": "",
+    "version": 9223372036854775807,
+    "customMetadataMap": {}
+  },
+  "inputs": [
+    {
+      "name": "x",
+      "shape": ["DynamicDimension.0", 3, 48, "DynamicDimension.1"],
+      "type": "tensor(float)"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "fetch_name_0",
+      "shape": ["DynamicDimension.0", "Reshape_471_o0__d2", 18710],
+      "type": "tensor(float)"
+    }
+  ],
+  "graphOutputsStatic": [
+    {
+      "name": "fetch_name_0",
+      "dims": ["DynamicDimension.0", "Reshape_471_o0__d2", 18710]
+    }
+  ],
+  "largeOneDimInitializers": [
+    {
+      "name": "linear_8.b_0",
+      "dim": 18710
+    }
+  ],
+  "providersAvailable": ["AzureExecutionProvider", "CPUExecutionProvider"],
+  "providersRequested": ["CPUExecutionProvider"],
+  "providersUsed": ["CPUExecutionProvider"],
+  "sessionOptions": {
+    "intraOpNumThreads": 1,
+    "interOpNumThreads": 1,
+    "executionMode": "ORT_SEQUENTIAL",
+    "graphOptimizationLevel": "default"
+  },
+  "runtime": {
+    "python": "3.11.15",
+    "onnxruntime": "1.28.0",
+    "onnx": "1.22.0",
+    "numpy": "2.4.6"
+  }
+}

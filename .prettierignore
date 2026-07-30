@@ -27,3 +27,4 @@ src/db/migrations/
 # Hugging Face revision for the Issue #149 PP-OCRv6 probe. Its bytes are hashed
 # and gated, so reformatting it would break its recorded identity.
 artifacts/issue-149-ppocrv6-small-onnx-compatibility-probe/vendor/inference.yml
+artifacts/issue-149-brand-ppocrv6-small-onnx-contrast/vendor/inference.yml

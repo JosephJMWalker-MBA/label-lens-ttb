@@ -1,0 +1,14 @@
+{
+  "artifact": "upstream-head-observation",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "observedAtUtc": "2026-07-30T15:41:27.866Z",
+  "repository": "PaddlePaddle/PP-OCRv6_small_rec_onnx",
+  "pinnedRevision": "b8f84f0b80c529de40b4fbb3544b84fa7233a513",
+  "upstreamDefaultBranchHead": "b8f84f0b80c529de40b4fbb3544b84fa7233a513",
+  "upstreamHeadChangedSincePinning": false,
+  "treatedAsBlocker": false,
+  "rule": "A later upstream commit does not invalidate an immutable approved revision. The experiment proceeds with the pinned revision provided its bytes, sizes, configuration and licence still verify. Only a failure of those checks halts.",
+  "pinnedRevisionStillRetrievable": true,
+  "lastModifiedAtPinning": "2026-06-18T11:08:57.000Z",
+  "lastModifiedObservedNow": "2026-06-18T11:08:57.000Z"
+}
