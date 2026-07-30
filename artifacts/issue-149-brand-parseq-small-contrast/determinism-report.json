@@ -1,0 +1,47 @@
+{
+  "artifact": "determinism-report",
+  "experimentId": "issue-149-brand-parseq-small-contrast",
+  "armBRequiredFields": [
+    "logitsBytes",
+    "tokenIds",
+    "eosIndex",
+    "characterProbabilities",
+    "rawTranscript",
+    "outputFingerprint"
+  ],
+  "rows": [
+    {
+      "opaqueItemId": "item-dcfc22ffeac8",
+      "armADeterministic": true,
+      "armBDeterministic": true
+    },
+    {
+      "opaqueItemId": "item-311a595a4f66",
+      "armADeterministic": true,
+      "armBDeterministic": true
+    },
+    {
+      "opaqueItemId": "item-ba86d5527473",
+      "armADeterministic": true,
+      "armBDeterministic": true
+    },
+    {
+      "opaqueItemId": "item-192b594faff0",
+      "armADeterministic": true,
+      "armBDeterministic": true
+    },
+    {
+      "opaqueItemId": "item-cea77b8f4af1",
+      "armADeterministic": true,
+      "armBDeterministic": true
+    },
+    {
+      "opaqueItemId": "item-897b872db6ae",
+      "armADeterministic": true,
+      "armBDeterministic": true
+    }
+  ],
+  "allArmADeterministic": true,
+  "allArmBDeterministic": true,
+  "ruleRelaxed": false
+}

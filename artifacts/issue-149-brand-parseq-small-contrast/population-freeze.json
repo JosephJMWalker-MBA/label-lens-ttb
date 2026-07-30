@@ -1,0 +1,31 @@
+{
+  "artifact": "population-freeze",
+  "experimentId": "issue-149-brand-parseq-small-contrast",
+  "frozenBeforeInference": true,
+  "recoveredFrom": "artifacts/issue-149-brand-native-tesseract-model-attribution (merged PR #211)",
+  "verifiedCounts": {
+    "historicalCases": 5,
+    "ocrItems": 6,
+    "distinctPreprocessedPixelSetsAtItemLevel": 5,
+    "distinctCropImagesAtCaseLevel": 4,
+    "distinctBrandDesigns": 3
+  },
+  "expectedCounts": {
+    "historicalCases": 5,
+    "ocrItems": 6,
+    "distinctPreprocessedPixelSetsAtItemLevel": 5,
+    "distinctCropImagesAtCaseLevel": 4,
+    "distinctBrandDesigns": 3
+  },
+  "countsReproduceExactly": true,
+  "historicalCases": [
+    "approved-wine-004",
+    "approved-wine-005",
+    "approved-wine-031",
+    "la-fattoria-rotated",
+    "wine-multi-artifact-04"
+  ],
+  "caseSubstitution": false,
+  "corpusExpansion": false,
+  "postResultCaseAddition": false
+}

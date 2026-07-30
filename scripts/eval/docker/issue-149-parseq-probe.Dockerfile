@@ -57,6 +57,7 @@ RUN curl -fsSL -o /tmp/parseq.tar.gz \
 
 COPY scripts/eval/parseq/generate_synthetic_inputs.py /opt/probe/generate_synthetic_inputs.py
 COPY scripts/eval/parseq/run_probe.py /opt/probe/run_probe.py
+COPY scripts/eval/parseq/run_brand_contrast.py /opt/probe/run_brand_contrast.py
 
 # Record the runtime inventory inside the image so it can be read back without
 # re-resolving anything at inference time.

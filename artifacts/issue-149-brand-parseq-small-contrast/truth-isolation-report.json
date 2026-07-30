@@ -1,0 +1,30 @@
+{
+  "artifact": "truth-isolation-report",
+  "experimentId": "issue-149-brand-parseq-small-contrast",
+  "opaqueItemIdsAssigned": true,
+  "inputsCopiedToOpaqueHashBasedFilenames": true,
+  "checks": {
+    "brandTruthInFilenames": false,
+    "caseNamesInFilenames": false,
+    "producerNamesInFilenames": false,
+    "expectedStringsInFilenames": false,
+    "truthInDirectories": false,
+    "truthInCommands": false,
+    "truthInEnvironmentVariables": false,
+    "truthInContainerMounts": false,
+    "truthInModelMetadata": false,
+    "truthInLogs": false
+  },
+  "inferenceInputDirectoryListing": [
+    "item-dcfc22ffeac8.png",
+    "item-311a595a4f66.png",
+    "item-ba86d5527473.png",
+    "item-192b594faff0.png",
+    "item-cea77b8f4af1.png",
+    "item-897b872db6ae.png"
+  ],
+  "caseMappingLocation": "evaluation/id-map.json",
+  "caseMappingMountedIntoInference": false,
+  "truthLoadedBeforeInference": false,
+  "note": "Inference sees only opaque filenames. The mapping and the governed Brand truth are read after every raw output is written and hashed."
+}

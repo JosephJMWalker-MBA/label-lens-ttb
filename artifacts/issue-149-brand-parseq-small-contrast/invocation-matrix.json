@@ -1,0 +1,21 @@
+{
+  "artifact": "invocation-matrix",
+  "experimentId": "issue-149-brand-parseq-small-contrast",
+  "ocrItems": 6,
+  "arms": ["A", "B"],
+  "runsPerArmItem": ["primary", "repeat"],
+  "expectedInferenceInvocations": 24,
+  "expectedArmItemPairs": 12,
+  "expectedExactRepeatComparisons": 12,
+  "hardening": {
+    "armBNetwork": "none",
+    "armBModelMount": "read-only",
+    "armBInputMount": "read-only",
+    "repositoryRootMounted": false,
+    "corpusMounted": false,
+    "fixtureTruthMounted": false,
+    "caseMappingMounted": false
+  },
+  "truthBoundary": "Both arms and both repeats run, and every raw output is written and hashed, before Brand truth is loaded.",
+  "prohibited": ["retry beyond the fixed repeat", "altered setting after output exists"]
+}

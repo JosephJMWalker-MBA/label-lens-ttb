@@ -1,0 +1,71 @@
+{
+  "artifact": "decision",
+  "experimentId": "issue-149-brand-parseq-small-contrast",
+  "evaluationOnly": true,
+  "twoArmArchitectureComparison": true,
+  "singleVariableCausalAttribution": false,
+  "decision": "REGRESSION",
+  "reason": "A distinct Brand design showed a primary-metric regression.",
+  "gates": [
+    {
+      "gate": "preregistration-frozen",
+      "status": "PASS",
+      "detail": "d708bd2bda043d6049397d91032bfd3e1c88c159c92b7b39db0f2a86742faf33"
+    },
+    {
+      "gate": "runner-native-amd64",
+      "status": "PASS",
+      "detail": "x86_64"
+    },
+    {
+      "gate": "incumbent-traineddata",
+      "status": "PASS",
+      "detail": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747"
+    },
+    {
+      "gate": "parseq-checkpoint",
+      "status": "PASS",
+      "detail": "bb5792a68e367476abca029cbf8699abc805f3d3dc7e57aae45c8ec4f7b7cd00"
+    },
+    {
+      "gate": "input-pixel-hashes",
+      "status": "PASS",
+      "detail": "6 inputs"
+    },
+    {
+      "gate": "no-production-or-fixture-changes",
+      "status": "PASS",
+      "detail": "clean"
+    }
+  ],
+  "counts": {
+    "historicalCases": 5,
+    "ocrItems": 6,
+    "distinctPixelSets": 5,
+    "distinctCropClusters": 4,
+    "distinctBrandDesigns": 3
+  },
+  "classifications": {
+    "PARSEQ_REGRESSION": 2,
+    "PARSEQ_TRUTH_BEARING_IMPROVEMENT": 4
+  },
+  "improvedCropClusters": 3,
+  "improvedDesignClusters": 2,
+  "designRegression": true,
+  "allArmBDeterministic": true,
+  "falseReliableRead": "NOT_ASSESSABLE_NO_CALIBRATED_AUTHORITY_MAPPING",
+  "falseReliableReadNote": "PARSeq is not connected to the authority classifier and has no calibrated mapping. Zero false reliable reads is NOT reported: the measure is not assessable here. PARSeq output remains evaluation evidence only and cannot produce a reliable finding in this experiment.",
+  "wrongOutputCount": 5,
+  "scoreOrderingRisk": true,
+  "blankHallucinationRiskInherited": "PR #213: PARSeq emitted `10` on a blank image and has no natural abstention.",
+  "authorizes": "nothing",
+  "doesNotAuthorize": [
+    "production use or integration",
+    "a Python production runtime",
+    "authority-state changes",
+    "shadow deployment",
+    "engine replacement"
+  ],
+  "codeCommit": "1902db043c029a7e03a3818c616c06600af574be",
+  "modelCommit": "a1526c3d63740e460153987f9aaf6b86aa199dc1"
+}

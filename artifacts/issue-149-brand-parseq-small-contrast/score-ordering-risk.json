@@ -1,0 +1,43 @@
+{
+  "artifact": "score-ordering-risk",
+  "experimentId": "issue-149-brand-parseq-small-contrast",
+  "thresholdFreeDiagnostic": true,
+  "isAuthorityClassifier": false,
+  "perItem": [
+    {
+      "opaqueItemId": "item-dcfc22ffeac8",
+      "nativeSequenceScore": 0.9334071278572083,
+      "correct": false
+    },
+    {
+      "opaqueItemId": "item-311a595a4f66",
+      "nativeSequenceScore": 0.8216066360473633,
+      "correct": false
+    },
+    {
+      "opaqueItemId": "item-ba86d5527473",
+      "nativeSequenceScore": 0.5930107831954956,
+      "correct": true
+    },
+    {
+      "opaqueItemId": "item-192b594faff0",
+      "nativeSequenceScore": 0.9334071278572083,
+      "correct": false
+    },
+    {
+      "opaqueItemId": "item-cea77b8f4af1",
+      "nativeSequenceScore": 0.2767797112464905,
+      "correct": false
+    },
+    {
+      "opaqueItemId": "item-897b872db6ae",
+      "nativeSequenceScore": 0.6390577554702759,
+      "correct": false
+    }
+  ],
+  "correctCount": 1,
+  "wrongCount": 5,
+  "scoreOrderingRisk": true,
+  "scoreOrderingRiskNote": "True means some wrong output scored at least as high as some correct output.",
+  "thresholdDerived": false
+}
