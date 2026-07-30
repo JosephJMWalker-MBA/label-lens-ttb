@@ -28,3 +28,8 @@ src/db/migrations/
 # and gated, so reformatting it would break its recorded identity.
 artifacts/issue-149-ppocrv6-small-onnx-compatibility-probe/vendor/inference.yml
 artifacts/issue-149-brand-ppocrv6-small-onnx-contrast/vendor/inference.yml
+
+# Frozen raw inference evidence. Every file's SHA-256 is recorded in
+# raw-output-manifest.json before the truth boundary is crossed, so reformatting
+# would invalidate the manifest that proves the evidence is unaltered.
+artifacts/issue-149-brand-ppocrv6-small-onnx-contrast/raw/

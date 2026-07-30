@@ -1,0 +1,70 @@
+{
+  "artifact": "arm-a-recomputation-crosscheck",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "why": "Arm A metrics are recomputed from the carried raw outputs by the same frozen scorer as Arm B, rather than copied from PR #214's published table, so both arms pass through one code path and the truth boundary stays meaningful.",
+  "publishedSource": "artifacts/issue-149-brand-parseq-small-contrast/per-item-results.json",
+  "fieldsComparedPerItem": [
+    "exactMatchWhitespaceFree",
+    "cerWhitespaceFree",
+    "truthContiguousInWhitespaceFree",
+    "usefulTokenRecall",
+    "matchedTokens",
+    "totalTokens",
+    "boundarySensitiveExactMatch",
+    "cerBoundaryPreserving",
+    "whitespaceDifference",
+    "rawTranscript"
+  ],
+  "items": [
+    {
+      "ocrItemId": "approved-wine-004",
+      "opaqueItemId": "item-afc6bdc0164a",
+      "priorOpaqueItemId": "item-dcfc22ffeac8",
+      "fieldsCompared": 10,
+      "differences": [],
+      "matches": true
+    },
+    {
+      "ocrItemId": "approved-wine-005",
+      "opaqueItemId": "item-0fd41fe162ac",
+      "priorOpaqueItemId": "item-311a595a4f66",
+      "fieldsCompared": 10,
+      "differences": [],
+      "matches": true
+    },
+    {
+      "ocrItemId": "approved-wine-031",
+      "opaqueItemId": "item-fb5c77aeb7be",
+      "priorOpaqueItemId": "item-ba86d5527473",
+      "fieldsCompared": 10,
+      "differences": [],
+      "matches": true
+    },
+    {
+      "ocrItemId": "la-fattoria-rotated",
+      "opaqueItemId": "item-4e0a448436b7",
+      "priorOpaqueItemId": "item-192b594faff0",
+      "fieldsCompared": 10,
+      "differences": [],
+      "matches": true
+    },
+    {
+      "ocrItemId": "wine-multi-artifact-04-region-1",
+      "opaqueItemId": "item-609a041ecdc3",
+      "priorOpaqueItemId": "item-cea77b8f4af1",
+      "fieldsCompared": 10,
+      "differences": [],
+      "matches": true
+    },
+    {
+      "ocrItemId": "wine-multi-artifact-04-region-2",
+      "opaqueItemId": "item-e5329d446477",
+      "priorOpaqueItemId": "item-897b872db6ae",
+      "fieldsCompared": 10,
+      "differences": [],
+      "matches": true
+    }
+  ],
+  "allItemsMatch": true,
+  "discrepancyPolicy": "Every difference is reported explicitly. Neither value is silently replaced, the scorer is not altered, and no threshold is changed."
+}

@@ -3,6 +3,11 @@
 Frozen before inference. These limits are stated in advance so that no result can
 be presented as broader than the design allows.
 
+> **Post-result note.** Everything below was written before any inference ran and
+> is unchanged. The one section marked *added after results* records limits that
+> only became visible once the outcome existed. The verdict is `REGRESSION`; see
+> `results-report.md`.
+
 ## Sample size, and it is smaller than it looks
 
 Five historical cases, six OCR items, **five** distinct item-level pixel sets,
@@ -110,3 +115,36 @@ It cannot select an engine, because engine selection needs a held-out corpus,
 calibrated abstention, latency measured on the production platform, and resolved
 training-data provenance. None of those is in scope, and three of them are
 explicitly blocked.
+
+## Added after results
+
+These four limits were not visible until the outcome existed. They are recorded
+here, separated from the pre-inference text, so the boundary between what was
+foreseen and what was learned stays legible.
+
+**The favourable score separation is thinner than it looks.** Every correct output
+scored above every wrong one under both frozen definitions, so `scoreOrderingRisk`
+is false. But the two correct readings sit against three *distinct* wrong ones
+once the byte-identical C1 duplicate is counted once. A clean gap across five
+effective observations is not calibration evidence, and no threshold is derived
+from it. Anyone reading the 0.86-to-0.91 gap as a candidate cut-point is reading
+more than the data carries.
+
+**Zero `NOT_VISUALLY_SUPPORTED` is a weak negative, not a clean bill.** It means
+one non-independent reviewer could trace every emitted character to visible
+lettering on six crops. It does not establish that PP-OCRv6 does not fabricate
+text, and `severeRepeatedUnsupportedOutput` being false is therefore a statement
+about this subset and this reviewer, not about the model.
+
+**The two failing items are one crop, and both candidates failed it.** PARSeq in
+PR #214 and PP-OCRv6 here regress on the same design, D1, driven by the same
+byte-identical C1 pixels. That coincidence is suggestive and is reported in
+`results-report.md`, but with n=1 crop it cannot distinguish a property of the
+image from a shared blind spot of modern scene-text recognizers, or from chance.
+
+**The whitespace-free primary metric understated the candidate here, exactly as
+predicted.** `Dry Cellar` is a boundary-sensitive exact match — the first in this
+sequence — and the primary table cannot show it. That was a foreseen cost of
+preserving comparability with PR #214, and the outcome confirms it was a real cost
+rather than a hypothetical one. It did not change the verdict: D1 regresses under
+both representations.

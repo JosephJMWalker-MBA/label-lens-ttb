@@ -1,0 +1,43 @@
+{
+  "artifact": "pixel-set-results",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "rule": "Byte-identical pixel sets count once. approved-wine-004 and la-fattoria-rotated share one pixel set.",
+  "groupCount": 5,
+  "groups": [
+    {
+      "sourcePngSha256": "690fbabb303481406c87542e02a063f1ffbc806d44aa1c3e1f113ac9ab94e309",
+      "ocrItems": ["wine-multi-artifact-04-region-1"],
+      "memberClassifications": ["PPOCRV6_TRUTH_BEARING_IMPROVEMENT"],
+      "groupClassification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT",
+      "countsOnce": true
+    },
+    {
+      "sourcePngSha256": "8080cb380c7d65e99ed9ae48c3075daf301518b03246ef03e25d8ee74adf3eee",
+      "ocrItems": ["approved-wine-005"],
+      "memberClassifications": ["PPOCRV6_TRUTH_BEARING_IMPROVEMENT"],
+      "groupClassification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT",
+      "countsOnce": true
+    },
+    {
+      "sourcePngSha256": "8746c2c0a4f73b9fd1208cd941aece76519c76a162086eecb0063c150ebabdb9",
+      "ocrItems": ["wine-multi-artifact-04-region-2"],
+      "memberClassifications": ["PPOCRV6_TRUTH_BEARING_IMPROVEMENT"],
+      "groupClassification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT",
+      "countsOnce": true
+    },
+    {
+      "sourcePngSha256": "ce5b99dc782cf2d893c35be8dea88e7bcddc09f0859183e8ff13f4dc3e6a67a1",
+      "ocrItems": ["approved-wine-004", "la-fattoria-rotated"],
+      "memberClassifications": ["PPOCRV6_REGRESSION", "PPOCRV6_REGRESSION"],
+      "groupClassification": "PPOCRV6_REGRESSION",
+      "countsOnce": true
+    },
+    {
+      "sourcePngSha256": "efd2a2f90dd1ee74da7df9258916f1d253f7948601bdc60f1dfbbbed3cc4fa65",
+      "ocrItems": ["approved-wine-031"],
+      "memberClassifications": ["PPOCRV6_TRUTH_BEARING_IMPROVEMENT"],
+      "groupClassification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT",
+      "countsOnce": true
+    }
+  ]
+}

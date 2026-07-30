@@ -1,0 +1,39 @@
+{
+  "artifact": "crop-cluster-results",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "rule": "The duplicate C1 crop counts once. Shared crop evidence counts once.",
+  "groupCount": 4,
+  "groups": [
+    {
+      "cropClusterId": "C1",
+      "ocrItems": ["approved-wine-004", "la-fattoria-rotated"],
+      "memberClassifications": ["PPOCRV6_REGRESSION", "PPOCRV6_REGRESSION"],
+      "groupClassification": "PPOCRV6_REGRESSION",
+      "countsOnce": true
+    },
+    {
+      "cropClusterId": "C2",
+      "ocrItems": ["approved-wine-005"],
+      "memberClassifications": ["PPOCRV6_TRUTH_BEARING_IMPROVEMENT"],
+      "groupClassification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT",
+      "countsOnce": true
+    },
+    {
+      "cropClusterId": "C3",
+      "ocrItems": ["approved-wine-031"],
+      "memberClassifications": ["PPOCRV6_TRUTH_BEARING_IMPROVEMENT"],
+      "groupClassification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT",
+      "countsOnce": true
+    },
+    {
+      "cropClusterId": "C4",
+      "ocrItems": ["wine-multi-artifact-04-region-1", "wine-multi-artifact-04-region-2"],
+      "memberClassifications": [
+        "PPOCRV6_TRUTH_BEARING_IMPROVEMENT",
+        "PPOCRV6_TRUTH_BEARING_IMPROVEMENT"
+      ],
+      "groupClassification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT",
+      "countsOnce": true
+    }
+  ]
+}

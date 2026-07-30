@@ -1,0 +1,43 @@
+{
+  "artifact": "truth-isolation-report",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "opaqueItemIdsAssigned": true,
+  "freshSaltUsed": true,
+  "inferenceInputDirectoryListing": [
+    "item-0fd41fe162ac.png",
+    "item-4e0a448436b7.png",
+    "item-609a041ecdc3.png",
+    "item-afc6bdc0164a.png",
+    "item-e5329d446477.png",
+    "item-fb5c77aeb7be.png"
+  ],
+  "checks": {
+    "brandTruthInFilenames": false,
+    "caseNamesInFilenames": false,
+    "producerNamesInFilenames": false,
+    "expectedStringsInFilenames": false,
+    "truthInDirectories": false,
+    "truthInCommands": false,
+    "truthInEnvironmentVariables": false,
+    "truthInContainerMounts": false,
+    "truthInModelMetadata": false,
+    "truthInLogs": false,
+    "clusterMappingInMounts": false,
+    "repositoryRootMounted": false,
+    "idMapMounted": false,
+    "armAFrozenEvidenceMounted": false,
+    "broaderCorpusMounted": false
+  },
+  "containerMounts": [
+    "/model (read-only) — the pinned inference.onnx",
+    "/config (read-only) — the pinned inference.yml",
+    "/inputs (read-only) — the six opaque input PNGs",
+    "/out — an empty output directory"
+  ],
+  "network": "none",
+  "caseMappingLocation": "evaluation/id-map.json",
+  "caseMappingMountedIntoInference": false,
+  "truthLoadedBeforeInference": false,
+  "truthLoadedAfterRawOutputManifest": true,
+  "rawOutputManifestSha256": "b8b440b0f3d008f548d024b2c48dd281605a19dab356e074b7020c3a0a77df80"
+}
