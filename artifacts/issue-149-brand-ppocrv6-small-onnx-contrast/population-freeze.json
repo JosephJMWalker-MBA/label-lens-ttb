@@ -1,0 +1,34 @@
+{
+  "artifact": "population-freeze",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "frozenBeforeInference": true,
+  "recoveredFrom": "artifacts/issue-149-brand-parseq-small-contrast (merged PR #214)",
+  "expectedCounts": {
+    "historicalCases": 5,
+    "ocrItems": 6,
+    "distinctPixelSetsAtItemLevel": 5,
+    "distinctCropClustersAtCaseLevel": 4,
+    "distinctBrandDesigns": 3
+  },
+  "verifiedCounts": {
+    "historicalCases": 5,
+    "ocrItems": 6,
+    "distinctPixelSetsAtItemLevel": 5,
+    "distinctCropClustersAtCaseLevel": 4,
+    "distinctBrandDesigns": 3
+  },
+  "countsReproduceExactly": true,
+  "historicalCases": [
+    "approved-wine-004",
+    "approved-wine-005",
+    "approved-wine-031",
+    "la-fattoria-rotated",
+    "wine-multi-artifact-04"
+  ],
+  "caseSubstitution": false,
+  "corpusExpansion": false,
+  "postResultCaseAddition": false,
+  "recroppingPerformed": false,
+  "newExamplesAdded": false,
+  "failClosedRule": "Any discrepancy between the frozen expectations compiled into the prepare script and the merged PR #214 source halts before staging. The expectations are not read from the source file, so a drifted source cannot silently redefine the population."
+}

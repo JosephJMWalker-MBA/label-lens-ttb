@@ -1,0 +1,39 @@
+{
+  "artifact": "configuration-isolation",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "comparisonType": "two-arm architecture comparison",
+  "singleVariableCausalAttribution": false,
+  "whyNotSingleVariable": "The recognizers differ in architecture, runtime and intrinsic transform at once. Arm A is a WASM Tesseract LSTM consuming the preprocessed PNG at its native size; Arm B is an ONNX CTC recognizer that resizes the same PNG to 48x320 in BGR as an unavoidable property of the model. No single dimension separates them, so no causal attribution is claimed.",
+  "sharedStartingEvidence": "both arms begin from byte-identical frozen source PNG bytes per OCR item",
+  "byteIdenticalTensorsClaimed": false,
+  "byteIdenticalTensorsNote": "The two models do NOT receive byte-identical tensors. They receive identical source evidence followed by architecture-native transforms.",
+  "armAIsCarriedForward": true,
+  "armAIsCarriedForwardNote": "Arm A is frozen evidence from merged PR #214, not a new execution. No current-code Tesseract run is authorized in this experiment, so Arm A cannot drift with the repository.",
+  "excluded": {
+    "thirdArm": false,
+    "parseqArm": false,
+    "alternativeCheckpoint": false,
+    "alternativeModelTier": false,
+    "decodingVariation": false,
+    "confidenceThreshold": false,
+    "ensemble": false,
+    "fallbackChain": false,
+    "detector": false,
+    "lexicon": false,
+    "vlm": false,
+    "cropOrPreprocessingSweep": false,
+    "recropping": false,
+    "note": "Every entry is false: none of these is used, and none may be introduced after any result exists."
+  },
+  "retryPolicy": "One primary invocation and one exact repeat per Arm B item. No retry beyond the fixed repeat, and no altered setting after any output exists.",
+  "productionUnchanged": {
+    "srcDir": false,
+    "productionDockerfile": false,
+    "applicationDependencies": false,
+    "fixtures": false,
+    "fixtureTruth": false,
+    "pr195": false,
+    "pr214Conclusions": false,
+    "pr215Conclusions": false
+  }
+}

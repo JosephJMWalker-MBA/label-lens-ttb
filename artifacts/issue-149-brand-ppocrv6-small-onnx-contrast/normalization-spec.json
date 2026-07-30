@@ -1,0 +1,51 @@
+{
+  "artifact": "normalization-spec",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "frozenBeforeInference": true,
+  "rationale": "PP-OCRv6 CAN emit ASCII space, at token 18709. Tesseract can too. The whitespace-free representation stays primary so this benchmark remains comparable with PR #214, whose Arm B could not emit a space at all; the boundary-preserving representation becomes substantively meaningful for the first time and is reported as a full secondary comparison rather than as a footnote.",
+  "representations": {
+    "1_rawTranscript": {
+      "definition": "The exact model-emitted string.",
+      "edited": false,
+      "reportedUnchanged": true
+    },
+    "2_boundaryPreservingNormalized": {
+      "steps": [
+        "Unicode NFKC",
+        "lowercase",
+        "convert every Unicode whitespace run to one ASCII space",
+        "trim outer whitespace"
+      ],
+      "implementation": "value.normalize(\"NFKC\").toLowerCase().replace(/\\s+/gu, \" \").trim()",
+      "carriedForwardUnchangedFromPr214": true,
+      "preservesSpaces": true,
+      "preservesPunctuation": true,
+      "purpose": "Substantively meaningful in this benchmark, because both arms can represent word boundaries."
+    },
+    "3_whitespaceFreeComparable": {
+      "steps": [
+        "apply the boundary-preserving normalization",
+        "remove every Unicode whitespace character"
+      ],
+      "implementation": "boundaryPreserving(value).replace(/\\s/gu, \"\")",
+      "carriedForwardUnchangedFromPr214": true,
+      "preservesNonWhitespace": true,
+      "preservesPunctuation": true,
+      "purpose": "The primary comparable representation, chosen to preserve comparability with PR #214.",
+      "isRawExactMatching": false
+    }
+  },
+  "prohibited": {
+    "removePunctuation": false,
+    "substituteCharacters": false,
+    "editDistanceCorrection": false,
+    "dictionaryWordSplitting": false,
+    "lexiconInsertion": false,
+    "insertSpacesIntoModelOutput": false,
+    "useTruthToSegmentOutput": false,
+    "note": "Every entry is false: none of these transformations is applied to either arm anywhere."
+  },
+  "primaryComparison": "3_whitespaceFreeComparable",
+  "secondaryComparison": "2_boundaryPreservingNormalized",
+  "reportingRule": "All three representations are reported for every item in both arms. Whitespace-free matching is never described as raw exact matching."
+}

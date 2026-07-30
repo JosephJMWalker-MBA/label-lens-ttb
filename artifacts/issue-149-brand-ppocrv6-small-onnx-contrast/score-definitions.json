@@ -1,0 +1,81 @@
+{
+  "artifact": "score-definitions",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "frozenBeforeInference": true,
+  "definitionsCarriedForwardFromPr214": true,
+  "definitionSource": "scripts/eval/run-issue-149-parseq-contrast.ts at merged commit 5161a58e02341753a31c2ab889b148b2cecedf81",
+  "appliedIdenticallyToBothArms": true,
+  "primaryMetrics": {
+    "representation": "3_whitespaceFreeComparable",
+    "exactMatch": "whitespaceFree(hypothesis) === whitespaceFree(truth)",
+    "characterErrorRate": "levenshtein(whitespaceFree(hypothesis), whitespaceFree(truth)) / whitespaceFree(truth).length; 1 when the truth is empty",
+    "truthContiguousSubstring": "whitespaceFree(truth).length > 0 && whitespaceFree(hypothesis).includes(whitespaceFree(truth))",
+    "usefulTokenRecall": {
+      "tokenSource": "boundaryPreserving(truth).split(\" \")",
+      "tokenFilter": "token.length >= 3",
+      "matchRule": "token is counted as matched when whitespaceFree(hypothesis).includes(token)",
+      "value": "matchedTokens / totalTokens, or null when totalTokens is 0",
+      "identicalForBothArms": true,
+      "exactPr214Definition": true
+    },
+    "emptyTranscript": "rawTranscript.length === 0",
+    "deterministicRepeat": "primary and repeat agree; see the determinism rule below",
+    "runtimeFailure": "the invocation raised, timed out, or produced no output"
+  },
+  "secondaryMetrics": {
+    "representation": "2_boundaryPreservingNormalized",
+    "boundarySensitiveExactMatch": "boundaryPreserving(hypothesis) === boundaryPreserving(truth)",
+    "boundarySensitiveCharacterErrorRate": "levenshtein(boundaryPreserving(hypothesis), boundaryPreserving(truth)) / boundaryPreserving(truth).length; 1 when the truth is empty",
+    "whitespaceDifference": "\"none\" when the two whitespace counts are equal, otherwise \"hypothesis has N space(s), truth has M\"",
+    "punctuationDifferences": "the multiset difference of non-alphanumeric, non-whitespace characters between hypothesis and truth, reported per item"
+  },
+  "multipleTruthStringsRule": {
+    "carriedForwardFromPr214": true,
+    "rule": "When an item carries more than one acceptable Brand truth string, metrics are computed against each and the best is retained. Better means: a whitespace-free exact match beats a non-match; otherwise the lower whitespace-free CER wins.",
+    "appliedIdenticallyToBothArms": true
+  },
+  "determinismRule": {
+    "armB": "For each item, the primary and the repeat must agree byte-for-byte on the raw probability tensor file, and must agree on the argmax token sequence, the collapsed token sequence, the raw transcript and the output fingerprint.",
+    "armA": "Carried forward. PR #214 recorded a deterministic fingerprint for each Arm A primary/repeat pair; the carry-forward re-verifies the recorded hashes rather than re-running Tesseract.",
+    "nondeterminismConsequence": "Any Arm B nondeterminism classifies that item PPOCRV6_NONDETERMINISTIC and blocks a KEEP decision."
+  },
+  "materialImprovementDefinition": {
+    "carriedForwardFromPr214": true,
+    "materialCharacterErrorRateDelta": 0.1,
+    "materialUsefulTokenRecallDelta": 0.25,
+    "gainedWhenAnyOf": [
+      "Arm A is not a whitespace-free exact match and Arm B is",
+      "truth is not contiguous in Arm A's whitespace-free output and is in Arm B's",
+      "armA.cerWhitespaceFree - armB.cerWhitespaceFree >= 0.10",
+      "armB.usefulTokenRecall - armA.usefulTokenRecall >= 0.25 AND armB.matchedTokens > armA.matchedTokens"
+    ],
+    "lostWhenAnyOf": [
+      "Arm A is a whitespace-free exact match and Arm B is not",
+      "truth is contiguous in Arm A's whitespace-free output and is not in Arm B's",
+      "armB.cerWhitespaceFree - armA.cerWhitespaceFree >= 0.10",
+      "armA.usefulTokenRecall - armB.usefulTokenRecall >= 0.25 AND armA.matchedTokens > armB.matchedTokens"
+    ],
+    "neverAnImprovementOnItsOwn": [
+      "more characters",
+      "a non-empty result",
+      "a higher native confidence score",
+      "a merely different transcript"
+    ],
+    "equallyWrongRule": "A change between two equally wrong transcripts is PPOCRV6_NO_EFFECT unless one has an objectively worse primary CER."
+  },
+  "classificationPrecedence": [
+    "PPOCRV6_NONDETERMINISTIC when the Arm B repeat does not match",
+    "PPOCRV6_INCOMPARABLE when a runtime failure prevents comparison",
+    "PPOCRV6_REGRESSION when lost",
+    "PPOCRV6_TRUTH_BEARING_IMPROVEMENT when gained",
+    "PPOCRV6_NO_EFFECT otherwise"
+  ],
+  "reportingUnits": [
+    "OCR item",
+    "distinct item-level pixel set",
+    "case-level crop cluster",
+    "historical case",
+    "distinct Brand design"
+  ],
+  "aggregationRule": "No averaging may conceal an item-level material regression. Item-level classifications are always published in full alongside any cluster-level summary."
+}
