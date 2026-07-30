@@ -1,0 +1,60 @@
+{
+  "artifact": "revision-gate-verification",
+  "issue": 149,
+  "candidate": "PP-OCRv6 small recognition, official ONNX export",
+  "purpose": "Independent re-verification of the Hugging Face revision gate, performed and preserved BEFORE any download, build or inference.",
+  "verifiedAtUtc": "2026-07-30T04:14:00Z",
+  "independentOfEarlierConversationalCheck": true,
+  "repository": "PaddlePaddle/PP-OCRv6_small_rec_onnx",
+  "repositoryUrl": "https://huggingface.co/PaddlePaddle/PP-OCRv6_small_rec_onnx",
+  "expectedRevision": "b8f84f0b80c529de40b4fbb3544b84fa7233a513",
+  "observedCurrentRevision": "b8f84f0b80c529de40b4fbb3544b84fa7233a513",
+  "gateResult": "PASS",
+  "gateRule": "If the current verified revision differs from the expected revision: stop, download nothing, run no inference, do not substitute the new revision, do not silently update the preregistration.",
+  "lastModified": "2026-06-18T11:08:57.000Z",
+  "license": "apache-2.0",
+  "libraryName": "PaddleOCR",
+  "pipelineTag": "image-to-text",
+  "filesAtRevision": [
+    {
+      "path": ".gitattributes",
+      "sizeBytes": 1519,
+      "lfs": null
+    },
+    {
+      "path": "README.md",
+      "sizeBytes": 16585,
+      "lfs": null
+    },
+    {
+      "path": "inference.json",
+      "sizeBytes": 208004,
+      "lfs": null
+    },
+    {
+      "path": "inference.onnx",
+      "sizeBytes": 21159378,
+      "lfs": {
+        "oidSha256": "5435fd747c9e0efe15a96d0b378d5bd157e9492ed8fd80edf08f30d02fa24634",
+        "size": 21159378
+      }
+    },
+    {
+      "path": "inference.yml",
+      "sizeBytes": 150579,
+      "lfs": null
+    }
+  ],
+  "onnxArtifactObserved": {
+    "path": "inference.onnx",
+    "sizeBytes": 21159378,
+    "sha256": "5435fd747c9e0efe15a96d0b378d5bd157e9492ed8fd80edf08f30d02fa24634",
+    "sha256Source": "git-lfs pointer at the pinned revision"
+  },
+  "downloadPerformed": false,
+  "runtimeBuilt": false,
+  "inferencePerformed": false,
+  "brandCorpusAccessed": false,
+  "productionChanged": false,
+  "note": "This artifact records only the gate. It does not constitute a preregistration and it selects no runtime design; those come from the governing plan document."
+}
