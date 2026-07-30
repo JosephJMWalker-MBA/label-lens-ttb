@@ -1,0 +1,27 @@
+{
+  "artifact": "output-risk-report",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "flags": {
+    "spaceAbsentFromDictionary": true,
+    "spaceDecodable": true,
+    "blankTranscriptEmpty": true,
+    "blankProducedText": false,
+    "modelHasNaturalAbstention": false,
+    "confidenceInterpretationKnown": false,
+    "trainingDataProductionReviewRequired": true
+  },
+  "flagNotes": {
+    "spaceAbsentFromDictionary": "ASCII space does not appear in inference.yml's PostProcess.character_dict. True, exactly as the plan records.",
+    "spaceDecodable": "It is nonetheless decodable at token id 18709, because PaddleOCR appends one trailing space and the model's output width is 18710 against 18708 dictionary entries. This changes the later benchmark's scoring design and is not a compatibility failure.",
+    "blankTranscriptEmpty": "An empty transcript on a blank image is a structural CTC outcome, not calibrated abstention.",
+    "modelHasNaturalAbstention": "CTC has no null class and no abstention. An empty transcript means every frame decoded to blank.",
+    "confidenceInterpretationKnown": "No calibration exists for this model in this codebase. No threshold may be derived from this probe."
+  },
+  "sentinel": {
+    "text": "BRAND NAME 123",
+    "observedTranscript": "BRAND NAME 123",
+    "exactMatch": true,
+    "whitespaceFreeMatch": true,
+    "exactTranscriptRequiredForCompatible": false
+  }
+}

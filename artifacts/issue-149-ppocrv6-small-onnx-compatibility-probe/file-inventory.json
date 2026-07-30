@@ -1,0 +1,52 @@
+{
+  "artifact": "file-inventory",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "verifiedAtUtc": "2026-07-30T04:51:43.025Z",
+  "repository": "PaddlePaddle/PP-OCRv6_small_rec_onnx",
+  "revision": "b8f84f0b80c529de40b4fbb3544b84fa7233a513",
+  "gateResult": "PASS",
+  "expectedFileCount": 5,
+  "observedFileCount": 5,
+  "exactInventoryMatch": true,
+  "additionalFilesPresent": false,
+  "filesMissing": false,
+  "files": [
+    {
+      "path": ".gitattributes",
+      "oid": "a6344aac8c09253b3b630fb776ae94478aa0275b",
+      "size": 1519,
+      "lfs": null
+    },
+    {
+      "path": "inference.json",
+      "oid": "89267025ba75ceca5c06787979079406a9d92591",
+      "size": 208004,
+      "lfs": null
+    },
+    {
+      "path": "inference.onnx",
+      "oid": "666cee731b98bee55376f02690226d60db9a8187",
+      "size": 21159378,
+      "lfs": {
+        "oid": "5435fd747c9e0efe15a96d0b378d5bd157e9492ed8fd80edf08f30d02fa24634",
+        "size": 21159378,
+        "pointerSize": 133
+      }
+    },
+    {
+      "path": "inference.yml",
+      "oid": "f1887595d177511e6af56fabd0baa25756d33bd8",
+      "size": 150579,
+      "lfs": null
+    },
+    {
+      "path": "README.md",
+      "oid": "1a37eb559d6575f4cd03c8685fcc96cceba3bbb6",
+      "size": 16585,
+      "lfs": null
+    }
+  ],
+  "licenseOrNoticeFileInModelRepository": false,
+  "licenseFileAbsenceNote": "The model repository carries no LICENSE and no NOTICE file at this revision. Attribution therefore references the PaddleOCR main repository Apache-2.0 licence, retained at vendor-license/LICENSE-Apache-2.0.txt.",
+  "inferenceJsonRole": "PaddlePaddle PIR static graph in JSON form. Not an ONNX Runtime config and not a model. Its git blob OID is recorded here; the file is neither committed nor loaded."
+}

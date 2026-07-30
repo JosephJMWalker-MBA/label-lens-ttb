@@ -1,0 +1,30 @@
+{
+  "artifact": "determinism-report",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "rule": "outputFingerprint must match between primary and repeat for each image; logitsSha256 is compared as well.",
+  "ruleRelaxedAfterResults": false,
+  "pairs": [
+    {
+      "image": "positive",
+      "run1Fingerprint": "ebb153adbf665a5be2aa129cd56fdea4eda9b9a22bb5ce4e8e1d90010c12b5be",
+      "run2Fingerprint": "ebb153adbf665a5be2aa129cd56fdea4eda9b9a22bb5ce4e8e1d90010c12b5be",
+      "logitsSha256Run1": "1f5f71eeeee84a776d592a5a44f8a2390b933783856cb7aaa61dc0f55c92ce2a",
+      "logitsSha256Run2": "1f5f71eeeee84a776d592a5a44f8a2390b933783856cb7aaa61dc0f55c92ce2a",
+      "fingerprintsMatch": true,
+      "rawLogitBytesExactlyEqual": true,
+      "deterministic": true
+    },
+    {
+      "image": "blank",
+      "run1Fingerprint": "b5e4da680b7d851d6fa6f6a3ae2451fa8ec878e625ee6d38f013f45bf5f1114b",
+      "run2Fingerprint": "b5e4da680b7d851d6fa6f6a3ae2451fa8ec878e625ee6d38f013f45bf5f1114b",
+      "logitsSha256Run1": "b2be574533556e00f0ef06fe626bf6d95b72dae4d44831cc0dbd857c988a1db2",
+      "logitsSha256Run2": "b2be574533556e00f0ef06fe626bf6d95b72dae4d44831cc0dbd857c988a1db2",
+      "fingerprintsMatch": true,
+      "rawLogitBytesExactlyEqual": true,
+      "deterministic": true
+    }
+  ],
+  "allDeterministic": true,
+  "determinismFailure": false
+}

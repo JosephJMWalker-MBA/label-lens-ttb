@@ -1,0 +1,316 @@
+{
+  "artifact": "artifact-manifest",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "issue": 149,
+  "evaluationOnly": true,
+  "compatibilityVerdict": "COMPATIBLE",
+  "invocations": 4,
+  "discoveryRunId": 30514968866,
+  "corpusAccessed": false,
+  "fixtureTruthAccessed": false,
+  "productionChanged": false,
+  "pr195Untouched": true,
+  "modelWeightsCommitted": false,
+  "fontBinaryCommitted": false,
+  "gitLfsUsed": false,
+  "fileCount": 58,
+  "largestArtifact": {
+    "path": "raw/blank-primary.logits.npy",
+    "byteSize": 2993728
+  },
+  "proof": "The 21.16 MB ONNX model never entered Git; it lives only in the untracked .local cache and is retrieved by a fail-closed script. The font binary was never committed either.",
+  "rawLogitsRetained": true,
+  "rawLogitsFormat": "unrounded float32 .npy plus a JSON descriptor per invocation",
+  "files": [
+    {
+      "path": "checkpoint-provenance.json",
+      "byteSize": 2606,
+      "sha256": "558efe6ac16f345e9bbb53ecca6191b46ef53c67812e22427540a09611d87c1d"
+    },
+    {
+      "path": "code-provenance.json",
+      "byteSize": 1634,
+      "sha256": "54e057fd3950eeab26ceaa90a320e80ecc176cf62c918a8d7582bf486c5c8f5d"
+    },
+    {
+      "path": "commands.sh",
+      "byteSize": 3199,
+      "sha256": "b5d968f700459405ff9b097ea4d6868d423cded3508d7961006c553ff83bc8fd"
+    },
+    {
+      "path": "config-provenance.json",
+      "byteSize": 1110,
+      "sha256": "e550baa54a4c20db6e4d82c27eb37c839a309331381f7c016ee52d79dac12c08"
+    },
+    {
+      "path": "container-provenance.json",
+      "byteSize": 1405,
+      "sha256": "19c33fabb3dd2863bfc4c8b28df13c0e5eb155cd2483ccd7ca8712d89efe8ecb"
+    },
+    {
+      "path": "decision.json",
+      "byteSize": 2694,
+      "sha256": "cdd7b7779bf0c2f7d8c9cddcf21be1cbbe4d699438bc2b63e2ed4fc440077584"
+    },
+    {
+      "path": "dependency-lock.json",
+      "byteSize": 1417,
+      "sha256": "c5dd563a57579d4df6e81f71d3b86e652e13f7bb98a5a524894976c444b8af99"
+    },
+    {
+      "path": "determinism-report.json",
+      "byteSize": 1369,
+      "sha256": "a8d9ee1c9067a5ef727b644e802e9eb0dbab3d3e5e91d88a21dad995b3e15913"
+    },
+    {
+      "path": "dictionary-audit.json",
+      "byteSize": 1724,
+      "sha256": "1e8dbd58a81d3f49c1cf9674e576945ed962791a5e7800df81dec587e3d338d7"
+    },
+    {
+      "path": "discovery/base-image-id.txt",
+      "byteSize": 72,
+      "sha256": "8290dde9c17a69644598bebf71bc28732c21a88240e85599df8261e24c09d3c5"
+    },
+    {
+      "path": "discovery/font-package.txt",
+      "byteSize": 25,
+      "sha256": "b46e1aab494cc7e154b17ffcb85342cd62415182ea4b2a943604a20547bc05c9"
+    },
+    {
+      "path": "discovery/image-id.txt",
+      "byteSize": 72,
+      "sha256": "a4084e49fedc9b26fea360234c3e90bffb45e9b63ae0d86651536c6b71fa696f"
+    },
+    {
+      "path": "discovery/onnx-graph-inspection.json",
+      "byteSize": 1679,
+      "sha256": "b5afb5657d781b16b08c5bd1bc0dfe9c9ab799012a2d1d69db0f07944185ba96"
+    },
+    {
+      "path": "discovery/pip-freeze.txt",
+      "byteSize": 207,
+      "sha256": "b0184945e1d438446fb1b1632c71d57ad78f774e101415401cf7cea45c1a9537"
+    },
+    {
+      "path": "discovery/revision-gate/BLOCKED.md",
+      "byteSize": 3602,
+      "sha256": "8d8cf58d65ad5fb5a44852f08e2204c5b1af8b78e6b0fc97e550afd4773aef58"
+    },
+    {
+      "path": "discovery/revision-gate/gate-chronology.md",
+      "byteSize": 2159,
+      "sha256": "3fb465fccc140d94febb23362ab1e2c0f145bbad4b08fabc2179592546bfbc96"
+    },
+    {
+      "path": "discovery/revision-gate/git-sha.txt",
+      "byteSize": 100,
+      "sha256": "400d0a415f519d37c60d31a27b85d10c8f60f64bcb2a615e38fe772a3e32711d"
+    },
+    {
+      "path": "discovery/revision-gate/revision-gate-verification.json",
+      "byteSize": 2154,
+      "sha256": "fce12074d360f86bda9fa5d79ec34e1b7b57b3277273406aa2be6812aaafbb91"
+    },
+    {
+      "path": "discovery/revision-recheck.json",
+      "byteSize": 892,
+      "sha256": "4be110b150a333cbcab940a963ce15f252c7dc883cbfe98c4a00629c64ceb818"
+    },
+    {
+      "path": "discovery/runtime-inventory.txt",
+      "byteSize": 365,
+      "sha256": "da082d48841bef357f16bb1c34627f71cc897213b51cd8244e156e57ac8701c5"
+    },
+    {
+      "path": "discovery-notes.md",
+      "byteSize": 7099,
+      "sha256": "3900e39b42a7697857abf6b143107d995516caa0d40739cd2febb313ee6016b7"
+    },
+    {
+      "path": "evidence-schema.json",
+      "byteSize": 7391,
+      "sha256": "17857ee51063b74e4efbef2464c96a379d6a4a5762ca7b17ca37cf7010963583"
+    },
+    {
+      "path": "file-inventory.json",
+      "byteSize": 1776,
+      "sha256": "198b7c5457d20ccec41167d0a4202160992889d1dc559cb6d7a232485380277e"
+    },
+    {
+      "path": "font-provenance.json",
+      "byteSize": 837,
+      "sha256": "e0b0d7e2573bfdacc1986e1fb8da7e29dd8b61466837a1a62cb50371c4459816"
+    },
+    {
+      "path": "frozen-pins.json",
+      "byteSize": 2111,
+      "sha256": "6a000d08c8fb7f5d34e54230289a9012bd8a4c3373e8f979a645845897f1c3c7"
+    },
+    {
+      "path": "invocation-matrix.json",
+      "byteSize": 1814,
+      "sha256": "980016e78ae393ec1823528e5525957d9abbe8381cbc26c178c0978e42907abb"
+    },
+    {
+      "path": "license-audit.md",
+      "byteSize": 2544,
+      "sha256": "70e536b79cc2157c9c49e512bcfba6cafcc9b3fd46ba5cb8ea57899ec5137d7a"
+    },
+    {
+      "path": "limitations.md",
+      "byteSize": 7080,
+      "sha256": "ead77dfcdb2eef1e628d6b38a2d36a6c9e4009784de52d8f3cb683840a5f98f5"
+    },
+    {
+      "path": "normalized-evidence.json",
+      "byteSize": 16642,
+      "sha256": "ed6b258dd99724e59db655b4c6fcb33a7a459a020a9d992eb5d82954bcf60f71"
+    },
+    {
+      "path": "output-risk-report.json",
+      "byteSize": 1434,
+      "sha256": "aeb7fc6d16b9f22caaa0032af9c1cadabebbb831c4284a6d0f5dc2cd1d0893e2"
+    },
+    {
+      "path": "preregistration.md",
+      "byteSize": 11495,
+      "sha256": "33c4752b611b93380f202389cc5cf17ec5d7004f220257091a2b4c0512bcc07a"
+    },
+    {
+      "path": "preregistration.sha256",
+      "byteSize": 85,
+      "sha256": "57e38071697d5efc3ffd304b5669af4bc0a6c05b34a2b2d7892a85bcfcbfb736"
+    },
+    {
+      "path": "raw/blank-primary.descriptor.json",
+      "byteSize": 6009,
+      "sha256": "34dc38e12422e8a8592b412bb9b3307bcb45128ae0f8351721e503f9531bf1e1"
+    },
+    {
+      "path": "raw/blank-primary.logits.npy",
+      "byteSize": 2993728,
+      "sha256": "b2be574533556e00f0ef06fe626bf6d95b72dae4d44831cc0dbd857c988a1db2"
+    },
+    {
+      "path": "raw/blank-repeat.descriptor.json",
+      "byteSize": 6006,
+      "sha256": "d0d649d956a9cb1f8943c44c80833896fc64710a191f775f6ed7f70979ac6a5a"
+    },
+    {
+      "path": "raw/blank-repeat.logits.npy",
+      "byteSize": 2993728,
+      "sha256": "b2be574533556e00f0ef06fe626bf6d95b72dae4d44831cc0dbd857c988a1db2"
+    },
+    {
+      "path": "raw/image-id.txt",
+      "byteSize": 72,
+      "sha256": "3102ddf5c837b0c9931e33b2c2631d205bc99d04203c253b54104422c4fb54fd"
+    },
+    {
+      "path": "raw/positive-primary.descriptor.json",
+      "byteSize": 7114,
+      "sha256": "d47a09d4783fb7ba788f113fd1b58ab2cd160615e0851e909082055c7c14766f"
+    },
+    {
+      "path": "raw/positive-primary.logits.npy",
+      "byteSize": 2993728,
+      "sha256": "1f5f71eeeee84a776d592a5a44f8a2390b933783856cb7aaa61dc0f55c92ce2a"
+    },
+    {
+      "path": "raw/positive-repeat.descriptor.json",
+      "byteSize": 7110,
+      "sha256": "dfb4f8523ac540b31b6a6982cdae558abd86c9b27928162a98288fc77b2057c9"
+    },
+    {
+      "path": "raw/positive-repeat.logits.npy",
+      "byteSize": 2993728,
+      "sha256": "1f5f71eeeee84a776d592a5a44f8a2390b933783856cb7aaa61dc0f55c92ce2a"
+    },
+    {
+      "path": "raw/run-results.json",
+      "byteSize": 28901,
+      "sha256": "6115480714aaa2ae7db4febd37de2c4876ac2b9fa09f1ecc0e63812ea5da7279"
+    },
+    {
+      "path": "resource-report.json",
+      "byteSize": 1355,
+      "sha256": "351811f1aefb742d0375ae56b6a6b68405f11150bc2332262923d376e367fd2e"
+    },
+    {
+      "path": "runtime-provenance.json",
+      "byteSize": 1488,
+      "sha256": "bc18872a5b8afbaf7752a8c27e21a638a495eff46c60f153991427b7186aa465"
+    },
+    {
+      "path": "safe-loading-report.json",
+      "byteSize": 939,
+      "sha256": "a66e48131d5db2252a668ee086d96e926d427ab85371948061449aec9d720536"
+    },
+    {
+      "path": "synthetic/blank.png",
+      "byteSize": 384,
+      "sha256": "26daf63d1830f5af6375d1be855f6ce7a7daba20994a667951d38da0d604fd48"
+    },
+    {
+      "path": "synthetic/blank.png.sha256",
+      "byteSize": 76,
+      "sha256": "5e66d0a4e6d516c92074f2bc0e2f04b2a0fc77f72cc1dfa7aaae08a72e00837e"
+    },
+    {
+      "path": "synthetic/positive.png",
+      "byteSize": 5728,
+      "sha256": "574d8cc7e2f9f5cdfae8843e964e4edf307d5d1fec52eeb967bb01a479183911"
+    },
+    {
+      "path": "synthetic/positive.png.sha256",
+      "byteSize": 79,
+      "sha256": "4a66b77e75c7f62f5b42943aee88318a349d911530df72b0515803751e887480"
+    },
+    {
+      "path": "synthetic-input-spec.json",
+      "byteSize": 1830,
+      "sha256": "c4852487ac6e0369762dd54e1ad88dd5d3bda441cfe4bbe972611458f03fc814"
+    },
+    {
+      "path": "training-data-provenance.md",
+      "byteSize": 1986,
+      "sha256": "04c1ff1e01bca1c1ca690310b29fd50a0b2d7b76e8dc81b6513d6af00457dad3"
+    },
+    {
+      "path": "transform-spec.json",
+      "byteSize": 3840,
+      "sha256": "4d50a50b1a771bf9eb4d7ab26b789d98f99d07a8f53eb708ac24b65f95f4bf7d"
+    },
+    {
+      "path": "vendor/inference.yml",
+      "byteSize": 150579,
+      "sha256": "ab078671bb49f06228eadccd34f1bb501e157f7a047095ffb943ba81512c77d1"
+    },
+    {
+      "path": "vendor/model-card-README.md",
+      "byteSize": 16585,
+      "sha256": "7d46dbd183ac09bd5a2e6b4577dcb29240751b1c00eb6813eca308d529f86806"
+    },
+    {
+      "path": "vendor-license/inference.onnx.lfs-pointer.txt",
+      "byteSize": 133,
+      "sha256": "89f3fbe4413224733d1c447c3aba23078247171fb5fb329e5276947040e51ab5"
+    },
+    {
+      "path": "vendor-license/LICENSE-Apache-2.0.txt",
+      "byteSize": 11376,
+      "sha256": "3840c5c0c61c294264d2dd77b8777be6ddd90121ef4e0e64abcd22edea581d6e"
+    },
+    {
+      "path": "vendor-license/MODEL-ATTRIBUTION.md",
+      "byteSize": 1947,
+      "sha256": "c7dc70cc70d24924c3f1530f76b61d0f40c9a8dd027b77d7379471f3bebe23ed"
+    },
+    {
+      "path": "workflow-mode.txt",
+      "byteSize": 9,
+      "sha256": "37a40f08d8548dba289b9b0bb35bcf63b359f6d37ee86044ebc6b6da080b9ec1"
+    }
+  ]
+}

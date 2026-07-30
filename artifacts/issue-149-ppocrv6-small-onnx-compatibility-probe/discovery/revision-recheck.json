@@ -1,0 +1,20 @@
+{
+  "artifact": "revision-recheck",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "purpose": "Independent re-assertion of the revision gate inside the governed §17 run. The canonical first-gate record is discovery/revision-gate/revision-gate-verification.json, written earlier and preserved unmodified.",
+  "verifiedAtUtc": "2026-07-30T04:51:43.025Z",
+  "repository": "PaddlePaddle/PP-OCRv6_small_rec_onnx",
+  "expectedRevision": "b8f84f0b80c529de40b4fbb3544b84fa7233a513",
+  "observedRevision": "b8f84f0b80c529de40b4fbb3544b84fa7233a513",
+  "gateResult": "PASS",
+  "lastModified": "2026-06-18T11:08:57.000Z",
+  "createdAt": "2026-06-09T07:04:09.000Z",
+  "gated": false,
+  "disabled": false,
+  "private": false,
+  "pipelineTag": "image-to-text",
+  "libraryName": "PaddleOCR",
+  "usedStorage": 21159378,
+  "downloadPerformed": false,
+  "inferencePerformed": false
+}

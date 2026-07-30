@@ -1,0 +1,57 @@
+{
+  "artifact": "invocation-matrix",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "plannedInvocations": 4,
+  "matrix": [
+    { "runId": "positive-primary", "image": "positive", "run": "primary" },
+    { "runId": "positive-repeat", "image": "positive", "run": "repeat" },
+    { "runId": "blank-primary", "image": "blank", "run": "primary" },
+    { "runId": "blank-repeat", "image": "blank", "run": "repeat" }
+  ],
+  "decoding": {
+    "mode": "greedy-ctc-argmax",
+    "duplicateRemoval": true,
+    "blankRemoval": true,
+    "ctcBlankTokenId": 0,
+    "device": "cpu",
+    "provider": "CPUExecutionProvider",
+    "beamSearch": false,
+    "sampling": false,
+    "bestOfN": false,
+    "languageModel": false,
+    "alternateDecodingArm": false
+  },
+  "runtime": {
+    "runtime": "ONNX Runtime",
+    "paddleNativeLoading": false,
+    "paddle2onnxConversion": false,
+    "detector": false,
+    "inferenceJsonLoaded": false,
+    "intraOpNumThreads": 1,
+    "interOpNumThreads": 1,
+    "executionMode": "ORT_SEQUENTIAL"
+  },
+  "modelLoadPolicy": "One session per container invocation of run_probe.py; all four invocations share that session. modelLoadMs is recorded and is explicitly EXCLUDED from per-invocation latencyMs.",
+  "prohibited": [
+    "fifth invocation",
+    "retry with changed settings",
+    "alternate model or model tier",
+    "alternate transform",
+    "alternate decoder",
+    "additional synthetic image",
+    "detection step",
+    "any governed Brand crop"
+  ],
+  "hardening": {
+    "network": "none",
+    "modelMount": "read-only",
+    "configMount": "read-only",
+    "dictionaryAuditMount": "read-only",
+    "inputMount": "read-only",
+    "repositoryRootMounted": false,
+    "corpusMounted": false,
+    "fixtureTruthMounted": false,
+    "cpus": "2",
+    "memory": "4g"
+  }
+}

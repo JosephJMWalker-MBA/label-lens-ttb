@@ -1,0 +1,212 @@
+# Issue #149 — PP-OCRv6-small ONNX compatibility and CTC evidence probe.
+#
+# Research-only, scoped to exactly one branch. Not part of the required CI checks
+# and it touches no production path. No pull_request_target, no schedule, no
+# repository_dispatch, no unscoped branch trigger.
+#
+# The path filter admits only this file and the mode file, so no ordinary code or
+# artifact commit can retrigger a run. When a harness fix needs a rerun, the
+# revision counter below is bumped in the same commit, which makes every rerun an
+# explicit and reviewable act rather than a side effect.
+#
+# harness revision: 2
+name: Issue 149 PP-OCRv6 ONNX probe
+
+on:
+  push:
+    branches:
+      - research/issue-149-ppocrv6-revision-gate
+    paths:
+      - .github/workflows/issue-149-ppocrv6-onnx-probe.yml
+      - artifacts/issue-149-ppocrv6-small-onnx-compatibility-probe/workflow-mode.txt
+
+permissions:
+  contents: read
+
+env:
+  MODE_FILE: artifacts/issue-149-ppocrv6-small-onnx-compatibility-probe/workflow-mode.txt
+  ART: artifacts/issue-149-ppocrv6-small-onnx-compatibility-probe
+  MODEL_CACHE: .local/ocr-research/models/ppocrv6-small-rec-onnx
+  BASE_DIGEST: sha256:b18992999dbe963a45a8a4da40ac2b1975be1a776d939d098c647482bcad5cba
+  IMAGE_TAG: issue-149-ppocrv6-onnx-probe:cpu
+
+jobs:
+  resolve-mode:
+    name: Resolve declared mode
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.mode.outputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: mode
+        run: |
+          set -eu
+          test -f "${MODE_FILE}" || { echo "MODE_FILE_MISSING" >&2; exit 1; }
+          mode="$(tr -d '[:space:]' < "${MODE_FILE}")"
+          echo "declared mode: '${mode}'"
+          case "${mode}" in
+            discover|execute|complete) ;;
+            *) echo "INVALID_MODE: '${mode}'" >&2; exit 1 ;;
+          esac
+          echo "mode=${mode}" >> "$GITHUB_OUTPUT"
+
+  discover:
+    name: Discover (no preregistered inference)
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'discover'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert native linux/amd64
+        run: |
+          set -eu
+          test "$(uname -m)" = "x86_64" || { echo "NOT_NATIVE_AMD64" >&2; exit 1; }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+
+      # Gates 1-5: revision, exact five-file inventory, Apache-2.0 model card,
+      # inference.yml hash and size, ONNX LFS pointer metadata. No weights yet.
+      - name: Discovery gates 1 to 5 (no download)
+        run: node scripts/eval/issue-149-ppocrv6-discovery.mjs
+
+      - name: Resolve pinned font package version inside the pinned base
+        id: font
+        run: |
+          set -eu
+          v="$(docker run --rm --platform=linux/amd64 "python:3.11-slim-bookworm@${BASE_DIGEST}" \
+                sh -lc 'apt-get update -qq >/dev/null 2>&1 && apt-cache policy fonts-dejavu-core | awk "/Candidate:/ {print \$2}"')"
+          echo "resolved fonts-dejavu-core=${v}"
+          test -n "${v}" || { echo "FONT_VERSION_UNRESOLVED" >&2; exit 1; }
+          echo "version=${v}" >> "$GITHUB_OUTPUT"
+
+      # Gate 6a: build the pinned ONNX Runtime CPU container.
+      - name: Build research container
+        run: |
+          set -eu
+          docker build --platform=linux/amd64 \
+            -f scripts/eval/docker/issue-149-ppocrv6-onnx-probe.Dockerfile \
+            --build-arg "FONT_PACKAGE_VERSION=${{ steps.font.outputs.version }}" \
+            -t "${IMAGE_TAG}" .
+
+      # Gate 7: full ONNX retrieval with fail-closed SHA-256 and byte-size
+      # verification. This necessarily precedes the dry session load, because a
+      # session cannot be created without the file; the plan lists the dry load
+      # first, so the ordering resolution is recorded in discovery-notes.md.
+      - name: Retrieve and verify inference.onnx
+        run: node scripts/eval/fetch-issue-149-ppocrv6-onnx.mjs
+
+      # Gate 6b + gate 9, with the network disabled: dry session load, opset and
+      # graph metadata, and the dictionary audit. session.run is never called.
+      - name: Dry session load and dictionary audit (offline)
+        run: |
+          set -eu
+          mkdir -p "${ART}/discovery"
+          docker run --rm --platform=linux/amd64 --network=none \
+            --cpus 2 --memory 4g \
+            -v "$PWD/${MODEL_CACHE}:/model:ro" \
+            -v "$PWD/${ART}/vendor:/config:ro" \
+            -v "$PWD/${ART}/discovery:/out" \
+            "${IMAGE_TAG}" python /opt/probe/inspect_model.py
+          mv "${ART}/discovery/dictionary-audit.json" "${ART}/dictionary-audit.json"
+          mv "${ART}/discovery/safe-loading-report.json" "${ART}/safe-loading-report.json"
+
+      - name: Generate synthetic inputs (offline)
+        run: |
+          set -eu
+          mkdir -p "${ART}/synthetic"
+          docker run --rm --platform=linux/amd64 --network=none \
+            -v "$PWD/${ART}/synthetic:/out" \
+            "${IMAGE_TAG}" python /opt/probe/generate_synthetic_inputs.py /out
+          mv "${ART}/synthetic/synthetic-input-spec.json" "${ART}/synthetic-input-spec.json"
+
+      - name: Record runtime inventory
+        run: |
+          set -eu
+          docker run --rm --platform=linux/amd64 --network=none "${IMAGE_TAG}" \
+            cat /probe/runtime-inventory.txt > "${ART}/discovery/runtime-inventory.txt"
+          docker run --rm --platform=linux/amd64 --network=none "${IMAGE_TAG}" \
+            cat /probe/pip-freeze.txt > "${ART}/discovery/pip-freeze.txt"
+          docker image inspect "${IMAGE_TAG}" --format '{{.Id}}' > "${ART}/discovery/image-id.txt"
+          docker image inspect "python:3.11-slim-bookworm@${BASE_DIGEST}" \
+            --format '{{.Id}}' > "${ART}/discovery/base-image-id.txt"
+          echo "fonts-dejavu-core=${{ steps.font.outputs.version }}" > "${ART}/discovery/font-package.txt"
+          cat "${ART}/discovery/runtime-inventory.txt"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-149-ppocrv6-discovery
+          path: artifacts/issue-149-ppocrv6-small-onnx-compatibility-probe/
+          if-no-files-found: error
+
+  execute:
+    name: Execute the four preregistered invocations
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'execute'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert native linux/amd64
+        run: |
+          set -eu
+          test "$(uname -m)" = "x86_64" || { echo "NOT_NATIVE_AMD64" >&2; exit 1; }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+
+      - name: Verify frozen identities
+        run: |
+          set -eu
+          ( cd "${ART}" && shasum -a 256 -c preregistration.sha256 )
+          ( cd "${ART}/synthetic" && shasum -a 256 -c positive.png.sha256 && shasum -a 256 -c blank.png.sha256 )
+          test -f "${ART}/frozen-pins.json" || { echo "FROZEN_PINS_MISSING" >&2; exit 1; }
+          test -f "${ART}/dictionary-audit.json" || { echo "DICTIONARY_AUDIT_MISSING" >&2; exit 1; }
+          cat "${ART}/frozen-pins.json"
+
+      - name: Retrieve and verify inference.onnx
+        run: node scripts/eval/fetch-issue-149-ppocrv6-onnx.mjs
+
+      - name: Rebuild the frozen research container
+        run: |
+          set -eu
+          font="$(node -e 'console.log(require("./"+process.env.ART+"/frozen-pins.json").fontPackageVersion)')"
+          echo "frozen font pin: ${font}"
+          docker build --platform=linux/amd64 \
+            -f scripts/eval/docker/issue-149-ppocrv6-onnx-probe.Dockerfile \
+            --build-arg "FONT_PACKAGE_VERSION=${font}" \
+            -t "${IMAGE_TAG}" .
+          mkdir -p "${ART}/raw"
+          docker image inspect "${IMAGE_TAG}" --format '{{.Id}}' > "${ART}/raw/image-id.txt"
+
+      # Offline inference: network disabled, model, config, audit and inputs all
+      # read-only, no repository root mounted, no corpus or fixture truth mounted.
+      - name: Run the four invocations offline
+        run: |
+          set -eu
+          docker run --rm --platform=linux/amd64 --network=none \
+            --cpus 2 --memory 4g \
+            -v "$PWD/${MODEL_CACHE}:/model:ro" \
+            -v "$PWD/${ART}/vendor:/config:ro" \
+            -v "$PWD/${ART}/dictionary-audit.json:/audit/dictionary-audit.json:ro" \
+            -v "$PWD/${ART}/synthetic:/inputs:ro" \
+            -v "$PWD/${ART}/raw:/out" \
+            -e OMP_NUM_THREADS=1 -e MKL_NUM_THREADS=1 \
+            "${IMAGE_TAG}" python /opt/probe/run_probe.py
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-149-ppocrv6-results
+          path: artifacts/issue-149-ppocrv6-small-onnx-compatibility-probe/
+          if-no-files-found: error
+
+  complete:
+    name: Complete (no inference)
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'complete'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Mode is 'complete': the probe is finished and this workflow will"
+          echo "not run inference. Results are committed to the branch."

@@ -1,0 +1,52 @@
+{
+  "artifact": "synthetic-input-spec",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "generator": "scripts/eval/ppocrv6/generate_synthetic_inputs.py",
+  "renderer": "Pillow ImageDraw.text with a real TrueType font",
+  "manuallyConstructedGlyphs": false,
+  "sentinelTextFixedByPlan": "BRAND NAME 123",
+  "sentinelContainsAsciiSpace": true,
+  "font": {
+    "package": "fonts-dejavu-core",
+    "path": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    "sha256": "abdc775b21b1bc470d50c97e790d276f2054b7504e56e5bd3e64f48d68582322",
+    "license": "DejaVu Fonts License (Bitstream Vera derived), permissive"
+  },
+  "canvas": {
+    "width": 640,
+    "height": 96
+  },
+  "canvasProvenance": "Engineering choice made during discovery, not a value from the plan.",
+  "canvasRationale": "640/96 == 320/48, so the model's aspect-preserving resize is an exact 2x downscale with no distortion and no right-padding.",
+  "fontSize": 48,
+  "textOrigin": {
+    "x": 24,
+    "y": 20
+  },
+  "background": [255, 255, 255],
+  "foreground": [0, 0, 0],
+  "blankImageIsPureWhite": true,
+  "blankImageSameDimensionsAsPositive": true,
+  "pngEncoding": {
+    "optimize": false,
+    "compress_level": 9
+  },
+  "pillowVersion": "12.3.0",
+  "deterministicRegenerationVerified": true,
+  "expectedPositiveTranscriptIfSpaceDecodable": "BRAND NAME 123",
+  "expectedPositiveTranscriptIfSpaceNotDecodable": "BRANDNAME123",
+  "expectedBlankTranscript": "",
+  "neitherSpaceOutcomeIsACompatibilityFailure": true,
+  "images": {
+    "positive": {
+      "sha256": "574d8cc7e2f9f5cdfae8843e964e4edf307d5d1fec52eeb967bb01a479183911",
+      "bytes": 5728,
+      "text": "BRAND NAME 123"
+    },
+    "blank": {
+      "sha256": "26daf63d1830f5af6375d1be855f6ce7a7daba20994a667951d38da0d604fd48",
+      "bytes": 384,
+      "text": null
+    }
+  }
+}

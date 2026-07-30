@@ -1,0 +1,15 @@
+{
+  "artifact": "font-provenance",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "package": "fonts-dejavu-core",
+  "packageVersion": "2.37-6",
+  "resolvedInsidePinnedBase": true,
+  "buildArgHasNoDefault": true,
+  "path": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+  "sha256": "abdc775b21b1bc470d50c97e790d276f2054b7504e56e5bd3e64f48d68582322",
+  "license": "DejaVu Fonts License (Bitstream Vera derived), permissive",
+  "fontBinaryCommitted": false,
+  "sameFontGovernanceAsPr213": true,
+  "handConstructedGlyphsUsed": false,
+  "rationale": "Attempts 2 and 3 of the native Tesseract probe were blocked by a synthetic typeface drawn from rectangles, which no recognizer was trained on. A real hashed TrueType face keeps byte-level determinism while producing glyph shapes the model has plausibly seen."
+}

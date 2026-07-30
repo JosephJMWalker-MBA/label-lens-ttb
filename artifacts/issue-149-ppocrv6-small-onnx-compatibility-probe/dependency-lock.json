@@ -1,0 +1,37 @@
+{
+  "artifact": "dependency-lock",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "source": "pip freeze inside the built research container",
+  "pinProvenance": "Hand-pinned during discovery. Upstream publishes no CPU lock for an ONNX-Runtime-only consumer of this artifact, so there was no upstream lock to adopt verbatim. The plan fixes only that onnxruntime must be CPU and >= 1.16.0.",
+  "python": "3.11.15",
+  "packageCount": 11,
+  "directPins": {
+    "onnxruntime": "1.28.0",
+    "onnx": "1.22.0",
+    "opencv-python-headless": "4.14.0.94",
+    "pillow": "12.3.0",
+    "PyYAML": "6.0.3",
+    "numpy": "2.4.6"
+  },
+  "onnxRoleIsDiscoveryOnly": "onnx is used to read opset_import and graph metadata. It performs no inference and is not required by ONNX Runtime.",
+  "allPins": {
+    "flatbuffers": "25.12.19",
+    "ml_dtypes": "0.5.4",
+    "numpy": "2.4.6",
+    "onnx": "1.22.0",
+    "onnxruntime": "1.28.0",
+    "opencv-python-headless": "4.14.0.94",
+    "packaging": "26.2",
+    "pillow": "12.3.0",
+    "protobuf": "7.35.1",
+    "PyYAML": "6.0.3",
+    "typing_extensions": "4.16.0"
+  },
+  "resolvedPackagesHash": "b0184945e1d438446fb1b1632c71d57ad78f774e101415401cf7cea45c1a9537",
+  "fullFreeze": "discovery/pip-freeze.txt",
+  "gpuPackagesInstalled": false,
+  "torchInstalled": false,
+  "paddlepaddleInstalled": false,
+  "paddle2onnxInstalled": false,
+  "discoveryRunId": 30514968866
+}
