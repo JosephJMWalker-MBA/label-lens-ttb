@@ -1,0 +1,170 @@
+{
+  "artifact": "arm-a-carryforward",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "arm": "A",
+  "role": "frozen incumbent evidence",
+  "tesseractRerun": false,
+  "currentCodeTesseractExecutionAuthorized": false,
+  "sourceExperiment": "issue-149-brand-parseq-small-contrast (merged PR #214)",
+  "sourceCommit": "5161a58e02341753a31c2ab889b148b2cecedf81",
+  "engine": "tesseract.js 7.0.0 / tesseract.js-core 7.0.0",
+  "oem": 1,
+  "psm": 11,
+  "traineddataSha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+  "traineddataPath": "src/pipeline/extractor/assets/eng.traineddata",
+  "dpiFlag": "none — the incumbent evaluation path sets none",
+  "executionPath": "the exact governed incumbent evaluation path from merged PR #211",
+  "carriedFiles": [
+    {
+      "file": "A-item-192b594faff0-primary.json",
+      "sourcePath": "artifacts/issue-149-brand-parseq-small-contrast/raw/A-item-192b594faff0-primary.json",
+      "pr214RecordedSha256": "f4257b3065b76a23d865d1efc077c24917beeab2bb379368ed241b11f802fb81",
+      "observedSha256": "f4257b3065b76a23d865d1efc077c24917beeab2bb379368ed241b11f802fb81",
+      "matches": true,
+      "priorOpaqueItemId": "item-192b594faff0",
+      "run": "primary",
+      "outputFingerprint": "a76d43c3a2fc44be4595d00bf006d22d0778e0b7e71f2286bd17c88436c40a8b",
+      "sourcePngSha256": "ce5b99dc782cf2d893c35be8dea88e7bcddc09f0859183e8ff13f4dc3e6a67a1"
+    },
+    {
+      "file": "A-item-192b594faff0-repeat.json",
+      "sourcePath": "artifacts/issue-149-brand-parseq-small-contrast/raw/A-item-192b594faff0-repeat.json",
+      "pr214RecordedSha256": "fc21e0f233a62e4737d7503e8857e1616549992d7887f0c6c432cfd1daa1c756",
+      "observedSha256": "fc21e0f233a62e4737d7503e8857e1616549992d7887f0c6c432cfd1daa1c756",
+      "matches": true,
+      "priorOpaqueItemId": "item-192b594faff0",
+      "run": "repeat",
+      "outputFingerprint": "a76d43c3a2fc44be4595d00bf006d22d0778e0b7e71f2286bd17c88436c40a8b",
+      "sourcePngSha256": "ce5b99dc782cf2d893c35be8dea88e7bcddc09f0859183e8ff13f4dc3e6a67a1"
+    },
+    {
+      "file": "A-item-311a595a4f66-primary.json",
+      "sourcePath": "artifacts/issue-149-brand-parseq-small-contrast/raw/A-item-311a595a4f66-primary.json",
+      "pr214RecordedSha256": "be6834375195a7b2dd2c4dfd11a5573663ab0c640f467a35e3535570b7d58490",
+      "observedSha256": "be6834375195a7b2dd2c4dfd11a5573663ab0c640f467a35e3535570b7d58490",
+      "matches": true,
+      "priorOpaqueItemId": "item-311a595a4f66",
+      "run": "primary",
+      "outputFingerprint": "14401703534e4edd426dad0d5ec90659fbb5920b1a2afec1970c671ff2696c54",
+      "sourcePngSha256": "8080cb380c7d65e99ed9ae48c3075daf301518b03246ef03e25d8ee74adf3eee"
+    },
+    {
+      "file": "A-item-311a595a4f66-repeat.json",
+      "sourcePath": "artifacts/issue-149-brand-parseq-small-contrast/raw/A-item-311a595a4f66-repeat.json",
+      "pr214RecordedSha256": "a864cbf83164dfc33112640178cfc7c21b5b4f97d55ac26dff625c087859ded8",
+      "observedSha256": "a864cbf83164dfc33112640178cfc7c21b5b4f97d55ac26dff625c087859ded8",
+      "matches": true,
+      "priorOpaqueItemId": "item-311a595a4f66",
+      "run": "repeat",
+      "outputFingerprint": "14401703534e4edd426dad0d5ec90659fbb5920b1a2afec1970c671ff2696c54",
+      "sourcePngSha256": "8080cb380c7d65e99ed9ae48c3075daf301518b03246ef03e25d8ee74adf3eee"
+    },
+    {
+      "file": "A-item-897b872db6ae-primary.json",
+      "sourcePath": "artifacts/issue-149-brand-parseq-small-contrast/raw/A-item-897b872db6ae-primary.json",
+      "pr214RecordedSha256": "2d97192fa4f53239c72bd42e5ef014204b00446bea3d0e0fc613da36bb1d1ffd",
+      "observedSha256": "2d97192fa4f53239c72bd42e5ef014204b00446bea3d0e0fc613da36bb1d1ffd",
+      "matches": true,
+      "priorOpaqueItemId": "item-897b872db6ae",
+      "run": "primary",
+      "outputFingerprint": "f31d29b8e95efb06176adba2ebe56bc1a5760af7474a4c5ccd72702cd765790e",
+      "sourcePngSha256": "8746c2c0a4f73b9fd1208cd941aece76519c76a162086eecb0063c150ebabdb9"
+    },
+    {
+      "file": "A-item-897b872db6ae-repeat.json",
+      "sourcePath": "artifacts/issue-149-brand-parseq-small-contrast/raw/A-item-897b872db6ae-repeat.json",
+      "pr214RecordedSha256": "baa80d8fc0042aefb093765e8b5dd4aab2b1ef3f781259522c085fa7265c4246",
+      "observedSha256": "baa80d8fc0042aefb093765e8b5dd4aab2b1ef3f781259522c085fa7265c4246",
+      "matches": true,
+      "priorOpaqueItemId": "item-897b872db6ae",
+      "run": "repeat",
+      "outputFingerprint": "f31d29b8e95efb06176adba2ebe56bc1a5760af7474a4c5ccd72702cd765790e",
+      "sourcePngSha256": "8746c2c0a4f73b9fd1208cd941aece76519c76a162086eecb0063c150ebabdb9"
+    },
+    {
+      "file": "A-item-ba86d5527473-primary.json",
+      "sourcePath": "artifacts/issue-149-brand-parseq-small-contrast/raw/A-item-ba86d5527473-primary.json",
+      "pr214RecordedSha256": "e5b20c6abc8988607f5239f19594a618ca1fae86f21ecb527d21716270829440",
+      "observedSha256": "e5b20c6abc8988607f5239f19594a618ca1fae86f21ecb527d21716270829440",
+      "matches": true,
+      "priorOpaqueItemId": "item-ba86d5527473",
+      "run": "primary",
+      "outputFingerprint": "3147adcce6328bb8ff4c58937fb91c83a279d005c2cc9cf0baa9bafef0731698",
+      "sourcePngSha256": "efd2a2f90dd1ee74da7df9258916f1d253f7948601bdc60f1dfbbbed3cc4fa65"
+    },
+    {
+      "file": "A-item-ba86d5527473-repeat.json",
+      "sourcePath": "artifacts/issue-149-brand-parseq-small-contrast/raw/A-item-ba86d5527473-repeat.json",
+      "pr214RecordedSha256": "1745bf8c3014771cc8c7008b8cabb37e1dd43121d26b3cc4b7e25d1404a9b00a",
+      "observedSha256": "1745bf8c3014771cc8c7008b8cabb37e1dd43121d26b3cc4b7e25d1404a9b00a",
+      "matches": true,
+      "priorOpaqueItemId": "item-ba86d5527473",
+      "run": "repeat",
+      "outputFingerprint": "3147adcce6328bb8ff4c58937fb91c83a279d005c2cc9cf0baa9bafef0731698",
+      "sourcePngSha256": "efd2a2f90dd1ee74da7df9258916f1d253f7948601bdc60f1dfbbbed3cc4fa65"
+    },
+    {
+      "file": "A-item-cea77b8f4af1-primary.json",
+      "sourcePath": "artifacts/issue-149-brand-parseq-small-contrast/raw/A-item-cea77b8f4af1-primary.json",
+      "pr214RecordedSha256": "7ce94e7d0a3813a482b3a8cf6301214cf3f036e9f29c8bffc8adfbcd4f246f23",
+      "observedSha256": "7ce94e7d0a3813a482b3a8cf6301214cf3f036e9f29c8bffc8adfbcd4f246f23",
+      "matches": true,
+      "priorOpaqueItemId": "item-cea77b8f4af1",
+      "run": "primary",
+      "outputFingerprint": "174680cd11e626237530f16c8d7d2c8d245ff2fd7d44764497a3c82655934715",
+      "sourcePngSha256": "690fbabb303481406c87542e02a063f1ffbc806d44aa1c3e1f113ac9ab94e309"
+    },
+    {
+      "file": "A-item-cea77b8f4af1-repeat.json",
+      "sourcePath": "artifacts/issue-149-brand-parseq-small-contrast/raw/A-item-cea77b8f4af1-repeat.json",
+      "pr214RecordedSha256": "9a84c1d07a0c4d85e09c20ebc72e7df0bdf0ee21fdbff82c98ac16f3bc6fc76b",
+      "observedSha256": "9a84c1d07a0c4d85e09c20ebc72e7df0bdf0ee21fdbff82c98ac16f3bc6fc76b",
+      "matches": true,
+      "priorOpaqueItemId": "item-cea77b8f4af1",
+      "run": "repeat",
+      "outputFingerprint": "174680cd11e626237530f16c8d7d2c8d245ff2fd7d44764497a3c82655934715",
+      "sourcePngSha256": "690fbabb303481406c87542e02a063f1ffbc806d44aa1c3e1f113ac9ab94e309"
+    },
+    {
+      "file": "A-item-dcfc22ffeac8-primary.json",
+      "sourcePath": "artifacts/issue-149-brand-parseq-small-contrast/raw/A-item-dcfc22ffeac8-primary.json",
+      "pr214RecordedSha256": "d5a50c4a616b71631b6f8f0d0c5ecbd28fae324960fe58d2d948a9c103d7d9b9",
+      "observedSha256": "d5a50c4a616b71631b6f8f0d0c5ecbd28fae324960fe58d2d948a9c103d7d9b9",
+      "matches": true,
+      "priorOpaqueItemId": "item-dcfc22ffeac8",
+      "run": "primary",
+      "outputFingerprint": "a76d43c3a2fc44be4595d00bf006d22d0778e0b7e71f2286bd17c88436c40a8b",
+      "sourcePngSha256": "ce5b99dc782cf2d893c35be8dea88e7bcddc09f0859183e8ff13f4dc3e6a67a1"
+    },
+    {
+      "file": "A-item-dcfc22ffeac8-repeat.json",
+      "sourcePath": "artifacts/issue-149-brand-parseq-small-contrast/raw/A-item-dcfc22ffeac8-repeat.json",
+      "pr214RecordedSha256": "c7928ea8f9a56fd77416b8e4950805ec90adef2b76e0924b5b972fd2df691100",
+      "observedSha256": "c7928ea8f9a56fd77416b8e4950805ec90adef2b76e0924b5b972fd2df691100",
+      "matches": true,
+      "priorOpaqueItemId": "item-dcfc22ffeac8",
+      "run": "repeat",
+      "outputFingerprint": "a76d43c3a2fc44be4595d00bf006d22d0778e0b7e71f2286bd17c88436c40a8b",
+      "sourcePngSha256": "ce5b99dc782cf2d893c35be8dea88e7bcddc09f0859183e8ff13f4dc3e6a67a1"
+    }
+  ],
+  "carriedFileCount": 12,
+  "everyFileMatchesPr214": true,
+  "verification": {
+    "method": "Each file's SHA-256 is recomputed from the merged PR #214 tree and compared with the value recorded in that PR's raw-output-manifest.json. The copy in arm-a-frozen/ is then re-hashed after writing.",
+    "recordedInPr214Manifest": "artifacts/issue-149-brand-parseq-small-contrast/raw-output-manifest.json",
+    "mismatchPolicy": "any mismatch halts before staging completes; nothing is written past the failure"
+  },
+  "retainedValues": [
+    "raw transcript",
+    "word sequence",
+    "word text and boxes",
+    "original Tesseract confidence values",
+    "warnings",
+    "latency",
+    "output fingerprint"
+  ],
+  "perItemValuesSource": "artifacts/issue-149-brand-parseq-small-contrast/per-item-results.json",
+  "identifierNote": "The carried files keep PR #214's opaque identifiers, because renaming them would break the hashes that prove they are unaltered. The mapping to this experiment's fresh identifiers lives in evaluation/id-map.json and is never mounted into inference.",
+  "productionBehaviourChanged": false
+}

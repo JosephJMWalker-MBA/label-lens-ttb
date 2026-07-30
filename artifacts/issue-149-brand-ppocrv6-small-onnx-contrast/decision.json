@@ -1,0 +1,190 @@
+{
+  "artifact": "decision",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "issue": 149,
+  "evaluationOnly": true,
+  "twoArmArchitectureComparison": true,
+  "singleVariableCausalAttribution": false,
+  "decision": "REGRESSION",
+  "reason": "distinct Brand-design regression: D1",
+  "verdictComputedFromGates": true,
+  "verdictHandAsserted": false,
+  "boundaryRelaxedBecauseCandidateLooksPromising": false,
+  "preregistrationSha256": "3971fea1fd2a9cac04d698892fdeacf8458ca861dab2acfbdc09ab8791921a37",
+  "counts": {
+    "historicalCases": 5,
+    "ocrItems": 6,
+    "distinctPixelSets": 5,
+    "distinctCropClusters": 4,
+    "distinctBrandDesigns": 3
+  },
+  "classifications": {
+    "PPOCRV6_REGRESSION": 2,
+    "PPOCRV6_TRUTH_BEARING_IMPROVEMENT": 4
+  },
+  "perItemClassifications": [
+    {
+      "ocrItemId": "approved-wine-004",
+      "cropClusterId": "C1",
+      "designClusterId": "D1",
+      "classification": "PPOCRV6_REGRESSION"
+    },
+    {
+      "ocrItemId": "approved-wine-005",
+      "cropClusterId": "C2",
+      "designClusterId": "D1",
+      "classification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT"
+    },
+    {
+      "ocrItemId": "approved-wine-031",
+      "cropClusterId": "C3",
+      "designClusterId": "D3",
+      "classification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT"
+    },
+    {
+      "ocrItemId": "la-fattoria-rotated",
+      "cropClusterId": "C1",
+      "designClusterId": "D1",
+      "classification": "PPOCRV6_REGRESSION"
+    },
+    {
+      "ocrItemId": "wine-multi-artifact-04-region-1",
+      "cropClusterId": "C4",
+      "designClusterId": "D2",
+      "classification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT"
+    },
+    {
+      "ocrItemId": "wine-multi-artifact-04-region-2",
+      "cropClusterId": "C4",
+      "designClusterId": "D2",
+      "classification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT"
+    }
+  ],
+  "cropClusterClassifications": [
+    {
+      "cropClusterId": "C1",
+      "groupClassification": "PPOCRV6_REGRESSION"
+    },
+    {
+      "cropClusterId": "C2",
+      "groupClassification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT"
+    },
+    {
+      "cropClusterId": "C3",
+      "groupClassification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT"
+    },
+    {
+      "cropClusterId": "C4",
+      "groupClassification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT"
+    }
+  ],
+  "designClusterClassifications": [
+    {
+      "designClusterId": "D1",
+      "groupClassification": "PPOCRV6_REGRESSION"
+    },
+    {
+      "designClusterId": "D2",
+      "groupClassification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT"
+    },
+    {
+      "designClusterId": "D3",
+      "groupClassification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT"
+    }
+  ],
+  "improvedCropClusters": ["C2", "C3", "C4"],
+  "improvedDesignClusters": ["D2", "D3"],
+  "regressedDesignClusters": ["D1"],
+  "severeRepeatedUnsupportedOutput": {
+    "value": false,
+    "notVisuallySupportedItems": [],
+    "distinctCropClusters": [],
+    "distinctBrandDesigns": [],
+    "thresholds": {
+      "minimumDistinctCropClusters": 2,
+      "minimumDistinctBrandDesigns": 2
+    },
+    "countingRulesApplied": [
+      "primary and repeat of one item count once",
+      "the byte-identical C1 crop counts once",
+      "multiple OCR items in one crop cluster count once",
+      "multiple items in one Brand design count once",
+      "PARTIALLY_VISUALLY_SUPPORTED does not satisfy the condition",
+      "UNADJUDICATED does not satisfy the condition",
+      "truth mismatch alone never establishes non-support"
+    ],
+    "reinterpreted": false
+  },
+  "determinism": {
+    "allDeterministic": true,
+    "pairs": [
+      {
+        "opaqueItemId": "item-afc6bdc0164a",
+        "deterministic": true
+      },
+      {
+        "opaqueItemId": "item-0fd41fe162ac",
+        "deterministic": true
+      },
+      {
+        "opaqueItemId": "item-fb5c77aeb7be",
+        "deterministic": true
+      },
+      {
+        "opaqueItemId": "item-4e0a448436b7",
+        "deterministic": true
+      },
+      {
+        "opaqueItemId": "item-609a041ecdc3",
+        "deterministic": true
+      },
+      {
+        "opaqueItemId": "item-e5329d446477",
+        "deterministic": true
+      }
+    ],
+    "rerunAttemptedOnMismatch": false
+  },
+  "armARecomputation": {
+    "allItemsMatchPublishedPr214": true,
+    "itemsWithDifferences": [],
+    "scorerAltered": false,
+    "thresholdChanged": false,
+    "valueSilentlyReplaced": false
+  },
+  "gatesPassed": {
+    "at least one distinct crop cluster improves": true,
+    "at least one distinct Brand design improves": true,
+    "no distinct Brand design regresses": false,
+    "all twelve PP-OCRv6 runs complete": true,
+    "every primary/repeat pair is byte-deterministic": true,
+    "no unexplained runtime failure": true,
+    "all source and model hashes verify": true,
+    "truth isolation passes": true,
+    "no concealed confidence or abstention assumption": true,
+    "known output risks are reported": true
+  },
+  "inconclusiveReasons": [],
+  "regressionReasons": ["distinct Brand-design regression: D1"],
+  "falseReliableRead": "NOT_ASSESSABLE_NO_CALIBRATED_AUTHORITY_MAPPING",
+  "falseReliableReadNote": "Zero is deliberately not reported. PP-OCRv6 has no calibrated mapping to the authority classifier, so the measure is undefined here, not satisfied.",
+  "confidenceInterpretationKnown": false,
+  "trainingDataProductionReviewRequired": true,
+  "authorizes": [],
+  "doesNotAuthorize": [
+    "production integration",
+    "shadow deployment",
+    "authority-state changes",
+    "engine replacement",
+    "production Python or ONNX Runtime dependencies",
+    "an abstention threshold",
+    "broader corpus access",
+    "a claim of production suitability",
+    "training-data clearance"
+  ],
+  "priorConclusionsPreserved": {
+    "pr214": "REGRESSION. Unchanged and not reinterpreted.",
+    "pr215": "COMPATIBLE. Unchanged and not reinterpreted.",
+    "pr195": "untouched"
+  }
+}

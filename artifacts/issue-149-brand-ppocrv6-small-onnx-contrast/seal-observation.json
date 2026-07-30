@@ -1,0 +1,18 @@
+{
+  "artifact": "seal-observation",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "mode": "complete",
+  "sealWorkflowRunId": 30559079354,
+  "sealHeadSha": "401fc5211bbf4c7db8f485f72d918a20de7eae93",
+  "conclusion": "success",
+  "jobs": {
+    "Resolve declared mode": "success",
+    "Complete (no inference)": "success",
+    "Discover (no Brand inference)": "skipped",
+    "Execute the twelve Arm B invocations": "skipped"
+  },
+  "discoverSkipped": true,
+  "executeSkipped": true,
+  "inferenceRan": false,
+  "observedNote": "The seal run was observed, not assumed: both the discover and execute jobs report `skipped`, so no model retrieval and no inference occurred on the sealing commit."
+}

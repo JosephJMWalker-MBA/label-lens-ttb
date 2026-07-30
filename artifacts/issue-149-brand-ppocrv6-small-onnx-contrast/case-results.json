@@ -1,0 +1,46 @@
+{
+  "artifact": "case-results",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "rule": "One historical case may contribute several OCR items; the case is reported once.",
+  "groupCount": 5,
+  "groups": [
+    {
+      "caseId": "approved-wine-004",
+      "ocrItems": ["approved-wine-004"],
+      "memberClassifications": ["PPOCRV6_REGRESSION"],
+      "groupClassification": "PPOCRV6_REGRESSION",
+      "countsOnce": true
+    },
+    {
+      "caseId": "approved-wine-005",
+      "ocrItems": ["approved-wine-005"],
+      "memberClassifications": ["PPOCRV6_TRUTH_BEARING_IMPROVEMENT"],
+      "groupClassification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT",
+      "countsOnce": true
+    },
+    {
+      "caseId": "approved-wine-031",
+      "ocrItems": ["approved-wine-031"],
+      "memberClassifications": ["PPOCRV6_TRUTH_BEARING_IMPROVEMENT"],
+      "groupClassification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT",
+      "countsOnce": true
+    },
+    {
+      "caseId": "la-fattoria-rotated",
+      "ocrItems": ["la-fattoria-rotated"],
+      "memberClassifications": ["PPOCRV6_REGRESSION"],
+      "groupClassification": "PPOCRV6_REGRESSION",
+      "countsOnce": true
+    },
+    {
+      "caseId": "wine-multi-artifact-04",
+      "ocrItems": ["wine-multi-artifact-04-region-1", "wine-multi-artifact-04-region-2"],
+      "memberClassifications": [
+        "PPOCRV6_TRUTH_BEARING_IMPROVEMENT",
+        "PPOCRV6_TRUTH_BEARING_IMPROVEMENT"
+      ],
+      "groupClassification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT",
+      "countsOnce": true
+    }
+  ]
+}

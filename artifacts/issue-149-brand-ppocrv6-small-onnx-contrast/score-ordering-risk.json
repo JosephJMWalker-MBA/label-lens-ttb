@@ -1,0 +1,81 @@
+{
+  "artifact": "score-ordering-risk",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "thresholdFreeDiagnostic": true,
+  "isAuthorityClassifier": false,
+  "impliesAThresholdExists": false,
+  "definitionChosenAfterResults": false,
+  "definitions": [
+    {
+      "definition": "planDefinedNonBlankTimestepMean",
+      "correctOutputs": [
+        {
+          "ocrItemId": "approved-wine-031",
+          "score": 0.909456193447113
+        },
+        {
+          "ocrItemId": "wine-multi-artifact-04-region-2",
+          "score": 0.9609336715478164
+        }
+      ],
+      "wrongOutputs": [
+        {
+          "ocrItemId": "approved-wine-004",
+          "score": 0.642649940082005
+        },
+        {
+          "ocrItemId": "approved-wine-005",
+          "score": 0.8628332548671298
+        },
+        {
+          "ocrItemId": "la-fattoria-rotated",
+          "score": 0.642649940082005
+        },
+        {
+          "ocrItemId": "wine-multi-artifact-04-region-1",
+          "score": 0.72768691607884
+        }
+      ],
+      "anyWrongOutputScoredAtLeastAsHighAsAnyCorrectOutput": false,
+      "scoreOrderingRisk": false,
+      "assessable": true,
+      "notAssessableReason": null
+    },
+    {
+      "definition": "upstreamCollapsedSequenceMean",
+      "correctOutputs": [
+        {
+          "ocrItemId": "approved-wine-031",
+          "score": 0.909456193447113
+        },
+        {
+          "ocrItemId": "wine-multi-artifact-04-region-2",
+          "score": 0.9635546326637268
+        }
+      ],
+      "wrongOutputs": [
+        {
+          "ocrItemId": "approved-wine-004",
+          "score": 0.642649940082005
+        },
+        {
+          "ocrItemId": "approved-wine-005",
+          "score": 0.8539999052882195
+        },
+        {
+          "ocrItemId": "la-fattoria-rotated",
+          "score": 0.642649940082005
+        },
+        {
+          "ocrItemId": "wine-multi-artifact-04-region-1",
+          "score": 0.7238311072190603
+        }
+      ],
+      "anyWrongOutputScoredAtLeastAsHighAsAnyCorrectOutput": false,
+      "scoreOrderingRisk": false,
+      "assessable": true,
+      "notAssessableReason": null
+    }
+  ],
+  "note": "Both frozen definitions are reported. Neither is selected on the basis of the results, and neither is compared numerically with Tesseract confidence."
+}

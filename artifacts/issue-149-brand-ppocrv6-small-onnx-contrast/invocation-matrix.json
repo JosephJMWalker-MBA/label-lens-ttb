@@ -1,0 +1,34 @@
+{
+  "artifact": "invocation-matrix",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "ocrItems": 6,
+  "arms": ["A", "B"],
+  "armAExecutesNewInference": false,
+  "armANote": "Arm A contributes twelve carried-forward frozen raw outputs from merged PR #214. They are evidence, not invocations, and Tesseract is not run.",
+  "armBRunsPerItem": ["primary", "repeat"],
+  "expectedArmBInvocations": 12,
+  "expectedArmBItemPairs": 6,
+  "expectedExactRepeatComparisons": 6,
+  "totalNewInferenceInvocations": 12,
+  "hardening": {
+    "armBNetwork": "none",
+    "armBModelMount": "read-only",
+    "armBConfigMount": "read-only",
+    "armBInputMount": "read-only",
+    "repositoryRootMounted": false,
+    "corpusMounted": false,
+    "fixtureTruthMounted": false,
+    "caseMappingMounted": false,
+    "armAFrozenEvidenceMounted": false,
+    "cpus": "2",
+    "memory": "4g"
+  },
+  "truthBoundary": "All twelve Arm B outputs are written and hashed into raw-output-manifest.json before Brand truth or cluster identities are loaded.",
+  "prohibited": [
+    "retry beyond the fixed repeat",
+    "altered setting after any output exists",
+    "a thirteenth Arm B invocation",
+    "re-running Tesseract",
+    "substituting or adding an OCR item"
+  ]
+}

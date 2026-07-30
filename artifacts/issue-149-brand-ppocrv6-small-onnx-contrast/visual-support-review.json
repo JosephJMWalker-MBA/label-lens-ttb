@@ -1,0 +1,120 @@
+{
+  "artifact": "visual-support-review",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "protocol": "visual-support-protocol.md",
+  "conductedAfterRawOutputsFrozen": true,
+  "rawOutputManifestSha256Reviewed": "verified before the review began; see raw-output-manifest.sha256",
+  "conductedAfterTruthRevealed": true,
+  "reviewer": {
+    "identity": "Claude Code agent (Opus 5), the same agent that authored and ran this benchmark",
+    "independentOfTheExperiment": false,
+    "human": false,
+    "secondAdjudication": false,
+    "interRaterAgreementComputed": false,
+    "note": "There is exactly one reviewer, and that reviewer is not independent of the work being judged. This is the weakest evidence class in the package and is reported as such."
+  },
+  "unblinded": true,
+  "unblindedNote": "By construction. The reviewer had already seen the Brand truth and the exact-match outcome for every item before judging visual support.",
+  "directPixelInspectionPerformed": true,
+  "inspectionMethod": "Each frozen crop PNG in inference-inputs/ was opened and viewed directly at full resolution. No judgement was made from the transcript, the truth string or the confidence score.",
+  "scope": "The six PRIMARY Arm B outputs only. Repeats add no independent visual evidence and are not classified.",
+  "items": [
+    {
+      "opaqueItemId": "item-afc6bdc0164a",
+      "ocrItemId": "approved-wine-004",
+      "cropClusterId": "C1",
+      "designClusterId": "D1",
+      "sourcePngSha256": "ce5b99dc782cf2d893c35be8dea88e7bcddc09f0859183e8ff13f4dc3e6a67a1",
+      "rawTranscript": "FALLORA",
+      "directPixelInspectionPerformed": true,
+      "classification": "PARTIALLY_VISUALLY_SUPPORTED",
+      "notes": "The crop shows a script 'La' above a wide, very thin-stroked 'FATTORIA' in capitals, inside an ellipse outline. Located in the emitted string: the leading F and A, and the trailing O, R, A, all correspond to capitals legibly present and in the same order. Not located: the two L glyphs. The crop has 'TT' at those positions, and no L appears anywhere in it, so those two characters are misreadings of present strokes rather than readings of present letters. The final I of FATTORIA is dropped, which is an omission rather than an invention. Nothing in the output originates outside the visible lettering.",
+      "uncertainty": "The letterforms are hairline-thin and the crop is reduced roughly 6.5x horizontally by the model's resize to width 320, so at the resolution the model actually sees, a bare T and an L are genuinely close. I cannot determine whether the T-to-L confusion happens at the glyph level or from the ellipse outline merging with the letter tops. That ambiguity does not change the classification: the characters are grounded in present strokes either way."
+    },
+    {
+      "opaqueItemId": "item-4e0a448436b7",
+      "ocrItemId": "la-fattoria-rotated",
+      "cropClusterId": "C1",
+      "designClusterId": "D1",
+      "sourcePngSha256": "ce5b99dc782cf2d893c35be8dea88e7bcddc09f0859183e8ff13f4dc3e6a67a1",
+      "rawTranscript": "FALLORA",
+      "directPixelInspectionPerformed": true,
+      "inspectionSharedWith": "approved-wine-004",
+      "classification": "PARTIALLY_VISUALLY_SUPPORTED",
+      "notes": "This item's pixels are BYTE-IDENTICAL to approved-wine-004 (same SHA-256), and the model emitted the same transcript. The image was inspected once; a second viewing would be the same bytes. Recorded as a shared inspection rather than presented as independent corroboration. Under the frozen counting rules these two items are one crop cluster and count once.",
+      "uncertainty": "Identical to approved-wine-004's, for the same reason: they are the same image."
+    },
+    {
+      "opaqueItemId": "item-0fd41fe162ac",
+      "ocrItemId": "approved-wine-005",
+      "cropClusterId": "C2",
+      "designClusterId": "D1",
+      "sourcePngSha256": "8080cb380c7d65e99ed9ae48c3075daf301518b03246ef03e25d8ee74adf3eee",
+      "rawTranscript": "TATTORIA",
+      "directPixelInspectionPerformed": true,
+      "classification": "PARTIALLY_VISUALLY_SUPPORTED",
+      "notes": "The same Brand design as C1, framed slightly wider so the whole ellipse and both text lines are visible. Located: A-T-T-O-R-I-A, seven of the eight emitted characters, each corresponding exactly to a capital legibly present and in order. Not located: the leading T. The crop has an F there. The F's middle bar is short and sits close to the cap line in this typeface, so the emitted T is a misreading of a present glyph, not an invention. The script 'La' above was not transcribed at all.",
+      "uncertainty": "Whether the model attended to the 'La' line and discarded it, or never saw it after the aspect-preserving resize flattened the two-line block, cannot be determined from the output alone. It does not affect the classification of the characters that were emitted."
+    },
+    {
+      "opaqueItemId": "item-fb5c77aeb7be",
+      "ocrItemId": "approved-wine-031",
+      "cropClusterId": "C3",
+      "designClusterId": "D3",
+      "sourcePngSha256": "efd2a2f90dd1ee74da7df9258916f1d253f7948601bdc60f1dfbbbed3cc4fa65",
+      "rawTranscript": "embeleso",
+      "directPixelInspectionPerformed": true,
+      "classification": "FULLY_VISUALLY_SUPPORTED",
+      "notes": "The crop shows 'embeleso' in a high-contrast serif face with tightly overlapping letterforms and a diaeresis-like ornament over the final o. Every one of the eight emitted characters corresponds to a glyph legibly present, in order, with no omission and no addition.",
+      "uncertainty": "None material. The ornament above the final 'o' was not transcribed; whether it is a diacritic or a decorative mark is not resolvable from the crop, but the model emitted a plain 'o' either way, so nothing unsupported was produced."
+    },
+    {
+      "opaqueItemId": "item-609a041ecdc3",
+      "ocrItemId": "wine-multi-artifact-04-region-1",
+      "cropClusterId": "C4",
+      "designClusterId": "D2",
+      "sourcePngSha256": "690fbabb303481406c87542e02a063f1ffbc806d44aa1c3e1f113ac9ab94e309",
+      "rawTranscript": "Celthr",
+      "directPixelInspectionPerformed": true,
+      "classification": "PARTIALLY_VISUALLY_SUPPORTED",
+      "notes": "The crop shows a heavy ornate script over two lines, 'Dry' above and 'Cellar' below, with large looped ascenders that cross between the lines. Located: the leading C, e and l, which correspond exactly to the opening of the visible 'Cellar', and the trailing r, which corresponds to its final letter. Not located as written: 't' and 'h'. The glyphs at those positions are the second looped 'l' and the 'a' of 'Cellar', so both emitted characters are misreadings of present strokes. The 'Dry' line was not transcribed.",
+      "uncertainty": "The two lines overlap heavily and the model receives them squeezed into a single 48-pixel-high strip, so I cannot tell which line each emitted character was drawn from with confidence. The reading is grounded in the visible lettering; the exact stroke-to-character correspondence for 't' and 'h' is my inference and could be wrong in detail."
+    },
+    {
+      "opaqueItemId": "item-e5329d446477",
+      "ocrItemId": "wine-multi-artifact-04-region-2",
+      "cropClusterId": "C4",
+      "designClusterId": "D2",
+      "sourcePngSha256": "8746c2c0a4f73b9fd1208cd941aece76519c76a162086eecb0063c150ebabdb9",
+      "rawTranscript": "Dry Cellar",
+      "directPixelInspectionPerformed": true,
+      "classification": "FULLY_VISUALLY_SUPPORTED",
+      "notes": "The crop shows 'Dry Cellar' as a single line of italic script with a clear gap between the two words. Every emitted character corresponds to a glyph legibly present, in order, including capitalisation. The emitted ASCII space corresponds to a word gap that is genuinely present in the image; it was not inserted by any normalization step.",
+      "uncertainty": "None material."
+    }
+  ],
+  "classificationCounts": {
+    "FULLY_VISUALLY_SUPPORTED": 2,
+    "PARTIALLY_VISUALLY_SUPPORTED": 4,
+    "NOT_VISUALLY_SUPPORTED": 0,
+    "UNADJUDICATED": 0
+  },
+  "truthMismatchUsedToEstablishNonSupport": false,
+  "truthMismatchNote": "Four of the six outputs do not match the Brand truth, and none of them is classified NOT_VISUALLY_SUPPORTED. Every emitted character in those four traces back to lettering that is visibly present; the errors are substitutions and omissions, not fabrications. Under the frozen rule, truth mismatch alone never establishes non-support.",
+  "unadjudicatedUsed": false,
+  "unadjudicatedNote": "Every crop was legible enough at full resolution to locate or fail to locate the emitted glyphs, so no item required UNADJUDICATED. Had any crop been too degraded to judge, UNADJUDICATED would have been recorded rather than a guess.",
+  "severeRepeatedUnsupportedOutputInputs": {
+    "notVisuallySupportedItems": [],
+    "distinctCropClustersWithNotVisuallySupported": 0,
+    "distinctBrandDesignsWithNotVisuallySupported": 0,
+    "minimumDistinctCropClustersRequired": 2,
+    "minimumDistinctBrandDesignsRequired": 2,
+    "computedIn": "decision.json, by scripts/eval/finalize-issue-149-brand-ppocrv6-contrast.mjs"
+  },
+  "notUsedToAdjust": [
+    "any transcript",
+    "any metric",
+    "any character error rate",
+    "any per-item classification"
+  ]
+}

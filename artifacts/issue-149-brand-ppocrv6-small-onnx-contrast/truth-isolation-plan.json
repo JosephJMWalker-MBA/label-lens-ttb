@@ -1,0 +1,46 @@
+{
+  "artifact": "truth-isolation-plan",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "frozenBeforeInference": true,
+  "opaqueIdScheme": "item-<first 12 hex of sha256(\"issue-149-brand-ppocrv6-small-onnx-contrast-v1:<ocrItemId>\")>",
+  "freshSaltForThisBenchmark": true,
+  "priorSaltReused": false,
+  "priorSaltCollisionCheck": "the prepare script halts with OPAQUE_ID_NOT_FRESH if any generated identifier equals PR #214's for the same item",
+  "inferenceInputDirectory": "artifacts/issue-149-brand-ppocrv6-small-onnx-contrast/inference-inputs",
+  "inferenceInputDirectoryListing": [
+    "item-0fd41fe162ac.png",
+    "item-4e0a448436b7.png",
+    "item-609a041ecdc3.png",
+    "item-afc6bdc0164a.png",
+    "item-e5329d446477.png",
+    "item-fb5c77aeb7be.png"
+  ],
+  "theInferenceEnvironmentNeverReceives": {
+    "caseIds": false,
+    "fixtureNames": false,
+    "brandTruth": false,
+    "producerNames": false,
+    "expectedTranscripts": false,
+    "clusterMappings": false,
+    "truthBearingFilenames": false,
+    "repositoryRoot": false,
+    "note": "Every entry is false: none of these is ever passed to the inference process."
+  },
+  "checkedSurfaces": [
+    "filenames",
+    "directory names",
+    "container mounts",
+    "command arguments",
+    "environment variables",
+    "model and config metadata",
+    "runtime logs",
+    "output filenames"
+  ],
+  "evaluationOnlyMappingLocation": "artifacts/issue-149-brand-ppocrv6-small-onnx-contrast/evaluation/id-map.json",
+  "evaluationOnlyMappingMounted": false,
+  "armAFrozenEvidenceLocation": "artifacts/issue-149-brand-ppocrv6-small-onnx-contrast/arm-a-frozen",
+  "armAFrozenEvidenceMounted": false,
+  "armAFrozenEvidenceNote": "The carried Arm A files keep PR #214's opaque identifiers so their hashes still prove they are unaltered. They are evaluation-side evidence and are never mounted into the Arm B container, so the two identifier spaces never meet inside inference.",
+  "truthBoundary": "Brand truth and cluster identities are loaded only after all twelve Arm B raw outputs are written and hashed into raw-output-manifest.json.",
+  "verificationAtExecutionTime": "A truth-isolation report is emitted that re-lists the mounted directory, re-checks every surface above, and records the point at which truth was first read."
+}

@@ -1,0 +1,14 @@
+{
+  "artifact": "frozen-identity-verification",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "verifiedAtUtc": "2026-07-30T15:41:27.866Z",
+  "verifiedBeforeAnyNetworkRetrieval": true,
+  "planningHeadExpectedAncestor": "2ccfe22771a9f5f071099f0ec4e8641b3089ea5c",
+  "preregistrationSha256": "3971fea1fd2a9cac04d698892fdeacf8458ca861dab2acfbdc09ab8791921a37",
+  "preregistrationMatchesFrozen": true,
+  "stagedInputCount": 6,
+  "stagedInputsVerified": true,
+  "armACarriedFileCount": 12,
+  "armACarriedFilesVerified": true,
+  "priorResultArtifactsPresent": false
+}

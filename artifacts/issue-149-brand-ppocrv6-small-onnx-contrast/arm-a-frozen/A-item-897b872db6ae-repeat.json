@@ -1,0 +1,35 @@
+{
+  "opaqueItemId": "item-897b872db6ae",
+  "arm": "A",
+  "run": "repeat",
+  "sourcePngSha256": "8746c2c0a4f73b9fd1208cd941aece76519c76a162086eecb0063c150ebabdb9",
+  "rawTranscript": "Colles Dig",
+  "words": [
+    {
+      "text": "Dig",
+      "confidence": 62,
+      "bbox": {
+        "x0": 37,
+        "y0": 47,
+        "x1": 218,
+        "y1": 154
+      }
+    },
+    {
+      "text": "Colles",
+      "confidence": 24,
+      "bbox": {
+        "x0": 245,
+        "y0": 36,
+        "x1": 461,
+        "y1": 116
+      }
+    }
+  ],
+  "wordCount": 2,
+  "meanConfidence": 43,
+  "warnings": [],
+  "latencyMs": 47,
+  "outputFingerprint": "f31d29b8e95efb06176adba2ebe56bc1a5760af7474a4c5ccd72702cd765790e",
+  "executed": true
+}

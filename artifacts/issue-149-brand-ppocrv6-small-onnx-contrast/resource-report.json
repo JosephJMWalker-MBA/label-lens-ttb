@@ -1,0 +1,47 @@
+{
+  "artifact": "resource-report",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "diagnosticOnly": true,
+  "armsNotComparable": true,
+  "armsNotComparableReason": "Arm A's figures were measured on a different host on a different day, in-process, while Arm B ran in a pinned container here. No runtime performance comparison may be drawn between the arms.",
+  "armB": {
+    "invocations": 12,
+    "medianLatencyMs": 29.709185000001526,
+    "maxLatencyMs": 30.744898999998327,
+    "minLatencyMs": 29.578813000000537,
+    "maxPeakMemoryBytes": 171446272,
+    "modelLoadMs": 63.96588399999814,
+    "modelLoadIncludedInLatency": false,
+    "peakMemoryMetric": "resource.getrusage(RUSAGE_SELF).ru_maxrss inside the container, cumulative across the twelve invocations because they share one process."
+  },
+  "armA": {
+    "carriedForward": true,
+    "latenciesMs": [
+      {
+        "ocrItemId": "approved-wine-004",
+        "latencyMs": 384
+      },
+      {
+        "ocrItemId": "approved-wine-005",
+        "latencyMs": 190
+      },
+      {
+        "ocrItemId": "approved-wine-031",
+        "latencyMs": 62
+      },
+      {
+        "ocrItemId": "la-fattoria-rotated",
+        "latencyMs": 231
+      },
+      {
+        "ocrItemId": "wine-multi-artifact-04-region-1",
+        "latencyMs": 96
+      },
+      {
+        "ocrItemId": "wine-multi-artifact-04-region-2",
+        "latencyMs": 44
+      }
+    ],
+    "note": "Carried from PR #214 for completeness only."
+  }
+}

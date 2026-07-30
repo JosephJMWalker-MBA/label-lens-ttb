@@ -1,0 +1,13 @@
+python=Python 3.11.15
+onnxruntime=1.28.0
+onnxruntime_providers=AzureExecutionProvider,CPUExecutionProvider
+onnx=1.22.0
+opencv=4.14.0
+numpy=2.4.6
+pillow=12.3.0
+pyyaml=6.0.3
+font_pkg=fonts-dejavu-core=2.37-6
+font_path=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+font_sha256=abdc775b21b1bc470d50c97e790d276f2054b7504e56e5bd3e64f48d68582322
+arch=amd64
+uname=x86_64

@@ -1,0 +1,36 @@
+{
+  "artifact": "design-cluster-results",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "rule": "A repeated Brand design counts once. Any material regression within a design makes that design a regression; an improvement in the same design does not cancel it.",
+  "groupCount": 3,
+  "groups": [
+    {
+      "designClusterId": "D1",
+      "ocrItems": ["approved-wine-004", "approved-wine-005", "la-fattoria-rotated"],
+      "memberClassifications": [
+        "PPOCRV6_REGRESSION",
+        "PPOCRV6_TRUTH_BEARING_IMPROVEMENT",
+        "PPOCRV6_REGRESSION"
+      ],
+      "groupClassification": "PPOCRV6_REGRESSION",
+      "countsOnce": true
+    },
+    {
+      "designClusterId": "D2",
+      "ocrItems": ["wine-multi-artifact-04-region-1", "wine-multi-artifact-04-region-2"],
+      "memberClassifications": [
+        "PPOCRV6_TRUTH_BEARING_IMPROVEMENT",
+        "PPOCRV6_TRUTH_BEARING_IMPROVEMENT"
+      ],
+      "groupClassification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT",
+      "countsOnce": true
+    },
+    {
+      "designClusterId": "D3",
+      "ocrItems": ["approved-wine-031"],
+      "memberClassifications": ["PPOCRV6_TRUTH_BEARING_IMPROVEMENT"],
+      "groupClassification": "PPOCRV6_TRUTH_BEARING_IMPROVEMENT",
+      "countsOnce": true
+    }
+  ]
+}

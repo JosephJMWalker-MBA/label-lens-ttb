@@ -1,0 +1,16 @@
+{
+  "artifact": "safe-loading-report",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "method": "onnxruntime.InferenceSession with CPUExecutionProvider",
+  "pickleCalled": false,
+  "arbitraryObjectsExecuted": false,
+  "note": "ONNX Runtime loads a protobuf graph. No Python pickle is invoked and no PaddlePaddle weight format is parsed, so the .pdiparams pickle concern raised for the native Paddle artifact does not apply to this probe. The bytes were additionally gated on the pinned SHA-256 and byte size before the session was created.",
+  "paddleNativeLoadingUsed": false,
+  "paddle2onnxConversionPerformed": false,
+  "inferenceJsonLoaded": false,
+  "onnxSha256Verified": true,
+  "onnxSha256": "5435fd747c9e0efe15a96d0b378d5bd157e9492ed8fd80edf08f30d02fa24634",
+  "onnxByteSize": 21159378,
+  "configSha256Verified": true,
+  "configSha256": "ab078671bb49f06228eadccd34f1bb501e157f7a047095ffb943ba81512c77d1"
+}

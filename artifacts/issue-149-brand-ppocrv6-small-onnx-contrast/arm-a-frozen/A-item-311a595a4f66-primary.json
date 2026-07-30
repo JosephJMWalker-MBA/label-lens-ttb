@@ -1,0 +1,55 @@
+{
+  "opaqueItemId": "item-311a595a4f66",
+  "arm": "A",
+  "run": "primary",
+  "sourcePngSha256": "8080cb380c7d65e99ed9ae48c3075daf301518b03246ef03e25d8ee74adf3eee",
+  "rawTranscript": "0 —_ GATT ORIA",
+  "words": [
+    {
+      "text": "0",
+      "confidence": 8,
+      "bbox": {
+        "x0": 875,
+        "y0": 226,
+        "x1": 992,
+        "y1": 362
+      }
+    },
+    {
+      "text": "—_",
+      "confidence": 8,
+      "bbox": {
+        "x0": 1094,
+        "y0": 222,
+        "x1": 1455,
+        "y1": 428
+      }
+    },
+    {
+      "text": "GATT",
+      "confidence": 1,
+      "bbox": {
+        "x0": 12,
+        "y0": 268,
+        "x1": 773,
+        "y1": 858
+      }
+    },
+    {
+      "text": "ORIA",
+      "confidence": 89,
+      "bbox": {
+        "x0": 761,
+        "y0": 527,
+        "x1": 1416,
+        "y1": 750
+      }
+    }
+  ],
+  "wordCount": 4,
+  "meanConfidence": 26.5,
+  "warnings": [],
+  "latencyMs": 190,
+  "outputFingerprint": "14401703534e4edd426dad0d5ec90659fbb5920b1a2afec1970c671ff2696c54",
+  "executed": true
+}

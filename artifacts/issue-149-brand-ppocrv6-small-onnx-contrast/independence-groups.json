@@ -1,0 +1,65 @@
+{
+  "artifact": "independence-groups",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "basis": "PR #207 adjudication, carried through PR #211 and PR #214 unchanged",
+  "counts": {
+    "historicalCases": 5,
+    "ocrItems": 6,
+    "distinctPixelSetsAtItemLevel": 5,
+    "distinctCropClustersAtCaseLevel": 4,
+    "distinctBrandDesigns": 3
+  },
+  "cropClusters": [
+    {
+      "cropClusterId": "C1",
+      "cases": ["approved-wine-004", "la-fattoria-rotated"],
+      "ocrItems": ["item-afc6bdc0164a", "item-4e0a448436b7"],
+      "countsOnce": true
+    },
+    {
+      "cropClusterId": "C2",
+      "cases": ["approved-wine-005"],
+      "ocrItems": ["item-0fd41fe162ac"],
+      "countsOnce": true
+    },
+    {
+      "cropClusterId": "C3",
+      "cases": ["approved-wine-031"],
+      "ocrItems": ["item-fb5c77aeb7be"],
+      "countsOnce": true
+    },
+    {
+      "cropClusterId": "C4",
+      "cases": ["wine-multi-artifact-04"],
+      "ocrItems": ["item-609a041ecdc3", "item-e5329d446477"],
+      "countsOnce": true
+    }
+  ],
+  "designClusters": [
+    {
+      "designClusterId": "D1",
+      "cases": ["approved-wine-004", "approved-wine-005", "la-fattoria-rotated"],
+      "ocrItems": ["item-afc6bdc0164a", "item-0fd41fe162ac", "item-4e0a448436b7"],
+      "countsOnce": true
+    },
+    {
+      "designClusterId": "D3",
+      "cases": ["approved-wine-031"],
+      "ocrItems": ["item-fb5c77aeb7be"],
+      "countsOnce": true
+    },
+    {
+      "designClusterId": "D2",
+      "cases": ["wine-multi-artifact-04"],
+      "ocrItems": ["item-609a041ecdc3", "item-e5329d446477"],
+      "countsOnce": true
+    }
+  ],
+  "countingRules": [
+    "The duplicate C1 crop counts once: approved-wine-004 and la-fattoria-rotated are byte-identical pixels.",
+    "A repeated Brand design counts once at design level.",
+    "Results are reported separately by OCR item, distinct pixel set, crop cluster, historical case and Brand design.",
+    "No averaging may conceal an item-level material regression.",
+    "Any material regression within a repeated Brand design makes that design a regression; an improvement in the same design does not cancel it."
+  ]
+}

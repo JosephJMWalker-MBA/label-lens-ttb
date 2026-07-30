@@ -1,0 +1,47 @@
+{
+  "artifact": "run-provenance",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "repository": "JosephJMWalker-MBA/label-lens-ttb",
+  "branch": "research/issue-149-brand-ppocrv6-small-onnx-contrast",
+  "base": "9372ebbb4f0cd3f4d58023e944c2500f28c8fe7b",
+  "planningHead": "2ccfe22771a9f5f071099f0ec4e8641b3089ea5c",
+  "amendmentHead": "b351bfb96d93794e6b5c5791de5ebb29fe5f0926",
+  "frozenPreregistrationSha256": "3971fea1fd2a9cac04d698892fdeacf8458ca861dab2acfbdc09ab8791921a37",
+  "runs": [
+    {
+      "phase": "discover",
+      "workflowRunId": 30557837900,
+      "headSha": "17816cfe10272f91d0495d3b3d5c809800bc089f",
+      "mode": "discover",
+      "conclusion": "success",
+      "brandInferencePerformed": false,
+      "sessionRunCalledOnBrandCrop": false,
+      "note": "Model retrieved and dry-inspected. No Brand crop was mounted into the container."
+    },
+    {
+      "phase": "execute",
+      "workflowRunId": 30558181193,
+      "headSha": "bf54f8a3b32635672834e4e84b8ebc65bc781e8d",
+      "mode": "execute",
+      "conclusion": "success",
+      "armBInvocations": 12,
+      "armAInvocations": 0,
+      "tesseractExecuted": false,
+      "network": "none",
+      "note": "The twelve Arm B invocations ran offline. Arm A evidence was carried forward frozen."
+    },
+    {
+      "phase": "complete",
+      "workflowRunId": 30559079354,
+      "headSha": "401fc5211bbf4c7db8f485f72d918a20de7eae93",
+      "mode": "complete",
+      "conclusion": "success",
+      "note": "Seal run observed: the discover and execute jobs both reported `skipped`, so no inference ran. See seal-observation.json."
+    }
+  ],
+  "runnerArchitecture": "x86_64, GitHub-hosted ubuntu-latest",
+  "containerImageIdDiscovery": "sha256:946fa35ff1041d4205a31543571922916cac36a6cf8843c4cae6c679bfe73ee7",
+  "harnessRevision": 1,
+  "harnessDefectsFound": 0,
+  "harnessDefectNote": "No harness defect was found before or after Brand output existed, so neither the pre-output repair path nor the post-output stop-and-report path was exercised."
+}

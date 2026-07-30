@@ -1,0 +1,29 @@
+{
+  "artifact": "evaluation-summary",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "allDeterministic": true,
+  "armBInvocations": 12,
+  "runtimeFailures": 0,
+  "classifications": {
+    "PPOCRV6_REGRESSION": 2,
+    "PPOCRV6_TRUTH_BEARING_IMPROVEMENT": 4
+  },
+  "improvedCropClusters": 3,
+  "improvedDesignClusters": 2,
+  "regressedDesignClusters": 1,
+  "armACrosscheckAllMatch": true,
+  "transcripts": {
+    "B-item-0fd41fe162ac-primary": "TATTORIA",
+    "B-item-0fd41fe162ac-repeat": "TATTORIA",
+    "B-item-4e0a448436b7-primary": "FALLORA",
+    "B-item-4e0a448436b7-repeat": "FALLORA",
+    "B-item-609a041ecdc3-primary": "Celthr",
+    "B-item-609a041ecdc3-repeat": "Celthr",
+    "B-item-afc6bdc0164a-primary": "FALLORA",
+    "B-item-afc6bdc0164a-repeat": "FALLORA",
+    "B-item-e5329d446477-primary": "Dry Cellar",
+    "B-item-e5329d446477-repeat": "Dry Cellar",
+    "B-item-fb5c77aeb7be-primary": "embeleso",
+    "B-item-fb5c77aeb7be-repeat": "embeleso"
+  }
+}

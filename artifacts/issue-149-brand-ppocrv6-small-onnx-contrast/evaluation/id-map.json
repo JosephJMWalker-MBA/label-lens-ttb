@@ -1,0 +1,56 @@
+{
+  "artifact": "id-map",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "availableToInference": false,
+  "purpose": "Post-inference evaluation only: maps this experiment's opaque item id back to the historical case, the clusters, and PR #214's opaque id for the carried Arm A evidence.",
+  "map": [
+    {
+      "opaqueItemId": "item-afc6bdc0164a",
+      "priorOpaqueItemId": "item-dcfc22ffeac8",
+      "ocrItemId": "approved-wine-004",
+      "caseId": "approved-wine-004",
+      "cropClusterId": "C1",
+      "designClusterId": "D1"
+    },
+    {
+      "opaqueItemId": "item-0fd41fe162ac",
+      "priorOpaqueItemId": "item-311a595a4f66",
+      "ocrItemId": "approved-wine-005",
+      "caseId": "approved-wine-005",
+      "cropClusterId": "C2",
+      "designClusterId": "D1"
+    },
+    {
+      "opaqueItemId": "item-fb5c77aeb7be",
+      "priorOpaqueItemId": "item-ba86d5527473",
+      "ocrItemId": "approved-wine-031",
+      "caseId": "approved-wine-031",
+      "cropClusterId": "C3",
+      "designClusterId": "D3"
+    },
+    {
+      "opaqueItemId": "item-4e0a448436b7",
+      "priorOpaqueItemId": "item-192b594faff0",
+      "ocrItemId": "la-fattoria-rotated",
+      "caseId": "la-fattoria-rotated",
+      "cropClusterId": "C1",
+      "designClusterId": "D1"
+    },
+    {
+      "opaqueItemId": "item-609a041ecdc3",
+      "priorOpaqueItemId": "item-cea77b8f4af1",
+      "ocrItemId": "wine-multi-artifact-04-region-1",
+      "caseId": "wine-multi-artifact-04",
+      "cropClusterId": "C4",
+      "designClusterId": "D2"
+    },
+    {
+      "opaqueItemId": "item-e5329d446477",
+      "priorOpaqueItemId": "item-897b872db6ae",
+      "ocrItemId": "wine-multi-artifact-04-region-2",
+      "caseId": "wine-multi-artifact-04",
+      "cropClusterId": "C4",
+      "designClusterId": "D2"
+    }
+  ]
+}

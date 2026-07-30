@@ -1,0 +1,26 @@
+{
+  "artifact": "output-risk-report",
+  "experimentId": "issue-149-brand-ppocrv6-small-onnx-contrast",
+  "falseReliableRead": "NOT_ASSESSABLE_NO_CALIBRATED_AUTHORITY_MAPPING",
+  "falseReliableReadNote": "PP-OCRv6 is not connected to the authority classifier and has no calibrated mapping. Zero false reliable reads is NOT reported: the measure is undefined here, not satisfied.",
+  "confidenceInterpretationKnown": false,
+  "thresholdDerived": false,
+  "authorityMappingDerived": false,
+  "scoresComparedWithTesseract": false,
+  "armB": {
+    "wrongOutputCount": 4,
+    "exactMatchCount": 2,
+    "emptyOutputCount": 0,
+    "emptyOutputItems": []
+  },
+  "armA": {
+    "wrongOutputCount": 6,
+    "exactMatchCount": 0,
+    "emptyOutputCount": 0
+  },
+  "modelHasNaturalAbstention": false,
+  "modelHasNaturalAbstentionNote": "CTC has no null class. An empty transcript means every frame decoded to blank: a structural outcome, not calibrated abstention.",
+  "spaceAbsentFromDictionary": true,
+  "spaceDecodable": true,
+  "trainingDataProductionReviewRequired": true
+}

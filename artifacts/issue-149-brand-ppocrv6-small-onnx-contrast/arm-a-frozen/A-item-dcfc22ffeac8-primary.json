@@ -1,0 +1,45 @@
+{
+  "opaqueItemId": "item-dcfc22ffeac8",
+  "arm": "A",
+  "run": "primary",
+  "sourcePngSha256": "ce5b99dc782cf2d893c35be8dea88e7bcddc09f0859183e8ff13f4dc3e6a67a1",
+  "rawTranscript": "Lo FAT TORIA",
+  "words": [
+    {
+      "text": "FAT",
+      "confidence": 38,
+      "bbox": {
+        "x0": 301,
+        "y0": 627,
+        "x1": 698,
+        "y1": 864
+      }
+    },
+    {
+      "text": "TORIA",
+      "confidence": 38,
+      "bbox": {
+        "x0": 842,
+        "y0": 619,
+        "x1": 1656,
+        "y1": 864
+      }
+    },
+    {
+      "text": "Lo",
+      "confidence": 22,
+      "bbox": {
+        "x0": 754,
+        "y0": 83,
+        "x1": 1707,
+        "y1": 561
+      }
+    }
+  ],
+  "wordCount": 3,
+  "meanConfidence": 32.666666666666664,
+  "warnings": [],
+  "latencyMs": 384,
+  "outputFingerprint": "a76d43c3a2fc44be4595d00bf006d22d0778e0b7e71f2286bd17c88436c40a8b",
+  "executed": true
+}
