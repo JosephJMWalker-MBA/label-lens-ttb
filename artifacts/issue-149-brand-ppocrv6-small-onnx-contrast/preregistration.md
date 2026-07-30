@@ -224,8 +224,32 @@ assumption; known output risks are reported.
 **`NO_EVIDENCE_OF_GAIN`** — no crop-cluster improvement or no design improvement,
 without a material design regression.
 
-**`REGRESSION`** — any distinct Brand-design regression, severe repeated
-unsupported output, or unexplained runtime failure.
+**`REGRESSION`** — any distinct Brand-design regression,
+`severeRepeatedUnsupportedOutput`, or unexplained runtime failure.
+
+### `severeRepeatedUnsupportedOutput`, defined exactly
+
+**True only when** primary PP-OCRv6 outputs are classified
+`NOT_VISUALLY_SUPPORTED` in **at least two distinct crop clusters** spanning **at
+least two distinct Brand designs**. Otherwise false.
+
+Counting rules:
+
+- the primary and the repeat of one item count **once**;
+- the byte-identical C1 crop counts **once**;
+- multiple OCR items in one crop cluster count **once**;
+- multiple items in one Brand design count **once**;
+- `PARTIALLY_VISUALLY_SUPPORTED` does **not** satisfy the condition;
+- `UNADJUDICATED` does **not** satisfy the condition;
+- **truth mismatch alone never establishes non-support.**
+
+`NOT_VISUALLY_SUPPORTED` requires **direct inspection of the frozen crop pixels**.
+Where meaningful inspection is unavailable, the item is `UNADJUDICATED`; visual
+support is never inferred from the transcript or from the truth string.
+
+Because both thresholds are two and the population holds four crop clusters and
+three Brand designs, this condition is deliberately hard to satisfy: a single
+unsupported item, or several within one design, cannot trigger it.
 
 **`INCONCLUSIVE`** — input reproduction failure, truth-isolation failure,
 incomplete raw evidence, broken independence mapping, or a comparison that cannot

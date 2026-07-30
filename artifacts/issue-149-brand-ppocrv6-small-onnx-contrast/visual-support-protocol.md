@@ -11,9 +11,9 @@ that does not match the Brand truth, **is that text visibly present in the crop 
 all?** A wrong transcript that reads glyphs actually on the label is a different
 failure from one that invents them.
 
-This is diagnostic. It feeds the `REGRESSION` condition "severe repeated
-unsupported output" and nothing else. It produces no metric that enters the
-primary comparison.
+This is diagnostic. It feeds the `REGRESSION` condition
+`severeRepeatedUnsupportedOutput` and nothing else. It produces no metric that
+enters the primary comparison.
 
 ## Sequencing
 
@@ -39,6 +39,43 @@ Each of the six Arm B primary outputs is classified exactly once:
 **`UNADJUDICATED` is a first-class outcome.** It must be used rather than guessing,
 and a package in which several items are `UNADJUDICATED` is a more honest package
 than one in which they were forced into a class.
+
+## Evidence requirement
+
+`NOT_VISUALLY_SUPPORTED` may be assigned **only after direct inspection of the
+frozen crop pixels** for that item. Where meaningful inspection is unavailable —
+the crop is illegible at the available resolution, the reviewer cannot locate the
+region the output would have come from, or the evidence simply does not settle the
+question — the item is `UNADJUDICATED`.
+
+Visual support is **never** inferred from the transcript, from the truth string,
+from the confidence score, or from the fact that another item in the same cluster
+was judged unsupported. Each of the six primary outputs is judged on the pixels.
+
+## Feeding `severeRepeatedUnsupportedOutput`
+
+Only the **primary** output of each item is classified. Repeats contribute nothing
+additional, because a deterministic repeat carries no independent visual evidence.
+
+The `REGRESSION` condition `severeRepeatedUnsupportedOutput` is true **only when**
+primary outputs are `NOT_VISUALLY_SUPPORTED` in **at least two distinct crop
+clusters** spanning **at least two distinct Brand designs**.
+
+Counting, in full:
+
+- primary and repeat of one item count **once**;
+- the byte-identical C1 crop counts **once**, so `approved-wine-004` and
+  `la-fattoria-rotated` can never contribute two clusters between them;
+- multiple OCR items in one crop cluster count **once**, so
+  `wine-multi-artifact-04`'s two regions cannot contribute two clusters;
+- multiple items in one Brand design count **once**;
+- `PARTIALLY_VISUALLY_SUPPORTED` does **not** satisfy the condition;
+- `UNADJUDICATED` does **not** satisfy the condition;
+- truth mismatch alone **never** establishes non-support.
+
+Both thresholds must be met at once. One unsupported item cannot trigger the
+condition, and neither can several unsupported items confined to a single Brand
+design.
 
 ## Governing rule
 

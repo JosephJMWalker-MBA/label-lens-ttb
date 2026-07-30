@@ -72,6 +72,21 @@ By construction it happens after truth is revealed. One reviewer, six items, no
 second adjudication, no inter-rater agreement. `UNADJUDICATED` is a first-class
 outcome and will be used rather than guessing.
 
+`NOT_VISUALLY_SUPPORTED` requires direct inspection of the frozen crop pixels;
+where meaningful inspection is unavailable the item is `UNADJUDICATED`, never
+inferred from the transcript or the truth string.
+
+**`severeRepeatedUnsupportedOutput` is deliberately hard to trigger, and that is a
+limitation as well as a safeguard.** It requires `NOT_VISUALLY_SUPPORTED` primary
+outputs in at least two distinct crop clusters spanning at least two distinct
+Brand designs, out of a population holding only four clusters and three designs.
+Neither `PARTIALLY_VISUALLY_SUPPORTED` nor `UNADJUDICATED` counts toward it. So a
+run in which PP-OCRv6 invents text on one item, or on several items within a
+single design, will **not** be recorded as a regression on that ground — and a run
+in which the crops cannot be meaningfully inspected will not either, because those
+items become `UNADJUDICATED`. The condition catches a broad pattern of fabricated
+output; it is not a per-item hallucination detector and must not be read as one.
+
 ## PR #215's sentinel does not transfer
 
 PP-OCRv6 read `BRAND NAME 123` exactly, at 0.9996 confidence, from 48 pt DejaVu

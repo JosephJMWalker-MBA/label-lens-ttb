@@ -24,7 +24,7 @@
     "REGRESSION": {
       "whenAnyOf": [
         "any distinct Brand-design regression",
-        "severe repeated unsupported output",
+        "severeRepeatedUnsupportedOutput",
         "unexplained runtime failure"
       ]
     },
@@ -37,6 +37,26 @@
         "a comparison that cannot be interpreted without changing the frozen design"
       ]
     }
+  },
+  "severeRepeatedUnsupportedOutput": {
+    "definition": "True only when primary PP-OCRv6 outputs are classified NOT_VISUALLY_SUPPORTED in at least two distinct crop clusters spanning at least two distinct Brand designs. Otherwise false.",
+    "thresholds": {
+      "minimumDistinctCropClusters": 2,
+      "minimumDistinctBrandDesigns": 2,
+      "bothThresholdsRequired": true
+    },
+    "qualifyingClassification": "NOT_VISUALLY_SUPPORTED",
+    "countingRules": [
+      "The primary and the repeat of one item count once.",
+      "The byte-identical C1 crop counts once.",
+      "Multiple OCR items in one crop cluster count once.",
+      "Multiple items in one Brand design count once."
+    ],
+    "doesNotSatisfy": ["PARTIALLY_VISUALLY_SUPPORTED", "UNADJUDICATED", "truth mismatch alone"],
+    "evidenceRequirement": "NOT_VISUALLY_SUPPORTED requires direct inspection of the frozen crop pixels. Where meaningful inspection is unavailable the item is UNADJUDICATED; visual support is never inferred from the transcript or from the truth string.",
+    "scopeNote": "Only primary outputs are classified. Repeats contribute nothing additional, because a deterministic repeat carries no independent visual evidence.",
+    "strictnessNote": "With four crop clusters and three Brand designs in the frozen population, and both thresholds set at two, a single unsupported item cannot trigger this condition, and neither can several unsupported items confined to one Brand design.",
+    "amendedBy": "preregistration-amendment.md, before model retrieval and before any inference"
   },
   "designRegressionRule": "Any material regression within a repeated Brand design makes that design a regression. An improvement within the same design does not cancel it.",
   "cropClusterRule": "The duplicate C1 crop counts once.",
