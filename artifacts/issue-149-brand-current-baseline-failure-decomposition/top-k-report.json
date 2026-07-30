@@ -1,0 +1,33 @@
+{
+  "artifact": "top-k-report",
+  "experimentId": "issue-149-brand-current-baseline-failure-decomposition",
+  "brandPresentCases": 105,
+  "truthPresentInRawOcr": 81,
+  "truthKeptAsCandidate": 37,
+  "top3Recall": {
+    "cases": 33,
+    "percent": 31.4
+  },
+  "top1Recall": {
+    "cases": 29,
+    "percent": 27.6
+  },
+  "selectedAccuracy": {
+    "cases": 29,
+    "percent": 27.6
+  },
+  "conditionalRecall": {
+    "note": "Recall conditioned on the truth having survived the previous stage. This separates a ranking problem from an upstream supply problem.",
+    "top3GivenKeptCandidate": 89.2,
+    "top1GivenTop3": 87.9,
+    "selectedGivenTop1": 100,
+    "keptCandidateGivenInRawOcr": 45.7
+  },
+  "truthRankDistribution": {
+    "1": 29,
+    "2": 2,
+    "3": 2,
+    "4": 2,
+    "6": 1
+  }
+}
