@@ -1,0 +1,11 @@
+{
+  "artifact": "false-certainty-report",
+  "experimentId": "issue-149-brand-current-baseline-failure-decomposition",
+  "definition": "An incorrect Brand candidate accepted as OBSERVED, evaluated across all 115 cases including the 10 brand-absent ones.",
+  "wrongAcceptedCandidateCount": 0,
+  "wrongAcceptedCandidateCases": [],
+  "observedStateCount": 4,
+  "observedAndCorrect": 4,
+  "brandAbsentReportedObserved": 0,
+  "interpretation": "Zero here is a measured count of wrong OBSERVED acceptances on this corpus under the current authority gate. It is not a calibration claim and does not mean the gate is correctly tuned: the same gate also withholds OBSERVED on correct answers, which is counted separately as CORRECT_CONSERVATIVE_STATE."
+}

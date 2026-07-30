@@ -1,0 +1,184 @@
+{
+  "artifact": "attribution-summary",
+  "experimentId": "issue-149-brand-current-baseline-failure-decomposition",
+  "totalGovernedCasesEvaluated": 115,
+  "brandPresentCases": 105,
+  "brandAbsentCases": 10,
+  "metrics": {
+    "brandRawExactMatch": {
+      "cases": 27,
+      "percentOfBrandPresent": 25.7
+    },
+    "brandNormalizedMatch": {
+      "cases": 29,
+      "percentOfBrandPresent": 27.6
+    },
+    "truthPresentInRawOcr": {
+      "cases": 81,
+      "percentOfBrandPresent": 77.1
+    },
+    "truthPresentInCandidateList": {
+      "cases": 37,
+      "percentOfBrandPresent": 35.2
+    },
+    "brandTop3Recall": {
+      "cases": 33,
+      "percentOfBrandPresent": 31.4
+    },
+    "brandTop1Recall": {
+      "cases": 29,
+      "percentOfBrandPresent": 27.6
+    },
+    "selectedCandidateAccuracy": {
+      "cases": 29,
+      "percentOfBrandPresent": 27.6
+    }
+  },
+  "survivalCascade": [
+    {
+      "stage": "governed truth exists",
+      "cases": 105,
+      "lostHere": 0
+    },
+    {
+      "stage": "truth present in raw OCR",
+      "cases": 81,
+      "lostHere": 24
+    },
+    {
+      "stage": "truth kept as a candidate",
+      "cases": 37,
+      "lostHere": 44
+    },
+    {
+      "stage": "truth in top 3",
+      "cases": 33,
+      "lostHere": 4
+    },
+    {
+      "stage": "truth top-ranked",
+      "cases": 29,
+      "lostHere": 4
+    },
+    {
+      "stage": "truth selected",
+      "cases": 29,
+      "lostHere": 0
+    },
+    {
+      "stage": "reported OBSERVED",
+      "cases": 4,
+      "lostHere": 25
+    }
+  ],
+  "classificationCounts": [
+    {
+      "classification": "WRONG_ACCEPTED_CANDIDATE",
+      "cases": 0,
+      "percentOfBrandPresent": 0
+    },
+    {
+      "classification": "CORRECT_OBSERVED",
+      "cases": 4,
+      "percentOfBrandPresent": 3.8
+    },
+    {
+      "classification": "CORRECT_CONSERVATIVE_STATE",
+      "cases": 25,
+      "percentOfBrandPresent": 23.8
+    },
+    {
+      "classification": "RANKING_OR_SELECTION_MISS",
+      "cases": 8,
+      "percentOfBrandPresent": 7.6
+    },
+    {
+      "classification": "CANDIDATE_GROUPING_MISS",
+      "cases": 44,
+      "percentOfBrandPresent": 41.9
+    },
+    {
+      "classification": "OCR_RECOGNITION_MISS",
+      "cases": 24,
+      "percentOfBrandPresent": 22.9
+    },
+    {
+      "classification": "INSUFFICIENT_EVIDENCE_TO_ATTRIBUTE",
+      "cases": 0,
+      "percentOfBrandPresent": 0
+    }
+  ],
+  "classificationCountsByDistinctBrandIdentity": [
+    {
+      "classification": "CANDIDATE_GROUPING_MISS",
+      "brandIdentities": 34
+    },
+    {
+      "classification": "CORRECT_CONSERVATIVE_STATE",
+      "brandIdentities": 22
+    },
+    {
+      "classification": "OCR_RECOGNITION_MISS",
+      "brandIdentities": 18
+    },
+    {
+      "classification": "RANKING_OR_SELECTION_MISS",
+      "brandIdentities": 5
+    },
+    {
+      "classification": "CORRECT_OBSERVED",
+      "brandIdentities": 2
+    }
+  ],
+  "slicesByGovernedFailureClass": {
+    "candidate-filtering-failure": {
+      "cases": 39,
+      "classifications": {
+        "CANDIDATE_GROUPING_MISS": 39
+      }
+    },
+    "ocr-recognition-failure": {
+      "cases": 24,
+      "classifications": {
+        "OCR_RECOGNITION_MISS": 24
+      }
+    },
+    "correct-uncertainty": {
+      "cases": 29,
+      "classifications": {
+        "CORRECT_CONSERVATIVE_STATE": 25,
+        "CANDIDATE_GROUPING_MISS": 4
+      }
+    },
+    "candidate-ranking-failure": {
+      "cases": 8,
+      "classifications": {
+        "RANKING_OR_SELECTION_MISS": 8
+      }
+    },
+    "correct": {
+      "cases": 14,
+      "classifications": {
+        "CORRECT_OBSERVED": 4
+      }
+    },
+    "line-reconstruction-failure": {
+      "cases": 1,
+      "classifications": {
+        "CANDIDATE_GROUPING_MISS": 1
+      }
+    }
+  },
+  "crossCheckAgainstSourceArtifact": {
+    "note": "The source artifact uses a different vocabulary, so divergence is expected and is not an error. Reported for transparency.",
+    "sourceClassCounts": {
+      "CANDIDATE_GENERATION_MISS": 43,
+      "OCR_RECOGNITION_MISS": 24,
+      "CORRECT_TOP_CANDIDATE_AUTHORITY_ABSTENTION": 25,
+      "WRONG_SELECTED_CANDIDATE": 7,
+      "CORRECT": 14,
+      "RANKING_MISS": 1,
+      "RECONSTRUCTION_MISS": 1
+    }
+  }
+}

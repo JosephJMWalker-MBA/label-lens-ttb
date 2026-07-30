@@ -1,0 +1,54 @@
+{
+  "artifact": "analysis-summary",
+  "experimentId": "issue-149-brand-current-baseline-failure-decomposition",
+  "conclusion": "CANDIDATE_CONSTRUCTION_HEADROOM",
+  "totalCases": 115,
+  "brandPresent": 105,
+  "classificationCounts": [
+    {
+      "classification": "CORRECT_OBSERVED",
+      "cases": 4,
+      "percentOfBrandPresent": 3.8
+    },
+    {
+      "classification": "CORRECT_CONSERVATIVE_STATE",
+      "cases": 25,
+      "percentOfBrandPresent": 23.8
+    },
+    {
+      "classification": "RANKING_OR_SELECTION_MISS",
+      "cases": 8,
+      "percentOfBrandPresent": 7.6
+    },
+    {
+      "classification": "CANDIDATE_GROUPING_MISS",
+      "cases": 44,
+      "percentOfBrandPresent": 41.9
+    },
+    {
+      "classification": "OCR_RECOGNITION_MISS",
+      "cases": 24,
+      "percentOfBrandPresent": 22.9
+    }
+  ],
+  "byIdentity": [
+    ["CANDIDATE_GROUPING_MISS", 34],
+    ["CORRECT_CONSERVATIVE_STATE", 22],
+    ["OCR_RECOGNITION_MISS", 18],
+    ["RANKING_OR_SELECTION_MISS", 5]
+  ],
+  "metrics": {
+    "exact": 27,
+    "normalized": 29,
+    "inRaw": 81,
+    "inCandidates": 37,
+    "top3": 33,
+    "top1": 29,
+    "wrongAccepted": 0
+  },
+  "stateHistogram": {
+    "AMBIGUOUS": 101,
+    "NOT_OBSERVED": 10,
+    "OBSERVED": 4
+  }
+}

@@ -1,0 +1,618 @@
+{
+  "artifact": "independence-report",
+  "experimentId": "issue-149-brand-current-baseline-failure-decomposition",
+  "historicalCases": 115,
+  "brandPresentCases": 105,
+  "distinctSourceImages": 115,
+  "distinctImagesEqualCases": true,
+  "distinctCropClustersAvailable": false,
+  "distinctCropClustersNote": "No crop-cluster mapping exists for this corpus in committed artifacts. The crop clusters recorded elsewhere in Issue #149 belong to a different five-case subset and are not applicable here.",
+  "distinctVisualDesignClustersAvailable": false,
+  "distinctVisualDesignClustersNote": "No verified visual-design clustering exists for this corpus. Distinct Brand IDENTITY is used as the available proxy and is labelled as a proxy wherever it is reported.",
+  "distinctBrandIdentities": 81,
+  "brandIdentitiesWithMultipleCases": 15,
+  "casesInRepeatedBrandIdentities": 39,
+  "proxyCaveat": "Distinct brand identity is not the same as distinct visual design. Two cases of one brand may use different label artwork, and two different brands may share a template. Treat identity-level counts as a duplication control, not as a design-diversity measurement.",
+  "groups": [
+    {
+      "brandIdentity": "la fattoria",
+      "caseCount": 5,
+      "cases": [
+        "la-fattoria-rotated",
+        "approved-wine-004",
+        "approved-wine-005",
+        "approved-wine-107",
+        "approved-wine-108"
+      ],
+      "memberClassifications": [
+        "OCR_RECOGNITION_MISS",
+        "OCR_RECOGNITION_MISS",
+        "OCR_RECOGNITION_MISS",
+        "OCR_RECOGNITION_MISS",
+        "OCR_RECOGNITION_MISS"
+      ],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "prinsi",
+      "caseCount": 5,
+      "cases": [
+        "approved-wine-056",
+        "approved-wine-057",
+        "approved-wine-063",
+        "approved-wine-064",
+        "approved-wine-065"
+      ],
+      "memberClassifications": [
+        "RANKING_OR_SELECTION_MISS",
+        "RANKING_OR_SELECTION_MISS",
+        "CANDIDATE_GROUPING_MISS",
+        "CANDIDATE_GROUPING_MISS",
+        "CANDIDATE_GROUPING_MISS"
+      ],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "mike's farm | mike's farm, inc.",
+      "caseCount": 3,
+      "cases": ["approved-wine-073", "approved-wine-074", "wine-multi-artifact-07"],
+      "memberClassifications": ["CORRECT_OBSERVED", "OCR_RECOGNITION_MISS", "OCR_RECOGNITION_MISS"],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "la mesma",
+      "caseCount": 3,
+      "cases": ["approved-wine-088", "approved-wine-089", "approved-wine-090"],
+      "memberClassifications": [
+        "CANDIDATE_GROUPING_MISS",
+        "CANDIDATE_GROUPING_MISS",
+        "CANDIDATE_GROUPING_MISS"
+      ],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "fontanavecchia",
+      "caseCount": 3,
+      "cases": ["approved-wine-093", "approved-wine-094", "approved-wine-099"],
+      "memberClassifications": [
+        "CANDIDATE_GROUPING_MISS",
+        "CANDIDATE_GROUPING_MISS",
+        "CANDIDATE_GROUPING_MISS"
+      ],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "luigi & giovanni",
+      "caseCount": 2,
+      "cases": ["luigi-giovanni-live", "approved-wine-105"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS", "CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "vino alpino",
+      "caseCount": 2,
+      "cases": ["approved-wine-008", "approved-wine-009"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS", "CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "cooley bay",
+      "caseCount": 2,
+      "cases": ["approved-wine-012", "approved-wine-110"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS", "CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "3 steves winery",
+      "caseCount": 2,
+      "cases": ["three-steves-winery", "approved-wine-086"],
+      "memberClassifications": ["CORRECT_OBSERVED", "CORRECT_OBSERVED"],
+      "groupClassification": "CORRECT_OBSERVED"
+    },
+    {
+      "brandIdentity": "domaine juliette avril",
+      "caseCount": 2,
+      "cases": ["approved-wine-066", "approved-wine-067"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS", "CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "altacima | altacima 4.090",
+      "caseCount": 2,
+      "cases": ["approved-wine-069", "altacima"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE", "CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "le caniette",
+      "caseCount": 2,
+      "cases": ["approved-wine-079", "le-caniette"],
+      "memberClassifications": ["RANKING_OR_SELECTION_MISS", "RANKING_OR_SELECTION_MISS"],
+      "groupClassification": "RANKING_OR_SELECTION_MISS"
+    },
+    {
+      "brandIdentity": "twin suns",
+      "caseCount": 2,
+      "cases": ["approved-wine-092", "approved-wine-102"],
+      "memberClassifications": ["OCR_RECOGNITION_MISS", "OCR_RECOGNITION_MISS"],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "blazic",
+      "caseCount": 2,
+      "cases": ["approved-wine-104", "wine-multi-artifact-05"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE", "CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "mauro molino",
+      "caseCount": 2,
+      "cases": ["wine-multi-artifact-06", "wine-multi-artifact-10"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS", "CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "alfredo's | alfredo's wine",
+      "caseCount": 1,
+      "cases": ["alfredos-wine"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "dark horse",
+      "caseCount": 1,
+      "cases": ["approved-wine-006"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "casanova della spinetta | casanova della spinetta",
+      "caseCount": 1,
+      "cases": ["casanova-della-spinetta"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "domaine follin-arbelet",
+      "caseCount": 1,
+      "cases": ["domaine-follin-arbelet"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "mariaantonietta",
+      "caseCount": 1,
+      "cases": ["approved-wine-011"],
+      "memberClassifications": ["OCR_RECOGNITION_MISS"],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "afflicted",
+      "caseCount": 1,
+      "cases": ["approved-wine-013"],
+      "memberClassifications": ["RANKING_OR_SELECTION_MISS"],
+      "groupClassification": "RANKING_OR_SELECTION_MISS"
+    },
+    {
+      "brandIdentity": "tre cori",
+      "caseCount": 1,
+      "cases": ["approved-wine-014"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "patricia green cellars",
+      "caseCount": 1,
+      "cases": ["patricia-green-cellars"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "marques de navarro",
+      "caseCount": 1,
+      "cases": ["approved-wine-016"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "la borde noire",
+      "caseCount": 1,
+      "cases": ["approved-wine-017"],
+      "memberClassifications": ["OCR_RECOGNITION_MISS"],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "poqr krya | poqr krya",
+      "caseCount": 1,
+      "cases": ["approved-wine-018"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "kyrios",
+      "caseCount": 1,
+      "cases": ["approved-wine-019"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "chateau courtieu | courtieu",
+      "caseCount": 1,
+      "cases": ["approved-wine-020"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "saker",
+      "caseCount": 1,
+      "cases": ["saker"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "podere don cataldo | podere don cataldo",
+      "caseCount": 1,
+      "cases": ["approved-wine-023"],
+      "memberClassifications": ["OCR_RECOGNITION_MISS"],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "chateau de laville",
+      "caseCount": 1,
+      "cases": ["approved-wine-024"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "nebla",
+      "caseCount": 1,
+      "cases": ["nebla-mencia"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "principe diphesa",
+      "caseCount": 1,
+      "cases": ["approved-wine-026"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "golden girls | the golden girls",
+      "caseCount": 1,
+      "cases": ["approved-wine-027"],
+      "memberClassifications": ["OCR_RECOGNITION_MISS"],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "field | field vineyards",
+      "caseCount": 1,
+      "cases": ["approved-wine-028"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "embeleso",
+      "caseCount": 1,
+      "cases": ["approved-wine-031"],
+      "memberClassifications": ["OCR_RECOGNITION_MISS"],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "travers reserve",
+      "caseCount": 1,
+      "cases": ["approved-wine-032"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "haywater cove",
+      "caseCount": 1,
+      "cases": ["approved-wine-033"],
+      "memberClassifications": ["RANKING_OR_SELECTION_MISS"],
+      "groupClassification": "RANKING_OR_SELECTION_MISS"
+    },
+    {
+      "brandIdentity": "nico",
+      "caseCount": 1,
+      "cases": ["approved-wine-034"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "hubert lamy",
+      "caseCount": 1,
+      "cases": ["approved-wine-035"],
+      "memberClassifications": ["OCR_RECOGNITION_MISS"],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "touch",
+      "caseCount": 1,
+      "cases": ["approved-wine-037"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "big red sunshine",
+      "caseCount": 1,
+      "cases": ["approved-wine-038"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "domaine julien auroux",
+      "caseCount": 1,
+      "cases": ["approved-wine-039"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "chateau bonneau | château bonneau",
+      "caseCount": 1,
+      "cases": ["chateau-bonneau"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "petite nature",
+      "caseCount": 1,
+      "cases": ["approved-wine-041"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "domaine quivy",
+      "caseCount": 1,
+      "cases": ["approved-wine-042"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "fulcrum",
+      "caseCount": 1,
+      "cases": ["approved-wine-043"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "sweet seduction",
+      "caseCount": 1,
+      "cases": ["approved-wine-044"],
+      "memberClassifications": ["OCR_RECOGNITION_MISS"],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "meeting of the minds",
+      "caseCount": 1,
+      "cases": ["approved-wine-045"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "curious",
+      "caseCount": 1,
+      "cases": ["approved-wine-046"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "etiris gx",
+      "caseCount": 1,
+      "cases": ["approved-wine-047"],
+      "memberClassifications": ["OCR_RECOGNITION_MISS"],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "pacha",
+      "caseCount": 1,
+      "cases": ["approved-wine-048"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "caywood vineyard",
+      "caseCount": 1,
+      "cases": ["approved-wine-049"],
+      "memberClassifications": ["OCR_RECOGNITION_MISS"],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "le temps des fleurs | le temps des fleurs",
+      "caseCount": 1,
+      "cases": ["le-temps-des-fleurs"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "pacheca",
+      "caseCount": 1,
+      "cases": ["approved-wine-051"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "mountain valley winery",
+      "caseCount": 1,
+      "cases": ["approved-wine-052"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "golden road vineyards",
+      "caseCount": 1,
+      "cases": ["approved-wine-053"],
+      "memberClassifications": ["OCR_RECOGNITION_MISS"],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "henri dufreres",
+      "caseCount": 1,
+      "cases": ["approved-wine-054"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "francois villard",
+      "caseCount": 1,
+      "cases": ["approved-wine-055"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "domenico negro | dominico negro",
+      "caseCount": 1,
+      "cases": ["approved-wine-059"],
+      "memberClassifications": ["OCR_RECOGNITION_MISS"],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "aphrodite",
+      "caseCount": 1,
+      "cases": ["approved-wine-061"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "sara",
+      "caseCount": 1,
+      "cases": ["approved-wine-068"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "altacima | altacima 6.330",
+      "caseCount": 1,
+      "cases": ["approved-wine-071"],
+      "memberClassifications": ["RANKING_OR_SELECTION_MISS"],
+      "groupClassification": "RANKING_OR_SELECTION_MISS"
+    },
+    {
+      "brandIdentity": "ava gardner",
+      "caseCount": 1,
+      "cases": ["approved-wine-072"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "etim",
+      "caseCount": 1,
+      "cases": ["approved-wine-076"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "valdinera",
+      "caseCount": 1,
+      "cases": ["approved-wine-077"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "pietta",
+      "caseCount": 1,
+      "cases": ["approved-wine-078"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "corte adagio",
+      "caseCount": 1,
+      "cases": ["approved-wine-081"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "barn sill wine co | barn sill wine co.",
+      "caseCount": 1,
+      "cases": ["approved-wine-083"],
+      "memberClassifications": ["OCR_RECOGNITION_MISS"],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "filadoro",
+      "caseCount": 1,
+      "cases": ["approved-wine-084"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "mosaikon",
+      "caseCount": 1,
+      "cases": ["approved-wine-085"],
+      "memberClassifications": ["OCR_RECOGNITION_MISS"],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "viridis",
+      "caseCount": 1,
+      "cases": ["approved-wine-087"],
+      "memberClassifications": ["RANKING_OR_SELECTION_MISS"],
+      "groupClassification": "RANKING_OR_SELECTION_MISS"
+    },
+    {
+      "brandIdentity": "rias",
+      "caseCount": 1,
+      "cases": ["approved-wine-091"],
+      "memberClassifications": ["OCR_RECOGNITION_MISS"],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "amuninni | fabio ferracane",
+      "caseCount": 1,
+      "cases": ["amuninni-ferracane"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "tenute valso",
+      "caseCount": 1,
+      "cases": ["approved-wine-103"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "alfredo's wine | alfredos wine",
+      "caseCount": 1,
+      "cases": ["approved-wine-106"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "sangouard-chene",
+      "caseCount": 1,
+      "cases": ["approved-wine-109"],
+      "memberClassifications": ["CORRECT_CONSERVATIVE_STATE"],
+      "groupClassification": "CORRECT_CONSERVATIVE_STATE"
+    },
+    {
+      "brandIdentity": "m cellars",
+      "caseCount": 1,
+      "cases": ["m-cellars-baseline"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "dry cellar",
+      "caseCount": 1,
+      "cases": ["wine-multi-artifact-04"],
+      "memberClassifications": ["OCR_RECOGNITION_MISS"],
+      "groupClassification": "OCR_RECOGNITION_MISS"
+    },
+    {
+      "brandIdentity": "pindar",
+      "caseCount": 1,
+      "cases": ["wine-multi-artifact-08"],
+      "memberClassifications": ["CANDIDATE_GROUPING_MISS"],
+      "groupClassification": "CANDIDATE_GROUPING_MISS"
+    },
+    {
+      "brandIdentity": "duck walk vineyards",
+      "caseCount": 1,
+      "cases": ["wine-multi-artifact-09"],
+      "memberClassifications": ["CORRECT_OBSERVED"],
+      "groupClassification": "CORRECT_OBSERVED"
+    }
+  ],
+  "countingRule": "Repeated brand identities count once at identity level; a group takes the worst outcome among its members."
+}

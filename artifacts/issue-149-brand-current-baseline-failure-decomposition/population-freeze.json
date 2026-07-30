@@ -1,0 +1,19 @@
+{
+  "artifact": "population-freeze",
+  "experimentId": "issue-149-brand-current-baseline-failure-decomposition",
+  "diagnosticEvaluationOnly": true,
+  "corpusSource": "src/fixtures/eval/eval-manifest.json",
+  "corpusRoot": "tests/fixtures/precheck",
+  "manifestRecords": 132,
+  "includedCases": 115,
+  "brandPresentCases": 105,
+  "brandAbsentCases": 10,
+  "excludedFromManifest": 17,
+  "corpusExpanded": false,
+  "corpusSubstituted": false,
+  "truthRevised": false,
+  "aliasesAdded": false,
+  "evidenceArtifact": "artifacts/brand-evidence-path-diagnosis/cases.json",
+  "evidenceArtifactBase": "a9fe943a7293230af88d857104f4e6e2aa74ae02",
+  "analysisBase": "7c34ef2a5f94cd3736599fdfca39c38928094729"
+}

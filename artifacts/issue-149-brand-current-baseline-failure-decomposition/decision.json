@@ -1,0 +1,72 @@
+{
+  "artifact": "decision",
+  "experimentId": "issue-149-brand-current-baseline-failure-decomposition",
+  "issue": 149,
+  "diagnosticOnly": true,
+  "keepsOrKillsAProductionChange": false,
+  "diagnosticConclusion": "CANDIDATE_CONSTRUCTION_HEADROOM",
+  "conclusionComputedFromCounts": true,
+  "conclusionHandAsserted": false,
+  "dominanceRule": "A category is the conclusion only when it leads on BOTH historical cases and distinct brand identities, by a factor of at least 1.25. Otherwise MIXED_HEADROOM.",
+  "byHistoricalCases": [
+    {
+      "classification": "CANDIDATE_GROUPING_MISS",
+      "cases": 44
+    },
+    {
+      "classification": "CORRECT_CONSERVATIVE_STATE",
+      "cases": 25
+    },
+    {
+      "classification": "OCR_RECOGNITION_MISS",
+      "cases": 24
+    },
+    {
+      "classification": "RANKING_OR_SELECTION_MISS",
+      "cases": 8
+    }
+  ],
+  "byDistinctBrandIdentity": [
+    {
+      "classification": "CANDIDATE_GROUPING_MISS",
+      "identities": 34
+    },
+    {
+      "classification": "CORRECT_CONSERVATIVE_STATE",
+      "identities": 22
+    },
+    {
+      "classification": "OCR_RECOGNITION_MISS",
+      "identities": 18
+    },
+    {
+      "classification": "RANKING_OR_SELECTION_MISS",
+      "identities": 5
+    }
+  ],
+  "leaderByCases": "CANDIDATE_GROUPING_MISS",
+  "leaderByIdentity": "CANDIDATE_GROUPING_MISS",
+  "sameLeaderOnBothUnits": true,
+  "marginSatisfiedByCases": true,
+  "marginSatisfiedByIdentity": true,
+  "insufficientEvidenceCases": 0,
+  "ocrRun": false,
+  "alternativeRecognizerExecuted": false,
+  "productionChanged": false,
+  "truthAltered": false,
+  "normalizationChanged": false,
+  "authorityThresholdsChanged": false,
+  "corpusExpanded": false,
+  "pr195Touched": false,
+  "pr214Reinterpreted": false,
+  "pr216Reinterpreted": false,
+  "authorizes": [],
+  "doesNotAuthorize": [
+    "any production change",
+    "any ranking, selection or authority change",
+    "any threshold change",
+    "any truth or normalization change",
+    "corpus expansion",
+    "implementing the suggested successor experiment"
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "artifact": "artifact-manifest",
+  "experimentId": "issue-149-brand-current-baseline-failure-decomposition",
+  "issue": 149,
+  "diagnosticEvaluationOnly": true,
+  "ocrRun": false,
+  "alternativeRecognizerExecuted": false,
+  "productionChanged": false,
+  "diagnosticConclusion": "CANDIDATE_CONSTRUCTION_HEADROOM",
+  "fileCount": 15,
+  "files": [
+    {
+      "path": "analysis-summary.json",
+      "byteSize": 1243,
+      "sha256": "3774e4c6f2193062f00df63d135f2427cc81b0d58275bfe7558eff1543171896"
+    },
+    {
+      "path": "attribution-summary.json",
+      "byteSize": 4205,
+      "sha256": "4c68b616d0a49ccca31e8a1f4b90ba74985ac6d4c1b9b181a87e373cbcb532ea"
+    },
+    {
+      "path": "classification-definitions.json",
+      "byteSize": 3498,
+      "sha256": "2f8786dd71528690898fcf3945b2ba3e8021c9dcf27c4f8b7294cf1a87c2e8e4"
+    },
+    {
+      "path": "commands.sh",
+      "byteSize": 1002,
+      "sha256": "f8b66b8d343c4fb0392477acdc858ab8ec156ef9e3d6670591038d6075b6adef"
+    },
+    {
+      "path": "decision.json",
+      "byteSize": 2059,
+      "sha256": "8b87e9241f24fe29910f5ce5a2e74e00af0039f72d7d420d80d426b9201c5077"
+    },
+    {
+      "path": "evidence-availability-preflight.md",
+      "byteSize": 6765,
+      "sha256": "9ab6a7c4beaedde4e67fec89bdd1d308046a18a2ab5eb1cbb187b94c8457220a"
+    },
+    {
+      "path": "false-certainty-report.json",
+      "byteSize": 745,
+      "sha256": "520ef584388d61ba52485a154dc417e8b19223dee016bc8e485b6d30d9a2bccb"
+    },
+    {
+      "path": "git-sha.txt",
+      "byteSize": 182,
+      "sha256": "51bf42a805c80ad03c92a90eda0e4cc5ceb3ef84d2f800c45f058648bfd2cc13"
+    },
+    {
+      "path": "independence-report.json",
+      "byteSize": 21397,
+      "sha256": "900cdbdcd285c7701179a13d2765b8e7926d97f7fe3b828caecafa086d63d6cf"
+    },
+    {
+      "path": "limitations.md",
+      "byteSize": 4077,
+      "sha256": "8656331bb1b7e95e840e8e5ff0fbf141dde36439087b7207f1d001a5297ab2c9"
+    },
+    {
+      "path": "normalization-provenance.json",
+      "byteSize": 1509,
+      "sha256": "c6fefd322a8651a0ed2ad7eba6d631d558e99f94b79f8bd7738815c98d83ff49"
+    },
+    {
+      "path": "per-case-attribution.json",
+      "byteSize": 408651,
+      "sha256": "99ca6655c4f40bd604d8b1b45863aba533a94b111d8d63f75c8b27efb18d709f"
+    },
+    {
+      "path": "population-freeze.json",
+      "byteSize": 700,
+      "sha256": "6397634cb2d7e66731ba57a8952548cb834e651325cb0b10560121157e0f339d"
+    },
+    {
+      "path": "state-histogram.json",
+      "byteSize": 390,
+      "sha256": "451b6e2320bf21104bf135b57bb1c6eb8d8e2619c66ffe03d597070abc53333a"
+    },
+    {
+      "path": "top-k-report.json",
+      "byteSize": 788,
+      "sha256": "49a55bbb07ea88e94eac3313b3c3cc0ae9e3d1e869864b68be1f31b8cfd949f1"
+    }
+  ]
+}

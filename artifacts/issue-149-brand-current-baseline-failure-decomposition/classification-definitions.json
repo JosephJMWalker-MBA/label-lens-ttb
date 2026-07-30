@@ -1,0 +1,74 @@
+{
+  "artifact": "classification-definitions",
+  "experimentId": "issue-149-brand-current-baseline-failure-decomposition",
+  "frozenBeforeScoring": true,
+  "mutuallyExclusive": true,
+  "appliedTopDownFirstMatchWins": true,
+  "vocabulary": [
+    {
+      "classification": "WRONG_ACCEPTED_CANDIDATE",
+      "definition": "An incorrect Brand candidate is accepted as OBSERVED.",
+      "predicate": "state === 'OBSERVED' && !selectedNormalizedMatch",
+      "appliesToBrandAbsentCases": true,
+      "appliesToBrandAbsentNote": "A brand-absent case reported OBSERVED is also a wrong acceptance, so this clause is evaluated across all 115 cases."
+    },
+    {
+      "classification": "CORRECT_OBSERVED",
+      "definition": "The selected Brand matches governed truth and the state is OBSERVED.",
+      "predicate": "selectedNormalizedMatch && state === 'OBSERVED'"
+    },
+    {
+      "classification": "CORRECT_CONSERVATIVE_STATE",
+      "definition": "The selected or top-ranked Brand matches governed truth, but the state is LOW_CONFIDENCE, AMBIGUOUS or another non-OBSERVED state.",
+      "predicate": "(selectedNormalizedMatch || truthInTop1) && state !== 'OBSERVED'"
+    },
+    {
+      "classification": "RANKING_OR_SELECTION_MISS",
+      "definition": "A truth-bearing candidate exists, but a different candidate is ranked or selected above it.",
+      "predicate": "truthAmongKeptCandidates"
+    },
+    {
+      "classification": "CANDIDATE_GROUPING_MISS",
+      "definition": "Truth-bearing text exists in raw OCR evidence, but no candidate preserving that evidence is constructed.",
+      "predicate": "truthInRawOcr"
+    },
+    {
+      "classification": "OCR_RECOGNITION_MISS",
+      "definition": "Governed truth is absent from all relevant raw OCR evidence under the existing frozen normalization.",
+      "predicate": "!truthInRawOcr"
+    },
+    {
+      "classification": "INSUFFICIENT_EVIDENCE_TO_ATTRIBUTE",
+      "definition": "The committed evidence cannot distinguish the responsible stage.",
+      "predicate": "no earlier clause matched"
+    }
+  ],
+  "precedence": [
+    "WRONG_ACCEPTED_CANDIDATE",
+    "CORRECT_OBSERVED",
+    "CORRECT_CONSERVATIVE_STATE",
+    "RANKING_OR_SELECTION_MISS",
+    "CANDIDATE_GROUPING_MISS",
+    "OCR_RECOGNITION_MISS",
+    "INSUFFICIENT_EVIDENCE_TO_ATTRIBUTE"
+  ],
+  "rankingSelectionSubcauses": {
+    "reportedSeparately": true,
+    "onlyWhereDistinguishable": true,
+    "values": [
+      {
+        "subcause": "TRUTH_CANDIDATE_KEPT_BUT_ABSENT_FROM_RANKED_OUTPUT",
+        "meaning": "The truth survived candidate filtering but appears in neither the selected value nor the alternates, so it was dropped at or before ranked-output assembly rather than out-ranked.",
+        "evidence": "truthAmongKeptCandidates === true && truthRank === null"
+      },
+      {
+        "subcause": "TRUTH_CANDIDATE_RANKED_BELOW_ANOTHER",
+        "meaning": "The truth candidate is present in the ranked output below position 1, so a different candidate out-ranked it.",
+        "evidence": "truthRank > 1"
+      }
+    ],
+    "fabricationPolicy": "Where the ranked output does not show where the truth candidate landed, no subcause is emitted. The distinction is never invented."
+  },
+  "sourceArtifactVocabularyCopied": false,
+  "sourceArtifactVocabularyNote": "artifacts/brand-evidence-path-diagnosis/cases.json carries its own failure-class labels under a different vocabulary. They are read for cross-check and reported alongside, never copied into a classification."
+}

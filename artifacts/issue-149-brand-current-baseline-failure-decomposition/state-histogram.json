@@ -1,0 +1,18 @@
+{
+  "artifact": "state-histogram",
+  "experimentId": "issue-149-brand-current-baseline-failure-decomposition",
+  "allCases": {
+    "AMBIGUOUS": 101,
+    "NOT_OBSERVED": 10,
+    "OBSERVED": 4
+  },
+  "brandPresentOnly": {
+    "AMBIGUOUS": 101,
+    "OBSERVED": 4
+  },
+  "brandAbsentOnly": {
+    "NOT_OBSERVED": 10
+  },
+  "authorityThresholdsChanged": false,
+  "stateSemanticsChanged": false
+}

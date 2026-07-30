@@ -1,0 +1,26 @@
+{
+  "artifact": "normalization-provenance",
+  "experimentId": "issue-149-brand-current-baseline-failure-decomposition",
+  "normalizationChangedByThisSprint": false,
+  "source": "src/fixtures/eval/metrics.ts",
+  "sourceUnchangedSinceEvidenceBase": true,
+  "sourceUnchangedEvidence": "git diff a9fe943a7293230af88d857104f4e6e2aa74ae02..7c34ef2a5f94cd3736599fdfca39c38928094729 -- src/fixtures/eval/metrics.ts is empty",
+  "functionsUsed": ["brandExactMatch", "brandNormalizedMatch", "normalizeKey"],
+  "truthSource": "src/fixtures/eval/eval-manifest.json plus src/fixtures/eval/eval-full-corpus-overrides.mjs",
+  "truthSourceUnchangedSinceEvidenceBase": true,
+  "acceptableValuePolicy": {
+    "multipleAcceptableValuesAllowed": true,
+    "bestMatchRule": "The existing frozen rule: a case counts as matched when any acceptable value matches under the governed normalization. Applied identically to every case.",
+    "ruleChangedByThisSprint": false
+  },
+  "prohibitedAndNotApplied": {
+    "punctuationRemoval": false,
+    "spaceInsertion": false,
+    "spellingCorrection": false,
+    "aliasesAddedAfterSeeingFailures": false,
+    "disputedTruthRevised": false,
+    "truthGuidedTransformation": false,
+    "note": "Every entry is false: none of these was applied."
+  },
+  "disputedTruthNote": "Five brand-boundary truths were referred for human visual review in artifacts/brand-evidence-path-diagnosis/truth-review/ and the reader confirmed all five stand. No truth was revised then and none is revised here."
+}
