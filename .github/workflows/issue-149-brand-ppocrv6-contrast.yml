@@ -1,0 +1,203 @@
+# Issue #149 — PP-OCRv6-small ONNX versus frozen incumbent Tesseract Brand evidence.
+#
+# Research-only, scoped to exactly one branch. Not part of the required CI checks
+# and it touches no production path. No pull_request_target, no schedule, no
+# repository_dispatch, no unscoped branch trigger.
+#
+# The path filter admits only this file and the mode file, so no ordinary code or
+# artifact commit can retrigger a run. When a harness fix needs a rerun, the
+# revision counter below is bumped in the same commit, which makes every rerun an
+# explicit and reviewable act rather than a side effect.
+#
+# harness revision: 1
+name: Issue 149 Brand PP-OCRv6 contrast
+
+on:
+  push:
+    branches:
+      - research/issue-149-brand-ppocrv6-small-onnx-contrast
+    paths:
+      - .github/workflows/issue-149-brand-ppocrv6-contrast.yml
+      - artifacts/issue-149-brand-ppocrv6-small-onnx-contrast/workflow-mode.txt
+
+permissions:
+  contents: read
+
+env:
+  MODE_FILE: artifacts/issue-149-brand-ppocrv6-small-onnx-contrast/workflow-mode.txt
+  ART: artifacts/issue-149-brand-ppocrv6-small-onnx-contrast
+  MODEL_CACHE: .local/ocr-research/models/ppocrv6-small-rec-onnx
+  BASE_DIGEST: sha256:b18992999dbe963a45a8a4da40ac2b1975be1a776d939d098c647482bcad5cba
+  IMAGE_TAG: issue-149-ppocrv6-onnx-probe:cpu
+
+jobs:
+  resolve-mode:
+    name: Resolve declared mode
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.mode.outputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: mode
+        run: |
+          set -eu
+          test -f "${MODE_FILE}" || { echo "MODE_FILE_MISSING" >&2; exit 1; }
+          mode="$(tr -d '[:space:]' < "${MODE_FILE}")"
+          echo "declared mode: '${mode}'"
+          case "${mode}" in
+            discover|execute|complete) ;;
+            *) echo "INVALID_MODE: '${mode}'" >&2; exit 1 ;;
+          esac
+          echo "mode=${mode}" >> "$GITHUB_OUTPUT"
+
+  discover:
+    name: Discover (no Brand inference)
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'discover'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert native linux/amd64
+        run: |
+          set -eu
+          test "$(uname -m)" = "x86_64" || { echo "NOT_NATIVE_AMD64" >&2; exit 1; }
+
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+
+      # Frozen identities first, then the pinned revision. Fails closed before any
+      # network retrieval if any frozen identity has moved.
+      - name: Verify frozen identities and the pinned model revision
+        run: node scripts/eval/issue-149-brand-ppocrv6-contrast-discovery.mjs
+
+      - name: Resolve pinned font package version inside the pinned base
+        id: font
+        run: |
+          set -eu
+          v="$(docker run --rm --platform=linux/amd64 "python:3.11-slim-bookworm@${BASE_DIGEST}" \
+                sh -lc 'apt-get update -qq >/dev/null 2>&1 && apt-cache policy fonts-dejavu-core | awk "/Candidate:/ {print \$2}"')"
+          echo "resolved fonts-dejavu-core=${v}"
+          test -n "${v}" || { echo "FONT_VERSION_UNRESOLVED" >&2; exit 1; }
+          echo "version=${v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build the pinned research container
+        run: |
+          set -eu
+          docker build --platform=linux/amd64 \
+            -f scripts/eval/docker/issue-149-ppocrv6-onnx-probe.Dockerfile \
+            --build-arg "FONT_PACKAGE_VERSION=${{ steps.font.outputs.version }}" \
+            -t "${IMAGE_TAG}" .
+
+      - name: Retrieve and verify inference.onnx
+        run: node scripts/eval/fetch-issue-149-ppocrv6-onnx.mjs
+
+      # Dry inspection only. session.run is never called, and no Brand crop is
+      # mounted into this container.
+      - name: Dry model inspection (offline, no Brand crop mounted)
+        run: |
+          set -eu
+          mkdir -p "${ART}/discovery"
+          docker run --rm --platform=linux/amd64 --network=none \
+            --cpus 2 --memory 4g \
+            -v "$PWD/${MODEL_CACHE}:/model:ro" \
+            -v "$PWD/${ART}/vendor:/config:ro" \
+            -v "$PWD/${ART}/discovery:/out" \
+            "${IMAGE_TAG}" python /opt/probe/inspect_model.py
+
+      - name: Record runtime inventory
+        run: |
+          set -eu
+          docker run --rm --platform=linux/amd64 --network=none "${IMAGE_TAG}" \
+            cat /probe/runtime-inventory.txt > "${ART}/discovery/runtime-inventory.txt"
+          docker run --rm --platform=linux/amd64 --network=none "${IMAGE_TAG}" \
+            cat /probe/pip-freeze.txt > "${ART}/discovery/pip-freeze.txt"
+          docker image inspect "${IMAGE_TAG}" --format '{{.Id}}' > "${ART}/discovery/image-id.txt"
+          echo "fonts-dejavu-core=${{ steps.font.outputs.version }}" > "${ART}/discovery/font-package.txt"
+          echo "$(uname -m)" > "${ART}/discovery/runner-arch.txt"
+          cat "${ART}/discovery/runtime-inventory.txt"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-149-brand-ppocrv6-discovery
+          path: artifacts/issue-149-brand-ppocrv6-small-onnx-contrast/
+          if-no-files-found: error
+
+  execute:
+    name: Execute the twelve Arm B invocations
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'execute'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert native linux/amd64
+        run: |
+          set -eu
+          test "$(uname -m)" = "x86_64" || { echo "NOT_NATIVE_AMD64" >&2; exit 1; }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+
+      - name: Verify frozen identities
+        run: |
+          set -eu
+          ( cd "${ART}" && shasum -a 256 -c preregistration.sha256 )
+          test -f "${ART}/discovery/model-identity-verification.json" \
+            || { echo "DISCOVERY_EVIDENCE_MISSING" >&2; exit 1; }
+          test -f "${ART}/upstream-head-observation.json" \
+            || { echo "UPSTREAM_HEAD_OBSERVATION_MISSING" >&2; exit 1; }
+          test -f "${ART}/vendor/inference.yml" \
+            || { echo "PINNED_CONFIG_MISSING" >&2; exit 1; }
+
+      - name: Retrieve and verify inference.onnx
+        run: node scripts/eval/fetch-issue-149-ppocrv6-onnx.mjs
+
+      - name: Rebuild the frozen research container
+        run: |
+          set -eu
+          font="$(cat "${ART}/discovery/font-package.txt" | cut -d= -f2)"
+          echo "frozen font pin: ${font}"
+          docker build --platform=linux/amd64 \
+            -f scripts/eval/docker/issue-149-ppocrv6-onnx-probe.Dockerfile \
+            --build-arg "FONT_PACKAGE_VERSION=${font}" \
+            -t "${IMAGE_TAG}" .
+          mkdir -p "${ART}/raw"
+          docker image inspect "${IMAGE_TAG}" --format '{{.Id}}' > "${ART}/raw/image-id.txt"
+
+      # Offline. Mounts are exactly: pinned model (ro), pinned config (ro), the six
+      # opaque input PNGs (ro), and an empty output directory. No repository root,
+      # no evaluation/id-map.json, no arm-a-frozen/, no fixture truth, no corpus.
+      - name: Run the twelve invocations offline
+        run: |
+          set -eu
+          docker run --rm --platform=linux/amd64 --network=none \
+            --cpus 2 --memory 4g \
+            -v "$PWD/${MODEL_CACHE}:/model:ro" \
+            -v "$PWD/${ART}/vendor:/config:ro" \
+            -v "$PWD/${ART}/inference-inputs:/inputs:ro" \
+            -v "$PWD/${ART}/raw:/out" \
+            -e OMP_NUM_THREADS=1 -e MKL_NUM_THREADS=1 \
+            "${IMAGE_TAG}" python /opt/probe/run_brand_contrast.py
+
+      # Writes and hashes raw-output-manifest.json BEFORE truth, case ids, cluster
+      # ids or Arm A evidence are loaded, then evaluates.
+      - name: Freeze raw evidence, then evaluate past the truth boundary
+        run: npx vite-node --config vitest.config.ts scripts/eval/run-issue-149-brand-ppocrv6-contrast.ts
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-149-brand-ppocrv6-results
+          path: artifacts/issue-149-brand-ppocrv6-small-onnx-contrast/
+          if-no-files-found: error
+
+  complete:
+    name: Complete (no inference)
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'complete'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Mode is 'complete': the benchmark is finished and this workflow will"
+          echo "not run inference. Results are committed to the branch."

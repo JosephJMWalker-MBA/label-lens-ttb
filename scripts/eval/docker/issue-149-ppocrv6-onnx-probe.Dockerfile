@@ -45,9 +45,14 @@ RUN pip install --no-cache-dir \
       "pyyaml==6.0.3" \
       "numpy==2.4.6"
 
+# Evaluation scripts. Adding one here does not change any runtime pin: the base
+# digest, every package version and the font package are unchanged from the build
+# that produced the PR #215 compatibility verdict. Only the copied script set
+# differs, so the built image id differs and both are recorded.
 COPY scripts/eval/ppocrv6/inspect_model.py /opt/probe/inspect_model.py
 COPY scripts/eval/ppocrv6/generate_synthetic_inputs.py /opt/probe/generate_synthetic_inputs.py
 COPY scripts/eval/ppocrv6/run_probe.py /opt/probe/run_probe.py
+COPY scripts/eval/ppocrv6/run_brand_contrast.py /opt/probe/run_brand_contrast.py
 
 # Record the runtime inventory inside the image so it can be read back without
 # re-resolving anything at inference time.
