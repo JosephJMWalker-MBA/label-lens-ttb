@@ -1,0 +1,25 @@
+{
+  "opaqueItemId": "item-ba86d5527473",
+  "arm": "A",
+  "run": "primary",
+  "sourcePngSha256": "efd2a2f90dd1ee74da7df9258916f1d253f7948601bdc60f1dfbbbed3cc4fa65",
+  "rawTranscript": "enheesO",
+  "words": [
+    {
+      "text": "enheesO",
+      "confidence": 35,
+      "bbox": {
+        "x0": 39,
+        "y0": 0,
+        "x1": 1000,
+        "y1": 218
+      }
+    }
+  ],
+  "wordCount": 1,
+  "meanConfidence": 35,
+  "warnings": [],
+  "latencyMs": 62,
+  "outputFingerprint": "3147adcce6328bb8ff4c58937fb91c83a279d005c2cc9cf0baa9bafef0731698",
+  "executed": true
+}

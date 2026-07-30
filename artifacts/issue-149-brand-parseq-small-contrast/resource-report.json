@@ -1,0 +1,63 @@
+{
+  "artifact": "resource-report",
+  "experimentId": "issue-149-brand-parseq-small-contrast",
+  "comparabilityWarning": "Arm A latency is in-process tesseract.js on the runner; Arm B latency is in-container PARSeq with model load excluded. The two are not directly comparable, and neither establishes production latency.",
+  "armA": [
+    {
+      "opaqueItemId": "item-dcfc22ffeac8",
+      "latencyMs": 384
+    },
+    {
+      "opaqueItemId": "item-311a595a4f66",
+      "latencyMs": 190
+    },
+    {
+      "opaqueItemId": "item-ba86d5527473",
+      "latencyMs": 62
+    },
+    {
+      "opaqueItemId": "item-192b594faff0",
+      "latencyMs": 231
+    },
+    {
+      "opaqueItemId": "item-cea77b8f4af1",
+      "latencyMs": 96
+    },
+    {
+      "opaqueItemId": "item-897b872db6ae",
+      "latencyMs": 44
+    }
+  ],
+  "armB": [
+    {
+      "opaqueItemId": "item-dcfc22ffeac8",
+      "latencyMs": 100.41972800001986,
+      "peakMemoryBytes": 559218688
+    },
+    {
+      "opaqueItemId": "item-311a595a4f66",
+      "latencyMs": 100.59283999999025,
+      "peakMemoryBytes": 559218688
+    },
+    {
+      "opaqueItemId": "item-ba86d5527473",
+      "latencyMs": 100.30770899999197,
+      "peakMemoryBytes": 559218688
+    },
+    {
+      "opaqueItemId": "item-192b594faff0",
+      "latencyMs": 104.03933200001347,
+      "peakMemoryBytes": 548507648
+    },
+    {
+      "opaqueItemId": "item-cea77b8f4af1",
+      "latencyMs": 96.35680899998533,
+      "peakMemoryBytes": 559218688
+    },
+    {
+      "opaqueItemId": "item-897b872db6ae",
+      "latencyMs": 101.80134199998747,
+      "peakMemoryBytes": 559218688
+    }
+  ]
+}

@@ -1,0 +1,162 @@
+{
+  "artifact": "raw-output-manifest",
+  "experimentId": "issue-149-brand-parseq-small-contrast",
+  "truthReadBeforeThisPoint": false,
+  "expectedInvocations": 24,
+  "armAInvocations": 12,
+  "armBInvocations": 12,
+  "files": [
+    {
+      "path": "raw/A-item-192b594faff0-primary.json",
+      "sha256": "f4257b3065b76a23d865d1efc077c24917beeab2bb379368ed241b11f802fb81"
+    },
+    {
+      "path": "raw/A-item-192b594faff0-repeat.json",
+      "sha256": "fc21e0f233a62e4737d7503e8857e1616549992d7887f0c6c432cfd1daa1c756"
+    },
+    {
+      "path": "raw/A-item-311a595a4f66-primary.json",
+      "sha256": "be6834375195a7b2dd2c4dfd11a5573663ab0c640f467a35e3535570b7d58490"
+    },
+    {
+      "path": "raw/A-item-311a595a4f66-repeat.json",
+      "sha256": "a864cbf83164dfc33112640178cfc7c21b5b4f97d55ac26dff625c087859ded8"
+    },
+    {
+      "path": "raw/A-item-897b872db6ae-primary.json",
+      "sha256": "2d97192fa4f53239c72bd42e5ef014204b00446bea3d0e0fc613da36bb1d1ffd"
+    },
+    {
+      "path": "raw/A-item-897b872db6ae-repeat.json",
+      "sha256": "baa80d8fc0042aefb093765e8b5dd4aab2b1ef3f781259522c085fa7265c4246"
+    },
+    {
+      "path": "raw/A-item-ba86d5527473-primary.json",
+      "sha256": "e5b20c6abc8988607f5239f19594a618ca1fae86f21ecb527d21716270829440"
+    },
+    {
+      "path": "raw/A-item-ba86d5527473-repeat.json",
+      "sha256": "1745bf8c3014771cc8c7008b8cabb37e1dd43121d26b3cc4b7e25d1404a9b00a"
+    },
+    {
+      "path": "raw/A-item-cea77b8f4af1-primary.json",
+      "sha256": "7ce94e7d0a3813a482b3a8cf6301214cf3f036e9f29c8bffc8adfbcd4f246f23"
+    },
+    {
+      "path": "raw/A-item-cea77b8f4af1-repeat.json",
+      "sha256": "9a84c1d07a0c4d85e09c20ebc72e7df0bdf0ee21fdbff82c98ac16f3bc6fc76b"
+    },
+    {
+      "path": "raw/A-item-dcfc22ffeac8-primary.json",
+      "sha256": "d5a50c4a616b71631b6f8f0d0c5ecbd28fae324960fe58d2d948a9c103d7d9b9"
+    },
+    {
+      "path": "raw/A-item-dcfc22ffeac8-repeat.json",
+      "sha256": "c7928ea8f9a56fd77416b8e4950805ec90adef2b76e0924b5b972fd2df691100"
+    },
+    {
+      "path": "raw/B-item-192b594faff0-primary.descriptor.json",
+      "sha256": "e309bbc6f26e620076048595456b5a56559f26dab8df5486e88cd0eb3a32d161"
+    },
+    {
+      "path": "raw/B-item-192b594faff0-primary.logits.npy",
+      "sha256": "682dc209602ed7bfa4fda7bbdd78f250d7fd4a7770af2405726a48c90de5d744"
+    },
+    {
+      "path": "raw/B-item-192b594faff0-repeat.descriptor.json",
+      "sha256": "0fef827d798796dde49cb74e776904c47dc5a899f8d776b789269d2766d0bc0e"
+    },
+    {
+      "path": "raw/B-item-192b594faff0-repeat.logits.npy",
+      "sha256": "682dc209602ed7bfa4fda7bbdd78f250d7fd4a7770af2405726a48c90de5d744"
+    },
+    {
+      "path": "raw/B-item-311a595a4f66-primary.descriptor.json",
+      "sha256": "52a0110c295f47fc11f6e85e3d670dc7f0c9128578ac44cc5a5a7ef9b69b1f08"
+    },
+    {
+      "path": "raw/B-item-311a595a4f66-primary.logits.npy",
+      "sha256": "d11ff22dedd5ebd28499ba1b452d26a999c7f26227293768104b69b30af157ea"
+    },
+    {
+      "path": "raw/B-item-311a595a4f66-repeat.descriptor.json",
+      "sha256": "e88026cb7dd09ede25ff57f7699f23a13bb6b060600a17d03db1af19af7b061e"
+    },
+    {
+      "path": "raw/B-item-311a595a4f66-repeat.logits.npy",
+      "sha256": "d11ff22dedd5ebd28499ba1b452d26a999c7f26227293768104b69b30af157ea"
+    },
+    {
+      "path": "raw/B-item-897b872db6ae-primary.descriptor.json",
+      "sha256": "22fed9aea89ea8e940b5fc35b8068e414b5392c7e41b51c76ba16b411d05f330"
+    },
+    {
+      "path": "raw/B-item-897b872db6ae-primary.logits.npy",
+      "sha256": "ef851503871308069c24cfa1e354874bd765dd88061abc05d96a1a3a7fb62089"
+    },
+    {
+      "path": "raw/B-item-897b872db6ae-repeat.descriptor.json",
+      "sha256": "cdf425dc4909fd63dc369e6b7619a93e9c9c66306b246af063ab188affc92cbd"
+    },
+    {
+      "path": "raw/B-item-897b872db6ae-repeat.logits.npy",
+      "sha256": "ef851503871308069c24cfa1e354874bd765dd88061abc05d96a1a3a7fb62089"
+    },
+    {
+      "path": "raw/B-item-ba86d5527473-primary.descriptor.json",
+      "sha256": "7de7e5e4820019b8a889adbf5973a11ae04b1c4b07aa0083e08c33b03cb33779"
+    },
+    {
+      "path": "raw/B-item-ba86d5527473-primary.logits.npy",
+      "sha256": "c718061f27b1a3b4d3b27470a3cd54655b41805d53e60ca221fb5dc54040a719"
+    },
+    {
+      "path": "raw/B-item-ba86d5527473-repeat.descriptor.json",
+      "sha256": "3633cfeb1d287304edffc06f92f8bed4ba60baddc28d6f130e33278cdf7fa388"
+    },
+    {
+      "path": "raw/B-item-ba86d5527473-repeat.logits.npy",
+      "sha256": "c718061f27b1a3b4d3b27470a3cd54655b41805d53e60ca221fb5dc54040a719"
+    },
+    {
+      "path": "raw/B-item-cea77b8f4af1-primary.descriptor.json",
+      "sha256": "b741d4f714dc876f4caed674efa1a317695ba3a886431c6dfb06a258b1694246"
+    },
+    {
+      "path": "raw/B-item-cea77b8f4af1-primary.logits.npy",
+      "sha256": "638da1787e5a5bee6bcd97489d45b8b99f88c78b5e6578e3a689ef37f1cd9c56"
+    },
+    {
+      "path": "raw/B-item-cea77b8f4af1-repeat.descriptor.json",
+      "sha256": "a865f8da9cb724af9ad4d4f549e4224d22598abed27f51f1e35d19bafcab5a81"
+    },
+    {
+      "path": "raw/B-item-cea77b8f4af1-repeat.logits.npy",
+      "sha256": "638da1787e5a5bee6bcd97489d45b8b99f88c78b5e6578e3a689ef37f1cd9c56"
+    },
+    {
+      "path": "raw/B-item-dcfc22ffeac8-primary.descriptor.json",
+      "sha256": "86e3804b81789a595f1c3cc839dec719216d00aa5dd1212591687f380859ce54"
+    },
+    {
+      "path": "raw/B-item-dcfc22ffeac8-primary.logits.npy",
+      "sha256": "682dc209602ed7bfa4fda7bbdd78f250d7fd4a7770af2405726a48c90de5d744"
+    },
+    {
+      "path": "raw/B-item-dcfc22ffeac8-repeat.descriptor.json",
+      "sha256": "42049c1ccc6242d70347f1d607d7573f1df852b2a3ab48b0025b11f37bb824c2"
+    },
+    {
+      "path": "raw/B-item-dcfc22ffeac8-repeat.logits.npy",
+      "sha256": "682dc209602ed7bfa4fda7bbdd78f250d7fd4a7770af2405726a48c90de5d744"
+    },
+    {
+      "path": "raw/arm-b-primary.json",
+      "sha256": "cb66e95175305eca03cf44efdeec8748d4e8cbacd4f95f166d2e781b2a68bd20"
+    },
+    {
+      "path": "raw/arm-b-repeat.json",
+      "sha256": "8025eb51ae5e6e55e6c7469d9b86e96be9aa633a569e78968baaf0f085985d71"
+    }
+  ]
+}

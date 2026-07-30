@@ -1,0 +1,33 @@
+{
+  "artifact": "design-cluster-results",
+  "experimentId": "issue-149-brand-parseq-small-contrast",
+  "rule": "A repeated Brand design can contribute only one design-level improvement.",
+  "distinctDesigns": 3,
+  "groups": [
+    {
+      "id": "D1",
+      "memberClassifications": [
+        "PARSEQ_REGRESSION",
+        "PARSEQ_TRUTH_BEARING_IMPROVEMENT",
+        "PARSEQ_REGRESSION"
+      ],
+      "groupClassification": "PARSEQ_REGRESSION",
+      "countsOnce": true
+    },
+    {
+      "id": "D3",
+      "memberClassifications": ["PARSEQ_TRUTH_BEARING_IMPROVEMENT"],
+      "groupClassification": "PARSEQ_TRUTH_BEARING_IMPROVEMENT",
+      "countsOnce": true
+    },
+    {
+      "id": "D2",
+      "memberClassifications": [
+        "PARSEQ_TRUTH_BEARING_IMPROVEMENT",
+        "PARSEQ_TRUTH_BEARING_IMPROVEMENT"
+      ],
+      "groupClassification": "PARSEQ_TRUTH_BEARING_IMPROVEMENT",
+      "countsOnce": true
+    }
+  ]
+}

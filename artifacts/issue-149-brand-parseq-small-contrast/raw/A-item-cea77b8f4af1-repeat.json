@@ -1,0 +1,25 @@
+{
+  "opaqueItemId": "item-cea77b8f4af1",
+  "arm": "A",
+  "run": "repeat",
+  "sourcePngSha256": "690fbabb303481406c87542e02a063f1ffbc806d44aa1c3e1f113ac9ab94e309",
+  "rawTranscript": "EA,",
+  "words": [
+    {
+      "text": "EA,",
+      "confidence": 3,
+      "bbox": {
+        "x0": 0,
+        "y0": 0,
+        "x1": 651,
+        "y1": 391
+      }
+    }
+  ],
+  "wordCount": 1,
+  "meanConfidence": 3,
+  "warnings": [],
+  "latencyMs": 97,
+  "outputFingerprint": "174680cd11e626237530f16c8d7d2c8d245ff2fd7d44764497a3c82655934715",
+  "executed": true
+}

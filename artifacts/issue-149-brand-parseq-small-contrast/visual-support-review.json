@@ -1,0 +1,67 @@
+{
+  "artifact": "visual-support-review",
+  "experimentId": "issue-149-brand-parseq-small-contrast",
+  "conductedAfterRawFreezeAndTruthReveal": true,
+  "separateFromExactMatchEvaluation": true,
+  "method": "Direct visual inspection of each frozen preprocessed crop against the PARSeq transcript, asking only whether the emitted characters are present in the image. Visual support was NOT inferred from truth mismatch: an omission is not a fabrication, and a correct-but-incomplete read is still fully supported.",
+  "reviewer": "single reviewer, non-blinded to truth at review time",
+  "reviewerLimitation": "Truth was already revealed when this review was performed, so the reviewer could not be blinded. Recorded as a limitation rather than described as a blinded review.",
+  "classificationRule": {
+    "FULLY_VISUALLY_SUPPORTED": "every emitted character is present in the image",
+    "PARTIALLY_VISUALLY_SUPPORTED": "some emitted characters are present and some are not",
+    "NOT_VISUALLY_SUPPORTED": "no meaningful emitted character is present",
+    "UNADJUDICATED": "support cannot be judged from the crop"
+  },
+  "items": [
+    {
+      "ocrItemId": "approved-wine-004",
+      "parseqTranscript": "FATTORIA",
+      "classification": "FULLY_VISUALLY_SUPPORTED",
+      "note": "The crop shows script 'La' above roman 'FATTORIA'. Every character emitted is present and correctly ordered. PARSeq omitted the script word entirely rather than mis-reading it, so this is an incomplete read, not a fabrication.",
+      "uncertainty": "none on support; the omission is certain"
+    },
+    {
+      "ocrItemId": "la-fattoria-rotated",
+      "parseqTranscript": "FATTORIA",
+      "classification": "FULLY_VISUALLY_SUPPORTED",
+      "note": "Byte-identical crop to approved-wine-004 and an identical transcript, as expected. Same adjudication.",
+      "uncertainty": "none"
+    },
+    {
+      "ocrItemId": "approved-wine-005",
+      "parseqTranscript": "FATTORIA",
+      "classification": "FULLY_VISUALLY_SUPPORTED",
+      "note": "Same producer design at a different scale. The roman word is read completely and correctly; the script 'La' is omitted.",
+      "uncertainty": "none on support"
+    },
+    {
+      "ocrItemId": "approved-wine-031",
+      "parseqTranscript": "embeleso",
+      "classification": "FULLY_VISUALLY_SUPPORTED",
+      "note": "The tightly-kerned lowercase logotype reads 'embeleso' and PARSeq reproduced it exactly, including the merged letterforms. This is the strongest single result in the benchmark.",
+      "uncertainty": "none"
+    },
+    {
+      "ocrItemId": "wine-multi-artifact-04-region-1",
+      "parseqTranscript": "Cellhr",
+      "classification": "PARTIALLY_VISUALLY_SUPPORTED",
+      "note": "The crop shows 'Dry' above 'Cellar' in heavy interlocking script. 'Cell' and the trailing 'r' are supported; the 'h' is not present and appears to be a mis-read of the 'a'. The word 'Dry' was omitted.",
+      "uncertainty": "moderate — the ornate ligatures make character boundaries genuinely hard to attribute"
+    },
+    {
+      "ocrItemId": "wine-multi-artifact-04-region-2",
+      "parseqTranscript": "DryCollar",
+      "classification": "PARTIALLY_VISUALLY_SUPPORTED",
+      "note": "The crop shows 'Dry Cellar' in ornate script. 'Dry', 'C', 'llar' are supported; the 'o' in 'Collar' is not present and appears to be a mis-read of the 'e'. Both words were captured, unlike region 1.",
+      "uncertainty": "low"
+    }
+  ],
+  "summary": {
+    "fullyVisuallySupported": 4,
+    "partiallyVisuallySupported": 2,
+    "notVisuallySupported": 0,
+    "unadjudicated": 0,
+    "fabricationObserved": false,
+    "keyObservation": "No PARSeq output on this subset was unsupported invention. The failures are omissions (dropping a script word) and single-character substitutions inside otherwise supported words. That is qualitatively different from Tesseract's failures here, which included reordered and garbled fragments such as 'Colles Dig' and '0 —_ GATT ORIA'. This observation does not change any classification and is not evidence of calibration."
+  }
+}

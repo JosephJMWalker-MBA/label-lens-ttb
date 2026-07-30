@@ -1,0 +1,35 @@
+{
+  "artifact": "crop-cluster-results",
+  "experimentId": "issue-149-brand-parseq-small-contrast",
+  "rule": "Shared crop evidence counts once.",
+  "distinctCropClusters": 4,
+  "groups": [
+    {
+      "id": "C1",
+      "memberClassifications": ["PARSEQ_REGRESSION", "PARSEQ_REGRESSION"],
+      "groupClassification": "PARSEQ_REGRESSION",
+      "countsOnce": true
+    },
+    {
+      "id": "C2",
+      "memberClassifications": ["PARSEQ_TRUTH_BEARING_IMPROVEMENT"],
+      "groupClassification": "PARSEQ_TRUTH_BEARING_IMPROVEMENT",
+      "countsOnce": true
+    },
+    {
+      "id": "C3",
+      "memberClassifications": ["PARSEQ_TRUTH_BEARING_IMPROVEMENT"],
+      "groupClassification": "PARSEQ_TRUTH_BEARING_IMPROVEMENT",
+      "countsOnce": true
+    },
+    {
+      "id": "C4",
+      "memberClassifications": [
+        "PARSEQ_TRUTH_BEARING_IMPROVEMENT",
+        "PARSEQ_TRUTH_BEARING_IMPROVEMENT"
+      ],
+      "groupClassification": "PARSEQ_TRUTH_BEARING_IMPROVEMENT",
+      "countsOnce": true
+    }
+  ]
+}
