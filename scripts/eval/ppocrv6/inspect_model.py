@@ -245,7 +245,9 @@ def main() -> int:
         "ctcBlankTokenId": 0,
         "ctcBlankTokenIdCandidateSource": POSTPROCESSOR_SOURCE,
         "ctcBlankAtIndexZeroNotVocabMinusOne": True,
-        "charsetSha256": hashlib.sha256(" ".join(charset).encode("utf-8")).hexdigest(),
+        "charsetSha256": hashlib.sha256(
+            json.dumps(charset, ensure_ascii=False).encode("utf-8")
+        ).hexdigest(),
     }
     with open(os.path.join(OUT_DIR, "dictionary-audit.json"), "w") as handle:
         json.dump(audit, handle, indent=2, ensure_ascii=False)

@@ -3,6 +3,13 @@
 # Research-only, scoped to exactly one branch. Not part of the required CI checks
 # and it touches no production path. No pull_request_target, no schedule, no
 # repository_dispatch, no unscoped branch trigger.
+#
+# The path filter admits only this file and the mode file, so no ordinary code or
+# artifact commit can retrigger a run. When a harness fix needs a rerun, the
+# revision counter below is bumped in the same commit, which makes every rerun an
+# explicit and reviewable act rather than a side effect.
+#
+# harness revision: 2
 name: Issue 149 PP-OCRv6 ONNX probe
 
 on:
