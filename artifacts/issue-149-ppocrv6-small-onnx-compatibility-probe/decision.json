@@ -1,0 +1,83 @@
+{
+  "artifact": "decision",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "issue": 149,
+  "evaluationOnly": true,
+  "decision": "COMPATIBLE",
+  "verdictComputedFromGates": true,
+  "exactPositiveTranscriptionRequired": false,
+  "gatesPassed": {
+    "licenseGate": true,
+    "discoveryGate": true,
+    "onnxIntegrityGate": true,
+    "allFourInvocationsCompleted": true,
+    "logitsFinite": true,
+    "determinismPositivePair": true,
+    "determinismBlankPair": true,
+    "safeLoading": true,
+    "dictionaryAuditComplete": true,
+    "withinPeakMemoryLimit": true,
+    "withinLatencyLimit": true
+  },
+  "invocations": {
+    "planned": 4,
+    "completed": 4,
+    "errors": 0
+  },
+  "logits": {
+    "shape": [1, 40, 18710],
+    "dtype": "float32",
+    "allFinite": true,
+    "alreadyNormalized": true
+  },
+  "vocabulary": {
+    "vocabSize": 18710,
+    "vocabSizeSource": "session.get_outputs()[0].shape[-1]",
+    "characterDictLength": 18708,
+    "ctcBlankTokenId": 0,
+    "asciiSpaceInInferenceYmlDict": false,
+    "asciiSpaceDecodable": true,
+    "asciiSpaceTokenIds": [18709]
+  },
+  "determinism": {
+    "allDeterministic": true,
+    "rawLogitBytesExactlyEqual": true,
+    "ruleRelaxedAfterResults": false
+  },
+  "transcripts": {
+    "positive-primary": "BRAND NAME 123",
+    "positive-repeat": "BRAND NAME 123",
+    "blank-primary": "",
+    "blank-repeat": ""
+  },
+  "nativeCtcSequenceScores": {
+    "positive-primary": 0.9995861967404683,
+    "positive-repeat": 0.9995861967404683,
+    "blank-primary": 0,
+    "blank-repeat": 0
+  },
+  "safeLoading": {
+    "method": "onnxruntime.InferenceSession with CPUExecutionProvider",
+    "pickleCalled": false,
+    "arbitraryObjectsExecuted": false,
+    "paddleNativeLoadingUsed": false,
+    "paddle2onnxConversionPerformed": false,
+    "inferenceJsonLoaded": false
+  },
+  "authorizes": [
+    "One separately preregistered frozen-crop Brand benchmark against Tesseract.js on the six OCR items, four crop clusters and three Brand designs of PR #214."
+  ],
+  "doesNotAuthorize": [
+    "production integration",
+    "shadow deployment",
+    "authority-state changes",
+    "engine replacement",
+    "expanded corpus access",
+    "installing Python or ONNX Runtime into the production application",
+    "any confidence or abstention threshold",
+    "a claim of better Brand recognition, lower CER or fewer false reliable reads",
+    "a production suitability or Render latency claim",
+    "production licensing clearance; training-data provenance remains unresolved"
+  ],
+  "priorResultsPreserved": "PR #212's BLOCKED_MODEL_LICENSE and PR #214's REGRESSION conclusions stand unchanged and were neither reopened nor reinterpreted."
+}

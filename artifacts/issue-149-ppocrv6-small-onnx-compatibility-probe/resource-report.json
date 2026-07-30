@@ -1,0 +1,39 @@
+{
+  "artifact": "resource-report",
+  "experimentId": "issue-149-ppocrv6-small-onnx-compatibility-probe",
+  "diagnosticOnly": true,
+  "diagnosticNote": "Measured on a GitHub-hosted native linux/amd64 runner with 2 CPUs and a 4 GB container limit. These figures say nothing about Render production performance.",
+  "perInvocation": [
+    {
+      "invocationId": "positive-primary",
+      "latencyMs": 29.388534999995386,
+      "peakMemoryBytes": 155062272
+    },
+    {
+      "invocationId": "positive-repeat",
+      "latencyMs": 28.45809000000088,
+      "peakMemoryBytes": 164614144
+    },
+    {
+      "invocationId": "blank-primary",
+      "latencyMs": 29.345333999998502,
+      "peakMemoryBytes": 164614144
+    },
+    {
+      "invocationId": "blank-repeat",
+      "latencyMs": 27.769939999998883,
+      "peakMemoryBytes": 164614144
+    }
+  ],
+  "modelLoadMs": 74.72518499999126,
+  "modelLoadIncludedInLatency": false,
+  "maxLatencyMs": 29.388534999995386,
+  "maxPeakMemoryBytes": 164614144,
+  "limits": {
+    "maxPeakMemoryBytes": 734003200,
+    "maxLatencyMs": 60000
+  },
+  "withinPeakMemoryLimit": true,
+  "withinLatencyLimit": true,
+  "peakMemoryMetric": "resource.getrusage(RUSAGE_SELF).ru_maxrss inside the container, converted to bytes. Cumulative across the four invocations because they share one process, so it is not a per-invocation figure."
+}
