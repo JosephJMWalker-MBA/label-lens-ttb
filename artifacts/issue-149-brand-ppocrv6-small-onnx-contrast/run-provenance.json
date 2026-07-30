@@ -32,11 +32,11 @@
     },
     {
       "phase": "complete",
-      "workflowRunId": null,
-      "headSha": null,
+      "workflowRunId": 30559079354,
+      "headSha": "401fc5211bbf4c7db8f485f72d918a20de7eae93",
       "mode": "complete",
-      "conclusion": null,
-      "note": "The seal run fires on the commit that sets the mode to 'complete'. Its identifiers are recorded in seal-observation.json once observed, because a run cannot record its own trigger commit before that commit exists."
+      "conclusion": "success",
+      "note": "Seal run observed: the discover and execute jobs both reported `skipped`, so no inference ran. See seal-observation.json."
     }
   ],
   "runnerArchitecture": "x86_64, GitHub-hosted ubuntu-latest",

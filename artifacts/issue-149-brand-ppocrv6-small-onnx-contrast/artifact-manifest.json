@@ -14,7 +14,7 @@
   "corpusAccessed": false,
   "productionChanged": false,
   "pr195Untouched": true,
-  "fileCount": 97,
+  "fileCount": 98,
   "largestArtifact": {
     "path": "raw/B-item-0fd41fe162ac-primary.probabilities.npy",
     "byteSize": 2993728
@@ -452,8 +452,8 @@
     },
     {
       "path": "run-provenance.json",
-      "byteSize": 2082,
-      "sha256": "564bf24b7ce12b9a98985e2f4d1028d3fb9e4017a69a833075e52c4f263d769d"
+      "byteSize": 2040,
+      "sha256": "d30772a1c4ad20bdc5b5562d0a3de07c2d50d5529b73525c8858bcfa3286a3c0"
     },
     {
       "path": "score-definitions.json",
@@ -464,6 +464,11 @@
       "path": "score-ordering-risk.json",
       "byteSize": 2315,
       "sha256": "a6967e241e99c5bdc29940dd8e9671771364ab7f8625fce0e7c67698b4aa7ae7"
+    },
+    {
+      "path": "seal-observation.json",
+      "byteSize": 712,
+      "sha256": "c0d05878a8bd718dd0e6f72975c81bad7035727f7aca1e3ab7455f3874d4e845"
     },
     {
       "path": "truth-isolation-plan.json",
