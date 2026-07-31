@@ -215,20 +215,36 @@ and nothing else. The post-freeze ID map is not mounted.
    `PASS_ORDER_MISMATCH`. This is what makes the counterfactual in capability 3
    replayable later, without OCR.
 4. Emit candidates through **exactly one call** to
-   `finalizeProductionCandidateArray(diagnosticSelection.candidates, opaqueItemId)`
-   from `scripts/eval/lib/issue-149-candidate-adapter.ts`. That is the **only**
-   authorized candidate-emission API. It validates the complete evidence schema
-   before hashing, and it is what assigns ranked membership from `decision`,
-   orders members with production's comparator, and enforces contiguity,
-   uniqueness and the exactly-one-selected invariant.
+   `finalizeProductionCandidateArray(diagnosticSelection, opaqueItemId)` from
+   `scripts/eval/lib/issue-149-candidate-adapter.ts`, passing the **complete
+   `FieldSelection`** that
+   `selectBrandObservationWithCompleteFilterDiagnostics` returned. The adapter
+   reads the population from `diagnosticSelection.brandDiagnostics.candidates`
+   itself.
 
-   The runner must **not** call `finalizeCandidateRecord`,
+   Do **not** pass `diagnosticSelection.candidates` — that property does not
+   exist on `FieldSelection` — and do not pass a candidate array of any kind. A
+   bare-array parameter would let a runner hand over a filtered or truncated
+   population while technically calling the approved function.
+
+   That single call validates the complete evidence schema before hashing,
+   assigns ranked membership from `decision`, orders members with production's
+   comparator, and enforces contiguity, uniqueness, the exactly-one-selected
+   invariant and the global rule that a kept population must retain a ranked
+   survivor. It halts with `COMPLETE_DIAGNOSTICS_ABSENT` if the diagnostics or
+   the candidate array are missing, and with `CANDIDATE_EVIDENCE_TRUNCATED` if the
+   emitted count disagrees with the complete diagnostic candidate count.
+
+   The runner must **not** reference `finalizeCandidateRecord`,
    `finalizeProductionCandidate`, `toCandidateEvidenceRecord`,
-   `stableCandidateId` or `TEST_ONLY_candidateAdapterInternals` for Brand
-   candidate emission, and must not construct a `rankedPosition` itself. Any of
-   those routes bypasses every array-level invariant. The canonical helper
-   remains permitted for pass validation, semantic fingerprinting and exact-byte
-   hashing.
+   `stableCandidateId` or `CandidateAdapterContext` for Brand candidate emission,
+   and must not construct a `rankedPosition` itself. There is no runtime
+   test-only interface to reach them through: the adapter exports one function.
+   Trusted Job A additionally scans **every** Stage 2 acquisition source input in
+   the dependency closure, because the runner-source guard is first-order by
+   construction. The canonical helper remains permitted for pass validation,
+   semantic fingerprinting and exact-byte hashing.
+
 5. On a case-level extractor failure, persist the typed failure record — error
    code, message, issues, opaque item ID, source-image SHA-256. **No partial
    debug object is invented and no failed item is retried.**

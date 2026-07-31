@@ -22,24 +22,44 @@ import {
   compareCandidateRanking,
   selectBrandObservationWithCompleteFilterDiagnostics,
   type BrandCandidateDiagnostic,
+  type FieldSelection,
 } from "@/pipeline/extractor/field-selection";
 
 import {
   CandidateAdapterError,
-  TEST_ONLY_candidateAdapterInternals,
   finalizeProductionCandidateArray,
 } from "../../../scripts/eval/lib/issue-149-candidate-adapter";
 
-// The lower-level adapter functions are not part of the acquisition API. They
-// are reachable only through this explicitly test-only interface, which the
-// future-runner guard prohibits the runner from referencing.
-const { finalizeProductionCandidate, toCandidateEvidenceRecord } =
-  TEST_ONLY_candidateAdapterInternals;
+/**
+ * The adapter exposes ONE function. There is no runtime test-only backdoor, so
+ * these tests reach candidate construction the same way Stage 2 will: through the
+ * complete diagnostic selection.
+ */
+function selectionOf(candidates: BrandCandidateDiagnostic[]): FieldSelection {
+  return {
+    observation: {
+      state: "NOT_OBSERVED",
+      value: null,
+      confidence: 0,
+      ocrEvidenceScore: 0,
+      alternates: [],
+    },
+    sourceRegion: null,
+    source: null,
+    supportingPassIds: [],
+    recoveryPassUsed: false,
+    brandDiagnostics: { lines: [], candidates },
+  } as unknown as FieldSelection;
+}
+
+/** One finalized record, obtained through the only public entry point. */
+function finalizeOne(candidate: BrandCandidateDiagnostic, opaqueItemId = "item-0001") {
+  return finalizeProductionCandidateArray(selectionOf([candidate]), opaqueItemId)[0];
+}
 import {
   ANALYZER_OCR_CONFIDENCE_KEYS,
   CANDIDATE_EVIDENCE_REQUIRED_KEYS,
   CANDIDATE_FINALIZED_KEYS,
-  assertCompleteCandidateEvidenceRecord,
 } from "../../../scripts/eval/lib/issue-149-evidence-canonical";
 
 /** One synthetic word. Geometry is uniform so prominence never decides anything. */
@@ -161,7 +181,7 @@ describe("Issue #149 production candidate compatibility", () => {
   });
 
   it("finalizes every real candidate through the reference adapter", () => {
-    const finalized = finalizeProductionCandidateArray(candidates, "item-0001");
+    const finalized = finalizeProductionCandidateArray(selectionOf(candidates), "item-0001");
     expect(finalized).toHaveLength(candidates.length);
 
     finalized.forEach((record, index) => {
@@ -184,13 +204,10 @@ describe("Issue #149 production candidate compatibility", () => {
   it("carries the real score and ranking structures through unchanged", () => {
     const ranked = candidates.find((candidate) => candidate.ranking !== undefined);
     expect(ranked).toBeDefined();
-    const record = toCandidateEvidenceRecord(ranked!, {
-      opaqueItemId: "item-0001",
-      candidateOrdinal: 0,
-      completeCandidateArrayLength: candidates.length,
-      rankedPosition: 0,
-    });
-    expect(() => assertCompleteCandidateEvidenceRecord(record)).not.toThrow();
+    const record = finalizeOne(ranked!, "item-0001");
+    // Finalization already validated the complete schema; re-validating a
+    // finalized record would correctly halt with ALREADY_FINALIZED.
+    expect(String(record.canonicalRecordSha256)).toMatch(/^[0-9a-f]{64}$/);
 
     const ranking = record.ranking as Record<string, unknown>;
     expect(ranking.strategy).toBe(ranked!.ranking?.strategy);
@@ -204,12 +221,7 @@ describe("Issue #149 production candidate compatibility", () => {
   });
 
   it("carries the real candidateProvenance through unchanged", () => {
-    const record = toCandidateEvidenceRecord(candidates[0], {
-      opaqueItemId: "item-0001",
-      candidateOrdinal: 0,
-      completeCandidateArrayLength: candidates.length,
-      rankedPosition: null,
-    });
+    const record = finalizeOne(candidates[0], "item-0001");
     expect(record.candidateProvenance).toEqual({ ...candidates[0].candidateProvenance });
   });
 
@@ -222,20 +234,15 @@ describe("Issue #149 production candidate compatibility", () => {
       (candidate) => candidate.ocrConfidence.missingTokenCount > 0,
     );
     expect(anyMissing).toBe(true);
-    expect(() => finalizeProductionCandidateArray(withMissing, "item-0002")).not.toThrow();
+    expect(() =>
+      finalizeProductionCandidateArray(selectionOf(withMissing), "item-0002"),
+    ).not.toThrow();
   });
 
   it("requires the complete-diagnostics entry point", () => {
     const withoutDiagnostics = { ...candidates[0] };
     delete (withoutDiagnostics as { filterChecks?: unknown }).filterChecks;
-    expect(() =>
-      finalizeProductionCandidate(withoutDiagnostics, {
-        opaqueItemId: "item-0001",
-        candidateOrdinal: 0,
-        completeCandidateArrayLength: 1,
-        rankedPosition: null,
-      }),
-    ).toThrow(CandidateAdapterError);
+    expect(() => finalizeOne(withoutDiagnostics, "item-0001")).toThrow(CandidateAdapterError);
   });
 
   it("rejects a candidate whose repeated facts disagree", () => {
@@ -246,14 +253,7 @@ describe("Issue #149 production candidate compatibility", () => {
       { confidence: 0.123456 },
     ]) {
       const tampered = { ...candidates[0], ...tamper } as BrandCandidateDiagnostic;
-      expect(() =>
-        finalizeProductionCandidate(tampered, {
-          opaqueItemId: "item-0001",
-          candidateOrdinal: 0,
-          completeCandidateArrayLength: 1,
-          rankedPosition: null,
-        }),
-      ).toThrow(CandidateAdapterError);
+      expect(() => finalizeOne(tampered, "item-0001")).toThrow(CandidateAdapterError);
     }
   });
 
@@ -261,13 +261,11 @@ describe("Issue #149 production candidate compatibility", () => {
     // Every required key must be produced by the adapter from real input; a key
     // no adapter can fill would block Stage 2 exactly as the six-key
     // ocrConfidence list would have.
-    const record = toCandidateEvidenceRecord(candidates[0], {
-      opaqueItemId: "item-0001",
-      candidateOrdinal: 0,
-      completeCandidateArrayLength: candidates.length,
-      rankedPosition: null,
-    });
-    expect(new Set(Object.keys(record))).toEqual(new Set(CANDIDATE_EVIDENCE_REQUIRED_KEYS));
+    const record = finalizeOne(candidates[0], "item-0001");
+    const derived = new Set(["canonicalRecordSha256", "stableCandidateId"]);
+    expect(new Set(Object.keys(record).filter((key) => !derived.has(key)))).toEqual(
+      new Set(CANDIDATE_EVIDENCE_REQUIRED_KEYS),
+    );
   });
 });
 
@@ -310,7 +308,7 @@ describe("Issue #149 production ranked membership", () => {
     expect(withRanking.length).toBeGreaterThan(withDecision.length);
     expect(withDecision).toHaveLength(1);
 
-    const finalized = finalizeProductionCandidateArray(duplicates, "item-0003");
+    const finalized = finalizeProductionCandidateArray(selectionOf(duplicates), "item-0003");
     const positions = finalized.map((record) => record.rankedPosition);
     expect(positions.filter((position) => position !== null)).toEqual([0]);
 
@@ -336,7 +334,7 @@ describe("Issue #149 production ranked membership", () => {
     const rankedMembers = distinct.filter((candidate) => candidate.decision !== undefined);
     expect(rankedMembers.length).toBeGreaterThanOrEqual(2);
 
-    const finalized = finalizeProductionCandidateArray(distinct, "item-0004");
+    const finalized = finalizeProductionCandidateArray(selectionOf(distinct), "item-0004");
     const positions = finalized
       .map((record, index) => ({ record, index }))
       .filter((entry) => entry.record.rankedPosition !== null)
@@ -405,7 +403,7 @@ describe("Issue #149 production ranked membership", () => {
       ranking: { ...base[0].ranking!, comparator: [...base[0].ranking!.comparator] },
       decision: index === 0 ? ("selected" as const) : ("alternate" as const),
     }));
-    const finalized = finalizeProductionCandidateArray(tied, "item-0005");
+    const finalized = finalizeProductionCandidateArray(selectionOf(tied), "item-0005");
     expect(finalized.map((record) => record.rankedPosition)).toEqual(tied.map((_, index) => index));
     expect(finalized.map((record) => record.rawText)).toEqual(tied.map((c) => c.rawText));
   });
@@ -424,7 +422,7 @@ describe("Issue #149 production ranked membership", () => {
       candidate === member ? { ...candidate, ranking: undefined } : candidate,
     );
     try {
-      finalizeProductionCandidateArray(noRanking, "item-0006");
+      finalizeProductionCandidateArray(selectionOf(noRanking), "item-0006");
       throw new Error("expected a rejection");
     } catch (error) {
       expect((error as CandidateAdapterError).code).toBe("RANKED_MEMBERSHIP_INCONSISTENT");
@@ -437,10 +435,153 @@ describe("Issue #149 production ranked membership", () => {
         : { ...candidate, decision: "selected" as const },
     );
     try {
-      finalizeProductionCandidateArray(twoSelected, "item-0006");
+      finalizeProductionCandidateArray(selectionOf(twoSelected), "item-0006");
       throw new Error("expected a rejection");
     } catch (error) {
       expect((error as CandidateAdapterError).code).toBe("RANKED_POSITION_PARITY_FAILURE");
     }
+  });
+});
+
+describe("Issue #149 complete-selection candidate API", () => {
+  const realSelection = selectBrandObservationWithCompleteFilterDiagnostics([region(LINES)]);
+
+  it("accepts the real diagnostic FieldSelection", () => {
+    const records = finalizeProductionCandidateArray(realSelection, "item-0001");
+    expect(records.length).toBe(realSelection.brandDiagnostics?.candidates.length);
+    expect(records.length).toBeGreaterThan(0);
+  });
+
+  it("takes the population from brandDiagnostics.candidates, not from the selection root", () => {
+    // The workflow previously named `diagnosticSelection.candidates`, which does
+    // not exist on FieldSelection.
+    expect(Object.hasOwn(realSelection, "candidates")).toBe(false);
+    expect(Array.isArray(realSelection.brandDiagnostics?.candidates)).toBe(true);
+  });
+
+  it("rejects a selection with no brandDiagnostics", () => {
+    const stripped = { ...realSelection };
+    delete (stripped as { brandDiagnostics?: unknown }).brandDiagnostics;
+    try {
+      finalizeProductionCandidateArray(stripped as FieldSelection, "item-0001");
+      throw new Error("expected a rejection");
+    } catch (error) {
+      expect((error as CandidateAdapterError).code).toBe("COMPLETE_DIAGNOSTICS_ABSENT");
+    }
+  });
+
+  it("rejects a selection whose candidates array is missing or not an array", () => {
+    for (const candidates of [undefined, null, "not-an-array", {}]) {
+      const broken = {
+        ...realSelection,
+        brandDiagnostics: { ...realSelection.brandDiagnostics, candidates },
+      } as unknown as FieldSelection;
+      try {
+        finalizeProductionCandidateArray(broken, "item-0001");
+        throw new Error("expected a rejection");
+      } catch (error) {
+        expect((error as CandidateAdapterError).code).toBe("COMPLETE_DIAGNOSTICS_ABSENT");
+      }
+    }
+  });
+
+  it("cannot be handed a filtered bare array", () => {
+    // A bare array is not a FieldSelection: it has no brandDiagnostics, so the
+    // filtered population is rejected rather than silently accepted.
+    const filtered = (realSelection.brandDiagnostics?.candidates ?? []).filter((c) => c.kept);
+    expect(filtered.length).toBeLessThan(realSelection.brandDiagnostics!.candidates.length);
+    try {
+      finalizeProductionCandidateArray(filtered as unknown as FieldSelection, "item-0001");
+      throw new Error("expected a rejection");
+    } catch (error) {
+      expect((error as CandidateAdapterError).code).toBe("COMPLETE_DIAGNOSTICS_ABSENT");
+    }
+  });
+
+  it("emits exactly one record per diagnostic candidate, in original order", () => {
+    const candidates = realSelection.brandDiagnostics!.candidates;
+    const records = finalizeProductionCandidateArray(realSelection, "item-0001");
+    expect(records).toHaveLength(candidates.length);
+    records.forEach((record, index) => {
+      expect(record.candidateOrdinal).toBe(index);
+      expect(record.completeCandidateArrayLength).toBe(candidates.length);
+      expect(record.rawText).toBe(candidates[index].rawText);
+    });
+  });
+
+  it("validates opaqueItemId even when the candidate array is empty", () => {
+    const empty = selectionOf([]);
+    expect(finalizeProductionCandidateArray(empty, "item-0001")).toEqual([]);
+    for (const bad of ["item-7", "ITEM-0001", "", "case-0001"]) {
+      try {
+        finalizeProductionCandidateArray(empty, bad);
+        throw new Error("expected a rejection");
+      } catch (error) {
+        expect((error as CandidateAdapterError).code).toBe("MALFORMED_OPAQUE_ITEM_ID");
+      }
+    }
+  });
+});
+
+describe("Issue #149 kept population must retain a ranked survivor", () => {
+  const realSelection = selectBrandObservationWithCompleteFilterDiagnostics([region(LINES)]);
+
+  it("halts when every kept candidate loses its decision", () => {
+    // The gap a per-record schema cannot see: each kept candidate may
+    // individually lack a decision because deduplication removed it, but they
+    // cannot ALL lack one. Production always ranks at least one survivor.
+    const candidates = realSelection.brandDiagnostics!.candidates;
+    expect(candidates.some((candidate) => candidate.kept)).toBe(true);
+
+    const stripped = selectionOf(
+      candidates.map((candidate) => {
+        const clone = { ...candidate };
+        delete (clone as { decision?: unknown }).decision;
+        return clone;
+      }),
+    );
+    try {
+      finalizeProductionCandidateArray(stripped, "item-0001");
+      throw new Error("expected a rejection");
+    } catch (error) {
+      expect((error as CandidateAdapterError).code).toBe("RANKED_MEMBERSHIP_INCONSISTENT");
+      expect((error as CandidateAdapterError).message).toContain("no final ranked member");
+    }
+  });
+
+  it("accepts an all-rejected selection with no decisions", () => {
+    const candidates = realSelection.brandDiagnostics!.candidates;
+    const rejectedOnly = selectionOf(candidates.filter((candidate) => !candidate.kept));
+    expect(rejectedOnly.brandDiagnostics!.candidates.length).toBeGreaterThan(0);
+    const records = finalizeProductionCandidateArray(rejectedOnly, "item-0002");
+    expect(records.every((record) => record.rankedPosition === null)).toBe(true);
+    expect(records.every((record) => record.selected === false)).toBe(true);
+  });
+
+  it("rejects a decision on a rejected candidate", () => {
+    const candidates = realSelection.brandDiagnostics!.candidates;
+    const tampered = selectionOf(
+      candidates.map((candidate) =>
+        candidate.kept ? candidate : { ...candidate, decision: "alternate" as const },
+      ),
+    );
+    try {
+      finalizeProductionCandidateArray(tampered, "item-0003");
+      throw new Error("expected a rejection");
+    } catch (error) {
+      expect((error as CandidateAdapterError).code).toBe("RANKED_MEMBERSHIP_INCONSISTENT");
+    }
+  });
+
+  it("accepts deduplicated kept candidates while another kept candidate survives", () => {
+    // The real duplicate probe: two kept candidates, one decision.
+    const duplicates = selectBrandObservationWithCompleteFilterDiagnostics([
+      region([["RED", "BRICK", "WINERY"]], [], "pass-1-full-image", "full-image-primary"),
+      region([["RED", "BRICK", "WINERY"]], [], "pass-2-rot180", "full-image-rot180"),
+    ]);
+    const candidates = duplicates.brandDiagnostics!.candidates;
+    expect(candidates.filter((candidate) => candidate.kept).length).toBeGreaterThan(1);
+    expect(candidates.filter((candidate) => candidate.decision !== undefined)).toHaveLength(1);
+    expect(() => finalizeProductionCandidateArray(duplicates, "item-0004")).not.toThrow();
   });
 });

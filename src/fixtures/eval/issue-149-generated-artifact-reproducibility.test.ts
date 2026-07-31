@@ -194,16 +194,30 @@ describe("Issue #149 Stage 1 generated-artifact reproducibility", () => {
     }, 180_000);
 
     it("returns a non-success status and exit code from the CLI on drift", () => {
-      // The CLI boundary, exercised end to end against a mutated expected file.
-      const backup = readFileSync(path.join(process.cwd(), `${ROOT}/population-freeze.json`));
+      // The CLI boundary, end to end, against TEMPORARY expected artifacts. An
+      // earlier version appended a byte to the committed population-freeze.json
+      // and restored it in `finally`, which protects the final working tree but
+      // races with any other Vitest file reading the same governed package.
+      const expectedRoot = mkdtempSync(path.join(tmpdir(), "issue-149-drift-cli-expected-"));
+      const before = GENERATED.map((file) => readFileSync(path.join(process.cwd(), file)));
       try {
-        const mutated = Buffer.concat([backup, Buffer.from("\n")]);
-        writeFileSync(path.join(process.cwd(), `${ROOT}/population-freeze.json`), mutated);
+        const destinations = [
+          path.join(expectedRoot, "truth-free-input-manifest.json"),
+          path.join(expectedRoot, "population-freeze.json"),
+          path.join(expectedRoot, "id-map.json"),
+        ];
+        GENERATED.forEach((source, index) =>
+          copyFileSync(path.join(process.cwd(), source), destinations[index]),
+        );
+        writeFileSync(
+          destinations[1],
+          Buffer.concat([readFileSync(destinations[1]), Buffer.from("\n")]),
+        );
 
         let status = 0;
         let stderr = "";
         try {
-          execFileSync("node", [SCRIPT, "--check"], {
+          execFileSync("node", [SCRIPT, "--check", `--expected-root=${expectedRoot}`], {
             cwd: process.cwd(),
             encoding: "utf8",
             maxBuffer: 32 * 1024 * 1024,
@@ -215,16 +229,59 @@ describe("Issue #149 Stage 1 generated-artifact reproducibility", () => {
           stderr = failure.stderr ?? "";
         }
         expect(status).toBe(1);
-        const report = JSON.parse(stderr) as { status: string; reason: string; ocrRun: boolean };
+        const report = JSON.parse(stderr) as {
+          status: string;
+          reason: string;
+          ocrRun: boolean;
+          detail: Array<{ artifact: string }>;
+        };
         expect(report.status).toBe("HALTED");
         expect(report.reason).toBe("STAGE_1_GENERATED_ARTIFACT_DRIFT");
         expect(report.ocrRun).toBe(false);
+        expect(report.detail.map((entry) => entry.artifact)).toEqual(["population-freeze.json"]);
       } finally {
-        writeFileSync(path.join(process.cwd(), `${ROOT}/population-freeze.json`), backup);
+        rmSync(expectedRoot, { recursive: true, force: true });
       }
-      // Restored byte-for-byte, so the success check still passes afterwards.
-      expect(runCheck().status).toBe("STAGE_1_GENERATED_ARTIFACTS_REPRODUCIBLE");
+      expect(existsSync(expectedRoot)).toBe(false);
+
+      // No tracked artifact was ever opened for writing.
+      const after = GENERATED.map((file) => readFileSync(path.join(process.cwd(), file)));
+      after.forEach((bytes, index) => expect(bytes.equals(before[index])).toBe(true));
     }, 300_000);
+  });
+
+  it("never writes a tracked Stage 1 artifact from any Stage 1 test", () => {
+    // A standing guard: reading the governed package is fine, writing it is not.
+    const testsDirectory = path.join(process.cwd(), "src/fixtures/eval");
+    const stage1Tests = readdirSync(testsDirectory).filter(
+      (entry) => entry.startsWith("issue-149-") && entry.endsWith(".test.ts"),
+    );
+    expect(stage1Tests.length).toBeGreaterThanOrEqual(8);
+
+    const writers = [
+      /writeFileSync\(/,
+      /appendFileSync\(/,
+      /copyFileSync\(/,
+      /rmSync\(/,
+      /mkdirSync\(/,
+    ];
+    const offences: string[] = [];
+    for (const file of stage1Tests) {
+      const source = readFileSync(path.join(testsDirectory, file), "utf8");
+      const lines = source.split("\n");
+      lines.forEach((line, index) => {
+        if (!writers.some((pattern) => pattern.test(line))) return;
+        // A write is an offence only when its destination is the governed package.
+        const window = lines.slice(index, index + 4).join(" ");
+        if (/ROOT|artifacts\/issue-149-brand-complete-evidence-acquisition/.test(window)) {
+          // ...unless the destination is demonstrably a temporary directory.
+          if (!/expectedRoot|scratch|tmpdir\(\)|destinations\[/.test(window)) {
+            offences.push(`${file}:${index + 1}`);
+          }
+        }
+      });
+    }
+    expect(offences).toEqual([]);
   });
 
   it("reads the forbidden-key inventory from the canonical asset", () => {

@@ -8,15 +8,18 @@
  * six-key `ocrConfidence` schema survived Amendment 5.
  *
  * It lives outside `src/fixtures/**` for the same reason the canonical helper
- * does, and it imports only production TYPES from
- * `src/pipeline/extractor/field-selection`, which the invocation contract
- * explicitly permits on the acquisition route.
+ * does. It imports production TYPES from
+ * `src/pipeline/extractor/field-selection` **and one runtime function**,
+ * `compareCandidateRanking` — deliberately, so ranked order is production's own
+ * comparator rather than a reimplementation. The invocation contract permits
+ * that module on the acquisition route.
  */
 import {
   compareCandidateRanking,
   type BrandCandidateDiagnostic,
   type BrandFilterCheck,
   type BrandFilterCheckName,
+  type FieldSelection,
 } from "@/pipeline/extractor/field-selection";
 
 import {
@@ -32,6 +35,7 @@ export class CandidateAdapterError extends Error {
       | "MALFORMED_OPAQUE_ITEM_ID"
       | "ORDINAL_OUT_OF_RANGE"
       | "PROVENANCE_DISAGREES_WITH_CANDIDATE"
+      | "CANDIDATE_EVIDENCE_TRUNCATED"
       | "RANKED_MEMBERSHIP_INCONSISTENT"
       | "RANKED_POSITION_PARITY_FAILURE",
     detail: string,
@@ -41,7 +45,12 @@ export class CandidateAdapterError extends Error {
   }
 }
 
-export interface CandidateAdapterContext {
+/**
+ * Internal. Not exported: every field is derived from the complete selection, and
+ * a caller-supplied `rankedPosition` is exactly the bypass this module exists to
+ * prevent.
+ */
+interface CandidateAdapterContext {
   opaqueItemId: string;
   candidateOrdinal: number;
   completeCandidateArrayLength: number;
@@ -216,7 +225,14 @@ const forComparator = (diagnostic: BrandCandidateDiagnostic): RankingCarrier =>
   ({ ranking: diagnostic.ranking }) as unknown as RankingCarrier;
 
 /**
- * Adapt and finalize a COMPLETE diagnostic array.
+ * Adapt and finalize the COMPLETE diagnostic candidate population.
+ *
+ * Takes the whole `FieldSelection` that
+ * `selectBrandObservationWithCompleteFilterDiagnostics` returned, and reads the
+ * candidates from `brandDiagnostics.candidates` itself. An earlier signature took
+ * a bare array, which let a caller hand over a filtered or truncated population
+ * while technically calling the approved function — and the workflow named the
+ * wrong property (`diagnosticSelection.candidates`) besides.
  *
  * ## Final ranked membership is `decision`, not `ranking`
  *
@@ -238,17 +254,35 @@ const forComparator = (diagnostic: BrandCandidateDiagnostic): RankingCarrier =>
  * modes.
  */
 export function finalizeProductionCandidateArray(
-  candidates: BrandCandidateDiagnostic[],
+  diagnosticSelection: FieldSelection,
   opaqueItemId: string,
 ): CandidateEvidenceRecord[] {
-  // Validated here too: an empty candidate array would otherwise never reach the
-  // per-record check, and a malformed opaque id would pass silently.
+  // Validated first: an empty candidate population would otherwise never reach
+  // the per-record check, and a malformed opaque id would pass silently.
   if (!OPAQUE_ITEM_ID.test(opaqueItemId)) {
     throw new CandidateAdapterError(
       "MALFORMED_OPAQUE_ITEM_ID",
       `opaqueItemId must match ^item-\\d{4}$, received ${JSON.stringify(opaqueItemId)}`,
     );
   }
+
+  // The candidate population comes from the selection itself, never from a
+  // separately supplied array. A bare-array parameter would let a runner pass a
+  // filtered or truncated population while technically calling this function.
+  const diagnostics = diagnosticSelection?.brandDiagnostics;
+  if (diagnostics === undefined || diagnostics === null) {
+    throw new CandidateAdapterError(
+      "COMPLETE_DIAGNOSTICS_ABSENT",
+      "the selection carries no brandDiagnostics; the acquisition must call selectBrandObservationWithCompleteFilterDiagnostics",
+    );
+  }
+  if (!Array.isArray(diagnostics.candidates)) {
+    throw new CandidateAdapterError(
+      "COMPLETE_DIAGNOSTICS_ABSENT",
+      "brandDiagnostics.candidates is not an array",
+    );
+  }
+  const candidates = diagnostics.candidates;
 
   const rankedMembers = candidates
     .map((candidate, index) => ({ candidate, index }))
@@ -261,6 +295,26 @@ export function finalizeProductionCandidateArray(
         `candidate ${member.index} carries decision ${String(member.candidate.decision)} but no ranking; production ranks only scored candidates`,
       );
     }
+    if (!member.candidate.kept) {
+      throw new CandidateAdapterError(
+        "RANKED_MEMBERSHIP_INCONSISTENT",
+        `candidate ${member.index} carries a decision but is not kept; production ranks only kept candidates`,
+      );
+    }
+  }
+
+  // The global relation the per-record schema cannot see. Production always
+  // builds a non-empty ranked list and assigns one selected decision whenever
+  // kept candidates exist, so an entire kept population losing every decision
+  // must halt rather than pass as "all deduplicated".
+  const anyKept = candidates.some((candidate) => candidate.kept);
+  if (anyKept !== rankedMembers.length > 0) {
+    throw new CandidateAdapterError(
+      "RANKED_MEMBERSHIP_INCONSISTENT",
+      anyKept
+        ? `${candidates.filter((c) => c.kept).length} kept candidate(s) but no final ranked member; production always ranks at least one survivor`
+        : `no kept candidate but ${rankedMembers.length} decision-bearing candidate(s)`,
+    );
   }
 
   // Production's own comparator, with the original diagnostic-array order as the
@@ -296,22 +350,25 @@ export function finalizeProductionCandidateArray(
   const finalized = candidates.map((candidate, index) =>
     finalizeProductionCandidate(candidate, {
       opaqueItemId,
+      // The ordinal IS the original diagnostic-array index.
       candidateOrdinal: index,
       completeCandidateArrayLength: candidates.length,
       rankedPosition: positionByIndex.get(index) ?? null,
     }),
   );
 
+  if (finalized.length !== candidates.length) {
+    throw new CandidateAdapterError(
+      "CANDIDATE_EVIDENCE_TRUNCATED",
+      `emitted ${finalized.length} records for ${candidates.length} diagnostic candidates`,
+    );
+  }
+
   assertRankedArrayInvariants(finalized);
   return finalized;
 }
 
-/**
- * Invariants that only exist across a whole array. A single-record validator
- * cannot prove uniqueness or contiguity, and pretending otherwise would be the
- * same class of overclaim as a guard that restates what it guards.
- */
-export function assertRankedArrayInvariants(records: CandidateEvidenceRecord[]): void {
+function assertRankedArrayInvariants(records: CandidateEvidenceRecord[]): void {
   const positions = records
     .map((record) => record.rankedPosition)
     .filter((position): position is number => position !== null);
@@ -350,21 +407,3 @@ export function assertRankedArrayInvariants(records: CandidateEvidenceRecord[]):
     );
   }
 }
-
-/**
- * The lower-level adapter functions, exposed for direct unit testing ONLY.
- *
- * They are not part of the acquisition API. `toCandidateEvidenceRecord` and
- * `finalizeProductionCandidate` both accept a caller-supplied `rankedPosition`,
- * so a runner using them could "use the reference adapter" while inventing
- * positions itself — bypassing production-comparator ordering, decision-based
- * membership, contiguity, uniqueness and the exactly-one-selected invariant.
- *
- * `finalizeProductionCandidateArray` is the ONLY authorized candidate-emission
- * API for Stage 2, and the future-runner guard fails on any reference to the
- * names below.
- */
-export const TEST_ONLY_candidateAdapterInternals = {
-  toCandidateEvidenceRecord,
-  finalizeProductionCandidate,
-} as const;

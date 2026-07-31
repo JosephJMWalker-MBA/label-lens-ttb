@@ -254,6 +254,8 @@ describe("Issue #149 acquisition identity and isolation", () => {
         "TEST_ONLY_candidateAdapterInternals",
         "rankedPosition",
       ];
+      /** The one module allowed to define these — it IS the adapter. */
+      const ADAPTER_MODULE = "scripts/eval/lib/issue-149-candidate-adapter.ts";
       const REQUIRED_CALL = "finalizeProductionCandidateArray";
 
       function candidateApiOffences(source: string): string[] {
@@ -331,15 +333,79 @@ const records = TEST_ONLY_candidateAdapterInternals.finalizeProductionCandidate(
         expect(offences).toEqual([]);
       });
 
-      it("keeps the lower-level functions off the module's public surface", () => {
-        const adapter = readFileSync(
-          path.join(process.cwd(), "scripts/eval/lib/issue-149-candidate-adapter.ts"),
-          "utf8",
-        );
+      it("exports exactly one candidate-emission function and no test backdoor", () => {
+        const adapter = readFileSync(path.join(process.cwd(), ADAPTER_MODULE), "utf8");
         expect(adapter).toMatch(/^export function finalizeProductionCandidateArray/m);
         expect(adapter).not.toMatch(/^export function toCandidateEvidenceRecord/m);
         expect(adapter).not.toMatch(/^export function finalizeProductionCandidate\(/m);
-        expect(adapter).toContain("TEST_ONLY_candidateAdapterInternals");
+        expect(adapter).not.toMatch(/^export interface CandidateAdapterContext/m);
+        expect(adapter).not.toMatch(/^export function assertRankedArrayInvariants/m);
+        // No runtime object may re-expose the private functions. A helper the
+        // runner imports could otherwise reach them without the runner source
+        // containing a prohibited symbol.
+        expect(adapter).not.toContain("TEST_ONLY_candidateAdapterInternals");
+        const exported = [...adapter.matchAll(/^export (?:function|const|class|interface) (\w+)/gm)]
+          .map((match) => match[1])
+          .filter((name) => name !== "CandidateAdapterError");
+        expect(exported).toEqual(["finalizeProductionCandidateArray"]);
+      });
+
+      it("catches a lower-level call hidden in a helper, not only in the runner", () => {
+        // The runner regex is first-order by construction. The Job A
+        // source-closure gate is what makes the property transitive, and this is
+        // the detector it uses over EVERY Stage 2 acquisition source input.
+        const closureFiles = [
+          {
+            path: "dist/acquisition/run.js",
+            contents: 'import { emit } from "./emit.js";\nemit(sel);',
+          },
+          {
+            path: "dist/acquisition/emit.js",
+            contents:
+              'import { finalizeProductionCandidate } from "../lib/issue-149-candidate-adapter";\nexport const emit = (s) => finalizeProductionCandidate(s.c, { rankedPosition: 0 });',
+          },
+        ];
+        const offences = closureFiles.flatMap((file) =>
+          file.path === ADAPTER_MODULE
+            ? []
+            : PROHIBITED_CANDIDATE_SYMBOLS.filter((symbol) => {
+                const pattern =
+                  symbol === "finalizeProductionCandidate"
+                    ? /\bfinalizeProductionCandidate\b(?!Array)/
+                    : new RegExp(`\\b${symbol}\\b`);
+                return pattern.test(file.contents);
+              }).map((symbol) => `${file.path} references ${symbol}`),
+        );
+        // The runner file alone is clean; the closure is not.
+        expect(closureFiles[0].contents).not.toContain("finalizeProductionCandidate");
+        expect(offences).toContain(
+          "dist/acquisition/emit.js references finalizeProductionCandidate",
+        );
+        expect(offences).toContain("dist/acquisition/emit.js references rankedPosition");
+      });
+
+      it("does not claim the first-order regex proves the transitive property", () => {
+        const isolation = read(path.join(ROOT, "acquisition-runtime-isolation-contract.json")) as {
+          runtimeBundle: {
+            dependencyClosureGate: {
+              candidateEmissionClosureGate: {
+                ownedBy: string;
+                scansEveryStage2AcquisitionSourceInput: boolean;
+                theDirectRunnerRegexIsNotTransitive: boolean;
+                prohibitedOutsideTheAdapterModule: string[];
+                requiredSoleEmissionCall: string;
+              };
+            };
+          };
+        };
+        const gate = isolation.runtimeBundle.dependencyClosureGate.candidateEmissionClosureGate;
+        expect(gate.ownedBy).toContain("Job A");
+        expect(gate.scansEveryStage2AcquisitionSourceInput).toBe(true);
+        expect(gate.theDirectRunnerRegexIsNotTransitive).toBe(true);
+        expect(gate.requiredSoleEmissionCall).toBe("finalizeProductionCandidateArray");
+        for (const symbol of ["toCandidateEvidenceRecord", "finalizeProductionCandidate"]) {
+          expect(gate.prohibitedOutsideTheAdapterModule).toContain(symbol);
+        }
       });
     });
 

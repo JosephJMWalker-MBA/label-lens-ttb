@@ -38,9 +38,7 @@ import {
   type BrandCandidateScore,
 } from "@/pipeline/extractor/field-selection";
 
-import { TEST_ONLY_candidateAdapterInternals } from "../../../scripts/eval/lib/issue-149-candidate-adapter";
-
-const { toCandidateEvidenceRecord } = TEST_ONLY_candidateAdapterInternals;
+import { finalizeProductionCandidateArray } from "../../../scripts/eval/lib/issue-149-candidate-adapter";
 
 import {
   ANALYZER_CANDIDATE_PROVENANCE_KEYS,
@@ -217,17 +215,14 @@ describe("Issue #149 frozen vocabulary matches production", () => {
       timings: { preprocessMs: 0, ocrMs: 0, inverseMappingMs: 0, totalMs: 0 },
     } as unknown as RegionOcrResult;
 
-    const candidates =
-      selectBrandObservationWithCompleteFilterDiagnostics([pass]).brandDiagnostics?.candidates ??
-      [];
-    expect(candidates.length).toBeGreaterThan(0);
+    const selection = selectBrandObservationWithCompleteFilterDiagnostics([pass]);
+    expect(selection.brandDiagnostics?.candidates.length).toBeGreaterThan(0);
 
-    const record = toCandidateEvidenceRecord(candidates[0], {
-      opaqueItemId: "item-0001",
-      candidateOrdinal: 0,
-      completeCandidateArrayLength: candidates.length,
-      rankedPosition: null,
-    });
-    expect(new Set(Object.keys(record))).toEqual(new Set(CANDIDATE_EVIDENCE_REQUIRED_KEYS));
+    // Through the ONLY public entry point — there is no runtime backdoor.
+    const [record] = finalizeProductionCandidateArray(selection, "item-0001");
+    const derived = new Set(["canonicalRecordSha256", "stableCandidateId"]);
+    expect(new Set(Object.keys(record).filter((key) => !derived.has(key)))).toEqual(
+      new Set(CANDIDATE_EVIDENCE_REQUIRED_KEYS),
+    );
   });
 });

@@ -5,11 +5,11 @@ Refs Issue #149. **Evidence acquisition only.** Frozen before any OCR runs.
 Base: `origin/main` `546c3f279ce431a1fd8c0203df7a83553ea866ef`, the merge commit
 of PR #220.
 
-**Amended eight times, every time before any governed acquisition OCR.** See
+**Amended nine times, every time before any governed acquisition OCR.** See
 `preregistration-amendment.md` and `preregistration-amendment-2.md` through
-`preregistration-amendment-8.md`. All earlier plans are preserved, not
+`preregistration-amendment-9.md`. All earlier plans are preserved, not
 overwritten, and their identities are recorded in `amendment-linkage.json` and
-`amendment-2-linkage.json` through `amendment-8-linkage.json`. **The Stage 1 trusted freeze/staging generator and its temporary
+`amendment-2-linkage.json` through `amendment-9-linkage.json`. **The Stage 1 trusted freeze/staging generator and its temporary
 reproducibility mode have run — that is what produced the three committed
 artifacts. No Stage 2 Job A workflow, truth-free preparation artifact,
 runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR
@@ -284,6 +284,17 @@ opaque ordering and the staged filenames are unchanged. It does **not** claim
 independence from `governedTruth.present`, because the script deliberately uses
 that flag.
 
+**`loadSourceImage` is the only source-image byte channel.** The exact Buffer the
+loader returned — the one that was hashed and size-checked — is what gets written
+to the opaque staged file, and the core resolves no source path against
+`process.cwd()`. An earlier revision verified through the loader and then staged
+with a separate `copyFileSync` from the historical path; the post-copy digest
+check prevented a silent mismatch, so this was never evidence contamination, but
+the injected loader was not actually the staging source. A synthetic test now
+stages 115 **virtual** images whose paths do not exist on disk, which a second
+byte channel could not satisfy. The transient bytes are released after staging and
+never serialized into any artifact.
+
 **The generator is one shared core.** `generateStageOneArtifacts` in
 `scripts/eval/lib/issue-149-freeze-core.mjs` holds the whole algorithm and takes
 its inputs explicitly — attribution data, population data, evaluation manifest, a
@@ -487,9 +498,21 @@ Halts with `CANDIDATE_ID_COLLISION` or `CANDIDATE_EVIDENCE_TRUNCATED`.
 ### One call emits the candidates
 
 The **only** authorized candidate-emission API is
-`finalizeProductionCandidateArray(completeDiagnosticCandidateArray, opaqueItemId)`
-from `scripts/eval/lib/issue-149-candidate-adapter.ts`, called exactly once per
-item. The runner may not call `finalizeCandidateRecord`,
+`finalizeProductionCandidateArray(diagnosticSelection, opaqueItemId)` from
+`scripts/eval/lib/issue-149-candidate-adapter.ts`, called exactly once per item
+with the **complete `FieldSelection`** that
+`selectBrandObservationWithCompleteFilterDiagnostics` returned.
+
+The adapter reads the population from
+`diagnosticSelection.brandDiagnostics.candidates` **itself**. An earlier signature
+took a bare array — and the workflow named `diagnosticSelection.candidates`, which
+does not exist on `FieldSelection` — so a runner could have handed over a filtered
+or truncated population while technically calling the approved function. It halts
+with `COMPLETE_DIAGNOSTICS_ABSENT` if the diagnostics or the candidate array are
+missing, and with `CANDIDATE_EVIDENCE_TRUNCATED` if the emitted count disagrees
+with the complete diagnostic candidate count. `candidateOrdinal` is the original
+diagnostic-array index, and `opaqueItemId` is validated even when the population
+is empty. The runner may not call `finalizeCandidateRecord`,
 `finalizeProductionCandidate`, `toCandidateEvidenceRecord`, `stableCandidateId` or
 `TEST_ONLY_candidateAdapterInternals` for Brand candidate emission, and may not
 construct a `rankedPosition` itself.
@@ -498,9 +521,34 @@ That prohibition is not stylistic. The lower-level functions accept a
 caller-supplied position, so a runner could "use the reference adapter" while
 inventing positions — bypassing production-comparator ordering, decision-based
 membership, contiguity, uniqueness and the exactly-one-selected invariant. Those
-functions are module-private, reachable only through an explicitly test-only
-interface that the runner guard also prohibits. The canonical helper remains
+functions are module-private and **not exported at runtime at all** — an earlier
+`TEST_ONLY_candidateAdapterInternals` object made them reachable, so a helper the
+runner imported could have bypassed the array API without the runner source
+containing a prohibited symbol. The adapter now exports exactly one
+candidate-emission function, and the tests exercise candidate construction
+through it.
+
+Because the runner-source guard is first-order by construction, **trusted Job A
+additionally scans every Stage 2 acquisition source input in the dependency
+closure** for those symbols, outside the adapter module itself. The first-order
+regex does not prove the transitive property and does not claim to. The canonical helper remains
 permitted for pass validation, semantic fingerprinting and exact-byte hashing.
+
+### A kept population must retain a ranked survivor
+
+Per-record validation cannot see this. Each kept candidate may individually lack a
+`decision` because deduplication removed it — but they cannot **all** lack one.
+Production always builds a non-empty ranked list and assigns exactly one selected
+decision whenever kept candidates exist. The global relation is:
+
+```
+(any candidate is kept) === (at least one candidate carries a decision)
+```
+
+Enforced in `finalizeProductionCandidateArray`, together with: every
+decision-bearing candidate is kept; every ranked member carries score and ranking
+semantics; positions are unique and contiguous; and exactly one selected candidate
+sits at position 0. Halt: `RANKED_MEMBERSHIP_INCONSISTENT`.
 
 ### Kept and rejected candidates carry different complete evidence
 

@@ -2,7 +2,7 @@
   "artifact": "acquisition-runtime-isolation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-8.md",
+  "amendedBy": "preregistration-amendment-9.md",
   "status": "CONTRACT FROZEN. Not implemented in this amendment.",
   "whyThisExists": {
     "correction": "The Stage 1 isolation tests are STATIC manifest, path and import validation. They read committed planning artifacts and assert their shape. They are NOT runtime proof, and this contract stops them being described as such.",
@@ -179,6 +179,28 @@
         "readByTheHostBundleScanner": true,
         "fieldNamesVersusValues": "These are FIELD NAMES, prohibited inside acquisition output. The historical identifier and fixture-path VALUES are checked after sealing by the read-only identity-leak verifier, which holds an inventory the isolated runtime never receives.",
         "governsEveryEmittedFile": "pass records, candidate records, selection records, item-level failure records, count records, manifests and provenance records alike"
+      },
+      "candidateEmissionClosureGate": {
+        "ownedBy": "phase 1 trusted host preparation (Job A)",
+        "scansEveryStage2AcquisitionSourceInput": true,
+        "notMerelyTheTwoRunnerEntryFiles": true,
+        "theDirectRunnerRegexIsNotTransitive": true,
+        "theDirectRunnerRegexIsNotTransitiveNote": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts inspects the runner sources only. A helper the runner imports could reach a lower-level candidate function without the runner source containing a prohibited symbol. The Stage 2 source-closure gate owns the transitive property; the first-order regex does not and does not claim to.",
+        "requiredSoleEmissionCall": "finalizeProductionCandidateArray",
+        "requiredSoleEmissionCallNote": "It must be the only candidate-emission call reachable from the runner's transitive Stage 2 source closure, and it takes the complete diagnostic FieldSelection \u2014 never a caller-supplied candidate array.",
+        "prohibitedOutsideTheAdapterModule": [
+          "toCandidateEvidenceRecord",
+          "finalizeProductionCandidate",
+          "finalizeCandidateRecord for Brand candidate emission",
+          "stableCandidateId for Brand candidate emission",
+          "CandidateAdapterContext",
+          "TEST_ONLY_candidateAdapterInternals",
+          "caller-constructed rankedPosition"
+        ],
+        "theAdapterModuleItself": "scripts/eval/lib/issue-149-candidate-adapter.ts \u2014 it defines the private functions and is the one file exempt from the reference prohibition",
+        "noRuntimeTestBackdoor": true,
+        "noRuntimeTestBackdoorNote": "TEST_ONLY_candidateAdapterInternals was a real exported object holding both lower-level functions, so the private functions were reachable at runtime. It is removed; the adapter exports exactly one candidate-emission function.",
+        "haltCode": "BUNDLE_PROHIBITED_DEPENDENCY"
       }
     }
   },

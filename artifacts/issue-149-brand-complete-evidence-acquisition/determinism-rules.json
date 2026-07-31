@@ -86,7 +86,7 @@
     }
   ],
   "verdictComputedNotAsserted": true,
-  "amendedBy": "preregistration-amendment-8.md",
+  "amendedBy": "preregistration-amendment-9.md",
   "threeSeparateConcepts": {
     "fullArtifactIntegrity": {
       "covers": "the EXACT persisted bytes of every raw file and manifest, including timings and run metadata",

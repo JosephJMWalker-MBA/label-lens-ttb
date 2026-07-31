@@ -8,7 +8,12 @@
  *
  * The core takes its inputs EXPLICITLY rather than reading fixed paths, so the
  * real implementation — not a restatement of it — can be driven with mutated
- * governed-truth text. An earlier staging-independence test reimplemented the
+ * governed-truth text and with virtual images that exist only in memory.
+ * `loadSourceImage` is the ONLY channel through which image bytes enter: the
+ * exact verified Buffer is what gets staged, and the core resolves no source path
+ * against `process.cwd()`. An earlier revision verified through the loader and
+ * then staged with a separate `copyFileSync` from the historical path, which
+ * meant the injected loader was not actually the staging source. An earlier staging-independence test reimplemented the
  * ordering algorithm and could therefore have stayed green while the actual
  * script started depending on `acceptableValues`. That is the same structural
  * failure as a drift guard that restates the list it guards.
@@ -18,7 +23,7 @@
  */
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { copyFileSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 export const EXPERIMENT_ID = "issue-149-brand-complete-evidence-acquisition";
@@ -178,6 +183,11 @@ export function generateStageOneArtifacts({
       sourceImageByteSize: bytes.length,
       extension: path.extname(record.imagePath).toLowerCase(),
       brandPresent: entry.governedTruth.present,
+      // The EXACT verified bytes, held transiently. These — not a second read of
+      // the historical path — are what get written to the opaque staged file, so
+      // there is one source-image byte channel rather than two. Never serialized
+      // into any artifact.
+      bytes,
     };
   });
 
@@ -196,11 +206,16 @@ export function generateStageOneArtifacts({
   for (const entry of assigned) {
     const stagedName = `${entry.opaqueItemId}${entry.extension}`;
     const destination = path.join(out.staged, stagedName);
-    copyFileSync(path.join(process.cwd(), entry.historicalImagePath), destination);
-    if (sha256(readFileSync(destination)) !== entry.sourceImageSha256) {
+    // Write the same Buffer that was verified. The core resolves no source path
+    // of its own: `loadSourceImage` is the only way bytes enter it.
+    writeFileSync(destination, entry.bytes);
+    const written = readFileSync(destination);
+    if (!written.equals(entry.bytes) || sha256(written) !== entry.sourceImageSha256) {
       throw new FreezeError("STAGED_COPY_NOT_BYTE_IDENTICAL", stagedName);
     }
     entry.stagedImageFileName = stagedName;
+    // Release the transient bytes as soon as they are on disk.
+    delete entry.bytes;
   }
 
   // ---- the acquisition input: opaque identity and image provenance only ----
@@ -281,7 +296,7 @@ export function generateStageOneArtifacts({
     accessBoundary: ID_MAP_ACCESS_BOUNDARY,
     location: DECLARED_ID_MAP_LOCATION,
     entryCount: assigned.length,
-    amendedBy: "preregistration-amendment-8.md",
+    amendedBy: "preregistration-amendment-9.md",
     map: assigned.map((entry) => ({
       opaqueItemId: entry.opaqueItemId,
       historicalCaseId: entry.historicalCaseId,

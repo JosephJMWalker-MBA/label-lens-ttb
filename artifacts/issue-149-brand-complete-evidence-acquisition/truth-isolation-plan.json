@@ -57,7 +57,7 @@
       "recommending a filter treatment"
     ]
   },
-  "amendedBy": "preregistration-amendment-8.md",
+  "amendedBy": "preregistration-amendment-9.md",
   "opaqueIdentity": {
     "scheme": "item-NNNN, 1-based, zero-padded to four digits",
     "assignmentOrder": "ascending source-image SHA-256, so the sequence is deterministic and carries no ordering signal from the historical names",
@@ -244,5 +244,14 @@
     "noninterferenceClaimIsBounded": "Complete noninterference from governedTruth.present is NOT claimed: the script intentionally uses that flag for the 105/10 accounting assertion. What is claimed, and tested, is that acceptable Brand values and other truth TEXT do not influence the truth-free input manifest, the opaque ordering or the staged filenames.",
     "stagingIndependenceTestedBy": "src/fixtures/eval/issue-149-staging-independence.test.ts"
   },
-  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run."
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run.",
+  "stagingByteChannel": {
+    "singleChannel": "loadSourceImage",
+    "theExactVerifiedBufferIsWhatIsStaged": true,
+    "coreResolvesNoSourcePathItself": true,
+    "priorDefect": "The core verified bytes through loadSourceImage and then staged with a separate copyFileSync from process.cwd() and the historical path. The post-copy digest check prevented a silent mismatch, so this was not evidence contamination \u2014 but the injected loader was not actually the staging source, and the core had two byte channels.",
+    "transientBytesNeverSerialized": true,
+    "provenBy": "src/fixtures/eval/issue-149-freeze-core-loader.test.ts",
+    "provenByNote": "It stages 115 virtual images whose paths do not exist on disk, so a second byte channel could not have satisfied it."
+  }
 }

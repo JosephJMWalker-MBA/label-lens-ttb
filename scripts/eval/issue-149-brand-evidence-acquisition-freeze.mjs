@@ -63,6 +63,23 @@ function realInputs() {
   };
 }
 
+/**
+ * The expected artifacts a check compares against. Injectable so the
+ * intentional-drift test can point the REAL check path at temporary copies
+ * instead of mutating a governed tracked file — which would race with any other
+ * test reading the same package.
+ */
+function expectedFromArgv() {
+  const flag = process.argv.find((argument) => argument.startsWith("--expected-root="));
+  if (flag === undefined) return COMMITTED;
+  const root = flag.slice("--expected-root=".length);
+  return {
+    truthFreeInputManifest: path.join(root, "truth-free-input-manifest.json"),
+    populationFreeze: path.join(root, "population-freeze.json"),
+    idMap: path.join(root, "id-map.json"),
+  };
+}
+
 const COMMITTED = {
   truthFreeInputManifest: path.join(ROOT, "truth-free-input-manifest.json"),
   populationFreeze: path.join(ROOT, "population-freeze.json"),
@@ -94,8 +111,11 @@ function stage() {
  * OCR. Cleanup happens in `finally` on both paths — the core throws rather than
  * exiting, so a drift failure can no longer terminate the process before the
  * temporary staging tree is removed.
+ *
+ * `expected` defaults to the committed artifacts. `--expected-root=<dir>` points
+ * it at copies instead, so a drift test never needs to write a governed file.
  */
-function check() {
+export function runFreezeCheck(expected = COMMITTED) {
   const scratch = mkdtempSync(path.join(tmpdir(), "issue-149-freeze-check-"));
   try {
     const generated = generateStageOneArtifacts({
@@ -108,7 +128,7 @@ function check() {
     });
     const artifactsCompared = compareGeneratedArtifacts({
       generated: generated.written,
-      expected: COMMITTED,
+      expected,
     });
     return {
       status: "STAGE_1_GENERATED_ARTIFACTS_REPRODUCIBLE",
@@ -126,7 +146,7 @@ function check() {
 
 // ---- the only boundary that decides an exit code ---------------------------
 try {
-  const result = process.argv.includes("--check") ? check() : stage();
+  const result = process.argv.includes("--check") ? runFreezeCheck(expectedFromArgv()) : stage();
   console.log(JSON.stringify(result, null, 2));
 } catch (cause) {
   const failure =

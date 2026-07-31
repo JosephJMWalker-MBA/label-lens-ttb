@@ -2,7 +2,7 @@
   "artifact": "acquisition-invocation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-8.md",
+  "amendedBy": "preregistration-amendment-9.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "route": "direct call to extractLabelEvidenceDetailed",
   "prohibitedRoute": {
@@ -116,11 +116,18 @@
   "candidateEmissionApi": {
     "module": "scripts/eval/lib/issue-149-candidate-adapter.ts",
     "function": "finalizeProductionCandidateArray",
-    "signature": "finalizeProductionCandidateArray(completeDiagnosticCandidateArray, opaqueItemId)",
-    "oneCallPerCompleteDiagnosticCandidateArray": true,
+    "signature": "finalizeProductionCandidateArray(diagnosticSelection, opaqueItemId)",
+    "firstArgument": "the COMPLETE FieldSelection returned by selectBrandObservationWithCompleteFilterDiagnostics",
+    "candidateSource": "diagnosticSelection.brandDiagnostics.candidates, read INSIDE the adapter",
+    "supersededPropertyPath": "diagnosticSelection.candidates \u2014 that property does not exist on FieldSelection",
+    "bareCandidateArrayProhibited": true,
+    "bareCandidateArrayProhibitedWhy": "A bare-array parameter let a caller hand over a filtered or truncated population while technically calling the approved function. The adapter now takes the whole selection and reads the population itself.",
+    "oneCallPerCompleteDiagnosticSelection": true,
     "callerSuppliedRankedPositionProhibited": true,
     "secondMappingOrFinalizationLoopInTheRunnerProhibited": true,
     "opaqueItemIdValidatedEvenWhenTheArrayIsEmpty": true,
+    "candidateOrdinalIsTheOriginalDiagnosticArrayIndex": true,
+    "emittedCountMustEqualTheCompleteCandidateCount": true,
     "prohibitedSymbolsInTheRunner": [
       "toCandidateEvidenceRecord",
       "finalizeProductionCandidate",
@@ -131,8 +138,34 @@
       "rankedPosition"
     ],
     "prohibitedSymbolsNote": "finalizeCandidateRecord and stableCandidateId are prohibited FOR BRAND CANDIDATE EMISSION. The canonical helper remains permitted for pass validation, semantic fingerprinting and exact-byte hashing.",
-    "whyLowerLevelFunctionsAreProhibited": "toCandidateEvidenceRecord and finalizeProductionCandidate both accept a caller-supplied rankedPosition, so a runner could 'use the reference adapter' while inventing positions itself \u2014 bypassing production-comparator ordering, decision-based ranked membership, position assignment, uniqueness, contiguity and the exactly-one-selected array invariant.",
-    "moduleSurface": "finalizeProductionCandidateArray is the only exported candidate-emission function. The lower-level functions are module-private and reachable only through TEST_ONLY_candidateAdapterInternals, which the runner guard also prohibits.",
-    "enforcedBy": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts"
+    "noRuntimeTestBackdoor": true,
+    "noRuntimeTestBackdoorNote": "TEST_ONLY_candidateAdapterInternals is removed. The adapter exports exactly one candidate-emission function; the lower-level helpers, CandidateAdapterContext and assertRankedArrayInvariants are module-private and unreachable at runtime.",
+    "haltCodes": {
+      "COMPLETE_DIAGNOSTICS_ABSENT": "the selection carries no brandDiagnostics, or brandDiagnostics.candidates is not an array",
+      "CANDIDATE_EVIDENCE_TRUNCATED": "the emitted record count does not equal the complete diagnostic candidate count",
+      "MALFORMED_OPAQUE_ITEM_ID": "opaqueItemId does not match ^item-\\\\d{4}$"
+    },
+    "transitiveClosureOwnedBy": "phase 1 trusted host preparation; see acquisition-runtime-isolation-contract.json#runtimeBundle.dependencyClosureGate.candidateEmissionClosureGate",
+    "enforcedBy": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts and src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts"
+  },
+  "keptPopulationMustRetainARankedSurvivor": {
+    "relation": "(any candidate is kept) === (at least one candidate carries a decision)",
+    "why": "Production always builds a non-empty ranked list and assigns exactly one selected decision whenever kept candidates exist. A kept candidate may individually lack a decision only because family reduction or deduplication removed it \u2014 which requires that another kept candidate survived.",
+    "whenNoKeptCandidates": [
+      "zero decision-bearing candidates",
+      "zero ranked positions",
+      "no selected candidate"
+    ],
+    "whenAtLeastOneKeptCandidate": [
+      "at least one decision-bearing final ranked member",
+      "exactly one selected candidate",
+      "the selected candidate is position 0",
+      "ranked positions are unique and contiguous",
+      "every decision-bearing candidate is kept",
+      "every ranked member carries score and ranking semantics"
+    ],
+    "priorGap": "The array adapter derived membership from candidates carrying a decision and checked selection only when that set was non-empty. If every kept candidate's decision disappeared, the ranked set was empty and every record still passed.",
+    "haltCode": "RANKED_MEMBERSHIP_INCONSISTENT",
+    "enforcedIn": "finalizeProductionCandidateArray"
   }
 }

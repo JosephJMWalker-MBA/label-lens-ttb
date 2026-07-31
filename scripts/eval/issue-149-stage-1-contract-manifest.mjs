@@ -34,6 +34,7 @@ const STAGE_1_TESTS = [
   "src/fixtures/eval/issue-149-contract-consistency.test.ts",
   "src/fixtures/eval/issue-149-dependency-closure.test.ts",
   "src/fixtures/eval/issue-149-evidence-canonical.test.ts",
+  "src/fixtures/eval/issue-149-freeze-core-loader.test.ts",
   "src/fixtures/eval/issue-149-frozen-vocabulary.test.ts",
   "src/fixtures/eval/issue-149-generated-artifact-reproducibility.test.ts",
   "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts",

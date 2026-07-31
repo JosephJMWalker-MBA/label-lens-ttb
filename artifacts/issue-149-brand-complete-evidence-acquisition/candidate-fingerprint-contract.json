@@ -2,7 +2,7 @@
   "artifact": "candidate-fingerprint-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-8.md",
+  "amendedBy": "preregistration-amendment-9.md",
   "status": "ALGORITHM AND TEST CONTRACT FROZEN. The acquisition is not implemented in this amendment.",
   "canonicalizationVersion": "issue-149-candidate-canonical-v1",
   "preimage": {
@@ -99,7 +99,15 @@
     "a kept candidate with null ranking is rejected",
     "a rejected candidate carrying score is rejected",
     "a rejected candidate carrying ranking is rejected",
-    "a kept deduplicated candidate retains score and ranking while decision and position are null"
+    "a kept deduplicated candidate retains score and ranking while decision and position are null",
+    "the real diagnostic FieldSelection finalizes successfully",
+    "a selection missing brandDiagnostics is rejected",
+    "a selection whose candidates array is missing or not an array is rejected",
+    "a filtered bare array cannot be passed",
+    "candidate ordinals match the original diagnostic-array order",
+    "the emitted count equals the complete diagnostic candidate count",
+    "an empty candidate array still validates opaqueItemId",
+    "a kept population that has lost every decision halts"
   ],
   "testedBy": "src/fixtures/eval/issue-149-evidence-canonical.test.ts",
   "implementedInThisAmendment": false,
@@ -124,5 +132,40 @@
       ],
       "priorDefect": "Amendment 5 declared six keys and omitted missingTokenCount, which production emits on every candidate, so the closed schema rejected every REAL candidate while the synthetic tests and a hard-coded drift guard both repeated the same wrong list."
     }
+  },
+  "candidateEmissionApi": {
+    "module": "scripts/eval/lib/issue-149-candidate-adapter.ts",
+    "function": "finalizeProductionCandidateArray",
+    "signature": "finalizeProductionCandidateArray(diagnosticSelection, opaqueItemId)",
+    "firstArgument": "the COMPLETE FieldSelection returned by selectBrandObservationWithCompleteFilterDiagnostics",
+    "candidateSource": "diagnosticSelection.brandDiagnostics.candidates, read INSIDE the adapter",
+    "supersededPropertyPath": "diagnosticSelection.candidates \u2014 that property does not exist on FieldSelection",
+    "bareCandidateArrayProhibited": true,
+    "bareCandidateArrayProhibitedWhy": "A bare-array parameter let a caller hand over a filtered or truncated population while technically calling the approved function. The adapter now takes the whole selection and reads the population itself.",
+    "oneCallPerCompleteDiagnosticSelection": true,
+    "callerSuppliedRankedPositionProhibited": true,
+    "secondMappingOrFinalizationLoopInTheRunnerProhibited": true,
+    "opaqueItemIdValidatedEvenWhenTheArrayIsEmpty": true,
+    "candidateOrdinalIsTheOriginalDiagnosticArrayIndex": true,
+    "emittedCountMustEqualTheCompleteCandidateCount": true,
+    "prohibitedSymbolsInTheRunner": [
+      "toCandidateEvidenceRecord",
+      "finalizeProductionCandidate",
+      "finalizeCandidateRecord",
+      "stableCandidateId",
+      "CandidateAdapterContext",
+      "TEST_ONLY_candidateAdapterInternals",
+      "rankedPosition"
+    ],
+    "prohibitedSymbolsNote": "finalizeCandidateRecord and stableCandidateId are prohibited FOR BRAND CANDIDATE EMISSION. The canonical helper remains permitted for pass validation, semantic fingerprinting and exact-byte hashing.",
+    "noRuntimeTestBackdoor": true,
+    "noRuntimeTestBackdoorNote": "TEST_ONLY_candidateAdapterInternals is removed. The adapter exports exactly one candidate-emission function; the lower-level helpers, CandidateAdapterContext and assertRankedArrayInvariants are module-private and unreachable at runtime.",
+    "haltCodes": {
+      "COMPLETE_DIAGNOSTICS_ABSENT": "the selection carries no brandDiagnostics, or brandDiagnostics.candidates is not an array",
+      "CANDIDATE_EVIDENCE_TRUNCATED": "the emitted record count does not equal the complete diagnostic candidate count",
+      "MALFORMED_OPAQUE_ITEM_ID": "opaqueItemId does not match ^item-\\\\d{4}$"
+    },
+    "transitiveClosureOwnedBy": "phase 1 trusted host preparation; see acquisition-runtime-isolation-contract.json#runtimeBundle.dependencyClosureGate.candidateEmissionClosureGate",
+    "enforcedBy": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts and src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts"
   }
 }

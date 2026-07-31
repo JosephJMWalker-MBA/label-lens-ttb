@@ -26,6 +26,7 @@ const HISTORICAL_FILES = new Set([
   "preregistration-amendment-6.md",
   "preregistration-amendment-7.md",
   "preregistration-amendment-8.md",
+  "preregistration-amendment-9.md",
   "branch-pointer-incident.md",
   "amendment-linkage.json",
   "amendment-2-linkage.json",
@@ -35,6 +36,7 @@ const HISTORICAL_FILES = new Set([
   "amendment-6-linkage.json",
   "amendment-7-linkage.json",
   "amendment-8-linkage.json",
+  "amendment-9-linkage.json",
 ]);
 
 /**
@@ -43,7 +45,7 @@ const HISTORICAL_FILES = new Set([
  * current amendment. Exempting it wholesale is what let it sit at "amendment 2"
  * while the package was at Amendment 4, faithfully hashed by the manifest.
  */
-const CURRENT_AMENDMENT = 8;
+const CURRENT_AMENDMENT = 9;
 
 /**
  * A line may mention a superseded term when it is explicitly marking it as
@@ -611,7 +613,7 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     expect(HISTORICAL_FILES.has("git-sha.txt")).toBe(false);
     expect(gitSha).toContain(`CURRENT — stage 1, amendment ${CURRENT_AMENDMENT}`);
     expect(gitSha.match(/^CURRENT/gm) ?? []).toHaveLength(1);
-    for (const earlier of [1, 2, 3, 4, 5, 6, 7]) {
+    for (const earlier of [1, 2, 3, 4, 5, 6, 7, 8]) {
       expect(gitSha).toContain(`HISTORICAL — amendment ${earlier}`);
     }
     expect(gitSha).toContain("No governed 115-case acquisition OCR");
@@ -960,44 +962,107 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     );
   });
 
-  it("names the complete-array function as the only candidate-emission API", () => {
+  it("names the complete-SELECTION function as the only candidate-emission API", () => {
     for (const file of [
       "acquisition-invocation-contract.json",
       "candidate-decision-contract.json",
+      "candidate-fingerprint-contract.json",
+      "evidence-schema.json",
     ]) {
       const contract = read(path.join(ROOT, file)) as {
         candidateEmissionApi: {
           module: string;
           function: string;
-          oneCallPerCompleteDiagnosticCandidateArray: boolean;
-          callerSuppliedRankedPositionProhibited: boolean;
-          secondMappingOrFinalizationLoopInTheRunnerProhibited: boolean;
+          signature: string;
+          candidateSource: string;
+          bareCandidateArrayProhibited: boolean;
+          noRuntimeTestBackdoor: boolean;
           opaqueItemIdValidatedEvenWhenTheArrayIsEmpty: boolean;
+          candidateOrdinalIsTheOriginalDiagnosticArrayIndex: boolean;
+          emittedCountMustEqualTheCompleteCandidateCount: boolean;
           prohibitedSymbolsInTheRunner: string[];
+          haltCodes: Record<string, string>;
         };
       };
       const api = contract.candidateEmissionApi;
       expect(api.module).toBe("scripts/eval/lib/issue-149-candidate-adapter.ts");
       expect(api.function).toBe("finalizeProductionCandidateArray");
-      expect(api.oneCallPerCompleteDiagnosticCandidateArray).toBe(true);
-      expect(api.callerSuppliedRankedPositionProhibited).toBe(true);
-      expect(api.secondMappingOrFinalizationLoopInTheRunnerProhibited).toBe(true);
+      expect(api.signature).toBe(
+        "finalizeProductionCandidateArray(diagnosticSelection, opaqueItemId)",
+      );
+      expect(api.candidateSource).toContain("brandDiagnostics.candidates");
+      expect(api.bareCandidateArrayProhibited).toBe(true);
+      expect(api.noRuntimeTestBackdoor).toBe(true);
       expect(api.opaqueItemIdValidatedEvenWhenTheArrayIsEmpty).toBe(true);
-      for (const symbol of [
-        "toCandidateEvidenceRecord",
-        "finalizeProductionCandidate",
-        "finalizeCandidateRecord",
-        "stableCandidateId",
-        "rankedPosition",
-      ]) {
+      expect(api.candidateOrdinalIsTheOriginalDiagnosticArrayIndex).toBe(true);
+      expect(api.emittedCountMustEqualTheCompleteCandidateCount).toBe(true);
+      expect(Object.hasOwn(api.haltCodes, "COMPLETE_DIAGNOSTICS_ABSENT")).toBe(true);
+      expect(Object.hasOwn(api.haltCodes, "CANDIDATE_EVIDENCE_TRUNCATED")).toBe(true);
+      for (const symbol of ["toCandidateEvidenceRecord", "finalizeProductionCandidate"]) {
         expect(api.prohibitedSymbolsInTheRunner).toContain(symbol);
       }
     }
-    // And the workflow no longer instructs the runner to bypass it.
+
+    // The workflow names the complete selection, not the non-existent property.
     const workflow = readFileSync(path.join(process.cwd(), ROOT, "workflow-plan.md"), "utf8");
     const execute = workflow.slice(workflow.indexOf("## Mode `execute`"));
-    expect(execute).toContain("finalizeProductionCandidateArray");
-    expect(execute).toContain("must **not** call `finalizeCandidateRecord`");
+    expect(execute).toContain(
+      "finalizeProductionCandidateArray(diagnosticSelection, opaqueItemId)",
+    );
+    expect(execute).toContain("brandDiagnostics.candidates");
+    expect(execute).toContain("must **not** reference `finalizeCandidateRecord`");
+
+    // And the adapter really exports only that one function.
+    const adapter = readFileSync(
+      path.join(process.cwd(), "scripts/eval/lib/issue-149-candidate-adapter.ts"),
+      "utf8",
+    );
+    expect(adapter).not.toContain("TEST_ONLY_candidateAdapterInternals");
+  });
+
+  it("requires a kept population to retain a ranked survivor", () => {
+    for (const file of [
+      "acquisition-invocation-contract.json",
+      "candidate-decision-contract.json",
+    ]) {
+      const contract = read(path.join(ROOT, file)) as {
+        keptPopulationMustRetainARankedSurvivor: {
+          relation: string;
+          whenNoKeptCandidates: string[];
+          whenAtLeastOneKeptCandidate: string[];
+          haltCode: string;
+          enforcedIn: string;
+        };
+      };
+      const rule = contract.keptPopulationMustRetainARankedSurvivor;
+      expect(rule.relation).toBe(
+        "(any candidate is kept) === (at least one candidate carries a decision)",
+      );
+      expect(rule.whenAtLeastOneKeptCandidate.join(" ")).toContain(
+        "exactly one selected candidate",
+      );
+      expect(rule.whenNoKeptCandidates.join(" ")).toContain("zero ranked positions");
+      expect(rule.haltCode).toBe("RANKED_MEMBERSHIP_INCONSISTENT");
+      expect(rule.enforcedIn).toBe("finalizeProductionCandidateArray");
+    }
+  });
+
+  it("keeps loadSourceImage as the single source-image byte channel", () => {
+    const plan = read(path.join(ROOT, "truth-isolation-plan.json")) as {
+      stagingByteChannel: {
+        singleChannel: string;
+        theExactVerifiedBufferIsWhatIsStaged: boolean;
+        coreResolvesNoSourcePathItself: boolean;
+        transientBytesNeverSerialized: boolean;
+        provenBy: string;
+      };
+    };
+    const channel = plan.stagingByteChannel;
+    expect(channel.singleChannel).toBe("loadSourceImage");
+    expect(channel.theExactVerifiedBufferIsWhatIsStaged).toBe(true);
+    expect(channel.coreResolvesNoSourcePathItself).toBe(true);
+    expect(channel.transientBytesNeverSerialized).toBe(true);
+    expect(existsSync(path.join(process.cwd(), channel.provenBy))).toBe(true);
   });
 
   it("requires complete score and ranking evidence on every kept candidate", () => {

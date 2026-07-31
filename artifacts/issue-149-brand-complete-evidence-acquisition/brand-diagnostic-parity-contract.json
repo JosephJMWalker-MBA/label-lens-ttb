@@ -2,7 +2,7 @@
   "artifact": "brand-diagnostic-parity-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-8.md",
+  "amendedBy": "preregistration-amendment-9.md",
   "correctionOf": {
     "priorClaim": "complete diagnostics live directly in ExtractionDebug.finalSelections.brand.brandDiagnostics.candidates",
     "whyWrong": "extractLabelEvidenceDetailed calls the ordinary selectBrandObservation, so debug.finalSelections carries the DEFAULT shape with neither filterChecks nor activeRejectionReasons. The prior claim was false and is corrected here, before any acquisition OCR."
@@ -91,5 +91,6 @@
     ],
     "implementedInThisAmendment": false
   },
-  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run."
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run.",
+  "candidateEvidenceSourceProperty": "diagnosticSelection.brandDiagnostics.candidates \u2014 read inside finalizeProductionCandidateArray, never supplied by the caller"
 }
