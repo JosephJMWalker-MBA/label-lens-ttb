@@ -2028,6 +2028,76 @@ function evaluateBrandFilterChecks(span: BrandSpan): BrandFilterCheck[] {
  * predicate runs, so a later diagnostic check structurally cannot alter the
  * result — it is computed after the decision exists and only added to a copy.
  */
+/** Prefix of every diagnostic invariant failure. Asserted by the focused tests. */
+const BRAND_FILTER_DIAGNOSTIC_INVARIANT_FAILURE = "BRAND_FILTER_DIAGNOSTIC_INVARIANT_FAILURE";
+
+/**
+ * Evaluation-only. Verify the emitted diagnostics against the authoritative
+ * decision that was already made.
+ *
+ * Runs only when complete diagnostics are enabled; the default path never
+ * reaches it. Exported so the focused tests can exercise every violation branch
+ * directly; production never calls it. It reads the authoritative `kept` and `filterReason` and never
+ * writes them, so a failing invariant surfaces a diagnostic defect rather than
+ * changing a production outcome.
+ */
+export function assertBrandFilterDiagnosticInvariants(
+  diagnostic: BrandCandidateDiagnostic,
+  filterChecks: BrandFilterCheck[],
+  activeRejectionReasons: BrandFilterCheckName[],
+): void {
+  const fail = (detail: string): never => {
+    throw new Error(
+      `${BRAND_FILTER_DIAGNOSTIC_INVARIANT_FAILURE}: ${detail} (candidate rawText=${JSON.stringify(
+        diagnostic.rawText,
+      )}, kept=${diagnostic.kept}, filterReason=${diagnostic.filterReason})`,
+    );
+  };
+
+  if (filterChecks.length !== BRAND_FILTER_CHECK_ORDER.length) {
+    fail(`expected ${BRAND_FILTER_CHECK_ORDER.length} checks, received ${filterChecks.length}`);
+  }
+  const seen = new Set<BrandFilterCheckName>();
+  for (const [index, entry] of filterChecks.entries()) {
+    if (entry.check !== BRAND_FILTER_CHECK_ORDER[index]) {
+      fail(
+        `check at position ${index} is ${entry.check}, expected ${BRAND_FILTER_CHECK_ORDER[index]}`,
+      );
+    }
+    if (seen.has(entry.check)) fail(`check ${entry.check} occurs more than once`);
+    seen.add(entry.check);
+  }
+
+  const failedInLadderOrder = filterChecks.filter((entry) => entry.failed).map((e) => e.check);
+  if (
+    activeRejectionReasons.length !== failedInLadderOrder.length ||
+    activeRejectionReasons.some((reason, index) => reason !== failedInLadderOrder[index])
+  ) {
+    fail(
+      `activeRejectionReasons ${JSON.stringify(activeRejectionReasons)} does not equal the failed checks in ladder order ${JSON.stringify(failedInLadderOrder)}`,
+    );
+  }
+
+  if (diagnostic.kept) {
+    if (activeRejectionReasons.length !== 0) {
+      fail(`kept candidate has ${activeRejectionReasons.length} active reason(s), expected 0`);
+    }
+    if (filterChecks.some((entry) => entry.failed)) {
+      fail("kept candidate has at least one failed check, expected none");
+    }
+    return;
+  }
+
+  if (activeRejectionReasons.length === 0) {
+    fail("rejected candidate has no active rejection reason");
+  }
+  if (activeRejectionReasons[0] !== diagnostic.filterReason) {
+    fail(
+      `first active reason ${activeRejectionReasons[0]} does not equal the authoritative filterReason ${diagnostic.filterReason}`,
+    );
+  }
+}
+
 function analyzeBrandSpanWithOptions(
   span: BrandSpan,
   options: BrandSelectionOptions,
@@ -2036,6 +2106,7 @@ function analyzeBrandSpanWithOptions(
   if (!options.collectCompleteFilterDiagnostics) return analysis;
   const filterChecks = evaluateBrandFilterChecks(span);
   const activeRejectionReasons = filterChecks.filter((c) => c.failed).map((c) => c.check);
+  assertBrandFilterDiagnosticInvariants(analysis.diagnostic, filterChecks, activeRejectionReasons);
   return {
     ...analysis,
     diagnostic: { ...analysis.diagnostic, filterChecks, activeRejectionReasons },
@@ -2432,10 +2503,13 @@ function buildBrandObservation(
       decision: candidate.decision,
       score: candidate.score,
       ranking: candidate.ranking,
-      // Evaluation-only. Undefined on the production path, so the emitted object
-      // is byte-identical to what it was before these fields existed.
-      filterChecks: candidate.filterChecks,
-      activeRejectionReasons: candidate.activeRejectionReasons,
+      // Evaluation-only, added by conditional spread. On the default path the
+      // emitted object has NEITHER key as an own property, so Object.keys and
+      // JSON serialization are unchanged from before these fields existed.
+      ...(candidate.filterChecks === undefined ? {} : { filterChecks: candidate.filterChecks }),
+      ...(candidate.activeRejectionReasons === undefined
+        ? {}
+        : { activeRejectionReasons: candidate.activeRejectionReasons }),
     })),
     abstentionReason: diagnostics.abstentionReason,
   });

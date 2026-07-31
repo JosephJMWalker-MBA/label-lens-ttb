@@ -10,10 +10,13 @@ import { describe, expect, it } from "vitest";
 
 import type { OcrWord, RegionOcrResult } from "./extractor.types";
 import {
+  assertBrandFilterDiagnosticInvariants,
   BRAND_FILTER_CHECK_ORDER,
   selectBrandObservation,
   selectBrandObservationWithCompleteFilterDiagnostics,
   type BrandCandidateDiagnostic,
+  type BrandFilterCheck,
+  type BrandFilterCheckName,
 } from "./field-selection";
 
 /** One synthetic word. Geometry is uniform so prominence never decides anything. */
@@ -232,6 +235,171 @@ describe("complete Brand filter diagnostics", () => {
       const on = selectBrandObservationWithCompleteFilterDiagnostics([region(lines)])
         .brandDiagnostics?.lines;
       expect(on).toEqual(off);
+    });
+  });
+
+  describe("default in-memory object shape", () => {
+    const lines = [
+      ["PRODUCED", "AND", "BOTTLED", "BY", "RED", "BRICK", "WINERY"],
+      ["Fattoria"],
+      ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"],
+    ];
+
+    it("gives default candidates neither key as an OWN property", () => {
+      const candidates = selectBrandObservation([region(lines)]).brandDiagnostics?.candidates ?? [];
+      expect(candidates.length).toBeGreaterThan(0);
+      for (const candidate of candidates) {
+        expect(Object.hasOwn(candidate, "filterChecks")).toBe(false);
+        expect(Object.hasOwn(candidate, "activeRejectionReasons")).toBe(false);
+      }
+    });
+
+    it("gives evaluation-only candidates both keys as OWN properties", () => {
+      const candidates = diagnosticsOf(lines);
+      expect(candidates.length).toBeGreaterThan(0);
+      for (const candidate of candidates) {
+        expect(Object.hasOwn(candidate, "filterChecks")).toBe(true);
+        expect(Object.hasOwn(candidate, "activeRejectionReasons")).toBe(true);
+      }
+    });
+
+    it("leaves default Object.keys free of any diagnostics key", () => {
+      const candidates = selectBrandObservation([region(lines)]).brandDiagnostics?.candidates ?? [];
+      for (const candidate of candidates) {
+        const keys = Object.keys(candidate);
+        expect(keys).not.toContain("filterChecks");
+        expect(keys).not.toContain("activeRejectionReasons");
+      }
+    });
+
+    it("leaves default JSON serialization unchanged", () => {
+      const candidates = selectBrandObservation([region(lines)]).brandDiagnostics?.candidates ?? [];
+      for (const candidate of candidates) {
+        const serialized = JSON.stringify(candidate);
+        expect(serialized).not.toContain("filterChecks");
+        expect(serialized).not.toContain("activeRejectionReasons");
+      }
+    });
+
+    it("serializes the diagnostics only on the evaluation-only path", () => {
+      const serialized = JSON.stringify(diagnosticsOf(lines));
+      expect(serialized).toContain("filterChecks");
+      expect(serialized).toContain("activeRejectionReasons");
+    });
+  });
+
+  describe("runtime invariant enforcement", () => {
+    const PREFIX = "BRAND_FILTER_DIAGNOSTIC_INVARIANT_FAILURE";
+    const allChecks = (failed: BrandFilterCheckName[] = []): BrandFilterCheck[] =>
+      BRAND_FILTER_CHECK_ORDER.map((check) => ({ check, failed: failed.includes(check) }));
+    const diag = (over: Partial<BrandCandidateDiagnostic> = {}) =>
+      ({
+        rawText: "x",
+        kept: false,
+        filterReason: "too-many-words",
+        ...over,
+      }) as BrandCandidateDiagnostic;
+
+    it("accepts a well-formed rejected candidate", () => {
+      expect(() =>
+        assertBrandFilterDiagnosticInvariants(diag(), allChecks(["too-many-words"]), [
+          "too-many-words",
+        ]),
+      ).not.toThrow();
+    });
+
+    it("accepts a well-formed kept candidate", () => {
+      expect(() =>
+        assertBrandFilterDiagnosticInvariants(
+          diag({ kept: true, filterReason: "candidate-positive" }),
+          allChecks(),
+          [],
+        ),
+      ).not.toThrow();
+    });
+
+    it("rejects a wrong number of checks", () => {
+      expect(() =>
+        assertBrandFilterDiagnosticInvariants(diag(), allChecks().slice(0, 9), []),
+      ).toThrow(new RegExp(`^${PREFIX}`));
+    });
+
+    it("rejects a duplicated check", () => {
+      const checks = allChecks();
+      checks[1] = { check: "producer-line", failed: false };
+      expect(() => assertBrandFilterDiagnosticInvariants(diag(), checks, [])).toThrow(
+        new RegExp(`^${PREFIX}`),
+      );
+    });
+
+    it("rejects checks out of ladder order", () => {
+      const checks = allChecks();
+      [checks[0], checks[1]] = [checks[1], checks[0]];
+      expect(() => assertBrandFilterDiagnosticInvariants(diag(), checks, [])).toThrow(
+        new RegExp(`^${PREFIX}`),
+      );
+    });
+
+    it("rejects active reasons that do not equal the failed checks in order", () => {
+      expect(() =>
+        assertBrandFilterDiagnosticInvariants(
+          diag(),
+          allChecks(["producer-line", "too-many-words"]),
+          ["too-many-words", "producer-line"],
+        ),
+      ).toThrow(new RegExp(`^${PREFIX}`));
+    });
+
+    it("rejects a rejected candidate with no active reason", () => {
+      expect(() => assertBrandFilterDiagnosticInvariants(diag(), allChecks(), [])).toThrow(
+        new RegExp(`^${PREFIX}`),
+      );
+    });
+
+    it("rejects a first active reason that is not the authoritative filterReason", () => {
+      expect(() =>
+        assertBrandFilterDiagnosticInvariants(
+          diag({ filterReason: "domain-like" }),
+          allChecks(["too-many-words"]),
+          ["too-many-words"],
+        ),
+      ).toThrow(new RegExp(`^${PREFIX}`));
+    });
+
+    it("rejects a kept candidate carrying an active reason", () => {
+      expect(() =>
+        assertBrandFilterDiagnosticInvariants(
+          diag({ kept: true, filterReason: "candidate-positive" }),
+          allChecks(["too-many-words"]),
+          ["too-many-words"],
+        ),
+      ).toThrow(new RegExp(`^${PREFIX}`));
+    });
+
+    it("rejects a kept candidate carrying a failed check", () => {
+      const checks = allChecks(["too-many-words"]);
+      expect(() =>
+        assertBrandFilterDiagnosticInvariants(
+          diag({ kept: true, filterReason: "candidate-positive" }),
+          checks,
+          [],
+        ),
+      ).toThrow(new RegExp(`^${PREFIX}`));
+    });
+
+    it("holds for every candidate the pipeline actually builds", () => {
+      // The enabled path asserts on every candidate; reaching this point without
+      // a throw is the proof.
+      expect(() =>
+        diagnosticsOf([
+          ["PRODUCED", "AND", "BOTTLED", "BY", "RED", "BRICK", "WINERY"],
+          ["www.example-winery.com", "and", "more", "prose", "here"],
+          ["Fattoria"],
+          ["CONTAINS", "SULFITES", "12%", "ALC"],
+          ["cabernet", "sauvignon"],
+          ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"],
+        ]),
+      ).not.toThrow();
     });
   });
 });
