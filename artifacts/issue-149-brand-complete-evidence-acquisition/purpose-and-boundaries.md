@@ -1,6 +1,9 @@
 # Purpose and boundaries
 
-Stage 1: planning and preregistration only. **No OCR has run.**
+Stage 1, **amended** at base `546c3f279ce431a1fd8c0203df7a83553ea866ef`
+(PR #220 merge). Planning and preregistration only. **No acquisition OCR has
+run**, under either the original or the amended plan. See
+`preregistration-amendment.md`.
 
 ## What this sprint is for
 
@@ -54,8 +57,12 @@ Three requirements in the brief are **not satisfiable** without a production
 change. They are stated here, before acquisition, rather than discovered
 afterwards:
 
-**1. "Every individual filter check" and "every active rejection reason" — not
-available.** The Brand filter is a short-circuit `if`-chain
+**1. "Every individual filter check" and "every active rejection reason" —
+RESOLVED by merged PR #220.** The text below records the original finding; the
+capability now exists behind an evaluation-only, default-off entry point. Kept
+for provenance, superseded in practice.
+
+**Original finding, no longer current:** The Brand filter is a short-circuit `if`-chain
 (`field-selection.ts:1649-1917`) that returns on the first failing rule.
 Production records exactly one `filterReason` per candidate. The checks after it
 are never evaluated, so their results do not exist. Emitting a reason *array*

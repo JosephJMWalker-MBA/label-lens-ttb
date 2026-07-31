@@ -1,0 +1,24 @@
+{
+  "artifact": "evidence-volume-rule",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "principle": "Preserve complete, uncapped evidence. This is a Git storage gate, never an evidence-completeness exception.",
+  "expectedTotalEstimate": "15-40 MB for primary plus repeat, extrapolated from the committed 15-case baseline",
+  "gate": {
+    "atOrBelow100MB": "commit the raw evidence according to the governed plan",
+    "above100MB": "complete the run and preserve the workflow artifact, but STOP before committing raw evidence to Git, and report"
+  },
+  "reportedEitherWay": [
+    "exact total bytes",
+    "bytes by category: pass records, word records, line records, candidate records, manifests",
+    "the largest individual files"
+  ],
+  "neverPermitted": [
+    "truncating evidence",
+    "sampling evidence",
+    "discarding evidence",
+    "destructively recompressing evidence",
+    "omitting evidence"
+  ],
+  "ifTheGateFires": "The evidence still exists in full as a workflow artifact. Only its commitment to Git is withheld, and that fact is reported rather than resolved by shrinking the evidence."
+}

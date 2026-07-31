@@ -1,0 +1,31 @@
+{
+  "artifact": "amendment-linkage",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "amendmentNumber": 1,
+  "amendedBeforeAnyAcquisitionOcr": true,
+  "original": {
+    "stage1Head": "7600b0a9ba5ce6995274a517121f1eda18a30424",
+    "base": "8f0c6a7ca7c271eed14d9084ed6da7fe11f897a9",
+    "preregistrationSha256": "7b691c78a9de008039ccc1a7f94824015373b1caec58f8235c78a03587c641fb",
+    "preservedNotOverwritten": true,
+    "preservedAt": "preregistration-amendment.md, which reproduces the original identity and states what changed and why"
+  },
+  "amended": {
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "baseIsPr220MergeCommit": true,
+    "pr220MergeCommit": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
+    "preregistrationSha256": "cfc118c670a9c69f783f3ca58174113711b553baf1278da31a35e31121bf13ad"
+  },
+  "governedAcquisitionOcrUnderOriginalPreregistration": {
+    "occurred": false,
+    "evidence": "No raw/ directory, no raw-evidence manifest and no execution workflow ever existed on this branch. The original Stage 1 commit added planning artifacts only, and CI on that commit ran no acquisition."
+  },
+  "reasonForAmendment": [
+    "PR #220 merged, supplying complete default-off filter diagnostics, which resolves the original first-reason-only limitation.",
+    "The original acquisition input exposed historical case IDs and fixture paths; opaque item IDs and generic staged filenames replace them.",
+    "The original pre-freeze scan compared emitted evidence against governed Brand strings, which would misread a legitimate OCR transcript as leakage; truth-string comparison moves to post-freeze.",
+    "Candidate identity was a truncated digest; it becomes an ordinal plus a full 64-character digest with collision and count assertions.",
+    "A repository-footprint gate was needed for the raw evidence."
+  ]
+}

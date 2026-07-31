@@ -30,11 +30,14 @@ The governed Issue #149 pattern, unchanged:
 
 1. Assert the runner is native `linux/amd64` and record its identity.
 2. Re-run the Stage 1 freeze script and confirm it reproduces
-   `population-freeze.json` and `truth-free-input-manifest.json` bit-for-bit.
+   `population-freeze.json`, `truth-free-input-manifest.json` and
+   `post-freeze/id-map.json` bit-for-bit, and restages the 115 opaque images.
 3. Verify the incumbent configuration against
    `incumbent-configuration-freeze.json`: tesseract.js and tesseract.js-core
    resolved versions, `eng.traineddata` SHA-256, OEM, page-segmentation modes,
-   pass templates. Halt on any difference.
+   pass templates, **and the `field-selection.ts` SHA-256
+   `8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c`**. Halt on
+   any difference.
 4. Verify all 115 source images by SHA-256 and byte size.
 5. Confirm `preregistration.sha256` verifies.
 6. Assert the acquisition input carries no truth-bearing field.
@@ -44,8 +47,11 @@ Discovery reads images to hash them. It runs no OCR pass.
 ## Mode `execute` — the only OCR
 
 1. Re-verify everything discovery verified.
-2. Run the **primary** matrix: all 115 cases, unchanged incumbent path, reading
-   `extractionDebug` rather than the capped `CaseReport`.
+2. Run the **primary** matrix: all 115 opaque items, unchanged incumbent path,
+   through `selectBrandObservationWithCompleteFilterDiagnostics`, reading
+   `extractionDebug` rather than the capped `CaseReport`. The container mounts
+   only `.local/issue-149-acquisition-inputs` read-only and an empty output
+   directory. The post-freeze ID map is not mounted.
 3. Assert per-pass and per-case counting proofs; halt on
    `RAW_EVIDENCE_TRUNCATED`, `LINE_EVIDENCE_TRUNCATED` or
    `CANDIDATE_EVIDENCE_TRUNCATED`.
@@ -57,8 +63,12 @@ Discovery reads images to hash them. It runs no OCR pass.
    No configuration changes between runs. No retries. No selective rerun.
 7. Compare the two runs at every level in `determinism-rules.json` and report
    every difference without repairing any of it.
-8. **Truth boundary.** Only now does the post-freeze evaluation open the governed
-   truth, and only to validate completeness and cross-check the prior artifacts.
+8. Apply the **100 MB repository-footprint gate**: report exact total bytes,
+   bytes by category and largest files; commit at or below 100 MB, and above it
+   preserve the workflow artifact and stop before committing raw evidence.
+9. **Truth boundary.** Only now does the post-freeze evaluation open
+   `post-freeze/id-map.json` and the governed truth, to attach historical
+   identity, validate completeness and cross-check the prior artifacts.
 
 Both matrices run exactly once. The workflow contains no path that reruns a
 single case.

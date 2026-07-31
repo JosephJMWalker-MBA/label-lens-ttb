@@ -30,6 +30,30 @@ Nothing else. The brief asks for these "where available"; they are not available
 assembled text and pass provenance, not word membership. Candidate-to-line
 membership is recoverable through `lineIndexes`; word-to-line membership is not.
 
+Both were re-verified against the real types at base `546c3f27…`. Neither is
+invented or approximated.
+
+## The staging step is trusted, by necessity
+
+Something must know which historical image becomes `item-0001`, because something
+must copy it. That knowledge lives in the freeze script, which runs before and
+outside the acquisition process. The acquisition process sees only a directory of
+`item-NNNN.<ext>` files.
+
+This is a real trust boundary, not an absence of one: if the staging step were
+wrong, every downstream mapping would be wrong in the same way. It is tested, but
+it is tested against its own output, so a systematic staging error would not be
+caught by these tests. The image SHA-256 carried on both sides is the check that
+would catch it, and it is asserted.
+
+## The 100 MB gate could withhold evidence from Git
+
+If the raw evidence exceeds 100 MB the run still completes and the workflow
+artifact still holds everything, but the evidence does not enter Git. That means
+a reviewer working only from the repository would not see it. The gate reports
+exact bytes so the gap is visible rather than silent, but it is a real reduction
+in what the repository alone can show.
+
 ## Production caps candidate generation, and that bounds any counterfactual
 
 `MAX_BRAND_WORDS = 4` and `MAX_MULTI_LINE_SEEDS_PER_LINE = 3` mean windows longer

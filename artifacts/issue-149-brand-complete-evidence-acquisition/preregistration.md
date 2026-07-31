@@ -2,8 +2,13 @@
 
 Refs Issue #149. **Evidence acquisition only.** Frozen before any OCR runs.
 
-Base: `origin/main` `8f0c6a7ca7c271eed14d9084ed6da7fe11f897a9`, the merge commit
-of PR #218.
+Base: `origin/main` `546c3f279ce431a1fd8c0203df7a83553ea866ef`, the merge commit
+of PR #220.
+
+**Amended before any acquisition OCR.** See `preregistration-amendment.md` for
+what changed and why; the original plan (head `7600b0a9…`, base `8f0c6a7c…`,
+hash `7b691c78…`) is preserved, not overwritten. No governed acquisition OCR
+occurred under the original preregistration.
 
 This sprint does **not** KEEP or KILL a production change, choose a successor
 treatment, or simulate any filter relaxation. It authorizes no production change.
@@ -26,9 +31,30 @@ Exactly the 115 included cases represented in merged PR #217 and PR #218:
 verified by SHA-256 and byte size against `eval-manifest.json`. Total source
 imagery 38,683,897 bytes. The 44-case PR #218 subset is verified to be a subset.
 
-The acquisition input is a **truth-free manifest** carrying only `caseId`,
-`imagePath`, `sourceImageSha256` and `sourceImageByteSize`. It is scanned for
-truth-bearing substrings before it is written.
+### Acquisition identity is opaque
+
+Every case is addressed by an opaque `item-NNNN` identifier, assigned 1-based and
+zero-padded in ascending order of source-image SHA-256 so the sequence carries no
+ordering signal from the historical names. Images are staged under generic
+`item-NNNN.<ext>` filenames in an untracked directory, and that directory is the
+only input the acquisition process receives.
+
+The acquisition input carries exactly four fields: `opaqueItemId`,
+`stagedImageFileName`, `sourceImageSha256`, `sourceImageByteSize`. It contains no
+historical case ID, no fixture path, no governed truth, no acceptable value, no
+prior per-case classification and no PR #217 or PR #218 record. The freeze script
+fails closed if any of those survives into it.
+
+The historical mapping lives at `post-freeze/id-map.json` — outside every
+acquisition mount, outside the staged input directory and outside every raw
+evidence directory. The acquisition process never imports, reads, resolves or
+receives it. The mapping is opened only during post-freeze evaluation, after both
+raw manifests are written, hashed and verified. This separation is tested in
+`src/fixtures/eval/issue-149-acquisition-isolation.test.ts`.
+
+The staging step that copies the images necessarily knows the mapping, because
+something must. It runs before and outside the acquisition process, and it is not
+the acquisition process.
 
 Execution halts on an unexpected case count, a missing or additional case, an
 image hash or byte-size mismatch, a changed engine, traineddata, transform or
@@ -40,6 +66,8 @@ No case is expanded, substituted or excluded.
 
 | Element | Frozen value |
 | --- | --- |
+| Base / PR #220 merge commit | `546c3f279ce431a1fd8c0203df7a83553ea866ef` |
+| `field-selection.ts` SHA-256 | `8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c` |
 | tesseract.js / tesseract.js-core | 7.0.0 / 7.0.0 |
 | `eng.traineddata` | `5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747`, 5,199,098 B |
 | OEM | 1 (LSTM only) |
@@ -47,9 +75,14 @@ No case is expanded, substituted or excluded.
 | Pass planning | `planPrimaryOcrPass` + `planRecoveryOcrPasses`, unchanged triggers |
 | Crop, transform, line reconstruction, candidate construction, filters, ranking, selection, authority | unchanged |
 
-No experimental flag is enabled.
+The acquisition harness is authorized to call exactly one non-default entry
+point: **`selectBrandObservationWithCompleteFilterDiagnostics`**, merged in
+PR #220. It is evaluation-only and changes no selection behaviour. Production
+`selectBrandObservation` remains unchanged and default-off.
+
 `selectBrandObservationWithCoherentLineMergeTreatment` is **not** called;
-`DEFAULT_BRAND_SELECTION_OPTIONS.allowCoherentPlausibleLineMerge` stays `false`.
+`allowCoherentPlausibleLineMerge` stays `false`. No other experimental flag is
+enabled.
 
 ## How completeness is achieved without changing anything
 
@@ -74,14 +107,24 @@ environment, package and host provenance are recorded for both.
 
 ## Truth isolation
 
-The acquisition process receives no governed Brand truth, no acceptable values,
-no truth-match booleans, no expected classifications, no PR #217 or PR #218
-per-case results and no filter-relaxation expectations. It emits no `isTruth`,
-`matchesTruth`, `truthInRawOcr`, `truthFilterReasons` or `expectedBrand` field.
+The acquisition process receives no historical case ID, no Brand-bearing
+filename, no historical fixture path, no governed Brand truth, no acceptable
+values, no prior per-case classification, no PR #217 or PR #218 record and not
+the post-freeze ID map. Every raw output filename uses the opaque item ID only.
+
+**The pre-freeze scan looks for keys, files and identifiers — not Brand
+strings.** It scans for prohibited JSON keys, unexpected mounted files,
+historical case IDs, historical fixture paths, governed truth files,
+acceptable-value files, prior per-case evaluation artifacts and the ID map. It
+does **not** compare OCR transcripts or candidate values against governed Brand
+strings, because a legitimate transcript may naturally contain the Brand text —
+that is evidence, not leakage, and checking it would require opening a truth file
+before the truth boundary. Truth-string inventory and comparison belong to
+post-freeze evaluation only.
 
 Both runs complete and both raw-evidence manifests are written and hashed
-**before any governed truth file is opened**. A banned field name appearing as a
-key halts with `TRUTH_ISOLATION_FAILURE`.
+**before the ID map or any governed truth file is opened**. A hit halts with
+`TRUTH_ISOLATION_FAILURE`.
 
 ## Complete raw OCR evidence
 
@@ -98,8 +141,9 @@ Observed maximum words and lines per case are recorded, and the emitted counts
 must equal the debug array lengths. Any inequality halts with
 `RAW_EVIDENCE_TRUNCATED` or `LINE_EVIDENCE_TRUNCATED`.
 
-**Not available, recorded as absent with the reason:** word baseline geometry;
-block, paragraph and line identifiers; constituent word IDs per line.
+**Not available, verified against the real types at this base and recorded as
+absent with the reason:** word baseline geometry; block, paragraph and line
+identifiers; constituent word IDs per line. No field is invented to fill these.
 
 ## Complete Brand candidate-decision evidence
 
@@ -119,22 +163,51 @@ halts with `CANDIDATE_EVIDENCE_TRUNCATED`.
 
 No truth label is attached during acquisition.
 
-### The blocker, stated before acquisition
+### Complete filter diagnostics — the original blocker is resolved
 
-**"Every individual filter check" and "every active rejection reason" cannot be
-recorded.** The filter is a short-circuit `if`-chain returning on the first
-failing rule, in the order `producer-line`, `no-letters-or-too-short`,
+The original plan recorded that only the first firing rule was observable.
+**Merged PR #220 resolves that.** For every candidate the acquisition persists:
+
+- `filterChecks` — the complete ordered array of all ten rules with whether each
+  failed;
+- `activeRejectionReasons` — every failed rule in ladder order;
+- the authoritative `filterReason`, which for a rejected candidate equals
+  `activeRejectionReasons[0]`;
+- kept/rejected status.
+
+The ladder order is `producer-line`, `no-letters-or-too-short`,
 `non-brand-keyword`, `too-many-words`, `domain-like`, `varietal-or-designation`,
 `generic-product-language`, `location-or-appellation`,
-`low-information-fragment`, `sentence-fragment`. Production records exactly one
-reason per candidate; the later checks are never evaluated and their results do
-not exist. Emitting an array would require a production change, and the
-predicates are unexported so they cannot be re-evaluated offline.
+`low-information-fragment`, `sentence-fragment`.
 
-Consequence, recorded now rather than discovered later: **a one-filter
-counterfactual built on this evidence remains an upper bound**, because removing
-a candidate's recorded reason does not reveal whether a later rule would then
-reject it.
+**The harness does not recompute any predicate.** It consumes what PR #220
+emits, so no second implementation can drift from production. PR #220 enforces
+eight runtime invariants whenever diagnostics are enabled, throwing on the prefix
+`BRAND_FILTER_DIAGNOSTIC_INVARIANT_FAILURE`.
+
+Acquisition halts with `COMPLETE_DIAGNOSTICS_ABSENT` if either field is missing
+from any candidate.
+
+### Candidate identity
+
+Identity is an ordinal plus a full digest, never a truncated hash: `opaqueItemId`,
+`candidateOrdinal` into the exact unprojected production array,
+`completeCandidateArrayLength`, a 64-character `canonicalRecordSha256`, and a
+`stableCandidateId` of `${opaqueItemId}:${ordinal}:${digest}`.
+
+Asserted: ordinals begin at 0, are contiguous and occur exactly once; candidate
+IDs are unique within each case; the emitted count equals the unprojected
+diagnostic-array count; no record is silently overwritten or deduplicated.
+Halts with `CANDIDATE_ID_COLLISION` or `CANDIDATE_EVIDENCE_TRUNCATED`.
+
+### Evidence volume
+
+Complete and uncapped. Expected 15–40 MB for both runs. A repository-footprint
+gate applies: at or below 100 MB commit per the governed plan; above 100 MB
+complete the run, preserve the workflow artifact, and stop before committing raw
+evidence to Git, reporting exact total bytes, bytes by category and largest
+files. **It is a Git storage gate, never an evidence-completeness exception** —
+nothing is truncated, sampled, discarded, recompressed destructively or omitted.
 
 ## Raw evidence freeze
 
@@ -185,10 +258,11 @@ mean "all candidates" means all candidates production formed.
 
 ## State at the time of this freeze
 
-No OCR has run. No recognizer has been downloaded or executed. No production
-code, OCR configuration, traineddata, preprocessing, crop planning, recovery
-trigger, Brand reconstruction, filter, ranking, selection, authority, truth,
-normalization, threshold, alias or state semantic has been changed. No filter
+No acquisition OCR has run and no execution workflow exists. No recognizer has
+been downloaded or executed. No production code, OCR configuration, traineddata,
+preprocessing, crop planning, recovery trigger, Brand reconstruction, filter,
+ranking, selection, authority, truth, normalization, threshold, alias or state
+semantic has been changed by this PR. No filter
 relaxation has been implemented or simulated. No successor treatment has been
 chosen. No corpus case has been expanded, substituted or excluded. PR #195 is
 untouched, and PRs #214, #216, #217 and #218 are not reinterpreted.
