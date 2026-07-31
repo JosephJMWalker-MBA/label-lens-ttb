@@ -202,48 +202,47 @@ and nothing else. The post-freeze ID map is not mounted.
 
 1. Re-verify everything discovery verified.
 2. Run the **primary** matrix: all 115 opaque items through a DIRECT
-   `extractLabelEvidenceDetailed` call — never `runCaseArtifacts` — then obtain
-   complete diagnostics with a second, exact-pass-set call to
-   `selectBrandObservationWithCompleteFilterDiagnostics`, asserting **full-object
-   canonical parity** against `debug.finalSelections.brand` once only
-   `filterChecks` and `activeRejectionReasons` are removed, and halting on
-   `BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE`. Parity is whole-object equality;
-   no field allowlist is authoritative.
+   `extractLabelEvidenceDetailed` call — never `runCaseArtifacts`. The complete
+   diagnostics, the exact-pass-set rule and the parity assertion are all owned by
+   `finalizeProductionBrandEvidence` in step 4; the runner does not perform them.
+
 3. Persist the **complete ordered `RegionOcrResult` array** — all thirteen fields
    of every pass, in emission order — per
    `region-ocr-result-replay-contract.json`; halt on `PASS_EVIDENCE_TRUNCATED` or
    `PASS_ORDER_MISMATCH`. This is what makes the counterfactual in capability 3
    replayable later, without OCR.
-4. Emit candidates through **exactly one call** to
-   `finalizeProductionCandidateArray(diagnosticSelection, opaqueItemId)` from
-   `scripts/eval/lib/issue-149-candidate-adapter.ts`, passing the **complete
-   `FieldSelection`** that
-   `selectBrandObservationWithCompleteFilterDiagnostics` returned. The adapter
-   reads the population from `diagnosticSelection.brandDiagnostics.candidates`
-   itself.
+4. Emit Brand evidence through **exactly one call** to
+   `finalizeProductionBrandEvidence(detailed.value.debug, opaqueItemId)` from
+   `scripts/eval/lib/issue-149-candidate-adapter.ts`, passing the complete
+   `ExtractionDebug` that `extractLabelEvidenceDetailed` returned.
 
-   Do **not** pass `diagnosticSelection.candidates` — that property does not
-   exist on `FieldSelection` — and do not pass a candidate array of any kind. A
-   bare-array parameter would let a runner hand over a filtered or truncated
-   population while technically calling the approved function.
+   That one call does everything internally: it reconstructs the exact production
+   Brand pass set (`primary OBSERVED ? [debug.passes[0]] : debug.passes`), invokes
+   `selectBrandObservationWithCompleteFilterDiagnostics` itself, performs the
+   full-object canonical parity assertion against `debug.finalSelections.brand`,
+   derives the candidate population only from the selection **it** created,
+   finalizes it, and asserts the emitted count. It returns the derived
+   `diagnosticSelection` and the finalized `candidateRecords`.
 
-   That single call validates the complete evidence schema before hashing,
-   assigns ranked membership from `decision`, orders members with production's
-   comparator, and enforces contiguity, uniqueness, the exactly-one-selected
-   invariant and the global rule that a kept population must retain a ranked
-   survivor. It halts with `COMPLETE_DIAGNOSTICS_ABSENT` if the diagnostics or
-   the candidate array are missing, and with `CANDIDATE_EVIDENCE_TRUNCATED` if the
-   emitted count disagrees with the complete diagnostic candidate count.
+   The runner supplies **no** candidate array, **no** `FieldSelection`, **no**
+   `diagnosticSelection`, **no** Brand diagnostics object and **no**
+   `rankedPosition`, and it must never call
+   `selectBrandObservationWithCompleteFilterDiagnostics` itself. Earlier
+   signatures took a bare array, and then a caller-supplied selection — which
+   still allowed a filtered population wrapped in a freshly constructed
+   `FieldSelection`. Taking `ExtractionDebug` removes the route rather than
+   prohibiting it.
 
-   The runner must **not** reference `finalizeCandidateRecord`,
-   `finalizeProductionCandidate`, `toCandidateEvidenceRecord`,
-   `stableCandidateId` or `CandidateAdapterContext` for Brand candidate emission,
-   and must not construct a `rankedPosition` itself. There is no runtime
-   test-only interface to reach them through: the adapter exports one function.
-   Trusted Job A additionally scans **every** Stage 2 acquisition source input in
-   the dependency closure, because the runner-source guard is first-order by
-   construction. The canonical helper remains permitted for pass validation,
-   semantic fingerprinting and exact-byte hashing.
+   Halts: `MALFORMED_OPAQUE_ITEM_ID`, `DEBUG_PASSES_ABSENT`,
+   `BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE` (no evidence is returned),
+   `COMPLETE_DIAGNOSTICS_ABSENT`, `CANDIDATE_EVIDENCE_TRUNCATED`.
+
+   The adapter's runtime namespace exports exactly `CandidateAdapterError` and
+   `finalizeProductionBrandEvidence` — verified by importing the module, not by a
+   source regex. Trusted Job A additionally scans every Stage 2 acquisition source
+   input in the dependency closure, because the runner-source guard is
+   first-order by construction. The canonical helper remains permitted for pass
+   validation, semantic fingerprinting and exact-byte hashing.
 
 5. On a case-level extractor failure, persist the typed failure record — error
    code, message, issues, opaque item ID, source-image SHA-256. **No partial

@@ -27,6 +27,7 @@ const HISTORICAL_FILES = new Set([
   "preregistration-amendment-7.md",
   "preregistration-amendment-8.md",
   "preregistration-amendment-9.md",
+  "preregistration-amendment-10.md",
   "branch-pointer-incident.md",
   "amendment-linkage.json",
   "amendment-2-linkage.json",
@@ -37,6 +38,7 @@ const HISTORICAL_FILES = new Set([
   "amendment-7-linkage.json",
   "amendment-8-linkage.json",
   "amendment-9-linkage.json",
+  "amendment-10-linkage.json",
 ]);
 
 /**
@@ -45,7 +47,7 @@ const HISTORICAL_FILES = new Set([
  * current amendment. Exempting it wholesale is what let it sit at "amendment 2"
  * while the package was at Amendment 4, faithfully hashed by the manifest.
  */
-const CURRENT_AMENDMENT = 9;
+const CURRENT_AMENDMENT = 10;
 
 /**
  * A line may mention a superseded term when it is explicitly marking it as
@@ -613,7 +615,7 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     expect(HISTORICAL_FILES.has("git-sha.txt")).toBe(false);
     expect(gitSha).toContain(`CURRENT — stage 1, amendment ${CURRENT_AMENDMENT}`);
     expect(gitSha.match(/^CURRENT/gm) ?? []).toHaveLength(1);
-    for (const earlier of [1, 2, 3, 4, 5, 6, 7, 8]) {
+    for (const earlier of [1, 2, 3, 4, 5, 6, 7, 8, 9]) {
       expect(gitSha).toContain(`HISTORICAL — amendment ${earlier}`);
     }
     expect(gitSha).toContain("No governed 115-case acquisition OCR");
@@ -962,7 +964,7 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     );
   });
 
-  it("names the complete-SELECTION function as the only candidate-emission API", () => {
+  it("names the debug-owned function as the only public Brand evidence API", () => {
     for (const file of [
       "acquisition-invocation-contract.json",
       "candidate-decision-contract.json",
@@ -974,50 +976,81 @@ describe("Issue #149 Stage 1 contract consistency", () => {
           module: string;
           function: string;
           signature: string;
-          candidateSource: string;
-          bareCandidateArrayProhibited: boolean;
-          noRuntimeTestBackdoor: boolean;
-          opaqueItemIdValidatedEvenWhenTheArrayIsEmpty: boolean;
-          candidateOrdinalIsTheOriginalDiagnosticArrayIndex: boolean;
-          emittedCountMustEqualTheCompleteCandidateCount: boolean;
-          prohibitedSymbolsInTheRunner: string[];
+          firstArgument: string;
+          theRunnerSuppliesNo: string[];
+          theRunnerNeverCalls: string;
+          internalSteps: string[];
+          supersededRoutes: string[];
+          runtimeExportSurface: string[];
+          runtimeExportSurfaceVerifiedBy: string;
           haltCodes: Record<string, string>;
         };
       };
       const api = contract.candidateEmissionApi;
       expect(api.module).toBe("scripts/eval/lib/issue-149-candidate-adapter.ts");
-      expect(api.function).toBe("finalizeProductionCandidateArray");
-      expect(api.signature).toBe(
-        "finalizeProductionCandidateArray(diagnosticSelection, opaqueItemId)",
-      );
-      expect(api.candidateSource).toContain("brandDiagnostics.candidates");
-      expect(api.bareCandidateArrayProhibited).toBe(true);
-      expect(api.noRuntimeTestBackdoor).toBe(true);
-      expect(api.opaqueItemIdValidatedEvenWhenTheArrayIsEmpty).toBe(true);
-      expect(api.candidateOrdinalIsTheOriginalDiagnosticArrayIndex).toBe(true);
-      expect(api.emittedCountMustEqualTheCompleteCandidateCount).toBe(true);
-      expect(Object.hasOwn(api.haltCodes, "COMPLETE_DIAGNOSTICS_ABSENT")).toBe(true);
-      expect(Object.hasOwn(api.haltCodes, "CANDIDATE_EVIDENCE_TRUNCATED")).toBe(true);
-      for (const symbol of ["toCandidateEvidenceRecord", "finalizeProductionCandidate"]) {
-        expect(api.prohibitedSymbolsInTheRunner).toContain(symbol);
+      expect(api.function).toBe("finalizeProductionBrandEvidence");
+      expect(api.signature).toBe("finalizeProductionBrandEvidence(debug, opaqueItemId)");
+      expect(api.firstArgument).toContain("ExtractionDebug");
+      expect(api.theRunnerSuppliesNo).toContain("FieldSelection");
+      expect(api.theRunnerSuppliesNo).toContain("candidate array");
+      expect(api.theRunnerNeverCalls).toBe("selectBrandObservationWithCompleteFilterDiagnostics");
+      expect(api.internalSteps.join(" ")).toContain("primary OBSERVED ? [debug.passes[0]]");
+      expect(api.supersededRoutes.join(" ")).toContain("caller-supplied FieldSelection");
+      expect(api.runtimeExportSurface).toEqual([
+        "CandidateAdapterError",
+        "finalizeProductionBrandEvidence",
+      ]);
+      expect(api.runtimeExportSurfaceVerifiedBy).toContain("not a source regex");
+      for (const code of [
+        "DEBUG_PASSES_ABSENT",
+        "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE",
+        "COMPLETE_DIAGNOSTICS_ABSENT",
+        "CANDIDATE_EVIDENCE_TRUNCATED",
+      ]) {
+        expect(Object.hasOwn(api.haltCodes, code)).toBe(true);
       }
     }
 
-    // The workflow names the complete selection, not the non-existent property.
     const workflow = readFileSync(path.join(process.cwd(), ROOT, "workflow-plan.md"), "utf8");
     const execute = workflow.slice(workflow.indexOf("## Mode `execute`"));
     expect(execute).toContain(
-      "finalizeProductionCandidateArray(diagnosticSelection, opaqueItemId)",
+      "finalizeProductionBrandEvidence(detailed.value.debug, opaqueItemId)",
     );
-    expect(execute).toContain("brandDiagnostics.candidates");
-    expect(execute).toContain("must **not** reference `finalizeCandidateRecord`");
+    expect(execute).toContain("must never call");
+    expect(execute).not.toContain("finalizeProductionCandidateArray(diagnosticSelection");
+  });
 
-    // And the adapter really exports only that one function.
-    const adapter = readFileSync(
-      path.join(process.cwd(), "scripts/eval/lib/issue-149-candidate-adapter.ts"),
-      "utf8",
-    );
-    expect(adapter).not.toContain("TEST_ONLY_candidateAdapterInternals");
+  it("performs parity inside the public boundary and returns nothing on failure", () => {
+    const parity = read(path.join(ROOT, "brand-diagnostic-parity-contract.json")) as {
+      parityIsInternalToThePublicApi: {
+        performedInside: string;
+        algorithm: string[];
+        automaticallyIncludes: string[];
+        authority: string;
+        noEvidenceReturnedOnFailure: boolean;
+        haltCode: string;
+      };
+    };
+    const rule = parity.parityIsInternalToThePublicApi;
+    expect(rule.performedInside).toBe("finalizeProductionBrandEvidence");
+    expect(rule.algorithm.join(" ")).toContain("ONLY filterChecks and activeRejectionReasons");
+    expect(rule.automaticallyIncludes).toContain("brandDiagnostics.lines");
+    expect(rule.authority).toBe("debug.finalSelections.brand");
+    expect(rule.noEvidenceReturnedOnFailure).toBe(true);
+    expect(rule.haltCode).toBe("BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE");
+  });
+
+  it("proves the staging truth-access boundary rather than asserting it", () => {
+    const plan = read(path.join(ROOT, "truth-isolation-plan.json")) as {
+      jobATruthAccess: {
+        provenBy: { proxyAccessProof: string; recursiveMutationProof: string; priorGap: string };
+      };
+    };
+    const proven = plan.jobATruthAccess.provenBy;
+    expect(proven.proxyAccessProof).toContain("Proxy");
+    expect(proven.proxyAccessProof).toContain("REAL core");
+    expect(proven.recursiveMutationProof).toContain("booleans");
+    expect(proven.priorGap).toContain("knownAmbiguous");
   });
 
   it("requires a kept population to retain a ranked survivor", () => {

@@ -5,11 +5,11 @@ Refs Issue #149. **Evidence acquisition only.** Frozen before any OCR runs.
 Base: `origin/main` `546c3f279ce431a1fd8c0203df7a83553ea866ef`, the merge commit
 of PR #220.
 
-**Amended nine times, every time before any governed acquisition OCR.** See
+**Amended ten times, every time before any governed acquisition OCR.** See
 `preregistration-amendment.md` and `preregistration-amendment-2.md` through
-`preregistration-amendment-9.md`. All earlier plans are preserved, not
+`preregistration-amendment-10.md`. All earlier plans are preserved, not
 overwritten, and their identities are recorded in `amendment-linkage.json` and
-`amendment-2-linkage.json` through `amendment-9-linkage.json`. **The Stage 1 trusted freeze/staging generator and its temporary
+`amendment-2-linkage.json` through `amendment-10-linkage.json`. **The Stage 1 trusted freeze/staging generator and its temporary
 reproducibility mode have run — that is what produced the three committed
 artifacts. No Stage 2 Job A workflow, truth-free preparation artifact,
 runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR
@@ -284,6 +284,15 @@ opaque ordering and the staged filenames are unchanged. It does **not** claim
 independence from `governedTruth.present`, because the script deliberately uses
 that flag.
 
+**Governed truth access in staging is proven, not asserted.** Every
+`governedTruth` object is wrapped in a `Proxy` that throws on reading or
+enumerating any property except `present`, and the **real** core is then run: a
+successful run is direct evidence that nothing else is read. A companion test
+recursively mutates every non-`present` leaf — strings, booleans, finite numbers,
+arrays and nested objects — and asserts all three outputs stay byte-identical. An
+earlier version mutated only strings and arrays, so the Boolean `knownAmbiguous`
+in the frozen source went untouched.
+
 **`loadSourceImage` is the only source-image byte channel.** The exact Buffer the
 loader returned — the one that was hashed and size-checked — is what gets written
 to the opaque staged file, and the core resolves no source path against
@@ -497,22 +506,37 @@ Halts with `CANDIDATE_ID_COLLISION` or `CANDIDATE_EVIDENCE_TRUNCATED`.
 
 ### One call emits the candidates
 
-The **only** authorized candidate-emission API is
-`finalizeProductionCandidateArray(diagnosticSelection, opaqueItemId)` from
+The **only** public Brand evidence API is
+`finalizeProductionBrandEvidence(debug, opaqueItemId)` from
 `scripts/eval/lib/issue-149-candidate-adapter.ts`, called exactly once per item
-with the **complete `FieldSelection`** that
-`selectBrandObservationWithCompleteFilterDiagnostics` returned.
+with the complete **`ExtractionDebug`** that `extractLabelEvidenceDetailed`
+returned.
 
-The adapter reads the population from
-`diagnosticSelection.brandDiagnostics.candidates` **itself**. An earlier signature
-took a bare array — and the workflow named `diagnosticSelection.candidates`, which
-does not exist on `FieldSelection` — so a runner could have handed over a filtered
-or truncated population while technically calling the approved function. It halts
-with `COMPLETE_DIAGNOSTICS_ABSENT` if the diagnostics or the candidate array are
-missing, and with `CANDIDATE_EVIDENCE_TRUNCATED` if the emitted count disagrees
-with the complete diagnostic candidate count. `candidateOrdinal` is the original
-diagnostic-array index, and `opaqueItemId` is validated even when the population
-is empty. The runner may not call `finalizeCandidateRecord`,
+Everything else is derived inside that call: the exact production Brand pass set
+(`primary OBSERVED ? [debug.passes[0]] : debug.passes`), the invocation of
+`selectBrandObservationWithCompleteFilterDiagnostics`, the full-object parity
+assertion against `debug.finalSelections.brand`, the candidate population — taken
+only from the selection the adapter itself created — and the finalized records.
+It returns the derived `diagnosticSelection` and the `candidateRecords`.
+
+**The runner supplies no selection and no candidate array, and never calls the
+diagnostic selector.** Two earlier signatures were not enough. A bare array was
+replaced by a caller-supplied `FieldSelection`, and a caller could still filter
+the candidates, wrap them in a freshly constructed selection and pass that — this
+package's own tests demonstrated the bypass. Taking `ExtractionDebug` removes the
+route instead of prohibiting it: there is no caller-reachable point at which the
+population can be filtered, projected or replaced.
+
+Halts: `MALFORMED_OPAQUE_ITEM_ID`, `DEBUG_PASSES_ABSENT`,
+`BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE` — **no evidence is returned on a
+parity failure** — `COMPLETE_DIAGNOSTICS_ABSENT`, and
+`CANDIDATE_EVIDENCE_TRUNCATED`. `candidateOrdinal` is the original
+diagnostic-array index, and `opaqueItemId` is validated before anything else.
+
+The adapter's runtime namespace exports exactly `CandidateAdapterError` and
+`finalizeProductionBrandEvidence`. That is verified by importing the module and
+inspecting its actual own keys, not by a source regex — a regex can miss export
+forms, and an inferred export surface is not an export surface. The runner may not call `finalizeCandidateRecord`,
 `finalizeProductionCandidate`, `toCandidateEvidenceRecord`, `stableCandidateId` or
 `TEST_ONLY_candidateAdapterInternals` for Brand candidate emission, and may not
 construct a `rankedPosition` itself.

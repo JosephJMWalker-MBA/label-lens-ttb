@@ -57,7 +57,7 @@
       "recommending a filter treatment"
     ]
   },
-  "amendedBy": "preregistration-amendment-9.md",
+  "amendedBy": "preregistration-amendment-10.md",
   "opaqueIdentity": {
     "scheme": "item-NNNN, 1-based, zero-padded to four digits",
     "assignmentOrder": "ascending source-image SHA-256, so the sequence is deterministic and carries no ordering signal from the historical names",
@@ -242,7 +242,12 @@
     "evaluationUseTruthBoundaryRemains": "between actor 2 and actor 3",
     "onlyActor3MayUseGovernedTruthAgainstAcquiredEvidence": true,
     "noninterferenceClaimIsBounded": "Complete noninterference from governedTruth.present is NOT claimed: the script intentionally uses that flag for the 105/10 accounting assertion. What is claimed, and tested, is that acceptable Brand values and other truth TEXT do not influence the truth-free input manifest, the opaque ordering or the staged filenames.",
-    "stagingIndependenceTestedBy": "src/fixtures/eval/issue-149-staging-independence.test.ts"
+    "stagingIndependenceTestedBy": "src/fixtures/eval/issue-149-staging-independence.test.ts",
+    "provenBy": {
+      "proxyAccessProof": "src/fixtures/eval/issue-149-staging-independence.test.ts wraps every governedTruth object in a Proxy that throws on reading or enumerating any property except `present`, then runs the REAL core. A successful run is direct evidence that nothing else is read.",
+      "recursiveMutationProof": "the same file recursively mutates every non-`present` leaf \u2014 strings, booleans, finite numbers, arrays and nested objects \u2014 and asserts all three generated outputs stay byte-identical.",
+      "priorGap": "An earlier mutation test changed only strings and arrays, so the Boolean field knownAmbiguous in the frozen source was never mutated."
+    }
   },
   "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run.",
   "stagingByteChannel": {

@@ -237,35 +237,38 @@ describe("Issue #149 acquisition identity and isolation", () => {
       }
     });
 
-    describe("the complete-array candidate API is the only authorized route", () => {
+    describe("the debug-owned evidence API is the only authorized route", () => {
       /**
-       * Lower-level candidate-emission symbols. Each accepts, or implies, a
-       * caller-supplied ranked position, so a runner could "use the reference
-       * adapter" while inventing positions itself — bypassing
-       * production-comparator ordering, decision-based membership, contiguity,
-       * uniqueness and the exactly-one-selected invariant.
+       * Symbols that would let a runner construct, filter, project or replace the
+       * diagnostic selection before candidate emission — or bypass the adapter
+       * entirely. Each is a route the public API exists to remove.
        */
       const PROHIBITED_CANDIDATE_SYMBOLS = [
+        "selectBrandObservationWithCompleteFilterDiagnostics",
+        "finalizeProductionCandidateArray",
         "toCandidateEvidenceRecord",
         "finalizeProductionCandidate",
         "finalizeCandidateRecord",
         "stableCandidateId",
         "CandidateAdapterContext",
         "TEST_ONLY_candidateAdapterInternals",
+        "brandDiagnostics",
+        "diagnosticSelection",
         "rankedPosition",
       ];
-      /** The one module allowed to define these — it IS the adapter. */
+      const REQUIRED_CALL = "finalizeProductionBrandEvidence";
+      /** The one module allowed to define and use these — it IS the adapter. */
       const ADAPTER_MODULE = "scripts/eval/lib/issue-149-candidate-adapter.ts";
-      const REQUIRED_CALL = "finalizeProductionCandidateArray";
 
-      function candidateApiOffences(source: string): string[] {
+      function candidateApiOffences(source: string, filePath = "runner"): string[] {
+        if (filePath === ADAPTER_MODULE) return [];
         const offences: string[] = [];
         if (!new RegExp(`\\b${REQUIRED_CALL}\\s*\\(`).test(source)) {
           offences.push(`does not invoke ${REQUIRED_CALL}`);
         }
         for (const symbol of PROHIBITED_CANDIDATE_SYMBOLS) {
-          // `finalizeProductionCandidate` is a prefix of the required call, so
-          // the boundary must exclude the array form explicitly.
+          // `finalizeProductionCandidate` is a prefix of the superseded array
+          // form, so the boundary excludes it explicitly.
           const pattern =
             symbol === "finalizeProductionCandidate"
               ? /\bfinalizeProductionCandidate\b(?!Array)/
@@ -275,113 +278,114 @@ describe("Issue #149 acquisition identity and isolation", () => {
         return offences;
       }
 
-      it("accepts exactly one complete-array call per item", () => {
+      it("accepts exactly one debug-owned call per item", () => {
         const good = `
-import { finalizeProductionCandidateArray } from "../lib/issue-149-candidate-adapter";
-const records = finalizeProductionCandidateArray(diagnostics.candidates, opaqueItemId);
+import { finalizeProductionBrandEvidence } from "../lib/issue-149-candidate-adapter";
+const { candidateRecords } = finalizeProductionBrandEvidence(detailed.value.debug, opaqueItemId);
 `;
         expect(candidateApiOffences(good)).toEqual([]);
       });
 
-      it("rejects a per-candidate finalization loop", () => {
-        const loop = `
-import { finalizeCandidateRecord } from "../lib/issue-149-evidence-canonical";
-const records = diagnostics.candidates.map((c, i) => finalizeCandidateRecord(adapt(c, i)));
+      it("rejects the superseded complete-array call", () => {
+        const superseded = `
+import { finalizeProductionCandidateArray } from "../lib/issue-149-candidate-adapter";
+const records = finalizeProductionCandidateArray(diagnosticSelection, opaqueItemId);
 `;
-        expect(candidateApiOffences(loop)).toContain("references finalizeCandidateRecord");
-        expect(candidateApiOffences(loop)).toContain(
-          "does not invoke finalizeProductionCandidateArray",
+        const offences = candidateApiOffences(superseded);
+        expect(offences).toContain("references finalizeProductionCandidateArray");
+        expect(offences).toContain("references diagnosticSelection");
+        expect(offences).toContain("does not invoke finalizeProductionBrandEvidence");
+      });
+
+      it("rejects a runner that calls the diagnostic selector itself", () => {
+        const selecting = `
+import { selectBrandObservationWithCompleteFilterDiagnostics } from "@/pipeline/extractor/field-selection";
+const sel = selectBrandObservationWithCompleteFilterDiagnostics(debug.passes);
+`;
+        expect(candidateApiOffences(selecting)).toContain(
+          "references selectBrandObservationWithCompleteFilterDiagnostics",
         );
       });
 
-      it("rejects finalizeProductionCandidate with a caller-supplied position", () => {
+      it("rejects a runner that touches brandDiagnostics.candidates", () => {
+        const projecting = `
+import { finalizeProductionBrandEvidence } from "../lib/issue-149-candidate-adapter";
+const kept = sel.brandDiagnostics.candidates.filter((c) => c.kept);
+finalizeProductionBrandEvidence(debug, opaqueItemId);
+`;
+        expect(candidateApiOffences(projecting)).toContain("references brandDiagnostics");
+      });
+
+      it("rejects a per-candidate finalization loop and a manual position", () => {
+        const loop = `
+import { finalizeCandidateRecord } from "../lib/issue-149-evidence-canonical";
+const records = candidates.map((c, i) => finalizeCandidateRecord(adapt(c, i)));
+`;
+        expect(candidateApiOffences(loop)).toContain("references finalizeCandidateRecord");
         const manual = `
 import { finalizeProductionCandidate } from "../lib/issue-149-candidate-adapter";
 const record = finalizeProductionCandidate(candidate, { opaqueItemId, rankedPosition: 0 });
 `;
-        const offences = candidateApiOffences(manual);
-        expect(offences).toContain("references finalizeProductionCandidate");
-        expect(offences).toContain("references rankedPosition");
-      });
-
-      it("rejects a runner that maps diagnostics itself", () => {
-        const mapped = `
-import { toCandidateEvidenceRecord } from "../lib/issue-149-candidate-adapter";
-const records = diagnostics.candidates.map((c, i) => toCandidateEvidenceRecord(c, ctx(i)));
-`;
-        expect(candidateApiOffences(mapped)).toContain("references toCandidateEvidenceRecord");
-      });
-
-      it("rejects reaching through the test-only interface", () => {
-        const sneaky = `
-import { TEST_ONLY_candidateAdapterInternals } from "../lib/issue-149-candidate-adapter";
-const records = TEST_ONLY_candidateAdapterInternals.finalizeProductionCandidate(c, ctx);
-`;
-        expect(candidateApiOffences(sneaky)).toContain(
-          "references TEST_ONLY_candidateAdapterInternals",
-        );
+        expect(candidateApiOffences(manual)).toContain("references finalizeProductionCandidate");
+        expect(candidateApiOffences(manual)).toContain("references rankedPosition");
       });
 
       it("binds any runner that exists", () => {
         const offences: string[] = [];
         for (const file of present) {
           const source = readFileSync(path.join(process.cwd(), file), "utf8");
-          for (const offence of candidateApiOffences(source)) {
+          for (const offence of candidateApiOffences(source, file)) {
             offences.push(`${file} ${offence}`);
           }
         }
         expect(offences).toEqual([]);
       });
 
-      it("exports exactly one candidate-emission function and no test backdoor", () => {
-        const adapter = readFileSync(path.join(process.cwd(), ADAPTER_MODULE), "utf8");
-        expect(adapter).toMatch(/^export function finalizeProductionCandidateArray/m);
-        expect(adapter).not.toMatch(/^export function toCandidateEvidenceRecord/m);
-        expect(adapter).not.toMatch(/^export function finalizeProductionCandidate\(/m);
-        expect(adapter).not.toMatch(/^export interface CandidateAdapterContext/m);
-        expect(adapter).not.toMatch(/^export function assertRankedArrayInvariants/m);
-        // No runtime object may re-expose the private functions. A helper the
-        // runner imports could otherwise reach them without the runner source
-        // containing a prohibited symbol.
-        expect(adapter).not.toContain("TEST_ONLY_candidateAdapterInternals");
-        const exported = [...adapter.matchAll(/^export (?:function|const|class|interface) (\w+)/gm)]
-          .map((match) => match[1])
-          .filter((name) => name !== "CandidateAdapterError");
-        expect(exported).toEqual(["finalizeProductionCandidateArray"]);
-      });
-
-      it("catches a lower-level call hidden in a helper, not only in the runner", () => {
-        // The runner regex is first-order by construction. The Job A
-        // source-closure gate is what makes the property transitive, and this is
-        // the detector it uses over EVERY Stage 2 acquisition source input.
-        const closureFiles = [
+      it("catches a filtering helper the runner imports, not only the runner", () => {
+        // The runner regex is first-order by construction. Job A's transitive
+        // source-closure gate is what makes the property hold, and this is the
+        // detector it applies to EVERY Stage 2 acquisition source input.
+        const closure = [
           {
             path: "dist/acquisition/run.js",
-            contents: 'import { emit } from "./emit.js";\nemit(sel);',
+            contents:
+              'import { emit } from "./emit.js";\nconst records = emit(detailed.value.debug, opaqueItemId);',
           },
           {
             path: "dist/acquisition/emit.js",
             contents:
-              'import { finalizeProductionCandidate } from "../lib/issue-149-candidate-adapter";\nexport const emit = (s) => finalizeProductionCandidate(s.c, { rankedPosition: 0 });',
+              'import { finalizeProductionBrandEvidence } from "../lib/issue-149-candidate-adapter";\nexport const emit = (debug, id) => {\n  const sel = structuredClone(debug.finalSelections.brand);\n  sel.brandDiagnostics.candidates = sel.brandDiagnostics.candidates.filter((c) => c.kept);\n  return finalizeProductionBrandEvidence({ ...debug, finalSelections: { brand: sel } }, id);\n};',
           },
         ];
-        const offences = closureFiles.flatMap((file) =>
-          file.path === ADAPTER_MODULE
-            ? []
-            : PROHIBITED_CANDIDATE_SYMBOLS.filter((symbol) => {
-                const pattern =
-                  symbol === "finalizeProductionCandidate"
-                    ? /\bfinalizeProductionCandidate\b(?!Array)/
-                    : new RegExp(`\\b${symbol}\\b`);
-                return pattern.test(file.contents);
-              }).map((symbol) => `${file.path} references ${symbol}`),
+        const offences = closure.flatMap((file) =>
+          candidateApiOffences(file.contents, file.path).map(
+            (offence) => `${file.path} ${offence}`,
+          ),
         );
-        // The runner file alone is clean; the closure is not.
-        expect(closureFiles[0].contents).not.toContain("finalizeProductionCandidate");
-        expect(offences).toContain(
-          "dist/acquisition/emit.js references finalizeProductionCandidate",
-        );
-        expect(offences).toContain("dist/acquisition/emit.js references rankedPosition");
+        // The runner file alone contains no prohibited symbol; the closure does.
+        expect(candidateApiOffences(closure[0].contents, closure[0].path)).toEqual([
+          "does not invoke finalizeProductionBrandEvidence",
+        ]);
+        expect(offences).toContain("dist/acquisition/emit.js references brandDiagnostics");
+      });
+
+      it("passes a clean closure that hands the debug object straight through", () => {
+        const clean = [
+          {
+            path: "dist/acquisition/run.js",
+            contents:
+              'import { finalizeProductionBrandEvidence } from "../lib/issue-149-candidate-adapter";\nconst { candidateRecords } = finalizeProductionBrandEvidence(detailed.value.debug, opaqueItemId);',
+          },
+        ];
+        const offences = clean.flatMap((file) => candidateApiOffences(file.contents, file.path));
+        expect(offences).toEqual([]);
+      });
+
+      it("exempts the adapter module itself", () => {
+        const adapter = readFileSync(path.join(process.cwd(), ADAPTER_MODULE), "utf8");
+        expect(candidateApiOffences(adapter, ADAPTER_MODULE)).toEqual([]);
+        // ...and the adapter really does contain what it is exempt for.
+        expect(adapter).toContain("selectBrandObservationWithCompleteFilterDiagnostics");
       });
 
       it("does not claim the first-order regex proves the transitive property", () => {
@@ -402,10 +406,23 @@ const records = TEST_ONLY_candidateAdapterInternals.finalizeProductionCandidate(
         expect(gate.ownedBy).toContain("Job A");
         expect(gate.scansEveryStage2AcquisitionSourceInput).toBe(true);
         expect(gate.theDirectRunnerRegexIsNotTransitive).toBe(true);
-        expect(gate.requiredSoleEmissionCall).toBe("finalizeProductionCandidateArray");
-        for (const symbol of ["toCandidateEvidenceRecord", "finalizeProductionCandidate"]) {
+        expect(gate.requiredSoleEmissionCall).toBe("finalizeProductionBrandEvidence");
+        for (const symbol of [
+          "selectBrandObservationWithCompleteFilterDiagnostics",
+          "finalizeProductionCandidateArray",
+          "caller construction or replacement of brandDiagnostics.candidates",
+        ]) {
           expect(gate.prohibitedOutsideTheAdapterModule).toContain(symbol);
         }
+      });
+
+      it("exports exactly the error class and the debug-owned API", async () => {
+        // Authoritative: the real runtime namespace, not a source regex.
+        const namespace = await import("../../../scripts/eval/lib/issue-149-candidate-adapter");
+        expect(Object.keys(namespace).sort()).toEqual([
+          "CandidateAdapterError",
+          "finalizeProductionBrandEvidence",
+        ]);
       });
     });
 

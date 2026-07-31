@@ -38,6 +38,7 @@ const SCRIPT = "scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs";
 const CORE = "scripts/eval/lib/issue-149-freeze-core.mjs";
 const ROOT = "artifacts/issue-149-brand-complete-evidence-acquisition";
 const REAL_STAGED = path.join(process.cwd(), ".local/issue-149-acquisition-inputs");
+const GOVERNED_DIRECTORY = "artifacts/issue-149-brand-complete-evidence-acquisition";
 
 const read = (p: string): unknown => JSON.parse(readFileSync(path.join(process.cwd(), p), "utf8"));
 const GENERATED = [
@@ -250,38 +251,77 @@ describe("Issue #149 Stage 1 generated-artifact reproducibility", () => {
     }, 300_000);
   });
 
-  it("never writes a tracked Stage 1 artifact from any Stage 1 test", () => {
-    // A standing guard: reading the governed package is fine, writing it is not.
-    const testsDirectory = path.join(process.cwd(), "src/fixtures/eval");
-    const stage1Tests = readdirSync(testsDirectory).filter(
-      (entry) => entry.startsWith("issue-149-") && entry.endsWith(".test.ts"),
-    );
-    expect(stage1Tests.length).toBeGreaterThanOrEqual(8);
+  describe("tracked Stage 1 artifacts are not written by tests", () => {
+    it("verifies the governed package is byte-identical and clean, authoritatively", () => {
+      // The authoritative check: the real manifest verifier plus Git status over
+      // the governed directory. It proves the package is intact NOW; it does not
+      // and cannot detect a write that was performed and restored mid-test.
+      const manifest = execFileSync(
+        "node",
+        ["scripts/eval/issue-149-stage-1-contract-manifest.mjs", "--verify"],
+        { cwd: process.cwd(), encoding: "utf8", maxBuffer: 32 * 1024 * 1024 },
+      );
+      expect((JSON.parse(manifest) as { status: string }).status).toBe("VERIFIED");
 
-    const writers = [
-      /writeFileSync\(/,
-      /appendFileSync\(/,
-      /copyFileSync\(/,
-      /rmSync\(/,
-      /mkdirSync\(/,
-    ];
-    const offences: string[] = [];
-    for (const file of stage1Tests) {
-      const source = readFileSync(path.join(testsDirectory, file), "utf8");
-      const lines = source.split("\n");
-      lines.forEach((line, index) => {
-        if (!writers.some((pattern) => pattern.test(line))) return;
-        // A write is an offence only when its destination is the governed package.
-        const window = lines.slice(index, index + 4).join(" ");
-        if (/ROOT|artifacts\/issue-149-brand-complete-evidence-acquisition/.test(window)) {
-          // ...unless the destination is demonstrably a temporary directory.
-          if (!/expectedRoot|scratch|tmpdir\(\)|destinations\[/.test(window)) {
-            offences.push(`${file}:${index + 1}`);
-          }
-        }
+      const diff = execFileSync("git", ["status", "--porcelain", "--", GOVERNED_DIRECTORY], {
+        cwd: process.cwd(),
+        encoding: "utf8",
       });
-    }
-    expect(offences).toEqual([]);
+      // Amendment work legitimately leaves modifications, and a NEW governed
+      // artifact is untracked until it is committed. What must never appear is an
+      // untracked file the Stage 1 manifest does not cover — which is what a
+      // stray test write would produce.
+      const untracked = diff
+        .split("\n")
+        .filter((line) => line.startsWith("??"))
+        .map((line) => line.slice(3).trim())
+        .filter((file) => file.length > 0);
+      const manifested = new Set(
+        readFileSync(
+          path.join(process.cwd(), `${GOVERNED_DIRECTORY}/stage-1-contract-manifest.sha256`),
+          "utf8",
+        )
+          .split("\n")
+          .filter((line) => !line.startsWith("#") && line.trim().length > 0)
+          .map((line) => line.split("  ")[1]),
+      );
+      const unaccounted = untracked.filter((file) => !manifested.has(file));
+      expect(unaccounted).toEqual([]);
+    }, 180_000);
+
+    it("finds no obvious tracked write in the Stage 1 tests — a SUPPLEMENTARY heuristic", () => {
+      // Deliberately labelled. This scans a fixed set of filesystem call names in
+      // a small source window. It cannot see aliases, `fs.promises`, helper
+      // functions or indirect writes, so it is a smoke check and NOT proof that a
+      // tracked write is impossible. The authoritative facts are the test above
+      // and the drift tests, which use only temporary expected artifacts.
+      const testsDirectory = path.join(process.cwd(), "src/fixtures/eval");
+      const stage1Tests = readdirSync(testsDirectory).filter(
+        (entry) => entry.startsWith("issue-149-") && entry.endsWith(".test.ts"),
+      );
+      expect(stage1Tests.length).toBeGreaterThanOrEqual(8);
+
+      const writers = [
+        /writeFileSync\(/,
+        /appendFileSync\(/,
+        /copyFileSync\(/,
+        /rmSync\(/,
+        /mkdirSync\(/,
+      ];
+      const offences: string[] = [];
+      for (const file of stage1Tests) {
+        const source = readFileSync(path.join(testsDirectory, file), "utf8");
+        const lines = source.split("\n");
+        lines.forEach((line, index) => {
+          if (!writers.some((pattern) => pattern.test(line))) return;
+          const window = lines.slice(index, index + 4).join(" ");
+          if (!/ROOT|artifacts\/issue-149-brand-complete-evidence-acquisition/.test(window)) return;
+          if (/expectedRoot|scratch|tmpdir\(\)|destinations\[/.test(window)) return;
+          offences.push(`${file}:${index + 1}`);
+        });
+      }
+      expect(offences).toEqual([]);
+    });
   });
 
   it("reads the forbidden-key inventory from the canonical asset", () => {

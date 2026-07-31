@@ -105,40 +105,123 @@ describe("Issue #149 staging independence, driven through the real core", () => 
     expect(Object.keys(first.governedTruth).length).toBeGreaterThan(1);
   });
 
-  it("produces identical staging when acceptable values and truth text change", () => {
+  it("never reads a governed-truth property other than `present`", () => {
+    // The direct proof. Every governedTruth object is wrapped in a Proxy that
+    // throws on any access except `present`, so a successful run is evidence that
+    // the real core reads nothing else — stronger than hoping a mutation shows up
+    // in an output.
+    const violations: string[] = [];
+    const guarded = clone(source);
+    for (const entry of guarded.cases) {
+      const truth = entry.governedTruth;
+      entry.governedTruth = new Proxy(truth, {
+        get(target, property, receiver) {
+          if (property === "present") return Reflect.get(target, property, receiver);
+          // Vitest and structuredClone probe a few well-known symbols; only
+          // string property reads are governed-truth accesses.
+          if (typeof property === "symbol") return Reflect.get(target, property, receiver);
+          violations.push(`get ${String(property)}`);
+          throw new Error(`governed truth property read: ${String(property)}`);
+        },
+        ownKeys() {
+          violations.push("ownKeys");
+          throw new Error("governed truth enumerated");
+        },
+        getOwnPropertyDescriptor(target, property) {
+          if (property === "present") {
+            return Reflect.getOwnPropertyDescriptor(target, property);
+          }
+          violations.push(`descriptor ${String(property)}`);
+          throw new Error(`governed truth descriptor read: ${String(property)}`);
+        },
+      }) as AttributionCase["governedTruth"];
+    }
+
+    // The guard must be load-bearing: reading any other property throws.
+    const probe = guarded.cases[0].governedTruth;
+    expect(probe.present).toBe(source.cases[0].governedTruth.present);
+    expect(() => (probe as Record<string, unknown>).acceptableValues).toThrow(
+      /governed truth property read/,
+    );
+    expect(() => Object.keys(probe)).toThrow(/governed truth enumerated/);
+    violations.length = 0;
+
+    const guardedRun = runRealCore(guarded);
+    expect(violations).toEqual([]);
+
+    // And it produced the same truth-free outputs as an unguarded run.
+    const baseline = runRealCore(clone(source));
+    expect(guardedRun.manifestBytes.equals(baseline.manifestBytes)).toBe(true);
+    expect(guardedRun.idMapBytes.equals(baseline.idMapBytes)).toBe(true);
+    expect(guardedRun.populationBytes.equals(baseline.populationBytes)).toBe(true);
+  }, 300_000);
+
+  it("produces identical staging when EVERY non-present truth field changes", () => {
     const baseline = runRealCore(clone(source));
 
-    // Mutate every governed-truth field EXCEPT `present`, plus acceptable values
-    // wherever they appear. Identity, inclusion, image paths, hashes and bytes
-    // are untouched.
+    // Recursively mutate every non-`present` leaf: strings get a sentinel,
+    // booleans invert, finite numbers change, arrays and nested objects are
+    // traversed. An earlier version changed only strings and arrays, so
+    // `knownAmbiguous: false` — a real field in the frozen source — went
+    // untouched.
+    const visited: string[] = [];
+    let booleansChanged = 0;
+    const mutate = (value: unknown, at: string): unknown => {
+      if (Array.isArray(value))
+        return value.map((entry, index) => mutate(entry, `${at}[${index}]`));
+      if (value !== null && typeof value === "object") {
+        const out: Record<string, unknown> = {};
+        for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+          out[key] = mutate(child, `${at}.${key}`);
+        }
+        return out;
+      }
+      visited.push(at);
+      if (typeof value === "string") return MUTATED_TEXT;
+      if (typeof value === "boolean") {
+        booleansChanged += 1;
+        return !value;
+      }
+      if (typeof value === "number" && Number.isFinite(value)) return value + 7;
+      return value;
+    };
+
     const mutatedSource = clone(source);
     for (const entry of mutatedSource.cases) {
+      const governedTruth: AttributionCase["governedTruth"] = {
+        present: entry.governedTruth.present,
+      };
       for (const [key, value] of Object.entries(entry.governedTruth)) {
         if (key === "present") continue;
-        entry.governedTruth[key] =
-          typeof value === "string"
-            ? MUTATED_TEXT
-            : Array.isArray(value)
-              ? [MUTATED_ACCEPTABLE]
-              : value;
+        governedTruth[key] = mutate(value, key);
       }
+      entry.governedTruth = governedTruth;
       (entry as Record<string, unknown>).acceptableValues = [MUTATED_ACCEPTABLE];
     }
-    const mutated = runRealCore(mutatedSource);
 
-    // Opaque ordering, staged filenames, and the complete manifest cases —
-    // including the REAL byte sizes, not a substituted zero.
+    // The mutation really did reach a boolean, and specifically knownAmbiguous.
+    expect(booleansChanged).toBeGreaterThan(0);
+    const frozenFirst = source.cases[0].governedTruth;
+    if (Object.hasOwn(frozenFirst, "knownAmbiguous")) {
+      expect(visited.some((at) => at.startsWith("knownAmbiguous"))).toBe(true);
+      expect(mutatedSource.cases[0].governedTruth.knownAmbiguous).toBe(!frozenFirst.knownAmbiguous);
+    }
+    // Every non-present field of the first case was visited.
+    for (const key of Object.keys(frozenFirst).filter((key) => key !== "present")) {
+      expect(
+        visited.some((at) => at === key || at.startsWith(`${key}.`) || at.startsWith(`${key}[`)),
+      ).toBe(true);
+    }
+
+    const mutated = runRealCore(mutatedSource);
     expect(mutated.stagedListing).toEqual(baseline.stagedListing);
     expect(mutated.manifest.cases).toEqual(baseline.manifest.cases);
     expect(mutated.manifest.cases.every((entry) => entry.sourceImageByteSize > 0)).toBe(true);
     expect(mutated.idMap.map).toEqual(baseline.idMap.map);
-
-    // Byte-for-byte equality of the truth-free outputs is the strongest form.
     expect(mutated.manifestBytes.equals(baseline.manifestBytes)).toBe(true);
     expect(mutated.idMapBytes.equals(baseline.idMapBytes)).toBe(true);
     expect(mutated.populationBytes.equals(baseline.populationBytes)).toBe(true);
 
-    // And none of the mutated text reached any output.
     for (const bytes of [mutated.manifestBytes, mutated.idMapBytes, mutated.populationBytes]) {
       expect(bytes.includes(Buffer.from(MUTATED_TEXT, "utf8"))).toBe(false);
       expect(bytes.includes(Buffer.from(MUTATED_ACCEPTABLE, "utf8"))).toBe(false);

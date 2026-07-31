@@ -2,7 +2,7 @@
   "artifact": "brand-diagnostic-parity-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-9.md",
+  "amendedBy": "preregistration-amendment-10.md",
   "correctionOf": {
     "priorClaim": "complete diagnostics live directly in ExtractionDebug.finalSelections.brand.brandDiagnostics.candidates",
     "whyWrong": "extractLabelEvidenceDetailed calls the ordinary selectBrandObservation, so debug.finalSelections carries the DEFAULT shape with neither filterChecks nor activeRejectionReasons. The prior claim was false and is corrected here, before any acquisition OCR."
@@ -13,7 +13,9 @@
     "step3": "call selectBrandObservationWithCompleteFilterDiagnostics over that exact pass set",
     "code": "const brandPasses = debug.primarySelections.brand.observation.state === \"OBSERVED\" ? [debug.passes[0]] : debug.passes;\nconst diagnosticSelection = selectBrandObservationWithCompleteFilterDiagnostics(brandPasses);",
     "unconditionalAllPassesProhibited": true,
-    "unconditionalAllPassesProhibitedWhy": "Production retains the PRIMARY selection when primary Brand is OBSERVED, and only otherwise selects over the complete pass array. Calling the diagnostic selector over all passes unconditionally would produce a different candidate population from production on every OBSERVED case."
+    "unconditionalAllPassesProhibitedWhy": "Production retains the PRIMARY selection when primary Brand is OBSERVED, and only otherwise selects over the complete pass array. Calling the diagnostic selector over all passes unconditionally would produce a different candidate population from production on every OBSERVED case.",
+    "obtainedInsideTheAdapter": true,
+    "theRunnerNeverCallsTheSelector": true
   },
   "mirrorsProductionBecause": {
     "source": "src/pipeline/extractor/extractor.ts",
@@ -92,5 +94,26 @@
     "implementedInThisAmendment": false
   },
   "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run.",
-  "candidateEvidenceSourceProperty": "diagnosticSelection.brandDiagnostics.candidates \u2014 read inside finalizeProductionCandidateArray, never supplied by the caller"
+  "candidateEvidenceSourceProperty": "the INTERNALLY derived diagnosticSelection.brandDiagnostics.candidates \u2014 never a caller-supplied selection or array",
+  "parityIsInternalToThePublicApi": {
+    "performedInside": "finalizeProductionBrandEvidence",
+    "algorithm": [
+      "deep-clone the internally derived diagnosticSelection",
+      "remove ONLY filterChecks and activeRejectionReasons from every Brand candidate",
+      "canonicalize the complete stripped FieldSelection",
+      "canonicalize debug.finalSelections.brand with the same frozen algorithm",
+      "require exact canonical equality"
+    ],
+    "automaticallyIncludes": [
+      "brandDiagnostics.lines",
+      "all observation fields",
+      "all provenance fields",
+      "every candidate field",
+      "future enumerable FieldSelection fields"
+    ],
+    "authority": "debug.finalSelections.brand",
+    "theDerivedSelectionSuppliesOnly": ["filterChecks", "activeRejectionReasons"],
+    "noEvidenceReturnedOnFailure": true,
+    "haltCode": "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE"
+  }
 }

@@ -1,7 +1,7 @@
 546c3f279ce431a1fd8c0203df7a83553ea866ef
 base: origin/main 546c3f279ce431a1fd8c0203df7a83553ea866ef (merge commit of PR #220)
 
-CURRENT — stage 1, amendment 9:
+CURRENT — stage 1, amendment 10:
   preregistration sha256: see preregistration.sha256
   stage 1 contract-package aggregate: see stage-1-contract-manifest.sha256
   field-selection.ts sha256 at this base: 8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c
@@ -51,3 +51,7 @@ HISTORICAL — amendment 7:
 HISTORICAL — amendment 8:
   head: dd50a9e258705b77d2109514f4a495c64b364036
   preregistration sha256: 7edbaeace6217c0fb1b51d20c3b3db2d4e024a84ba31d697a3a354f43f2a5d85
+
+HISTORICAL — amendment 9:
+  head: 849ecbb1e50eab4d9f5ec53edf5f92dc56015d05
+  preregistration sha256: 15fe208b96fc9b1fdff53f0637b5a002d31d4393d3e8e48354937ec051678176

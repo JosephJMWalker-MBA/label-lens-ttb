@@ -1,21 +1,23 @@
 /**
- * Issue #149 — the one reference adapter from a production
- * `BrandCandidateDiagnostic` to a persisted candidate evidence record.
+ * Issue #149 — the one public Brand evidence API.
  *
  * Evaluation-only and non-OCR. **The Stage 2 acquisition runner must use this
- * adapter rather than reimplementing the mapping.** A second mapping could drift
+ * module rather than reimplementing the mapping.** A second mapping could drift
  * from production's shape without any test noticing — which is exactly how the
  * six-key `ocrConfidence` schema survived Amendment 5.
  *
  * It lives outside `src/fixtures/**` for the same reason the canonical helper
- * does. It imports production TYPES from
- * `src/pipeline/extractor/field-selection` **and one runtime function**,
- * `compareCandidateRanking` — deliberately, so ranked order is production's own
- * comparator rather than a reimplementation. The invocation contract permits
- * that module on the acquisition route.
+ * does. It imports production TYPES and **two runtime functions**:
+ * `compareCandidateRanking`, so ranked order is production's own comparator
+ * rather than a reimplementation, and
+ * `selectBrandObservationWithCompleteFilterDiagnostics`, so the diagnostic
+ * selection is derived HERE and never handed in by a caller. The invocation
+ * contract permits that module on the acquisition route.
  */
+import type { ExtractionDebug } from "@/pipeline/extractor/extractor";
 import {
   compareCandidateRanking,
+  selectBrandObservationWithCompleteFilterDiagnostics,
   type BrandCandidateDiagnostic,
   type BrandFilterCheck,
   type BrandFilterCheckName,
@@ -25,6 +27,7 @@ import {
 import {
   CANDIDATE_CANONICALIZATION_VERSION,
   type CandidateEvidenceRecord,
+  canonicalize,
   finalizeCandidateRecord,
 } from "./issue-149-evidence-canonical";
 
@@ -37,7 +40,9 @@ export class CandidateAdapterError extends Error {
       | "PROVENANCE_DISAGREES_WITH_CANDIDATE"
       | "CANDIDATE_EVIDENCE_TRUNCATED"
       | "RANKED_MEMBERSHIP_INCONSISTENT"
-      | "RANKED_POSITION_PARITY_FAILURE",
+      | "RANKED_POSITION_PARITY_FAILURE"
+      | "DEBUG_PASSES_ABSENT"
+      | "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE",
     detail: string,
   ) {
     super(`${code}: ${detail}`);
@@ -253,7 +258,7 @@ const forComparator = (diagnostic: BrandCandidateDiagnostic): RankingCarrier =>
  * prominence, OCR evidence and normalized value under three different ordering
  * modes.
  */
-export function finalizeProductionCandidateArray(
+function finalizeProductionCandidateArray(
   diagnosticSelection: FieldSelection,
   opaqueItemId: string,
 ): CandidateEvidenceRecord[] {
@@ -406,4 +411,110 @@ function assertRankedArrayInvariants(records: CandidateEvidenceRecord[]): void {
       `the selected candidate is at position ${String(selected[0].rankedPosition)}, expected 0`,
     );
   }
+}
+
+// ---------------------------------------------------------------------------
+// The one public Brand evidence API
+// ---------------------------------------------------------------------------
+
+/** Fields the diagnostic selector adds and the ordinary selector does not. */
+const COMPLETE_DIAGNOSTICS_ONLY_KEYS = ["filterChecks", "activeRejectionReasons"] as const;
+
+/**
+ * A structural deep clone with the two complete-diagnostics fields removed from
+ * every Brand candidate. Everything else — `brandDiagnostics.lines`, every
+ * observation field, every provenance field, every candidate field, and any
+ * enumerable field added upstream later — survives into the comparison.
+ */
+function strippedForParity(selection: FieldSelection): unknown {
+  const clone = structuredClone(selection) as {
+    brandDiagnostics?: { candidates?: Array<Record<string, unknown>> };
+  };
+  for (const candidate of clone.brandDiagnostics?.candidates ?? []) {
+    for (const key of COMPLETE_DIAGNOSTICS_ONLY_KEYS) delete candidate[key];
+  }
+  return clone;
+}
+
+/**
+ * The ONLY public Brand evidence API.
+ *
+ * It takes the complete `ExtractionDebug` that `extractLabelEvidenceDetailed`
+ * returned, and derives everything else itself.
+ *
+ * ## Why the input is `ExtractionDebug`
+ *
+ * Amendment 9 accepted a caller-supplied `FieldSelection` and read the candidate
+ * population from `brandDiagnostics.candidates`. That removed the bare-array
+ * route but left an equivalent one: a caller could filter the candidates, wrap
+ * them in a freshly constructed `FieldSelection`, and pass that. This module's own
+ * tests demonstrated the bypass.
+ *
+ * Taking `ExtractionDebug` closes it structurally. The adapter reconstructs the
+ * exact production pass set, calls the complete-diagnostics selector itself,
+ * asserts parity itself, and derives candidates only from the selection it
+ * created — so there is no caller-reachable point at which the population can be
+ * filtered, projected or replaced.
+ *
+ * The runner must never call `selectBrandObservationWithCompleteFilterDiagnostics`
+ * directly, for the same reason.
+ */
+export function finalizeProductionBrandEvidence(
+  debug: ExtractionDebug,
+  opaqueItemId: string,
+): { diagnosticSelection: FieldSelection; candidateRecords: CandidateEvidenceRecord[] } {
+  if (!OPAQUE_ITEM_ID.test(opaqueItemId)) {
+    throw new CandidateAdapterError(
+      "MALFORMED_OPAQUE_ITEM_ID",
+      `opaqueItemId must match ^item-\\d{4}$, received ${JSON.stringify(opaqueItemId)}`,
+    );
+  }
+  if (!Array.isArray(debug?.passes) || debug.passes.length === 0) {
+    throw new CandidateAdapterError(
+      "DEBUG_PASSES_ABSENT",
+      "debug.passes must be a non-empty ordered array",
+    );
+  }
+
+  // Production's own branch, mirrored exactly (extractor.ts:99, 113): the primary
+  // selection is retained when primary Brand is OBSERVED, otherwise selection
+  // runs over the complete ordered pass array. Calling the diagnostic selector
+  // over all passes unconditionally would produce a different candidate
+  // population on every OBSERVED case.
+  const brandPasses =
+    debug.primarySelections?.brand?.observation?.state === "OBSERVED"
+      ? [debug.passes[0]]
+      : debug.passes;
+
+  const diagnosticSelection = selectBrandObservationWithCompleteFilterDiagnostics(brandPasses);
+
+  // Full-object canonical parity against the authority, before any evidence is
+  // produced. `debug.finalSelections.brand` remains authoritative; the internally
+  // derived selection supplies only the two complete-diagnostics fields.
+  const derived = canonicalize(strippedForParity(diagnosticSelection));
+  const authoritative = canonicalize(structuredClone(debug.finalSelections.brand));
+  if (derived !== authoritative) {
+    throw new CandidateAdapterError(
+      "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE",
+      "the internally derived diagnostic selection differs from debug.finalSelections.brand once only filterChecks and activeRejectionReasons are removed",
+    );
+  }
+
+  const candidates = diagnosticSelection.brandDiagnostics?.candidates;
+  if (!Array.isArray(candidates)) {
+    throw new CandidateAdapterError(
+      "COMPLETE_DIAGNOSTICS_ABSENT",
+      "the internally derived selection carries no brandDiagnostics.candidates array",
+    );
+  }
+
+  const candidateRecords = finalizeProductionCandidateArray(diagnosticSelection, opaqueItemId);
+  if (candidateRecords.length !== candidates.length) {
+    throw new CandidateAdapterError(
+      "CANDIDATE_EVIDENCE_TRUNCATED",
+      `emitted ${candidateRecords.length} records for ${candidates.length} internally derived diagnostic candidates`,
+    );
+  }
+
+  return { diagnosticSelection, candidateRecords };
 }

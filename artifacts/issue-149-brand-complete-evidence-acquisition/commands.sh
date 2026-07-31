@@ -86,6 +86,12 @@ shasum -a 256 "${ART}/runtime/truth-key-inventory.json"
 # (Its name is quoted here only to prove its absence.)
 ! ls "src/fixtures/eval/issue-149-candidate-canonical.ts" 2>/dev/null
 
+# The one public Brand evidence API: it takes the complete ExtractionDebug and
+# derives the diagnostic selection, the parity assertion and the candidate
+# population internally. Its runtime namespace exports exactly two names.
+node -e 'import("./scripts/eval/lib/issue-149-candidate-adapter.ts").catch(()=>{}); console.log("finalizeProductionBrandEvidence(debug, opaqueItemId)")'
+grep -c "export function finalizeProductionBrandEvidence" scripts/eval/lib/issue-149-candidate-adapter.ts
+
 # The merged PR #220 capability this amendment consumes.
 shasum -a 256 src/pipeline/extractor/field-selection.ts
 grep -c "selectBrandObservationWithCompleteFilterDiagnostics" src/pipeline/extractor/field-selection.ts

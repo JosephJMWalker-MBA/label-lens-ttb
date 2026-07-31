@@ -2,7 +2,7 @@
   "artifact": "candidate-fingerprint-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-9.md",
+  "amendedBy": "preregistration-amendment-10.md",
   "status": "ALGORITHM AND TEST CONTRACT FROZEN. The acquisition is not implemented in this amendment.",
   "canonicalizationVersion": "issue-149-candidate-canonical-v1",
   "preimage": {
@@ -135,37 +135,42 @@
   },
   "candidateEmissionApi": {
     "module": "scripts/eval/lib/issue-149-candidate-adapter.ts",
-    "function": "finalizeProductionCandidateArray",
-    "signature": "finalizeProductionCandidateArray(diagnosticSelection, opaqueItemId)",
-    "firstArgument": "the COMPLETE FieldSelection returned by selectBrandObservationWithCompleteFilterDiagnostics",
-    "candidateSource": "diagnosticSelection.brandDiagnostics.candidates, read INSIDE the adapter",
-    "supersededPropertyPath": "diagnosticSelection.candidates \u2014 that property does not exist on FieldSelection",
-    "bareCandidateArrayProhibited": true,
-    "bareCandidateArrayProhibitedWhy": "A bare-array parameter let a caller hand over a filtered or truncated population while technically calling the approved function. The adapter now takes the whole selection and reads the population itself.",
-    "oneCallPerCompleteDiagnosticSelection": true,
-    "callerSuppliedRankedPositionProhibited": true,
-    "secondMappingOrFinalizationLoopInTheRunnerProhibited": true,
-    "opaqueItemIdValidatedEvenWhenTheArrayIsEmpty": true,
-    "candidateOrdinalIsTheOriginalDiagnosticArrayIndex": true,
-    "emittedCountMustEqualTheCompleteCandidateCount": true,
-    "prohibitedSymbolsInTheRunner": [
-      "toCandidateEvidenceRecord",
-      "finalizeProductionCandidate",
-      "finalizeCandidateRecord",
-      "stableCandidateId",
-      "CandidateAdapterContext",
-      "TEST_ONLY_candidateAdapterInternals",
+    "function": "finalizeProductionBrandEvidence",
+    "signature": "finalizeProductionBrandEvidence(debug, opaqueItemId)",
+    "firstArgument": "the complete ExtractionDebug returned by extractLabelEvidenceDetailed (src/pipeline/extractor/extractor.ts#ExtractionDebug)",
+    "returns": "{ diagnosticSelection, candidateRecords } \u2014 both derived internally",
+    "theRunnerSuppliesNo": [
+      "candidate array",
+      "FieldSelection",
+      "diagnosticSelection",
+      "Brand diagnostics object",
       "rankedPosition"
     ],
-    "prohibitedSymbolsNote": "finalizeCandidateRecord and stableCandidateId are prohibited FOR BRAND CANDIDATE EMISSION. The canonical helper remains permitted for pass validation, semantic fingerprinting and exact-byte hashing.",
-    "noRuntimeTestBackdoor": true,
-    "noRuntimeTestBackdoorNote": "TEST_ONLY_candidateAdapterInternals is removed. The adapter exports exactly one candidate-emission function; the lower-level helpers, CandidateAdapterContext and assertRankedArrayInvariants are module-private and unreachable at runtime.",
+    "theRunnerNeverCalls": "selectBrandObservationWithCompleteFilterDiagnostics",
+    "internalSteps": [
+      "validate opaqueItemId",
+      "require debug.passes to be a non-empty ordered array",
+      "reconstruct the exact production Brand pass set: primary OBSERVED ? [debug.passes[0]] : debug.passes",
+      "invoke selectBrandObservationWithCompleteFilterDiagnostics internally",
+      "perform the complete parity assertion internally against debug.finalSelections.brand",
+      "derive candidates only from the internally created diagnosticSelection.brandDiagnostics.candidates",
+      "finalize the complete candidate population",
+      "assert the emitted count equals the internally derived diagnostic count"
+    ],
+    "supersededRoutes": [
+      "a bare candidate array (Amendment 8 and earlier)",
+      "a caller-supplied FieldSelection (Amendment 9): a filtered population could be wrapped in a freshly constructed selection and accepted \u2014 the Amendment 9 tests themselves demonstrated the bypass"
+    ],
+    "whyDebugOwned": "ExtractionDebug already exposes the ordered passes, the primary selections and the authoritative final selections. Taking it closes the derivation structurally: there is no caller-reachable point at which the population can be filtered, projected or replaced.",
+    "runtimeExportSurface": ["CandidateAdapterError", "finalizeProductionBrandEvidence"],
+    "runtimeExportSurfaceVerifiedBy": "importing the module namespace and inspecting its actual runtime own keys, not a source regex",
     "haltCodes": {
-      "COMPLETE_DIAGNOSTICS_ABSENT": "the selection carries no brandDiagnostics, or brandDiagnostics.candidates is not an array",
-      "CANDIDATE_EVIDENCE_TRUNCATED": "the emitted record count does not equal the complete diagnostic candidate count",
-      "MALFORMED_OPAQUE_ITEM_ID": "opaqueItemId does not match ^item-\\\\d{4}$"
+      "MALFORMED_OPAQUE_ITEM_ID": "opaqueItemId does not match ^item-\\\\d{4}$",
+      "DEBUG_PASSES_ABSENT": "debug.passes is absent, not an array, or empty",
+      "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE": "the internally derived selection differs from debug.finalSelections.brand once only filterChecks and activeRejectionReasons are removed",
+      "COMPLETE_DIAGNOSTICS_ABSENT": "the internally derived selection carries no brandDiagnostics.candidates array",
+      "CANDIDATE_EVIDENCE_TRUNCATED": "the emitted record count does not equal the internally derived diagnostic candidate count"
     },
-    "transitiveClosureOwnedBy": "phase 1 trusted host preparation; see acquisition-runtime-isolation-contract.json#runtimeBundle.dependencyClosureGate.candidateEmissionClosureGate",
     "enforcedBy": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts and src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts"
   }
 }

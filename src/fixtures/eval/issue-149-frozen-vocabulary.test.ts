@@ -18,6 +18,7 @@ import {
   ANALYZER_RANKING_SCORE_FACTOR_DIRECTIONS as PROD_SCORE_FACTOR_DIRECTIONS,
   ANALYZER_RANKING_SCORE_FACTOR_IDS as PROD_SCORE_FACTOR_IDS,
 } from "@/pipeline/analyzer/analyzer.types";
+import type { ExtractionDebug } from "@/pipeline/extractor/extractor";
 import type {
   AnalyzerCandidateProvenance,
   AnalyzerOcrConfidence,
@@ -34,11 +35,11 @@ import {
   BRAND_CANDIDATE_DECISIONS as PROD_DECISIONS,
   BRAND_FILTER_CHECK_ORDER as PROD_FILTER_CHECK_ORDER,
   BRAND_LINE_REASONS as PROD_LINE_REASONS,
-  selectBrandObservationWithCompleteFilterDiagnostics,
+  selectBrandObservation,
   type BrandCandidateScore,
 } from "@/pipeline/extractor/field-selection";
 
-import { finalizeProductionCandidateArray } from "../../../scripts/eval/lib/issue-149-candidate-adapter";
+import { finalizeProductionBrandEvidence } from "../../../scripts/eval/lib/issue-149-candidate-adapter";
 
 import {
   ANALYZER_CANDIDATE_PROVENANCE_KEYS,
@@ -215,11 +216,21 @@ describe("Issue #149 frozen vocabulary matches production", () => {
       timings: { preprocessMs: 0, ocrMs: 0, inverseMappingMs: 0, totalMs: 0 },
     } as unknown as RegionOcrResult;
 
-    const selection = selectBrandObservationWithCompleteFilterDiagnostics([pass]);
-    expect(selection.brandDiagnostics?.candidates.length).toBeGreaterThan(0);
-
-    // Through the ONLY public entry point — there is no runtime backdoor.
-    const [record] = finalizeProductionCandidateArray(selection, "item-0001");
+    // Through the ONLY public entry point: the complete ExtractionDebug. There is
+    // no runtime backdoor and no caller-supplied selection.
+    const primaryBrand = selectBrandObservation([pass]);
+    const debug = {
+      decoded: { width: 1600, height: 1200, format: "png" },
+      passes: [pass],
+      primarySelections: { brand: primaryBrand, alcohol: primaryBrand },
+      finalSelections: { brand: primaryBrand, alcohol: primaryBrand },
+    } as unknown as ExtractionDebug;
+    const { diagnosticSelection, candidateRecords } = finalizeProductionBrandEvidence(
+      debug,
+      "item-0001",
+    );
+    expect(diagnosticSelection.brandDiagnostics?.candidates.length).toBeGreaterThan(0);
+    const [record] = candidateRecords;
     const derived = new Set(["canonicalRecordSha256", "stableCandidateId"]);
     expect(new Set(Object.keys(record).filter((key) => !derived.has(key)))).toEqual(
       new Set(CANDIDATE_EVIDENCE_REQUIRED_KEYS),
