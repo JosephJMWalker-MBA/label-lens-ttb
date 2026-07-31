@@ -26,6 +26,27 @@ const HASHES_AT_MERGED_PR_197 = {
     "9b2712e6bb15552e9524bc5e60be4da2b163bdb325206f452ecbaf44ebf5084c",
 } as const;
 
+/**
+ * Owner-authorized boundary move for PR #220. The constant above remains the
+ * historical record and is NOT edited; this is the boundary the live guard
+ * compares against.
+ *
+ * `extractor.ts` and `regions.ts` remain frozen at their historical values.
+ * `field-selection.ts` moved only through PR #220's default-off diagnostics
+ * change: the authoritative ladder, `filterReason`, kept/rejected status,
+ * candidate formation, ranking, selection, authority and state are unchanged,
+ * and that is now protected by the diagnostics equivalence and runtime invariant
+ * tests in src/pipeline/extractor/brand-filter-diagnostics.test.ts rather than by
+ * this file hash alone.
+ *
+ * Prior boundary: 3e84fa8a043570713991643830c7b95e0f7189a4ed037b737c783353d519106d
+ */
+const APPROVED_CURRENT_HASHES_AFTER_PR_220 = {
+  ...HASHES_AT_MERGED_PR_197,
+  "src/pipeline/extractor/field-selection.ts":
+    "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
+} as const;
+
 function sha256File(filePath: string): string {
   return createHash("sha256")
     .update(readFileSync(path.join(process.cwd(), filePath)))
@@ -326,11 +347,14 @@ describe("bounded Brand mild sharpening governance", () => {
     expect(result.successCriteria.emptyOcrDoesNotIncrease).toBe(false);
   });
 
-  it("leaves production OCR and the open PR 195 Brand selector baseline untouched", () => {
+  it("keeps extractor.ts and regions.ts frozen, and field-selection.ts at the PR 220 approved boundary", () => {
     expect(
       Object.fromEntries(
-        Object.keys(HASHES_AT_MERGED_PR_197).map((filePath) => [filePath, sha256File(filePath)]),
+        Object.keys(APPROVED_CURRENT_HASHES_AFTER_PR_220).map((filePath) => [
+          filePath,
+          sha256File(filePath),
+        ]),
       ),
-    ).toEqual(HASHES_AT_MERGED_PR_197);
+    ).toEqual(APPROVED_CURRENT_HASHES_AFTER_PR_220);
   });
 });

@@ -330,13 +330,30 @@ describe("Issue #149 frozen decision and mechanism rules", () => {
   });
 });
 
+/**
+ * The Brand selector boundary before PR #220, kept for provenance and not edited.
+ */
+const FIELD_SELECTION_HASH_BEFORE_PR_220 =
+  "3e84fa8a043570713991643830c7b95e0f7189a4ed037b737c783353d519106d";
+
+/**
+ * Owner-authorized boundary move for PR #220. `field-selection.ts` moved only
+ * through the default-off diagnostics change; every other guarded file below
+ * remains frozen at its historical value. The authoritative selector behaviour is
+ * protected by the diagnostics equivalence and runtime invariant tests in
+ * src/pipeline/extractor/brand-filter-diagnostics.test.ts.
+ */
+const FIELD_SELECTION_HASH_APPROVED_AFTER_PR_220 =
+  "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c";
+
 describe("Issue #149 frozen boundaries", () => {
-  it("keeps production OCR, preprocessing, PSM, parsing, thresholds, Warning, and route hashes frozen", () => {
+  it("keeps OCR, preprocessing, PSM, parsing, thresholds, Warning and route hashes frozen, with field-selection.ts at the PR 220 approved boundary", () => {
+    expect(FIELD_SELECTION_HASH_APPROVED_AFTER_PR_220).not.toBe(FIELD_SELECTION_HASH_BEFORE_PR_220);
     expect(hashFile("src/pipeline/extractor/extractor.ts")).toBe(
       "9b2712e6bb15552e9524bc5e60be4da2b163bdb325206f452ecbaf44ebf5084c",
     );
     expect(hashFile("src/pipeline/extractor/field-selection.ts")).toBe(
-      "3e84fa8a043570713991643830c7b95e0f7189a4ed037b737c783353d519106d",
+      FIELD_SELECTION_HASH_APPROVED_AFTER_PR_220,
     );
     expect(hashFile("src/pipeline/extractor/regions.ts")).toBe(
       "910d763e20f47d811348b62c77f17d46ddf3a07b5849a337669a07f6b8efc9ab",

@@ -1,0 +1,5 @@
+8f0c6a7ca7c271eed14d9084ed6da7fe11f897a9
+base: origin/main 8f0c6a7ca7c271eed14d9084ed6da7fe11f897a9 (merge commit of PR #218)
+branch: eval/issue-149-brand-complete-filter-diagnostics
+final src/pipeline/extractor/field-selection.ts sha256: 8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c
+prior guarded boundary sha256: 3e84fa8a043570713991643830c7b95e0f7189a4ed037b737c783353d519106d

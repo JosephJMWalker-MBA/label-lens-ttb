@@ -103,10 +103,16 @@ interface Candidate {
 
 interface BrandSelectionOptions {
   allowCoherentPlausibleLineMerge: boolean;
+  /**
+   * Evaluation-only. When false — the production default — no additional
+   * predicate is evaluated and no diagnostic field is emitted.
+   */
+  collectCompleteFilterDiagnostics: boolean;
 }
 
 const DEFAULT_BRAND_SELECTION_OPTIONS: BrandSelectionOptions = {
   allowCoherentPlausibleLineMerge: false,
+  collectCompleteFilterDiagnostics: false,
 };
 
 /** An observation plus the region the selected value came from (for provenance). */
@@ -141,6 +147,32 @@ export const BRAND_LINE_REASONS = [
   "candidate-plausible",
 ] as const;
 export type BrandLineReason = (typeof BRAND_LINE_REASONS)[number];
+
+/**
+ * The rejection rules of the Brand candidate filter, in the exact order
+ * `analyzeBrandSpan` evaluates them. The authoritative ladder short-circuits on
+ * the first failing rule; this order is what makes `activeRejectionReasons[0]`
+ * equal to the authoritative `filterReason`.
+ */
+export const BRAND_FILTER_CHECK_ORDER = [
+  "producer-line",
+  "no-letters-or-too-short",
+  "non-brand-keyword",
+  "too-many-words",
+  "domain-like",
+  "varietal-or-designation",
+  "generic-product-language",
+  "location-or-appellation",
+  "low-information-fragment",
+  "sentence-fragment",
+] as const;
+export type BrandFilterCheckName = (typeof BRAND_FILTER_CHECK_ORDER)[number];
+
+/** One ladder rule, evaluated independently of whether an earlier rule fired. */
+export interface BrandFilterCheck {
+  check: BrandFilterCheckName;
+  failed: boolean;
+}
 
 export const BRAND_CANDIDATE_ASSEMBLIES = [
   "whole-line",
@@ -198,6 +230,17 @@ export interface BrandCandidateDiagnostic {
   decision?: BrandCandidateDecision;
   score?: BrandCandidateScore;
   ranking?: AnalyzerCandidateRanking;
+  /**
+   * Evaluation-only. Present ONLY under
+   * `selectBrandObservationWithCompleteFilterDiagnostics`. Every ladder rule in
+   * order, with whether it failed. Absent from ordinary production output.
+   */
+  filterChecks?: BrandFilterCheck[];
+  /**
+   * Evaluation-only. Every failed rule in ladder order. Empty for a kept
+   * candidate. Its first element is the authoritative `filterReason`.
+   */
+  activeRejectionReasons?: BrandFilterCheckName[];
 }
 
 export interface BrandSelectionDiagnostics {
@@ -1949,6 +1992,127 @@ function analyzeBrandSpan(span: BrandSpan): BrandCandidateAnalysis {
   };
 }
 
+/**
+ * Evaluate EVERY ladder rule for a span, independently of which one the
+ * authoritative ladder stopped at.
+ *
+ * Safe to run after an earlier rule has already failed: every predicate below is
+ * pure — it reads its arguments, allocates locally and returns a boolean. None
+ * mutates its input, and none uses a `g`/`y`-flagged regular expression with
+ * `.test()`, so there is no `lastIndex` state to carry between calls. Order of
+ * evaluation therefore cannot change any individual result.
+ *
+ * This function is never called on the production path.
+ */
+function evaluateBrandFilterChecks(span: BrandSpan): BrandFilterCheck[] {
+  const failed: Record<BrandFilterCheckName, boolean> = {
+    "producer-line": isProducerLine(span.words),
+    "no-letters-or-too-short": span.value.length < 2 || !/[a-z]/i.test(span.value),
+    "non-brand-keyword": hasNonBrandKeyword(span.rawText, span.value),
+    "too-many-words": span.value.split(" ").length > MAX_BRAND_WORDS,
+    "domain-like": isDomainLike(span.value),
+    "varietal-or-designation": isPurelyVarietalOrDesignation(span.value),
+    "generic-product-language": isGenericProductLanguage(span.value),
+    "location-or-appellation": isLocationOrAppellationLike(span.value),
+    "low-information-fragment": isLowInformationFragment(span.value),
+    "sentence-fragment": isSentenceFragment(span.rawText, span.value),
+  };
+  return BRAND_FILTER_CHECK_ORDER.map((check) => ({ check, failed: failed[check] }));
+}
+
+/**
+ * Run the authoritative analysis first, unchanged, then optionally DECORATE its
+ * diagnostic with the complete check results.
+ *
+ * The authoritative ladder decides `kept` and `filterReason` before any extra
+ * predicate runs, so a later diagnostic check structurally cannot alter the
+ * result — it is computed after the decision exists and only added to a copy.
+ */
+/** Prefix of every diagnostic invariant failure. Asserted by the focused tests. */
+const BRAND_FILTER_DIAGNOSTIC_INVARIANT_FAILURE = "BRAND_FILTER_DIAGNOSTIC_INVARIANT_FAILURE";
+
+/**
+ * Evaluation-only. Verify the emitted diagnostics against the authoritative
+ * decision that was already made.
+ *
+ * Runs only when complete diagnostics are enabled; the default path never
+ * reaches it. Exported so the focused tests can exercise every violation branch
+ * directly; production never calls it. It reads the authoritative `kept` and `filterReason` and never
+ * writes them, so a failing invariant surfaces a diagnostic defect rather than
+ * changing a production outcome.
+ */
+export function assertBrandFilterDiagnosticInvariants(
+  diagnostic: BrandCandidateDiagnostic,
+  filterChecks: BrandFilterCheck[],
+  activeRejectionReasons: BrandFilterCheckName[],
+): void {
+  const fail = (detail: string): never => {
+    throw new Error(
+      `${BRAND_FILTER_DIAGNOSTIC_INVARIANT_FAILURE}: ${detail} (candidate rawText=${JSON.stringify(
+        diagnostic.rawText,
+      )}, kept=${diagnostic.kept}, filterReason=${diagnostic.filterReason})`,
+    );
+  };
+
+  if (filterChecks.length !== BRAND_FILTER_CHECK_ORDER.length) {
+    fail(`expected ${BRAND_FILTER_CHECK_ORDER.length} checks, received ${filterChecks.length}`);
+  }
+  const seen = new Set<BrandFilterCheckName>();
+  for (const [index, entry] of filterChecks.entries()) {
+    if (entry.check !== BRAND_FILTER_CHECK_ORDER[index]) {
+      fail(
+        `check at position ${index} is ${entry.check}, expected ${BRAND_FILTER_CHECK_ORDER[index]}`,
+      );
+    }
+    if (seen.has(entry.check)) fail(`check ${entry.check} occurs more than once`);
+    seen.add(entry.check);
+  }
+
+  const failedInLadderOrder = filterChecks.filter((entry) => entry.failed).map((e) => e.check);
+  if (
+    activeRejectionReasons.length !== failedInLadderOrder.length ||
+    activeRejectionReasons.some((reason, index) => reason !== failedInLadderOrder[index])
+  ) {
+    fail(
+      `activeRejectionReasons ${JSON.stringify(activeRejectionReasons)} does not equal the failed checks in ladder order ${JSON.stringify(failedInLadderOrder)}`,
+    );
+  }
+
+  if (diagnostic.kept) {
+    if (activeRejectionReasons.length !== 0) {
+      fail(`kept candidate has ${activeRejectionReasons.length} active reason(s), expected 0`);
+    }
+    if (filterChecks.some((entry) => entry.failed)) {
+      fail("kept candidate has at least one failed check, expected none");
+    }
+    return;
+  }
+
+  if (activeRejectionReasons.length === 0) {
+    fail("rejected candidate has no active rejection reason");
+  }
+  if (activeRejectionReasons[0] !== diagnostic.filterReason) {
+    fail(
+      `first active reason ${activeRejectionReasons[0]} does not equal the authoritative filterReason ${diagnostic.filterReason}`,
+    );
+  }
+}
+
+function analyzeBrandSpanWithOptions(
+  span: BrandSpan,
+  options: BrandSelectionOptions,
+): BrandCandidateAnalysis {
+  const analysis = analyzeBrandSpan(span);
+  if (!options.collectCompleteFilterDiagnostics) return analysis;
+  const filterChecks = evaluateBrandFilterChecks(span);
+  const activeRejectionReasons = filterChecks.filter((c) => c.failed).map((c) => c.check);
+  assertBrandFilterDiagnosticInvariants(analysis.diagnostic, filterChecks, activeRejectionReasons);
+  return {
+    ...analysis,
+    diagnostic: { ...analysis.diagnostic, filterChecks, activeRejectionReasons },
+  };
+}
+
 function shouldTrimWholeLineCandidate(candidate: Candidate | undefined): boolean {
   if (!candidate || candidate.brandClass !== "positive") return false;
   return residualPenalty(candidate.words) > 0.25;
@@ -2212,8 +2376,9 @@ function selectBrandObservationWithOptions(
       const analysis = analyzeBrandLine(line, result);
       lineDiagnostics.push(analysis.diagnostic);
 
-      const wholeLine = analyzeBrandSpan(
+      const wholeLine = analyzeBrandSpanWithOptions(
         buildBrandSpan(nextCandidateId(), line, result, "whole-line", [lineIndex]),
+        options,
       );
       candidateDiagnostics.push(wholeLine.diagnostic);
       if (wholeLine.candidate) {
@@ -2223,8 +2388,9 @@ function selectBrandObservationWithOptions(
 
       if (!shouldTrimWholeLineCandidate(wholeLine.candidate)) continue;
       for (const window of lineWindows(line)) {
-        const windowAnalysis = analyzeBrandSpan(
+        const windowAnalysis = analyzeBrandSpanWithOptions(
           buildBrandSpan(nextCandidateId(), window, result, "line-window", [lineIndex]),
+          options,
         );
         candidateDiagnostics.push(windowAnalysis.diagnostic);
         if (windowAnalysis.candidate) candidates.push(windowAnalysis.candidate);
@@ -2251,7 +2417,7 @@ function selectBrandObservationWithOptions(
           if (mergedWords.length > MAX_BRAND_WORDS + 2) continue;
           const mergedValue = cleanedBrandValue(mergedWords.map((word) => word.text).join(" "));
           if (brandTokens(mergedValue).filter((token) => /[a-z]/.test(token)).length > 3) continue;
-          const merged = analyzeBrandSpan(
+          const merged = analyzeBrandSpanWithOptions(
             buildBrandSpan(
               nextCandidateId(),
               mergedWords,
@@ -2261,6 +2427,7 @@ function selectBrandObservationWithOptions(
               alignment,
               proximity,
             ),
+            options,
           );
           candidateDiagnostics.push(merged.diagnostic);
           if (merged.candidate) candidates.push(merged.candidate);
@@ -2279,10 +2446,29 @@ export function selectBrandObservation(results: RegionOcrResult[]): FieldSelecti
   return selectBrandObservationWithOptions(results, DEFAULT_BRAND_SELECTION_OPTIONS);
 }
 
+/**
+ * Evaluation-only. Identical selection behaviour to `selectBrandObservation` —
+ * same ladder, same authoritative `filterReason`, same kept/rejected status, same
+ * candidate formation, ranking, selection, authority and state — with each
+ * candidate diagnostic additionally carrying `filterChecks` and
+ * `activeRejectionReasons`.
+ *
+ * Never called by production.
+ */
+export function selectBrandObservationWithCompleteFilterDiagnostics(
+  results: RegionOcrResult[],
+): FieldSelection {
+  return selectBrandObservationWithOptions(results, {
+    ...DEFAULT_BRAND_SELECTION_OPTIONS,
+    collectCompleteFilterDiagnostics: true,
+  });
+}
+
 export function selectBrandObservationWithCoherentLineMergeTreatment(
   results: RegionOcrResult[],
 ): FieldSelection {
   return selectBrandObservationWithOptions(results, {
+    ...DEFAULT_BRAND_SELECTION_OPTIONS,
     allowCoherentPlausibleLineMerge: true,
   });
 }
@@ -2317,6 +2503,13 @@ function buildBrandObservation(
       decision: candidate.decision,
       score: candidate.score,
       ranking: candidate.ranking,
+      // Evaluation-only, added by conditional spread. On the default path the
+      // emitted object has NEITHER key as an own property, so Object.keys and
+      // JSON serialization are unchanged from before these fields existed.
+      ...(candidate.filterChecks === undefined ? {} : { filterChecks: candidate.filterChecks }),
+      ...(candidate.activeRejectionReasons === undefined
+        ? {}
+        : { activeRejectionReasons: candidate.activeRejectionReasons }),
     })),
     abstentionReason: diagnostics.abstentionReason,
   });
