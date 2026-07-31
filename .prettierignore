@@ -33,3 +33,4 @@ artifacts/issue-149-brand-ppocrv6-small-onnx-contrast/vendor/inference.yml
 # raw-output-manifest.json before the truth boundary is crossed, so reformatting
 # would invalidate the manifest that proves the evidence is unaltered.
 artifacts/issue-149-brand-ppocrv6-small-onnx-contrast/raw/
+artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json

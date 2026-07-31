@@ -2,7 +2,7 @@
   "artifact": "acquisition-runtime-isolation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-5.md",
+  "amendedBy": "preregistration-amendment-6.md",
   "status": "CONTRACT FROZEN. Not implemented in this amendment.",
   "whyThisExists": {
     "correction": "The Stage 1 isolation tests are STATIC manifest, path and import validation. They read committed planning artifacts and assert their shape. They are NOT runtime proof, and this contract stops them being described as such.",
@@ -87,53 +87,103 @@
       },
       "bundleManifestMustRecord": [
         "every SOURCE input path with its SHA-256",
+        "for each production source input, the SHA-256 it has at the frozen base commit",
         "every EMITTED runtime path with its SHA-256",
         "the exact build command",
         "the exact build tool name and version",
         "the SHA-256 of the dependency graph / metafile itself",
-        "the designated truth-isolation scanner module path and its SHA-256"
+        "the designated truth-key inventory asset path and its SHA-256",
+        "the separately reviewed Stage 2 evaluation-script paths and their SHA-256 values"
       ],
       "preIsolationBundleScan": {
         "runsIn": "phase 1, on the BUILT bundle, before anything is mounted",
         "referenceImplementation": "scripts/eval/lib/issue-149-bundle-scan.ts",
-        "selfTriggeringDefect": "Amendment 4 required scanning the built executable bundle for prohibited truth-bearing JSON keys. But the runtime must CARRY that inventory in order to scan its own emitted evidence, so a blanket string scan would have rejected the truth-isolation scanner as its own first violation.",
-        "frozenScope": [
-          "every bundle file, executable or data, is scanned for historical case IDs and historical fixture paths",
-          "bundled non-executable data and configuration assets are scanned for prohibited truth-bearing JSON keys",
-          "executable code may contain the exact prohibited-key inventory ONLY inside the designated truth-isolation scanner module",
-          "that module's path and SHA-256 are recorded in the bundle manifest",
-          "the key inventory in any other executable module is a violation",
-          "an additional, mutated or narrowed inventory inside the designated module is a violation"
-        ],
-        "designatedScannerModule": {
-          "recordedInBundleManifest": ["path", "sha256"],
-          "inventoryMustBeExactly": "truth-isolation-plan.json#emittedFieldBan",
-          "wideningItIsAViolation": true,
-          "narrowingItIsAViolation": true,
-          "whyNarrowingToo": "A dropped key means the runtime's own emitted-evidence scan is silently incomplete."
+        "selfTriggeringDefect": "A blanket executable scan for the forbidden keys would have rejected the truth-isolation scanner, which must know those keys to scan emitted evidence.",
+        "sourceTextInferenceDefect": "Amendment 5 solved that by inspecting the scanner's SOURCE TEXT: every frozen token had to appear somewhere, and a regex looked for some additions. That proves neither direction. A key left only in a COMMENT satisfied the presence test, and an addition outside the regex's recognized prefixes \u2014 matchesExpectedResult, for instance \u2014 widened the scanner undetected.",
+        "strategy": "dedicated canonical inventory ASSET; array equality is decidable, source-text presence is not",
+        "inventoryAsset": {
+          "bundlePath": "runtime/truth-key-inventory.json",
+          "authoritativeCopy": "artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json",
+          "content": "a bare canonical JSON array of the authoritative key names, in authoritative order, and nothing else",
+          "exactByteSha256": "80ae4a144259a9a013d8a35163e724cef1dded4e92e0aa4abd0dc74587e1ff6f",
+          "recordedInBundleManifest": true,
+          "readByTheRuntimeEmittedEvidenceScanner": true,
+          "executableCodeCarriesNoDuplicateLiteralInventory": true
         },
+        "frozenScope": [
+          "scan the RAW BYTES of every bundle file, including binary assets, for historical case IDs and historical fixture paths",
+          "parse the designated inventory asset",
+          "require exact array equality with the authoritative inventory, order included",
+          "require the asset's exact byte digest to match the bundle manifest",
+          "permit forbidden-key strings only in that one asset",
+          "reject them in every other executable, data or configuration file",
+          "never receive or scan a Brand-value inventory"
+        ],
         "brandStringsNeverScanned": true,
-        "brandStringsNeverScannedWhy": "A legitimate transcript may naturally contain the Brand text. That is evidence, not leakage. The scan takes no Brand inventory as a parameter, so this cannot regress by configuration.",
-        "governedTruthDataStillProhibitedEntirely": "Governed truth data, acceptable values and prior per-case results remain prohibited from the bundle by the dependency-closure gate, independently of this key scan.",
+        "brandStringsNeverScannedWhy": "A legitimate transcript may naturally contain the Brand text. That is evidence, not leakage. The scan takes no Brand inventory as a parameter, so it cannot be reconfigured into comparing evidence against Brand truth.",
         "haltCode": "BUNDLE_PROHIBITED_CONTENT",
         "violationRules": [
           "HISTORICAL_CASE_ID",
           "HISTORICAL_FIXTURE_PATH",
-          "TRUTH_KEY_IN_DATA_ASSET",
-          "TRUTH_KEY_OUTSIDE_DESIGNATED_SCANNER",
-          "SCANNER_INVENTORY_MUTATED",
-          "SCANNER_MODULE_MISSING",
-          "SCANNER_DIGEST_MISMATCH"
+          "INVENTORY_ASSET_MISSING",
+          "INVENTORY_ASSET_DIGEST_MISMATCH",
+          "INVENTORY_ASSET_UNPARSEABLE",
+          "INVENTORY_ARRAY_NOT_EQUAL",
+          "TRUTH_KEY_OUTSIDE_INVENTORY_ASSET"
         ],
         "testedBy": "src/fixtures/eval/issue-149-bundle-scan.test.ts"
       },
       "haltCodes": {
         "BUNDLE_PROHIBITED_DEPENDENCY": "a transitive source input resolves under a prohibited path",
         "BUNDLE_MANIFEST_INCOMPLETE": "a source or emitted path is missing from the manifest, or the metafile digest does not match",
-        "BUNDLE_PROHIBITED_CONTENT": "the pre-isolation scan found a historical identifier, fixture path or truth-bearing key"
+        "BUNDLE_PROHIBITED_CONTENT": "the pre-isolation scan found a historical identifier, fixture path or truth-bearing key",
+        "PRODUCTION_SOURCE_DRIFTED_FROM_BASE": "a production runtime source input does not match its bytes at the frozen base commit"
       },
       "directRunnerGuardStillApplies": true,
-      "directRunnerGuardIsNotTransitive": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts inspects the runner sources only. It is a useful first-order gate and is explicitly not a transitive proof."
+      "directRunnerGuardIsNotTransitive": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts inspects the runner sources only. It is a useful first-order gate and is explicitly not a transitive proof.",
+      "frozenExceptions": [
+        {
+          "path": "src/domain/rules/wine-alcohol-parse.ts",
+          "sha256": "2ec1368cf3f4fcfab264d1507f98267aa6f6112091332d4dda5a76152ea816e7",
+          "sha256ComputedAt": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+          "reason": "Mandatory deterministic incumbent Alcohol parser, reached by the UNCHANGED extractor path: field-selection.ts line 1 imports @/domain/rules/wine-alcohol-parse. Without it the direct extractLabelEvidenceDetailed route cannot run at all.",
+          "isNotAnEvaluationTruthModule": true,
+          "whyNotTruth": "It is a bounded deterministic parser over label text. It reads no governed truth, no acceptable values and no per-case record.",
+          "transitiveImports": [],
+          "transitiveImportsVerifiedBy": "src/fixtures/eval/issue-149-dependency-closure.test.ts",
+          "isTheOnlyExceptionUnder": "src/domain/rules/**",
+          "priorDefect": "Amendment 5 prohibited every transitive dependency under src/domain/rules/**, so host preparation would have halted with BUNDLE_PROHIBITED_DEPENDENCY while bundling the exact incumbent extractor it is required to run."
+        }
+      ],
+      "frozenExceptionsAreExhaustive": true,
+      "frozenExceptionsRule": "An exception is a PATH AND CONTENT HASH pair. A different path under the same directory is not covered, and the same path with different bytes is not covered.",
+      "productionSourceBaseDriftGate": {
+        "everyProductionRuntimeSourceInputMustMatchItsBytesAt": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+        "why": "A bundle manifest that merely records whatever production source happened to be present proves the bundle is internally consistent, not that it is the INCUMBENT. The acquisition claims to observe the incumbent path at a named commit; that claim needs the bytes pinned to that commit.",
+        "appliesTo": "every production source file in the dependency closure, not only the named exception",
+        "haltCode": "PRODUCTION_SOURCE_DRIFTED_FROM_BASE",
+        "stage2ScriptsAreSeparate": "Stage 2 acquisition scripts under the explicitly approved evaluation paths are not production sources. They are hashed and reviewed separately, and are listed distinctly in the bundle manifest."
+      },
+      "forbiddenEvidenceKeyInventory": {
+        "authoritativeInventory": "artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json",
+        "assetSha256": "80ae4a144259a9a013d8a35163e724cef1dded4e92e0aa4abd0dc74587e1ff6f",
+        "bundlePath": "runtime/truth-key-inventory.json",
+        "keys": [
+          "isTruth",
+          "matchesTruth",
+          "truthInRawOcr",
+          "truthOnReconstructedLine",
+          "truthFilterReasons",
+          "expectedBrand",
+          "acceptableValues",
+          "brandPresent",
+          "historicalCaseId",
+          "historicalImagePath"
+        ],
+        "singleSourceRule": "This is the ONE inventory. No contract, test or executable module may declare a second list. Amendment 5 left three different sets in play \u2014 ten keys in evidence-schema.json, seven in truth-isolation-plan.json and the scanner, five in raw-ocr-contract.json \u2014 so brandPresent, historicalCaseId and historicalImagePath were absent from the executable scanner.",
+        "fieldNamesVersusValues": "These are FIELD NAMES, prohibited inside acquisition output. The historical identifier and fixture-path VALUES are a separate matter: they are checked after sealing by the read-only identity-leak verifier, which holds an inventory the isolated runtime never receives.",
+        "governsEveryEmittedFile": "pass records, candidate records, selection records, item-level failure records, count records, manifests and provenance records alike \u2014 closed pass and candidate schemas cover two of those shapes, not all of them"
+      }
     }
   },
   "discoverModeGate": {

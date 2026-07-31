@@ -74,7 +74,7 @@
     "a changed pass template, crop geometry or transform",
     "any experimental flag or optional Brand treatment entry point being reachable"
   ],
-  "amendedBy": "preregistration-amendment-4.md",
+  "amendedBy": "preregistration-amendment-6.md",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "historicalNote": "The original plan and Amendment 1 routed acquisition through runCaseArtifacts. That route is prohibited from Amendment 2 onward because it reads governed truth and uses the historical case id as artifactRef.",
   "completeFilterDiagnostics": {
@@ -102,5 +102,18 @@
     "engineVersionCrossCheck": "tesseract.js 7.0.0 in package-lock.json, matching ocrEngine.engineVersion",
     "noneInferredAtRuntime": true
   },
-  "fixedProcessedAtCorrection": "Amendment 4. This key previously carried a second, contradictory timestamp literal alongside the authoritative nested identity. Two authoritative values cannot both be right, and the Amendment 3 tests only inspected the nested one, so the contradiction passed CI. The stale literal is removed and is quoted only in preregistration-amendment-4.md; extractionInputIdentities.processedAt is now the single source."
+  "fixedProcessedAtCorrection": "Amendment 4. This key previously carried a second, contradictory timestamp literal alongside the authoritative nested identity. Two authoritative values cannot both be right, and the Amendment 3 tests only inspected the nested one, so the contradiction passed CI. The stale literal is removed and is quoted only in preregistration-amendment-4.md; extractionInputIdentities.processedAt is now the single source.",
+  "mandatoryProductionDependencies": [
+    {
+      "path": "src/domain/rules/wine-alcohol-parse.ts",
+      "sha256": "2ec1368cf3f4fcfab264d1507f98267aa6f6112091332d4dda5a76152ea816e7",
+      "importedBy": "src/pipeline/extractor/field-selection.ts, line 1",
+      "transitiveImports": [],
+      "role": "the bounded deterministic incumbent Alcohol parser reached by the unchanged extractor path"
+    }
+  ],
+  "productionSourceBaseDrift": {
+    "everySourceInTheRuntimeClosureMustMatchItsBytesAt": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "haltCode": "PRODUCTION_SOURCE_DRIFTED_FROM_BASE"
+  }
 }

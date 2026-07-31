@@ -11,11 +11,17 @@
     "sourceImageByteSize": "number"
   },
   "accessBoundary": {
-    "insideAcquisitionInputDirectory": false,
+    "supersededClaim": "readable only after both raw manifests are written",
+    "whyItWasFalse": "Trusted staging generates and verifies the map before isolated acquisition begins, and the map is committed on PR #219 where any checkout can read it. Unreadability was never the control.",
+    "trustedStagingMayReadGenerateAndVerify": true,
+    "insideStagedImageDirectory": false,
     "insideRawEvidenceDirectory": false,
-    "mountedIntoAcquisition": false,
-    "importedByAcquisitionHarness": false,
-    "readableOnlyAfter": "both the primary and repeat raw-evidence manifests are written, hashed and verified"
+    "mountedIntoIsolatedDiscovery": false,
+    "mountedIntoIsolatedExecution": false,
+    "importedByAcquisitionCode": false,
+    "mayNotBeUsedAgainstAcquiredEvidenceUntil": "both raw manifests are sealed AND the read-only identity-leak verification has run clean and is authorized",
+    "onlyActorAuthorizedToUseItForTruthBasedEvaluation": "actor 3, the post-freeze evaluation process",
+    "physicalInaccessibilityClaimed": false
   },
   "acquisitionInputDirectory": ".local/issue-149-acquisition-inputs",
   "acquisitionInputDirectoryContents": "staged images only, named item-NNNN.<ext>",
@@ -33,5 +39,6 @@
     "the map lives under post-freeze/, never under raw/, and never under the staged input directory",
     "the map declares itself unmounted and unimported",
     "every opaque id maps to exactly one historical case, with matching image hash and size"
-  ]
+  ],
+  "amendedBy": "preregistration-amendment-6.md"
 }

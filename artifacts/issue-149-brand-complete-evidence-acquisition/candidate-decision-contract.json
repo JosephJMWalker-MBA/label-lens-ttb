@@ -2,7 +2,7 @@
   "artifact": "candidate-decision-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-5.md",
+  "amendedBy": "preregistration-amendment-6.md",
   "sourceOfTruthForShape": "BrandCandidateDiagnostic in src/pipeline/extractor/field-selection.ts at PR #220 merge commit 546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "entryPoint": "selectBrandObservationWithCompleteFilterDiagnostics",
@@ -34,7 +34,7 @@
     "cleanedValue": "string | null, untruncated",
     "confidence": "finite number",
     "ocrEvidenceScore": "finite number",
-    "ocrConfidence": "AnalyzerOcrConfidence, persisted whole",
+    "ocrConfidence": "AnalyzerOcrConfidence, persisted whole \u2014 all SEVEN fields including missingTokenCount",
     "prominence": "finite number",
     "regionName": "string, the top-level BrandCandidateDiagnostic.regionName; NOT only the copy inside candidateProvenance",
     "passId": "string",
@@ -44,7 +44,7 @@
     "assembly": "string",
     "lineIndexes": "integer[]",
     "kept": "boolean",
-    "filterReason": "string | null \u2014 the REAL production property name. For a rejected candidate it equals activeRejectionReasons[0].",
+    "filterReason": "BrandLineReason, NEVER null \u2014 the REAL production property name. For a rejected candidate it equals activeRejectionReasons[0]; for a kept candidate it is candidate-positive or candidate-plausible.",
     "decision": "string | null",
     "score": "BrandCandidateScore | null, persisted whole",
     "ranking": "AnalyzerCandidateRanking | null, persisted WHOLE \u2014 strategy, orderingMode, comparator, rankingScore and scoreFactors. Persisting only rankingScore would discard the comparator and ordering mode a replay needs.",
@@ -72,7 +72,23 @@
     "CANDIDATE_ID_COLLISION": "two candidates in one case produced the same stable id, or an ordinal repeated",
     "CANDIDATE_EVIDENCE_TRUNCATED": "emitted count does not equal the unprojected diagnostic-array count",
     "COMPLETE_DIAGNOSTICS_ABSENT": "filterChecks or activeRejectionReasons missing from any candidate",
-    "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE": "the diagnostic selection differs from debug.finalSelections.brand on any compared field once filterChecks and activeRejectionReasons are removed"
+    "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE": "the diagnostic selection differs from debug.finalSelections.brand once filterChecks and activeRejectionReasons are removed",
+    "MISSING_REQUIRED_FIELD": "a required own property is absent",
+    "UNEXPECTED_FIELD": "an undeclared key is present; the schema is closed",
+    "FIELD_TYPE_MISMATCH": "a field does not satisfy the frozen type or enum",
+    "MALFORMED_OPAQUE_ITEM_ID": "opaqueItemId does not match ^item-\\d{4}$",
+    "MALFORMED_CANDIDATE_ORDINAL": "candidateOrdinal is not a non-negative integer",
+    "MALFORMED_ARRAY_LENGTH": "completeCandidateArrayLength is not a positive integer",
+    "ORDINAL_OUT_OF_RANGE": "candidateOrdinal is not below completeCandidateArrayLength",
+    "WRONG_CANONICALIZATION_VERSION": "canonicalizationVersion does not equal the frozen version",
+    "FILTER_LADDER_INVARIANT_VIOLATED": "filterChecks, activeRejectionReasons and kept/filterReason are mutually inconsistent",
+    "DERIVED_FIELD_INCONSISTENT": "rankingEligible, rankingScore or selected is not derivable from ranking or decision",
+    "ALREADY_FINALIZED": "a derived identity field was present before finalization",
+    "MISSING_DIGEST": "canonicalRecordSha256 is absent",
+    "MALFORMED_DIGEST": "canonicalRecordSha256 is not lowercase 64-hex",
+    "DIGEST_DOES_NOT_MATCH_RECORD": "the supplied digest does not equal the recomputation over the complete record",
+    "PROVENANCE_DISAGREES_WITH_CANDIDATE": "a fact the diagnostic states twice disagrees with itself",
+    "MALFORMED_OPAQUE_ITEM_ID_AT_ADAPTER": "the adapter received an opaqueItemId outside ^item-\\d{4}$"
   },
   "storageFormat": {
     "layout": "one JSONL file per case per run, one JSON object per candidate decision",
@@ -193,5 +209,23 @@
     "candidateProvenance",
     "score",
     "ranking"
-  ]
+  ],
+  "brandClassNotPersisted": {
+    "explicitBrandClassFieldPersisted": false,
+    "why": "There is no brandClass on BrandCandidateDiagnostic. For a KEPT candidate the distinction is recorded by filterReason: candidate-positive versus candidate-plausible. A REJECTED span returns from analyzeBrandSpan before a Candidate object exists, so production never calculates a brandClass for it and none can be persisted."
+  },
+  "referenceAdapter": {
+    "path": "scripts/eval/lib/issue-149-candidate-adapter.ts",
+    "requiredForStage2": true,
+    "why": "One mapping from BrandCandidateDiagnostic to the persisted record. A second mapping could drift from production's shape without any test noticing.",
+    "crossFieldChecksOnRepeatedFacts": [
+      "confidence equals ocrEvidenceScore",
+      "passId equals candidateProvenance.passId",
+      "passKind equals candidateProvenance.passKind",
+      "regionName equals candidateProvenance.regionName",
+      "supportPassIds equals candidateProvenance.supportingPassIds",
+      "candidateProvenance.recoveryPassUsed equals passKind !== 'full-image-primary'"
+    ],
+    "testedAgainstRealSelectorOutputBy": "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts"
+  }
 }

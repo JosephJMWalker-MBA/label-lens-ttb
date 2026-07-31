@@ -12,64 +12,96 @@
  *
  * ## Why the scan is scoped rather than blanket
  *
- * The acquisition runtime must itself carry the prohibited-key inventory, because
- * scanning its own emitted evidence for those keys is one of its jobs. A blanket
- * "no bundle file may contain the string `isTruth`" rule would therefore reject
- * the truth-isolation scanner as its own first violation.
+ * The acquisition runtime must know the forbidden evidence keys in order to scan
+ * its own emitted evidence. A blanket "no bundle file may contain the string
+ * `isTruth`" rule would therefore reject the scanner as its own first violation.
  *
- * The frozen scope, chosen and fixed here:
+ * ## Why the inventory is an asset, not source text
  *
- * 1. **Every** bundle file — executable or data — is scanned for historical case
- *    IDs and historical fixture paths. There is no legitimate reason for either
- *    to appear anywhere in the bundle.
- * 2. **Data and configuration assets** are scanned for prohibited truth-bearing
- *    JSON keys. A data asset has no reason to name them.
- * 3. **Executable code** may contain the prohibited-key inventory in exactly one
- *    place: the designated truth-isolation scanner module, whose path and
- *    SHA-256 are recorded in the bundle manifest. Anywhere else is a violation.
- * 4. Inside that module the inventory must be **exactly** the frozen set —
- *    additional keys or mutated spellings are violations, so the exemption cannot
- *    be widened by editing the scanner.
- * 5. Governed Brand strings are **never** an input to this scan. A legitimate
- *    transcript may contain the Brand text; that is evidence, not leakage.
+ * Amendment 5 tried to solve that by inspecting the scanner's SOURCE TEXT: it
+ * checked that every frozen token appeared somewhere in the module and used a
+ * regex to notice some additions. That proves neither direction. A key left only
+ * in a comment satisfied the presence test, and an addition outside the regex's
+ * recognized prefixes — `matchesExpectedResult`, say — widened the scanner
+ * undetected.
+ *
+ * The inventory is now a **dedicated canonical data asset**. Its bytes are
+ * hashed, its parsed array must equal the authoritative array exactly including
+ * order, and executable code carries no duplicate literal list. Equality of a
+ * parsed array is decidable; "does this token appear in this source file" is not
+ * the same question.
  */
 import { createHash } from "node:crypto";
 
-/** The emitted-field ban, frozen in `truth-isolation-plan.json#emittedFieldBan`. */
-export const PROHIBITED_TRUTH_KEYS = [
-  "isTruth",
-  "matchesTruth",
-  "truthInRawOcr",
-  "truthOnReconstructedLine",
-  "truthFilterReasons",
-  "expectedBrand",
-  "acceptableValues",
-] as const;
+/** The one path inside the bundle permitted to carry the inventory. */
+export const TRUTH_KEY_INVENTORY_ASSET_PATH = "runtime/truth-key-inventory.json";
 
-export type ProhibitedTruthKey = (typeof PROHIBITED_TRUTH_KEYS)[number];
+export class TruthKeyInventoryError extends Error {
+  constructor(
+    readonly code: "INVENTORY_NOT_JSON" | "INVENTORY_NOT_A_STRING_ARRAY",
+    detail: string,
+  ) {
+    super(`${code}: ${detail}`);
+    this.name = "TruthKeyInventoryError";
+  }
+}
 
-export type BundleFileKind = "executable" | "data";
+/**
+ * Parse the canonical inventory asset. The asset is a bare JSON array of key
+ * names in authoritative order — nothing else, so there is no envelope to
+ * disagree about.
+ */
+export function parseTruthKeyInventory(bytes: Uint8Array | Buffer | string): string[] {
+  const text = typeof bytes === "string" ? bytes : Buffer.from(bytes).toString("utf8");
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch (cause) {
+    throw new TruthKeyInventoryError(
+      "INVENTORY_NOT_JSON",
+      cause instanceof Error ? cause.message : String(cause),
+    );
+  }
+  if (!Array.isArray(parsed) || !parsed.every((entry) => typeof entry === "string")) {
+    throw new TruthKeyInventoryError(
+      "INVENTORY_NOT_A_STRING_ARRAY",
+      `expected an array of strings, received ${JSON.stringify(parsed)}`,
+    );
+  }
+  return parsed as string[];
+}
+
+export type BundleFileKind = "executable" | "data" | "binary";
 
 export interface BundleFile {
   path: string;
   kind: BundleFileKind;
-  /** File contents as text. Binary assets are hashed, not scanned, upstream. */
-  contents: string;
+  /**
+   * The file's RAW bytes. Historical identifiers are searched in the bytes, so a
+   * value encoded in a binary asset cannot slip past a text-only scan.
+   */
+  bytes: Buffer;
 }
 
 export interface BundleScanInput {
   files: BundleFile[];
   /**
-   * The historical identifiers and fixture paths that must not appear anywhere.
+   * The authoritative ordered inventory, read by the host from the committed
+   * asset. Supplied rather than hard-coded so this module carries no duplicate
+   * literal list.
+   */
+  authoritativeInventory: string[];
+  /** Exact byte SHA-256 of the authoritative asset, as recorded in the manifest. */
+  authoritativeInventorySha256: string;
+  /**
+   * Historical identifiers and fixture paths that must not appear anywhere.
    * Supplied by trusted host preparation, which legitimately holds them; the
    * isolated runtime never receives this inventory.
    */
   historicalCaseIds: string[];
   historicalFixturePaths: string[];
-  /** The one executable module permitted to carry the prohibited-key inventory. */
-  designatedScannerModulePath: string;
-  /** Its SHA-256, as recorded in the bundle manifest. */
-  designatedScannerSha256: string;
+  /** Defaults to the frozen asset path. */
+  inventoryAssetPath?: string;
 }
 
 export interface BundleScanViolation {
@@ -77,11 +109,11 @@ export interface BundleScanViolation {
   rule:
     | "HISTORICAL_CASE_ID"
     | "HISTORICAL_FIXTURE_PATH"
-    | "TRUTH_KEY_IN_DATA_ASSET"
-    | "TRUTH_KEY_OUTSIDE_DESIGNATED_SCANNER"
-    | "SCANNER_INVENTORY_MUTATED"
-    | "SCANNER_MODULE_MISSING"
-    | "SCANNER_DIGEST_MISMATCH";
+    | "INVENTORY_ASSET_MISSING"
+    | "INVENTORY_ASSET_DIGEST_MISMATCH"
+    | "INVENTORY_ASSET_UNPARSEABLE"
+    | "INVENTORY_ARRAY_NOT_EQUAL"
+    | "TRUTH_KEY_OUTSIDE_INVENTORY_ASSET";
   detail: string;
 }
 
@@ -89,111 +121,99 @@ export interface BundleScanReport {
   ok: boolean;
   haltCode: "BUNDLE_PROHIBITED_CONTENT" | null;
   violations: BundleScanViolation[];
-  /** Recorded so the report itself proves which module held the exemption. */
-  designatedScannerModulePath: string;
-  designatedScannerSha256: string;
+  inventoryAssetPath: string;
+  inventoryAssetSha256: string;
+  /** Recorded so the report itself states that no Brand inventory was involved. */
   brandStringsScanned: false;
 }
 
-const wordBoundary = (key: string): RegExp => new RegExp(`\\b${key}\\b`);
-
-/**
- * A key inventory is "mutated" if the module names anything outside the frozen
- * set that looks like a truth key, or omits one of the frozen keys. Both matter:
- * an extra key widens the exemption, and a missing key means the runtime's own
- * scan is incomplete.
- */
-function inventoryProblems(contents: string): string[] {
-  const problems: string[] = [];
-  for (const key of PROHIBITED_TRUTH_KEYS) {
-    if (!wordBoundary(key).test(contents)) {
-      problems.push(`the designated scanner does not carry the frozen key ${key}`);
-    }
-  }
-  // Anything of the shape "truthSomething" or "expectedSomething" that is not in
-  // the frozen list is an unapproved addition to the inventory.
-  const frozen = new Set<string>(PROHIBITED_TRUTH_KEYS);
-  for (const match of contents.matchAll(/\b(?:truth|expected|acceptable|isTruth)[A-Za-z]*\b/g)) {
-    const token = match[0];
-    if (!frozen.has(token) && token !== "truth" && token !== "expected") {
-      problems.push(`the designated scanner names ${token}, which is not in the frozen inventory`);
-    }
-  }
-  return problems;
-}
+const sha256 = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
 
 /**
  * Scan a built bundle. Returns a report; the caller halts on
  * `BUNDLE_PROHIBITED_CONTENT`.
  *
- * Governed Brand strings are deliberately not a parameter of this function.
+ * Governed Brand values are deliberately not a parameter of this function, so
+ * the scan cannot be reconfigured into comparing evidence against Brand truth.
  */
 export function scanBundleForProhibitedContent(input: BundleScanInput): BundleScanReport {
+  const inventoryAssetPath = input.inventoryAssetPath ?? TRUTH_KEY_INVENTORY_ASSET_PATH;
   const violations: BundleScanViolation[] = [];
 
-  const scanner = input.files.find((file) => file.path === input.designatedScannerModulePath);
-  if (scanner === undefined) {
+  // ---- The inventory asset -------------------------------------------------
+  const asset = input.files.find((file) => file.path === inventoryAssetPath);
+  if (asset === undefined) {
     violations.push({
-      path: input.designatedScannerModulePath,
-      rule: "SCANNER_MODULE_MISSING",
-      detail: "the bundle manifest names a designated scanner module that is not in the bundle",
+      path: inventoryAssetPath,
+      rule: "INVENTORY_ASSET_MISSING",
+      detail: "the bundle carries no truth-key inventory asset at the frozen path",
     });
   } else {
-    const digest = createHash("sha256").update(Buffer.from(scanner.contents, "utf8")).digest("hex");
-    if (digest !== input.designatedScannerSha256) {
+    const digest = sha256(asset.bytes);
+    if (digest !== input.authoritativeInventorySha256) {
       violations.push({
-        path: scanner.path,
-        rule: "SCANNER_DIGEST_MISMATCH",
-        detail: `bundle manifest records ${input.designatedScannerSha256} but the bundled module hashes to ${digest}`,
+        path: asset.path,
+        rule: "INVENTORY_ASSET_DIGEST_MISMATCH",
+        detail: `manifest records ${input.authoritativeInventorySha256} but the bundled asset hashes to ${digest}`,
       });
     }
-    for (const problem of inventoryProblems(scanner.contents)) {
+    let bundled: string[] | null = null;
+    try {
+      bundled = parseTruthKeyInventory(asset.bytes);
+    } catch (error) {
       violations.push({
-        path: scanner.path,
-        rule: "SCANNER_INVENTORY_MUTATED",
-        detail: problem,
+        path: asset.path,
+        rule: "INVENTORY_ASSET_UNPARSEABLE",
+        detail: error instanceof Error ? error.message : String(error),
       });
+    }
+    if (bundled !== null) {
+      // Exact array equality, order included. Not "contains", not "mentions".
+      const equal =
+        bundled.length === input.authoritativeInventory.length &&
+        bundled.every((key, index) => key === input.authoritativeInventory[index]);
+      if (!equal) {
+        violations.push({
+          path: asset.path,
+          rule: "INVENTORY_ARRAY_NOT_EQUAL",
+          detail: `bundled inventory ${JSON.stringify(bundled)} does not equal the authoritative inventory ${JSON.stringify(input.authoritativeInventory)}`,
+        });
+      }
     }
   }
 
+  // ---- Every file ----------------------------------------------------------
   for (const file of input.files) {
-    // Rule 1 — historical identity, everywhere, no exemption.
+    // Rule 1 — historical identity, in RAW BYTES, everywhere, no exemption.
     for (const caseId of input.historicalCaseIds) {
-      if (caseId.length > 0 && file.contents.includes(caseId)) {
+      if (caseId.length > 0 && file.bytes.includes(Buffer.from(caseId, "utf8"))) {
         violations.push({
           path: file.path,
           rule: "HISTORICAL_CASE_ID",
-          detail: `contains the historical case identifier ${caseId}`,
+          detail: `raw bytes contain the historical case identifier ${caseId}`,
         });
       }
     }
     for (const fixturePath of input.historicalFixturePaths) {
-      if (fixturePath.length > 0 && file.contents.includes(fixturePath)) {
+      if (fixturePath.length > 0 && file.bytes.includes(Buffer.from(fixturePath, "utf8"))) {
         violations.push({
           path: file.path,
           rule: "HISTORICAL_FIXTURE_PATH",
-          detail: `contains the historical fixture path ${fixturePath}`,
+          detail: `raw bytes contain the historical fixture path ${fixturePath}`,
         });
       }
     }
 
-    // Rules 2 and 3 — the truth-key inventory.
-    const isDesignatedScanner = file.path === input.designatedScannerModulePath;
-    for (const key of PROHIBITED_TRUTH_KEYS) {
-      if (!wordBoundary(key).test(file.contents)) continue;
-      if (file.kind === "data") {
+    // Rule 2 — forbidden evidence keys live in the inventory asset and nowhere
+    // else. Binary assets are covered too: a key name is a key name.
+    if (file.path === inventoryAssetPath) continue;
+    const text = file.bytes.toString("utf8");
+    for (const key of input.authoritativeInventory) {
+      if (new RegExp(`\\b${key}\\b`).test(text)) {
         violations.push({
           path: file.path,
-          rule: "TRUTH_KEY_IN_DATA_ASSET",
-          detail: `data asset names the prohibited truth-bearing key ${key}`,
-        });
-        continue;
-      }
-      if (!isDesignatedScanner) {
-        violations.push({
-          path: file.path,
-          rule: "TRUTH_KEY_OUTSIDE_DESIGNATED_SCANNER",
-          detail: `executable module names ${key}; only ${input.designatedScannerModulePath} may carry the inventory`,
+          rule: "TRUTH_KEY_OUTSIDE_INVENTORY_ASSET",
+          detail: `names the forbidden evidence key ${key}; only ${inventoryAssetPath} may carry the inventory`,
         });
       }
     }
@@ -203,8 +223,8 @@ export function scanBundleForProhibitedContent(input: BundleScanInput): BundleSc
     ok: violations.length === 0,
     haltCode: violations.length === 0 ? null : "BUNDLE_PROHIBITED_CONTENT",
     violations,
-    designatedScannerModulePath: input.designatedScannerModulePath,
-    designatedScannerSha256: input.designatedScannerSha256,
+    inventoryAssetPath,
+    inventoryAssetSha256: input.authoritativeInventorySha256,
     brandStringsScanned: false,
   };
 }

@@ -2,7 +2,7 @@
   "artifact": "candidate-fingerprint-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-5.md",
+  "amendedBy": "preregistration-amendment-6.md",
   "status": "ALGORITHM AND TEST CONTRACT FROZEN. The acquisition is not implemented in this amendment.",
   "canonicalizationVersion": "issue-149-candidate-canonical-v1",
   "preimage": {
@@ -87,11 +87,33 @@
     "the exact full digest appears in the stable id",
     "a PARTIAL record carrying its own correctly computed digest is rejected",
     "an unexpected extra key is rejected before and after finalization",
-    "every cross-field ladder and derived-field invariant is enforced"
+    "every cross-field ladder and derived-field invariant is enforced",
+    "the real selector's emitted candidates finalize successfully through the reference adapter",
+    "ocrConfidence arithmetic invariants are enforced",
+    "a six-key ocrConfidence is rejected"
   ],
   "testedBy": "src/fixtures/eval/issue-149-evidence-canonical.test.ts",
   "implementedInThisAmendment": false,
   "referenceImplementation": "scripts/eval/lib/issue-149-evidence-canonical.ts",
   "referenceImplementationLocationNote": "Deliberately OUTSIDE src/fixtures/**. The Stage 2 runner is required to use this helper and is prohibited from importing anything under src/fixtures/**; Amendment 3 left it inside fixtures, so the requirement and the prohibition contradicted each other. The canonicalization VERSION string still reads issue-149-candidate-canonical-v1 because it names the frozen algorithm, which is unchanged, not the file path.",
-  "stableCandidateIdRequiresTheCompleteValidatedPreimage": true
+  "stableCandidateIdRequiresTheCompleteValidatedPreimage": true,
+  "nestedShapes": {
+    "ocrConfidence": {
+      "keys": [
+        "aggregation",
+        "rawScale",
+        "rawTokenConfidences",
+        "rawMean",
+        "rawMin",
+        "rawMax",
+        "missingTokenCount"
+      ],
+      "arithmeticInvariants": [
+        "missingTokenCount equals the number of null entries in rawTokenConfidences",
+        "rawMean, rawMin and rawMax equal the values derived from the non-null entries",
+        "when no token confidence is present, all three aggregates are null"
+      ],
+      "priorDefect": "Amendment 5 declared six keys and omitted missingTokenCount, which production emits on every candidate, so the closed schema rejected every REAL candidate while the synthetic tests and a hard-coded drift guard both repeated the same wrong list."
+    }
+  }
 }

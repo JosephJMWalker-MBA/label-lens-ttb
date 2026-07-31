@@ -5,11 +5,13 @@
  * superseded design. Historical amendment records are allowed to contain the old
  * language, because that is their job.
  */
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { parseTruthKeyInventory } from "../../../scripts/eval/lib/issue-149-bundle-scan";
 import { CANDIDATE_EVIDENCE_REQUIRED_KEYS } from "../../../scripts/eval/lib/issue-149-evidence-canonical";
 
 const ROOT = "artifacts/issue-149-brand-complete-evidence-acquisition";
@@ -21,12 +23,14 @@ const HISTORICAL_FILES = new Set([
   "preregistration-amendment-3.md",
   "preregistration-amendment-4.md",
   "preregistration-amendment-5.md",
+  "preregistration-amendment-6.md",
   "branch-pointer-incident.md",
   "amendment-linkage.json",
   "amendment-2-linkage.json",
   "amendment-3-linkage.json",
   "amendment-4-linkage.json",
   "amendment-5-linkage.json",
+  "amendment-6-linkage.json",
 ]);
 
 /**
@@ -35,7 +39,7 @@ const HISTORICAL_FILES = new Set([
  * current amendment. Exempting it wholesale is what let it sit at "amendment 2"
  * while the package was at Amendment 4, faithfully hashed by the manifest.
  */
-const CURRENT_AMENDMENT = 5;
+const CURRENT_AMENDMENT = 6;
 
 /**
  * A line may mention a superseded term when it is explicitly marking it as
@@ -100,6 +104,11 @@ const STALE_TERMS = [
 ];
 
 const read = (p: string): unknown => JSON.parse(readFileSync(path.join(process.cwd(), p), "utf8"));
+
+const sha256 = (p: string): string =>
+  createHash("sha256")
+    .update(readFileSync(path.join(process.cwd(), p)))
+    .digest("hex");
 
 function walk(dir: string): string[] {
   return readdirSync(path.join(process.cwd(), dir)).flatMap((entry) => {
@@ -463,10 +472,9 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     }
   });
 
-  it("names the post-freeze actors and protects evidence by byte equality, not a false access claim", () => {
+  it("protects evidence by byte equality, not by a false access claim", () => {
     const plan = read(path.join(ROOT, "post-freeze-evaluation-plan.json")) as {
       actorsAndBoundaries: {
-        actor1_ocrWorkflowJob: { commitsToGit: boolean; receivesGovernedTruth: boolean };
         actor2_postRunCommitProcess: {
           isNotTheOcrProcess: boolean;
           physicalInaccessibilityClaimed: boolean;
@@ -477,17 +485,9 @@ describe("Issue #149 Stage 1 contract consistency", () => {
           mustDo: string[];
           mustNotDo: string[];
         };
-        actor3_postFreezeEvaluationProcess: {
-          isTheOnlyActorThatMayOpen: string[];
-          isTheOnlyActorAuthorizedToUseTheMapOrGovernedTruthForEvaluation: boolean;
-        };
       };
     };
-    const actors = plan.actorsAndBoundaries;
-    expect(actors.actor1_ocrWorkflowJob.commitsToGit).toBe(false);
-    expect(actors.actor1_ocrWorkflowJob.receivesGovernedTruth).toBe(false);
-
-    const actor2 = actors.actor2_postRunCommitProcess;
+    const actor2 = plan.actorsAndBoundaries.actor2_postRunCommitProcess;
     expect(actor2.isNotTheOcrProcess).toBe(true);
     // The map is committed on this branch, so "cannot reach it" would be false.
     expect(actor2.physicalInaccessibilityClaimed).toBe(false);
@@ -499,10 +499,6 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     for (const forbidden of ["transform", "filter", "regenerate", "re-serialize", "reorder"]) {
       expect(actor2.mustNotDo.join(" ").toLowerCase()).toContain(forbidden);
     }
-
-    const actor3 = actors.actor3_postFreezeEvaluationProcess;
-    expect(actor3.isTheOnlyActorThatMayOpen.join(" ")).toContain("id-map.json");
-    expect(actor3.isTheOnlyActorAuthorizedToUseTheMapOrGovernedTruthForEvaluation).toBe(true);
   });
 
   it("states the truth-boundary chronology accurately, including trusted staging", () => {
@@ -543,17 +539,19 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     }
   });
 
-  it("scopes the bundle scan so it cannot reject its own scanner", () => {
+  it("scopes the bundle scan to an asset, not to scanner source text", () => {
     const isolation = read(path.join(ROOT, "acquisition-runtime-isolation-contract.json")) as {
       runtimeBundle: {
         dependencyClosureGate: {
           preIsolationBundleScan: {
             selfTriggeringDefect: string;
+            sourceTextInferenceDefect: string;
             frozenScope: string[];
-            designatedScannerModule: {
-              inventoryMustBeExactly: string;
-              wideningItIsAViolation: boolean;
-              narrowingItIsAViolation: boolean;
+            inventoryAsset: {
+              bundlePath: string;
+              authoritativeCopy: string;
+              exactByteSha256: string;
+              executableCodeCarriesNoDuplicateLiteralInventory: boolean;
             };
             brandStringsNeverScanned: boolean;
             referenceImplementation: string;
@@ -565,14 +563,38 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     const gate = isolation.runtimeBundle.dependencyClosureGate;
     const scan = gate.preIsolationBundleScan;
     expect(scan.selfTriggeringDefect).toContain("truth-isolation scanner");
-    expect(scan.designatedScannerModule.wideningItIsAViolation).toBe(true);
-    expect(scan.designatedScannerModule.narrowingItIsAViolation).toBe(true);
+    expect(scan.sourceTextInferenceDefect).toContain("COMMENT");
+    expect(scan.inventoryAsset.executableCodeCarriesNoDuplicateLiteralInventory).toBe(true);
+    expect(scan.inventoryAsset.exactByteSha256).toBe(
+      sha256(`${ROOT}/runtime/truth-key-inventory.json`),
+    );
+    expect(existsSync(path.join(process.cwd(), scan.inventoryAsset.authoritativeCopy))).toBe(true);
     expect(scan.brandStringsNeverScanned).toBe(true);
     expect(existsSync(path.join(process.cwd(), scan.referenceImplementation))).toBe(true);
-    expect(scan.frozenScope.join(" ")).toContain("data and configuration assets");
-    expect(gate.bundleManifestMustRecord.join(" ")).toContain(
-      "designated truth-isolation scanner module path",
+    expect(scan.frozenScope.join(" ")).toContain("RAW BYTES of every bundle file");
+    expect(scan.frozenScope.join(" ")).toContain("exact array equality");
+    expect(gate.bundleManifestMustRecord.join(" ")).toContain("truth-key inventory asset path");
+  });
+
+  it("allows the incumbent's own mandatory rules dependency by path and hash", () => {
+    const isolation = read(path.join(ROOT, "acquisition-runtime-isolation-contract.json")) as {
+      runtimeBundle: {
+        dependencyClosureGate: {
+          frozenExceptions: Array<{ path: string; sha256: string; transitiveImports: string[] }>;
+          failIfAnyTransitiveSourceInputIsUnderOrDerivedFrom: string[];
+          productionSourceBaseDriftGate: { haltCode: string };
+        };
+      };
+    };
+    const gate = isolation.runtimeBundle.dependencyClosureGate;
+    expect(gate.failIfAnyTransitiveSourceInputIsUnderOrDerivedFrom).toContain(
+      "src/domain/rules/**",
     );
+    expect(gate.frozenExceptions).toHaveLength(1);
+    expect(gate.frozenExceptions[0].path).toBe("src/domain/rules/wine-alcohol-parse.ts");
+    expect(gate.frozenExceptions[0].sha256).toBe(sha256("src/domain/rules/wine-alcohol-parse.ts"));
+    expect(gate.frozenExceptions[0].transitiveImports).toEqual([]);
+    expect(gate.productionSourceBaseDriftGate.haltCode).toBe("PRODUCTION_SOURCE_DRIFTED_FROM_BASE");
   });
 
   it("keeps git-sha.txt current, and does not exempt it from the sweep", () => {
@@ -580,7 +602,7 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     expect(HISTORICAL_FILES.has("git-sha.txt")).toBe(false);
     expect(gitSha).toContain(`CURRENT — stage 1, amendment ${CURRENT_AMENDMENT}`);
     expect(gitSha.match(/^CURRENT/gm) ?? []).toHaveLength(1);
-    for (const earlier of [1, 2, 3, 4]) {
+    for (const earlier of [1, 2, 3, 4, 5]) {
       expect(gitSha).toContain(`HISTORICAL — amendment ${earlier}`);
     }
     expect(gitSha).toContain("No governed 115-case acquisition OCR");
@@ -638,6 +660,203 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     expect(incident).toContain("HEAD:<remote-branch>");
     expect(incident).toContain("No commit was lost");
     expect(incident).toContain("audit event, not an experimental result");
+  });
+
+  it("stamps every operative contract with the current amendment", () => {
+    // Amendment 5's evidence-schema.json sat at "amendment 4" while the manifest
+    // faithfully hashed it. A per-file assertion is cheaper than noticing later.
+    const stale: string[] = [];
+    for (const file of files.filter((f) => f.endsWith(".json"))) {
+      if (HISTORICAL_FILES.has(path.basename(file))) continue;
+      const contract = read(file) as { amendedBy?: string };
+      if (contract.amendedBy === undefined) continue;
+      if (contract.amendedBy !== `preregistration-amendment-${CURRENT_AMENDMENT}.md`) {
+        stale.push(`${file} — ${contract.amendedBy}`);
+      }
+    }
+    expect(stale).toEqual([]);
+  });
+
+  describe("one authoritative forbidden-key inventory", () => {
+    const ASSET = `${ROOT}/runtime/truth-key-inventory.json`;
+    const authoritative = read(ASSET) as string[];
+
+    it("is a bare canonical array of the ten keys", () => {
+      expect(authoritative).toEqual([
+        "isTruth",
+        "matchesTruth",
+        "truthInRawOcr",
+        "truthOnReconstructedLine",
+        "truthFilterReasons",
+        "expectedBrand",
+        "acceptableValues",
+        "brandPresent",
+        "historicalCaseId",
+        "historicalImagePath",
+      ]);
+      // Canonical: no whitespace, one terminal newline, parses back identically.
+      const bytes = readFileSync(path.join(process.cwd(), ASSET), "utf8");
+      expect(bytes).toBe(`${JSON.stringify(authoritative)}\n`);
+    });
+
+    it("is the same inventory in every operative contract and in code", () => {
+      // Amendment 5 left three different sets in play: ten keys in
+      // evidence-schema.json, seven in truth-isolation-plan.json and the
+      // scanner, five in raw-ocr-contract.json.
+      for (const file of [
+        "truth-isolation-plan.json",
+        "evidence-schema.json",
+        "raw-ocr-contract.json",
+        "acquisition-runtime-isolation-contract.json",
+      ]) {
+        const contract = read(path.join(ROOT, file)) as {
+          forbiddenEvidenceKeyInventory?: { keys: string[]; assetSha256: string };
+          runtimeBundle?: {
+            dependencyClosureGate: {
+              forbiddenEvidenceKeyInventory: { keys: string[]; assetSha256: string };
+            };
+          };
+        };
+        const inventory =
+          contract.forbiddenEvidenceKeyInventory ??
+          contract.runtimeBundle?.dependencyClosureGate.forbiddenEvidenceKeyInventory;
+        expect(inventory, `${file} declares no inventory`).toBeDefined();
+        expect(inventory!.keys).toEqual(authoritative);
+        expect(inventory!.assetSha256).toBe(sha256(ASSET));
+      }
+      // And the executable path agrees, by reading the same asset.
+      expect(parseTruthKeyInventory(readFileSync(path.join(process.cwd(), ASSET)))).toEqual(
+        authoritative,
+      );
+    });
+
+    it("distinguishes prohibited field NAMES from historical VALUES", () => {
+      const plan = read(path.join(ROOT, "truth-isolation-plan.json")) as {
+        forbiddenEvidenceKeyInventory: { fieldNamesVersusValues: string };
+      };
+      expect(plan.forbiddenEvidenceKeyInventory.fieldNamesVersusValues).toContain(
+        "read-only identity-leak verifier",
+      );
+      const schema = read(path.join(ROOT, "evidence-schema.json")) as {
+        truthIsolationAssertion: {
+          inBoundaryKeyAndFileScan: string;
+          postSealHistoricalValueScan: string;
+        };
+      };
+      expect(schema.truthIsolationAssertion.postSealHistoricalValueScan).toContain("AFTER");
+      expect(schema.truthIsolationAssertion.inBoundaryKeyAndFileScan).toContain("KEY");
+    });
+  });
+
+  it("corrects the ID-map access boundary in both the contract and the map", () => {
+    for (const file of [`${ROOT}/id-map-contract.json`, `${ROOT}/post-freeze/id-map.json`]) {
+      const record = read(file) as {
+        accessBoundary: {
+          trustedStagingMayReadGenerateAndVerify: boolean;
+          mountedIntoIsolatedDiscovery: boolean;
+          mountedIntoIsolatedExecution: boolean;
+          importedByAcquisitionCode: boolean;
+          insideStagedImageDirectory: boolean;
+          insideRawEvidenceDirectory: boolean;
+          physicalInaccessibilityClaimed: boolean;
+          mayNotBeUsedAgainstAcquiredEvidenceUntil: string;
+          onlyActorAuthorizedToUseItForTruthBasedEvaluation: string;
+        };
+      };
+      const boundary = record.accessBoundary;
+      expect(boundary.trustedStagingMayReadGenerateAndVerify).toBe(true);
+      expect(boundary.mountedIntoIsolatedDiscovery).toBe(false);
+      expect(boundary.mountedIntoIsolatedExecution).toBe(false);
+      expect(boundary.importedByAcquisitionCode).toBe(false);
+      expect(boundary.insideStagedImageDirectory).toBe(false);
+      expect(boundary.insideRawEvidenceDirectory).toBe(false);
+      expect(boundary.physicalInaccessibilityClaimed).toBe(false);
+      expect(boundary.mayNotBeUsedAgainstAcquiredEvidenceUntil).toContain("sealed");
+      expect(boundary.onlyActorAuthorizedToUseItForTruthBasedEvaluation).toContain("actor 3");
+      // The false global rule must be gone, not merely reworded around.
+      expect(JSON.stringify(boundary)).not.toContain("readableOnlyAfter");
+    }
+  });
+
+  describe("three separate workflow jobs", () => {
+    const plan = read(path.join(ROOT, "post-freeze-evaluation-plan.json")) as {
+      actorsAndBoundaries: {
+        jobA_trustedPreparation: {
+          checksOutTheRepository: boolean;
+          mayReadHistoricalIdentityAndTheEvaluationManifest: boolean;
+          isNotTruthFreeItself: boolean;
+          emitsTruthFreePreparationArtifactContainingOnly: string[];
+          mustNotPlaceInThatArtifact: string[];
+        };
+        jobB_isolatedDiscoverOrExecute: {
+          checksOutTheRepository: boolean;
+          receivesTheRepositoryWorkspace: boolean;
+          receivesOnly: string;
+          gitHubTokenOrRepositoryCredentialEntersTheContainer: boolean;
+          receivesTheIdMap: boolean;
+        };
+        jobC_readOnlyIdentityLeakVerifier: {
+          receives: string[];
+          doesNotReceive: string[];
+          mayNot: string[];
+          cleanReportIsAMandatoryPreconditionFor: string[];
+          reportLocation: string;
+        };
+        actor2_postRunCommitProcess: { preconditions: string[] };
+        actor3_postFreezeEvaluationProcess: {
+          preconditions: string[];
+          physicalExclusivityClaimed: boolean;
+          isTheOnlyActorAuthorizedToUseTheMapOrGovernedTruthForEvaluation: boolean;
+        };
+      };
+    };
+    const actors = plan.actorsAndBoundaries;
+
+    it("keeps Job A trusted rather than calling the whole workflow truth-free", () => {
+      const a = actors.jobA_trustedPreparation;
+      expect(a.checksOutTheRepository).toBe(true);
+      expect(a.mayReadHistoricalIdentityAndTheEvaluationManifest).toBe(true);
+      expect(a.isNotTruthFreeItself).toBe(true);
+      expect(a.emitsTruthFreePreparationArtifactContainingOnly).toHaveLength(5);
+      expect(a.mustNotPlaceInThatArtifact.join(" ")).toContain("post-freeze ID map");
+    });
+
+    it("gives Job B no checkout, no workspace and no credential", () => {
+      const b = actors.jobB_isolatedDiscoverOrExecute;
+      expect(b.checksOutTheRepository).toBe(false);
+      expect(b.receivesTheRepositoryWorkspace).toBe(false);
+      expect(b.gitHubTokenOrRepositoryCredentialEntersTheContainer).toBe(false);
+      expect(b.receivesTheIdMap).toBe(false);
+      expect(b.receivesOnly).toContain("truth-free preparation artifact");
+    });
+
+    it("gives Job C an identifier inventory and no truth, and makes its report a precondition", () => {
+      const c = actors.jobC_readOnlyIdentityLeakVerifier;
+      expect(c.receives.join(" ")).toContain("historical case-ID and fixture-path inventory");
+      expect(c.doesNotReceive.join(" ")).toContain("acceptable Brand values");
+      expect(c.doesNotReceive.join(" ")).toContain("governed truth labels");
+      expect(c.mayNot.join(" ").toLowerCase()).toContain("modify");
+      expect(c.reportLocation).toContain("outside raw/");
+      expect(c.cleanReportIsAMandatoryPreconditionFor).toEqual([
+        "actor 2 committing evidence",
+        "actor 3 beginning post-freeze evaluation",
+      ]);
+    });
+
+    it("requires the clean verifier report before commitment and before evaluation", () => {
+      expect(actors.actor2_postRunCommitProcess.preconditions.join(" ")).toContain(
+        "identity-leak report",
+      );
+      expect(actors.actor3_postFreezeEvaluationProcess.preconditions.join(" ")).toContain(
+        "identity-leak report",
+      );
+    });
+
+    it("states actor 3's exclusivity as authorization, not physical access", () => {
+      const three = actors.actor3_postFreezeEvaluationProcess;
+      expect(three.physicalExclusivityClaimed).toBe(false);
+      expect(three.isTheOnlyActorAuthorizedToUseTheMapOrGovernedTruthForEvaluation).toBe(true);
+    });
   });
 
   it("uses retention-bound language for the 100 MB fallback", () => {

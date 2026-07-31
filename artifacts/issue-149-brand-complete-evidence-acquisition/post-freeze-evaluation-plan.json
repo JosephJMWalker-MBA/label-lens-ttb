@@ -84,28 +84,98 @@
     "treating the diagnostic selection rather than debug.finalSelections as the behavioural authority"
   ],
   "expectedUseOfTheResult": "A later, separately preregistered zero-OCR study may use this evidence. This sprint does not perform, design or recommend that study's treatment.",
-  "amendedBy": "preregistration-amendment-5.md",
+  "amendedBy": "preregistration-amendment-6.md",
   "actorsAndBoundaries": {
-    "actor1_ocrWorkflowJob": {
-      "permissions": "contents: read",
+    "jobA_trustedPreparation": {
+      "runsOcr": false,
+      "checksOutTheRepository": true,
+      "mayReadHistoricalIdentityAndTheEvaluationManifest": true,
+      "why": "Staging cannot freeze the corpus, assign opaque identifiers or write the post-freeze map without them.",
+      "does": [
+        "verify the Stage 1 package against stage-1-contract-manifest.sha256",
+        "verify preregistration.sha256",
+        "run staging and verify source images and the post-freeze map",
+        "verify the incumbent configuration pins and the production-source base-drift gate",
+        "build the allowlisted runtime bundle and generate its dependency closure",
+        "write the bundle manifest and run the pre-isolation bundle scan"
+      ],
+      "emitsTruthFreePreparationArtifactContainingOnly": [
+        "the runtime bundle",
+        "the bundle manifest",
+        "the truth-free input manifest",
+        "the staged opaque images",
+        "the empty-output specification"
+      ],
+      "mustNotPlaceInThatArtifact": [
+        "historical case identifiers",
+        "historical fixture paths",
+        "the post-freeze ID map",
+        "governed truth",
+        "acceptable values",
+        "prior per-case records"
+      ],
+      "isNotTruthFreeItself": true,
+      "isNotTruthFreeItselfNote": "Job A is TRUSTED, not truth-free. Calling the whole workflow truth-free would be false. What is truth-free is the artifact it emits and the isolated job that consumes it."
+    },
+    "jobB_isolatedDiscoverOrExecute": {
+      "checksOutTheRepository": false,
+      "receivesTheRepositoryWorkspace": false,
+      "receivesOnly": "Job A's truth-free preparation artifact",
+      "containerMounts": "the four governed experiment-controlled data mounts, plus the frozen pseudo-filesystem allowlist and named tmpfs scratch",
+      "gitHubTokenOrRepositoryCredentialEntersTheContainer": false,
+      "discoverStopsForOwnerReviewBeforeExecute": true,
+      "executeUploads": "one sealed evidence artifact plus its externally recorded digest",
       "receivesGovernedTruth": false,
       "receivesTheIdMap": false,
-      "commitsToGit": false,
-      "endsAfter": "uploading the complete lossless evidence artifact at every size AND verifying its digest",
-      "mayNotProceedTo": "Git commitment or post-freeze evaluation, under any circumstances"
+      "commitsToGit": false
+    },
+    "jobC_readOnlyIdentityLeakVerifier": {
+      "runsOnlyAfter": "both raw manifests are sealed and the evidence artifact exists",
+      "evidenceExposure": "downloaded or mounted READ-ONLY",
+      "receives": [
+        "the sealed evidence, read-only",
+        "a minimal historical case-ID and fixture-path inventory"
+      ],
+      "doesNotReceive": [
+        "acceptable Brand values",
+        "governed truth labels",
+        "prior per-case classifications"
+      ],
+      "does": [
+        "verify the evidence artifact digest",
+        "verify both raw manifests against the frozen bytes",
+        "scan the frozen bytes for historical case IDs and historical fixture paths"
+      ],
+      "mayNot": [
+        "modify any raw file",
+        "rewrite, reformat or re-emit any raw file",
+        "replace any raw file",
+        "perform any truth-based evaluation"
+      ],
+      "reportLocation": "outside raw/, with its own SHA-256",
+      "onHit": "TRUTH_ISOLATION_FAILURE",
+      "cleanReportIsAMandatoryPreconditionFor": [
+        "actor 2 committing evidence",
+        "actor 3 beginning post-freeze evaluation"
+      ]
     },
     "actor2_postRunCommitProcess": {
       "authorization": "explicit owner authorization, separate from the OCR run",
       "isNotTheOcrProcess": true,
+      "preconditions": [
+        "the Job C identity-leak report exists and is clean",
+        "the evidence artifact digest verifies",
+        "both raw manifests verify"
+      ],
       "appliesWhen": "total evidence footprint is at or below 100 MB",
       "physicalInaccessibilityClaimed": false,
-      "physicalInaccessibilityCorrection": "Amendment 4 said actor 2 'receives neither governed truth nor the ID map'. post-freeze/id-map.json is committed on PR #219 and covered by the Stage 1 package manifest, so a process operating in an ordinary branch checkout CAN reach it. Claiming otherwise would be false unless actor 2 were implemented inside a separately verified restricted environment, which it is not.",
       "mayOperateInARepositoryCheckout": true,
       "theControlThatActuallyProtectsTheEvidence": "immutable-byte equality, not file inaccessibility",
       "evidenceInput": "the verified workflow artifact \u2014 not a regenerated, re-serialized or locally rebuilt copy",
       "mustDo": [
         "verify the outer artifact digest against the value the OCR job recorded",
         "verify BOTH raw manifests (primary and repeat) against the artifact contents",
+        "verify the Job C identity-leak report is present and clean",
         "commit exactly those immutable bytes",
         "verify that every committed file's SHA-256 equals the artifact manifest entry",
         "stop after exact commitment and verification"
@@ -120,35 +190,40 @@
       ],
       "anyChangedByteFailsVerification": true,
       "truthIsNotAnInputToItsOperation": true,
-      "truthIsNotAnInputNote": "Actor 2 makes no content-dependent decision at all: it commits the bytes it verified, or it fails. Reading the map would not change any output it can produce, which is why byte equality is the sufficient control.",
+      "truthIsNotAnInputNote": "Actor 2 makes no content-dependent decision at all: it commits the bytes it verified, or it fails.",
       "haltCodes": {
         "ARTIFACT_DIGEST_MISMATCH": "the downloaded artifact does not match the digest the OCR job recorded",
         "RAW_MANIFEST_MISMATCH": "a raw file's SHA-256 does not match its manifest entry",
+        "IDENTITY_VERIFIER_REPORT_MISSING_OR_UNCLEAN": "the Job C report is absent, unverifiable or reports a hit",
         "COMMITTED_BYTES_DIFFER": "a committed file's SHA-256 does not equal the artifact manifest entry"
       }
     },
     "actor3_postFreezeEvaluationProcess": {
       "authorization": "separate authorization again, after actor 2 stops for review",
-      "isTheOnlyActorThatMayOpen": [
+      "preconditions": [
+        "the Job C identity-leak report exists and is clean",
+        "both raw manifests verify",
+        "the raw evidence is committed and immutable"
+      ],
+      "isTheOnlyActorAuthorizedToUseTheMapOrGovernedTruthForEvaluation": true,
+      "physicalExclusivityClaimed": false,
+      "physicalExclusivityNote": "Other processes can READ post-freeze/id-map.json \u2014 it is committed on this branch. What is exclusive is AUTHORIZATION to use it, and governed truth, for evaluation. An earlier revision claimed actor 3 was the only actor that may open the map; that was an access claim the design does not enforce.",
+      "mayUse": [
         "artifacts/issue-149-brand-complete-evidence-acquisition/post-freeze/id-map.json",
         "the governed Brand truth",
         "acceptable Brand values",
         "prior per-case classifications and PR #217/#218 records"
       ],
-      "preconditions": [
-        "both raw manifests verify",
-        "the raw evidence is committed and immutable",
-        "the truth-isolation scan passed during acquisition"
-      ],
-      "mayNotModify": "any raw evidence file, for any reason",
-      "isTheOnlyActorAuthorizedToUseTheMapOrGovernedTruthForEvaluation": true
+      "mayNotModify": "any raw evidence file, for any reason"
     },
     "above100MB": {
-      "actor1Still": "uploads and verifies the complete lossless artifact",
+      "jobBStill": "uploads and verifies the complete lossless artifact",
       "thenStopsBefore": ["Git commitment", "post-freeze truth evaluation"],
+      "jobCStillRuns": true,
+      "jobCStillRunsWhy": "Identity-leak verification does not depend on whether the evidence is committed.",
       "requires": "an explicit owner decision about durable archival before anything continues",
       "actor2AndActor3DoNotRun": true
     }
   },
-  "truthBoundaryLocation": "Between actor 2 and actor 3. Not between the OCR job and its own output, and not inside the OCR workflow at all \u2014 the OCR workflow never holds truth to begin with."
+  "truthBoundaryLocation": "Between actor 2 and actor 3. Job A is trusted and holds historical identity; Job B is isolated and truth-free; Job C holds only a minimal identifier inventory and no truth."
 }

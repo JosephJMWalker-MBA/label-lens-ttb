@@ -18,16 +18,27 @@ import {
   ANALYZER_RANKING_SCORE_FACTOR_DIRECTIONS as PROD_SCORE_FACTOR_DIRECTIONS,
   ANALYZER_RANKING_SCORE_FACTOR_IDS as PROD_SCORE_FACTOR_IDS,
 } from "@/pipeline/analyzer/analyzer.types";
+import type {
+  AnalyzerCandidateProvenance,
+  AnalyzerOcrConfidence,
+  EvidenceGeometry,
+} from "@/pipeline/analyzer/analyzer.types";
 import {
   OCR_PASS_KINDS as PROD_PASS_KINDS,
   OCR_PASS_TRIGGER_REASONS as PROD_TRIGGER_REASONS,
+  type OcrWord,
+  type RegionOcrResult,
 } from "@/pipeline/extractor/extractor.types";
 import {
   BRAND_CANDIDATE_ASSEMBLIES as PROD_ASSEMBLIES,
   BRAND_CANDIDATE_DECISIONS as PROD_DECISIONS,
   BRAND_FILTER_CHECK_ORDER as PROD_FILTER_CHECK_ORDER,
   BRAND_LINE_REASONS as PROD_LINE_REASONS,
+  selectBrandObservationWithCompleteFilterDiagnostics,
+  type BrandCandidateScore,
 } from "@/pipeline/extractor/field-selection";
+
+import { toCandidateEvidenceRecord } from "../../../scripts/eval/lib/issue-149-candidate-adapter";
 
 import {
   ANALYZER_CANDIDATE_PROVENANCE_KEYS,
@@ -39,6 +50,7 @@ import {
   ANALYZER_RANKING_SCORE_FACTOR_DIRECTIONS,
   ANALYZER_RANKING_SCORE_FACTOR_IDS,
   BRAND_CANDIDATE_ASSEMBLIES,
+  CANDIDATE_EVIDENCE_REQUIRED_KEYS,
   BRAND_CANDIDATE_DECISIONS,
   BRAND_CANDIDATE_SCORE_KEYS,
   BRAND_FILTER_CHECK_ORDER,
@@ -77,64 +89,143 @@ describe("Issue #149 frozen vocabulary matches production", () => {
     );
   });
 
-  it("declares key sets that match the production interfaces", () => {
-    // These mirror interfaces rather than const arrays, so they are asserted
-    // against the literal shapes production emits.
-    expect([...REGION_OCR_RESULT_KEYS]).toEqual([
-      "passId",
-      "regionName",
-      "passKind",
-      "triggerReasons",
-      "preprocessing",
-      "fieldEligibility",
-      "transform",
-      "transformedSize",
-      "pageSegMode",
-      "rawWordCount",
-      "discardedWordCount",
-      "timings",
-      "words",
-    ]);
-    expect([...ANALYZER_OCR_CONFIDENCE_KEYS]).toEqual([
-      "aggregation",
-      "rawScale",
-      "rawTokenConfidences",
-      "rawMean",
-      "rawMin",
-      "rawMax",
-    ]);
-    expect([...ANALYZER_CANDIDATE_PROVENANCE_KEYS]).toEqual([
-      "passId",
-      "passKind",
-      "triggerReasons",
-      "preprocessing",
-      "regionName",
-      "supportingPassIds",
-      "supportingPassKinds",
-      "recoveryPassUsed",
-    ]);
-    expect([...BRAND_CANDIDATE_SCORE_KEYS]).toEqual([
-      "positiveSignal",
-      "meaningfulChars",
-      "structure",
-      "ocrEvidenceScore",
-      "prominence",
-      "area",
-      "centrality",
-      "alignment",
-      "lineProximity",
-      "lowInformationPenalty",
-      "residualPenalty",
-      "total",
-    ]);
-    expect([...EVIDENCE_GEOMETRY_KEYS]).toEqual([
-      "imageIndex",
-      "x",
-      "y",
-      "width",
-      "height",
-      "imageWidth",
-      "imageHeight",
-    ]);
+  it("derives interface key sets from typed exemplars, not from an asserted list", () => {
+    // Amendment 5 asserted a hard-coded list here and repeated its own six-key
+    // ocrConfidence mistake, so the "drift guard" agreed with the bug. A guard
+    // that restates the thing it is guarding proves nothing.
+    //
+    // These exemplars are typed as the production interfaces. If a field is
+    // added, removed or renamed upstream, the exemplar stops compiling — and the
+    // key set below is read OFF the exemplar rather than written out again.
+    const ocrConfidence: AnalyzerOcrConfidence = {
+      aggregation: "mean",
+      rawScale: "0-100",
+      rawTokenConfidences: [91, null],
+      rawMean: 91,
+      rawMin: 91,
+      rawMax: 91,
+      missingTokenCount: 1,
+    };
+    const provenance: AnalyzerCandidateProvenance = {
+      passId: "pass-1-full-image",
+      passKind: "full-image-primary",
+      triggerReasons: [],
+      preprocessing: [],
+      regionName: "full-image",
+      supportingPassIds: [],
+      supportingPassKinds: [],
+      recoveryPassUsed: false,
+    };
+    const geometry: EvidenceGeometry = {
+      imageIndex: 0,
+      x: 0,
+      y: 0,
+      width: 1,
+      height: 1,
+      imageWidth: 2,
+      imageHeight: 2,
+    };
+    const score: BrandCandidateScore = {
+      positiveSignal: 0,
+      meaningfulChars: 0,
+      structure: 0,
+      ocrEvidenceScore: 0,
+      prominence: 0,
+      area: 0,
+      centrality: 0,
+      alignment: 0,
+      lineProximity: 0,
+      residualPenalty: 0,
+      lowInformationPenalty: 0,
+      total: 0,
+    };
+
+    expect(new Set(ANALYZER_OCR_CONFIDENCE_KEYS)).toEqual(new Set(Object.keys(ocrConfidence)));
+    expect(new Set(ANALYZER_CANDIDATE_PROVENANCE_KEYS)).toEqual(new Set(Object.keys(provenance)));
+    expect(new Set(EVIDENCE_GEOMETRY_KEYS)).toEqual(new Set(Object.keys(geometry)));
+    expect(new Set(BRAND_CANDIDATE_SCORE_KEYS)).toEqual(new Set(Object.keys(score)));
+  });
+
+  it("derives the RegionOcrResult key set from a typed exemplar", () => {
+    const pass: RegionOcrResult = {
+      passId: "pass-1-full-image",
+      regionName: "full-image",
+      passKind: "full-image-primary",
+      triggerReasons: [],
+      preprocessing: [],
+      fieldEligibility: { brand: true, alcohol: true },
+      transform: {
+        crop: { left: 0, top: 0, width: 1, height: 1 },
+        rotate: 0,
+        scale: 1,
+        originalWidth: 1,
+        originalHeight: 1,
+      },
+      transformedSize: { width: 1, height: 1 },
+      pageSegMode: 11,
+      rawWordCount: 0,
+      discardedWordCount: 0,
+      timings: { preprocessMs: 0, ocrMs: 0, inverseMappingMs: 0, totalMs: 0 },
+      words: [],
+    };
+    expect(new Set(REGION_OCR_RESULT_KEYS)).toEqual(new Set(Object.keys(pass)));
+    // Order matters for the semantic preimage, so it is asserted separately.
+    expect([...REGION_OCR_RESULT_KEYS]).toEqual(Object.keys(pass));
+  });
+
+  it("derives the candidate key set from what production actually emits", () => {
+    // The strongest available guard: run the real selector, adapt one real
+    // candidate, and require the frozen schema to describe exactly that record.
+    const words: OcrWord[] = ["RED", "BRICK", "WINERY"].map((text, index) => {
+      const x0 = 40 + index * 220;
+      return {
+        text,
+        rawConfidence: 92,
+        bbox: { x0, y0: 100, x1: x0 + text.length * 20, y1: 160 },
+        originalGeometry: {
+          imageIndex: 0,
+          x: x0,
+          y: 100,
+          width: text.length * 20,
+          height: 60,
+          imageWidth: 1600,
+          imageHeight: 1200,
+        },
+      };
+    });
+    const pass = {
+      passId: "pass-1-full-image",
+      regionName: "full-image",
+      passKind: "full-image-primary",
+      triggerReasons: [],
+      preprocessing: [],
+      fieldEligibility: { brand: true, alcohol: true },
+      pageSegMode: 11,
+      transform: {
+        crop: { left: 0, top: 0, width: 1600, height: 1200 },
+        rotate: 0,
+        scale: 1,
+        originalWidth: 1600,
+        originalHeight: 1200,
+      },
+      transformedSize: { width: 1600, height: 1200 },
+      rawWordCount: words.length,
+      discardedWordCount: 0,
+      words,
+      timings: { preprocessMs: 0, ocrMs: 0, inverseMappingMs: 0, totalMs: 0 },
+    } as unknown as RegionOcrResult;
+
+    const candidates =
+      selectBrandObservationWithCompleteFilterDiagnostics([pass]).brandDiagnostics?.candidates ??
+      [];
+    expect(candidates.length).toBeGreaterThan(0);
+
+    const record = toCandidateEvidenceRecord(candidates[0], {
+      opaqueItemId: "item-0001",
+      candidateOrdinal: 0,
+      completeCandidateArrayLength: candidates.length,
+      rankedPosition: null,
+    });
+    expect(new Set(Object.keys(record))).toEqual(new Set(CANDIDATE_EVIDENCE_REQUIRED_KEYS));
   });
 });

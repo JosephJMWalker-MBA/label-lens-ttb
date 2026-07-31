@@ -32,13 +32,18 @@
     "historicalCaseId",
     "historicalImagePath"
   ],
-  "truthIsolationAssertion": "Before each manifest is written, every emitted file is scanned for the forbidden field names, for historical case IDs and for historical fixture paths. Emitted OCR text is NOT compared against governed Brand strings before the freeze. A hit halts with TRUTH_ISOLATION_FAILURE.",
+  "truthIsolationAssertion": {
+    "inBoundaryKeyAndFileScan": "Inside the isolated boundary the acquisition scans every emitted file for the forbidden evidence KEY inventory, and for unexpected mounted or emitted files. Halt: TRUTH_ISOLATION_FAILURE.",
+    "postSealHistoricalValueScan": "AFTER both raw manifests are sealed, a separate read-only verifier \u2014 which holds the historical case-ID and fixture-path inventory the runtime never receives \u2014 scans the frozen bytes for those VALUES. Halt: TRUTH_ISOLATION_FAILURE.",
+    "correctionOfPriorClaim": "An earlier revision said historical IDs and paths were scanned before each manifest was written. The isolated runtime cannot do that: it does not hold the inventory, and handing it over would be the leak. The two scans are distinct in scope, actor and timing.",
+    "haltCode": "TRUTH_ISOLATION_FAILURE"
+  },
   "knownGapsCarriedFromTheContracts": [
     "word baseline geometry \u2014 not present on OcrWord",
     "block, paragraph and line identifiers \u2014 not present on OcrWord",
     "constituent word IDs per reconstructed line \u2014 not emitted by BrandLineDiagnostic"
   ],
-  "amendedBy": "preregistration-amendment-4.md",
+  "amendedBy": "preregistration-amendment-6.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "everyRawFilenameUsesOpaqueIdOnly": true,
@@ -57,5 +62,25 @@
   },
   "candidateRecordSchema": "candidate-decision-contract.json#requiredOwnPropertiesBeforeFinalization; enforced by finalizeCandidateRecord in scripts/eval/lib/issue-149-evidence-canonical.ts",
   "passRecordSchema": "region-ocr-result-replay-contract.json#persistEveryFieldOfRegionOcrResult",
-  "itemLevelFailureRecords": "raw-ocr-contract.json#itemLevelFailureEvidence"
+  "itemLevelFailureRecords": "raw-ocr-contract.json#itemLevelFailureEvidence",
+  "forbiddenEvidenceKeyInventory": {
+    "authoritativeInventory": "artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json",
+    "assetSha256": "80ae4a144259a9a013d8a35163e724cef1dded4e92e0aa4abd0dc74587e1ff6f",
+    "bundlePath": "runtime/truth-key-inventory.json",
+    "keys": [
+      "isTruth",
+      "matchesTruth",
+      "truthInRawOcr",
+      "truthOnReconstructedLine",
+      "truthFilterReasons",
+      "expectedBrand",
+      "acceptableValues",
+      "brandPresent",
+      "historicalCaseId",
+      "historicalImagePath"
+    ],
+    "singleSourceRule": "This is the ONE inventory. No contract, test or executable module may declare a second list. Amendment 5 left three different sets in play \u2014 ten keys in evidence-schema.json, seven in truth-isolation-plan.json and the scanner, five in raw-ocr-contract.json \u2014 so brandPresent, historicalCaseId and historicalImagePath were absent from the executable scanner.",
+    "fieldNamesVersusValues": "These are FIELD NAMES, prohibited inside acquisition output. The historical identifier and fixture-path VALUES are a separate matter: they are checked after sealing by the read-only identity-leak verifier, which holds an inventory the isolated runtime never receives.",
+    "governsEveryEmittedFile": "pass records, candidate records, selection records, item-level failure records, count records, manifests and provenance records alike \u2014 closed pass and candidate schemas cover two of those shapes, not all of them"
+  }
 }

@@ -2,7 +2,7 @@
   "artifact": "acquisition-invocation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-4.md",
+  "amendedBy": "preregistration-amendment-6.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "route": "direct call to extractLabelEvidenceDetailed",
   "prohibitedRoute": {
@@ -60,7 +60,9 @@
     "src/pipeline/extractor/field-selection",
     "src/pipeline/extractor/ocr-engine",
     "src/pipeline/extractor/regions",
+    "src/domain/rules/wine-alcohol-parse",
     "scripts/eval/lib/issue-149-evidence-canonical",
+    "scripts/eval/lib/issue-149-candidate-adapter",
     "node builtins"
   ],
   "prohibitedImportPrefixes": [
@@ -93,5 +95,17 @@
     "priorContradiction": "Amendment 3 required the runner to use the helper while it lived at src/fixtures/eval/issue-149-candidate-canonical.ts, which the same contract and the implemented guard both prohibited importing. The helper is moved rather than the prohibition weakened.",
     "importsNothingProhibited": "the helper imports only node:crypto",
     "canonicalizationVersionUnchanged": "issue-149-candidate-canonical-v1 names the frozen algorithm, not the file path, so the version string is deliberately not renamed by the move"
+  },
+  "mandatoryProductionDependencyException": {
+    "path": "src/domain/rules/wine-alcohol-parse.ts",
+    "sha256": "2ec1368cf3f4fcfab264d1507f98267aa6f6112091332d4dda5a76152ea816e7",
+    "why": "field-selection.ts imports it directly; the frozen route cannot run without it. Every other module under src/domain/rules/** remains prohibited.",
+    "classProhibitionUnchanged": "src/domain/rules/**"
+  },
+  "referenceCandidateAdapter": {
+    "path": "scripts/eval/lib/issue-149-candidate-adapter.ts",
+    "required": true,
+    "why": "The Stage 2 runner must map BrandCandidateDiagnostic to the persisted evidence record through this one adapter rather than reimplementing it. A second mapping could drift from production's shape without any test noticing \u2014 which is exactly how a six-key ocrConfidence schema survived Amendment 5.",
+    "testedAgainstRealSelectorOutputBy": "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts"
   }
 }

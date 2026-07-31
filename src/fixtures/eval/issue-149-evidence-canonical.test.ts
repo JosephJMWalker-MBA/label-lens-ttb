@@ -12,6 +12,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  ANALYZER_OCR_CONFIDENCE_KEYS,
   BRAND_FILTER_CHECK_ORDER,
   CANDIDATE_CANONICALIZATION_VERSION,
   CANDIDATE_EVIDENCE_REQUIRED_KEYS,
@@ -58,9 +59,10 @@ function record(over: Record<string, unknown> = {}): Record<string, unknown> {
       aggregation: "mean",
       rawScale: "0-100",
       rawTokenConfidences: [91, 84, 87],
-      rawMean: 87,
+      rawMean: (91 + 84 + 87) / 3,
       rawMin: 84,
       rawMax: 91,
+      missingTokenCount: 0,
     },
     prominence: 61,
     regionName: "full-image",
@@ -368,6 +370,12 @@ describe("Issue #149 closed candidate evidence schema", () => {
       { ocrConfidence: {} },
       { ocrConfidence: { aggregation: "mean", rawScale: "0-100", rawMean: 87 } },
       { ocrConfidence: { ...(record().ocrConfidence as object), extra: 1 } },
+      // The Amendment 5 shape: six keys, missing the seventh production emits.
+      (() => {
+        const six = { ...(record().ocrConfidence as Record<string, unknown>) };
+        delete six.missingTokenCount;
+        return { ocrConfidence: six };
+      })(),
       { candidateProvenance: { passId: "pass-1-full-image" } },
       { score: { total: 1 } },
     ]) {
@@ -398,6 +406,73 @@ describe("Issue #149 closed candidate evidence schema", () => {
       expect(() => finalizeCandidateRecord(keptRecord(violation))).toThrow(CandidateRecordError);
     }
     expect(() => finalizeCandidateRecord(keptRecord())).not.toThrow();
+  });
+
+  describe("ocrConfidence arithmetic", () => {
+    const base = record().ocrConfidence as Record<string, unknown>;
+
+    it("declares all seven production keys", () => {
+      // Amendment 5 declared six and omitted missingTokenCount, so the closed
+      // schema rejected every real candidate while CI stayed green.
+      expect(Object.keys(base).sort()).toEqual([...ANALYZER_OCR_CONFIDENCE_KEYS].sort());
+      expect(ANALYZER_OCR_CONFIDENCE_KEYS).toContain("missingTokenCount");
+    });
+
+    it("requires missingTokenCount to equal the null entries", () => {
+      expect(() =>
+        finalizeCandidateRecord(record({ ocrConfidence: { ...base, missingTokenCount: 1 } })),
+      ).toThrow(CandidateRecordError);
+      expect(() =>
+        finalizeCandidateRecord(
+          record({
+            ocrConfidence: {
+              ...base,
+              rawTokenConfidences: [91, null, 87],
+              rawMean: 89,
+              rawMin: 87,
+              rawMax: 91,
+              missingTokenCount: 1,
+            },
+          }),
+        ),
+      ).not.toThrow();
+    });
+
+    it("requires the aggregates to match the non-null tokens", () => {
+      for (const bad of [
+        { ...base, rawMean: 90 },
+        { ...base, rawMin: 80 },
+        { ...base, rawMax: 99 },
+      ]) {
+        expect(() => finalizeCandidateRecord(record({ ocrConfidence: bad }))).toThrow(
+          CandidateRecordError,
+        );
+      }
+    });
+
+    it("requires all three aggregates to be null when no token confidence is present", () => {
+      const allMissing = {
+        aggregation: "mean",
+        rawScale: "0-100",
+        rawTokenConfidences: [null, null],
+        rawMean: null,
+        rawMin: null,
+        rawMax: null,
+        missingTokenCount: 2,
+      };
+      expect(() => finalizeCandidateRecord(record({ ocrConfidence: allMissing }))).not.toThrow();
+      expect(() =>
+        finalizeCandidateRecord(record({ ocrConfidence: { ...allMissing, rawMean: 0 } })),
+      ).toThrow(CandidateRecordError);
+    });
+
+    it("rejects a negative or non-integer missingTokenCount", () => {
+      for (const bad of [-1, 1.5, "0", null]) {
+        expect(() =>
+          finalizeCandidateRecord(record({ ocrConfidence: { ...base, missingTokenCount: bad } })),
+        ).toThrow(CandidateRecordError);
+      }
+    });
   });
 
   describe("filter ladder invariants", () => {
@@ -506,7 +581,15 @@ describe("Issue #149 closed candidate evidence schema", () => {
       { cleanedValue: "OTHER" },
       { confidence: 0.88 },
       { ocrEvidenceScore: 0.88 },
-      { ocrConfidence: { ...(keptRecord().ocrConfidence as object), rawMean: 86 } },
+      {
+        ocrConfidence: {
+          ...(keptRecord().ocrConfidence as object),
+          rawTokenConfidences: [91, 84],
+          rawMean: 87.5,
+          rawMin: 84,
+          rawMax: 91,
+        },
+      },
       { prominence: 62 },
       { regionName: "brand-band" },
       { passId: "pass-2" },

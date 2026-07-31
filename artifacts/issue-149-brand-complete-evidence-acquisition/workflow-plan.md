@@ -50,7 +50,13 @@ prepares its own inputs.
 execute is authorized.** Neither the workflow nor the runtime bundle is
 implemented in this amendment.
 
-## Phase 1 — trusted host preparation, outside isolation, no OCR
+## Job A — trusted preparation, outside isolation, no OCR
+
+**Job A is trusted, not truth-free.** It checks out the repository and may read
+historical identity and the evaluation manifest, because staging cannot freeze
+the corpus, assign opaque identifiers or write the post-freeze map without them.
+Calling the whole workflow truth-free would be false. What is truth-free is the
+**preparation artifact** Job A emits and the isolated job that consumes it.
 
 These steps need the repository checkout, the Stage 1 artifacts and the
 post-freeze map. **None of those exists inside the isolated boundary**, so they
@@ -82,22 +88,46 @@ corrected here.
 8. Write the bundle manifest: every source input path and SHA-256, every emitted
    path and SHA-256, the exact build command, the build tool version, and the
    metafile digest.
-9. Scan the built bundle, with a **scope that cannot reject its own scanner**:
-   every file, executable or data, is checked for historical case IDs and
-   fixture paths; **data and configuration assets** are checked for prohibited
-   truth-bearing JSON keys; and executable code may carry that key inventory in
-   exactly one place — the designated truth-isolation scanner module, whose path
-   and SHA-256 are recorded in the bundle manifest. The inventory in any other
-   module, or a widened or narrowed inventory inside that module, is a violation.
-   Halt with `BUNDLE_PROHIBITED_CONTENT`. The scan takes no Brand inventory as a
-   parameter at all — a transcript may contain the Brand text, and that is
-   evidence, not leakage.
+9. Scan the built bundle, with a **scope that cannot reject its own scanner and
+   does not infer an inventory from source text**. The **raw bytes** of every
+   bundle file — including binary assets — are checked for historical case IDs
+   and fixture paths. The forbidden evidence keys live in exactly one place: the
+   canonical inventory asset at `runtime/truth-key-inventory.json`, a bare JSON
+   array whose exact byte SHA-256 is recorded in the bundle manifest and whose
+   parsed array must **equal** the authoritative array, order included. The
+   runtime's emitted-evidence scanner reads that asset; no executable module
+   carries a duplicate literal list, and a forbidden key appearing in any other
+   file is a violation. Halt with `BUNDLE_PROHIBITED_CONTENT`. The scan takes no
+   Brand inventory as a parameter at all — a transcript may contain the Brand
+   text, and that is evidence, not leakage.
 10. Prepare the initially empty output mount.
 
-Host preparation owns the transitive dependency proof. The Stage 1 runner-source
-guard is a useful first-order check and is explicitly not a substitute for it.
+Job A emits a **truth-free preparation artifact** containing only: the runtime
+bundle, the bundle manifest, the truth-free input manifest, the staged opaque
+images, and the empty-output specification. No historical case identifier, no
+fixture path, no ID map, no governed truth and no prior per-case record may enter
+that artifact.
 
-## Mode `discover` — inside the execute boundary, no OCR
+Job A owns the transitive dependency proof and the production-source base-drift
+gate. The Stage 1 runner-source guard is a useful first-order check and is
+explicitly not a substitute for either.
+
+**The incumbent's own dependency is allowed by name.** `field-selection.ts`
+imports `@/domain/rules/wine-alcohol-parse` on its first line, so the frozen
+route cannot run without it. One exception is frozen by **path and content
+hash** — `src/domain/rules/wine-alcohol-parse.ts`,
+`2ec1368cf3f4fcfab264d1507f98267aa6f6112091332d4dda5a76152ea816e7`, no imports of
+its own — and every other module under `src/domain/rules/**` stays prohibited.
+Every production source in the closure must also match its bytes at the frozen
+base commit, or the job halts with `PRODUCTION_SOURCE_DRIFTED_FROM_BASE`.
+
+## Job B — isolated discover or execute
+
+Job B performs **no repository checkout** and never receives the repository
+workspace. It receives only Job A's truth-free preparation artifact, and no
+GitHub token or repository credential enters the container.
+
+### Mode `discover` — inside the execute boundary, no OCR
 
 Isolated discovery receives **exactly four experiment-controlled data mounts**:
 
@@ -165,11 +195,13 @@ and nothing else. The post-freeze ID map is not mounted.
 6. Assert per-pass and per-case counting proofs; halt on
    `RAW_EVIDENCE_TRUNCATED`, `LINE_EVIDENCE_TRUNCATED` or
    `CANDIDATE_EVIDENCE_TRUNCATED`.
-7. Scan every emitted file for banned field names and unexpected files; halt on
-   `TRUTH_ISOLATION_FAILURE`. The isolated runtime does **not** scan for
-   historical case IDs or fixture paths: it does not hold that inventory, and
-   handing it the inventory would be the leak the scan exists to prevent. Those
-   checks run afterwards, read-only — see the identity-leak verifier below.
+7. Scan every emitted file — pass, candidate, selection, failure, count,
+   manifest and provenance records alike — against the **single authoritative
+   forbidden-key inventory** read from `runtime/truth-key-inventory.json`, and
+   for unexpected files; halt on `TRUTH_ISOLATION_FAILURE`. The isolated runtime
+   does **not** scan for historical case ID or fixture-path VALUES: it does not
+   hold that inventory, and handing it over would be the leak the scan exists to
+   prevent. Those checks run afterwards, read-only — see Job C below.
 8. Write and hash `raw/primary/raw-evidence-manifest.json` and its aggregate
    SHA-256. **`raw/primary/` is immutable from this point.**
 9. Run the **repeat** matrix identically and freeze `raw/repeat/` the same way.
@@ -189,7 +221,7 @@ and nothing else. The post-freeze ID map is not mounted.
 Both matrices run exactly once. The workflow contains no path that reruns a
 single case.
 
-## Read-only identity-leak verification — after sealing, outside the boundary
+## Job C — read-only identity-leak verification, after sealing, outside the boundary
 
 Once **both** raw manifests are sealed, the evidence is remounted or otherwise
 exposed **read-only** to a separate verifier. That verifier may read the
@@ -197,9 +229,16 @@ historical case-ID and fixture-path inventory, and it scans the already-frozen
 bytes for both. It also re-verifies that each raw file still matches its manifest
 entry.
 
+It receives **only** a minimal historical case-ID and fixture-path inventory —
+no acceptable Brand values, no truth labels, no prior per-case classifications.
 It **may not** modify, rewrite, reformat, re-emit or replace any raw file, and it
-performs **no** truth-based evaluation. Its report lives outside `raw/`. A hit
-halts with `TRUTH_ISOLATION_FAILURE`.
+performs **no** truth-based evaluation. Its report lives outside `raw/` and
+carries its own SHA-256. A hit halts with `TRUTH_ISOLATION_FAILURE`.
+
+**A clean Job C report is a mandatory precondition for both actor 2 committing
+evidence and actor 3 beginning post-freeze evaluation.** Above 100 MB, Job C
+still runs — identity-leak verification does not depend on whether the evidence
+is ever committed.
 
 This is why the superseded claim that "nothing opens the ID map or truth before
 both manifests exist" was dropped: trusted staging necessarily opened historical
@@ -209,11 +248,13 @@ that identity-leak checking happens against frozen bytes it cannot alter.
 
 ## After the run — the actors, in order
 
-| # | Actor | May read truth? | May commit? |
-| --- | --- | --- | --- |
-| 1 | the OCR workflow job | no | no |
-| 2 | the owner-authorized post-run commit process | no | yes, ≤ 100 MB |
-| 3 | the separately authorized post-freeze evaluation | yes | no raw evidence |
+| # | Actor | Checkout? | Historical identity? | Governed truth? | May commit? |
+| --- | --- | --- | --- | --- | --- |
+| A | trusted preparation | yes | yes | no | no |
+| B | isolated discover / execute | no | no | no | no |
+| C | read-only identity verifier | no | identifier inventory only | no | no |
+| 2 | owner-authorized commit process | yes, in practice | not used as an input | no | yes, ≤ 100 MB |
+| 3 | post-freeze evaluation | yes | yes | yes | no raw evidence |
 
 **At or below 100 MB:** actor 2 — *not* the OCR process — takes the verified
 workflow artifact as its evidence input, verifies the outer artifact digest,
@@ -232,7 +273,10 @@ historical identity are not inputs to any decision actor 2 makes, because it
 makes no content-dependent decision at all — it commits the bytes it verified, or
 it fails.
 
-Only actor 3 is authorized to use the map and governed truth **for evaluation**.
+Only actor 3 is **authorized to use** the map and governed truth for evaluation.
+That is an authorization rule, not an access claim: the map is committed on this
+branch, so other processes can physically read it. Actor 2's preconditions
+include a clean Job C report, and so do actor 3's.
 
 **Above 100 MB:** actor 1 still uploads and verifies the complete lossless
 artifact, then stops before Git commitment and **before post-freeze truth

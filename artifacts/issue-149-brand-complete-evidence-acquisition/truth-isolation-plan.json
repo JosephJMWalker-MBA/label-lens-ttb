@@ -20,18 +20,13 @@
     "thePostFreezeIdMap": false,
     "note": "Every entry is false. Enforced by construction in the staging step, asserted by the freeze script, and tested in src/fixtures/eval/issue-149-acquisition-isolation.test.ts."
   },
-  "emittedFieldBan": [
-    "isTruth",
-    "matchesTruth",
-    "truthInRawOcr",
-    "truthOnReconstructedLine",
-    "truthFilterReasons",
-    "expectedBrand",
-    "acceptableValues"
-  ],
   "scanBeforeFreeze": {
     "scope": "the acquisition input, the staged directory listing, the mounted file set, and every file under raw/<run>/ \u2014 as scanned FROM INSIDE the isolated boundary",
-    "scansFor": ["prohibited JSON keys", "unexpected mounted files", "unexpected emitted files"],
+    "scansFor": [
+      "the forbidden evidence key inventory, in every emitted file",
+      "unexpected mounted files",
+      "unexpected emitted files"
+    ],
     "doesNotScanFor": [
       "governed Brand strings appearing inside OCR transcripts or candidate values"
     ],
@@ -62,7 +57,7 @@
       "recommending a filter treatment"
     ]
   },
-  "amendedBy": "preregistration-amendment-5.md",
+  "amendedBy": "preregistration-amendment-6.md",
   "opaqueIdentity": {
     "scheme": "item-NNNN, 1-based, zero-padded to four digits",
     "assignmentOrder": "ascending source-image SHA-256, so the sequence is deterministic and carries no ordering signal from the historical names",
@@ -105,7 +100,9 @@
         "the process environment",
         "any mounted data"
       ],
-      "runsNoOcr": true
+      "runsNoOcr": true,
+      "isJobA": true,
+      "isTrustedNotTruthFree": true
     },
     "phase2IsolatedAcquisition": {
       "receivesNo": [
@@ -123,7 +120,10 @@
         "unexpected emitted files"
       ],
       "cannotScanFor": "historical case IDs and historical fixture paths, because it does not hold that inventory \u2014 and giving it the inventory would be the leak it is meant to prevent",
-      "writesAndSeals": "each raw manifest inside the isolated boundary"
+      "writesAndSeals": "each raw manifest inside the isolated boundary",
+      "isJobB": true,
+      "checksOutTheRepository": false,
+      "receivesOnly": "Job A's truth-free preparation artifact"
     },
     "phase3ReadOnlyIdentityLeakVerification": {
       "runsAfter": "both raw manifests are sealed",
@@ -146,12 +146,39 @@
       ],
       "reportLocation": "outside raw/",
       "onHit": "TRUTH_ISOLATION_FAILURE",
-      "isNotPostFreezeEvaluation": true
+      "isNotPostFreezeEvaluation": true,
+      "isJobC": true,
+      "receivesNoTruthLabelsOrAcceptableValues": true,
+      "reportIsAMandatoryPreconditionFor": [
+        "actor 2 committing evidence",
+        "actor 3 beginning post-freeze evaluation"
+      ],
+      "reportHasItsOwnSha256": true
     },
     "phase4PostFreezeEvaluation": {
       "isTheOnlyPhaseThatUsesGovernedTruthAgainstEvidence": true,
       "runsAfter": "phase 3 reports clean and the raw evidence is committed",
       "seePlan": "post-freeze-evaluation-plan.json"
     }
+  },
+  "forbiddenEvidenceKeyInventory": {
+    "authoritativeInventory": "artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json",
+    "assetSha256": "80ae4a144259a9a013d8a35163e724cef1dded4e92e0aa4abd0dc74587e1ff6f",
+    "bundlePath": "runtime/truth-key-inventory.json",
+    "keys": [
+      "isTruth",
+      "matchesTruth",
+      "truthInRawOcr",
+      "truthOnReconstructedLine",
+      "truthFilterReasons",
+      "expectedBrand",
+      "acceptableValues",
+      "brandPresent",
+      "historicalCaseId",
+      "historicalImagePath"
+    ],
+    "singleSourceRule": "This is the ONE inventory. No contract, test or executable module may declare a second list. Amendment 5 left three different sets in play \u2014 ten keys in evidence-schema.json, seven in truth-isolation-plan.json and the scanner, five in raw-ocr-contract.json \u2014 so brandPresent, historicalCaseId and historicalImagePath were absent from the executable scanner.",
+    "fieldNamesVersusValues": "These are FIELD NAMES, prohibited inside acquisition output. The historical identifier and fixture-path VALUES are a separate matter: they are checked after sealing by the read-only identity-leak verifier, which holds an inventory the isolated runtime never receives.",
+    "governsEveryEmittedFile": "pass records, candidate records, selection records, item-level failure records, count records, manifests and provenance records alike \u2014 closed pass and candidate schemas cover two of those shapes, not all of them"
   }
 }

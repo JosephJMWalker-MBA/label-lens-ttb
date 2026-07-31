@@ -226,6 +226,18 @@ export const BRAND_CANDIDATE_SCORE_KEYS = [
   "total",
 ] as const;
 
+/**
+ * All SEVEN fields of `AnalyzerOcrConfidence`.
+ *
+ * Amendment 5 listed six and omitted `missingTokenCount`, which `ocrConfidenceOf`
+ * emits on every candidate. The closed schema therefore rejected every REAL
+ * production candidate as carrying an unexpected key, while the synthetic tests
+ * and a hard-coded "drift guard" both repeated the same wrong list, so CI stayed
+ * green and Stage 2 would have failed on its first case. That is precisely what a
+ * synthetic-only schema test cannot catch, which is why
+ * `issue-149-production-candidate-compatibility.test.ts` now drives the real
+ * selector.
+ */
 export const ANALYZER_OCR_CONFIDENCE_KEYS = [
   "aggregation",
   "rawScale",
@@ -233,6 +245,7 @@ export const ANALYZER_OCR_CONFIDENCE_KEYS = [
   "rawMean",
   "rawMin",
   "rawMax",
+  "missingTokenCount",
 ] as const;
 
 export const ANALYZER_CANDIDATE_PROVENANCE_KEYS = [
@@ -317,15 +330,61 @@ const isBbox = (value: unknown): boolean =>
     y1: isFiniteNumber,
   }) === null;
 
-const isOcrConfidence = (value: unknown): boolean =>
-  exactShape(value, ANALYZER_OCR_CONFIDENCE_KEYS, {
+/**
+ * Shape plus the arithmetic that `ocrConfidenceOf` guarantees. Checking the shape
+ * alone would accept an aggregate that contradicts its own token list.
+ */
+function ocrConfidenceProblem(value: unknown): string | null {
+  const shape = exactShape(value, ANALYZER_OCR_CONFIDENCE_KEYS, {
     aggregation: (v) => v === "mean",
     rawScale: (v) => v === "0-100",
     rawTokenConfidences: (v) => isArrayOf(v, (e) => e === null || isFiniteNumber(e)),
     rawMean: (v) => v === null || isFiniteNumber(v),
     rawMin: (v) => v === null || isFiniteNumber(v),
     rawMax: (v) => v === null || isFiniteNumber(v),
-  }) === null;
+    missingTokenCount: (v) => isInteger(v) && (v as number) >= 0,
+  });
+  if (shape !== null) return shape;
+
+  const confidence = value as {
+    rawTokenConfidences: Array<number | null>;
+    rawMean: number | null;
+    rawMin: number | null;
+    rawMax: number | null;
+    missingTokenCount: number;
+  };
+  const observed = confidence.rawTokenConfidences.filter(
+    (entry): entry is number => entry !== null,
+  );
+  const missing = confidence.rawTokenConfidences.length - observed.length;
+
+  if (confidence.missingTokenCount !== missing) {
+    return `missingTokenCount is ${confidence.missingTokenCount} but rawTokenConfidences holds ${missing} null entries`;
+  }
+  if (observed.length === 0) {
+    if (confidence.rawMean !== null || confidence.rawMin !== null || confidence.rawMax !== null) {
+      return "no token confidence is present, so rawMean, rawMin and rawMax must all be null";
+    }
+    return null;
+  }
+  const mean = observed.reduce((sum, entry) => sum + entry, 0) / observed.length;
+  if (confidence.rawMean === null || !nearlyEqual(confidence.rawMean, mean)) {
+    return `rawMean is ${JSON.stringify(confidence.rawMean)} but the observed tokens average ${mean}`;
+  }
+  if (confidence.rawMin !== Math.min(...observed)) {
+    return `rawMin is ${JSON.stringify(confidence.rawMin)} but the observed minimum is ${Math.min(...observed)}`;
+  }
+  if (confidence.rawMax !== Math.max(...observed)) {
+    return `rawMax is ${JSON.stringify(confidence.rawMax)} but the observed maximum is ${Math.max(...observed)}`;
+  }
+  return null;
+}
+
+/** Floating-point means are compared with a tolerance, never with `===`. */
+const nearlyEqual = (a: number, b: number): boolean =>
+  Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(b));
+
+const isOcrConfidence = (value: unknown): boolean => ocrConfidenceProblem(value) === null;
 
 const isCandidateProvenance = (value: unknown): boolean =>
   exactShape(value, ANALYZER_CANDIDATE_PROVENANCE_KEYS, {

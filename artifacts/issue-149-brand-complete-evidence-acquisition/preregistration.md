@@ -195,6 +195,37 @@ separately governed, zero-OCR treatment selector can later replay these passes
 with exactly one filter changed. This acquisition does not run that replay and
 authorizes no filter change.
 
+### The incumbent's own mandatory dependency is allowed by name
+
+`field-selection.ts` imports `@/domain/rules/wine-alcohol-parse` on its first
+line, so the frozen route cannot run without it. An earlier plan prohibited every
+transitive dependency under `src/domain/rules/**`, which would have halted trusted
+preparation with `BUNDLE_PROHIBITED_DEPENDENCY` while bundling the exact incumbent
+extractor it is required to run.
+
+One exception is frozen, by **path and content hash**:
+
+| | |
+| --- | --- |
+| path | `src/domain/rules/wine-alcohol-parse.ts` |
+| SHA-256 at base `546c3f27…` | `2ec1368cf3f4fcfab264d1507f98267aa6f6112091332d4dda5a76152ea816e7` |
+| reason | mandatory deterministic incumbent Alcohol parser reached by the unchanged extractor path |
+| transitive imports | none |
+
+It is a bounded deterministic parser over label text, not an evaluation truth
+module: it reads no governed truth, no acceptable values and no per-case record.
+**Every other module under `src/domain/rules/**` remains prohibited**, and the
+exception is a path-and-hash pair, so a different path is not covered and the same
+path with different bytes is not covered.
+
+Separately, **every production runtime source input in the dependency closure must
+match its exact bytes at the frozen base commit**, or preparation halts with
+`PRODUCTION_SOURCE_DRIFTED_FROM_BASE`. A bundle manifest that merely records
+whatever production source happened to be present proves the bundle is internally
+consistent, not that it is the *incumbent*. Stage 2 acquisition scripts under the
+explicitly approved evaluation paths are not production sources; they are hashed
+and reviewed separately and listed distinctly in the manifest.
+
 ## Two exact corpus runs
 
 One **primary** run over all 115 cases and one exact **repeat** over all 115.
@@ -220,7 +251,19 @@ write the post-freeze map — and staging happens *before* acquisition. The
 invariant that actually holds was never global ordering; it is **who receives
 what**.
 
-**Phase 1 — trusted staging.** May read the evaluation manifest, historical case
+The workflow is three separate jobs, so the boundary is a process boundary and
+not a promise. **Job A — trusted preparation** checks out the repository, may read
+historical identity, and emits a truth-free preparation artifact containing only
+the runtime bundle, the bundle manifest, the truth-free input manifest, the staged
+opaque images and the empty-output specification. **Job B — isolated discover or
+execute** performs no checkout, never receives the repository workspace, receives
+only that artifact, and admits no GitHub token or repository credential into the
+container. **Job C — the read-only identity-leak verifier** runs after sealing.
+Job A is *trusted*, not truth-free; what is truth-free is the artifact it emits
+and the job that consumes it, and calling the whole workflow truth-free would be
+false.
+
+**Phase 1 — trusted staging (Job A).** May read the evaluation manifest, historical case
 identities, historical fixture paths and the source images, and may do so *only*
 to freeze the population, assign `item-NNNN` identifiers, stage images under
 generic filenames, verify source-image hashes and byte sizes, and write and
@@ -233,21 +276,35 @@ Brand-bearing filename, no historical fixture path, no governed Brand truth, no
 acceptable values, no prior per-case classification, no PR #217 or PR #218 record
 and not the post-freeze ID map. Every raw output filename uses the opaque item ID
 only. From inside the boundary it scans its mounted input set, its mount list and
-its emitted records for **prohibited JSON keys, unexpected mounted files and
+its emitted records for **the single authoritative forbidden-key inventory, unexpected mounted files and
 unexpected emitted files**, and it writes and seals each raw manifest inside the
-boundary.
+boundary. That inventory is one ordered list of ten field names, held in a
+canonical asset at `runtime/truth-key-inventory.json` and referenced by every
+contract and by the executable scanner — `isTruth`, `matchesTruth`,
+`truthInRawOcr`, `truthOnReconstructedLine`, `truthFilterReasons`,
+`expectedBrand`, `acceptableValues`, `brandPresent`, `historicalCaseId`,
+`historicalImagePath`. It governs **every** emitted file, not only the pass and
+candidate records whose schemas are closed: selection, failure, count, manifest
+and provenance records are separate output shapes and are scanned too.
 
 It does **not** scan for historical case IDs or fixture paths. It cannot: it does
 not hold that inventory, and handing it the inventory would be precisely the leak
 the scan exists to prevent.
 
-**Phase 3 — read-only identity-leak verification.** After **both** raw manifests
-are sealed, the evidence is remounted or otherwise exposed **read-only**. A
-separate verifier — which *may* read the historical case-ID and fixture-path
-inventory — scans the already-frozen bytes for both, and re-verifies that each
-raw file still matches its manifest entry. It may not modify, rewrite, reformat,
-re-emit or replace any raw file, and it performs no truth-based evaluation. Its
-report lives outside `raw/`. A hit halts with `TRUTH_ISOLATION_FAILURE`.
+**Phase 3 — read-only identity-leak verification (Job C).** After **both** raw
+manifests are sealed, the evidence is remounted or otherwise exposed
+**read-only**. A separate verifier receives the sealed evidence and a *minimal*
+historical case-ID and fixture-path inventory — and no acceptable Brand values, no
+truth labels, no prior per-case classifications. It verifies the artifact digest
+and both raw manifests, then scans the already-frozen bytes for historical IDs and
+paths. It may not modify, rewrite, reformat, re-emit or replace any raw file, and
+it performs no truth-based evaluation. Its report lives outside `raw/` and carries
+its own SHA-256. A hit halts with `TRUTH_ISOLATION_FAILURE`.
+
+**A clean Job C report is a mandatory precondition for both actor 2 committing
+evidence and actor 3 beginning post-freeze evaluation.** Above 100 MB Job C still
+runs: identity-leak verification does not depend on whether the evidence is ever
+committed.
 
 **Phase 4 — post-freeze evaluation** is the only phase that uses governed truth
 against the evidence.
@@ -431,6 +488,7 @@ Three details matter and were wrong before:
   renamed `authoritative…` variant;
 - **`regionName`** is persisted at the top level, not only inside
   `candidateProvenance`;
+- **`filterReason`** is a non-null `BrandLineReason`, never `string | null`.
 - **`ranking`** is persisted as the complete `AnalyzerCandidateRanking` object —
   strategy, ordering mode, comparator and score factors — not merely
   `rankingScore`, because a replay needs the comparator and ordering mode.
@@ -473,9 +531,17 @@ nothing is truncated, sampled, discarded, recompressed destructively or omitted.
 
 ## Raw evidence freeze
 
-Before truth is loaded: write a primary manifest, write a repeat manifest, hash
-every OCR, line and candidate record, write an aggregate manifest SHA-256, record
-the exact commit and workflow run, and assert no truth-bearing field is present.
+**Inside the isolated acquisition process, before it exits:** write a primary
+manifest, write a repeat manifest, hash every OCR, line and candidate record,
+write an aggregate manifest SHA-256, record the exact commit and workflow run,
+and assert no forbidden evidence key is present in any emitted file.
+
+"Before truth is loaded" was the wrong framing, because it described a global
+ordering no component could honour — trusted staging necessarily read historical
+identity earlier. The boundary is **process-specific**: the isolated acquisition
+process never holds the ID map or governed truth at any point in its life, and
+the sealing above happens entirely inside it. Historical identifier *values* are
+checked afterwards by Job C, read-only, against frozen bytes.
 
 `raw/` becomes **immutable**. Nothing under it is pretty-printed or rewritten
 after freezing; JSONL is emitted in final form and added to `.prettierignore`
@@ -559,8 +625,11 @@ commits the bytes it verified, or it fails.
 At or below 100 MB, actor 2 — explicitly **not** the OCR process — downloads the
 artifact, verifies its digest, verifies **both** raw manifests and their
 aggregates, commits the immutable raw evidence to PR #219, and **stops for
-review**. Only then may actor 3 be authorized, and actor 3 is the only actor that
-ever receives `post-freeze/id-map.json` or the governed truth.
+review**. Only then may actor 3 be authorized, and actor 3 is the only actor
+**authorized to use** `post-freeze/id-map.json` or the governed truth for
+evaluation. That is an authorization rule, not an access claim: the map is
+committed on this branch, so any checkout can physically read it. A clean Job C
+identity-leak report is a precondition for both actor 2 and actor 3.
 
 Above 100 MB, actor 1 still uploads and verifies, then stops before Git
 commitment and before post-freeze truth evaluation; actors 2 and 3 do not run
@@ -599,8 +668,11 @@ mean "all candidates" means all candidates production formed.
 No governed 115-case acquisition OCR, acquisition runner OCR, discovery or
 execute-mode OCR has run, and no execution workflow exists. The ordinary
 repository suite continues to run its pre-existing bundled-image OCR tests,
-disclosed separately. No recognizer has
-been downloaded or executed. No production code, OCR configuration, traineddata,
+disclosed separately. **No recognizer has been downloaded or executed for
+acquisition purposes** — no recognizer runs on the governed corpus, in the
+acquisition runner, in discovery or in execute mode. The ordinary suite's
+pre-existing tests do execute the bundled `eng.traineddata` recognizer, which is
+why that statement is qualified rather than absolute. No production code, OCR configuration, traineddata,
 preprocessing, crop planning, recovery trigger, Brand reconstruction, filter,
 ranking, selection, authority, truth, normalization, threshold, alias or state
 semantic has been changed by this PR. No filter
