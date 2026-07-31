@@ -84,7 +84,7 @@
     "treating the diagnostic selection rather than debug.finalSelections as the behavioural authority"
   ],
   "expectedUseOfTheResult": "A later, separately preregistered zero-OCR study may use this evidence. This sprint does not perform, design or recommend that study's treatment.",
-  "amendedBy": "preregistration-amendment-4.md",
+  "amendedBy": "preregistration-amendment-5.md",
   "actorsAndBoundaries": {
     "actor1_ocrWorkflowJob": {
       "permissions": "contents: read",
@@ -98,16 +98,34 @@
       "authorization": "explicit owner authorization, separate from the OCR run",
       "isNotTheOcrProcess": true,
       "appliesWhen": "total evidence footprint is at or below 100 MB",
-      "steps": [
-        "download the workflow artifact",
-        "verify the artifact digest",
-        "verify BOTH raw manifests (primary and repeat) and their aggregates",
-        "commit the immutable raw evidence to PR #219",
-        "STOP for review"
+      "physicalInaccessibilityClaimed": false,
+      "physicalInaccessibilityCorrection": "Amendment 4 said actor 2 'receives neither governed truth nor the ID map'. post-freeze/id-map.json is committed on PR #219 and covered by the Stage 1 package manifest, so a process operating in an ordinary branch checkout CAN reach it. Claiming otherwise would be false unless actor 2 were implemented inside a separately verified restricted environment, which it is not.",
+      "mayOperateInARepositoryCheckout": true,
+      "theControlThatActuallyProtectsTheEvidence": "immutable-byte equality, not file inaccessibility",
+      "evidenceInput": "the verified workflow artifact \u2014 not a regenerated, re-serialized or locally rebuilt copy",
+      "mustDo": [
+        "verify the outer artifact digest against the value the OCR job recorded",
+        "verify BOTH raw manifests (primary and repeat) against the artifact contents",
+        "commit exactly those immutable bytes",
+        "verify that every committed file's SHA-256 equals the artifact manifest entry",
+        "stop after exact commitment and verification"
       ],
-      "receivesGovernedTruth": false,
-      "receivesTheIdMap": false,
-      "whyNot": "The truth boundary is crossed only after the raw evidence is frozen AND committed. A process that could both write evidence and read truth could, in principle, let truth influence what was written."
+      "mustNotDo": [
+        "transform any evidence file",
+        "filter, subset or selectively omit any evidence file",
+        "regenerate or recompute any evidence file",
+        "re-serialize, reformat or pretty-print any evidence file",
+        "reorder records within any evidence file",
+        "use truth or historical identity as an input to any decision it makes"
+      ],
+      "anyChangedByteFailsVerification": true,
+      "truthIsNotAnInputToItsOperation": true,
+      "truthIsNotAnInputNote": "Actor 2 makes no content-dependent decision at all: it commits the bytes it verified, or it fails. Reading the map would not change any output it can produce, which is why byte equality is the sufficient control.",
+      "haltCodes": {
+        "ARTIFACT_DIGEST_MISMATCH": "the downloaded artifact does not match the digest the OCR job recorded",
+        "RAW_MANIFEST_MISMATCH": "a raw file's SHA-256 does not match its manifest entry",
+        "COMMITTED_BYTES_DIFFER": "a committed file's SHA-256 does not equal the artifact manifest entry"
+      }
     },
     "actor3_postFreezeEvaluationProcess": {
       "authorization": "separate authorization again, after actor 2 stops for review",
@@ -122,7 +140,8 @@
         "the raw evidence is committed and immutable",
         "the truth-isolation scan passed during acquisition"
       ],
-      "mayNotModify": "any raw evidence file, for any reason"
+      "mayNotModify": "any raw evidence file, for any reason",
+      "isTheOnlyActorAuthorizedToUseTheMapOrGovernedTruthForEvaluation": true
     },
     "above100MB": {
       "actor1Still": "uploads and verifies the complete lossless artifact",

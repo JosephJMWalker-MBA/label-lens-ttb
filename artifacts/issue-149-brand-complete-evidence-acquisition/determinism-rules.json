@@ -86,17 +86,20 @@
     }
   ],
   "verdictComputedNotAsserted": true,
-  "amendedBy": "preregistration-amendment-4.md",
+  "amendedBy": "preregistration-amendment-5.md",
   "threeSeparateConcepts": {
     "fullArtifactIntegrity": {
-      "covers": "every persisted byte of every raw file and manifest, INCLUDING timings and run metadata",
-      "computedAs": "sha256 over the file bytes, plus an aggregate over the sorted manifest lines",
-      "proves": "immutability of what was written",
+      "covers": "the EXACT persisted bytes of every raw file and manifest, including timings and run metadata",
+      "computedAs": "sha256Bytes(file bytes) per file, plus an aggregate over the sorted manifest lines",
+      "referenceImplementation": "sha256Bytes in scripts/eval/lib/issue-149-evidence-canonical.ts",
+      "isNotACanonicalObjectDigest": true,
+      "priorDefect": "Amendment 4 exported fullRecordIntegritySha256, which canonicalized an object first and therefore could not see whitespace, key order or a terminal newline \u2014 while this contract defined artifact integrity as SHA-256 over file bytes. That name is removed rather than reinterpreted.",
+      "proves": "immutability of what was written; a changed byte, including whitespace or a terminal newline, changes the value",
       "expectedToMatchBetweenPrimaryAndRepeat": false,
       "why": "Two runs legitimately differ in timings and run metadata. An integrity hash that matched across runs would mean the second run had not been recorded independently."
     },
     "semanticPassFingerprint": {
-      "computedOver": "the complete RegionOcrResult record",
+      "computedOver": "the VALIDATED complete RegionOcrResult record",
       "excludesExactly": ["timings"],
       "includesEveryOtherField": [
         "passId",
@@ -113,12 +116,19 @@
         "words"
       ],
       "arrayOrderPreserved": true,
-      "canonicalization": "issue-149-candidate-canonical-v1"
+      "canonicalization": "issue-149-candidate-canonical-v1",
+      "validatesFirst": "assertRegionOcrResultRecord \u2014 an invalid or metadata-bearing pass is rejected, not hashed"
     },
     "semanticOrderedPassArrayFingerprint": {
       "computedOver": "the complete ordered pass array after removing timings from each pass",
       "arrayOrderPreserved": true,
-      "why": "Production selects over the pass array in order; a reordered replay is a different experiment."
+      "why": "Production selects over the pass array in order; a reordered replay is a different experiment.",
+      "validatesEachPassFirst": true
+    },
+    "canonicalObjectDigest": {
+      "computedAs": "canonicalRecordDigest(record) \u2014 canonical JSON over a parsed object",
+      "isNotAnArtifactIntegrityProof": true,
+      "why": "Canonicalization deliberately erases key order and formatting, so it cannot prove a file is unaltered. It compares two parsed structures, nothing more."
     }
   },
   "excludedFromTheSemanticEqualityGate": {
@@ -135,5 +145,6 @@
     "stillComparedAndReported": true,
     "butNeverAloneAVerdict": "A difference confined to timings or run metadata must NOT produce COMPLETE_WITH_NONDETERMINISM. It is reported descriptively."
   },
-  "cropPixelComparisonRemoved": "The 'crop pixels' level compared cropPixelSha256 per pass. That value is not obtainable through the frozen production interface; see raw-ocr-contract.json#unavailableThroughTheFrozenInterface."
+  "cropPixelComparisonRemoved": "The 'crop pixels' level compared cropPixelSha256 per pass. That value is not obtainable through the frozen production interface; see raw-ocr-contract.json#unavailableThroughTheFrozenInterface.",
+  "rawManifestsUseExactFileBytes": true
 }

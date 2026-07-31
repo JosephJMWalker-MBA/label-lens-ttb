@@ -20,13 +20,22 @@ const HISTORICAL_FILES = new Set([
   "preregistration-amendment-2.md",
   "preregistration-amendment-3.md",
   "preregistration-amendment-4.md",
+  "preregistration-amendment-5.md",
   "branch-pointer-incident.md",
   "amendment-linkage.json",
   "amendment-2-linkage.json",
   "amendment-3-linkage.json",
   "amendment-4-linkage.json",
-  "git-sha.txt",
+  "amendment-5-linkage.json",
 ]);
+
+/**
+ * `git-sha.txt` is deliberately NOT exempt. It mixes CURRENT and HISTORICAL
+ * entries, and the point of the file is that its CURRENT block states the
+ * current amendment. Exempting it wholesale is what let it sit at "amendment 2"
+ * while the package was at Amendment 4, faithfully hashed by the manifest.
+ */
+const CURRENT_AMENDMENT = 5;
 
 /**
  * A line may mention a superseded term when it is explicitly marking it as
@@ -40,6 +49,7 @@ const ALLOWED_MARKERS = [
   "Never",
   "historical",
   "Historical",
+  "HISTORICAL",
   "historicalNote",
   "correctionOf",
   "corrected",
@@ -453,25 +463,149 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     }
   });
 
-  it("names the post-freeze actors and where the truth boundary sits", () => {
+  it("names the post-freeze actors and protects evidence by byte equality, not a false access claim", () => {
     const plan = read(path.join(ROOT, "post-freeze-evaluation-plan.json")) as {
       actorsAndBoundaries: {
         actor1_ocrWorkflowJob: { commitsToGit: boolean; receivesGovernedTruth: boolean };
         actor2_postRunCommitProcess: {
           isNotTheOcrProcess: boolean;
-          receivesGovernedTruth: boolean;
+          physicalInaccessibilityClaimed: boolean;
+          mayOperateInARepositoryCheckout: boolean;
+          theControlThatActuallyProtectsTheEvidence: string;
+          anyChangedByteFailsVerification: boolean;
+          truthIsNotAnInputToItsOperation: boolean;
+          mustDo: string[];
+          mustNotDo: string[];
         };
-        actor3_postFreezeEvaluationProcess: { isTheOnlyActorThatMayOpen: string[] };
+        actor3_postFreezeEvaluationProcess: {
+          isTheOnlyActorThatMayOpen: string[];
+          isTheOnlyActorAuthorizedToUseTheMapOrGovernedTruthForEvaluation: boolean;
+        };
       };
     };
     const actors = plan.actorsAndBoundaries;
     expect(actors.actor1_ocrWorkflowJob.commitsToGit).toBe(false);
     expect(actors.actor1_ocrWorkflowJob.receivesGovernedTruth).toBe(false);
-    expect(actors.actor2_postRunCommitProcess.isNotTheOcrProcess).toBe(true);
-    expect(actors.actor2_postRunCommitProcess.receivesGovernedTruth).toBe(false);
-    expect(actors.actor3_postFreezeEvaluationProcess.isTheOnlyActorThatMayOpen.join(" ")).toContain(
-      "id-map.json",
+
+    const actor2 = actors.actor2_postRunCommitProcess;
+    expect(actor2.isNotTheOcrProcess).toBe(true);
+    // The map is committed on this branch, so "cannot reach it" would be false.
+    expect(actor2.physicalInaccessibilityClaimed).toBe(false);
+    expect(actor2.mayOperateInARepositoryCheckout).toBe(true);
+    expect(actor2.theControlThatActuallyProtectsTheEvidence).toContain("immutable-byte equality");
+    expect(actor2.anyChangedByteFailsVerification).toBe(true);
+    expect(actor2.truthIsNotAnInputToItsOperation).toBe(true);
+    expect(actor2.mustDo.join(" ")).toContain("commit exactly those immutable bytes");
+    for (const forbidden of ["transform", "filter", "regenerate", "re-serialize", "reorder"]) {
+      expect(actor2.mustNotDo.join(" ").toLowerCase()).toContain(forbidden);
+    }
+
+    const actor3 = actors.actor3_postFreezeEvaluationProcess;
+    expect(actor3.isTheOnlyActorThatMayOpen.join(" ")).toContain("id-map.json");
+    expect(actor3.isTheOnlyActorAuthorizedToUseTheMapOrGovernedTruthForEvaluation).toBe(true);
+  });
+
+  it("states the truth-boundary chronology accurately, including trusted staging", () => {
+    const plan = read(path.join(ROOT, "truth-isolation-plan.json")) as {
+      orderingRule?: string;
+      truthBoundaryChronology: {
+        supersededClaim: string;
+        whyItWasFalse: string;
+        phase1TrustedStaging: { mayRead: string[]; isOutsideTheAcquisitionProcess: boolean };
+        phase2IsolatedAcquisition: { cannotScanFor: string; receivesNo: string[] };
+        phase3ReadOnlyIdentityLeakVerification: {
+          mayRead: string[];
+          mayNot: string[];
+          onHit: string;
+          isNotPostFreezeEvaluation: boolean;
+        };
+      };
+    };
+    // The false global ordering claim is gone, not merely reworded around.
+    expect(plan.orderingRule).toBeUndefined();
+    const chronology = plan.truthBoundaryChronology;
+    expect(chronology.whyItWasFalse).toContain("Trusted staging");
+    expect(chronology.phase1TrustedStaging.isOutsideTheAcquisitionProcess).toBe(true);
+    expect(chronology.phase1TrustedStaging.mayRead.join(" ")).toContain(
+      "historical case identities",
     );
+    expect(chronology.phase2IsolatedAcquisition.receivesNo.join(" ")).toContain(
+      "post-freeze ID map",
+    );
+    expect(chronology.phase2IsolatedAcquisition.cannotScanFor).toContain("historical case IDs");
+
+    const verifier = chronology.phase3ReadOnlyIdentityLeakVerification;
+    expect(verifier.mayRead.join(" ")).toContain("inventory");
+    expect(verifier.onHit).toBe("TRUTH_ISOLATION_FAILURE");
+    expect(verifier.isNotPostFreezeEvaluation).toBe(true);
+    for (const forbidden of ["modify", "rewrite", "replace"]) {
+      expect(verifier.mayNot.join(" ").toLowerCase()).toContain(forbidden);
+    }
+  });
+
+  it("scopes the bundle scan so it cannot reject its own scanner", () => {
+    const isolation = read(path.join(ROOT, "acquisition-runtime-isolation-contract.json")) as {
+      runtimeBundle: {
+        dependencyClosureGate: {
+          preIsolationBundleScan: {
+            selfTriggeringDefect: string;
+            frozenScope: string[];
+            designatedScannerModule: {
+              inventoryMustBeExactly: string;
+              wideningItIsAViolation: boolean;
+              narrowingItIsAViolation: boolean;
+            };
+            brandStringsNeverScanned: boolean;
+            referenceImplementation: string;
+          };
+          bundleManifestMustRecord: string[];
+        };
+      };
+    };
+    const gate = isolation.runtimeBundle.dependencyClosureGate;
+    const scan = gate.preIsolationBundleScan;
+    expect(scan.selfTriggeringDefect).toContain("truth-isolation scanner");
+    expect(scan.designatedScannerModule.wideningItIsAViolation).toBe(true);
+    expect(scan.designatedScannerModule.narrowingItIsAViolation).toBe(true);
+    expect(scan.brandStringsNeverScanned).toBe(true);
+    expect(existsSync(path.join(process.cwd(), scan.referenceImplementation))).toBe(true);
+    expect(scan.frozenScope.join(" ")).toContain("data and configuration assets");
+    expect(gate.bundleManifestMustRecord.join(" ")).toContain(
+      "designated truth-isolation scanner module path",
+    );
+  });
+
+  it("keeps git-sha.txt current, and does not exempt it from the sweep", () => {
+    const gitSha = readFileSync(path.join(process.cwd(), ROOT, "git-sha.txt"), "utf8");
+    expect(HISTORICAL_FILES.has("git-sha.txt")).toBe(false);
+    expect(gitSha).toContain(`CURRENT — stage 1, amendment ${CURRENT_AMENDMENT}`);
+    expect(gitSha.match(/^CURRENT/gm) ?? []).toHaveLength(1);
+    for (const earlier of [1, 2, 3, 4]) {
+      expect(gitSha).toContain(`HISTORICAL — amendment ${earlier}`);
+    }
+    expect(gitSha).toContain("No governed 115-case acquisition OCR");
+    expect(gitSha).toContain("pre-existing bundled-image OCR tests");
+  });
+
+  it("states the no-OCR claim precisely wherever a current document makes it", () => {
+    const offences: string[] = [];
+    for (const file of files) {
+      if (HISTORICAL_FILES.has(path.basename(file))) continue;
+      const text = readFileSync(path.join(process.cwd(), file), "utf8");
+      // An unqualified claim says no OCR ran without naming the governed corpus
+      // and without disclosing the ordinary suite's bundled-image tests.
+      for (const unqualified of [
+        /\bNo OCR has run\b/,
+        /\bNo OCR executed\b/,
+        /\bNo acquisition OCR has run\b/,
+      ]) {
+        if (unqualified.test(text)) offences.push(`${file} — ${unqualified.source}`);
+      }
+    }
+    expect(offences).toEqual([]);
+    const limitations = readFileSync(path.join(process.cwd(), ROOT, "limitations.md"), "utf8");
+    expect(limitations).toContain("No governed 115-case acquisition OCR");
+    expect(limitations).toContain("pre-existing bundled-image OCR tests");
   });
 
   it("keeps host-only steps out of the isolated discovery description", () => {

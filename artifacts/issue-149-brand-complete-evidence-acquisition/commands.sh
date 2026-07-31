@@ -26,8 +26,10 @@ node -e 'const m=require("./artifacts/issue-149-brand-complete-evidence-acquisit
 # not runtime isolation proof; runtime isolation is a discover-mode gate.
 npx vitest run \
   src/fixtures/eval/issue-149-acquisition-isolation.test.ts \
+  src/fixtures/eval/issue-149-bundle-scan.test.ts \
   src/fixtures/eval/issue-149-contract-consistency.test.ts \
   src/fixtures/eval/issue-149-evidence-canonical.test.ts \
+  src/fixtures/eval/issue-149-frozen-vocabulary.test.ts \
   src/fixtures/eval/issue-149-stage-1-manifest.test.ts
 
 # Verify the whole Stage 1 contract package, not just the preregistration.
@@ -55,7 +57,7 @@ grep -rho "[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T[0-9:.]*Z" "${ART}" --include="*.jso
 
 # The canonical helper the Stage 2 runner must import lives OUTSIDE src/fixtures,
 # because the runner is prohibited from importing anything under src/fixtures/**.
-ls scripts/eval/lib/issue-149-evidence-canonical.ts
+ls scripts/eval/lib/issue-149-evidence-canonical.ts scripts/eval/lib/issue-149-bundle-scan.ts
 ! ls src/fixtures/eval/issue-149-candidate-canonical.ts 2>/dev/null
 
 # The merged PR #220 capability this amendment consumes.

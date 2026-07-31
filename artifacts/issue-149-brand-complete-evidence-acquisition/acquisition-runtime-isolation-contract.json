@@ -2,7 +2,7 @@
   "artifact": "acquisition-runtime-isolation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-4.md",
+  "amendedBy": "preregistration-amendment-5.md",
   "status": "CONTRACT FROZEN. Not implemented in this amendment.",
   "whyThisExists": {
     "correction": "The Stage 1 isolation tests are STATIC manifest, path and import validation. They read committed planning artifacts and assert their shape. They are NOT runtime proof, and this contract stops them being described as such.",
@@ -90,18 +90,42 @@
         "every EMITTED runtime path with its SHA-256",
         "the exact build command",
         "the exact build tool name and version",
-        "the SHA-256 of the dependency graph / metafile itself"
+        "the SHA-256 of the dependency graph / metafile itself",
+        "the designated truth-isolation scanner module path and its SHA-256"
       ],
       "preIsolationBundleScan": {
         "runsIn": "phase 1, on the BUILT bundle, before anything is mounted",
-        "scansFor": [
-          "historical case IDs",
-          "historical fixture paths",
-          "prohibited truth-bearing JSON keys"
+        "referenceImplementation": "scripts/eval/lib/issue-149-bundle-scan.ts",
+        "selfTriggeringDefect": "Amendment 4 required scanning the built executable bundle for prohibited truth-bearing JSON keys. But the runtime must CARRY that inventory in order to scan its own emitted evidence, so a blanket string scan would have rejected the truth-isolation scanner as its own first violation.",
+        "frozenScope": [
+          "every bundle file, executable or data, is scanned for historical case IDs and historical fixture paths",
+          "bundled non-executable data and configuration assets are scanned for prohibited truth-bearing JSON keys",
+          "executable code may contain the exact prohibited-key inventory ONLY inside the designated truth-isolation scanner module",
+          "that module's path and SHA-256 are recorded in the bundle manifest",
+          "the key inventory in any other executable module is a violation",
+          "an additional, mutated or narrowed inventory inside the designated module is a violation"
         ],
-        "doesNotScanFor": "legitimate Brand strings in OCR or candidate evidence",
-        "whyNot": "A transcript may naturally contain the Brand text. That is evidence, not leakage, and checking it would require opening a truth file before the truth boundary.",
-        "haltCode": "BUNDLE_PROHIBITED_CONTENT"
+        "designatedScannerModule": {
+          "recordedInBundleManifest": ["path", "sha256"],
+          "inventoryMustBeExactly": "truth-isolation-plan.json#emittedFieldBan",
+          "wideningItIsAViolation": true,
+          "narrowingItIsAViolation": true,
+          "whyNarrowingToo": "A dropped key means the runtime's own emitted-evidence scan is silently incomplete."
+        },
+        "brandStringsNeverScanned": true,
+        "brandStringsNeverScannedWhy": "A legitimate transcript may naturally contain the Brand text. That is evidence, not leakage. The scan takes no Brand inventory as a parameter, so this cannot regress by configuration.",
+        "governedTruthDataStillProhibitedEntirely": "Governed truth data, acceptable values and prior per-case results remain prohibited from the bundle by the dependency-closure gate, independently of this key scan.",
+        "haltCode": "BUNDLE_PROHIBITED_CONTENT",
+        "violationRules": [
+          "HISTORICAL_CASE_ID",
+          "HISTORICAL_FIXTURE_PATH",
+          "TRUTH_KEY_IN_DATA_ASSET",
+          "TRUTH_KEY_OUTSIDE_DESIGNATED_SCANNER",
+          "SCANNER_INVENTORY_MUTATED",
+          "SCANNER_MODULE_MISSING",
+          "SCANNER_DIGEST_MISMATCH"
+        ],
+        "testedBy": "src/fixtures/eval/issue-149-bundle-scan.test.ts"
       },
       "haltCodes": {
         "BUNDLE_PROHIBITED_DEPENDENCY": "a transitive source input resolves under a prohibited path",

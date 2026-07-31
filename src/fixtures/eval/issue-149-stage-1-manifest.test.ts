@@ -57,6 +57,7 @@ describe("Issue #149 Stage 1 contract manifest", () => {
   it("keeps the canonical helper outside src/fixtures, where the runner may import it", () => {
     const listed = entries.map((e) => e.path);
     expect(listed).toContain("scripts/eval/lib/issue-149-evidence-canonical.ts");
+    expect(listed).toContain("scripts/eval/lib/issue-149-bundle-scan.ts");
     expect(
       listed.some((f) => f.startsWith("src/fixtures/eval/issue-149-candidate-canonical")),
     ).toBe(false);
@@ -67,10 +68,13 @@ describe("Issue #149 Stage 1 contract manifest", () => {
     for (const file of [
       "scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs",
       "scripts/eval/issue-149-stage-1-contract-manifest.mjs",
+      "scripts/eval/lib/issue-149-bundle-scan.ts",
       "scripts/eval/lib/issue-149-evidence-canonical.ts",
       "src/fixtures/eval/issue-149-acquisition-isolation.test.ts",
+      "src/fixtures/eval/issue-149-bundle-scan.test.ts",
       "src/fixtures/eval/issue-149-contract-consistency.test.ts",
       "src/fixtures/eval/issue-149-evidence-canonical.test.ts",
+      "src/fixtures/eval/issue-149-frozen-vocabulary.test.ts",
       "src/fixtures/eval/issue-149-stage-1-manifest.test.ts",
     ]) {
       expect(listed).toContain(file);

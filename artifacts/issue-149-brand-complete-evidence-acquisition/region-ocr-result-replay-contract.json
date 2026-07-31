@@ -2,7 +2,7 @@
   "artifact": "region-ocr-result-replay-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-4.md",
+  "amendedBy": "preregistration-amendment-5.md",
   "purpose": "Freeze the complete RegionOcrResult persistence that makes a later zero-OCR selector replay possible. This is what actually underwrites capability 3; complete rejection reasons alone do not.",
   "whyRejectionReasonsAloneAreInsufficient": [
     "a rejected span returns from analyzeBrandSpan BEFORE a Candidate object is constructed",
@@ -37,9 +37,10 @@
   },
   "assertions": {
     "perPass": [
+      "the record validates against the exact closed RegionOcrResult schema",
       "emitted word count equals words.length",
       "rawWordCount and discardedWordCount are persisted as produced, never recomputed",
-      "a SEMANTIC per-pass fingerprint is computed over the complete persisted pass record with timings removed"
+      "a SEMANTIC per-pass fingerprint is computed over the validated record with timings removed"
     ],
     "perCase": [
       "the emitted pass count equals debug.passes.length",
@@ -58,5 +59,55 @@
     "resolution": "timings are PERSISTED in full for completeness and covered by the artifact integrity hashes, but are EXCLUDED from every semantic fingerprint and from the determinism equality gate. See determinism-rules.json.",
     "timingsAreStillPersisted": true,
     "timingsExcludedFromSemanticFingerprintsOnly": true
+  },
+  "exactPersistedRecordSchema": {
+    "ownKeySetIsExactlyThese13": [
+      "passId",
+      "regionName",
+      "passKind",
+      "triggerReasons",
+      "preprocessing",
+      "fieldEligibility",
+      "transform",
+      "transformedSize",
+      "pageSegMode",
+      "rawWordCount",
+      "discardedWordCount",
+      "timings",
+      "words"
+    ],
+    "keySetIsClosed": true,
+    "missingKeyRejected": true,
+    "unexpectedKeyRejected": true,
+    "runMetadataRejected": true,
+    "runMetadataNote": "Wall-clock start and end, workflow run ID, artifact ID, artifact expiration and runner/host identity live BESIDE the evidence, in a separate provenance record. On a pass record they are an unexpected key and are rejected, so they can never enter a semantic fingerprint by accident.",
+    "nestedShapesValidated": {
+      "passKind": "an actual OcrPassKind",
+      "triggerReasons": "actual OcrPassTriggerReason values, array order preserved",
+      "preprocessing": "non-empty strings, array order preserved",
+      "fieldEligibility": "exactly { brand, alcohol }, both boolean",
+      "transform": "exactly { crop:{left,top,width,height}, rotate, scale, originalWidth, originalHeight }, rotate one of 0/90/180/270",
+      "transformedSize": "exactly { width, height }",
+      "pageSegMode": "integer",
+      "rawWordCount": "non-negative integer",
+      "discardedWordCount": "non-negative integer",
+      "timings": "exactly { preprocessMs, ocrMs, inverseMappingMs, totalMs }",
+      "words": "OcrWord[], array order preserved"
+    },
+    "perWord": {
+      "text": "string, persisted always",
+      "rawConfidence": "finite number, persisted always",
+      "bbox": "exactly { x0, y0, x1, y1 }, persisted always",
+      "originalGeometry": "persisted ONLY when production emitted it; absence is OMISSION, never null; when present it is exactly { imageIndex, x, y, width, height, imageWidth, imageHeight }"
+    },
+    "referenceValidator": "assertRegionOcrResultRecord in scripts/eval/lib/issue-149-evidence-canonical.ts",
+    "haltCodes": [
+      "PASS_RECORD_NOT_AN_OBJECT",
+      "PASS_RECORD_KEY_SET_MISMATCH",
+      "PASS_RECORD_FIELD_INVALID",
+      "PASS_WORD_INVALID",
+      "PASS_WORD_ORIGINAL_GEOMETRY_NULL",
+      "PASS_ARRAY_INVALID"
+    ]
   }
 }

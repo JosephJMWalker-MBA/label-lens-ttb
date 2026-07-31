@@ -1,6 +1,8 @@
 # Limitations
 
-Stage 1: planning and preregistration only. No OCR has run.
+Stage 1: planning and preregistration only. No governed 115-case acquisition OCR, acquisition runner OCR, discovery or
+execute-mode OCR has run. The ordinary repository suite continues to run its
+pre-existing bundled-image OCR tests, disclosed separately.
 
 ## What is available, and what genuinely is not
 

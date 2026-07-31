@@ -5,14 +5,17 @@ Refs Issue #149. **Evidence acquisition only.** Frozen before any OCR runs.
 Base: `origin/main` `546c3f279ce431a1fd8c0203df7a83553ea866ef`, the merge commit
 of PR #220.
 
-**Amended four times, every time before any acquisition OCR.** See
+**Amended five times, every time before any governed acquisition OCR.** See
 `preregistration-amendment.md`, `preregistration-amendment-2.md`,
-`preregistration-amendment-3.md` and `preregistration-amendment-4.md`. All
-earlier plans are preserved, not overwritten, and their identities are recorded
-in `amendment-linkage.json`, `amendment-2-linkage.json`,
-`amendment-3-linkage.json` and `amendment-4-linkage.json`. **No governed
-acquisition OCR or discovery occurred under any earlier plan, and none has
-occurred under this one.**
+`preregistration-amendment-3.md`, `preregistration-amendment-4.md` and
+`preregistration-amendment-5.md`. All earlier plans are preserved, not
+overwritten, and their identities are recorded in `amendment-linkage.json`,
+`amendment-2-linkage.json`, `amendment-3-linkage.json`, `amendment-4-linkage.json`
+and `amendment-5-linkage.json`. **No governed 115-case acquisition OCR,
+acquisition runner OCR, discovery, execute-mode OCR or trusted host preparation
+occurred under any earlier plan, and none has occurred under this one.** The
+ordinary repository suite continues to run its pre-existing bundled-image OCR
+tests, disclosed separately.
 
 One operational incident is recorded in `branch-pointer-incident.md`: a push used
 a stale local branch as its source refspec, which reset the remote branch and
@@ -207,19 +210,53 @@ filename, no historical fixture path, no governed Brand truth, no acceptable
 values, no prior per-case classification, no PR #217 or PR #218 record and not
 the post-freeze ID map. Every raw output filename uses the opaque item ID only.
 
-**The pre-freeze scan looks for keys, files and identifiers — not Brand
-strings.** It scans for prohibited JSON keys, unexpected mounted files,
-historical case IDs, historical fixture paths, governed truth files,
-acceptable-value files, prior per-case evaluation artifacts and the ID map. It
-does **not** compare OCR transcripts or candidate values against governed Brand
-strings, because a legitimate transcript may naturally contain the Brand text —
-that is evidence, not leakage, and checking it would require opening a truth file
-before the truth boundary. Truth-string inventory and comparison belong to
-post-freeze evaluation only.
+### The chronology, stated accurately
 
-Both runs complete and both raw-evidence manifests are written and hashed
-**before the ID map or any governed truth file is opened**. A hit halts with
-`TRUTH_ISOLATION_FAILURE`.
+An earlier version of this plan said both raw manifests were written and hashed
+**before the ID map or any governed truth file was opened at all**. That could
+never literally be true. Trusted staging has to read the evaluation manifest and
+the historical identities in order to freeze the corpus, assign opaque ids and
+write the post-freeze map — and staging happens *before* acquisition. The
+invariant that actually holds was never global ordering; it is **who receives
+what**.
+
+**Phase 1 — trusted staging.** May read the evaluation manifest, historical case
+identities, historical fixture paths and the source images, and may do so *only*
+to freeze the population, assign `item-NNNN` identifiers, stage images under
+generic filenames, verify source-image hashes and byte sizes, and write and
+verify `post-freeze/id-map.json`. It is outside the acquisition process, runs no
+OCR, and supplies historical identity and truth to **nothing** — not the runtime
+bundle, not the truth-free manifest, not the environment, not any mounted data.
+
+**Phase 2 — isolated acquisition.** Receives no historical case identifier, no
+Brand-bearing filename, no historical fixture path, no governed Brand truth, no
+acceptable values, no prior per-case classification, no PR #217 or PR #218 record
+and not the post-freeze ID map. Every raw output filename uses the opaque item ID
+only. From inside the boundary it scans its mounted input set, its mount list and
+its emitted records for **prohibited JSON keys, unexpected mounted files and
+unexpected emitted files**, and it writes and seals each raw manifest inside the
+boundary.
+
+It does **not** scan for historical case IDs or fixture paths. It cannot: it does
+not hold that inventory, and handing it the inventory would be precisely the leak
+the scan exists to prevent.
+
+**Phase 3 — read-only identity-leak verification.** After **both** raw manifests
+are sealed, the evidence is remounted or otherwise exposed **read-only**. A
+separate verifier — which *may* read the historical case-ID and fixture-path
+inventory — scans the already-frozen bytes for both, and re-verifies that each
+raw file still matches its manifest entry. It may not modify, rewrite, reformat,
+re-emit or replace any raw file, and it performs no truth-based evaluation. Its
+report lives outside `raw/`. A hit halts with `TRUTH_ISOLATION_FAILURE`.
+
+**Phase 4 — post-freeze evaluation** is the only phase that uses governed truth
+against the evidence.
+
+**No phase compares OCR transcripts or candidate values against governed Brand
+strings before the truth boundary.** A legitimate transcript may naturally
+contain the Brand text — that is evidence, not leakage, and checking it would
+require opening a truth file early. Truth-string inventory and comparison belong
+to phase 4 alone.
 
 ## Complete raw OCR evidence
 
@@ -249,6 +286,22 @@ thirteen-field result:
 - **per-pass `warnings` and `errors`** — `RegionOcrResult` has no such field.
   `runOcrPass` reports failure by *throwing*, so a failed pass yields no pass
   record at all.
+
+`originalGeometry` is optional in production, and the faithful JSON
+representation of an absent optional is **omission**, not `null`. An earlier
+version normalized it to `null`; that is not an exact `RegionOcrResult`, because
+a replay reading `null` sees a present-but-empty property where production had no
+property at all — and the inverse mapping producing nothing is precisely the
+signal that the token was never mapped back to the original frame. A replay must
+preserve omission, or decode it back to absence before selection. An explicit
+`null` halts with `PASS_WORD_ORIGINAL_GEOMETRY_NULL`.
+
+The pass record's key set is **closed**: exactly those thirteen fields. Run
+metadata — wall clock, workflow run ID, artifact ID, artifact expiration, runner
+identity — lives in a separate provenance record; on a pass record it is an
+unexpected key and is rejected, so it cannot enter a semantic fingerprint by
+accident. The words-only digest is named `orderedWordsOnlyFingerprint` so it can
+never be mistaken for the complete semantic pass fingerprint.
 
 In their place, an item-level typed failure record is persisted from the `Result`
 that `extractLabelEvidenceDetailed` returns: `code`, `message`, `issues`, the
@@ -347,6 +400,31 @@ finalize otherwise. The twenty-eight required own properties are
 `activeRejectionReasons`, `rankingEligible`, `rankingScore`, `rankedPosition` and
 `selected`.
 
+The key set is **closed**: before finalization the own keys must *equal* that
+list, and after finalization they must equal it plus `canonicalRecordSha256` and
+`stableCandidateId`. An unexpected key is as fatal as a missing one — an open set
+would let an undeclared acquisition, truth, debug or convenience property enter
+the fingerprint silently, so the digest would cover something no contract
+describes.
+
+Every value must be an **actual incumbent value**, not merely the right
+primitive: `passKind` an `OcrPassKind`, `assembly` a `BrandCandidateAssembly`,
+`filterReason` a non-null `BrandLineReason`, `decision` null or a
+`BrandCandidateDecision`, and `ocrConfidence`, `candidateProvenance`, `score` and
+`ranking` complete frozen structures rather than merely non-array objects. The
+copied vocabularies are guarded against drift by a test that imports the
+production constants and asserts equality.
+
+Seven cross-field invariants are enforced, mirroring production's own
+`assertBrandFilterDiagnosticInvariants` plus the acquisition's derived-field
+rules: `filterChecks` holds exactly all ten rules, once each, in frozen order;
+`activeRejectionReasons` equals the failed checks in ladder order; a rejected
+candidate has at least one active reason whose first element is `filterReason`; a
+kept candidate has no active reason, no failed check and a `candidate-positive`
+or `candidate-plausible` reason; `rankingEligible` equals `ranking !== null`;
+`rankingScore` equals `ranking?.rankingScore ?? null`; and `selected` equals
+`decision === "selected"`.
+
 Three details matter and were wrong before:
 
 - the field is **`filterReason`**, production's own property name, never a
@@ -360,6 +438,13 @@ Three details matter and were wrong before:
 Production optionals that are absent are normalized to **explicit `null`**, so
 the canonical key set is identical across every record. Omission is rejected;
 `null` is valid.
+
+`stableCandidateId` validates the **complete preimage schema** before it will
+accept a supplied digest. An earlier version checked only that the digest was
+present, well formed and self-consistent — so a caller could hash a two-field
+partial and hand the result straight back, and the digest matched because it was
+computed over exactly that partial. A self-consistent digest over incomplete
+evidence is still incomplete evidence.
 
 Validation runs first, and only then does the acquisition compute
 `canonicalRecordSha256`, attach it, verify it, and attach `stableCandidateId`.
@@ -400,16 +485,23 @@ before hashing.
 
 ### Integrity and semantics are separate measurements
 
-**Full artifact integrity** covers every persisted byte, including `timings` and
-run metadata. It proves immutability of what was written, and it is **not**
-expected to match between the primary and repeat runs — two independent runs
-legitimately differ in timings, and an integrity hash that matched across them
-would mean the second run had not been recorded independently.
+**Full artifact integrity** is SHA-256 over the **exact persisted file bytes**,
+including `timings` and run metadata — `sha256Bytes`, not a canonical object
+digest. A canonical digest deliberately cannot see whitespace, key order or a
+terminal newline, so it can never prove a file is unaltered; an earlier version
+exported one under an integrity-sounding name, and that name is removed rather
+than reinterpreted. Byte integrity is **not** expected to match between the
+primary and repeat runs — two independent runs legitimately differ in timings,
+and an integrity hash that matched across them would mean the second run had not
+been recorded independently. Raw manifests and their aggregate use exact file
+bytes.
 
-**Semantic fingerprints** are computed over the complete `RegionOcrResult` with
-exactly one exclusion, `timings`, preserving all array order; and over the
-complete ordered pass array with `timings` removed from each pass. These carry
-the determinism verdict.
+**Semantic fingerprints** are computed over the **validated** complete
+`RegionOcrResult` with exactly one exclusion, `timings`, preserving all array
+order; and over the complete ordered pass array with `timings` removed from each
+pass. Validation is not optional: the pass record's own-key set must equal the
+thirteen production fields exactly, so run metadata on a pass record is
+**rejected rather than silently hashed**. These carry the determinism verdict.
 
 This split is a correction. Amendment 3 required a fingerprint over the complete
 pass record *including* timings and simultaneously required exact fingerprint
@@ -449,6 +541,20 @@ anything**. Three actors, in order, each with an explicit boundary:
 
 Actor 1 ends after uploading the complete lossless evidence artifact **at every
 size** and verifying its digest before any job-local output is deleted.
+
+Actor 2 is **not** claimed to be physically unable to reach the ID map.
+`post-freeze/id-map.json` is committed on this branch and covered by the Stage 1
+package manifest, so a process operating in an ordinary checkout can read it, and
+saying otherwise would be false unless actor 2 ran inside a separately verified
+restricted environment — which it does not. The control that protects the
+evidence is **immutable-byte equality**: actor 2 takes the verified workflow
+artifact as its evidence input, verifies the outer digest and both raw manifests,
+commits exactly those bytes, and verifies that every committed file's SHA-256
+equals its manifest entry. It performs no transformation, filtering,
+regeneration, re-serialization, reordering or selective omission, and any changed
+byte fails verification. Truth and historical identity are not inputs to any
+decision it makes, because it makes no content-dependent decision at all — it
+commits the bytes it verified, or it fails.
 
 At or below 100 MB, actor 2 — explicitly **not** the OCR process — downloads the
 artifact, verifies its digest, verifies **both** raw manifests and their
@@ -490,7 +596,10 @@ mean "all candidates" means all candidates production formed.
 
 ## State at the time of this freeze
 
-No acquisition OCR has run and no execution workflow exists. No recognizer has
+No governed 115-case acquisition OCR, acquisition runner OCR, discovery or
+execute-mode OCR has run, and no execution workflow exists. The ordinary
+repository suite continues to run its pre-existing bundled-image OCR tests,
+disclosed separately. No recognizer has
 been downloaded or executed. No production code, OCR configuration, traineddata,
 preprocessing, crop planning, recovery trigger, Brand reconstruction, filter,
 ranking, selection, authority, truth, normalization, threshold, alias or state

@@ -62,12 +62,12 @@
       "available": true,
       "source": "OcrPassTimings: preprocessMs, ocrMs, inverseMappingMs, totalMs"
     },
-    "passOutputFingerprint": {
+    "orderedWordsOnlyFingerprint": {
       "available": true,
-      "renamedTo": "orderedWordsOnlyFingerprint",
       "computedAs": "sha256 of canonical JSON over the ordered word records ONLY",
+      "renamedFrom": "passOutputFingerprint",
       "isNotTheSemanticPassFingerprint": true,
-      "why": "It covers words alone. Amendment 4 defines a COMPLETE semantic pass fingerprint over every RegionOcrResult field except timings, and the two must never be confused. See determinism-rules.json."
+      "why": "It covers words alone. The COMPLETE semantic pass fingerprint covers every RegionOcrResult field except timings. Two different digests must not share a name that suggests either could stand for the other. See determinism-rules.json."
     }
   },
   "perWordFields": {
@@ -92,7 +92,13 @@
     "originalGeometry": {
       "available": true,
       "field": "OcrWord.originalGeometry",
-      "note": "present once a pass has mapped the token back to the original image frame; recorded as null where absent rather than omitted"
+      "optionalInProduction": true,
+      "persistedWhenPresent": true,
+      "persistedWhenAbsent": "OMITTED \u2014 the property is not written at all",
+      "normalizedToNull": false,
+      "priorDefect": "Amendment 4 said absent originalGeometry was 'recorded as null rather than omitted'. That is not an exact RegionOcrResult: a replay reading null sees a present-but-empty property where production had no property at all, and mapBoxToOriginalGeometry producing nothing is precisely the signal that the token was never mapped back to the original frame.",
+      "replayRequirement": "A replay must preserve omission, or explicitly decode it back to absence before selection. Passing null through is prohibited.",
+      "haltCode": "PASS_WORD_ORIGINAL_GEOMETRY_NULL"
     },
     "baselineGeometry": {
       "available": false,
@@ -119,7 +125,7 @@
     "truthFilterReasons",
     "expectedBrand"
   ],
-  "amendedBy": "preregistration-amendment-4.md",
+  "amendedBy": "preregistration-amendment-5.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "historicalNote": "Amendment 1 described this evidence as reachable through runCaseArtifacts. That route is prohibited from Amendment 2 onward.",
   "completeRegionOcrResultPersistence": "Every RegionOcrResult field is persisted exactly; see region-ocr-result-replay-contract.json. The per-pass field list here is explanatory and is not a licence to persist a subset.",
@@ -153,5 +159,11 @@
     "noSelectiveRetry": "A failed item is never retried, in whole or in part.",
     "verdict": "A case-level extraction failure produces the preregistered RUNTIME_FAILURE or INCOMPLETE_EVIDENCE verdict per determinism-rules.json. It is never quietly dropped from the population."
   },
-  "derivedVersusTypeFields": "Fields marked derived:true or manifest-sourced are computed by the acquisition or copied from the truth-free manifest. They are labelled as such so no reader mistakes them for properties of RegionOcrResult. The authoritative field list of RegionOcrResult is region-ocr-result-replay-contract.json."
+  "derivedVersusTypeFields": "Fields marked derived:true or manifest-sourced are computed by the acquisition or copied from the truth-free manifest. They are labelled as such so no reader mistakes them for properties of RegionOcrResult. The authoritative field list of RegionOcrResult is region-ocr-result-replay-contract.json.",
+  "exactRecordSchema": {
+    "definedIn": "region-ocr-result-replay-contract.json#exactPersistedRecordSchema",
+    "referenceValidator": "assertRegionOcrResultRecord in scripts/eval/lib/issue-149-evidence-canonical.ts",
+    "keySetIsClosed": true,
+    "runMetadataOnAPassRecordIsRejected": true
+  }
 }

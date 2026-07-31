@@ -1,0 +1,98 @@
+{
+  "artifact": "amendment-5-linkage",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "amendmentNumber": 5,
+  "amendedBeforeAnyGovernedAcquisitionOcr": true,
+  "amendedBeforeDiscovery": true,
+  "amendedBeforeTrustedHostPreparation": true,
+  "runStatusBeforeAmendment5": {
+    "governed115CaseAcquisitionOcr": false,
+    "acquisitionRunnerOcr": false,
+    "discoverMode": false,
+    "executeMode": false,
+    "trustedHostPreparation": false,
+    "runtimeBundleBuilt": false,
+    "evidence": "No raw/ directory, no raw-evidence manifest, no workflow file, no workflow-mode.txt and no acquisition runner has ever existed on this branch.",
+    "ordinarySuiteBundledImageOcr": {
+      "runs": true,
+      "files": [
+        "src/fixtures/corpus-real-ocr.test.ts",
+        "src/pipeline/extractor/extractor.test.ts",
+        "src/pipeline/extractor/extractor-precheck.integration.test.ts",
+        "src/fixtures/eval/eval-harness.integration.test.ts"
+      ],
+      "note": "Unmodified, pre-existing tests over bundled fixture images. Not the governed 115-case corpus. Disclosed here so no document in the package carries an unqualified 'no OCR has run'."
+    }
+  },
+  "originalStage1": {
+    "head": "7600b0a9ba5ce6995274a517121f1eda18a30424",
+    "base": "8f0c6a7ca7c271eed14d9084ed6da7fe11f897a9",
+    "preregistrationSha256": "7b691c78a9de008039ccc1a7f94824015373b1caec58f8235c78a03587c641fb",
+    "preservedNotOverwritten": true
+  },
+  "amendment1": {
+    "head": "26157cfe036fb8b1506431d1aa9309029ac2dcdb",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "cfc118c670a9c69f783f3ca58174113711b553baf1278da31a35e31121bf13ad",
+    "preservedNotOverwritten": true
+  },
+  "amendment2": {
+    "head": "ad1c296194e21e91af8333953ad47abe396495dc",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "9287ecc0d5d01bae83316c9d0dcb462d6eca566c925405cde83631fa65c89d35",
+    "preservedNotOverwritten": true
+  },
+  "amendment3": {
+    "head": "37e1a3ea752c12b230d468c10f604b8550d37ce1",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "3cf3d25fbb892dabc66e58796841c542fcc4eb79f7cd5d561271a7689ed87786",
+    "preservedNotOverwritten": true
+  },
+  "amendment4": {
+    "head": "cb574539d5e541446ec58d2b2bc62b9fda480048",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "87302e60a0629f6d657f4f118c8d73a50ea93aa3d321c15f77b5974ae75d28a3",
+    "preservedNotOverwritten": true,
+    "historicalMeaningRewritten": false,
+    "note": "Amendment 4's nine reconciliations stand. Amendment 5 closes five implementation-readiness gaps that survived it."
+  },
+  "amendment5": {
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "headAtAmendmentStart": "cb574539d5e541446ec58d2b2bc62b9fda480048",
+    "preregistrationSha256": {
+      "recordedIn": "artifacts/issue-149-brand-complete-evidence-acquisition/preregistration.sha256",
+      "notDuplicatedHere": true
+    },
+    "stage1ContractManifestAggregate": {
+      "recordedIn": "artifacts/issue-149-brand-complete-evidence-acquisition/stage-1-contract-manifest.sha256",
+      "notDuplicatedHere": true,
+      "why": "The aggregate covers every governed file. Writing it into a file the manifest itself hashes would be self-referential. It lives on the manifest's own trailing `# aggregate` line, which the manifest excludes from its own file list."
+    }
+  },
+  "corrections": [
+    "stableCandidateId now validates the complete candidate preimage schema before accepting a supplied digest, closing the partial-record-with-self-consistent-digest hole",
+    "the candidate schema is CLOSED: the own-key set must equal the required keys exactly before finalization, and those plus the two derived fields after",
+    "nested structures, incumbent enum values and seven cross-field ladder and derived-field invariants are enforced, with a production-import drift guard on every copied vocabulary",
+    "an exact closed RegionOcrResult validator: thirteen fields, complete nested shapes, run metadata rejected, absent originalGeometry OMITTED rather than normalized to null",
+    "fullRecordIntegritySha256 removed; sha256Bytes hashes exact file bytes, canonicalRecordDigest is documented as not an integrity proof, and both semantic fingerprints validate before hashing",
+    "the false global truth-ordering claim removed and replaced with a four-phase chronology, including a read-only identity-leak verifier that runs after sealing and outside the acquisition boundary",
+    "the actor-2 physical-inaccessibility overclaim withdrawn and replaced with immutable-byte equality as the operative control",
+    "the pre-isolation bundle scan scoped so it cannot reject its own truth-isolation scanner, with a designated module recorded by path and SHA-256 in the bundle manifest",
+    "git-sha.txt updated to Amendment 5 and removed from the sweep exemption; unqualified no-OCR statements replaced with the precise claim everywhere in current material"
+  ],
+  "unchangedByThisAmendment": [
+    "the frozen 115-item population and its opaque identifiers",
+    "the incumbent configuration pins, including field-selection.ts 8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
+    "two exact corpus runs with no retries and no selective rerun",
+    "the direct extractLabelEvidenceDetailed route and the runCaseArtifacts prohibition",
+    "full-object canonical diagnostic parity",
+    "the four experiment-controlled mounts and the trusted-host/isolated-discover phase split",
+    "the transitive dependency-closure gate",
+    "the prohibition on modifying PR #195 or any production behaviour"
+  ],
+  "capability3": {
+    "status": "SATISFIABLE",
+    "by": "a separately governed, zero-OCR replay of the persisted complete ordered RegionOcrResult array",
+    "performedHere": false
+  }
+}

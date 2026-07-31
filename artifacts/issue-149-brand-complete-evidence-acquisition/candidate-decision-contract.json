@@ -2,7 +2,7 @@
   "artifact": "candidate-decision-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-4.md",
+  "amendedBy": "preregistration-amendment-5.md",
   "sourceOfTruthForShape": "BrandCandidateDiagnostic in src/pipeline/extractor/field-selection.ts at PR #220 merge commit 546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "entryPoint": "selectBrandObservationWithCompleteFilterDiagnostics",
@@ -157,7 +157,41 @@
       "MALFORMED_DIGEST",
       "DIGEST_DOES_NOT_MATCH_RECORD"
     ],
-    "priorDefect": "Amendment 3 had no complete-record schema, so finalizeCandidateRecord accepted { opaqueItemId, candidateOrdinal } and produced a well-formed identity over no evidence."
+    "priorDefect": "Amendment 3 had no complete-record schema, so finalizeCandidateRecord accepted { opaqueItemId, candidateOrdinal } and produced a well-formed identity over no evidence.",
+    "stableCandidateIdValidatesTheCompletePreimage": true,
+    "priorDefectAmendment4": "stableCandidateId checked only that a digest was present, well formed and self-consistent. A caller could hash a two-field partial and pass the result back in; the digest matched because it was computed over exactly that partial. A self-consistent digest over incomplete evidence is still incomplete evidence."
   },
-  "stableCandidateIdNeverFinalizesPartialRecords": true
+  "stableCandidateIdNeverFinalizesPartialRecords": true,
+  "keySetIsClosed": true,
+  "closedKeySetRule": {
+    "beforeFinalization": "the own-key set must EQUAL requiredOwnPropertiesBeforeFinalization exactly",
+    "afterFinalization": "the own-key set must EQUAL those keys plus canonicalRecordSha256 and stableCandidateId, exactly",
+    "unexpectedKeyRejected": true,
+    "why": "An open key set would let an undeclared acquisition, truth, debug or convenience property enter the fingerprint silently, so the digest would cover something the contract never described.",
+    "haltCode": "UNEXPECTED_FIELD"
+  },
+  "crossFieldInvariants": [
+    "filterChecks contains exactly all ten ladder rules, once each, in frozen order",
+    "activeRejectionReasons equals the failed checks in ladder order",
+    "a rejected candidate has at least one active reason, and the first equals filterReason",
+    "a kept candidate has no active reason and no failed check, and its filterReason is candidate-positive or candidate-plausible",
+    "rankingEligible equals ranking !== null",
+    "rankingScore equals ranking?.rankingScore ?? null",
+    "selected equals decision === 'selected'"
+  ],
+  "enumValuesAreIncumbentValues": {
+    "passKind": "OcrPassKind",
+    "assembly": "BrandCandidateAssembly",
+    "filterReason": "BrandLineReason, never null",
+    "decision": "null or BrandCandidateDecision",
+    "checkNames": "BrandFilterCheckName",
+    "rankingStrategyAndMode": "AnalyzerCandidateRankingStrategy and AnalyzerCandidateRankingMode",
+    "driftGuard": "src/fixtures/eval/issue-149-frozen-vocabulary.test.ts asserts every copied vocabulary equals the production constant"
+  },
+  "nestedStructuresValidatedCompletely": [
+    "ocrConfidence",
+    "candidateProvenance",
+    "score",
+    "ranking"
+  ]
 }

@@ -2,7 +2,7 @@
   "artifact": "candidate-fingerprint-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-4.md",
+  "amendedBy": "preregistration-amendment-5.md",
   "status": "ALGORITHM AND TEST CONTRACT FROZEN. The acquisition is not implemented in this amendment.",
   "canonicalizationVersion": "issue-149-candidate-canonical-v1",
   "preimage": {
@@ -40,7 +40,9 @@
       "selected"
     ],
     "includesExplicitlyIsExhaustive": true,
-    "includesExplicitlyNote": "Amendment 3's list omitted regionName and the complete ranking object, and renamed the authoritative filter-reason field. This list is now exactly CANDIDATE_EVIDENCE_REQUIRED_KEYS in the reference implementation, uses production's own property names, and a test asserts every one of these keys changes the digest. The renamed field is quoted only in preregistration-amendment-4.md."
+    "includesExplicitlyNote": "Amendment 3's list omitted regionName and the complete ranking object, and renamed the authoritative filter-reason field. This list is now exactly CANDIDATE_EVIDENCE_REQUIRED_KEYS in the reference implementation, uses production's own property names, and a test asserts every one of these keys changes the digest. The renamed field is quoted only in preregistration-amendment-4.md.",
+    "keySetIsClosed": true,
+    "unexpectedKeyRejected": true
   },
   "canonicalization": [
     "object keys recursively sorted lexicographically",
@@ -82,10 +84,14 @@
     "a malformed or truncated digest is rejected",
     "a digest borrowed from a different record is rejected",
     "a complete record finalizes",
-    "the exact full digest appears in the stable id"
+    "the exact full digest appears in the stable id",
+    "a PARTIAL record carrying its own correctly computed digest is rejected",
+    "an unexpected extra key is rejected before and after finalization",
+    "every cross-field ladder and derived-field invariant is enforced"
   ],
   "testedBy": "src/fixtures/eval/issue-149-evidence-canonical.test.ts",
   "implementedInThisAmendment": false,
   "referenceImplementation": "scripts/eval/lib/issue-149-evidence-canonical.ts",
-  "referenceImplementationLocationNote": "Deliberately OUTSIDE src/fixtures/**. The Stage 2 runner is required to use this helper and is prohibited from importing anything under src/fixtures/**; Amendment 3 left it inside fixtures, so the requirement and the prohibition contradicted each other. The canonicalization VERSION string still reads issue-149-candidate-canonical-v1 because it names the frozen algorithm, which is unchanged, not the file path."
+  "referenceImplementationLocationNote": "Deliberately OUTSIDE src/fixtures/**. The Stage 2 runner is required to use this helper and is prohibited from importing anything under src/fixtures/**; Amendment 3 left it inside fixtures, so the requirement and the prohibition contradicted each other. The canonicalization VERSION string still reads issue-149-candidate-canonical-v1 because it names the frozen algorithm, which is unchanged, not the file path.",
+  "stableCandidateIdRequiresTheCompleteValidatedPreimage": true
 }
