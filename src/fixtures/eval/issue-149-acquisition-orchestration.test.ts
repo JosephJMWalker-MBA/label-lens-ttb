@@ -10,7 +10,10 @@
  * filtered or reordered passes plus matching selections. Owning the extractor
  * call removes the class: there is no caller-supplied evidence at all.
  */
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { extractLabelEvidenceDetailed, type ExtractionDebug } from "@/pipeline/extractor/extractor";
 import type { ExtractionInput } from "@/pipeline/extractor/extractor.types";
@@ -85,6 +88,7 @@ function validDebug(): ExtractionDebug {
   } as unknown as ExtractionDebug;
 }
 
+/** A mutable input carrying exactly the frozen incumbent identities. */
 const inputFor = (artifactRef: string): ExtractionInput =>
   ({
     artifactRef,
@@ -98,12 +102,25 @@ const inputFor = (artifactRef: string): ExtractionInput =>
     parserVersion: "1.0.0",
   }) as unknown as ExtractionInput;
 
+/** A mocked extractor whose resolution the test controls. */
+function deferredExtractor(debug: ExtractionDebug) {
+  let release: () => void = () => {};
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  vi.mocked(extractLabelEvidenceDetailed).mockImplementation(async () => {
+    await gate;
+    return { ok: true, value: { response: {}, debug, sellerRegionReadings: [] } } as never;
+  });
+  return { release };
+}
+
 beforeEach(() => {
   vi.mocked(extractLabelEvidenceDetailed).mockReset();
 });
 
 describe("Issue #149 extractor-owning acquisition", () => {
-  it("calls the extractor exactly once, with the supplied input object", async () => {
+  it("calls the extractor exactly once, with a deeply frozen SNAPSHOT", async () => {
     const debug = validDebug();
     vi.mocked(extractLabelEvidenceDetailed).mockResolvedValue({
       ok: true,
@@ -114,9 +131,174 @@ describe("Issue #149 extractor-owning acquisition", () => {
     const result = await acquireProductionBrandEvidence(input);
 
     expect(extractLabelEvidenceDetailed).toHaveBeenCalledTimes(1);
-    // The same object, not a copy: the runner's frozen input flows through.
-    expect(vi.mocked(extractLabelEvidenceDetailed).mock.calls[0][0]).toBe(input);
+    const passed = vi.mocked(extractLabelEvidenceDetailed).mock.calls[0][0];
+
+    // NOT the caller's object. An earlier version asserted identity, which is
+    // exactly what left the caller able to mutate it mid-flight.
+    expect(passed).not.toBe(input);
+    expect(Object.isFrozen(passed)).toBe(true);
+    expect(Object.isFrozen(passed.ocrEngine)).toBe(true);
+    expect(passed.imageBytes).not.toBe(input.imageBytes);
+
+    // Same initial values.
+    expect(passed.artifactRef).toBe("item-0001");
+    expect(passed.derivativeSha256).toBe(input.derivativeSha256);
+    expect(passed.processedAt).toBe("2026-07-12T00:00:00Z");
+    expect([...passed.imageBytes]).toEqual([...input.imageBytes]);
+    expect(passed.ocrEngine).toEqual(input.ocrEngine);
     expect(result.ok).toBe(true);
+  });
+
+  describe("the caller cannot mutate the input mid-flight", () => {
+    it("ignores an artifactRef changed while the extractor is pending", async () => {
+      const debug = validDebug();
+      const { release } = deferredExtractor(debug);
+      const input = inputFor("item-0001");
+
+      const pending = acquireProductionBrandEvidence(input);
+      // The window an earlier boundary left open: validated, awaited, re-read.
+      input.artifactRef = "item-0042";
+      release();
+
+      const result = await pending;
+      if (!result.ok) throw new Error("expected success");
+      expect(vi.mocked(extractLabelEvidenceDetailed).mock.calls[0][0].artifactRef).toBe(
+        "item-0001",
+      );
+      expect(result.value.candidateRecords.every((r) => r.opaqueItemId === "item-0001")).toBe(true);
+      expect(input.artifactRef).toBe("item-0042");
+    });
+
+    it("ignores imageBytes mutated after the call begins", async () => {
+      const debug = validDebug();
+      const { release } = deferredExtractor(debug);
+      const input = inputFor("item-0001");
+      const original = [...input.imageBytes];
+
+      const pending = acquireProductionBrandEvidence(input);
+      input.imageBytes[0] = 99;
+      input.imageBytes = new Uint8Array([7, 7, 7]);
+      release();
+      await pending;
+
+      expect([...vi.mocked(extractLabelEvidenceDetailed).mock.calls[0][0].imageBytes]).toEqual(
+        original,
+      );
+    });
+
+    it("ignores nested ocrEngine mutation", async () => {
+      const debug = validDebug();
+      const { release } = deferredExtractor(debug);
+      const input = inputFor("item-0001");
+
+      const pending = acquireProductionBrandEvidence(input);
+      (input.ocrEngine as { engineVersion: string }).engineVersion = "9.9.9";
+      release();
+      await pending;
+
+      const engine = vi.mocked(extractLabelEvidenceDetailed).mock.calls[0][0]
+        .ocrEngine as unknown as Record<string, unknown>;
+      expect(engine.engineVersion).toBe("7.0.0");
+    });
+  });
+
+  describe("the input schema is closed and identity-checked", () => {
+    it("rejects accessor-backed properties before invoking the extractor", async () => {
+      const input = inputFor("item-0001") as unknown as Record<string, unknown>;
+      let reads = 0;
+      Object.defineProperty(input, "artifactRef", {
+        configurable: true,
+        enumerable: true,
+        get() {
+          reads += 1;
+          return reads === 1 ? "item-0001" : "item-0042";
+        },
+      });
+      await expect(
+        acquireProductionBrandEvidence(input as unknown as ExtractionInput),
+      ).rejects.toMatchObject({ code: "MALFORMED_EXTRACTION_INPUT" });
+      expect(extractLabelEvidenceDetailed).not.toHaveBeenCalled();
+    });
+
+    it("rejects extra fields, sellerRegionTargets and diagnostics", async () => {
+      for (const extra of [
+        { sellerRegionTargets: [] },
+        { diagnostics: {} },
+        { somethingElse: 1 },
+      ]) {
+        const input = { ...inputFor("item-0001"), ...extra } as unknown as ExtractionInput;
+        await expect(acquireProductionBrandEvidence(input)).rejects.toMatchObject({
+          code: "MALFORMED_EXTRACTION_INPUT",
+        });
+      }
+      expect(extractLabelEvidenceDetailed).not.toHaveBeenCalled();
+    });
+
+    it("rejects a missing field, a bad digest or non-Uint8Array bytes", async () => {
+      const missing = { ...inputFor("item-0001") } as unknown as Record<string, unknown>;
+      delete missing.parserId;
+      for (const broken of [
+        missing,
+        { ...inputFor("item-0001"), derivativeSha256: "NOTHEX" },
+        { ...inputFor("item-0001"), derivativeSha256: "a".repeat(64).toUpperCase() },
+        { ...inputFor("item-0001"), imageBytes: [1, 2, 3] },
+      ]) {
+        await expect(
+          acquireProductionBrandEvidence(broken as unknown as ExtractionInput),
+        ).rejects.toMatchObject({ code: "MALFORMED_EXTRACTION_INPUT" });
+      }
+      expect(extractLabelEvidenceDetailed).not.toHaveBeenCalled();
+    });
+
+    it("halts on a frozen-identity mismatch before any OCR", async () => {
+      for (const drift of [
+        { processedAt: "2026-01-01T00:00:00.000Z" },
+        { extractionAdapterId: "some-other-adapter" },
+        { extractionAdapterVersion: "2.0.0" },
+        { parserId: "other-parser" },
+        { parserVersion: "9.9.9" },
+        {
+          ocrEngine: {
+            kind: "ocr",
+            engineId: "tesseract.js",
+            engineVersion: "6.0.0",
+            modelId: "eng",
+          },
+        },
+      ]) {
+        const input = { ...inputFor("item-0001"), ...drift } as unknown as ExtractionInput;
+        await expect(acquireProductionBrandEvidence(input)).rejects.toMatchObject({
+          code: "EXTRACTION_INPUT_IDENTITY_MISMATCH",
+        });
+      }
+      expect(extractLabelEvidenceDetailed).not.toHaveBeenCalled();
+    });
+
+    it("uses the frozen identities the incumbent configuration records", async () => {
+      // The literals in the adapter must equal the governed artifact, or
+      // "frozen from the incumbent" is an unchecked assertion.
+      const incumbent = JSON.parse(
+        readFileSync(
+          path.join(
+            process.cwd(),
+            "artifacts/issue-149-brand-complete-evidence-acquisition/incumbent-configuration-freeze.json",
+          ),
+          "utf8",
+        ),
+      ) as { extractionInputIdentities: Record<string, unknown> };
+      const frozen = incumbent.extractionInputIdentities;
+      const accepted = inputFor("item-0001") as unknown as Record<string, unknown>;
+      for (const key of [
+        "processedAt",
+        "extractionAdapterId",
+        "extractionAdapterVersion",
+        "parserId",
+        "parserVersion",
+      ]) {
+        expect(accepted[key]).toBe(frozen[key]);
+      }
+      expect(accepted.ocrEngine).toEqual(frozen.ocrEngine);
+    });
   });
 
   it("binds the returned passes and candidates to the same detailed result", async () => {

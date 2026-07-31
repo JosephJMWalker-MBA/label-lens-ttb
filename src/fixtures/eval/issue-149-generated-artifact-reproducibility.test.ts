@@ -23,6 +23,14 @@ import {
 import { tmpdir } from "node:os";
 import path from "node:path";
 
+import {
+  HALT_CODES,
+  verifyWorkingTree,
+  defaultModeForEnvironment,
+  evaluateWorkingTree,
+  parsePorcelain,
+  resolveMode,
+} from "../../../scripts/eval/issue-149-stage-1-working-tree.mjs";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -252,78 +260,124 @@ describe("Issue #149 Stage 1 generated-artifact reproducibility", () => {
   });
 
   describe("tracked Stage 1 artifacts are not written by tests", () => {
-    it("verifies the governed package is intact — AUTHORITATIVE for state, not for history", () => {
-      // The authoritative check: the real manifest verifier plus Git status over
-      // the governed directory. It proves the package is intact NOW; it does not
-      // and cannot detect a write that was performed and restored mid-test.
-      const manifest = execFileSync(
-        "node",
-        ["scripts/eval/issue-149-stage-1-contract-manifest.mjs", "--verify"],
-        { cwd: process.cwd(), encoding: "utf8", maxBuffer: 32 * 1024 * 1024 },
-      );
-      expect((JSON.parse(manifest) as { status: string }).status).toBe("VERIFIED");
-
-      const diff = execFileSync("git", ["status", "--porcelain", "--", GOVERNED_DIRECTORY], {
-        cwd: process.cwd(),
-        encoding: "utf8",
-      });
-      // This proves the package's STATE after the tests. It cannot prove that a
-      // write occurred and was restored during a test. The intentional-drift
-      // tests demonstrably use only temporary paths, which is a separate and
-      // executable fact.
+    it("verifies the governed package with the REAL verifier — state, not history", () => {
+      // The authoritative check: the real manifest verifier plus the real
+      // working-tree evaluator, run end to end. It proves the package is intact
+      // NOW; it does not and cannot detect a write that was performed and
+      // restored mid-test. The intentional-drift tests demonstrably use only
+      // temporary paths, which is a separate and executable fact.
       //
-      // LOCAL (this assertion): amendment work legitimately leaves modifications,
-      // and a NEW governed artifact is untracked until it is committed, so the
-      // lenient check permits the known amendment diff and rejects only files the
-      // Stage 1 manifest does not account for.
-      //
-      // CLEAN CI: `git status --porcelain` over the governed directory must be
-      // EMPTY. That stricter form is asserted separately below and is the one
-      // that runs on an unmodified checkout. The lenient local check is NOT
-      // equivalent to it.
-      const untracked = diff
-        .split("\n")
-        .filter((line) => line.startsWith("??"))
-        .map((line) => line.slice(3).trim())
-        .filter((file) => file.length > 0);
-      const manifested = new Set(
-        readFileSync(
-          path.join(process.cwd(), `${GOVERNED_DIRECTORY}/stage-1-contract-manifest.sha256`),
-          "utf8",
-        )
-          .split("\n")
-          .filter((line) => !line.startsWith("#") && line.trim().length > 0)
-          .map((line) => line.split("  ")[1]),
-      );
-      const unaccounted = untracked.filter((file) => !manifested.has(file));
-      expect(unaccounted).toEqual([]);
+      // Local runs use `--local`, because amendment work legitimately leaves a
+      // diff inside the governed package. CI runs `--clean` from `posttest`,
+      // where any difference at all fails. The two are NOT equivalent, and the
+      // mode is an argument — never a deduction from how dirty the tree is.
+      const report = verifyWorkingTree([defaultModeForEnvironment(process.env)]) as {
+        status: string;
+        manifestVerified?: boolean;
+        detail?: unknown;
+      };
+      expect(report.status).not.toBe("HALTED");
+      expect(report.manifestVerified).toBe(true);
     }, 180_000);
 
-    it("requires an empty porcelain status on a clean checkout", () => {
-      // On an unmodified checkout — which is what CI runs — nothing under the
-      // governed directory may differ at all. During local amendment work the
-      // diff is expected, so the assertion states which regime it is in rather
-      // than pretending the lenient case is the strict one.
-      // Only the trailing newline is stripped: `trim()` would eat the leading
-      // status space of the first entry and shift every path by one character.
-      const porcelain = execFileSync("git", ["status", "--porcelain", "--", GOVERNED_DIRECTORY], {
-        cwd: process.cwd(),
-        encoding: "utf8",
-      }).replace(/\n+$/, "");
+    it("verifies the working tree through the REAL mode-explicit verifier", () => {
+      // The previous version of this assertion inferred its own regime: a
+      // nonempty porcelain status was read as "an amendment must be in
+      // progress", so anything that dirtied the tree also switched the check
+      // into its lenient branch and the strict assertion could never fail.
+      // That branch is gone. The mode is now an explicit argument, and these
+      // cases drive the real `evaluateWorkingTree`/`resolveMode` rather than
+      // restating what they are supposed to do.
+      const dirty = parsePorcelain(
+        [
+          ` M ${GOVERNED_DIRECTORY}/preregistration.md`,
+          `?? ${GOVERNED_DIRECTORY}/preregistration-amendment-12.md`,
+        ].join("\n"),
+      );
+      const manifested = new Set([`${GOVERNED_DIRECTORY}/preregistration-amendment-12.md`]);
 
-      const amendmentInProgress = porcelain.length > 0;
-      if (!amendmentInProgress) {
-        expect(porcelain).toBe("");
-        return;
+      // Clean mode fails on ANY difference. No allowance, no work-in-progress.
+      const strict = evaluateWorkingTree({
+        mode: "clean",
+        entries: dirty,
+        manifestedPaths: manifested,
+      });
+      expect(strict).toMatchObject({ ok: false, code: HALT_CODES.DIRTY });
+
+      // Local mode permits that same diff, because it is confined to the package
+      // and the untracked file is manifested.
+      const lenient = evaluateWorkingTree({
+        mode: "local",
+        entries: dirty,
+        manifestedPaths: manifested,
+      });
+      expect(lenient.ok).toBe(true);
+
+      // Local mode is still a real check: a path outside the package fails, and
+      // so does an untracked governed file the manifest does not account for.
+      expect(
+        evaluateWorkingTree({
+          mode: "local",
+          entries: parsePorcelain(" M src/pipeline/extractor/extractor.ts"),
+          manifestedPaths: manifested,
+        }),
+      ).toMatchObject({ ok: false, code: HALT_CODES.OUTSIDE_PACKAGE });
+      expect(
+        evaluateWorkingTree({
+          mode: "local",
+          entries: parsePorcelain(`?? ${GOVERNED_DIRECTORY}/scratch.json`),
+          manifestedPaths: manifested,
+        }),
+      ).toMatchObject({ ok: false, code: HALT_CODES.UNACCOUNTED });
+
+      // Clean mode passes only on an actually clean package.
+      expect(
+        evaluateWorkingTree({ mode: "clean", entries: [], manifestedPaths: manifested }).ok,
+      ).toBe(true);
+    });
+
+    it("never infers the mode, and selects the strict one in CI", () => {
+      // No mode is not a default-to-lenient; it is a halt.
+      expect(resolveMode([])).toMatchObject({ ok: false, code: HALT_CODES.NO_MODE });
+      expect(resolveMode(["--clean", "--local"])).toMatchObject({
+        ok: false,
+        code: HALT_CODES.AMBIGUOUS_MODE,
+      });
+      expect(resolveMode(["--clean"])).toMatchObject({ ok: true, mode: "clean" });
+      expect(resolveMode(["--local"])).toMatchObject({ ok: true, mode: "local" });
+
+      // `--mode-from-env` reads the ENVIRONMENT, never the working tree.
+      expect(defaultModeForEnvironment({ CI: "true" })).toBe("--clean");
+      expect(defaultModeForEnvironment({ CI: "1" })).toBe("--clean");
+      expect(defaultModeForEnvironment({})).toBe("--local");
+      expect(resolveMode(["--mode-from-env"], { CI: "true" })).toMatchObject({
+        ok: true,
+        mode: "clean",
+        modeSource: "environment",
+      });
+      expect(resolveMode(["--mode-from-env"], {})).toMatchObject({ ok: true, mode: "local" });
+
+      // A dirty tree cannot change the mode: the selector never sees one.
+      // The selector cannot consult the working tree: it receives only argv and
+      // an environment, and its body names no Git command.
+      const selectorSource = resolveMode.toString();
+      for (const marker of [["porce", "lain"].join(""), ["git ", "status"].join(""), "execFile"]) {
+        expect(selectorSource).not.toContain(marker);
       }
-      // Local amendment regime: every differing path must be a governed artifact
-      // the manifest accounts for, and none may be outside the package.
-      const paths = porcelain
-        .split("\n")
-        .map((line) => line.slice(3).trim())
-        .filter((file) => file.length > 0);
-      expect(paths.every((file) => file.startsWith(`${GOVERNED_DIRECTORY}/`))).toBe(true);
-    }, 60_000);
+    });
+
+    it("runs the strict check AFTER the suite, via the posttest lifecycle", () => {
+      // Verifying cleanliness BEFORE the tests proves nothing about the tests.
+      const scripts = (
+        JSON.parse(readFileSync(path.join(process.cwd(), "package.json"), "utf8")) as {
+          scripts: Record<string, string>;
+        }
+      ).scripts;
+      expect(scripts.posttest).toBe(
+        "node scripts/eval/issue-149-stage-1-working-tree.mjs --mode-from-env",
+      );
+      expect(scripts.test).toBe("vitest run");
+    });
 
     it("finds no obvious tracked write in the Stage 1 tests — a SUPPLEMENTARY heuristic", () => {
       // Deliberately labelled. This scans a fixed set of filesystem call names in

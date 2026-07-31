@@ -71,6 +71,20 @@ import {
   REGION_OCR_RESULT_KEYS,
 } from "../../../scripts/eval/lib/issue-149-evidence-canonical";
 
+/** A valid acquisition input carrying exactly the frozen incumbent identities. */
+const validInput = (artifactRef: string): ExtractionInput =>
+  ({
+    imageBytes: new Uint8Array([1, 2, 3]),
+    artifactRef,
+    derivativeSha256: "a".repeat(64),
+    processedAt: "2026-07-12T00:00:00Z",
+    extractionAdapterId: "local-two-field-extractor",
+    extractionAdapterVersion: "1.0.0",
+    ocrEngine: { kind: "ocr", engineId: "tesseract.js", engineVersion: "7.0.0", modelId: "eng" },
+    parserId: "wine-alcohol-parse",
+    parserVersion: "1.0.0",
+  }) as unknown as ExtractionInput;
+
 describe("Issue #149 frozen vocabulary matches production", () => {
   it("copies every ordered enum exactly, order included", () => {
     // Order matters for the filter ladder; for the rest it is simply the truth.
@@ -237,9 +251,7 @@ describe("Issue #149 frozen vocabulary matches production", () => {
       ok: true,
       value: { response: {}, debug, sellerRegionReadings: [] },
     } as never);
-    const acquired = await acquireProductionBrandEvidence({
-      artifactRef: "item-0001",
-    } as unknown as ExtractionInput);
+    const acquired = await acquireProductionBrandEvidence(validInput("item-0001"));
     if (!acquired.ok) throw new Error("expected success");
     const { diagnosticSelection, candidateRecords } = acquired.value;
     expect(diagnosticSelection.brandDiagnostics?.candidates.length).toBeGreaterThan(0);

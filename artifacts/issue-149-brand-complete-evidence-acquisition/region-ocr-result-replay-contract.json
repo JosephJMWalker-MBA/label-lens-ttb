@@ -2,7 +2,7 @@
   "artifact": "region-ocr-result-replay-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-11.md",
+  "amendedBy": "preregistration-amendment-12.md",
   "purpose": "Freeze the complete RegionOcrResult persistence that makes a later zero-OCR selector replay possible. This is what actually underwrites capability 3; complete rejection reasons alone do not.",
   "whyRejectionReasonsAloneAreInsufficient": [
     "a rejected span returns from analyzeBrandSpan BEFORE a Candidate object is constructed",

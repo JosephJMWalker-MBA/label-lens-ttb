@@ -9,6 +9,10 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 
+import {
+  AUTHORIZED_ADAPTER_MODULE,
+  RUNNER_ENTRY_PATH,
+} from "../../../scripts/eval/lib/issue-149-stage2-source-closure";
 import { describe, expect, it } from "vitest";
 
 import { parseTruthKeyInventory } from "../../../scripts/eval/lib/issue-149-bundle-scan";
@@ -49,7 +53,7 @@ const HISTORICAL_FILES = new Set([
  * current amendment. Exempting it wholesale is what let it sit at "amendment 2"
  * while the package was at Amendment 4, faithfully hashed by the manifest.
  */
-const CURRENT_AMENDMENT = 11;
+const CURRENT_AMENDMENT = 12;
 
 /**
  * A line may mention a superseded term when it is explicitly marking it as
@@ -171,9 +175,19 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     const contract = JSON.parse(
       readFileSync(path.join(process.cwd(), ROOT, "acquisition-invocation-contract.json"), "utf8"),
     );
-    expect(contract.route).toContain("direct call to extractLabelEvidenceDetailed");
     // The route is unchanged in substance; what changed is who makes the call.
+    // The runner's one call is acquireProductionBrandEvidence, and the direct
+    // extractor call happens inside it — the runner is prohibited from making
+    // that call itself, so the contract must not instruct it to.
     expect(contract.route).toContain("acquireProductionBrandEvidence");
+    expect(contract.route).toContain("extractLabelEvidenceDetailed");
+    expect(contract.requiredInvocationSteps.at(-1)).toContain(
+      "acquireProductionBrandEvidence(extractionInput)",
+    );
+    expect(contract.requiredInvocationSteps.join(" ")).not.toContain(
+      ["call ", "extractLabelEvidenceDetailed", " directly"].join(""),
+    );
+    expect(contract.extractionInputImmutability.identityIsNotPreserved).toContain("toBe(input)");
     expect(contract.prohibitedRoute.symbols).toContain("runCaseArtifacts");
     expect(contract.prohibitedRoute.modules).toContain("src/fixtures/eval/**");
     expect(contract.extractionInputBinding.artifactRef).toContain("opaqueItemId");
@@ -1056,7 +1070,17 @@ describe("Issue #149 Stage 1 contract consistency", () => {
             referenceAnalyzer: string;
             onlyTheRunnerEntrypointMustInvokeTheApi: boolean;
             prohibitedCallsOutsideTheAdapterModule: string[];
-            prohibitedWritesOutsideTheAdapterModule: string[];
+            prohibitedWritesOutsideTheAdapterModule: {
+              detectedForms: string[];
+              anchoredOnAdjacentPropertyPairs: string[];
+              singleNamesAreNotEnough: boolean;
+            };
+            symbolResolvedNotNameMatched: boolean;
+            frozenPathsNotCallerSelectable: {
+              runnerEntry: string;
+              authorizedAdapterModule: string;
+            };
+            requiredCallShape: Record<string, boolean>;
             acrossTheCompleteClosure: string[];
             haltCode: string;
             testedBy: string;
@@ -1068,8 +1092,32 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     expect(existsSync(path.join(process.cwd(), gate.referenceAnalyzer))).toBe(true);
     expect(gate.onlyTheRunnerEntrypointMustInvokeTheApi).toBe(true);
     expect(gate.prohibitedCallsOutsideTheAdapterModule).toContain("extractLabelEvidenceDetailed");
-    expect(gate.prohibitedWritesOutsideTheAdapterModule).toContain("passes");
-    expect(gate.prohibitedWritesOutsideTheAdapterModule).toContain("finalSelections");
+    // The write rule is anchored on ADJACENT property pairs, not single names:
+    // a bare `passes` would reject any unrelated object with that property.
+    const writes = gate.prohibitedWritesOutsideTheAdapterModule;
+    expect(writes.singleNamesAreNotEnough).toBe(true);
+    expect(writes.anchoredOnAdjacentPropertyPairs).toContain("debug.passes");
+    expect(writes.anchoredOnAdjacentPropertyPairs).toContain("debug.finalSelections");
+    expect(writes.anchoredOnAdjacentPropertyPairs).toContain("brandDiagnostics.candidates");
+    for (const form of [
+      "delete",
+      "Object.assign",
+      "Reflect.set",
+      "splice",
+      "compound assignment",
+    ]) {
+      expect(writes.detectedForms).toContain(form);
+    }
+
+    // The contract's claims are the analyzer's actual behaviour, not a
+    // description of it: the frozen paths are the analyzer's own constants and
+    // are not caller-selectable.
+    expect(gate.symbolResolvedNotNameMatched).toBe(true);
+    expect(gate.frozenPathsNotCallerSelectable.runnerEntry).toBe(RUNNER_ENTRY_PATH);
+    expect(gate.frozenPathsNotCallerSelectable.authorizedAdapterModule).toBe(
+      AUTHORIZED_ADAPTER_MODULE,
+    );
+    expect(Object.values(gate.requiredCallShape).every((value) => value === true)).toBe(true);
     expect(gate.acrossTheCompleteClosure.join(" ")).toContain("exactly one call");
     expect(gate.haltCode).toBe("STAGE2_SOURCE_CLOSURE_VIOLATION");
     expect(existsSync(path.join(process.cwd(), gate.testedBy))).toBe(true);

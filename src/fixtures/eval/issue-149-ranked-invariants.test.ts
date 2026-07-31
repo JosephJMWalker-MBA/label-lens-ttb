@@ -170,7 +170,21 @@ function authorityFor(selection: FieldSelection): FieldSelection {
 
 const pass = { passId: "pass-1-full-image" } as unknown as RegionOcrResult;
 
-const input = { artifactRef: "item-0001" } as unknown as ExtractionInput;
+/** A valid acquisition input carrying exactly the frozen incumbent identities. */
+const validInput = (artifactRef: string): ExtractionInput =>
+  ({
+    imageBytes: new Uint8Array([1, 2, 3]),
+    artifactRef,
+    derivativeSha256: "a".repeat(64),
+    processedAt: "2026-07-12T00:00:00Z",
+    extractionAdapterId: "local-two-field-extractor",
+    extractionAdapterVersion: "1.0.0",
+    ocrEngine: { kind: "ocr", engineId: "tesseract.js", engineVersion: "7.0.0", modelId: "eng" },
+    parserId: "wine-alcohol-parse",
+    parserVersion: "1.0.0",
+  }) as unknown as ExtractionInput;
+
+const input = validInput("item-0001");
 
 /** Drive the public API with a controlled internally derived selection. */
 async function acquireWith(selection: FieldSelection) {

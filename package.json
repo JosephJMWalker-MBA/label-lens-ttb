@@ -11,6 +11,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
+    "posttest": "node scripts/eval/issue-149-stage-1-working-tree.mjs --mode-from-env",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:sqlite:finalize": "vitest run src/app/api/package/submit/finalize/route.test.ts",

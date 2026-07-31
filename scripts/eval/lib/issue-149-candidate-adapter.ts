@@ -1,18 +1,24 @@
 /**
- * Issue #149 — the one public Brand evidence API.
+ * Issue #149 — the one public Brand acquisition API.
  *
- * Evaluation-only and non-OCR. **The Stage 2 acquisition runner must use this
- * module rather than reimplementing the mapping.** A second mapping could drift
- * from production's shape without any test noticing — which is exactly how the
- * six-key `ocrConfidence` schema survived Amendment 5.
+ * Evaluation-only, and **NOT non-OCR**: `acquireProductionBrandEvidence` calls
+ * `extractLabelEvidenceDetailed`, which runs the recognizer. In Stage 2 this
+ * module is what performs the governed OCR. Only the focused tests are non-OCR,
+ * and they are non-OCR because they mock the extractor.
+ *
+ * **The Stage 2 acquisition runner must use this module rather than
+ * reimplementing any part of it.** A second mapping could drift from production's
+ * shape without any test noticing — which is exactly how the six-key
+ * `ocrConfidence` schema survived Amendment 5.
  *
  * It lives outside `src/fixtures/**` for the same reason the canonical helper
- * does. It imports production TYPES and **two runtime functions**:
- * `compareCandidateRanking`, so ranked order is production's own comparator
- * rather than a reimplementation, and
+ * does. It imports production TYPES and **three runtime functions**:
+ * `extractLabelEvidenceDetailed`, so the acquisition owns the OCR invocation and
+ * no caller supplies evidence; `compareCandidateRanking`, so ranked order is
+ * production's own comparator rather than a reimplementation; and
  * `selectBrandObservationWithCompleteFilterDiagnostics`, so the diagnostic
- * selection is derived HERE and never handed in by a caller. The invocation
- * contract permits that module on the acquisition route.
+ * selection is derived HERE. The invocation contract permits those modules on the
+ * acquisition route.
  */
 import type { Result } from "@/shared/result";
 import {
@@ -49,6 +55,8 @@ export class CandidateAdapterError extends Error {
       | "RANKED_POSITION_PARITY_FAILURE"
       | "DEBUG_PASSES_ABSENT"
       | "MALFORMED_ARTIFACT_REF"
+      | "MALFORMED_EXTRACTION_INPUT"
+      | "EXTRACTION_INPUT_IDENTITY_MISMATCH"
       | "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE",
     detail: string,
   ) {
@@ -545,19 +553,217 @@ export interface ProductionBrandEvidenceSuccess {
  * The opaque identity comes from `input.artifactRef`, so there is no second
  * identifier that could disagree with it.
  */
-export async function acquireProductionBrandEvidence(
-  input: ExtractionInput,
-): Promise<Result<ProductionBrandEvidenceSuccess, ExtractionError>> {
-  if (typeof input?.artifactRef !== "string" || !OPAQUE_ITEM_ID.test(input.artifactRef)) {
+/**
+ * The exact own properties an acquisition `ExtractionInput` may carry.
+ *
+ * `sellerRegionTargets` and `diagnostics` are absent by contract: the seller
+ * region pass is not exercised, and a diagnostics trace would give the caller a
+ * channel into the extractor.
+ */
+const ACQUISITION_INPUT_KEYS = [
+  "imageBytes",
+  "artifactRef",
+  "derivativeSha256",
+  "processedAt",
+  "extractionAdapterId",
+  "extractionAdapterVersion",
+  "ocrEngine",
+  "parserId",
+  "parserVersion",
+] as const;
+
+const OCR_ENGINE_KEYS = ["kind", "engineId", "engineVersion", "modelId"] as const;
+
+/**
+ * The frozen incumbent identities, copied as literals from
+ * `incumbent-configuration-freeze.json#extractionInputIdentities`. A test asserts
+ * they still equal that artifact, so a drift is a test failure rather than a
+ * silent divergence.
+ */
+const FROZEN_IDENTITIES = {
+  processedAt: "2026-07-12T00:00:00Z",
+  extractionAdapterId: "local-two-field-extractor",
+  extractionAdapterVersion: "1.0.0",
+  parserId: "wine-alcohol-parse",
+  parserVersion: "1.0.0",
+  ocrEngine: {
+    kind: "ocr",
+    engineId: "tesseract.js",
+    engineVersion: "7.0.0",
+    modelId: "eng",
+  },
+} as const;
+
+const LOWER_HEX_64 = /^[0-9a-f]{64}$/;
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" &&
+  value !== null &&
+  !Array.isArray(value) &&
+  (Object.getPrototypeOf(value) === Object.prototype || Object.getPrototypeOf(value) === null);
+
+/** Reject accessor-backed properties: a getter can return a different value each read. */
+function assertNoAccessors(target: object, keys: readonly string[], at: string): void {
+  for (const key of keys) {
+    const descriptor = Object.getOwnPropertyDescriptor(target, key);
+    if (descriptor === undefined) continue;
+    if (descriptor.get !== undefined || descriptor.set !== undefined) {
+      throw new CandidateAdapterError(
+        "MALFORMED_EXTRACTION_INPUT",
+        `${at}.${key} is an accessor property; a getter can return a different value on each read`,
+      );
+    }
+  }
+}
+
+/**
+ * Synchronously validate the caller's input and copy it into a closed, deeply
+ * frozen snapshot.
+ *
+ * `ExtractionInput` is an ordinary mutable interface, including mutable
+ * `imageBytes` and a nested `ocrEngine`. An earlier boundary validated
+ * `artifactRef`, passed the caller's object into the asynchronous extractor, and
+ * re-read `artifactRef` afterwards for candidate identity — so this was possible:
+ *
+ * ```ts
+ * const promise = acquireProductionBrandEvidence(input);
+ * input.artifactRef = "item-0042";
+ * await promise;
+ * ```
+ *
+ * Everything here happens **before the first await**, and everything afterwards
+ * uses only the snapshot.
+ */
+function snapshotAcquisitionInput(input: ExtractionInput): ExtractionInput {
+  if (!isPlainObject(input)) {
     throw new CandidateAdapterError(
-      "MALFORMED_ARTIFACT_REF",
-      `input.artifactRef must match ^item-\\d{4}$, received ${JSON.stringify(input?.artifactRef)}`,
+      "MALFORMED_EXTRACTION_INPUT",
+      "the acquisition input must be a plain object",
     );
   }
 
-  // Exactly once. There is no retry path: a failed item produces the
-  // preregistered typed failure and is never re-run.
-  const detailed = await extractLabelEvidenceDetailed(input);
+  const actual = Object.keys(input);
+  const missing = ACQUISITION_INPUT_KEYS.filter((key) => !Object.hasOwn(input, key));
+  const unexpected = actual.filter(
+    (key) => !(ACQUISITION_INPUT_KEYS as readonly string[]).includes(key),
+  );
+  if (missing.length > 0 || unexpected.length > 0) {
+    throw new CandidateAdapterError(
+      "MALFORMED_EXTRACTION_INPUT",
+      [
+        ...missing.map((key) => `missing ${key}`),
+        ...unexpected.map((key) => `unexpected ${key}`),
+      ].join("; "),
+    );
+  }
+  assertNoAccessors(input, ACQUISITION_INPUT_KEYS, "input");
+
+  const raw = input as unknown as Record<string, unknown>;
+
+  if (typeof raw.artifactRef !== "string" || !OPAQUE_ITEM_ID.test(raw.artifactRef)) {
+    throw new CandidateAdapterError(
+      "MALFORMED_ARTIFACT_REF",
+      `input.artifactRef must match ^item-\\d{4}$, received ${JSON.stringify(raw.artifactRef)}`,
+    );
+  }
+  if (typeof raw.derivativeSha256 !== "string" || !LOWER_HEX_64.test(raw.derivativeSha256)) {
+    throw new CandidateAdapterError(
+      "MALFORMED_EXTRACTION_INPUT",
+      `input.derivativeSha256 must be lowercase 64-hex, received ${JSON.stringify(raw.derivativeSha256)}`,
+    );
+  }
+  if (!(raw.imageBytes instanceof Uint8Array)) {
+    throw new CandidateAdapterError(
+      "MALFORMED_EXTRACTION_INPUT",
+      "input.imageBytes must be a Uint8Array",
+    );
+  }
+
+  if (!isPlainObject(raw.ocrEngine)) {
+    throw new CandidateAdapterError(
+      "MALFORMED_EXTRACTION_INPUT",
+      "input.ocrEngine must be a plain object",
+    );
+  }
+  const engineKeys = Object.keys(raw.ocrEngine);
+  const engineProblems = [
+    ...OCR_ENGINE_KEYS.filter((key) => !Object.hasOwn(raw.ocrEngine as object, key)).map(
+      (key) => `missing ${key}`,
+    ),
+    ...engineKeys
+      .filter((key) => !(OCR_ENGINE_KEYS as readonly string[]).includes(key))
+      .map((key) => `unexpected ${key}`),
+  ];
+  if (engineProblems.length > 0) {
+    throw new CandidateAdapterError(
+      "MALFORMED_EXTRACTION_INPUT",
+      `input.ocrEngine: ${engineProblems.join("; ")}`,
+    );
+  }
+  assertNoAccessors(raw.ocrEngine as object, OCR_ENGINE_KEYS, "input.ocrEngine");
+
+  // The frozen incumbent identities. A run whose provenance differs from the
+  // preregistered one is not an observation of the incumbent.
+  const engine = raw.ocrEngine as Record<string, unknown>;
+  const identityMismatches: string[] = [];
+  for (const key of [
+    "processedAt",
+    "extractionAdapterId",
+    "extractionAdapterVersion",
+    "parserId",
+    "parserVersion",
+  ] as const) {
+    if (raw[key] !== FROZEN_IDENTITIES[key]) {
+      identityMismatches.push(
+        `${key} is ${JSON.stringify(raw[key])}, frozen value is ${JSON.stringify(FROZEN_IDENTITIES[key])}`,
+      );
+    }
+  }
+  for (const key of OCR_ENGINE_KEYS) {
+    if (engine[key] !== FROZEN_IDENTITIES.ocrEngine[key]) {
+      identityMismatches.push(
+        `ocrEngine.${key} is ${JSON.stringify(engine[key])}, frozen value is ${JSON.stringify(FROZEN_IDENTITIES.ocrEngine[key])}`,
+      );
+    }
+  }
+  if (identityMismatches.length > 0) {
+    throw new CandidateAdapterError(
+      "EXTRACTION_INPUT_IDENTITY_MISMATCH",
+      identityMismatches.join("; "),
+    );
+  }
+
+  // Copy, then freeze. `imageBytes` is copied into a NEW Uint8Array so a later
+  // mutation of the caller's buffer cannot reach the extractor.
+  const snapshot = {
+    imageBytes: Uint8Array.from(raw.imageBytes),
+    artifactRef: String(raw.artifactRef),
+    derivativeSha256: String(raw.derivativeSha256),
+    processedAt: String(raw.processedAt),
+    extractionAdapterId: String(raw.extractionAdapterId),
+    extractionAdapterVersion: String(raw.extractionAdapterVersion),
+    ocrEngine: Object.freeze({
+      kind: String(engine.kind),
+      engineId: String(engine.engineId),
+      engineVersion: String(engine.engineVersion),
+      modelId: String(engine.modelId),
+    }),
+    parserId: String(raw.parserId),
+    parserVersion: String(raw.parserVersion),
+  };
+  return Object.freeze(snapshot) as unknown as ExtractionInput;
+}
+
+export async function acquireProductionBrandEvidence(
+  input: ExtractionInput,
+): Promise<Result<ProductionBrandEvidenceSuccess, ExtractionError>> {
+  // Synchronously, before the first await: validate and copy. Nothing after this
+  // line reads the caller's object.
+  const snapshot = snapshotAcquisitionInput(input);
+
+  // Exactly once, with the snapshot. There is no retry path: a failed item
+  // produces the preregistered typed failure and is never re-run.
+  const detailed = await extractLabelEvidenceDetailed(snapshot);
   if (!detailed.ok) {
     // The extractor's typed failure, unchanged. No diagnostic selection and no
     // candidate record is produced or returned.
@@ -566,7 +772,7 @@ export async function acquireProductionBrandEvidence(
 
   const { diagnosticSelection, candidateRecords } = deriveBrandEvidenceFromDebug(
     detailed.value.debug,
-    input.artifactRef,
+    snapshot.artifactRef,
   );
 
   return { ok: true, value: { detailed: detailed.value, diagnosticSelection, candidateRecords } };

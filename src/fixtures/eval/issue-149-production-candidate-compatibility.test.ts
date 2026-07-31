@@ -135,8 +135,19 @@ const LINES: string[][] = [
   ["NAPA", "VALLEY"],
 ];
 
-/** The frozen ExtractionInput shape, with only the identity that matters here. */
-const inputFor = (artifactRef: string) => ({ artifactRef }) as unknown as ExtractionInput;
+/** A valid acquisition input carrying exactly the frozen incumbent identities. */
+const validInput = (artifactRef: string): ExtractionInput =>
+  ({
+    imageBytes: new Uint8Array([1, 2, 3]),
+    artifactRef,
+    derivativeSha256: "a".repeat(64),
+    processedAt: "2026-07-12T00:00:00Z",
+    extractionAdapterId: "local-two-field-extractor",
+    extractionAdapterVersion: "1.0.0",
+    ocrEngine: { kind: "ocr", engineId: "tesseract.js", engineVersion: "7.0.0", modelId: "eng" },
+    parserId: "wine-alcohol-parse",
+    parserVersion: "1.0.0",
+  }) as unknown as ExtractionInput;
 
 /** Route a synthetic debug object through the real public boundary. */
 async function acquire(debug: ExtractionDebug, artifactRef: string) {
@@ -144,7 +155,7 @@ async function acquire(debug: ExtractionDebug, artifactRef: string) {
     ok: true,
     value: { response: {}, debug, sellerRegionReadings: [] },
   } as never);
-  const result = await acquireProductionBrandEvidence(inputFor(artifactRef));
+  const result = await acquireProductionBrandEvidence(validInput(artifactRef));
   if (!result.ok) throw new Error("expected success");
   return result.value;
 }

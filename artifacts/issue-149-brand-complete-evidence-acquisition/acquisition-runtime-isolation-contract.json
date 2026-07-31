@@ -2,7 +2,7 @@
   "artifact": "acquisition-runtime-isolation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-11.md",
+  "amendedBy": "preregistration-amendment-12.md",
   "status": "CONTRACT FROZEN. Not implemented in this amendment.",
   "whyThisExists": {
     "correction": "The Stage 1 isolation tests are STATIC manifest, path and import validation. They read committed planning artifacts and assert their shape. They are NOT runtime proof, and this contract stops them being described as such.",
@@ -187,7 +187,7 @@
         "theDirectRunnerRegexIsNotTransitive": true,
         "theDirectRunnerRegexIsNotTransitiveNote": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts inspects the runner sources only. A helper the runner imports could reach a lower-level candidate function without the runner source containing a prohibited symbol. The Stage 2 source-closure gate owns the transitive property; the first-order regex does not and does not claim to.",
         "requiredSoleEmissionCall": "acquireProductionBrandEvidence",
-        "requiredSoleEmissionCallNote": "It takes the frozen ExtractionInput and calls extractLabelEvidenceDetailed itself, exactly once. There is no caller-supplied debug, selection or candidate array.",
+        "requiredSoleEmissionCallNote": "It takes an ExtractionInput, copies it into a deeply frozen snapshot before its first await, and calls extractLabelEvidenceDetailed on that snapshot itself, exactly once. There is no caller-supplied debug, selection or candidate array, and no live caller reference to the input the extractor reads.",
         "prohibitedOutsideTheAdapterModule": [
           "selectBrandObservationWithCompleteFilterDiagnostics for Brand acquisition",
           "selectBrandObservationWithCompleteFilterDiagnostics",
@@ -206,7 +206,7 @@
         "noRuntimeTestBackdoorNote": "TEST_ONLY_candidateAdapterInternals was a real exported object holding both lower-level functions, so the private functions were reachable at runtime. It is removed; the adapter exports exactly one candidate-emission function.",
         "haltCode": "STAGE2_SOURCE_CLOSURE_VIOLATION",
         "referenceAnalyzer": "scripts/eval/lib/issue-149-stage2-source-closure.ts",
-        "referenceAnalyzerNote": "One host-only implementation, parsing the TypeScript AST. Job A and the Stage 1 synthetic tests use it, so the gate that runs before acquisition is the gate the tests exercise. It replaces a substring detector embedded in a test file, which could not tell a call from a mention.",
+        "referenceAnalyzerNote": "One host-only implementation building a ts.Program over the supplied closure and resolving every callee through the TypeChecker and the file's import bindings. Job A and the Stage 1 synthetic tests use it, so the gate that runs before acquisition is the gate the tests exercise.",
         "onlyTheRunnerEntrypointMustInvokeTheApi": true,
         "onlyTheRunnerEntrypointMustInvokeTheApiNote": "Helper modules for pass validation, semantic fingerprinting, exact-byte hashing, manifest writing and evidence scanning are legitimate Stage 2 sources and must NOT be required to call the acquisition API. They must only be free of prohibited routes. The previous detector added 'does not invoke the API' to every inspected file, which would have rejected all of them.",
         "prohibitedCallsOutsideTheAdapterModule": [
@@ -220,14 +220,39 @@
           "finalizeCandidateRecord",
           "stableCandidateId"
         ],
-        "prohibitedWritesOutsideTheAdapterModule": [
-          "primarySelections",
-          "finalSelections",
-          "brandDiagnostics",
-          "candidates",
-          "passes",
-          "rankedPosition"
-        ],
+        "prohibitedWritesOutsideTheAdapterModule": {
+          "detectedForms": [
+            "assignment",
+            "bracket/element assignment",
+            "compound assignment",
+            "destructuring assignment",
+            "delete",
+            "Object.assign",
+            "Reflect.set",
+            "push",
+            "pop",
+            "shift",
+            "unshift",
+            "splice",
+            "sort",
+            "reverse",
+            "copyWithin",
+            "fill"
+          ],
+          "anchoredOnAdjacentPropertyPairs": [
+            "value.detailed",
+            "value.diagnosticSelection",
+            "value.candidateRecords",
+            "detailed.debug",
+            "debug.passes",
+            "debug.primarySelections",
+            "debug.finalSelections",
+            "diagnosticSelection.brandDiagnostics",
+            "brandDiagnostics.candidates"
+          ],
+          "singleNamesAreNotEnough": true,
+          "singleNamesAreNotEnoughNote": "The previous rule flagged any chain containing a property called passes or candidates, so an ordinary unrelated helper \u2014 const stats = { passes: 0, candidates: [] }; stats.passes = n \u2014 failed the gate, and detection was still limited to plain dotted assignment. Anchoring on an adjacent pair keeps every real route, including chains reached through a destructured debug or diagnosticSelection, without claiming every same-named property in the closure."
+        },
         "prohibitedWritesNote": "Reading is permitted \u2014 the runner persists detailed.debug.passes. Writing, replacing or reconstructing these is how a filtered or reordered population would be smuggled in.",
         "acrossTheCompleteClosure": [
           "exactly one call to acquireProductionBrandEvidence exists",
@@ -248,7 +273,23 @@
           "a bare candidate array (Amendment 8 and earlier)",
           "a caller-supplied FieldSelection (Amendment 9): a filtered population could be wrapped in a freshly constructed selection",
           "a caller-supplied ExtractionDebug (Amendment 10): a helper could filter or reorder the passes and reconstruct matching selections"
-        ]
+        ],
+        "symbolResolvedNotNameMatched": true,
+        "symbolResolvedNotNameMatchedNote": "The previous version matched callee NAMES. It could be satisfied by a local function coincidentally named acquireProductionBrandEvidence, by importing that name from an unreviewed module, and evaded by calling a prohibited function through an alias or a namespace import. It also could not tell whether the required call was awaited or what it was passed. A name is not evidence of a binding.",
+        "frozenPathsNotCallerSelectable": {
+          "runnerEntry": "scripts/eval/issue-149-brand-evidence-acquisition-run.ts",
+          "authorizedAdapterModule": "scripts/eval/lib/issue-149-candidate-adapter.ts",
+          "note": "The adapterModulePath override is removed. A gate whose authorized module the caller chooses authorizes whatever the caller points it at."
+        },
+        "requiredCallShape": {
+          "importedFromTheAuthorizedAdapterModule": true,
+          "notTypeOnly": true,
+          "notLocallyShadowed": true,
+          "awaited": true,
+          "argumentIsTheFrozenExtractionInputIdentifier": true,
+          "exactlyOnce": true,
+          "onlyInTheRunnerEntrypoint": true
+        }
       }
     }
   },

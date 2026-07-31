@@ -2,7 +2,7 @@
   "artifact": "candidate-decision-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-11.md",
+  "amendedBy": "preregistration-amendment-12.md",
   "sourceOfTruthForShape": "BrandCandidateDiagnostic in src/pipeline/extractor/field-selection.ts at PR #220 merge commit 546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "entryPoint": "selectBrandObservationWithCompleteFilterDiagnostics",

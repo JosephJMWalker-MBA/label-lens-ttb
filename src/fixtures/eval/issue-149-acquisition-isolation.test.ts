@@ -255,11 +255,19 @@ describe("Issue #149 acquisition identity and isolation", () => {
           return;
         }
         const report = analyzeStage2SourceClosure({
-          runnerEntryPath: present[0],
-          files: present.map((file) => ({
-            path: file,
-            contents: readFileSync(path.join(process.cwd(), file), "utf8"),
-          })),
+          files: [
+            {
+              path: "scripts/eval/lib/issue-149-candidate-adapter.ts",
+              contents: readFileSync(
+                path.join(process.cwd(), "scripts/eval/lib/issue-149-candidate-adapter.ts"),
+                "utf8",
+              ),
+            },
+            ...present.map((file) => ({
+              path: file,
+              contents: readFileSync(path.join(process.cwd(), file), "utf8"),
+            })),
+          ],
         });
         expect(report.violations).toEqual([]);
       });
@@ -281,14 +289,17 @@ describe("Issue #149 acquisition identity and isolation", () => {
       it("does not require every closure file to invoke the acquisition API", () => {
         // A hashing helper is legitimate Stage 2 source and must pass.
         const report = analyzeStage2SourceClosure({
-          runnerEntryPath: "runner.ts",
           files: [
             {
-              path: "runner.ts",
-              contents:
-                'import { acquireProductionBrandEvidence } from "./adapter";\nconst e = await acquireProductionBrandEvidence(input);',
+              path: "scripts/eval/lib/issue-149-candidate-adapter.ts",
+              contents: "export async function acquireProductionBrandEvidence(i) { return i; }",
             },
-            { path: "hash.ts", contents: "export const sha = (b) => digest(b);" },
+            {
+              path: "scripts/eval/issue-149-brand-evidence-acquisition-run.ts",
+              contents:
+                'import { acquireProductionBrandEvidence } from "./lib/issue-149-candidate-adapter";\nexport const go = async (input) => await acquireProductionBrandEvidence(input);',
+            },
+            { path: "scripts/eval/lib/hash.ts", contents: "export const sha = (b) => digest(b);" },
           ],
         });
         expect(report.violations).toEqual([]);

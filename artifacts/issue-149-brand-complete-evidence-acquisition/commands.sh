@@ -51,6 +51,13 @@ npx vitest run \
 # Verify the whole Stage 1 contract package, not just the preregistration.
 node scripts/eval/issue-149-stage-1-contract-manifest.mjs --verify
 
+# Verify the governed package's working-tree state. The mode is an explicit
+# argument and is never inferred from how dirty the tree is: `--local` permits an
+# amendment diff confined to the package, `--clean` permits nothing at all. CI
+# runs `--clean` from the `posttest` lifecycle, AFTER the full suite. This is
+# ordinary repository CI hygiene, not an acquisition workflow.
+node scripts/eval/issue-149-stage-1-working-tree.mjs --local
+
 # Verify the frozen preregistration.
 ( cd "${ART}" && shasum -a 256 -c preregistration.sha256 )
 
@@ -89,11 +96,20 @@ shasum -a 256 "${ART}/runtime/truth-key-inventory.json"
 # (Its name is quoted here only to prove its absence.)
 ! ls "src/fixtures/eval/issue-149-candidate-canonical.ts" 2>/dev/null
 
-# The one public Brand evidence API: it takes the complete ExtractionDebug and
-# derives the diagnostic selection, the parity assertion and the candidate
-# population internally. Its runtime namespace exports exactly two names.
-node -e 'import("./scripts/eval/lib/issue-149-candidate-adapter.ts").catch(()=>{}); console.log("finalizeProductionBrandEvidence(debug, opaqueItemId)")'
-grep -c "export function finalizeProductionBrandEvidence" scripts/eval/lib/issue-149-candidate-adapter.ts
+# The one public Brand evidence API. `acquireProductionBrandEvidence` takes an
+# ExtractionInput, copies it into a deeply frozen snapshot before its first
+# await, calls extractLabelEvidenceDetailed itself, and derives the diagnostic
+# selection and candidate population from the returned ExtractionDebug. The
+# caller never holds the debug, and never holds a mutable input the extractor
+# will later read.
+#
+# grep -c exits 1 on no match, which would kill this script under `set -e`, so
+# each count is captured and printed rather than left as the command's status.
+ADAPTER=scripts/eval/lib/issue-149-candidate-adapter.ts
+echo "public API: $(grep -c 'export async function acquireProductionBrandEvidence' "${ADAPTER}" || true)"
+echo "snapshot before first await: $(grep -c 'const snapshot = snapshotAcquisitionInput(input);' "${ADAPTER}" || true)"
+echo "no finalize* public entrypoint: $(grep -c 'export function finalizeProductionBrandEvidence' "${ADAPTER}" || true)"
+shasum -a 256 "${ADAPTER}"
 
 # The merged PR #220 capability this amendment consumes.
 shasum -a 256 src/pipeline/extractor/field-selection.ts

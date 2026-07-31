@@ -1,0 +1,76 @@
+{
+  "artifact": "amendment-12-linkage",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "amendment": 12,
+  "record": "preregistration-amendment-12.md",
+  "priorHead": "198cb370bfd5c436b62bda64dd1e5ffdd40810dd",
+  "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+  "title": "Immutable acquisition input, symbol-resolved source closure, and executable Stage 1 command verification",
+  "defectsClosed": [
+    {
+      "defect": "the canonical Stage 1 command script was stale and failed under set -e",
+      "detail": "commands.sh described a finalizeProductionBrandEvidence(debug, opaqueItemId) API that no longer exists and ended with grep -c for that removed symbol; grep -c exits 1 on no match, so the script terminated on its second-to-last command after printing a false description of the API.",
+      "correction": "the block now prints counts describing the real acquireProductionBrandEvidence API, each captured in a command substitution guarded with || true; working-tree verification added; the whole script runs to completion",
+      "provenBy": ["artifacts/issue-149-brand-complete-evidence-acquisition/commands.sh"]
+    },
+    {
+      "defect": "the caller still owned a mutable ExtractionInput across the await",
+      "detail": "the caller's object was passed straight to extractLabelEvidenceDetailed, so between the call and the extractor's first read the caller could change imageBytes, artifactRef, derivativeSha256 or any frozen identity. Freezing the caller's object in place would not have fixed it: a frozen alias is still the caller's object, and accessors already installed would still be live.",
+      "correction": "snapshotAcquisitionInput validates and copies synchronously before the first await into a closed, deeply frozen snapshot; accessors are rejected; imageBytes is copied; frozen identities are checked against incumbent-configuration-freeze.json",
+      "haltCodes": ["MALFORMED_EXTRACTION_INPUT", "EXTRACTION_INPUT_IDENTITY_MISMATCH"],
+      "provenBy": ["src/fixtures/eval/issue-149-acquisition-orchestration.test.ts"]
+    },
+    {
+      "defect": "the closure analyzer did not resolve bindings",
+      "detail": "it matched callee names, so a local function with the authorized name satisfied it, an import of that name from an unreviewed module satisfied it, and an alias or namespace call evaded it. It could not tell whether the required call was awaited or what it was passed. The adapterModulePath override let the caller nominate the authorized module.",
+      "correction": "a ts.Program is built over the supplied closure and every callee is resolved through the file's import bindings and the checker; RUNNER_ENTRY_PATH and AUTHORIZED_ADAPTER_MODULE are frozen constants and the path parameters are removed",
+      "provenBy": ["src/fixtures/eval/issue-149-stage2-source-closure.test.ts"]
+    },
+    {
+      "defect": "protected-evidence mutation detection was wrong in both directions",
+      "detail": "it covered plain dotted assignment only, missing bracket, compound and destructuring assignment, delete, Object.assign, Reflect.set and every mutating array method; and its single-name protected set falsely rejected unrelated objects with a property called passes or candidates.",
+      "correction": "all those forms are detected, and protection is anchored on adjacent property pairs rather than single names",
+      "provenBy": ["src/fixtures/eval/issue-149-stage2-source-closure.test.ts"]
+    },
+    {
+      "defect": "the clean-CI check inferred its own regime and ran inside the suite",
+      "detail": "a nonempty porcelain status was read as 'an amendment must be in progress', so anything that dirtied the tree also switched the check into its lenient branch and the strict form could never fail. It also could not observe what the suite left behind.",
+      "correction": "scripts/eval/issue-149-stage-1-working-tree.mjs takes an explicit --clean/--local mode (or --mode-from-env, which reads the environment, never the tree), runs the contract-manifest verification first, and is wired to npm's posttest lifecycle so clean mode runs after the full suite",
+      "haltCodes": [
+        "STAGE_1_WORKING_TREE_MODE_NOT_SPECIFIED",
+        "STAGE_1_WORKING_TREE_MODE_AMBIGUOUS",
+        "STAGE_1_CONTRACT_MANIFEST_UNVERIFIED",
+        "STAGE_1_GOVERNED_PACKAGE_DIRTY",
+        "STAGE_1_MODIFICATION_OUTSIDE_GOVERNED_PACKAGE",
+        "STAGE_1_UNACCOUNTED_UNTRACKED_ARTIFACT"
+      ],
+      "isOrdinaryRepositoryCiHygiene": true,
+      "isNotAnAcquisitionWorkflow": true,
+      "provenBy": ["src/fixtures/eval/issue-149-generated-artifact-reproducibility.test.ts"]
+    }
+  ],
+  "theRepeatedFailureMode": {
+    "statement": "Each review has found that the named route was closed while an adjacent one stayed open, and that several tests asserted the SHAPE of correctness rather than exercising it.",
+    "instances": [
+      "bare candidate array -> wrapped FieldSelection -> constructed ExtractionDebug -> mutable ExtractionInput",
+      "callee name matched -> local function, wrong module, alias, namespace",
+      "dotted assignment detected -> bracket, compound, delete, Object.assign, Reflect.set, array methods",
+      "strict porcelain assertion added -> disarmed by the very dirtiness it was meant to catch"
+    ],
+    "structuralFixPattern": "delete the alternative rather than prohibit it by convention, and drive the real function rather than restate what it does"
+  },
+  "notStarted": [
+    "Stage 2 Job A",
+    "discovery",
+    "execute mode",
+    "governed 115-case acquisition OCR",
+    "runtime bundle build",
+    "truth-free preparation artifact",
+    "acquisition runner",
+    "acquisition workflow",
+    "workflow-mode file"
+  ],
+  "productionRuntimeBehaviourChanged": false,
+  "ocrRun": false
+}
