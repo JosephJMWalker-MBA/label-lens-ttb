@@ -1,0 +1,121 @@
+{
+  "artifact": "filter-reason-combinations",
+  "experimentId": "issue-149-brand-candidate-construction-filter-decomposition",
+  "combinations": [
+    {
+      "combination": "too-many-words",
+      "reasonCount": 1,
+      "isSoleReason": true,
+      "historicalCases": 17,
+      "distinctBrandIdentities": 14,
+      "cases": [
+        "approved-wine-006",
+        "approved-wine-012",
+        "approved-wine-016",
+        "approved-wine-018",
+        "approved-wine-024",
+        "approved-wine-038",
+        "approved-wine-042",
+        "approved-wine-045",
+        "approved-wine-048",
+        "approved-wine-052",
+        "approved-wine-076",
+        "approved-wine-093",
+        "approved-wine-094",
+        "approved-wine-099",
+        "approved-wine-103",
+        "approved-wine-110",
+        "m-cellars-baseline"
+      ]
+    },
+    {
+      "combination": "producer-line",
+      "reasonCount": 1,
+      "isSoleReason": true,
+      "historicalCases": 6,
+      "distinctBrandIdentities": 3,
+      "cases": [
+        "approved-wine-063",
+        "approved-wine-064",
+        "approved-wine-065",
+        "approved-wine-066",
+        "approved-wine-067",
+        "wine-multi-artifact-08"
+      ]
+    },
+    {
+      "combination": "non-brand-keyword",
+      "reasonCount": 1,
+      "isSoleReason": true,
+      "historicalCases": 4,
+      "distinctBrandIdentities": 3,
+      "cases": ["luigi-giovanni-live", "alfredos-wine", "approved-wine-105", "approved-wine-106"]
+    },
+    {
+      "combination": "domain-like",
+      "reasonCount": 1,
+      "isSoleReason": true,
+      "historicalCases": 3,
+      "distinctBrandIdentities": 3,
+      "cases": ["approved-wine-072", "approved-wine-090", "wine-multi-artifact-05"]
+    },
+    {
+      "combination": "sentence-fragment + too-many-words",
+      "reasonCount": 2,
+      "isSoleReason": false,
+      "historicalCases": 2,
+      "distinctBrandIdentities": 2,
+      "cases": ["approved-wine-008", "approved-wine-037"]
+    },
+    {
+      "combination": "sentence-fragment",
+      "reasonCount": 1,
+      "isSoleReason": true,
+      "historicalCases": 2,
+      "distinctBrandIdentities": 2,
+      "cases": ["approved-wine-046", "amuninni-ferracane"]
+    },
+    {
+      "combination": "non-brand-keyword + too-many-words",
+      "reasonCount": 2,
+      "isSoleReason": false,
+      "historicalCases": 2,
+      "distinctBrandIdentities": 2,
+      "cases": ["approved-wine-051", "approved-wine-078"]
+    },
+    {
+      "combination": "domain-like + producer-line",
+      "reasonCount": 2,
+      "isSoleReason": false,
+      "historicalCases": 2,
+      "distinctBrandIdentities": 1,
+      "cases": ["approved-wine-088", "approved-wine-089"]
+    },
+    {
+      "combination": "domain-like + too-many-words",
+      "reasonCount": 2,
+      "isSoleReason": false,
+      "historicalCases": 1,
+      "distinctBrandIdentities": 1,
+      "cases": ["approved-wine-009"]
+    },
+    {
+      "combination": "domain-like + producer-line + too-many-words",
+      "reasonCount": 3,
+      "isSoleReason": false,
+      "historicalCases": 1,
+      "distinctBrandIdentities": 1,
+      "cases": ["patricia-green-cellars"]
+    },
+    {
+      "combination": "domain-like + sentence-fragment",
+      "reasonCount": 2,
+      "isSoleReason": false,
+      "historicalCases": 1,
+      "distinctBrandIdentities": 1,
+      "cases": ["approved-wine-084"]
+    }
+  ],
+  "everyFilterRejectionCaseAppearsInExactlyOneCombination": true,
+  "doubleCountingPrevented": true
+}

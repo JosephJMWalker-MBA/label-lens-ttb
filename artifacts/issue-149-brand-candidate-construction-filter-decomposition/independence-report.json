@@ -1,0 +1,46 @@
+{
+  "artifact": "independence-report",
+  "experimentId": "issue-149-brand-candidate-construction-filter-decomposition",
+  "frozenCases": 44,
+  "distinctBrandIdentitiesInFrozenSet": 34,
+  "distinctSourceImages": 44,
+  "proxyCaveat": "Distinct brand identity is the acceptable-truth-value set. It is a duplication control, not a measurement of visual-design diversity, and it is carried forward from PR #217 with the same caveat.",
+  "repeatedIdentities": [
+    {
+      "brandIdentity": "luigi & giovanni",
+      "caseCount": 2,
+      "cases": ["luigi-giovanni-live", "approved-wine-105"]
+    },
+    {
+      "brandIdentity": "vino alpino",
+      "caseCount": 2,
+      "cases": ["approved-wine-008", "approved-wine-009"]
+    },
+    {
+      "brandIdentity": "cooley bay",
+      "caseCount": 2,
+      "cases": ["approved-wine-012", "approved-wine-110"]
+    },
+    {
+      "brandIdentity": "prinsi",
+      "caseCount": 3,
+      "cases": ["approved-wine-063", "approved-wine-064", "approved-wine-065"]
+    },
+    {
+      "brandIdentity": "domaine juliette avril",
+      "caseCount": 2,
+      "cases": ["approved-wine-066", "approved-wine-067"]
+    },
+    {
+      "brandIdentity": "la mesma",
+      "caseCount": 3,
+      "cases": ["approved-wine-088", "approved-wine-089", "approved-wine-090"]
+    },
+    {
+      "brandIdentity": "fontanavecchia",
+      "caseCount": 3,
+      "cases": ["approved-wine-093", "approved-wine-094", "approved-wine-099"]
+    }
+  ],
+  "countingRule": "A repeated brand identity counts once at identity level."
+}

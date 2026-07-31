@@ -1,0 +1,52 @@
+{
+  "artifact": "stage-classification-definitions",
+  "experimentId": "issue-149-brand-candidate-construction-filter-decomposition",
+  "frozenBeforeScoring": true,
+  "mutuallyExclusive": true,
+  "appliedTopDownFirstMatchWins": true,
+  "umbrellaLabelUsedAsResult": false,
+  "vocabulary": [
+    {
+      "classification": "EVIDENCE_CONTRADICTION",
+      "definition": "Committed fields disagree in a way that prevents reliable stage attribution.",
+      "predicate": "truthOnReconstructedLine is true, the truth is absent from the retained reconstructed lines, AND the retained line list is known to be complete (below the 12-line cap)",
+      "completenessRequirement": "A disagreement on a list that may be truncated is recorded as unverifiable, not as a contradiction."
+    },
+    {
+      "classification": "LINE_RECONSTRUCTION_LOSS",
+      "definition": "truthInRawOcr is true but truthOnReconstructedLine is false.",
+      "predicate": "!truthOnReconstructedLine"
+    },
+    {
+      "classification": "CANDIDATE_FORMATION_LOSS",
+      "definition": "Truth appears on a reconstructed line but no truth-bearing candidate object or window is formed.",
+      "predicate": "truthOnReconstructedLine && truthFilterReasons.length === 0",
+      "evidenceBasis": "No rejected candidate decision carries the truth, so no truth-bearing candidate object appears to have been formed."
+    },
+    {
+      "classification": "FILTER_REJECTION",
+      "definition": "A truth-bearing candidate is formed but rejected by one or more current filters and does not enter the kept candidate set.",
+      "predicate": "truthOnReconstructedLine && truthFilterReasons.length > 0",
+      "evidenceBasis": "truthFilterReasons is derived from brandCandidateDecisions.filter(!kept && matchesTruth), so a non-empty value proves a truth-bearing candidate object existed and was rejected."
+    },
+    {
+      "classification": "UNATTRIBUTABLE_WITH_COMMITTED_EVIDENCE",
+      "definition": "No earlier classification can be established honestly.",
+      "predicate": "no earlier clause matched"
+    }
+  ],
+  "precedence": [
+    "EVIDENCE_CONTRADICTION",
+    "LINE_RECONSTRUCTION_LOSS",
+    "CANDIDATE_FORMATION_LOSS",
+    "FILTER_REJECTION",
+    "UNATTRIBUTABLE_WITH_COMMITTED_EVIDENCE"
+  ],
+  "precedenceNote": "The brief lists CANDIDATE_FORMATION_LOSS before FILTER_REJECTION. The two are disjoint by construction here — a case has either zero recorded truth-rejection reasons or at least one — so the order between them cannot change any result.",
+  "fieldNotUsedAsFormationSignal": {
+    "field": "truthReachedCandidate",
+    "committedAs": "diagnostics.brandCandidateContainsAcceptable",
+    "computedOver": "kept candidates only, per src/fixtures/eval/eval-harness.ts:332",
+    "consequence": "It is a synonym for truthAmongKeptCandidates and carries no information about candidate-object formation. Observed values across all 115 cases are (false,false) x78 and (true,true) x37, never (true,false). It is reported per case and is not used to classify."
+  }
+}

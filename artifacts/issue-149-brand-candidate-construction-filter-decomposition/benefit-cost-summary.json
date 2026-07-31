@@ -1,0 +1,50 @@
+{
+  "artifact": "benefit-cost-summary",
+  "experimentId": "issue-149-brand-candidate-construction-filter-decomposition",
+  "costEvidenceComplete": false,
+  "counterfactualPerformed": false,
+  "benefitOnlyFiguresPublishedAsRecoverable": false,
+  "benefitSideUpperBound": [
+    {
+      "filterReason": "too-many-words",
+      "maximumHistoricalCasesRecoverableUnderAOneRuleRemoval": 17,
+      "maximumDistinctBrandIdentities": 14,
+      "isAnUpperBoundNotAnEstimate": "It assumes every sole-blocked truth candidate, once kept, would also survive ranking, selection and the unchanged authority gate. None of that is computed here, so the real recovery is at most this and probably less.",
+      "costUnknown": true
+    },
+    {
+      "filterReason": "producer-line",
+      "maximumHistoricalCasesRecoverableUnderAOneRuleRemoval": 6,
+      "maximumDistinctBrandIdentities": 3,
+      "isAnUpperBoundNotAnEstimate": "It assumes every sole-blocked truth candidate, once kept, would also survive ranking, selection and the unchanged authority gate. None of that is computed here, so the real recovery is at most this and probably less.",
+      "costUnknown": true
+    },
+    {
+      "filterReason": "non-brand-keyword",
+      "maximumHistoricalCasesRecoverableUnderAOneRuleRemoval": 4,
+      "maximumDistinctBrandIdentities": 3,
+      "isAnUpperBoundNotAnEstimate": "It assumes every sole-blocked truth candidate, once kept, would also survive ranking, selection and the unchanged authority gate. None of that is computed here, so the real recovery is at most this and probably less.",
+      "costUnknown": true
+    },
+    {
+      "filterReason": "domain-like",
+      "maximumHistoricalCasesRecoverableUnderAOneRuleRemoval": 3,
+      "maximumDistinctBrandIdentities": 3,
+      "isAnUpperBoundNotAnEstimate": "It assumes every sole-blocked truth candidate, once kept, would also survive ranking, selection and the unchanged authority gate. None of that is computed here, so the real recovery is at most this and probably less.",
+      "costUnknown": true
+    },
+    {
+      "filterReason": "sentence-fragment",
+      "maximumHistoricalCasesRecoverableUnderAOneRuleRemoval": 2,
+      "maximumDistinctBrandIdentities": 2,
+      "isAnUpperBoundNotAnEstimate": "It assumes every sole-blocked truth candidate, once kept, would also survive ranking, selection and the unchanged authority gate. None of that is computed here, so the real recovery is at most this and probably less.",
+      "costUnknown": true
+    }
+  ],
+  "costSideStatus": "NOT COMPUTED. Non-truth candidate exposure, displacement of currently-correct top-1 and selected values, Brand-absent case exposure and candidate-volume growth are all uncomputable from committed evidence.",
+  "priorArt": {
+    "note": "Two treatments targeting the largest sole blocker have already been simulated and killed. This sprint does not reinterpret them; it records that the largest upside category is not an open question.",
+    "e1a": "too-many-words sub-span generation — KILLED. 17 of 23 targeted cases recovered truth as a kept candidate, but 8 of 10 Brand-absent cases emitted a value, 2 wrong values reached OBSERVED, and 12 currently-correct selections broke.",
+    "e1b": "the same, gated by production's prominence-eligibility rule — KILLED in Phase 1, and recorded as closing the brand sub-span-generation family."
+  }
+}
