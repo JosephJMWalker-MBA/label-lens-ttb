@@ -32,7 +32,7 @@
     {
       "field": "filtersRejectingEachTruthBearingCandidate",
       "from": "the complete activeRejectionReasons array recorded against each truth-matching rejected candidate",
-      "limitation": "None remaining from the ladder. Merged PR #220 records every rule that would reject a candidate, so the set of rules that would ALSO have fired is now derivable."
+      "limitation": "None remaining from the ladder: merged PR #220 records every rule that would reject a candidate. A one-filter counterfactual is still not answered by those reasons alone, because candidates are constructed from the passes; it is answered by a separately governed zero-OCR replay of the persisted complete ordered RegionOcrResult array, which is not performed here."
     },
     {
       "field": "truthRank",
@@ -84,5 +84,52 @@
     "treating the diagnostic selection rather than debug.finalSelections as the behavioural authority"
   ],
   "expectedUseOfTheResult": "A later, separately preregistered zero-OCR study may use this evidence. This sprint does not perform, design or recommend that study's treatment.",
-  "amendedBy": "preregistration-amendment-2.md"
+  "amendedBy": "preregistration-amendment-4.md",
+  "actorsAndBoundaries": {
+    "actor1_ocrWorkflowJob": {
+      "permissions": "contents: read",
+      "receivesGovernedTruth": false,
+      "receivesTheIdMap": false,
+      "commitsToGit": false,
+      "endsAfter": "uploading the complete lossless evidence artifact at every size AND verifying its digest",
+      "mayNotProceedTo": "Git commitment or post-freeze evaluation, under any circumstances"
+    },
+    "actor2_postRunCommitProcess": {
+      "authorization": "explicit owner authorization, separate from the OCR run",
+      "isNotTheOcrProcess": true,
+      "appliesWhen": "total evidence footprint is at or below 100 MB",
+      "steps": [
+        "download the workflow artifact",
+        "verify the artifact digest",
+        "verify BOTH raw manifests (primary and repeat) and their aggregates",
+        "commit the immutable raw evidence to PR #219",
+        "STOP for review"
+      ],
+      "receivesGovernedTruth": false,
+      "receivesTheIdMap": false,
+      "whyNot": "The truth boundary is crossed only after the raw evidence is frozen AND committed. A process that could both write evidence and read truth could, in principle, let truth influence what was written."
+    },
+    "actor3_postFreezeEvaluationProcess": {
+      "authorization": "separate authorization again, after actor 2 stops for review",
+      "isTheOnlyActorThatMayOpen": [
+        "artifacts/issue-149-brand-complete-evidence-acquisition/post-freeze/id-map.json",
+        "the governed Brand truth",
+        "acceptable Brand values",
+        "prior per-case classifications and PR #217/#218 records"
+      ],
+      "preconditions": [
+        "both raw manifests verify",
+        "the raw evidence is committed and immutable",
+        "the truth-isolation scan passed during acquisition"
+      ],
+      "mayNotModify": "any raw evidence file, for any reason"
+    },
+    "above100MB": {
+      "actor1Still": "uploads and verifies the complete lossless artifact",
+      "thenStopsBefore": ["Git commitment", "post-freeze truth evaluation"],
+      "requires": "an explicit owner decision about durable archival before anything continues",
+      "actor2AndActor3DoNotRun": true
+    }
+  },
+  "truthBoundaryLocation": "Between actor 2 and actor 3. Not between the OCR job and its own output, and not inside the OCR workflow at all \u2014 the OCR workflow never holds truth to begin with."
 }

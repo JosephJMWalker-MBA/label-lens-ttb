@@ -2,7 +2,7 @@
   "artifact": "acquisition-invocation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-3.md",
+  "amendedBy": "preregistration-amendment-4.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "route": "direct call to extractLabelEvidenceDetailed",
   "prohibitedRoute": {
@@ -11,10 +11,15 @@
       "runCase",
       "loadCaseImage",
       "buildCaseReport",
-      "diagnosticsFor"
+      "diagnosticsFor",
+      "EvalCase"
     ],
     "modules": [
       "src/fixtures/eval/**",
+      "src/fixtures/**",
+      "tests/**",
+      "artifacts/**",
+      "src/domain/rules/**",
       "any EvalCase-based adapter",
       "any truth module",
       "any metrics module",
@@ -55,6 +60,7 @@
     "src/pipeline/extractor/field-selection",
     "src/pipeline/extractor/ocr-engine",
     "src/pipeline/extractor/regions",
+    "scripts/eval/lib/issue-149-evidence-canonical",
     "node builtins"
   ],
   "prohibitedImportPrefixes": [
@@ -70,12 +76,22 @@
       "scripts/eval/issue-149-brand-evidence-acquisition-run.ts",
       "scripts/eval/issue-149-brand-evidence-acquisition-run.mjs"
     ],
-    "note": "Neither file exists yet. The test asserts the prohibition against whichever of them exists, so the rule binds the moment Stage 2 adds one."
+    "note": "Neither file exists yet. The test asserts the prohibition against whichever of them exists, so the rule binds the moment Stage 2 adds one.",
+    "transitiveClosureOwnedBy": "phase 1 trusted host preparation; see acquisition-runtime-isolation-contract.json#runtimeBundle.dependencyClosureGate. The Stage 1 test is first-order source inspection only and is explicitly not a transitive proof.",
+    "explicitlyPermittedDespitePrefixRules": ["scripts/eval/lib/issue-149-evidence-canonical"]
   },
   "haltCodes": {
     "STAGED_IMAGE_INTEGRITY_FAILURE": "staged bytes or SHA-256 disagree with the truth-free manifest",
     "PROHIBITED_ACQUISITION_IMPORT": "an acquisition-route script imports the evaluation harness or a governed truth module"
   },
   "identitiesFrozenNotRediscovered": true,
-  "identitiesFrozenNote": "Every ExtractionInput identity now has an exact value in incumbent-configuration-freeze.json. Stage 2 reads them; it does not invent or rediscover any of them."
+  "identitiesFrozenNote": "Every ExtractionInput identity now has an exact value in incumbent-configuration-freeze.json. Stage 2 reads them; it does not invent or rediscover any of them.",
+  "canonicalHelperImport": {
+    "path": "scripts/eval/lib/issue-149-evidence-canonical.ts",
+    "required": true,
+    "why": "The runner must use the frozen reference implementation of canonicalization, the complete-record schema and the fingerprints rather than reimplementing them, because a second implementation could drift.",
+    "priorContradiction": "Amendment 3 required the runner to use the helper while it lived at src/fixtures/eval/issue-149-candidate-canonical.ts, which the same contract and the implemented guard both prohibited importing. The helper is moved rather than the prohibition weakened.",
+    "importsNothingProhibited": "the helper imports only node:crypto",
+    "canonicalizationVersionUnchanged": "issue-149-candidate-canonical-v1 names the frozen algorithm, not the file path, so the version string is deliberately not renamed by the move"
+  }
 }

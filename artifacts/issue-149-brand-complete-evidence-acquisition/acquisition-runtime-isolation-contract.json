@@ -2,7 +2,7 @@
   "artifact": "acquisition-runtime-isolation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-3.md",
+  "amendedBy": "preregistration-amendment-4.md",
   "status": "CONTRACT FROZEN. Not implemented in this amendment.",
   "whyThisExists": {
     "correction": "The Stage 1 isolation tests are STATIC manifest, path and import validation. They read committed planning artifacts and assert their shape. They are NOT runtime proof, and this contract stops them being described as such.",
@@ -63,8 +63,53 @@
     "builtWithUnrestrictedRepositoryCopyNote": "A blanket COPY of the repository is prohibited: it would place .git, artifacts/, fixtures and the eval manifest inside the boundary and silently defeat every isolation claim above.",
     "bundleManifest": {
       "required": true,
-      "contents": "every bundled path with its SHA-256",
-      "verifiedIn": "discover mode, before execute is authorized"
+      "contents": "every SOURCE input path and every EMITTED path, each with its SHA-256, plus the build command, tool version and metafile digest",
+      "verifiedIn": "generated and verified in phase 1 trusted host preparation; re-verified against the mounted bundle in isolated discover"
+    },
+    "dependencyClosureGate": {
+      "why": "The Stage 1 source guard inspects only the two runner files. A runner could import an apparently innocuous helper that itself imports fixtures or a truth-bearing module. First-order source inspection cannot see that; a dependency closure can.",
+      "ownedBy": "phase 1 trusted host preparation. Isolated discover verifies the resulting bundle and manifest, but does not and cannot own the transitive proof.",
+      "required": true,
+      "mustGenerate": "a complete dependency closure \u2014 a bundler metafile or an equivalent full module graph \u2014 enumerating EVERY source module that contributed to the built runtime, transitively, not only the runner's first-order imports",
+      "failIfAnyTransitiveSourceInputIsUnderOrDerivedFrom": [
+        "src/fixtures/**",
+        "tests/**",
+        "artifacts/**",
+        "src/domain/rules/**",
+        "the eval manifest",
+        "governed truth",
+        "prior per-case reports"
+      ],
+      "sourceMapsAndEmbeddedSources": {
+        "embeddedSourceContentFromProhibitedPathsPermitted": false,
+        "why": "A source map with inlined sourcesContent would carry prohibited file contents into the bundle even though no prohibited path appears in the emitted graph.",
+        "rule": "either emit no source maps, or emit them with sourcesContent stripped and prove no prohibited path appears in the sources array"
+      },
+      "bundleManifestMustRecord": [
+        "every SOURCE input path with its SHA-256",
+        "every EMITTED runtime path with its SHA-256",
+        "the exact build command",
+        "the exact build tool name and version",
+        "the SHA-256 of the dependency graph / metafile itself"
+      ],
+      "preIsolationBundleScan": {
+        "runsIn": "phase 1, on the BUILT bundle, before anything is mounted",
+        "scansFor": [
+          "historical case IDs",
+          "historical fixture paths",
+          "prohibited truth-bearing JSON keys"
+        ],
+        "doesNotScanFor": "legitimate Brand strings in OCR or candidate evidence",
+        "whyNot": "A transcript may naturally contain the Brand text. That is evidence, not leakage, and checking it would require opening a truth file before the truth boundary.",
+        "haltCode": "BUNDLE_PROHIBITED_CONTENT"
+      },
+      "haltCodes": {
+        "BUNDLE_PROHIBITED_DEPENDENCY": "a transitive source input resolves under a prohibited path",
+        "BUNDLE_MANIFEST_INCOMPLETE": "a source or emitted path is missing from the manifest, or the metafile digest does not match",
+        "BUNDLE_PROHIBITED_CONTENT": "the pre-isolation scan found a historical identifier, fixture path or truth-bearing key"
+      },
+      "directRunnerGuardStillApplies": true,
+      "directRunnerGuardIsNotTransitive": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts inspects the runner sources only. It is a useful first-order gate and is explicitly not a transitive proof."
     }
   },
   "discoverModeGate": {
@@ -128,7 +173,10 @@
         "run the freeze/staging script",
         "verify the source images and the post-freeze id map",
         "build the allowlisted runtime bundle WITHOUT an unrestricted repository COPY",
-        "write the runtime bundle manifest with a per-path SHA-256",
+        "generate the complete dependency closure / metafile for every runtime input module",
+        "fail closed on any transitive source input under a prohibited path",
+        "write the runtime bundle manifest: source paths, emitted paths, per-path SHA-256, build command, tool version, metafile digest",
+        "scan the BUILT bundle for historical case IDs, historical fixture paths and prohibited truth-bearing keys",
         "prepare an initially empty output directory"
       ],
       "hasAccessTo": "the repository checkout, artifacts, fixtures and the post-freeze id map, because preparation legitimately needs them"
@@ -146,7 +194,7 @@
         "the original source image paths"
       ],
       "mustVerify": [
-        "the runtime bundle manifest",
+        "the runtime bundle manifest, including that every mounted emitted path matches its recorded SHA-256",
         "the truth-free manifest",
         "staged opaque image hashes and byte sizes",
         "the environment allowlist",
@@ -164,7 +212,8 @@
         "reading fixtures",
         "reading post-freeze/id-map.json"
       ],
-      "checksMovedToPhase1Note": "These require files that do not exist inside the boundary. Claiming they run inside the container would be false."
+      "checksMovedToPhase1Note": "These require files that do not exist inside the boundary. Claiming they run inside the container would be false.",
+      "doesNotOwn": "the transitive dependency proof. It can confirm the bundle it was given matches the manifest; it cannot reconstruct how that bundle was built."
     },
     "discoverStopsForOwnerReviewBeforeExecute": true
   }

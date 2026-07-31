@@ -2,7 +2,7 @@
   "artifact": "region-ocr-result-replay-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-3.md",
+  "amendedBy": "preregistration-amendment-4.md",
   "purpose": "Freeze the complete RegionOcrResult persistence that makes a later zero-OCR selector replay possible. This is what actually underwrites capability 3; complete rejection reasons alone do not.",
   "whyRejectionReasonsAloneAreInsufficient": [
     "a rejected span returns from analyzeBrandSpan BEFORE a Candidate object is constructed",
@@ -39,12 +39,12 @@
     "perPass": [
       "emitted word count equals words.length",
       "rawWordCount and discardedWordCount are persisted as produced, never recomputed",
-      "a canonical per-pass fingerprint is computed over the complete persisted pass record"
+      "a SEMANTIC per-pass fingerprint is computed over the complete persisted pass record with timings removed"
     ],
     "perCase": [
       "the emitted pass count equals debug.passes.length",
       "pass order matches debug.passes order exactly",
-      "a canonical fingerprint is computed over the COMPLETE ORDERED pass array"
+      "a SEMANTIC fingerprint is computed over the COMPLETE ORDERED pass array with timings removed from each pass"
     ],
     "canonicalization": "issue-149-candidate-canonical-v1, the same algorithm used for candidate records",
     "haltCodes": {
@@ -52,5 +52,11 @@
       "PASS_ORDER_MISMATCH": "persisted pass order differs from debug.passes order"
     }
   },
-  "implementedInThisAmendment": false
+  "implementedInThisAmendment": false,
+  "timingsCorrection": {
+    "priorDefect": "Amendment 3 required a canonical fingerprint over the COMPLETE pass record including timings, while determinism-rules.json required exact fingerprint agreement between the primary and repeat runs. performance.now() timings differ by construction, so that pair guaranteed a nondeterminism verdict on every run.",
+    "resolution": "timings are PERSISTED in full for completeness and covered by the artifact integrity hashes, but are EXCLUDED from every semantic fingerprint and from the determinism equality gate. See determinism-rules.json.",
+    "timingsAreStillPersisted": true,
+    "timingsExcludedFromSemanticFingerprintsOnly": true
+  }
 }

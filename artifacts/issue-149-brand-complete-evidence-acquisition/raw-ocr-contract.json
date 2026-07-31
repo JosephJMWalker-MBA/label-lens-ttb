@@ -14,7 +14,9 @@
   "perPassFields": {
     "opaqueItemId": {
       "available": true,
-      "value": "the opaque item identifier; the schema field is NOT named caseId"
+      "derived": true,
+      "value": "the opaque item identifier; the schema field is NOT named caseId",
+      "note": "MANIFEST-SOURCED. Not a field of RegionOcrResult."
     },
     "passId": {
       "available": true,
@@ -28,7 +30,9 @@
     },
     "role": {
       "available": true,
-      "derivedFrom": "passKind plus triggerReasons; primary vs recovery"
+      "derived": true,
+      "derivedFrom": "passKind plus triggerReasons; primary vs recovery",
+      "note": "DERIVED by the acquisition. Not a field of RegionOcrResult."
     },
     "triggerReasons": {
       "available": true
@@ -38,11 +42,9 @@
     },
     "sourceImageSha256": {
       "available": true,
-      "source": "the frozen truth-free input manifest"
-    },
-    "cropPixelSha256": {
-      "available": true,
-      "note": "Computed by this acquisition over the preprocessed PNG buffer handed to the engine. It is an observation of an existing byte stream, not a change to preprocessing."
+      "derived": true,
+      "source": "the frozen truth-free input manifest",
+      "note": "MANIFEST-SOURCED. Not a field of RegionOcrResult."
     },
     "cropGeometry": {
       "available": true,
@@ -56,16 +58,16 @@
       "available": true,
       "source": "incumbent-configuration-freeze.json plus pass pageSegMode"
     },
-    "warningsAndErrors": {
-      "available": true
-    },
     "passLatency": {
       "available": true,
       "source": "OcrPassTimings: preprocessMs, ocrMs, inverseMappingMs, totalMs"
     },
     "passOutputFingerprint": {
       "available": true,
-      "computedAs": "sha256 of canonical JSON over the ordered word records"
+      "renamedTo": "orderedWordsOnlyFingerprint",
+      "computedAs": "sha256 of canonical JSON over the ordered word records ONLY",
+      "isNotTheSemanticPassFingerprint": true,
+      "why": "It covers words alone. Amendment 4 defines a COMPLETE semantic pass fingerprint over every RegionOcrResult field except timings, and the two must never be confused. See determinism-rules.json."
     }
   },
   "perWordFields": {
@@ -117,8 +119,39 @@
     "truthFilterReasons",
     "expectedBrand"
   ],
-  "amendedBy": "preregistration-amendment-3.md",
+  "amendedBy": "preregistration-amendment-4.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "historicalNote": "Amendment 1 described this evidence as reachable through runCaseArtifacts. That route is prohibited from Amendment 2 onward.",
-  "completeRegionOcrResultPersistence": "Every RegionOcrResult field is persisted exactly; see region-ocr-result-replay-contract.json. The per-pass field list here is explanatory and is not a licence to persist a subset."
+  "completeRegionOcrResultPersistence": "Every RegionOcrResult field is persisted exactly; see region-ocr-result-replay-contract.json. The per-pass field list here is explanatory and is not a licence to persist a subset.",
+  "unavailableThroughTheFrozenInterface": {
+    "cropPixelSha256": {
+      "available": false,
+      "priorClaim": "Amendment 3 and earlier promised the SHA-256 of the preprocessed PNG buffer actually handed to the engine.",
+      "whyWrong": "runOcrPass (src/pipeline/extractor/regions.ts:610) builds that PNG inside a private preprocess() call, passes it to engine.recognizeWords, and returns only the 13-field RegionOcrResult. The buffer is never exposed on debug.",
+      "notReplacedBy": "a separately reconstructed crop. Re-running preprocessing outside production would be a SECOND implementation; hashing its output and calling it cropPixelSha256 would mislabel a different byte stream as the original.",
+      "wouldRequire": "a production instrumentation change, which this sprint forbids",
+      "recordedAs": "unavailable, with this reason"
+    },
+    "warningsAndErrors": {
+      "available": false,
+      "priorClaim": "Amendment 3 and earlier listed a per-pass warnings/errors array.",
+      "whyWrong": "RegionOcrResult carries no warning or error field. runOcrPass reports failures by THROWING (PREPROCESSING_FAILED, OCR_PASS_FAILED, OCR_PASS_MAPPING_FAILED) through the optional diagnostics trace, which the acquisition does not pass. A thrown pass produces no pass record at all.",
+      "recordedAs": "unavailable, with this reason",
+      "replacedBy": "item-level typed failure evidence; see itemLevelFailureEvidence"
+    }
+  },
+  "itemLevelFailureEvidence": {
+    "sourceOfTruthForShape": "the Result<DetailedExtractionResult, ExtractionError> returned by extractLabelEvidenceDetailed; ExtractionError is { code, message, issues } at src/pipeline/extractor/extractor.types.ts:57",
+    "persistedOnFailure": {
+      "opaqueItemId": "string, manifest-sourced",
+      "sourceImageSha256": "string, manifest-sourced",
+      "errorCode": "ExtractionError.code",
+      "errorMessage": "ExtractionError.message",
+      "issues": "ExtractionError.issues, array order preserved"
+    },
+    "noInventedDebug": "No partial debug object may be synthesised after an extractor failure. A failed item has no pass array, no lines and no candidates, and none may be fabricated.",
+    "noSelectiveRetry": "A failed item is never retried, in whole or in part.",
+    "verdict": "A case-level extraction failure produces the preregistered RUNTIME_FAILURE or INCOMPLETE_EVIDENCE verdict per determinism-rules.json. It is never quietly dropped from the population."
+  },
+  "derivedVersusTypeFields": "Fields marked derived:true or manifest-sourced are computed by the acquisition or copied from the truth-free manifest. They are labelled as such so no reader mistakes them for properties of RegionOcrResult. The authoritative field list of RegionOcrResult is region-ocr-result-replay-contract.json."
 }

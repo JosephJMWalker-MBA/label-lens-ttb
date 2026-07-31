@@ -16,11 +16,16 @@ const ROOT = "artifacts/issue-149-brand-complete-evidence-acquisition";
 const MANIFEST = path.join(ROOT, "stage-1-contract-manifest.sha256");
 const FREEZE_SCRIPT = "scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs";
 const MANIFEST_SCRIPT = "scripts/eval/issue-149-stage-1-contract-manifest.mjs";
+/**
+ * The canonical helper lives under `scripts/eval/lib/` rather than
+ * `src/fixtures/`, because the Stage 2 runner must import it and is prohibited
+ * from importing anything under `src/fixtures/**`.
+ */
+const CANONICAL_LIB = "scripts/eval/lib/issue-149-evidence-canonical.ts";
 const STAGE_1_TESTS = [
   "src/fixtures/eval/issue-149-acquisition-isolation.test.ts",
-  "src/fixtures/eval/issue-149-candidate-canonical.ts",
-  "src/fixtures/eval/issue-149-candidate-fingerprint.test.ts",
   "src/fixtures/eval/issue-149-contract-consistency.test.ts",
+  "src/fixtures/eval/issue-149-evidence-canonical.test.ts",
   "src/fixtures/eval/issue-149-stage-1-manifest.test.ts",
 ];
 
@@ -36,7 +41,7 @@ function walk(dir) {
 /** Every governed file, in sorted path order, manifest itself excluded. */
 export function stage1Files() {
   const governed = walk(ROOT).filter((f) => f !== MANIFEST);
-  return [...governed, FREEZE_SCRIPT, MANIFEST_SCRIPT, ...STAGE_1_TESTS].sort();
+  return [...governed, FREEZE_SCRIPT, MANIFEST_SCRIPT, CANONICAL_LIB, ...STAGE_1_TESTS].sort();
 }
 
 export function stage1Entries() {

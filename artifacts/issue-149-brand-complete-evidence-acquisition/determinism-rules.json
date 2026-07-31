@@ -8,12 +8,12 @@
       "compare": "sourceImageSha256 and byte size"
     },
     {
-      "level": "crop pixels",
-      "compare": "cropPixelSha256 per pass"
-    },
-    {
       "level": "OCR words",
       "compare": "ordered word records: text, rawConfidence, bbox, originalGeometry"
+    },
+    {
+      "level": "complete pass records",
+      "compare": "every RegionOcrResult field except timings, in pass order"
     },
     {
       "level": "reconstructed lines",
@@ -21,7 +21,7 @@
     },
     {
       "level": "candidate decisions",
-      "compare": "the complete ordered candidate array, field by field, including rejected candidates, the authoritative filterReason, and the COMPLETE filterChecks and activeRejectionReasons arrays compared element by element"
+      "compare": "the complete ordered candidate array, field by field, including rejected candidates, the authoritative filterReason, the complete ranking object, regionName, and the COMPLETE filterChecks and activeRejectionReasons arrays compared element by element"
     },
     {
       "level": "ranking order",
@@ -36,8 +36,8 @@
       "compare": "final state and abstention reason per case"
     },
     {
-      "level": "fingerprints",
-      "compare": "per-pass and per-case output fingerprints"
+      "level": "semantic fingerprints",
+      "compare": "the semantic per-pass and semantic ordered-pass-array fingerprints, which exclude timings"
     },
     {
       "level": "candidate identity",
@@ -64,12 +64,13 @@
         "no truncation at any level",
         "truth isolation passes",
         "all required fields present",
-        "primary and repeat evidence match exactly at every comparison level"
+        "primary and repeat evidence match exactly at every SEMANTIC comparison level"
       ]
     },
     {
       "verdict": "COMPLETE_WITH_NONDETERMINISM",
-      "when": "evidence is complete and truth-isolated, but one or more primary/repeat records differ"
+      "when": "evidence is complete and truth-isolated, but one or more primary/repeat records differ at a SEMANTIC comparison level",
+      "notTriggeredBy": "a difference confined to timings or run metadata"
     },
     {
       "verdict": "INCOMPLETE_EVIDENCE",
@@ -85,5 +86,54 @@
     }
   ],
   "verdictComputedNotAsserted": true,
-  "amendedBy": "preregistration-amendment-2.md"
+  "amendedBy": "preregistration-amendment-4.md",
+  "threeSeparateConcepts": {
+    "fullArtifactIntegrity": {
+      "covers": "every persisted byte of every raw file and manifest, INCLUDING timings and run metadata",
+      "computedAs": "sha256 over the file bytes, plus an aggregate over the sorted manifest lines",
+      "proves": "immutability of what was written",
+      "expectedToMatchBetweenPrimaryAndRepeat": false,
+      "why": "Two runs legitimately differ in timings and run metadata. An integrity hash that matched across runs would mean the second run had not been recorded independently."
+    },
+    "semanticPassFingerprint": {
+      "computedOver": "the complete RegionOcrResult record",
+      "excludesExactly": ["timings"],
+      "includesEveryOtherField": [
+        "passId",
+        "regionName",
+        "passKind",
+        "triggerReasons",
+        "preprocessing",
+        "fieldEligibility",
+        "transform",
+        "transformedSize",
+        "pageSegMode",
+        "rawWordCount",
+        "discardedWordCount",
+        "words"
+      ],
+      "arrayOrderPreserved": true,
+      "canonicalization": "issue-149-candidate-canonical-v1"
+    },
+    "semanticOrderedPassArrayFingerprint": {
+      "computedOver": "the complete ordered pass array after removing timings from each pass",
+      "arrayOrderPreserved": true,
+      "why": "Production selects over the pass array in order; a reordered replay is a different experiment."
+    }
+  },
+  "excludedFromTheSemanticEqualityGate": {
+    "timings": ["preprocessMs", "ocrMs", "inverseMappingMs", "totalMs"],
+    "runMetadata": [
+      "wall-clock start and end",
+      "workflow run ID",
+      "artifact ID",
+      "artifact expiration",
+      "runner and host identity"
+    ],
+    "why": "These are provenance and telemetry, not OCR output. A difference in any of them says nothing about whether the recognizer produced the same result.",
+    "stillPersistedInFull": true,
+    "stillComparedAndReported": true,
+    "butNeverAloneAVerdict": "A difference confined to timings or run metadata must NOT produce COMPLETE_WITH_NONDETERMINISM. It is reported descriptively."
+  },
+  "cropPixelComparisonRemoved": "The 'crop pixels' level compared cropPixelSha256 per pass. That value is not obtainable through the frozen production interface; see raw-ocr-contract.json#unavailableThroughTheFrozenInterface."
 }

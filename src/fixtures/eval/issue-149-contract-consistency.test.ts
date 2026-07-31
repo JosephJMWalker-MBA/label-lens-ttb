@@ -5,10 +5,12 @@
  * superseded design. Historical amendment records are allowed to contain the old
  * language, because that is their job.
  */
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 
 import { describe, expect, it } from "vitest";
+
+import { CANDIDATE_EVIDENCE_REQUIRED_KEYS } from "../../../scripts/eval/lib/issue-149-evidence-canonical";
 
 const ROOT = "artifacts/issue-149-brand-complete-evidence-acquisition";
 
@@ -17,9 +19,12 @@ const HISTORICAL_FILES = new Set([
   "preregistration-amendment.md",
   "preregistration-amendment-2.md",
   "preregistration-amendment-3.md",
+  "preregistration-amendment-4.md",
+  "branch-pointer-incident.md",
   "amendment-linkage.json",
   "amendment-2-linkage.json",
   "amendment-3-linkage.json",
+  "amendment-4-linkage.json",
   "git-sha.txt",
 ]);
 
@@ -66,6 +71,22 @@ const STALE_TERMS = [
   "twenty-one compared fields",
   "21-field allowlist",
   "contents: write",
+  // Superseded by Amendment 4. These are CONCEPTS, not only the exact old
+  // sentences: each phrase below is a distinct way the package used to state a
+  // conclusion that is no longer true.
+  "2026-01-01T00:00:00.000Z",
+  "authoritativeFilterReason",
+  "module-local and unexported",
+  "cannot be re-evaluated offline",
+  "most consequential limitation",
+  "remains an upper bound",
+  "still *an upper bound*",
+  "The harness consumes",
+  "The harness does not recompute",
+  "moved from partial to satisfied",
+  "satisfied only because PR #220 merged",
+  'amendedBy": "preregistration-amendment-2',
+  "src/fixtures/eval/issue-149-candidate-canonical",
 ];
 
 const read = (p: string): unknown => JSON.parse(readFileSync(path.join(process.cwd(), p), "utf8"));
@@ -267,6 +288,222 @@ describe("Issue #149 Stage 1 contract consistency", () => {
       expect(invocation.extractionInputBinding.sellerRegionTargets).toBe("omitted");
       expect(invocation.extractionInputBinding.diagnostics).toBe("omitted");
     });
+  });
+
+  describe("exactly one processedAt value", () => {
+    const FROZEN = "2026-07-12T00:00:00Z";
+
+    it("declares the frozen literal once and contradicts it nowhere", () => {
+      const incumbent = read(path.join(ROOT, "incumbent-configuration-freeze.json")) as {
+        extractionInputIdentities: { processedAt: string };
+        fixedProcessedAt: string;
+      };
+      expect(incumbent.extractionInputIdentities.processedAt).toBe(FROZEN);
+      // The former top-level literal is gone; the key now points at the one
+      // authoritative value rather than carrying a second, different one.
+      expect(incumbent.fixedProcessedAt).not.toMatch(/\d{4}-\d{2}-\d{2}T/);
+      expect(incumbent.fixedProcessedAt).toContain("extractionInputIdentities.processedAt");
+    });
+
+    it("contains no ISO timestamp other than the frozen literal in any current contract", () => {
+      // A recursive scan, because Amendment 3's tests only inspected the nested
+      // value and the contradicting top-level literal passed CI unnoticed.
+      const ISO = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z/g;
+      const offences: string[] = [];
+      for (const file of files) {
+        if (HISTORICAL_FILES.has(path.basename(file))) continue;
+        const text = readFileSync(path.join(process.cwd(), file), "utf8");
+        for (const match of text.match(ISO) ?? []) {
+          if (match !== FROZEN) offences.push(`${file} — ${match}`);
+        }
+      }
+      expect(offences).toEqual([]);
+    });
+
+    it("resolves every current processedAt declaration to the one literal", () => {
+      const declarations: string[] = [];
+      const walkFor = (value: unknown, file: string): void => {
+        if (Array.isArray(value)) {
+          value.forEach((entry) => walkFor(entry, file));
+          return;
+        }
+        if (value === null || typeof value !== "object") return;
+        for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+          if (/^processedAt$/i.test(key) && typeof child === "string") declarations.push(child);
+          walkFor(child, file);
+        }
+      };
+      for (const file of files.filter((f) => f.endsWith(".json"))) {
+        if (HISTORICAL_FILES.has(path.basename(file))) continue;
+        walkFor(read(file), file);
+      }
+      expect(declarations.length).toBeGreaterThan(0);
+      // A declaration may add a source pointer, but every timestamp it names
+      // must be the one frozen literal.
+      for (const declaration of declarations) {
+        const stamps = declaration.match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z/g) ?? [];
+        expect(stamps).toEqual([FROZEN]);
+      }
+    });
+  });
+
+  it("keeps the canonical helper outside src/fixtures and permits the runner to import it", () => {
+    const invocation = read(path.join(ROOT, "acquisition-invocation-contract.json")) as {
+      permittedImports: string[];
+      prohibitedImportPrefixes: string[];
+      canonicalHelperImport: { path: string; required: boolean };
+    };
+    expect(invocation.canonicalHelperImport.path).toBe(
+      "scripts/eval/lib/issue-149-evidence-canonical.ts",
+    );
+    expect(invocation.canonicalHelperImport.required).toBe(true);
+    expect(invocation.permittedImports).toContain("scripts/eval/lib/issue-149-evidence-canonical");
+    // The helper must not sit under any prefix the same contract prohibits.
+    for (const prefix of invocation.prohibitedImportPrefixes) {
+      expect(invocation.canonicalHelperImport.path.startsWith(prefix)).toBe(false);
+    }
+    expect(existsSync(path.join(process.cwd(), invocation.canonicalHelperImport.path))).toBe(true);
+    expect(
+      existsSync(path.join(process.cwd(), "src/fixtures/eval/issue-149-candidate-canonical.ts")),
+    ).toBe(false);
+  });
+
+  it("names every required own property of a candidate evidence record", () => {
+    const decision = read(path.join(ROOT, "candidate-decision-contract.json")) as {
+      requiredOwnPropertiesBeforeFinalization: string[];
+      perCandidatePersisted: Record<string, string>;
+    };
+    const required = decision.requiredOwnPropertiesBeforeFinalization;
+    expect(new Set(required)).toEqual(new Set(CANDIDATE_EVIDENCE_REQUIRED_KEYS));
+    // The contract and the implementation must agree, or the schema is decorative.
+    expect(required).toContain("regionName");
+    expect(required).toContain("ranking");
+    expect(required).toContain("filterReason");
+    expect(required as string[]).not.toContain("authoritativeFilterReason");
+    for (const key of required) {
+      expect(Object.hasOwn(decision.perCandidatePersisted, key)).toBe(true);
+    }
+  });
+
+  it("removes evidence fields unavailable through the frozen interface", () => {
+    const raw = read(path.join(ROOT, "raw-ocr-contract.json")) as {
+      perPassFields: Record<string, unknown>;
+      unavailableThroughTheFrozenInterface: Record<string, { available: boolean }>;
+      itemLevelFailureEvidence: { persistedOnFailure: Record<string, string> };
+    };
+    for (const gone of ["cropPixelSha256", "warningsAndErrors"]) {
+      expect(Object.hasOwn(raw.perPassFields, gone)).toBe(false);
+      expect(raw.unavailableThroughTheFrozenInterface[gone].available).toBe(false);
+    }
+    for (const key of [
+      "opaqueItemId",
+      "sourceImageSha256",
+      "errorCode",
+      "errorMessage",
+      "issues",
+    ]) {
+      expect(Object.hasOwn(raw.itemLevelFailureEvidence.persistedOnFailure, key)).toBe(true);
+    }
+  });
+
+  it("separates artifact integrity from semantic determinism", () => {
+    const determinism = read(path.join(ROOT, "determinism-rules.json")) as {
+      threeSeparateConcepts: {
+        fullArtifactIntegrity: { expectedToMatchBetweenPrimaryAndRepeat: boolean };
+        semanticPassFingerprint: { excludesExactly: string[] };
+      };
+      excludedFromTheSemanticEqualityGate: { timings: string[]; runMetadata: string[] };
+    };
+    expect(
+      determinism.threeSeparateConcepts.fullArtifactIntegrity
+        .expectedToMatchBetweenPrimaryAndRepeat,
+    ).toBe(false);
+    expect(determinism.threeSeparateConcepts.semanticPassFingerprint.excludesExactly).toEqual([
+      "timings",
+    ]);
+    expect(determinism.excludedFromTheSemanticEqualityGate.runMetadata.length).toBeGreaterThan(0);
+  });
+
+  it("owns the transitive dependency proof in host preparation, not in discovery", () => {
+    const isolation = read(path.join(ROOT, "acquisition-runtime-isolation-contract.json")) as {
+      runtimeBundle: {
+        dependencyClosureGate: {
+          required: boolean;
+          ownedBy: string;
+          failIfAnyTransitiveSourceInputIsUnderOrDerivedFrom: string[];
+          sourceMapsAndEmbeddedSources: {
+            embeddedSourceContentFromProhibitedPathsPermitted: boolean;
+          };
+        };
+      };
+    };
+    const gate = isolation.runtimeBundle.dependencyClosureGate;
+    expect(gate.required).toBe(true);
+    expect(gate.ownedBy).toContain("phase 1");
+    expect(
+      gate.sourceMapsAndEmbeddedSources.embeddedSourceContentFromProhibitedPathsPermitted,
+    ).toBe(false);
+    for (const prohibited of [
+      "src/fixtures/**",
+      "tests/**",
+      "artifacts/**",
+      "src/domain/rules/**",
+    ]) {
+      expect(gate.failIfAnyTransitiveSourceInputIsUnderOrDerivedFrom).toContain(prohibited);
+    }
+  });
+
+  it("names the post-freeze actors and where the truth boundary sits", () => {
+    const plan = read(path.join(ROOT, "post-freeze-evaluation-plan.json")) as {
+      actorsAndBoundaries: {
+        actor1_ocrWorkflowJob: { commitsToGit: boolean; receivesGovernedTruth: boolean };
+        actor2_postRunCommitProcess: {
+          isNotTheOcrProcess: boolean;
+          receivesGovernedTruth: boolean;
+        };
+        actor3_postFreezeEvaluationProcess: { isTheOnlyActorThatMayOpen: string[] };
+      };
+    };
+    const actors = plan.actorsAndBoundaries;
+    expect(actors.actor1_ocrWorkflowJob.commitsToGit).toBe(false);
+    expect(actors.actor1_ocrWorkflowJob.receivesGovernedTruth).toBe(false);
+    expect(actors.actor2_postRunCommitProcess.isNotTheOcrProcess).toBe(true);
+    expect(actors.actor2_postRunCommitProcess.receivesGovernedTruth).toBe(false);
+    expect(actors.actor3_postFreezeEvaluationProcess.isTheOnlyActorThatMayOpen.join(" ")).toContain(
+      "id-map.json",
+    );
+  });
+
+  it("keeps host-only steps out of the isolated discovery description", () => {
+    const workflow = readFileSync(path.join(process.cwd(), ROOT, "workflow-plan.md"), "utf8");
+    const discover = workflow.slice(
+      workflow.indexOf("## Mode `discover`"),
+      workflow.indexOf("## Mode `execute`"),
+    );
+    expect(discover.length).toBeGreaterThan(0);
+    // The prohibition is stated inside the discover section; the steps must not
+    // then perform the thing prohibited.
+    expect(discover).toContain("Inside isolated discovery, do not");
+    expect(discover).toContain("exactly four experiment-controlled data mounts");
+    const steps = discover.slice(discover.indexOf("verify only what is actually mounted"));
+    for (const hostOnly of [
+      "re-run the freeze script",
+      "preregistration.sha256",
+      "post-freeze/id-map.json",
+    ]) {
+      expect(steps).not.toContain(hostOnly);
+    }
+  });
+
+  it("records the branch-pointer incident as an audit event", () => {
+    const incident = readFileSync(
+      path.join(process.cwd(), ROOT, "branch-pointer-incident.md"),
+      "utf8",
+    );
+    expect(incident).toContain("8b36245ec0eb7df68bc2812614d1c10d4a475baa");
+    expect(incident).toContain("HEAD:<remote-branch>");
+    expect(incident).toContain("No commit was lost");
+    expect(incident).toContain("audit event, not an experimental result");
   });
 
   it("uses retention-bound language for the 100 MB fallback", () => {

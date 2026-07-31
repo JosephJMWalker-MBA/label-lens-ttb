@@ -27,7 +27,7 @@ node -e 'const m=require("./artifacts/issue-149-brand-complete-evidence-acquisit
 npx vitest run \
   src/fixtures/eval/issue-149-acquisition-isolation.test.ts \
   src/fixtures/eval/issue-149-contract-consistency.test.ts \
-  src/fixtures/eval/issue-149-candidate-fingerprint.test.ts \
+  src/fixtures/eval/issue-149-evidence-canonical.test.ts \
   src/fixtures/eval/issue-149-stage-1-manifest.test.ts
 
 # Verify the whole Stage 1 contract package, not just the preregistration.
@@ -50,6 +50,14 @@ sed -n '72p;75p;304p;415p' src/fixtures/eval/eval-harness.ts
 # test asserts each one is non-blank and actually occurs in this file.
 sed -n '62,69p' src/fixtures/eval/eval-harness.ts
 
+# Exactly one processedAt literal in the whole current package.
+grep -rho "[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T[0-9:.]*Z" "${ART}" --include="*.json" | sort -u
+
+# The canonical helper the Stage 2 runner must import lives OUTSIDE src/fixtures,
+# because the runner is prohibited from importing anything under src/fixtures/**.
+ls scripts/eval/lib/issue-149-evidence-canonical.ts
+! ls src/fixtures/eval/issue-149-candidate-canonical.ts 2>/dev/null
+
 # The merged PR #220 capability this amendment consumes.
 shasum -a 256 src/pipeline/extractor/field-selection.ts
 grep -c "selectBrandObservationWithCompleteFilterDiagnostics" src/pipeline/extractor/field-selection.ts
@@ -59,3 +67,7 @@ grep -c "selectBrandObservationWithCompleteFilterDiagnostics" src/pipeline/extra
 # are added in Stage 2 behind the push-triggered workflow described in
 # workflow-plan.md, and run only when the committed mode file reads `execute`.
 # No command in this file can start them.
+#
+# Nor is the runtime bundle built here. Its transitive dependency closure, its
+# manifest and its pre-isolation content scan belong to phase 1 trusted host
+# preparation; see acquisition-runtime-isolation-contract.json.

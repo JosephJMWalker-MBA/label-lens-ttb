@@ -61,29 +61,22 @@ expanding, substituting or excluding corpus cases. PR #195 untouched; PRs #214,
 
 ## What the acquisition will and will not be able to record
 
-Three requirements in the brief are **not satisfiable** without a production
-change. They are stated here, before acquisition, rather than discovered
-afterwards:
+Two requirements in the brief are **not satisfiable** without a production
+change, and one is satisfiable only by a later replay. All three are stated here,
+before acquisition, rather than discovered afterwards:
 
 **1. "Every individual filter check" and "every active rejection reason" —
-RESOLVED by merged PR #220.** The text below records the original finding; the
-capability now exists behind an evaluation-only, default-off entry point. Kept
-for provenance, superseded in practice.
+AVAILABLE since merged PR #220.** They are obtained through an evaluation-only,
+default-off entry point that changes no selection behaviour. The old finding —
+that the ladder short-circuits, that only the first rule is observable, and that
+the predicates are module-local and unexported — is preserved only in the
+historical amendment records, because none of it is true at this base.
 
-**Original finding, no longer current:** The Brand filter is a short-circuit `if`-chain
-(`field-selection.ts:1649-1917`) that returns on the first failing rule.
-Production records exactly one `filterReason` per candidate. The checks after it
-are never evaluated, so their results do not exist. Emitting a reason *array*
-would require changing production code.
-
-This has a direct downstream consequence worth stating plainly: **even with
-complete candidate persistence, a one-rule counterfactual remains an upper
-bound.** Removing the recorded reason does not reveal whether the candidate would
-then fail a later rule. A candidate rejected at `producer-line` (rule 1) may or
-may not also be `too-many-words` (rule 4).
-
-The predicates are module-local and unexported, so the missing checks cannot be
-recomputed offline either.
+What remains true, and is a *different* constraint from the one originally
+recorded: a one-filter counterfactual is not answered by rejection reasons alone,
+because candidates are constructed from the passes. It becomes reachable through
+replay of the persisted complete ordered `RegionOcrResult` array, and that replay
+is not performed here.
 
 **2. Word baseline geometry and block/paragraph/line identifiers — not
 available.** `OcrWord` carries `text`, `rawConfidence`, `bbox` and an optional

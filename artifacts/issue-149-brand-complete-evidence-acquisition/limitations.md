@@ -2,25 +2,42 @@
 
 Stage 1: planning and preregistration only. No OCR has run.
 
-## Three requirements cannot be met, and they are named before acquisition
+## What is available, and what genuinely is not
 
-**Every individual filter check, and every active rejection reason per
-candidate.** The Brand filter is a short-circuit `if`-chain that returns on the
-first failing rule, so production records exactly one `filterReason` per
-candidate and the later checks are never evaluated. Their results do not exist to
-be persisted. Emitting a reason array would require changing production code,
-which this sprint forbids, and the predicates are module-local and unexported so
-they cannot be re-evaluated offline either.
+### Complete filter checks — AVAILABLE
 
-**This is the most consequential limitation in the package.** It means the
-evidence this sprint acquires will make a one-filter counterfactual *computable*
-but still *an upper bound*: removing a candidate's recorded reason does not
-reveal whether a later rule would then reject it. PR #218 returned
-`INSUFFICIENT_COST_EVIDENCE` because no rejected candidate was committed at all;
-after this acquisition the cost side becomes measurable for the candidates
-production formed, but the "would another rule have fired?" question stays open.
+Merged PR #220 evaluates all ten ladder rules under an evaluation-only,
+default-off entry point (`selectBrandObservationWithCompleteFilterDiagnostics`)
+and exports `BRAND_FILTER_CHECK_ORDER` and the invariant assertions. For every
+candidate the acquisition records `filterChecks` (all ten rules with whether each
+failed) and `activeRejectionReasons` (every failed rule in ladder order).
 
-Anyone reading a future counterfactual should read it with that caveat attached.
+The earlier statements that the checks were unavailable, that the predicates were
+module-local and unexported, and that this was "the most consequential limitation
+in the package" were true before PR #220 and are false now. They are preserved
+only in the historical amendment records.
+
+### The one-filter counterfactual — SATISFIABLE BY REPLAY, not by reasons
+
+The superseded claim was that unknown *later* rules made a one-filter
+counterfactual an upper bound. That is no longer the binding constraint: every
+rule that would reject a candidate is recorded.
+
+The real constraint is different, and Amendment 3 named it. Rejection reasons say
+why a candidate was rejected; they do not say what the selector would have
+produced under a different filter, because candidates are *constructed from the
+passes*. A rejected span returns from `analyzeBrandSpan` before a `Candidate`
+object exists, so it carries no `brandClass`, no geometry-on-candidate, no score
+and no ranking — and filter outcomes feed forward into line-window and multi-line
+candidate formation.
+
+What makes the counterfactual reachable is the **complete ordered
+`RegionOcrResult` array**, persisted per case
+(`region-ocr-result-replay-contract.json`). A separately governed, zero-OCR
+selector can replay it with exactly one filter changed. **This sprint does not
+run that replay and authorizes no filter change.**
+
+## Requirements that genuinely cannot be met
 
 **Word baseline geometry, and block/paragraph/line identifiers.** `OcrWord`
 carries text, raw confidence, a bounding box and an optional original geometry.

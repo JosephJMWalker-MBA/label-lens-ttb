@@ -5,13 +5,20 @@ Refs Issue #149. **Evidence acquisition only.** Frozen before any OCR runs.
 Base: `origin/main` `546c3f279ce431a1fd8c0203df7a83553ea866ef`, the merge commit
 of PR #220.
 
-**Amended three times, every time before any acquisition OCR.** See
-`preregistration-amendment.md`, `preregistration-amendment-2.md` and
-`preregistration-amendment-3.md`. All earlier plans are preserved, not
-overwritten, and their identities are recorded in `amendment-linkage.json`,
-`amendment-2-linkage.json` and `amendment-3-linkage.json`. **No governed
-acquisition OCR occurred under any earlier plan, and none has occurred under this
-one.**
+**Amended four times, every time before any acquisition OCR.** See
+`preregistration-amendment.md`, `preregistration-amendment-2.md`,
+`preregistration-amendment-3.md` and `preregistration-amendment-4.md`. All
+earlier plans are preserved, not overwritten, and their identities are recorded
+in `amendment-linkage.json`, `amendment-2-linkage.json`,
+`amendment-3-linkage.json` and `amendment-4-linkage.json`. **No governed
+acquisition OCR or discovery occurred under any earlier plan, and none has
+occurred under this one.**
+
+One operational incident is recorded in `branch-pointer-incident.md`: a push used
+a stale local branch as its source refspec, which reset the remote branch and
+briefly closed PR #219. It was corrected within the minute, no commit was lost,
+and no workflow, discovery or acquisition existed at the time. It is an audit
+event, not an experimental result.
 
 This sprint does **not** KEEP or KILL a production change, choose a successor
 treatment, or simulate any filter relaxation. It authorizes no production change.
@@ -82,7 +89,7 @@ No case is expanded, substituted or excluded.
 | Pass planning | `planPrimaryOcrPass` + `planRecoveryOcrPasses`, unchanged triggers |
 | Crop, transform, line reconstruction, candidate construction, filters, ranking, selection, authority | unchanged |
 
-The acquisition harness is authorized to call exactly one non-default entry
+The acquisition is authorized to call exactly one non-default entry
 point: **`selectBrandObservationWithCompleteFilterDiagnostics`**, merged in
 PR #220. It is evaluation-only and changes no selection behaviour. Production
 `selectBrandObservation` remains unchanged and default-off.
@@ -216,12 +223,39 @@ Both runs complete and both raw-evidence manifests are written and hashed
 
 ## Complete raw OCR evidence
 
-Per item and per pass, without sampling or truncation: the **opaque item ID**
-(no schema field anywhere is named `caseId`); pass ID, kind and
-role; source image SHA-256; crop pixel SHA-256; crop geometry; transform and
-orientation; engine configuration; **every raw OCR word** in original order with
-exact text, confidence and bounding box, plus original geometry where the pass
-mapped it; warnings; errors; pass latency; pass output fingerprint.
+Per item and per pass, without sampling or truncation: the complete
+`RegionOcrResult` — all thirteen fields, in emission order — plus two clearly
+labelled non-type fields, the **opaque item ID** and the **source image SHA-256**,
+both manifest-sourced, and one clearly labelled derived field, `role`. No schema
+field anywhere is named `caseId`.
+
+The pass record therefore carries `passId`, `regionName`, `passKind`,
+`triggerReasons`, `preprocessing`, `fieldEligibility`, `transform`,
+`transformedSize`, `pageSegMode`, `rawWordCount`, `discardedWordCount`, `timings`
+and `words` — **every raw OCR word** in original order with exact text,
+confidence and bounding box, plus original geometry where the pass mapped it.
+
+**Two previously promised fields are withdrawn, because they are not reachable
+through the frozen production interface.** `runOcrPass`
+(`src/pipeline/extractor/regions.ts:610`) builds the preprocessed PNG inside a
+private `preprocess()` call, hands it to the engine, and returns only the
+thirteen-field result:
+
+- **`cropPixelSha256`** — the buffer handed to OCR is never exposed on `debug`.
+  It is recorded as unavailable. It is **not** replaced by hashing a separately
+  reconstructed crop: that would be a second implementation of preprocessing, and
+  labelling its output `cropPixelSha256` would present a different byte stream as
+  the original.
+- **per-pass `warnings` and `errors`** — `RegionOcrResult` has no such field.
+  `runOcrPass` reports failure by *throwing*, so a failed pass yields no pass
+  record at all.
+
+In their place, an item-level typed failure record is persisted from the `Result`
+that `extractLabelEvidenceDetailed` returns: `code`, `message`, `issues`, the
+opaque item ID and the source-image SHA-256. **No partial `debug` object is
+invented after an extractor failure, and no failed item is retried, in whole or
+in part.** A case-level failure produces the preregistered `RUNTIME_FAILURE` or
+`INCOMPLETE_EVIDENCE` verdict; it is never quietly dropped from the population.
 
 Every reconstructed Brand line, with no 12-line cap: exact text, cleaned value,
 confidence inputs, reconstruction provenance, kept flag, line reason, ordering.
@@ -269,7 +303,7 @@ The ladder order is `producer-line`, `no-letters-or-too-short`,
 `generic-product-language`, `location-or-appellation`,
 `low-information-fragment`, `sentence-fragment`.
 
-**The harness does not recompute any predicate.** It consumes what PR #220
+**The acquisition does not recompute any predicate.** It consumes what PR #220
 emits, so no second implementation can drift from production. PR #220 enforces
 eight runtime invariants whenever diagnostics are enabled, throwing on the prefix
 `BRAND_FILTER_DIAGNOSTIC_INVARIANT_FAILURE`.
@@ -291,12 +325,49 @@ sorted, array order preserved, undefined object properties omitted, undefined
 array values and non-finite numbers rejected, no separator whitespace, UTF-8
 bytes, lowercase 64-hex digest. Full definition in
 `candidate-fingerprint-contract.json`; reference implementation and tests in
-`src/fixtures/eval/issue-149-candidate-canonical.ts`.
+`scripts/eval/lib/issue-149-evidence-canonical.ts`, deliberately outside
+`src/fixtures/**` so the Stage 2 runner may import it without violating the
+fixtures prohibition.
 
 Asserted: ordinals begin at 0, are contiguous and occur exactly once; candidate
 IDs are unique within each case; the emitted count equals the unprojected
 diagnostic-array count; no record is silently overwritten or deduplicated.
 Halts with `CANDIDATE_ID_COLLISION` or `CANDIDATE_EVIDENCE_TRUNCATED`.
+
+### A complete record is a schema, not a convention
+
+Identity alone is not evidence. `finalizeCandidateRecord` validates the **whole
+record against a frozen schema before it hashes anything**, and refuses to
+finalize otherwise. The twenty-eight required own properties are
+`canonicalizationVersion`, `opaqueItemId`, `candidateOrdinal`,
+`completeCandidateArrayLength`, `rawText`, `cleanedValue`, `confidence`,
+`ocrEvidenceScore`, `ocrConfidence`, `prominence`, `regionName`, `passId`,
+`passKind`, `supportPassIds`, `candidateProvenance`, `assembly`, `lineIndexes`,
+`kept`, `filterReason`, `decision`, `score`, `ranking`, `filterChecks`,
+`activeRejectionReasons`, `rankingEligible`, `rankingScore`, `rankedPosition` and
+`selected`.
+
+Three details matter and were wrong before:
+
+- the field is **`filterReason`**, production's own property name, never a
+  renamed `authoritative…` variant;
+- **`regionName`** is persisted at the top level, not only inside
+  `candidateProvenance`;
+- **`ranking`** is persisted as the complete `AnalyzerCandidateRanking` object —
+  strategy, ordering mode, comparator and score factors — not merely
+  `rankingScore`, because a replay needs the comparator and ordering mode.
+
+Production optionals that are absent are normalized to **explicit `null`**, so
+the canonical key set is identical across every record. Omission is rejected;
+`null` is valid.
+
+Validation runs first, and only then does the acquisition compute
+`canonicalRecordSha256`, attach it, verify it, and attach `stableCandidateId`.
+Halts: `MISSING_REQUIRED_FIELD`, `FIELD_TYPE_MISMATCH`,
+`MALFORMED_OPAQUE_ITEM_ID`, `MALFORMED_CANDIDATE_ORDINAL`,
+`MALFORMED_ARRAY_LENGTH`, `ORDINAL_OUT_OF_RANGE`,
+`WRONG_CANONICALIZATION_VERSION`, `ALREADY_FINALIZED`, `MISSING_DIGEST`,
+`MALFORMED_DIGEST`, `DIGEST_DOES_NOT_MATCH_RECORD`.
 
 ### Evidence volume
 
@@ -327,15 +398,70 @@ before hashing.
 
 ## Repeat comparison and acquisition verdict
 
-Primary and repeat are compared at image and crop hashes, OCR words and geometry,
-reconstructed lines, candidate-decision arrays, ranking order, selected value,
-authority state and fingerprints. **Every difference is reported. No case is
-rerun or repaired.** Under nondeterminism both runs are preserved and neither is
+### Integrity and semantics are separate measurements
+
+**Full artifact integrity** covers every persisted byte, including `timings` and
+run metadata. It proves immutability of what was written, and it is **not**
+expected to match between the primary and repeat runs — two independent runs
+legitimately differ in timings, and an integrity hash that matched across them
+would mean the second run had not been recorded independently.
+
+**Semantic fingerprints** are computed over the complete `RegionOcrResult` with
+exactly one exclusion, `timings`, preserving all array order; and over the
+complete ordered pass array with `timings` removed from each pass. These carry
+the determinism verdict.
+
+This split is a correction. Amendment 3 required a fingerprint over the complete
+pass record *including* timings and simultaneously required exact fingerprint
+agreement between runs. `performance.now()` values differ by construction, so
+that pair guaranteed an apparent-nondeterminism verdict on every possible run.
+
+`timings` and run metadata — wall-clock start and end, workflow run ID, artifact
+ID, artifact expiration, runner and host identity — are **persisted in full and
+compared and reported descriptively**, but a difference confined to them must
+never on its own produce `COMPLETE_WITH_NONDETERMINISM`. They are provenance and
+telemetry, not recognizer output.
+
+The words-only pass digest is renamed `orderedWordsOnlyFingerprint` so it cannot
+be mistaken for the complete semantic pass fingerprint.
+
+Primary and repeat are compared at source-image hashes, OCR words and geometry,
+complete pass records excluding timings, reconstructed lines, candidate-decision
+arrays, ranking order, selected value, authority state, semantic fingerprints and
+candidate identity. **Every difference is reported. No case is rerun or
+repaired.** Under nondeterminism both runs are preserved and neither is
 canonical.
 
 Exactly one verdict, computed from gates rather than asserted:
 `COMPLETE_DETERMINISTIC_EVIDENCE`, `COMPLETE_WITH_NONDETERMINISM`,
 `INCOMPLETE_EVIDENCE`, `TRUTH_ISOLATION_FAILURE` or `RUNTIME_FAILURE`.
+
+## Who does what after the run
+
+The OCR job holds `permissions: contents: read` and therefore **never commits
+anything**. Three actors, in order, each with an explicit boundary:
+
+| # | Actor | May read governed truth? | May commit? |
+| --- | --- | --- | --- |
+| 1 | the OCR workflow job | no | no |
+| 2 | the owner-authorized post-run commit process | no | yes, at or below 100 MB |
+| 3 | the separately authorized post-freeze evaluation | yes | no raw evidence |
+
+Actor 1 ends after uploading the complete lossless evidence artifact **at every
+size** and verifying its digest before any job-local output is deleted.
+
+At or below 100 MB, actor 2 — explicitly **not** the OCR process — downloads the
+artifact, verifies its digest, verifies **both** raw manifests and their
+aggregates, commits the immutable raw evidence to PR #219, and **stops for
+review**. Only then may actor 3 be authorized, and actor 3 is the only actor that
+ever receives `post-freeze/id-map.json` or the governed truth.
+
+Above 100 MB, actor 1 still uploads and verifies, then stops before Git
+commitment and before post-freeze truth evaluation; actors 2 and 3 do not run
+until an explicit owner decision about durable archival.
+
+**The truth boundary sits between actor 2 and actor 3** — not inside the OCR
+workflow, which never holds truth to begin with.
 
 ## Post-freeze evaluation
 

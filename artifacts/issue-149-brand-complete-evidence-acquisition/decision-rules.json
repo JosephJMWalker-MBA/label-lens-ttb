@@ -28,8 +28,8 @@
       "capability2": "expected to be satisfied",
       "capability3": "expected to be SATISFIABLE, because the acquisition preserves the COMPLETE ordered RegionOcrResult array, which a separately governed zero-OCR treatment selector can later replay with exactly one filter changed.",
       "capability4": "expected to be satisfied for displacement and Brand-absent exposure among candidates production actually formed",
-      "statedInAdvanceBecause": "Recording the expected outcome before acquisition prevents a limitation being discovered afterwards and presented as a surprise, or quietly omitted. Capability 3 moved from partial to satisfied only because PR #220 merged, and that change is recorded rather than silently applied.",
-      "capability3PreviousStatement": "HISTORICAL, superseded: the original plan expected capability 3 to be only partially satisfied because the ladder short-circuited and only the first firing rule was observable.",
+      "statedInAdvanceBecause": "Recording the expected outcome before acquisition prevents a limitation being discovered afterwards and presented as a surprise, or quietly omitted. Capability 3 moved from PARTIAL to SATISFIABLE, and the reason is recorded rather than silently applied: it is satisfiable because the complete ordered RegionOcrResult array is persisted for later zero-OCR replay, NOT merely because PR #220 merged.",
+      "capability3PreviousStatement": "HISTORICAL, superseded twice: the original plan expected capability 3 to be only partially satisfied because the ladder short-circuited; Amendment 2 then declared it SATISFIED because PR #220 merged. Both are superseded by the replay rationale below.",
       "capability3RationaleCorrection": "Amendment 2 said capability 3 was satisfied because PR #220 records every rejection rule. That rationale was wrong. Complete rejection reasons are necessary but NOT sufficient: a rejected span returns before a Candidate is built, so it carries no brandClass, geometry-on-candidate, score or ranking, and filter outcomes also change later line-window and multi-line candidate formation. The sufficient condition is complete pass replay; see region-ocr-result-replay-contract.json.",
       "replayIsNotAuthorizedHere": true
     }
@@ -50,6 +50,6 @@
     "choosing a successor treatment",
     "corpus expansion, substitution or exclusion"
   ],
-  "amendedBy": "preregistration-amendment-3.md",
+  "amendedBy": "preregistration-amendment-4.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef"
 }

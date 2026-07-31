@@ -12,7 +12,7 @@
     "raw/<run>/<opaqueItemId>.passes.json": "one record per OCR pass",
     "raw/<run>/<opaqueItemId>.words.jsonl": "one record per OCR word, in original order, across every pass",
     "raw/<run>/<opaqueItemId>.lines.jsonl": "one record per reconstructed Brand line, in emitted order",
-    "raw/<run>/<opaqueItemId>.candidates.jsonl": "one record per Brand candidate decision, kept and rejected, with complete PR #220 diagnostics",
+    "raw/<run>/<opaqueItemId>.candidates.jsonl": "one record per Brand candidate decision, kept and rejected, with complete PR #220 filter diagnostics and the complete evidence record schema in candidate-decision-contract.json",
     "raw/<run>/<opaqueItemId>.selection.json": "final selected value, authority state, abstention reason, complete ranked order",
     "raw/<run>/counts.json": "per-case and per-run counting proof",
     "raw/<run>/raw-evidence-manifest.json": "sha256 of every file above",
@@ -38,7 +38,7 @@
     "block, paragraph and line identifiers \u2014 not present on OcrWord",
     "constituent word IDs per reconstructed line \u2014 not emitted by BrandLineDiagnostic"
   ],
-  "amendedBy": "preregistration-amendment-2.md",
+  "amendedBy": "preregistration-amendment-4.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "everyRawFilenameUsesOpaqueIdOnly": true,
@@ -54,5 +54,8 @@
     ],
     "canonicalizationVersion": "issue-149-candidate-canonical-v1",
     "contract": "candidate-fingerprint-contract.json"
-  }
+  },
+  "candidateRecordSchema": "candidate-decision-contract.json#requiredOwnPropertiesBeforeFinalization; enforced by finalizeCandidateRecord in scripts/eval/lib/issue-149-evidence-canonical.ts",
+  "passRecordSchema": "region-ocr-result-replay-contract.json#persistEveryFieldOfRegionOcrResult",
+  "itemLevelFailureRecords": "raw-ocr-contract.json#itemLevelFailureEvidence"
 }
