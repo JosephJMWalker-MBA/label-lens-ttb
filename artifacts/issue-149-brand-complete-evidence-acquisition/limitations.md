@@ -1,8 +1,10 @@
 # Limitations
 
-Stage 1: planning and preregistration only. No governed 115-case acquisition OCR, acquisition runner OCR, discovery or
-execute-mode OCR has run. The ordinary repository suite continues to run its
-pre-existing bundled-image OCR tests, disclosed separately.
+Stage 1: contract generation and trusted freeze/staging. The Stage 1 trusted freeze/staging generator and its temporary reproducibility
+mode have run. **No Stage 2 Job A workflow, truth-free preparation artifact,
+runtime-bundle build, discovery, execute mode or governed 115-case acquisition
+OCR has run.** The ordinary repository suite continues to run its pre-existing
+bundled-image OCR tests, disclosed separately.
 
 ## What is available, and what genuinely is not
 

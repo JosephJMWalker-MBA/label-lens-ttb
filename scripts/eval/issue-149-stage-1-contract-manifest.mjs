@@ -23,6 +23,8 @@ const MANIFEST_SCRIPT = "scripts/eval/issue-149-stage-1-contract-manifest.mjs";
  */
 const CANONICAL_LIBS = [
   "scripts/eval/lib/issue-149-bundle-scan.ts",
+  "scripts/eval/lib/issue-149-freeze-core.d.mts",
+  "scripts/eval/lib/issue-149-freeze-core.mjs",
   "scripts/eval/lib/issue-149-candidate-adapter.ts",
   "scripts/eval/lib/issue-149-evidence-canonical.ts",
 ];

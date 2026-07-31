@@ -1,7 +1,11 @@
 # Purpose and boundaries
 
 Stage 1, **amended** at base `546c3f279ce431a1fd8c0203df7a83553ea866ef`
-(PR #220 merge). Planning and preregistration only. **No governed 115-case acquisition OCR, acquisition runner OCR, discovery or execute-mode OCR has run. The ordinary repository suite continues to run its pre-existing bundled-image OCR tests, disclosed separately.**, under either the original or the amended plan. See
+(PR #220 merge). Contract generation and trusted freeze/staging. The Stage 1 trusted freeze/staging generator and its temporary reproducibility
+mode have run. **No Stage 2 Job A workflow, truth-free preparation artifact,
+runtime-bundle build, discovery, execute mode or governed 115-case acquisition
+OCR has run.** The ordinary repository suite continues to run its pre-existing
+bundled-image OCR tests, disclosed separately., under either the original or the amended plan. See
 `preregistration-amendment.md`.
 
 ## What this sprint is for

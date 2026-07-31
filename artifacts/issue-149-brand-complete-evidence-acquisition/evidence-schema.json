@@ -32,7 +32,7 @@
     "block, paragraph and line identifiers \u2014 not present on OcrWord",
     "constituent word IDs per reconstructed line \u2014 not emitted by BrandLineDiagnostic"
   ],
-  "amendedBy": "preregistration-amendment-7.md",
+  "amendedBy": "preregistration-amendment-8.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "everyRawFilenameUsesOpaqueIdOnly": true,
@@ -81,5 +81,6 @@
       "recordedAs": "a genuine remaining limitation"
     },
     "doNotCall": "the candidate-record supportPassIds the final post-deduplication support set for every ranked candidate"
-  }
+  },
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run."
 }

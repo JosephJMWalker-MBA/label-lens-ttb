@@ -2,7 +2,7 @@
   "artifact": "candidate-fingerprint-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-7.md",
+  "amendedBy": "preregistration-amendment-8.md",
   "status": "ALGORITHM AND TEST CONTRACT FROZEN. The acquisition is not implemented in this amendment.",
   "canonicalizationVersion": "issue-149-candidate-canonical-v1",
   "preimage": {
@@ -94,7 +94,12 @@
     "a deduplicated real candidate keeps ranking semantics and receives no ranked position",
     "multiple real ranked candidates are ordered by production's comparator, contiguously, with the selected candidate at position 0",
     "the adapter does not order by rankingScore alone",
-    "a comparator tie preserves the original diagnostic-array order"
+    "a comparator tie preserves the original diagnostic-array order",
+    "a kept candidate with null score is rejected",
+    "a kept candidate with null ranking is rejected",
+    "a rejected candidate carrying score is rejected",
+    "a rejected candidate carrying ranking is rejected",
+    "a kept deduplicated candidate retains score and ranking while decision and position are null"
   ],
   "testedBy": "src/fixtures/eval/issue-149-evidence-canonical.test.ts",
   "implementedInThisAmendment": false,

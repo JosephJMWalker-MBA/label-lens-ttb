@@ -25,6 +25,7 @@ const HISTORICAL_FILES = new Set([
   "preregistration-amendment-5.md",
   "preregistration-amendment-6.md",
   "preregistration-amendment-7.md",
+  "preregistration-amendment-8.md",
   "branch-pointer-incident.md",
   "amendment-linkage.json",
   "amendment-2-linkage.json",
@@ -33,6 +34,7 @@ const HISTORICAL_FILES = new Set([
   "amendment-5-linkage.json",
   "amendment-6-linkage.json",
   "amendment-7-linkage.json",
+  "amendment-8-linkage.json",
 ]);
 
 /**
@@ -41,7 +43,7 @@ const HISTORICAL_FILES = new Set([
  * current amendment. Exempting it wholesale is what let it sit at "amendment 2"
  * while the package was at Amendment 4, faithfully hashed by the manifest.
  */
-const CURRENT_AMENDMENT = 7;
+const CURRENT_AMENDMENT = 8;
 
 /**
  * A line may mention a superseded term when it is explicitly marking it as
@@ -609,7 +611,7 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     expect(HISTORICAL_FILES.has("git-sha.txt")).toBe(false);
     expect(gitSha).toContain(`CURRENT — stage 1, amendment ${CURRENT_AMENDMENT}`);
     expect(gitSha.match(/^CURRENT/gm) ?? []).toHaveLength(1);
-    for (const earlier of [1, 2, 3, 4, 5, 6]) {
+    for (const earlier of [1, 2, 3, 4, 5, 6, 7]) {
       expect(gitSha).toContain(`HISTORICAL — amendment ${earlier}`);
     }
     expect(gitSha).toContain("No governed 115-case acquisition OCR");
@@ -632,9 +634,15 @@ describe("Issue #149 Stage 1 contract consistency", () => {
       }
     }
     expect(offences).toEqual([]);
-    const limitations = readFileSync(path.join(process.cwd(), ROOT, "limitations.md"), "utf8");
-    expect(limitations).toContain("No governed 115-case acquisition OCR");
+    // Prose wraps, so these assertions are whitespace-insensitive.
+    const limitations = readFileSync(
+      path.join(process.cwd(), ROOT, "limitations.md"),
+      "utf8",
+    ).replace(/\s+/g, " ");
+    expect(limitations).toContain("governed 115-case acquisition");
     expect(limitations).toContain("pre-existing bundled-image OCR tests");
+    // And it states what HAS run rather than implying nothing has.
+    expect(limitations).toContain("trusted freeze/staging generator");
   });
 
   it("keeps host-only steps out of the isolated discovery description", () => {
@@ -950,6 +958,103 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     expect(commands).toContain(
       "node scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs --check",
     );
+  });
+
+  it("names the complete-array function as the only candidate-emission API", () => {
+    for (const file of [
+      "acquisition-invocation-contract.json",
+      "candidate-decision-contract.json",
+    ]) {
+      const contract = read(path.join(ROOT, file)) as {
+        candidateEmissionApi: {
+          module: string;
+          function: string;
+          oneCallPerCompleteDiagnosticCandidateArray: boolean;
+          callerSuppliedRankedPositionProhibited: boolean;
+          secondMappingOrFinalizationLoopInTheRunnerProhibited: boolean;
+          opaqueItemIdValidatedEvenWhenTheArrayIsEmpty: boolean;
+          prohibitedSymbolsInTheRunner: string[];
+        };
+      };
+      const api = contract.candidateEmissionApi;
+      expect(api.module).toBe("scripts/eval/lib/issue-149-candidate-adapter.ts");
+      expect(api.function).toBe("finalizeProductionCandidateArray");
+      expect(api.oneCallPerCompleteDiagnosticCandidateArray).toBe(true);
+      expect(api.callerSuppliedRankedPositionProhibited).toBe(true);
+      expect(api.secondMappingOrFinalizationLoopInTheRunnerProhibited).toBe(true);
+      expect(api.opaqueItemIdValidatedEvenWhenTheArrayIsEmpty).toBe(true);
+      for (const symbol of [
+        "toCandidateEvidenceRecord",
+        "finalizeProductionCandidate",
+        "finalizeCandidateRecord",
+        "stableCandidateId",
+        "rankedPosition",
+      ]) {
+        expect(api.prohibitedSymbolsInTheRunner).toContain(symbol);
+      }
+    }
+    // And the workflow no longer instructs the runner to bypass it.
+    const workflow = readFileSync(path.join(process.cwd(), ROOT, "workflow-plan.md"), "utf8");
+    const execute = workflow.slice(workflow.indexOf("## Mode `execute`"));
+    expect(execute).toContain("finalizeProductionCandidateArray");
+    expect(execute).toContain("must **not** call `finalizeCandidateRecord`");
+  });
+
+  it("requires complete score and ranking evidence on every kept candidate", () => {
+    const contract = read(path.join(ROOT, "candidate-decision-contract.json")) as {
+      keptCandidateEvidence: {
+        everyKeptCandidate: string[];
+        everyRejectedCandidate: string[];
+        aKeptCandidateMayLackADecision: string;
+        haltCode: string;
+      };
+      haltCodes: Record<string, string>;
+    };
+    const kept = contract.keptCandidateEvidence;
+    expect(kept.everyKeptCandidate.join(" ")).toContain("score is non-null");
+    expect(kept.everyKeptCandidate.join(" ")).toContain("ranking is non-null");
+    expect(kept.everyRejectedCandidate).toContain("score is null");
+    expect(kept.everyRejectedCandidate).toContain("ranking is null");
+    expect(kept.aKeptCandidateMayLackADecision).toContain("deduplication");
+    expect(kept.haltCode).toBe("KEPT_CANDIDATE_EVIDENCE_INCOMPLETE");
+    expect(Object.hasOwn(contract.haltCodes, "KEPT_CANDIDATE_EVIDENCE_INCOMPLETE")).toBe(true);
+  });
+
+  it("states the Stage 1 execution status accurately", () => {
+    // Trusted staging HAS run — it is what produced the committed artifacts.
+    // Claiming otherwise was an audit-language error, not an evidence problem.
+    const expected =
+      "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run.";
+    const contracts = files.filter(
+      (f) => f.endsWith(".json") && !HISTORICAL_FILES.has(path.basename(f)),
+    );
+    const declaring = contracts.filter((f) => {
+      const contract = read(f) as { stage1ExecutionStatus?: string };
+      return contract.stage1ExecutionStatus !== undefined;
+    });
+    expect(declaring.length).toBeGreaterThanOrEqual(10);
+    for (const file of declaring) {
+      const contract = read(file) as { stage1ExecutionStatus: string };
+      expect(contract.stage1ExecutionStatus).toContain(expected);
+      expect(contract.stage1ExecutionStatus).toContain("No Stage 2 Job A workflow");
+    }
+
+    const gitSha = readFileSync(path.join(process.cwd(), ROOT, "git-sha.txt"), "utf8");
+    expect(gitSha).toContain("trusted freeze/staging generator");
+    expect(gitSha).toContain("No Stage 2 Job A workflow");
+
+    const commands = readFileSync(path.join(process.cwd(), ROOT, "commands.sh"), "utf8");
+    expect(commands).toContain("TRUSTED FREEZE/STAGING");
+    expect(commands).not.toContain("planning and preregistration only");
+  });
+
+  it("keeps the freeze core out of the runtime bundle", () => {
+    const core = readFileSync(
+      path.join(process.cwd(), "scripts/eval/lib/issue-149-freeze-core.mjs"),
+      "utf8",
+    );
+    expect(core).toContain("Host-only");
+    expect(core).toContain("never present in Job B");
   });
 
   it("uses retention-bound language for the 100 MB fallback", () => {

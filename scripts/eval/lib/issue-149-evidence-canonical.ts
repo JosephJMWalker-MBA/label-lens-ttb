@@ -748,6 +748,7 @@ export class CandidateRecordError extends Error {
       | "FILTER_LADDER_INVARIANT_VIOLATED"
       | "DERIVED_FIELD_INCONSISTENT"
       | "RANKED_MEMBERSHIP_INCONSISTENT"
+      | "KEPT_CANDIDATE_EVIDENCE_INCOMPLETE"
       | "WRONG_CANONICALIZATION_VERSION"
       | "ALREADY_FINALIZED"
       | "MISSING_DIGEST"
@@ -927,11 +928,51 @@ function assertCandidateInvariants(record: Record<string, unknown>): void {
       `ranked position 0 is production's selected candidate, but decision is ${JSON.stringify(decision)}`,
     );
   }
-  if (record.kept === false && (decision !== null || ranking !== null || rankedPosition !== null)) {
-    throw new CandidateRecordError(
-      "RANKED_MEMBERSHIP_INCONSISTENT",
-      "a rejected candidate returns before a Candidate object exists, so decision, ranking and rankedPosition must all be null",
-    );
+  // ---- kept and rejected candidates carry different complete evidence -------
+  //
+  // Production scores and assigns ranking semantics to EVERY kept candidate
+  // before family reduction and deduplication (field-selection.ts:2536-2543). A
+  // rejected span returns from analyzeBrandSpan before a Candidate object is
+  // constructed, so it can carry none of it.
+  if (record.kept === true) {
+    if (record.score === null) {
+      throw new CandidateRecordError(
+        "KEPT_CANDIDATE_EVIDENCE_INCOMPLETE",
+        "every kept candidate is scored before family reduction, so score may not be null",
+      );
+    }
+    if (ranking === null) {
+      throw new CandidateRecordError(
+        "KEPT_CANDIDATE_EVIDENCE_INCOMPLETE",
+        "every kept candidate receives ranking semantics before family reduction, so ranking may not be null",
+      );
+    }
+    if (record.rankingEligible !== true) {
+      throw new CandidateRecordError(
+        "KEPT_CANDIDATE_EVIDENCE_INCOMPLETE",
+        "a kept candidate always has ranking semantics, so rankingEligible must be true",
+      );
+    }
+  } else {
+    for (const [key, value] of [
+      ["score", record.score],
+      ["ranking", ranking],
+      ["decision", decision],
+      ["rankedPosition", rankedPosition],
+    ] as const) {
+      if (value !== null) {
+        throw new CandidateRecordError(
+          "RANKED_MEMBERSHIP_INCONSISTENT",
+          `a rejected candidate returns before a Candidate object exists, so ${key} must be null`,
+        );
+      }
+    }
+    if (record.rankingEligible !== false || record.selected !== false) {
+      throw new CandidateRecordError(
+        "RANKED_MEMBERSHIP_INCONSISTENT",
+        "a rejected candidate has no ranking semantics and is never selected",
+      );
+    }
   }
 }
 

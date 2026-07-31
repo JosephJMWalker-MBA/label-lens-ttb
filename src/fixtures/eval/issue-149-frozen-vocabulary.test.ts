@@ -38,7 +38,9 @@ import {
   type BrandCandidateScore,
 } from "@/pipeline/extractor/field-selection";
 
-import { toCandidateEvidenceRecord } from "../../../scripts/eval/lib/issue-149-candidate-adapter";
+import { TEST_ONLY_candidateAdapterInternals } from "../../../scripts/eval/lib/issue-149-candidate-adapter";
+
+const { toCandidateEvidenceRecord } = TEST_ONLY_candidateAdapterInternals;
 
 import {
   ANALYZER_CANDIDATE_PROVENANCE_KEYS,

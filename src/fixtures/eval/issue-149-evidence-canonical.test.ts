@@ -572,6 +572,75 @@ describe("Issue #149 closed candidate evidence schema", () => {
     });
   });
 
+  describe("kept and rejected candidates carry different complete evidence", () => {
+    it("requires every kept candidate to carry score and ranking", () => {
+      // Production scores and assigns ranking semantics to every kept candidate
+      // BEFORE family reduction and deduplication, so a kept candidate without
+      // them cannot have come from production.
+      for (const bad of [
+        { score: null },
+        { ranking: null, rankingEligible: false, rankingScore: null },
+      ]) {
+        try {
+          finalizeCandidateRecord(
+            keptRecord({ decision: null, selected: false, rankedPosition: null, ...bad }),
+          );
+          throw new Error("expected a rejection");
+        } catch (error) {
+          expect((error as CandidateRecordError).code).toBe("KEPT_CANDIDATE_EVIDENCE_INCOMPLETE");
+        }
+      }
+
+      // `rankingEligible: false` beside a present ranking is caught earlier, and
+      // more precisely, by the derived-field rule.
+      try {
+        finalizeCandidateRecord(
+          keptRecord({
+            decision: null,
+            selected: false,
+            rankedPosition: null,
+            rankingEligible: false,
+          }),
+        );
+        throw new Error("expected a rejection");
+      } catch (error) {
+        expect((error as CandidateRecordError).code).toBe("DERIVED_FIELD_INCONSISTENT");
+      }
+    });
+
+    it("accepts a kept candidate removed by deduplication", () => {
+      // Complete score and ranking, no decision and no position: exactly what a
+      // candidate eliminated during family reduction or dedup looks like.
+      const deduplicated = keptRecord({ decision: null, selected: false, rankedPosition: null });
+      expect(() => finalizeCandidateRecord(deduplicated)).not.toThrow();
+      expect(deduplicated.score).not.toBeNull();
+      expect(deduplicated.ranking).not.toBeNull();
+      expect(deduplicated.rankingEligible).toBe(true);
+    });
+
+    it("requires every rejected candidate to carry none of it", () => {
+      for (const bad of [
+        { score: keptRecord().score },
+        { ranking: keptRecord().ranking, rankingEligible: true, rankingScore: 12.5 },
+        { rankingEligible: true },
+        { selected: true },
+      ]) {
+        expect(() => finalizeCandidateRecord(record(bad))).toThrow(CandidateRecordError);
+      }
+    });
+
+    it("accepts the baseline rejected record, which carries nothing", () => {
+      const rejected = record();
+      expect(rejected.score).toBeNull();
+      expect(rejected.ranking).toBeNull();
+      expect(rejected.decision).toBeNull();
+      expect(rejected.rankedPosition).toBeNull();
+      expect(rejected.rankingEligible).toBe(false);
+      expect(rejected.selected).toBe(false);
+      expect(() => finalizeCandidateRecord(rejected)).not.toThrow();
+    });
+  });
+
   describe("final ranked membership", () => {
     it("ties rankedPosition to decision, not to the presence of ranking", () => {
       // Production assigns ranking semantics to every scored candidate, then

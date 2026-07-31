@@ -74,7 +74,7 @@
     "a changed pass template, crop geometry or transform",
     "any experimental flag or optional Brand treatment entry point being reachable"
   ],
-  "amendedBy": "preregistration-amendment-7.md",
+  "amendedBy": "preregistration-amendment-8.md",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "historicalNote": "The original plan and Amendment 1 routed acquisition through runCaseArtifacts. That route is prohibited from Amendment 2 onward because it reads governed truth and uses the historical case id as artifactRef.",
   "completeFilterDiagnostics": {
@@ -115,5 +115,6 @@
   "productionSourceBaseDrift": {
     "everySourceInTheRuntimeClosureMustMatchItsBytesAt": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
     "haltCode": "PRODUCTION_SOURCE_DRIFTED_FROM_BASE"
-  }
+  },
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run."
 }

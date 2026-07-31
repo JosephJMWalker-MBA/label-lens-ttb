@@ -57,7 +57,7 @@
       "recommending a filter treatment"
     ]
   },
-  "amendedBy": "preregistration-amendment-7.md",
+  "amendedBy": "preregistration-amendment-8.md",
   "opaqueIdentity": {
     "scheme": "item-NNNN, 1-based, zero-padded to four digits",
     "assignmentOrder": "ascending source-image SHA-256, so the sequence is deterministic and carries no ordering signal from the historical names",
@@ -243,5 +243,6 @@
     "onlyActor3MayUseGovernedTruthAgainstAcquiredEvidence": true,
     "noninterferenceClaimIsBounded": "Complete noninterference from governedTruth.present is NOT claimed: the script intentionally uses that flag for the 105/10 accounting assertion. What is claimed, and tested, is that acceptable Brand values and other truth TEXT do not influence the truth-free input manifest, the opaque ordering or the staged filenames.",
     "stagingIndependenceTestedBy": "src/fixtures/eval/issue-149-staging-independence.test.ts"
-  }
+  },
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run."
 }

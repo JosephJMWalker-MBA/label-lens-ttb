@@ -21,7 +21,7 @@
     "omitting evidence"
   ],
   "ifTheGateFires": "The evidence still exists in full as a workflow artifact. Only its commitment to Git is withheld, and that fact is reported rather than resolved by shrinking the evidence.",
-  "amendedBy": "preregistration-amendment-7.md",
+  "amendedBy": "preregistration-amendment-8.md",
   "above100MBProcedure": [
     "upload the complete lossless evidence artifact",
     "record the artifact ID, exact bytes, SHA-256, configured retention and expected expiration",
@@ -58,5 +58,6 @@
       "require the durable-archive owner decision"
     ],
     "contentsWriteGrantedToOcrJob": false
-  }
+  },
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run."
 }

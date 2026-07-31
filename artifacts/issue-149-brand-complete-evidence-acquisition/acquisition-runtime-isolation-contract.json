@@ -2,7 +2,7 @@
   "artifact": "acquisition-runtime-isolation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-7.md",
+  "amendedBy": "preregistration-amendment-8.md",
   "status": "CONTRACT FROZEN. Not implemented in this amendment.",
   "whyThisExists": {
     "correction": "The Stage 1 isolation tests are STATIC manifest, path and import validation. They read committed planning artifacts and assert their shape. They are NOT runtime proof, and this contract stops them being described as such.",
@@ -286,5 +286,6 @@
       "doesNotOwn": "the transitive dependency proof. It can confirm the bundle it was given matches the manifest; it cannot reconstruct how that bundle was built."
     },
     "discoverStopsForOwnerReviewBeforeExecute": true
-  }
+  },
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run."
 }

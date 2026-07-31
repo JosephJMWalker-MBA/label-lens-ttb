@@ -237,6 +237,112 @@ describe("Issue #149 acquisition identity and isolation", () => {
       }
     });
 
+    describe("the complete-array candidate API is the only authorized route", () => {
+      /**
+       * Lower-level candidate-emission symbols. Each accepts, or implies, a
+       * caller-supplied ranked position, so a runner could "use the reference
+       * adapter" while inventing positions itself — bypassing
+       * production-comparator ordering, decision-based membership, contiguity,
+       * uniqueness and the exactly-one-selected invariant.
+       */
+      const PROHIBITED_CANDIDATE_SYMBOLS = [
+        "toCandidateEvidenceRecord",
+        "finalizeProductionCandidate",
+        "finalizeCandidateRecord",
+        "stableCandidateId",
+        "CandidateAdapterContext",
+        "TEST_ONLY_candidateAdapterInternals",
+        "rankedPosition",
+      ];
+      const REQUIRED_CALL = "finalizeProductionCandidateArray";
+
+      function candidateApiOffences(source: string): string[] {
+        const offences: string[] = [];
+        if (!new RegExp(`\\b${REQUIRED_CALL}\\s*\\(`).test(source)) {
+          offences.push(`does not invoke ${REQUIRED_CALL}`);
+        }
+        for (const symbol of PROHIBITED_CANDIDATE_SYMBOLS) {
+          // `finalizeProductionCandidate` is a prefix of the required call, so
+          // the boundary must exclude the array form explicitly.
+          const pattern =
+            symbol === "finalizeProductionCandidate"
+              ? /\bfinalizeProductionCandidate\b(?!Array)/
+              : new RegExp(`\\b${symbol}\\b`);
+          if (pattern.test(source)) offences.push(`references ${symbol}`);
+        }
+        return offences;
+      }
+
+      it("accepts exactly one complete-array call per item", () => {
+        const good = `
+import { finalizeProductionCandidateArray } from "../lib/issue-149-candidate-adapter";
+const records = finalizeProductionCandidateArray(diagnostics.candidates, opaqueItemId);
+`;
+        expect(candidateApiOffences(good)).toEqual([]);
+      });
+
+      it("rejects a per-candidate finalization loop", () => {
+        const loop = `
+import { finalizeCandidateRecord } from "../lib/issue-149-evidence-canonical";
+const records = diagnostics.candidates.map((c, i) => finalizeCandidateRecord(adapt(c, i)));
+`;
+        expect(candidateApiOffences(loop)).toContain("references finalizeCandidateRecord");
+        expect(candidateApiOffences(loop)).toContain(
+          "does not invoke finalizeProductionCandidateArray",
+        );
+      });
+
+      it("rejects finalizeProductionCandidate with a caller-supplied position", () => {
+        const manual = `
+import { finalizeProductionCandidate } from "../lib/issue-149-candidate-adapter";
+const record = finalizeProductionCandidate(candidate, { opaqueItemId, rankedPosition: 0 });
+`;
+        const offences = candidateApiOffences(manual);
+        expect(offences).toContain("references finalizeProductionCandidate");
+        expect(offences).toContain("references rankedPosition");
+      });
+
+      it("rejects a runner that maps diagnostics itself", () => {
+        const mapped = `
+import { toCandidateEvidenceRecord } from "../lib/issue-149-candidate-adapter";
+const records = diagnostics.candidates.map((c, i) => toCandidateEvidenceRecord(c, ctx(i)));
+`;
+        expect(candidateApiOffences(mapped)).toContain("references toCandidateEvidenceRecord");
+      });
+
+      it("rejects reaching through the test-only interface", () => {
+        const sneaky = `
+import { TEST_ONLY_candidateAdapterInternals } from "../lib/issue-149-candidate-adapter";
+const records = TEST_ONLY_candidateAdapterInternals.finalizeProductionCandidate(c, ctx);
+`;
+        expect(candidateApiOffences(sneaky)).toContain(
+          "references TEST_ONLY_candidateAdapterInternals",
+        );
+      });
+
+      it("binds any runner that exists", () => {
+        const offences: string[] = [];
+        for (const file of present) {
+          const source = readFileSync(path.join(process.cwd(), file), "utf8");
+          for (const offence of candidateApiOffences(source)) {
+            offences.push(`${file} ${offence}`);
+          }
+        }
+        expect(offences).toEqual([]);
+      });
+
+      it("keeps the lower-level functions off the module's public surface", () => {
+        const adapter = readFileSync(
+          path.join(process.cwd(), "scripts/eval/lib/issue-149-candidate-adapter.ts"),
+          "utf8",
+        );
+        expect(adapter).toMatch(/^export function finalizeProductionCandidateArray/m);
+        expect(adapter).not.toMatch(/^export function toCandidateEvidenceRecord/m);
+        expect(adapter).not.toMatch(/^export function finalizeProductionCandidate\(/m);
+        expect(adapter).toContain("TEST_ONLY_candidateAdapterInternals");
+      });
+    });
+
     it("does not claim transitive runtime isolation", () => {
       // Static source inspection cannot prove what a process can reach at run
       // time. The runtime bundle manifest and the discover gate own that.

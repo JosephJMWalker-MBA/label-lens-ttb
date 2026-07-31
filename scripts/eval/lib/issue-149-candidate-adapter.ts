@@ -112,7 +112,7 @@ function assertProvenanceAgreement(diagnostic: BrandCandidateDiagnostic): void {
  * (`rankingEligible`, `rankingScore`, `selected`) are computed here so the
  * canonical validator's invariants can check them rather than trust them.
  */
-export function toCandidateEvidenceRecord(
+function toCandidateEvidenceRecord(
   diagnostic: BrandCandidateDiagnostic,
   context: CandidateAdapterContext,
 ): Record<string, unknown> {
@@ -196,8 +196,8 @@ function normalizeRanking(
   };
 }
 
-/** Adapt and finalize in one step: the sanctioned Stage 2 call. */
-export function finalizeProductionCandidate(
+/** Adapt and finalize one candidate. Internal: positions come from the array. */
+function finalizeProductionCandidate(
   diagnostic: BrandCandidateDiagnostic,
   context: CandidateAdapterContext,
 ): CandidateEvidenceRecord {
@@ -241,6 +241,15 @@ export function finalizeProductionCandidateArray(
   candidates: BrandCandidateDiagnostic[],
   opaqueItemId: string,
 ): CandidateEvidenceRecord[] {
+  // Validated here too: an empty candidate array would otherwise never reach the
+  // per-record check, and a malformed opaque id would pass silently.
+  if (!OPAQUE_ITEM_ID.test(opaqueItemId)) {
+    throw new CandidateAdapterError(
+      "MALFORMED_OPAQUE_ITEM_ID",
+      `opaqueItemId must match ^item-\\d{4}$, received ${JSON.stringify(opaqueItemId)}`,
+    );
+  }
+
   const rankedMembers = candidates
     .map((candidate, index) => ({ candidate, index }))
     .filter((entry) => entry.candidate.decision !== undefined);
@@ -341,3 +350,21 @@ export function assertRankedArrayInvariants(records: CandidateEvidenceRecord[]):
     );
   }
 }
+
+/**
+ * The lower-level adapter functions, exposed for direct unit testing ONLY.
+ *
+ * They are not part of the acquisition API. `toCandidateEvidenceRecord` and
+ * `finalizeProductionCandidate` both accept a caller-supplied `rankedPosition`,
+ * so a runner using them could "use the reference adapter" while inventing
+ * positions itself — bypassing production-comparator ordering, decision-based
+ * membership, contiguity, uniqueness and the exactly-one-selected invariant.
+ *
+ * `finalizeProductionCandidateArray` is the ONLY authorized candidate-emission
+ * API for Stage 2, and the future-runner guard fails on any reference to the
+ * names below.
+ */
+export const TEST_ONLY_candidateAdapterInternals = {
+  toCandidateEvidenceRecord,
+  finalizeProductionCandidate,
+} as const;

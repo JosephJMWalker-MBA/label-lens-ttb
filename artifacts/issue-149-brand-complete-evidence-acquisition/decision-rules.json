@@ -50,6 +50,7 @@
     "choosing a successor treatment",
     "corpus expansion, substitution or exclusion"
   ],
-  "amendedBy": "preregistration-amendment-7.md",
-  "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef"
+  "amendedBy": "preregistration-amendment-8.md",
+  "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run."
 }

@@ -84,7 +84,7 @@
     "treating the diagnostic selection rather than debug.finalSelections as the behavioural authority"
   ],
   "expectedUseOfTheResult": "A later, separately preregistered zero-OCR study may use this evidence. This sprint does not perform, design or recommend that study's treatment.",
-  "amendedBy": "preregistration-amendment-7.md",
+  "amendedBy": "preregistration-amendment-8.md",
   "actorsAndBoundaries": {
     "jobA_trustedPreparation": {
       "runsOcr": false,
@@ -151,7 +151,8 @@
         "onlyActor3MayUseGovernedTruthAgainstAcquiredEvidence": true,
         "noninterferenceClaimIsBounded": "Complete noninterference from governedTruth.present is NOT claimed: the script intentionally uses that flag for the 105/10 accounting assertion. What is claimed, and tested, is that acceptable Brand values and other truth TEXT do not influence the truth-free input manifest, the opaque ordering or the staged filenames.",
         "stagingIndependenceTestedBy": "src/fixtures/eval/issue-149-staging-independence.test.ts"
-      }
+      },
+      "distinctFromStage1TrustedStaging": "Stage 1 trusted staging has ALREADY run: it froze and verified the corpus and generated the three committed artifacts. Stage 2 Job A additionally builds and scans the runtime bundle and emits the truth-free preparation artifact. Neither of those has happened."
     },
     "jobB_isolatedDiscoverOrExecute": {
       "checksOutTheRepository": false,
@@ -261,5 +262,6 @@
       "actor2AndActor3DoNotRun": true
     }
   },
-  "truthBoundaryLocation": "The EVALUATION-USE boundary sits between actor 2 and actor 3. It is not the first physical access to truth-bearing files: that occurs in trusted Job A, which reads the PR #217 attribution artifact. Job B is isolated and truth-free; Job C holds only a minimal identifier inventory and no truth."
+  "truthBoundaryLocation": "The EVALUATION-USE boundary sits between actor 2 and actor 3. It is not the first physical access to truth-bearing files: that occurs in trusted Job A, which reads the PR #217 attribution artifact. Job B is isolated and truth-free; Job C holds only a minimal identifier inventory and no truth.",
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run."
 }

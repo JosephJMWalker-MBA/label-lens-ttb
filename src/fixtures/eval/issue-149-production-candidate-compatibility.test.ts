@@ -25,11 +25,16 @@ import {
 } from "@/pipeline/extractor/field-selection";
 
 import {
-  finalizeProductionCandidate,
-  finalizeProductionCandidateArray,
-  toCandidateEvidenceRecord,
   CandidateAdapterError,
+  TEST_ONLY_candidateAdapterInternals,
+  finalizeProductionCandidateArray,
 } from "../../../scripts/eval/lib/issue-149-candidate-adapter";
+
+// The lower-level adapter functions are not part of the acquisition API. They
+// are reachable only through this explicitly test-only interface, which the
+// future-runner guard prohibits the runner from referencing.
+const { finalizeProductionCandidate, toCandidateEvidenceRecord } =
+  TEST_ONLY_candidateAdapterInternals;
 import {
   ANALYZER_OCR_CONFIDENCE_KEYS,
   CANDIDATE_EVIDENCE_REQUIRED_KEYS,

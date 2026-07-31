@@ -5,15 +5,21 @@ Refs Issue #149. **Evidence acquisition only.** Frozen before any OCR runs.
 Base: `origin/main` `546c3f279ce431a1fd8c0203df7a83553ea866ef`, the merge commit
 of PR #220.
 
-**Amended seven times, every time before any governed acquisition OCR.** See
+**Amended eight times, every time before any governed acquisition OCR.** See
 `preregistration-amendment.md` and `preregistration-amendment-2.md` through
-`preregistration-amendment-7.md`. All earlier plans are preserved, not
+`preregistration-amendment-8.md`. All earlier plans are preserved, not
 overwritten, and their identities are recorded in `amendment-linkage.json` and
-`amendment-2-linkage.json` through `amendment-7-linkage.json`. **No governed
-115-case acquisition OCR, acquisition-runner OCR, trusted preparation, discovery
-or execute-mode OCR occurred under any earlier plan, and none has occurred under
-this one.** The ordinary repository suite continues to run its pre-existing
-bundled-image OCR tests, disclosed separately.
+`amendment-2-linkage.json` through `amendment-8-linkage.json`. **The Stage 1 trusted freeze/staging generator and its temporary
+reproducibility mode have run — that is what produced the three committed
+artifacts. No Stage 2 Job A workflow, truth-free preparation artifact,
+runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR
+has run, under any plan.** The ordinary repository suite continues to run its
+pre-existing bundled-image OCR tests, disclosed separately.
+
+Stage 1 trusted staging and Stage 2 Job A are distinct: staging froze and verified
+the corpus and generated the committed artifacts; Job A additionally builds and
+scans the runtime bundle and emits the truth-free preparation artifact, and has
+not begun.
 
 One operational incident is recorded in `branch-pointer-incident.md`: a push used
 a stale local branch as its source refspec, which reset the remote branch and
@@ -278,6 +284,16 @@ opaque ordering and the staged filenames are unchanged. It does **not** claim
 independence from `governedTruth.present`, because the script deliberately uses
 that flag.
 
+**The generator is one shared core.** `generateStageOneArtifacts` in
+`scripts/eval/lib/issue-149-freeze-core.mjs` holds the whole algorithm and takes
+its inputs explicitly — attribution data, population data, evaluation manifest, a
+source-image loader, the forbidden-key inventory and output destinations. Normal
+staging, `--check` and the staging-independence tests all call it, so the tests
+drive the real implementation rather than a restatement of it. The core is
+host-only and is never included in the runtime bundle or present in Job B. It
+never calls `process.exit`: failures throw a typed `FreezeError`, cleanup runs in
+`finally`, and only the CLI boundary sets `process.exitCode`.
+
 **The generator must reproduce its own committed artifacts.** Job A reruns the
 freeze script and requires bit-for-bit reproduction, so `--check` — which
 regenerates all three artifacts into a temporary root, compares exact bytes,
@@ -467,6 +483,40 @@ Asserted: ordinals begin at 0, are contiguous and occur exactly once; candidate
 IDs are unique within each case; the emitted count equals the unprojected
 diagnostic-array count; no record is silently overwritten or deduplicated.
 Halts with `CANDIDATE_ID_COLLISION` or `CANDIDATE_EVIDENCE_TRUNCATED`.
+
+### One call emits the candidates
+
+The **only** authorized candidate-emission API is
+`finalizeProductionCandidateArray(completeDiagnosticCandidateArray, opaqueItemId)`
+from `scripts/eval/lib/issue-149-candidate-adapter.ts`, called exactly once per
+item. The runner may not call `finalizeCandidateRecord`,
+`finalizeProductionCandidate`, `toCandidateEvidenceRecord`, `stableCandidateId` or
+`TEST_ONLY_candidateAdapterInternals` for Brand candidate emission, and may not
+construct a `rankedPosition` itself.
+
+That prohibition is not stylistic. The lower-level functions accept a
+caller-supplied position, so a runner could "use the reference adapter" while
+inventing positions — bypassing production-comparator ordering, decision-based
+membership, contiguity, uniqueness and the exactly-one-selected invariant. Those
+functions are module-private, reachable only through an explicitly test-only
+interface that the runner guard also prohibits. The canonical helper remains
+permitted for pass validation, semantic fingerprinting and exact-byte hashing.
+
+### Kept and rejected candidates carry different complete evidence
+
+Production scores and assigns ranking semantics to **every kept candidate** before
+family reduction and deduplication. A rejected span returns from
+`analyzeBrandSpan` before a `Candidate` object exists, so it can carry none of it.
+
+Every **kept** candidate therefore has a non-null `score` satisfying the complete
+`BrandCandidateScore` schema, a non-null `ranking` satisfying the complete ranking
+schema, `rankingEligible` true, and `rankingScore` equal to `ranking.rankingScore`.
+It may still have `decision` and `rankedPosition` both null — that is exactly what
+a candidate removed by deduplication looks like.
+
+Every **rejected** candidate has `score`, `ranking`, `decision` and
+`rankedPosition` all null, `rankingEligible` false and `selected` false. Halt:
+`KEPT_CANDIDATE_EVIDENCE_INCOMPLETE`.
 
 ### Ranked position means final production ranked membership
 

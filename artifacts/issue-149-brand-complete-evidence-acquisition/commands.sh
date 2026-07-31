@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Issue #149 — complete Brand evidence acquisition.
-# STAGE 1: planning and preregistration only. Nothing here runs OCR.
+# STAGE 1: contract generation and TRUSTED FREEZE/STAGING. No governed
+# acquisition OCR. The freeze script reads the PR #217 attribution artifact,
+# which is truth-bearing, and uses governedTruth.present only for the
+# preregistered 105/10 corpus-accounting assertion.
 set -euo pipefail
 
 ART=artifacts/issue-149-brand-complete-evidence-acquisition

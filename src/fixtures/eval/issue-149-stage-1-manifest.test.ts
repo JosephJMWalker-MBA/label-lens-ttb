@@ -63,6 +63,7 @@ describe("Issue #149 Stage 1 contract manifest", () => {
     expect(listed).toContain("scripts/eval/lib/issue-149-evidence-canonical.ts");
     expect(listed).toContain("scripts/eval/lib/issue-149-bundle-scan.ts");
     expect(listed).toContain("scripts/eval/lib/issue-149-candidate-adapter.ts");
+    expect(listed).toContain("scripts/eval/lib/issue-149-freeze-core.mjs");
     expect(
       listed.some((f) => f.startsWith("src/fixtures/eval/issue-149-candidate-canonical")),
     ).toBe(false);
@@ -74,6 +75,8 @@ describe("Issue #149 Stage 1 contract manifest", () => {
       "scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs",
       "scripts/eval/issue-149-stage-1-contract-manifest.mjs",
       "scripts/eval/lib/issue-149-bundle-scan.ts",
+      "scripts/eval/lib/issue-149-freeze-core.d.mts",
+      "scripts/eval/lib/issue-149-freeze-core.mjs",
       "scripts/eval/lib/issue-149-candidate-adapter.ts",
       "scripts/eval/lib/issue-149-evidence-canonical.ts",
       "src/fixtures/eval/issue-149-acquisition-isolation.test.ts",

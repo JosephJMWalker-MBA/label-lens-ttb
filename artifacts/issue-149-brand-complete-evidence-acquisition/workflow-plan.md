@@ -214,9 +214,21 @@ and nothing else. The post-freeze ID map is not mounted.
    `region-ocr-result-replay-contract.json`; halt on `PASS_EVIDENCE_TRUNCATED` or
    `PASS_ORDER_MISMATCH`. This is what makes the counterfactual in capability 3
    replayable later, without OCR.
-4. Finalize every candidate through `finalizeCandidateRecord`, which validates the
-   complete evidence schema **before** hashing and refuses any record missing a
-   required own property.
+4. Emit candidates through **exactly one call** to
+   `finalizeProductionCandidateArray(diagnosticSelection.candidates, opaqueItemId)`
+   from `scripts/eval/lib/issue-149-candidate-adapter.ts`. That is the **only**
+   authorized candidate-emission API. It validates the complete evidence schema
+   before hashing, and it is what assigns ranked membership from `decision`,
+   orders members with production's comparator, and enforces contiguity,
+   uniqueness and the exactly-one-selected invariant.
+
+   The runner must **not** call `finalizeCandidateRecord`,
+   `finalizeProductionCandidate`, `toCandidateEvidenceRecord`,
+   `stableCandidateId` or `TEST_ONLY_candidateAdapterInternals` for Brand
+   candidate emission, and must not construct a `rankedPosition` itself. Any of
+   those routes bypasses every array-level invariant. The canonical helper
+   remains permitted for pass validation, semantic fingerprinting and exact-byte
+   hashing.
 5. On a case-level extractor failure, persist the typed failure record — error
    code, message, issues, opaque item ID, source-image SHA-256. **No partial
    debug object is invented and no failed item is retried.**

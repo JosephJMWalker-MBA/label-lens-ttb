@@ -86,7 +86,7 @@
     }
   ],
   "verdictComputedNotAsserted": true,
-  "amendedBy": "preregistration-amendment-7.md",
+  "amendedBy": "preregistration-amendment-8.md",
   "threeSeparateConcepts": {
     "fullArtifactIntegrity": {
       "covers": "the EXACT persisted bytes of every raw file and manifest, including timings and run metadata",
@@ -146,5 +146,6 @@
     "butNeverAloneAVerdict": "A difference confined to timings or run metadata must NOT produce COMPLETE_WITH_NONDETERMINISM. It is reported descriptively."
   },
   "cropPixelComparisonRemoved": "The 'crop pixels' level compared cropPixelSha256 per pass. That value is not obtainable through the frozen production interface; see raw-ocr-contract.json#unavailableThroughTheFrozenInterface.",
-  "rawManifestsUseExactFileBytes": true
+  "rawManifestsUseExactFileBytes": true,
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run."
 }

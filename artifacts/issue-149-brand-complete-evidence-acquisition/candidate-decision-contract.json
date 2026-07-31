@@ -2,7 +2,7 @@
   "artifact": "candidate-decision-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-7.md",
+  "amendedBy": "preregistration-amendment-8.md",
   "sourceOfTruthForShape": "BrandCandidateDiagnostic in src/pipeline/extractor/field-selection.ts at PR #220 merge commit 546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "entryPoint": "selectBrandObservationWithCompleteFilterDiagnostics",
@@ -88,7 +88,8 @@
     "MALFORMED_DIGEST": "canonicalRecordSha256 is not lowercase 64-hex",
     "DIGEST_DOES_NOT_MATCH_RECORD": "the supplied digest does not equal the recomputation over the complete record",
     "PROVENANCE_DISAGREES_WITH_CANDIDATE": "a fact the diagnostic states twice disagrees with itself",
-    "MALFORMED_OPAQUE_ITEM_ID_AT_ADAPTER": "the adapter received an opaqueItemId outside ^item-\\d{4}$"
+    "MALFORMED_OPAQUE_ITEM_ID_AT_ADAPTER": "the adapter received an opaqueItemId outside ^item-\\d{4}$",
+    "KEPT_CANDIDATE_EVIDENCE_INCOMPLETE": "a kept candidate is missing score or ranking, or declares rankingEligible false"
   },
   "storageFormat": {
     "layout": "one JSONL file per case per run, one JSON object per candidate decision",
@@ -260,5 +261,48 @@
     },
     "arrayLevelInvariantsEnforcedIn": "finalizeProductionCandidateArray \u2014 a single-record validator cannot prove uniqueness or contiguity, and claiming it could would be an overclaim",
     "priorDefect": "An earlier adapter took every diagnostic carrying a ranking, sorted by rankingScore descending, and gave them all positions. That assigned fake positions to deduplicated candidates and produced an order production never produced."
+  },
+  "candidateEmissionApi": {
+    "module": "scripts/eval/lib/issue-149-candidate-adapter.ts",
+    "function": "finalizeProductionCandidateArray",
+    "signature": "finalizeProductionCandidateArray(completeDiagnosticCandidateArray, opaqueItemId)",
+    "oneCallPerCompleteDiagnosticCandidateArray": true,
+    "callerSuppliedRankedPositionProhibited": true,
+    "secondMappingOrFinalizationLoopInTheRunnerProhibited": true,
+    "opaqueItemIdValidatedEvenWhenTheArrayIsEmpty": true,
+    "prohibitedSymbolsInTheRunner": [
+      "toCandidateEvidenceRecord",
+      "finalizeProductionCandidate",
+      "finalizeCandidateRecord",
+      "stableCandidateId",
+      "CandidateAdapterContext",
+      "TEST_ONLY_candidateAdapterInternals",
+      "rankedPosition"
+    ],
+    "prohibitedSymbolsNote": "finalizeCandidateRecord and stableCandidateId are prohibited FOR BRAND CANDIDATE EMISSION. The canonical helper remains permitted for pass validation, semantic fingerprinting and exact-byte hashing.",
+    "whyLowerLevelFunctionsAreProhibited": "toCandidateEvidenceRecord and finalizeProductionCandidate both accept a caller-supplied rankedPosition, so a runner could 'use the reference adapter' while inventing positions itself \u2014 bypassing production-comparator ordering, decision-based ranked membership, position assignment, uniqueness, contiguity and the exactly-one-selected array invariant.",
+    "moduleSurface": "finalizeProductionCandidateArray is the only exported candidate-emission function. The lower-level functions are module-private and reachable only through TEST_ONLY_candidateAdapterInternals, which the runner guard also prohibits.",
+    "enforcedBy": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts"
+  },
+  "keptCandidateEvidence": {
+    "everyKeptCandidate": [
+      "score is non-null and satisfies the complete BrandCandidateScore schema",
+      "ranking is non-null and satisfies the complete ranking schema",
+      "rankingEligible is true",
+      "rankingScore equals ranking.rankingScore"
+    ],
+    "aKeptCandidateMayLackADecision": "yes \u2014 family reduction or normalized-value deduplication removed it. decision and rankedPosition are then both null while score and ranking remain.",
+    "everyRejectedCandidate": [
+      "score is null",
+      "ranking is null",
+      "rankingEligible is false",
+      "rankingScore is null",
+      "decision is null",
+      "rankedPosition is null",
+      "selected is false"
+    ],
+    "why": "Production scores and assigns ranking semantics to every kept candidate before family reduction and deduplication (field-selection.ts:2536-2543). A rejected span returns from analyzeBrandSpan before a Candidate object is constructed, so it can carry none of it.",
+    "priorDefect": "The validator permitted a kept candidate with score, ranking, rankingEligible, decision and rankedPosition all null or false, and did not require a rejected candidate's score to be null.",
+    "haltCode": "KEPT_CANDIDATE_EVIDENCE_INCOMPLETE"
   }
 }
