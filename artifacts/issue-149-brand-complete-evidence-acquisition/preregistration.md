@@ -5,17 +5,15 @@ Refs Issue #149. **Evidence acquisition only.** Frozen before any OCR runs.
 Base: `origin/main` `546c3f279ce431a1fd8c0203df7a83553ea866ef`, the merge commit
 of PR #220.
 
-**Amended five times, every time before any governed acquisition OCR.** See
-`preregistration-amendment.md`, `preregistration-amendment-2.md`,
-`preregistration-amendment-3.md`, `preregistration-amendment-4.md` and
-`preregistration-amendment-5.md`. All earlier plans are preserved, not
-overwritten, and their identities are recorded in `amendment-linkage.json`,
-`amendment-2-linkage.json`, `amendment-3-linkage.json`, `amendment-4-linkage.json`
-and `amendment-5-linkage.json`. **No governed 115-case acquisition OCR,
-acquisition runner OCR, discovery, execute-mode OCR or trusted host preparation
-occurred under any earlier plan, and none has occurred under this one.** The
-ordinary repository suite continues to run its pre-existing bundled-image OCR
-tests, disclosed separately.
+**Amended seven times, every time before any governed acquisition OCR.** See
+`preregistration-amendment.md` and `preregistration-amendment-2.md` through
+`preregistration-amendment-7.md`. All earlier plans are preserved, not
+overwritten, and their identities are recorded in `amendment-linkage.json` and
+`amendment-2-linkage.json` through `amendment-7-linkage.json`. **No governed
+115-case acquisition OCR, acquisition-runner OCR, trusted preparation, discovery
+or execute-mode OCR occurred under any earlier plan, and none has occurred under
+this one.** The ordinary repository suite continues to run its pre-existing
+bundled-image OCR tests, disclosed separately.
 
 One operational incident is recorded in `branch-pointer-incident.md`: a push used
 a stale local branch as its source refspec, which reset the remote branch and
@@ -263,6 +261,32 @@ Job A is *trusted*, not truth-free; what is truth-free is the artifact it emits
 and the job that consumes it, and calling the whole workflow truth-free would be
 false.
 
+**Job A physically reads governed truth, and that is now stated rather than
+denied.** The freeze script reads the PR #217 per-case attribution artifact, whose
+case objects carry `governedTruth.present` alongside acceptable Brand values and
+other truth. It *uses* the presence flag — and only that — for the preregistered
+105/10 corpus-accounting assertion. It must not use acceptable values or any truth
+text for inclusion, opaque-ID assignment, image ordering, staged filenames,
+preprocessing, bundle construction, or any acquisition input or emitted field.
+
+So the **first physical access to a truth-bearing source occurs in trusted
+Job A**. The boundary between actor 2 and actor 3 remains the **evaluation-use**
+boundary: only actor 3 may use governed truth against acquired evidence. A
+staging-independence test holds identity, paths, hashes, inclusion and presence
+fixed while changing the truth text, and proves the truth-free manifest, the
+opaque ordering and the staged filenames are unchanged. It does **not** claim
+independence from `governedTruth.present`, because the script deliberately uses
+that flag.
+
+**The generator must reproduce its own committed artifacts.** Job A reruns the
+freeze script and requires bit-for-bit reproduction, so `--check` — which
+regenerates all three artifacts into a temporary root, compares exact bytes,
+touches no tracked file or real staging directory, and runs no OCR — is a
+**mandatory precondition**. It halts with `STAGE_1_GENERATED_ARTIFACT_DRIFT`.
+Amendment 6 corrected the committed ID map but not its generator, which would have
+left Job A choosing between failing and overwriting reviewed artifacts with
+superseded metadata.
+
 **Phase 1 — trusted staging (Job A).** May read the evaluation manifest, historical case
 identities, historical fixture paths and the source images, and may do so *only*
 to freeze the population, assign `item-NNNN` identifiers, stage images under
@@ -443,6 +467,45 @@ Asserted: ordinals begin at 0, are contiguous and occur exactly once; candidate
 IDs are unique within each case; the emitted count equals the unprojected
 diagnostic-array count; no record is silently overwritten or deduplicated.
 Halts with `CANDIDATE_ID_COLLISION` or `CANDIDATE_EVIDENCE_TRUNCATED`.
+
+### Ranked position means final production ranked membership
+
+Production assigns `ranking` semantics to **every scored candidate**, then reduces
+them with `bestFamilyCandidates` and `dedupeBestCandidates`, sorts the survivors
+with `compareCandidateRanking`, and assigns a `decision` **only to candidates in
+that final ranked array** (`field-selection.ts:2556-2578`).
+
+So `ranking !== undefined` means *ranking semantics were computed*, and
+`decision !== undefined` means *this candidate survived into the final ranked
+list*. A candidate can have the first without the second, because deduplication
+removed it.
+
+`rankedPosition` therefore tracks `decision`, not `ranking`. Final ranked members
+are ordered by **production's own exported comparator**, applied through a minimal
+`{ ranking }` wrapper — the comparator reads nothing else, which is verified
+against the real function — with the original diagnostic-array order as the stable
+tie-break. Positions are contiguous `0..N-1` and unique; exactly one candidate is
+selected when N > 0 and it must be position 0; nothing outside the membership
+receives a position; and a rejected candidate has `decision`, `ranking` and
+`rankedPosition` all null.
+
+An earlier adapter took every diagnostic carrying a `ranking` and sorted by
+`rankingScore` descending. That gave fake positions to candidates production had
+eliminated and ignored the ordered comparator, which can prioritise score
+eligibility, prominence, OCR evidence and normalized value under three ordering
+modes. Halts: `RANKED_MEMBERSHIP_INCONSISTENT`, `RANKED_POSITION_PARITY_FAILURE`.
+Uniqueness and contiguity are enforced across the whole array, because no
+single-record validator can prove them.
+
+### Candidate support is pre-deduplication support
+
+Production merges support-pass information during deduplication, *after* the
+public diagnostics are built, and never writes the merged value back. The record's
+`supportPassIds` and `candidateProvenance` are therefore the **pre-merge** values
+and must not be described as the final support set. The post-merge support for the
+**selected observation** is available from `FieldSelection.supportingPassIds` and
+is persisted separately; the complete merged support for every ranked candidate is
+not exposed and is **not reconstructed here**.
 
 ### A complete record is a schema, not a convention
 

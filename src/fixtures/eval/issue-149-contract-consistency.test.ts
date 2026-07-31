@@ -24,6 +24,7 @@ const HISTORICAL_FILES = new Set([
   "preregistration-amendment-4.md",
   "preregistration-amendment-5.md",
   "preregistration-amendment-6.md",
+  "preregistration-amendment-7.md",
   "branch-pointer-incident.md",
   "amendment-linkage.json",
   "amendment-2-linkage.json",
@@ -31,6 +32,7 @@ const HISTORICAL_FILES = new Set([
   "amendment-4-linkage.json",
   "amendment-5-linkage.json",
   "amendment-6-linkage.json",
+  "amendment-7-linkage.json",
 ]);
 
 /**
@@ -39,7 +41,7 @@ const HISTORICAL_FILES = new Set([
  * current amendment. Exempting it wholesale is what let it sit at "amendment 2"
  * while the package was at Amendment 4, faithfully hashed by the manifest.
  */
-const CURRENT_AMENDMENT = 6;
+const CURRENT_AMENDMENT = 7;
 
 /**
  * A line may mention a superseded term when it is explicitly marking it as
@@ -507,7 +509,11 @@ describe("Issue #149 Stage 1 contract consistency", () => {
       truthBoundaryChronology: {
         supersededClaim: string;
         whyItWasFalse: string;
-        phase1TrustedStaging: { mayRead: string[]; isOutsideTheAcquisitionProcess: boolean };
+        phase1TrustedStaging: {
+          mayRead: string[];
+          isOutsideTheAcquisitionProcess: boolean;
+          governedTruthAccess: { physicallyReadsATruthBearingSource: boolean };
+        };
         phase2IsolatedAcquisition: { cannotScanFor: string; receivesNo: string[] };
         phase3ReadOnlyIdentityLeakVerification: {
           mayRead: string[];
@@ -522,9 +528,10 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     const chronology = plan.truthBoundaryChronology;
     expect(chronology.whyItWasFalse).toContain("Trusted staging");
     expect(chronology.phase1TrustedStaging.isOutsideTheAcquisitionProcess).toBe(true);
-    expect(chronology.phase1TrustedStaging.mayRead.join(" ")).toContain(
-      "historical case identities",
-    );
+    expect(chronology.phase1TrustedStaging.mayRead.join(" ")).toContain("historical identity");
+    expect(
+      chronology.phase1TrustedStaging.governedTruthAccess.physicallyReadsATruthBearingSource,
+    ).toBe(true);
     expect(chronology.phase2IsolatedAcquisition.receivesNo.join(" ")).toContain(
       "post-freeze ID map",
     );
@@ -602,7 +609,7 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     expect(HISTORICAL_FILES.has("git-sha.txt")).toBe(false);
     expect(gitSha).toContain(`CURRENT — stage 1, amendment ${CURRENT_AMENDMENT}`);
     expect(gitSha.match(/^CURRENT/gm) ?? []).toHaveLength(1);
-    for (const earlier of [1, 2, 3, 4, 5]) {
+    for (const earlier of [1, 2, 3, 4, 5, 6]) {
       expect(gitSha).toContain(`HISTORICAL — amendment ${earlier}`);
     }
     expect(gitSha).toContain("No governed 115-case acquisition OCR");
@@ -679,30 +686,20 @@ describe("Issue #149 Stage 1 contract consistency", () => {
 
   describe("one authoritative forbidden-key inventory", () => {
     const ASSET = `${ROOT}/runtime/truth-key-inventory.json`;
-    const authoritative = read(ASSET) as string[];
+    const assetBytes = readFileSync(path.join(process.cwd(), ASSET));
+    const authoritative = parseTruthKeyInventory(assetBytes);
+    const assetSha = sha256(ASSET);
 
-    it("is a bare canonical array of the ten keys", () => {
-      expect(authoritative).toEqual([
-        "isTruth",
-        "matchesTruth",
-        "truthInRawOcr",
-        "truthOnReconstructedLine",
-        "truthFilterReasons",
-        "expectedBrand",
-        "acceptableValues",
-        "brandPresent",
-        "historicalCaseId",
-        "historicalImagePath",
-      ]);
-      // Canonical: no whitespace, one terminal newline, parses back identically.
-      const bytes = readFileSync(path.join(process.cwd(), ASSET), "utf8");
-      expect(bytes).toBe(`${JSON.stringify(authoritative)}\n`);
+    it("is a bare canonical array, and the asset is the only place the keys are written", () => {
+      expect(assetBytes.toString("utf8")).toBe(`${JSON.stringify(authoritative)}\n`);
+      expect(authoritative.length).toBeGreaterThan(0);
+      expect(authoritative.every((key) => typeof key === "string" && key.length > 0)).toBe(true);
     });
 
-    it("is the same inventory in every operative contract and in code", () => {
-      // Amendment 5 left three different sets in play: ten keys in
-      // evidence-schema.json, seven in truth-isolation-plan.json and the
-      // scanner, five in raw-ocr-contract.json.
+    it("is referenced by path and hash, never restated, in every operative contract", () => {
+      // Amendment 6 declared the asset authoritative and then copied the array
+      // into four contracts and this test — four more places to drift. The
+      // contracts now carry the path, the digest and the count, and nothing else.
       for (const file of [
         "truth-isolation-plan.json",
         "evidence-schema.json",
@@ -710,24 +707,43 @@ describe("Issue #149 Stage 1 contract consistency", () => {
         "acquisition-runtime-isolation-contract.json",
       ]) {
         const contract = read(path.join(ROOT, file)) as {
-          forbiddenEvidenceKeyInventory?: { keys: string[]; assetSha256: string };
+          forbiddenEvidenceKeyInventory?: Record<string, unknown>;
           runtimeBundle?: {
-            dependencyClosureGate: {
-              forbiddenEvidenceKeyInventory: { keys: string[]; assetSha256: string };
-            };
+            dependencyClosureGate: { forbiddenEvidenceKeyInventory: Record<string, unknown> };
           };
         };
         const inventory =
           contract.forbiddenEvidenceKeyInventory ??
           contract.runtimeBundle?.dependencyClosureGate.forbiddenEvidenceKeyInventory;
         expect(inventory, `${file} declares no inventory`).toBeDefined();
-        expect(inventory!.keys).toEqual(authoritative);
-        expect(inventory!.assetSha256).toBe(sha256(ASSET));
+        expect(inventory!.authoritativeAsset).toBe(ASSET);
+        expect(inventory!.assetSha256).toBe(assetSha);
+        expect(inventory!.keyCount).toBe(authoritative.length);
+        expect(inventory!.keysNotRestatedHere).toBe(true);
+        // The literal keys must NOT appear anywhere in the contract.
+        const serialized = JSON.stringify(contract);
+        for (const key of authoritative) {
+          expect(serialized.includes(`"${key}"`), `${file} restates ${key}`).toBe(false);
+        }
       }
-      // And the executable path agrees, by reading the same asset.
-      expect(parseTruthKeyInventory(readFileSync(path.join(process.cwd(), ASSET)))).toEqual(
-        authoritative,
+    });
+
+    it("is read, not restated, by the freeze script and the bundle scanner", () => {
+      const freeze = readFileSync(
+        path.join(process.cwd(), "scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs"),
+        "utf8",
       );
+      expect(freeze).toContain('path.join(ROOT, "runtime/truth-key-inventory.json")');
+      for (const key of authoritative) {
+        expect(freeze.includes(`"${key}"`), `freeze script restates ${key}`).toBe(false);
+      }
+      const scanner = readFileSync(
+        path.join(process.cwd(), "scripts/eval/lib/issue-149-bundle-scan.ts"),
+        "utf8",
+      );
+      for (const key of authoritative) {
+        expect(scanner.includes(`"${key}"`), `bundle scanner restates ${key}`).toBe(false);
+      }
     });
 
     it("distinguishes prohibited field NAMES from historical VALUES", () => {
@@ -857,6 +873,83 @@ describe("Issue #149 Stage 1 contract consistency", () => {
       expect(three.physicalExclusivityClaimed).toBe(false);
       expect(three.isTheOnlyActorAuthorizedToUseTheMapOrGovernedTruthForEvaluation).toBe(true);
     });
+  });
+
+  it("shows Job A as physically reading governed truth", () => {
+    const plan = read(path.join(ROOT, "post-freeze-evaluation-plan.json")) as {
+      actorsAndBoundaries: {
+        jobA_trustedPreparation: {
+          receivesGovernedTruth: boolean;
+          governedTruthAccess: {
+            physicallyReadsATruthBearingSource: boolean;
+            supersededClaim: string;
+            mayUseOnly: string[];
+            mustNotUseAcceptableValuesOrTruthTextFor: string[];
+            noninterferenceClaimIsBounded: string;
+            firstPhysicalAccessToATruthBearingSourceOccursIn: string;
+            evaluationUseTruthBoundaryRemains: string;
+          };
+        };
+      };
+      truthBoundaryLocation: string;
+    };
+    const access = plan.actorsAndBoundaries.jobA_trustedPreparation.governedTruthAccess;
+    expect(plan.actorsAndBoundaries.jobA_trustedPreparation.receivesGovernedTruth).toBe(true);
+    expect(access.physicallyReadsATruthBearingSource).toBe(true);
+    expect(access.supersededClaim).toContain("no governed truth");
+    expect(access.firstPhysicalAccessToATruthBearingSourceOccursIn).toContain("Job A");
+    expect(access.evaluationUseTruthBoundaryRemains).toContain("actor 2 and actor 3");
+    expect(access.noninterferenceClaimIsBounded).toContain("NOT claimed");
+    expect(plan.truthBoundaryLocation).toContain("EVALUATION-USE");
+  });
+
+  it("defines final ranked membership as decision, not as the presence of ranking", () => {
+    const contract = read(path.join(ROOT, "candidate-decision-contract.json")) as {
+      finalRankedMembership: {
+        membershipIs: string;
+        notThePresenceOfRanking: boolean;
+        orderedBy: string;
+        tieOrder: string;
+        selectedCandidate: string;
+        arrayLevelInvariantsEnforcedIn: string;
+        haltCodes: Record<string, string>;
+      };
+      supportProvenanceLevel: {
+        completePostDeduplicationMergedSupportForEveryFinalRankedCandidate: {
+          available: boolean;
+          notReconstructedInTheAdapter: boolean;
+        };
+      };
+    };
+    const membership = contract.finalRankedMembership;
+    expect(membership.membershipIs).toContain("decision is defined");
+    expect(membership.notThePresenceOfRanking).toBe(true);
+    expect(membership.orderedBy).toContain("compareCandidateRanking");
+    expect(membership.orderedBy).toContain("NOT rankingScore alone");
+    expect(membership.tieOrder).toContain("original diagnostic-array order");
+    expect(membership.selectedCandidate).toContain("position 0");
+    expect(membership.arrayLevelInvariantsEnforcedIn).toContain("finalizeProductionCandidateArray");
+    expect(Object.keys(membership.haltCodes)).toEqual([
+      "RANKED_MEMBERSHIP_INCONSISTENT",
+      "RANKED_POSITION_PARITY_FAILURE",
+    ]);
+
+    const support =
+      contract.supportProvenanceLevel
+        .completePostDeduplicationMergedSupportForEveryFinalRankedCandidate;
+    expect(support.available).toBe(false);
+    expect(support.notReconstructedInTheAdapter).toBe(true);
+  });
+
+  it("makes generator reproducibility a mandatory Job A precondition", () => {
+    const workflow = readFileSync(path.join(process.cwd(), ROOT, "workflow-plan.md"), "utf8");
+    expect(workflow).toContain("--check");
+    expect(workflow).toContain("STAGE_1_GENERATED_ARTIFACT_DRIFT");
+    expect(workflow).toContain("mandatory precondition");
+    const commands = readFileSync(path.join(process.cwd(), ROOT, "commands.sh"), "utf8");
+    expect(commands).toContain(
+      "node scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs --check",
+    );
   });
 
   it("uses retention-bound language for the 100 MB fallback", () => {

@@ -2,7 +2,7 @@
   "artifact": "brand-diagnostic-parity-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-6.md",
+  "amendedBy": "preregistration-amendment-7.md",
   "correctionOf": {
     "priorClaim": "complete diagnostics live directly in ExtractionDebug.finalSelections.brand.brandDiagnostics.candidates",
     "whyWrong": "extractLabelEvidenceDetailed calls the ordinary selectBrandObservation, so debug.finalSelections carries the DEFAULT shape with neither filterChecks nor activeRejectionReasons. The prior claim was false and is corrected here, before any acquisition OCR."

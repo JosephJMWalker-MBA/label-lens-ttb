@@ -57,7 +57,7 @@
       "recommending a filter treatment"
     ]
   },
-  "amendedBy": "preregistration-amendment-6.md",
+  "amendedBy": "preregistration-amendment-7.md",
   "opaqueIdentity": {
     "scheme": "item-NNNN, 1-based, zero-padded to four digits",
     "assignmentOrder": "ascending source-image SHA-256, so the sequence is deterministic and carries no ordering signal from the historical names",
@@ -81,10 +81,11 @@
     "whyItWasFalse": "Trusted staging necessarily opens the evaluation manifest and the historical identities in order to freeze the corpus, assign opaque ids and write the post-freeze map. That happens BEFORE acquisition, so no component could truthfully claim nothing had opened them before the runs. The invariant that matters was never global ordering; it is who receives what.",
     "phase1TrustedStaging": {
       "mayRead": [
+        "the PR #217 per-case attribution artifact",
+        "governedTruth.present",
+        "acceptableValues and other truth fields that coexist in that source object",
         "the evaluation manifest",
-        "historical case identities",
-        "historical fixture paths",
-        "the source images"
+        "historical identity and source image paths"
       ],
       "onlyInOrderTo": [
         "freeze the 115-item population",
@@ -102,7 +103,41 @@
       ],
       "runsNoOcr": true,
       "isJobA": true,
-      "isTrustedNotTruthFree": true
+      "isTrustedNotTruthFree": true,
+      "governedTruthAccess": {
+        "physicallyReadsATruthBearingSource": true,
+        "supersededClaim": "Job A receives no governed truth.",
+        "whyItWasFalse": "The freeze script reads artifacts/issue-149-brand-current-baseline-failure-decomposition/per-case-attribution.json and accesses c.governedTruth.present to enforce the frozen 105/10 Brand-present split. Acceptable Brand values and other governed truth live in the same case objects, so they are physically in the process's address space whether or not they are used.",
+        "mayPhysicallyRead": [
+          "the PR #217 per-case attribution artifact",
+          "governedTruth.present",
+          "acceptableValues and other truth fields that coexist in that source object",
+          "the evaluation manifest",
+          "historical identity and source image paths"
+        ],
+        "mayUseOnly": [
+          "case identity and inclusion status",
+          "source-image path, SHA-256 and byte size",
+          "governedTruth.present, SOLELY for the preregistered 105/10 corpus-accounting assertion",
+          "PR #218 membership, for the frozen-subset assertion"
+        ],
+        "mustNotUseAcceptableValuesOrTruthTextFor": [
+          "inclusion or exclusion",
+          "opaque-ID assignment",
+          "image ordering",
+          "staged filenames",
+          "preprocessing",
+          "runtime bundle construction",
+          "any acquisition input or emitted field"
+        ],
+        "preparationArtifactRemainsTruthFree": true,
+        "jobBRemainsTruthFree": true,
+        "firstPhysicalAccessToATruthBearingSourceOccursIn": "trusted Job A",
+        "evaluationUseTruthBoundaryRemains": "between actor 2 and actor 3",
+        "onlyActor3MayUseGovernedTruthAgainstAcquiredEvidence": true,
+        "noninterferenceClaimIsBounded": "Complete noninterference from governedTruth.present is NOT claimed: the script intentionally uses that flag for the 105/10 accounting assertion. What is claimed, and tested, is that acceptable Brand values and other truth TEXT do not influence the truth-free input manifest, the opaque ordering or the staged filenames.",
+        "stagingIndependenceTestedBy": "src/fixtures/eval/issue-149-staging-independence.test.ts"
+      }
     },
     "phase2IsolatedAcquisition": {
       "receivesNo": [
@@ -162,23 +197,51 @@
     }
   },
   "forbiddenEvidenceKeyInventory": {
-    "authoritativeInventory": "artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json",
-    "assetSha256": "80ae4a144259a9a013d8a35163e724cef1dded4e92e0aa4abd0dc74587e1ff6f",
+    "authoritativeAsset": "artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json",
     "bundlePath": "runtime/truth-key-inventory.json",
-    "keys": [
-      "isTruth",
-      "matchesTruth",
-      "truthInRawOcr",
-      "truthOnReconstructedLine",
-      "truthFilterReasons",
-      "expectedBrand",
-      "acceptableValues",
-      "brandPresent",
-      "historicalCaseId",
-      "historicalImagePath"
+    "assetSha256": "80ae4a144259a9a013d8a35163e724cef1dded4e92e0aa4abd0dc74587e1ff6f",
+    "canonicalFormatting": "a bare JSON array of the key names in authoritative order, no whitespace, one terminal newline",
+    "keyCount": 10,
+    "keysNotRestatedHere": true,
+    "keysNotRestatedHereWhy": "Amendment 6 declared the asset authoritative and then copied the array into four contracts and a test, which is four more places to drift. Operative contracts reference the path and hash; the runtime, the freeze script, the bundle scanner and the consistency test all READ the asset.",
+    "readByTheRuntimeEmittedEvidenceScanner": true,
+    "readByTheStagingLeakScan": true,
+    "readByTheHostBundleScanner": true,
+    "fieldNamesVersusValues": "These are FIELD NAMES, prohibited inside acquisition output. The historical identifier and fixture-path VALUES are checked after sealing by the read-only identity-leak verifier, which holds an inventory the isolated runtime never receives.",
+    "governsEveryEmittedFile": "pass records, candidate records, selection records, item-level failure records, count records, manifests and provenance records alike"
+  },
+  "jobATruthAccess": {
+    "physicallyReadsATruthBearingSource": true,
+    "supersededClaim": "Job A receives no governed truth.",
+    "whyItWasFalse": "The freeze script reads artifacts/issue-149-brand-current-baseline-failure-decomposition/per-case-attribution.json and accesses c.governedTruth.present to enforce the frozen 105/10 Brand-present split. Acceptable Brand values and other governed truth live in the same case objects, so they are physically in the process's address space whether or not they are used.",
+    "mayPhysicallyRead": [
+      "the PR #217 per-case attribution artifact",
+      "governedTruth.present",
+      "acceptableValues and other truth fields that coexist in that source object",
+      "the evaluation manifest",
+      "historical identity and source image paths"
     ],
-    "singleSourceRule": "This is the ONE inventory. No contract, test or executable module may declare a second list. Amendment 5 left three different sets in play \u2014 ten keys in evidence-schema.json, seven in truth-isolation-plan.json and the scanner, five in raw-ocr-contract.json \u2014 so brandPresent, historicalCaseId and historicalImagePath were absent from the executable scanner.",
-    "fieldNamesVersusValues": "These are FIELD NAMES, prohibited inside acquisition output. The historical identifier and fixture-path VALUES are a separate matter: they are checked after sealing by the read-only identity-leak verifier, which holds an inventory the isolated runtime never receives.",
-    "governsEveryEmittedFile": "pass records, candidate records, selection records, item-level failure records, count records, manifests and provenance records alike \u2014 closed pass and candidate schemas cover two of those shapes, not all of them"
+    "mayUseOnly": [
+      "case identity and inclusion status",
+      "source-image path, SHA-256 and byte size",
+      "governedTruth.present, SOLELY for the preregistered 105/10 corpus-accounting assertion",
+      "PR #218 membership, for the frozen-subset assertion"
+    ],
+    "mustNotUseAcceptableValuesOrTruthTextFor": [
+      "inclusion or exclusion",
+      "opaque-ID assignment",
+      "image ordering",
+      "staged filenames",
+      "preprocessing",
+      "runtime bundle construction",
+      "any acquisition input or emitted field"
+    ],
+    "preparationArtifactRemainsTruthFree": true,
+    "jobBRemainsTruthFree": true,
+    "firstPhysicalAccessToATruthBearingSourceOccursIn": "trusted Job A",
+    "evaluationUseTruthBoundaryRemains": "between actor 2 and actor 3",
+    "onlyActor3MayUseGovernedTruthAgainstAcquiredEvidence": true,
+    "noninterferenceClaimIsBounded": "Complete noninterference from governedTruth.present is NOT claimed: the script intentionally uses that flag for the 105/10 accounting assertion. What is claimed, and tested, is that acceptable Brand values and other truth TEXT do not influence the truth-free input manifest, the opaque ordering or the staged filenames.",
+    "stagingIndependenceTestedBy": "src/fixtures/eval/issue-149-staging-independence.test.ts"
   }
 }

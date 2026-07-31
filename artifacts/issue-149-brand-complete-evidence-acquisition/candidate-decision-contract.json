@@ -2,7 +2,7 @@
   "artifact": "candidate-decision-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-6.md",
+  "amendedBy": "preregistration-amendment-7.md",
   "sourceOfTruthForShape": "BrandCandidateDiagnostic in src/pipeline/extractor/field-selection.ts at PR #220 merge commit 546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "entryPoint": "selectBrandObservationWithCompleteFilterDiagnostics",
@@ -39,7 +39,7 @@
     "regionName": "string, the top-level BrandCandidateDiagnostic.regionName; NOT only the copy inside candidateProvenance",
     "passId": "string",
     "passKind": "string",
-    "supportPassIds": "string[]",
+    "supportPassIds": "string[] \u2014 the PUBLIC diagnostic support IDs, pre-deduplication-merge. NOT the final merged support set.",
     "candidateProvenance": "AnalyzerCandidateProvenance, persisted whole",
     "assembly": "string",
     "lineIndexes": "integer[]",
@@ -50,9 +50,9 @@
     "ranking": "AnalyzerCandidateRanking | null, persisted WHOLE \u2014 strategy, orderingMode, comparator, rankingScore and scoreFactors. Persisting only rankingScore would discard the comparator and ordering mode a replay needs.",
     "filterChecks": "complete ordered BrandFilterCheck[], all ten rules",
     "activeRejectionReasons": "complete ordered BrandFilterCheckName[]",
-    "rankingEligible": "boolean, DERIVED by the acquisition from the presence of the ranking object",
+    "rankingEligible": "boolean, DERIVED from the presence of the ranking object. It means RANKING SEMANTICS WERE COMPUTED, which is not the same as final ranked membership.",
     "rankingScore": "number | null, a convenience copy of ranking.rankingScore; the complete ranking object above remains authoritative",
-    "rankedPosition": "integer | null, DERIVED position in the COMPLETE ranked list rather than a truncated head",
+    "rankedPosition": "integer | null \u2014 position in production's FINAL ranked array, which is exactly the set of candidates carrying a decision. Null for a candidate that has ranking semantics but was removed by family reduction or normalized-value deduplication, and null for every rejected candidate.",
     "selected": "boolean, DERIVED by the acquisition from decision",
     "canonicalRecordSha256": "DERIVED. string, full 64 lowercase hex over the canonical preimage in candidate-fingerprint-contract.json",
     "stableCandidateId": "DERIVED. `${opaqueItemId}:${candidateOrdinal}:${canonicalRecordSha256}` \u2014 never a truncated digest"
@@ -227,5 +227,38 @@
       "candidateProvenance.recoveryPassUsed equals passKind !== 'full-image-primary'"
     ],
     "testedAgainstRealSelectorOutputBy": "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts"
+  },
+  "supportProvenanceLevel": {
+    "candidateRecordSupportPassIds": "the support IDs exposed on the PUBLIC BrandCandidateDiagnostic \u2014 that is, the support the candidate had BEFORE any later merge",
+    "candidateProvenance": "the PUBLIC diagnostic provenance, likewise pre-merge",
+    "whyPreMerge": "Production merges support-pass information during candidate deduplication (dedupeBestCandidates -> mergeCandidateSupport, field-selection.ts:466, 2175-2195). The public diagnostic objects are constructed before that, and the only values written back to them afterwards are score, ranking and decision. supportPassIds is never written back.",
+    "finalSelectionSupportingPassIds": "persisted SEPARATELY from FieldSelection.supportingPassIds for the selected observation, where the post-merge value IS exposed",
+    "alternateProvenance": "persisted wherever FieldSelection exposes it",
+    "completePostDeduplicationMergedSupportForEveryFinalRankedCandidate": {
+      "available": false,
+      "why": "The merged support set exists only on the internal Candidate objects inside the ranked array. It is not written back to the public diagnostics and is not otherwise exposed.",
+      "notReconstructedInTheAdapter": true,
+      "notReconstructedWhy": "Recomputing the merge outside production would be a second implementation of deduplication, and labelling its output as production's merged support would misstate what the pipeline produced.",
+      "wouldRequire": "a production change to expose it, which this amendment forbids",
+      "recordedAs": "a genuine remaining limitation"
+    },
+    "doNotCall": "the candidate-record supportPassIds the final post-deduplication support set for every ranked candidate"
+  },
+  "finalRankedMembership": {
+    "membershipIs": "the set of candidates whose decision is defined",
+    "notThePresenceOfRanking": true,
+    "whyNot": "Production assigns ranking semantics to every scored candidate, then reduces them with bestFamilyCandidates and dedupeBestCandidates, sorts the survivors with compareCandidateRanking, and assigns a decision only to that final array (field-selection.ts:2556-2578).",
+    "orderedBy": "production's exported compareCandidateRanking, applied through a minimal structural wrapper; NOT rankingScore alone",
+    "whyNotRankingScoreAlone": "The comparator is an ordered list that can prioritise score eligibility, prominence, OCR evidence and normalized value under three ordering modes. Sorting on rankingScore alone reorders prominence-first candidates and breaks equal-score ties differently from production.",
+    "tieOrder": "the original diagnostic-array order, preserved when the production comparator returns zero",
+    "positions": "contiguous 0..N-1, unique",
+    "selectedCandidate": "exactly one when N > 0, and it must be position 0",
+    "noCandidateOutsideMembershipReceivesAPosition": true,
+    "haltCodes": {
+      "RANKED_MEMBERSHIP_INCONSISTENT": "a decision without ranking semantics, a rankedPosition without a decision, a decision without a rankedPosition, a selected candidate away from position 0, position 0 held by a non-selected candidate, or a rejected candidate carrying any of the three",
+      "RANKED_POSITION_PARITY_FAILURE": "positions not unique, not contiguous from 0, more than one selected candidate, or a non-empty ranked set without exactly one selected candidate"
+    },
+    "arrayLevelInvariantsEnforcedIn": "finalizeProductionCandidateArray \u2014 a single-record validator cannot prove uniqueness or contiguity, and claiming it could would be an overclaim",
+    "priorDefect": "An earlier adapter took every diagnostic carrying a ranking, sorted by rankingScore descending, and gave them all positions. That assigned fake positions to deduplicated candidates and produced an order production never produced."
   }
 }

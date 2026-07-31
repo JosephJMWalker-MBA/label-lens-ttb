@@ -562,9 +562,76 @@ describe("Issue #149 closed candidate evidence schema", () => {
       expect(() => finalizeCandidateRecord(keptRecord({ decision: "alternate" }))).toThrow(
         CandidateRecordError,
       );
+      // An alternate is a real ranked member, so it needs a non-zero position:
+      // position 0 is production's selected candidate.
       expect(() =>
-        finalizeCandidateRecord(keptRecord({ decision: "alternate", selected: false })),
+        finalizeCandidateRecord(
+          keptRecord({ decision: "alternate", selected: false, rankedPosition: 1 }),
+        ),
       ).not.toThrow();
+    });
+  });
+
+  describe("final ranked membership", () => {
+    it("ties rankedPosition to decision, not to the presence of ranking", () => {
+      // Production assigns ranking semantics to every scored candidate, then
+      // deduplicates, then assigns a decision only to the survivors. A candidate
+      // with ranking but no decision was eliminated and has no position.
+      expect(() =>
+        finalizeCandidateRecord(
+          keptRecord({ decision: null, selected: false, rankedPosition: null }),
+        ),
+      ).not.toThrow();
+      for (const bad of [
+        { decision: null, selected: false, rankedPosition: 2 },
+        { decision: "alternate", selected: false, rankedPosition: null },
+      ]) {
+        try {
+          finalizeCandidateRecord(keptRecord(bad));
+          throw new Error("expected a rejection");
+        } catch (error) {
+          expect((error as CandidateRecordError).code).toBe("RANKED_MEMBERSHIP_INCONSISTENT");
+        }
+      }
+    });
+
+    it("requires a ranked member to carry ranking semantics", () => {
+      try {
+        finalizeCandidateRecord(
+          keptRecord({ ranking: null, rankingEligible: false, rankingScore: null }),
+        );
+        throw new Error("expected a rejection");
+      } catch (error) {
+        expect((error as CandidateRecordError).code).toBe("RANKED_MEMBERSHIP_INCONSISTENT");
+      }
+    });
+
+    it("puts the selected candidate at position 0, and only it there", () => {
+      expect(() => finalizeCandidateRecord(keptRecord({ rankedPosition: 3 }))).toThrow(
+        CandidateRecordError,
+      );
+      try {
+        finalizeCandidateRecord(
+          keptRecord({ decision: "ambiguous-rival", selected: false, rankedPosition: 0 }),
+        );
+        throw new Error("expected a rejection");
+      } catch (error) {
+        expect((error as CandidateRecordError).code).toBe("RANKED_MEMBERSHIP_INCONSISTENT");
+      }
+    });
+
+    it("requires a rejected candidate to have no decision, ranking or position", () => {
+      for (const bad of [
+        { decision: "alternate", selected: false, rankedPosition: 1 },
+        { ranking: keptRecord().ranking, rankingEligible: true, rankingScore: 12.5 },
+      ]) {
+        try {
+          finalizeCandidateRecord(record(bad));
+          throw new Error("expected a rejection");
+        } catch (error) {
+          expect((error as CandidateRecordError).code).toBe("RANKED_MEMBERSHIP_INCONSISTENT");
+        }
+      }
     });
   });
 
@@ -604,12 +671,12 @@ describe("Issue #149 closed candidate evidence schema", () => {
       { assembly: "line-window" },
       { lineIndexes: [5] },
       { filterReason: "candidate-plausible" },
-      { decision: "alternate", selected: false },
+      { decision: "alternate", selected: false, rankedPosition: 1 },
       { score: { ...(keptRecord().score as object), total: 11 } },
       { ranking: { ...(keptRecord().ranking as object), orderingMode: "prominence-first" } },
       { rankingScore: 11, ranking: { ...(keptRecord().ranking as object), rankingScore: 11 } },
-      { rankedPosition: 1 },
-      { selected: false, decision: "alternate" },
+      { rankedPosition: 1, decision: "alternate", selected: false },
+      { selected: false, decision: "alternate", rankedPosition: 2 },
     ];
     for (const mutation of keptMutations) {
       expect(canonicalRecordSha256(keptRecord(mutation))).not.toBe(keptBase);
@@ -630,7 +697,15 @@ describe("Issue #149 closed candidate evidence schema", () => {
         filterChecks: ladder(),
         activeRejectionReasons: [],
       },
-      { rankingEligible: true, ranking: keptRecord().ranking, rankingScore: 12.5 },
+      {
+        kept: true,
+        filterReason: "candidate-positive",
+        filterChecks: ladder(),
+        activeRejectionReasons: [],
+        rankingEligible: true,
+        ranking: keptRecord().ranking,
+        rankingScore: 12.5,
+      },
     ];
     for (const mutation of rejectedMutations) {
       expect(canonicalRecordSha256(record(mutation))).not.toBe(rejectedBase);

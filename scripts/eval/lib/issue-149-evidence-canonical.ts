@@ -747,6 +747,7 @@ export class CandidateRecordError extends Error {
       | "FIELD_TYPE_MISMATCH"
       | "FILTER_LADDER_INVARIANT_VIOLATED"
       | "DERIVED_FIELD_INCONSISTENT"
+      | "RANKED_MEMBERSHIP_INCONSISTENT"
       | "WRONG_CANONICALIZATION_VERSION"
       | "ALREADY_FINALIZED"
       | "MISSING_DIGEST"
@@ -889,6 +890,47 @@ function assertCandidateInvariants(record: Record<string, unknown>): void {
     throw new CandidateRecordError(
       "DERIVED_FIELD_INCONSISTENT",
       `selected is ${String(record.selected)} but decision is ${JSON.stringify(record.decision)}`,
+    );
+  }
+
+  // ---- final ranked membership --------------------------------------------
+  //
+  // Production assigns `ranking` semantics to every scored candidate, then
+  // reduces them by family selection and normalized-value deduplication, sorts
+  // the survivors, and assigns a `decision` ONLY to that final ranked array. So
+  // `decision` — not `ranking` — is what final ranked membership means, and
+  // `rankedPosition` must track `decision` exactly.
+  const decision = record.decision;
+  const rankedPosition = record.rankedPosition;
+
+  if ((decision === null) !== (rankedPosition === null)) {
+    throw new CandidateRecordError(
+      "RANKED_MEMBERSHIP_INCONSISTENT",
+      `decision ${JSON.stringify(decision)} and rankedPosition ${JSON.stringify(rankedPosition)} disagree; final ranked membership is exactly the set of candidates carrying a decision`,
+    );
+  }
+  if (decision !== null && ranking === null) {
+    throw new CandidateRecordError(
+      "RANKED_MEMBERSHIP_INCONSISTENT",
+      "a candidate in the final ranked list must carry ranking semantics",
+    );
+  }
+  if (record.selected === true && rankedPosition !== 0) {
+    throw new CandidateRecordError(
+      "RANKED_MEMBERSHIP_INCONSISTENT",
+      `the selected candidate must be ranked position 0, received ${JSON.stringify(rankedPosition)}`,
+    );
+  }
+  if (rankedPosition === 0 && decision !== "selected") {
+    throw new CandidateRecordError(
+      "RANKED_MEMBERSHIP_INCONSISTENT",
+      `ranked position 0 is production's selected candidate, but decision is ${JSON.stringify(decision)}`,
+    );
+  }
+  if (record.kept === false && (decision !== null || ranking !== null || rankedPosition !== null)) {
+    throw new CandidateRecordError(
+      "RANKED_MEMBERSHIP_INCONSISTENT",
+      "a rejected candidate returns before a Candidate object exists, so decision, ranking and rankedPosition must all be null",
     );
   }
 }

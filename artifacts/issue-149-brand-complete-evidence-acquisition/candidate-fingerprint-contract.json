@@ -2,7 +2,7 @@
   "artifact": "candidate-fingerprint-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-6.md",
+  "amendedBy": "preregistration-amendment-7.md",
   "status": "ALGORITHM AND TEST CONTRACT FROZEN. The acquisition is not implemented in this amendment.",
   "canonicalizationVersion": "issue-149-candidate-canonical-v1",
   "preimage": {
@@ -90,7 +90,11 @@
     "every cross-field ladder and derived-field invariant is enforced",
     "the real selector's emitted candidates finalize successfully through the reference adapter",
     "ocrConfidence arithmetic invariants are enforced",
-    "a six-key ocrConfidence is rejected"
+    "a six-key ocrConfidence is rejected",
+    "a deduplicated real candidate keeps ranking semantics and receives no ranked position",
+    "multiple real ranked candidates are ordered by production's comparator, contiguously, with the selected candidate at position 0",
+    "the adapter does not order by rankingScore alone",
+    "a comparator tie preserves the original diagnostic-array order"
   ],
   "testedBy": "src/fixtures/eval/issue-149-evidence-canonical.test.ts",
   "implementedInThisAmendment": false,

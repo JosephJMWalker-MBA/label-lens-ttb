@@ -48,6 +48,46 @@ const EXPECTED_TOTAL = 115;
 const EXPECTED_BRAND_PRESENT = 105;
 const EXPECTED_BRAND_ABSENT = 10;
 
+/**
+ * The one authoritative forbidden evidence-key inventory. Read from the canonical
+ * asset so this script cannot drift from the contracts, the runtime scanner or
+ * the bundle scanner.
+ */
+const TRUTH_KEY_INVENTORY = path.join(ROOT, "runtime/truth-key-inventory.json");
+const forbiddenEvidenceKeys = () => JSON.parse(readFileSync(TRUTH_KEY_INVENTORY, "utf8"));
+
+/**
+ * Staging-specific prohibited input keys. Not truth-bearing, but either would
+ * defeat the opacity of the acquisition input.
+ */
+const STAGING_PROHIBITED_INPUT_KEYS = ["caseId", "imagePath"];
+
+/**
+ * The ID-map access boundary, identical to `id-map-contract.json#accessBoundary`.
+ *
+ * Amendment 6 corrected the committed map but not this generator, which still
+ * emitted `readableOnlyAfter`, `mountedIntoAcquisition` and
+ * `importedByAcquisitionHarness`. Job A is preregistered to rerun this script and
+ * require bit-for-bit reproduction of the committed map, so the two disagreeing
+ * meant Job A had to either fail or overwrite the corrected map with stale
+ * metadata.
+ */
+const ID_MAP_ACCESS_BOUNDARY = {
+  supersededClaim: "readable only after both raw manifests are written",
+  whyItWasFalse:
+    "Trusted staging generates and verifies the map before isolated acquisition begins, and the map is committed on PR #219 where any checkout can read it. Unreadability was never the control.",
+  trustedStagingMayReadGenerateAndVerify: true,
+  insideStagedImageDirectory: false,
+  insideRawEvidenceDirectory: false,
+  mountedIntoIsolatedDiscovery: false,
+  mountedIntoIsolatedExecution: false,
+  importedByAcquisitionCode: false,
+  mayNotBeUsedAgainstAcquiredEvidenceUntil:
+    "both raw manifests are sealed AND the read-only identity-leak verification has run clean and is authorized",
+  onlyActorAuthorizedToUseItForTruthBasedEvaluation: "actor 3, the post-freeze evaluation process",
+  physicalInaccessibilityClaimed: false,
+};
+
 const sha256 = (b) => createHash("sha256").update(b).digest("hex");
 const readJson = (p) => JSON.parse(readFileSync(path.join(process.cwd(), p), "utf8"));
 const writeJson = (p, v) => writeFileSync(p, `${JSON.stringify(v, null, 2)}\n`);
@@ -61,9 +101,20 @@ function halt(reason, detail) {
   process.exit(1);
 }
 
-function main() {
-  mkdirSync(ROOT, { recursive: true });
-  mkdirSync(POST_FREEZE, { recursive: true });
+/**
+ * Generate the three Stage 1 artifacts.
+ *
+ * `out` names where the bytes are WRITTEN; the canonical paths the artifacts
+ * DECLARE about themselves never change, so check mode reproduces the committed
+ * files exactly rather than differing only in a self-referential path.
+ *
+ * There is exactly one implementation. Check mode calls this same function with
+ * a temporary output root, so the two can never diverge into separately
+ * maintained serializers.
+ */
+function generate(out) {
+  mkdirSync(out.root, { recursive: true });
+  mkdirSync(out.postFreeze, { recursive: true });
 
   const pr217 = readJson(PR217);
   const pr218 = readJson(PR218);
@@ -132,11 +183,11 @@ function main() {
   }
 
   // ---- stage the images under generic names, untracked ----
-  rmSync(STAGED, { recursive: true, force: true });
-  mkdirSync(STAGED, { recursive: true });
+  rmSync(out.staged, { recursive: true, force: true });
+  mkdirSync(out.staged, { recursive: true });
   for (const entry of assigned) {
     const stagedName = `${entry.opaqueItemId}${entry.extension}`;
-    const destination = path.join(STAGED, stagedName);
+    const destination = path.join(out.staged, stagedName);
     copyFileSync(path.join(process.cwd(), entry.historicalImagePath), destination);
     const staged = readFileSync(destination);
     if (sha256(staged) !== entry.sourceImageSha256) {
@@ -160,12 +211,19 @@ function main() {
     if (serialized.includes(e.historicalCaseId)) leaked.push(e.historicalCaseId);
     if (serialized.includes(e.historicalImagePath)) leaked.push(e.historicalImagePath);
   }
-  for (const key of ["truth", "acceptable", "brandPresent", "expected", "caseId", "imagePath"]) {
+  // The prohibited FIELD-NAME inventory comes from the canonical asset, never
+  // from a list maintained here. A second list is a second source of truth.
+  for (const key of forbiddenEvidenceKeys()) {
+    if (serialized.toLowerCase().includes(key.toLowerCase())) leaked.push(`key:${key}`);
+  }
+  // Two additional field names that would defeat opacity even though they are
+  // not truth-bearing. These are staging-specific and are stated as such.
+  for (const key of STAGING_PROHIBITED_INPUT_KEYS) {
     if (serialized.toLowerCase().includes(key.toLowerCase())) leaked.push(`key:${key}`);
   }
   if (leaked.length > 0) halt("HISTORICAL_IDENTITY_IN_ACQUISITION_INPUT", [...new Set(leaked)]);
 
-  const stagedListing = readdirSync(STAGED).sort();
+  const stagedListing = readdirSync(out.staged).sort();
   for (const name of stagedListing) {
     for (const e of assigned) {
       if (name.includes(e.historicalCaseId)) halt("HISTORICAL_ID_IN_STAGED_FILENAME", name);
@@ -173,7 +231,7 @@ function main() {
     if (!/^item-\d{4}\.[a-z0-9]+$/.test(name)) halt("STAGED_FILENAME_NOT_OPAQUE", name);
   }
 
-  writeJson(path.join(ROOT, "truth-free-input-manifest.json"), {
+  writeJson(path.join(out.root, "truth-free-input-manifest.json"), {
     artifact: "truth-free-input-manifest",
     experimentId: EXPERIMENT_ID,
     stage: 1,
@@ -211,19 +269,13 @@ function main() {
   });
 
   // ---- the post-freeze mapping, deliberately elsewhere ----
-  writeJson(path.join(POST_FREEZE, "id-map.json"), {
+  writeJson(path.join(out.postFreeze, "id-map.json"), {
     artifact: "post-freeze-id-map",
     experimentId: EXPERIMENT_ID,
-    accessBoundary: {
-      mountedIntoAcquisition: false,
-      insideAcquisitionInputDirectory: false,
-      insideRawEvidenceDirectory: false,
-      readableOnlyAfter:
-        "both the primary and repeat raw-evidence manifests are written, hashed and verified",
-      importedByAcquisitionHarness: false,
-    },
+    accessBoundary: ID_MAP_ACCESS_BOUNDARY,
     location: path.relative(process.cwd(), path.join(POST_FREEZE, "id-map.json")),
     entryCount: assigned.length,
+    amendedBy: "preregistration-amendment-7.md",
     map: assigned.map((e) => ({
       opaqueItemId: e.opaqueItemId,
       historicalCaseId: e.historicalCaseId,
@@ -233,7 +285,7 @@ function main() {
     })),
   });
 
-  writeJson(path.join(ROOT, "population-freeze.json"), {
+  writeJson(path.join(out.root, "population-freeze.json"), {
     artifact: "population-freeze",
     experimentId: EXPERIMENT_ID,
     stage: 1,
@@ -276,26 +328,38 @@ function main() {
     ],
   });
 
-  format([
-    path.join(ROOT, "truth-free-input-manifest.json"),
-    path.join(ROOT, "population-freeze.json"),
-    path.join(POST_FREEZE, "id-map.json"),
-  ]);
+  const written = [
+    path.join(out.root, "truth-free-input-manifest.json"),
+    path.join(out.root, "population-freeze.json"),
+    path.join(out.postFreeze, "id-map.json"),
+  ];
+  format(written);
 
+  return {
+    written,
+    summary: {
+      total: assigned.length,
+      brandPresent: assigned.filter((e) => e.brandPresent).length,
+      brandAbsent: assigned.filter((e) => !e.brandPresent).length,
+      opaqueIdRange: `${assigned[0].opaqueItemId}..${assigned.at(-1).opaqueItemId}`,
+      stagedFilesVerified: stagedListing.length,
+      totalSourceImageBytes: assigned.reduce((n, e) => n + e.sourceImageByteSize, 0),
+    },
+  };
+}
+
+/** Normal staging: write the committed artifacts and stage the real images. */
+function stage() {
+  const result = generate({ root: ROOT, postFreeze: POST_FREEZE, staged: STAGED });
   console.log(
     JSON.stringify(
       {
         status: "STAGE_1_POPULATION_FROZEN",
-        total: assigned.length,
-        brandPresent: assigned.filter((e) => e.brandPresent).length,
-        brandAbsent: assigned.filter((e) => !e.brandPresent).length,
-        opaqueIdRange: `${assigned[0].opaqueItemId}..${assigned.at(-1).opaqueItemId}`,
+        ...result.summary,
         stagedImageDirectory: path.relative(process.cwd(), STAGED),
         stagedImageDirectoryTracked: false,
-        stagedFilesVerified: stagedListing.length,
         historicalIdentityInAcquisitionInput: false,
         idMapLocation: path.relative(process.cwd(), path.join(POST_FREEZE, "id-map.json")),
-        totalSourceImageBytes: assigned.reduce((n, e) => n + e.sourceImageByteSize, 0),
         ocrRun: false,
       },
       null,
@@ -304,4 +368,85 @@ function main() {
   );
 }
 
-main();
+/**
+ * Reproducibility check. Regenerates all three artifacts into a temporary output
+ * root and compares the EXACT BYTES against the committed files.
+ *
+ * It touches no tracked artifact and no real staging directory, and it runs no
+ * OCR. Job A is preregistered to require this before it does anything else: a
+ * generator that cannot reproduce its own committed output would leave Job A with
+ * a choice between failing and overwriting reviewed artifacts with stale
+ * metadata.
+ */
+function check() {
+  const scratch = path.join(process.cwd(), ".local/issue-149-freeze-check");
+  const out = {
+    root: path.join(scratch, "artifacts"),
+    postFreeze: path.join(scratch, "artifacts/post-freeze"),
+    staged: path.join(scratch, "staged"),
+  };
+  rmSync(scratch, { recursive: true, force: true });
+
+  let result;
+  try {
+    result = generate(out);
+
+    const compared = [
+      [
+        "truth-free-input-manifest.json",
+        path.join(ROOT, "truth-free-input-manifest.json"),
+        path.join(out.root, "truth-free-input-manifest.json"),
+      ],
+      [
+        "population-freeze.json",
+        path.join(ROOT, "population-freeze.json"),
+        path.join(out.root, "population-freeze.json"),
+      ],
+      [
+        "post-freeze/id-map.json",
+        path.join(POST_FREEZE, "id-map.json"),
+        path.join(out.postFreeze, "id-map.json"),
+      ],
+    ];
+
+    const drifted = [];
+    for (const [name, committedPath, regeneratedPath] of compared) {
+      const committed = readFileSync(committedPath);
+      const regenerated = readFileSync(regeneratedPath);
+      if (!committed.equals(regenerated)) {
+        drifted.push({
+          artifact: name,
+          committedSha256: sha256(committed),
+          regeneratedSha256: sha256(regenerated),
+          committedBytes: committed.length,
+          regeneratedBytes: regenerated.length,
+        });
+      }
+    }
+
+    if (drifted.length > 0) {
+      halt("STAGE_1_GENERATED_ARTIFACT_DRIFT", drifted);
+    }
+
+    console.log(
+      JSON.stringify(
+        {
+          status: "STAGE_1_GENERATED_ARTIFACTS_REPRODUCIBLE",
+          artifactsCompared: compared.map(([name]) => name),
+          byteIdentical: true,
+          trackedArtifactsModified: false,
+          realStagingDirectoryModified: false,
+          ocrRun: false,
+          ...result.summary,
+        },
+        null,
+        2,
+      ),
+    );
+  } finally {
+    rmSync(scratch, { recursive: true, force: true });
+  }
+}
+
+if (process.argv.includes("--check")) check();
+else stage();

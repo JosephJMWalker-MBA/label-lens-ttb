@@ -2,14 +2,11 @@
   "artifact": "post-freeze-id-map",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "accessBoundary": {
-    "mountedIntoAcquisition": false,
-    "insideAcquisitionInputDirectory": false,
-    "insideRawEvidenceDirectory": false,
-    "importedByAcquisitionHarness": false,
     "supersededClaim": "readable only after both raw manifests are written",
     "whyItWasFalse": "Trusted staging generates and verifies the map before isolated acquisition begins, and the map is committed on PR #219 where any checkout can read it. Unreadability was never the control.",
     "trustedStagingMayReadGenerateAndVerify": true,
     "insideStagedImageDirectory": false,
+    "insideRawEvidenceDirectory": false,
     "mountedIntoIsolatedDiscovery": false,
     "mountedIntoIsolatedExecution": false,
     "importedByAcquisitionCode": false,
@@ -19,6 +16,7 @@
   },
   "location": "artifacts/issue-149-brand-complete-evidence-acquisition/post-freeze/id-map.json",
   "entryCount": 115,
+  "amendedBy": "preregistration-amendment-7.md",
   "map": [
     {
       "opaqueItemId": "item-0001",
@@ -825,6 +823,5 @@
       "sourceImageSha256": "feafd79824e046f75426744c581454838ce6058ee0bb6e69ca907eaa98a0a16a",
       "sourceImageByteSize": 609808
     }
-  ],
-  "amendedBy": "preregistration-amendment-6.md"
+  ]
 }

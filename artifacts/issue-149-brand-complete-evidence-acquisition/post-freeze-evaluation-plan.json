@@ -84,7 +84,7 @@
     "treating the diagnostic selection rather than debug.finalSelections as the behavioural authority"
   ],
   "expectedUseOfTheResult": "A later, separately preregistered zero-OCR study may use this evidence. This sprint does not perform, design or recommend that study's treatment.",
-  "amendedBy": "preregistration-amendment-6.md",
+  "amendedBy": "preregistration-amendment-7.md",
   "actorsAndBoundaries": {
     "jobA_trustedPreparation": {
       "runsOcr": false,
@@ -115,7 +115,43 @@
         "prior per-case records"
       ],
       "isNotTruthFreeItself": true,
-      "isNotTruthFreeItselfNote": "Job A is TRUSTED, not truth-free. Calling the whole workflow truth-free would be false. What is truth-free is the artifact it emits and the isolated job that consumes it."
+      "isNotTruthFreeItselfNote": "Job A is TRUSTED, not truth-free. Calling the whole workflow truth-free would be false. What is truth-free is the artifact it emits and the isolated job that consumes it.",
+      "receivesGovernedTruth": true,
+      "receivesGovernedTruthNote": "Job A PHYSICALLY reads a truth-bearing source. Showing it as 'governed truth: no' was wrong. See governedTruthAccess for exactly what it may read and what it may use.",
+      "governedTruthAccess": {
+        "physicallyReadsATruthBearingSource": true,
+        "supersededClaim": "Job A receives no governed truth.",
+        "whyItWasFalse": "The freeze script reads artifacts/issue-149-brand-current-baseline-failure-decomposition/per-case-attribution.json and accesses c.governedTruth.present to enforce the frozen 105/10 Brand-present split. Acceptable Brand values and other governed truth live in the same case objects, so they are physically in the process's address space whether or not they are used.",
+        "mayPhysicallyRead": [
+          "the PR #217 per-case attribution artifact",
+          "governedTruth.present",
+          "acceptableValues and other truth fields that coexist in that source object",
+          "the evaluation manifest",
+          "historical identity and source image paths"
+        ],
+        "mayUseOnly": [
+          "case identity and inclusion status",
+          "source-image path, SHA-256 and byte size",
+          "governedTruth.present, SOLELY for the preregistered 105/10 corpus-accounting assertion",
+          "PR #218 membership, for the frozen-subset assertion"
+        ],
+        "mustNotUseAcceptableValuesOrTruthTextFor": [
+          "inclusion or exclusion",
+          "opaque-ID assignment",
+          "image ordering",
+          "staged filenames",
+          "preprocessing",
+          "runtime bundle construction",
+          "any acquisition input or emitted field"
+        ],
+        "preparationArtifactRemainsTruthFree": true,
+        "jobBRemainsTruthFree": true,
+        "firstPhysicalAccessToATruthBearingSourceOccursIn": "trusted Job A",
+        "evaluationUseTruthBoundaryRemains": "between actor 2 and actor 3",
+        "onlyActor3MayUseGovernedTruthAgainstAcquiredEvidence": true,
+        "noninterferenceClaimIsBounded": "Complete noninterference from governedTruth.present is NOT claimed: the script intentionally uses that flag for the 105/10 accounting assertion. What is claimed, and tested, is that acceptable Brand values and other truth TEXT do not influence the truth-free input manifest, the opaque ordering or the staged filenames.",
+        "stagingIndependenceTestedBy": "src/fixtures/eval/issue-149-staging-independence.test.ts"
+      }
     },
     "jobB_isolatedDiscoverOrExecute": {
       "checksOutTheRepository": false,
@@ -225,5 +261,5 @@
       "actor2AndActor3DoNotRun": true
     }
   },
-  "truthBoundaryLocation": "Between actor 2 and actor 3. Job A is trusted and holds historical identity; Job B is isolated and truth-free; Job C holds only a minimal identifier inventory and no truth."
+  "truthBoundaryLocation": "The EVALUATION-USE boundary sits between actor 2 and actor 3. It is not the first physical access to truth-bearing files: that occurs in trusted Job A, which reads the PR #217 attribution artifact. Job B is isolated and truth-free; Job C holds only a minimal identifier inventory and no truth."
 }

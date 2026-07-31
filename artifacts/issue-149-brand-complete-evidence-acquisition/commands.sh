@@ -17,6 +17,11 @@ ART=artifacts/issue-149-brand-complete-evidence-acquisition
 # count, a missing case, an image hash or byte-size mismatch, a non-included
 # status, an opaque-id collision, or any historical identifier surviving into the
 # acquisition input.
+# MANDATORY Job A precondition: the generator must reproduce its own committed
+# artifacts byte-for-byte. Check mode uses a temporary root, touches no tracked
+# artifact and no real staging directory, and runs no OCR.
+node scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs --check
+
 node scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs
 
 # The acquisition input carries no historical identity, and the id map is not
@@ -32,6 +37,8 @@ npx vitest run \
   src/fixtures/eval/issue-149-contract-consistency.test.ts \
   src/fixtures/eval/issue-149-evidence-canonical.test.ts \
   src/fixtures/eval/issue-149-frozen-vocabulary.test.ts \
+  src/fixtures/eval/issue-149-generated-artifact-reproducibility.test.ts \
+  src/fixtures/eval/issue-149-staging-independence.test.ts \
   src/fixtures/eval/issue-149-stage-1-manifest.test.ts
 
 # Verify the whole Stage 1 contract package, not just the preregistration.

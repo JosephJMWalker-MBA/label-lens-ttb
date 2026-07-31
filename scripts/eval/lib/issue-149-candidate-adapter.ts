@@ -12,10 +12,11 @@
  * `src/pipeline/extractor/field-selection`, which the invocation contract
  * explicitly permits on the acquisition route.
  */
-import type {
-  BrandCandidateDiagnostic,
-  BrandFilterCheck,
-  BrandFilterCheckName,
+import {
+  compareCandidateRanking,
+  type BrandCandidateDiagnostic,
+  type BrandFilterCheck,
+  type BrandFilterCheckName,
 } from "@/pipeline/extractor/field-selection";
 
 import {
@@ -30,7 +31,9 @@ export class CandidateAdapterError extends Error {
       | "COMPLETE_DIAGNOSTICS_ABSENT"
       | "MALFORMED_OPAQUE_ITEM_ID"
       | "ORDINAL_OUT_OF_RANGE"
-      | "PROVENANCE_DISAGREES_WITH_CANDIDATE",
+      | "PROVENANCE_DISAGREES_WITH_CANDIDATE"
+      | "RANKED_MEMBERSHIP_INCONSISTENT"
+      | "RANKED_POSITION_PARITY_FAILURE",
     detail: string,
   ) {
     super(`${code}: ${detail}`);
@@ -202,31 +205,139 @@ export function finalizeProductionCandidate(
 }
 
 /**
- * Adapt and finalize a COMPLETE diagnostic array, assigning contiguous ordinals
- * from 0 and the ranked position from the whole array.
+ * `compareCandidateRanking` is exported by production and reads **only**
+ * `candidate.ranking` — verified against the function body at the frozen base and
+ * asserted by `issue-149-production-candidate-compatibility.test.ts`. A minimal
+ * structural wrapper is therefore faithful, and is used in preference to
+ * reimplementing the comparator.
+ */
+type RankingCarrier = Parameters<typeof compareCandidateRanking>[0];
+const forComparator = (diagnostic: BrandCandidateDiagnostic): RankingCarrier =>
+  ({ ranking: diagnostic.ranking }) as unknown as RankingCarrier;
+
+/**
+ * Adapt and finalize a COMPLETE diagnostic array.
+ *
+ * ## Final ranked membership is `decision`, not `ranking`
+ *
+ * Production assigns `ranking` semantics to **every scored candidate**, then
+ * reduces them — `dedupeBestCandidates(bestFamilyCandidates(scored))` — sorts the
+ * survivors with `compareCandidateRanking`, and assigns a `decision` **only to
+ * candidates in that final ranked array** (`field-selection.ts:2556-2578`).
+ *
+ * So `ranking !== undefined` means "ranking semantics were computed" and
+ * `decision !== undefined` means "this candidate survived into the final ranked
+ * list". A candidate can have the first without the second, because family
+ * reduction or normalized-value deduplication removed it.
+ *
+ * An earlier revision of this adapter took every diagnostic carrying a `ranking`
+ * and sorted them by `rankingScore` descending. That was wrong twice over: it
+ * gave a fake ranked position to candidates production had eliminated, and it
+ * ignored the ordered comparator, which can prioritise score eligibility,
+ * prominence, OCR evidence and normalized value under three different ordering
+ * modes.
  */
 export function finalizeProductionCandidateArray(
   candidates: BrandCandidateDiagnostic[],
   opaqueItemId: string,
 ): CandidateEvidenceRecord[] {
-  const rankedOrder = candidates
+  const rankedMembers = candidates
     .map((candidate, index) => ({ candidate, index }))
-    .filter((entry) => entry.candidate.ranking !== undefined)
-    .sort(
-      (a, b) =>
-        (b.candidate.ranking?.rankingScore ?? 0) - (a.candidate.ranking?.rankingScore ?? 0) ||
-        a.index - b.index,
+    .filter((entry) => entry.candidate.decision !== undefined);
+
+  for (const member of rankedMembers) {
+    if (member.candidate.ranking === undefined) {
+      throw new CandidateAdapterError(
+        "RANKED_MEMBERSHIP_INCONSISTENT",
+        `candidate ${member.index} carries decision ${String(member.candidate.decision)} but no ranking; production ranks only scored candidates`,
+      );
+    }
+  }
+
+  // Production's own comparator, with the original diagnostic-array order as the
+  // stable tie-break so a comparator tie can never reorder the evidence.
+  const sorted = [...rankedMembers].sort((left, right) => {
+    const compared = compareCandidateRanking(
+      forComparator(left.candidate),
+      forComparator(right.candidate),
     );
-  const rankedPositionByIndex = new Map<number, number>(
-    rankedOrder.map((entry, position) => [entry.index, position]),
+    return compared !== 0 ? compared : left.index - right.index;
+  });
+
+  const positionByIndex = new Map<number, number>(
+    sorted.map((entry, position) => [entry.index, position]),
   );
 
-  return candidates.map((candidate, index) =>
+  if (sorted.length > 0) {
+    const selected = sorted.filter((entry) => entry.candidate.decision === "selected");
+    if (selected.length !== 1) {
+      throw new CandidateAdapterError(
+        "RANKED_POSITION_PARITY_FAILURE",
+        `a non-empty ranked list must contain exactly one selected candidate, found ${selected.length}`,
+      );
+    }
+    if (positionByIndex.get(selected[0].index) !== 0) {
+      throw new CandidateAdapterError(
+        "RANKED_POSITION_PARITY_FAILURE",
+        `the selected candidate is at ranked position ${String(positionByIndex.get(selected[0].index))}, but production's selected candidate is ranked[0]`,
+      );
+    }
+  }
+
+  const finalized = candidates.map((candidate, index) =>
     finalizeProductionCandidate(candidate, {
       opaqueItemId,
       candidateOrdinal: index,
       completeCandidateArrayLength: candidates.length,
-      rankedPosition: rankedPositionByIndex.get(index) ?? null,
+      rankedPosition: positionByIndex.get(index) ?? null,
     }),
   );
+
+  assertRankedArrayInvariants(finalized);
+  return finalized;
+}
+
+/**
+ * Invariants that only exist across a whole array. A single-record validator
+ * cannot prove uniqueness or contiguity, and pretending otherwise would be the
+ * same class of overclaim as a guard that restates what it guards.
+ */
+export function assertRankedArrayInvariants(records: CandidateEvidenceRecord[]): void {
+  const positions = records
+    .map((record) => record.rankedPosition)
+    .filter((position): position is number => position !== null);
+
+  if (new Set(positions).size !== positions.length) {
+    throw new CandidateAdapterError(
+      "RANKED_POSITION_PARITY_FAILURE",
+      `ranked positions are not unique: ${JSON.stringify(positions)}`,
+    );
+  }
+  const expected = Array.from({ length: positions.length }, (_, index) => index);
+  if ([...positions].sort((a, b) => a - b).join(",") !== expected.join(",")) {
+    throw new CandidateAdapterError(
+      "RANKED_POSITION_PARITY_FAILURE",
+      `ranked positions are not contiguous from 0: ${JSON.stringify([...positions].sort((a, b) => a - b))}`,
+    );
+  }
+
+  const selected = records.filter((record) => record.selected);
+  if (selected.length > 1) {
+    throw new CandidateAdapterError(
+      "RANKED_POSITION_PARITY_FAILURE",
+      `at most one candidate may be selected, found ${selected.length}`,
+    );
+  }
+  if (positions.length > 0 && selected.length !== 1) {
+    throw new CandidateAdapterError(
+      "RANKED_POSITION_PARITY_FAILURE",
+      `a non-empty ranked set requires exactly one selected candidate, found ${selected.length}`,
+    );
+  }
+  if (selected.length === 1 && selected[0].rankedPosition !== 0) {
+    throw new CandidateAdapterError(
+      "RANKED_POSITION_PARITY_FAILURE",
+      `the selected candidate is at position ${String(selected[0].rankedPosition)}, expected 0`,
+    );
+  }
 }

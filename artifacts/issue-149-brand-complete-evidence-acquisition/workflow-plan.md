@@ -52,11 +52,25 @@ implemented in this amendment.
 
 ## Job A — trusted preparation, outside isolation, no OCR
 
-**Job A is trusted, not truth-free.** It checks out the repository and may read
-historical identity and the evaluation manifest, because staging cannot freeze
-the corpus, assign opaque identifiers or write the post-freeze map without them.
-Calling the whole workflow truth-free would be false. What is truth-free is the
-**preparation artifact** Job A emits and the isolated job that consumes it.
+**Job A is trusted, not truth-free — and it physically reads governed truth.**
+It checks out the repository and reads the PR #217 per-case attribution artifact,
+whose case objects carry `governedTruth.present` alongside acceptable Brand values
+and other truth. It *uses* the presence flag, and only that, for the preregistered
+105/10 corpus-accounting assertion. It must not use acceptable values or any truth
+text for inclusion, opaque-ID assignment, image ordering, staged filenames,
+preprocessing, bundle construction, or any acquisition input or emitted field.
+
+So **the first physical access to a truth-bearing source happens here, in Job A**.
+The evaluation-use truth boundary still sits between actor 2 and actor 3, and only
+actor 3 may use governed truth against acquired evidence. Calling the whole
+workflow truth-free would be false. What is truth-free is the **preparation
+artifact** Job A emits and the isolated job that consumes it.
+
+A staging-independence test holds identities, paths, hashes, inclusion and
+presence flags fixed while changing the truth text, and proves the truth-free
+manifest, opaque ordering and staged filenames are unchanged. It does **not**
+claim independence from `governedTruth.present`, because the script intentionally
+uses that flag.
 
 These steps need the repository checkout, the Stage 1 artifacts and the
 post-freeze map. **None of those exists inside the isolated boundary**, so they
@@ -66,29 +80,43 @@ corrected here.
 
 1. Check out and verify the Stage 1 contract package against
    `stage-1-contract-manifest.sha256`.
-2. Verify `preregistration.sha256`.
-3. Run the freeze/staging script and confirm it reproduces
+2. **Verify that the freeze script reproduces its own committed artifacts**:
+
+   ```bash
+   node scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs --check
+   ```
+
+   Check mode regenerates `truth-free-input-manifest.json`,
+   `population-freeze.json` and `post-freeze/id-map.json` into a temporary root
+   and compares the **exact bytes** against the committed files, touching no
+   tracked artifact and no real staging directory and running no OCR. It halts
+   with `STAGE_1_GENERATED_ARTIFACT_DRIFT`. **This is a mandatory precondition**:
+   Job A is required to rerun the generator and reproduce the committed map
+   bit-for-bit, so a generator that has drifted from its own output would leave
+   Job A choosing between failing and overwriting reviewed artifacts.
+3. Verify `preregistration.sha256`.
+4. Run the freeze/staging script and confirm it reproduces
    `population-freeze.json`, `truth-free-input-manifest.json` and
    `post-freeze/id-map.json` bit-for-bit, restaging the 115 opaque images.
-4. Verify all 115 source images by SHA-256 and byte size, and verify the
+5. Verify all 115 source images by SHA-256 and byte size, and verify the
    post-freeze ID map.
-5. Verify the incumbent configuration against
+6. Verify the incumbent configuration against
    `incumbent-configuration-freeze.json`: tesseract.js and tesseract.js-core
    resolved versions, `eng.traineddata` SHA-256, OEM, page-segmentation modes,
    pass templates, **and the `field-selection.ts` SHA-256
    `8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c`**. Halt on
    any difference.
-6. Build the allowlisted runtime bundle. **No unrestricted repository `COPY`.**
-7. Generate the **complete dependency closure** — a bundler metafile or
+7. Build the allowlisted runtime bundle. **No unrestricted repository `COPY`.**
+8. Generate the **complete dependency closure** — a bundler metafile or
    equivalent full module graph — for every runtime input module, and halt with
    `BUNDLE_PROHIBITED_DEPENDENCY` if any transitive source input resolves under
    `src/fixtures/**`, `tests/**`, `artifacts/**`, `src/domain/rules/**`, the eval
    manifest, governed truth or a prior per-case report. Source maps carry no
    embedded `sourcesContent` from prohibited paths.
-8. Write the bundle manifest: every source input path and SHA-256, every emitted
+9. Write the bundle manifest: every source input path and SHA-256, every emitted
    path and SHA-256, the exact build command, the build tool version, and the
    metafile digest.
-9. Scan the built bundle, with a **scope that cannot reject its own scanner and
+10. Scan the built bundle, with a **scope that cannot reject its own scanner and
    does not infer an inventory from source text**. The **raw bytes** of every
    bundle file — including binary assets — are checked for historical case IDs
    and fixture paths. The forbidden evidence keys live in exactly one place: the
@@ -100,7 +128,7 @@ corrected here.
    file is a violation. Halt with `BUNDLE_PROHIBITED_CONTENT`. The scan takes no
    Brand inventory as a parameter at all — a transcript may contain the Brand
    text, and that is evidence, not leakage.
-10. Prepare the initially empty output mount.
+11. Prepare the initially empty output mount.
 
 Job A emits a **truth-free preparation artifact** containing only: the runtime
 bundle, the bundle manifest, the truth-free input manifest, the staged opaque
@@ -250,7 +278,7 @@ that identity-leak checking happens against frozen bytes it cannot alter.
 
 | # | Actor | Checkout? | Historical identity? | Governed truth? | May commit? |
 | --- | --- | --- | --- | --- | --- |
-| A | trusted preparation | yes | yes | no | no |
+| A | trusted preparation | yes | yes | yes, reads it; uses only the presence flag | no |
 | B | isolated discover / execute | no | no | no | no |
 | C | read-only identity verifier | no | identifier inventory only | no | no |
 | 2 | owner-authorized commit process | yes, in practice | not used as an input | no | yes, ≤ 100 MB |

@@ -82,7 +82,9 @@ describe("Issue #149 Stage 1 contract manifest", () => {
       "src/fixtures/eval/issue-149-dependency-closure.test.ts",
       "src/fixtures/eval/issue-149-evidence-canonical.test.ts",
       "src/fixtures/eval/issue-149-frozen-vocabulary.test.ts",
+      "src/fixtures/eval/issue-149-generated-artifact-reproducibility.test.ts",
       "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts",
+      "src/fixtures/eval/issue-149-staging-independence.test.ts",
       "src/fixtures/eval/issue-149-stage-1-manifest.test.ts",
     ]) {
       expect(listed).toContain(file);

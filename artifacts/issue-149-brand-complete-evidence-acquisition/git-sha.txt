@@ -1,7 +1,7 @@
 546c3f279ce431a1fd8c0203df7a83553ea866ef
 base: origin/main 546c3f279ce431a1fd8c0203df7a83553ea866ef (merge commit of PR #220)
 
-CURRENT — stage 1, amendment 6:
+CURRENT — stage 1, amendment 7:
   preregistration sha256: see preregistration.sha256
   stage 1 contract-package aggregate: see stage-1-contract-manifest.sha256
   field-selection.ts sha256 at this base: 8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c
@@ -11,7 +11,9 @@ CURRENT — stage 1, amendment 6:
     separately.
   runtime status: no acquisition runner, no execution workflow and no
     workflow-mode.txt exists; no raw/ directory exists; trusted preparation
-    (job A) has not been performed and no runtime bundle has been built.
+    (job A) has not been performed and no runtime bundle has been built. The
+    freeze script's --check mode reproduces its three committed artifacts
+    byte-for-byte without touching any tracked file.
 
 HISTORICAL — original Stage 1:
   head: 7600b0a9ba5ce6995274a517121f1eda18a30424
@@ -37,3 +39,7 @@ HISTORICAL — amendment 4:
 HISTORICAL — amendment 5:
   head: fca0755d629af2a15206d4cc5f5251768223e2f7
   preregistration sha256: 274e45779c849d4e6ada50e10b74d1fc8f6b1396f68b540ae02156e640422332
+
+HISTORICAL — amendment 6:
+  head: ad8351ee84f073f13b869871115748a0700beea7
+  preregistration sha256: 15771503f342652fd69ea1edf24d470a0e61324adac1451d32532b47e77627a1

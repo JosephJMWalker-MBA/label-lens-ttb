@@ -39,6 +39,27 @@ What makes the counterfactual reachable is the **complete ordered
 selector can replay it with exactly one filter changed. **This sprint does not
 run that replay and authorizes no filter change.**
 
+### Post-deduplication merged support — NOT AVAILABLE
+
+Production merges support-pass information during candidate deduplication
+(`dedupeBestCandidates` → `mergeCandidateSupport`,
+`field-selection.ts:466, 2175-2195`). The public `BrandCandidateDiagnostic`
+objects are constructed *before* that merge, and the only values written back to
+them afterwards are `score`, `ranking` and `decision`. `supportPassIds` is never
+written back.
+
+So the candidate record's `supportPassIds` and `candidateProvenance` are the
+**pre-merge** support the diagnostic carried. They must not be described as the
+final post-deduplication support set for every ranked candidate.
+
+What *is* available: `FieldSelection.supportingPassIds` exposes the post-merge
+support for the **selected observation**, and it is persisted separately.
+Alternate provenance is persisted wherever `FieldSelection` exposes it. The
+complete merged support for every final ranked candidate is not exposed, is **not
+reconstructed in the acquisition adapter** — that would be a second
+implementation of deduplication presented as production's output — and would
+require a production change this sprint forbids.
+
 ## Requirements that genuinely cannot be met
 
 **Word baseline geometry, and block/paragraph/line identifiers.** `OcrWord`

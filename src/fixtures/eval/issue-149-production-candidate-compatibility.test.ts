@@ -19,6 +19,7 @@ import { describe, expect, it } from "vitest";
 import type { OcrWord, RegionOcrResult } from "@/pipeline/extractor/extractor.types";
 import {
   BRAND_FILTER_CHECK_ORDER,
+  compareCandidateRanking,
   selectBrandObservationWithCompleteFilterDiagnostics,
   type BrandCandidateDiagnostic,
 } from "@/pipeline/extractor/field-selection";
@@ -60,7 +61,12 @@ function word(text: string, index: number, y: number, rawConfidence: number | nu
 }
 
 /** One synthetic single-pass region result containing the given lines. */
-function region(lines: string[][], missingConfidenceOn: string[] = []): RegionOcrResult {
+function region(
+  lines: string[][],
+  missingConfidenceOn: string[] = [],
+  passId = "pass-1-full-image",
+  passKind = "full-image-primary",
+): RegionOcrResult {
   const words: OcrWord[] = [];
   lines.forEach((line, lineIndex) => {
     line.forEach((text, wordIndex) =>
@@ -75,9 +81,9 @@ function region(lines: string[][], missingConfidenceOn: string[] = []): RegionOc
     );
   });
   return {
-    passId: "pass-1-full-image",
+    passId,
     regionName: "full-image",
-    passKind: "full-image-primary",
+    passKind,
     triggerReasons: [],
     preprocessing: [],
     fieldEligibility: { brand: true, alcohol: true },
@@ -257,5 +263,179 @@ describe("Issue #149 production candidate compatibility", () => {
       rankedPosition: null,
     });
     expect(new Set(Object.keys(record))).toEqual(new Set(CANDIDATE_EVIDENCE_REQUIRED_KEYS));
+  });
+});
+
+/** Diagnostics from an arbitrary pass set, so multi-pass behaviour is reachable. */
+function candidatesFrom(passes: RegionOcrResult[]): BrandCandidateDiagnostic[] {
+  return (
+    selectBrandObservationWithCompleteFilterDiagnostics(passes).brandDiagnostics?.candidates ?? []
+  );
+}
+
+describe("Issue #149 production ranked membership", () => {
+  it("uses a comparator that reads only candidate.ranking", () => {
+    // The adapter wraps a diagnostic as `{ ranking }` before calling production's
+    // comparator. That is faithful only while the comparator touches nothing
+    // else, so the claim is checked against the real function rather than
+    // assumed: two wrappers carrying only rankings must compare without throwing.
+    const ranked = candidatesFrom([
+      region([
+        ["RED", "BRICK", "WINERY"],
+        ["SILVER", "OAK", "CELLARS"],
+      ]),
+    ]).filter((candidate) => candidate.ranking !== undefined);
+    expect(ranked.length).toBeGreaterThanOrEqual(2);
+    const wrap = (candidate: BrandCandidateDiagnostic) =>
+      ({ ranking: candidate.ranking }) as unknown as Parameters<typeof compareCandidateRanking>[0];
+    expect(() => compareCandidateRanking(wrap(ranked[0]), wrap(ranked[1]))).not.toThrow();
+    expect(typeof compareCandidateRanking(wrap(ranked[0]), wrap(ranked[1]))).toBe("number");
+  });
+
+  it("gives a deduplicated candidate ranking semantics but NO ranked position", () => {
+    // The same Brand read from two passes: production keeps both diagnostics,
+    // scores both — so both carry `ranking` — and then removes one during
+    // deduplication, so only the survivor receives a `decision`.
+    const duplicates = candidatesFrom([
+      region([["RED", "BRICK", "WINERY"]], [], "pass-1-full-image", "full-image-primary"),
+      region([["RED", "BRICK", "WINERY"]], [], "pass-2-rot180", "full-image-rot180"),
+    ]);
+    const withRanking = duplicates.filter((candidate) => candidate.ranking !== undefined);
+    const withDecision = duplicates.filter((candidate) => candidate.decision !== undefined);
+    expect(withRanking.length).toBeGreaterThan(withDecision.length);
+    expect(withDecision).toHaveLength(1);
+
+    const finalized = finalizeProductionCandidateArray(duplicates, "item-0003");
+    const positions = finalized.map((record) => record.rankedPosition);
+    expect(positions.filter((position) => position !== null)).toEqual([0]);
+
+    // The eliminated duplicate keeps its ranking evidence and gets no position.
+    const eliminated = finalized.filter((record) => record.decision === null);
+    expect(eliminated.length).toBeGreaterThan(0);
+    for (const record of eliminated) {
+      expect(record.rankedPosition).toBeNull();
+      expect(record.selected).toBe(false);
+      // Ranking semantics are still persisted — they are real evidence.
+      expect(record.rankingEligible).toBe(true);
+      expect(record.ranking).not.toBeNull();
+    }
+  });
+
+  it("orders multiple ranked candidates the way production's comparator does", () => {
+    const distinct = candidatesFrom([
+      region([
+        ["RED", "BRICK", "WINERY"],
+        ["SILVER", "OAK", "CELLARS"],
+      ]),
+    ]);
+    const rankedMembers = distinct.filter((candidate) => candidate.decision !== undefined);
+    expect(rankedMembers.length).toBeGreaterThanOrEqual(2);
+
+    const finalized = finalizeProductionCandidateArray(distinct, "item-0004");
+    const positions = finalized
+      .map((record, index) => ({ record, index }))
+      .filter((entry) => entry.record.rankedPosition !== null)
+      .sort((a, b) => (a.record.rankedPosition as number) - (b.record.rankedPosition as number));
+
+    // Contiguous from 0, unique, and the selected candidate leads.
+    expect(positions.map((entry) => entry.record.rankedPosition)).toEqual(
+      Array.from({ length: positions.length }, (_, i) => i),
+    );
+    expect(positions[0].record.selected).toBe(true);
+    expect(positions[0].record.decision).toBe("selected");
+    expect(positions.slice(1).every((entry) => entry.record.selected === false)).toBe(true);
+
+    // The order matches production's comparator applied to the same members.
+    const expectedOrder = rankedMembers
+      .map((candidate, index) => ({ candidate, index }))
+      .sort((left, right) => {
+        const wrap = (c: BrandCandidateDiagnostic) =>
+          ({ ranking: c.ranking }) as unknown as Parameters<typeof compareCandidateRanking>[0];
+        const compared = compareCandidateRanking(wrap(left.candidate), wrap(right.candidate));
+        return compared !== 0 ? compared : left.index - right.index;
+      })
+      .map((entry) => entry.candidate.rawText);
+    expect(positions.map((entry) => entry.record.rawText)).toEqual(expectedOrder);
+  });
+
+  it("does not order by rankingScore alone", () => {
+    // A controlled synthetic ranking array where score ties but a later
+    // comparator entry decides. Sorting on rankingScore alone would leave the
+    // original order; production's comparator must reverse it.
+    const ranking = (valueKey: string) => ({
+      strategy: "brand-mixed-prominence-score" as const,
+      orderingMode: "score-first" as const,
+      comparator: [
+        { id: "score-eligibility" as const, direction: "desc" as const, value: true },
+        { id: "ranking-score" as const, direction: "desc" as const, value: 5 },
+        { id: "prominence" as const, direction: "desc" as const, value: 60 },
+        { id: "ocr-evidence-score" as const, direction: "desc" as const, value: 0.92 },
+        { id: "normalized-value-key" as const, direction: "asc" as const, value: valueKey },
+      ],
+      rankingScore: 5,
+    });
+    const wrap = (valueKey: string) =>
+      ({ ranking: ranking(valueKey) }) as unknown as Parameters<typeof compareCandidateRanking>[0];
+
+    // Equal rankingScore, so a score-only sort returns 0 for every pair.
+    expect(compareCandidateRanking(wrap("zulu"), wrap("alpha"))).toBeGreaterThan(0);
+    expect(compareCandidateRanking(wrap("alpha"), wrap("zulu"))).toBeLessThan(0);
+    expect(compareCandidateRanking(wrap("alpha"), wrap("alpha"))).toBe(0);
+  });
+
+  it("keeps original diagnostic-array order when the comparator ties", () => {
+    // Two identical-in-every-comparator-entry candidates cannot be distinguished
+    // by production, so the evidence order must be preserved rather than
+    // arbitrarily permuted by the sort.
+    const base = candidatesFrom([
+      region([
+        ["RED", "BRICK", "WINERY"],
+        ["SILVER", "OAK", "CELLARS"],
+      ]),
+    ]).filter((candidate) => candidate.decision !== undefined);
+    expect(base.length).toBeGreaterThanOrEqual(2);
+
+    const tied = base.map((candidate, index) => ({
+      ...candidate,
+      ranking: { ...base[0].ranking!, comparator: [...base[0].ranking!.comparator] },
+      decision: index === 0 ? ("selected" as const) : ("alternate" as const),
+    }));
+    const finalized = finalizeProductionCandidateArray(tied, "item-0005");
+    expect(finalized.map((record) => record.rankedPosition)).toEqual(tied.map((_, index) => index));
+    expect(finalized.map((record) => record.rawText)).toEqual(tied.map((c) => c.rawText));
+  });
+
+  it("halts when ranked membership or position parity is impossible", () => {
+    const distinct = candidatesFrom([
+      region([
+        ["RED", "BRICK", "WINERY"],
+        ["SILVER", "OAK", "CELLARS"],
+      ]),
+    ]);
+    const member = distinct.find((candidate) => candidate.decision !== undefined)!;
+
+    // A decision without ranking semantics cannot have come from production.
+    const noRanking = distinct.map((candidate) =>
+      candidate === member ? { ...candidate, ranking: undefined } : candidate,
+    );
+    try {
+      finalizeProductionCandidateArray(noRanking, "item-0006");
+      throw new Error("expected a rejection");
+    } catch (error) {
+      expect((error as CandidateAdapterError).code).toBe("RANKED_MEMBERSHIP_INCONSISTENT");
+    }
+
+    // Two selected candidates cannot have come from production either.
+    const twoSelected = distinct.map((candidate) =>
+      candidate.decision === undefined
+        ? candidate
+        : { ...candidate, decision: "selected" as const },
+    );
+    try {
+      finalizeProductionCandidateArray(twoSelected, "item-0006");
+      throw new Error("expected a rejection");
+    } catch (error) {
+      expect((error as CandidateAdapterError).code).toBe("RANKED_POSITION_PARITY_FAILURE");
+    }
   });
 });

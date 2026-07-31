@@ -20,18 +20,7 @@
   },
   "runs": ["primary", "repeat"],
   "immutabilityRule": "After a run's raw-evidence-manifest.sha256 is written, no file under raw/<run>/ is rewritten, reformatted or pretty-printed. JSONL is emitted in final form and is excluded from prettier via .prettierignore.",
-  "truthBearingFieldsAbsentByConstruction": [
-    "isTruth",
-    "matchesTruth",
-    "truthInRawOcr",
-    "truthOnReconstructedLine",
-    "truthFilterReasons",
-    "expectedBrand",
-    "acceptableValues",
-    "brandPresent",
-    "historicalCaseId",
-    "historicalImagePath"
-  ],
+  "truthBearingFieldsAbsentByConstruction": "every key in the canonical inventory asset; see forbiddenEvidenceKeyInventory for the path and digest. The list is not restated here.",
   "truthIsolationAssertion": {
     "inBoundaryKeyAndFileScan": "Inside the isolated boundary the acquisition scans every emitted file for the forbidden evidence KEY inventory, and for unexpected mounted or emitted files. Halt: TRUTH_ISOLATION_FAILURE.",
     "postSealHistoricalValueScan": "AFTER both raw manifests are sealed, a separate read-only verifier \u2014 which holds the historical case-ID and fixture-path inventory the runtime never receives \u2014 scans the frozen bytes for those VALUES. Halt: TRUTH_ISOLATION_FAILURE.",
@@ -43,7 +32,7 @@
     "block, paragraph and line identifiers \u2014 not present on OcrWord",
     "constituent word IDs per reconstructed line \u2014 not emitted by BrandLineDiagnostic"
   ],
-  "amendedBy": "preregistration-amendment-6.md",
+  "amendedBy": "preregistration-amendment-7.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "everyRawFilenameUsesOpaqueIdOnly": true,
@@ -64,23 +53,33 @@
   "passRecordSchema": "region-ocr-result-replay-contract.json#persistEveryFieldOfRegionOcrResult",
   "itemLevelFailureRecords": "raw-ocr-contract.json#itemLevelFailureEvidence",
   "forbiddenEvidenceKeyInventory": {
-    "authoritativeInventory": "artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json",
-    "assetSha256": "80ae4a144259a9a013d8a35163e724cef1dded4e92e0aa4abd0dc74587e1ff6f",
+    "authoritativeAsset": "artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json",
     "bundlePath": "runtime/truth-key-inventory.json",
-    "keys": [
-      "isTruth",
-      "matchesTruth",
-      "truthInRawOcr",
-      "truthOnReconstructedLine",
-      "truthFilterReasons",
-      "expectedBrand",
-      "acceptableValues",
-      "brandPresent",
-      "historicalCaseId",
-      "historicalImagePath"
-    ],
-    "singleSourceRule": "This is the ONE inventory. No contract, test or executable module may declare a second list. Amendment 5 left three different sets in play \u2014 ten keys in evidence-schema.json, seven in truth-isolation-plan.json and the scanner, five in raw-ocr-contract.json \u2014 so brandPresent, historicalCaseId and historicalImagePath were absent from the executable scanner.",
-    "fieldNamesVersusValues": "These are FIELD NAMES, prohibited inside acquisition output. The historical identifier and fixture-path VALUES are a separate matter: they are checked after sealing by the read-only identity-leak verifier, which holds an inventory the isolated runtime never receives.",
-    "governsEveryEmittedFile": "pass records, candidate records, selection records, item-level failure records, count records, manifests and provenance records alike \u2014 closed pass and candidate schemas cover two of those shapes, not all of them"
+    "assetSha256": "80ae4a144259a9a013d8a35163e724cef1dded4e92e0aa4abd0dc74587e1ff6f",
+    "canonicalFormatting": "a bare JSON array of the key names in authoritative order, no whitespace, one terminal newline",
+    "keyCount": 10,
+    "keysNotRestatedHere": true,
+    "keysNotRestatedHereWhy": "Amendment 6 declared the asset authoritative and then copied the array into four contracts and a test, which is four more places to drift. Operative contracts reference the path and hash; the runtime, the freeze script, the bundle scanner and the consistency test all READ the asset.",
+    "readByTheRuntimeEmittedEvidenceScanner": true,
+    "readByTheStagingLeakScan": true,
+    "readByTheHostBundleScanner": true,
+    "fieldNamesVersusValues": "These are FIELD NAMES, prohibited inside acquisition output. The historical identifier and fixture-path VALUES are checked after sealing by the read-only identity-leak verifier, which holds an inventory the isolated runtime never receives.",
+    "governsEveryEmittedFile": "pass records, candidate records, selection records, item-level failure records, count records, manifests and provenance records alike"
+  },
+  "supportProvenanceLevel": {
+    "candidateRecordSupportPassIds": "the support IDs exposed on the PUBLIC BrandCandidateDiagnostic \u2014 that is, the support the candidate had BEFORE any later merge",
+    "candidateProvenance": "the PUBLIC diagnostic provenance, likewise pre-merge",
+    "whyPreMerge": "Production merges support-pass information during candidate deduplication (dedupeBestCandidates -> mergeCandidateSupport, field-selection.ts:466, 2175-2195). The public diagnostic objects are constructed before that, and the only values written back to them afterwards are score, ranking and decision. supportPassIds is never written back.",
+    "finalSelectionSupportingPassIds": "persisted SEPARATELY from FieldSelection.supportingPassIds for the selected observation, where the post-merge value IS exposed",
+    "alternateProvenance": "persisted wherever FieldSelection exposes it",
+    "completePostDeduplicationMergedSupportForEveryFinalRankedCandidate": {
+      "available": false,
+      "why": "The merged support set exists only on the internal Candidate objects inside the ranked array. It is not written back to the public diagnostics and is not otherwise exposed.",
+      "notReconstructedInTheAdapter": true,
+      "notReconstructedWhy": "Recomputing the merge outside production would be a second implementation of deduplication, and labelling its output as production's merged support would misstate what the pipeline produced.",
+      "wouldRequire": "a production change to expose it, which this amendment forbids",
+      "recordedAs": "a genuine remaining limitation"
+    },
+    "doNotCall": "the candidate-record supportPassIds the final post-deduplication support set for every ranked candidate"
   }
 }

@@ -92,13 +92,31 @@ describe("Issue #149 acquisition identity and isolation", () => {
     expect(existsSync(path.join(process.cwd(), ROOT, "raw"))).toBe(false);
   });
 
-  it("declares the id map unreachable from acquisition", () => {
+  it("declares the id map's real access boundary, not a false unreadability rule", () => {
+    // Amendment 7 removed the obsolete aliases rather than keeping them beside
+    // the corrected keys: the generator emits exactly this shape, and Job A is
+    // required to reproduce the committed map bit-for-bit.
     expect(idMap.accessBoundary).toMatchObject({
-      mountedIntoAcquisition: false,
-      insideAcquisitionInputDirectory: false,
+      trustedStagingMayReadGenerateAndVerify: true,
+      insideStagedImageDirectory: false,
       insideRawEvidenceDirectory: false,
-      importedByAcquisitionHarness: false,
+      mountedIntoIsolatedDiscovery: false,
+      mountedIntoIsolatedExecution: false,
+      importedByAcquisitionCode: false,
+      physicalInaccessibilityClaimed: false,
     });
+    expect(idMap.accessBoundary.mayNotBeUsedAgainstAcquiredEvidenceUntil).toContain("sealed");
+    expect(idMap.accessBoundary.onlyActorAuthorizedToUseItForTruthBasedEvaluation).toContain(
+      "actor 3",
+    );
+    for (const obsolete of [
+      "readableOnlyAfter",
+      "mountedIntoAcquisition",
+      "insideAcquisitionInputDirectory",
+      "importedByAcquisitionHarness",
+    ]) {
+      expect(Object.hasOwn(idMap.accessBoundary, obsolete)).toBe(false);
+    }
   });
 
   it("maps every opaque id back to exactly one historical case", () => {

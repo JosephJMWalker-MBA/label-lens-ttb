@@ -118,7 +118,7 @@
     "the emitted word count per pass must equal the length of the debug pass word array",
     "any inequality halts with RAW_EVIDENCE_TRUNCATED"
   ],
-  "amendedBy": "preregistration-amendment-6.md",
+  "amendedBy": "preregistration-amendment-7.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "historicalNote": "Amendment 1 described this evidence as reachable through runCaseArtifacts. That route is prohibited from Amendment 2 onward.",
   "completeRegionOcrResultPersistence": "Every RegionOcrResult field is persisted exactly; see region-ocr-result-replay-contract.json. The per-pass field list here is explanatory and is not a licence to persist a subset.",
@@ -160,23 +160,17 @@
     "runMetadataOnAPassRecordIsRejected": true
   },
   "forbiddenEvidenceKeyInventory": {
-    "authoritativeInventory": "artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json",
-    "assetSha256": "80ae4a144259a9a013d8a35163e724cef1dded4e92e0aa4abd0dc74587e1ff6f",
+    "authoritativeAsset": "artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json",
     "bundlePath": "runtime/truth-key-inventory.json",
-    "keys": [
-      "isTruth",
-      "matchesTruth",
-      "truthInRawOcr",
-      "truthOnReconstructedLine",
-      "truthFilterReasons",
-      "expectedBrand",
-      "acceptableValues",
-      "brandPresent",
-      "historicalCaseId",
-      "historicalImagePath"
-    ],
-    "singleSourceRule": "This is the ONE inventory. No contract, test or executable module may declare a second list. Amendment 5 left three different sets in play \u2014 ten keys in evidence-schema.json, seven in truth-isolation-plan.json and the scanner, five in raw-ocr-contract.json \u2014 so brandPresent, historicalCaseId and historicalImagePath were absent from the executable scanner.",
-    "fieldNamesVersusValues": "These are FIELD NAMES, prohibited inside acquisition output. The historical identifier and fixture-path VALUES are a separate matter: they are checked after sealing by the read-only identity-leak verifier, which holds an inventory the isolated runtime never receives.",
-    "governsEveryEmittedFile": "pass records, candidate records, selection records, item-level failure records, count records, manifests and provenance records alike \u2014 closed pass and candidate schemas cover two of those shapes, not all of them"
+    "assetSha256": "80ae4a144259a9a013d8a35163e724cef1dded4e92e0aa4abd0dc74587e1ff6f",
+    "canonicalFormatting": "a bare JSON array of the key names in authoritative order, no whitespace, one terminal newline",
+    "keyCount": 10,
+    "keysNotRestatedHere": true,
+    "keysNotRestatedHereWhy": "Amendment 6 declared the asset authoritative and then copied the array into four contracts and a test, which is four more places to drift. Operative contracts reference the path and hash; the runtime, the freeze script, the bundle scanner and the consistency test all READ the asset.",
+    "readByTheRuntimeEmittedEvidenceScanner": true,
+    "readByTheStagingLeakScan": true,
+    "readByTheHostBundleScanner": true,
+    "fieldNamesVersusValues": "These are FIELD NAMES, prohibited inside acquisition output. The historical identifier and fixture-path VALUES are checked after sealing by the read-only identity-leak verifier, which holds an inventory the isolated runtime never receives.",
+    "governsEveryEmittedFile": "pass records, candidate records, selection records, item-level failure records, count records, manifests and provenance records alike"
   }
 }

@@ -1,0 +1,146 @@
+{
+  "artifact": "amendment-7-linkage",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "amendmentNumber": 7,
+  "amendedBeforeAnyGovernedAcquisitionOcr": true,
+  "amendedBeforeJobATrustedPreparation": true,
+  "amendedBeforeDiscovery": true,
+  "runStatusBeforeAmendment7": {
+    "governed115CaseAcquisitionOcr": false,
+    "acquisitionRunnerOcr": false,
+    "trustedPreparation": false,
+    "discoverMode": false,
+    "executeMode": false,
+    "runtimeBundleBuilt": false,
+    "evidence": "No raw/ directory, no raw-evidence manifest, no workflow file, no workflow-mode.txt and no acquisition runner has ever existed on this branch.",
+    "freezeScriptCheckModeRun": true,
+    "freezeScriptCheckModeRunNote": "--check regenerates into a temporary root under .local/, compares exact bytes, modifies no tracked artifact and no real staging directory, and runs no OCR. It is not Job A.",
+    "ordinarySuiteBundledImageOcr": {
+      "runs": true,
+      "files": [
+        "src/fixtures/corpus-real-ocr.test.ts",
+        "src/pipeline/extractor/extractor.test.ts",
+        "src/pipeline/extractor/extractor-precheck.integration.test.ts",
+        "src/fixtures/eval/eval-harness.integration.test.ts"
+      ],
+      "note": "Unmodified, pre-existing tests over bundled fixture images. Not the governed 115-case corpus. Disclosed here so no document in the package carries an unqualified 'no OCR has run'."
+    }
+  },
+  "originalStage1": {
+    "head": "7600b0a9ba5ce6995274a517121f1eda18a30424",
+    "base": "8f0c6a7ca7c271eed14d9084ed6da7fe11f897a9",
+    "preregistrationSha256": "7b691c78a9de008039ccc1a7f94824015373b1caec58f8235c78a03587c641fb",
+    "preservedNotOverwritten": true
+  },
+  "amendment1": {
+    "head": "26157cfe036fb8b1506431d1aa9309029ac2dcdb",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "cfc118c670a9c69f783f3ca58174113711b553baf1278da31a35e31121bf13ad",
+    "preservedNotOverwritten": true
+  },
+  "amendment2": {
+    "head": "ad1c296194e21e91af8333953ad47abe396495dc",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "9287ecc0d5d01bae83316c9d0dcb462d6eca566c925405cde83631fa65c89d35",
+    "preservedNotOverwritten": true
+  },
+  "amendment3": {
+    "head": "37e1a3ea752c12b230d468c10f604b8550d37ce1",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "3cf3d25fbb892dabc66e58796841c542fcc4eb79f7cd5d561271a7689ed87786",
+    "preservedNotOverwritten": true
+  },
+  "amendment4": {
+    "head": "cb574539d5e541446ec58d2b2bc62b9fda480048",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "87302e60a0629f6d657f4f118c8d73a50ea93aa3d321c15f77b5974ae75d28a3",
+    "preservedNotOverwritten": true,
+    "historicalMeaningRewritten": false,
+    "note": "Amendment 4's nine reconciliations stand. Amendment 5 closes five implementation-readiness gaps that survived it."
+  },
+  "amendment5": {
+    "head": "fca0755d629af2a15206d4cc5f5251768223e2f7",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "274e45779c849d4e6ada50e10b74d1fc8f6b1396f68b540ae02156e640422332",
+    "preservedNotOverwritten": true,
+    "historicalMeaningRewritten": false,
+    "uncharacterizedLocalTestFlake": {
+      "reported": true,
+      "detail": "One local full-suite run reported a single failure whose identity was not captured before the output scrolled. Two subsequent local runs and ordinary CI were clean.",
+      "causeInvented": false,
+      "retainedVerbatim": true
+    },
+    "note": "Amendment 5's closures stand. Amendment 6 fixes two execution blockers it introduced or left, and unifies contracts it left inconsistent."
+  },
+  "amendment6": {
+    "head": "ad8351ee84f073f13b869871115748a0700beea7",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "15771503f342652fd69ea1edf24d470a0e61324adac1451d32532b47e77627a1",
+    "preservedNotOverwritten": true,
+    "historicalMeaningRewritten": false,
+    "note": "Amendment 6's corrections stand. Amendment 7 fixes three execution blockers it left or introduced, and completes the single-source inventory design it declared."
+  },
+  "amendment7": {
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "headAtAmendmentStart": "ad8351ee84f073f13b869871115748a0700beea7",
+    "preregistrationSha256": {
+      "recordedIn": "artifacts/issue-149-brand-complete-evidence-acquisition/preregistration.sha256",
+      "notDuplicatedHere": true
+    },
+    "stage1ContractManifestAggregate": {
+      "recordedIn": "artifacts/issue-149-brand-complete-evidence-acquisition/stage-1-contract-manifest.sha256",
+      "notDuplicatedHere": true
+    }
+  },
+  "executionBlockersClosed": [
+    {
+      "id": "generator-artifact-drift",
+      "defect": "The freeze script still generated the superseded ID-map access boundary while the committed map carried the Amendment 6 correction. Job A is preregistered to rerun the script and require bit-for-bit reproduction, so it had to either fail or overwrite the corrected map.",
+      "fix": "the generator emits exactly the contract's boundary with the obsolete keys REMOVED rather than aliased; the committed map is aligned to the generator's exact output; a --check mode reproduces all three artifacts byte-for-byte from one shared implementation",
+      "haltCode": "STAGE_1_GENERATED_ARTIFACT_DRIFT",
+      "result": "all three artifacts byte-identical",
+      "mandatoryJobAPrecondition": true,
+      "test": "src/fixtures/eval/issue-149-generated-artifact-reproducibility.test.ts"
+    },
+    {
+      "id": "job-a-truth-access",
+      "defect": "The actor table said Job A had no governed truth, while the freeze script reads the PR #217 attribution artifact and uses governedTruth.present for the 105/10 split. Acceptable Brand values live in the same case objects.",
+      "fix": "the claim is replaced with the accurate physical-access statement and a bounded use rule; the first physical access to a truth-bearing source is recorded as occurring in trusted Job A; the actor-2/actor-3 boundary is restated as an EVALUATION-USE boundary",
+      "noninterferenceClaimIsBounded": "Independence from governedTruth.present is NOT claimed. Independence from acceptable values and other truth TEXT is claimed and tested.",
+      "test": "src/fixtures/eval/issue-149-staging-independence.test.ts"
+    },
+    {
+      "id": "ranked-position-fidelity",
+      "defect": "The adapter took every diagnostic carrying a ranking and sorted by rankingScore descending, giving fake positions to deduplicated candidates and an order production never produced.",
+      "fix": "final ranked membership is the set of candidates carrying a decision; members are ordered by production's exported compareCandidateRanking through a minimal { ranking } wrapper with the original array order as the stable tie-break; positions are contiguous and unique; the selected candidate is position 0",
+      "haltCodes": ["RANKED_MEMBERSHIP_INCONSISTENT", "RANKED_POSITION_PARITY_FAILURE"],
+      "arrayLevelInvariantsEnforcedIn": "finalizeProductionCandidateArray",
+      "test": "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts"
+    }
+  ],
+  "evidenceDefinitionCorrections": [
+    "candidate supportPassIds and candidateProvenance are the PUBLIC pre-deduplication-merge values; the post-merge support is available only for the selected observation and is persisted separately; complete merged support for every ranked candidate is unavailable and is NOT reconstructed in the adapter",
+    "the forbidden-key asset is now the only place the keys are written; contracts reference path, hash, formatting rule and count, and a test asserts no contract, the freeze script or the bundle scanner restates a key"
+  ],
+  "forbiddenEvidenceKeyInventory": {
+    "authoritativeAsset": "artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json",
+    "assetSha256": "80ae4a144259a9a013d8a35163e724cef1dded4e92e0aa4abd0dc74587e1ff6f",
+    "keysRestatedElsewhere": false
+  },
+  "unchangedByThisAmendment": [
+    "the frozen 115-item population and its opaque identifiers",
+    "the incumbent configuration pins, including field-selection.ts 8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
+    "two exact corpus runs with no retries and no selective rerun",
+    "the direct extractLabelEvidenceDetailed route and the runCaseArtifacts prohibition",
+    "full-object canonical diagnostic parity",
+    "the four experiment-controlled mounts",
+    "the closed RegionOcrResult schema and the omitted-originalGeometry rule",
+    "exact-byte artifact integrity versus semantic fingerprints",
+    "the prohibition on modifying PR #195 or any production behaviour"
+  ],
+  "capability3": {
+    "status": "SATISFIABLE",
+    "by": "a separately governed, zero-OCR replay of the persisted complete ordered RegionOcrResult array",
+    "performedHere": false
+  }
+}
