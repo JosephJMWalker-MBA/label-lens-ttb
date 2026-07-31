@@ -1,0 +1,62 @@
+{
+  "artifact": "determinism-rules",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "comparisonLevels": [
+    { "level": "source image", "compare": "sourceImageSha256 and byte size" },
+    { "level": "crop pixels", "compare": "cropPixelSha256 per pass" },
+    {
+      "level": "OCR words",
+      "compare": "ordered word records: text, rawConfidence, bbox, originalGeometry"
+    },
+    {
+      "level": "reconstructed lines",
+      "compare": "ordered line records: rawText, cleanedValue, confidence, prominence, kept, reason, provenance"
+    },
+    {
+      "level": "candidate decisions",
+      "compare": "the complete ordered candidate array, field by field, including rejected candidates and their single recorded filterReason"
+    },
+    {
+      "level": "ranking order",
+      "compare": "position in the complete ranked list for every ranked candidate"
+    },
+    { "level": "selected value", "compare": "final selected value per case" },
+    { "level": "authority state", "compare": "final state and abstention reason per case" },
+    { "level": "fingerprints", "compare": "per-pass and per-case output fingerprints" }
+  ],
+  "everyDifferenceReported": true,
+  "rerunOnDifference": false,
+  "repairOnDifference": false,
+  "favourableRunSelection": {
+    "permitted": false,
+    "rule": "Under nondeterminism BOTH runs are preserved in full. Neither is designated canonical, and no downstream artifact may silently prefer one."
+  },
+  "acquisitionVerdicts": [
+    {
+      "verdict": "COMPLETE_DETERMINISTIC_EVIDENCE",
+      "requiresAll": [
+        "both runs complete",
+        "all 115 cases present in both",
+        "no truncation at any level",
+        "truth isolation passes",
+        "all required fields present",
+        "primary and repeat evidence match exactly at every comparison level"
+      ]
+    },
+    {
+      "verdict": "COMPLETE_WITH_NONDETERMINISM",
+      "when": "evidence is complete and truth-isolated, but one or more primary/repeat records differ"
+    },
+    {
+      "verdict": "INCOMPLETE_EVIDENCE",
+      "when": "a required field, case, candidate or OCR record is missing or truncated"
+    },
+    {
+      "verdict": "TRUTH_ISOLATION_FAILURE",
+      "when": "truth or expected outcomes entered acquisition before the raw freeze"
+    },
+    { "verdict": "RUNTIME_FAILURE", "when": "the fixed acquisition could not complete" }
+  ],
+  "verdictComputedNotAsserted": true
+}

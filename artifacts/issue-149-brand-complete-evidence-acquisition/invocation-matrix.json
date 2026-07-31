@@ -1,0 +1,32 @@
+{
+  "artifact": "invocation-matrix",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "cases": 115,
+  "runs": ["primary", "repeat"],
+  "caseInvocationsPerRun": 115,
+  "totalCaseInvocations": 230,
+  "ocrPassesPerCase": "1 primary pass plus 0-2 recovery passes, decided by the unchanged recovery triggers; not fixed in advance and recorded as observed",
+  "retriesPermitted": 0,
+  "configurationChangeBetweenRuns": false,
+  "selectiveRerunAfterDiscrepancy": false,
+  "repeatPurpose": "To determine whether the complete evidence package is stable. It is NOT a second sample from which the more favourable output may be chosen.",
+  "recordedPerRun": [
+    "wall-clock start and end",
+    "node version",
+    "os and architecture",
+    "runner identity",
+    "package-lock resolved versions for tesseract.js and tesseract.js-core",
+    "eng.traineddata sha256",
+    "git commit",
+    "workflow run id"
+  ],
+  "prohibited": [
+    "a third run",
+    "rerunning a single case",
+    "repairing a nondeterministic case",
+    "changing any configuration between primary and repeat",
+    "enabling any experimental flag",
+    "calling selectBrandObservationWithCoherentLineMergeTreatment"
+  ]
+}

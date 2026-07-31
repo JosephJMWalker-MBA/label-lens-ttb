@@ -1,0 +1,101 @@
+{
+  "artifact": "candidate-decision-contract",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "sourceOfTruthForShape": "BrandCandidateDiagnostic (src/pipeline/extractor/field-selection.ts:180-201) reached via BrandSelectionDiagnostics.candidates",
+  "reachableWithoutProductionChange": true,
+  "reachableVia": "ExtractionDebug.finalSelections.brand.brandDiagnostics.candidates — the complete production array, kept AND rejected, before any evaluation-side projection",
+  "prohibitedProjectionExplicitlyNotUsed": "brandCandidateDecisions.filter(kept && ranking).slice(0, 6)",
+  "capsExplicitlyNotApplied": {
+    "MAX_BRAND_CANDIDATES": "the eval-harness CaseReport cap at line 415 is bypassed entirely, not raised",
+    "MAX_TEXT_LEN": "the 120-character truncate() applied to rawText and cleanedValue in the CaseReport projection is bypassed",
+    "keptOnlyFilter": "not applied; rejected candidates are persisted"
+  },
+  "storageFormat": {
+    "layout": "one JSONL file per case, one JSON object per candidate decision, one line per record",
+    "why": "Keeps the evidence reviewable and removes any reason for a retention cap.",
+    "prettyPrintedAfterFreeze": false
+  },
+  "perCandidateFields": {
+    "stableCandidateId": {
+      "available": true,
+      "derivedAs": "sha256 of caseId + passId + assembly + lineIndexes + rawText, truncated to 16 hex",
+      "note": "Derived by the acquisition for cross-referencing. It is an identifier, not a measurement."
+    },
+    "rawValue": { "available": true, "field": "rawText", "truncated": false },
+    "cleanedValue": { "available": true, "truncated": false },
+    "sourcePass": { "available": true, "fields": ["passId", "passKind", "supportPassIds"] },
+    "sourceLineIds": { "available": true, "field": "lineIndexes" },
+    "sourceSpans": {
+      "available": true,
+      "field": "assembly",
+      "note": "whole-line, line-window or multi-line merge; the span shape production recorded"
+    },
+    "geometryAndProminenceInputs": { "available": true, "fields": ["prominence"] },
+    "tokenAndLineConfidences": {
+      "available": true,
+      "fields": ["confidence", "ocrEvidenceScore", "ocrConfidence"]
+    },
+    "candidateClass": { "available": true, "fields": ["decision", "candidateProvenance"] },
+    "producerCompanyIndicators": {
+      "available": "partially",
+      "note": "The producer-line determination is observable only as the recorded filterReason value `producer-line`. The underlying boolean signals are computed inside a module-local predicate and are not emitted."
+    },
+    "keptOrRejected": { "available": true, "field": "kept" },
+    "rankingEligibility": { "available": true, "derivedAs": "presence of the ranking object" },
+    "rankingScoreComponents": {
+      "available": true,
+      "field": "score (BrandCandidateScore), persisted whole"
+    },
+    "finalRankingScore": { "available": true, "field": "ranking.rankingScore" },
+    "positionInCompleteRankedList": {
+      "available": true,
+      "derivedAs": "index in the complete list ordered by the production ranking comparator, computed over ALL ranked candidates rather than a truncated head"
+    },
+    "whetherSelected": { "available": true, "field": "decision" },
+    "finalSelectedValue": { "available": true, "perCase": true },
+    "finalAuthorityStateAndAbstentionReason": {
+      "available": true,
+      "perCase": true,
+      "fields": ["state", "brandDiagnostics.abstentionReason"]
+    },
+    "everyIndividualFilterCheck": {
+      "available": false,
+      "why": "BLOCKER. The Brand filter is a short-circuit if-chain (field-selection.ts:1649-1917) that RETURNS on the first failing check. Production records exactly one filterReason per candidate: the first rule that fired. The results of the checks that were never reached do not exist.",
+      "consequence": "Acquisition cannot record every rule that would have rejected a candidate, only the one that did.",
+      "wouldRequire": "a production change to evaluate all predicates and emit a reason array — explicitly forbidden by this sprint"
+    },
+    "everyActiveRejectionReason": {
+      "available": false,
+      "why": "Same blocker. `filterReason` is a single BrandLineReason, not an array.",
+      "whatIsAvailable": "the one reason recorded per candidate, and the union of reasons across the several distinct candidate objects a case may produce"
+    }
+  },
+  "filterLadderOrder": [
+    "producer-line",
+    "no-letters-or-too-short",
+    "non-brand-keyword",
+    "too-many-words",
+    "domain-like",
+    "varietal-or-designation",
+    "generic-product-language",
+    "location-or-appellation",
+    "low-information-fragment",
+    "sentence-fragment"
+  ],
+  "filterLadderOrderNote": "Recorded because it is the exact evaluation order and therefore determines which single reason is observable for any candidate. A candidate rejected at producer-line may or may not also violate too-many-words; that is unknowable from acquisition evidence.",
+  "countingProof": {
+    "recordedPerCase": ["candidateCount", "keptCount", "rejectedCount"],
+    "recordedPerRun": ["maximumCandidateCountPerCase", "totalCandidateCount"],
+    "proofRule": "the number of emitted records per case must equal brandDiagnostics.candidates.length read before any projection",
+    "haltOnMismatch": "CANDIDATE_EVIDENCE_TRUNCATED"
+  },
+  "truthLabelsAttachedDuringAcquisition": false,
+  "forbiddenFields": [
+    "isTruth",
+    "matchesTruth",
+    "truthInRawOcr",
+    "truthFilterReasons",
+    "expectedBrand"
+  ]
+}

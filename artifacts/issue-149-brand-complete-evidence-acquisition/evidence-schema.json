@@ -1,0 +1,40 @@
+{
+  "artifact": "evidence-schema",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "containsCompleteRawOcrWords": true,
+  "containsCompleteCandidateDecisions": true,
+  "proofOfCompleteness": {
+    "rawOcrWords": "raw/<run>/<caseId>.words.jsonl carries one record per OcrWord for every pass, and the acquisition asserts emittedWordCount === extractionDebug.passes[i].words.length for every pass. Any inequality halts with RAW_EVIDENCE_TRUNCATED. No sampleWords cap, no first-25 cap and no 120-character text truncation is applied, because the evidence is read from extractionDebug rather than from the capped CaseReport projection.",
+    "candidateDecisions": "raw/<run>/<caseId>.candidates.jsonl carries one record per BrandCandidateDiagnostic, kept AND rejected, and the acquisition asserts emittedCandidateCount === brandDiagnostics.candidates.length read before any projection. Any inequality halts with CANDIDATE_EVIDENCE_TRUNCATED. The prohibited filter(kept && ranking).slice(0, 6) projection is not used and the cap is not merely raised."
+  },
+  "layout": {
+    "raw/<run>/<caseId>.passes.json": "one record per OCR pass: identity, role, crop and transform, engine configuration, timings, warnings, errors, pass fingerprint",
+    "raw/<run>/<caseId>.words.jsonl": "one record per OCR word, in original order, across every pass",
+    "raw/<run>/<caseId>.lines.jsonl": "one record per reconstructed Brand line, in emitted order",
+    "raw/<run>/<caseId>.candidates.jsonl": "one record per Brand candidate decision, kept and rejected",
+    "raw/<run>/<caseId>.selection.json": "final selected value, authority state, abstention reason, ranked order over the complete list",
+    "raw/<run>/counts.json": "per-case and per-run counting proof",
+    "raw/<run>/raw-evidence-manifest.json": "sha256 of every file above",
+    "raw/<run>/raw-evidence-manifest.sha256": "aggregate hash"
+  },
+  "runs": ["primary", "repeat"],
+  "immutabilityRule": "After a run's raw-evidence-manifest.sha256 is written, no file under raw/<run>/ is rewritten, reformatted or pretty-printed. JSONL is emitted in final form and is excluded from prettier via .prettierignore.",
+  "truthBearingFieldsAbsentByConstruction": [
+    "isTruth",
+    "matchesTruth",
+    "truthInRawOcr",
+    "truthOnReconstructedLine",
+    "truthFilterReasons",
+    "expectedBrand",
+    "acceptableValues",
+    "brandPresent"
+  ],
+  "truthIsolationAssertion": "Before each manifest is written, every emitted file is scanned for the forbidden field names and for any governed acceptable-value string. A hit halts with TRUTH_ISOLATION_FAILURE.",
+  "knownGapsCarriedFromTheContracts": [
+    "every individual filter check and every active rejection reason per candidate — the ladder short-circuits, so only the first firing reason exists",
+    "word baseline geometry and block/paragraph/line identifiers — not present on OcrWord",
+    "constituent word IDs per reconstructed line — not emitted by BrandLineDiagnostic",
+    "line bounding boxes — only prominence is emitted"
+  ]
+}

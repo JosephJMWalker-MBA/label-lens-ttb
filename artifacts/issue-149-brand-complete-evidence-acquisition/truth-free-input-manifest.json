@@ -1,0 +1,711 @@
+{
+  "artifact": "truth-free-input-manifest",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "purpose": "The complete and only input the acquisition run receives. It carries identifiers and image provenance, and nothing else.",
+  "containsGovernedBrandTruth": false,
+  "containsAcceptableValues": false,
+  "containsTruthMatchBooleans": false,
+  "containsExpectedClassifications": false,
+  "containsPriorPerCaseResults": false,
+  "containsFilterRelaxationExpectations": false,
+  "fieldsPerCase": ["caseId", "imagePath", "sourceImageSha256", "sourceImageByteSize"],
+  "forbiddenSubstringScan": {
+    "scannedFor": ["truth", "acceptable", "brandPresent", "expected", "matches", "isTruth"],
+    "found": [],
+    "passed": true
+  },
+  "caseCount": 115,
+  "cases": [
+    {
+      "caseId": "luigi-giovanni-live",
+      "imagePath": "tests/fixtures/precheck/approved-wine-001/label.png",
+      "sourceImageSha256": "32b0fc57508fcc79cf37c33c402ecce5b9b3570e89da98dd487e1d91d338b579",
+      "sourceImageByteSize": 133430
+    },
+    {
+      "caseId": "alfredos-wine",
+      "imagePath": "tests/fixtures/precheck/approved-wine-002/label.png",
+      "sourceImageSha256": "c3f0d11ce789f779be6985ec8d97c0a5ac2145e1805a3e0be1c05e25cc7afa14",
+      "sourceImageByteSize": 98180
+    },
+    {
+      "caseId": "la-fattoria-rotated",
+      "imagePath": "tests/fixtures/precheck/approved-wine-003/label.png",
+      "sourceImageSha256": "78a45dc3df09a29615ebb19687803d4c0b9e50c0ffdcea833d6cc332bd3ee4e8",
+      "sourceImageByteSize": 235030
+    },
+    {
+      "caseId": "approved-wine-004",
+      "imagePath": "tests/fixtures/precheck/approved-wine-004/label.png",
+      "sourceImageSha256": "02c272bc23e836befc6024a0c7fa1e3b448dc7d31b2e691cdff1f37457377aa5",
+      "sourceImageByteSize": 263094
+    },
+    {
+      "caseId": "approved-wine-005",
+      "imagePath": "tests/fixtures/precheck/approved-wine-005/label.png",
+      "sourceImageSha256": "4098ba3ddd706354a51ac55015aac04cd1a67a12aaa1947cfef59a523fd13ef9",
+      "sourceImageByteSize": 178473
+    },
+    {
+      "caseId": "approved-wine-006",
+      "imagePath": "tests/fixtures/precheck/approved-wine-006/label.png",
+      "sourceImageSha256": "ccc769bafa231ba823d0a13727da2c3f940c4974811c20e64c6d3dd03ffab270",
+      "sourceImageByteSize": 176968
+    },
+    {
+      "caseId": "casanova-della-spinetta",
+      "imagePath": "tests/fixtures/precheck/approved-wine-007/label.jpeg",
+      "sourceImageSha256": "6ead323c40f67fcdc261491828330c4f3f3d15fe40dc8b553bb59bebb8aa7e54",
+      "sourceImageByteSize": 219312
+    },
+    {
+      "caseId": "approved-wine-008",
+      "imagePath": "tests/fixtures/precheck/approved-wine-008/label.png",
+      "sourceImageSha256": "5aca28702c0621fbc4c45a63ad0828d3fac02fee089ba4702926f182d47580d1",
+      "sourceImageByteSize": 191856
+    },
+    {
+      "caseId": "approved-wine-009",
+      "imagePath": "tests/fixtures/precheck/approved-wine-009/label.png",
+      "sourceImageSha256": "a891cec4e2ed3645957859b421a127659b095646144c526bd237677a9e2907ea",
+      "sourceImageByteSize": 193161
+    },
+    {
+      "caseId": "domaine-follin-arbelet",
+      "imagePath": "tests/fixtures/precheck/approved-wine-010/label.jpeg",
+      "sourceImageSha256": "6187b67b93a895b2f0836f607e3eee7bf015f716b75c8d89b3664a5ca6026751",
+      "sourceImageByteSize": 234270
+    },
+    {
+      "caseId": "approved-wine-011",
+      "imagePath": "tests/fixtures/precheck/approved-wine-011/label.png",
+      "sourceImageSha256": "0c1adfbce9d94830a8e0473eb622491fbd500c4f8365584aa8fe163e0fbeacdf",
+      "sourceImageByteSize": 365375
+    },
+    {
+      "caseId": "approved-wine-012",
+      "imagePath": "tests/fixtures/precheck/approved-wine-012/label.jpeg",
+      "sourceImageSha256": "59d5a26169ac77d44cc3db8ec25402ff52f0622f3213d4db6d5361588b3a960f",
+      "sourceImageByteSize": 1020563
+    },
+    {
+      "caseId": "approved-wine-013",
+      "imagePath": "tests/fixtures/precheck/approved-wine-013/label.jpeg",
+      "sourceImageSha256": "7f0474a138a0a393f4088b7fbdadc9fd8bf2651b87a632ee9467dbf4a08cd3c1",
+      "sourceImageByteSize": 509470
+    },
+    {
+      "caseId": "approved-wine-014",
+      "imagePath": "tests/fixtures/precheck/approved-wine-014/label.jpeg",
+      "sourceImageSha256": "4c2f4212c43b7f38f5e73f136caa28a9c65d393b22337339632d36a839c8efc8",
+      "sourceImageByteSize": 722945
+    },
+    {
+      "caseId": "patricia-green-cellars",
+      "imagePath": "tests/fixtures/precheck/approved-wine-015/label.jpeg",
+      "sourceImageSha256": "c79e78cc91b668a424b17ad2dfcd0598797eb40fcb2e362d99eeec9822b1f408",
+      "sourceImageByteSize": 147612
+    },
+    {
+      "caseId": "approved-wine-016",
+      "imagePath": "tests/fixtures/precheck/approved-wine-016/label.png",
+      "sourceImageSha256": "7f5bfb5f1447f280a190928784b3ee047681ccc539046721e8a0e57792cd03e0",
+      "sourceImageByteSize": 161199
+    },
+    {
+      "caseId": "approved-wine-017",
+      "imagePath": "tests/fixtures/precheck/approved-wine-017/label.png",
+      "sourceImageSha256": "9dcb2a2068b7fcad720726cb08935962f0871d159b76ab7be4f77bdd58de826c",
+      "sourceImageByteSize": 144318
+    },
+    {
+      "caseId": "approved-wine-018",
+      "imagePath": "tests/fixtures/precheck/approved-wine-018/label.png",
+      "sourceImageSha256": "24ebcddb13916e0224191a08042702a471261a95e187b7f0ac736ff8a43658e7",
+      "sourceImageByteSize": 1207844
+    },
+    {
+      "caseId": "approved-wine-019",
+      "imagePath": "tests/fixtures/precheck/approved-wine-019/label.png",
+      "sourceImageSha256": "7b06e68ad3026e33e6f1b8b12953570bfbc542ff3239b9b7d39d0b19e4e49391",
+      "sourceImageByteSize": 706332
+    },
+    {
+      "caseId": "approved-wine-020",
+      "imagePath": "tests/fixtures/precheck/approved-wine-020/label.png",
+      "sourceImageSha256": "a6880a833a6cb425d717998bd5bc31edbe4a1f719fe1856693e044c8f2296fe6",
+      "sourceImageByteSize": 1001976
+    },
+    {
+      "caseId": "saker",
+      "imagePath": "tests/fixtures/precheck/approved-wine-021/label.jpeg",
+      "sourceImageSha256": "bbc9e83d13b3770fce80d51c90d5193d087fe07a9ce9ff4b5a70827621ba012b",
+      "sourceImageByteSize": 298682
+    },
+    {
+      "caseId": "approved-wine-022",
+      "imagePath": "tests/fixtures/precheck/approved-wine-022/label.png",
+      "sourceImageSha256": "4e12d8c395ca647939f874d8da1d31268863e151319159180360c98050182e33",
+      "sourceImageByteSize": 103860
+    },
+    {
+      "caseId": "approved-wine-023",
+      "imagePath": "tests/fixtures/precheck/approved-wine-023/label.png",
+      "sourceImageSha256": "ab9f888e0673afed9e08d6db30f6d5623c0c30a9bb69fc55e028ac82381fd010",
+      "sourceImageByteSize": 804173
+    },
+    {
+      "caseId": "approved-wine-024",
+      "imagePath": "tests/fixtures/precheck/approved-wine-024/label.jpeg",
+      "sourceImageSha256": "85942382ac1b5185be48b348fd02a624a973a45327ad765db6e827012cf1f5d3",
+      "sourceImageByteSize": 483231
+    },
+    {
+      "caseId": "nebla-mencia",
+      "imagePath": "tests/fixtures/precheck/approved-wine-025/label.jpeg",
+      "sourceImageSha256": "77e85396ddc8f80b7268fedc3ec050bb0f00c81c92d7494aac8b0dde2b616242",
+      "sourceImageByteSize": 252511
+    },
+    {
+      "caseId": "approved-wine-026",
+      "imagePath": "tests/fixtures/precheck/approved-wine-026/label.png",
+      "sourceImageSha256": "82f01a79197865261cbcf16dd64c752f83bf4c29b59044e1631f57e465239240",
+      "sourceImageByteSize": 338847
+    },
+    {
+      "caseId": "approved-wine-027",
+      "imagePath": "tests/fixtures/precheck/approved-wine-027/label.jpeg",
+      "sourceImageSha256": "76910b129a3b4e0d50892da3f9643ab699510ded8c0f61656afd2a0505a156fe",
+      "sourceImageByteSize": 606189
+    },
+    {
+      "caseId": "approved-wine-028",
+      "imagePath": "tests/fixtures/precheck/approved-wine-028/label.jpeg",
+      "sourceImageSha256": "52ed32942e08ce40ca5de7fdfc7ebd5563fc15b0d215bc7287b19bb7760bf0e1",
+      "sourceImageByteSize": 296515
+    },
+    {
+      "caseId": "approved-wine-031",
+      "imagePath": "tests/fixtures/precheck/approved-wine-031/label.jpeg",
+      "sourceImageSha256": "512afcf475b691396481d289dbcb461f6880cb81c03ec02e8db4a54faea6a4b2",
+      "sourceImageByteSize": 424393
+    },
+    {
+      "caseId": "approved-wine-032",
+      "imagePath": "tests/fixtures/precheck/approved-wine-032/label.jpeg",
+      "sourceImageSha256": "4efa2ad223b7357669b6e05fcb6b3b09d1d1ef8556e37a410c57b70ecd1f8e7e",
+      "sourceImageByteSize": 791201
+    },
+    {
+      "caseId": "approved-wine-033",
+      "imagePath": "tests/fixtures/precheck/approved-wine-033/label.jpeg",
+      "sourceImageSha256": "4d9f9004ac2898301936711cb01153bb4dcb4f74d731ae8222a1c78dd09a06f7",
+      "sourceImageByteSize": 502064
+    },
+    {
+      "caseId": "approved-wine-034",
+      "imagePath": "tests/fixtures/precheck/approved-wine-034/label.jpeg",
+      "sourceImageSha256": "d4d881e8ffbb90dc96ed56e0f502a28525c203092d2e916739d28da719d6124f",
+      "sourceImageByteSize": 524288
+    },
+    {
+      "caseId": "approved-wine-035",
+      "imagePath": "tests/fixtures/precheck/approved-wine-035/label.png",
+      "sourceImageSha256": "bf0d8e4ea936e1ddc67ce265345fde413cc29080f2a0b3ba42538912e30dd035",
+      "sourceImageByteSize": 271586
+    },
+    {
+      "caseId": "approved-wine-037",
+      "imagePath": "tests/fixtures/precheck/approved-wine-037/label.jpeg",
+      "sourceImageSha256": "843ad7bb486cef69d5dd4b145e4abe974f9f94848bb42e25cecc951d7f0fb23b",
+      "sourceImageByteSize": 141244
+    },
+    {
+      "caseId": "approved-wine-038",
+      "imagePath": "tests/fixtures/precheck/approved-wine-038/label.jpeg",
+      "sourceImageSha256": "e376757648f94edb819b9713487c0f5972e8c2ac48e7a806882a0963648ae31d",
+      "sourceImageByteSize": 160854
+    },
+    {
+      "caseId": "approved-wine-039",
+      "imagePath": "tests/fixtures/precheck/approved-wine-039/label.png",
+      "sourceImageSha256": "0814451112c0e60f1d83c06fd39a6ca96357864b531c2ffe981cf990b9d047c2",
+      "sourceImageByteSize": 274586
+    },
+    {
+      "caseId": "chateau-bonneau",
+      "imagePath": "tests/fixtures/precheck/approved-wine-040/label.png",
+      "sourceImageSha256": "d107a059f92c787fe61e706a323b7b6e1fd6d3d5efe154dd05e6437e04615edf",
+      "sourceImageByteSize": 316883
+    },
+    {
+      "caseId": "approved-wine-041",
+      "imagePath": "tests/fixtures/precheck/approved-wine-041/label.png",
+      "sourceImageSha256": "53f3b49e627e75b415d4bec3c6440397300778b9b527ee2c2e118d1e482a7d86",
+      "sourceImageByteSize": 248498
+    },
+    {
+      "caseId": "approved-wine-042",
+      "imagePath": "tests/fixtures/precheck/approved-wine-042/label.png",
+      "sourceImageSha256": "58f9e12b698de57aedfa1de526de477d8a165552c20087827db344ba7c1020ba",
+      "sourceImageByteSize": 599555
+    },
+    {
+      "caseId": "approved-wine-043",
+      "imagePath": "tests/fixtures/precheck/approved-wine-043/label.jpeg",
+      "sourceImageSha256": "0669fbf34f02906dc4e9fe9050754650e612fe915c253fd21a909f18e1ba0d5c",
+      "sourceImageByteSize": 324561
+    },
+    {
+      "caseId": "approved-wine-044",
+      "imagePath": "tests/fixtures/precheck/approved-wine-044/label.jpeg",
+      "sourceImageSha256": "13cce4f8c22c9bbcdd0c9b0c0e9276c02fe19e9bebb66d912201d30d132d80cc",
+      "sourceImageByteSize": 524846
+    },
+    {
+      "caseId": "approved-wine-045",
+      "imagePath": "tests/fixtures/precheck/approved-wine-045/label.jpeg",
+      "sourceImageSha256": "4b2aa2abea5db906cf6a52d5d69bad88b50c0acef61134a15ef439db5f01c637",
+      "sourceImageByteSize": 113700
+    },
+    {
+      "caseId": "approved-wine-046",
+      "imagePath": "tests/fixtures/precheck/approved-wine-046/label.jpeg",
+      "sourceImageSha256": "d5a4dcbf430141714cdaf7ec8dc857098b2d3c552e5e3fd5d15d974fdb42697d",
+      "sourceImageByteSize": 471466
+    },
+    {
+      "caseId": "approved-wine-047",
+      "imagePath": "tests/fixtures/precheck/approved-wine-047/label.jpeg",
+      "sourceImageSha256": "56436de64c0a811eb5dc2cf1ce83df2d5864aef13ac60d75dd4852d305b4f7c2",
+      "sourceImageByteSize": 649795
+    },
+    {
+      "caseId": "approved-wine-048",
+      "imagePath": "tests/fixtures/precheck/approved-wine-048/label.png",
+      "sourceImageSha256": "4b959267dd06123b4a8734e24d38acdaf7048ca4df6ded73765c6aa9cf37216e",
+      "sourceImageByteSize": 274584
+    },
+    {
+      "caseId": "approved-wine-049",
+      "imagePath": "tests/fixtures/precheck/approved-wine-049/label.jpeg",
+      "sourceImageSha256": "477fd260edf54a3e5c25887259e036a8dcede11dd72289bb1bf3228a0259a08c",
+      "sourceImageByteSize": 1039491
+    },
+    {
+      "caseId": "le-temps-des-fleurs",
+      "imagePath": "tests/fixtures/precheck/approved-wine-050/label.jpeg",
+      "sourceImageSha256": "48318d4539d109e715a643382a36e9ef88952147497b6f1bd7d07858a1f301ee",
+      "sourceImageByteSize": 180121
+    },
+    {
+      "caseId": "approved-wine-051",
+      "imagePath": "tests/fixtures/precheck/approved-wine-051/label.jpeg",
+      "sourceImageSha256": "ea51732542d8015c69fc7f4ca43da31bc61fbf8fe901aa9bc25a18fbd0121704",
+      "sourceImageByteSize": 1008873
+    },
+    {
+      "caseId": "approved-wine-052",
+      "imagePath": "tests/fixtures/precheck/approved-wine-052/label.jpeg",
+      "sourceImageSha256": "bdaefd9a1b5f333f5ba5375621c45afc441dc7c6730f17b75815cebd6b851bd7",
+      "sourceImageByteSize": 487606
+    },
+    {
+      "caseId": "approved-wine-053",
+      "imagePath": "tests/fixtures/precheck/approved-wine-053/label.jpeg",
+      "sourceImageSha256": "f6a083780b4135610ae39e1b0e3b66fcc3b1f57444fb60477e662f8f737c84ce",
+      "sourceImageByteSize": 362746
+    },
+    {
+      "caseId": "approved-wine-054",
+      "imagePath": "tests/fixtures/precheck/approved-wine-054/label.jpeg",
+      "sourceImageSha256": "17219e52c3383f57a89ee94614a6ab9afa9976eb40cfb5c147541704175a9949",
+      "sourceImageByteSize": 184785
+    },
+    {
+      "caseId": "approved-wine-055",
+      "imagePath": "tests/fixtures/precheck/approved-wine-055/label.jpeg",
+      "sourceImageSha256": "c50b9047abc76d46b0b0a3b1bf713f62bf6a787864ca2e8a044a83b5003ebefd",
+      "sourceImageByteSize": 116616
+    },
+    {
+      "caseId": "approved-wine-056",
+      "imagePath": "tests/fixtures/precheck/approved-wine-056/label.jpeg",
+      "sourceImageSha256": "2dd812743e891d88b99e8de31e8c13edc5105757d558251ebe457b4a58c8ae52",
+      "sourceImageByteSize": 229472
+    },
+    {
+      "caseId": "approved-wine-057",
+      "imagePath": "tests/fixtures/precheck/approved-wine-057/label.jpeg",
+      "sourceImageSha256": "e10c843870da02a6ac9c59d6b077fe46cffb997ca54b4195e7dfcb7d808d5ee1",
+      "sourceImageByteSize": 151661
+    },
+    {
+      "caseId": "approved-wine-058",
+      "imagePath": "tests/fixtures/precheck/approved-wine-058/label.jpeg",
+      "sourceImageSha256": "31f498d357e3484d39f8e069a1d8628c97592f7ea0138bdf419a5a901cf28474",
+      "sourceImageByteSize": 237138
+    },
+    {
+      "caseId": "approved-wine-059",
+      "imagePath": "tests/fixtures/precheck/approved-wine-059/label.jpeg",
+      "sourceImageSha256": "063420e593998aea146360b944b4860973d350e340ef144e157d695bc90d5967",
+      "sourceImageByteSize": 202923
+    },
+    {
+      "caseId": "three-steves-winery",
+      "imagePath": "tests/fixtures/precheck/approved-wine-060/label.jpeg",
+      "sourceImageSha256": "0eb36380a43c9f3f6b27ebf846f038b2d866a331f581decdb9be974fbcaa7cc6",
+      "sourceImageByteSize": 105481
+    },
+    {
+      "caseId": "approved-wine-061",
+      "imagePath": "tests/fixtures/precheck/approved-wine-061/label.jpeg",
+      "sourceImageSha256": "827b547b84b73601626a55c2cf7a5369ad529075b35890bd292abbb7054768f6",
+      "sourceImageByteSize": 122393
+    },
+    {
+      "caseId": "approved-wine-062",
+      "imagePath": "tests/fixtures/precheck/approved-wine-062/label.jpeg",
+      "sourceImageSha256": "7b88469d526d02ae5beab594865c7f99570bf254a4ddb6d6612825ff94415dea",
+      "sourceImageByteSize": 466034
+    },
+    {
+      "caseId": "approved-wine-063",
+      "imagePath": "tests/fixtures/precheck/approved-wine-063/label.jpeg",
+      "sourceImageSha256": "9ddce4fa2881511b369cea27248071b55ed112389f4d0bc5ed6362b0ec61a0d6",
+      "sourceImageByteSize": 71227
+    },
+    {
+      "caseId": "approved-wine-064",
+      "imagePath": "tests/fixtures/precheck/approved-wine-064/label.jpeg",
+      "sourceImageSha256": "b271c1af798d1ff3aa7c17ecbe554041897de26cb82b5f3104f0b7382f32adaf",
+      "sourceImageByteSize": 71558
+    },
+    {
+      "caseId": "approved-wine-065",
+      "imagePath": "tests/fixtures/precheck/approved-wine-065/label.jpeg",
+      "sourceImageSha256": "33d9440f5be731303258cd8857e1221bdf48135e7bd33b0fb1759a423f765083",
+      "sourceImageByteSize": 126258
+    },
+    {
+      "caseId": "approved-wine-066",
+      "imagePath": "tests/fixtures/precheck/approved-wine-066/label.jpeg",
+      "sourceImageSha256": "3d544e7cf55c7f78090596f370e1ff5cdb59cfccc27802ab1d076068b6f6b209",
+      "sourceImageByteSize": 527992
+    },
+    {
+      "caseId": "approved-wine-067",
+      "imagePath": "tests/fixtures/precheck/approved-wine-067/label.jpeg",
+      "sourceImageSha256": "3438e32c9c2fe76f5174fbca63001d02afe15ef4d8163e906c4e3acfeed70800",
+      "sourceImageByteSize": 506237
+    },
+    {
+      "caseId": "approved-wine-068",
+      "imagePath": "tests/fixtures/precheck/approved-wine-068/label.jpeg",
+      "sourceImageSha256": "85b3a7a3823cda36c55c29ab8b0c4498a4bcc4725646d1a8e14e150d35ebb614",
+      "sourceImageByteSize": 375671
+    },
+    {
+      "caseId": "approved-wine-069",
+      "imagePath": "tests/fixtures/precheck/approved-wine-069/label.jpeg",
+      "sourceImageSha256": "41d64cff195abec28eeb805f3a8b9cc9ca64196c50e6e86d71b486466bbdf0c5",
+      "sourceImageByteSize": 428379
+    },
+    {
+      "caseId": "altacima",
+      "imagePath": "tests/fixtures/precheck/approved-wine-070/label.jpeg",
+      "sourceImageSha256": "feafd79824e046f75426744c581454838ce6058ee0bb6e69ca907eaa98a0a16a",
+      "sourceImageByteSize": 609808
+    },
+    {
+      "caseId": "approved-wine-071",
+      "imagePath": "tests/fixtures/precheck/approved-wine-071/label.jpeg",
+      "sourceImageSha256": "129e1e054e5d72688b26ef48c165dd7c35f32922907bc4c70db2bd69f86c637d",
+      "sourceImageByteSize": 688598
+    },
+    {
+      "caseId": "approved-wine-072",
+      "imagePath": "tests/fixtures/precheck/approved-wine-072/label.jpeg",
+      "sourceImageSha256": "f0825d0f6a4e12fab451748580a921884b2a3bbd0578a65cbe2919cd68f86b81",
+      "sourceImageByteSize": 240231
+    },
+    {
+      "caseId": "approved-wine-073",
+      "imagePath": "tests/fixtures/precheck/approved-wine-073/label.jpeg",
+      "sourceImageSha256": "05fcc9115414905e66b838a3b32acb481c02226a34412597a07d111831dd0902",
+      "sourceImageByteSize": 113487
+    },
+    {
+      "caseId": "approved-wine-074",
+      "imagePath": "tests/fixtures/precheck/approved-wine-074/label.jpeg",
+      "sourceImageSha256": "51cda786987a31778d33ed962af8e0b22a75fa1666534ca81af05ba7a45b3185",
+      "sourceImageByteSize": 114036
+    },
+    {
+      "caseId": "approved-wine-075",
+      "imagePath": "tests/fixtures/precheck/approved-wine-075/label.jpeg",
+      "sourceImageSha256": "f3f689b65bae9b458234c443201b341a430008615c26da48f4a99848c974c29c",
+      "sourceImageByteSize": 147769
+    },
+    {
+      "caseId": "approved-wine-076",
+      "imagePath": "tests/fixtures/precheck/approved-wine-076/label.jpeg",
+      "sourceImageSha256": "7260b52e004d8d310caa16643496624fd86c9683b27f8a9474cdeaf64ae9d3ce",
+      "sourceImageByteSize": 118778
+    },
+    {
+      "caseId": "approved-wine-077",
+      "imagePath": "tests/fixtures/precheck/approved-wine-077/label.jpeg",
+      "sourceImageSha256": "648868ef9c26aa4c2ce17e82f4acc924eab02edbdbb144ee53cac9987b84da68",
+      "sourceImageByteSize": 121285
+    },
+    {
+      "caseId": "approved-wine-078",
+      "imagePath": "tests/fixtures/precheck/approved-wine-078/label.jpeg",
+      "sourceImageSha256": "93212632b4415e322ac70393cfdbcf718ac8154d7f2822f79e3638afe1a777d7",
+      "sourceImageByteSize": 85382
+    },
+    {
+      "caseId": "approved-wine-079",
+      "imagePath": "tests/fixtures/precheck/approved-wine-079/label.jpeg",
+      "sourceImageSha256": "7a2a1ce4ad3728559c9beef0e98187863dd581d2a7f0c8dcce67d71c1c7d773c",
+      "sourceImageByteSize": 106039
+    },
+    {
+      "caseId": "le-caniette",
+      "imagePath": "tests/fixtures/precheck/approved-wine-080/label.jpeg",
+      "sourceImageSha256": "cf1fb8c8ae79aed14480df1e533320edfbdb20c878e79bbd8f3c09dc1139aff1",
+      "sourceImageByteSize": 111804
+    },
+    {
+      "caseId": "approved-wine-081",
+      "imagePath": "tests/fixtures/precheck/approved-wine-081/label.jpeg",
+      "sourceImageSha256": "868857eb88802609fee25e3cd50a6f44e26880f914eba69177aca1c84f2c1475",
+      "sourceImageByteSize": 36646
+    },
+    {
+      "caseId": "approved-wine-082",
+      "imagePath": "tests/fixtures/precheck/approved-wine-082/label.jpeg",
+      "sourceImageSha256": "3ffdd716e0db6c40f07d478fd08374255e51b83bcc7ae0f2b8e931d78d5fb755",
+      "sourceImageByteSize": 220377
+    },
+    {
+      "caseId": "approved-wine-083",
+      "imagePath": "tests/fixtures/precheck/approved-wine-083/label.jpeg",
+      "sourceImageSha256": "c535798ff76995ad464955dc3dd5cef0e1cf2601f1340b9f034b13830f56410c",
+      "sourceImageByteSize": 212520
+    },
+    {
+      "caseId": "approved-wine-084",
+      "imagePath": "tests/fixtures/precheck/approved-wine-084/label.jpeg",
+      "sourceImageSha256": "2fd2256ba59854a67a6944b051dd99ed0acda76c5e48ba92966bc99cd61bf103",
+      "sourceImageByteSize": 86686
+    },
+    {
+      "caseId": "approved-wine-085",
+      "imagePath": "tests/fixtures/precheck/approved-wine-085/label.jpeg",
+      "sourceImageSha256": "e9c6de2e35a6f75bf1de128f8c1d2c2f0a824d52628e32fa6e003efb1bb758b6",
+      "sourceImageByteSize": 62096
+    },
+    {
+      "caseId": "approved-wine-086",
+      "imagePath": "tests/fixtures/precheck/approved-wine-086/label.jpeg",
+      "sourceImageSha256": "c062b9d73f4a7b45cc73011bb1d7346219f7bbd503c0fd2188cdd2d5296a351c",
+      "sourceImageByteSize": 67382
+    },
+    {
+      "caseId": "approved-wine-087",
+      "imagePath": "tests/fixtures/precheck/approved-wine-087/label.jpeg",
+      "sourceImageSha256": "2aa667529ed475670edabac71a0fe0bbee342d1e194262abf77aa6ab5ea9b33d",
+      "sourceImageByteSize": 568380
+    },
+    {
+      "caseId": "approved-wine-088",
+      "imagePath": "tests/fixtures/precheck/approved-wine-088/label.jpeg",
+      "sourceImageSha256": "b81efafbcb2622811e57d44a2065e08d9c65570abc74911f4f311588b18e3acc",
+      "sourceImageByteSize": 87414
+    },
+    {
+      "caseId": "approved-wine-089",
+      "imagePath": "tests/fixtures/precheck/approved-wine-089/label.jpeg",
+      "sourceImageSha256": "833b2e2584d2ed2361aff0a4e6f13bf1a614989ce96065e67ae7939528a4b2ef",
+      "sourceImageByteSize": 80382
+    },
+    {
+      "caseId": "approved-wine-090",
+      "imagePath": "tests/fixtures/precheck/approved-wine-090/label.jpeg",
+      "sourceImageSha256": "6db5edc250cf6644d4353df03c4542d7a3fbebef8940b0ba33d790d046449974",
+      "sourceImageByteSize": 88570
+    },
+    {
+      "caseId": "approved-wine-091",
+      "imagePath": "tests/fixtures/precheck/approved-wine-091/label.jpeg",
+      "sourceImageSha256": "d3518e47880e39d38cf47d4692ad3a10d194a5b56e67690ab53c0b1d2306ab73",
+      "sourceImageByteSize": 73854
+    },
+    {
+      "caseId": "approved-wine-092",
+      "imagePath": "tests/fixtures/precheck/approved-wine-092/label.jpeg",
+      "sourceImageSha256": "7e6e3b102a430e042a4e407a3b45397c9c754db2565154622ed2a8d33e634b19",
+      "sourceImageByteSize": 704897
+    },
+    {
+      "caseId": "approved-wine-093",
+      "imagePath": "tests/fixtures/precheck/approved-wine-093/label.jpeg",
+      "sourceImageSha256": "54e1df770dcca0041258e323302fa8cd9e2916f8901b95f2573dbd0839d22fe3",
+      "sourceImageByteSize": 184741
+    },
+    {
+      "caseId": "approved-wine-094",
+      "imagePath": "tests/fixtures/precheck/approved-wine-094/label.jpeg",
+      "sourceImageSha256": "a9e93c5074ae8a7efc0a734d7e10b388f335fa1340307e690d8eaf340323ced6",
+      "sourceImageByteSize": 178343
+    },
+    {
+      "caseId": "approved-wine-095",
+      "imagePath": "tests/fixtures/precheck/approved-wine-095/label.jpeg",
+      "sourceImageSha256": "cbef11f3214d3763eceb50639b4da97f850e51591d71f29b76e9b9daf0b946e1",
+      "sourceImageByteSize": 68754
+    },
+    {
+      "caseId": "approved-wine-096",
+      "imagePath": "tests/fixtures/precheck/approved-wine-096/label.jpeg",
+      "sourceImageSha256": "a4bcc370b8b9825cd550272fdf4dc7c10bcbaae3d7c9cf768d9596e7339bd9fc",
+      "sourceImageByteSize": 274000
+    },
+    {
+      "caseId": "approved-wine-097",
+      "imagePath": "tests/fixtures/precheck/approved-wine-097/label.jpeg",
+      "sourceImageSha256": "0435b2d064b3b09d7b26cb4876c3310798e6ad9f83584b50ebebd08e3a677ec3",
+      "sourceImageByteSize": 264403
+    },
+    {
+      "caseId": "approved-wine-098",
+      "imagePath": "tests/fixtures/precheck/approved-wine-098/label.jpeg",
+      "sourceImageSha256": "e901a1becc58b32c2e1f4a5f52e36031ab92abfcf4a9556549cb0ceeeb4bc8e4",
+      "sourceImageByteSize": 64175
+    },
+    {
+      "caseId": "approved-wine-099",
+      "imagePath": "tests/fixtures/precheck/approved-wine-099/label.jpeg",
+      "sourceImageSha256": "0c6382c256454084eceb741a9c4360b51e77bfb96504938a66c218f910e459e0",
+      "sourceImageByteSize": 179625
+    },
+    {
+      "caseId": "amuninni-ferracane",
+      "imagePath": "tests/fixtures/precheck/approved-wine-100/label.jpeg",
+      "sourceImageSha256": "164960edc12c29f8cbd22e08ebdc29e7d08d7eaeb7f1105a4121e766314da844",
+      "sourceImageByteSize": 217217
+    },
+    {
+      "caseId": "approved-wine-101",
+      "imagePath": "tests/fixtures/precheck/approved-wine-101/label.jpeg",
+      "sourceImageSha256": "cfb3470e8acef3e34887bc9db9a9500956e9c918bd6cc769d3ed5b7f423ca19f",
+      "sourceImageByteSize": 145032
+    },
+    {
+      "caseId": "approved-wine-102",
+      "imagePath": "tests/fixtures/precheck/approved-wine-102/label.jpeg",
+      "sourceImageSha256": "6e17b7005859546f06bc40dbf757180daf6b27c998189ef96d132ff91a1ffcd2",
+      "sourceImageByteSize": 721553
+    },
+    {
+      "caseId": "approved-wine-103",
+      "imagePath": "tests/fixtures/precheck/approved-wine-103/label.jpeg",
+      "sourceImageSha256": "d43254fd31f62350e5fa7aadd498613a4940f9d60822f215a8cfcac01b02d612",
+      "sourceImageByteSize": 423476
+    },
+    {
+      "caseId": "approved-wine-104",
+      "imagePath": "tests/fixtures/precheck/approved-wine-104/label.jpeg",
+      "sourceImageSha256": "9ba935bab31d38d2afb904754bf5a8775baeff145553a0da52bfcb8a884d6ed4",
+      "sourceImageByteSize": 181938
+    },
+    {
+      "caseId": "approved-wine-105",
+      "imagePath": "tests/fixtures/precheck/approved-wine-105/label.png",
+      "sourceImageSha256": "15349de24bf2601dbb4debb80c664116b63aa7890bd6ba95ad7e260d8f460137",
+      "sourceImageByteSize": 128629
+    },
+    {
+      "caseId": "approved-wine-106",
+      "imagePath": "tests/fixtures/precheck/approved-wine-106/label.png",
+      "sourceImageSha256": "53512aeff23cd5988267b45e18667bc73321d3f31d6dbf46d5a167cf48f9b641",
+      "sourceImageByteSize": 111897
+    },
+    {
+      "caseId": "approved-wine-107",
+      "imagePath": "tests/fixtures/precheck/approved-wine-107/label.png",
+      "sourceImageSha256": "7128e5df5a998ce48b2a2e79a4b3cdbcdc30e7703f290220125569498132db23",
+      "sourceImageByteSize": 190320
+    },
+    {
+      "caseId": "approved-wine-108",
+      "imagePath": "tests/fixtures/precheck/approved-wine-108/label.png",
+      "sourceImageSha256": "9d9e490df12705103371d26f9da1832b2223fe54feb7505a875456f953b64d63",
+      "sourceImageByteSize": 195957
+    },
+    {
+      "caseId": "approved-wine-109",
+      "imagePath": "tests/fixtures/precheck/approved-wine-109/label.png",
+      "sourceImageSha256": "8d95ab6bcbaf380f14d0923c643bc8415971d27ad99e835f9babdfb900d7c9fe",
+      "sourceImageByteSize": 133542
+    },
+    {
+      "caseId": "approved-wine-110",
+      "imagePath": "tests/fixtures/precheck/approved-wine-110/label.jpeg",
+      "sourceImageSha256": "48138d8e6bd4ac11811be0faf2d228f0a12abd22111bfc9e55de256a3eb228fc",
+      "sourceImageByteSize": 1020307
+    },
+    {
+      "caseId": "m-cellars-baseline",
+      "imagePath": "tests/fixtures/precheck/m-cellars-24205001000905/label-ocr-source.jpeg",
+      "sourceImageSha256": "0b0ccec13bf6c533ec7928b017b140a0213fb4555812fea81d71872adb453713",
+      "sourceImageByteSize": 607442
+    },
+    {
+      "caseId": "wine-multi-artifact-04",
+      "imagePath": "tests/fixtures/precheck/wine-multi-artifact-04/label.png",
+      "sourceImageSha256": "445d39b8f73d04cd05bb35e03f9678f6ba9e81f6a6f01d5469306ec43c9c5887",
+      "sourceImageByteSize": 778791
+    },
+    {
+      "caseId": "wine-multi-artifact-05",
+      "imagePath": "tests/fixtures/precheck/wine-multi-artifact-05/label.png",
+      "sourceImageSha256": "5aaecc88b41d5c12d5551d7b5978165dbfe07c92568219d885f6c20afdfff992",
+      "sourceImageByteSize": 1001392
+    },
+    {
+      "caseId": "wine-multi-artifact-06",
+      "imagePath": "tests/fixtures/precheck/wine-multi-artifact-06/label.png",
+      "sourceImageSha256": "4de6d23cc7d701836628b3f7ec2a116126a8d1fb6a6cfbba85bced4879811e49",
+      "sourceImageByteSize": 361029
+    },
+    {
+      "caseId": "wine-multi-artifact-07",
+      "imagePath": "tests/fixtures/precheck/wine-multi-artifact-07/label.png",
+      "sourceImageSha256": "6907f03956286e7f4f6ae6b6c6670deb044af072b6008000db221d3f337360b7",
+      "sourceImageByteSize": 499047
+    },
+    {
+      "caseId": "wine-multi-artifact-08",
+      "imagePath": "tests/fixtures/precheck/wine-multi-artifact-08/label.png",
+      "sourceImageSha256": "29cc7e0232fa796b046db41791da7272f5b3092933cc912869d9b3596105fd4d",
+      "sourceImageByteSize": 499564
+    },
+    {
+      "caseId": "wine-multi-artifact-09",
+      "imagePath": "tests/fixtures/precheck/wine-multi-artifact-09/label.png",
+      "sourceImageSha256": "02afffe0d861686f86f361f1c467820f58325d14a01c9c03bcd010bc8b7c8e44",
+      "sourceImageByteSize": 274529
+    },
+    {
+      "caseId": "wine-multi-artifact-10",
+      "imagePath": "tests/fixtures/precheck/wine-multi-artifact-10/label.png",
+      "sourceImageSha256": "209116cac5f9ede387e39dcc313a7ef30a68ddc249468cb2da79e0ada188b155",
+      "sourceImageByteSize": 519591
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "artifact": "truth-isolation-plan",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "acquisitionInput": "artifacts/issue-149-brand-complete-evidence-acquisition/truth-free-input-manifest.json",
+  "acquisitionInputFields": ["caseId", "imagePath", "sourceImageSha256", "sourceImageByteSize"],
+  "theAcquisitionProcessNeverReceives": {
+    "governedBrandTruth": false,
+    "acceptableBrandValues": false,
+    "truthMatchBooleans": false,
+    "expectedClassifications": false,
+    "pr217PerCaseResults": false,
+    "pr218PerCaseResults": false,
+    "filterRelaxationExpectations": false,
+    "note": "Every entry is false: none of these is passed to, imported by, or reachable from the acquisition path."
+  },
+  "harnessEntryPointCaveat": {
+    "concern": "runCaseArtifacts takes an eval case object which, in the harness's normal use, carries brand truth alongside the image.",
+    "mitigation": "The acquisition constructs its case objects from the truth-free input manifest only, leaving truth fields unset, and asserts before each call that the object carries no acceptable-value array. This is an input-construction discipline, not a harness change.",
+    "assertionOnFailure": "TRUTH_ISOLATION_FAILURE, before any OCR call for that case"
+  },
+  "emittedFieldBan": [
+    "isTruth",
+    "matchesTruth",
+    "truthInRawOcr",
+    "truthOnReconstructedLine",
+    "truthFilterReasons",
+    "expectedBrand",
+    "acceptableValues"
+  ],
+  "scanBeforeFreeze": {
+    "scope": "every file under raw/<run>/",
+    "checks": [
+      "no banned field name appears as a JSON key",
+      "no governed acceptable-value string appears anywhere in the emitted evidence except where it is genuinely part of an OCR-recognized text or a candidate value produced by the pipeline",
+      "the second check is reported as an inventory rather than a hard failure, because a correct OCR reading of a brand legitimately contains the brand string"
+    ],
+    "hardFailure": "a banned field NAME appearing as a key halts with TRUTH_ISOLATION_FAILURE"
+  },
+  "orderingRule": "Both runs complete, and both raw-evidence manifests are written and hashed, BEFORE any governed truth file is opened.",
+  "postFreezeTruthUse": {
+    "permitted": [
+      "verify the new evidence can rederive the previously carried determinations",
+      "compare the new current-base snapshot with the older evidence artifact",
+      "report differences"
+    ],
+    "forbidden": [
+      "modifying any acquired artifact",
+      "reordering, re-emitting or reformatting any frozen raw file",
+      "simulating a filter relaxation",
+      "recommending a filter treatment"
+    ]
+  }
+}

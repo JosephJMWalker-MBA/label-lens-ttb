@@ -1,0 +1,71 @@
+{
+  "artifact": "post-freeze-evaluation-plan",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "precondition": "Both raw-evidence manifests exist and their aggregate SHA-256 files verify.",
+  "purpose": "Validation of evidence completeness only.",
+  "normalization": {
+    "source": "src/fixtures/eval/metrics.ts",
+    "functions": ["normalizeKey", "brandNormalizedMatch", "normalizedIncludes"],
+    "changed": false,
+    "newAliasAdded": false,
+    "truthGuidedCorrectionApplied": false
+  },
+  "rederivations": [
+    {
+      "field": "truthInRawOcr",
+      "from": "the complete word evidence across every Brand-eligible pass",
+      "previouslyCarriedNotRederivable": true
+    },
+    { "field": "truthOnReconstructedLine", "from": "all reconstructed lines, with no 12-line cap" },
+    {
+      "field": "truthBearingCandidateFormed",
+      "from": "the complete candidate array including rejected candidates"
+    },
+    { "field": "truthBearingCandidateKept", "from": "kept flags on truth-matching candidates" },
+    {
+      "field": "filtersRejectingEachTruthBearingCandidate",
+      "from": "the recorded filterReason on each truth-matching rejected candidate",
+      "limitation": "one reason per candidate, because the ladder short-circuits; the union across candidates is reported, and the set of rules that would ALSO have fired is not derivable"
+    },
+    { "field": "truthRank", "from": "position in the complete ranked list" },
+    { "field": "selectedCorrectness", "from": "the final selected value" },
+    { "field": "finalAuthorityResult", "from": "the final state and abstention reason" }
+  ],
+  "crossCheckAgainst": [
+    "artifacts/brand-evidence-path-diagnosis/cases.json",
+    "artifacts/issue-149-brand-current-baseline-failure-decomposition/per-case-attribution.json",
+    "artifacts/issue-149-brand-candidate-construction-filter-decomposition/per-case-stage-attribution.json"
+  ],
+  "differenceVocabulary": [
+    {
+      "code": "CURRENT_RERUN_CONFIRMS_PRIOR_FIELD",
+      "meaning": "the rerun reproduces the previously carried value"
+    },
+    {
+      "code": "PRIOR_FIELD_NOT_REPRODUCED",
+      "meaning": "the rerun disagrees and the difference is not explained by a known pipeline change"
+    },
+    {
+      "code": "CURRENT_PIPELINE_DIFFERENCE",
+      "meaning": "the rerun disagrees and a specific, identified change between the two bases accounts for it"
+    },
+    {
+      "code": "NONDETERMINISTIC_EVIDENCE",
+      "meaning": "the primary and repeat runs themselves disagree on this field"
+    },
+    {
+      "code": "CANNOT_COMPARE_SEMANTICALLY",
+      "meaning": "the prior field and the new field do not measure the same thing"
+    }
+  ],
+  "prohibited": [
+    "silently replacing a prior record",
+    "claiming current-equivalence where a measurement now disagrees",
+    "modifying any acquired artifact",
+    "simulating removal of a filter",
+    "recommending a filter treatment",
+    "choosing a successor treatment"
+  ],
+  "expectedUseOfTheResult": "A later, separately preregistered zero-OCR study may use this evidence. This sprint does not perform, design or recommend that study's treatment."
+}

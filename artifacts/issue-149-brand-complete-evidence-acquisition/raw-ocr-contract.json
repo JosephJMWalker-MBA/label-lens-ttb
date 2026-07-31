@@ -1,0 +1,87 @@
+{
+  "artifact": "raw-ocr-contract",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "sourceOfTruthForShape": "ExtractionDebug.passes[] (src/pipeline/extractor/extractor.ts:30) and OcrWord (src/pipeline/extractor/extractor.types.ts:103)",
+  "reachableWithoutProductionChange": true,
+  "reachableVia": "runCaseArtifacts already returns extractionDebug (src/fixtures/eval/eval-harness.ts:959). The debug object is UNTRUNCATED; only the CaseReport projection applies caps.",
+  "capsExplicitlyNotApplied": {
+    "MAX_SAMPLE_WORDS_PER_REGION": "the 25-word sampleWords cap in eval-harness.ts is a CaseReport projection and is bypassed by reading extractionDebug directly",
+    "MAX_TEXT_LEN": "the 120-character truncate() applied to CaseReport strings is likewise bypassed",
+    "firstNWordCap": "none applied",
+    "truthGuidedWordFiltering": "none applied"
+  },
+  "perPassFields": {
+    "caseId": { "available": true },
+    "passId": { "available": true, "source": "PlannedOcrPass.passId" },
+    "passKind": { "available": true },
+    "regionName": { "available": true },
+    "role": {
+      "available": true,
+      "derivedFrom": "passKind plus triggerReasons; primary vs recovery"
+    },
+    "triggerReasons": { "available": true },
+    "fieldEligibility": { "available": true },
+    "sourceImageSha256": { "available": true, "source": "the frozen truth-free input manifest" },
+    "cropPixelSha256": {
+      "available": true,
+      "note": "Computed by this acquisition over the preprocessed PNG buffer handed to the engine. It is an observation of an existing byte stream, not a change to preprocessing."
+    },
+    "cropGeometry": { "available": true, "source": "PlannedOcrPass.transform.crop" },
+    "transformAndOrientation": {
+      "available": true,
+      "source": "PlannedOcrPass.transform (rotate, scale, originalWidth, originalHeight) and template.preprocessing"
+    },
+    "ocrEngineAndConfiguration": {
+      "available": true,
+      "source": "incumbent-configuration-freeze.json plus pass pageSegMode"
+    },
+    "warningsAndErrors": { "available": true },
+    "passLatency": {
+      "available": true,
+      "source": "OcrPassTimings: preprocessMs, ocrMs, inverseMappingMs, totalMs"
+    },
+    "passOutputFingerprint": {
+      "available": true,
+      "computedAs": "sha256 of canonical JSON over the ordered word records"
+    }
+  },
+  "perWordFields": {
+    "originalWordOrder": {
+      "available": true,
+      "note": "array index in the emitted order, preserved exactly"
+    },
+    "text": { "available": true, "field": "OcrWord.text", "truncated": false },
+    "confidence": { "available": true, "field": "OcrWord.rawConfidence", "scale": "engine 0-100" },
+    "boundingBox": { "available": true, "field": "OcrWord.bbox (x0,y0,x1,y1)" },
+    "originalGeometry": {
+      "available": true,
+      "field": "OcrWord.originalGeometry",
+      "note": "present once a pass has mapped the token back to the original image frame; recorded as null where absent rather than omitted"
+    },
+    "baselineGeometry": {
+      "available": false,
+      "why": "OcrWord carries no baseline. Exposing it would require changing the production OCR adapter, which this sprint forbids.",
+      "recordedAs": "absent, with this reason"
+    },
+    "blockParagraphLineIdentifiers": {
+      "available": false,
+      "why": "The production adapter maps tesseract.js output to OcrWord, which carries no block, paragraph or line identifier. Exposing them would require a production change.",
+      "recordedAs": "absent, with this reason",
+      "mitigation": "Reconstructed-line membership is captured separately in reconstructed-line-contract.json, which is the grouping the Brand path actually uses."
+    }
+  },
+  "truncationAssertions": [
+    "observed maximum words per pass and per case are recorded",
+    "observed maximum lines per case are recorded",
+    "the emitted word count per pass must equal the length of the debug pass word array",
+    "any inequality halts with RAW_EVIDENCE_TRUNCATED"
+  ],
+  "truthBearingFieldsForbidden": [
+    "isTruth",
+    "matchesTruth",
+    "truthInRawOcr",
+    "truthFilterReasons",
+    "expectedBrand"
+  ]
+}

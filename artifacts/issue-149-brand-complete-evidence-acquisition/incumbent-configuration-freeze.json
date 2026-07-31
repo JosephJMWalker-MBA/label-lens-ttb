@@ -1,0 +1,74 @@
+{
+  "artifact": "incumbent-configuration-freeze",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "base": "8f0c6a7ca7c271eed14d9084ed6da7fe11f897a9",
+  "productionEquivalentPath": "the unmodified incumbent extractor, reached through src/fixtures/eval/eval-harness.ts runCaseArtifacts, which calls extractLabelEvidenceDetailed",
+  "engine": {
+    "tesseractJs": "7.0.0",
+    "tesseractJsCore": "7.0.0",
+    "versionSource": "package-lock.json resolved versions",
+    "oem": 1,
+    "oemMeaning": "LSTM only",
+    "oemSource": "src/pipeline/extractor/ocr-engine.ts:155",
+    "assetsLocal": true,
+    "networkDownloadsDuringOcr": false
+  },
+  "traineddata": {
+    "path": "src/pipeline/extractor/assets/eng.traineddata",
+    "sha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+    "byteSize": 5199098
+  },
+  "pageSegModes": {
+    "constants": { "SPARSE_TEXT": 11, "SINGLE_LINE": 7 },
+    "source": "src/pipeline/extractor/ocr-engine.ts:110",
+    "usedByEveryBrandEligibleTemplate": 11,
+    "note": "Every pass template in regions.ts sets pageSegMode SPARSE_TEXT (11). No template is altered by this sprint."
+  },
+  "passPlanning": {
+    "primary": "planPrimaryOcrPass",
+    "recovery": "planRecoveryOcrPasses",
+    "recoveryTriggers": "needsBrandRecovery when the primary Brand state is NOT_OBSERVED; needsAlcoholRecovery likewise. Unchanged.",
+    "sellerRegionPass": "planSellerRegionOcrPass is NOT exercised: sellerRegionTargets is empty in this acquisition, and its output never feeds the Brand observation in any case.",
+    "source": "src/pipeline/extractor/regions.ts, src/pipeline/extractor/extractor.ts"
+  },
+  "cropAndTransform": {
+    "source": "PassTemplate entries in src/pipeline/extractor/regions.ts",
+    "fieldsPersisted": [
+      "crop",
+      "rotate",
+      "scale",
+      "originalWidth",
+      "originalHeight",
+      "preprocessing"
+    ],
+    "changedByThisSprint": false
+  },
+  "brandPath": {
+    "lineReconstruction": "unchanged",
+    "candidateConstruction": "unchanged",
+    "filterLadder": "unchanged",
+    "ranking": "unchanged",
+    "selection": "unchanged",
+    "authorityStateComputation": "unchanged",
+    "entryPoint": "selectBrandObservation",
+    "optionalTreatmentEntryPointCalled": false,
+    "optionalTreatmentEntryPointName": "selectBrandObservationWithCoherentLineMergeTreatment",
+    "optionalTreatmentNote": "This opt-in entry point exists in field-selection.ts and is NOT called. DEFAULT_BRAND_SELECTION_OPTIONS.allowCoherentPlausibleLineMerge stays false.",
+    "experimentalFlagsEnabled": []
+  },
+  "generationTimeCapsInProduction": {
+    "MAX_BRAND_WORDS": 4,
+    "MAX_MULTI_LINE_SEEDS_PER_LINE": 3,
+    "source": "src/pipeline/extractor/field-selection.ts:1293-1295",
+    "consequence": "These are production behaviour, not evidence caps. Sub-span windows longer than 4 words are never FORMED, so acquisition cannot enumerate a candidate production never built. Whole-line candidates longer than 4 words ARE formed and then rejected with too-many-words, so those do appear. This boundary is recorded because it limits what any later counterfactual can claim about 'all candidate windows considered'.",
+    "changedByThisSprint": false
+  },
+  "haltConditions": [
+    "a changed tesseract.js or tesseract.js-core version",
+    "a changed eng.traineddata SHA-256",
+    "a changed OEM or page-segmentation mode",
+    "a changed pass template, crop geometry or transform",
+    "any experimental flag or optional Brand treatment entry point being reachable"
+  ]
+}

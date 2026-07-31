@@ -1,0 +1,50 @@
+{
+  "artifact": "decision-rules",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "frozenBeforeAcquisition": true,
+  "acquisitionVerdict": {
+    "oneOf": [
+      "COMPLETE_DETERMINISTIC_EVIDENCE",
+      "COMPLETE_WITH_NONDETERMINISM",
+      "INCOMPLETE_EVIDENCE",
+      "TRUTH_ISOLATION_FAILURE",
+      "RUNTIME_FAILURE"
+    ],
+    "computedFromGates": true,
+    "handAsserted": false
+  },
+  "evidenceCompletenessVerdict": {
+    "separateFrom": "the acquisition verdict",
+    "question": "Does the acquired evidence support the four stated downstream capabilities?",
+    "capabilities": [
+      "independently rederive truthInRawOcr",
+      "distinguish line reconstruction, candidate formation and filtering",
+      "simulate one-filter-at-a-time counterfactuals over all truth and non-truth candidates",
+      "measure displacement and Brand-absent exposure rather than upside alone"
+    ],
+    "expectedOutcomeStatedInAdvance": {
+      "capability1": "expected to be satisfied",
+      "capability2": "expected to be satisfied",
+      "capability3": "expected to be PARTIALLY satisfied — see the short-circuit blocker in candidate-decision-contract.json. All candidates and their recorded reason become available, but the rules that would also have fired on a candidate do not exist in production output.",
+      "capability4": "expected to be satisfied for displacement and Brand-absent exposure among candidates production actually formed",
+      "statedInAdvanceBecause": "Recording the expected limitation before acquisition prevents it from being discovered afterwards and presented as a surprise, or quietly omitted."
+    }
+  },
+  "thisSprintDoesNot": [
+    "KEEP or KILL a production change",
+    "choose a successor treatment",
+    "simulate any filter relaxation",
+    "authorize any production change"
+  ],
+  "authorizes": [],
+  "doesNotAuthorize": [
+    "any production code change",
+    "any OCR configuration, traineddata, preprocessing, crop or recovery change",
+    "any Brand reconstruction, filtering, ranking, selection or authority change",
+    "any truth, normalization, threshold, alias or state-semantics change",
+    "implementing or simulating a filter relaxation",
+    "choosing a successor treatment",
+    "corpus expansion, substitution or exclusion"
+  ]
+}
