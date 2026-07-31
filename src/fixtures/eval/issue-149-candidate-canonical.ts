@@ -97,11 +97,86 @@ export function canonicalRecordSha256(record: Record<string, unknown>): string {
     .digest("hex");
 }
 
-export function stableCandidateId(record: {
-  opaqueItemId: string;
-  candidateOrdinal: number;
-  canonicalRecordSha256?: string;
-}): string {
-  const digest = record.canonicalRecordSha256 ?? canonicalRecordSha256(record as never);
-  return `${record.opaqueItemId}:${record.candidateOrdinal}:${digest}`;
+export class CandidateRecordError extends Error {
+  constructor(
+    readonly code:
+      | "MISSING_OPAQUE_ITEM_ID"
+      | "MISSING_CANDIDATE_ORDINAL"
+      | "MISSING_DIGEST"
+      | "MALFORMED_DIGEST"
+      | "DIGEST_DOES_NOT_MATCH_RECORD",
+    detail: string,
+  ) {
+    super(`${code}: ${detail}`);
+    this.name = "CandidateRecordError";
+  }
+}
+
+const LOWER_HEX_64 = /^[0-9a-f]{64}$/;
+
+/**
+ * Build the stable id. Fails closed.
+ *
+ * The digest is REQUIRED and is re-derived from the complete record before the
+ * id is returned, so a partial object cannot yield a valid-looking id. An
+ * earlier revision made the digest optional and computed it from whatever it was
+ * given, which meant `{ opaqueItemId, candidateOrdinal }` alone produced a
+ * plausible 64-hex id that was never derived from the evidence.
+ */
+export function stableCandidateId(record: Record<string, unknown>): string {
+  const opaqueItemId = record.opaqueItemId;
+  const candidateOrdinal = record.candidateOrdinal;
+  const digest = record.canonicalRecordSha256;
+
+  if (typeof opaqueItemId !== "string" || opaqueItemId.length === 0) {
+    throw new CandidateRecordError(
+      "MISSING_OPAQUE_ITEM_ID",
+      "opaqueItemId must be a non-empty string",
+    );
+  }
+  if (typeof candidateOrdinal !== "number" || !Number.isInteger(candidateOrdinal)) {
+    throw new CandidateRecordError(
+      "MISSING_CANDIDATE_ORDINAL",
+      "candidateOrdinal must be an integer",
+    );
+  }
+  if (digest === undefined || digest === null) {
+    throw new CandidateRecordError(
+      "MISSING_DIGEST",
+      "canonicalRecordSha256 is required; a stable id may not be built from identity fields alone",
+    );
+  }
+  if (typeof digest !== "string" || !LOWER_HEX_64.test(digest)) {
+    throw new CandidateRecordError(
+      "MALFORMED_DIGEST",
+      `canonicalRecordSha256 must be lowercase 64-hex, received ${JSON.stringify(digest)}`,
+    );
+  }
+  const recomputed = canonicalRecordSha256(record);
+  if (recomputed !== digest) {
+    throw new CandidateRecordError(
+      "DIGEST_DOES_NOT_MATCH_RECORD",
+      `supplied ${digest} but the complete record canonicalizes to ${recomputed}`,
+    );
+  }
+  return `${opaqueItemId}:${candidateOrdinal}:${digest}`;
+}
+
+/**
+ * The preferred entry point: take a complete evidence record and return it with
+ * both derived fields attached. There is no path here that produces an id from
+ * identity fields alone.
+ */
+export function finalizeCandidateRecord(
+  completeEvidenceRecord: Record<string, unknown>,
+): Record<string, unknown> {
+  if (Object.hasOwn(completeEvidenceRecord, "canonicalRecordSha256")) {
+    throw new CandidateRecordError(
+      "MALFORMED_DIGEST",
+      "finalizeCandidateRecord expects an unfinalized record; canonicalRecordSha256 is already present",
+    );
+  }
+  const digest = canonicalRecordSha256(completeEvidenceRecord);
+  const finalized = { ...completeEvidenceRecord, canonicalRecordSha256: digest };
+  return { ...finalized, stableCandidateId: stableCandidateId(finalized) };
 }

@@ -17,7 +17,8 @@ The governed Issue #149 pattern, unchanged:
   `research/issue-149-brand-complete-evidence-acquisition`;
 - `paths:` admitting **only** the workflow file and
   `artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt`;
-- `permissions: contents: read`;
+- `permissions: contents: read` — the OCR job cannot push, and is never granted
+  `contents: write`;
 - committed mode file with exactly three legal values: `discover`, `execute`,
   `complete`;
 - **OCR runs only when the mode is exactly `execute`**;
@@ -32,9 +33,18 @@ Discover and execute both run inside the boundary frozen in
 `acquisition-runtime-isolation-contract.json`: no repository checkout, no `.git`,
 no `artifacts/`, no fixtures, no eval manifest, no ID map, no truth, no
 credentials, no environment inheritance; network disabled, read-only root, all
-capabilities dropped, `no-new-privileges`, tmpfs-only writable space, and exactly
-four mounts. The runtime bundle is allowlisted and must not be built with an
-unrestricted repository `COPY`.
+capabilities dropped, `no-new-privileges`. Writable space is the read-write
+**output bind mount** plus a named `tmpfs` for scratch — nothing else is
+writable. The invariant is **four experiment-controlled data mounts** plus an
+explicit allowlist of the pseudo-filesystems every container unavoidably carries;
+"exactly four mounts" was not implementable and is superseded. The runtime bundle
+is allowlisted and must not be built with an unrestricted repository `COPY`.
+
+The design is two-phase. **Phase 1 is trusted host preparation**: the freeze
+script stages the opaque images and writes the truth-free manifest on the host,
+outside the boundary. **Phase 2 is the isolated discover run**, which sees only
+the staged inputs. Phase 1 never runs inside the boundary and phase 2 never
+prepares its own inputs.
 
 **Discover mode must run inside that same boundary and stop for review before
 execute is authorized.** Neither the workflow nor the runtime bundle is
@@ -64,34 +74,46 @@ Discovery reads images to hash them. It runs no OCR pass.
 2. Run the **primary** matrix: all 115 opaque items through a DIRECT
    `extractLabelEvidenceDetailed` call — never `runCaseArtifacts` — then obtain
    complete diagnostics with a second, exact-pass-set call to
-   `selectBrandObservationWithCompleteFilterDiagnostics`, asserting parity
-   against `debug.finalSelections.brand` and halting on
-   `BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE`. The container mounts
-   only `.local/issue-149-acquisition-inputs` read-only and an empty output
+   `selectBrandObservationWithCompleteFilterDiagnostics`, asserting **full-object
+   canonical parity** against `debug.finalSelections.brand` once only
+   `filterChecks` and `activeRejectionReasons` are removed, and halting on
+   `BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE`. Parity is whole-object equality;
+   no field allowlist is authoritative. The container mounts only
+   `.local/issue-149-acquisition-inputs` read-only and an empty output
    directory. The post-freeze ID map is not mounted.
-3. Assert per-pass and per-case counting proofs; halt on
+3. Persist the **complete ordered `RegionOcrResult` array** — all thirteen fields
+   of every pass, in emission order — per
+   `region-ocr-result-replay-contract.json`; halt on `PASS_EVIDENCE_TRUNCATED` or
+   `PASS_ORDER_MISMATCH`. This is what makes the counterfactual in capability 3
+   replayable later, without OCR.
+4. Assert per-pass and per-case counting proofs; halt on
    `RAW_EVIDENCE_TRUNCATED`, `LINE_EVIDENCE_TRUNCATED` or
    `CANDIDATE_EVIDENCE_TRUNCATED`.
-4. Scan every emitted file for banned field names; halt on
+5. Scan every emitted file for banned field names; halt on
    `TRUTH_ISOLATION_FAILURE`.
-5. Write and hash `raw/primary/raw-evidence-manifest.json` and its aggregate
+6. Write and hash `raw/primary/raw-evidence-manifest.json` and its aggregate
    SHA-256. **`raw/primary/` is immutable from this point.**
-6. Run the **repeat** matrix identically and freeze `raw/repeat/` the same way.
+7. Run the **repeat** matrix identically and freeze `raw/repeat/` the same way.
    No configuration changes between runs. No retries. No selective rerun.
-7. Compare the two runs at every level in `determinism-rules.json` and report
+8. Compare the two runs at every level in `determinism-rules.json` and report
    every difference without repairing any of it.
-8. Apply the **100 MB repository-footprint gate**: report exact total bytes,
-   bytes by category and largest files. At or below 100 MB commit per the
-   governed plan. Above 100 MB, upload the complete lossless evidence as a
-   **temporarily retained workflow artifact**, record its ID, exact bytes,
-   SHA-256, configured retention and expected expiration, do not delete local job
-   output until the upload and its digest verify, stop before committing raw
-   evidence to Git, **stop before post-freeze truth evaluation**, and require an
-   explicit owner decision about durable archival before continuing. A workflow
-   artifact is retention-bound and is never called permanent preservation.
-9. **Truth boundary.** Only now does the post-freeze evaluation open
-   `post-freeze/id-map.json` and the governed truth, to attach historical
-   identity, validate completeness and cross-check the prior artifacts.
+9. **Transport.** The OCR job holds `contents: read` and therefore **never
+   commits anything**. At every size it uploads the complete lossless evidence as
+   a **temporarily retained workflow artifact**, records the artifact ID, exact
+   bytes, SHA-256, configured retention and expected expiration, and verifies the
+   uploaded digest **before** any job-local output is deleted. It then reports
+   exact total bytes, bytes by category and largest files, and applies the
+   **100 MB gate**: at or below 100 MB it stops after verification, and a
+   separate, owner-authorized post-run process — not the OCR process — downloads
+   the artifact, re-verifies the digest and commits the evidence to PR #219;
+   above 100 MB it stops before Git commitment, **stops before post-freeze truth
+   evaluation**, and requires an explicit owner decision about durable archival.
+   A workflow artifact is retention-bound and is never called permanent
+   preservation.
+10. **Truth boundary.** Only after both raw manifests verify does the post-freeze
+    evaluation open `post-freeze/id-map.json` and the governed truth, to attach
+    historical identity, validate completeness and cross-check the prior
+    artifacts.
 
 Both matrices run exactly once. The workflow contains no path that reruns a
 single case.

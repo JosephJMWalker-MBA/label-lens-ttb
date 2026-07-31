@@ -1,0 +1,66 @@
+{
+  "artifact": "amendment-3-linkage",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "amendmentNumber": 3,
+  "amendedBeforeAnyAcquisitionOcr": true,
+  "governedAcquisitionOcrBeforeAmendment3": {
+    "occurred": false,
+    "underOriginalPlan": false,
+    "underAmendment1": false,
+    "underAmendment2": false,
+    "discoverModeEntered": false,
+    "executeModeEntered": false,
+    "evidence": "No raw/ directory, no raw-evidence manifest, no workflow file and no workflow-mode file has ever existed on this branch."
+  },
+  "originalStage1": {
+    "head": "7600b0a9ba5ce6995274a517121f1eda18a30424",
+    "base": "8f0c6a7ca7c271eed14d9084ed6da7fe11f897a9",
+    "preregistrationSha256": "7b691c78a9de008039ccc1a7f94824015373b1caec58f8235c78a03587c641fb",
+    "preservedNotOverwritten": true
+  },
+  "amendment1": {
+    "head": "26157cfe036fb8b1506431d1aa9309029ac2dcdb",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "cfc118c670a9c69f783f3ca58174113711b553baf1278da31a35e31121bf13ad",
+    "preservedNotOverwritten": true
+  },
+  "amendment2": {
+    "head": "ad1c296194e21e91af8333953ad47abe396495dc",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "9287ecc0d5d01bae83316c9d0dcb462d6eca566c925405cde83631fa65c89d35",
+    "preservedNotOverwritten": true,
+    "historicalMeaningRewritten": false,
+    "note": "Amendment 2's corrections stand. Amendment 3 fixes eight defects found in reviewing Amendment 2's contracts before execution, and does not reinterpret what Amendment 2 got right."
+  },
+  "amendment3": {
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "headAtAmendmentStart": "ad1c296194e21e91af8333953ad47abe396495dc",
+    "preregistrationSha256": {
+      "recordedIn": "artifacts/issue-149-brand-complete-evidence-acquisition/preregistration.sha256",
+      "notDuplicatedHere": true,
+      "why": "Amendment 2 duplicated the digest into this file, which then had to be kept in sync by hand. It lives in exactly one authoritative place."
+    },
+    "stage1ContractManifestAggregate": {
+      "recordedIn": "artifacts/issue-149-brand-complete-evidence-acquisition/stage-1-contract-manifest.sha256",
+      "notDuplicatedHere": true,
+      "why": "The aggregate covers every governed file. Writing it into a file the manifest itself hashes would be self-referential: recording it would change the value being recorded. It lives on the manifest's own trailing `# aggregate` line, which the manifest excludes from its own file list."
+    }
+  },
+  "corrections": [
+    "ExtractionInput identities frozen from the incumbent harness constants; the invented processedAt corrected to the repository's own 2026-07-12T00:00:00Z",
+    "future-runner import prohibition implemented as a real source-inspection test over both runner paths, with the detector itself exercised, and explicitly not claimed as transitive runtime isolation",
+    "runtime boundary contradiction resolved: writable space is the output bind mount plus a named tmpfs, and the mount invariant is four experiment-controlled data mounts plus an allowlist of unavoidable pseudo-filesystem classes; trusted host preparation and isolated discover separated into two phases",
+    "the raw schema's per-pass identifier renamed from caseId to opaqueItemId, enforced by a JSON key walk rather than a prose grep",
+    "stableCandidateId made fail-closed with a required, re-derived digest, plus finalizeCandidateRecord as the preferred entry point",
+    "parity redefined as full-object canonical equality; the 21-field allowlist marked non-authoritative and a Stage 2 synthetic parity test contracted",
+    "transport rewritten for permissions: contents: read — artifact upload at every size, digest verified before deleting job output, a separate owner-authorized post-run process commits",
+    "capability 3 restated as SATISFIABLE via replay of the persisted complete ordered RegionOcrResult array, not SATISFIED via rejection reasons"
+  ],
+  "unchangedByThisAmendment": [
+    "the frozen 115-item population and its opaque identifiers",
+    "the incumbent configuration pins, including field-selection.ts 8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
+    "two exact corpus runs with no retries and no selective rerun",
+    "the truth boundary and the pre-freeze scan's key-and-path scope",
+    "the prohibition on modifying PR #195 or any production behaviour"
+  ]
+}

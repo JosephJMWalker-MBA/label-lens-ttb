@@ -9,8 +9,10 @@ import { describe, expect, it } from "vitest";
 import {
   CANDIDATE_CANONICALIZATION_VERSION,
   CandidateCanonicalizationError,
+  CandidateRecordError,
   canonicalRecordSha256,
   canonicalize,
+  finalizeCandidateRecord,
   fingerprintPreimage,
   stableCandidateId,
 } from "./issue-149-candidate-canonical";
@@ -145,23 +147,76 @@ describe("Issue #149 candidate fingerprint", () => {
   });
 
   it("recomputes to the persisted digest", () => {
-    const evidence = record();
-    const digest = canonicalRecordSha256(evidence);
-    const persisted = {
-      ...evidence,
-      canonicalRecordSha256: digest,
-      stableCandidateId: `${evidence.opaqueItemId}:${evidence.candidateOrdinal}:${digest}`,
-    };
-    expect(canonicalRecordSha256(persisted)).toBe(digest);
-    expect(stableCandidateId(persisted as never)).toBe(persisted.stableCandidateId);
+    const finalized = finalizeCandidateRecord(record());
+    expect(canonicalRecordSha256(finalized)).toBe(finalized.canonicalRecordSha256);
+    expect(stableCandidateId(finalized)).toBe(finalized.stableCandidateId);
   });
 
-  it("builds the stable id from the full digest, never a truncation", () => {
-    const evidence = record();
-    const id = stableCandidateId(evidence as never);
-    const [item, ordinal, digest] = id.split(":");
+  it("builds the stable id from the full verified digest, never a truncation", () => {
+    const finalized = finalizeCandidateRecord(record());
+    const [item, ordinal, digest] = String(finalized.stableCandidateId).split(":");
     expect(item).toBe("item-0007");
     expect(ordinal).toBe("3");
     expect(digest).toHaveLength(64);
+    expect(digest).toBe(finalized.canonicalRecordSha256);
+  });
+
+  describe("fail-closed candidate identity", () => {
+    it("rejects a partial record carrying only identity fields", () => {
+      expect(() => stableCandidateId({ opaqueItemId: "item-0007", candidateOrdinal: 3 })).toThrow(
+        CandidateRecordError,
+      );
+      try {
+        stableCandidateId({ opaqueItemId: "item-0007", candidateOrdinal: 3 });
+      } catch (error) {
+        expect((error as CandidateRecordError).code).toBe("MISSING_DIGEST");
+      }
+    });
+
+    it("rejects a missing opaque id or ordinal", () => {
+      const finalized = finalizeCandidateRecord(record());
+      expect(() => stableCandidateId({ ...finalized, opaqueItemId: "" })).toThrow(
+        CandidateRecordError,
+      );
+      expect(() => stableCandidateId({ ...finalized, candidateOrdinal: "3" })).toThrow(
+        CandidateRecordError,
+      );
+    });
+
+    it("rejects a malformed or truncated digest", () => {
+      const finalized = finalizeCandidateRecord(record());
+      for (const bad of [
+        String(finalized.canonicalRecordSha256).slice(0, 16),
+        String(finalized.canonicalRecordSha256).toUpperCase(),
+        "not-hex",
+        "",
+      ]) {
+        expect(() => stableCandidateId({ ...finalized, canonicalRecordSha256: bad })).toThrow(
+          CandidateRecordError,
+        );
+      }
+    });
+
+    it("rejects a well-formed digest taken from a different record", () => {
+      const mine = finalizeCandidateRecord(record());
+      const other = finalizeCandidateRecord(record({ candidateOrdinal: 9 }));
+      expect(() =>
+        stableCandidateId({ ...mine, canonicalRecordSha256: other.canonicalRecordSha256 }),
+      ).toThrow(CandidateRecordError);
+      try {
+        stableCandidateId({ ...mine, canonicalRecordSha256: other.canonicalRecordSha256 });
+      } catch (error) {
+        expect((error as CandidateRecordError).code).toBe("DIGEST_DOES_NOT_MATCH_RECORD");
+      }
+    });
+
+    it("finalizes a complete record and refuses to re-finalize", () => {
+      const finalized = finalizeCandidateRecord(record());
+      expect(String(finalized.canonicalRecordSha256)).toMatch(/^[0-9a-f]{64}$/);
+      expect(String(finalized.stableCandidateId)).toContain(
+        String(finalized.canonicalRecordSha256),
+      );
+      expect(() => finalizeCandidateRecord(finalized)).toThrow(CandidateRecordError);
+    });
   });
 });

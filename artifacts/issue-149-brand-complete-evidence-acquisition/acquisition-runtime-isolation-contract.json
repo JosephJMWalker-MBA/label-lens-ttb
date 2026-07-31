@@ -2,7 +2,7 @@
   "artifact": "acquisition-runtime-isolation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-2.md",
+  "amendedBy": "preregistration-amendment-3.md",
   "status": "CONTRACT FROZEN. Not implemented in this amendment.",
   "whyThisExists": {
     "correction": "The Stage 1 isolation tests are STATIC manifest, path and import validation. They read committed planning artifacts and assert their shape. They are NOT runtime proof, and this contract stops them being described as such.",
@@ -26,16 +26,31 @@
     "rootFilesystem": "read-only",
     "linuxCapabilities": "all dropped",
     "noNewPrivileges": true,
-    "writableSpace": "only an explicit tmpfs",
+    "writableSpace": "exactly two classes: the experiment output mount (read-write), and explicitly named tmpfs paths for process and runtime temporary files. No other experiment-controlled path is writable.",
     "environment": "explicit allowlist only; no inheritance"
   },
   "authorizedMounts": [
-    { "ordinal": 1, "path": "the allowlisted runtime bundle", "mode": "read-only" },
-    { "ordinal": 2, "path": "truth-free-input-manifest.json", "mode": "read-only" },
-    { "ordinal": 3, "path": "the staged opaque images", "mode": "read-only" },
-    { "ordinal": 4, "path": "an initially empty output directory", "mode": "read-write" }
+    {
+      "ordinal": 1,
+      "path": "the allowlisted runtime bundle",
+      "mode": "read-only"
+    },
+    {
+      "ordinal": 2,
+      "path": "truth-free-input-manifest.json",
+      "mode": "read-only"
+    },
+    {
+      "ordinal": 3,
+      "path": "the staged opaque images",
+      "mode": "read-only"
+    },
+    {
+      "ordinal": 4,
+      "path": "an initially empty output directory",
+      "mode": "read-write"
+    }
   ],
-  "exactlyFourMounts": true,
   "runtimeBundle": {
     "mayContainOnly": [
       "compiled acquisition code",
@@ -65,10 +80,92 @@
       "assert the post-freeze ID map is unavailable",
       "assert the eval manifest and fixture paths are unavailable",
       "verify the runtime bundle manifest",
-      "verify only the four authorized mounts exist"
+      "verify that only the four authorized experiment data mounts exist, plus the allowlisted pseudo-filesystem classes"
     ],
     "thenStopsForReview": true,
     "executeAuthorizedOnlyAfter": "the discover-mode evidence is reviewed and execute is explicitly authorized"
   },
-  "implementedInThisAmendment": false
+  "implementedInThisAmendment": false,
+  "writableSpaceCorrection": {
+    "priorContradiction": "Amendment 2 said writable space was tmpfs-only AND authorized a read-write output mount. Both could not be true.",
+    "resolution": "The output mount is a real read-write bind mount, not a tmpfs, so evidence survives the container. tmpfs covers only process/runtime scratch. The two are named separately.",
+    "authorizedWritablePaths": [
+      {
+        "path": "the experiment output mount",
+        "kind": "bind, read-write",
+        "survivesContainer": true
+      },
+      {
+        "path": "explicitly named tmpfs paths",
+        "kind": "tmpfs",
+        "survivesContainer": false,
+        "purpose": "process and runtime temporary files only"
+      }
+    ]
+  },
+  "mountInvariant": {
+    "exactlyFourExperimentControlledDataMounts": true,
+    "plusAllowlistedRuntimePseudoFilesystems": true,
+    "correction": "Amendment 2 said 'exactly four mounts'. That is not implementable: every container carries required runtime mounts. The invariant is four EXPERIMENT-CONTROLLED data mounts plus an explicit allowlist of unavoidable pseudo-filesystems.",
+    "allowedPseudoFilesystemClasses": [
+      "proc",
+      "sysfs",
+      "devtmpfs / devpts / mqueue / shm",
+      "cgroup and cgroup2",
+      "tmpfs for the explicitly named scratch paths",
+      "container-runtime generated files: /etc/hosts, /etc/hostname, /etc/resolv.conf"
+    ],
+    "anythingElseIsAFailure": true
+  },
+  "twoPhaseDesign": {
+    "correction": "Amendment 2's discover steps required the checkout, the freeze script, artifacts and the ID map \u2014 none of which exists inside the isolated boundary. The plan is split so each check runs where it can actually run.",
+    "phase1TrustedHostPreparation": {
+      "runsInsideIsolatedBoundary": false,
+      "runsOcr": false,
+      "steps": [
+        "checkout and verify the Stage 1 contract package against stage-1-contract-manifest.sha256",
+        "verify preregistration.sha256",
+        "run the freeze/staging script",
+        "verify the source images and the post-freeze id map",
+        "build the allowlisted runtime bundle WITHOUT an unrestricted repository COPY",
+        "write the runtime bundle manifest with a per-path SHA-256",
+        "prepare an initially empty output directory"
+      ],
+      "hasAccessTo": "the repository checkout, artifacts, fixtures and the post-freeze id map, because preparation legitimately needs them"
+    },
+    "phase2IsolatedDiscover": {
+      "runsInsideExactExecuteBoundary": true,
+      "runsOcr": false,
+      "receivesOnly": "the four experiment-controlled data mounts",
+      "mayNotAccess": [
+        "the checkout",
+        "artifacts/",
+        "fixtures",
+        "the post-freeze id map",
+        "governed truth",
+        "the original source image paths"
+      ],
+      "mustVerify": [
+        "the runtime bundle manifest",
+        "the truth-free manifest",
+        "staged opaque image hashes and byte sizes",
+        "the environment allowlist",
+        "the experiment-controlled mount list",
+        "the pseudo-filesystem mount allowlist",
+        "read-only root",
+        "that only the output mount and the named tmpfs paths are writable",
+        "that forbidden paths cannot be opened",
+        "that network is unavailable",
+        "that no credential is present"
+      ],
+      "checksMovedToPhase1": [
+        "verifying preregistration.md",
+        "re-running the freeze script",
+        "reading fixtures",
+        "reading post-freeze/id-map.json"
+      ],
+      "checksMovedToPhase1Note": "These require files that do not exist inside the boundary. Claiming they run inside the container would be false."
+    },
+    "discoverStopsForOwnerReviewBeforeExecute": true
+  }
 }

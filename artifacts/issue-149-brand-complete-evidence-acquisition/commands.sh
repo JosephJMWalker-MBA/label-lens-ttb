@@ -45,6 +45,11 @@ node -e 'const l=require("./package-lock.json").packages;for(const k of ["node_m
 # extractLabelEvidenceDetailed directly.
 sed -n '72p;75p;304p;415p' src/fixtures/eval/eval-harness.ts
 
+# The ExtractionInput identities frozen in incumbent-configuration-freeze.json are
+# the harness's own constants, copied as literals. Read them here; the contract
+# test asserts each one is non-blank and actually occurs in this file.
+sed -n '62,69p' src/fixtures/eval/eval-harness.ts
+
 # The merged PR #220 capability this amendment consumes.
 shasum -a 256 src/pipeline/extractor/field-selection.ts
 grep -c "selectBrandObservationWithCompleteFilterDiagnostics" src/pipeline/extractor/field-selection.ts

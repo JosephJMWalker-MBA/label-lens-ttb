@@ -16,8 +16,10 @@ const ROOT = "artifacts/issue-149-brand-complete-evidence-acquisition";
 const HISTORICAL_FILES = new Set([
   "preregistration-amendment.md",
   "preregistration-amendment-2.md",
+  "preregistration-amendment-3.md",
   "amendment-linkage.json",
   "amendment-2-linkage.json",
+  "amendment-3-linkage.json",
   "git-sha.txt",
 ]);
 
@@ -40,6 +42,9 @@ const ALLOWED_MARKERS = [
   "not use",
   "notPresentIn",
   "priorClaim",
+  "priorDefect",
+  "priorContradiction",
+  "correction",
   "whyWrong",
   "PreviousStatement",
   "does not use",
@@ -55,7 +60,15 @@ const STALE_TERMS = [
   "raw/<run>/<caseId>",
   "per-pass caseId",
   "8f0c6a7ca7c271eed14d9084ed6da7fe11f897a9",
+  // Superseded by Amendment 3.
+  "exactly four mounts",
+  "tmpfs-only",
+  "twenty-one compared fields",
+  "21-field allowlist",
+  "contents: write",
 ];
+
+const read = (p: string): unknown => JSON.parse(readFileSync(path.join(process.cwd(), p), "utf8"));
 
 function walk(dir: string): string[] {
   return readdirSync(path.join(process.cwd(), dir)).flatMap((entry) => {
@@ -124,13 +137,17 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     expect(parity.candidateEvidenceSource.isThe).toContain("diagnosticSelection");
   });
 
-  it("records the first-reason-only limitation as resolved, not current", () => {
-    const decision = JSON.parse(
-      readFileSync(path.join(process.cwd(), ROOT, "decision-rules.json"), "utf8"),
-    );
+  it("states capability 3 as replay-satisfiable, neither partial nor overclaimed", () => {
+    const decision = read(path.join(ROOT, "decision-rules.json")) as {
+      evidenceCompletenessVerdict: { expectedOutcomeStatedInAdvance: { capability3: string } };
+    };
     const capability =
       decision.evidenceCompletenessVerdict.expectedOutcomeStatedInAdvance.capability3;
-    expect(capability).toContain("SATISFIED");
+    // Amendment 3 corrected this. Complete rejection reasons alone do not answer
+    // a counterfactual; what makes capability 3 reachable is the preserved
+    // ordered RegionOcrResult array, which a later governed selector can replay.
+    expect(capability).toContain("SATISFIABLE");
+    expect(capability).toContain("RegionOcrResult");
     expect(capability).not.toContain("PARTIALLY");
   });
 
@@ -151,6 +168,105 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     );
     expect(plan.stage1TestsAre.isRuntimeProof).toBe(false);
     expect(plan.stage1TestsAre.kind).toContain("static");
+  });
+
+  it("names no schema field caseId anywhere in a current contract", () => {
+    // Amendment 2 only banned the PHRASE "per-pass caseId". A schema could still
+    // have declared a key literally called `caseId`, so the keys themselves are
+    // walked. `historicalCaseId` stays legal: it names the historical identity in
+    // the post-freeze map, which is exactly where that identity belongs.
+    const offences: string[] = [];
+
+    function walkKeys(value: unknown, file: string, at: string): void {
+      if (Array.isArray(value)) {
+        value.forEach((entry, index) => walkKeys(entry, file, `${at}[${index}]`));
+        return;
+      }
+      if (value === null || typeof value !== "object") return;
+      for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+        if (/caseid/i.test(key) && !/^historical/.test(key) && !/^contains/.test(key)) {
+          offences.push(`${file} — key ${at}.${key}`);
+        }
+        walkKeys(child, file, `${at}.${key}`);
+      }
+    }
+
+    for (const file of files.filter((f) => f.endsWith(".json"))) {
+      if (HISTORICAL_FILES.has(path.basename(file))) continue;
+      walkKeys(read(file), file, "$");
+    }
+    expect(offences).toEqual([]);
+  });
+
+  it("names the per-pass identifier opaqueItemId in the raw schema", () => {
+    const raw = read(path.join(ROOT, "raw-ocr-contract.json")) as {
+      perPassFields: Record<string, unknown>;
+    };
+    expect(Object.hasOwn(raw.perPassFields, "opaqueItemId")).toBe(true);
+    expect(Object.hasOwn(raw.perPassFields, "caseId")).toBe(false);
+  });
+
+  it("allows the historical identity only inside the post-freeze map", () => {
+    const map = read(`${ROOT}/post-freeze/id-map.json`) as { map: Array<Record<string, unknown>> };
+    expect(Object.hasOwn(map.map[0], "historicalCaseId")).toBe(true);
+    expect(Object.hasOwn(map.map[0], "caseId")).toBe(false);
+  });
+
+  describe("frozen ExtractionInput identities", () => {
+    const incumbent = read(path.join(ROOT, "incumbent-configuration-freeze.json")) as {
+      extractionInputIdentities: Record<string, unknown>;
+    };
+    const invocation = read(path.join(ROOT, "acquisition-invocation-contract.json")) as {
+      extractionInputBinding: Record<string, string>;
+    };
+    const identities = incumbent.extractionInputIdentities;
+
+    it("carries a non-blank value for every identity the binding names", () => {
+      for (const key of [
+        "extractionAdapterId",
+        "extractionAdapterVersion",
+        "parserId",
+        "parserVersion",
+        "processedAt",
+      ]) {
+        const value = identities[key];
+        expect(typeof value).toBe("string");
+        expect(String(value).trim().length).toBeGreaterThan(0);
+        // The binding must quote the frozen literal, not merely gesture at it.
+        expect(invocation.extractionInputBinding[key]).toContain(String(value));
+      }
+      expect(identities.ocrEngine).toMatchObject({
+        kind: "ocr",
+        engineId: "tesseract.js",
+        engineVersion: "7.0.0",
+        modelId: "eng",
+      });
+      expect(identities.invented).toBe(false);
+      expect(identities.noneInferredAtRuntime).toBe(true);
+    });
+
+    it("takes every identity from the incumbent evaluation harness, not from invention", () => {
+      // The literals must actually exist in the repository they claim to come
+      // from; otherwise "frozen from the incumbent" is an unchecked assertion.
+      const harness = readFileSync(
+        path.join(process.cwd(), "src/fixtures/eval/eval-harness.ts"),
+        "utf8",
+      );
+      for (const literal of [
+        String(identities.extractionAdapterId),
+        String(identities.parserId),
+        String(identities.processedAt),
+        "tesseract.js",
+      ]) {
+        expect(harness).toContain(literal);
+      }
+      expect(String(identities.derivedFrom)).toContain("eval-harness.ts");
+    });
+
+    it("omits sellerRegionTargets and diagnostics rather than inventing them", () => {
+      expect(invocation.extractionInputBinding.sellerRegionTargets).toBe("omitted");
+      expect(invocation.extractionInputBinding.diagnostics).toBe("omitted");
+    });
   });
 
   it("uses retention-bound language for the 100 MB fallback", () => {

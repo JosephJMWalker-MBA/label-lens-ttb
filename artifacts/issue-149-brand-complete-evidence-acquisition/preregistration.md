@@ -5,11 +5,13 @@ Refs Issue #149. **Evidence acquisition only.** Frozen before any OCR runs.
 Base: `origin/main` `546c3f279ce431a1fd8c0203df7a83553ea866ef`, the merge commit
 of PR #220.
 
-**Amended twice, both times before any acquisition OCR.** See
-`preregistration-amendment.md` and `preregistration-amendment-2.md`. Both earlier
-plans are preserved, not overwritten, and their identities are recorded in
-`amendment-linkage.json` and `amendment-2-linkage.json`. **No governed
-acquisition OCR occurred under either earlier plan.**
+**Amended three times, every time before any acquisition OCR.** See
+`preregistration-amendment.md`, `preregistration-amendment-2.md` and
+`preregistration-amendment-3.md`. All earlier plans are preserved, not
+overwritten, and their identities are recorded in `amendment-linkage.json`,
+`amendment-2-linkage.json` and `amendment-3-linkage.json`. **No governed
+acquisition OCR occurred under any earlier plan, and none has occurred under this
+one.**
 
 This sprint does **not** KEEP or KILL a production change, choose a successor
 treatment, or simulate any filter relaxation. It authorizes no production change.
@@ -128,19 +130,60 @@ production retains the primary selection when primary Brand is `OBSERVED`, so an
 unconditional call would produce a different candidate population on every such
 case.
 
-Before any evidence is emitted, `diagnosticSelection` must be behaviourally
-identical to `debug.finalSelections.brand` once **only** `filterChecks` and
-`activeRejectionReasons` are removed, across observation state, value,
-confidence, OCR evidence score, alternates, source region, source, supporting
-pass IDs, recovery-pass flag, abstention reason, candidate-array length and
-order, and per candidate `rawText`, `cleanedValue`, `kept`, `filterReason`,
-`decision`, `score`, `ranking`, provenance, `assembly` and `lineIndexes`. A
-mismatch halts with **`BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE`**.
+Before any evidence is emitted, `diagnosticSelection` must equal
+`debug.finalSelections.brand` under **full-object canonical comparison** once
+**only** `filterChecks` and `activeRejectionReasons` are removed. Parity is
+whole-object equality over the canonical serialization, not a field allowlist:
+an allowlist compares only what someone remembered to list, so a field added
+later — or one already omitted, as `brandDiagnostics.lines` was — escapes
+comparison silently. Any difference, in any field at any depth, halts with
+**`BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE`**. The enumerated field list in
+`brand-diagnostic-parity-contract.json` is illustrative and explicitly
+non-authoritative.
 
 **`debug.finalSelections.brand` remains the authority**; the diagnostic selection
 is the candidate evidence source only because parity proves the two are otherwise
 the same array. No extra OCR pass runs: the second call is a pure re-selection
 over results already produced.
+
+### The `ExtractionInput` identities are frozen from the incumbent, not invented
+
+The direct call needs an `ExtractionInput`, and every identity on it is taken
+from the incumbent evaluation path's own constants in
+`src/fixtures/eval/eval-harness.ts` — copied as literal values so nothing is
+imported and nothing is inferred at run time:
+
+| Field | Frozen value |
+| --- | --- |
+| `artifactRef` | the `opaqueItemId`, never a historical case id |
+| `derivativeSha256` | `sourceImageSha256` from the truth-free manifest |
+| `extractionAdapter` | `local-two-field-extractor` `1.0.0` |
+| `ocrEngine` | `{ kind: ocr, engineId: tesseract.js, engineVersion: 7.0.0, modelId: eng }` |
+| `parser` | `wine-alcohol-parse` `1.0.0` |
+| `processedAt` | `2026-07-12T00:00:00Z` |
+| `sellerRegionTargets` | omitted |
+| `diagnostics` | omitted |
+
+`processedAt` is the harness's own fixed `EVAL_PROCESSED_AT`, so it cannot vary
+between the primary and repeat runs. Amendment 2 stated an invented timestamp
+here; that was wrong and is corrected. The frozen values live in
+`incumbent-configuration-freeze.json#extractionInputIdentities` and a Stage 1
+test asserts each one is non-blank, is quoted by the invocation contract, and
+actually occurs in `eval-harness.ts`.
+
+### The complete ordered pass array is persisted, so the counterfactual is replayable
+
+Complete rejection reasons say *why* each candidate was rejected. They do not say
+what the selector would have produced had one filter been different, because the
+candidates themselves are constructed from the passes. The acquisition therefore
+persists the **complete ordered `RegionOcrResult` array** — all thirteen fields of
+every pass, in emission order — per `region-ocr-result-replay-contract.json`,
+halting on `PASS_EVIDENCE_TRUNCATED` or `PASS_ORDER_MISMATCH`.
+
+Capability 3 is accordingly stated as **SATISFIABLE**, not satisfied: a
+separately governed, zero-OCR treatment selector can later replay these passes
+with exactly one filter changed. This acquisition does not run that replay and
+authorizes no filter change.
 
 ## Two exact corpus runs
 
@@ -173,7 +216,8 @@ Both runs complete and both raw-evidence manifests are written and hashed
 
 ## Complete raw OCR evidence
 
-Per case and per pass, without sampling or truncation: case ID; pass ID, kind and
+Per item and per pass, without sampling or truncation: the **opaque item ID**
+(no schema field anywhere is named `caseId`); pass ID, kind and
 role; source image SHA-256; crop pixel SHA-256; crop geometry; transform and
 orientation; engine configuration; **every raw OCR word** in original order with
 exact text, confidence and bounding box, plus original geometry where the pass
@@ -257,13 +301,16 @@ Halts with `CANDIDATE_ID_COLLISION` or `CANDIDATE_EVIDENCE_TRUNCATED`.
 ### Evidence volume
 
 Complete and uncapped. Expected 15–40 MB for both runs. A repository-footprint
-gate applies: at or below 100 MB commit per the governed plan; above 100 MB
-complete the run, upload the complete lossless evidence as a **temporarily
-retained workflow artifact** — recording its ID, exact bytes, SHA-256, configured
-retention and expected expiration — stop before committing raw evidence to Git,
-**stop before post-freeze truth evaluation**, and require an explicit owner
-decision about durable archival before continuing. Local job output is not
-deleted before the upload and its digest verify. A workflow artifact is
+gate applies, under a transport that respects `permissions: contents: read`.
+The OCR job **never commits anything** and is never granted `contents: write`.
+At every size it uploads the complete lossless evidence as a **temporarily
+retained workflow artifact**, recording its ID, exact bytes, SHA-256, configured
+retention and expected expiration, and verifies the uploaded digest before any
+job-local output is deleted. At or below 100 MB it stops there, and a separate,
+owner-authorized post-run process — not the OCR process — downloads the artifact,
+re-verifies its digest and commits the evidence. Above 100 MB it stops before Git
+commitment, **stops before post-freeze truth evaluation**, and requires an
+explicit owner decision about durable archival before continuing. A workflow artifact is
 retention-bound; it is never described as permanent preservation unless a durable
 destination has actually been verified. **It is a Git storage gate, never an evidence-completeness exception** —
 nothing is truncated, sampled, discarded, recompressed destructively or omitted.

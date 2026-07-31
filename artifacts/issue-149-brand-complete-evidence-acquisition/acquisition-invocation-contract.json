@@ -2,7 +2,7 @@
   "artifact": "acquisition-invocation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-2.md",
+  "amendedBy": "preregistration-amendment-3.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "route": "direct call to extractLabelEvidenceDetailed",
   "prohibitedRoute": {
@@ -37,15 +37,15 @@
   ],
   "extractionInputBinding": {
     "imageBytes": "the staged image bytes, verified",
-    "artifactRef": "opaqueItemId — never a historical case id",
+    "artifactRef": "opaqueItemId \u2014 never a historical case id",
     "derivativeSha256": "sourceImageSha256 from the truth-free manifest",
-    "processedAt": "2026-01-01T00:00:00.000Z",
-    "processedAtNote": "A fixed preregistered constant, so the value never varies between the primary and repeat runs and can never become a source of nondeterminism.",
-    "extractionAdapterId": "from incumbent-configuration-freeze.json",
-    "extractionAdapterVersion": "from incumbent-configuration-freeze.json",
-    "ocrEngine": "from incumbent-configuration-freeze.json",
-    "parserId": "from incumbent-configuration-freeze.json",
-    "parserVersion": "from incumbent-configuration-freeze.json",
+    "processedAt": "2026-07-12T00:00:00Z (incumbent-configuration-freeze.json#extractionInputIdentities)",
+    "processedAtNote": "The incumbent evaluation path's own EVAL_PROCESSED_AT constant. Amendment 2 stated an invented value; corrected here to the repository's own.",
+    "extractionAdapterId": "local-two-field-extractor (incumbent-configuration-freeze.json#extractionInputIdentities)",
+    "extractionAdapterVersion": "1.0.0 (incumbent-configuration-freeze.json#extractionInputIdentities)",
+    "ocrEngine": "{ kind: ocr, engineId: tesseract.js, engineVersion: 7.0.0, modelId: eng } (incumbent-configuration-freeze.json#extractionInputIdentities)",
+    "parserId": "wine-alcohol-parse (incumbent-configuration-freeze.json#extractionInputIdentities)",
+    "parserVersion": "1.0.0 (incumbent-configuration-freeze.json#extractionInputIdentities)",
     "sellerRegionTargets": "omitted",
     "diagnostics": "omitted"
   },
@@ -75,5 +75,7 @@
   "haltCodes": {
     "STAGED_IMAGE_INTEGRITY_FAILURE": "staged bytes or SHA-256 disagree with the truth-free manifest",
     "PROHIBITED_ACQUISITION_IMPORT": "an acquisition-route script imports the evaluation harness or a governed truth module"
-  }
+  },
+  "identitiesFrozenNotRediscovered": true,
+  "identitiesFrozenNote": "Every ExtractionInput identity now has an exact value in incumbent-configuration-freeze.json. Stage 2 reads them; it does not invent or rediscover any of them."
 }

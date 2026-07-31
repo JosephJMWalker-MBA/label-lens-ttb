@@ -1,0 +1,56 @@
+{
+  "artifact": "region-ocr-result-replay-contract",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "amendedBy": "preregistration-amendment-3.md",
+  "purpose": "Freeze the complete RegionOcrResult persistence that makes a later zero-OCR selector replay possible. This is what actually underwrites capability 3; complete rejection reasons alone do not.",
+  "whyRejectionReasonsAloneAreInsufficient": [
+    "a rejected span returns from analyzeBrandSpan BEFORE a Candidate object is constructed",
+    "its brandClass is therefore never calculated",
+    "its geometry and words are never placed on a candidate",
+    "scoring and ranking run only over candidates that passed the filter ladder, so a rejected span carries no hypothetical score, ranking or ordering",
+    "filter outcomes also change later candidate formation: shouldTrimWholeLineCandidate gates line-window generation, and kept candidates become the seeds for multi-line merges"
+  ],
+  "correctRationaleForCapability3": "The acquisition preserves the COMPLETE ordered RegionOcrResult array per case. A separately governed, zero-OCR treatment selector can later replay selection over that frozen pass evidence with exactly one filter changed, reconstructing candidate formation, scoring and ranking as production would have produced them. Capability 3 is expected to be satisfiable because of that replay, not because rejection reasons exist.",
+  "thatReplayIsNotAuthorizedHere": true,
+  "persistEveryFieldOfRegionOcrResult": {
+    "passId": "string",
+    "regionName": "string",
+    "passKind": "OcrPassKind",
+    "triggerReasons": "OcrPassTriggerReason[], array order preserved",
+    "preprocessing": "string[], array order preserved",
+    "fieldEligibility": "OcrFieldEligibility, persisted whole",
+    "transform": "RegionTransform, persisted whole: crop, rotate, scale, originalWidth, originalHeight",
+    "transformedSize": "{ width, height }",
+    "pageSegMode": "number",
+    "rawWordCount": "number",
+    "discardedWordCount": "number",
+    "timings": "OcrPassTimings, persisted whole: preprocessMs, ocrMs, inverseMappingMs, totalMs",
+    "words": "OcrWord[], array order preserved, each with text, rawConfidence, bbox and optional originalGeometry"
+  },
+  "informalSubsetProhibited": true,
+  "informalSubsetProhibitedNote": "The earlier raw-ocr-contract described an informal subset of these fields. A replay needs the whole type, so every field above is persisted exactly and none is summarised.",
+  "arrayOrder": {
+    "passArrayOrderPreserved": true,
+    "wordArrayOrderPreserved": true,
+    "why": "Production selects over the pass array in order and groups words in emitted order. A reordered replay would not be the same experiment."
+  },
+  "assertions": {
+    "perPass": [
+      "emitted word count equals words.length",
+      "rawWordCount and discardedWordCount are persisted as produced, never recomputed",
+      "a canonical per-pass fingerprint is computed over the complete persisted pass record"
+    ],
+    "perCase": [
+      "the emitted pass count equals debug.passes.length",
+      "pass order matches debug.passes order exactly",
+      "a canonical fingerprint is computed over the COMPLETE ORDERED pass array"
+    ],
+    "canonicalization": "issue-149-candidate-canonical-v1, the same algorithm used for candidate records",
+    "haltCodes": {
+      "PASS_EVIDENCE_TRUNCATED": "emitted pass or word count disagrees with the debug object",
+      "PASS_ORDER_MISMATCH": "persisted pass order differs from debug.passes order"
+    }
+  },
+  "implementedInThisAmendment": false
+}

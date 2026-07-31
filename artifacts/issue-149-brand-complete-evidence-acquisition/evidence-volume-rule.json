@@ -5,7 +5,7 @@
   "principle": "Preserve complete, uncapped evidence. This is a Git storage gate, never an evidence-completeness exception.",
   "expectedTotalEstimate": "15-40 MB for primary plus repeat, extrapolated from the committed 15-case baseline",
   "gate": {
-    "atOrBelow100MB": "commit the raw evidence according to the governed plan",
+    "atOrBelow100MB": "upload and verify the artifact, then stop; a separate owner-authorized post-run process commits the evidence",
     "above100MB": "complete the run, upload the complete lossless evidence as a TEMPORARILY RETAINED workflow artifact, and stop before committing raw evidence to Git"
   },
   "reportedEitherWay": [
@@ -21,7 +21,7 @@
     "omitting evidence"
   ],
   "ifTheGateFires": "The evidence still exists in full as a workflow artifact. Only its commitment to Git is withheld, and that fact is reported rather than resolved by shrinking the evidence.",
-  "amendedBy": "preregistration-amendment-2.md",
+  "amendedBy": "preregistration-amendment-3.md",
   "above100MBProcedure": [
     "upload the complete lossless evidence artifact",
     "record the artifact ID, exact bytes, SHA-256, configured retention and expected expiration",
@@ -36,5 +36,27 @@
     "prohibited": "permanently preserved",
     "why": "A workflow artifact is retention-bound and expires. Calling it permanent preservation would overstate what exists, and would let the evidence quietly disappear at expiry with the record still claiming it is safe.",
     "permittedOnlyIf": "a durable archival destination has actually been verified"
+  },
+  "workflowPermissions": "contents: read",
+  "ocrWorkflowNeverPushes": true,
+  "priorDefect": "Amendment 2 said evidence at or below 100 MB would be committed by the workflow, which cannot happen under contents: read.",
+  "transport": {
+    "atEverySize": [
+      "upload the complete lossless evidence as a workflow artifact",
+      "record the artifact ID, exact byte size, SHA-256, retention and expiration",
+      "verify the uploaded artifact digest BEFORE deleting any job-local output"
+    ],
+    "atOrBelow100MB": [
+      "stop after artifact verification",
+      "a separate owner-authorized post-run process downloads the artifact, verifies its digest, and commits the raw evidence to PR #219",
+      "that post-run process is NOT the OCR process",
+      "it has no access to governed truth until both raw manifests verify"
+    ],
+    "above100MB": [
+      "stop before Git commitment",
+      "stop before post-freeze truth evaluation",
+      "require the durable-archive owner decision"
+    ],
+    "contentsWriteGrantedToOcrJob": false
   }
 }

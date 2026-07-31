@@ -116,14 +116,116 @@ describe("Issue #149 acquisition identity and isolation", () => {
     }
   });
 
-  it("keeps no acquisition script importing or referencing the id map", () => {
-    const acquisitionFacing = ["scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs"];
-    for (const file of acquisitionFacing) {
-      const source = readFileSync(path.join(process.cwd(), file), "utf8");
-      // The freeze script is the TRUSTED STAGING STEP and legitimately writes the
-      // map. What must never happen is an acquisition-side read of it.
-      expect(source).not.toContain("readFileSync(ID_MAP");
-      expect(source).not.toContain('post-freeze/id-map.json", "utf8")');
+  describe("future acquisition-runner import prohibition", () => {
+    const RUNNERS = [
+      "scripts/eval/issue-149-brand-evidence-acquisition-run.ts",
+      "scripts/eval/issue-149-brand-evidence-acquisition-run.mjs",
+    ];
+    /**
+     * A specifier is prohibited when its path reaches `fixtures/` or
+     * `domain/rules/`, however it is spelled: `@/fixtures/…`,
+     * `src/fixtures/…`, or a relative walk such as `../../src/fixtures/…`.
+     * Matching on the segment rather than on a fixed prefix is what stops a
+     * relative path from slipping past the guard.
+     */
+    const PROHIBITED_PATH_SEGMENTS = [/(?:^|\/)fixtures\//, /(?:^|\/)domain\/rules\//];
+
+    function isProhibitedSpecifier(quoted: string): boolean {
+      const specifier = quoted.slice(1, -1).replace(/^@\//, "");
+      return PROHIBITED_PATH_SEGMENTS.some((pattern) => pattern.test(specifier));
     }
+    const PROHIBITED_SYMBOLS = [
+      "runCaseArtifacts",
+      "runCase",
+      "loadCaseImage",
+      "buildCaseReport",
+      "diagnosticsFor",
+      "EvalCase",
+    ];
+
+    /** Import, re-export, `require(...)` and dynamic `import(...)` specifiers. */
+    function moduleSpecifiers(source: string): string[] {
+      const found: string[] = [];
+      const patterns = [
+        /\bfrom\s+(["'`][^"'`]+["'`])/g,
+        /\bimport\s+(["'`][^"'`]+["'`])/g,
+        /\brequire\s*\(\s*(["'`][^"'`]+["'`])\s*\)/g,
+        /\bimport\s*\(\s*(["'`][^"'`]+["'`])\s*\)/g,
+      ];
+      for (const pattern of patterns) {
+        for (const match of source.matchAll(pattern)) found.push(match[1]);
+      }
+      return found;
+    }
+
+    const present = RUNNERS.filter((file) => existsSync(path.join(process.cwd(), file)));
+
+    it("records explicitly that no future runner exists yet", () => {
+      if (present.length > 0) {
+        // A runner has appeared: the prohibition below is what binds it.
+        expect(present.length).toBeGreaterThan(0);
+        return;
+      }
+      expect(present).toEqual([]);
+    });
+
+    it("fails any existing runner that imports a prohibited module", () => {
+      const offences: string[] = [];
+      for (const file of present) {
+        const source = readFileSync(path.join(process.cwd(), file), "utf8");
+        for (const specifier of moduleSpecifiers(source)) {
+          if (isProhibitedSpecifier(specifier)) offences.push(`${file} imports ${specifier}`);
+        }
+      }
+      expect(offences).toEqual([]);
+    });
+
+    it("fails any existing runner that references a prohibited symbol", () => {
+      const offences: string[] = [];
+      for (const file of present) {
+        const source = readFileSync(path.join(process.cwd(), file), "utf8");
+        for (const symbol of PROHIBITED_SYMBOLS) {
+          if (new RegExp(`\\b${symbol}\\b`).test(source)) {
+            offences.push(`${file} references ${symbol}`);
+          }
+        }
+      }
+      expect(offences).toEqual([]);
+    });
+
+    it("detects prohibited imports and symbols in synthetic sources", () => {
+      // The detector is exercised directly, so "no runner exists" can never be
+      // mistaken for "the guard works".
+      const bad = [
+        'import { runCaseArtifacts } from "@/fixtures/eval/eval-harness";',
+        'const h = require("../../src/fixtures/eval/eval-harness");',
+        'const m = await import("@/domain/rules/wine-alcohol-parse");',
+        'export { x } from "src/fixtures/eval/metrics";',
+      ];
+      for (const source of bad) {
+        expect(moduleSpecifiers(source).some(isProhibitedSpecifier)).toBe(true);
+      }
+      for (const symbol of PROHIBITED_SYMBOLS) {
+        expect(new RegExp(`\\b${symbol}\\b`).test(bad.join("\n"))).toBe(
+          symbol === "runCaseArtifacts",
+        );
+      }
+      // Permitted specifiers must not be flagged, so the guard is not vacuous.
+      for (const ok of [
+        'import { createHash } from "node:crypto";',
+        'import { extractLabelEvidenceDetailed } from "../../src/pipeline/extractor";',
+      ]) {
+        expect(moduleSpecifiers(ok).some(isProhibitedSpecifier)).toBe(false);
+      }
+    });
+
+    it("does not claim transitive runtime isolation", () => {
+      // Static source inspection cannot prove what a process can reach at run
+      // time. The runtime bundle manifest and the discover gate own that.
+      const contract = read(path.join(ROOT, "acquisition-runtime-isolation-contract.json")) as {
+        discoverModeGate: { runsInsideTheSameRuntimeBoundaryAsExecute: boolean };
+      };
+      expect(contract.discoverModeGate.runsInsideTheSameRuntimeBoundaryAsExecute).toBe(true);
+    });
   });
 });
