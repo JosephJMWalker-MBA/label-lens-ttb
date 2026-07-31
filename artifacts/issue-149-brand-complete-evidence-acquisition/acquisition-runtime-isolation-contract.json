@@ -2,7 +2,7 @@
   "artifact": "acquisition-runtime-isolation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-10.md",
+  "amendedBy": "preregistration-amendment-11.md",
   "status": "CONTRACT FROZEN. Not implemented in this amendment.",
   "whyThisExists": {
     "correction": "The Stage 1 isolation tests are STATIC manifest, path and import validation. They read committed planning artifacts and assert their shape. They are NOT runtime proof, and this contract stops them being described as such.",
@@ -186,8 +186,8 @@
         "notMerelyTheTwoRunnerEntryFiles": true,
         "theDirectRunnerRegexIsNotTransitive": true,
         "theDirectRunnerRegexIsNotTransitiveNote": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts inspects the runner sources only. A helper the runner imports could reach a lower-level candidate function without the runner source containing a prohibited symbol. The Stage 2 source-closure gate owns the transitive property; the first-order regex does not and does not claim to.",
-        "requiredSoleEmissionCall": "finalizeProductionBrandEvidence",
-        "requiredSoleEmissionCallNote": "It takes the complete ExtractionDebug and derives the diagnostic selection, the parity assertion and the candidate population internally. There is no parameter through which a caller can supply, filter, project or replace a selection or a candidate array.",
+        "requiredSoleEmissionCall": "acquireProductionBrandEvidence",
+        "requiredSoleEmissionCallNote": "It takes the frozen ExtractionInput and calls extractLabelEvidenceDetailed itself, exactly once. There is no caller-supplied debug, selection or candidate array.",
         "prohibitedOutsideTheAdapterModule": [
           "selectBrandObservationWithCompleteFilterDiagnostics for Brand acquisition",
           "selectBrandObservationWithCompleteFilterDiagnostics",
@@ -204,10 +204,50 @@
         "theAdapterModuleItself": "scripts/eval/lib/issue-149-candidate-adapter.ts \u2014 it defines the private functions and is the one file exempt from the reference prohibition",
         "noRuntimeTestBackdoor": true,
         "noRuntimeTestBackdoorNote": "TEST_ONLY_candidateAdapterInternals was a real exported object holding both lower-level functions, so the private functions were reachable at runtime. It is removed; the adapter exports exactly one candidate-emission function.",
-        "haltCode": "BUNDLE_PROHIBITED_DEPENDENCY",
+        "haltCode": "STAGE2_SOURCE_CLOSURE_VIOLATION",
+        "referenceAnalyzer": "scripts/eval/lib/issue-149-stage2-source-closure.ts",
+        "referenceAnalyzerNote": "One host-only implementation, parsing the TypeScript AST. Job A and the Stage 1 synthetic tests use it, so the gate that runs before acquisition is the gate the tests exercise. It replaces a substring detector embedded in a test file, which could not tell a call from a mention.",
+        "onlyTheRunnerEntrypointMustInvokeTheApi": true,
+        "onlyTheRunnerEntrypointMustInvokeTheApiNote": "Helper modules for pass validation, semantic fingerprinting, exact-byte hashing, manifest writing and evidence scanning are legitimate Stage 2 sources and must NOT be required to call the acquisition API. They must only be free of prohibited routes. The previous detector added 'does not invoke the API' to every inspected file, which would have rejected all of them.",
+        "prohibitedCallsOutsideTheAdapterModule": [
+          "extractLabelEvidenceDetailed",
+          "selectBrandObservation",
+          "selectBrandObservationWithCompleteFilterDiagnostics",
+          "finalizeProductionBrandEvidence",
+          "finalizeProductionCandidateArray",
+          "toCandidateEvidenceRecord",
+          "finalizeProductionCandidate",
+          "finalizeCandidateRecord",
+          "stableCandidateId"
+        ],
+        "prohibitedWritesOutsideTheAdapterModule": [
+          "primarySelections",
+          "finalSelections",
+          "brandDiagnostics",
+          "candidates",
+          "passes",
+          "rankedPosition"
+        ],
+        "prohibitedWritesNote": "Reading is permitted \u2014 the runner persists detailed.debug.passes. Writing, replacing or reconstructing these is how a filtered or reordered population would be smuggled in.",
+        "acrossTheCompleteClosure": [
+          "exactly one call to acquireProductionBrandEvidence exists",
+          "it is in the runner entrypoint",
+          "zero direct extractor calls exist outside the adapter",
+          "zero direct selector calls exist outside the adapter"
+        ],
+        "violationRules": [
+          "RUNNER_DOES_NOT_INVOKE_ACQUISITION",
+          "RUNNER_INVOKES_ACQUISITION_MORE_THAN_ONCE",
+          "ACQUISITION_INVOKED_OUTSIDE_RUNNER",
+          "PROHIBITED_CALL",
+          "PROHIBITED_WRITE",
+          "RUNNER_ENTRY_MISSING"
+        ],
+        "testedBy": "src/fixtures/eval/issue-149-stage2-source-closure.test.ts",
         "supersededRoutes": [
           "a bare candidate array (Amendment 8 and earlier)",
-          "a caller-supplied FieldSelection (Amendment 9) \u2014 a filtered population could be wrapped in a freshly constructed selection and accepted"
+          "a caller-supplied FieldSelection (Amendment 9): a filtered population could be wrapped in a freshly constructed selection",
+          "a caller-supplied ExtractionDebug (Amendment 10): a helper could filter or reorder the passes and reconstruct matching selections"
         ]
       }
     }

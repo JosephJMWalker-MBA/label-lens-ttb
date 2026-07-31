@@ -28,6 +28,7 @@ const HISTORICAL_FILES = new Set([
   "preregistration-amendment-8.md",
   "preregistration-amendment-9.md",
   "preregistration-amendment-10.md",
+  "preregistration-amendment-11.md",
   "branch-pointer-incident.md",
   "amendment-linkage.json",
   "amendment-2-linkage.json",
@@ -39,6 +40,7 @@ const HISTORICAL_FILES = new Set([
   "amendment-8-linkage.json",
   "amendment-9-linkage.json",
   "amendment-10-linkage.json",
+  "amendment-11-linkage.json",
 ]);
 
 /**
@@ -47,7 +49,7 @@ const HISTORICAL_FILES = new Set([
  * current amendment. Exempting it wholesale is what let it sit at "amendment 2"
  * while the package was at Amendment 4, faithfully hashed by the manifest.
  */
-const CURRENT_AMENDMENT = 10;
+const CURRENT_AMENDMENT = 11;
 
 /**
  * A line may mention a superseded term when it is explicitly marking it as
@@ -169,7 +171,9 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     const contract = JSON.parse(
       readFileSync(path.join(process.cwd(), ROOT, "acquisition-invocation-contract.json"), "utf8"),
     );
-    expect(contract.route).toBe("direct call to extractLabelEvidenceDetailed");
+    expect(contract.route).toContain("direct call to extractLabelEvidenceDetailed");
+    // The route is unchanged in substance; what changed is who makes the call.
+    expect(contract.route).toContain("acquireProductionBrandEvidence");
     expect(contract.prohibitedRoute.symbols).toContain("runCaseArtifacts");
     expect(contract.prohibitedRoute.modules).toContain("src/fixtures/eval/**");
     expect(contract.extractionInputBinding.artifactRef).toContain("opaqueItemId");
@@ -615,7 +619,7 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     expect(HISTORICAL_FILES.has("git-sha.txt")).toBe(false);
     expect(gitSha).toContain(`CURRENT — stage 1, amendment ${CURRENT_AMENDMENT}`);
     expect(gitSha.match(/^CURRENT/gm) ?? []).toHaveLength(1);
-    for (const earlier of [1, 2, 3, 4, 5, 6, 7, 8, 9]) {
+    for (const earlier of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) {
       expect(gitSha).toContain(`HISTORICAL — amendment ${earlier}`);
     }
     expect(gitSha).toContain("No governed 115-case acquisition OCR");
@@ -940,7 +944,8 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     expect(membership.orderedBy).toContain("NOT rankingScore alone");
     expect(membership.tieOrder).toContain("original diagnostic-array order");
     expect(membership.selectedCandidate).toContain("position 0");
-    expect(membership.arrayLevelInvariantsEnforcedIn).toContain("finalizeProductionCandidateArray");
+    expect(membership.arrayLevelInvariantsEnforcedIn).toContain("module-private");
+    expect(membership.arrayLevelInvariantsEnforcedIn).toContain("acquireProductionBrandEvidence");
     expect(Object.keys(membership.haltCodes)).toEqual([
       "RANKED_MEMBERSHIP_INCONSISTENT",
       "RANKED_POSITION_PARITY_FAILURE",
@@ -964,7 +969,7 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     );
   });
 
-  it("names the debug-owned function as the only public Brand evidence API", () => {
+  it("names the extractor-owning function as the only public Brand evidence API", () => {
     for (const file of [
       "acquisition-invocation-contract.json",
       "candidate-decision-contract.json",
@@ -975,49 +980,99 @@ describe("Issue #149 Stage 1 contract consistency", () => {
         candidateEmissionApi: {
           module: string;
           function: string;
-          signature: string;
           firstArgument: string;
           theRunnerSuppliesNo: string[];
-          theRunnerNeverCalls: string;
+          theRunnerNeverCalls: string[];
+          opaqueIdentitySource: string;
+          extractorInvokedExactlyOncePerItem: boolean;
+          noRetryPath: boolean;
           internalSteps: string[];
           supersededRoutes: string[];
           runtimeExportSurface: string[];
-          runtimeExportSurfaceVerifiedBy: string;
           haltCodes: Record<string, string>;
         };
       };
       const api = contract.candidateEmissionApi;
       expect(api.module).toBe("scripts/eval/lib/issue-149-candidate-adapter.ts");
-      expect(api.function).toBe("finalizeProductionBrandEvidence");
-      expect(api.signature).toBe("finalizeProductionBrandEvidence(debug, opaqueItemId)");
-      expect(api.firstArgument).toContain("ExtractionDebug");
+      expect(api.function).toBe("acquireProductionBrandEvidence");
+      expect(api.firstArgument).toContain("ExtractionInput");
+      expect(api.firstArgument).toContain("NOT ExtractionDebug");
+      expect(api.theRunnerSuppliesNo).toContain("ExtractionDebug");
       expect(api.theRunnerSuppliesNo).toContain("FieldSelection");
-      expect(api.theRunnerSuppliesNo).toContain("candidate array");
-      expect(api.theRunnerNeverCalls).toBe("selectBrandObservationWithCompleteFilterDiagnostics");
-      expect(api.internalSteps.join(" ")).toContain("primary OBSERVED ? [debug.passes[0]]");
-      expect(api.supersededRoutes.join(" ")).toContain("caller-supplied FieldSelection");
+      expect(api.theRunnerNeverCalls).toContain("extractLabelEvidenceDetailed");
+      expect(api.opaqueIdentitySource).toContain("input.artifactRef");
+      expect(api.extractorInvokedExactlyOncePerItem).toBe(true);
+      expect(api.noRetryPath).toBe(true);
+      expect(api.internalSteps.join(" ")).toContain("exactly once");
+      expect(api.supersededRoutes).toHaveLength(3);
       expect(api.runtimeExportSurface).toEqual([
         "CandidateAdapterError",
-        "finalizeProductionBrandEvidence",
+        "acquireProductionBrandEvidence",
       ]);
-      expect(api.runtimeExportSurfaceVerifiedBy).toContain("not a source regex");
-      for (const code of [
-        "DEBUG_PASSES_ABSENT",
-        "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE",
-        "COMPLETE_DIAGNOSTICS_ABSENT",
-        "CANDIDATE_EVIDENCE_TRUNCATED",
-      ]) {
+      for (const code of ["MALFORMED_ARTIFACT_REF", "RANKED_MEMBERSHIP_INCONSISTENT"]) {
         expect(Object.hasOwn(api.haltCodes, code)).toBe(true);
       }
     }
 
+    // The reference-adapter section no longer names the superseded function.
+    const invocation = read(path.join(ROOT, "acquisition-invocation-contract.json")) as {
+      referenceCandidateAdapter: {
+        theOnlyAuthorizedFunction: string;
+        usingTheModuleIsNotSufficient: string;
+      };
+      onExtractorFailure: { diagnosticSelectionReturned: boolean; itemRetried: boolean };
+    };
+    expect(invocation.referenceCandidateAdapter.theOnlyAuthorizedFunction).toBe(
+      "acquireProductionBrandEvidence",
+    );
+    expect(invocation.referenceCandidateAdapter.usingTheModuleIsNotSufficient).toContain(
+      "acquireProductionBrandEvidence",
+    );
+    expect(invocation.onExtractorFailure.diagnosticSelectionReturned).toBe(false);
+    expect(invocation.onExtractorFailure.itemRetried).toBe(false);
+
     const workflow = readFileSync(path.join(process.cwd(), ROOT, "workflow-plan.md"), "utf8");
     const execute = workflow.slice(workflow.indexOf("## Mode `execute`"));
-    expect(execute).toContain(
-      "finalizeProductionBrandEvidence(detailed.value.debug, opaqueItemId)",
-    );
-    expect(execute).toContain("must never call");
-    expect(execute).not.toContain("finalizeProductionCandidateArray(diagnosticSelection");
+    expect(execute).toContain("acquireProductionBrandEvidence(extractionInput)");
+    expect(execute).toContain("evidence.value.detailed.debug.passes");
+    expect(execute).toContain("evidence.value.candidateRecords");
+  });
+
+  it("records the parity tests as implemented, because they are", () => {
+    const parity = read(path.join(ROOT, "brand-diagnostic-parity-contract.json")) as {
+      stage2TestContract: { implementedInThisAmendment: boolean; implementedIn: string[] };
+    };
+    expect(parity.stage2TestContract.implementedInThisAmendment).toBe(true);
+    for (const file of parity.stage2TestContract.implementedIn) {
+      expect(existsSync(path.join(process.cwd(), file))).toBe(true);
+    }
+  });
+
+  it("uses one parsed closure analyzer, and does not require helpers to call the API", () => {
+    const isolation = read(path.join(ROOT, "acquisition-runtime-isolation-contract.json")) as {
+      runtimeBundle: {
+        dependencyClosureGate: {
+          candidateEmissionClosureGate: {
+            referenceAnalyzer: string;
+            onlyTheRunnerEntrypointMustInvokeTheApi: boolean;
+            prohibitedCallsOutsideTheAdapterModule: string[];
+            prohibitedWritesOutsideTheAdapterModule: string[];
+            acrossTheCompleteClosure: string[];
+            haltCode: string;
+            testedBy: string;
+          };
+        };
+      };
+    };
+    const gate = isolation.runtimeBundle.dependencyClosureGate.candidateEmissionClosureGate;
+    expect(existsSync(path.join(process.cwd(), gate.referenceAnalyzer))).toBe(true);
+    expect(gate.onlyTheRunnerEntrypointMustInvokeTheApi).toBe(true);
+    expect(gate.prohibitedCallsOutsideTheAdapterModule).toContain("extractLabelEvidenceDetailed");
+    expect(gate.prohibitedWritesOutsideTheAdapterModule).toContain("passes");
+    expect(gate.prohibitedWritesOutsideTheAdapterModule).toContain("finalSelections");
+    expect(gate.acrossTheCompleteClosure.join(" ")).toContain("exactly one call");
+    expect(gate.haltCode).toBe("STAGE2_SOURCE_CLOSURE_VIOLATION");
+    expect(existsSync(path.join(process.cwd(), gate.testedBy))).toBe(true);
   });
 
   it("performs parity inside the public boundary and returns nothing on failure", () => {
@@ -1032,7 +1087,7 @@ describe("Issue #149 Stage 1 contract consistency", () => {
       };
     };
     const rule = parity.parityIsInternalToThePublicApi;
-    expect(rule.performedInside).toBe("finalizeProductionBrandEvidence");
+    expect(rule.performedInside).toBe("acquireProductionBrandEvidence");
     expect(rule.algorithm.join(" ")).toContain("ONLY filterChecks and activeRejectionReasons");
     expect(rule.automaticallyIncludes).toContain("brandDiagnostics.lines");
     expect(rule.authority).toBe("debug.finalSelections.brand");
@@ -1076,7 +1131,7 @@ describe("Issue #149 Stage 1 contract consistency", () => {
       );
       expect(rule.whenNoKeptCandidates.join(" ")).toContain("zero ranked positions");
       expect(rule.haltCode).toBe("RANKED_MEMBERSHIP_INCONSISTENT");
-      expect(rule.enforcedIn).toBe("finalizeProductionCandidateArray");
+      expect(rule.enforcedIn).toContain("acquireProductionBrandEvidence");
     }
   });
 

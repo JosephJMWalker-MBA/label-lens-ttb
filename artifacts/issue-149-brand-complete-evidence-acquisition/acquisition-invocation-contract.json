@@ -2,9 +2,9 @@
   "artifact": "acquisition-invocation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-10.md",
+  "amendedBy": "preregistration-amendment-11.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
-  "route": "direct call to extractLabelEvidenceDetailed",
+  "route": "direct call to extractLabelEvidenceDetailed, made INSIDE acquireProductionBrandEvidence",
   "prohibitedRoute": {
     "symbols": [
       "runCaseArtifacts",
@@ -105,53 +105,75 @@
   "referenceCandidateAdapter": {
     "path": "scripts/eval/lib/issue-149-candidate-adapter.ts",
     "required": true,
-    "why": "The Stage 2 runner must map BrandCandidateDiagnostic to the persisted evidence record through this one adapter rather than reimplementing it. A second mapping could drift from production's shape without any test noticing \u2014 which is exactly how a six-key ocrConfidence schema survived Amendment 5.",
+    "why": "The Stage 2 runner must obtain Brand evidence through this one call rather than reimplementing any part of it. A second mapping could drift from production's shape without any test noticing \u2014 which is exactly how a six-key ocrConfidence schema survived Amendment 5.",
     "testedAgainstRealSelectorOutputBy": "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts",
-    "rankedMembershipRule": "final ranked membership is the set of candidates carrying a decision, ordered by production's exported compareCandidateRanking with the original array order as the stable tie-break",
+    "rankedMembershipRule": "final ranked membership is the set of candidates carrying a decision, ordered by production's exported compareCandidateRanking with the original array order as the stable tie-break; derived internally from the selection the adapter created",
     "usesProductionComparator": true,
     "comparatorWrapper": "compareCandidateRanking reads only candidate.ranking, verified against the function body at the frozen base and asserted by the compatibility test, so a minimal { ranking } wrapper is faithful",
-    "theOnlyAuthorizedFunction": "finalizeProductionCandidateArray",
-    "usingTheModuleIsNotSufficient": "Naming the adapter module is not enough: the runner must call the COMPLETE-ARRAY function. Per-candidate routes bypass every array-level invariant."
+    "theOnlyAuthorizedFunction": "acquireProductionBrandEvidence",
+    "usingTheModuleIsNotSufficient": "Naming the adapter module is not enough: the runner must call acquireProductionBrandEvidence and nothing else in it. Every other route \u2014 a per-candidate loop, a caller-supplied selection or debug object, a direct extractor or selector call \u2014 bypasses the derivation the API owns."
   },
   "candidateEmissionApi": {
     "module": "scripts/eval/lib/issue-149-candidate-adapter.ts",
-    "function": "finalizeProductionBrandEvidence",
-    "signature": "finalizeProductionBrandEvidence(debug, opaqueItemId)",
-    "firstArgument": "the complete ExtractionDebug returned by extractLabelEvidenceDetailed (src/pipeline/extractor/extractor.ts#ExtractionDebug)",
-    "returns": "{ diagnosticSelection, candidateRecords } \u2014 both derived internally",
+    "function": "acquireProductionBrandEvidence",
+    "signature": "acquireProductionBrandEvidence(input: ExtractionInput): Promise<Result<ProductionBrandEvidenceSuccess, ExtractionError>>",
+    "firstArgument": "the frozen ExtractionInput. NOT ExtractionDebug, NOT a FieldSelection, NOT a candidate array.",
+    "returnsOnSuccess": [
+      "detailed: DetailedExtractionResult",
+      "diagnosticSelection: FieldSelection",
+      "candidateRecords: CandidateEvidenceRecord[]"
+    ],
+    "returnsOnFailure": "the extractor's typed ExtractionError, unchanged, with no diagnostic selection and no candidate record",
     "theRunnerSuppliesNo": [
-      "candidate array",
+      "ExtractionDebug",
       "FieldSelection",
-      "diagnosticSelection",
-      "Brand diagnostics object",
-      "rankedPosition"
+      "candidate array",
+      "rankedPosition",
+      "a second opaque identifier"
     ],
-    "theRunnerNeverCalls": "selectBrandObservationWithCompleteFilterDiagnostics",
+    "theRunnerNeverCalls": [
+      "extractLabelEvidenceDetailed",
+      "selectBrandObservationWithCompleteFilterDiagnostics"
+    ],
+    "opaqueIdentitySource": "input.artifactRef \u2014 there is no second identifier that could disagree with it",
     "internalSteps": [
-      "validate opaqueItemId",
-      "require debug.passes to be a non-empty ordered array",
-      "reconstruct the exact production Brand pass set: primary OBSERVED ? [debug.passes[0]] : debug.passes",
+      "validate input.artifactRef matches ^item-\\\\d{4}$, before any extractor invocation",
+      "call extractLabelEvidenceDetailed(input) exactly once",
+      "return the extractor's typed failure unchanged when it returns !ok",
+      "keep DetailedExtractionResult and ExtractionDebug private until that call succeeds",
+      "reconstruct the exact Brand pass set: primary OBSERVED ? [debug.passes[0]] : debug.passes",
       "invoke selectBrandObservationWithCompleteFilterDiagnostics internally",
-      "perform the complete parity assertion internally against debug.finalSelections.brand",
-      "derive candidates only from the internally created diagnosticSelection.brandDiagnostics.candidates",
-      "finalize the complete candidate population",
-      "assert the emitted count equals the internally derived diagnostic count"
+      "perform full-object parity internally against debug.finalSelections.brand",
+      "finalize the complete internally derived candidate population",
+      "return the original detailed result, the diagnostic selection and the candidate records together"
     ],
+    "extractorInvokedExactlyOncePerItem": true,
+    "noRetryPath": true,
+    "runnerPersistsPassEvidenceFrom": "evidence.value.detailed.debug.passes",
+    "runnerPersistsCandidateEvidenceFrom": "evidence.value.candidateRecords",
     "supersededRoutes": [
       "a bare candidate array (Amendment 8 and earlier)",
-      "a caller-supplied FieldSelection (Amendment 9): a filtered population could be wrapped in a freshly constructed selection and accepted \u2014 the Amendment 9 tests themselves demonstrated the bypass"
+      "a caller-supplied FieldSelection (Amendment 9): a filtered population could be wrapped in a freshly constructed selection",
+      "a caller-supplied ExtractionDebug (Amendment 10): a helper could filter or reorder the passes and reconstruct matching primary and final selections"
     ],
-    "whyDebugOwned": "ExtractionDebug already exposes the ordered passes, the primary selections and the authoritative final selections. Taking it closes the derivation structurally: there is no caller-reachable point at which the population can be filtered, projected or replaced.",
-    "runtimeExportSurface": ["CandidateAdapterError", "finalizeProductionBrandEvidence"],
+    "whyExtractorOwned": "Each earlier signature closed the route it named and left an adjacent one open. Owning the extractor call removes the class: there is no caller-supplied evidence at all, and the runner never holds an intermediate it could alter.",
+    "runtimeExportSurface": ["CandidateAdapterError", "acquireProductionBrandEvidence"],
     "runtimeExportSurfaceVerifiedBy": "importing the module namespace and inspecting its actual runtime own keys, not a source regex",
     "haltCodes": {
-      "MALFORMED_OPAQUE_ITEM_ID": "opaqueItemId does not match ^item-\\\\d{4}$",
-      "DEBUG_PASSES_ABSENT": "debug.passes is absent, not an array, or empty",
-      "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE": "the internally derived selection differs from debug.finalSelections.brand once only filterChecks and activeRejectionReasons are removed",
+      "MALFORMED_ARTIFACT_REF": "input.artifactRef does not match ^item-\\\\d{4}$; raised before the extractor is invoked",
+      "DEBUG_PASSES_ABSENT": "the extractor's debug carries no ordered pass array",
+      "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE": "the internally derived selection differs from debug.finalSelections.brand once only the two complete-diagnostics fields are removed",
       "COMPLETE_DIAGNOSTICS_ABSENT": "the internally derived selection carries no brandDiagnostics.candidates array",
-      "CANDIDATE_EVIDENCE_TRUNCATED": "the emitted record count does not equal the internally derived diagnostic candidate count"
+      "CANDIDATE_EVIDENCE_TRUNCATED": "the emitted record count does not equal the internally derived diagnostic candidate count",
+      "RANKED_MEMBERSHIP_INCONSISTENT": "decision, ranking and rankedPosition are mutually inconsistent, or a kept population retains no ranked survivor",
+      "RANKED_POSITION_PARITY_FAILURE": "ranked positions are not unique or contiguous, or there is not exactly one selected candidate"
     },
-    "enforcedBy": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts and src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts"
+    "enforcedBy": [
+      "src/fixtures/eval/issue-149-acquisition-orchestration.test.ts",
+      "src/fixtures/eval/issue-149-ranked-invariants.test.ts",
+      "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts",
+      "src/fixtures/eval/issue-149-stage2-source-closure.test.ts"
+    ]
   },
   "keptPopulationMustRetainARankedSurvivor": {
     "relation": "(any candidate is kept) === (at least one candidate carries a decision)",
@@ -171,6 +193,14 @@
     ],
     "priorGap": "The array adapter derived membership from candidates carrying a decision and checked selection only when that set was non-empty. If every kept candidate's decision disappeared, the ranked set was empty and every record still passed.",
     "haltCode": "RANKED_MEMBERSHIP_INCONSISTENT",
-    "enforcedIn": "finalizeProductionCandidateArray"
+    "enforcedIn": "the internal array-invariant check reached through acquireProductionBrandEvidence",
+    "reachedPastParityBy": "src/fixtures/eval/issue-149-ranked-invariants.test.ts, which controls the internally derived selection so parity succeeds and the invariant is actually evaluated"
+  },
+  "routeNote": "The route is unchanged in substance: one direct extractor invocation per item, never runCaseArtifacts. What changed is who makes it. The runner constructs the frozen ExtractionInput and reads the result; it does not call the extractor itself.",
+  "onExtractorFailure": {
+    "diagnosticSelectionReturned": false,
+    "candidateRecordReturned": false,
+    "runnerPersists": "the preregistered item-level typed failure record: ExtractionError code, message and issues, plus the manifest-sourced opaque item id and source-image SHA-256",
+    "itemRetried": false
   }
 }

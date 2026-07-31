@@ -201,48 +201,53 @@ discovery — runtime bundle, truth-free manifest, staged images, empty output �
 and nothing else. The post-freeze ID map is not mounted.
 
 1. Re-verify everything discovery verified.
-2. Run the **primary** matrix: all 115 opaque items through a DIRECT
-   `extractLabelEvidenceDetailed` call — never `runCaseArtifacts`. The complete
-   diagnostics, the exact-pass-set rule and the parity assertion are all owned by
-   `finalizeProductionBrandEvidence` in step 4; the runner does not perform them.
+2. Run the **primary** matrix: all 115 opaque items through
+   `acquireProductionBrandEvidence(extractionInput)` — one call per item. That
+   call makes the direct `extractLabelEvidenceDetailed` invocation itself,
+   exactly once, and never `runCaseArtifacts`. The runner constructs the frozen
+   `ExtractionInput` and reads the result; it does not call the extractor, and it
+   does not perform the pass-set reconstruction, the diagnostic selection or the
+   parity assertion.
 
 3. Persist the **complete ordered `RegionOcrResult` array** — all thirteen fields
    of every pass, in emission order — per
    `region-ocr-result-replay-contract.json`; halt on `PASS_EVIDENCE_TRUNCATED` or
    `PASS_ORDER_MISMATCH`. This is what makes the counterfactual in capability 3
    replayable later, without OCR.
-4. Emit Brand evidence through **exactly one call** to
-   `finalizeProductionBrandEvidence(detailed.value.debug, opaqueItemId)` from
-   `scripts/eval/lib/issue-149-candidate-adapter.ts`, passing the complete
-   `ExtractionDebug` that `extractLabelEvidenceDetailed` returned.
+4. The same call returns everything. Persist pass evidence only from
+   `evidence.value.detailed.debug.passes` and candidate evidence only from
+   `evidence.value.candidateRecords`.
 
-   That one call does everything internally: it reconstructs the exact production
-   Brand pass set (`primary OBSERVED ? [debug.passes[0]] : debug.passes`), invokes
-   `selectBrandObservationWithCompleteFilterDiagnostics` itself, performs the
-   full-object canonical parity assertion against `debug.finalSelections.brand`,
-   derives the candidate population only from the selection **it** created,
-   finalizes it, and asserts the emitted count. It returns the derived
-   `diagnosticSelection` and the finalized `candidateRecords`.
+   Inside it: `input.artifactRef` is validated before the extractor is invoked;
+   the extractor is called exactly once and its typed failure is returned
+   unchanged; the exact Brand pass set is reconstructed
+   (`primary OBSERVED ? [debug.passes[0]] : debug.passes`);
+   `selectBrandObservationWithCompleteFilterDiagnostics` is invoked; full-object
+   canonical parity is asserted against `debug.finalSelections.brand`; and the
+   complete internally derived candidate population is finalized. The opaque
+   identity comes from `input.artifactRef`, so no second identifier can disagree
+   with it.
 
-   The runner supplies **no** candidate array, **no** `FieldSelection`, **no**
-   `diagnosticSelection`, **no** Brand diagnostics object and **no**
-   `rankedPosition`, and it must never call
-   `selectBrandObservationWithCompleteFilterDiagnostics` itself. Earlier
-   signatures took a bare array, and then a caller-supplied selection — which
-   still allowed a filtered population wrapped in a freshly constructed
-   `FieldSelection`. Taking `ExtractionDebug` removes the route rather than
-   prohibiting it.
+   The runner supplies **no** `ExtractionDebug`, **no** `FieldSelection`, **no**
+   candidate array and **no** `rankedPosition`, and never calls
+   `extractLabelEvidenceDetailed` or a selector itself. Three earlier signatures
+   each closed the route they named and left an adjacent one open — a bare array,
+   then a caller-supplied selection, then a caller-supplied debug object a helper
+   could construct with filtered passes and matching selections. Owning the
+   extractor call removes the class.
 
-   Halts: `MALFORMED_OPAQUE_ITEM_ID`, `DEBUG_PASSES_ABSENT`,
-   `BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE` (no evidence is returned),
-   `COMPLETE_DIAGNOSTICS_ABSENT`, `CANDIDATE_EVIDENCE_TRUNCATED`.
+   Halts: `MALFORMED_ARTIFACT_REF`, `DEBUG_PASSES_ABSENT`,
+   `BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE` (no evidence returned),
+   `COMPLETE_DIAGNOSTICS_ABSENT`, `CANDIDATE_EVIDENCE_TRUNCATED`,
+   `RANKED_MEMBERSHIP_INCONSISTENT`, `RANKED_POSITION_PARITY_FAILURE`.
 
    The adapter's runtime namespace exports exactly `CandidateAdapterError` and
-   `finalizeProductionBrandEvidence` — verified by importing the module, not by a
-   source regex. Trusted Job A additionally scans every Stage 2 acquisition source
-   input in the dependency closure, because the runner-source guard is
-   first-order by construction. The canonical helper remains permitted for pass
-   validation, semantic fingerprinting and exact-byte hashing.
+   `acquireProductionBrandEvidence`. Trusted Job A runs the parsed source-closure
+   analyzer at `scripts/eval/lib/issue-149-stage2-source-closure.ts` over the
+   **complete transitive** Stage 2 source set. Only the runner entrypoint must
+   invoke the acquisition API; hashing, manifest, validation and scanning helpers
+   are legitimate closure members and are required only to be free of prohibited
+   routes.
 
 5. On a case-level extractor failure, persist the typed failure record — error
    code, message, issues, opaque item ID, source-image SHA-256. **No partial

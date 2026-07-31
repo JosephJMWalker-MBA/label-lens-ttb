@@ -25,11 +25,13 @@ const CANONICAL_LIBS = [
   "scripts/eval/lib/issue-149-bundle-scan.ts",
   "scripts/eval/lib/issue-149-freeze-core.d.mts",
   "scripts/eval/lib/issue-149-freeze-core.mjs",
+  "scripts/eval/lib/issue-149-stage2-source-closure.ts",
   "scripts/eval/lib/issue-149-candidate-adapter.ts",
   "scripts/eval/lib/issue-149-evidence-canonical.ts",
 ];
 const STAGE_1_TESTS = [
   "src/fixtures/eval/issue-149-acquisition-isolation.test.ts",
+  "src/fixtures/eval/issue-149-acquisition-orchestration.test.ts",
   "src/fixtures/eval/issue-149-bundle-scan.test.ts",
   "src/fixtures/eval/issue-149-contract-consistency.test.ts",
   "src/fixtures/eval/issue-149-dependency-closure.test.ts",
@@ -38,6 +40,8 @@ const STAGE_1_TESTS = [
   "src/fixtures/eval/issue-149-frozen-vocabulary.test.ts",
   "src/fixtures/eval/issue-149-generated-artifact-reproducibility.test.ts",
   "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts",
+  "src/fixtures/eval/issue-149-ranked-invariants.test.ts",
+  "src/fixtures/eval/issue-149-stage2-source-closure.test.ts",
   "src/fixtures/eval/issue-149-staging-independence.test.ts",
   "src/fixtures/eval/issue-149-stage-1-manifest.test.ts",
 ];

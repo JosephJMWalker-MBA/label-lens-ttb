@@ -14,7 +14,13 @@
  * selection is derived HERE and never handed in by a caller. The invocation
  * contract permits that module on the acquisition route.
  */
-import type { ExtractionDebug } from "@/pipeline/extractor/extractor";
+import type { Result } from "@/shared/result";
+import {
+  extractLabelEvidenceDetailed,
+  type DetailedExtractionResult,
+  type ExtractionDebug,
+} from "@/pipeline/extractor/extractor";
+import type { ExtractionError, ExtractionInput } from "@/pipeline/extractor/extractor.types";
 import {
   compareCandidateRanking,
   selectBrandObservationWithCompleteFilterDiagnostics,
@@ -42,6 +48,7 @@ export class CandidateAdapterError extends Error {
       | "RANKED_MEMBERSHIP_INCONSISTENT"
       | "RANKED_POSITION_PARITY_FAILURE"
       | "DEBUG_PASSES_ABSENT"
+      | "MALFORMED_ARTIFACT_REF"
       | "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE",
     detail: string,
   ) {
@@ -437,29 +444,14 @@ function strippedForParity(selection: FieldSelection): unknown {
 }
 
 /**
- * The ONLY public Brand evidence API.
- *
- * It takes the complete `ExtractionDebug` that `extractLabelEvidenceDetailed`
- * returned, and derives everything else itself.
- *
- * ## Why the input is `ExtractionDebug`
- *
- * Amendment 9 accepted a caller-supplied `FieldSelection` and read the candidate
- * population from `brandDiagnostics.candidates`. That removed the bare-array
- * route but left an equivalent one: a caller could filter the candidates, wrap
- * them in a freshly constructed `FieldSelection`, and pass that. This module's own
- * tests demonstrated the bypass.
- *
- * Taking `ExtractionDebug` closes it structurally. The adapter reconstructs the
- * exact production pass set, calls the complete-diagnostics selector itself,
- * asserts parity itself, and derives candidates only from the selection it
- * created — so there is no caller-reachable point at which the population can be
- * filtered, projected or replaced.
- *
- * The runner must never call `selectBrandObservationWithCompleteFilterDiagnostics`
- * directly, for the same reason.
+ * Internal. Derives the Brand evidence from a debug object the module produced
+ * itself. **Not exported**: an `ExtractionDebug` parameter is caller-supplied
+ * data, and a helper can construct a coherent one — filtered or reordered passes
+ * plus matching primary and final selections — that this function would accept.
+ * Only `acquireProductionBrandEvidence` may call it, with a debug object it
+ * obtained privately.
  */
-export function finalizeProductionBrandEvidence(
+function deriveBrandEvidenceFromDebug(
   debug: ExtractionDebug,
   opaqueItemId: string,
 ): { diagnosticSelection: FieldSelection; candidateRecords: CandidateEvidenceRecord[] } {
@@ -517,4 +509,65 @@ export function finalizeProductionBrandEvidence(
   }
 
   return { diagnosticSelection, candidateRecords };
+}
+
+// ---------------------------------------------------------------------------
+// The one public acquisition API
+// ---------------------------------------------------------------------------
+
+export interface ProductionBrandEvidenceSuccess {
+  detailed: DetailedExtractionResult;
+  diagnosticSelection: FieldSelection;
+  candidateRecords: CandidateEvidenceRecord[];
+}
+
+/**
+ * The ONLY public Brand acquisition API.
+ *
+ * It takes the frozen `ExtractionInput`, calls `extractLabelEvidenceDetailed`
+ * **itself, exactly once**, and derives everything from that private result.
+ *
+ * ## Why the input is `ExtractionInput` and not `ExtractionDebug`
+ *
+ * Each earlier signature closed the route it named and left an adjacent one open.
+ * A bare candidate array became a caller-supplied `FieldSelection`; a caller could
+ * still filter the candidates and wrap them in a fresh selection. That became a
+ * caller-supplied `ExtractionDebug`; a helper could still filter or reorder
+ * `debug.passes`, reconstruct matching `primarySelections` and `finalSelections`,
+ * and hand over a coherent replacement.
+ *
+ * Owning the extractor call removes the class. There is no caller-supplied
+ * evidence at all: the passes, the primary and final selections, the diagnostic
+ * selection, the parity assertion and the candidate population are all derived
+ * from one private invocation. The runner constructs the input and reads the
+ * result; it never holds an intermediate it could alter.
+ *
+ * The opaque identity comes from `input.artifactRef`, so there is no second
+ * identifier that could disagree with it.
+ */
+export async function acquireProductionBrandEvidence(
+  input: ExtractionInput,
+): Promise<Result<ProductionBrandEvidenceSuccess, ExtractionError>> {
+  if (typeof input?.artifactRef !== "string" || !OPAQUE_ITEM_ID.test(input.artifactRef)) {
+    throw new CandidateAdapterError(
+      "MALFORMED_ARTIFACT_REF",
+      `input.artifactRef must match ^item-\\d{4}$, received ${JSON.stringify(input?.artifactRef)}`,
+    );
+  }
+
+  // Exactly once. There is no retry path: a failed item produces the
+  // preregistered typed failure and is never re-run.
+  const detailed = await extractLabelEvidenceDetailed(input);
+  if (!detailed.ok) {
+    // The extractor's typed failure, unchanged. No diagnostic selection and no
+    // candidate record is produced or returned.
+    return detailed;
+  }
+
+  const { diagnosticSelection, candidateRecords } = deriveBrandEvidenceFromDebug(
+    detailed.value.debug,
+    input.artifactRef,
+  );
+
+  return { ok: true, value: { detailed: detailed.value, diagnosticSelection, candidateRecords } };
 }

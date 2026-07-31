@@ -5,11 +5,11 @@ Refs Issue #149. **Evidence acquisition only.** Frozen before any OCR runs.
 Base: `origin/main` `546c3f279ce431a1fd8c0203df7a83553ea866ef`, the merge commit
 of PR #220.
 
-**Amended ten times, every time before any governed acquisition OCR.** See
+**Amended eleven times, every time before any governed acquisition OCR.** See
 `preregistration-amendment.md` and `preregistration-amendment-2.md` through
-`preregistration-amendment-10.md`. All earlier plans are preserved, not
+`preregistration-amendment-11.md`. All earlier plans are preserved, not
 overwritten, and their identities are recorded in `amendment-linkage.json` and
-`amendment-2-linkage.json` through `amendment-10-linkage.json`. **The Stage 1 trusted freeze/staging generator and its temporary
+`amendment-2-linkage.json` through `amendment-11-linkage.json`. **The Stage 1 trusted freeze/staging generator and its temporary
 reproducibility mode have run — that is what produced the three committed
 artifacts. No Stage 2 Job A workflow, truth-free preparation artifact,
 runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR
@@ -506,37 +506,70 @@ Halts with `CANDIDATE_ID_COLLISION` or `CANDIDATE_EVIDENCE_TRUNCATED`.
 
 ### One call emits the candidates
 
-The **only** public Brand evidence API is
-`finalizeProductionBrandEvidence(debug, opaqueItemId)` from
+The **only** public Brand acquisition API is
+`acquireProductionBrandEvidence(input)` from
 `scripts/eval/lib/issue-149-candidate-adapter.ts`, called exactly once per item
-with the complete **`ExtractionDebug`** that `extractLabelEvidenceDetailed`
-returned.
+with the frozen **`ExtractionInput`**. It returns
+`Result<{ detailed, diagnosticSelection, candidateRecords }, ExtractionError>`.
 
-Everything else is derived inside that call: the exact production Brand pass set
+**It calls `extractLabelEvidenceDetailed` itself, exactly once**, and derives
+everything from that private result: the exact production Brand pass set
 (`primary OBSERVED ? [debug.passes[0]] : debug.passes`), the invocation of
 `selectBrandObservationWithCompleteFilterDiagnostics`, the full-object parity
 assertion against `debug.finalSelections.brand`, the candidate population — taken
-only from the selection the adapter itself created — and the finalized records.
-It returns the derived `diagnosticSelection` and the `candidateRecords`.
+only from the selection it created — and the finalized records. The opaque
+identity comes from `input.artifactRef`, so there is no second identifier that
+could disagree with it.
 
-**The runner supplies no selection and no candidate array, and never calls the
-diagnostic selector.** Two earlier signatures were not enough. A bare array was
-replaced by a caller-supplied `FieldSelection`, and a caller could still filter
-the candidates, wrap them in a freshly constructed selection and pass that — this
-package's own tests demonstrated the bypass. Taking `ExtractionDebug` removes the
-route instead of prohibiting it: there is no caller-reachable point at which the
-population can be filtered, projected or replaced.
+**The runner supplies no evidence at all.** It constructs the input and reads the
+result; it never holds an intermediate it could alter, and it never calls the
+extractor or a selector. Three earlier signatures were not enough, and each
+failed the same way — closing the route it named while leaving an adjacent one
+open. A bare candidate array became a caller-supplied `FieldSelection`, and a
+caller could still filter the candidates and wrap them in a fresh selection. That
+became a caller-supplied `ExtractionDebug`, and a helper could still filter or
+reorder `debug.passes`, reconstruct matching `primarySelections` and
+`finalSelections`, and hand over a coherent replacement. Owning the extractor call
+removes the class rather than the instance.
 
-Halts: `MALFORMED_OPAQUE_ITEM_ID`, `DEBUG_PASSES_ABSENT`,
-`BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE` — **no evidence is returned on a
-parity failure** — `COMPLETE_DIAGNOSTICS_ABSENT`, and
-`CANDIDATE_EVIDENCE_TRUNCATED`. `candidateOrdinal` is the original
-diagnostic-array index, and `opaqueItemId` is validated before anything else.
+The runner persists pass evidence only from
+`evidence.value.detailed.debug.passes` and candidate evidence only from
+`evidence.value.candidateRecords`.
+
+On extractor failure the typed `ExtractionError` is returned unchanged, **no
+diagnostic selection or candidate record exists**, the runner persists the
+preregistered item-level typed failure, and the item is never retried.
+
+Halts: `MALFORMED_ARTIFACT_REF` — raised before the extractor is invoked —
+`DEBUG_PASSES_ABSENT`, `BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE` (no evidence
+returned), `COMPLETE_DIAGNOSTICS_ABSENT`, `CANDIDATE_EVIDENCE_TRUNCATED`,
+`RANKED_MEMBERSHIP_INCONSISTENT` and `RANKED_POSITION_PARITY_FAILURE`.
+`candidateOrdinal` is the original diagnostic-array index.
 
 The adapter's runtime namespace exports exactly `CandidateAdapterError` and
-`finalizeProductionBrandEvidence`. That is verified by importing the module and
+`acquireProductionBrandEvidence`. That is verified by importing the module and
 inspecting its actual own keys, not by a source regex — a regex can miss export
-forms, and an inferred export surface is not an export surface. The runner may not call `finalizeCandidateRecord`,
+forms, and an inferred export surface is not an export surface.
+
+**The Stage 2 source-closure gate is a parser, not a substring scan.**
+`scripts/eval/lib/issue-149-stage2-source-closure.ts` walks the TypeScript AST,
+and Job A and the Stage 1 tests use that one implementation. It distinguishes a
+call from a mention, and it distinguishes the runner entrypoint — which must
+invoke the acquisition API exactly once — from the rest of the closure. Hashing,
+manifest, pass-validation and evidence-scanning helpers are legitimate Stage 2
+sources and are required only to be free of prohibited routes; the previous
+detector demanded that *every* inspected file call the API, which would have
+rejected all of them. Outside the adapter it prohibits calls to the extractor and
+the selectors, and writes to `primarySelections`, `finalSelections`,
+`brandDiagnostics`, `candidates`, `passes` and `rankedPosition`. Reading is
+permitted — the runner persists `detailed.debug.passes`.
+
+**The ranked-array invariants are reached, not merely declared.** A regression
+that removed decisions only from the authority halted at *parity*, before the
+array invariant was evaluated. A focused test now controls the internally derived
+selection so parity succeeds, and asserts the exact codes
+`RANKED_MEMBERSHIP_INCONSISTENT` and `RANKED_POSITION_PARITY_FAILURE` — with no
+runtime test-only export added to reach them. The runner may not call `finalizeCandidateRecord`,
 `finalizeProductionCandidate`, `toCandidateEvidenceRecord`, `stableCandidateId` or
 `TEST_ONLY_candidateAdapterInternals` for Brand candidate emission, and may not
 construct a `rankedPosition` itself.

@@ -118,7 +118,7 @@
     "the emitted word count per pass must equal the length of the debug pass word array",
     "any inequality halts with RAW_EVIDENCE_TRUNCATED"
   ],
-  "amendedBy": "preregistration-amendment-10.md",
+  "amendedBy": "preregistration-amendment-11.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "historicalNote": "Amendment 1 described this evidence as reachable through runCaseArtifacts. That route is prohibited from Amendment 2 onward.",
   "completeRegionOcrResultPersistence": "Every RegionOcrResult field is persisted exactly; see region-ocr-result-replay-contract.json. The per-pass field list here is explanatory and is not a licence to persist a subset.",

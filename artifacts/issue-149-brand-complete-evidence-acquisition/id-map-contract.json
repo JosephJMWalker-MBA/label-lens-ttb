@@ -40,6 +40,6 @@
     "the map declares itself unmounted and unimported",
     "every opaque id maps to exactly one historical case, with matching image hash and size"
   ],
-  "amendedBy": "preregistration-amendment-10.md",
+  "amendedBy": "preregistration-amendment-11.md",
   "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run."
 }

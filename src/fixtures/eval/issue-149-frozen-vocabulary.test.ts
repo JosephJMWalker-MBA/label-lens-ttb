@@ -8,7 +8,14 @@
  *
  * A test may import production; the acquisition runner may not, and does not.
  */
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// The public API owns the extractor call, so a synthetic debug object reaches it
+// only through a mocked extractor. The selectors themselves are never mocked.
+vi.mock("@/pipeline/extractor/extractor", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/pipeline/extractor/extractor")>()),
+  extractLabelEvidenceDetailed: vi.fn(),
+}));
 
 import {
   ANALYZER_CANDIDATE_RANKING_MODES as PROD_RANKING_MODES,
@@ -18,7 +25,8 @@ import {
   ANALYZER_RANKING_SCORE_FACTOR_DIRECTIONS as PROD_SCORE_FACTOR_DIRECTIONS,
   ANALYZER_RANKING_SCORE_FACTOR_IDS as PROD_SCORE_FACTOR_IDS,
 } from "@/pipeline/analyzer/analyzer.types";
-import type { ExtractionDebug } from "@/pipeline/extractor/extractor";
+import { extractLabelEvidenceDetailed, type ExtractionDebug } from "@/pipeline/extractor/extractor";
+import type { ExtractionInput } from "@/pipeline/extractor/extractor.types";
 import type {
   AnalyzerCandidateProvenance,
   AnalyzerOcrConfidence,
@@ -39,7 +47,7 @@ import {
   type BrandCandidateScore,
 } from "@/pipeline/extractor/field-selection";
 
-import { finalizeProductionBrandEvidence } from "../../../scripts/eval/lib/issue-149-candidate-adapter";
+import { acquireProductionBrandEvidence } from "../../../scripts/eval/lib/issue-149-candidate-adapter";
 
 import {
   ANALYZER_CANDIDATE_PROVENANCE_KEYS,
@@ -174,7 +182,7 @@ describe("Issue #149 frozen vocabulary matches production", () => {
     expect([...REGION_OCR_RESULT_KEYS]).toEqual(Object.keys(pass));
   });
 
-  it("derives the candidate key set from what production actually emits", () => {
+  it("derives the candidate key set from what production actually emits", async () => {
     // The strongest available guard: run the real selector, adapt one real
     // candidate, and require the frozen schema to describe exactly that record.
     const words: OcrWord[] = ["RED", "BRICK", "WINERY"].map((text, index) => {
@@ -225,10 +233,15 @@ describe("Issue #149 frozen vocabulary matches production", () => {
       primarySelections: { brand: primaryBrand, alcohol: primaryBrand },
       finalSelections: { brand: primaryBrand, alcohol: primaryBrand },
     } as unknown as ExtractionDebug;
-    const { diagnosticSelection, candidateRecords } = finalizeProductionBrandEvidence(
-      debug,
-      "item-0001",
-    );
+    vi.mocked(extractLabelEvidenceDetailed).mockResolvedValue({
+      ok: true,
+      value: { response: {}, debug, sellerRegionReadings: [] },
+    } as never);
+    const acquired = await acquireProductionBrandEvidence({
+      artifactRef: "item-0001",
+    } as unknown as ExtractionInput);
+    if (!acquired.ok) throw new Error("expected success");
+    const { diagnosticSelection, candidateRecords } = acquired.value;
     expect(diagnosticSelection.brandDiagnostics?.candidates.length).toBeGreaterThan(0);
     const [record] = candidateRecords;
     const derived = new Set(["canonicalRecordSha256", "stableCandidateId"]);

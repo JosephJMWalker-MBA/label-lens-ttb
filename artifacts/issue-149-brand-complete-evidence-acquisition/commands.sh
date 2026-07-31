@@ -34,9 +34,12 @@ node -e 'const m=require("./artifacts/issue-149-brand-complete-evidence-acquisit
 # not runtime isolation proof; runtime isolation is a discover-mode gate.
 npx vitest run \
   src/fixtures/eval/issue-149-acquisition-isolation.test.ts \
+  src/fixtures/eval/issue-149-acquisition-orchestration.test.ts \
   src/fixtures/eval/issue-149-bundle-scan.test.ts \
   src/fixtures/eval/issue-149-dependency-closure.test.ts \
   src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts \
+  src/fixtures/eval/issue-149-ranked-invariants.test.ts \
+  src/fixtures/eval/issue-149-stage2-source-closure.test.ts \
   src/fixtures/eval/issue-149-contract-consistency.test.ts \
   src/fixtures/eval/issue-149-evidence-canonical.test.ts \
   src/fixtures/eval/issue-149-freeze-core-loader.test.ts \

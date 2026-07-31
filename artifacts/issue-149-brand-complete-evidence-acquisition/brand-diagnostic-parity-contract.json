@@ -2,7 +2,7 @@
   "artifact": "brand-diagnostic-parity-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-10.md",
+  "amendedBy": "preregistration-amendment-11.md",
   "correctionOf": {
     "priorClaim": "complete diagnostics live directly in ExtractionDebug.finalSelections.brand.brandDiagnostics.candidates",
     "whyWrong": "extractLabelEvidenceDetailed calls the ordinary selectBrandObservation, so debug.finalSelections carries the DEFAULT shape with neither filterChecks nor activeRejectionReasons. The prior claim was false and is corrected here, before any acquisition OCR."
@@ -91,12 +91,17 @@
       "an injected difference in an observation field is detected",
       "the halt code is BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE"
     ],
-    "implementedInThisAmendment": false
+    "implementedInThisAmendment": true,
+    "implementedIn": [
+      "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts",
+      "src/fixtures/eval/issue-149-ranked-invariants.test.ts"
+    ],
+    "implementedNote": "Amendment 10 added and ran these tests; the contract still said they were not implemented. Amendment 11 corrects that and adds the ranked-invariant tests that reach past parity."
   },
   "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run.",
   "candidateEvidenceSourceProperty": "the INTERNALLY derived diagnosticSelection.brandDiagnostics.candidates \u2014 never a caller-supplied selection or array",
   "parityIsInternalToThePublicApi": {
-    "performedInside": "finalizeProductionBrandEvidence",
+    "performedInside": "acquireProductionBrandEvidence",
     "algorithm": [
       "deep-clone the internally derived diagnosticSelection",
       "remove ONLY filterChecks and activeRejectionReasons from every Brand candidate",
@@ -114,6 +119,7 @@
     "authority": "debug.finalSelections.brand",
     "theDerivedSelectionSuppliesOnly": ["filterChecks", "activeRejectionReasons"],
     "noEvidenceReturnedOnFailure": true,
-    "haltCode": "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE"
+    "haltCode": "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE",
+    "candidateEvidenceComesFrom": "the internally derived diagnostic selection inside the extractor-owning public API"
   }
 }

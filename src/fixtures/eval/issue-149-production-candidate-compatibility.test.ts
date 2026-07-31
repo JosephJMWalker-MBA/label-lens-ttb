@@ -10,12 +10,23 @@
  *
  * There is deliberately no helper that builds a `FieldSelection` around a
  * caller-chosen candidate array. Amendment 9's `selectionOf()` was exactly the
- * bypass this amendment closes: it demonstrated that a filtered population could
- * be wrapped in a fresh selection and accepted.
+ * bypass a later amendment closed: it demonstrated that a filtered population
+ * could be wrapped in a fresh selection and accepted.
+ *
+ * The public API now owns the extractor call, so these tests reach it the only
+ * way Stage 2 will: by mocking `extractLabelEvidenceDetailed` to return a
+ * synthetic `DetailedExtractionResult` built from the REAL selectors, then
+ * calling `acquireProductionBrandEvidence`. The selectors themselves are never
+ * mocked here.
  */
-import { describe, expect, it } from "vitest";
+vi.mock("@/pipeline/extractor/extractor", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/pipeline/extractor/extractor")>()),
+  extractLabelEvidenceDetailed: vi.fn(),
+}));
+import { beforeAll, describe, expect, it, vi } from "vitest";
 
-import type { ExtractionDebug } from "@/pipeline/extractor/extractor";
+import { extractLabelEvidenceDetailed, type ExtractionDebug } from "@/pipeline/extractor/extractor";
+import type { ExtractionInput } from "@/pipeline/extractor/extractor.types";
 import type { OcrWord, RegionOcrResult } from "@/pipeline/extractor/extractor.types";
 import {
   BRAND_FILTER_CHECK_ORDER,
@@ -26,7 +37,7 @@ import {
 
 import {
   CandidateAdapterError,
-  finalizeProductionBrandEvidence,
+  acquireProductionBrandEvidence,
 } from "../../../scripts/eval/lib/issue-149-candidate-adapter";
 import {
   ANALYZER_OCR_CONFIDENCE_KEYS,
@@ -124,9 +135,29 @@ const LINES: string[][] = [
   ["NAPA", "VALLEY"],
 ];
 
+/** The frozen ExtractionInput shape, with only the identity that matters here. */
+const inputFor = (artifactRef: string) => ({ artifactRef }) as unknown as ExtractionInput;
+
+/** Route a synthetic debug object through the real public boundary. */
+async function acquire(debug: ExtractionDebug, artifactRef: string) {
+  vi.mocked(extractLabelEvidenceDetailed).mockResolvedValue({
+    ok: true,
+    value: { response: {}, debug, sellerRegionReadings: [] },
+  } as never);
+  const result = await acquireProductionBrandEvidence(inputFor(artifactRef));
+  if (!result.ok) throw new Error("expected success");
+  return result.value;
+}
+
 const DEBUG = debugFor([region(LINES)]);
-const EVIDENCE = finalizeProductionBrandEvidence(DEBUG, "item-0001");
-const CANDIDATES = EVIDENCE.diagnosticSelection.brandDiagnostics!.candidates;
+
+let EVIDENCE: Awaited<ReturnType<typeof acquire>>;
+let CANDIDATES: BrandCandidateDiagnostic[];
+
+beforeAll(async () => {
+  EVIDENCE = await acquire(DEBUG, "item-0001");
+  CANDIDATES = EVIDENCE.diagnosticSelection.brandDiagnostics!.candidates;
+});
 
 /** Clone a debug object so a test can corrupt it without touching the shared one. */
 const cloneDebug = (debug: ExtractionDebug): ExtractionDebug =>
@@ -196,11 +227,8 @@ describe("Issue #149 production candidate compatibility", () => {
     expect(record.candidateProvenance).toEqual({ ...source.candidateProvenance });
   });
 
-  it("accepts a real ocrConfidence with missing token confidences", () => {
-    const withMissing = finalizeProductionBrandEvidence(
-      debugFor([region(LINES, ["BRICK"])]),
-      "item-0002",
-    );
+  it("accepts a real ocrConfidence with missing token confidences", async () => {
+    const withMissing = await acquire(debugFor([region(LINES, ["BRICK"])]), "item-0002");
     const candidates = withMissing.diagnosticSelection.brandDiagnostics!.candidates;
     expect(candidates.some((candidate) => candidate.ocrConfidence.missingTokenCount > 0)).toBe(
       true,
@@ -208,7 +236,7 @@ describe("Issue #149 production candidate compatibility", () => {
     expect(withMissing.candidateRecords.length).toBe(candidates.length);
   });
 
-  it("rejects a candidate whose repeated facts disagree", () => {
+  it("rejects a candidate whose repeated facts disagree", async () => {
     for (const tamper of [
       { passId: "pass-9-elsewhere" },
       { regionName: "brand-band" },
@@ -220,15 +248,13 @@ describe("Issue #149 production candidate compatibility", () => {
       // reaches the provenance check rather than halting earlier.
       const target = corrupted.finalSelections.brand.brandDiagnostics!.candidates[0];
       Object.assign(target, tamper);
-      expect(() => finalizeProductionBrandEvidence(corrupted, "item-0001")).toThrow(
-        CandidateAdapterError,
-      );
+      await expect(acquire(corrupted, "item-0001")).rejects.toThrow(CandidateAdapterError);
     }
   });
 });
 
 describe("Issue #149 the public API owns the derivation", () => {
-  it("accepts only ExtractionDebug — no selection, no candidate array", () => {
+  it("accepts no caller-supplied selection, debug or candidate array", async () => {
     // A filtered population wrapped in a fresh FieldSelection was the Amendment 9
     // bypass. There is no longer a parameter through which one can be supplied.
     for (const notDebug of [
@@ -238,36 +264,30 @@ describe("Issue #149 the public API owns the derivation", () => {
       { brandDiagnostics: { candidates: CANDIDATES } },
       {},
     ]) {
-      expect(() =>
-        finalizeProductionBrandEvidence(notDebug as unknown as ExtractionDebug, "item-0001"),
-      ).toThrow(CandidateAdapterError);
+      await expect(acquire(notDebug as unknown as ExtractionDebug, "item-0001")).rejects.toThrow(
+        CandidateAdapterError,
+      );
     }
   });
 
-  it("halts when debug.passes is absent or empty", () => {
+  it("halts when the extractor's debug carries no passes", async () => {
     for (const passes of [undefined, null, [], "not-an-array"]) {
       const broken = { ...cloneDebug(DEBUG), passes } as unknown as ExtractionDebug;
-      try {
-        finalizeProductionBrandEvidence(broken, "item-0001");
-        throw new Error("expected a rejection");
-      } catch (error) {
-        expect((error as CandidateAdapterError).code).toBe("DEBUG_PASSES_ABSENT");
-      }
+      await expect(acquire(broken, "item-0001")).rejects.toMatchObject({
+        code: "DEBUG_PASSES_ABSENT",
+      });
     }
   });
 
-  it("validates opaqueItemId before anything else", () => {
+  it("validates artifactRef before anything else", async () => {
     for (const bad of ["item-7", "ITEM-0001", "", "case-0001"]) {
-      try {
-        finalizeProductionBrandEvidence(DEBUG, bad);
-        throw new Error("expected a rejection");
-      } catch (error) {
-        expect((error as CandidateAdapterError).code).toBe("MALFORMED_OPAQUE_ITEM_ID");
-      }
+      await expect(acquire(DEBUG, bad)).rejects.toMatchObject({
+        code: "MALFORMED_ARTIFACT_REF",
+      });
     }
   });
 
-  it("uses exactly [passes[0]] when primary Brand is OBSERVED", () => {
+  it("uses exactly [passes[0]] when primary Brand is OBSERVED", async () => {
     const observed = debugFor([region([["RED", "BRICK", "WINERY"]])]);
     expect(observed.primarySelections.brand.observation.state).toBe("OBSERVED");
     // The recovery pass carries a different Brand. If the adapter selected over
@@ -279,20 +299,20 @@ describe("Issue #149 the public API owns the derivation", () => {
         region([["SILVER", "OAK", "CELLARS"]], [], "pass-2-rot180", "full-image-rot180"),
       ],
     } as unknown as ExtractionDebug;
-    const evidence = finalizeProductionBrandEvidence(withRecovery, "item-0003");
+    const evidence = await acquire(withRecovery, "item-0003");
     const values = evidence.diagnosticSelection.brandDiagnostics!.candidates.map((c) => c.rawText);
     expect(values).toContain("RED BRICK WINERY");
     expect(values).not.toContain("SILVER OAK CELLARS");
   });
 
-  it("uses the complete ordered pass array when primary Brand is not OBSERVED", () => {
+  it("uses the complete ordered pass array when primary Brand is not OBSERVED", async () => {
     const passes = [
       region([["PRODUCED", "AND", "BOTTLED", "BY", "SOMEONE", "ELSE"]]),
       region([["RED", "BRICK", "WINERY"]], [], "pass-2-rot180", "full-image-rot180"),
     ];
     const debug = debugFor(passes);
     expect(debug.primarySelections.brand.observation.state).not.toBe("OBSERVED");
-    const evidence = finalizeProductionBrandEvidence(debug, "item-0004");
+    const evidence = await acquire(debug, "item-0004");
     const values = evidence.diagnosticSelection.brandDiagnostics!.candidates.map((c) => c.rawText);
     // The second pass's candidate is present, so all passes were selected over.
     expect(values).toContain("RED BRICK WINERY");
@@ -300,45 +320,40 @@ describe("Issue #149 the public API owns the derivation", () => {
 });
 
 describe("Issue #149 internal parity against the authority", () => {
-  it("succeeds on a valid debug object", () => {
-    expect(() => finalizeProductionBrandEvidence(DEBUG, "item-0001")).not.toThrow();
+  it("succeeds on a valid debug object", async () => {
+    await expect(acquire(DEBUG, "item-0001")).resolves.toBeDefined();
   });
 
-  it("fails on an altered line diagnostic, and returns no evidence", () => {
+  it("fails on an altered line diagnostic, and returns no evidence", async () => {
     const corrupted = cloneDebug(DEBUG);
     const lines = corrupted.finalSelections.brand.brandDiagnostics!.lines;
     expect(lines.length).toBeGreaterThan(0);
     lines[0].rawText = "ALTERED LINE";
-    try {
-      finalizeProductionBrandEvidence(corrupted, "item-0001");
-      throw new Error("expected a rejection");
-    } catch (error) {
-      expect((error as CandidateAdapterError).code).toBe(
-        "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE",
-      );
-    }
+    await expect(acquire(corrupted, "item-0001")).rejects.toMatchObject({
+      code: "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE",
+    });
   });
 
-  it("fails on an altered candidate property", () => {
+  it("fails on an altered candidate property", async () => {
     const corrupted = cloneDebug(DEBUG);
     corrupted.finalSelections.brand.brandDiagnostics!.candidates[0].prominence += 1;
-    expect(() => finalizeProductionBrandEvidence(corrupted, "item-0001")).toThrow(
+    await expect(acquire(corrupted, "item-0001")).rejects.toThrow(
       /BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE/,
     );
   });
 
-  it("fails on an altered observation field", () => {
+  it("fails on an altered observation field", async () => {
     const corrupted = cloneDebug(DEBUG);
     corrupted.finalSelections.brand.observation.confidence = 0.123456;
-    expect(() => finalizeProductionBrandEvidence(corrupted, "item-0001")).toThrow(
+    await expect(acquire(corrupted, "item-0001")).rejects.toThrow(
       /BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE/,
     );
   });
 
-  it("fails on an altered final selection provenance field", () => {
+  it("fails on an altered final selection provenance field", async () => {
     const corrupted = cloneDebug(DEBUG);
     corrupted.finalSelections.brand.supportingPassIds = ["pass-9-elsewhere"];
-    expect(() => finalizeProductionBrandEvidence(corrupted, "item-0001")).toThrow(
+    await expect(acquire(corrupted, "item-0001")).rejects.toThrow(
       /BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE/,
     );
   });
@@ -353,10 +368,10 @@ describe("Issue #149 production ranked membership", () => {
     expect(typeof compareCandidateRanking(wrap(ranked[0]), wrap(ranked[0]))).toBe("number");
   });
 
-  it("gives a deduplicated candidate ranking semantics but NO ranked position", () => {
+  it("gives a deduplicated candidate ranking semantics but NO ranked position", async () => {
     // The same Brand read from two passes. Production keeps both diagnostics and
     // scores both, then removes one during deduplication.
-    const duplicates = finalizeProductionBrandEvidence(
+    const duplicates = await acquire(
       debugFor([
         region([["PRODUCED", "AND", "BOTTLED", "BY", "SOMEONE", "ELSE"]]),
         region([["RED", "BRICK", "WINERY"]], [], "pass-2-rot180", "full-image-rot180"),
@@ -380,8 +395,8 @@ describe("Issue #149 production ranked membership", () => {
     }
   });
 
-  it("orders multiple ranked candidates the way production's comparator does", () => {
-    const evidence = finalizeProductionBrandEvidence(
+  it("orders multiple ranked candidates the way production's comparator does", async () => {
+    const evidence = await acquire(
       debugFor([
         region([
           ["RED", "BRICK", "WINERY"],
@@ -433,7 +448,7 @@ describe("Issue #149 production ranked membership", () => {
 });
 
 describe("Issue #149 a kept population must retain a ranked survivor", () => {
-  it("halts when every kept candidate loses its decision", () => {
+  it("halts when every kept candidate loses its decision (at parity, not the array invariant)", async () => {
     // The deliberate corruption under test: decisions removed from BOTH the
     // authority and, by construction, the internally derived selection — the
     // adapter derives its own selection, so the corruption must be applied to the
@@ -444,12 +459,10 @@ describe("Issue #149 a kept population must retain a ranked survivor", () => {
     }
     // Parity now fails first, which is itself correct: a selection missing every
     // decision is not the authority's. Prove the adapter refuses either way.
-    expect(() => finalizeProductionBrandEvidence(corrupted, "item-0001")).toThrow(
-      CandidateAdapterError,
-    );
+    await expect(acquire(corrupted, "item-0001")).rejects.toThrow(CandidateAdapterError);
   });
 
-  it("accepts an all-rejected population derived from real passes", () => {
+  it("accepts an all-rejected population derived from real passes", async () => {
     // A real pass set whose complete selector result contains only rejected
     // candidates — obtained by choosing the input text, never by filtering.
     const debug = debugFor([
@@ -458,7 +471,7 @@ describe("Issue #149 a kept population must retain a ranked survivor", () => {
         ["NAPA", "VALLEY"],
       ]),
     ]);
-    const evidence = finalizeProductionBrandEvidence(debug, "item-0007");
+    const evidence = await acquire(debug, "item-0007");
     const candidates = evidence.diagnosticSelection.brandDiagnostics!.candidates;
     expect(candidates.length).toBeGreaterThan(0);
     expect(candidates.every((candidate) => !candidate.kept)).toBe(true);
@@ -466,14 +479,12 @@ describe("Issue #149 a kept population must retain a ranked survivor", () => {
     expect(evidence.candidateRecords.every((record) => record.selected === false)).toBe(true);
   });
 
-  it("halts on a decision attached to a rejected candidate", () => {
+  it("halts on a decision attached to a rejected candidate (at parity)", async () => {
     const corrupted = cloneDebug(DEBUG);
     for (const candidate of corrupted.finalSelections.brand.brandDiagnostics!.candidates) {
       if (!candidate.kept) (candidate as { decision?: string }).decision = "alternate";
     }
-    expect(() => finalizeProductionBrandEvidence(corrupted, "item-0001")).toThrow(
-      CandidateAdapterError,
-    );
+    await expect(acquire(corrupted, "item-0001")).rejects.toThrow(CandidateAdapterError);
   });
 });
 
@@ -483,9 +494,10 @@ describe("Issue #149 adapter runtime export surface", () => {
     const namespace = await import("../../../scripts/eval/lib/issue-149-candidate-adapter");
     expect(Object.keys(namespace).sort()).toEqual([
       "CandidateAdapterError",
-      "finalizeProductionBrandEvidence",
+      "acquireProductionBrandEvidence",
     ]);
     for (const removed of [
+      "finalizeProductionBrandEvidence",
       "finalizeProductionCandidateArray",
       "toCandidateEvidenceRecord",
       "finalizeProductionCandidate",

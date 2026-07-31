@@ -10,6 +10,8 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { analyzeStage2SourceClosure } from "../../../scripts/eval/lib/issue-149-stage2-source-closure";
+
 const ROOT = "artifacts/issue-149-brand-complete-evidence-acquisition";
 const INPUT_MANIFEST = path.join(ROOT, "truth-free-input-manifest.json");
 const ID_MAP = path.join(ROOT, "post-freeze/id-map.json");
@@ -237,166 +239,80 @@ describe("Issue #149 acquisition identity and isolation", () => {
       }
     });
 
-    describe("the debug-owned evidence API is the only authorized route", () => {
+    describe("the acquisition API is the only authorized route — SUPPLEMENTARY smoke test", () => {
       /**
-       * Symbols that would let a runner construct, filter, project or replace the
-       * diagnostic selection before candidate emission — or bypass the adapter
-       * entirely. Each is a route the public API exists to remove.
+       * Deliberately labelled supplementary. The authoritative gate is the parsed
+       * analyzer in `scripts/eval/lib/issue-149-stage2-source-closure.ts`, which
+       * Job A runs over the complete transitive Stage 2 source closure and which
+       * `issue-149-stage2-source-closure.test.ts` exercises. This file only
+       * checks the runner entry files that exist today, using that same
+       * implementation rather than a second copied detector.
        */
-      const PROHIBITED_CANDIDATE_SYMBOLS = [
-        "selectBrandObservationWithCompleteFilterDiagnostics",
-        "finalizeProductionCandidateArray",
-        "toCandidateEvidenceRecord",
-        "finalizeProductionCandidate",
-        "finalizeCandidateRecord",
-        "stableCandidateId",
-        "CandidateAdapterContext",
-        "TEST_ONLY_candidateAdapterInternals",
-        "brandDiagnostics",
-        "diagnosticSelection",
-        "rankedPosition",
-      ];
-      const REQUIRED_CALL = "finalizeProductionBrandEvidence";
-      /** The one module allowed to define and use these — it IS the adapter. */
-      const ADAPTER_MODULE = "scripts/eval/lib/issue-149-candidate-adapter.ts";
-
-      function candidateApiOffences(source: string, filePath = "runner"): string[] {
-        if (filePath === ADAPTER_MODULE) return [];
-        const offences: string[] = [];
-        if (!new RegExp(`\\b${REQUIRED_CALL}\\s*\\(`).test(source)) {
-          offences.push(`does not invoke ${REQUIRED_CALL}`);
+      it("runs the real analyzer over whichever runner files exist", () => {
+        if (present.length === 0) {
+          // Nothing to analyze yet; the analyzer's own tests cover the rules.
+          expect(present).toEqual([]);
+          return;
         }
-        for (const symbol of PROHIBITED_CANDIDATE_SYMBOLS) {
-          // `finalizeProductionCandidate` is a prefix of the superseded array
-          // form, so the boundary excludes it explicitly.
-          const pattern =
-            symbol === "finalizeProductionCandidate"
-              ? /\bfinalizeProductionCandidate\b(?!Array)/
-              : new RegExp(`\\b${symbol}\\b`);
-          if (pattern.test(source)) offences.push(`references ${symbol}`);
-        }
-        return offences;
-      }
-
-      it("accepts exactly one debug-owned call per item", () => {
-        const good = `
-import { finalizeProductionBrandEvidence } from "../lib/issue-149-candidate-adapter";
-const { candidateRecords } = finalizeProductionBrandEvidence(detailed.value.debug, opaqueItemId);
-`;
-        expect(candidateApiOffences(good)).toEqual([]);
+        const report = analyzeStage2SourceClosure({
+          runnerEntryPath: present[0],
+          files: present.map((file) => ({
+            path: file,
+            contents: readFileSync(path.join(process.cwd(), file), "utf8"),
+          })),
+        });
+        expect(report.violations).toEqual([]);
       });
 
-      it("rejects the superseded complete-array call", () => {
-        const superseded = `
-import { finalizeProductionCandidateArray } from "../lib/issue-149-candidate-adapter";
-const records = finalizeProductionCandidateArray(diagnosticSelection, opaqueItemId);
-`;
-        const offences = candidateApiOffences(superseded);
-        expect(offences).toContain("references finalizeProductionCandidateArray");
-        expect(offences).toContain("references diagnosticSelection");
-        expect(offences).toContain("does not invoke finalizeProductionBrandEvidence");
-      });
-
-      it("rejects a runner that calls the diagnostic selector itself", () => {
-        const selecting = `
-import { selectBrandObservationWithCompleteFilterDiagnostics } from "@/pipeline/extractor/field-selection";
-const sel = selectBrandObservationWithCompleteFilterDiagnostics(debug.passes);
-`;
-        expect(candidateApiOffences(selecting)).toContain(
-          "references selectBrandObservationWithCompleteFilterDiagnostics",
+      it("delegates to one shared analyzer instead of a copied detector", () => {
+        // The previous version embedded `candidateApiOffences` in this test file,
+        // so the gate Job A would run and the gate the tests exercised were two
+        // different implementations.
+        const self = readFileSync(
+          path.join(process.cwd(), "src/fixtures/eval/issue-149-acquisition-isolation.test.ts"),
+          "utf8",
         );
+        expect(self).toContain("analyzeStage2SourceClosure");
+        // Assembled from fragments so this assertion cannot match its own source.
+        const copiedDetector = ["function ", "candidateApi", "Offences"].join("");
+        expect(self.includes(copiedDetector)).toBe(false);
       });
 
-      it("rejects a runner that touches brandDiagnostics.candidates", () => {
-        const projecting = `
-import { finalizeProductionBrandEvidence } from "../lib/issue-149-candidate-adapter";
-const kept = sel.brandDiagnostics.candidates.filter((c) => c.kept);
-finalizeProductionBrandEvidence(debug, opaqueItemId);
-`;
-        expect(candidateApiOffences(projecting)).toContain("references brandDiagnostics");
+      it("does not require every closure file to invoke the acquisition API", () => {
+        // A hashing helper is legitimate Stage 2 source and must pass.
+        const report = analyzeStage2SourceClosure({
+          runnerEntryPath: "runner.ts",
+          files: [
+            {
+              path: "runner.ts",
+              contents:
+                'import { acquireProductionBrandEvidence } from "./adapter";\nconst e = await acquireProductionBrandEvidence(input);',
+            },
+            { path: "hash.ts", contents: "export const sha = (b) => digest(b);" },
+          ],
+        });
+        expect(report.violations).toEqual([]);
       });
 
-      it("rejects a per-candidate finalization loop and a manual position", () => {
-        const loop = `
-import { finalizeCandidateRecord } from "../lib/issue-149-evidence-canonical";
-const records = candidates.map((c, i) => finalizeCandidateRecord(adapt(c, i)));
-`;
-        expect(candidateApiOffences(loop)).toContain("references finalizeCandidateRecord");
-        const manual = `
-import { finalizeProductionCandidate } from "../lib/issue-149-candidate-adapter";
-const record = finalizeProductionCandidate(candidate, { opaqueItemId, rankedPosition: 0 });
-`;
-        expect(candidateApiOffences(manual)).toContain("references finalizeProductionCandidate");
-        expect(candidateApiOffences(manual)).toContain("references rankedPosition");
-      });
-
-      it("binds any runner that exists", () => {
-        const offences: string[] = [];
-        for (const file of present) {
-          const source = readFileSync(path.join(process.cwd(), file), "utf8");
-          for (const offence of candidateApiOffences(source, file)) {
-            offences.push(`${file} ${offence}`);
-          }
-        }
-        expect(offences).toEqual([]);
-      });
-
-      it("catches a filtering helper the runner imports, not only the runner", () => {
-        // The runner regex is first-order by construction. Job A's transitive
-        // source-closure gate is what makes the property hold, and this is the
-        // detector it applies to EVERY Stage 2 acquisition source input.
-        const closure = [
-          {
-            path: "dist/acquisition/run.js",
-            contents:
-              'import { emit } from "./emit.js";\nconst records = emit(detailed.value.debug, opaqueItemId);',
-          },
-          {
-            path: "dist/acquisition/emit.js",
-            contents:
-              'import { finalizeProductionBrandEvidence } from "../lib/issue-149-candidate-adapter";\nexport const emit = (debug, id) => {\n  const sel = structuredClone(debug.finalSelections.brand);\n  sel.brandDiagnostics.candidates = sel.brandDiagnostics.candidates.filter((c) => c.kept);\n  return finalizeProductionBrandEvidence({ ...debug, finalSelections: { brand: sel } }, id);\n};',
-          },
-        ];
-        const offences = closure.flatMap((file) =>
-          candidateApiOffences(file.contents, file.path).map(
-            (offence) => `${file.path} ${offence}`,
-          ),
-        );
-        // The runner file alone contains no prohibited symbol; the closure does.
-        expect(candidateApiOffences(closure[0].contents, closure[0].path)).toEqual([
-          "does not invoke finalizeProductionBrandEvidence",
+      it("exports exactly the error class and the acquisition API", async () => {
+        // Authoritative: the real runtime namespace, not a source regex.
+        const namespace = await import("../../../scripts/eval/lib/issue-149-candidate-adapter");
+        expect(Object.keys(namespace).sort()).toEqual([
+          "CandidateAdapterError",
+          "acquireProductionBrandEvidence",
         ]);
-        expect(offences).toContain("dist/acquisition/emit.js references brandDiagnostics");
       });
 
-      it("passes a clean closure that hands the debug object straight through", () => {
-        const clean = [
-          {
-            path: "dist/acquisition/run.js",
-            contents:
-              'import { finalizeProductionBrandEvidence } from "../lib/issue-149-candidate-adapter";\nconst { candidateRecords } = finalizeProductionBrandEvidence(detailed.value.debug, opaqueItemId);',
-          },
-        ];
-        const offences = clean.flatMap((file) => candidateApiOffences(file.contents, file.path));
-        expect(offences).toEqual([]);
-      });
-
-      it("exempts the adapter module itself", () => {
-        const adapter = readFileSync(path.join(process.cwd(), ADAPTER_MODULE), "utf8");
-        expect(candidateApiOffences(adapter, ADAPTER_MODULE)).toEqual([]);
-        // ...and the adapter really does contain what it is exempt for.
-        expect(adapter).toContain("selectBrandObservationWithCompleteFilterDiagnostics");
-      });
-
-      it("does not claim the first-order regex proves the transitive property", () => {
+      it("does not claim the first-order smoke test proves the transitive property", () => {
         const isolation = read(path.join(ROOT, "acquisition-runtime-isolation-contract.json")) as {
           runtimeBundle: {
             dependencyClosureGate: {
               candidateEmissionClosureGate: {
                 ownedBy: string;
+                referenceAnalyzer: string;
                 scansEveryStage2AcquisitionSourceInput: boolean;
                 theDirectRunnerRegexIsNotTransitive: boolean;
-                prohibitedOutsideTheAdapterModule: string[];
+                onlyTheRunnerEntrypointMustInvokeTheApi: boolean;
                 requiredSoleEmissionCall: string;
               };
             };
@@ -404,25 +320,12 @@ const record = finalizeProductionCandidate(candidate, { opaqueItemId, rankedPosi
         };
         const gate = isolation.runtimeBundle.dependencyClosureGate.candidateEmissionClosureGate;
         expect(gate.ownedBy).toContain("Job A");
+        expect(gate.referenceAnalyzer).toBe("scripts/eval/lib/issue-149-stage2-source-closure.ts");
+        expect(existsSync(path.join(process.cwd(), gate.referenceAnalyzer))).toBe(true);
         expect(gate.scansEveryStage2AcquisitionSourceInput).toBe(true);
         expect(gate.theDirectRunnerRegexIsNotTransitive).toBe(true);
-        expect(gate.requiredSoleEmissionCall).toBe("finalizeProductionBrandEvidence");
-        for (const symbol of [
-          "selectBrandObservationWithCompleteFilterDiagnostics",
-          "finalizeProductionCandidateArray",
-          "caller construction or replacement of brandDiagnostics.candidates",
-        ]) {
-          expect(gate.prohibitedOutsideTheAdapterModule).toContain(symbol);
-        }
-      });
-
-      it("exports exactly the error class and the debug-owned API", async () => {
-        // Authoritative: the real runtime namespace, not a source regex.
-        const namespace = await import("../../../scripts/eval/lib/issue-149-candidate-adapter");
-        expect(Object.keys(namespace).sort()).toEqual([
-          "CandidateAdapterError",
-          "finalizeProductionBrandEvidence",
-        ]);
+        expect(gate.onlyTheRunnerEntrypointMustInvokeTheApi).toBe(true);
+        expect(gate.requiredSoleEmissionCall).toBe("acquireProductionBrandEvidence");
       });
     });
 

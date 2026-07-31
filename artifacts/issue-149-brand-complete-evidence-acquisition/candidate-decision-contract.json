@@ -2,7 +2,7 @@
   "artifact": "candidate-decision-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-10.md",
+  "amendedBy": "preregistration-amendment-11.md",
   "sourceOfTruthForShape": "BrandCandidateDiagnostic in src/pipeline/extractor/field-selection.ts at PR #220 merge commit 546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "entryPoint": "selectBrandObservationWithCompleteFilterDiagnostics",
@@ -90,7 +90,8 @@
     "PROVENANCE_DISAGREES_WITH_CANDIDATE": "a fact the diagnostic states twice disagrees with itself",
     "MALFORMED_OPAQUE_ITEM_ID_AT_ADAPTER": "the adapter received an opaqueItemId outside ^item-\\d{4}$",
     "KEPT_CANDIDATE_EVIDENCE_INCOMPLETE": "a kept candidate is missing score or ranking, or declares rankingEligible false",
-    "DEBUG_PASSES_ABSENT": "debug.passes is absent, not an array, or empty"
+    "DEBUG_PASSES_ABSENT": "debug.passes is absent, not an array, or empty",
+    "MALFORMED_ARTIFACT_REF": "input.artifactRef does not match ^item-\\d{4}$"
   },
   "storageFormat": {
     "layout": "one JSONL file per case per run, one JSON object per candidate decision",
@@ -260,48 +261,70 @@
       "RANKED_MEMBERSHIP_INCONSISTENT": "a decision without ranking semantics, a rankedPosition without a decision, a decision without a rankedPosition, a selected candidate away from position 0, position 0 held by a non-selected candidate, or a rejected candidate carrying any of the three",
       "RANKED_POSITION_PARITY_FAILURE": "positions not unique, not contiguous from 0, more than one selected candidate, or a non-empty ranked set without exactly one selected candidate"
     },
-    "arrayLevelInvariantsEnforcedIn": "finalizeProductionCandidateArray \u2014 a single-record validator cannot prove uniqueness or contiguity, and claiming it could would be an overclaim",
+    "arrayLevelInvariantsEnforcedIn": "the module-private array-invariant check, reached only through acquireProductionBrandEvidence \u2014 a single-record validator cannot prove uniqueness or contiguity, and claiming it could would be an overclaim",
     "priorDefect": "An earlier adapter took every diagnostic carrying a ranking, sorted by rankingScore descending, and gave them all positions. That assigned fake positions to deduplicated candidates and produced an order production never produced."
   },
   "candidateEmissionApi": {
     "module": "scripts/eval/lib/issue-149-candidate-adapter.ts",
-    "function": "finalizeProductionBrandEvidence",
-    "signature": "finalizeProductionBrandEvidence(debug, opaqueItemId)",
-    "firstArgument": "the complete ExtractionDebug returned by extractLabelEvidenceDetailed (src/pipeline/extractor/extractor.ts#ExtractionDebug)",
-    "returns": "{ diagnosticSelection, candidateRecords } \u2014 both derived internally",
+    "function": "acquireProductionBrandEvidence",
+    "signature": "acquireProductionBrandEvidence(input: ExtractionInput): Promise<Result<ProductionBrandEvidenceSuccess, ExtractionError>>",
+    "firstArgument": "the frozen ExtractionInput. NOT ExtractionDebug, NOT a FieldSelection, NOT a candidate array.",
+    "returnsOnSuccess": [
+      "detailed: DetailedExtractionResult",
+      "diagnosticSelection: FieldSelection",
+      "candidateRecords: CandidateEvidenceRecord[]"
+    ],
+    "returnsOnFailure": "the extractor's typed ExtractionError, unchanged, with no diagnostic selection and no candidate record",
     "theRunnerSuppliesNo": [
-      "candidate array",
+      "ExtractionDebug",
       "FieldSelection",
-      "diagnosticSelection",
-      "Brand diagnostics object",
-      "rankedPosition"
+      "candidate array",
+      "rankedPosition",
+      "a second opaque identifier"
     ],
-    "theRunnerNeverCalls": "selectBrandObservationWithCompleteFilterDiagnostics",
+    "theRunnerNeverCalls": [
+      "extractLabelEvidenceDetailed",
+      "selectBrandObservationWithCompleteFilterDiagnostics"
+    ],
+    "opaqueIdentitySource": "input.artifactRef \u2014 there is no second identifier that could disagree with it",
     "internalSteps": [
-      "validate opaqueItemId",
-      "require debug.passes to be a non-empty ordered array",
-      "reconstruct the exact production Brand pass set: primary OBSERVED ? [debug.passes[0]] : debug.passes",
+      "validate input.artifactRef matches ^item-\\\\d{4}$, before any extractor invocation",
+      "call extractLabelEvidenceDetailed(input) exactly once",
+      "return the extractor's typed failure unchanged when it returns !ok",
+      "keep DetailedExtractionResult and ExtractionDebug private until that call succeeds",
+      "reconstruct the exact Brand pass set: primary OBSERVED ? [debug.passes[0]] : debug.passes",
       "invoke selectBrandObservationWithCompleteFilterDiagnostics internally",
-      "perform the complete parity assertion internally against debug.finalSelections.brand",
-      "derive candidates only from the internally created diagnosticSelection.brandDiagnostics.candidates",
-      "finalize the complete candidate population",
-      "assert the emitted count equals the internally derived diagnostic count"
+      "perform full-object parity internally against debug.finalSelections.brand",
+      "finalize the complete internally derived candidate population",
+      "return the original detailed result, the diagnostic selection and the candidate records together"
     ],
+    "extractorInvokedExactlyOncePerItem": true,
+    "noRetryPath": true,
+    "runnerPersistsPassEvidenceFrom": "evidence.value.detailed.debug.passes",
+    "runnerPersistsCandidateEvidenceFrom": "evidence.value.candidateRecords",
     "supersededRoutes": [
       "a bare candidate array (Amendment 8 and earlier)",
-      "a caller-supplied FieldSelection (Amendment 9): a filtered population could be wrapped in a freshly constructed selection and accepted \u2014 the Amendment 9 tests themselves demonstrated the bypass"
+      "a caller-supplied FieldSelection (Amendment 9): a filtered population could be wrapped in a freshly constructed selection",
+      "a caller-supplied ExtractionDebug (Amendment 10): a helper could filter or reorder the passes and reconstruct matching primary and final selections"
     ],
-    "whyDebugOwned": "ExtractionDebug already exposes the ordered passes, the primary selections and the authoritative final selections. Taking it closes the derivation structurally: there is no caller-reachable point at which the population can be filtered, projected or replaced.",
-    "runtimeExportSurface": ["CandidateAdapterError", "finalizeProductionBrandEvidence"],
+    "whyExtractorOwned": "Each earlier signature closed the route it named and left an adjacent one open. Owning the extractor call removes the class: there is no caller-supplied evidence at all, and the runner never holds an intermediate it could alter.",
+    "runtimeExportSurface": ["CandidateAdapterError", "acquireProductionBrandEvidence"],
     "runtimeExportSurfaceVerifiedBy": "importing the module namespace and inspecting its actual runtime own keys, not a source regex",
     "haltCodes": {
-      "MALFORMED_OPAQUE_ITEM_ID": "opaqueItemId does not match ^item-\\\\d{4}$",
-      "DEBUG_PASSES_ABSENT": "debug.passes is absent, not an array, or empty",
-      "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE": "the internally derived selection differs from debug.finalSelections.brand once only filterChecks and activeRejectionReasons are removed",
+      "MALFORMED_ARTIFACT_REF": "input.artifactRef does not match ^item-\\\\d{4}$; raised before the extractor is invoked",
+      "DEBUG_PASSES_ABSENT": "the extractor's debug carries no ordered pass array",
+      "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE": "the internally derived selection differs from debug.finalSelections.brand once only the two complete-diagnostics fields are removed",
       "COMPLETE_DIAGNOSTICS_ABSENT": "the internally derived selection carries no brandDiagnostics.candidates array",
-      "CANDIDATE_EVIDENCE_TRUNCATED": "the emitted record count does not equal the internally derived diagnostic candidate count"
+      "CANDIDATE_EVIDENCE_TRUNCATED": "the emitted record count does not equal the internally derived diagnostic candidate count",
+      "RANKED_MEMBERSHIP_INCONSISTENT": "decision, ranking and rankedPosition are mutually inconsistent, or a kept population retains no ranked survivor",
+      "RANKED_POSITION_PARITY_FAILURE": "ranked positions are not unique or contiguous, or there is not exactly one selected candidate"
     },
-    "enforcedBy": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts and src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts"
+    "enforcedBy": [
+      "src/fixtures/eval/issue-149-acquisition-orchestration.test.ts",
+      "src/fixtures/eval/issue-149-ranked-invariants.test.ts",
+      "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts",
+      "src/fixtures/eval/issue-149-stage2-source-closure.test.ts"
+    ]
   },
   "keptCandidateEvidence": {
     "everyKeptCandidate": [
@@ -342,6 +365,7 @@
     ],
     "priorGap": "The array adapter derived membership from candidates carrying a decision and checked selection only when that set was non-empty. If every kept candidate's decision disappeared, the ranked set was empty and every record still passed.",
     "haltCode": "RANKED_MEMBERSHIP_INCONSISTENT",
-    "enforcedIn": "finalizeProductionCandidateArray"
+    "enforcedIn": "the internal array-invariant check reached through acquireProductionBrandEvidence",
+    "reachedPastParityBy": "src/fixtures/eval/issue-149-ranked-invariants.test.ts"
   }
 }
