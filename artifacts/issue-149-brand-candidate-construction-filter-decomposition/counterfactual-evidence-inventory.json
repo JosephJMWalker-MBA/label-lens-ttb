@@ -1,0 +1,50 @@
+{
+  "artifact": "counterfactual-evidence-inventory",
+  "experimentId": "issue-149-brand-candidate-construction-filter-decomposition",
+  "question": "Can the COST of removing exactly one filter rule be computed from committed evidence across all 115 cases?",
+  "requiredEvidence": [
+    {
+      "requirement": "all candidate windows or candidate objects considered, including non-truth candidates",
+      "available": false,
+      "why": "The committed 115-case artifact stores rankedCandidates = brandCandidateDecisions.filter(kept && ranking).slice(0, 6). Rejected candidates are not committed at all, and kept candidates are capped at six."
+    },
+    {
+      "requirement": "all rejection reasons for those candidates",
+      "available": false,
+      "why": "Only truthFilterReasons is committed, which is the reason set attached to REJECTED candidates that carried the truth. No rejection reason is committed for any non-truth candidate."
+    },
+    {
+      "requirement": "values and provenance for all candidates",
+      "available": false,
+      "why": "Available for up to six kept candidates per case; absent for every rejected candidate."
+    },
+    {
+      "requirement": "ranking inputs to determine whether newly admitted candidates could enter top 3, top 1 or selection",
+      "available": false,
+      "why": "Ranking inputs are committed only for candidates that were already kept and ranked. A newly admitted candidate has no committed prominence, score components or ordering mode, so its rank cannot be computed without re-running the pipeline."
+    },
+    {
+      "requirement": "evidence for all 10 Brand-absent cases",
+      "available": false,
+      "why": "The same limitation applies: their rejected candidates and rejection reasons are not committed, so newly admitted candidates in absent cases cannot be enumerated."
+    },
+    {
+      "requirement": "evidence for all currently correct and correctly withheld cases",
+      "available": false,
+      "why": "Their kept candidates are committed, but displacement requires knowing which currently-rejected candidates would newly compete, which is not committed."
+    }
+  ],
+  "priorSimulationArtifactsChecked": {
+    "artifacts/brand-evidence-path-diagnosis/e1a-too-many-words-simulation": {
+      "reusableForThisCostAnalysis": false,
+      "why": "Its filter-results.json records the rejection-reason distribution of sub-spans generated UNDER the E1a treatment, not the unmodified pipeline's full candidate decision list. It cannot answer what removing producer-line, non-brand-keyword, domain-like or sentence-fragment would admit."
+    },
+    "artifacts/brand-evidence-path-diagnosis/e1b-prominence-gated-simulation": {
+      "reusableForThisCostAnalysis": false,
+      "why": "Same scope limitation, and Phase 2 was never run."
+    }
+  },
+  "completeCostEvidenceAvailable": false,
+  "consequence": "The counterfactual cost analysis is not performed and counterfactual-results.json is deliberately absent. No relaxation is described as safe, and no benefit figure is presented without its cost.",
+  "ocrRerunRequestedToFillGap": false
+}

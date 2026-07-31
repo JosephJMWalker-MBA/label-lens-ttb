@@ -1,0 +1,83 @@
+{
+  "artifact": "decision",
+  "experimentId": "issue-149-brand-candidate-construction-filter-decomposition",
+  "issue": 149,
+  "readOnly": true,
+  "zeroOcr": true,
+  "evaluationOnly": true,
+  "stageConclusion": "FILTER_REJECTION_DOMINATES",
+  "stageConclusionSeparateFromCostConclusion": true,
+  "stageConclusionEvidence": {
+    "byHistoricalCases": [
+      {
+        "stage": "FILTER_REJECTION",
+        "cases": 41
+      },
+      {
+        "stage": "CANDIDATE_FORMATION_LOSS",
+        "cases": 2
+      },
+      {
+        "stage": "LINE_RECONSTRUCTION_LOSS",
+        "cases": 1
+      }
+    ],
+    "byDistinctBrandIdentity": [
+      {
+        "stage": "FILTER_REJECTION",
+        "brandIdentities": 31
+      },
+      {
+        "stage": "CANDIDATE_FORMATION_LOSS",
+        "brandIdentities": 2
+      },
+      {
+        "stage": "LINE_RECONSTRUCTION_LOSS",
+        "brandIdentities": 1
+      }
+    ],
+    "dominanceRule": "The leader must lead on BOTH historical cases and distinct brand identities by at least 1.25x.",
+    "leaderByCases": "FILTER_REJECTION",
+    "leaderByIdentity": "FILTER_REJECTION",
+    "sameLeaderOnBothUnits": true,
+    "marginSatisfiedByCases": true,
+    "marginSatisfiedByIdentity": true,
+    "contradictoryOrUnattributableCases": 0,
+    "insufficientStageEvidenceThreshold": "more than 10% of the frozen 44"
+  },
+  "costConclusion": "INSUFFICIENT_COST_EVIDENCE",
+  "costConclusionEvidence": {
+    "completeCostEvidenceAvailable": false,
+    "missing": [
+      "all candidate windows or candidate objects considered, including non-truth candidates",
+      "all rejection reasons for those candidates",
+      "values and provenance for all candidates",
+      "ranking inputs to determine whether newly admitted candidates could enter top 3, top 1 or selection",
+      "evidence for all 10 Brand-absent cases",
+      "evidence for all currently correct and correctly withheld cases"
+    ],
+    "counterfactualResultsArtifactWritten": false,
+    "anyRelaxationDescribedAsSafe": false,
+    "ocrRerunRequested": false
+  },
+  "filterRelaxationImplemented": false,
+  "productionChanged": false,
+  "filtersModified": false,
+  "truthChanged": false,
+  "normalizationChanged": false,
+  "thresholdsChanged": false,
+  "corpusRegenerated": false,
+  "pr195Touched": false,
+  "pr214Reinterpreted": false,
+  "pr216Reinterpreted": false,
+  "pr217Reinterpreted": false,
+  "authorizes": [],
+  "doesNotAuthorize": [
+    "any production code change",
+    "relaxing or modifying any filter",
+    "any candidate-construction, ranking, selection or authority change",
+    "any threshold or state-semantics change",
+    "implementing any treatment",
+    "describing any relaxation as safe"
+  ]
+}

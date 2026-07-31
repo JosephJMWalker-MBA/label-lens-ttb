@@ -1,0 +1,33 @@
+{
+  "artifact": "stage-summary",
+  "experimentId": "issue-149-brand-candidate-construction-filter-decomposition",
+  "frozenCases": 44,
+  "byHistoricalCases": {
+    "EVIDENCE_CONTRADICTION": 0,
+    "LINE_RECONSTRUCTION_LOSS": 1,
+    "CANDIDATE_FORMATION_LOSS": 2,
+    "FILTER_REJECTION": 41,
+    "UNATTRIBUTABLE_WITH_COMMITTED_EVIDENCE": 0
+  },
+  "byDistinctBrandIdentity": {
+    "EVIDENCE_CONTRADICTION": 0,
+    "LINE_RECONSTRUCTION_LOSS": 1,
+    "CANDIDATE_FORMATION_LOSS": 2,
+    "FILTER_REJECTION": 31,
+    "UNATTRIBUTABLE_WITH_COMMITTED_EVIDENCE": 0
+  },
+  "percentOfFrozen": {
+    "EVIDENCE_CONTRADICTION": 0,
+    "LINE_RECONSTRUCTION_LOSS": 2.3,
+    "CANDIDATE_FORMATION_LOSS": 4.5,
+    "FILTER_REJECTION": 93.2,
+    "UNATTRIBUTABLE_WITH_COMMITTED_EVIDENCE": 0
+  },
+  "independentLineVerification": {
+    "method": "Each case's retained reconstructed lines were re-tested against the governed normalization, transcribed from src/fixtures/eval/metrics.ts.",
+    "asymmetryNote": "Finding the truth confirms truthOnReconstructedLine. Not finding it cannot refute the flag, because the committed line list is capped at 12. Disagreement on a possibly-truncated list is recorded as unverifiable, not as a contradiction.",
+    "independentlyConfirmed": 38,
+    "unverifiable": 5,
+    "contradictions": 0
+  }
+}

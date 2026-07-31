@@ -1,0 +1,66 @@
+{
+  "artifact": "sole-blocker-analysis",
+  "experimentId": "issue-149-brand-candidate-construction-filter-decomposition",
+  "definition": "A rule is a DIRECT_SOLE_BLOCKER for a case only when it is the only recorded reason preventing that truth-bearing candidate from being kept.",
+  "coBlockerRule": "A reason occurring alongside another blocker is not credited with a recoverable case under a one-rule treatment.",
+  "noDoubleCounting": "No case is credited as recoverable under more than one independent one-rule relaxation; each FILTER_REJECTION case belongs to exactly one reason combination.",
+  "rules": [
+    {
+      "filterReason": "too-many-words",
+      "directSoleBlockerCases": 17,
+      "directSoleBlockerDistinctBrandIdentities": 14,
+      "coBlockerCases": 6,
+      "casesStillBlockedIfOnlyThisRuleRemoved": 6,
+      "meetsThreeCaseThreeIdentityBar": true,
+      "costEvidenceAvailable": false,
+      "eligibleForBoundedCandidate": false,
+      "eligibilityNote": "Meeting the upside bar is necessary but not sufficient. Every rule fails eligibility here because the cost side cannot be computed from committed evidence."
+    },
+    {
+      "filterReason": "producer-line",
+      "directSoleBlockerCases": 6,
+      "directSoleBlockerDistinctBrandIdentities": 3,
+      "coBlockerCases": 3,
+      "casesStillBlockedIfOnlyThisRuleRemoved": 3,
+      "meetsThreeCaseThreeIdentityBar": true,
+      "costEvidenceAvailable": false,
+      "eligibleForBoundedCandidate": false,
+      "eligibilityNote": "Meeting the upside bar is necessary but not sufficient. Every rule fails eligibility here because the cost side cannot be computed from committed evidence."
+    },
+    {
+      "filterReason": "non-brand-keyword",
+      "directSoleBlockerCases": 4,
+      "directSoleBlockerDistinctBrandIdentities": 3,
+      "coBlockerCases": 2,
+      "casesStillBlockedIfOnlyThisRuleRemoved": 2,
+      "meetsThreeCaseThreeIdentityBar": true,
+      "costEvidenceAvailable": false,
+      "eligibleForBoundedCandidate": false,
+      "eligibilityNote": "Meeting the upside bar is necessary but not sufficient. Every rule fails eligibility here because the cost side cannot be computed from committed evidence."
+    },
+    {
+      "filterReason": "domain-like",
+      "directSoleBlockerCases": 3,
+      "directSoleBlockerDistinctBrandIdentities": 3,
+      "coBlockerCases": 5,
+      "casesStillBlockedIfOnlyThisRuleRemoved": 5,
+      "meetsThreeCaseThreeIdentityBar": true,
+      "costEvidenceAvailable": false,
+      "eligibleForBoundedCandidate": false,
+      "eligibilityNote": "Meeting the upside bar is necessary but not sufficient. Every rule fails eligibility here because the cost side cannot be computed from committed evidence."
+    },
+    {
+      "filterReason": "sentence-fragment",
+      "directSoleBlockerCases": 2,
+      "directSoleBlockerDistinctBrandIdentities": 2,
+      "coBlockerCases": 3,
+      "casesStillBlockedIfOnlyThisRuleRemoved": 3,
+      "meetsThreeCaseThreeIdentityBar": false,
+      "costEvidenceAvailable": false,
+      "eligibleForBoundedCandidate": false,
+      "eligibilityNote": "Meeting the upside bar is necessary but not sufficient. Every rule fails eligibility here because the cost side cannot be computed from committed evidence."
+    }
+  ],
+  "inconsistentReasonCases": [],
+  "inconsistentReasonNote": "A recorded reason is treated as inconsistent only when the retained evidence is complete and disagrees with it. None met that bar."
+}

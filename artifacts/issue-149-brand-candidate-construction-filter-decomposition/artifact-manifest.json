@@ -1,0 +1,100 @@
+{
+  "artifact": "artifact-manifest",
+  "experimentId": "issue-149-brand-candidate-construction-filter-decomposition",
+  "issue": 149,
+  "readOnly": true,
+  "zeroOcr": true,
+  "productionChanged": false,
+  "stageConclusion": "FILTER_REJECTION_DOMINATES",
+  "costConclusion": "INSUFFICIENT_COST_EVIDENCE",
+  "counterfactualResultsPresent": false,
+  "counterfactualResultsAbsentReason": "INSUFFICIENT_COST_EVIDENCE",
+  "fileCount": 17,
+  "files": [
+    {
+      "path": "analysis-summary.json",
+      "byteSize": 2194,
+      "sha256": "e49b86ea04cd8714fbe0e5093e69f80564c9fc18c1e9949dab469a96f5e014ea"
+    },
+    {
+      "path": "benefit-cost-summary.json",
+      "byteSize": 3373,
+      "sha256": "218c28f87ada4d9f74e1fa64f83dbbc4ebb23810dd719f0ff3ffddeaae50c703"
+    },
+    {
+      "path": "commands.sh",
+      "byteSize": 947,
+      "sha256": "6e5c3894875e01aeb82e9d9cc2f84c4f29b5ad8e88d340d1c80ea483882e1870"
+    },
+    {
+      "path": "counterfactual-evidence-inventory.json",
+      "byteSize": 3119,
+      "sha256": "d5925276bcd6c20178561faaa31fb0dae8b55be56952e59ed1c9cc5235a33fce"
+    },
+    {
+      "path": "decision.json",
+      "byteSize": 2695,
+      "sha256": "95b05eee52074683c837cd971c72d459c8ec40aa817f928952416c8c11a0703b"
+    },
+    {
+      "path": "evidence-availability-preflight.md",
+      "byteSize": 6394,
+      "sha256": "b3273c05a130161e433b70b4fc9c66c6bc391ab6a1964fd133c73e050abd2bdd"
+    },
+    {
+      "path": "filter-reason-combinations.json",
+      "byteSize": 3477,
+      "sha256": "d80a8aaee77e913fb6071360cfe62f6c6d3d11001fae362e9a41b06bae88d249"
+    },
+    {
+      "path": "filter-reason-definitions.json",
+      "byteSize": 2009,
+      "sha256": "9f0a7d94f974f10ae688d8b31c663536d4f24bd6c80e0984b94e3b90b6e5d235"
+    },
+    {
+      "path": "filter-reason-frequency.json",
+      "byteSize": 5266,
+      "sha256": "d2a6defd148118d52e7528ef166dfeee86b2705b4465d0a8907f970bd65110bc"
+    },
+    {
+      "path": "git-sha.txt",
+      "byteSize": 202,
+      "sha256": "09c20e2995886369019532e24436a08447e8dc9d0ec942b51ef83cb38dba1079"
+    },
+    {
+      "path": "independence-report.json",
+      "byteSize": 1531,
+      "sha256": "05e61e5d484bac525276678fb04623b0b9088678663544d45c887efa374a612d"
+    },
+    {
+      "path": "limitations.md",
+      "byteSize": 4706,
+      "sha256": "f3a1d9fbed6a06e0a487a44e6d312cffa42a17f4662bbc9c51360725218c6e59"
+    },
+    {
+      "path": "per-case-stage-attribution.json",
+      "byteSize": 97245,
+      "sha256": "6de2dcd21f475be57cd65f12837c3709bc941f91212fb33794f568881b58eaf8"
+    },
+    {
+      "path": "population-freeze.json",
+      "byteSize": 1889,
+      "sha256": "0206c72bd049979338cafa2f69bf1dff8b37f1f1d23e4c4950a06556db1b6ab2"
+    },
+    {
+      "path": "sole-blocker-analysis.json",
+      "byteSize": 3468,
+      "sha256": "bfe8d3f401347bfdef0f819d9fa490be409e0a0cfe00693f5c4c091882e0c2d3"
+    },
+    {
+      "path": "stage-classification-definitions.json",
+      "byteSize": 3038,
+      "sha256": "751a47242579bb8c77ec8710b188c002057d0b4c9b7937d5c999aa97687e99b4"
+    },
+    {
+      "path": "stage-summary.json",
+      "byteSize": 1310,
+      "sha256": "5470da3f03b785e45f58f8d882f66945f59e869fcc0889b94e9f9674f280f268"
+    }
+  ]
+}

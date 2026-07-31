@@ -1,0 +1,128 @@
+{
+  "artifact": "filter-reason-frequency",
+  "experimentId": "issue-149-brand-candidate-construction-filter-decomposition",
+  "filterRejectionCases": 41,
+  "distinctFilterReasons": 5,
+  "reasons": [
+    {
+      "filterReason": "too-many-words",
+      "historicalCases": 23,
+      "distinctBrandIdentities": 19,
+      "soleBlockerCases": 17,
+      "soleBlockerDistinctBrandIdentities": 14,
+      "coBlockerCases": 6,
+      "casesStillBlockedIfOnlyThisReasonRemoved": 6,
+      "casesStillBlockedList": [
+        "approved-wine-008",
+        "approved-wine-009",
+        "patricia-green-cellars",
+        "approved-wine-037",
+        "approved-wine-051",
+        "approved-wine-078"
+      ],
+      "isDirectSoleBlockerForCases": [
+        "approved-wine-006",
+        "approved-wine-012",
+        "approved-wine-016",
+        "approved-wine-018",
+        "approved-wine-024",
+        "approved-wine-038",
+        "approved-wine-042",
+        "approved-wine-045",
+        "approved-wine-048",
+        "approved-wine-052",
+        "approved-wine-076",
+        "approved-wine-093",
+        "approved-wine-094",
+        "approved-wine-099",
+        "approved-wine-103",
+        "approved-wine-110",
+        "m-cellars-baseline"
+      ],
+      "oneRuleRecoverableCases": 17,
+      "oneRuleRecoverableNote": "Counted only where this reason is the sole recorded blocker. A reason appearing beside another blocker is not credited with a recoverable case, and no case is credited to more than one one-rule relaxation."
+    },
+    {
+      "filterReason": "producer-line",
+      "historicalCases": 9,
+      "distinctBrandIdentities": 5,
+      "soleBlockerCases": 6,
+      "soleBlockerDistinctBrandIdentities": 3,
+      "coBlockerCases": 3,
+      "casesStillBlockedIfOnlyThisReasonRemoved": 3,
+      "casesStillBlockedList": ["patricia-green-cellars", "approved-wine-088", "approved-wine-089"],
+      "isDirectSoleBlockerForCases": [
+        "approved-wine-063",
+        "approved-wine-064",
+        "approved-wine-065",
+        "approved-wine-066",
+        "approved-wine-067",
+        "wine-multi-artifact-08"
+      ],
+      "oneRuleRecoverableCases": 6,
+      "oneRuleRecoverableNote": "Counted only where this reason is the sole recorded blocker. A reason appearing beside another blocker is not credited with a recoverable case, and no case is credited to more than one one-rule relaxation."
+    },
+    {
+      "filterReason": "non-brand-keyword",
+      "historicalCases": 6,
+      "distinctBrandIdentities": 5,
+      "soleBlockerCases": 4,
+      "soleBlockerDistinctBrandIdentities": 3,
+      "coBlockerCases": 2,
+      "casesStillBlockedIfOnlyThisReasonRemoved": 2,
+      "casesStillBlockedList": ["approved-wine-051", "approved-wine-078"],
+      "isDirectSoleBlockerForCases": [
+        "luigi-giovanni-live",
+        "alfredos-wine",
+        "approved-wine-105",
+        "approved-wine-106"
+      ],
+      "oneRuleRecoverableCases": 4,
+      "oneRuleRecoverableNote": "Counted only where this reason is the sole recorded blocker. A reason appearing beside another blocker is not credited with a recoverable case, and no case is credited to more than one one-rule relaxation."
+    },
+    {
+      "filterReason": "domain-like",
+      "historicalCases": 8,
+      "distinctBrandIdentities": 6,
+      "soleBlockerCases": 3,
+      "soleBlockerDistinctBrandIdentities": 3,
+      "coBlockerCases": 5,
+      "casesStillBlockedIfOnlyThisReasonRemoved": 5,
+      "casesStillBlockedList": [
+        "approved-wine-009",
+        "patricia-green-cellars",
+        "approved-wine-084",
+        "approved-wine-088",
+        "approved-wine-089"
+      ],
+      "isDirectSoleBlockerForCases": [
+        "approved-wine-072",
+        "approved-wine-090",
+        "wine-multi-artifact-05"
+      ],
+      "oneRuleRecoverableCases": 3,
+      "oneRuleRecoverableNote": "Counted only where this reason is the sole recorded blocker. A reason appearing beside another blocker is not credited with a recoverable case, and no case is credited to more than one one-rule relaxation."
+    },
+    {
+      "filterReason": "sentence-fragment",
+      "historicalCases": 5,
+      "distinctBrandIdentities": 5,
+      "soleBlockerCases": 2,
+      "soleBlockerDistinctBrandIdentities": 2,
+      "coBlockerCases": 3,
+      "casesStillBlockedIfOnlyThisReasonRemoved": 3,
+      "casesStillBlockedList": ["approved-wine-008", "approved-wine-037", "approved-wine-084"],
+      "isDirectSoleBlockerForCases": ["approved-wine-046", "amuninni-ferracane"],
+      "oneRuleRecoverableCases": 2,
+      "oneRuleRecoverableNote": "Counted only where this reason is the sole recorded blocker. A reason appearing beside another blocker is not credited with a recoverable case, and no case is credited to more than one one-rule relaxation."
+    }
+  ],
+  "otherPipelineFilterReasonsNeverBlockingTruthHere": [
+    "low-information-fragment",
+    "no-letters-or-too-short",
+    "location-or-appellation",
+    "generic-product-language",
+    "varietal-or-designation"
+  ],
+  "otherReasonsNote": "These rules exist in the pipeline — they appear in the E1a simulation's reason distribution — but no case in this frozen set records them as a truth blocker. Their absence here is not evidence that they never block truth elsewhere."
+}

@@ -1,0 +1,24 @@
+{
+  "artifact": "filter-reason-definitions",
+  "experimentId": "issue-149-brand-candidate-construction-filter-decomposition",
+  "source": "reasons recorded against rejected truth-bearing candidates in artifacts/brand-evidence-path-diagnosis/cases.json, produced by the unmodified production filter ladder",
+  "reasonsObservedAsTruthBlockers": [
+    { "reason": "too-many-words", "observedSoleBlockerCases": 17, "observedTotalCases": 23 },
+    { "reason": "producer-line", "observedSoleBlockerCases": 6, "observedTotalCases": 9 },
+    { "reason": "non-brand-keyword", "observedSoleBlockerCases": 4, "observedTotalCases": 6 },
+    { "reason": "domain-like", "observedSoleBlockerCases": 3, "observedTotalCases": 8 },
+    { "reason": "sentence-fragment", "observedSoleBlockerCases": 2, "observedTotalCases": 5 }
+  ],
+  "reasonsPresentInThePipelineButNotObservedAsTruthBlockersHere": [
+    "low-information-fragment",
+    "no-letters-or-too-short",
+    "location-or-appellation",
+    "generic-product-language",
+    "varietal-or-designation"
+  ],
+  "notObservedNote": "These appear in the E1a simulation's reason distribution, so they exist in the ladder. No case in this frozen set records them as blocking truth. That is not evidence that they never block truth on other corpora.",
+  "definitionsNotAuthoredHere": "This artifact records which reasons were observed and how often. It does not restate or reinterpret what each rule means in production code, because this sprint reads the filters and changes nothing.",
+  "soleBlockerDefinition": "A rule is a DIRECT_SOLE_BLOCKER for a case only when it is the only recorded reason preventing that truth-bearing candidate from being kept.",
+  "coBlockerRule": "A reason occurring alongside another blocker is not credited with a recoverable case under a one-rule treatment.",
+  "doubleCountingRule": "Each FILTER_REJECTION case belongs to exactly one reason combination, so no case is credited as recoverable under more than one independent one-rule relaxation."
+}

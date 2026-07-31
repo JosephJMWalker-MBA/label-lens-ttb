@@ -1,0 +1,104 @@
+{
+  "artifact": "analysis-summary",
+  "experimentId": "issue-149-brand-candidate-construction-filter-decomposition",
+  "stageConclusion": "FILTER_REJECTION_DOMINATES",
+  "costConclusion": "INSUFFICIENT_COST_EVIDENCE",
+  "frozenCases": 44,
+  "stageCounts": {
+    "EVIDENCE_CONTRADICTION": 0,
+    "LINE_RECONSTRUCTION_LOSS": 1,
+    "CANDIDATE_FORMATION_LOSS": 2,
+    "FILTER_REJECTION": 41,
+    "UNATTRIBUTABLE_WITH_COMMITTED_EVIDENCE": 0
+  },
+  "stageIdentities": {
+    "EVIDENCE_CONTRADICTION": 0,
+    "LINE_RECONSTRUCTION_LOSS": 1,
+    "CANDIDATE_FORMATION_LOSS": 2,
+    "FILTER_REJECTION": 31,
+    "UNATTRIBUTABLE_WITH_COMMITTED_EVIDENCE": 0
+  },
+  "soleBlockers": [
+    {
+      "reason": "too-many-words",
+      "sole": 17,
+      "soleIdentities": 14,
+      "total": 23,
+      "co": 6
+    },
+    {
+      "reason": "producer-line",
+      "sole": 6,
+      "soleIdentities": 3,
+      "total": 9,
+      "co": 3
+    },
+    {
+      "reason": "non-brand-keyword",
+      "sole": 4,
+      "soleIdentities": 3,
+      "total": 6,
+      "co": 2
+    },
+    {
+      "reason": "domain-like",
+      "sole": 3,
+      "soleIdentities": 3,
+      "total": 8,
+      "co": 5
+    },
+    {
+      "reason": "sentence-fragment",
+      "sole": 2,
+      "soleIdentities": 2,
+      "total": 5,
+      "co": 3
+    }
+  ],
+  "combinations": [
+    {
+      "combination": "too-many-words",
+      "cases": 17
+    },
+    {
+      "combination": "producer-line",
+      "cases": 6
+    },
+    {
+      "combination": "non-brand-keyword",
+      "cases": 4
+    },
+    {
+      "combination": "domain-like",
+      "cases": 3
+    },
+    {
+      "combination": "sentence-fragment + too-many-words",
+      "cases": 2
+    },
+    {
+      "combination": "sentence-fragment",
+      "cases": 2
+    },
+    {
+      "combination": "non-brand-keyword + too-many-words",
+      "cases": 2
+    },
+    {
+      "combination": "domain-like + producer-line",
+      "cases": 2
+    },
+    {
+      "combination": "domain-like + too-many-words",
+      "cases": 1
+    },
+    {
+      "combination": "domain-like + producer-line + too-many-words",
+      "cases": 1
+    },
+    {
+      "combination": "domain-like + sentence-fragment",
+      "cases": 1
+    }
+  ]
+}
