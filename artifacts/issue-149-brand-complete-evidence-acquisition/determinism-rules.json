@@ -3,8 +3,14 @@
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
   "comparisonLevels": [
-    { "level": "source image", "compare": "sourceImageSha256 and byte size" },
-    { "level": "crop pixels", "compare": "cropPixelSha256 per pass" },
+    {
+      "level": "source image",
+      "compare": "sourceImageSha256 and byte size"
+    },
+    {
+      "level": "crop pixels",
+      "compare": "cropPixelSha256 per pass"
+    },
     {
       "level": "OCR words",
       "compare": "ordered word records: text, rawConfidence, bbox, originalGeometry"
@@ -15,15 +21,32 @@
     },
     {
       "level": "candidate decisions",
-      "compare": "the complete ordered candidate array, field by field, including rejected candidates and their single recorded filterReason"
+      "compare": "the complete ordered candidate array, field by field, including rejected candidates, the authoritative filterReason, and the COMPLETE filterChecks and activeRejectionReasons arrays compared element by element"
     },
     {
       "level": "ranking order",
       "compare": "position in the complete ranked list for every ranked candidate"
     },
-    { "level": "selected value", "compare": "final selected value per case" },
-    { "level": "authority state", "compare": "final state and abstention reason per case" },
-    { "level": "fingerprints", "compare": "per-pass and per-case output fingerprints" }
+    {
+      "level": "selected value",
+      "compare": "final selected value per case"
+    },
+    {
+      "level": "authority state",
+      "compare": "final state and abstention reason per case"
+    },
+    {
+      "level": "fingerprints",
+      "compare": "per-pass and per-case output fingerprints"
+    },
+    {
+      "level": "candidate identity",
+      "compare": "candidateOrdinal, completeCandidateArrayLength, canonicalRecordSha256 and stableCandidateId for every candidate"
+    },
+    {
+      "level": "diagnostic parity",
+      "compare": "that the BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE assertion passed for every case in both runs"
+    }
   ],
   "everyDifferenceReported": true,
   "rerunOnDifference": false,
@@ -56,7 +79,11 @@
       "verdict": "TRUTH_ISOLATION_FAILURE",
       "when": "truth or expected outcomes entered acquisition before the raw freeze"
     },
-    { "verdict": "RUNTIME_FAILURE", "when": "the fixed acquisition could not complete" }
+    {
+      "verdict": "RUNTIME_FAILURE",
+      "when": "the fixed acquisition could not complete"
+    }
   ],
-  "verdictComputedNotAsserted": true
+  "verdictComputedNotAsserted": true,
+  "amendedBy": "preregistration-amendment-2.md"
 }

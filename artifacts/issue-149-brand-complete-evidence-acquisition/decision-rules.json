@@ -26,9 +26,10 @@
     "expectedOutcomeStatedInAdvance": {
       "capability1": "expected to be satisfied",
       "capability2": "expected to be satisfied",
-      "capability3": "expected to be PARTIALLY satisfied — see the short-circuit blocker in candidate-decision-contract.json. All candidates and their recorded reason become available, but the rules that would also have fired on a candidate do not exist in production output.",
+      "capability3": "expected to be SATISFIED. Merged PR #220 records every rule that would reject a candidate, so a one-filter counterfactual is no longer bounded by unknown later rules.",
       "capability4": "expected to be satisfied for displacement and Brand-absent exposure among candidates production actually formed",
-      "statedInAdvanceBecause": "Recording the expected limitation before acquisition prevents it from being discovered afterwards and presented as a surprise, or quietly omitted."
+      "statedInAdvanceBecause": "Recording the expected outcome before acquisition prevents a limitation being discovered afterwards and presented as a surprise, or quietly omitted. Capability 3 moved from partial to satisfied only because PR #220 merged, and that change is recorded rather than silently applied.",
+      "capability3PreviousStatement": "HISTORICAL, superseded: the original plan expected capability 3 to be only partially satisfied because the ladder short-circuited and only the first firing rule was observable."
     }
   },
   "thisSprintDoesNot": [
@@ -46,5 +47,7 @@
     "implementing or simulating a filter relaxation",
     "choosing a successor treatment",
     "corpus expansion, substitution or exclusion"
-  ]
+  ],
+  "amendedBy": "preregistration-amendment-2.md",
+  "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef"
 }

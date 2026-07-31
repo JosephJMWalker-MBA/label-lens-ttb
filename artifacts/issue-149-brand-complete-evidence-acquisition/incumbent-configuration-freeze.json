@@ -2,8 +2,8 @@
   "artifact": "incumbent-configuration-freeze",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "base": "8f0c6a7ca7c271eed14d9084ed6da7fe11f897a9",
-  "productionEquivalentPath": "the unmodified incumbent extractor, reached through src/fixtures/eval/eval-harness.ts runCaseArtifacts, which calls extractLabelEvidenceDetailed",
+  "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+  "productionEquivalentPath": "the unmodified incumbent extractor, reached by calling extractLabelEvidenceDetailed DIRECTLY. The evaluation harness is not on the acquisition route; see acquisition-invocation-contract.json.",
   "engine": {
     "tesseractJs": "7.0.0",
     "tesseractJsCore": "7.0.0",
@@ -20,7 +20,10 @@
     "byteSize": 5199098
   },
   "pageSegModes": {
-    "constants": { "SPARSE_TEXT": 11, "SINGLE_LINE": 7 },
+    "constants": {
+      "SPARSE_TEXT": 11,
+      "SINGLE_LINE": 7
+    },
     "source": "src/pipeline/extractor/ocr-engine.ts:110",
     "usedByEveryBrandEligibleTemplate": 11,
     "note": "Every pass template in regions.ts sets pageSegMode SPARSE_TEXT (11). No template is altered by this sprint."
@@ -70,5 +73,15 @@
     "a changed OEM or page-segmentation mode",
     "a changed pass template, crop geometry or transform",
     "any experimental flag or optional Brand treatment entry point being reachable"
-  ]
+  ],
+  "amendedBy": "preregistration-amendment-2.md",
+  "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
+  "historicalNote": "The original plan and Amendment 1 routed acquisition through runCaseArtifacts. That route is prohibited from Amendment 2 onward because it reads governed truth and uses the historical case id as artifactRef.",
+  "completeFilterDiagnostics": {
+    "entryPoint": "selectBrandObservationWithCompleteFilterDiagnostics",
+    "obtainedBy": "a separate exact-pass-set call; see brand-diagnostic-parity-contract.json",
+    "notPresentInDebugFinalSelections": true,
+    "invariantPrefix": "BRAND_FILTER_DIAGNOSTIC_INVARIANT_FAILURE"
+  },
+  "fixedProcessedAt": "2026-01-01T00:00:00.000Z"
 }

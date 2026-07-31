@@ -2,7 +2,7 @@
   "artifact": "post-freeze-evaluation-plan",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "precondition": "Both raw-evidence manifests exist and their aggregate SHA-256 files verify.",
+  "precondition": "Both raw-evidence manifests exist and their aggregate SHA-256 files verify, AND the 100 MB repository-footprint gate has been evaluated and did not stop the run.",
   "purpose": "Validation of evidence completeness only.",
   "normalization": {
     "source": "src/fixtures/eval/metrics.ts",
@@ -17,20 +17,35 @@
       "from": "the complete word evidence across every Brand-eligible pass",
       "previouslyCarriedNotRederivable": true
     },
-    { "field": "truthOnReconstructedLine", "from": "all reconstructed lines, with no 12-line cap" },
+    {
+      "field": "truthOnReconstructedLine",
+      "from": "all reconstructed lines, with no 12-line cap"
+    },
     {
       "field": "truthBearingCandidateFormed",
       "from": "the complete candidate array including rejected candidates"
     },
-    { "field": "truthBearingCandidateKept", "from": "kept flags on truth-matching candidates" },
+    {
+      "field": "truthBearingCandidateKept",
+      "from": "kept flags on truth-matching candidates"
+    },
     {
       "field": "filtersRejectingEachTruthBearingCandidate",
-      "from": "the recorded filterReason on each truth-matching rejected candidate",
-      "limitation": "one reason per candidate, because the ladder short-circuits; the union across candidates is reported, and the set of rules that would ALSO have fired is not derivable"
+      "from": "the complete activeRejectionReasons array recorded against each truth-matching rejected candidate",
+      "limitation": "None remaining from the ladder. Merged PR #220 records every rule that would reject a candidate, so the set of rules that would ALSO have fired is now derivable."
     },
-    { "field": "truthRank", "from": "position in the complete ranked list" },
-    { "field": "selectedCorrectness", "from": "the final selected value" },
-    { "field": "finalAuthorityResult", "from": "the final state and abstention reason" }
+    {
+      "field": "truthRank",
+      "from": "position in the complete ranked list"
+    },
+    {
+      "field": "selectedCorrectness",
+      "from": "the final selected value"
+    },
+    {
+      "field": "finalAuthorityResult",
+      "from": "the final state and abstention reason"
+    }
   ],
   "crossCheckAgainst": [
     "artifacts/brand-evidence-path-diagnosis/cases.json",
@@ -65,7 +80,9 @@
     "modifying any acquired artifact",
     "simulating removal of a filter",
     "recommending a filter treatment",
-    "choosing a successor treatment"
+    "choosing a successor treatment",
+    "treating the diagnostic selection rather than debug.finalSelections as the behavioural authority"
   ],
-  "expectedUseOfTheResult": "A later, separately preregistered zero-OCR study may use this evidence. This sprint does not perform, design or recommend that study's treatment."
+  "expectedUseOfTheResult": "A later, separately preregistered zero-OCR study may use this evidence. This sprint does not perform, design or recommend that study's treatment.",
+  "amendedBy": "preregistration-amendment-2.md"
 }

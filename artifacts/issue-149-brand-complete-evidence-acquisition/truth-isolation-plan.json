@@ -63,7 +63,7 @@
       "recommending a filter treatment"
     ]
   },
-  "amendedBy": "preregistration-amendment.md",
+  "amendedBy": "preregistration-amendment-2.md",
   "opaqueIdentity": {
     "scheme": "item-NNNN, 1-based, zero-padded to four digits",
     "assignmentOrder": "ascending source-image SHA-256, so the sequence is deterministic and carries no ordering signal from the historical names",
@@ -75,5 +75,11 @@
     "why": "Something must know which historical image becomes which opaque id, because something must copy it.",
     "runsBeforeAndOutsideAcquisition": true,
     "isNotTheAcquisitionProcess": true
+  },
+  "stage1TestsAre": {
+    "kind": "static manifest, path and import validation",
+    "isRuntimeProof": false,
+    "why": "The Stage 1 tests read committed planning artifacts and assert their shape. They cannot demonstrate that a future process is unable to read the repository checkout.",
+    "actualIsolationGate": "a mandatory discover-mode gate inside the runtime boundary; see acquisition-runtime-isolation-contract.json"
   }
 }

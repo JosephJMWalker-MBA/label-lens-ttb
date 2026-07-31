@@ -1,0 +1,63 @@
+{
+  "artifact": "brand-diagnostic-parity-contract",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "amendedBy": "preregistration-amendment-2.md",
+  "correctionOf": {
+    "priorClaim": "complete diagnostics live directly in ExtractionDebug.finalSelections.brand.brandDiagnostics.candidates",
+    "whyWrong": "extractLabelEvidenceDetailed calls the ordinary selectBrandObservation, so debug.finalSelections carries the DEFAULT shape with neither filterChecks nor activeRejectionReasons. The prior claim was false and is corrected here, before any acquisition OCR."
+  },
+  "howCompleteDiagnosticsAreObtained": {
+    "step1": "run the production extractor once via extractLabelEvidenceDetailed and keep its debug object",
+    "step2": "reconstruct the exact pass set production used for its FINAL Brand selection",
+    "step3": "call selectBrandObservationWithCompleteFilterDiagnostics over that exact pass set",
+    "code": "const brandPasses = debug.primarySelections.brand.observation.state === \"OBSERVED\" ? [debug.passes[0]] : debug.passes;\nconst diagnosticSelection = selectBrandObservationWithCompleteFilterDiagnostics(brandPasses);",
+    "unconditionalAllPassesProhibited": true,
+    "unconditionalAllPassesProhibitedWhy": "Production retains the PRIMARY selection when primary Brand is OBSERVED, and only otherwise selects over the complete pass array. Calling the diagnostic selector over all passes unconditionally would produce a different candidate population from production on every OBSERVED case."
+  },
+  "mirrorsProductionBecause": {
+    "source": "src/pipeline/extractor/extractor.ts",
+    "productionCode": "primaryBrand = selectBrandObservation([primaryPass]); ... brand = primaryBrand.observation.state === \"OBSERVED\" ? primaryBrand : selectBrandObservation(passes);",
+    "primaryPassIsPassesIndexZero": true
+  },
+  "parityAssertion": {
+    "when": "for every case, before any evidence is emitted",
+    "rule": "diagnosticSelection must be behaviourally identical to debug.finalSelections.brand after removing ONLY filterChecks and activeRejectionReasons",
+    "authority": "debug.finalSelections.brand — the default final selection remains the authority against which parity is tested; the diagnostic selection is never treated as the authority",
+    "comparedFields": [
+      "observation.state",
+      "observation.value",
+      "observation.confidence",
+      "observation.ocrEvidenceScore",
+      "observation.alternates",
+      "sourceRegion",
+      "source",
+      "supportingPassIds",
+      "recoveryPassUsed",
+      "brandDiagnostics.abstentionReason",
+      "brandDiagnostics.candidates.length",
+      "brandDiagnostics.candidates order",
+      "per candidate: rawText",
+      "per candidate: cleanedValue",
+      "per candidate: kept",
+      "per candidate: filterReason",
+      "per candidate: decision",
+      "per candidate: score",
+      "per candidate: ranking",
+      "per candidate: candidateProvenance",
+      "per candidate: assembly",
+      "per candidate: lineIndexes"
+    ],
+    "haltCode": "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE",
+    "onHalt": "no evidence is emitted for that case and the run stops; no case is retried and no mismatch is repaired"
+  },
+  "candidateEvidenceSource": {
+    "isThe": "diagnosticSelection candidate array",
+    "isNot": "debug.finalSelections.brand.brandDiagnostics.candidates",
+    "why": "only the diagnostic selection carries filterChecks and activeRejectionReasons; parity proves the two are otherwise the same array"
+  },
+  "costOfTheSecondCall": {
+    "extraOcrPasses": 0,
+    "note": "selectBrandObservationWithCompleteFilterDiagnostics is a pure re-selection over pass results already produced. It runs no OCR and reads no image."
+  }
+}

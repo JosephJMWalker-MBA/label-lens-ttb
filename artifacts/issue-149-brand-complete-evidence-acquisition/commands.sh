@@ -22,7 +22,16 @@ node scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs
 # The acquisition input carries no historical identity, and the id map is not
 # inside it. This is also asserted by the focused contract test below.
 node -e 'const m=require("./artifacts/issue-149-brand-complete-evidence-acquisition/truth-free-input-manifest.json");console.log(Object.keys(m.cases[0]).join(", "))'
-npx vitest run src/fixtures/eval/issue-149-acquisition-isolation.test.ts
+# Stage 1 contract tests. These are STATIC manifest, path and import validation,
+# not runtime isolation proof; runtime isolation is a discover-mode gate.
+npx vitest run \
+  src/fixtures/eval/issue-149-acquisition-isolation.test.ts \
+  src/fixtures/eval/issue-149-contract-consistency.test.ts \
+  src/fixtures/eval/issue-149-candidate-fingerprint.test.ts \
+  src/fixtures/eval/issue-149-stage-1-manifest.test.ts
+
+# Verify the whole Stage 1 contract package, not just the preregistration.
+node scripts/eval/issue-149-stage-1-contract-manifest.mjs --verify
 
 # Verify the frozen preregistration.
 ( cd "${ART}" && shasum -a 256 -c preregistration.sha256 )
@@ -31,10 +40,10 @@ npx vitest run src/fixtures/eval/issue-149-acquisition-isolation.test.ts
 shasum -a 256 src/pipeline/extractor/assets/eng.traineddata
 node -e 'const l=require("./package-lock.json").packages;for(const k of ["node_modules/tesseract.js","node_modules/tesseract.js-core"])console.log(k,l[k].version)'
 
-# The two claims the evidence contract rests on: the caps are in the harness
-# projection, and the untruncated debug object is already returned.
+# The caps that limited the prior studies are in the harness CaseReport
+# projection. The acquisition does not use the harness at all; it calls
+# extractLabelEvidenceDetailed directly.
 sed -n '72p;75p;304p;415p' src/fixtures/eval/eval-harness.ts
-sed -n '959,962p' src/fixtures/eval/eval-harness.ts
 
 # The merged PR #220 capability this amendment consumes.
 shasum -a 256 src/pipeline/extractor/field-selection.ts

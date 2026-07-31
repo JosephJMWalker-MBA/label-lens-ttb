@@ -6,7 +6,7 @@
   "expectedTotalEstimate": "15-40 MB for primary plus repeat, extrapolated from the committed 15-case baseline",
   "gate": {
     "atOrBelow100MB": "commit the raw evidence according to the governed plan",
-    "above100MB": "complete the run and preserve the workflow artifact, but STOP before committing raw evidence to Git, and report"
+    "above100MB": "complete the run, upload the complete lossless evidence as a TEMPORARILY RETAINED workflow artifact, and stop before committing raw evidence to Git"
   },
   "reportedEitherWay": [
     "exact total bytes",
@@ -20,5 +20,21 @@
     "destructively recompressing evidence",
     "omitting evidence"
   ],
-  "ifTheGateFires": "The evidence still exists in full as a workflow artifact. Only its commitment to Git is withheld, and that fact is reported rather than resolved by shrinking the evidence."
+  "ifTheGateFires": "The evidence still exists in full as a workflow artifact. Only its commitment to Git is withheld, and that fact is reported rather than resolved by shrinking the evidence.",
+  "amendedBy": "preregistration-amendment-2.md",
+  "above100MBProcedure": [
+    "upload the complete lossless evidence artifact",
+    "record the artifact ID, exact bytes, SHA-256, configured retention and expected expiration",
+    "stop before post-freeze truth evaluation",
+    "stop before claiming durable preservation",
+    "require an explicit owner decision about durable archival before continuing",
+    "do not delete local job output before successful artifact upload AND digest verification",
+    "do not truncate, sample or destructively recompress"
+  ],
+  "retentionLanguage": {
+    "required": "temporarily retained workflow artifact",
+    "prohibited": "permanently preserved",
+    "why": "A workflow artifact is retention-bound and expires. Calling it permanent preservation would overstate what exists, and would let the evidence quietly disappear at expiry with the record still claiming it is safe.",
+    "permittedOnlyIf": "a durable archival destination has actually been verified"
+  }
 }

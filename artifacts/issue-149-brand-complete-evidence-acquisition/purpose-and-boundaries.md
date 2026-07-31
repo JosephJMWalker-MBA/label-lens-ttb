@@ -28,14 +28,22 @@ and Brand-absent exposure rather than upside alone.
 
 ## The one thing that makes this feasible without a production change
 
-The caps above are all in the **evaluation harness's `CaseReport` projection**.
-The production path already emits the complete evidence, and
-`runCaseArtifacts` already returns it untruncated as `extractionDebug`
-(`eval-harness.ts:959`, added before this sprint).
+The caps above are all in the **evaluation harness's `CaseReport` projection**,
+and the production path already emits the complete evidence.
 
-So the acquisition reads `extractionDebug` directly instead of the capped
-`CaseReport`. **No production code, no harness code and no cap constant is
-modified.** The prohibited projection is bypassed, not raised.
+**The acquisition does not touch the harness.** It calls
+`extractLabelEvidenceDetailed` directly and reads the untruncated `debug` object.
+`runCaseArtifacts` and every `src/fixtures/eval` module are prohibited on the
+acquisition route: `runCaseArtifacts` takes an `EvalCase`, uses the historical
+`caseId` as `artifactRef` and always builds a truth-bearing `CaseReport`, so
+discarding that report afterwards would not make the call truth-free.
+
+Complete filter diagnostics are obtained by a second, exact-pass-set call to
+`selectBrandObservationWithCompleteFilterDiagnostics`, checked for parity against
+`debug.finalSelections.brand`. See `acquisition-invocation-contract.json` and
+`brand-diagnostic-parity-contract.json`.
+
+**No production code, no harness code and no cap constant is modified.** The prohibited projection is bypassed, not raised.
 
 ## Boundaries
 

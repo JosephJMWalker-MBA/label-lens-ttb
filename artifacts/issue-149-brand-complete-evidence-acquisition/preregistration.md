@@ -5,10 +5,11 @@ Refs Issue #149. **Evidence acquisition only.** Frozen before any OCR runs.
 Base: `origin/main` `546c3f279ce431a1fd8c0203df7a83553ea866ef`, the merge commit
 of PR #220.
 
-**Amended before any acquisition OCR.** See `preregistration-amendment.md` for
-what changed and why; the original plan (head `7600b0a9…`, base `8f0c6a7c…`,
-hash `7b691c78…`) is preserved, not overwritten. No governed acquisition OCR
-occurred under the original preregistration.
+**Amended twice, both times before any acquisition OCR.** See
+`preregistration-amendment.md` and `preregistration-amendment-2.md`. Both earlier
+plans are preserved, not overwritten, and their identities are recorded in
+`amendment-linkage.json` and `amendment-2-linkage.json`. **No governed
+acquisition OCR occurred under either earlier plan.**
 
 This sprint does **not** KEEP or KILL a production change, choose a successor
 treatment, or simulate any filter relaxation. It authorizes no production change.
@@ -49,8 +50,12 @@ The historical mapping lives at `post-freeze/id-map.json` — outside every
 acquisition mount, outside the staged input directory and outside every raw
 evidence directory. The acquisition process never imports, reads, resolves or
 receives it. The mapping is opened only during post-freeze evaluation, after both
-raw manifests are written, hashed and verified. This separation is tested in
-`src/fixtures/eval/issue-149-acquisition-isolation.test.ts`.
+raw manifests are written, hashed and verified. This separation is validated by
+`src/fixtures/eval/issue-149-acquisition-isolation.test.ts`, which performs
+**static manifest, path and import validation** — it is not runtime proof.
+Actual process-level isolation is a **mandatory discover-mode gate** inside the
+runtime boundary, frozen in `acquisition-runtime-isolation-contract.json` and not
+implemented in this amendment.
 
 The staging step that copies the images necessarily knows the mapping, because
 something must. It runs before and outside the acquisition process, and it is not
@@ -90,12 +95,52 @@ Every truncation that limited the prior studies lives in the **evaluation
 harness's `CaseReport` projection** — the 25-word `sampleWords` cap, the 12-line
 cap, the 120-character text truncation, and
 `filter(kept && ranking).slice(0, 6)`. The production path already produces the
-complete evidence, and `runCaseArtifacts` already returns it untruncated as
-`extractionDebug`.
+complete evidence.
 
-The acquisition therefore reads `extractionDebug` directly. **The prohibited
-projection is bypassed, not raised, and no cap constant, harness file or
-production file is modified.**
+**The acquisition does not use the evaluation harness at all.** It calls
+`extractLabelEvidenceDetailed` directly and reads the untruncated `debug` object
+it returns. `runCaseArtifacts` and every `src/fixtures/eval` module are
+prohibited on the acquisition route, because `runCaseArtifacts` takes an
+`EvalCase`, uses the historical `caseId` as `artifactRef`, and always builds a
+truth-bearing `CaseReport`. Discarding that report afterwards would not make the
+call truth-free. The full contract is in `acquisition-invocation-contract.json`.
+
+**The prohibited projection is bypassed, not raised, and no cap constant, harness
+file or production file is modified.**
+
+### Complete diagnostics are obtained by a second, exact-pass-set call
+
+`extractLabelEvidenceDetailed` uses the ordinary `selectBrandObservation`, so its
+`debug.finalSelections` carries the **default** shape with neither `filterChecks`
+nor `activeRejectionReasons`. The acquisition therefore mirrors production's own
+pass-set branch and re-selects:
+
+```ts
+const brandPasses =
+  debug.primarySelections.brand.observation.state === "OBSERVED"
+    ? [debug.passes[0]]
+    : debug.passes;
+const diagnosticSelection = selectBrandObservationWithCompleteFilterDiagnostics(brandPasses);
+```
+
+Calling the diagnostic selector over all passes unconditionally is **prohibited**:
+production retains the primary selection when primary Brand is `OBSERVED`, so an
+unconditional call would produce a different candidate population on every such
+case.
+
+Before any evidence is emitted, `diagnosticSelection` must be behaviourally
+identical to `debug.finalSelections.brand` once **only** `filterChecks` and
+`activeRejectionReasons` are removed, across observation state, value,
+confidence, OCR evidence score, alternates, source region, source, supporting
+pass IDs, recovery-pass flag, abstention reason, candidate-array length and
+order, and per candidate `rawText`, `cleanedValue`, `kept`, `filterReason`,
+`decision`, `score`, `ranking`, provenance, `assembly` and `lineIndexes`. A
+mismatch halts with **`BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE`**.
+
+**`debug.finalSelections.brand` remains the authority**; the diagnostic selection
+is the candidate evidence source only because parity proves the two are otherwise
+the same array. No extra OCR pass runs: the second call is a pure re-selection
+over results already produced.
 
 ## Two exact corpus runs
 
@@ -195,6 +240,15 @@ Identity is an ordinal plus a full digest, never a truncated hash: `opaqueItemId
 `completeCandidateArrayLength`, a 64-character `canonicalRecordSha256`, and a
 `stableCandidateId` of `${opaqueItemId}:${ordinal}:${digest}`.
 
+`canonicalRecordSha256` is defined over a **non-circular preimage**: the complete
+persisted record minus exactly `canonicalRecordSha256` and `stableCandidateId`.
+Canonicalization version `issue-149-candidate-canonical-v1` — keys recursively
+sorted, array order preserved, undefined object properties omitted, undefined
+array values and non-finite numbers rejected, no separator whitespace, UTF-8
+bytes, lowercase 64-hex digest. Full definition in
+`candidate-fingerprint-contract.json`; reference implementation and tests in
+`src/fixtures/eval/issue-149-candidate-canonical.ts`.
+
 Asserted: ordinals begin at 0, are contiguous and occur exactly once; candidate
 IDs are unique within each case; the emitted count equals the unprojected
 diagnostic-array count; no record is silently overwritten or deduplicated.
@@ -204,9 +258,14 @@ Halts with `CANDIDATE_ID_COLLISION` or `CANDIDATE_EVIDENCE_TRUNCATED`.
 
 Complete and uncapped. Expected 15–40 MB for both runs. A repository-footprint
 gate applies: at or below 100 MB commit per the governed plan; above 100 MB
-complete the run, preserve the workflow artifact, and stop before committing raw
-evidence to Git, reporting exact total bytes, bytes by category and largest
-files. **It is a Git storage gate, never an evidence-completeness exception** —
+complete the run, upload the complete lossless evidence as a **temporarily
+retained workflow artifact** — recording its ID, exact bytes, SHA-256, configured
+retention and expected expiration — stop before committing raw evidence to Git,
+**stop before post-freeze truth evaluation**, and require an explicit owner
+decision about durable archival before continuing. Local job output is not
+deleted before the upload and its digest verify. A workflow artifact is
+retention-bound; it is never described as permanent preservation unless a durable
+destination has actually been verified. **It is a Git storage gate, never an evidence-completeness exception** —
 nothing is truncated, sampled, discarded, recompressed destructively or omitted.
 
 ## Raw evidence freeze

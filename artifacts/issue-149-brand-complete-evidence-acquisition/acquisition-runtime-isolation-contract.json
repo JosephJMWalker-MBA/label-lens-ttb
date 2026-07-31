@@ -1,0 +1,74 @@
+{
+  "artifact": "acquisition-runtime-isolation-contract",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "amendedBy": "preregistration-amendment-2.md",
+  "status": "CONTRACT FROZEN. Not implemented in this amendment.",
+  "whyThisExists": {
+    "correction": "The Stage 1 isolation tests are STATIC manifest, path and import validation. They read committed planning artifacts and assert their shape. They are NOT runtime proof, and this contract stops them being described as such.",
+    "actualIsolationIs": "a mandatory discover-mode gate that must run inside the same runtime boundary intended for execute mode, before execute is authorized"
+  },
+  "theAcquisitionProcessReceivesNo": {
+    "repositoryCheckout": false,
+    "gitDirectory": false,
+    "artifactsDirectory": false,
+    "fixturesDirectory": false,
+    "evalManifest": false,
+    "postFreezeIdMap": false,
+    "governedTruth": false,
+    "priorPerCaseReports": false,
+    "githubTokenOrRepositoryCredential": false,
+    "unrestrictedEnvironmentInheritance": false,
+    "note": "Every entry is false: none of these is present inside the acquisition runtime boundary."
+  },
+  "runtimeHardening": {
+    "network": "disabled",
+    "rootFilesystem": "read-only",
+    "linuxCapabilities": "all dropped",
+    "noNewPrivileges": true,
+    "writableSpace": "only an explicit tmpfs",
+    "environment": "explicit allowlist only; no inheritance"
+  },
+  "authorizedMounts": [
+    { "ordinal": 1, "path": "the allowlisted runtime bundle", "mode": "read-only" },
+    { "ordinal": 2, "path": "truth-free-input-manifest.json", "mode": "read-only" },
+    { "ordinal": 3, "path": "the staged opaque images", "mode": "read-only" },
+    { "ordinal": 4, "path": "an initially empty output directory", "mode": "read-write" }
+  ],
+  "exactlyFourMounts": true,
+  "runtimeBundle": {
+    "mayContainOnly": [
+      "compiled acquisition code",
+      "production extractor dependencies",
+      "PR #220 field-selection code",
+      "the frozen eng.traineddata",
+      "package and runtime files required to execute"
+    ],
+    "builtWithUnrestrictedRepositoryCopy": false,
+    "builtWithUnrestrictedRepositoryCopyNote": "A blanket COPY of the repository is prohibited: it would place .git, artifacts/, fixtures and the eval manifest inside the boundary and silently defeat every isolation claim above.",
+    "bundleManifest": {
+      "required": true,
+      "contents": "every bundled path with its SHA-256",
+      "verifiedIn": "discover mode, before execute is authorized"
+    }
+  },
+  "discoverModeGate": {
+    "runsInsideTheSameRuntimeBoundaryAsExecute": true,
+    "runsOcr": false,
+    "mustDo": [
+      "recursively list every accessible mounted file",
+      "report mount information",
+      "report the allowlisted environment",
+      "assert network is unavailable",
+      "assert known forbidden paths cannot be opened",
+      "assert the repository root is unavailable",
+      "assert the post-freeze ID map is unavailable",
+      "assert the eval manifest and fixture paths are unavailable",
+      "verify the runtime bundle manifest",
+      "verify only the four authorized mounts exist"
+    ],
+    "thenStopsForReview": true,
+    "executeAuthorizedOnlyAfter": "the discover-mode evidence is reviewed and execute is explicitly authorized"
+  },
+  "implementedInThisAmendment": false
+}

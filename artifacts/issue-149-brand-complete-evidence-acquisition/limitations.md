@@ -33,6 +33,16 @@ membership is recoverable through `lineIndexes`; word-to-line membership is not.
 Both were re-verified against the real types at base `546c3f27…`. Neither is
 invented or approximated.
 
+## The Stage 1 isolation tests are static, not runtime proof
+
+They read committed planning artifacts and assert manifest shape, path separation
+and import prohibitions. **They cannot demonstrate that a future process is unable
+to read the repository checkout.** Actual process-level isolation is a mandatory
+discover-mode gate inside the runtime boundary, frozen in
+`acquisition-runtime-isolation-contract.json` and deliberately not implemented
+here. Until that gate has run and been reviewed, the isolation claim in this
+package is a design commitment, not a measurement.
+
 ## The staging step is trusted, by necessity
 
 Something must know which historical image becomes `item-0001`, because something
@@ -46,13 +56,20 @@ it is tested against its own output, so a systematic staging error would not be
 caught by these tests. The image SHA-256 carried on both sides is the check that
 would catch it, and it is asserted.
 
-## The 100 MB gate could withhold evidence from Git
+## The 100 MB fallback is retention-bound, not preservation
 
-If the raw evidence exceeds 100 MB the run still completes and the workflow
-artifact still holds everything, but the evidence does not enter Git. That means
-a reviewer working only from the repository would not see it. The gate reports
-exact bytes so the gap is visible rather than silent, but it is a real reduction
-in what the repository alone can show.
+If the raw evidence exceeds 100 MB the run still completes and the complete
+lossless evidence is uploaded — but as a **temporarily retained workflow
+artifact**, which expires. It is not durable archival, and this package does not
+call it that. The procedure records the artifact ID, exact bytes, SHA-256,
+configured retention and expected expiration, stops before post-freeze truth
+evaluation, and requires an explicit owner decision about durable archival before
+continuing.
+
+Two real consequences. A reviewer working only from the repository would not see
+the evidence. And if no durable destination is chosen before expiry, the evidence
+is **gone** — the run would have to be repeated. The gate makes that visible
+rather than silent, but it does not prevent it.
 
 ## Production caps candidate generation, and that bounds any counterfactual
 

@@ -26,6 +26,20 @@ The governed Issue #149 pattern, unchanged:
 - a visible `harness revision:` counter, bumped in the same commit whenever a
   harness fix needs a rerun.
 
+## Runtime boundary
+
+Discover and execute both run inside the boundary frozen in
+`acquisition-runtime-isolation-contract.json`: no repository checkout, no `.git`,
+no `artifacts/`, no fixtures, no eval manifest, no ID map, no truth, no
+credentials, no environment inheritance; network disabled, read-only root, all
+capabilities dropped, `no-new-privileges`, tmpfs-only writable space, and exactly
+four mounts. The runtime bundle is allowlisted and must not be built with an
+unrestricted repository `COPY`.
+
+**Discover mode must run inside that same boundary and stop for review before
+execute is authorized.** Neither the workflow nor the runtime bundle is
+implemented in this amendment.
+
 ## Mode `discover` — no OCR
 
 1. Assert the runner is native `linux/amd64` and record its identity.
@@ -47,9 +61,12 @@ Discovery reads images to hash them. It runs no OCR pass.
 ## Mode `execute` — the only OCR
 
 1. Re-verify everything discovery verified.
-2. Run the **primary** matrix: all 115 opaque items, unchanged incumbent path,
-   through `selectBrandObservationWithCompleteFilterDiagnostics`, reading
-   `extractionDebug` rather than the capped `CaseReport`. The container mounts
+2. Run the **primary** matrix: all 115 opaque items through a DIRECT
+   `extractLabelEvidenceDetailed` call — never `runCaseArtifacts` — then obtain
+   complete diagnostics with a second, exact-pass-set call to
+   `selectBrandObservationWithCompleteFilterDiagnostics`, asserting parity
+   against `debug.finalSelections.brand` and halting on
+   `BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE`. The container mounts
    only `.local/issue-149-acquisition-inputs` read-only and an empty output
    directory. The post-freeze ID map is not mounted.
 3. Assert per-pass and per-case counting proofs; halt on
@@ -64,8 +81,14 @@ Discovery reads images to hash them. It runs no OCR pass.
 7. Compare the two runs at every level in `determinism-rules.json` and report
    every difference without repairing any of it.
 8. Apply the **100 MB repository-footprint gate**: report exact total bytes,
-   bytes by category and largest files; commit at or below 100 MB, and above it
-   preserve the workflow artifact and stop before committing raw evidence.
+   bytes by category and largest files. At or below 100 MB commit per the
+   governed plan. Above 100 MB, upload the complete lossless evidence as a
+   **temporarily retained workflow artifact**, record its ID, exact bytes,
+   SHA-256, configured retention and expected expiration, do not delete local job
+   output until the upload and its digest verify, stop before committing raw
+   evidence to Git, **stop before post-freeze truth evaluation**, and require an
+   explicit owner decision about durable archival before continuing. A workflow
+   artifact is retention-bound and is never called permanent preservation.
 9. **Truth boundary.** Only now does the post-freeze evaluation open
    `post-freeze/id-map.json` and the governed truth, to attach historical
    identity, validate completeness and cross-check the prior artifacts.

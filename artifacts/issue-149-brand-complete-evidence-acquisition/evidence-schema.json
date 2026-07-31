@@ -5,7 +5,7 @@
   "containsCompleteRawOcrWords": true,
   "containsCompleteCandidateDecisions": true,
   "proofOfCompleteness": {
-    "rawOcrWords": "raw/<run>/<caseId>.words.jsonl carries one record per OcrWord for every pass, and the acquisition asserts emittedWordCount === extractionDebug.passes[i].words.length for every pass. Any inequality halts with RAW_EVIDENCE_TRUNCATED. No sampleWords cap, no first-25 cap and no 120-character text truncation is applied, because the evidence is read from extractionDebug rather than from the capped CaseReport projection.",
+    "rawOcrWords": "raw/<run>/<opaqueItemId>.words.jsonl carries one record per OcrWord for every pass, and the acquisition asserts emittedWordCount === debug.passes[i].words.length for every pass. Any inequality halts with RAW_EVIDENCE_TRUNCATED. No sampleWords cap, no first-25 cap and no 120-character text truncation is applied, because the evidence is read from the debug object returned by a direct extractLabelEvidenceDetailed call rather than from the capped CaseReport projection.",
     "candidateDecisions": "raw/<run>/<opaqueItemId>.candidates.jsonl carries one record per BrandCandidateDiagnostic, kept AND rejected, each with the complete PR #220 filterChecks and activeRejectionReasons. The acquisition asserts emittedCandidateCount === brandDiagnostics.candidates.length read before any projection, that ordinals are contiguous from 0 and unique, and that stable candidate IDs are unique within the case. Halts with CANDIDATE_EVIDENCE_TRUNCATED, CANDIDATE_ID_COLLISION or COMPLETE_DIAGNOSTICS_ABSENT."
   },
   "layout": {
@@ -38,9 +38,21 @@
     "block, paragraph and line identifiers \u2014 not present on OcrWord",
     "constituent word IDs per reconstructed line \u2014 not emitted by BrandLineDiagnostic"
   ],
-  "amendedBy": "preregistration-amendment.md",
+  "amendedBy": "preregistration-amendment-2.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "everyRawFilenameUsesOpaqueIdOnly": true,
-  "resolvedGap": "Every individual filter check and every active rejection reason per candidate, previously unavailable, is supplied by merged PR #220."
+  "resolvedGap": "Every individual filter check and every active rejection reason per candidate, previously unavailable, is supplied by merged PR #220.",
+  "completeDiagnosticsSource": "the diagnosticSelection candidate array produced by selectBrandObservationWithCompleteFilterDiagnostics over the exact production pass set, NOT debug.finalSelections. See brand-diagnostic-parity-contract.json.",
+  "candidateIdentity": {
+    "fields": [
+      "opaqueItemId",
+      "candidateOrdinal",
+      "completeCandidateArrayLength",
+      "canonicalRecordSha256",
+      "stableCandidateId"
+    ],
+    "canonicalizationVersion": "issue-149-candidate-canonical-v1",
+    "contract": "candidate-fingerprint-contract.json"
+  }
 }

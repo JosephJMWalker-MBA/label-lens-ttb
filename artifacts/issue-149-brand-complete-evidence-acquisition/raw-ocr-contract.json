@@ -4,7 +4,7 @@
   "stage": 1,
   "sourceOfTruthForShape": "ExtractionDebug.passes[] (src/pipeline/extractor/extractor.ts:30) and OcrWord (src/pipeline/extractor/extractor.types.ts:103)",
   "reachableWithoutProductionChange": true,
-  "reachableVia": "runCaseArtifacts already returns extractionDebug (src/fixtures/eval/eval-harness.ts:959). The debug object is UNTRUNCATED; only the CaseReport projection applies caps.",
+  "reachableVia": "extractLabelEvidenceDetailed returns DetailedExtractionResult.debug, which is untruncated. The acquisition calls that function directly; it does not use the evaluation harness, whose CaseReport projection is what applied the caps.",
   "capsExplicitlyNotApplied": {
     "MAX_SAMPLE_WORDS_PER_REGION": "the 25-word sampleWords cap in eval-harness.ts is a CaseReport projection and is bypassed by reading extractionDebug directly",
     "MAX_TEXT_LEN": "the 120-character truncate() applied to CaseReport strings is likewise bypassed",
@@ -12,22 +12,42 @@
     "truthGuidedWordFiltering": "none applied"
   },
   "perPassFields": {
-    "caseId": { "available": true },
-    "passId": { "available": true, "source": "PlannedOcrPass.passId" },
-    "passKind": { "available": true },
-    "regionName": { "available": true },
+    "caseId": {
+      "available": true,
+      "value": "opaqueItemId only \u2014 never a historical case id"
+    },
+    "passId": {
+      "available": true,
+      "source": "PlannedOcrPass.passId"
+    },
+    "passKind": {
+      "available": true
+    },
+    "regionName": {
+      "available": true
+    },
     "role": {
       "available": true,
       "derivedFrom": "passKind plus triggerReasons; primary vs recovery"
     },
-    "triggerReasons": { "available": true },
-    "fieldEligibility": { "available": true },
-    "sourceImageSha256": { "available": true, "source": "the frozen truth-free input manifest" },
+    "triggerReasons": {
+      "available": true
+    },
+    "fieldEligibility": {
+      "available": true
+    },
+    "sourceImageSha256": {
+      "available": true,
+      "source": "the frozen truth-free input manifest"
+    },
     "cropPixelSha256": {
       "available": true,
       "note": "Computed by this acquisition over the preprocessed PNG buffer handed to the engine. It is an observation of an existing byte stream, not a change to preprocessing."
     },
-    "cropGeometry": { "available": true, "source": "PlannedOcrPass.transform.crop" },
+    "cropGeometry": {
+      "available": true,
+      "source": "PlannedOcrPass.transform.crop"
+    },
     "transformAndOrientation": {
       "available": true,
       "source": "PlannedOcrPass.transform (rotate, scale, originalWidth, originalHeight) and template.preprocessing"
@@ -36,7 +56,9 @@
       "available": true,
       "source": "incumbent-configuration-freeze.json plus pass pageSegMode"
     },
-    "warningsAndErrors": { "available": true },
+    "warningsAndErrors": {
+      "available": true
+    },
     "passLatency": {
       "available": true,
       "source": "OcrPassTimings: preprocessMs, ocrMs, inverseMappingMs, totalMs"
@@ -51,9 +73,20 @@
       "available": true,
       "note": "array index in the emitted order, preserved exactly"
     },
-    "text": { "available": true, "field": "OcrWord.text", "truncated": false },
-    "confidence": { "available": true, "field": "OcrWord.rawConfidence", "scale": "engine 0-100" },
-    "boundingBox": { "available": true, "field": "OcrWord.bbox (x0,y0,x1,y1)" },
+    "text": {
+      "available": true,
+      "field": "OcrWord.text",
+      "truncated": false
+    },
+    "confidence": {
+      "available": true,
+      "field": "OcrWord.rawConfidence",
+      "scale": "engine 0-100"
+    },
+    "boundingBox": {
+      "available": true,
+      "field": "OcrWord.bbox (x0,y0,x1,y1)"
+    },
     "originalGeometry": {
       "available": true,
       "field": "OcrWord.originalGeometry",
@@ -83,5 +116,8 @@
     "truthInRawOcr",
     "truthFilterReasons",
     "expectedBrand"
-  ]
+  ],
+  "amendedBy": "preregistration-amendment-2.md",
+  "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+  "historicalNote": "Amendment 1 described this evidence as reachable through runCaseArtifacts. That route is prohibited from Amendment 2 onward."
 }

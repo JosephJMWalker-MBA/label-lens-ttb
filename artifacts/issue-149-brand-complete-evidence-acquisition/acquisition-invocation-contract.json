@@ -1,0 +1,79 @@
+{
+  "artifact": "acquisition-invocation-contract",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "amendedBy": "preregistration-amendment-2.md",
+  "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+  "route": "direct call to extractLabelEvidenceDetailed",
+  "prohibitedRoute": {
+    "symbols": [
+      "runCaseArtifacts",
+      "runCase",
+      "loadCaseImage",
+      "buildCaseReport",
+      "diagnosticsFor"
+    ],
+    "modules": [
+      "src/fixtures/eval/**",
+      "any EvalCase-based adapter",
+      "any truth module",
+      "any metrics module",
+      "any classification module",
+      "any diagnostic-attribution module"
+    ],
+    "why": "runCaseArtifacts accepts an EvalCase, uses evalCase.caseId as artifactRef, loads the evaluation fixture, and ALWAYS constructs a truth-bearing CaseReport from Brand and Alcohol acceptable values and classifications. Discarding that report afterwards does not make the invocation truth-free: the truth was read, and the historical case id was used as the artifact reference.",
+    "correctionOf": "Amendment 1 and the original plan both routed acquisition through runCaseArtifacts. That was wrong and is corrected here, before any acquisition OCR."
+  },
+  "requiredInvocationSteps": [
+    "read the staged image by opaque filename from the mounted staged directory",
+    "verify byte length and SHA-256 against truth-free-input-manifest.json",
+    "construct ExtractionInput directly",
+    "set artifactRef to the opaqueItemId",
+    "set derivativeSha256 from the truth-free manifest",
+    "use the frozen adapter, engine and parser identities from incumbent-configuration-freeze.json",
+    "use the fixed preregistered processedAt value",
+    "provide no sellerRegionTargets",
+    "call extractLabelEvidenceDetailed directly"
+  ],
+  "extractionInputBinding": {
+    "imageBytes": "the staged image bytes, verified",
+    "artifactRef": "opaqueItemId — never a historical case id",
+    "derivativeSha256": "sourceImageSha256 from the truth-free manifest",
+    "processedAt": "2026-01-01T00:00:00.000Z",
+    "processedAtNote": "A fixed preregistered constant, so the value never varies between the primary and repeat runs and can never become a source of nondeterminism.",
+    "extractionAdapterId": "from incumbent-configuration-freeze.json",
+    "extractionAdapterVersion": "from incumbent-configuration-freeze.json",
+    "ocrEngine": "from incumbent-configuration-freeze.json",
+    "parserId": "from incumbent-configuration-freeze.json",
+    "parserVersion": "from incumbent-configuration-freeze.json",
+    "sellerRegionTargets": "omitted",
+    "diagnostics": "omitted"
+  },
+  "permittedImports": [
+    "src/pipeline/extractor/extractor",
+    "src/pipeline/extractor/extractor.types",
+    "src/pipeline/extractor/field-selection",
+    "src/pipeline/extractor/ocr-engine",
+    "src/pipeline/extractor/regions",
+    "node builtins"
+  ],
+  "prohibitedImportPrefixes": [
+    "src/fixtures/",
+    "@/fixtures/",
+    "src/domain/rules/",
+    "@/domain/rules/"
+  ],
+  "futureScriptImportProhibition": {
+    "appliesTo": "every acquisition-route script added in Stage 2",
+    "enforcedBy": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts, which fails if any acquisition-route script imports a prohibited module or references a prohibited symbol",
+    "acquisitionRouteScripts": [
+      "scripts/eval/issue-149-brand-evidence-acquisition-run.ts",
+      "scripts/eval/issue-149-brand-evidence-acquisition-run.mjs"
+    ],
+    "note": "Neither file exists yet. The test asserts the prohibition against whichever of them exists, so the rule binds the moment Stage 2 adds one."
+  },
+  "haltCodes": {
+    "STAGED_IMAGE_INTEGRITY_FAILURE": "staged bytes or SHA-256 disagree with the truth-free manifest",
+    "PROHIBITED_ACQUISITION_IMPORT": "an acquisition-route script imports the evaluation harness or a governed truth module"
+  }
+}

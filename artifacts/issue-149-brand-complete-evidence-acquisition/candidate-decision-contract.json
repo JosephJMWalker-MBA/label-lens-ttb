@@ -2,13 +2,13 @@
   "artifact": "candidate-decision-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment.md",
+  "amendedBy": "preregistration-amendment-2.md",
   "sourceOfTruthForShape": "BrandCandidateDiagnostic in src/pipeline/extractor/field-selection.ts at PR #220 merge commit 546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "entryPoint": "selectBrandObservationWithCompleteFilterDiagnostics",
   "entryPointIsEvaluationOnly": true,
   "productionEntryPointUnchangedAndDefaultOff": "selectBrandObservation",
-  "reachableVia": "ExtractionDebug.finalSelections.brand.brandDiagnostics.candidates — the complete production array, kept AND rejected, before any evaluation-side projection",
+  "reachableVia": "the diagnosticSelection candidate array from selectBrandObservationWithCompleteFilterDiagnostics over the exact production pass set. NOT debug.finalSelections, which carries the default shape. See brand-diagnostic-parity-contract.json.",
   "prohibitedProjectionExplicitlyNotUsed": "brandCandidateDecisions.filter(kept && ranking).slice(0, 6)",
   "predicatesRecomputedInHarness": false,
   "predicatesRecomputedNote": "The harness consumes the diagnostics PR #220 emits. It does not re-evaluate any predicate, so there is no second implementation that could drift from production.",
@@ -29,8 +29,8 @@
     "opaqueItemId": "string, item-NNNN",
     "candidateOrdinal": "number, the index in the exact unprojected production candidate array",
     "completeCandidateArrayLength": "number, the unprojected array length for this case",
-    "canonicalRecordSha256": "string, full 64 hex over the canonical JSON of the candidate record",
-    "stableCandidateId": "string, `${opaqueItemId}:${candidateOrdinal}:${canonicalRecordSha256}` — never a truncated digest",
+    "canonicalRecordSha256": "string, full 64 hex over the canonical preimage defined in candidate-fingerprint-contract.json, canonicalization version issue-149-candidate-canonical-v1",
+    "stableCandidateId": "string, `${opaqueItemId}:${candidateOrdinal}:${canonicalRecordSha256}` \u2014 never a truncated digest",
     "filterChecks": "complete ordered BrandFilterCheck[], all ten rules",
     "activeRejectionReasons": "complete ordered BrandFilterCheckName[]",
     "authoritativeFilterReason": "the existing filterReason, which for a rejected candidate equals activeRejectionReasons[0]",
@@ -68,7 +68,8 @@
   "haltCodes": {
     "CANDIDATE_ID_COLLISION": "two candidates in one case produced the same stable id, or an ordinal repeated",
     "CANDIDATE_EVIDENCE_TRUNCATED": "emitted count does not equal the unprojected diagnostic-array count",
-    "COMPLETE_DIAGNOSTICS_ABSENT": "filterChecks or activeRejectionReasons missing from any candidate"
+    "COMPLETE_DIAGNOSTICS_ABSENT": "filterChecks or activeRejectionReasons missing from any candidate",
+    "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE": "the diagnostic selection differs from debug.finalSelections.brand on any compared field once filterChecks and activeRejectionReasons are removed"
   },
   "storageFormat": {
     "layout": "one JSONL file per case per run, one JSON object per candidate decision",
@@ -79,5 +80,6 @@
     "was": "every individual filter check and every active rejection reason were unavailable, because the ladder short-circuits and production recorded only the first firing rule",
     "now": "RESOLVED by merged PR #220, which evaluates all ten rules under an evaluation-only, default-off entry point and enforces eight runtime invariants",
     "consequence": "A one-filter counterfactual built on this evidence is no longer bounded by unknown later rules: for every candidate the complete set of rules that would reject it is now recorded."
-  }
+  },
+  "historicalNote": "An earlier revision of this contract named debug.finalSelections.brand.brandDiagnostics.candidates as the source of complete diagnostics. That was incorrect and is corrected here."
 }
