@@ -162,7 +162,7 @@ describe("Issue #149 discover mode halts before any acquisition route", () => {
       "branches:\n      - research/issue-149-brand-complete-evidence-acquisition",
     );
     expect(workflow).toContain("permissions:\n  contents: read");
-    expect(workflow).toContain("harness revision: 9");
+    expect(workflow).toContain("harness revision: 10");
     for (const forbidden of [
       "schedule:",
       "pull_request_target:",

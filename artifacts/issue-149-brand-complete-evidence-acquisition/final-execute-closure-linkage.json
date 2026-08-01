@@ -1,0 +1,45 @@
+{
+  "artifact": "final-execute-closure-linkage",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 2,
+  "record": "preregistration-stage-2-final-execute-closure.md",
+  "priorHead": "48b59443af2e2a5242f5112c18bcee83190a1275",
+  "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+  "defectsClosed": [
+    {
+      "id": 1,
+      "title": "execute performed no boundary preflight",
+      "detail": "The runner read the manifest and began the acquisition loop immediately. A workflow flag is not a runtime observation.",
+      "correction": "runRuntimeDiscovery runs inside the container before the first acquisition call, using the same implementation discovery uses; failure halts with EXECUTE_BOUNDARY_PREFLIGHT_FAILED and every call count is reported as zero"
+    },
+    {
+      "id": 2,
+      "title": "post-acquisition verification checked only size",
+      "detail": "du -sb against a 100 MB threshold, with no item sets, file sets, digests, commit state, staging check or verdict. The raw artifact was then uploaded with if: always(), including after a partial run.",
+      "correction": "verifyRawEvidence performs actor-2 verification; the volume rule runs after it; verified evidence and incomplete forensic output are separate artifacts; the uploaded artifact digest is recorded and re-verified by a separate download job; Job C runs the identity-leak scan"
+    },
+    {
+      "id": 3,
+      "title": "the determinism decision compared only pass fingerprints",
+      "detail": "A nondeterministic downstream ordering changes candidates or selection while the pass fingerprints stay equal, and the runner labelled that timing-only. SEMANTIC_DIFFERENCE also returned exit 1, which skipped the following verification step for a valid preregistered outcome.",
+      "correction": "nine preregistered levels compared, timing confinement checked rather than assumed, and COMPLETE_WITH_NONDETERMINISM treated as a successful acquisition outcome"
+    },
+    {
+      "id": 4,
+      "title": "the run-level writer trusted caller assertions",
+      "detail": "Item outcome and aggregateSha256 came from the runner; the determinism object was open and was spread after runId and itemCount, so caller fields could overwrite them. The manifest did not cover counts.json or determinism-report.json, and the per-file commit left an ambiguous partial state.",
+      "correction": "every item fact derived from the committed files; a closed determinism schema with the writer's facts written last; the manifest covers the run-level files; and RUN_COMMITTED.json is an exclusive final marker binding every run-level digest"
+    },
+    {
+      "id": 5,
+      "title": "the execute gate cannot authenticate its own continued existence",
+      "detail": "The workflow and the gate script are both loaded from the current branch head, so a transition commit that modifies the workflow could bypass the gate before it rejects that modification.",
+      "correction": "the gate is stated as defense in depth, not self-authenticating authorization, and the frozen procedure requires an externally reviewed transition commit identified by full SHA before it is pushed",
+      "transitionCommitCreatedInThisSprint": false
+    }
+  ],
+  "modeRemained": "discover",
+  "executeAuthorization": "EXECUTE_NOT_AUTHORIZED",
+  "governedOcrRun": false,
+  "rawEvidenceProduced": false
+}

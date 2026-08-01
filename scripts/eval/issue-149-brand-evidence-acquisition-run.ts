@@ -18,7 +18,7 @@
  * while leaving the execute path unanalysed. The gate checks the source; the mode
  * check below decides whether the source is reached.
  */
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -26,11 +26,12 @@ import {
   acquireProductionBrandEvidence,
   writeSealedEvidencePackage,
 } from "./lib/issue-149-candidate-adapter";
+import { sealRunEvidence, writeRunEvidence } from "./lib/issue-149-run-evidence-writer";
 import {
-  sealRunEvidence,
-  writeRunEvidence,
-  type RunItemOutcome,
-} from "./lib/issue-149-run-evidence-writer";
+  comparisonDigest,
+  compareRuns,
+  isSuccessfulAcquisition,
+} from "./lib/issue-149-semantic-comparison";
 import { runRuntimeDiscovery } from "./lib/issue-149-runtime-discovery";
 
 const OUTPUT_ROOT = "/output";
@@ -68,26 +69,46 @@ async function discover(): Promise<number> {
  *
  * **NOT REACHABLE IN DISCOVER MODE.** The committed mode is `discover`, the
  * execute job additionally requires the execute-transition gate to pass, and
- * that gate rejects today because `execute-authorization.json` says
+ * that gate rejects while `execute-authorization.json` says
  * `EXECUTE_NOT_AUTHORIZED`. This code is implemented and dormant so it can be
- * reviewed and analysed by the closure gate, not so it can be run.
- *
- * The shape is the frozen plan: a PRIMARY pass over all 115 items and a REPEAT
- * pass over all 115, under the identical frozen configuration, with no retry and
- * no selective rerun, transactional per-item persistence, governed run-level
- * counts and manifests, and a semantic determinism comparison in which
- * timing-only differences are descriptive rather than failures.
+ * reviewed and analysed, not so it can be run.
  */
 async function execute(): Promise<number> {
+  // ---- THE PREFLIGHT ------------------------------------------------------
+  //
+  // Before the first acquisition call, the container re-verifies the boundary
+  // ITSELF. A workflow flag is not a runtime observation: the job could be
+  // started with the right arguments against the wrong container, and nothing
+  // downstream would notice. This runs the SAME implementation discovery runs —
+  // one shared core, not a second restatement.
+  const preflight = await runRuntimeDiscovery(process.env);
+  if (!preflight.ok) {
+    process.stderr.write(
+      `${JSON.stringify(
+        {
+          status: "HALTED",
+          reason: "EXECUTE_BOUNDARY_PREFLIGHT_FAILED",
+          failedChecks: preflight.findings.filter((finding) => !finding.ok),
+          acquisitionApiCalls: 0,
+          extractorCalls: 0,
+          itemWriterCalls: 0,
+          runWriterCalls: 0,
+          outputFilesCreated: 0,
+        },
+        null,
+        2,
+      )}\n`,
+    );
+    return 1;
+  }
+
   const manifest = JSON.parse(readFileSync(INPUT_MANIFEST, "utf8")) as {
     cases: Array<{ opaqueItemId: string; stagedImageFileName: string; sourceImageSha256: string }>;
   };
-
-  const runs: Array<{ runId: "primary" | "repeat"; outcomes: RunItemOutcome[] }> = [];
+  const expectedItemIds = manifest.cases.map((item) => item.opaqueItemId);
 
   for (const runId of ["primary", "repeat"] as const) {
     const rawDirectory = path.join(OUTPUT_ROOT, "raw", runId);
-    const outcomes: RunItemOutcome[] = [];
 
     for (const item of manifest.cases) {
       const imageBytes = readFileSync(path.join(STAGED_IMAGES, item.stagedImageFileName));
@@ -106,79 +127,53 @@ async function execute(): Promise<number> {
         parserVersion: FROZEN_PARSER_VERSION,
       };
 
-      // Exactly once per item, per run. There is no retry and no selective
-      // rerun: a failed item seals its governed failure evidence and the run
-      // continues.
+      // Exactly once per item, per run. No retry, no selective rerun: a failed
+      // item seals its governed failure evidence and the run continues.
       const sealed = await acquireProductionBrandEvidence(extractionInput);
       const written = writeSealedEvidencePackage(sealed, { directory: rawDirectory });
-      outcomes.push({
-        itemId: sealed.itemId,
-        outcome: sealed.outcome,
-        aggregateSha256: sealed.aggregateSha256,
-      });
       process.stdout.write(`${JSON.stringify({ run: runId, ...written })}\n`);
     }
-
-    if (outcomes.length !== manifest.cases.length) {
-      throw new Error(
-        `${runId}: ${outcomes.length} items persisted for ${manifest.cases.length} declared`,
-      );
-    }
-    runs.push({ runId, outcomes });
   }
 
-  // The semantic determinism comparison. Item aggregates cover the sealed bytes,
-  // which include `timings` — so an aggregate difference alone does not mean the
-  // pipeline was nondeterministic. The SEMANTIC fingerprints exclude timings and
-  // are what the verdict rests on; a timing-only difference is recorded
-  // descriptively.
-  const [primary, repeat] = runs;
-  const byItem = new Map(repeat.outcomes.map((outcome) => [outcome.itemId, outcome]));
-  const aggregateDifferences = primary.outcomes.filter(
-    (outcome) => byItem.get(outcome.itemId)?.aggregateSha256 !== outcome.aggregateSha256,
-  );
-  const semanticDifferences = compareSemanticFingerprints(
-    path.join(OUTPUT_ROOT, "raw", "primary"),
-    path.join(OUTPUT_ROOT, "raw", "repeat"),
-  );
+  // ---- the COMPLETE semantic comparison -----------------------------------
+  //
+  // Every preregistered level, not the pass fingerprints alone. A difference is
+  // timing-only when NO semantic level differs and the byte difference is
+  // confined to `timings`; anything else is semantic.
+  const comparison = compareRuns({
+    primaryDirectory: path.join(OUTPUT_ROOT, "raw", "primary"),
+    repeatDirectory: path.join(OUTPUT_ROOT, "raw", "repeat"),
+    expectedItemIds,
+  });
 
   const determinism = {
-    comparedItems: primary.outcomes.length,
-    aggregateDifferingItems: aggregateDifferences.map((outcome) => outcome.itemId),
-    semanticDifferingItems: semanticDifferences,
-    timingOnlyDifferences: aggregateDifferences
-      .map((outcome) => outcome.itemId)
-      .filter((itemId) => !semanticDifferences.includes(itemId)),
-    timingOnlyDifferencesAreDescriptive: true,
-    verdict:
-      semanticDifferences.length === 0 ? "SEMANTICALLY_DETERMINISTIC" : "SEMANTIC_DIFFERENCE",
+    verdict: comparison.verdict,
+    comparedItems: comparison.comparedItems,
+    semanticallyDifferingItems: comparison.semanticallyDifferingItems,
+    timingOnlyDifferingItems: comparison.timingOnlyDifferingItems,
+    differencesByLevel: comparison.differencesByLevel,
+    comparedLevels: comparison.comparedLevels,
   };
 
-  // Governed run-level evidence, through the ONE authenticated run writer. The
-  // runner writes no file itself.
-  for (const run of runs) {
-    const rawDirectory = path.join(OUTPUT_ROOT, "raw", run.runId);
-    const sealedRun = sealRunEvidence({
-      runId: run.runId,
-      rawDirectory,
-      declaredItems: run.outcomes,
-      determinism: run.runId === "primary" ? determinism : { ...determinism, role: "repeat" },
-    });
+  // Governed run-level evidence, through the ONE authenticated run writer, which
+  // derives every item fact from the committed files itself.
+  for (const runId of ["primary", "repeat"] as const) {
+    const rawDirectory = path.join(OUTPUT_ROOT, "raw", runId);
+    const sealedRun = sealRunEvidence({ runId, rawDirectory, expectedItemIds, determinism });
     const written = writeRunEvidence(sealedRun, { directory: rawDirectory });
-    process.stdout.write(`${JSON.stringify({ runLevel: run.runId, ...written })}\n`);
+    process.stdout.write(`${JSON.stringify({ runLevel: runId, ...written })}\n`);
   }
 
-  // The emitted-evidence truth-key scan, over what was actually written.
-  const leaked = scanEmittedEvidenceForForbiddenKeys(path.join(OUTPUT_ROOT, "raw"));
-  if (leaked.length > 0) {
-    process.stderr.write(
-      `${JSON.stringify({ status: "HALTED", reason: "EMITTED_EVIDENCE_FORBIDDEN_KEY", detail: leaked })}\n`,
-    );
-    return 1;
-  }
+  process.stdout.write(
+    `${JSON.stringify({ status: "ACQUISITION_COMPLETE", ...determinism, comparisonDigest: comparisonDigest(comparison) })}\n`,
+  );
 
-  process.stdout.write(`${JSON.stringify({ status: "ACQUISITION_COMPLETE", ...determinism })}\n`);
-  return determinism.verdict === "SEMANTICALLY_DETERMINISTIC" ? 0 : 1;
+  // A COMPLETE nondeterministic result is a SUCCESSFUL acquisition outcome. It
+  // must not return a failing status: the verification and upload steps that
+  // follow are exactly what a nondeterministic result most needs, and a nonzero
+  // exit would skip them. Nonzero is reserved for incomplete evidence, an
+  // isolation failure or a runtime failure.
+  return isSuccessfulAcquisition(comparison.verdict) ? 0 : 1;
 }
 
 /** The frozen incumbent identities, identical on the primary and repeat runs. */
@@ -193,58 +188,6 @@ const FROZEN_OCR_ENGINE = {
   engineVersion: "7.0.0",
   modelId: "eng",
 };
-
-/**
- * Compare the SEALED semantic fingerprints of two runs.
- *
- * Reads `<item>.fingerprints.json` from both, which carries the per-pass
- * semantic fingerprints (excluding `timings`) and the ordered pass-array
- * fingerprint. Timing differences cannot reach this comparison by construction.
- */
-function compareSemanticFingerprints(primaryRaw: string, repeatRaw: string): string[] {
-  const differing: string[] = [];
-  for (const itemId of readdirSync(primaryRaw).filter((entry) => /^item-\d{4}$/.test(entry))) {
-    const file = `${itemId}.fingerprints.json`;
-    const primaryPath = path.join(primaryRaw, itemId, file);
-    const repeatPath = path.join(repeatRaw, itemId, file);
-    if (!existsSync(primaryPath) || !existsSync(repeatPath)) {
-      differing.push(itemId);
-      continue;
-    }
-    if (readFileSync(primaryPath, "utf8") !== readFileSync(repeatPath, "utf8")) {
-      differing.push(itemId);
-    }
-  }
-  return differing;
-}
-
-/**
- * Scan the emitted evidence for forbidden truth keys.
- *
- * The inventory is the canonical asset mounted with the bundle. No executable
- * module carries a duplicate literal list.
- */
-function scanEmittedEvidenceForForbiddenKeys(rawRoot: string): string[] {
-  const inventory = JSON.parse(
-    readFileSync("/opt/acquisition/truth-key-inventory.json", "utf8"),
-  ) as string[];
-  const found: string[] = [];
-  const walk = (dir: string): void => {
-    for (const entry of readdirSync(dir)) {
-      const full = path.join(dir, entry);
-      if (statSync(full).isDirectory()) {
-        walk(full);
-        continue;
-      }
-      const text = readFileSync(full, "utf8");
-      for (const key of inventory) {
-        if (text.includes(`"${key}"`)) found.push(`${full}: ${key}`);
-      }
-    }
-  };
-  if (existsSync(rawRoot)) walk(rawRoot);
-  return found;
-}
 
 /** Recorded so a reader can see the runner never silently changed its own mode. */
 export function declaredModeMarker(mode: RunnerMode): string {

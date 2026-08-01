@@ -86,7 +86,7 @@
     }
   ],
   "verdictComputedNotAsserted": true,
-  "amendedBy": "preregistration-stage-2-execute-readiness.md",
+  "amendedBy": "preregistration-stage-2-final-execute-closure.md",
   "threeSeparateConcepts": {
     "fullArtifactIntegrity": {
       "covers": "the EXACT persisted bytes of every raw file and manifest, including timings and run metadata",
@@ -155,5 +155,18 @@
     "excludedFromEverySemanticFingerprint": ["timings"],
     "artifactIntegrityStillCoversTimings": "sha256Bytes over the exact persisted bytes, which include timings"
   },
-  "timingOnlyDifferencesAreDescriptive": "An item whose sealed BYTES differ only because timings differ has identical semantic fingerprints. The determinism verdict rests on the semantic fingerprints; timing-only differences are recorded descriptively and are not a nondeterminism finding."
+  "timingOnlyDifferencesAreDescriptive": "An item whose sealed BYTES differ only because timings differ has identical semantic fingerprints. The determinism verdict rests on the semantic fingerprints; timing-only differences are recorded descriptively and are not a nondeterminism finding.",
+  "comparedSemanticLevels": [
+    "outcome",
+    "sourceProvenanceAndConfiguration",
+    "passSemanticsExcludingTimings",
+    "orderedOcrWords",
+    "reconstructedLines",
+    "candidateRecordsAndStableIdentities",
+    "rankingSelectionAuthorityAndAbstention",
+    "itemCounts",
+    "typedFailureEvidence"
+  ],
+  "timingOnlyIsAFindingNotADefault": "A difference is timing-only ONLY when no semantic level differs AND the remaining byte difference is confined to `timings`, which is checked by comparing the pass records with `timings` removed. Classifying an aggregate difference as timing-only because the PASS fingerprints matched was wrong: a nondeterministic downstream ordering changes candidates or selection while leaving passes identical.",
+  "completeNondeterminismIsASuccessfulOutcome": "COMPLETE_WITH_NONDETERMINISM is a preregistered valid experimental outcome. Both runs are preserved, raw verification and artifact upload continue, and the process status is successful. A nonzero status would skip the verification and upload steps that a nondeterministic result most needs. Nonzero is reserved for INCOMPLETE_EVIDENCE, TRUTH_ISOLATION_FAILURE and RUNTIME_FAILURE."
 }

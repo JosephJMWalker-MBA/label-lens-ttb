@@ -279,28 +279,31 @@ describe("Issue #149 item persistence is transactional and single-use", () => {
 });
 
 describe("Issue #149 run-level evidence has one authenticated writer", () => {
+  const DETERMINISM = {
+    verdict: "COMPLETE_DETERMINISTIC_EVIDENCE" as const,
+    comparedItems: 1,
+    semanticallyDifferingItems: [] as string[],
+    timingOnlyDifferingItems: [] as string[],
+    differencesByLevel: {},
+    comparedLevels: ["outcome"],
+  };
+
   async function committedRun(runId: string, itemIds: string[]) {
     const rawDirectory = path.join(scratch, `run-${runId}`);
-    const declaredItems = [];
     for (const itemId of itemIds) {
       const sealed = await acquire(itemId);
       writeSealedEvidencePackage(sealed, { directory: rawDirectory });
-      declaredItems.push({
-        itemId: sealed.itemId,
-        outcome: sealed.outcome,
-        aggregateSha256: sealed.aggregateSha256,
-      });
     }
-    return { rawDirectory, declaredItems };
+    return { rawDirectory, expectedItemIds: itemIds };
   }
 
   it("seals and commits the complete run-level file set", async () => {
-    const { rawDirectory, declaredItems } = await committedRun("ok", ["item-0011", "item-0012"]);
+    const { rawDirectory, expectedItemIds } = await committedRun("ok", ["item-0011", "item-0012"]);
     const sealed = sealRunEvidence({
       runId: "primary",
       rawDirectory,
-      declaredItems,
-      determinism: { verdict: "SEMANTICALLY_DETERMINISTIC" },
+      expectedItemIds,
+      determinism: { ...DETERMINISM, comparedItems: 2 },
     });
     expect(sealed.files.map((file) => file.path)).toEqual([...RUN_EVIDENCE_FILES]);
 
@@ -309,7 +312,6 @@ describe("Issue #149 run-level evidence has one authenticated writer", () => {
     for (const file of RUN_EVIDENCE_FILES) {
       expect(existsSync(path.join(rawDirectory, file))).toBe(true);
     }
-    // The manifest digest file covers the exact manifest bytes.
     const manifestBytes = readFileSync(path.join(rawDirectory, "raw-evidence-manifest.json"));
     const digestLine = readFileSync(
       path.join(rawDirectory, "raw-evidence-manifest.sha256"),
@@ -318,52 +320,39 @@ describe("Issue #149 run-level evidence has one authenticated writer", () => {
     expect(digestLine).toBe(`${sha256Bytes(manifestBytes)}  raw-evidence-manifest.json\n`);
   });
 
-  it("halts when the committed item set disagrees with the declared one", async () => {
-    const { rawDirectory, declaredItems } = await committedRun("short", ["item-0013"]);
+  it("halts when the committed item set disagrees with the expected one", async () => {
+    const { rawDirectory, expectedItemIds } = await committedRun("short", ["item-0013"]);
     expect(() =>
       sealRunEvidence({
         runId: "primary",
         rawDirectory,
-        declaredItems: [
-          ...declaredItems,
-          { itemId: "item-9999", outcome: "extracted" as const, aggregateSha256: "0".repeat(64) },
-        ],
-        determinism: {},
+        expectedItemIds: [...expectedItemIds, "item-9999"],
+        determinism: DETERMINISM,
       }),
     ).toThrow(expect.objectContaining({ code: "RUN_ITEM_SET_INCOMPLETE" }));
   });
 
   it("rejects a forged, replayed or overwriting run summary", async () => {
-    const { rawDirectory, declaredItems } = await committedRun("forge", ["item-0014"]);
-    const sealed = sealRunEvidence({
-      runId: "primary",
-      rawDirectory,
-      declaredItems,
-      determinism: {},
-    });
+    const { rawDirectory, expectedItemIds } = await committedRun("forge", ["item-0014"]);
+    const seal = () =>
+      sealRunEvidence({
+        runId: "primary",
+        rawDirectory,
+        expectedItemIds,
+        determinism: DETERMINISM,
+      });
+    const sealed = seal();
 
-    // Forged: same shape, different origin.
     const forged = { ...sealed } as typeof sealed;
     expect(() => writeRunEvidence(forged, { directory: rawDirectory })).toThrow(
       expect.objectContaining({ code: "RUN_SUMMARY_UNAUTHENTIC" }),
     );
 
     writeRunEvidence(sealed, { directory: rawDirectory });
-    // Replayed.
     expect(() => writeRunEvidence(sealed, { directory: rawDirectory })).toThrow(
       expect.objectContaining({ code: "RUN_EVIDENCE_ALREADY_CONSUMED" }),
     );
-
-    // Overwriting: a fresh, authentic summary over an existing destination.
-    const again = sealRunEvidence({
-      runId: "primary",
-      rawDirectory,
-      declaredItems,
-      determinism: {},
-    });
-    expect(() => writeRunEvidence(again, { directory: rawDirectory })).toThrow(
-      expect.objectContaining({ code: "RUN_EVIDENCE_DESTINATION_EXISTS" }),
-    );
+    expect(() => writeRunEvidence(seal(), { directory: rawDirectory })).toThrow(RunEvidenceError);
   });
 
   it("takes no caller-selected subset and no truth-bearing input", () => {

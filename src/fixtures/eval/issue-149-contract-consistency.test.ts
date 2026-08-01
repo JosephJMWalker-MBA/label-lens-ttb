@@ -727,8 +727,12 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     ).replace(/\s+/g, " ");
     expect(limitations).toContain("governed 115-case acquisition");
     expect(limitations).toContain("pre-existing bundled-image OCR tests");
-    // And it states what HAS run rather than implying nothing has.
-    expect(limitations).toContain("trusted freeze/staging generator");
+    // And it states what HAS run rather than implying nothing has: Stage 1
+    // staging, Job A, and the runtime bundle executing in discover mode.
+    expect(limitations).toContain("Stage 2 Job A and isolated discovery have run");
+    expect(limitations).toContain("runtime bundle executes in `discover` mode");
+    // …and what has not.
+    expect(limitations).toContain("What has NOT run: execute mode");
   });
 
   it("keeps host-only steps out of the isolated discovery description", () => {
@@ -777,6 +781,7 @@ describe("Issue #149 Stage 1 contract consistency", () => {
         `preregistration-amendment-${CURRENT_AMENDMENT}.md`,
         "preregistration-stage-2-discovery.md",
         "preregistration-stage-2-execute-readiness.md",
+        "preregistration-stage-2-final-execute-closure.md",
       ];
       if (!currentStamps.includes(contract.amendedBy)) {
         stale.push(`${file} — ${contract.amendedBy}`);

@@ -99,6 +99,19 @@ export const WRITE_EXEMPT_MODULES = [
 ] as const;
 
 /**
+ * Read-only verifier modules.
+ *
+ * They read sealed evidence and report; they persist nothing, so they are
+ * exempt from the CALL prohibitions in the same way production modules are, and
+ * are NOT exempt from the write prohibition — a verifier that wrote would be a
+ * violation.
+ */
+export const READ_ONLY_VERIFIER_MODULES = [
+  "scripts/eval/lib/issue-149-semantic-comparison.ts",
+  "scripts/eval/lib/issue-149-raw-verifier.ts",
+] as const;
+
+/**
  * Evidence-writing routes prohibited outside the authenticated writer.
  *
  * The writer is the only thing that can persist an AUTHENTIC package; a direct
@@ -496,7 +509,10 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
     // The adapter defines the machinery; production modules ARE the machinery.
     const isRunWriter = filePath === AUTHORIZED_RUN_WRITER_MODULE;
     const exemptFromCallProhibitions =
-      isAdapter || isRunWriter || filePath.startsWith(PRODUCTION_MODULE_PREFIX);
+      isAdapter ||
+      isRunWriter ||
+      (READ_ONLY_VERIFIER_MODULES as readonly string[]).includes(filePath) ||
+      filePath.startsWith(PRODUCTION_MODULE_PREFIX);
 
     // Locals that were destructured out of a sealed package under a new name.
     const sealedAliases = new Set<string>();

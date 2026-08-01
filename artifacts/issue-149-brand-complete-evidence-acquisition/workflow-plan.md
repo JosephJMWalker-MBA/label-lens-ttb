@@ -61,9 +61,14 @@ outside the boundary. **Phase 2 is the isolated discover run**, which sees only
 the staged inputs. Phase 1 never runs inside the boundary and phase 2 never
 prepares its own inputs.
 
-**Discover mode must run inside that same boundary and stop for review before
-execute is authorized.** Neither the workflow nor the runtime bundle is
-implemented in this amendment.
+**Discover mode runs inside that same boundary and stops for review before
+execute is authorized.** The workflow, the runtime bundle and the execute path
+are implemented; discovery has run and passed. Execute remains gated on an
+explicit authorization artifact.
+
+The runtime identity is pinned: the isolated job runs as **uid 10149 / gid
+10149**, and discovery verifies the running identity against the pinned values
+rather than accepting root.
 
 ## Job A — trusted preparation, outside isolation, no OCR
 
@@ -216,7 +221,16 @@ discovery — runtime bundle, truth-free manifest, staged images, empty output �
 and nothing else. The post-freeze ID map is not mounted.
 
 1. Re-verify everything discovery verified.
-2. Run the **primary** matrix: all 115 opaque items through
+2. **Before the first acquisition call, run the boundary preflight inside the
+   container.** It re-verifies the pinned image digest and identity, the mounts
+   and their options, the environment, credential absence, observed network
+   denial, the writable surfaces, the forbidden paths, the bundle and its
+   manifest, all 115 staged images and the initially empty output — using the
+   same implementation discovery runs. A workflow flag is not a runtime
+   observation. On failure it halts with `EXECUTE_BOUNDARY_PREFLIGHT_FAILED`
+   and no acquisition, extractor, OCR or writer call is made.
+
+3. Run the **primary** matrix: all 115 opaque items through
    `acquireProductionBrandEvidence(extractionInput)` — one call per item. That
    call makes the direct `extractLabelEvidenceDetailed` invocation itself,
    exactly once, and never `runCaseArtifacts`. The runner constructs the frozen

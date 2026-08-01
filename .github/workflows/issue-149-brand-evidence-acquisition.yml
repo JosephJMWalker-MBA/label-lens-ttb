@@ -44,8 +44,8 @@ permissions:
   contents: read
 
 env:
-  # harness revision: 9
-  ISSUE_149_HARNESS_REVISION: "9"
+  # harness revision: 10
+  ISSUE_149_HARNESS_REVISION: "10"
   MODE_FILE: artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt
   # linux/amd64 manifest digest for node:20-bookworm-slim, resolved and recorded.
   ISSUE_149_BASE_IMAGE: node@sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c
@@ -268,24 +268,59 @@ jobs:
             "${ISSUE_149_BASE_IMAGE}" \
             node /opt/acquisition/acquisition.mjs > acquisition-report.json
 
-      - name: Verify the sealed raw evidence, before any evaluator sees truth
+      # ACTOR 2's raw verification. The previous step here ran `du -sb` and
+      # reported a size against the 100 MB threshold, which is a volume
+      # measurement and not verification: it says nothing about item sets, file
+      # sets, digests, run commit state, staging leftovers or the verdict. A
+      # size check that passes on a half-written run reads as one and is worse
+      # than none.
+      - name: Actor 2 — verify the sealed raw evidence
+        id: raw
         run: |
           set -euo pipefail
-          # Actor 2's raw verification. The post-freeze evaluator receives
-          # nothing until this succeeds.
-          node -e '
-            const { execFileSync } = require("node:child_process");
-            const size = Number(execFileSync("du", ["-sb", "output"], { encoding: "utf8" }).split("\t")[0]);
-            console.log(JSON.stringify({ rawBytes: size, durableArchiveStopRuleMb: 100 }));
-            if (size > 100 * 1024 * 1024) {
-              console.error("RAW_EVIDENCE_EXCEEDS_DURABLE_ARCHIVE_LIMIT");
-              process.exitCode = 1;
-            }
-          '
+          npx vite-node --config vitest.config.ts \
+            scripts/eval/issue-149-verify-raw-evidence.ts -- \
+            --raw output/raw \
+            --manifest preparation/input/truth-free-input-manifest.json \
+            --report raw-verification-report.json
+          echo "verified=true" >> "$GITHUB_OUTPUT"
 
+      # JOB C — the read-only historical identity-leak verifier. It receives the
+      # sealed bytes and the minimal identifier inventory only: no acceptable
+      # Brand values, no truth labels, no expected field values, no prior
+      # classifications. A clean report is mandatory before any post-run commit
+      # process or truth-based evaluator. No evaluator is authorized here.
+      - name: Job C — historical identity-leak verification
+        if: steps.raw.outputs.verified == 'true'
+        run: |
+          set -euo pipefail
+          npx vite-node --config vitest.config.ts \
+            scripts/eval/issue-149-verify-raw-evidence.ts -- \
+            --raw output/raw \
+            --manifest preparation/input/truth-free-input-manifest.json \
+            --identity \
+            --id-map artifacts/issue-149-brand-complete-evidence-acquisition/post-freeze/id-map.json \
+            --truth-keys artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json \
+            --report identity-leak-report.json
+
+      # The volume rule applies only AFTER complete raw verification. Measuring
+      # first would gate on the size of evidence that had not been verified.
+      - name: Apply the durable-archive volume rule
+        if: steps.raw.outputs.verified == 'true'
+        run: |
+          set -euo pipefail
+          BYTES=$(du -sb output | cut -f1)
+          echo "{\"rawBytes\": ${BYTES}, \"durableArchiveStopRuleMb\": 100}"
+          test "${BYTES}" -le 104857600 || {
+            echo "RAW_EVIDENCE_EXCEEDS_DURABLE_ARCHIVE_LIMIT" >&2; exit 1; }
+
+      # VERIFIED evidence and PARTIAL output are different artifacts. Uploading
+      # a failed or partial run under the name `issue-149-raw-evidence` would
+      # label incomplete output as completed evidence.
       # actions/upload-artifact v4
-      - name: Upload the raw evidence
-        if: always()
+      - name: Upload the verified raw evidence
+        id: upload
+        if: steps.raw.outputs.verified == 'true'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: issue-149-raw-evidence
@@ -293,4 +328,62 @@ jobs:
             output
             acquisition-report.json
             image-identity.json
+            raw-verification-report.json
+            identity-leak-report.json
           retention-days: 30
+
+      # actions/upload-artifact v4
+      - name: Upload forensic output from an incomplete run
+        if: failure() || steps.raw.outputs.verified != 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: issue-149-incomplete-forensic-output
+          path: |
+            output
+            acquisition-report.json
+            image-identity.json
+            raw-verification-report.json
+          retention-days: 30
+
+      - name: Record the uploaded artifact identity
+        if: steps.upload.outcome == 'success'
+        run: |
+          set -euo pipefail
+          cat > uploaded-artifact.json <<JSON
+          {
+            "artifactId": "${{ steps.upload.outputs.artifact-id }}",
+            "artifactDigest": "${{ steps.upload.outputs.artifact-digest }}",
+            "artifactUrl": "${{ steps.upload.outputs.artifact-url }}",
+            "retentionDays": 30
+          }
+          JSON
+          cat uploaded-artifact.json
+
+  verify-uploaded-artifact:
+    name: Verify the uploaded artifact digest
+    needs: [resolve-mode, job-b-execute]
+    if: needs.resolve-mode.outputs.mode == 'execute'
+    runs-on: ubuntu-latest
+    steps:
+      # The uploaded artifact is downloaded again and re-verified, BEFORE the
+      # job-local output disappears. An upload whose digest was never checked is
+      # an assumption about durability, not a record of it.
+      # actions/download-artifact v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: issue-149-raw-evidence
+          path: downloaded
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Re-verify the downloaded evidence
+        run: |
+          set -euo pipefail
+          npx vite-node --config vitest.config.ts \
+            scripts/eval/issue-149-verify-raw-evidence.ts -- \
+            --raw downloaded/output/raw \
+            --manifest artifacts/issue-149-brand-complete-evidence-acquisition/truth-free-input-manifest.json \
+            --report downloaded-verification-report.json

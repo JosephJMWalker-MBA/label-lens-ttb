@@ -45,7 +45,10 @@ export class RunEvidenceError extends Error {
       | "RUN_EVIDENCE_ALREADY_CONSUMED"
       | "RUN_EVIDENCE_WRITE_UNVERIFIED"
       | "RUN_EVIDENCE_COMMIT_FAILED"
-      | "RUN_ITEM_SET_INCOMPLETE",
+      | "RUN_ITEM_SET_INCOMPLETE"
+      | "RUN_ITEM_FILE_SET_INVALID"
+      | "RUN_COMMIT_MARKER_EXISTS"
+      | "RUN_NOT_COMMITTED",
     detail: string,
   ) {
     super(`${code}: ${detail}`);
@@ -60,6 +63,33 @@ export const RUN_EVIDENCE_FILES = [
   "raw-evidence-manifest.sha256",
   "determinism-report.json",
 ] as const;
+
+/**
+ * The final, exclusive commit marker.
+ *
+ * The run-level files land in a directory that already exists — it holds the
+ * items — so there is no single directory rename to serve as the commit point.
+ * Renaming each file individually leaves a window in which some are present and
+ * some are not, and a reader cannot tell that state from a committed one.
+ *
+ * This marker closes it. It is created LAST, with exclusive creation, and it
+ * binds every run-level digest. A run without a valid marker is UNCOMMITTED, no
+ * matter which of its files happen to exist.
+ */
+export const RUN_COMMIT_MARKER = "RUN_COMMITTED.json";
+
+/** The exact success and failure file suffix sets an item directory may hold. */
+export const ITEM_SUCCESS_SUFFIXES = [
+  ".provenance.json",
+  ".passes.json",
+  ".fingerprints.json",
+  ".words.jsonl",
+  ".lines.jsonl",
+  ".candidates.jsonl",
+  ".selection.json",
+  ".counts.json",
+] as const;
+export const ITEM_FAILURE_SUFFIXES = [".provenance.json", ".failure.json"] as const;
 
 const OPAQUE_ITEM_ID = /^item-\d{4}$/;
 const RUN_FILE = /^[a-z0-9-]+\.(?:json|sha256)$/;
@@ -81,11 +111,51 @@ export interface SealedRunEvidence {
   readonly aggregateSha256: string;
 }
 
-/** Per-item facts the run summary is built from. Supplied by the runner, verified here. */
-export interface RunItemOutcome {
+/**
+ * The determinism report's CLOSED schema.
+ *
+ * It was `Record<string, unknown>` and was spread AFTER the writer's own `runId`
+ * and `itemCount`, so a caller field could silently overwrite either. A closed
+ * schema removes both problems: unknown keys are rejected, and the writer's own
+ * facts are written last.
+ */
+export interface DeterminismReport {
+  readonly verdict:
+    | "COMPLETE_DETERMINISTIC_EVIDENCE"
+    | "COMPLETE_WITH_NONDETERMINISM"
+    | "INCOMPLETE_EVIDENCE"
+    | "TRUTH_ISOLATION_FAILURE"
+    | "RUNTIME_FAILURE";
+  readonly comparedItems: number;
+  readonly semanticallyDifferingItems: readonly string[];
+  readonly timingOnlyDifferingItems: readonly string[];
+  readonly differencesByLevel: Readonly<Record<string, readonly string[]>>;
+  readonly comparedLevels: readonly string[];
+}
+
+const DETERMINISM_KEYS = [
+  "verdict",
+  "comparedItems",
+  "semanticallyDifferingItems",
+  "timingOnlyDifferingItems",
+  "differencesByLevel",
+  "comparedLevels",
+] as const;
+
+const DETERMINISM_VERDICTS = [
+  "COMPLETE_DETERMINISTIC_EVIDENCE",
+  "COMPLETE_WITH_NONDETERMINISM",
+  "INCOMPLETE_EVIDENCE",
+  "TRUTH_ISOLATION_FAILURE",
+  "RUNTIME_FAILURE",
+] as const;
+
+/** What the sealer DERIVES for each item. Nothing here is taken from the caller. */
+export interface DerivedItemOutcome {
   readonly itemId: string;
   readonly outcome: "extracted" | "extraction-failed";
   readonly aggregateSha256: string;
+  readonly files: ReadonlyArray<{ path: string; byteLength: number; sha256: string }>;
 }
 
 const AUTHENTIC_RUN_SUMMARIES = new WeakSet<SealedRunEvidence>();
@@ -125,21 +195,26 @@ function sealRunFile(path: string, text: string): RunEvidenceFile {
 export function sealRunEvidence(input: {
   runId: string;
   rawDirectory: string;
-  declaredItems: readonly RunItemOutcome[];
-  determinism: Record<string, unknown>;
+  /** The closed, truth-free set of item IDs this run must contain. */
+  expectedItemIds: readonly string[];
+  determinism: DeterminismReport;
 }): SealedRunEvidence {
-  const { runId, rawDirectory, declaredItems, determinism } = input;
+  const { runId, rawDirectory, expectedItemIds, determinism } = input;
   if (!/^[a-z0-9-]+$/.test(runId)) {
     throw new RunEvidenceError(
       "RUN_SUMMARY_INVALID",
       `runId ${JSON.stringify(runId)} is malformed`,
     );
   }
-  for (const item of declaredItems) {
-    if (!OPAQUE_ITEM_ID.test(item.itemId)) {
-      throw new RunEvidenceError("RUN_SUMMARY_INVALID", `itemId ${JSON.stringify(item.itemId)}`);
+  for (const itemId of expectedItemIds) {
+    if (!OPAQUE_ITEM_ID.test(itemId)) {
+      throw new RunEvidenceError("RUN_SUMMARY_INVALID", `itemId ${JSON.stringify(itemId)}`);
     }
   }
+  if (new Set(expectedItemIds).size !== expectedItemIds.length) {
+    throw new RunEvidenceError("RUN_ITEM_SET_INCOMPLETE", "duplicate itemId in the expected set");
+  }
+  assertDeterminismReport(determinism);
 
   const root = resolve(rawDirectory);
   const onDisk = existsSync(root)
@@ -147,54 +222,80 @@ export function sealRunEvidence(input: {
         .filter((entry) => OPAQUE_ITEM_ID.test(entry) && statSync(join(root, entry)).isDirectory())
         .sort()
     : [];
-  const declared = declaredItems.map((item) => item.itemId).sort();
+  const expected = [...expectedItemIds].sort();
 
-  if (onDisk.length !== declared.length || onDisk.some((id, index) => id !== declared[index])) {
+  if (onDisk.length !== expected.length || onDisk.some((id, index) => id !== expected[index])) {
     throw new RunEvidenceError(
       "RUN_ITEM_SET_INCOMPLETE",
-      `${onDisk.length} committed item directories but ${declared.length} declared; a manifest that does not describe the committed evidence is not a manifest of it`,
+      `${onDisk.length} committed item directories but ${expected.length} expected; a manifest that does not describe the committed evidence is not a manifest of it`,
     );
   }
-  if (new Set(declared).size !== declared.length) {
-    throw new RunEvidenceError("RUN_ITEM_SET_INCOMPLETE", "duplicate itemId in the declared set");
-  }
 
-  // Every committed file, hashed from disk.
-  const entries: Array<{ path: string; byteLength: number; sha256: string }> = [];
-  for (const itemId of onDisk) {
-    const itemDirectory = join(root, itemId);
-    for (const file of readdirSync(itemDirectory).sort()) {
-      const bytes = readFileSync(join(itemDirectory, file));
-      entries.push({
-        path: `${itemId}/${file}`,
-        byteLength: bytes.byteLength,
-        sha256: sha256Bytes(bytes),
-      });
-    }
-  }
+  // Every item fact is DERIVED from the committed files. The runner supplies the
+  // expected ID set — a closed, truth-free declaration — and nothing else. It
+  // previously supplied each item's outcome and aggregate, which the sealer then
+  // recorded without checking: a runner that mislabelled a failure as a success,
+  // or reported a stale aggregate, would have had that written into the governed
+  // manifest as fact.
+  const derived: DerivedItemOutcome[] = onDisk.map((itemId) => deriveItemOutcome(root, itemId));
+
+  const entries = derived.flatMap((item) =>
+    item.files.map((file) => ({
+      path: `${item.itemId}/${file.path}`,
+      byteLength: file.byteLength,
+      sha256: file.sha256,
+    })),
+  );
   entries.sort((left, right) => left.path.localeCompare(right.path));
 
-  const byOutcome = declaredItems.reduce<Record<string, number>>((counts, item) => {
+  const outcomeCounts = derived.reduce<Record<string, number>>((counts, item) => {
     counts[item.outcome] = (counts[item.outcome] ?? 0) + 1;
     return counts;
   }, {});
 
   const countsText = canonicalLine({
     runId,
-    itemCount: declared.length,
-    outcomeCounts: byOutcome,
-    fileCount: entries.length,
-    totalBytes: entries.reduce((sum, entry) => sum + entry.byteLength, 0),
-    itemAggregates: [...declaredItems]
-      .sort((left, right) => left.itemId.localeCompare(right.itemId))
-      .map((item) => ({ itemId: item.itemId, aggregateSha256: item.aggregateSha256 })),
+    itemCount: derived.length,
+    outcomeCounts,
+    itemFileCount: entries.length,
+    itemTotalBytes: entries.reduce((sum, entry) => sum + entry.byteLength, 0),
+    itemAggregates: derived.map((item) => ({
+      itemId: item.itemId,
+      outcome: item.outcome,
+      aggregateSha256: item.aggregateSha256,
+    })),
   });
 
-  const manifestText = canonicalLine({ runId, itemCount: declared.length, files: entries });
-  // SHA-256 over the exact manifest BYTES, in the conventional shasum format.
+  // The determinism report: the writer's own facts LAST, so caller data cannot
+  // overwrite them.
+  const determinismText = canonicalLine({
+    ...determinism,
+    semanticallyDifferingItems: [...determinism.semanticallyDifferingItems],
+    timingOnlyDifferingItems: [...determinism.timingOnlyDifferingItems],
+    comparedLevels: [...determinism.comparedLevels],
+    runId,
+    itemCount: derived.length,
+  });
+
+  // The manifest covers the run-level files too, so integrity is not confined to
+  // the item directories.
+  const countsDigest = sha256Bytes(countsText);
+  const determinismDigest = sha256Bytes(determinismText);
+  const manifestText = canonicalLine({
+    runId,
+    itemCount: derived.length,
+    itemFiles: entries,
+    runFiles: [
+      { path: "counts.json", byteLength: Buffer.byteLength(countsText), sha256: countsDigest },
+      {
+        path: "determinism-report.json",
+        byteLength: Buffer.byteLength(determinismText),
+        sha256: determinismDigest,
+      },
+    ],
+  });
   const manifestDigest = sha256Bytes(manifestText);
   const manifestSha256Text = `${manifestDigest}  raw-evidence-manifest.json\n`;
-  const determinismText = canonicalLine({ runId, itemCount: declared.length, ...determinism });
 
   const files = [
     sealRunFile("counts.json", countsText),
@@ -205,7 +306,7 @@ export function sealRunEvidence(input: {
 
   const sealed = Object.freeze({
     runId,
-    itemCount: declared.length,
+    itemCount: derived.length,
     files: Object.freeze(files.slice()),
     fileCount: files.length,
     totalBytes: files.reduce((sum, file) => sum + file.byteLength, 0),
@@ -214,6 +315,81 @@ export function sealRunEvidence(input: {
 
   AUTHENTIC_RUN_SUMMARIES.add(sealed);
   return sealed;
+}
+
+/** Reject an open or overriding determinism object. */
+function assertDeterminismReport(report: DeterminismReport): void {
+  if (typeof report !== "object" || report === null || nodeTypes.isProxy(report)) {
+    throw new RunEvidenceError(
+      "RUN_SUMMARY_INVALID",
+      "the determinism report must be a plain object",
+    );
+  }
+  const keys = Reflect.ownKeys(report);
+  if (keys.some((key) => typeof key === "symbol")) {
+    throw new RunEvidenceError("RUN_SUMMARY_INVALID", "the determinism report carries symbol keys");
+  }
+  const names = keys as string[];
+  const problems = [
+    ...DETERMINISM_KEYS.filter((key) => !names.includes(key)).map((key) => `missing ${key}`),
+    ...names
+      .filter((key) => !(DETERMINISM_KEYS as readonly string[]).includes(key))
+      .map((key) => `unexpected ${key}`),
+  ];
+  if (problems.length > 0) {
+    throw new RunEvidenceError(
+      "RUN_SUMMARY_INVALID",
+      `determinism report: ${problems.join("; ")}. runId and itemCount are the writer's own facts and cannot be supplied.`,
+    );
+  }
+  if (!(DETERMINISM_VERDICTS as readonly string[]).includes(report.verdict)) {
+    throw new RunEvidenceError(
+      "RUN_SUMMARY_INVALID",
+      `determinism verdict ${JSON.stringify(report.verdict)} is not preregistered`,
+    );
+  }
+}
+
+/**
+ * Derive one item's outcome and aggregate from its COMMITTED files.
+ *
+ * The outcome comes from which authenticated suffix set is present, and the
+ * aggregate is recomputed with the same algorithm the item sealer used, over the
+ * bytes actually on disk.
+ */
+function deriveItemOutcome(root: string, itemId: string): DerivedItemOutcome {
+  const directory = join(root, itemId);
+  const present = readdirSync(directory).sort();
+  const success = ITEM_SUCCESS_SUFFIXES.map((suffix) => `${itemId}${suffix}`);
+  const failure = ITEM_FAILURE_SUFFIXES.map((suffix) => `${itemId}${suffix}`);
+
+  const matches = (expected: string[]): boolean =>
+    present.length === expected.length &&
+    [...expected].sort().every((name, index) => name === present[index]);
+
+  const outcome = matches(success)
+    ? ("extracted" as const)
+    : matches(failure)
+      ? ("extraction-failed" as const)
+      : null;
+  if (outcome === null) {
+    throw new RunEvidenceError(
+      "RUN_ITEM_FILE_SET_INVALID",
+      `${itemId} holds ${JSON.stringify(present)}, which is neither the success set nor the failure set`,
+    );
+  }
+
+  // The item aggregate, recomputed in the sealer's own ORDER — the order the
+  // suffix list defines, not directory order.
+  const ordered = (outcome === "extracted" ? ITEM_SUCCESS_SUFFIXES : ITEM_FAILURE_SUFFIXES).map(
+    (suffix) => {
+      const name = `${itemId}${suffix}`;
+      const bytes = readFileSync(join(directory, name));
+      return { path: name, byteLength: bytes.byteLength, sha256: sha256Bytes(bytes) };
+    },
+  );
+  const aggregateSha256 = sha256Bytes(canonicalize(ordered));
+  return { itemId, outcome, aggregateSha256, files: ordered };
 }
 
 /**
@@ -287,17 +463,18 @@ export function writeRunEvidence(
   if (aggregateOf(sealed.files) !== sealed.aggregateSha256)
     fail("aggregateSha256 recomputes differently");
 
-  for (const file of sealed.files) {
-    if (existsSync(join(resolved, file.path))) {
+  for (const file of [...sealed.files.map((entry) => entry.path), RUN_COMMIT_MARKER]) {
+    if (existsSync(join(resolved, file))) {
       throw new RunEvidenceError(
-        "RUN_EVIDENCE_DESTINATION_EXISTS",
-        `${file.path} already exists; run evidence is never overwritten`,
+        file === RUN_COMMIT_MARKER ? "RUN_COMMIT_MARKER_EXISTS" : "RUN_EVIDENCE_DESTINATION_EXISTS",
+        `${file} already exists; run evidence is never overwritten`,
       );
     }
   }
 
   mkdirSync(resolved, { recursive: true });
   const staging = mkdtempSync(join(resolved, `.staging-run-${sealed.runId}-`));
+  let committed = false;
   try {
     for (const file of sealed.files) {
       const stagedPath = join(staging, file.path);
@@ -310,15 +487,28 @@ export function writeRunEvidence(
         );
       }
     }
-    // THE COMMIT POINT: each file moved into place by rename, after all of them
-    // verified. The run directory already exists (it holds the items), so a
-    // directory rename is not available and each file is renamed individually;
-    // a partial commit here is impossible only because every file was already
-    // written and verified, and rename within a filesystem does not fail for
-    // space.
     for (const file of sealed.files) {
       renameSync(join(staging, file.path), join(resolved, file.path));
     }
+
+    // THE COMMIT POINT: one exclusive marker, created LAST, binding every
+    // run-level digest. Renaming the files individually leaves a window in which
+    // some exist and some do not; a reader cannot distinguish that from a
+    // completed run. A run without a valid marker is UNCOMMITTED, whatever files
+    // happen to be present.
+    const marker = `${canonicalize({
+      runId: sealed.runId,
+      itemCount: sealed.itemCount,
+      requiredFiles: [...RUN_EVIDENCE_FILES],
+      fileDigests: sealed.files.map((file) => ({
+        path: file.path,
+        byteLength: file.byteLength,
+        sha256: file.sha256,
+      })),
+      aggregateSha256: sealed.aggregateSha256,
+    })}\n`;
+    writeFileSync(join(resolved, RUN_COMMIT_MARKER), Buffer.from(marker, "utf8"), { flag: "wx" });
+    committed = true;
     rmSync(staging, { recursive: true, force: true });
   } catch (cause) {
     rmSync(staging, { recursive: true, force: true });
@@ -326,6 +516,12 @@ export function writeRunEvidence(
     throw new RunEvidenceError(
       "RUN_EVIDENCE_COMMIT_FAILED",
       `${sealed.runId}: ${cause instanceof Error ? cause.message : String(cause)}`,
+    );
+  }
+  if (!committed) {
+    throw new RunEvidenceError(
+      "RUN_NOT_COMMITTED",
+      `${sealed.runId} did not reach the commit point`,
     );
   }
 
@@ -336,6 +532,78 @@ export function writeRunEvidence(
     totalBytes: sealed.totalBytes,
     aggregateSha256: sealed.aggregateSha256,
   };
+}
+
+/**
+ * Is this run committed?
+ *
+ * A valid marker is required, and every digest it binds must match the file on
+ * disk. Actor 2 treats anything else as UNCOMMITTED — including a run whose four
+ * files are all present but whose marker is absent, which is exactly the state a
+ * crash between renames leaves behind.
+ */
+export function verifyRunCommitted(rawDirectory: string): {
+  committed: boolean;
+  reason: string | null;
+  runId: string | null;
+  itemCount: number | null;
+} {
+  const root = resolve(rawDirectory);
+  const markerPath = join(root, RUN_COMMIT_MARKER);
+  if (!existsSync(markerPath)) {
+    return { committed: false, reason: "RUN_COMMIT_MARKER_ABSENT", runId: null, itemCount: null };
+  }
+  let marker: {
+    runId: string;
+    itemCount: number;
+    requiredFiles: string[];
+    fileDigests: Array<{ path: string; byteLength: number; sha256: string }>;
+    aggregateSha256: string;
+  };
+  try {
+    marker = JSON.parse(readFileSync(markerPath, "utf8"));
+  } catch {
+    return {
+      committed: false,
+      reason: "RUN_COMMIT_MARKER_MALFORMED",
+      runId: null,
+      itemCount: null,
+    };
+  }
+
+  const required = [...RUN_EVIDENCE_FILES].sort();
+  if (
+    !Array.isArray(marker.requiredFiles) ||
+    [...marker.requiredFiles].sort().join(",") !== required.join(",")
+  ) {
+    return {
+      committed: false,
+      reason: "RUN_COMMIT_MARKER_FILE_SET_MISMATCH",
+      runId: marker.runId ?? null,
+      itemCount: marker.itemCount ?? null,
+    };
+  }
+  for (const entry of marker.fileDigests) {
+    const filePath = join(root, entry.path);
+    if (!existsSync(filePath)) {
+      return {
+        committed: false,
+        reason: `RUN_FILE_ABSENT: ${entry.path}`,
+        runId: marker.runId,
+        itemCount: marker.itemCount,
+      };
+    }
+    const bytes = readFileSync(filePath);
+    if (bytes.byteLength !== entry.byteLength || sha256Bytes(bytes) !== entry.sha256) {
+      return {
+        committed: false,
+        reason: `RUN_FILE_DIGEST_MISMATCH: ${entry.path}`,
+        runId: marker.runId,
+        itemCount: marker.itemCount,
+      };
+    }
+  }
+  return { committed: true, reason: null, runId: marker.runId, itemCount: marker.itemCount };
 }
 
 /** Exposed for the determinism comparison; hashes nothing truth-bearing. */

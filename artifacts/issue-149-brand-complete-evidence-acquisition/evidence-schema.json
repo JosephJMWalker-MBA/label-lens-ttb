@@ -9,16 +9,28 @@
     "candidateDecisions": "raw/<run>/<opaqueItemId>.candidates.jsonl carries one record per BrandCandidateDiagnostic, kept AND rejected, each with the complete PR #220 filterChecks and activeRejectionReasons. The acquisition asserts emittedCandidateCount === brandDiagnostics.candidates.length read before any projection, that ordinals are contiguous from 0 and unique, and that stable candidate IDs are unique within the case. Halts with CANDIDATE_EVIDENCE_TRUNCATED, CANDIDATE_ID_COLLISION or COMPLETE_DIAGNOSTICS_ABSENT."
   },
   "layout": {
-    "raw/<run>/<opaqueItemId>.passes.json": "one record per OCR pass",
-    "raw/<run>/<opaqueItemId>.words.jsonl": "one record per OCR word, in original order, across every pass",
-    "raw/<run>/<opaqueItemId>.lines.jsonl": "one record per reconstructed Brand line, in emitted order",
-    "raw/<run>/<opaqueItemId>.candidates.jsonl": "one record per Brand candidate decision, kept and rejected, with complete PR #220 filter diagnostics and the complete evidence record schema in candidate-decision-contract.json",
-    "raw/<run>/<opaqueItemId>.selection.json": "final selected value, authority state, abstention reason, complete ranked order",
-    "raw/<run>/counts.json": "per-case and per-run counting proof",
-    "raw/<run>/raw-evidence-manifest.json": "sha256 of every file above",
-    "raw/<run>/raw-evidence-manifest.sha256": "aggregate hash",
-    "raw/<run>/<opaqueItemId>.provenance.json": "the input bytes and frozen configuration that produced this item's evidence: image byte length, recomputed image SHA-256, derivativeSha256, processedAt, adapter identity, complete OCR engine identity, parser identity, attempt count 1, retried false",
-    "raw/<run>/<opaqueItemId>.fingerprints.json": "the per-pass semantic fingerprint (excluding timings), the per-pass ordered-words-only fingerprint, and the ordered pass-array semantic fingerprint"
+    "itemDirectory": "raw/<run>/<opaqueItemId>/",
+    "itemFiles": "raw/<run>/<opaqueItemId>/<opaqueItemId>.<type> \u2014 the item's identity is the DIRECTORY and the filename prefix; there is no flat path form",
+    "supersededFlatLayout": "raw/<run>/<opaqueItemId>.<type> was the Stage 1 description and is not what the writer produces",
+    "successFiles": [
+      ".provenance.json",
+      ".passes.json",
+      ".fingerprints.json",
+      ".words.jsonl",
+      ".lines.jsonl",
+      ".candidates.jsonl",
+      ".selection.json",
+      ".counts.json"
+    ],
+    "failureFiles": [".provenance.json", ".failure.json"],
+    "runFiles": [
+      "counts.json",
+      "raw-evidence-manifest.json",
+      "raw-evidence-manifest.sha256",
+      "determinism-report.json",
+      "RUN_COMMITTED.json"
+    ],
+    "runCommitMarker": "RUN_COMMITTED.json \u2014 written LAST with exclusive creation, binding every run-level digest. A run without a valid marker is UNCOMMITTED."
   },
   "runs": ["primary", "repeat"],
   "immutabilityRule": "After a run's raw-evidence-manifest.sha256 is written, no file under raw/<run>/ is rewritten, reformatted or pretty-printed. JSONL is emitted in final form and is excluded from prettier via .prettierignore.",
@@ -34,7 +46,7 @@
     "block, paragraph and line identifiers \u2014 not present on OcrWord",
     "constituent word IDs per reconstructed line \u2014 not emitted by BrandLineDiagnostic"
   ],
-  "amendedBy": "preregistration-stage-2-execute-readiness.md",
+  "amendedBy": "preregistration-stage-2-final-execute-closure.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "everyRawFilenameUsesOpaqueIdOnly": true,
@@ -125,7 +137,8 @@
         "counts.json",
         "raw-evidence-manifest.json",
         "raw-evidence-manifest.sha256",
-        "determinism-report.json"
+        "determinism-report.json",
+        "RUN_COMMITTED.json"
       ],
       "authenticity": "a module-private WeakSet of summaries produced by sealRunEvidence",
       "transaction": "exclusive creation into a staging directory, readback, then rename into place",
@@ -137,7 +150,9 @@
         "RUN_EVIDENCE_WRITE_UNVERIFIED",
         "RUN_EVIDENCE_COMMIT_FAILED",
         "RUN_ITEM_SET_INCOMPLETE"
-      ]
+      ],
+      "derivesEveryItemFactFromCommittedFiles": true,
+      "acceptsFromTheCaller": ["the closed expected item ID set", "a closed determinism report"]
     }
   },
   "itemTransactionProtocol": {
@@ -152,5 +167,35 @@
       "SEALED_EVIDENCE_DESTINATION_EXISTS",
       "SEALED_EVIDENCE_COMMIT_FAILED"
     ]
+  },
+  "actor2RawVerification": {
+    "module": "scripts/eval/lib/issue-149-raw-verifier.ts",
+    "verifies": [
+      "exact item sets for both runs",
+      "exact success/failure file set per item",
+      "every item file digest against the manifest",
+      "valid run commit markers",
+      "counts and determinism covered by the manifest",
+      "the manifest's own SHA-256 file",
+      "no staging directories or unexpected files",
+      "the final acquisition verdict"
+    ],
+    "isNotASizeCheck": "a du -sb measurement is a volume statement, not verification, and passing one on a half-written run reads as verification"
+  },
+  "jobCIdentityVerification": {
+    "module": "scripts/eval/lib/issue-149-raw-verifier.ts#verifyNoHistoricalIdentity",
+    "receives": [
+      "the sealed raw artifact, read-only",
+      "the minimal historical case-ID and fixture-path inventory",
+      "the forbidden evidence-key inventory"
+    ],
+    "doesNotReceive": [
+      "acceptable Brand values",
+      "truth labels",
+      "expected field values",
+      "prior classifications"
+    ],
+    "haltCode": "TRUTH_ISOLATION_FAILURE",
+    "reportLocation": "outside raw/, with its own digest"
   }
 }

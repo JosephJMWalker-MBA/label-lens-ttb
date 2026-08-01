@@ -24,5 +24,21 @@
     "haltCode": "EXECUTE_TRANSITION_REJECTED"
   },
   "currentDecision": "Execute is NOT authorized. This sprint implements the dormant execute path and re-runs discovery; execute requires a later, explicit authorization decision.",
-  "ocrRun": false
+  "ocrRun": false,
+  "amendedBy": "preregistration-stage-2-final-execute-closure.md",
+  "branchLocalGateLimitation": {
+    "statement": "A branch-local workflow cannot prove that an unreviewed commit did not replace or remove its own gate. The workflow file and the gate script are both loaded from the current branch head, so a transition commit that modifies the workflow could bypass the gate before the gate has a chance to reject that modification.",
+    "thereforeTheGateIs": "defense in depth against ordinary accidental co-changes, NOT self-authenticating authorization",
+    "whatActuallyAuthorizes": "an externally reviewed transition commit, identified by its full SHA before it is pushed"
+  },
+  "frozenAuthorizationProcedure": [
+    "1. create the authorization-and-mode transition commit LOCALLY",
+    "2. it changes exactly two files: workflow-mode.txt and execute-authorization.json",
+    "3. do not push it",
+    "4. report its full commit SHA, its parent SHA, the exact two-file list and the byte diffs",
+    "5. obtain explicit owner authorization naming that transition commit SHA",
+    "6. push only the already-authorized commit",
+    "7. the repository gate independently rechecks the reviewed implementation range"
+  ],
+  "transitionCommitCreatedInThisSprint": false
 }

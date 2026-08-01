@@ -1,10 +1,18 @@
 # Limitations
 
-Stage 1: contract generation and trusted freeze/staging. The Stage 1 trusted freeze/staging generator and its temporary reproducibility
-mode have run. **No Stage 2 Job A workflow, truth-free preparation artifact,
-runtime-bundle build, discovery, execute mode or governed 115-case acquisition
-OCR has run.** The ordinary repository suite continues to run its pre-existing
-bundled-image OCR tests, disclosed separately.
+Stage 1 contract generation and trusted freeze/staging are complete, and **Stage 2
+Job A and isolated discovery have run**. Job A builds the allowlisted runtime
+bundle and emits the truth-free preparation artifact; the **runtime bundle
+executes in `discover` mode** inside the isolated boundary and produces the
+boundary report.
+
+**What has NOT run: execute mode, the acquisition API, the extractor, the OCR
+engine, the item and run writers, and any governed 115-case acquisition OCR.** No
+`raw/` evidence exists. The execute path is implemented and dormant, and
+`execute-authorization.json` reads `EXECUTE_NOT_AUTHORIZED`.
+
+The ordinary repository suite continues to run its pre-existing bundled-image OCR
+tests, disclosed separately.
 
 ## What is available, and what genuinely is not
 
@@ -177,15 +185,28 @@ there is no evidence object left to project. The source gate rejects the obvious
 projection and parse forms as defense in depth, and is described as defense in
 depth rather than as proof.
 
-## The run-level commit is per-file, not a single rename
+## The run-level commit is a marker, not a single rename
 
 An item commits by renaming its staging directory, which is atomic. The run-level
 files land in a directory that already exists — it holds the items — so they are
-renamed individually after all of them have been written and read back. That is
-weaker than a single atomic commit, and it is stated rather than described as
-equivalent: a crash between two renames could leave some run-level files present.
-Every one of them is derived from the committed items, so the recovery is to
-re-derive, not to reconstruct.
+renamed individually. That window is closed by an **exclusive commit marker**
+written last, `RUN_COMMITTED.json`, which binds every run-level digest: a run
+without a valid marker is UNCOMMITTED no matter which of its files are present,
+and actor 2 treats it as such.
+
+What remains true and is stated rather than smoothed over: the marker makes the
+partial state DETECTABLE, not impossible. A crash between renames still leaves
+files on disk; they simply cannot be mistaken for a committed run. Recovery is
+explicit re-derivation from the committed items, never reconstruction.
+
+## The branch-local execute gate cannot authenticate itself
+
+The changed-file gate compares the actual commit range against a reviewed SHA,
+which catches ordinary accidental co-changes. It cannot prove that an unreviewed
+commit did not replace or remove the gate itself: the workflow and the gate
+script are both loaded from the current branch head. It is defense in depth. What
+actually authorizes execute is an externally reviewed transition commit,
+identified by its full SHA **before** it is pushed.
 
 ## Scope
 
