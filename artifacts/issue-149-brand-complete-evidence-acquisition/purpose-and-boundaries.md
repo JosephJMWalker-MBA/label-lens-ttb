@@ -103,3 +103,19 @@ Production also caps candidate *generation*: `MAX_BRAND_WORDS = 4` and
 formed, so acquisition cannot enumerate a candidate production never built.
 Whole-line candidates longer than four words *are* formed and rejected with
 `too-many-words`, so those do appear.
+
+## What the acquisition boundary owns
+
+It owns the whole path from input to bytes: the input snapshot, the single
+extractor call, the pass-set reconstruction, the diagnostic selection, the parity
+assertion, the candidate finalization **and the serialization**. What the runner
+receives is a sealed, frozen list of file descriptors with exact byte lengths and
+digests.
+
+That is deliberate, and it is the fifth iteration of one correction. Each earlier
+boundary closed the route it named and left the adjacent one open: a bare
+candidate array became a caller-supplied `FieldSelection`, which became a
+caller-supplied `ExtractionDebug`, which became a caller-owned mutable
+`ExtractionInput`, which became caller-owned mutable **output**. A projection of
+the output needs no mutation at all, so prohibiting mutation was never going to
+be enough. The alternative is deleted rather than prohibited by convention.

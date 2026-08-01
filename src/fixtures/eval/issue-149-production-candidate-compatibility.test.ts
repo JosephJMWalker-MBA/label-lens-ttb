@@ -25,6 +25,8 @@ vi.mock("@/pipeline/extractor/extractor", async (importOriginal) => ({
 }));
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
+import { sealedCandidates } from "./issue-149-sealed-package-support";
+
 import { extractLabelEvidenceDetailed, type ExtractionDebug } from "@/pipeline/extractor/extractor";
 import type { ExtractionInput } from "@/pipeline/extractor/extractor.types";
 import type { OcrWord, RegionOcrResult } from "@/pipeline/extractor/extractor.types";
@@ -32,6 +34,7 @@ import {
   BRAND_FILTER_CHECK_ORDER,
   compareCandidateRanking,
   selectBrandObservation,
+  selectBrandObservationWithCompleteFilterDiagnostics,
   type BrandCandidateDiagnostic,
 } from "@/pipeline/extractor/field-selection";
 
@@ -155,9 +158,30 @@ async function acquire(debug: ExtractionDebug, artifactRef: string) {
     ok: true,
     value: { response: {}, debug, sellerRegionReadings: [] },
   } as never);
-  const result = await acquireProductionBrandEvidence(validInput(artifactRef));
-  if (!result.ok) throw new Error("expected success");
-  return result.value;
+  const sealed = await acquireProductionBrandEvidence(validInput(artifactRef));
+  if (sealed.outcome !== "extracted") throw new Error("expected success");
+  // The candidate population is read back out of the SEALED BYTES. There is no
+  // privileged in-memory view any more, not even here. `productionCandidates` is
+  // recomputed independently from the same debug object, using production's own
+  // selector and production's own pass-set rule, so the sealed evidence is
+  // compared against the population rather than against itself.
+  return {
+    sealed,
+    candidateRecords: sealedCandidates(sealed),
+    productionCandidates: productionCandidatesFor(debug),
+  };
+}
+
+/**
+ * Production's own Brand candidate population for a debug object, using the
+ * exact pass-set branch the extractor uses (extractor.ts:99,113).
+ */
+function productionCandidatesFor(debug: ExtractionDebug): BrandCandidateDiagnostic[] {
+  const passes =
+    debug.primarySelections?.brand?.observation?.state === "OBSERVED"
+      ? [debug.passes[0]]
+      : debug.passes;
+  return selectBrandObservationWithCompleteFilterDiagnostics(passes).brandDiagnostics!.candidates;
 }
 
 const DEBUG = debugFor([region(LINES)]);
@@ -167,7 +191,8 @@ let CANDIDATES: BrandCandidateDiagnostic[];
 
 beforeAll(async () => {
   EVIDENCE = await acquire(DEBUG, "item-0001");
-  CANDIDATES = EVIDENCE.diagnosticSelection.brandDiagnostics!.candidates;
+  // The production population the sealed records must account for, in full.
+  CANDIDATES = EVIDENCE.productionCandidates;
 });
 
 /** Clone a debug object so a test can corrupt it without touching the shared one. */
@@ -238,13 +263,27 @@ describe("Issue #149 production candidate compatibility", () => {
     expect(record.candidateProvenance).toEqual({ ...source.candidateProvenance });
   });
 
-  it("accepts a real ocrConfidence with missing token confidences", async () => {
-    const withMissing = await acquire(debugFor([region(LINES, ["BRICK"])]), "item-0002");
-    const candidates = withMissing.diagnosticSelection.brandDiagnostics!.candidates;
+  it("reaches a real nonzero missingTokenCount through production's own selector", () => {
+    // A word whose rawConfidence is not a finite number is what drives
+    // production's missingTokenCount above zero (field-selection.ts:35-53).
+    const debug = debugFor([region(LINES, ["BRICK"])]);
+    const candidates = productionCandidatesFor(debug);
     expect(candidates.some((candidate) => candidate.ocrConfidence.missingTokenCount > 0)).toBe(
       true,
     );
-    expect(withMissing.candidateRecords.length).toBe(candidates.length);
+  });
+
+  it("HALTS rather than sealing a pass whose word carries no finite rawConfidence", async () => {
+    // Stated plainly, because it is a real constraint and not a convenience:
+    // the sealed pass schema requires a finite `rawConfidence` on every word, so
+    // the population above cannot be persisted. `OcrWord.rawConfidence` is a
+    // REQUIRED number in production's own type, so this is a pass production's
+    // types say cannot occur — but if the engine ever produced one, the item
+    // halts with PASS_WORD_INVALID instead of being silently persisted with a
+    // hole in it. See limitations.md.
+    await expect(acquire(debugFor([region(LINES, ["BRICK"])]), "item-0002")).rejects.toMatchObject({
+      code: "PASS_WORD_INVALID",
+    });
   });
 
   it("rejects a candidate whose repeated facts disagree", async () => {
@@ -271,7 +310,7 @@ describe("Issue #149 the public API owns the derivation", () => {
     for (const notDebug of [
       CANDIDATES,
       CANDIDATES.filter((candidate) => !candidate.kept),
-      EVIDENCE.diagnosticSelection,
+      { brandDiagnostics: { candidates: CANDIDATES }, observation: {} },
       { brandDiagnostics: { candidates: CANDIDATES } },
       {},
     ]) {
@@ -311,7 +350,8 @@ describe("Issue #149 the public API owns the derivation", () => {
       ],
     } as unknown as ExtractionDebug;
     const evidence = await acquire(withRecovery, "item-0003");
-    const values = evidence.diagnosticSelection.brandDiagnostics!.candidates.map((c) => c.rawText);
+    // Read from the SEALED candidate evidence, which is the only view there is.
+    const values = evidence.candidateRecords.map((record) => record.rawText);
     expect(values).toContain("RED BRICK WINERY");
     expect(values).not.toContain("SILVER OAK CELLARS");
   });
@@ -324,7 +364,7 @@ describe("Issue #149 the public API owns the derivation", () => {
     const debug = debugFor(passes);
     expect(debug.primarySelections.brand.observation.state).not.toBe("OBSERVED");
     const evidence = await acquire(debug, "item-0004");
-    const values = evidence.diagnosticSelection.brandDiagnostics!.candidates.map((c) => c.rawText);
+    const values = evidence.candidateRecords.map((record) => record.rawText);
     // The second pass's candidate is present, so all passes were selected over.
     expect(values).toContain("RED BRICK WINERY");
   });
@@ -390,7 +430,7 @@ describe("Issue #149 production ranked membership", () => {
       ]),
       "item-0005",
     );
-    const candidates = duplicates.diagnosticSelection.brandDiagnostics!.candidates;
+    const candidates = duplicates.productionCandidates;
     const withRanking = candidates.filter((candidate) => candidate.ranking !== undefined);
     const withDecision = candidates.filter((candidate) => candidate.decision !== undefined);
     expect(withRanking.length).toBeGreaterThan(withDecision.length);
@@ -426,8 +466,8 @@ describe("Issue #149 production ranked membership", () => {
     expect(ranked[0].selected).toBe(true);
     expect(ranked.slice(1).every((record) => record.selected === false)).toBe(true);
 
-    const members = evidence.diagnosticSelection
-      .brandDiagnostics!.candidates.map((candidate, index) => ({ candidate, index }))
+    const members = evidence.productionCandidates
+      .map((candidate, index) => ({ candidate, index }))
       .filter((entry) => entry.candidate.decision !== undefined);
     const wrap = (c: BrandCandidateDiagnostic) =>
       ({ ranking: c.ranking }) as unknown as Parameters<typeof compareCandidateRanking>[0];
@@ -483,7 +523,7 @@ describe("Issue #149 a kept population must retain a ranked survivor", () => {
       ]),
     ]);
     const evidence = await acquire(debug, "item-0007");
-    const candidates = evidence.diagnosticSelection.brandDiagnostics!.candidates;
+    const candidates = evidence.productionCandidates;
     expect(candidates.length).toBeGreaterThan(0);
     expect(candidates.every((candidate) => !candidate.kept)).toBe(true);
     expect(evidence.candidateRecords.every((record) => record.rankedPosition === null)).toBe(true);
@@ -503,9 +543,15 @@ describe("Issue #149 adapter runtime export surface", () => {
   it("exports exactly the error class and the debug-owned API", async () => {
     // The authoritative check: the real runtime namespace, not a source regex.
     const namespace = await import("../../../scripts/eval/lib/issue-149-candidate-adapter");
+    // Five names: the error class, the one acquisition function, the writer that
+    // takes a COMPLETE sealed package, and the two frozen file-suffix lists that
+    // make the required package contents inspectable without exposing evidence.
     expect(Object.keys(namespace).sort()).toEqual([
       "CandidateAdapterError",
+      "SEALED_FAILURE_FILE_SUFFIXES",
+      "SEALED_SUCCESS_FILE_SUFFIXES",
       "acquireProductionBrandEvidence",
+      "writeSealedEvidencePackage",
     ]);
     for (const removed of [
       "finalizeProductionBrandEvidence",

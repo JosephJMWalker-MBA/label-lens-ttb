@@ -10,6 +10,8 @@
  */
 import { describe, expect, it, vi } from "vitest";
 
+import { sealedCandidates } from "./issue-149-sealed-package-support";
+
 // The public API owns the extractor call, so a synthetic debug object reaches it
 // only through a mocked extractor. The selectors themselves are never mocked.
 vi.mock("@/pipeline/extractor/extractor", async (importOriginal) => ({
@@ -252,9 +254,9 @@ describe("Issue #149 frozen vocabulary matches production", () => {
       value: { response: {}, debug, sellerRegionReadings: [] },
     } as never);
     const acquired = await acquireProductionBrandEvidence(validInput("item-0001"));
-    if (!acquired.ok) throw new Error("expected success");
-    const { diagnosticSelection, candidateRecords } = acquired.value;
-    expect(diagnosticSelection.brandDiagnostics?.candidates.length).toBeGreaterThan(0);
+    expect(acquired.outcome).toBe("extracted");
+    const candidateRecords = sealedCandidates(acquired);
+    expect(candidateRecords.length).toBeGreaterThan(0);
     const [record] = candidateRecords;
     const derived = new Set(["canonicalRecordSha256", "stableCandidateId"]);
     expect(new Set(Object.keys(record).filter((key) => !derived.has(key)))).toEqual(

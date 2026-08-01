@@ -14,6 +14,7 @@ import { execFileSync } from "node:child_process";
 import {
   copyFileSync,
   existsSync,
+  mkdirSync,
   mkdtempSync,
   readFileSync,
   readdirSync,
@@ -260,24 +261,27 @@ describe("Issue #149 Stage 1 generated-artifact reproducibility", () => {
   });
 
   describe("tracked Stage 1 artifacts are not written by tests", () => {
-    it("verifies the governed package with the REAL verifier — state, not history", () => {
-      // The authoritative check: the real manifest verifier plus the real
-      // working-tree evaluator, run end to end. It proves the package is intact
-      // NOW; it does not and cannot detect a write that was performed and
-      // restored mid-test. The intentional-drift tests demonstrably use only
-      // temporary paths, which is a separate and executable fact.
+    it("verifies the contract manifest through the REAL verifier", () => {
+      // The authoritative intactness check: the real manifest verifier, run end
+      // to end through the CLI entrypoint. It proves the package's recorded
+      // digests match the files on disk NOW; it cannot detect a write that was
+      // performed and restored mid-test. The intentional-drift tests
+      // demonstrably use only temporary paths, which is a separate and
+      // executable fact.
       //
-      // Local runs use `--local`, because amendment work legitimately leaves a
-      // diff inside the governed package. CI runs `--clean` from `posttest`,
-      // where any difference at all fails. The two are NOT equivalent, and the
-      // mode is an argument — never a deduction from how dirty the tree is.
-      const report = verifyWorkingTree([defaultModeForEnvironment(process.env)]) as {
+      // The working-tree VERDICT is deliberately NOT asserted here. Local
+      // amendment work leaves the repository dirty by construction, and a check
+      // that has to tolerate that is the check this amendment removed. The
+      // verdict belongs to the `posttest` lifecycle, which runs `--clean` on a
+      // committed tree after the suite; the mode-specific cases below drive the
+      // real evaluator directly.
+      const report = verifyWorkingTree(["--clean"]) as {
         status: string;
         manifestVerified?: boolean;
-        detail?: unknown;
+        reason?: string;
       };
-      expect(report.status).not.toBe("HALTED");
-      expect(report.manifestVerified).toBe(true);
+      expect(report.reason).not.toBe(HALT_CODES.MANIFEST_UNVERIFIED);
+      if (report.status !== "HALTED") expect(report.manifestVerified).toBe(true);
     }, 180_000);
 
     it("verifies the working tree through the REAL mode-explicit verifier", () => {
@@ -322,6 +326,12 @@ describe("Issue #149 Stage 1 generated-artifact reproducibility", () => {
           manifestedPaths: manifested,
         }),
       ).toMatchObject({ ok: false, code: HALT_CODES.OUTSIDE_PACKAGE });
+
+      // ...and that outcome is REACHABLE from the CLI, which it previously was
+      // not: local mode scoped `git status` to the governed directory, so an
+      // outside modification could never enter `entries` at all.
+      const localScope = verifyWorkingTree.toString();
+      expect(localScope).toContain('run("git", ["status", "--porcelain"])');
       expect(
         evaluateWorkingTree({
           mode: "local",
@@ -366,6 +376,60 @@ describe("Issue #149 Stage 1 generated-artifact reproducibility", () => {
       }
     });
 
+    it("asks Git about the WHOLE repository in local mode", () => {
+      // An end-to-end demonstration on a throwaway repository: a modification
+      // OUTSIDE the governed package must fail --local. This cannot be shown by
+      // dirtying the real checkout, so a scratch repository stands in.
+      const scratch = mkdtempSync(path.join(tmpdir(), "issue-149-worktree-scope-"));
+      try {
+        const governed = path.join(scratch, GOVERNED_DIRECTORY);
+        mkdirSync(path.join(scratch, "src"), { recursive: true });
+        mkdirSync(governed, { recursive: true });
+        writeFileSync(path.join(scratch, "src/production.ts"), "export const x = 1;\n");
+        writeFileSync(path.join(governed, "contract.json"), "{}\n");
+
+        const git = (...args: string[]): string =>
+          execFileSync("git", args, { cwd: scratch, encoding: "utf8" });
+        git("init", "--quiet");
+        git("config", "user.email", "test@example.com");
+        git("config", "user.name", "test");
+        git("add", "-A");
+        git("commit", "--quiet", "-m", "base");
+
+        // Clean: nothing differs anywhere.
+        expect(parsePorcelain(git("status", "--porcelain"))).toEqual([]);
+
+        // Now change a file OUTSIDE the governed package.
+        writeFileSync(path.join(scratch, "src/production.ts"), "export const x = 2;\n");
+        const repositoryWide = parsePorcelain(git("status", "--porcelain"));
+        const packageScoped = parsePorcelain(
+          git("status", "--porcelain", "--", GOVERNED_DIRECTORY),
+        );
+
+        // The scoped query cannot see it. That is precisely why local mode must
+        // not use the scoped query.
+        expect(packageScoped).toEqual([]);
+        expect(repositoryWide.map((entry) => entry.file)).toEqual(["src/production.ts"]);
+
+        expect(
+          evaluateWorkingTree({
+            mode: "local",
+            entries: repositoryWide,
+            manifestedPaths: new Set<string>(),
+          }),
+        ).toMatchObject({ ok: false, code: HALT_CODES.OUTSIDE_PACKAGE });
+        expect(
+          evaluateWorkingTree({
+            mode: "local",
+            entries: packageScoped,
+            manifestedPaths: new Set<string>(),
+          }),
+        ).toMatchObject({ ok: true });
+      } finally {
+        rmSync(scratch, { recursive: true, force: true });
+      }
+    }, 60_000);
+
     it("runs the strict check AFTER the suite, via the posttest lifecycle", () => {
       // Verifying cleanliness BEFORE the tests proves nothing about the tests.
       const scripts = (
@@ -377,6 +441,22 @@ describe("Issue #149 Stage 1 generated-artifact reproducibility", () => {
         "node scripts/eval/issue-149-stage-1-working-tree.mjs --mode-from-env",
       );
       expect(scripts.test).toBe("vitest run");
+    });
+
+    it("describes clean mode's scope exactly, without overclaiming", () => {
+      // Clean mode intentionally checks the governed package only. It is the
+      // post-suite "the tests changed nothing" assertion, not a repository-wide
+      // cleanliness claim, and the source must not describe it as one.
+      const source = readFileSync(
+        path.join(process.cwd(), "scripts/eval/issue-149-stage-1-working-tree.mjs"),
+        "utf8",
+      );
+      const prose = source.replace(/\s*\n\s*(?:\/\/)?\s*/g, " ");
+      expect(prose).toContain("`--clean` deliberately checks the governed package ONLY");
+      expect(prose).toContain("not a repository-wide cleanliness claim");
+      expect(prose).toContain(
+        "`--local` claims every difference is confined to the governed package, so it must ask Git about the WHOLE REPOSITORY",
+      );
     });
 
     it("finds no obvious tracked write in the Stage 1 tests — a SUPPLEMENTARY heuristic", () => {

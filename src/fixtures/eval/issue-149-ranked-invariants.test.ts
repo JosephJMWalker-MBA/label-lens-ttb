@@ -19,6 +19,8 @@
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { sealedCandidates } from "./issue-149-sealed-package-support";
+
 import { extractLabelEvidenceDetailed, type ExtractionDebug } from "@/pipeline/extractor/extractor";
 import type { ExtractionInput, RegionOcrResult } from "@/pipeline/extractor/extractor.types";
 import {
@@ -168,7 +170,39 @@ function authorityFor(selection: FieldSelection): FieldSelection {
   return clone as unknown as FieldSelection;
 }
 
-const pass = { passId: "pass-1-full-image" } as unknown as RegionOcrResult;
+/**
+ * A COMPLETE `RegionOcrResult`. The stub used to be `{ passId }` alone, which was
+ * enough while the boundary returned objects. It is not enough now: sealing
+ * serializes the pass array through `assertRegionOcrResultRecord`, so an
+ * incomplete pass record halts before anything is sealed — which is the point.
+ */
+const pass = {
+  passId: "pass-1-full-image",
+  regionName: "full-image",
+  passKind: "full-image-primary",
+  triggerReasons: [],
+  preprocessing: [],
+  fieldEligibility: { brand: true, alcohol: true },
+  transform: {
+    crop: { left: 0, top: 0, width: 1600, height: 1200 },
+    rotate: 0,
+    scale: 1,
+    originalWidth: 1600,
+    originalHeight: 1200,
+  },
+  transformedSize: { width: 1600, height: 1200 },
+  pageSegMode: 11,
+  rawWordCount: 1,
+  discardedWordCount: 0,
+  timings: { preprocessMs: 1, ocrMs: 2, inverseMappingMs: 3, totalMs: 6 },
+  words: [
+    {
+      text: "RED",
+      rawConfidence: 92,
+      bbox: { x0: 0, y0: 0, x1: 10, y1: 10 },
+    },
+  ],
+} as unknown as RegionOcrResult;
 
 /** A valid acquisition input carrying exactly the frozen incumbent identities. */
 const validInput = (artifactRef: string): ExtractionInput =>
@@ -254,14 +288,14 @@ describe("Issue #149 ranked-array invariants, reached past parity", () => {
       keptCandidate("RED BRICK WINERY", 9),
     ]);
     const result = await acquireWith(selection);
-    if (!result.ok) throw new Error("expected success");
+    expect(result.outcome).toBe("extracted");
 
-    const positions = result.value.candidateRecords.map((record) => record.rankedPosition);
-    expect(positions).toEqual([0, null]);
-    expect(result.value.candidateRecords[0].selected).toBe(true);
+    const records = sealedCandidates(result);
+    expect(records.map((record) => record.rankedPosition)).toEqual([0, null]);
+    expect(records[0].selected).toBe(true);
     // The deduplicated candidate keeps its ranking evidence.
-    expect(result.value.candidateRecords[1].rankingEligible).toBe(true);
-    expect(result.value.candidateRecords[1].ranking).not.toBeNull();
+    expect(records[1].rankingEligible).toBe(true);
+    expect(records[1].ranking).not.toBeNull();
   });
 
   it("still halts at parity when the AUTHORITY disagrees, before the array invariants", async () => {
@@ -292,7 +326,10 @@ describe("Issue #149 ranked-array invariants, reached past parity", () => {
     const namespace = await import("../../../scripts/eval/lib/issue-149-candidate-adapter");
     expect(Object.keys(namespace).sort()).toEqual([
       "CandidateAdapterError",
+      "SEALED_FAILURE_FILE_SUFFIXES",
+      "SEALED_SUCCESS_FILE_SUFFIXES",
       "acquireProductionBrandEvidence",
+      "writeSealedEvidencePackage",
     ]);
     expect(CandidateAdapterError).toBeDefined();
   });

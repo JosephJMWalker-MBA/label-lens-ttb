@@ -211,20 +211,41 @@ and nothing else. The post-freeze ID map is not mounted.
 
 3. Persist the **complete ordered `RegionOcrResult` array** — all thirteen fields
    of every pass, in emission order — per
-   `region-ocr-result-replay-contract.json`; halt on `PASS_EVIDENCE_TRUNCATED` or
-   `PASS_ORDER_MISMATCH`. This is what makes the counterfactual in capability 3
-   replayable later, without OCR.
-4. The same call returns everything. Persist pass evidence only from
-   `evidence.value.detailed.debug.passes` and candidate evidence only from
-   `evidence.value.candidateRecords`.
+   `region-ocr-result-replay-contract.json`. The runner does not do this by
+   reading a pass array: the acquisition boundary serializes it and returns
+   bytes. This is what makes the counterfactual in capability 3 replayable
+   later, without OCR.
+4. **Write the sealed package, whole.** The call returns a frozen
+   `SealedItemEvidence`: an item id, an outcome, an ordered list of frozen file
+   descriptors — governed run-relative path, exact byte length, SHA-256 over
+   exactly those bytes, and a `bytes` reader that hands out a fresh copy every
+   time — plus `fileCount`, `totalBytes` and an `aggregateSha256` over the
+   ordered `(path, byteLength, sha256)` entries.
 
-   Inside it: `input.artifactRef` is validated before the extractor is invoked;
-   the extractor is called exactly once and its typed failure is returned
-   unchanged; the exact Brand pass set is reconstructed
+   The runner passes that package to `writeSealedEvidencePackage`, which writes
+   every file and verifies each by reading it back. It does **not** serialize,
+   filter, map, project, rank, reorder, reconstruct or parse evidence, and it
+   cannot select a subset: the writer takes the complete package and a
+   destination, and has no subset parameter.
+
+   An earlier plan had the runner persist pass evidence from
+   `evidence.value.detailed.debug.passes` and candidate evidence from
+   `evidence.value.candidateRecords`. That left the runner holding the live
+   objects, and a **projection** — `slice`, `filter`, `map`, `concat`, a spread
+   into a new array — produces incomplete evidence with no mutation at all, which
+   no source-level mutation rule can catch. Serialization therefore happens
+   inside the boundary and the alternative no longer exists.
+
+   Inside it: the input's exact own data-property values are captured before the
+   first await (`Reflect.ownKeys`, symbols rejected, `Proxy` rejected, accessors
+   rejected, `imageBytes` copied); the extractor is called exactly once and a
+   typed failure seals exactly one governed `.failure.json` with no synthesised
+   debug and no retry; the exact Brand pass set is reconstructed
    (`primary OBSERVED ? [debug.passes[0]] : debug.passes`);
    `selectBrandObservationWithCompleteFilterDiagnostics` is invoked; full-object
-   canonical parity is asserted against `debug.finalSelections.brand`; and the
-   complete internally derived candidate population is finalized. The opaque
+   canonical parity is asserted against `debug.finalSelections.brand`; the
+   complete internally derived candidate population is finalized; and every
+   record is validated and serialized in production's own order. The opaque
    identity comes from `input.artifactRef`, so no second identifier can disagree
    with it.
 

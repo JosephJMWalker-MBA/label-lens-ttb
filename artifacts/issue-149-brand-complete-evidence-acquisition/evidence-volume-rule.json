@@ -21,7 +21,7 @@
     "omitting evidence"
   ],
   "ifTheGateFires": "The evidence still exists in full as a workflow artifact. Only its commitment to Git is withheld, and that fact is reported rather than resolved by shrinking the evidence.",
-  "amendedBy": "preregistration-amendment-12.md",
+  "amendedBy": "preregistration-amendment-13.md",
   "above100MBProcedure": [
     "upload the complete lossless evidence artifact",
     "record the artifact ID, exact bytes, SHA-256, configured retention and expected expiration",

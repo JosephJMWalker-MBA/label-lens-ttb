@@ -1,0 +1,83 @@
+{
+  "artifact": "amendment-13-linkage",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "amendment": 13,
+  "record": "preregistration-amendment-13.md",
+  "priorHead": "c8154b016a80ab9a9463e71914db9bce68cb382a",
+  "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+  "title": "Sealed output ownership, real symbol resolution, and load-bearing Stage 1 checks",
+  "defectsClosed": [
+    {
+      "defect": "the source analyzer did not resolve symbols through the TypeChecker",
+      "detail": "It built a ts.Program and never asked it anything, comparing callee TEXT against a manually constructed import-name map. An acquisition call imported under an alias outside the runner was neither counted nor rejected, and two imports of the authorized function under different local names were reported as one call. hasLocalDeclaration also missed parameters, catch bindings, destructuring and block scope, and module comparison used a broad endsWith.",
+      "correction": "program.getTypeChecker, checker.getSymbolAtLocation and checker.getAliasedSymbol resolve every callee to a declaration, compared against the adapter module's exported declaration; shadowing is detected in every binding position; there is no suffix matching and no caller-selectable path",
+      "provenBy": ["src/fixtures/eval/issue-149-stage2-source-closure.test.ts"]
+    },
+    {
+      "defect": "the runner still owned mutable and projectable output evidence",
+      "detail": "The boundary returned the extractor's DetailedExtractionResult, the live FieldSelection and a mutable candidate array. Aliasing lost the property chain the mutation analyzer relied on, and a PROJECTION (slice, filter, map, concat, spread) produced incomplete evidence with no mutation at all. Source text cannot establish data lineage through either.",
+      "correction": "the public API serializes and seals internally and returns frozen byte descriptors; a separately named writer takes the COMPLETE package, writes every file and verifies by readback, with no subset parameter",
+      "haltCodes": [
+        "SEALED_EVIDENCE_INCOMPLETE",
+        "SEALED_EVIDENCE_WRITE_UNVERIFIED",
+        "SEALED_PACKAGE_PROJECTED",
+        "SEALED_EVIDENCE_PARSED"
+      ],
+      "provenBy": [
+        "src/fixtures/eval/issue-149-sealed-evidence.test.ts",
+        "src/fixtures/eval/issue-149-stage2-source-closure.test.ts"
+      ]
+    },
+    {
+      "defect": "the input snapshot was private but not literally closed or deeply frozen",
+      "detail": "Object.keys ignores non-enumerable and symbol own properties, so the claimed exact key set was not checked. A Proxy over a plain target passed isPlainObject and could return different values from a get trap on successive reads. Object.freeze(snapshot) is shallow, and a nonempty typed array cannot be frozen at all.",
+      "correction": "Reflect.ownKeys with symbols and unexpected non-enumerable keys rejected; util.types.isProxy rejects Proxy input and Proxy ocrEngine; data descriptors captured once and the caller's object never re-read; the immutability claim corrected to top-level snapshot frozen, ocrEngine frozen, imageBytes a private copy with no caller-held alias",
+      "claimWithdrawn": "'closed and deeply frozen' — the closure was real, the deep freezing was not",
+      "provenBy": ["src/fixtures/eval/issue-149-acquisition-orchestration.test.ts"]
+    },
+    {
+      "defect": "commands.sh succeeded by suppressing failed assertions",
+      "detail": "The stale fatal grep was replaced with echo \"…: $(grep -c … || true)\", which converted three checks into display. The script exited zero when the required public API count was 0, when the snapshot count was 0, and when the obsolete entrypoint count was nonzero.",
+      "correction": "assert-adapter-surface.sh captures each count and asserts it, exiting nonzero with a named code; a test runs the real script against temporary modified adapter copies and proves each failure",
+      "provenBy": ["src/fixtures/eval/issue-149-command-assertions.test.ts"]
+    },
+    {
+      "defect": "working-tree local mode could not reach its own outside-package halt",
+      "detail": "It claimed every difference was confined to the governed package while running git status scoped to that directory, so STAGE_1_MODIFICATION_OUTSIDE_GOVERNED_PACKAGE was unreachable in actual CLI execution.",
+      "correction": "--local takes an unscoped repository status; --clean keeps the governed-package scope and is described as a post-suite package assertion rather than a repository-wide cleanliness claim",
+      "provenBy": ["src/fixtures/eval/issue-149-generated-artifact-reproducibility.test.ts"]
+    }
+  ],
+  "claimsWithdrawn": [
+    "that the analyzer already used TypeChecker symbol identity",
+    "that Object.keys proved an exact own-key set",
+    "that the input snapshot was deeply or recursively frozen, including imageBytes",
+    "that source mutation analysis alone made evidence objects unchangeable",
+    "that commands.sh counts constituted verification"
+  ],
+  "theRepeatedFailureMode": {
+    "statement": "Each review has found the named route closed and an adjacent one left open, and several checks asserting the SHAPE of correctness rather than carrying its verdict.",
+    "instances": [
+      "bare candidate array -> wrapped FieldSelection -> constructed ExtractionDebug -> mutable ExtractionInput -> mutable and projectable RETURNED evidence",
+      "callee name matched -> local function, wrong module, alias, namespace, re-export, second alias",
+      "dotted assignment -> bracket, compound, delete, Object.assign, Reflect.set, array methods -> aliasing and non-mutating projection",
+      "strict porcelain assertion -> disarmed by dirtiness -> explicit mode but a scoped query that could not see the thing it rejected",
+      "fatal grep -> printed count that exits zero on failure"
+    ],
+    "structuralFixPattern": "delete the alternative rather than prohibit it by convention; drive the real function rather than restate what it does; and make every check observed to fail"
+  },
+  "notStarted": [
+    "Stage 2 Job A",
+    "discovery",
+    "execute mode",
+    "governed 115-case acquisition OCR",
+    "runtime bundle build",
+    "truth-free preparation artifact",
+    "acquisition runner",
+    "acquisition workflow",
+    "workflow-mode file"
+  ],
+  "productionRuntimeBehaviourChanged": false,
+  "ocrRun": false
+}

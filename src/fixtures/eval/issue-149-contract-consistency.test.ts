@@ -11,6 +11,7 @@ import path from "node:path";
 
 import {
   AUTHORIZED_ADAPTER_MODULE,
+  PROHIBITED_SEALED_PACKAGE_OPERATIONS,
   RUNNER_ENTRY_PATH,
 } from "../../../scripts/eval/lib/issue-149-stage2-source-closure";
 import { describe, expect, it } from "vitest";
@@ -33,6 +34,7 @@ const HISTORICAL_FILES = new Set([
   "preregistration-amendment-9.md",
   "preregistration-amendment-10.md",
   "preregistration-amendment-11.md",
+  "preregistration-amendment-12.md",
   "branch-pointer-incident.md",
   "amendment-linkage.json",
   "amendment-2-linkage.json",
@@ -45,6 +47,7 @@ const HISTORICAL_FILES = new Set([
   "amendment-9-linkage.json",
   "amendment-10-linkage.json",
   "amendment-11-linkage.json",
+  "amendment-12-linkage.json",
 ]);
 
 /**
@@ -53,7 +56,7 @@ const HISTORICAL_FILES = new Set([
  * current amendment. Exempting it wholesale is what let it sit at "amendment 2"
  * while the package was at Amendment 4, faithfully hashed by the manifest.
  */
-const CURRENT_AMENDMENT = 12;
+const CURRENT_AMENDMENT = 13;
 
 /**
  * A line may mention a superseded term when it is explicitly marking it as
@@ -1070,10 +1073,23 @@ describe("Issue #149 Stage 1 contract consistency", () => {
             referenceAnalyzer: string;
             onlyTheRunnerEntrypointMustInvokeTheApi: boolean;
             prohibitedCallsOutsideTheAdapterModule: string[];
-            prohibitedWritesOutsideTheAdapterModule: {
-              detectedForms: string[];
-              anchoredOnAdjacentPropertyPairs: string[];
-              singleNamesAreNotEnough: boolean;
+            mutationAnalysisIsNotCompletenessControl: {
+              priorOverclaim: string;
+              primaryControl: string;
+              sourceAnalysisRole: string;
+            };
+            sealedPackageRules: {
+              prohibitedOperationsOnSealedFiles: string[];
+              prohibitedParsingOfSealedBytes: boolean;
+              prohibitedSubsetSelection: boolean;
+              required: string;
+            };
+            resolutionApi: string[];
+            authorizationIsNeverEstablishedBy: string[];
+            twoSeparateControls: {
+              sourceGate: string;
+              runtimeGate: string;
+              neitherSubstitutesForTheOther: boolean;
             };
             symbolResolvedNotNameMatched: boolean;
             frozenPathsNotCallerSelectable: {
@@ -1092,27 +1108,38 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     expect(existsSync(path.join(process.cwd(), gate.referenceAnalyzer))).toBe(true);
     expect(gate.onlyTheRunnerEntrypointMustInvokeTheApi).toBe(true);
     expect(gate.prohibitedCallsOutsideTheAdapterModule).toContain("extractLabelEvidenceDetailed");
-    // The write rule is anchored on ADJACENT property pairs, not single names:
-    // a bare `passes` would reject any unrelated object with that property.
-    const writes = gate.prohibitedWritesOutsideTheAdapterModule;
-    expect(writes.singleNamesAreNotEnough).toBe(true);
-    expect(writes.anchoredOnAdjacentPropertyPairs).toContain("debug.passes");
-    expect(writes.anchoredOnAdjacentPropertyPairs).toContain("debug.finalSelections");
-    expect(writes.anchoredOnAdjacentPropertyPairs).toContain("brandDiagnostics.candidates");
-    for (const form of [
-      "delete",
-      "Object.assign",
-      "Reflect.set",
-      "splice",
-      "compound assignment",
-    ]) {
-      expect(writes.detectedForms).toContain(form);
+    // Completeness is a RUNTIME control now: the sealed package leaves nothing
+    // to project. Source analysis is defense in depth and must say so.
+    const reconciled = gate.mutationAnalysisIsNotCompletenessControl;
+    expect(reconciled.primaryControl).toContain("sealed package");
+    expect(reconciled.sourceAnalysisRole).toBe("defense in depth");
+    expect(reconciled.priorOverclaim).toContain("slice");
+    for (const operation of ["filter", "slice", "map", "concat"]) {
+      expect(gate.sealedPackageRules.prohibitedOperationsOnSealedFiles).toContain(operation);
+      expect(PROHIBITED_SEALED_PACKAGE_OPERATIONS).toContain(operation);
     }
+    expect(gate.sealedPackageRules.prohibitedSubsetSelection).toBe(true);
+    expect(gate.sealedPackageRules.prohibitedParsingOfSealedBytes).toBe(true);
+    expect(gate.sealedPackageRules.required).toContain("readback");
 
-    // The contract's claims are the analyzer's actual behaviour, not a
-    // description of it: the frozen paths are the analyzer's own constants and
-    // are not caller-selectable.
+    // The analyzer resolves symbols, and the contract says so because it does.
     expect(gate.symbolResolvedNotNameMatched).toBe(true);
+    expect(gate.resolutionApi).toEqual([
+      "program.getTypeChecker",
+      "checker.getSymbolAtLocation",
+      "checker.getAliasedSymbol",
+    ]);
+    const analyzerSource = readFileSync(path.join(process.cwd(), gate.referenceAnalyzer), "utf8");
+    for (const api of gate.resolutionApi) {
+      expect(analyzerSource).toContain(api.split(".").slice(-1)[0]);
+    }
+    expect(gate.authorizationIsNeverEstablishedBy).toContain("endsWith");
+    expect(analyzerSource).not.toContain(["end", "sWith("].join(""));
+
+    // Two controls, named separately.
+    expect(gate.twoSeparateControls.sourceGate).toContain("cannot prove");
+    expect(gate.twoSeparateControls.neitherSubstitutesForTheOther).toBe(true);
+
     expect(gate.frozenPathsNotCallerSelectable.runnerEntry).toBe(RUNNER_ENTRY_PATH);
     expect(gate.frozenPathsNotCallerSelectable.authorizedAdapterModule).toBe(
       AUTHORIZED_ADAPTER_MODULE,

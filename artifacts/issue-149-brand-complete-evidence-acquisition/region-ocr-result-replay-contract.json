@@ -2,7 +2,7 @@
   "artifact": "region-ocr-result-replay-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-12.md",
+  "amendedBy": "preregistration-amendment-13.md",
   "purpose": "Freeze the complete RegionOcrResult persistence that makes a later zero-OCR selector replay possible. This is what actually underwrites capability 3; complete rejection reasons alone do not.",
   "whyRejectionReasonsAloneAreInsufficient": [
     "a rejected span returns from analyzeBrandSpan BEFORE a Candidate object is constructed",
@@ -110,5 +110,7 @@
       "PASS_ARRAY_INVALID"
     ]
   },
-  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run."
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run.",
+  "arrayOrderFrozenBeforeSerialization": "The ordered pass array, the ordered word stream, the ordered line diagnostics and the ordered candidate records are all serialized inside the acquisition boundary, in the order production produced them. The runner receives bytes and cannot reorder them.",
+  "sealedEvidenceIsNotParsedByTheRunner": true
 }

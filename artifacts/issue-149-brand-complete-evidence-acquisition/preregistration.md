@@ -5,11 +5,11 @@ Refs Issue #149. **Evidence acquisition only.** Frozen before any OCR runs.
 Base: `origin/main` `546c3f279ce431a1fd8c0203df7a83553ea866ef`, the merge commit
 of PR #220.
 
-**Amended twelve times, every time before any governed acquisition OCR.** See
+**Amended thirteen times, every time before any governed acquisition OCR.** See
 `preregistration-amendment.md` and `preregistration-amendment-2.md` through
-`preregistration-amendment-12.md`. All earlier plans are preserved, not
+`preregistration-amendment-13.md`. All earlier plans are preserved, not
 overwritten, and their identities are recorded in `amendment-linkage.json` and
-`amendment-2-linkage.json` through `amendment-12-linkage.json`. **The Stage 1 trusted freeze/staging generator and its temporary
+`amendment-2-linkage.json` through `amendment-13-linkage.json`. **The Stage 1 trusted freeze/staging generator and its temporary
 reproducibility mode have run — that is what produced the three committed
 artifacts. No Stage 2 Job A workflow, truth-free preparation artifact,
 runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR

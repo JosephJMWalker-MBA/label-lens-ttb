@@ -111,6 +111,8 @@ export function parsePorcelain(raw) {
  */
 export function evaluateWorkingTree({ mode, entries, manifestedPaths }) {
   if (mode === "clean") {
+    // Governed-package scope. This is the post-suite "the tests changed nothing"
+    // assertion, not a claim about the rest of the repository.
     if (entries.length === 0)
       return { ok: true, status: "STAGE_1_GOVERNED_PACKAGE_CLEAN", mode, differingPaths: [] };
     return {
@@ -193,13 +195,29 @@ export function verifyWorkingTree(argv, { cwd = process.cwd(), env = process.env
     };
   }
 
-  const entries = parsePorcelain(run("git", ["status", "--porcelain", "--", GOVERNED_DIRECTORY]));
+  // SCOPE, stated exactly:
+  //
+  // - `--local` claims every difference is confined to the governed package, so
+  //   it must ask Git about the WHOLE REPOSITORY. The previous implementation
+  //   scoped `git status` to the governed directory, which made
+  //   STAGE_1_MODIFICATION_OUTSIDE_GOVERNED_PACKAGE unreachable in real CLI
+  //   execution: an outside modification could never enter `entries` at all.
+  // - `--clean` deliberately checks the governed package ONLY. It is a
+  //   post-suite assertion that the tests left the package untouched, not a
+  //   repository-wide cleanliness claim, and this file does not describe it as
+  //   one.
+  const entries = parsePorcelain(
+    selected.mode === "local"
+      ? run("git", ["status", "--porcelain"])
+      : run("git", ["status", "--porcelain", "--", GOVERNED_DIRECTORY]),
+  );
   // The WORKING-TREE manifest, not HEAD's. An amendment that adds a governed
   // artifact records it in the manifest before it is committed, and reading
   // HEAD's copy would reject every such amendment. This is not a loophole: the
   // manifest verification above already proved this manifest's recorded digests
   // match the files on disk, so an entry cannot be added without the file.
   const manifestedPaths = manifestedPathsFrom(readFileSync(path.join(cwd, MANIFEST_FILE), "utf8"));
+
   const verdict = evaluateWorkingTree({ mode: selected.mode, entries, manifestedPaths });
 
   if (!verdict.ok) {
@@ -216,6 +234,7 @@ export function verifyWorkingTree(argv, { cwd = process.cwd(), env = process.env
     mode: verdict.mode,
     governedDirectory: path.relative(cwd, path.join(cwd, GOVERNED_DIRECTORY)),
     modeSource: selected.modeSource,
+    statusScope: selected.mode === "local" ? "repository" : "governed-package",
     manifestVerified: true,
     differingPaths: verdict.differingPaths,
     acquisitionRun: false,

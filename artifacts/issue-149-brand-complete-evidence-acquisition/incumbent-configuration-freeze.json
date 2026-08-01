@@ -74,7 +74,7 @@
     "a changed pass template, crop geometry or transform",
     "any experimental flag or optional Brand treatment entry point being reachable"
   ],
-  "amendedBy": "preregistration-amendment-12.md",
+  "amendedBy": "preregistration-amendment-13.md",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "historicalNote": "The original plan and Amendment 1 routed acquisition through runCaseArtifacts. That route is prohibited from Amendment 2 onward because it reads governed truth and uses the historical case id as artifactRef.",
   "completeFilterDiagnostics": {

@@ -26,6 +26,8 @@ export interface PorcelainEntry {
   file: string;
 }
 
+export type WorkingTreeStatusScope = "repository" | "governed-package";
+
 export type ModeResolution =
   | { ok: true; mode: WorkingTreeMode; modeSource: "argument" | "environment" }
   | { ok: false; code: string; detail: string };

@@ -310,7 +310,10 @@ describe("Issue #149 acquisition identity and isolation", () => {
         const namespace = await import("../../../scripts/eval/lib/issue-149-candidate-adapter");
         expect(Object.keys(namespace).sort()).toEqual([
           "CandidateAdapterError",
+          "SEALED_FAILURE_FILE_SUFFIXES",
+          "SEALED_SUCCESS_FILE_SUFFIXES",
           "acquireProductionBrandEvidence",
+          "writeSealedEvidencePackage",
         ]);
       });
 

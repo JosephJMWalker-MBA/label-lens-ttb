@@ -15,6 +15,13 @@ import path from "node:path";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+  sealedCandidates,
+  sealedCounts,
+  sealedJson,
+  sealedPasses,
+} from "./issue-149-sealed-package-support";
+
 import { extractLabelEvidenceDetailed, type ExtractionDebug } from "@/pipeline/extractor/extractor";
 import type { ExtractionInput } from "@/pipeline/extractor/extractor.types";
 import type { OcrWord, RegionOcrResult } from "@/pipeline/extractor/extractor.types";
@@ -146,7 +153,136 @@ describe("Issue #149 extractor-owning acquisition", () => {
     expect(passed.processedAt).toBe("2026-07-12T00:00:00Z");
     expect([...passed.imageBytes]).toEqual([...input.imageBytes]);
     expect(passed.ocrEngine).toEqual(input.ocrEngine);
-    expect(result.ok).toBe(true);
+    expect(result.outcome).toBe("extracted");
+  });
+
+  describe("the input's own-key set is EXACT, not merely enumerable", () => {
+    // `Object.keys` returns only enumerable string keys, so the previous
+    // "closed key set" check could not see either of the first two cases.
+    it("rejects a NON-ENUMERABLE unexpected own property", async () => {
+      const input = inputFor("item-0001");
+      Object.defineProperty(input, "governedTruth", {
+        value: { present: true },
+        enumerable: false,
+        writable: true,
+        configurable: true,
+      });
+      expect(Object.keys(input)).not.toContain("governedTruth");
+      await expect(acquireProductionBrandEvidence(input)).rejects.toMatchObject({
+        code: "MALFORMED_EXTRACTION_INPUT",
+      });
+      expect(extractLabelEvidenceDetailed).not.toHaveBeenCalled();
+    });
+
+    it("rejects a SYMBOL-keyed own property", async () => {
+      const input = inputFor("item-0001");
+      (input as unknown as Record<symbol, unknown>)[Symbol("historicalCaseId")] = "brand-023";
+      await expect(acquireProductionBrandEvidence(input)).rejects.toMatchObject({
+        code: "MALFORMED_EXTRACTION_INPUT",
+      });
+      expect(extractLabelEvidenceDetailed).not.toHaveBeenCalled();
+    });
+
+    it("rejects a Proxy input, whose descriptors are not evidence of its values", async () => {
+      // A Proxy over a plain target satisfies every structural test and presents
+      // ordinary data descriptors, then returns whatever it likes from `get`.
+      let reads = 0;
+      const target = inputFor("item-0001");
+      const proxy = new Proxy(target, {
+        get(receiver, property, ...rest) {
+          if (property === "artifactRef") {
+            reads += 1;
+            return reads === 1 ? "item-0001" : "item-0042";
+          }
+          return Reflect.get(receiver, property, ...rest);
+        },
+      });
+      await expect(
+        acquireProductionBrandEvidence(proxy as unknown as ExtractionInput),
+      ).rejects.toMatchObject({ code: "MALFORMED_EXTRACTION_INPUT" });
+      expect(extractLabelEvidenceDetailed).not.toHaveBeenCalled();
+    });
+
+    it("rejects a Proxy ocrEngine", async () => {
+      const input = inputFor("item-0001");
+      input.ocrEngine = new Proxy(
+        { kind: "ocr", engineId: "tesseract.js", engineVersion: "7.0.0", modelId: "eng" },
+        {},
+      ) as unknown as ExtractionInput["ocrEngine"];
+      await expect(acquireProductionBrandEvidence(input)).rejects.toMatchObject({
+        code: "MALFORMED_EXTRACTION_INPUT",
+      });
+      expect(extractLabelEvidenceDetailed).not.toHaveBeenCalled();
+    });
+
+    it("captures each own property once, and cannot be re-read afterwards", async () => {
+      // Stated exactly. Once accessors and Proxies are BOTH refused, a data
+      // property's value cannot change between two reads, so "read once" is not
+      // observable from outside — refusing the two ways a value could change is
+      // what carries the guarantee. What is checkable is that the capture
+      // happens in exactly one place and that nothing downstream re-reads the
+      // caller's object, so that is what is asserted.
+      const source = readFileSync(
+        path.join(process.cwd(), "scripts/eval/lib/issue-149-candidate-adapter.ts"),
+        "utf8",
+      );
+      expect(source.match(/captured\[key\] = descriptor\.value;/g)).toHaveLength(1);
+
+      // After the capture, `raw` and `engine` are plain value records. The
+      // parameter `input` must not be read again anywhere below the capture.
+      const body = source.slice(source.indexOf("function snapshotAcquisitionInput"));
+      const afterCapture = body
+        .slice(body.indexOf("captureOwnDataValues(input,"))
+        // Error messages NAME the caller's properties; naming one is not
+        // reading it, so string and template literals are removed first.
+        .replace(/`(?:[^`\\]|\\.)*`/g, "``")
+        .replace(/"(?:[^"\\]|\\.)*"/g, '""')
+        .replace(/'(?:[^'\\]|\\.)*'/g, "''");
+      expect(afterCapture).not.toContain("input.");
+      expect(afterCapture).not.toContain("input[");
+
+      // And the observable consequence: what the extractor receives is a
+      // different object whose values match the ones present at call time.
+      const debug = validDebug();
+      vi.mocked(extractLabelEvidenceDetailed).mockResolvedValue({
+        ok: true,
+        value: { response: {}, debug, sellerRegionReadings: [] },
+      } as never);
+      const input = inputFor("item-0001");
+      await acquireProductionBrandEvidence(input);
+      const passed = vi.mocked(extractLabelEvidenceDetailed).mock.calls[0][0];
+      expect(passed).not.toBe(input);
+      expect(passed.artifactRef).toBe("item-0001");
+    });
+
+    it("states imageBytes isolation as a private copy, not as freezing", async () => {
+      // A nonempty typed array cannot be frozen in current JavaScript runtimes,
+      // so claiming the snapshot is "recursively frozen" would be false. What
+      // protects the bytes is that no caller holds a reference to the copy.
+      const debug = validDebug();
+      vi.mocked(extractLabelEvidenceDetailed).mockResolvedValue({
+        ok: true,
+        value: { response: {}, debug, sellerRegionReadings: [] },
+      } as never);
+      const input = inputFor("item-0001");
+      await acquireProductionBrandEvidence(input);
+      const passed = vi.mocked(extractLabelEvidenceDetailed).mock.calls[0][0];
+
+      expect(Object.isFrozen(passed)).toBe(true);
+      expect(Object.isFrozen(passed.ocrEngine)).toBe(true);
+      // Honest about the bytes: NOT frozen, and no caller alias.
+      expect(Object.isFrozen(passed.imageBytes)).toBe(false);
+      expect(passed.imageBytes).not.toBe(input.imageBytes);
+      expect(() => Object.freeze(new Uint8Array([1]))).toThrow(TypeError);
+
+      const source = readFileSync(
+        path.join(process.cwd(), "scripts/eval/lib/issue-149-candidate-adapter.ts"),
+        "utf8",
+      );
+      const prose = source.replace(/\s*\n\s*\*?\s*/g, " ");
+      expect(prose).toContain("private copied `Uint8Array` with no caller-held alias");
+      expect(prose).toContain('is therefore **not** "recursively frozen"');
+    });
   });
 
   describe("the caller cannot mutate the input mid-flight", () => {
@@ -161,11 +297,14 @@ describe("Issue #149 extractor-owning acquisition", () => {
       release();
 
       const result = await pending;
-      if (!result.ok) throw new Error("expected success");
+      expect(result.outcome).toBe("extracted");
       expect(vi.mocked(extractLabelEvidenceDetailed).mock.calls[0][0].artifactRef).toBe(
         "item-0001",
       );
-      expect(result.value.candidateRecords.every((r) => r.opaqueItemId === "item-0001")).toBe(true);
+      expect(result.itemId).toBe("item-0001");
+      expect(sealedCandidates(result).every((record) => record.opaqueItemId === "item-0001")).toBe(
+        true,
+      );
       expect(input.artifactRef).toBe("item-0042");
     });
 
@@ -309,16 +448,19 @@ describe("Issue #149 extractor-owning acquisition", () => {
     } as never);
 
     const result = await acquireProductionBrandEvidence(inputFor("item-0001"));
-    if (!result.ok) throw new Error("expected success");
+    expect(result.outcome).toBe("extracted");
 
-    // Pass evidence comes from the detailed result the API itself obtained.
-    expect(result.value.detailed.debug).toBe(debug);
-    expect(result.value.detailed.debug.passes).toBe(debug.passes);
+    // Pass evidence comes from the detailed result the API itself obtained, and
+    // is now readable only as sealed bytes.
+    const passes = sealedPasses(result);
+    expect(passes).toHaveLength(debug.passes.length);
+    expect(passes.map((pass) => pass.passId)).toEqual(debug.passes.map((pass) => pass.passId));
+
     // Candidate evidence comes from the internally derived selection.
-    expect(result.value.candidateRecords).toHaveLength(
-      result.value.diagnosticSelection.brandDiagnostics!.candidates.length,
-    );
-    expect(result.value.candidateRecords.every((r) => r.opaqueItemId === "item-0001")).toBe(true);
+    const counts = sealedCounts(result);
+    const candidates = sealedCandidates(result);
+    expect(candidates).toHaveLength(counts.candidateCount as number);
+    expect(candidates.every((record) => record.opaqueItemId === "item-0001")).toBe(true);
   });
 
   it("returns the extractor's typed failure unchanged, with no evidence", async () => {
@@ -330,13 +472,19 @@ describe("Issue #149 extractor-owning acquisition", () => {
 
     const result = await acquireProductionBrandEvidence(inputFor("item-0001"));
 
-    expect(result).toBe(failure);
-    expect(result.ok).toBe(false);
-    if (result.ok) throw new Error("expected failure");
-    expect(result.error.code).toBe("IMAGE_DECODE_FAILED");
-    expect(result.error.issues).toEqual(["truncated"]);
-    // No diagnostic selection and no candidate record exists on a failure.
-    expect(Object.hasOwn(result, "value")).toBe(false);
+    expect(result.outcome).toBe("extraction-failed");
+    expect(result.failure).toEqual({
+      code: "IMAGE_DECODE_FAILED",
+      message: "bad image",
+      issues: ["truncated"],
+    });
+    // Exactly one governed failure file. No partial debug is synthesised, so no
+    // pass, line, candidate, selection or counts file exists.
+    expect(result.files.map((file) => file.path)).toEqual(["item-0001.failure.json"]);
+    const record = sealedJson(result, ".failure.json");
+    expect(record.errorCode).toBe("IMAGE_DECODE_FAILED");
+    expect(record.retried).toBe(false);
+    expect(record.debugSynthesised).toBe(false);
     expect(extractLabelEvidenceDetailed).toHaveBeenCalledTimes(1);
   });
 
@@ -365,8 +513,10 @@ describe("Issue #149 extractor-owning acquisition", () => {
       value: { response: {}, debug, sellerRegionReadings: [] },
     } as never);
     const result = await acquireProductionBrandEvidence(inputFor("item-0042"));
-    if (!result.ok) throw new Error("expected success");
-    expect(result.value.candidateRecords.every((r) => r.opaqueItemId === "item-0042")).toBe(true);
+    expect(result.itemId).toBe("item-0042");
+    expect(sealedCandidates(result).every((record) => record.opaqueItemId === "item-0042")).toBe(
+      true,
+    );
     // The function takes exactly one argument, so no second identifier can
     // disagree with artifactRef.
     expect(acquireProductionBrandEvidence).toHaveLength(1);
@@ -376,7 +526,10 @@ describe("Issue #149 extractor-owning acquisition", () => {
     const namespace = await import("../../../scripts/eval/lib/issue-149-candidate-adapter");
     expect(Object.keys(namespace).sort()).toEqual([
       "CandidateAdapterError",
+      "SEALED_FAILURE_FILE_SUFFIXES",
+      "SEALED_SUCCESS_FILE_SUFFIXES",
       "acquireProductionBrandEvidence",
+      "writeSealedEvidencePackage",
     ]);
     for (const removed of [
       "finalizeProductionBrandEvidence",

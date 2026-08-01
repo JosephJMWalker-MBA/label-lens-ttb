@@ -2,7 +2,7 @@
   "artifact": "acquisition-runtime-isolation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-12.md",
+  "amendedBy": "preregistration-amendment-13.md",
   "status": "CONTRACT FROZEN. Not implemented in this amendment.",
   "whyThisExists": {
     "correction": "The Stage 1 isolation tests are STATIC manifest, path and import validation. They read committed planning artifacts and assert their shape. They are NOT runtime proof, and this contract stops them being described as such.",
@@ -206,7 +206,7 @@
         "noRuntimeTestBackdoorNote": "TEST_ONLY_candidateAdapterInternals was a real exported object holding both lower-level functions, so the private functions were reachable at runtime. It is removed; the adapter exports exactly one candidate-emission function.",
         "haltCode": "STAGE2_SOURCE_CLOSURE_VIOLATION",
         "referenceAnalyzer": "scripts/eval/lib/issue-149-stage2-source-closure.ts",
-        "referenceAnalyzerNote": "One host-only implementation building a ts.Program over the supplied closure and resolving every callee through the TypeChecker and the file's import bindings. Job A and the Stage 1 synthetic tests use it, so the gate that runs before acquisition is the gate the tests exercise.",
+        "referenceAnalyzerNote": "One host-only implementation. It builds a ts.Program over the supplied closure and resolves every callee through program.getTypeChecker(), checker.getSymbolAtLocation() and checker.getAliasedSymbol(), comparing the resolved DECLARATION against the adapter module's exported declaration. Job A and the Stage 1 synthetic tests use it.",
         "onlyTheRunnerEntrypointMustInvokeTheApi": true,
         "onlyTheRunnerEntrypointMustInvokeTheApiNote": "Helper modules for pass validation, semantic fingerprinting, exact-byte hashing, manifest writing and evidence scanning are legitimate Stage 2 sources and must NOT be required to call the acquisition API. They must only be free of prohibited routes. The previous detector added 'does not invoke the API' to every inspected file, which would have rejected all of them.",
         "prohibitedCallsOutsideTheAdapterModule": [
@@ -220,39 +220,6 @@
           "finalizeCandidateRecord",
           "stableCandidateId"
         ],
-        "prohibitedWritesOutsideTheAdapterModule": {
-          "detectedForms": [
-            "assignment",
-            "bracket/element assignment",
-            "compound assignment",
-            "destructuring assignment",
-            "delete",
-            "Object.assign",
-            "Reflect.set",
-            "push",
-            "pop",
-            "shift",
-            "unshift",
-            "splice",
-            "sort",
-            "reverse",
-            "copyWithin",
-            "fill"
-          ],
-          "anchoredOnAdjacentPropertyPairs": [
-            "value.detailed",
-            "value.diagnosticSelection",
-            "value.candidateRecords",
-            "detailed.debug",
-            "debug.passes",
-            "debug.primarySelections",
-            "debug.finalSelections",
-            "diagnosticSelection.brandDiagnostics",
-            "brandDiagnostics.candidates"
-          ],
-          "singleNamesAreNotEnough": true,
-          "singleNamesAreNotEnoughNote": "The previous rule flagged any chain containing a property called passes or candidates, so an ordinary unrelated helper \u2014 const stats = { passes: 0, candidates: [] }; stats.passes = n \u2014 failed the gate, and detection was still limited to plain dotted assignment. Anchoring on an adjacent pair keeps every real route, including chains reached through a destructured debug or diagnosticSelection, without claiming every same-named property in the closure."
-        },
         "prohibitedWritesNote": "Reading is permitted \u2014 the runner persists detailed.debug.passes. Writing, replacing or reconstructing these is how a filtered or reordered population would be smuggled in.",
         "acrossTheCompleteClosure": [
           "exactly one call to acquireProductionBrandEvidence exists",
@@ -275,20 +242,84 @@
           "a caller-supplied ExtractionDebug (Amendment 10): a helper could filter or reorder the passes and reconstruct matching selections"
         ],
         "symbolResolvedNotNameMatched": true,
-        "symbolResolvedNotNameMatchedNote": "The previous version matched callee NAMES. It could be satisfied by a local function coincidentally named acquireProductionBrandEvidence, by importing that name from an unreviewed module, and evaded by calling a prohibited function through an alias or a namespace import. It also could not tell whether the required call was awaited or what it was passed. A name is not evidence of a binding.",
+        "symbolResolvedNotNameMatchedNote": "The previous version created a ts.Program and then never asked it anything: it compared callee TEXT against a manually built import-name map. That left an aliased acquisition call outside the runner undetected (callee text `run` is neither the authorized name nor a prohibited one), and reported two imports of the authorized function under different local names as ONE call. A name is not an identity.",
         "frozenPathsNotCallerSelectable": {
           "runnerEntry": "scripts/eval/issue-149-brand-evidence-acquisition-run.ts",
           "authorizedAdapterModule": "scripts/eval/lib/issue-149-candidate-adapter.ts",
           "note": "The adapterModulePath override is removed. A gate whose authorized module the caller chooses authorizes whatever the caller points it at."
         },
         "requiredCallShape": {
-          "importedFromTheAuthorizedAdapterModule": true,
-          "notTypeOnly": true,
-          "notLocallyShadowed": true,
+          "inTheFrozenRunnerEntrypoint": true,
+          "resolvesToTheExactAdapterExport": true,
+          "exactlyOnceAcrossTheCompleteClosure": true,
           "awaited": true,
-          "argumentIsTheFrozenExtractionInputIdentifier": true,
-          "exactlyOnce": true,
-          "onlyInTheRunnerEntrypoint": true
+          "receivesOneIdentifierArgument": true
+        },
+        "resolutionApi": [
+          "program.getTypeChecker",
+          "checker.getSymbolAtLocation",
+          "checker.getAliasedSymbol"
+        ],
+        "authorizationIsNeverEstablishedBy": [
+          "textual callee names",
+          "a manually constructed import-name map alone",
+          "path suffix matching",
+          "endsWith",
+          "caller-selectable adapter paths"
+        ],
+        "resolvedAndRejected": [
+          "aliased acquisition calls outside the runner",
+          "a second acquisition call through another alias",
+          "namespace calls",
+          "re-exported calls",
+          "prohibited extractor or selector calls through aliases, namespaces or re-exports",
+          "local same-name functions",
+          "function-parameter shadowing",
+          "catch-binding shadowing",
+          "block-local shadowing",
+          "destructured aliases"
+        ],
+        "twoSeparateControls": {
+          "sourceGate": "proves WHICH function is called, from where, how often, and that the argument is an identifier. It does NOT and cannot prove the identifier holds a valid ExtractionInput.",
+          "runtimeGate": "acquireProductionBrandEvidence performs the schema, own-key, Proxy, descriptor and frozen-identity validation itself, at call time.",
+          "neitherSubstitutesForTheOther": true
+        },
+        "mutationAnalysisIsNotCompletenessControl": {
+          "priorOverclaim": "Amendment 12 described the adjacent-pair mutation detector as making arbitrary evidence objects unchangeable. It did not: provenance is lost as soon as a value is aliased (`const passes = e.value.detailed.debug.passes; passes.splice(0,1)`), and a non-mutating PROJECTION (`slice`, `filter`, `map`, `concat`, spread) produces incomplete evidence with no mutation at all. Source text cannot establish data lineage through either.",
+          "primaryControl": "the RUNTIME sealed package: the public API returns bytes, so there is nothing to project",
+          "sourceAnalysisRole": "defense in depth"
+        },
+        "sealedPackageRules": {
+          "prohibitedOperationsOnSealedFiles": [
+            "filter",
+            "slice",
+            "map",
+            "concat",
+            "reverse",
+            "sort",
+            "splice",
+            "push",
+            "pop",
+            "shift",
+            "unshift",
+            "find",
+            "flatMap",
+            "spread into a new array",
+            "single-element index"
+          ],
+          "prohibitedParsingOfSealedBytes": true,
+          "prohibitedSubsetSelection": true,
+          "required": "one complete package write with exact readback verification",
+          "permitted": [
+            "reading itemId",
+            "reading outcome",
+            "reading fileCount",
+            "reading totalBytes",
+            "reading aggregateSha256",
+            "passing the COMPLETE package to the authorized writer",
+            "logging non-evidence status metadata"
+          ],
+          "haltCodes": ["SEALED_PACKAGE_PROJECTED", "SEALED_EVIDENCE_PARSED"]
         }
       }
     }

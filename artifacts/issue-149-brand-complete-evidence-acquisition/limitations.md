@@ -150,6 +150,33 @@ guessed, but it is an extrapolation from 15 cases to 115 and the real figure wil
 differ. If the raw evidence turns out substantially larger than estimated, that
 is a fact to report, not a reason to reintroduce a cap.
 
+## A pass whose word carries no finite `rawConfidence` halts the item
+
+The sealed pass schema requires a finite `rawConfidence` on every `OcrWord`.
+`OcrWord.rawConfidence` is a REQUIRED number in production's own type, so this is
+a pass production's types say cannot occur — but production's
+`rawConfidenceOf` explicitly tolerates a non-finite value and counts it in
+`ocrConfidence.missingTokenCount`, so the two are not perfectly aligned.
+
+If the engine ever produced such a word, the item halts with `PASS_WORD_INVALID`
+rather than being persisted with a hole in it, and is reported as a failed item.
+That is the intended behaviour and is stated here rather than discovered later.
+The consequence is that a nonzero `missingTokenCount` reachable through a
+non-finite confidence is a population the sealing schema will not persist.
+
+## The source-closure gate does not prove evidence completeness
+
+The Stage 2 source analyzer resolves symbols and rejects prohibited calls,
+aliases, namespaces, re-exports and shadowing. It does **not** establish data
+lineage: once a value is aliased (`const passes = sealed.files;`) or projected
+(`sealed.files.slice(0, 1)`), source text cannot show what the resulting value
+descends from. Amendment 12 overclaimed here.
+
+Completeness is a **runtime** control: the public API returns sealed bytes, so
+there is no evidence object left to project. The source gate rejects the obvious
+projection and parse forms as defense in depth, and is described as defense in
+depth rather than as proof.
+
 ## Scope
 
 115 cases, one corpus, one pipeline, one base. This sprint does not KEEP or KILL

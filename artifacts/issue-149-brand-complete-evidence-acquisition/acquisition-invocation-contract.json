@@ -2,9 +2,9 @@
   "artifact": "acquisition-invocation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-12.md",
+  "amendedBy": "preregistration-amendment-13.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
-  "route": "the runner calls acquireProductionBrandEvidence(extractionInput); that function copies the input into a deeply frozen snapshot before its first await and calls extractLabelEvidenceDetailed itself. The runner never calls the extractor.",
+  "route": "the runner calls acquireProductionBrandEvidence(extractionInput); that function captures the input's exact own data-property values before its first await, calls extractLabelEvidenceDetailed itself, and returns a SEALED byte package. The runner never calls the extractor and never holds evidence objects.",
   "prohibitedRoute": {
     "symbols": [
       "runCaseArtifacts",
@@ -38,7 +38,7 @@
     "use the frozen adapter, engine and parser identities from incumbent-configuration-freeze.json",
     "use the fixed preregistered processedAt value",
     "provide no sellerRegionTargets",
-    "await acquireProductionBrandEvidence(extractionInput), exactly once, in the runner entrypoint"
+    "await acquireProductionBrandEvidence(extractionInput), exactly once, in the runner entrypoint, then write the complete sealed package"
   ],
   "extractionInputBinding": {
     "imageBytes": "the staged image bytes, verified",
@@ -206,12 +206,93 @@
   "requiredInvocationStepsNote": "The final step previously read 'call extractLabelEvidenceDetailed directly', which contradicted the candidate-emission closure gate: extractLabelEvidenceDetailed is prohibited outside the adapter module. The runner's one call is acquireProductionBrandEvidence; the direct extractor call happens inside it.",
   "extractionInputImmutability": {
     "theCallerNeverOwnsTheInputTheExtractorReads": true,
-    "mechanism": "acquireProductionBrandEvidence validates and copies the ExtractionInput into a closed, deeply frozen snapshot SYNCHRONOUSLY, before its first await, and passes the snapshot to extractLabelEvidenceDetailed.",
-    "why": "Passing the caller's object through left a live reference. Between the call and the extractor's first read the caller could still mutate imageBytes, artifactRef, derivativeSha256 or any frozen identity, so the recorded provenance need not describe what was actually recognized. Freezing the caller's object in place would not fix it either: the caller could have installed accessors, and a frozen alias is still the caller's object.",
-    "closedKeySet": true,
-    "haltCodes": ["MALFORMED_EXTRACTION_INPUT", "EXTRACTION_INPUT_IDENTITY_MISMATCH"],
-    "accessorsRejected": true,
-    "identityIsNotPreserved": "the extractor receives an object that is NOT the caller's; a test asserting toBe(input) would be asserting the defect"
+    "mechanism": "captureOwnDataValues validates and captures the input's exact own DATA-property values SYNCHRONOUSLY, before the first await, and the snapshot is built entirely from those captured values.",
+    "exactOwnKeyValidation": {
+      "usesReflectOwnKeys": true,
+      "objectKeysIsNotAnExactOwnKeyProof": true,
+      "why": "Object.keys returns only ENUMERABLE STRING keys, so a non-enumerable own property and a symbol-keyed own property both passed the previous closed-key-set check while being present on the object.",
+      "symbolKeysRejected": true,
+      "nonEnumerableUnexpectedKeysRejected": true,
+      "inputKeyCount": 9,
+      "ocrEngineKeyCount": 4
+    },
+    "proxyRejected": {
+      "input": true,
+      "ocrEngine": true,
+      "test": "node:util types.isProxy",
+      "why": "A Proxy over a plain target satisfies every structural test and can present ordinary data descriptors, then return a different value from a get trap on each read. Descriptor inspection cannot see that."
+    },
+    "descriptorsCapturedOnce": {
+      "dataDescriptorsOnly": true,
+      "accessorsRejected": true,
+      "valueReadExactlyOnce": true,
+      "callerObjectNotRereadAfterCapture": true
+    },
+    "whatIsFrozen": {
+      "topLevelSnapshot": "frozen",
+      "ocrEngine": "frozen",
+      "imageBytes": "a PRIVATE COPIED Uint8Array with no caller-held alias. NOT frozen: a nonempty typed array cannot be frozen in current JavaScript runtimes, because its indexed elements are non-configurable and cannot be made non-writable. Isolation, not immutability, is what protects those bytes.",
+      "recursivelyFrozenClaimWithdrawn": true,
+      "priorClaim": "Amendment 12 described the snapshot as 'closed and deeply frozen'. The closure is real; the deep freezing was not, and is corrected rather than restated."
+    },
+    "identityIsNotPreserved": "the extractor receives an object that is NOT the caller's; a test asserting toBe(input) would be asserting the defect",
+    "haltCodes": ["MALFORMED_EXTRACTION_INPUT", "EXTRACTION_INPUT_IDENTITY_MISMATCH"]
   },
-  "permittedImportsNote": "Applies to the acquisition source closure as a whole. The RUNNER entrypoint's only route to evidence is scripts/eval/lib/issue-149-candidate-adapter; the extractor and field-selection imports are permitted to the adapter module only."
+  "permittedImportsNote": "Applies to the acquisition source closure as a whole. The RUNNER entrypoint's only route to evidence is scripts/eval/lib/issue-149-candidate-adapter; the extractor and field-selection imports are permitted to the adapter module only.",
+  "sealedOutputBoundary": {
+    "thePublicApiReturnsBytesNotObjects": true,
+    "why": "Owning the extractor call closed the INPUT side. The output side stayed open: the boundary returned the extractor's own DetailedExtractionResult, the live FieldSelection and a mutable candidate array, and left serialization to the runner. A runner could alias, filter, project, reorder or copy the evidence before persisting it, and a PROJECTION (slice, filter, map, concat, spread) needs no mutation at all, so no source-level mutation rule could catch it.",
+    "theSameOwnershipDefectOneStepOut": "candidate array -> FieldSelection -> ExtractionDebug -> ExtractionInput -> returned evidence",
+    "successFiles": [
+      "<opaqueItemId>.passes.json",
+      "<opaqueItemId>.words.jsonl",
+      "<opaqueItemId>.lines.jsonl",
+      "<opaqueItemId>.candidates.jsonl",
+      "<opaqueItemId>.selection.json",
+      "<opaqueItemId>.counts.json"
+    ],
+    "failureFiles": ["<opaqueItemId>.failure.json"],
+    "pathsAreRelativeToTheRunDirectory": "raw/<run>/",
+    "descriptorShape": {
+      "path": "governed run-relative path",
+      "byteLength": "exact",
+      "sha256": "SHA-256 over exactly those bytes",
+      "bytes": "a FRESH COPY on every read; the sealed buffer is module-private and never handed out"
+    },
+    "aggregateSha256": "SHA-256 over the ordered (path, byteLength, sha256) entries",
+    "frozen": ["the package", "the files list", "every descriptor"],
+    "noMutableEvidenceIsPublic": [
+      "DetailedExtractionResult",
+      "ExtractionDebug",
+      "FieldSelection",
+      "candidate array",
+      "pass array"
+    ],
+    "runnerMustNot": [
+      "serialize",
+      "filter",
+      "map",
+      "project",
+      "rank",
+      "reorder",
+      "reconstruct",
+      "parse sealed bytes",
+      "select a subset of sealed file descriptors"
+    ],
+    "runnerMust": ["write the COMPLETE sealed package exactly once, with readback verification"],
+    "writer": {
+      "name": "writeSealedEvidencePackage",
+      "takesTheCompletePackage": true,
+      "acceptsNoFileSubsetParameter": true,
+      "verifiesByReadback": true
+    },
+    "haltCodes": ["SEALED_EVIDENCE_INCOMPLETE", "SEALED_EVIDENCE_WRITE_UNVERIFIED"]
+  },
+  "publicRuntimeExports": [
+    "CandidateAdapterError",
+    "SEALED_FAILURE_FILE_SUFFIXES",
+    "SEALED_SUCCESS_FILE_SUFFIXES",
+    "acquireProductionBrandEvidence",
+    "writeSealedEvidencePackage"
+  ]
 }

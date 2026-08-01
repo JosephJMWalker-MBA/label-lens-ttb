@@ -32,7 +32,7 @@
     "block, paragraph and line identifiers \u2014 not present on OcrWord",
     "constituent word IDs per reconstructed line \u2014 not emitted by BrandLineDiagnostic"
   ],
-  "amendedBy": "preregistration-amendment-12.md",
+  "amendedBy": "preregistration-amendment-13.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "everyRawFilenameUsesOpaqueIdOnly": true,
@@ -144,5 +144,24 @@
       "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts",
       "src/fixtures/eval/issue-149-stage2-source-closure.test.ts"
     ]
+  },
+  "producedBy": {
+    "sealedInsideThePublicApi": true,
+    "note": "Every per-item file below is serialized INSIDE acquireProductionBrandEvidence and returned as a sealed byte descriptor. The runner writes the complete package and never serializes, filters, projects, reorders or parses evidence itself.",
+    "successFiles": [
+      ".passes.json",
+      ".words.jsonl",
+      ".lines.jsonl",
+      ".candidates.jsonl",
+      ".selection.json",
+      ".counts.json"
+    ],
+    "failureFiles": [".failure.json"],
+    "runLevelFilesRemainTheRunnersResponsibility": [
+      "counts.json",
+      "raw-evidence-manifest.json",
+      "raw-evidence-manifest.sha256"
+    ],
+    "contract": "acquisition-invocation-contract.json#sealedOutputBoundary"
   }
 }

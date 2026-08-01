@@ -97,18 +97,19 @@ shasum -a 256 "${ART}/runtime/truth-key-inventory.json"
 ! ls "src/fixtures/eval/issue-149-candidate-canonical.ts" 2>/dev/null
 
 # The one public Brand evidence API. `acquireProductionBrandEvidence` takes an
-# ExtractionInput, copies it into a deeply frozen snapshot before its first
-# await, calls extractLabelEvidenceDetailed itself, and derives the diagnostic
-# selection and candidate population from the returned ExtractionDebug. The
-# caller never holds the debug, and never holds a mutable input the extractor
-# will later read.
+# ExtractionInput, captures its exact own data-property values once before its
+# first await, calls extractLabelEvidenceDetailed itself, derives the diagnostic
+# selection and candidate population from the returned ExtractionDebug, and
+# SEALS the complete item evidence into byte descriptors. No mutable
+# DetailedExtractionResult, ExtractionDebug, FieldSelection, candidate array or
+# pass array leaves the boundary.
 #
-# grep -c exits 1 on no match, which would kill this script under `set -e`, so
-# each count is captured and printed rather than left as the command's status.
+# These are ASSERTIONS, not display. `grep -c` exits 1 on no match, which under
+# `set -e` would kill the script; the count is therefore captured with `|| true`
+# and then CHECKED. Printing a failing count and exiting zero is not
+# verification.
 ADAPTER=scripts/eval/lib/issue-149-candidate-adapter.ts
-echo "public API: $(grep -c 'export async function acquireProductionBrandEvidence' "${ADAPTER}" || true)"
-echo "snapshot before first await: $(grep -c 'const snapshot = snapshotAcquisitionInput(input);' "${ADAPTER}" || true)"
-echo "no finalize* public entrypoint: $(grep -c 'export function finalizeProductionBrandEvidence' "${ADAPTER}" || true)"
+"${ART}/assert-adapter-surface.sh" "${ADAPTER}"
 shasum -a 256 "${ADAPTER}"
 
 # The merged PR #220 capability this amendment consumes.

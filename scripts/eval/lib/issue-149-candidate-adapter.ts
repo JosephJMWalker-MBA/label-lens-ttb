@@ -20,12 +20,11 @@
  * selection is derived HERE. The invocation contract permits those modules on the
  * acquisition route.
  */
-import type { Result } from "@/shared/result";
-import {
-  extractLabelEvidenceDetailed,
-  type DetailedExtractionResult,
-  type ExtractionDebug,
-} from "@/pipeline/extractor/extractor";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join as pathJoin } from "node:path";
+import { types as nodeTypes } from "node:util";
+
+import { extractLabelEvidenceDetailed, type ExtractionDebug } from "@/pipeline/extractor/extractor";
 import type { ExtractionError, ExtractionInput } from "@/pipeline/extractor/extractor.types";
 import {
   compareCandidateRanking,
@@ -39,8 +38,11 @@ import {
 import {
   CANDIDATE_CANONICALIZATION_VERSION,
   type CandidateEvidenceRecord,
+  assertRegionOcrResultRecord,
   canonicalize,
   finalizeCandidateRecord,
+  semanticOrderedPassArrayFingerprint,
+  sha256Bytes,
 } from "./issue-149-evidence-canonical";
 
 export class CandidateAdapterError extends Error {
@@ -57,6 +59,8 @@ export class CandidateAdapterError extends Error {
       | "MALFORMED_ARTIFACT_REF"
       | "MALFORMED_EXTRACTION_INPUT"
       | "EXTRACTION_INPUT_IDENTITY_MISMATCH"
+      | "SEALED_EVIDENCE_INCOMPLETE"
+      | "SEALED_EVIDENCE_WRITE_UNVERIFIED"
       | "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE",
     detail: string,
   ) {
@@ -523,36 +527,6 @@ function deriveBrandEvidenceFromDebug(
 // The one public acquisition API
 // ---------------------------------------------------------------------------
 
-export interface ProductionBrandEvidenceSuccess {
-  detailed: DetailedExtractionResult;
-  diagnosticSelection: FieldSelection;
-  candidateRecords: CandidateEvidenceRecord[];
-}
-
-/**
- * The ONLY public Brand acquisition API.
- *
- * It takes the frozen `ExtractionInput`, calls `extractLabelEvidenceDetailed`
- * **itself, exactly once**, and derives everything from that private result.
- *
- * ## Why the input is `ExtractionInput` and not `ExtractionDebug`
- *
- * Each earlier signature closed the route it named and left an adjacent one open.
- * A bare candidate array became a caller-supplied `FieldSelection`; a caller could
- * still filter the candidates and wrap them in a fresh selection. That became a
- * caller-supplied `ExtractionDebug`; a helper could still filter or reorder
- * `debug.passes`, reconstruct matching `primarySelections` and `finalSelections`,
- * and hand over a coherent replacement.
- *
- * Owning the extractor call removes the class. There is no caller-supplied
- * evidence at all: the passes, the primary and final selections, the diagnostic
- * selection, the parity assertion and the candidate population are all derived
- * from one private invocation. The runner constructs the input and reads the
- * result; it never holds an intermediate it could alter.
- *
- * The opaque identity comes from `input.artifactRef`, so there is no second
- * identifier that could disagree with it.
- */
 /**
  * The exact own properties an acquisition `ExtractionInput` may carry.
  *
@@ -602,23 +576,79 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> =>
   !Array.isArray(value) &&
   (Object.getPrototypeOf(value) === Object.prototype || Object.getPrototypeOf(value) === null);
 
-/** Reject accessor-backed properties: a getter can return a different value each read. */
-function assertNoAccessors(target: object, keys: readonly string[], at: string): void {
-  for (const key of keys) {
+/**
+ * Capture the EXACT own data-property values of a caller-supplied object, once.
+ *
+ * Three distinct problems are closed here, all of which survived the previous
+ * `Object.keys` validation:
+ *
+ * - `Object.keys` returns only ENUMERABLE STRING keys. A non-enumerable own
+ *   property and a symbol-keyed own property both passed the "closed key set"
+ *   check while being present on the object. `Reflect.ownKeys` returns every own
+ *   key of both kinds, so the claimed exact key set is now actually checked.
+ * - A `Proxy` whose target is a plain object satisfies `isPlainObject` and can
+ *   present ordinary data descriptors, then return a DIFFERENT value from a `get`
+ *   trap on each subsequent read. Descriptor inspection cannot see that;
+ *   `util.types.isProxy` is Node's authoritative test and is used instead.
+ * - Even with data descriptors, reading `raw.artifactRef` at validation time and
+ *   again at copy time is two reads. Every value is captured ONCE here, and the
+ *   caller's object is never read again.
+ */
+function captureOwnDataValues(
+  target: object,
+  expected: readonly string[],
+  at: string,
+): Record<string, unknown> {
+  if (nodeTypes.isProxy(target)) {
+    throw new CandidateAdapterError(
+      "MALFORMED_EXTRACTION_INPUT",
+      `${at} is a Proxy; a get trap can return a different value on each read, so its descriptors are not evidence of its values`,
+    );
+  }
+
+  const ownKeys = Reflect.ownKeys(target);
+  const symbolKeys = ownKeys.filter((key): key is symbol => typeof key === "symbol");
+  if (symbolKeys.length > 0) {
+    throw new CandidateAdapterError(
+      "MALFORMED_EXTRACTION_INPUT",
+      `${at} carries ${symbolKeys.length} symbol-keyed own propert${symbolKeys.length === 1 ? "y" : "ies"}; the acquisition key set is closed and string-only`,
+    );
+  }
+
+  // Every own key, enumerable or not. An unexpected non-enumerable property is
+  // as fatal as an unexpected enumerable one.
+  const actual = ownKeys as string[];
+  const problems = [
+    ...expected.filter((key) => !actual.includes(key)).map((key) => `missing ${key}`),
+    ...actual.filter((key) => !expected.includes(key)).map((key) => `unexpected ${key}`),
+  ];
+  if (problems.length > 0) {
+    throw new CandidateAdapterError("MALFORMED_EXTRACTION_INPUT", `${at}: ${problems.join("; ")}`);
+  }
+
+  const captured: Record<string, unknown> = {};
+  for (const key of expected) {
     const descriptor = Object.getOwnPropertyDescriptor(target, key);
-    if (descriptor === undefined) continue;
+    if (descriptor === undefined) {
+      throw new CandidateAdapterError(
+        "MALFORMED_EXTRACTION_INPUT",
+        `${at}.${key} has no own property descriptor`,
+      );
+    }
     if (descriptor.get !== undefined || descriptor.set !== undefined) {
       throw new CandidateAdapterError(
         "MALFORMED_EXTRACTION_INPUT",
         `${at}.${key} is an accessor property; a getter can return a different value on each read`,
       );
     }
+    // The one and only read of this property.
+    captured[key] = descriptor.value;
   }
+  return captured;
 }
 
 /**
- * Synchronously validate the caller's input and copy it into a closed, deeply
- * frozen snapshot.
+ * Synchronously validate the caller's input and copy it into a private snapshot.
  *
  * `ExtractionInput` is an ordinary mutable interface, including mutable
  * `imageBytes` and a nested `ocrEngine`. An earlier boundary validated
@@ -633,6 +663,21 @@ function assertNoAccessors(target: object, keys: readonly string[], at: string):
  *
  * Everything here happens **before the first await**, and everything afterwards
  * uses only the snapshot.
+ *
+ * ## What is and is not frozen — stated exactly
+ *
+ * - the top-level snapshot object IS frozen;
+ * - `ocrEngine` IS frozen;
+ * - `imageBytes` is a **private copied `Uint8Array` with no caller-held alias**.
+ *   It is NOT frozen, and describing it as frozen would be false: a nonempty
+ *   typed array cannot be frozen in current JavaScript runtimes —
+ *   `Object.freeze` on one throws, because its indexed elements are
+ *   non-configurable and cannot be made non-writable. Isolation, not
+ *   immutability, is what protects those bytes, and isolation is sufficient:
+ *   nothing outside this module holds a reference to that buffer.
+ *
+ * The snapshot is therefore **not** "recursively frozen", and this module does
+ * not claim it is.
  */
 function snapshotAcquisitionInput(input: ExtractionInput): ExtractionInput {
   if (!isPlainObject(input)) {
@@ -642,23 +687,8 @@ function snapshotAcquisitionInput(input: ExtractionInput): ExtractionInput {
     );
   }
 
-  const actual = Object.keys(input);
-  const missing = ACQUISITION_INPUT_KEYS.filter((key) => !Object.hasOwn(input, key));
-  const unexpected = actual.filter(
-    (key) => !(ACQUISITION_INPUT_KEYS as readonly string[]).includes(key),
-  );
-  if (missing.length > 0 || unexpected.length > 0) {
-    throw new CandidateAdapterError(
-      "MALFORMED_EXTRACTION_INPUT",
-      [
-        ...missing.map((key) => `missing ${key}`),
-        ...unexpected.map((key) => `unexpected ${key}`),
-      ].join("; "),
-    );
-  }
-  assertNoAccessors(input, ACQUISITION_INPUT_KEYS, "input");
-
-  const raw = input as unknown as Record<string, unknown>;
+  // One capture. `raw` holds VALUES, not a live view of the caller's object.
+  const raw = captureOwnDataValues(input, ACQUISITION_INPUT_KEYS, "input");
 
   if (typeof raw.artifactRef !== "string" || !OPAQUE_ITEM_ID.test(raw.artifactRef)) {
     throw new CandidateAdapterError(
@@ -678,6 +708,20 @@ function snapshotAcquisitionInput(input: ExtractionInput): ExtractionInput {
       "input.imageBytes must be a Uint8Array",
     );
   }
+  for (const key of [
+    "processedAt",
+    "extractionAdapterId",
+    "extractionAdapterVersion",
+    "parserId",
+    "parserVersion",
+  ] as const) {
+    if (typeof raw[key] !== "string") {
+      throw new CandidateAdapterError(
+        "MALFORMED_EXTRACTION_INPUT",
+        `input.${key} must be a string, received ${JSON.stringify(raw[key])}`,
+      );
+    }
+  }
 
   if (!isPlainObject(raw.ocrEngine)) {
     throw new CandidateAdapterError(
@@ -685,26 +729,18 @@ function snapshotAcquisitionInput(input: ExtractionInput): ExtractionInput {
       "input.ocrEngine must be a plain object",
     );
   }
-  const engineKeys = Object.keys(raw.ocrEngine);
-  const engineProblems = [
-    ...OCR_ENGINE_KEYS.filter((key) => !Object.hasOwn(raw.ocrEngine as object, key)).map(
-      (key) => `missing ${key}`,
-    ),
-    ...engineKeys
-      .filter((key) => !(OCR_ENGINE_KEYS as readonly string[]).includes(key))
-      .map((key) => `unexpected ${key}`),
-  ];
-  if (engineProblems.length > 0) {
-    throw new CandidateAdapterError(
-      "MALFORMED_EXTRACTION_INPUT",
-      `input.ocrEngine: ${engineProblems.join("; ")}`,
-    );
+  const engine = captureOwnDataValues(raw.ocrEngine, OCR_ENGINE_KEYS, "input.ocrEngine");
+  for (const key of OCR_ENGINE_KEYS) {
+    if (typeof engine[key] !== "string") {
+      throw new CandidateAdapterError(
+        "MALFORMED_EXTRACTION_INPUT",
+        `input.ocrEngine.${key} must be a string, received ${JSON.stringify(engine[key])}`,
+      );
+    }
   }
-  assertNoAccessors(raw.ocrEngine as object, OCR_ENGINE_KEYS, "input.ocrEngine");
 
   // The frozen incumbent identities. A run whose provenance differs from the
   // preregistered one is not an observation of the incumbent.
-  const engine = raw.ocrEngine as Record<string, unknown>;
   const identityMismatches: string[] = [];
   for (const key of [
     "processedAt",
@@ -733,47 +769,350 @@ function snapshotAcquisitionInput(input: ExtractionInput): ExtractionInput {
     );
   }
 
-  // Copy, then freeze. `imageBytes` is copied into a NEW Uint8Array so a later
-  // mutation of the caller's buffer cannot reach the extractor.
+  // Built entirely from the captured values. `imageBytes` is copied into a NEW
+  // Uint8Array, so a later mutation of the caller's buffer cannot reach the
+  // extractor and nothing outside this module aliases the copy.
   const snapshot = {
     imageBytes: Uint8Array.from(raw.imageBytes),
-    artifactRef: String(raw.artifactRef),
-    derivativeSha256: String(raw.derivativeSha256),
-    processedAt: String(raw.processedAt),
-    extractionAdapterId: String(raw.extractionAdapterId),
-    extractionAdapterVersion: String(raw.extractionAdapterVersion),
+    artifactRef: raw.artifactRef,
+    derivativeSha256: raw.derivativeSha256,
+    processedAt: raw.processedAt as string,
+    extractionAdapterId: raw.extractionAdapterId as string,
+    extractionAdapterVersion: raw.extractionAdapterVersion as string,
     ocrEngine: Object.freeze({
-      kind: String(engine.kind),
-      engineId: String(engine.engineId),
-      engineVersion: String(engine.engineVersion),
-      modelId: String(engine.modelId),
+      kind: engine.kind as string,
+      engineId: engine.engineId as string,
+      engineVersion: engine.engineVersion as string,
+      modelId: engine.modelId as string,
     }),
-    parserId: String(raw.parserId),
-    parserVersion: String(raw.parserVersion),
+    parserId: raw.parserId as string,
+    parserVersion: raw.parserVersion as string,
   };
   return Object.freeze(snapshot) as unknown as ExtractionInput;
 }
 
+// ---------------------------------------------------------------------------
+// The sealed item-evidence package
+// ---------------------------------------------------------------------------
+
+/**
+ * ## Why the public API returns bytes and not objects
+ *
+ * Owning the extractor call closed the INPUT side. The output side was still
+ * open: the boundary returned the extractor's own `DetailedExtractionResult`,
+ * the live `FieldSelection` and a mutable candidate array, and left serialization
+ * to the runner. The source analyzer could catch a write that kept a recognizable
+ * property chain, but it could not catch either of these:
+ *
+ * ```ts
+ * const passes = evidence.value.detailed.debug.passes;  // now a bare identifier
+ * passes.splice(0, 1);
+ *
+ * const head = evidence.value.detailed.debug.passes.slice(0, 1);  // no mutation
+ * persistPasses(head);                                            // truncated
+ * ```
+ *
+ * The second needs no mutation at all. A projection — `slice`, `filter`, `map`,
+ * `concat`, a spread into a new array — produces incomplete evidence while
+ * leaving every original object untouched, and no adjacent-pair or alias
+ * analysis of source text can establish data lineage through it.
+ *
+ * That is the same ownership defect as before, one step further out:
+ *
+ * ```
+ * candidate array -> FieldSelection -> ExtractionDebug -> ExtractionInput -> returned evidence
+ * ```
+ *
+ * So the alternative is deleted rather than prohibited. Serialization happens
+ * HERE, over the complete populations, before anything is returned. What the
+ * runner receives is a frozen list of file descriptors carrying exact bytes and
+ * their digests. There is nothing left to filter, project, reorder or rebuild:
+ * the only faithful action on a sealed package is to write all of it.
+ */
+export interface SealedEvidenceFile {
+  /** Governed path RELATIVE TO THE RUN DIRECTORY (`raw/<run>/`). */
+  readonly path: string;
+  /** Exact byte length of the sealed content. */
+  readonly byteLength: number;
+  /** SHA-256 over exactly those bytes. */
+  readonly sha256: string;
+  /**
+   * A FRESH COPY of the sealed bytes on every read. The sealed buffer itself is
+   * module-private and is never handed out, so mutating what this returns cannot
+   * change what gets written or what `sha256` covers.
+   */
+  readonly bytes: Uint8Array;
+}
+
+export interface SealedItemEvidence {
+  readonly itemId: string;
+  readonly outcome: "extracted" | "extraction-failed";
+  readonly files: readonly SealedEvidenceFile[];
+  readonly fileCount: number;
+  readonly totalBytes: number;
+  /** SHA-256 over the ordered (path, byteLength, sha256) entries. */
+  readonly aggregateSha256: string;
+  /** Present only when `outcome` is `extraction-failed`. A frozen copy. */
+  readonly failure?: {
+    readonly code: string;
+    readonly message: string;
+    readonly issues: readonly string[];
+  };
+}
+
+/** The item files a successful extraction seals, in fixed order. */
+export const SEALED_SUCCESS_FILE_SUFFIXES = [
+  ".passes.json",
+  ".words.jsonl",
+  ".lines.jsonl",
+  ".candidates.jsonl",
+  ".selection.json",
+  ".counts.json",
+] as const;
+
+/** The one file a failed extraction seals. No partial debug is ever synthesised. */
+export const SEALED_FAILURE_FILE_SUFFIXES = [".failure.json"] as const;
+
+/** Canonical JSON plus a terminal newline. Bytes, from here on. */
+const canonicalLine = (value: unknown): string => `${canonicalize(value)}\n`;
+
+function sealFile(path: string, text: string): SealedEvidenceFile {
+  const sealed = Uint8Array.from(Buffer.from(text, "utf8"));
+  const descriptor = {
+    path,
+    byteLength: sealed.byteLength,
+    sha256: sha256Bytes(sealed),
+    get bytes(): Uint8Array {
+      // A copy, every time. Handing out `sealed` would alias it.
+      return Uint8Array.from(sealed);
+    },
+  };
+  return Object.freeze(descriptor);
+}
+
+function sealPackage(
+  itemId: string,
+  outcome: SealedItemEvidence["outcome"],
+  files: SealedEvidenceFile[],
+  failure?: SealedItemEvidence["failure"],
+): SealedItemEvidence {
+  const expected =
+    outcome === "extracted" ? SEALED_SUCCESS_FILE_SUFFIXES : SEALED_FAILURE_FILE_SUFFIXES;
+  const expectedPaths = expected.map((suffix) => `${itemId}${suffix}`);
+  const actualPaths = files.map((file) => file.path);
+
+  // Dropped or duplicated files are caught HERE, before return — a package that
+  // is missing a file is not a sealed package, and the runner has no way to
+  // notice on its own because it never sees the populations.
+  if (
+    actualPaths.length !== expectedPaths.length ||
+    actualPaths.some((path, index) => path !== expectedPaths[index])
+  ) {
+    throw new CandidateAdapterError(
+      "SEALED_EVIDENCE_INCOMPLETE",
+      `sealed files ${JSON.stringify(actualPaths)} do not match the required ordered set ${JSON.stringify(expectedPaths)}`,
+    );
+  }
+  if (new Set(actualPaths).size !== actualPaths.length) {
+    throw new CandidateAdapterError(
+      "SEALED_EVIDENCE_INCOMPLETE",
+      `duplicate sealed path in ${JSON.stringify(actualPaths)}`,
+    );
+  }
+
+  const aggregateSha256 = sha256Bytes(
+    canonicalize(
+      files.map((file) => ({ path: file.path, byteLength: file.byteLength, sha256: file.sha256 })),
+    ),
+  );
+
+  return Object.freeze({
+    itemId,
+    outcome,
+    files: Object.freeze(files.slice()),
+    fileCount: files.length,
+    totalBytes: files.reduce((sum, file) => sum + file.byteLength, 0),
+    aggregateSha256,
+    ...(failure === undefined ? {} : { failure }),
+  }) as SealedItemEvidence;
+}
+
+/**
+ * Serialize the COMPLETE populations and seal them.
+ *
+ * Every array's order is fixed before serialization, and every record passes the
+ * frozen schema validators, so an incomplete or reordered package cannot be
+ * produced by this function at all.
+ */
+function sealSuccessfulItem(
+  itemId: string,
+  debug: ExtractionDebug,
+  diagnosticSelection: FieldSelection,
+  candidateRecords: CandidateEvidenceRecord[],
+): SealedItemEvidence {
+  const passes = debug.passes;
+  passes.forEach((pass, index) => assertRegionOcrResultRecord(pass, `debug.passes[${index}]`));
+
+  const passesText = canonicalLine(
+    passes.map((pass, index) => ({
+      opaqueItemId: itemId,
+      passOrdinal: index,
+      ...(pass as unknown as Record<string, unknown>),
+    })),
+  );
+
+  let wordOrdinal = 0;
+  const wordLines: string[] = [];
+  passes.forEach((pass, passIndex) => {
+    const record = pass as unknown as { passId: string; words: unknown[] };
+    record.words.forEach((word, wordIndex) => {
+      wordLines.push(
+        canonicalLine({
+          opaqueItemId: itemId,
+          passOrdinal: passIndex,
+          passId: record.passId,
+          originalWordOrder: wordIndex,
+          globalWordOrdinal: wordOrdinal++,
+          ...(word as Record<string, unknown>),
+        }),
+      );
+    });
+  });
+
+  const lines = diagnosticSelection.brandDiagnostics?.lines ?? [];
+  const lineLines = lines.map((line, index) =>
+    canonicalLine({
+      opaqueItemId: itemId,
+      lineOrdinal: index,
+      ...(line as unknown as Record<string, unknown>),
+    }),
+  );
+
+  const candidateLines = candidateRecords.map((record) => canonicalLine(record));
+
+  const selectionText = canonicalLine({ opaqueItemId: itemId, selection: diagnosticSelection });
+
+  const countsText = canonicalLine({
+    opaqueItemId: itemId,
+    canonicalizationVersion: CANDIDATE_CANONICALIZATION_VERSION,
+    passCount: passes.length,
+    wordCount: wordLines.length,
+    perPassWordCounts: passes.map((pass) => (pass as unknown as { words: unknown[] }).words.length),
+    lineCount: lineLines.length,
+    candidateCount: candidateLines.length,
+    rankedCount: candidateRecords.filter((record) => record.rankedPosition !== null).length,
+    selectedCount: candidateRecords.filter((record) => record.selected).length,
+    semanticOrderedPassArrayFingerprint: semanticOrderedPassArrayFingerprint(passes),
+    stableCandidateIds: candidateRecords.map((record) => record.stableCandidateId),
+  });
+
+  return sealPackage(itemId, "extracted", [
+    sealFile(`${itemId}.passes.json`, passesText),
+    sealFile(`${itemId}.words.jsonl`, wordLines.join("")),
+    sealFile(`${itemId}.lines.jsonl`, lineLines.join("")),
+    sealFile(`${itemId}.candidates.jsonl`, candidateLines.join("")),
+    sealFile(`${itemId}.selection.json`, selectionText),
+    sealFile(`${itemId}.counts.json`, countsText),
+  ]);
+}
+
+/**
+ * Seal the governed failure evidence. No partial debug object is synthesised: a
+ * failed item has no pass array, no lines and no candidates, and none is
+ * fabricated. There is no retry — the extractor was called once.
+ */
+function sealFailedItem(itemId: string, error: ExtractionError): SealedItemEvidence {
+  const issues = Array.isArray((error as unknown as { issues?: unknown[] }).issues)
+    ? (error as unknown as { issues: unknown[] }).issues.map((issue) => String(issue))
+    : [];
+  const failure = Object.freeze({
+    code: String((error as unknown as { code?: unknown }).code),
+    message: String((error as unknown as { message?: unknown }).message),
+    issues: Object.freeze(issues) as readonly string[],
+  });
+  const text = canonicalLine({
+    opaqueItemId: itemId,
+    outcome: "extraction-failed",
+    errorCode: failure.code,
+    errorMessage: failure.message,
+    issues: [...failure.issues],
+    retried: false,
+    debugSynthesised: false,
+  });
+  return sealPackage(
+    itemId,
+    "extraction-failed",
+    [sealFile(`${itemId}.failure.json`, text)],
+    failure,
+  );
+}
+
+/**
+ * Write a COMPLETE sealed package and verify it by reading the bytes back.
+ *
+ * It takes the whole package. There is deliberately no file-subset parameter:
+ * a writer that accepts a caller-chosen subset reintroduces exactly the
+ * projection this boundary exists to remove.
+ */
+export function writeSealedEvidencePackage(
+  sealed: SealedItemEvidence,
+  options: { directory: string },
+): {
+  itemId: string;
+  directory: string;
+  filesWritten: number;
+  totalBytes: number;
+  aggregateSha256: string;
+} {
+  if (sealed.fileCount !== sealed.files.length) {
+    throw new CandidateAdapterError(
+      "SEALED_EVIDENCE_INCOMPLETE",
+      `fileCount ${sealed.fileCount} disagrees with files.length ${sealed.files.length}`,
+    );
+  }
+  mkdirSync(options.directory, { recursive: true });
+  for (const file of sealed.files) {
+    const target = pathJoin(options.directory, file.path);
+    writeFileSync(target, file.bytes);
+    const readBack = readFileSync(target);
+    if (readBack.byteLength !== file.byteLength || sha256Bytes(readBack) !== file.sha256) {
+      throw new CandidateAdapterError(
+        "SEALED_EVIDENCE_WRITE_UNVERIFIED",
+        `${file.path} read back as ${readBack.byteLength} bytes / ${sha256Bytes(readBack)}, expected ${file.byteLength} / ${file.sha256}`,
+      );
+    }
+  }
+  return {
+    itemId: sealed.itemId,
+    directory: options.directory,
+    filesWritten: sealed.files.length,
+    totalBytes: sealed.totalBytes,
+    aggregateSha256: sealed.aggregateSha256,
+  };
+}
+
 export async function acquireProductionBrandEvidence(
   input: ExtractionInput,
-): Promise<Result<ProductionBrandEvidenceSuccess, ExtractionError>> {
+): Promise<SealedItemEvidence> {
   // Synchronously, before the first await: validate and copy. Nothing after this
   // line reads the caller's object.
   const snapshot = snapshotAcquisitionInput(input);
+  const itemId = snapshot.artifactRef;
 
   // Exactly once, with the snapshot. There is no retry path: a failed item
   // produces the preregistered typed failure and is never re-run.
   const detailed = await extractLabelEvidenceDetailed(snapshot);
   if (!detailed.ok) {
-    // The extractor's typed failure, unchanged. No diagnostic selection and no
-    // candidate record is produced or returned.
-    return detailed;
+    return sealFailedItem(itemId, detailed.error);
   }
 
   const { diagnosticSelection, candidateRecords } = deriveBrandEvidenceFromDebug(
     detailed.value.debug,
-    snapshot.artifactRef,
+    itemId,
   );
 
-  return { ok: true, value: { detailed: detailed.value, diagnosticSelection, candidateRecords } };
+  // Serialized and sealed HERE. No mutable DetailedExtractionResult,
+  // ExtractionDebug, FieldSelection, candidate array or pass array leaves this
+  // function.
+  return sealSuccessfulItem(itemId, detailed.value.debug, diagnosticSelection, candidateRecords);
 }

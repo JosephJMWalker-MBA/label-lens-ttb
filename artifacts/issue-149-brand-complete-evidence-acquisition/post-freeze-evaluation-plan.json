@@ -84,7 +84,7 @@
     "treating the diagnostic selection rather than debug.finalSelections as the behavioural authority"
   ],
   "expectedUseOfTheResult": "A later, separately preregistered zero-OCR study may use this evidence. This sprint does not perform, design or recommend that study's treatment.",
-  "amendedBy": "preregistration-amendment-12.md",
+  "amendedBy": "preregistration-amendment-13.md",
   "actorsAndBoundaries": {
     "jobA_trustedPreparation": {
       "runsOcr": false,

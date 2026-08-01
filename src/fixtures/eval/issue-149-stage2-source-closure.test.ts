@@ -5,43 +5,39 @@
  * Job A uses this same implementation, so the gate that will run before
  * acquisition is the gate these tests exercise.
  *
- * The previous version matched callee NAMES. These tests are written against the
- * ways that failed: a local function with the authorized name, an alias, a
- * namespace call, and an import from an unreviewed module.
+ * The cases are written against the ways the previous versions failed: a callee
+ * NAME was treated as an identity, so a local function, an alias, a namespace
+ * member and a second import under a different name all got through.
  */
 import { describe, expect, it } from "vitest";
 
 import {
   AUTHORIZED_ADAPTER_MODULE,
+  PROHIBITED_SEALED_PACKAGE_OPERATIONS,
   REQUIRED_ACQUISITION_CALL,
   RUNNER_ENTRY_PATH,
   analyzeStage2SourceClosure,
   type Stage2SourceFile,
 } from "../../../scripts/eval/lib/issue-149-stage2-source-closure";
 
+/** A stand-in adapter that genuinely EXPORTS the authorized function. */
 const ADAPTER: Stage2SourceFile = {
   path: AUTHORIZED_ADAPTER_MODULE,
-  contents:
-    'import { extractLabelEvidenceDetailed } from "@/pipeline/extractor/extractor";\nexport async function acquireProductionBrandEvidence(input) { return extractLabelEvidenceDetailed(input); }',
+  contents: `
+import { extractLabelEvidenceDetailed } from "@/pipeline/extractor/extractor";
+export async function acquireProductionBrandEvidence(input) {
+  const detailed = await extractLabelEvidenceDetailed(input);
+  return { itemId: input.artifactRef, files: [], fileCount: 0 };
+}
+export function writeSealedEvidencePackage(sealed, options) { return sealed.files.length; }
+`,
 };
 
 const CLEAN_RUNNER = `
-import { acquireProductionBrandEvidence } from "./lib/issue-149-candidate-adapter";
+import { acquireProductionBrandEvidence, writeSealedEvidencePackage } from "./lib/issue-149-candidate-adapter";
 export async function acquireItem(extractionInput) {
-  const evidence = await acquireProductionBrandEvidence(extractionInput);
-  if (!evidence.ok) return persistFailure(evidence.error);
-  persistPasses(evidence.value.detailed.debug.passes);
-  persistCandidates(evidence.value.candidateRecords);
-}
-`;
-
-const HASHING_HELPER = `
-import { createHash } from "node:crypto";
-export const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
-export function writeManifest(files) {
-  const entries = [];
-  entries.push({ path: files[0].path });
-  return entries;
+  const sealed = await acquireProductionBrandEvidence(extractionInput);
+  return writeSealedEvidencePackage(sealed, { directory: outputDirectory });
 }
 `;
 
@@ -56,11 +52,30 @@ const analyze = (files: Stage2SourceFile[]) =>
 const rules = (report: ReturnType<typeof analyze>) => report.violations.map((v) => v.rule);
 
 describe("Issue #149 Stage 2 source-closure analyzer", () => {
-  it("passes an authorized awaited call plus helpers that never call the API", () => {
-    const report = analyze([runner(CLEAN_RUNNER), helper(HASHING_HELPER, "hashing")]);
+  it("passes an authorized awaited call plus helpers that never touch evidence", () => {
+    const hashing = `
+import { createHash } from "node:crypto";
+export const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
+export function report(sealed) {
+  return { id: sealed.itemId, count: sealed.fileCount, digest: sealed.aggregateSha256 };
+}
+`;
+    const report = analyze([runner(CLEAN_RUNNER), helper(hashing, "hashing")]);
     expect(report.violations).toEqual([]);
     expect(report.ok).toBe(true);
     expect(report.acquisitionCallSites).toEqual([RUNNER_ENTRY_PATH]);
+  });
+
+  it("resolves the authorized call through the TypeChecker, to a declaration", () => {
+    // The identity is a DECLARATION in the adapter module, not a string.
+    const report = analyze([runner(CLEAN_RUNNER)]);
+    expect(report.authorizedSymbolDeclaredIn).toBe(AUTHORIZED_ADAPTER_MODULE);
+
+    // The analyzer's own source must actually ask the checker. A previous
+    // version created a Program and then never used it.
+    const source = analyzeStage2SourceClosure.toString();
+    expect(source).not.toContain("adapterModulePath");
+    expect(source).not.toContain("endsWith");
   });
 
   describe("a name is not a binding", () => {
@@ -68,8 +83,7 @@ describe("Issue #149 Stage 2 source-closure analyzer", () => {
       const local = `
 function acquireProductionBrandEvidence(input) { return { ok: true }; }
 export async function acquireItem(extractionInput) {
-  const evidence = await acquireProductionBrandEvidence(extractionInput);
-  return evidence;
+  return await acquireProductionBrandEvidence(extractionInput);
 }
 `;
       const report = analyze([runner(local)]);
@@ -78,34 +92,115 @@ export async function acquireItem(extractionInput) {
       expect(rules(report)).toContain("RUNNER_DOES_NOT_INVOKE_ACQUISITION");
     });
 
-    it("rejects an import from the wrong module", () => {
+    it("rejects an import of the authorized name from the WRONG module", () => {
       const wrong = `
-import { acquireProductionBrandEvidence } from "./unreviewed-helper";
+import { acquireProductionBrandEvidence } from "@/unreviewed/helper";
 export async function acquireItem(i) { return await acquireProductionBrandEvidence(i); }
 `;
       expect(rules(analyze([runner(wrong)]))).toContain("ACQUISITION_BINDING_NOT_FROM_ADAPTER");
     });
 
+    it("rejects a module whose basename or suffix merely RESEMBLES the adapter", () => {
+      for (const specifier of [
+        "./lib/issue-149-candidate-adapter-v2",
+        "@/vendor/scripts/eval/lib/issue-149-candidate-adapter",
+        "./issue-149-candidate-adapter",
+      ]) {
+        const lookalike = `
+import { acquireProductionBrandEvidence } from "${specifier}";
+export const go = async (i) => await acquireProductionBrandEvidence(i);
+`;
+        const report = analyze([runner(lookalike)]);
+        expect(rules(report)).toContain("ACQUISITION_BINDING_NOT_FROM_ADAPTER");
+      }
+    });
+
     it("rejects a type-only adapter import", () => {
       const typeOnly = `
 import type { acquireProductionBrandEvidence } from "./lib/issue-149-candidate-adapter";
-export async function acquireItem(i) { return await acquireProductionBrandEvidence(i); }
+export const go = async (i) => await acquireProductionBrandEvidence(i);
 `;
       expect(rules(analyze([runner(typeOnly)]))).toContain("ACQUISITION_IMPORT_IS_TYPE_ONLY");
     });
 
-    it("rejects a locally shadowed authorized binding", () => {
-      const shadowed = `
+    describe("shadowing, in every binding position", () => {
+      const shadows: Array<[string, string]> = [
+        [
+          "function parameter",
+          "export const go = (acquireProductionBrandEvidence) => acquireProductionBrandEvidence(1);",
+        ],
+        [
+          "catch binding",
+          "export function go() { try { run(); } catch (acquireProductionBrandEvidence) { log(acquireProductionBrandEvidence); } }",
+        ],
+        [
+          "block-local declaration",
+          "export function go() { { const acquireProductionBrandEvidence = fake; use(acquireProductionBrandEvidence); } }",
+        ],
+        [
+          "destructured declaration",
+          "export function go(bag) { const { acquireProductionBrandEvidence } = bag; use(acquireProductionBrandEvidence); }",
+        ],
+      ];
+
+      for (const [name, statement] of shadows) {
+        it(`rejects ${name} shadowing`, () => {
+          const shadowed = `
 import { acquireProductionBrandEvidence } from "./lib/issue-149-candidate-adapter";
-const acquireProductionBrandEvidence2 = acquireProductionBrandEvidence;
-function acquireProductionBrandEvidence(i) { return { ok: true }; }
-export async function acquireItem(i) { return await acquireProductionBrandEvidence(i); }
+${statement}
+export const acquire = async (i) => await acquireProductionBrandEvidence(i);
 `;
-      expect(rules(analyze([runner(shadowed)]))).toContain("ACQUISITION_BINDING_SHADOWED");
+          expect(rules(analyze([runner(shadowed)]))).toContain("ACQUISITION_BINDING_SHADOWED");
+        });
+      }
     });
   });
 
-  describe("aliases and namespaces do not evade the prohibition", () => {
+  describe("aliases, namespaces and re-exports do not change identity", () => {
+    it("rejects an aliased ACQUISITION call outside the runner", () => {
+      // The exact bypass the name map allowed: the callee text is `run`, which
+      // is neither the authorized name nor a prohibited one.
+      const aliased = `
+import { acquireProductionBrandEvidence as run } from "./issue-149-candidate-adapter";
+export const hidden = (input) => run(input);
+`;
+      const report = analyze([runner(CLEAN_RUNNER), helper(aliased, "hidden")]);
+      expect(rules(report)).toContain("ACQUISITION_INVOKED_OUTSIDE_RUNNER");
+    });
+
+    it("counts TWO imports of the authorized function under different names", () => {
+      // Previously reported as one call.
+      const twice = `
+import {
+  acquireProductionBrandEvidence,
+  acquireProductionBrandEvidence as again,
+} from "./lib/issue-149-candidate-adapter";
+export async function go(extractionInput) {
+  await acquireProductionBrandEvidence(extractionInput);
+  await again(extractionInput);
+}
+`;
+      expect(rules(analyze([runner(twice)]))).toContain(
+        "RUNNER_INVOKES_ACQUISITION_MORE_THAN_ONCE",
+      );
+    });
+
+    it("rejects a re-export of the authorized function through a helper", () => {
+      const reexport = `
+export { acquireProductionBrandEvidence } from "./issue-149-candidate-adapter";
+`;
+      const caller = `
+import { acquireProductionBrandEvidence } from "./reexport";
+export const go = async (i) => await acquireProductionBrandEvidence(i);
+`;
+      const report = analyze([
+        runner(CLEAN_RUNNER),
+        helper(reexport, "reexport"),
+        helper(caller, "caller"),
+      ]);
+      expect(rules(report)).toContain("ACQUISITION_INVOKED_OUTSIDE_RUNNER");
+    });
+
     it("rejects an ALIASED extractor call", () => {
       const aliased = `
 import { extractLabelEvidenceDetailed as run } from "@/pipeline/extractor/extractor";
@@ -113,7 +208,9 @@ export const go = (i) => run(i);
 `;
       const report = analyze([runner(CLEAN_RUNNER), helper(aliased, "aliased")]);
       expect(rules(report)).toContain("PROHIBITED_CALL");
-      expect(report.violations.some((v) => v.detail.includes("through the alias run"))).toBe(true);
+      expect(report.violations.some((v) => v.detail.includes("through the local name run"))).toBe(
+        true,
+      );
     });
 
     it("rejects a NAMESPACE extractor call", () => {
@@ -130,8 +227,9 @@ export const go = (i) => extractor.extractLabelEvidenceDetailed(i);
 import { selectBrandObservationWithCompleteFilterDiagnostics as pick } from "@/pipeline/extractor/field-selection";
 export const s = (p) => pick(p);
 `;
-      const report = analyze([runner(CLEAN_RUNNER), helper(aliased, "sel")]);
-      expect(rules(report)).toContain("PROHIBITED_CALL");
+      expect(rules(analyze([runner(CLEAN_RUNNER), helper(aliased, "sel")]))).toContain(
+        "PROHIBITED_CALL",
+      );
     });
   });
 
@@ -154,81 +252,90 @@ export const go = async () => await acquireProductionBrandEvidence(${argument});
       }
     });
 
-    it("rejects a missing, duplicated or misplaced call", () => {
+    it("does not claim the identifier holds a valid ExtractionInput", () => {
+      // The source gate proves the ARGUMENT is an identifier. Whether it holds a
+      // well-formed, correctly identified input is a runtime property, checked
+      // by the public API itself. Two controls, stated separately.
+      const anything = `
+import { acquireProductionBrandEvidence } from "./lib/issue-149-candidate-adapter";
+export const go = async () => { const nonsense = 42; return await acquireProductionBrandEvidence(nonsense); };
+`;
+      expect(analyze([runner(anything)]).violations).toEqual([]);
+    });
+
+    it("rejects a missing call", () => {
       expect(rules(analyze([runner("export const go = () => null;")]))).toContain(
         "RUNNER_DOES_NOT_INVOKE_ACQUISITION",
-      );
-      const twice = `${CLEAN_RUNNER}\nexport const again = async (i) => await acquireProductionBrandEvidence(i);`;
-      expect(rules(analyze([runner(twice)]))).toContain(
-        "RUNNER_INVOKES_ACQUISITION_MORE_THAN_ONCE",
-      );
-      const elsewhere = `
-import { acquireProductionBrandEvidence } from "./issue-149-candidate-adapter";
-export const go = async (i) => await acquireProductionBrandEvidence(i);
-`;
-      expect(rules(analyze([runner(CLEAN_RUNNER), helper(elsewhere, "sneaky")]))).toContain(
-        "ACQUISITION_INVOKED_OUTSIDE_RUNNER",
       );
     });
   });
 
-  describe("protected-evidence mutation, in every form", () => {
-    const mutations: Array<[string, string]> = [
-      ["direct assignment", "e.value.detailed.debug.passes = [];"],
-      ["bracket assignment", 'e.value.detailed.debug["passes"] = [];'],
-      ["compound assignment", "e.value.candidateRecords.length += 0;"],
-      ["delete", "delete e.value.diagnosticSelection.brandDiagnostics;"],
-      ["Object.assign", "Object.assign(e.value.diagnosticSelection.brandDiagnostics, {});"],
-      ["Reflect.set", "Reflect.set(e.value.detailed.debug.passes, 0, null);"],
-      ["push", "e.value.detailed.debug.passes.push(extra);"],
-      ["splice", "e.value.candidateRecords.splice(0, 1);"],
-      ["sort", "e.value.candidateRecords.sort(byScore);"],
-      ["reverse", "e.value.detailed.debug.passes.reverse();"],
-      ["fill", "e.value.candidateRecords.fill(null);"],
-      ["shift", "e.value.detailed.debug.passes.shift();"],
+  describe("a sealed package is written whole or not at all", () => {
+    const attempts: Array<[string, string, string]> = [
+      [
+        "filter",
+        "return sealed.files.filter((f) => f.byteLength > 0);",
+        "SEALED_PACKAGE_PROJECTED",
+      ],
+      ["slice", "return sealed.files.slice(0, 1);", "SEALED_PACKAGE_PROJECTED"],
+      ["map", "return sealed.files.map((f) => f.path);", "SEALED_PACKAGE_PROJECTED"],
+      ["spread and reverse", "return [...sealed.files].reverse();", "SEALED_PACKAGE_PROJECTED"],
+      ["single-file write", "return write(sealed.files[0]);", "SEALED_PACKAGE_PROJECTED"],
+      [
+        "JSON.parse of sealed bytes",
+        "return JSON.parse(sealed.files[0].bytes);",
+        "SEALED_EVIDENCE_PARSED",
+      ],
     ];
 
-    for (const [name, statement] of mutations) {
+    for (const [name, statement, rule] of attempts) {
       it(`rejects ${name}`, () => {
         const report = analyze([
           runner(CLEAN_RUNNER),
           helper(
-            `export function tamper(e, extra, byScore) { ${statement} }`,
-            `m-${name.replace(/\W/g, "")}`,
+            `export function handle(sealed, write) { ${statement} }`,
+            `p-${name.replace(/\W/g, "")}`,
           ),
         ]);
-        expect(rules(report)).toContain("PROTECTED_EVIDENCE_MUTATED");
+        expect(rules(report)).toContain(rule);
       });
     }
 
-    it("permits reading, hashing and validating the evidence", () => {
+    it("permits reading counts, digests and status metadata", () => {
       const reader = `
-export function summarize(e) {
-  const count = e.value.detailed.debug.passes.length;
-  const texts = e.value.candidateRecords.map((r) => r.rawText);
-  const first = e.value.diagnosticSelection.brandDiagnostics.candidates[0];
-  return { count, texts, first };
+export function summarize(sealed, logger) {
+  logger.info("acquired", sealed.itemId, sealed.outcome);
+  const total = sealed.fileCount + sealed.totalBytes;
+  return { digest: sealed.aggregateSha256, total, failed: sealed.outcome !== "extracted" };
 }
 `;
-      const report = analyze([runner(CLEAN_RUNNER), helper(reader, "reader")]);
-      expect(report.violations).toEqual([]);
+      expect(analyze([runner(CLEAN_RUNNER), helper(reader, "reader")]).violations).toEqual([]);
     });
 
-    it("permits unrelated objects that happen to use those property names", () => {
-      // The previous detector rejected any object literal with a key named
-      // `passes` or `candidates`, which would have failed ordinary helpers.
+    it("permits passing the COMPLETE package to the authorized writer", () => {
+      const passthrough = `
+import { writeSealedEvidencePackage } from "./issue-149-candidate-adapter";
+export const persist = (sealed, directory) => writeSealedEvidencePackage(sealed, { directory });
+`;
+      expect(analyze([runner(CLEAN_RUNNER), helper(passthrough, "persist")]).violations).toEqual(
+        [],
+      );
+    });
+
+    it("permits unrelated helpers that happen to project their own arrays", () => {
       const unrelated = `
-export function summarizeRun(report) {
-  const stats = { passes: 0, candidates: [] };
-  stats.passes = report.total;
-  stats.candidates.push(report.name);
-  const config = { candidates: ["a"], passes: ["b"] };
-  config.passes[0] = "c";
-  return { stats, config };
+export function plan(items) {
+  const chosen = items.filter((item) => item.enabled).map((item) => item.id);
+  return [...chosen].sort();
 }
 `;
-      const report = analyze([runner(CLEAN_RUNNER), helper(unrelated, "unrelated")]);
-      expect(report.violations).toEqual([]);
+      expect(analyze([runner(CLEAN_RUNNER), helper(unrelated, "plan")]).violations).toEqual([]);
+    });
+
+    it("names the operations it rejects, rather than implying mutation is enough", () => {
+      for (const operation of ["filter", "slice", "map", "concat"]) {
+        expect(PROHIBITED_SEALED_PACKAGE_OPERATIONS).toContain(operation);
+      }
     });
   });
 
@@ -241,22 +348,30 @@ export function summarizeRun(report) {
     });
 
     it("rejects malformed TypeScript", () => {
-      const report = analyze([runner(CLEAN_RUNNER), helper("export function ( {{{", "broken")]);
-      expect(rules(report)).toContain("PARSE_ERROR");
+      expect(
+        rules(analyze([runner(CLEAN_RUNNER), helper("export function ( {{{", "broken")])),
+      ).toContain("PARSE_ERROR");
     });
 
-    it("reports a missing runner or adapter", () => {
+    it("reports a missing runner, adapter or adapter export", () => {
       expect(
         analyzeStage2SourceClosure({ files: [ADAPTER] }).violations.map((v) => v.rule),
       ).toContain("RUNNER_ENTRY_MISSING");
       expect(
         analyzeStage2SourceClosure({ files: [runner(CLEAN_RUNNER)] }).violations.map((v) => v.rule),
       ).toContain("ADAPTER_MODULE_MISSING");
+      expect(
+        analyzeStage2SourceClosure({
+          files: [
+            { path: AUTHORIZED_ADAPTER_MODULE, contents: "export const nothing = 1;" },
+            runner(CLEAN_RUNNER),
+          ],
+        }).violations.map((v) => v.rule),
+      ).toContain("ADAPTER_EXPORT_MISSING");
     });
 
     it("exempts the adapter, which defines the machinery", () => {
-      const report = analyze([runner(CLEAN_RUNNER)]);
-      expect(report.violations).toEqual([]);
+      expect(analyze([runner(CLEAN_RUNNER)]).violations).toEqual([]);
       expect(ADAPTER.contents).toContain("extractLabelEvidenceDetailed");
     });
 
@@ -264,8 +379,6 @@ export function summarizeRun(report) {
       expect(RUNNER_ENTRY_PATH).toBe("scripts/eval/issue-149-brand-evidence-acquisition-run.ts");
       expect(AUTHORIZED_ADAPTER_MODULE).toBe("scripts/eval/lib/issue-149-candidate-adapter.ts");
       expect(REQUIRED_ACQUISITION_CALL).toBe("acquireProductionBrandEvidence");
-      const analyzerSource = analyzeStage2SourceClosure.toString();
-      expect(analyzerSource).not.toContain("adapterModulePath");
     });
   });
 });

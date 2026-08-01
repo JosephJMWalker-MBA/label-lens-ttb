@@ -7,18 +7,35 @@
  * Job A and the Stage 1 synthetic tests use this one implementation, so the gate
  * that will run before acquisition is the gate the tests exercise.
  *
- * ## Why symbol resolution rather than identifier names
+ * ## Why the TypeChecker and not an import-name map
  *
- * The previous version matched on the textual callee name. That could be
- * satisfied by a *local* function coincidentally named
- * `acquireProductionBrandEvidence`, evaded by importing a prohibited function
- * under an alias or through a namespace, and satisfied by importing the
- * authorized name from an unreviewed module. It also could not tell whether the
- * required call was awaited or what it was passed.
+ * The previous version built a `ts.Program` and then never asked it anything: it
+ * compared callee TEXT against a manually constructed map of import names. That
+ * left concrete bypasses open.
  *
- * This version builds a `ts.Program` over the supplied virtual closure and uses
- * the `TypeChecker` to resolve every callee back to its declaration. A name is
- * not evidence of a binding.
+ * ```ts
+ * import { acquireProductionBrandEvidence as run } from "./lib/issue-149-candidate-adapter";
+ * export const hidden = (input) => run(input);          // never counted, never rejected
+ *
+ * import { acquireProductionBrandEvidence, acquireProductionBrandEvidence as again } from "...";
+ * await acquireProductionBrandEvidence(extractionInput);
+ * await again(extractionInput);                          // reported as ONE call
+ * ```
+ *
+ * The callee's TEXT is not its identity. This version resolves every call
+ * through `checker.getSymbolAtLocation` and `checker.getAliasedSymbol`, and
+ * compares the resulting DECLARATION against the exported declaration in the
+ * authorized adapter module. An alias, a namespace member, a re-export and a
+ * second local name all resolve to the same symbol; a local function with the
+ * authorized name resolves to a different one.
+ *
+ * ## Two separate controls
+ *
+ * This is the SOURCE gate. It can prove which function is called, from where,
+ * how often, and whether the argument is an identifier. It cannot prove that the
+ * identifier holds a valid `ExtractionInput` — that is a RUNTIME property, and
+ * `acquireProductionBrandEvidence` performs the schema and identity validation
+ * itself. Nothing here claims otherwise.
  */
 import path from "node:path";
 
@@ -36,6 +53,13 @@ export const REQUIRED_ACQUISITION_CALL = "acquireProductionBrandEvidence";
 /**
  * Calls prohibited anywhere outside the adapter module. Each is a route by which
  * a caller could obtain, construct or alter evidence the public API owns.
+ *
+ * These are resolved BY SYMBOL where the symbol is reachable in the closure, and
+ * by imported-name otherwise: a production module such as
+ * `@/pipeline/extractor/extractor` is not part of the supplied Stage 2 closure,
+ * so no declaration exists to resolve to. An import of `extractLabelEvidenceDetailed`
+ * from an unresolvable module is therefore matched on the IMPORTED name — which
+ * is the name in the exporting module and cannot be changed by an alias.
  */
 export const PROHIBITED_CALLS = [
   "extractLabelEvidenceDetailed",
@@ -49,41 +73,39 @@ export const PROHIBITED_CALLS = [
   "stableCandidateId",
 ] as const;
 
-/** Array methods that mutate their receiver in place. */
-const MUTATING_ARRAY_METHODS = [
+/**
+ * Operations prohibited on a sealed evidence package.
+ *
+ * A sealed package is a complete set of byte descriptors. Every one of these
+ * produces a DIFFERENT set — a subset, a copy, or a reordering — and persisting
+ * the result would persist incomplete evidence while leaving the package
+ * untouched. Mutation is not required for that, so a mutation-only rule cannot
+ * catch it.
+ */
+export const PROHIBITED_SEALED_PACKAGE_OPERATIONS = [
+  "filter",
+  "slice",
+  "map",
+  "concat",
+  "reverse",
+  "sort",
+  "splice",
   "push",
   "pop",
   "shift",
   "unshift",
-  "splice",
-  "sort",
-  "reverse",
-  "copyWithin",
-  "fill",
+  "find",
+  "flatMap",
 ] as const;
 
-/**
- * The acquired-evidence anchors: ADJACENT property pairs that identify a chain as
- * reaching into acquired evidence.
- *
- * A single name is not enough. The previous version flagged any chain containing
- * a property called `passes` or `candidates`, which rejected ordinary unrelated
- * helpers — `const stats = { passes: 0, candidates: [] }; stats.passes = n;` — and
- * so would have failed legitimate Stage 2 code. Requiring an adjacent pair
- * (`value.detailed`, `debug.passes`, `brandDiagnostics.candidates`, …) keeps the
- * real routes, including chains reached through a destructured `debug` or
- * `diagnosticSelection`, without claiming every same-named property.
- */
-const PROTECTED_EVIDENCE_ANCHORS: ReadonlyArray<readonly [string, string]> = [
-  ["value", "detailed"],
-  ["value", "diagnosticSelection"],
-  ["value", "candidateRecords"],
-  ["detailed", "debug"],
-  ["debug", "passes"],
-  ["debug", "primarySelections"],
-  ["debug", "finalSelections"],
-  ["diagnosticSelection", "brandDiagnostics"],
-  ["brandDiagnostics", "candidates"],
+/** Reading these off a sealed package is legitimate and must stay allowed. */
+export const PERMITTED_SEALED_PACKAGE_READS = [
+  "itemId",
+  "outcome",
+  "fileCount",
+  "totalBytes",
+  "aggregateSha256",
+  "failure",
 ] as const;
 
 export interface Stage2SourceFile {
@@ -96,24 +118,28 @@ export interface Stage2ClosureInput {
   files: Stage2SourceFile[];
 }
 
+export type Stage2ClosureRule =
+  | "RUNNER_ENTRY_MISSING"
+  | "ADAPTER_MODULE_MISSING"
+  | "ADAPTER_EXPORT_MISSING"
+  | "DUPLICATE_FILE_PATH"
+  | "PARSE_ERROR"
+  | "RUNNER_DOES_NOT_IMPORT_ACQUISITION"
+  | "ACQUISITION_IMPORT_IS_TYPE_ONLY"
+  | "ACQUISITION_BINDING_SHADOWED"
+  | "ACQUISITION_BINDING_NOT_FROM_ADAPTER"
+  | "RUNNER_DOES_NOT_INVOKE_ACQUISITION"
+  | "RUNNER_INVOKES_ACQUISITION_MORE_THAN_ONCE"
+  | "ACQUISITION_INVOKED_OUTSIDE_RUNNER"
+  | "ACQUISITION_CALL_NOT_AWAITED"
+  | "ACQUISITION_CALL_ARGUMENT_INVALID"
+  | "PROHIBITED_CALL"
+  | "SEALED_PACKAGE_PROJECTED"
+  | "SEALED_EVIDENCE_PARSED";
+
 export interface Stage2ClosureViolation {
   path: string;
-  rule:
-    | "RUNNER_ENTRY_MISSING"
-    | "ADAPTER_MODULE_MISSING"
-    | "DUPLICATE_FILE_PATH"
-    | "PARSE_ERROR"
-    | "RUNNER_DOES_NOT_IMPORT_ACQUISITION"
-    | "ACQUISITION_IMPORT_IS_TYPE_ONLY"
-    | "ACQUISITION_BINDING_SHADOWED"
-    | "ACQUISITION_BINDING_NOT_FROM_ADAPTER"
-    | "RUNNER_DOES_NOT_INVOKE_ACQUISITION"
-    | "RUNNER_INVOKES_ACQUISITION_MORE_THAN_ONCE"
-    | "ACQUISITION_INVOKED_OUTSIDE_RUNNER"
-    | "ACQUISITION_CALL_NOT_AWAITED"
-    | "ACQUISITION_CALL_ARGUMENT_INVALID"
-    | "PROHIBITED_CALL"
-    | "PROTECTED_EVIDENCE_MUTATED";
+  rule: Stage2ClosureRule;
   detail: string;
 }
 
@@ -122,6 +148,8 @@ export interface Stage2ClosureReport {
   haltCode: "STAGE2_SOURCE_CLOSURE_VIOLATION" | null;
   violations: Stage2ClosureViolation[];
   acquisitionCallSites: string[];
+  /** The resolved declaration the authorized call was checked against. */
+  authorizedSymbolDeclaredIn: string | null;
   filesAnalyzed: number;
 }
 
@@ -149,10 +177,10 @@ function createProgram(files: Stage2SourceFile[]): {
     readFile: (name) => sources.get(name)?.text,
     resolveModuleNames: (moduleNames, containingFile) =>
       moduleNames.map((moduleName) => {
-        // Relative specifiers resolve inside the virtual closure; everything else
-        // (production `@/…` modules) resolves to nothing, which is what makes an
-        // import of a prohibited symbol resolvable by NAME but not to a local
-        // declaration — handled explicitly below.
+        // Only specifiers that resolve INSIDE the supplied closure resolve at
+        // all. Production modules are deliberately unresolved: the closure is
+        // what is under review, and an unresolved import is handled by the
+        // imported-name rule rather than silently ignored.
         if (!moduleName.startsWith(".")) return undefined;
         const base = path.posix.join(path.posix.dirname(containingFile), moduleName);
         for (const candidate of [base, `${base}.ts`, `${base}/index.ts`]) {
@@ -169,354 +197,369 @@ function createProgram(files: Stage2SourceFile[]): {
   return { program, sourceFiles: sources };
 }
 
-/** Every import binding in a file: local name → { module, isTypeOnly }. */
-function importBindings(
-  source: ts.SourceFile,
-): Map<string, { module: string; isTypeOnly: boolean; imported: string; isNamespace: boolean }> {
-  const bindings = new Map<
-    string,
-    { module: string; isTypeOnly: boolean; imported: string; isNamespace: boolean }
-  >();
-  for (const statement of source.statements) {
-    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier)) {
-      continue;
-    }
-    const module = statement.moduleSpecifier.text;
-    const clause = statement.importClause;
-    if (clause === undefined) continue;
-    const declarationTypeOnly = clause.isTypeOnly;
-
-    if (clause.namedBindings !== undefined && ts.isNamespaceImport(clause.namedBindings)) {
-      bindings.set(clause.namedBindings.name.text, {
-        module,
-        isTypeOnly: declarationTypeOnly,
-        imported: "*",
-        isNamespace: true,
-      });
-      continue;
-    }
-    if (clause.namedBindings !== undefined && ts.isNamedImports(clause.namedBindings)) {
-      for (const element of clause.namedBindings.elements) {
-        bindings.set(element.name.text, {
-          module,
-          isTypeOnly: declarationTypeOnly || element.isTypeOnly,
-          imported: (element.propertyName ?? element.name).text,
-          isNamespace: false,
-        });
-      }
-    }
+/** Follow an alias symbol to the thing it actually names. */
+function resolveAliased(
+  checker: ts.TypeChecker,
+  symbol: ts.Symbol | undefined,
+): ts.Symbol | undefined {
+  if (symbol === undefined) return undefined;
+  if ((symbol.flags & ts.SymbolFlags.Alias) === 0) return symbol;
+  try {
+    return checker.getAliasedSymbol(symbol);
+  } catch {
+    return symbol;
   }
-  return bindings;
 }
 
-/** Does a local declaration of this name exist in the file? */
-function hasLocalDeclaration(source: ts.SourceFile, name: string): boolean {
-  let found = false;
-  const visit = (node: ts.Node): void => {
-    if (found) return;
-    if (ts.isFunctionDeclaration(node) && node.name?.text === name) found = true;
-    if (ts.isClassDeclaration(node) && node.name?.text === name) found = true;
-    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.name.text === name) {
-      found = true;
-    }
-    ts.forEachChild(node, visit);
-  };
-  ts.forEachChild(source, visit);
-  return found;
+/** The symbol a callee expression resolves to, following aliases. */
+function calleeSymbol(checker: ts.TypeChecker, callee: ts.Expression): ts.Symbol | undefined {
+  const target = ts.isPropertyAccessExpression(callee) ? callee.name : callee;
+  return resolveAliased(checker, checker.getSymbolAtLocation(target));
 }
 
-/** The root object identifier of a property-access chain, plus the chain names. */
-function accessChain(node: ts.Expression): { root: string; chain: string[] } | undefined {
+/** Where a symbol is declared, as a file path — or null when it is unresolved. */
+function declarationFile(symbol: ts.Symbol | undefined): string | null {
+  const declaration = symbol?.declarations?.[0];
+  return declaration === undefined ? null : declaration.getSourceFile().fileName;
+}
+
+/**
+ * The IMPORTED name behind an identifier, if it came from an import in this file.
+ *
+ * This is the name in the EXPORTING module, so it is unaffected by a local alias.
+ * It is the fallback identity for symbols whose declarations are outside the
+ * supplied closure — production modules, which are not part of Stage 2 source.
+ */
+function importedNameOf(checker: ts.TypeChecker, node: ts.Node): string | null {
+  const symbol = checker.getSymbolAtLocation(node);
+  const declaration = symbol?.declarations?.[0];
+  if (declaration === undefined) return null;
+  if (ts.isImportSpecifier(declaration)) {
+    return (declaration.propertyName ?? declaration.name).text;
+  }
+  if (ts.isImportClause(declaration)) return "default";
+  if (ts.isNamespaceImport(declaration)) return "*";
+  return null;
+}
+
+/** Is this identifier a namespace import (`import * as ns`)? */
+function isNamespaceImport(checker: ts.TypeChecker, node: ts.Node): boolean {
+  const symbol = checker.getSymbolAtLocation(node);
+  const declaration = symbol?.declarations?.[0];
+  return declaration !== undefined && ts.isNamespaceImport(declaration);
+}
+
+/** Is a declaration type-only (`import type` or `import { type x }`)? */
+function isTypeOnlyDeclaration(declaration: ts.Declaration): boolean {
+  if (ts.isImportSpecifier(declaration)) {
+    return (
+      declaration.isTypeOnly || declaration.parent.parent.parent.importClause?.isTypeOnly === true
+    );
+  }
+  return false;
+}
+
+/** The dotted property chain an expression reads, innermost first. */
+function accessChain(node: ts.Node): string[] {
   const chain: string[] = [];
-  let current: ts.Expression = node;
+  let current: ts.Node = node;
   while (ts.isPropertyAccessExpression(current) || ts.isElementAccessExpression(current)) {
-    if (ts.isPropertyAccessExpression(current)) {
-      chain.unshift(current.name.text);
-      current = current.expression;
-    } else {
-      const argument = current.argumentExpression;
-      chain.unshift(ts.isStringLiteral(argument) ? argument.text : "[computed]");
-      current = current.expression;
-    }
+    if (ts.isPropertyAccessExpression(current)) chain.unshift(current.name.text);
+    else if (ts.isStringLiteralLike(current.argumentExpression)) {
+      chain.unshift(current.argumentExpression.text);
+    } else chain.unshift("[computed]");
+    current = current.expression;
   }
-  if (!ts.isIdentifier(current)) return undefined;
-  return { root: current.text, chain };
+  if (ts.isIdentifier(current)) chain.unshift(current.text);
+  return chain;
 }
 
-/** Is this access chain rooted in acquired evidence, or a protected descendant? */
-function touchesProtectedEvidence(chain: string[]): boolean {
-  return chain.some((name, index) =>
-    PROTECTED_EVIDENCE_ANCHORS.some(
-      ([first, second]) => name === first && chain[index + 1] === second,
-    ),
-  );
-}
+/**
+ * Does this chain reach the `files` descriptor list of a sealed package?
+ *
+ * A sealed package's ONLY evidence-bearing member is `files`. Everything else is
+ * a count, an identifier or a digest, which a helper may freely read. So the rule
+ * is anchored on the `files` member rather than on a general lineage analysis,
+ * which source text cannot support.
+ */
+const touchesSealedFiles = (chain: string[]): boolean =>
+  chain.includes("files") || chain.includes("bytes");
 
 export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2ClosureReport {
   const violations: Stage2ClosureViolation[] = [];
   const acquisitionCallSites: string[] = [];
+  const add = (path: string, rule: Stage2ClosureRule, detail: string): void => {
+    violations.push({ path, rule, detail });
+  };
 
   const seen = new Set<string>();
   for (const file of input.files) {
     if (seen.has(file.path)) {
-      violations.push({
-        path: file.path,
-        rule: "DUPLICATE_FILE_PATH",
-        detail: "the closure lists this path more than once",
-      });
+      add(file.path, "DUPLICATE_FILE_PATH", "the closure lists this path more than once");
     }
     seen.add(file.path);
   }
-  if (!seen.has(RUNNER_ENTRY_PATH)) {
-    violations.push({
-      path: RUNNER_ENTRY_PATH,
-      rule: "RUNNER_ENTRY_MISSING",
-      detail: "the runner entrypoint is not present in the analyzed closure",
-    });
+
+  const runnerPresent = input.files.some((file) => file.path === RUNNER_ENTRY_PATH);
+  const adapterPresent = input.files.some((file) => file.path === AUTHORIZED_ADAPTER_MODULE);
+  if (!runnerPresent) {
+    add(
+      RUNNER_ENTRY_PATH,
+      "RUNNER_ENTRY_MISSING",
+      "the closure does not contain the runner entrypoint",
+    );
   }
-  if (!seen.has(AUTHORIZED_ADAPTER_MODULE)) {
-    violations.push({
-      path: AUTHORIZED_ADAPTER_MODULE,
-      rule: "ADAPTER_MODULE_MISSING",
-      detail: "the authorized adapter module is not present in the analyzed closure",
-    });
+  if (!adapterPresent) {
+    add(
+      AUTHORIZED_ADAPTER_MODULE,
+      "ADAPTER_MODULE_MISSING",
+      "the closure does not contain the authorized adapter module",
+    );
   }
 
-  const { sourceFiles } = createProgram(input.files);
+  const { program, sourceFiles } = createProgram(input.files);
+  const checker = program.getTypeChecker();
 
-  for (const file of input.files) {
-    const source = sourceFiles.get(file.path);
-    if (source === undefined) continue;
-    // A file that fails to parse cannot be reasoned about, so it fails closed.
-    const parseDiagnostics = (source as unknown as { parseDiagnostics?: unknown[] })
+  for (const [filePath, source] of sourceFiles) {
+    // `ts.createSourceFile` records recoverable syntax errors here.
+    const diagnostics = (source as unknown as { parseDiagnostics?: ts.Diagnostic[] })
       .parseDiagnostics;
-    if (Array.isArray(parseDiagnostics) && parseDiagnostics.length > 0) {
-      violations.push({
-        path: file.path,
-        rule: "PARSE_ERROR",
-        detail: `${parseDiagnostics.length} parse diagnostic(s); a file that does not parse cannot be gated`,
-      });
-      continue;
+    if (diagnostics !== undefined && diagnostics.length > 0) {
+      add(
+        filePath,
+        "PARSE_ERROR",
+        ts.flattenDiagnosticMessageText(diagnostics[0].messageText, " "),
+      );
     }
+  }
 
-    if (file.path === AUTHORIZED_ADAPTER_MODULE) continue;
-
-    const isRunner = file.path === RUNNER_ENTRY_PATH;
-    const bindings = importBindings(source);
-    const acquisitionBinding = bindings.get(REQUIRED_ACQUISITION_CALL);
-    let acquisitionCalls = 0;
-
-    if (isRunner) {
-      if (acquisitionBinding === undefined) {
-        violations.push({
-          path: file.path,
-          rule: "RUNNER_DOES_NOT_IMPORT_ACQUISITION",
-          detail: `the runner must import ${REQUIRED_ACQUISITION_CALL} from ${AUTHORIZED_ADAPTER_MODULE}`,
-        });
-      } else {
-        if (acquisitionBinding.isTypeOnly) {
-          violations.push({
-            path: file.path,
-            rule: "ACQUISITION_IMPORT_IS_TYPE_ONLY",
-            detail: "a type-only import produces no runtime binding",
-          });
-        }
-        // The specifier must resolve to the authorized adapter. Relative
-        // specifiers are compared against the frozen path; a bare specifier that
-        // does not name it is rejected.
-        const resolved = acquisitionBinding.module.startsWith(".")
-          ? path.posix.normalize(
-              path.posix.join(path.posix.dirname(file.path), acquisitionBinding.module),
-            )
-          : acquisitionBinding.module;
-        const matchesAdapter =
-          resolved === AUTHORIZED_ADAPTER_MODULE ||
-          `${resolved}.ts` === AUTHORIZED_ADAPTER_MODULE ||
-          AUTHORIZED_ADAPTER_MODULE.endsWith(`${resolved.replace(/^@\//, "")}.ts`);
-        if (!matchesAdapter) {
-          violations.push({
-            path: file.path,
-            rule: "ACQUISITION_BINDING_NOT_FROM_ADAPTER",
-            detail: `${REQUIRED_ACQUISITION_CALL} is imported from ${acquisitionBinding.module}, not ${AUTHORIZED_ADAPTER_MODULE}`,
-          });
-        }
-        if (acquisitionBinding.imported !== REQUIRED_ACQUISITION_CALL) {
-          violations.push({
-            path: file.path,
-            rule: "ACQUISITION_BINDING_NOT_FROM_ADAPTER",
-            detail: `the local name ${REQUIRED_ACQUISITION_CALL} is an alias for ${acquisitionBinding.imported}`,
-          });
-        }
-      }
-      if (hasLocalDeclaration(source, REQUIRED_ACQUISITION_CALL)) {
-        violations.push({
-          path: file.path,
-          rule: "ACQUISITION_BINDING_SHADOWED",
-          detail: `a local declaration named ${REQUIRED_ACQUISITION_CALL} shadows the imported binding; a name is not a binding`,
-        });
-      }
+  // ---- the authorized symbol, resolved once ------------------------------
+  const adapterSource = sourceFiles.get(AUTHORIZED_ADAPTER_MODULE);
+  let authorizedSymbol: ts.Symbol | undefined;
+  if (adapterSource !== undefined) {
+    const moduleSymbol = checker.getSymbolAtLocation(adapterSource);
+    authorizedSymbol = moduleSymbol?.exports?.get(REQUIRED_ACQUISITION_CALL as ts.__String);
+    if (authorizedSymbol === undefined) {
+      // Fall back to the exported-symbol list, which covers `export { x }`.
+      authorizedSymbol =
+        moduleSymbol === undefined
+          ? undefined
+          : checker
+              .getExportsOfModule(moduleSymbol)
+              .find((symbol) => symbol.getName() === REQUIRED_ACQUISITION_CALL);
     }
+    authorizedSymbol = resolveAliased(checker, authorizedSymbol);
+    if (authorizedSymbol === undefined) {
+      add(
+        AUTHORIZED_ADAPTER_MODULE,
+        "ADAPTER_EXPORT_MISSING",
+        `the adapter module does not export ${REQUIRED_ACQUISITION_CALL}`,
+      );
+    }
+  }
+  const authorizedDeclaration = authorizedSymbol?.declarations?.[0];
+
+  const isAuthorized = (symbol: ts.Symbol | undefined): boolean =>
+    symbol !== undefined &&
+    authorizedSymbol !== undefined &&
+    (symbol === authorizedSymbol ||
+      (authorizedDeclaration !== undefined && symbol.declarations?.[0] === authorizedDeclaration));
+
+  // ---- per-file analysis --------------------------------------------------
+  for (const [filePath, source] of sourceFiles) {
+    const isRunner = filePath === RUNNER_ENTRY_PATH;
+    const isAdapter = filePath === AUTHORIZED_ADAPTER_MODULE;
 
     const visit = (node: ts.Node): void => {
-      // ---- calls ----------------------------------------------------------
       if (ts.isCallExpression(node)) {
-        const target = node.expression;
+        const symbol = calleeSymbol(checker, node.expression);
 
-        if (ts.isPropertyAccessExpression(target)) {
-          const method = target.name.text;
-          const receiver = target.expression;
-
-          // Namespace call: `ns.extractLabelEvidenceDetailed(...)`.
-          if (ts.isIdentifier(receiver)) {
-            const namespaceBinding = bindings.get(receiver.text);
-            if (
-              namespaceBinding?.isNamespace === true &&
-              (PROHIBITED_CALLS as readonly string[]).includes(method)
-            ) {
-              violations.push({
-                path: file.path,
-                rule: "PROHIBITED_CALL",
-                detail: `calls ${method} through the namespace import ${receiver.text}`,
-              });
+        // --- the authorized acquisition call, by SYMBOL -------------------
+        if (isAuthorized(symbol)) {
+          if (!isRunner) {
+            add(
+              filePath,
+              "ACQUISITION_INVOKED_OUTSIDE_RUNNER",
+              `${node.expression.getText()} resolves to the authorized acquisition function, which only the runner entrypoint may call`,
+            );
+          } else {
+            acquisitionCallSites.push(filePath);
+            if (!ts.isAwaitExpression(node.parent)) {
+              add(
+                filePath,
+                "ACQUISITION_CALL_NOT_AWAITED",
+                "the acquisition call must be awaited directly; an un-awaited promise can be dropped, raced or resolved elsewhere",
+              );
             }
-            // `Object.assign(target, …)` / `Reflect.set(target, …)`.
-            const qualified = `${receiver.text}.${method}`;
-            if (
-              (qualified === "Object.assign" || qualified === "Reflect.set") &&
-              node.arguments.length > 0 &&
-              touchesProtectedEvidence(accessChain(node.arguments[0])?.chain ?? [])
-            ) {
-              violations.push({
-                path: file.path,
-                rule: "PROTECTED_EVIDENCE_MUTATED",
-                detail: `uses ${qualified} on acquired evidence`,
-              });
+            if (node.arguments.length !== 1 || !ts.isIdentifier(node.arguments[0])) {
+              add(
+                filePath,
+                "ACQUISITION_CALL_ARGUMENT_INVALID",
+                `the acquisition call takes exactly one identifier argument, received ${node.arguments.map((a) => a.getText()).join(", ")}`,
+              );
+            }
+            if (ts.isPropertyAccessExpression(node.expression)) {
+              add(
+                filePath,
+                "PROHIBITED_CALL",
+                `the acquisition call must use a direct import binding, not the member access ${node.expression.getText()}`,
+              );
             }
           }
+        } else if (!isAdapter) {
+          // --- prohibited calls ------------------------------------------
+          const target = ts.isPropertyAccessExpression(node.expression)
+            ? node.expression.name
+            : node.expression;
+          const declaredIn = declarationFile(symbol);
+          const imported = importedNameOf(checker, target);
 
-          // A mutating array method on a protected chain. The receiver is itself
-          // an access chain — `e.value.detailed.debug.passes.push(…)` — so it must
-          // NOT be required to be a bare identifier.
+          // Resolved inside the closure: identity is the declaration.
+          if (declaredIn === AUTHORIZED_ADAPTER_MODULE && symbol !== undefined) {
+            const name = symbol.getName();
+            if ((PROHIBITED_CALLS as readonly string[]).includes(name)) {
+              add(filePath, "PROHIBITED_CALL", `calls ${name}, declared in the adapter module`);
+            }
+          }
+          // Unresolved (a production module): identity is the IMPORTED name,
+          // which an alias cannot change.
+          if (imported !== null && (PROHIBITED_CALLS as readonly string[]).includes(imported)) {
+            const local = target.getText();
+            add(
+              filePath,
+              "PROHIBITED_CALL",
+              local === imported
+                ? `calls ${imported}`
+                : `calls ${imported} through the local name ${local}`,
+            );
+          }
+          // A namespace member call: `extractor.extractLabelEvidenceDetailed(…)`.
           if (
-            (MUTATING_ARRAY_METHODS as readonly string[]).includes(method) &&
-            touchesProtectedEvidence(accessChain(receiver)?.chain ?? [])
+            ts.isPropertyAccessExpression(node.expression) &&
+            ts.isIdentifier(node.expression.expression) &&
+            isNamespaceImport(checker, node.expression.expression) &&
+            (PROHIBITED_CALLS as readonly string[]).includes(node.expression.name.text)
           ) {
-            violations.push({
-              path: file.path,
-              rule: "PROTECTED_EVIDENCE_MUTATED",
-              detail: `calls the mutating array method ${method} on acquired evidence`,
-            });
+            add(
+              filePath,
+              "PROHIBITED_CALL",
+              `calls ${node.expression.name.text} through the namespace import ${node.expression.expression.getText()}`,
+            );
+          }
+          // An unresolved import of the AUTHORIZED name is not the authorized
+          // symbol — it comes from somewhere unreviewed.
+          if (imported === REQUIRED_ACQUISITION_CALL) {
+            add(
+              filePath,
+              "ACQUISITION_BINDING_NOT_FROM_ADAPTER",
+              `${target.getText()} is imported as ${imported} but does not resolve to the adapter module's export`,
+            );
           }
         }
 
-        if (ts.isIdentifier(target)) {
-          const name = target.text;
-          const binding = bindings.get(name);
-
-          if (name === REQUIRED_ACQUISITION_CALL) {
-            // Only an authorized, non-shadowed import counts as the required call.
-            const authorized =
-              binding !== undefined &&
-              !binding.isTypeOnly &&
-              binding.imported === REQUIRED_ACQUISITION_CALL &&
-              !hasLocalDeclaration(source, REQUIRED_ACQUISITION_CALL);
-            if (authorized) {
-              acquisitionCalls += 1;
-              acquisitionCallSites.push(file.path);
-              if (!isRunner) {
-                violations.push({
-                  path: file.path,
-                  rule: "ACQUISITION_INVOKED_OUTSIDE_RUNNER",
-                  detail: `${REQUIRED_ACQUISITION_CALL} is invoked outside the runner entrypoint`,
-                });
-              } else {
-                if (node.parent === undefined || !ts.isAwaitExpression(node.parent)) {
-                  violations.push({
-                    path: file.path,
-                    rule: "ACQUISITION_CALL_NOT_AWAITED",
-                    detail: "the acquisition call must be awaited",
-                  });
-                }
-                if (node.arguments.length !== 1 || !ts.isIdentifier(node.arguments[0])) {
-                  violations.push({
-                    path: file.path,
-                    rule: "ACQUISITION_CALL_ARGUMENT_INVALID",
-                    detail:
-                      "the acquisition call takes exactly one identifier argument: the frozen ExtractionInput",
-                  });
-                }
-              }
-            }
-          } else if ((PROHIBITED_CALLS as readonly string[]).includes(name)) {
-            violations.push({
-              path: file.path,
-              rule: "PROHIBITED_CALL",
-              detail: `calls ${name}, which only ${AUTHORIZED_ADAPTER_MODULE} may call`,
-            });
-          } else if (
-            binding !== undefined &&
-            !binding.isNamespace &&
-            (PROHIBITED_CALLS as readonly string[]).includes(binding.imported)
+        // --- sealed-package projection -----------------------------------
+        if (!isAdapter && ts.isPropertyAccessExpression(node.expression)) {
+          const method = node.expression.name.text;
+          const chain = accessChain(node.expression.expression);
+          if (
+            (PROHIBITED_SEALED_PACKAGE_OPERATIONS as readonly string[]).includes(method) &&
+            touchesSealedFiles(chain)
           ) {
-            // An alias: `import { extractLabelEvidenceDetailed as run }`.
-            violations.push({
-              path: file.path,
-              rule: "PROHIBITED_CALL",
-              detail: `calls ${binding.imported} through the alias ${name}`,
-            });
+            add(
+              filePath,
+              "SEALED_PACKAGE_PROJECTED",
+              `${chain.join(".")}.${method}(…) produces a different file set; a sealed package is written whole or not at all`,
+            );
+          }
+          if (
+            (method === "parse" || method === "toString" || method === "from") &&
+            node.arguments.some((argument) => touchesSealedFiles(accessChain(argument)))
+          ) {
+            add(
+              filePath,
+              "SEALED_EVIDENCE_PARSED",
+              `${node.expression.getText()}(…) reads sealed evidence bytes; the runner writes them and never interprets them`,
+            );
           }
         }
       }
 
-      // ---- writes ---------------------------------------------------------
-      if (ts.isBinaryExpression(node)) {
-        const assigns =
-          node.operatorToken.kind === ts.SyntaxKind.EqualsToken ||
-          (node.operatorToken.kind >= ts.SyntaxKind.FirstCompoundAssignment &&
-            node.operatorToken.kind <= ts.SyntaxKind.LastCompoundAssignment);
-        if (
-          assigns &&
-          (ts.isPropertyAccessExpression(node.left) || ts.isElementAccessExpression(node.left))
-        ) {
-          const chain = accessChain(node.left)?.chain ?? [];
-          if (touchesProtectedEvidence(chain)) {
-            violations.push({
-              path: file.path,
-              rule: "PROTECTED_EVIDENCE_MUTATED",
-              detail: `assigns to ${chain.join(".")} on acquired evidence`,
-            });
-          }
-        }
+      // Spread or index into the sealed file list: `[...pkg.files]`, `files[0]`.
+      if (ts.isSpreadElement(node) && touchesSealedFiles(accessChain(node.expression))) {
+        add(
+          node.getSourceFile().fileName,
+          "SEALED_PACKAGE_PROJECTED",
+          `spreading ${node.expression.getText()} produces a new, separately mutable file list`,
+        );
       }
-      if (ts.isDeleteExpression(node)) {
-        const chain = accessChain(node.expression)?.chain ?? [];
-        if (touchesProtectedEvidence(chain)) {
-          violations.push({
-            path: file.path,
-            rule: "PROTECTED_EVIDENCE_MUTATED",
-            detail: `deletes ${chain.join(".")} from acquired evidence`,
-          });
-        }
+      if (
+        ts.isElementAccessExpression(node) &&
+        touchesSealedFiles(accessChain(node.expression)) &&
+        node.getSourceFile().fileName !== AUTHORIZED_ADAPTER_MODULE
+      ) {
+        add(
+          node.getSourceFile().fileName,
+          "SEALED_PACKAGE_PROJECTED",
+          `${node.getText()} selects a single sealed file; the package is written whole`,
+        );
       }
 
       ts.forEachChild(node, visit);
     };
-    ts.forEachChild(source, visit);
 
-    if (isRunner) {
-      if (acquisitionCalls === 0) {
-        violations.push({
-          path: file.path,
-          rule: "RUNNER_DOES_NOT_INVOKE_ACQUISITION",
-          detail: `the runner entrypoint must invoke ${REQUIRED_ACQUISITION_CALL} exactly once`,
-        });
-      } else if (acquisitionCalls > 1) {
-        violations.push({
-          path: file.path,
-          rule: "RUNNER_INVOKES_ACQUISITION_MORE_THAN_ONCE",
-          detail: `${REQUIRED_ACQUISITION_CALL} is invoked ${acquisitionCalls} times; exactly one call is authorized`,
-        });
+    if (!isAdapter || true) visit(source);
+  }
+
+  // ---- runner-level requirements -----------------------------------------
+  const runnerSource = sourceFiles.get(RUNNER_ENTRY_PATH);
+  if (runnerSource !== undefined) {
+    const bindings = runnerAcquisitionBindings(checker, runnerSource);
+    if (bindings.length === 0) {
+      add(
+        RUNNER_ENTRY_PATH,
+        "RUNNER_DOES_NOT_IMPORT_ACQUISITION",
+        `the runner must import ${REQUIRED_ACQUISITION_CALL} from ${AUTHORIZED_ADAPTER_MODULE}`,
+      );
+    }
+    for (const binding of bindings) {
+      if (binding.typeOnly) {
+        add(
+          RUNNER_ENTRY_PATH,
+          "ACQUISITION_IMPORT_IS_TYPE_ONLY",
+          `${binding.local} is imported type-only and is erased at runtime`,
+        );
       }
+      if (binding.shadowed) {
+        add(
+          RUNNER_ENTRY_PATH,
+          "ACQUISITION_BINDING_SHADOWED",
+          `${binding.local} is shadowed by a local declaration; the call would reach the local one`,
+        );
+      }
+    }
+
+    const shadowingLocals = localDeclarationsNamed(runnerSource, REQUIRED_ACQUISITION_CALL);
+    if (shadowingLocals.length > 0 && bindings.length === 0) {
+      add(
+        RUNNER_ENTRY_PATH,
+        "ACQUISITION_BINDING_SHADOWED",
+        `${REQUIRED_ACQUISITION_CALL} is declared locally (${shadowingLocals.join(", ")}); a name is not a binding`,
+      );
+    }
+
+    const runnerCalls = acquisitionCallSites.filter((site) => site === RUNNER_ENTRY_PATH).length;
+    if (runnerCalls === 0) {
+      add(
+        RUNNER_ENTRY_PATH,
+        "RUNNER_DOES_NOT_INVOKE_ACQUISITION",
+        `the runner entrypoint does not call the adapter module's ${REQUIRED_ACQUISITION_CALL}`,
+      );
+    } else if (runnerCalls > 1) {
+      add(
+        RUNNER_ENTRY_PATH,
+        "RUNNER_INVOKES_ACQUISITION_MORE_THAN_ONCE",
+        `${runnerCalls} acquisition calls; each item is acquired exactly once and never retried`,
+      );
     }
   }
 
@@ -524,7 +567,81 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
     ok: violations.length === 0,
     haltCode: violations.length === 0 ? null : "STAGE2_SOURCE_CLOSURE_VIOLATION",
     violations,
-    acquisitionCallSites,
-    filesAnalyzed: input.files.length,
+    acquisitionCallSites: [...new Set(acquisitionCallSites)],
+    authorizedSymbolDeclaredIn: declarationFile(authorizedSymbol),
+    filesAnalyzed: sourceFiles.size,
   };
+}
+
+/**
+ * Every local binding in the runner that resolves to the authorized export.
+ *
+ * Two imports under different local names produce two bindings, which is exactly
+ * what the previous name-map missed.
+ */
+function runnerAcquisitionBindings(
+  checker: ts.TypeChecker,
+  source: ts.SourceFile,
+): Array<{ local: string; typeOnly: boolean; shadowed: boolean }> {
+  const bindings: Array<{ local: string; typeOnly: boolean; shadowed: boolean }> = [];
+  for (const statement of source.statements) {
+    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier)) {
+      continue;
+    }
+    const named = statement.importClause?.namedBindings;
+    if (named === undefined || !ts.isNamedImports(named)) continue;
+    for (const element of named.elements) {
+      const importedName = (element.propertyName ?? element.name).text;
+      if (importedName !== REQUIRED_ACQUISITION_CALL) continue;
+
+      const symbol = resolveAliased(checker, checker.getSymbolAtLocation(element.name));
+      const declaredIn = declarationFile(symbol);
+      const typeOnly = element.isTypeOnly || statement.importClause?.isTypeOnly === true;
+      if (declaredIn !== AUTHORIZED_ADAPTER_MODULE && !typeOnly) continue;
+
+      bindings.push({
+        local: element.name.text,
+        typeOnly,
+        shadowed: localDeclarationsNamed(source, element.name.text).length > 0,
+      });
+    }
+  }
+  return bindings;
+}
+
+/**
+ * Local declarations of a name, in any binding position.
+ *
+ * The previous version looked only at top-level function and variable
+ * declarations, so a function PARAMETER, a `catch` binding, a destructured
+ * declaration or a block-scoped declaration could shadow the authorized import
+ * without being noticed.
+ */
+function localDeclarationsNamed(source: ts.SourceFile, name: string): string[] {
+  const found: string[] = [];
+  const record = (kind: string): void => {
+    found.push(kind);
+  };
+  const visitBindingName = (binding: ts.BindingName, kind: string): void => {
+    if (ts.isIdentifier(binding)) {
+      if (binding.text === name) record(kind);
+      return;
+    }
+    for (const element of binding.elements) {
+      if (ts.isBindingElement(element)) visitBindingName(element.name, `${kind} (destructured)`);
+    }
+  };
+
+  const visit = (node: ts.Node): void => {
+    if (ts.isFunctionDeclaration(node) && node.name?.text === name) record("function declaration");
+    if (ts.isClassDeclaration(node) && node.name?.text === name) record("class declaration");
+    if (ts.isVariableDeclaration(node)) visitBindingName(node.name, "variable declaration");
+    if (ts.isParameter(node)) visitBindingName(node.name, "parameter");
+    if (ts.isCatchClause(node) && node.variableDeclaration !== undefined) {
+      visitBindingName(node.variableDeclaration.name, "catch binding");
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(source);
+  return found;
 }
