@@ -92,6 +92,12 @@ export const ENVIRONMENT_ALLOWLIST = [
   "VIPSHOME",
   "ISSUE_149_MODE",
   "ISSUE_149_HARNESS_REVISION",
+  // The three verification variables the workflow passes in so discovery can
+  // check the boundary against what was PINNED rather than against itself.
+  // They were added without being allowlisted, and the check caught it.
+  "ISSUE_149_EXPECTED_UID",
+  "ISSUE_149_EXPECTED_GID",
+  "ISSUE_149_EXPECTED_IMAGE_DIGEST",
 ] as const;
 
 /** Substrings that would indicate a credential reached the boundary. */
