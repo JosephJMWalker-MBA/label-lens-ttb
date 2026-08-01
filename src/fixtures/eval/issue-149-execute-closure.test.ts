@@ -49,6 +49,95 @@ import {
   decideArchiveVolume,
 } from "../../../scripts/eval/lib/issue-149-archive-volume";
 
+/**
+ * The committed control state: the mode file and the authorization artifact,
+ * read together.
+ *
+ * These are ONE state, not two independent facts, and the tests assert its
+ * COHERENCE rather than today's value. Asserting `discover` and
+ * `EXECUTE_NOT_AUTHORIZED` literally froze the pre-transition state into
+ * ordinary CI — and the frozen transition commit may change only the mode file
+ * and the authorization artifact, so it could not have repaired them. Pushing it
+ * would have started the acquisition workflow and turned ordinary CI red by
+ * construction.
+ *
+ * No trimming and no whitespace normalization: the mode bytes are exact.
+ */
+const CONTROL_STATE_ROOT = "artifacts/issue-149-brand-complete-evidence-acquisition";
+const LOWER_HEX_40 = /^[0-9a-f]{40}$/;
+
+type ControlState = "discover" | "execute" | "complete";
+
+interface CommittedControlState {
+  modeBytes: string;
+  status: string;
+  reviewedImplementationSha: string | null;
+  state: ControlState | null;
+  coherent: boolean;
+  reason: string | null;
+}
+
+/** Classify a mode/authorization pair. Every incoherent pairing is rejected. */
+function classifyControlState(
+  modeBytes: string,
+  status: string,
+  reviewedImplementationSha: string | null,
+): CommittedControlState {
+  const base = { modeBytes, status, reviewedImplementationSha };
+  const incoherent = (reason: string): CommittedControlState => ({
+    ...base,
+    state: null,
+    coherent: false,
+    reason,
+  });
+  const hasSha =
+    typeof reviewedImplementationSha === "string" && LOWER_HEX_40.test(reviewedImplementationSha);
+
+  if (modeBytes === "discover\n") {
+    if (status !== "EXECUTE_NOT_AUTHORIZED") {
+      return incoherent(`discover requires EXECUTE_NOT_AUTHORIZED, found ${status}`);
+    }
+    if (reviewedImplementationSha !== null) {
+      return incoherent("discover requires a null reviewedImplementationSha");
+    }
+    return { ...base, state: "discover", coherent: true, reason: null };
+  }
+  if (modeBytes === "execute\n") {
+    if (status !== "EXECUTE_AUTHORIZED") {
+      return incoherent(`execute requires EXECUTE_AUTHORIZED, found ${status}`);
+    }
+    if (!hasSha) return incoherent("execute requires a full lowercase 40-hex reviewed SHA");
+    return { ...base, state: "execute", coherent: true, reason: null };
+  }
+  if (modeBytes === "complete\n") {
+    if (status !== "EXECUTE_AUTHORIZED") {
+      return incoherent(`complete requires EXECUTE_AUTHORIZED, found ${status}`);
+    }
+    if (!hasSha) return incoherent("complete requires a full lowercase 40-hex reviewed SHA");
+    return { ...base, state: "complete", coherent: true, reason: null };
+  }
+  return incoherent(`mode bytes ${JSON.stringify(modeBytes)} are not an exact governed mode`);
+}
+
+/** Read the real committed control state from disk. */
+function committedControlState(): CommittedControlState {
+  const modeBytes = readFileSync(
+    path.join(process.cwd(), CONTROL_STATE_ROOT, "workflow-mode.txt"),
+    "utf8",
+  );
+  const authorization = JSON.parse(
+    readFileSync(
+      path.join(process.cwd(), CONTROL_STATE_ROOT, "execute-authorization.json"),
+      "utf8",
+    ),
+  ) as { status: string; reviewedImplementationSha: string | null };
+  return classifyControlState(
+    modeBytes,
+    authorization.status,
+    authorization.reviewedImplementationSha,
+  );
+}
+
 const scratch = mkdtempSync(path.join(tmpdir(), "issue-149-execute-closure-"));
 afterAll(() => rmSync(scratch, { recursive: true, force: true }));
 
@@ -907,8 +996,13 @@ describe("Issue #149 the authorization boundary is stated honestly", () => {
       branchLocalGateLimitation: { statement: string };
       frozenAuthorizationProcedure: string[];
     };
-    expect(authorization.status).toBe("EXECUTE_NOT_AUTHORIZED");
-    expect(authorization.reviewedImplementationSha).toBeNull();
+    // Coherence, not today's value: the transition commit may change only the
+    // mode file and this artifact, so a test that pinned their current contents
+    // could not survive it.
+    const committed = committedControlState();
+    expect(committed.coherent, committed.reason ?? "").toBe(true);
+    expect(authorization.status).toBe(committed.status);
+    expect(authorization.reviewedImplementationSha).toBe(committed.reviewedImplementationSha);
     expect(authorization.branchLocalGateLimitation.statement).toContain("cannot prove");
     expect(authorization.frozenAuthorizationProcedure.length).toBeGreaterThanOrEqual(7);
     expect(authorization.frozenAuthorizationProcedure.join(" ")).toContain("do not push");

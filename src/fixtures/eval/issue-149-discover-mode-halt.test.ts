@@ -6,6 +6,9 @@
  * them is invoked. A comment saying "discover returns early" is not a control;
  * this is.
  */
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/pipeline/extractor/extractor", async (importOriginal) => ({
@@ -40,6 +43,95 @@ import {
   main,
   resolveRunnerMode,
 } from "../../../scripts/eval/issue-149-brand-evidence-acquisition-run";
+
+/**
+ * The committed control state: the mode file and the authorization artifact,
+ * read together.
+ *
+ * These are ONE state, not two independent facts, and the tests assert its
+ * COHERENCE rather than today's value. Asserting `discover` and
+ * `EXECUTE_NOT_AUTHORIZED` literally froze the pre-transition state into
+ * ordinary CI — and the frozen transition commit may change only the mode file
+ * and the authorization artifact, so it could not have repaired them. Pushing it
+ * would have started the acquisition workflow and turned ordinary CI red by
+ * construction.
+ *
+ * No trimming and no whitespace normalization: the mode bytes are exact.
+ */
+const CONTROL_STATE_ROOT = "artifacts/issue-149-brand-complete-evidence-acquisition";
+const LOWER_HEX_40 = /^[0-9a-f]{40}$/;
+
+type ControlState = "discover" | "execute" | "complete";
+
+interface CommittedControlState {
+  modeBytes: string;
+  status: string;
+  reviewedImplementationSha: string | null;
+  state: ControlState | null;
+  coherent: boolean;
+  reason: string | null;
+}
+
+/** Classify a mode/authorization pair. Every incoherent pairing is rejected. */
+function classifyControlState(
+  modeBytes: string,
+  status: string,
+  reviewedImplementationSha: string | null,
+): CommittedControlState {
+  const base = { modeBytes, status, reviewedImplementationSha };
+  const incoherent = (reason: string): CommittedControlState => ({
+    ...base,
+    state: null,
+    coherent: false,
+    reason,
+  });
+  const hasSha =
+    typeof reviewedImplementationSha === "string" && LOWER_HEX_40.test(reviewedImplementationSha);
+
+  if (modeBytes === "discover\n") {
+    if (status !== "EXECUTE_NOT_AUTHORIZED") {
+      return incoherent(`discover requires EXECUTE_NOT_AUTHORIZED, found ${status}`);
+    }
+    if (reviewedImplementationSha !== null) {
+      return incoherent("discover requires a null reviewedImplementationSha");
+    }
+    return { ...base, state: "discover", coherent: true, reason: null };
+  }
+  if (modeBytes === "execute\n") {
+    if (status !== "EXECUTE_AUTHORIZED") {
+      return incoherent(`execute requires EXECUTE_AUTHORIZED, found ${status}`);
+    }
+    if (!hasSha) return incoherent("execute requires a full lowercase 40-hex reviewed SHA");
+    return { ...base, state: "execute", coherent: true, reason: null };
+  }
+  if (modeBytes === "complete\n") {
+    if (status !== "EXECUTE_AUTHORIZED") {
+      return incoherent(`complete requires EXECUTE_AUTHORIZED, found ${status}`);
+    }
+    if (!hasSha) return incoherent("complete requires a full lowercase 40-hex reviewed SHA");
+    return { ...base, state: "complete", coherent: true, reason: null };
+  }
+  return incoherent(`mode bytes ${JSON.stringify(modeBytes)} are not an exact governed mode`);
+}
+
+/** Read the real committed control state from disk. */
+function committedControlState(): CommittedControlState {
+  const modeBytes = readFileSync(
+    path.join(process.cwd(), CONTROL_STATE_ROOT, "workflow-mode.txt"),
+    "utf8",
+  );
+  const authorization = JSON.parse(
+    readFileSync(
+      path.join(process.cwd(), CONTROL_STATE_ROOT, "execute-authorization.json"),
+      "utf8",
+    ),
+  ) as { status: string; reviewedImplementationSha: string | null };
+  return classifyControlState(
+    modeBytes,
+    authorization.status,
+    authorization.reviewedImplementationSha,
+  );
+}
 
 const OCR_ROUTES = [
   extractLabelEvidenceDetailed,
@@ -141,14 +233,47 @@ describe("Issue #149 discover mode halts before any acquisition route", () => {
     expect(declaredModeMarker("discover")).toBe("ISSUE_149_RUNNER_MODE=discover");
   });
 
-  it("keeps the committed mode file at exactly discover", async () => {
-    const { readFileSync } = await import("node:fs");
-    const mode = readFileSync(
-      "artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt",
-      "utf8",
+  it("commits a COHERENT control state, whichever state it is in", () => {
+    const committed = committedControlState();
+    expect(committed.reason).toBeNull();
+    expect(committed.coherent).toBe(true);
+    expect(["discover", "execute", "complete"]).toContain(committed.state);
+  });
+
+  it("accepts each governed state and rejects every incoherent pairing", () => {
+    const SHA = "a".repeat(40);
+    // The three governed states.
+    expect(classifyControlState("discover\n", "EXECUTE_NOT_AUTHORIZED", null).state).toBe(
+      "discover",
     );
-    expect(mode).toBe("discover\n");
-    expect(mode.trim()).not.toBe("execute");
+    expect(classifyControlState("execute\n", "EXECUTE_AUTHORIZED", SHA).state).toBe("execute");
+    expect(classifyControlState("complete\n", "EXECUTE_AUTHORIZED", SHA).state).toBe("complete");
+
+    // Every incoherent pairing.
+    const incoherent: Array<[string, string, string | null]> = [
+      ["discover\n", "EXECUTE_AUTHORIZED", SHA],
+      ["discover\n", "EXECUTE_NOT_AUTHORIZED", SHA],
+      ["execute\n", "EXECUTE_NOT_AUTHORIZED", null],
+      ["execute\n", "EXECUTE_AUTHORIZED", null],
+      ["execute\n", "EXECUTE_AUTHORIZED", "abc"],
+      ["execute\n", "EXECUTE_AUTHORIZED", "A".repeat(40)],
+      ["complete\n", "EXECUTE_AUTHORIZED", null],
+      ["complete\n", "EXECUTE_NOT_AUTHORIZED", SHA],
+      // Non-exact mode bytes. No trimming is permitted.
+      ["discover", "EXECUTE_NOT_AUTHORIZED", null],
+      [" discover\n", "EXECUTE_NOT_AUTHORIZED", null],
+      ["discover\n\n", "EXECUTE_NOT_AUTHORIZED", null],
+      ["execute\r\n", "EXECUTE_AUTHORIZED", SHA],
+      ["EXECUTE\n", "EXECUTE_AUTHORIZED", SHA],
+    ];
+    for (const [mode, status, sha] of incoherent) {
+      const verdict = classifyControlState(mode, status, sha);
+      expect(
+        verdict.coherent,
+        `${JSON.stringify(mode)} + ${status} + ${sha} must be incoherent`,
+      ).toBe(false);
+      expect(typeof verdict.reason).toBe("string");
+    }
   });
 
   it("gates OCR on the mode file and the transition gate", async () => {
@@ -176,13 +301,15 @@ describe("Issue #149 discover mode halts before any acquisition route", () => {
     expect(workflow).toContain("if: needs.resolve-mode.outputs.mode == 'discover'");
     // …and cannot start unless the execute-transition gate job succeeded.
     expect(workflow).toContain("needs: [resolve-mode, execute-transition-gate, job-a-prepare]");
-    // The gate itself rejects today.
-    const authorization = JSON.parse(
-      readFileSync(
-        "artifacts/issue-149-brand-complete-evidence-acquisition/execute-authorization.json",
-        "utf8",
-      ),
-    ) as { status: string };
-    expect(authorization.status).toBe("EXECUTE_NOT_AUTHORIZED");
+    // The OCR job is gated on the transition gate whatever the committed state
+    // is. Asserting the current authorization value here would pin the
+    // pre-transition state into a test about the workflow's structure.
+    const committed = committedControlState();
+    expect(committed.coherent, committed.reason ?? "").toBe(true);
+    if (committed.state === "discover") {
+      expect(committed.status).toBe("EXECUTE_NOT_AUTHORIZED");
+    } else {
+      expect(committed.status).toBe("EXECUTE_AUTHORIZED");
+    }
   });
 });
