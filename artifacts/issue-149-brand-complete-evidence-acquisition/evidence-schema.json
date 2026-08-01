@@ -30,7 +30,7 @@
       "determinism-report.json",
       "RUN_COMMITTED.json"
     ],
-    "runCommitMarker": "RUN_COMMITTED.json \u2014 written LAST with exclusive creation, binding every run-level digest. A run without a valid marker is UNCOMMITTED."
+    "runCommitMarker": "RUN_COMMITTED.json \u2014 written LAST with exclusive creation. Its schema is CLOSED: exact own-key set, requiredFiles in frozen order, fileDigests exactly the same four paths each once in order, every digest matching, and the aggregate recomputed. A subset of digests no longer reads as committed."
   },
   "runs": ["primary", "repeat"],
   "immutabilityRule": "After a run's raw-evidence-manifest.sha256 is written, no file under raw/<run>/ is rewritten, reformatted or pretty-printed. JSONL is emitted in final form and is excluded from prettier via .prettierignore.",
@@ -46,7 +46,7 @@
     "block, paragraph and line identifiers \u2014 not present on OcrWord",
     "constituent word IDs per reconstructed line \u2014 not emitted by BrandLineDiagnostic"
   ],
-  "amendedBy": "preregistration-stage-2-final-execute-closure.md",
+  "amendedBy": "preregistration-stage-2-verifier-transport.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "everyRawFilenameUsesOpaqueIdOnly": true,
@@ -180,7 +180,12 @@
       "no staging directories or unexpected files",
       "the final acquisition verdict"
     ],
-    "isNotASizeCheck": "a du -sb measurement is a volume statement, not verification, and passing one on a half-written run reads as verification"
+    "isNotASizeCheck": "a du -sb measurement is a volume statement, not verification, and passing one on a half-written run reads as verification",
+    "transport": "runs on the HOST from a self-contained verifier bundle under plain pinned Node. Job B performs no repository checkout, so the earlier `npx vite-node scripts/eval/...` invocation could not have run there at all.",
+    "runsEvenWhenTheAcquisitionFailed": true,
+    "priorDefect": "The step had no always() condition and the container ran under `set -euo pipefail`, so a nonzero runner status ended the job before it. The path most in need of forensic verification was the one that skipped it.",
+    "verifiesTheManifestInBothDirections": true,
+    "doesNotAdjudicateForbiddenKeys": "Actor 2 records a DELEGATION entry, not a result. It previously emitted `no-forbidden-evidence-key: true` for a scan it never performed."
   },
   "jobCIdentityVerification": {
     "module": "scripts/eval/lib/issue-149-raw-verifier.ts#verifyNoHistoricalIdentity",
@@ -196,6 +201,15 @@
       "prior classifications"
     ],
     "haltCode": "TRUTH_ISOLATION_FAILURE",
-    "reportLocation": "outside raw/, with its own digest"
+    "reportLocation": "outside raw/, with its own digest",
+    "transport": "the minimal identity inventory is its own artifact, downloaded on the host only after the container exits; it is not part of the truth-free acquisition input and is never mounted with it",
+    "missingInventoryHalts": true,
+    "priorDefect": "The CLI converted an absent ID map or truth-key file into an empty array, so Job C would scan zero markers and could report clean. A zero-marker scan is never a successful clean scan.",
+    "haltCodes": [
+      "IDENTITY_INVENTORY_ABSENT",
+      "IDENTITY_INVENTORY_MALFORMED",
+      "IDENTITY_INVENTORY_DIGEST_MISMATCH",
+      "TRUTH_ISOLATION_FAILURE"
+    ]
   }
 }

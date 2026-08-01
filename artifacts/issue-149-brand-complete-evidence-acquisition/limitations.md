@@ -208,6 +208,20 @@ script are both loaded from the current branch head. It is defense in depth. Wha
 actually authorizes execute is an externally reviewed transition commit,
 identified by its full SHA **before** it is pushed.
 
+## Verification steps that ran but could not fail — a recurring class
+
+Three checks in this package executed, reported, and could not have failed:
+
+- a `du -sb` size measurement standing in for raw verification;
+- an `ok: true` finding for a forbidden-key scan Actor 2 never performed;
+- a content re-verification reading a path that the artifact download never
+  created, so it verified an empty tree.
+
+Two were found by review; the third by the no-OCR rehearsal, before it mattered.
+The rehearsal exists because a dormant path cannot be trusted on inspection
+alone, and it is the reason the third was caught rather than discovered during
+execute.
+
 ## Scope
 
 115 cases, one corpus, one pipeline, one base. This sprint does not KEEP or KILL

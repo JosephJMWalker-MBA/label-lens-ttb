@@ -2,7 +2,7 @@
   "artifact": "execution-supply-chain-pins",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 2,
-  "amendedBy": "preregistration-stage-2-execute-readiness.md",
+  "amendedBy": "preregistration-stage-2-verifier-transport.md",
   "why": "A tag is a movable reference. A full commit SHA is the only immutable way to reference an action, and an image digest identifies exact bytes where a tag may later resolve to different ones. Before governed OCR, everything in the execution path is pinned to an immutable reference and the human-readable release is recorded beside it.",
   "actions": [
     {
@@ -46,5 +46,14 @@
     "why": "Discovery observed uid 0 inside the boundary. Capabilities were dropped and no-new-privileges was set, but nothing pinned a non-root user. Documenting uid 0 as accepted was not sufficient.",
     "verifiedBy": "discovery reads process.getuid()/getgid() and compares them against ISSUE_149_EXPECTED_UID/GID"
   },
-  "ocrRun": false
+  "ocrRun": false,
+  "uploadedArtifactIdentity": {
+    "carriedAsJobOutputs": ["artifactId", "artifactDigest", "artifactUrl", "headSha"],
+    "downloadedBy": "exact artifact ID, with merge-multiple so the contents land at the given path",
+    "metadataComparison": "the artifact metadata digest is normalized and compared to the upload output, and the metadata's workflow_run id must match this execution; disagreement fails the job",
+    "scope": "actions: read, narrowly scoped to this run's artifact metadata",
+    "receipt": "issue-149-verification-receipt binds artifact ID, upload digest, metadata digest, head SHA, raw-verification report digest and final status",
+    "priorDefect": "uploaded-artifact.json was written and never uploaded, exposed or compared. GitHub's download-action digest check produces a WARNING, not a load-bearing failure, and was not a gate.",
+    "gitHubAutomaticCheckIsNotAGate": true
+  }
 }
