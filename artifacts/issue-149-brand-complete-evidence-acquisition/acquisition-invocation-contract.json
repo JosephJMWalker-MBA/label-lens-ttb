@@ -2,9 +2,9 @@
   "artifact": "acquisition-invocation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-13.md",
+  "amendedBy": "preregistration-amendment-14.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
-  "route": "the runner calls acquireProductionBrandEvidence(extractionInput); that function captures the input's exact own data-property values before its first await, calls extractLabelEvidenceDetailed itself, and returns a SEALED byte package. The runner never calls the extractor and never holds evidence objects.",
+  "route": "the runner calls acquireProductionBrandEvidence(extractionInput), which calls extractLabelEvidenceDetailed itself exactly once and returns a sealed byte package; the runner then passes that whole package to writeSealedEvidencePackage, exactly once",
   "prohibitedRoute": {
     "symbols": [
       "runCaseArtifacts",
@@ -113,68 +113,6 @@
     "theOnlyAuthorizedFunction": "acquireProductionBrandEvidence",
     "usingTheModuleIsNotSufficient": "Naming the adapter module is not enough: the runner must call acquireProductionBrandEvidence and nothing else in it. Every other route \u2014 a per-candidate loop, a caller-supplied selection or debug object, a direct extractor or selector call \u2014 bypasses the derivation the API owns."
   },
-  "candidateEmissionApi": {
-    "module": "scripts/eval/lib/issue-149-candidate-adapter.ts",
-    "function": "acquireProductionBrandEvidence",
-    "signature": "acquireProductionBrandEvidence(input: ExtractionInput): Promise<Result<ProductionBrandEvidenceSuccess, ExtractionError>>",
-    "firstArgument": "the frozen ExtractionInput. NOT ExtractionDebug, NOT a FieldSelection, NOT a candidate array.",
-    "returnsOnSuccess": [
-      "detailed: DetailedExtractionResult",
-      "diagnosticSelection: FieldSelection",
-      "candidateRecords: CandidateEvidenceRecord[]"
-    ],
-    "returnsOnFailure": "the extractor's typed ExtractionError, unchanged, with no diagnostic selection and no candidate record",
-    "theRunnerSuppliesNo": [
-      "ExtractionDebug",
-      "FieldSelection",
-      "candidate array",
-      "rankedPosition",
-      "a second opaque identifier"
-    ],
-    "theRunnerNeverCalls": [
-      "extractLabelEvidenceDetailed",
-      "selectBrandObservationWithCompleteFilterDiagnostics"
-    ],
-    "opaqueIdentitySource": "input.artifactRef \u2014 there is no second identifier that could disagree with it",
-    "internalSteps": [
-      "validate input.artifactRef matches ^item-\\\\d{4}$, before any extractor invocation",
-      "call extractLabelEvidenceDetailed(input) exactly once",
-      "return the extractor's typed failure unchanged when it returns !ok",
-      "keep DetailedExtractionResult and ExtractionDebug private until that call succeeds",
-      "reconstruct the exact Brand pass set: primary OBSERVED ? [debug.passes[0]] : debug.passes",
-      "invoke selectBrandObservationWithCompleteFilterDiagnostics internally",
-      "perform full-object parity internally against debug.finalSelections.brand",
-      "finalize the complete internally derived candidate population",
-      "return the original detailed result, the diagnostic selection and the candidate records together"
-    ],
-    "extractorInvokedExactlyOncePerItem": true,
-    "noRetryPath": true,
-    "runnerPersistsPassEvidenceFrom": "evidence.value.detailed.debug.passes",
-    "runnerPersistsCandidateEvidenceFrom": "evidence.value.candidateRecords",
-    "supersededRoutes": [
-      "a bare candidate array (Amendment 8 and earlier)",
-      "a caller-supplied FieldSelection (Amendment 9): a filtered population could be wrapped in a freshly constructed selection",
-      "a caller-supplied ExtractionDebug (Amendment 10): a helper could filter or reorder the passes and reconstruct matching primary and final selections"
-    ],
-    "whyExtractorOwned": "Each earlier signature closed the route it named and left an adjacent one open. Owning the extractor call removes the class: there is no caller-supplied evidence at all, and the runner never holds an intermediate it could alter.",
-    "runtimeExportSurface": ["CandidateAdapterError", "acquireProductionBrandEvidence"],
-    "runtimeExportSurfaceVerifiedBy": "importing the module namespace and inspecting its actual runtime own keys, not a source regex",
-    "haltCodes": {
-      "MALFORMED_ARTIFACT_REF": "input.artifactRef does not match ^item-\\\\d{4}$; raised before the extractor is invoked",
-      "DEBUG_PASSES_ABSENT": "the extractor's debug carries no ordered pass array",
-      "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE": "the internally derived selection differs from debug.finalSelections.brand once only the two complete-diagnostics fields are removed",
-      "COMPLETE_DIAGNOSTICS_ABSENT": "the internally derived selection carries no brandDiagnostics.candidates array",
-      "CANDIDATE_EVIDENCE_TRUNCATED": "the emitted record count does not equal the internally derived diagnostic candidate count",
-      "RANKED_MEMBERSHIP_INCONSISTENT": "decision, ranking and rankedPosition are mutually inconsistent, or a kept population retains no ranked survivor",
-      "RANKED_POSITION_PARITY_FAILURE": "ranked positions are not unique or contiguous, or there is not exactly one selected candidate"
-    },
-    "enforcedBy": [
-      "src/fixtures/eval/issue-149-acquisition-orchestration.test.ts",
-      "src/fixtures/eval/issue-149-ranked-invariants.test.ts",
-      "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts",
-      "src/fixtures/eval/issue-149-stage2-source-closure.test.ts"
-    ]
-  },
   "keptPopulationMustRetainARankedSurvivor": {
     "relation": "(any candidate is kept) === (at least one candidate carries a decision)",
     "why": "Production always builds a non-empty ranked list and assigns exactly one selected decision whenever kept candidates exist. A kept candidate may individually lack a decision only because family reduction or deduplication removed it \u2014 which requires that another kept candidate survived.",
@@ -196,7 +134,7 @@
     "enforcedIn": "the internal array-invariant check reached through acquireProductionBrandEvidence",
     "reachedPastParityBy": "src/fixtures/eval/issue-149-ranked-invariants.test.ts, which controls the internally derived selection so parity succeeds and the invariant is actually evaluated"
   },
-  "routeNote": "The route is unchanged in substance: one direct extractor invocation per item, never runCaseArtifacts. What changed is who makes it. The runner constructs the frozen ExtractionInput and reads the result; it does not call the extractor itself.",
+  "routeNote": "The route is unchanged in substance: one direct extractor invocation per item, never runCaseArtifacts. What changed is who makes it and what comes back. The runner constructs the ExtractionInput, receives a sealed byte package, and passes the whole package to the authenticated writer. It never calls the extractor and never holds an evidence object.",
   "onExtractorFailure": {
     "diagnosticSelectionReturned": false,
     "candidateRecordReturned": false,
@@ -239,11 +177,57 @@
     "haltCodes": ["MALFORMED_EXTRACTION_INPUT", "EXTRACTION_INPUT_IDENTITY_MISMATCH"]
   },
   "permittedImportsNote": "Applies to the acquisition source closure as a whole. The RUNNER entrypoint's only route to evidence is scripts/eval/lib/issue-149-candidate-adapter; the extractor and field-selection imports are permitted to the adapter module only.",
-  "sealedOutputBoundary": {
-    "thePublicApiReturnsBytesNotObjects": true,
-    "why": "Owning the extractor call closed the INPUT side. The output side stayed open: the boundary returned the extractor's own DetailedExtractionResult, the live FieldSelection and a mutable candidate array, and left serialization to the runner. A runner could alias, filter, project, reorder or copy the evidence before persisting it, and a PROJECTION (slice, filter, map, concat, spread) needs no mutation at all, so no source-level mutation rule could catch it.",
-    "theSameOwnershipDefectOneStepOut": "candidate array -> FieldSelection -> ExtractionDebug -> ExtractionInput -> returned evidence",
-    "successFiles": [
+  "publicRuntimeExports": [
+    "CandidateAdapterError",
+    "acquireProductionBrandEvidence",
+    "writeSealedEvidencePackage"
+  ],
+  "acquisitionApi": {
+    "module": "scripts/eval/lib/issue-149-candidate-adapter.ts",
+    "function": "acquireProductionBrandEvidence",
+    "signature": "acquireProductionBrandEvidence(input: ExtractionInput): Promise<SealedItemEvidence>",
+    "firstArgument": "the caller's ExtractionInput. NOT ExtractionDebug, NOT a FieldSelection, NOT a candidate array.",
+    "returns": "a frozen SealedItemEvidence: { itemId, outcome, files: readonly SealedEvidenceFile[], fileCount, totalBytes, aggregateSha256, failure? }",
+    "returnsNoMutableEvidence": [
+      "DetailedExtractionResult",
+      "ExtractionDebug",
+      "FieldSelection",
+      "candidate array",
+      "pass array"
+    ],
+    "onExtractorFailure": "the typed ExtractionError is NOT returned to the caller. It is sealed into <itemId>.failure.json alongside <itemId>.provenance.json, and summarised on the package as a frozen { code, message, issues }. No partial debug is synthesised and the item is never retried.",
+    "supersededReturnShape": "Result<ProductionBrandEvidenceSuccess, ExtractionError> carrying detailed, diagnosticSelection and candidateRecords. Removed in Amendment 13: it left the runner holding live evidence objects, and a projection of them needs no mutation.",
+    "theRunnerSuppliesNo": [
+      "ExtractionDebug",
+      "FieldSelection",
+      "candidate array",
+      "rankedPosition",
+      "a second opaque identifier"
+    ],
+    "theRunnerNeverCalls": [
+      "extractLabelEvidenceDetailed",
+      "selectBrandObservationWithCompleteFilterDiagnostics"
+    ],
+    "theRunnerNeverSerializes": true,
+    "theRunnerPersistsBy": "passing the COMPLETE sealed package to writeSealedEvidencePackage, exactly once",
+    "opaqueIdentitySource": "input.artifactRef \u2014 there is no second identifier that could disagree with it",
+    "internalSteps": [
+      "reject a Proxy input BEFORE any structural inspection, then capture the exact own data-property values once",
+      "validate the closed nine-key input set and four-key ocrEngine set with Reflect.ownKeys",
+      "validate input.artifactRef matches ^item-\\\\d{4}$, before any extractor invocation",
+      "copy imageBytes into a private Uint8Array and recompute its SHA-256",
+      "halt with EXTRACTION_INPUT_IMAGE_DIGEST_MISMATCH when that digest differs from derivativeSha256, before the extractor is invoked",
+      "build the provenance record from the private snapshot and the recomputed digest",
+      "call extractLabelEvidenceDetailed(snapshot) exactly once",
+      "on failure, seal the provenance record and the governed failure record and return",
+      "reconstruct the exact Brand pass set: primary OBSERVED ? [debug.passes[0]] : debug.passes",
+      "invoke selectBrandObservationWithCompleteFilterDiagnostics internally",
+      "perform full-object parity internally against debug.finalSelections.brand",
+      "finalize the complete internally derived candidate population",
+      "serialize every record in production's own order and seal the complete file set"
+    ],
+    "sealedSuccessFiles": [
+      "<opaqueItemId>.provenance.json",
       "<opaqueItemId>.passes.json",
       "<opaqueItemId>.words.jsonl",
       "<opaqueItemId>.lines.jsonl",
@@ -251,48 +235,76 @@
       "<opaqueItemId>.selection.json",
       "<opaqueItemId>.counts.json"
     ],
-    "failureFiles": ["<opaqueItemId>.failure.json"],
-    "pathsAreRelativeToTheRunDirectory": "raw/<run>/",
-    "descriptorShape": {
-      "path": "governed run-relative path",
-      "byteLength": "exact",
-      "sha256": "SHA-256 over exactly those bytes",
-      "bytes": "a FRESH COPY on every read; the sealed buffer is module-private and never handed out"
-    },
-    "aggregateSha256": "SHA-256 over the ordered (path, byteLength, sha256) entries",
-    "frozen": ["the package", "the files list", "every descriptor"],
-    "noMutableEvidenceIsPublic": [
-      "DetailedExtractionResult",
-      "ExtractionDebug",
-      "FieldSelection",
-      "candidate array",
-      "pass array"
+    "sealedFailureFiles": ["<opaqueItemId>.provenance.json", "<opaqueItemId>.failure.json"],
+    "extractorInvokedExactlyOncePerItem": true,
+    "noRetryPath": true,
+    "runtimeExportSurface": [
+      "CandidateAdapterError",
+      "acquireProductionBrandEvidence",
+      "writeSealedEvidencePackage"
     ],
-    "runnerMustNot": [
-      "serialize",
-      "filter",
-      "map",
-      "project",
-      "rank",
-      "reorder",
-      "reconstruct",
-      "parse sealed bytes",
-      "select a subset of sealed file descriptors"
-    ],
-    "runnerMust": ["write the COMPLETE sealed package exactly once, with readback verification"],
-    "writer": {
-      "name": "writeSealedEvidencePackage",
-      "takesTheCompletePackage": true,
-      "acceptsNoFileSubsetParameter": true,
-      "verifiesByReadback": true
+    "runtimeExportSurfaceVerifiedBy": "dynamically importing the real module and asserting the exact sorted Object.keys of its namespace. The shell assertions in assert-adapter-surface.sh check the adapter's SOURCE surface and are useful, but they do not prove the runtime namespace and are not described as doing so.",
+    "typeOnlyExportsAreNotRuntimeExports": ["SealedItemEvidence", "SealedEvidenceFile"],
+    "haltCodes": {
+      "MALFORMED_EXTRACTION_INPUT": "an unexpected, missing, symbol-keyed, accessor-backed or wrongly typed own property, or a Proxy; raised before the extractor is invoked",
+      "MALFORMED_ARTIFACT_REF": "input.artifactRef does not match ^item-\\\\d{4}$; raised before the extractor is invoked",
+      "EXTRACTION_INPUT_IDENTITY_MISMATCH": "a frozen incumbent identity differs from incumbent-configuration-freeze.json",
+      "EXTRACTION_INPUT_IMAGE_DIGEST_MISMATCH": "the SHA-256 of the private imageBytes copy differs from derivativeSha256; raised before the extractor is invoked",
+      "DEBUG_PASSES_ABSENT": "the extractor's debug carries no ordered pass array",
+      "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE": "the internally derived selection differs from debug.finalSelections.brand once only the two complete-diagnostics fields are removed",
+      "COMPLETE_DIAGNOSTICS_ABSENT": "the internally derived selection carries no brandDiagnostics.candidates array",
+      "CANDIDATE_EVIDENCE_TRUNCATED": "the emitted record count does not equal the internally derived diagnostic candidate count",
+      "RANKED_MEMBERSHIP_INCONSISTENT": "decision, ranking and rankedPosition are mutually inconsistent, or a kept population retains no ranked survivor",
+      "RANKED_POSITION_PARITY_FAILURE": "ranked positions are not unique or contiguous, or there is not exactly one selected candidate",
+      "SEALED_EVIDENCE_INCOMPLETE": "the sealer's produced file set does not match the required ordered set for the outcome",
+      "SEALED_PACKAGE_UNAUTHENTIC": "the writer received a package this module did not produce",
+      "SEALED_PACKAGE_INVALID": "a revalidated package or descriptor invariant failed; nothing is written",
+      "SEALED_EVIDENCE_WRITE_UNVERIFIED": "a written file did not read back with its recorded length and digest"
     },
-    "haltCodes": ["SEALED_EVIDENCE_INCOMPLETE", "SEALED_EVIDENCE_WRITE_UNVERIFIED"]
+    "enforcedBy": [
+      "src/fixtures/eval/issue-149-acquisition-orchestration.test.ts",
+      "src/fixtures/eval/issue-149-sealed-evidence.test.ts",
+      "src/fixtures/eval/issue-149-ranked-invariants.test.ts",
+      "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts",
+      "src/fixtures/eval/issue-149-stage2-source-closure.test.ts"
+    ]
   },
-  "publicRuntimeExports": [
-    "CandidateAdapterError",
-    "SEALED_FAILURE_FILE_SUFFIXES",
-    "SEALED_SUCCESS_FILE_SUFFIXES",
-    "acquireProductionBrandEvidence",
-    "writeSealedEvidencePackage"
-  ]
+  "sealedPackageWriter": {
+    "function": "writeSealedEvidencePackage",
+    "signature": "writeSealedEvidencePackage(sealed: SealedItemEvidence, options: { directory: string })",
+    "acceptsNoFileSubsetParameter": true,
+    "authenticity": {
+      "mechanism": "a module-private WeakSet of packages produced by the sealer, plus a module-private WeakSet of descriptors produced by sealFile. A package is registered only after every internal invariant has succeeded.",
+      "nothingIsExported": [
+        "no token",
+        "no symbol",
+        "no constructor",
+        "no registration function",
+        "no reference to either WeakSet"
+      ],
+      "notReliedOn": [
+        "TypeScript structural typing",
+        "Object.freeze",
+        "source inspection",
+        "caller convention"
+      ],
+      "haltCode": "SEALED_PACKAGE_UNAUTHENTIC",
+      "priorDefect": "The writer accepted any structurally compatible object and checked only fileCount === files.length, so a caller could rewrite files, fileCount, totalBytes and aggregateSha256 together and have the subset written and the caller's own aggregate returned. A coherent forgery is still a forgery."
+    },
+    "revalidatedBeforeAnyWrite": [
+      "itemId matches ^item-\\\\d{4}$",
+      "outcome is exactly extracted or extraction-failed",
+      "the exact outcome-specific ordered suffix set",
+      "each path is exactly `${itemId}${suffix}`",
+      "each path is a bare governed evidence filename: no slash, backslash, NUL, absolute path, dot component or traversal",
+      "fileCount equals both files.length and the required count",
+      "every descriptor was produced by the sealer and is frozen",
+      "every bytes read has the recorded byte length and SHA-256",
+      "totalBytes recomputes exactly",
+      "aggregateSha256 recomputes from the ordered path, byteLength and sha256 entries",
+      "the resolved target stays inside the resolved output directory"
+    ],
+    "nothingIsWrittenIfAnyInvariantFails": true,
+    "verifiesByReadback": true
+  }
 }

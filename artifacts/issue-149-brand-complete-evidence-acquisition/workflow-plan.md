@@ -228,10 +228,9 @@ and nothing else. The post-freeze ID map is not mounted.
    cannot select a subset: the writer takes the complete package and a
    destination, and has no subset parameter.
 
-   An earlier plan had the runner persist pass evidence from
-   `evidence.value.detailed.debug.passes` and candidate evidence from
-   `evidence.value.candidateRecords`. That left the runner holding the live
-   objects, and a **projection** — `slice`, `filter`, `map`, `concat`, a spread
+   A superseded plan (Amendment 12) had the runner reach into the returned
+   result for pass and candidate evidence itself. That left the runner holding
+   the live objects, and a **projection** — `slice`, `filter`, `map`, `concat`, a spread
    into a new array — produces incomplete evidence with no mutation at all, which
    no source-level mutation rule can catch. Serialization therefore happens
    inside the boundary and the alternative no longer exists.

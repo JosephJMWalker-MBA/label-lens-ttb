@@ -22,6 +22,20 @@ import { CANDIDATE_EVIDENCE_REQUIRED_KEYS } from "../../../scripts/eval/lib/issu
 const ROOT = "artifacts/issue-149-brand-complete-evidence-acquisition";
 
 /** Records whose purpose is to preserve superseded language. */
+/**
+ * An amendment record's job is to state what the previous design said and why it
+ * was wrong, so it necessarily quotes superseded language. That is true of the
+ * CURRENT record as much as the earlier ones — it becomes historical at the next
+ * amendment — so the exemption is by KIND, matched on the filename pattern,
+ * rather than a list that has to be extended by hand each time.
+ *
+ * `git-sha.txt` remains deliberately unexempt: it mixes current and historical
+ * entries, and its current block must state the current amendment.
+ */
+const isAmendmentRecord = (basename: string): boolean =>
+  /^preregistration-amendment(-\d+)?\.md$/.test(basename) ||
+  /^amendment(-\d+)?-linkage\.json$/.test(basename);
+
 const HISTORICAL_FILES = new Set([
   "preregistration-amendment.md",
   "preregistration-amendment-2.md",
@@ -35,6 +49,7 @@ const HISTORICAL_FILES = new Set([
   "preregistration-amendment-10.md",
   "preregistration-amendment-11.md",
   "preregistration-amendment-12.md",
+  "preregistration-amendment-13.md",
   "branch-pointer-incident.md",
   "amendment-linkage.json",
   "amendment-2-linkage.json",
@@ -48,6 +63,7 @@ const HISTORICAL_FILES = new Set([
   "amendment-10-linkage.json",
   "amendment-11-linkage.json",
   "amendment-12-linkage.json",
+  "amendment-13-linkage.json",
 ]);
 
 /**
@@ -56,7 +72,7 @@ const HISTORICAL_FILES = new Set([
  * current amendment. Exempting it wholesale is what let it sit at "amendment 2"
  * while the package was at Amendment 4, faithfully hashed by the manifest.
  */
-const CURRENT_AMENDMENT = 13;
+const CURRENT_AMENDMENT = 14;
 
 /**
  * A line may mention a superseded term when it is explicitly marking it as
@@ -87,6 +103,23 @@ const ALLOWED_MARKERS = [
 ];
 
 const STALE_TERMS = [
+  // Amendment 14: phrases that describe the SUPERSEDED public API. These fail on
+  // the words themselves, not on an amendment number, because the Amendment 12
+  // signature survived in three artifacts while every amendment stamp was
+  // current and the sweep passed.
+  "Promise<Result<ProductionBrandEvidenceSuccess",
+  "ProductionBrandEvidenceSuccess",
+  "returnsOnSuccess",
+  "detailed: DetailedExtractionResult",
+  "diagnosticSelection: FieldSelection",
+  "candidateRecords: CandidateEvidenceRecord",
+  "evidence.value.detailed",
+  "evidence.value.candidateRecords",
+  "typed ExtractionError, unchanged",
+  "runnerPersistsPassEvidenceFrom",
+  "runnerPersistsCandidateEvidenceFrom",
+  "SEALED_SUCCESS_FILE_SUFFIXES",
+  "SEALED_FAILURE_FILE_SUFFIXES",
   "runCaseArtifacts",
   "ExtractionDebug.finalSelections.brand.brandDiagnostics.candidates",
   "single recorded filterReason",
@@ -144,7 +177,8 @@ describe("Issue #149 Stage 1 contract consistency", () => {
   it("leaves no superseded design language in a current contract", () => {
     const offences: string[] = [];
     for (const file of files) {
-      if (HISTORICAL_FILES.has(path.basename(file))) continue;
+      if (HISTORICAL_FILES.has(path.basename(file)) || isAmendmentRecord(path.basename(file)))
+        continue;
       const lines = readFileSync(path.join(process.cwd(), file), "utf8").split("\n");
       lines.forEach((line, index) => {
         for (const term of STALE_TERMS) {
@@ -183,10 +217,32 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     // extractor call happens inside it — the runner is prohibited from making
     // that call itself, so the contract must not instruct it to.
     expect(contract.route).toContain("acquireProductionBrandEvidence");
-    expect(contract.route).toContain("extractLabelEvidenceDetailed");
+    expect(contract.route).toContain("writeSealedEvidencePackage");
+    expect(`${contract.route} ${contract.routeNote}`).toContain("extractLabelEvidenceDetailed");
     expect(contract.requiredInvocationSteps.at(-1)).toContain(
       "acquireProductionBrandEvidence(extractionInput)",
     );
+
+    // The CURRENT signature, asserted as a phrase rather than via an amendment
+    // stamp — three artifacts kept the Amendment 12 signature while every stamp
+    // was current and the sweep passed.
+    expect(contract.acquisitionApi.signature).toBe(
+      "acquireProductionBrandEvidence(input: ExtractionInput): Promise<SealedItemEvidence>",
+    );
+    expect(contract.acquisitionApi.runtimeExportSurface).toEqual([
+      "CandidateAdapterError",
+      "acquireProductionBrandEvidence",
+      "writeSealedEvidencePackage",
+    ]);
+    expect(contract.acquisitionApi.sealedSuccessFiles).toHaveLength(7);
+    expect(contract.acquisitionApi.sealedSuccessFiles[0]).toContain(".provenance.json");
+    expect(contract.acquisitionApi.sealedFailureFiles).toEqual([
+      "<opaqueItemId>.provenance.json",
+      "<opaqueItemId>.failure.json",
+    ]);
+    expect(contract.sealedPackageWriter.authenticity.haltCode).toBe("SEALED_PACKAGE_UNAUTHENTIC");
+    expect(contract.sealedPackageWriter.authenticity.notReliedOn).toContain("Object.freeze");
+    expect(contract.sealedPackageWriter.nothingIsWrittenIfAnyInvariantFails).toBe(true);
     expect(contract.requiredInvocationSteps.join(" ")).not.toContain(
       ["call ", "extractLabelEvidenceDetailed", " directly"].join(""),
     );
@@ -986,73 +1042,100 @@ describe("Issue #149 Stage 1 contract consistency", () => {
     );
   });
 
-  it("names the extractor-owning function as the only public Brand evidence API", () => {
+  it("describes ONE current API, in one place, everywhere it is referenced", () => {
+    // The canonical definition lives in the invocation contract. The other
+    // artifacts POINT AT IT rather than restating it — a restated copy is
+    // exactly what let the Amendment 12 signature survive in three artifacts
+    // while every amendment stamp was current.
+    const canonical = read(path.join(ROOT, "acquisition-invocation-contract.json")) as {
+      acquisitionApi: {
+        module: string;
+        function: string;
+        signature: string;
+        firstArgument: string;
+        returns: string;
+        returnsNoMutableEvidence: string[];
+        onExtractorFailure: string;
+        theRunnerSuppliesNo: string[];
+        theRunnerNeverCalls: string[];
+        theRunnerNeverSerializes: boolean;
+        theRunnerPersistsBy: string;
+        opaqueIdentitySource: string;
+        extractorInvokedExactlyOncePerItem: boolean;
+        noRetryPath: boolean;
+        internalSteps: string[];
+        sealedSuccessFiles: string[];
+        sealedFailureFiles: string[];
+        runtimeExportSurface: string[];
+        haltCodes: Record<string, string>;
+      };
+    };
+    const api = canonical.acquisitionApi;
+
+    expect(api.module).toBe("scripts/eval/lib/issue-149-candidate-adapter.ts");
+    expect(api.function).toBe("acquireProductionBrandEvidence");
+    expect(api.signature).toBe(
+      "acquireProductionBrandEvidence(input: ExtractionInput): Promise<SealedItemEvidence>",
+    );
+    expect(api.firstArgument).toContain("NOT ExtractionDebug");
+    expect(api.returns).toContain("SealedItemEvidence");
+    for (const absent of [
+      "DetailedExtractionResult",
+      "ExtractionDebug",
+      "FieldSelection",
+      "candidate array",
+      "pass array",
+    ]) {
+      expect(api.returnsNoMutableEvidence).toContain(absent);
+    }
+    expect(api.onExtractorFailure).toContain("is NOT returned to the caller");
+    expect(api.theRunnerNeverSerializes).toBe(true);
+    expect(api.theRunnerPersistsBy).toContain("writeSealedEvidencePackage");
+    expect(api.theRunnerNeverCalls).toContain("extractLabelEvidenceDetailed");
+    expect(api.extractorInvokedExactlyOncePerItem).toBe(true);
+    expect(api.noRetryPath).toBe(true);
+    expect(api.internalSteps.join(" ")).toContain("EXTRACTION_INPUT_IMAGE_DIGEST_MISMATCH");
+    expect(api.haltCodes.SEALED_PACKAGE_UNAUTHENTIC).toBeDefined();
+
+    // Everywhere else agrees, and none of them restates the definition.
     for (const file of [
-      "acquisition-invocation-contract.json",
       "candidate-decision-contract.json",
       "candidate-fingerprint-contract.json",
-      "evidence-schema.json",
     ]) {
-      const contract = read(path.join(ROOT, file)) as {
-        candidateEmissionApi: {
-          module: string;
-          function: string;
-          firstArgument: string;
-          theRunnerSuppliesNo: string[];
-          theRunnerNeverCalls: string[];
-          opaqueIdentitySource: string;
-          extractorInvokedExactlyOncePerItem: boolean;
-          noRetryPath: boolean;
-          internalSteps: string[];
-          supersededRoutes: string[];
+      const reference = read(path.join(ROOT, file)) as {
+        acquisitionApi: {
+          seeCanonicalDefinition: string;
+          signature: string;
           runtimeExportSurface: string[];
-          haltCodes: Record<string, string>;
+          sealedSuccessFiles: string[];
         };
       };
-      const api = contract.candidateEmissionApi;
-      expect(api.module).toBe("scripts/eval/lib/issue-149-candidate-adapter.ts");
-      expect(api.function).toBe("acquireProductionBrandEvidence");
-      expect(api.firstArgument).toContain("ExtractionInput");
-      expect(api.firstArgument).toContain("NOT ExtractionDebug");
-      expect(api.theRunnerSuppliesNo).toContain("ExtractionDebug");
-      expect(api.theRunnerSuppliesNo).toContain("FieldSelection");
-      expect(api.theRunnerNeverCalls).toContain("extractLabelEvidenceDetailed");
-      expect(api.opaqueIdentitySource).toContain("input.artifactRef");
-      expect(api.extractorInvokedExactlyOncePerItem).toBe(true);
-      expect(api.noRetryPath).toBe(true);
-      expect(api.internalSteps.join(" ")).toContain("exactly once");
-      expect(api.supersededRoutes).toHaveLength(3);
-      expect(api.runtimeExportSurface).toEqual([
-        "CandidateAdapterError",
-        "acquireProductionBrandEvidence",
-      ]);
-      for (const code of ["MALFORMED_ARTIFACT_REF", "RANKED_MEMBERSHIP_INCONSISTENT"]) {
-        expect(Object.hasOwn(api.haltCodes, code)).toBe(true);
-      }
+      expect(reference.acquisitionApi.seeCanonicalDefinition).toBe(
+        "acquisition-invocation-contract.json#acquisitionApi",
+      );
+      expect(reference.acquisitionApi.signature).toBe(api.signature);
+      expect(reference.acquisitionApi.runtimeExportSurface).toEqual(api.runtimeExportSurface);
+      expect(reference.acquisitionApi.sealedSuccessFiles).toEqual(api.sealedSuccessFiles);
     }
 
-    // The reference-adapter section no longer names the superseded function.
-    const invocation = read(path.join(ROOT, "acquisition-invocation-contract.json")) as {
-      referenceCandidateAdapter: {
-        theOnlyAuthorizedFunction: string;
-        usingTheModuleIsNotSufficient: string;
+    const schema = read(path.join(ROOT, "evidence-schema.json")) as {
+      producedBy: {
+        signature: string;
+        sealedSuccessFiles: string[];
+        sealedFailureFiles: string[];
+        provenanceSealedOnBothOutcomes: boolean;
+        provenanceKeys: string[];
+        imageSha256IsRecomputed: string;
+        aggregateCoversTheProvenanceFile: boolean;
       };
-      onExtractorFailure: { diagnosticSelectionReturned: boolean; itemRetried: boolean };
     };
-    expect(invocation.referenceCandidateAdapter.theOnlyAuthorizedFunction).toBe(
-      "acquireProductionBrandEvidence",
-    );
-    expect(invocation.referenceCandidateAdapter.usingTheModuleIsNotSufficient).toContain(
-      "acquireProductionBrandEvidence",
-    );
-    expect(invocation.onExtractorFailure.diagnosticSelectionReturned).toBe(false);
-    expect(invocation.onExtractorFailure.itemRetried).toBe(false);
-
-    const workflow = readFileSync(path.join(process.cwd(), ROOT, "workflow-plan.md"), "utf8");
-    const execute = workflow.slice(workflow.indexOf("## Mode `execute`"));
-    expect(execute).toContain("acquireProductionBrandEvidence(extractionInput)");
-    expect(execute).toContain("evidence.value.detailed.debug.passes");
-    expect(execute).toContain("evidence.value.candidateRecords");
+    expect(schema.producedBy.signature).toBe(api.signature);
+    expect(schema.producedBy.sealedSuccessFiles).toEqual(api.sealedSuccessFiles);
+    expect(schema.producedBy.sealedFailureFiles).toEqual(api.sealedFailureFiles);
+    expect(schema.producedBy.provenanceSealedOnBothOutcomes).toBe(true);
+    expect(schema.producedBy.provenanceKeys).toContain("imageSha256");
+    expect(schema.producedBy.imageSha256IsRecomputed).toContain("PRIVATE copy");
+    expect(schema.producedBy.aggregateCoversTheProvenanceFile).toBe(true);
   });
 
   it("records the parity tests as implemented, because they are", () => {

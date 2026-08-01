@@ -50,6 +50,28 @@ export const AUTHORIZED_ADAPTER_MODULE = "scripts/eval/lib/issue-149-candidate-a
 /** The one call the runner entrypoint must make, exactly once. */
 export const REQUIRED_ACQUISITION_CALL = "acquireProductionBrandEvidence";
 
+/** The one authenticated persistence call, resolved the same way. */
+export const REQUIRED_WRITER_CALL = "writeSealedEvidencePackage";
+
+/**
+ * Evidence-writing routes prohibited outside the authenticated writer.
+ *
+ * The writer is the only thing that can persist an AUTHENTIC package; a direct
+ * filesystem write bypasses that entirely and can put anything on disk in the
+ * shape of evidence.
+ */
+export const PROHIBITED_WRITE_ROUTES = [
+  "writeFile",
+  "writeFileSync",
+  "appendFile",
+  "appendFileSync",
+  "createWriteStream",
+  "open",
+  "openSync",
+  "copyFile",
+  "copyFileSync",
+] as const;
+
 /**
  * Calls prohibited anywhere outside the adapter module. Each is a route by which
  * a caller could obtain, construct or alter evidence the public API owns.
@@ -135,7 +157,12 @@ export type Stage2ClosureRule =
   | "ACQUISITION_CALL_ARGUMENT_INVALID"
   | "PROHIBITED_CALL"
   | "SEALED_PACKAGE_PROJECTED"
-  | "SEALED_EVIDENCE_PARSED";
+  | "SEALED_EVIDENCE_PARSED"
+  | "WRITER_EXPORT_MISSING"
+  | "RUNNER_DOES_NOT_WRITE_THE_SEALED_PACKAGE"
+  | "SEALED_PACKAGE_WRITTEN_MORE_THAN_ONCE"
+  | "WRITER_INVOKED_OUTSIDE_AUTHORIZED_LOCATION"
+  | "UNAUTHENTICATED_EVIDENCE_WRITE";
 
 export interface Stage2ClosureViolation {
   path: string;
@@ -150,6 +177,9 @@ export interface Stage2ClosureReport {
   acquisitionCallSites: string[];
   /** The resolved declaration the authorized call was checked against. */
   authorizedSymbolDeclaredIn: string | null;
+  /** The resolved declaration the writer call was checked against. */
+  writerSymbolDeclaredIn: string | null;
+  writerCallSites: string[];
   filesAnalyzed: number;
 }
 
@@ -215,6 +245,20 @@ function resolveAliased(
 function calleeSymbol(checker: ts.TypeChecker, callee: ts.Expression): ts.Symbol | undefined {
   const target = ts.isPropertyAccessExpression(callee) ? callee.name : callee;
   return resolveAliased(checker, checker.getSymbolAtLocation(target));
+}
+
+/** A module's exported symbol by name, covering both `export fn` and `export { fn }`. */
+function exportedSymbol(
+  checker: ts.TypeChecker,
+  source: ts.SourceFile,
+  name: string,
+): ts.Symbol | undefined {
+  const moduleSymbol = checker.getSymbolAtLocation(source);
+  if (moduleSymbol === undefined) return undefined;
+  return (
+    moduleSymbol.exports?.get(name as ts.__String) ??
+    checker.getExportsOfModule(moduleSymbol).find((symbol) => symbol.getName() === name)
+  );
 }
 
 /** Where a symbol is declared, as a file path — or null when it is unresolved. */
@@ -337,18 +381,10 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
   const adapterSource = sourceFiles.get(AUTHORIZED_ADAPTER_MODULE);
   let authorizedSymbol: ts.Symbol | undefined;
   if (adapterSource !== undefined) {
-    const moduleSymbol = checker.getSymbolAtLocation(adapterSource);
-    authorizedSymbol = moduleSymbol?.exports?.get(REQUIRED_ACQUISITION_CALL as ts.__String);
-    if (authorizedSymbol === undefined) {
-      // Fall back to the exported-symbol list, which covers `export { x }`.
-      authorizedSymbol =
-        moduleSymbol === undefined
-          ? undefined
-          : checker
-              .getExportsOfModule(moduleSymbol)
-              .find((symbol) => symbol.getName() === REQUIRED_ACQUISITION_CALL);
-    }
-    authorizedSymbol = resolveAliased(checker, authorizedSymbol);
+    authorizedSymbol = resolveAliased(
+      checker,
+      exportedSymbol(checker, adapterSource, REQUIRED_ACQUISITION_CALL),
+    );
     if (authorizedSymbol === undefined) {
       add(
         AUTHORIZED_ADAPTER_MODULE,
@@ -357,18 +393,48 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
       );
     }
   }
+  let writerSymbol: ts.Symbol | undefined;
+  if (adapterSource !== undefined) {
+    writerSymbol = resolveAliased(
+      checker,
+      exportedSymbol(checker, adapterSource, REQUIRED_WRITER_CALL),
+    );
+    if (writerSymbol === undefined) {
+      add(
+        AUTHORIZED_ADAPTER_MODULE,
+        "WRITER_EXPORT_MISSING",
+        `the adapter module does not export ${REQUIRED_WRITER_CALL}`,
+      );
+    }
+  }
+
   const authorizedDeclaration = authorizedSymbol?.declarations?.[0];
+  const writerDeclaration = writerSymbol?.declarations?.[0];
+
+  const sameSymbol = (
+    symbol: ts.Symbol | undefined,
+    target: ts.Symbol | undefined,
+    declaration: ts.Declaration | undefined,
+  ): boolean =>
+    symbol !== undefined &&
+    target !== undefined &&
+    (symbol === target || (declaration !== undefined && symbol.declarations?.[0] === declaration));
 
   const isAuthorized = (symbol: ts.Symbol | undefined): boolean =>
-    symbol !== undefined &&
-    authorizedSymbol !== undefined &&
-    (symbol === authorizedSymbol ||
-      (authorizedDeclaration !== undefined && symbol.declarations?.[0] === authorizedDeclaration));
+    sameSymbol(symbol, authorizedSymbol, authorizedDeclaration);
+  const isWriter = (symbol: ts.Symbol | undefined): boolean =>
+    sameSymbol(symbol, writerSymbol, writerDeclaration);
+  const writerCallSites: string[] = [];
 
   // ---- per-file analysis --------------------------------------------------
   for (const [filePath, source] of sourceFiles) {
     const isRunner = filePath === RUNNER_ENTRY_PATH;
     const isAdapter = filePath === AUTHORIZED_ADAPTER_MODULE;
+
+    // Locals that were destructured out of a sealed package under a new name.
+    const sealedAliases = new Set<string>();
+    const touchesSealed = (chain: string[]): boolean =>
+      touchesSealedFiles(chain) || chain.some((name) => sealedAliases.has(name));
 
     const visit = (node: ts.Node): void => {
       if (ts.isCallExpression(node)) {
@@ -405,6 +471,30 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
                 `the acquisition call must use a direct import binding, not the member access ${node.expression.getText()}`,
               );
             }
+          }
+        } else if (isWriter(symbol)) {
+          // --- the authenticated persistence call ------------------------
+          writerCallSites.push(filePath);
+          if (!isRunner) {
+            add(
+              filePath,
+              "WRITER_INVOKED_OUTSIDE_AUTHORIZED_LOCATION",
+              `${node.expression.getText()} resolves to ${REQUIRED_WRITER_CALL}, which only the runner entrypoint may call`,
+            );
+          }
+          if (ts.isPropertyAccessExpression(node.expression)) {
+            add(
+              filePath,
+              "PROHIBITED_CALL",
+              `the writer call must use a direct import binding, not the member access ${node.expression.getText()}`,
+            );
+          }
+          if (node.arguments.length === 0 || !ts.isIdentifier(node.arguments[0])) {
+            add(
+              filePath,
+              "ACQUISITION_CALL_ARGUMENT_INVALID",
+              `${REQUIRED_WRITER_CALL} must receive the acquired package as an identifier, received ${node.arguments.map((a) => a.getText()).join(", ")}`,
+            );
           }
         } else if (!isAdapter) {
           // --- prohibited calls ------------------------------------------
@@ -448,11 +538,29 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
           }
           // An unresolved import of the AUTHORIZED name is not the authorized
           // symbol — it comes from somewhere unreviewed.
-          if (imported === REQUIRED_ACQUISITION_CALL) {
+          if (imported === REQUIRED_ACQUISITION_CALL || imported === REQUIRED_WRITER_CALL) {
             add(
               filePath,
               "ACQUISITION_BINDING_NOT_FROM_ADAPTER",
               `${target.getText()} is imported as ${imported} but does not resolve to the adapter module's export`,
+            );
+          }
+
+          // --- direct filesystem evidence writes --------------------------
+          // The authenticated writer is the ONLY thing that can persist an
+          // authentic package. A direct write bypasses authenticity entirely.
+          const nodeFsRoute =
+            (imported !== null &&
+              (PROHIBITED_WRITE_ROUTES as readonly string[]).includes(imported)) ||
+            (ts.isPropertyAccessExpression(node.expression) &&
+              ts.isIdentifier(node.expression.expression) &&
+              isNamespaceImport(checker, node.expression.expression) &&
+              (PROHIBITED_WRITE_ROUTES as readonly string[]).includes(node.expression.name.text));
+          if (nodeFsRoute) {
+            add(
+              filePath,
+              "UNAUTHENTICATED_EVIDENCE_WRITE",
+              `${node.expression.getText()} writes to the filesystem outside ${REQUIRED_WRITER_CALL}; only the authenticated writer may persist evidence`,
             );
           }
         }
@@ -463,7 +571,7 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
           const chain = accessChain(node.expression.expression);
           if (
             (PROHIBITED_SEALED_PACKAGE_OPERATIONS as readonly string[]).includes(method) &&
-            touchesSealedFiles(chain)
+            touchesSealed(chain)
           ) {
             add(
               filePath,
@@ -473,7 +581,7 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
           }
           if (
             (method === "parse" || method === "toString" || method === "from") &&
-            node.arguments.some((argument) => touchesSealedFiles(accessChain(argument)))
+            node.arguments.some((argument) => touchesSealed(accessChain(argument)))
           ) {
             add(
               filePath,
@@ -485,7 +593,7 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
       }
 
       // Spread or index into the sealed file list: `[...pkg.files]`, `files[0]`.
-      if (ts.isSpreadElement(node) && touchesSealedFiles(accessChain(node.expression))) {
+      if (ts.isSpreadElement(node) && touchesSealed(accessChain(node.expression))) {
         add(
           node.getSourceFile().fileName,
           "SEALED_PACKAGE_PROJECTED",
@@ -494,7 +602,7 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
       }
       if (
         ts.isElementAccessExpression(node) &&
-        touchesSealedFiles(accessChain(node.expression)) &&
+        touchesSealed(accessChain(node.expression)) &&
         node.getSourceFile().fileName !== AUTHORIZED_ADAPTER_MODULE
       ) {
         add(
@@ -504,10 +612,30 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
         );
       }
 
+      // `const { files: parts } = sealed;` renames the property, so a later
+      // `parts.slice(0, 1)` carries no `files` in its access chain. The RENAMED
+      // local is therefore tracked as a sealed-file binding for this file.
+      if (
+        ts.isVariableDeclaration(node) &&
+        ts.isObjectBindingPattern(node.name) &&
+        node.initializer !== undefined
+      ) {
+        for (const element of node.name.elements) {
+          const property = (element.propertyName ?? element.name).getText();
+          if ((property === "files" || property === "bytes") && ts.isIdentifier(element.name)) {
+            sealedAliases.add(element.name.text);
+          }
+        }
+      }
+
       ts.forEachChild(node, visit);
     };
 
-    if (!isAdapter || true) visit(source);
+    // Every file is traversed, including the adapter: the adapter is exempt from
+    // specific RULES (it defines the machinery), not from analysis. The previous
+    // `if (!isAdapter || true)` was an always-true condition that said the
+    // opposite of what it did.
+    visit(source);
   }
 
   // ---- runner-level requirements -----------------------------------------
@@ -547,6 +675,21 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
       );
     }
 
+    const runnerWrites = writerCallSites.filter((site) => site === RUNNER_ENTRY_PATH).length;
+    if (runnerWrites === 0) {
+      add(
+        RUNNER_ENTRY_PATH,
+        "RUNNER_DOES_NOT_WRITE_THE_SEALED_PACKAGE",
+        `the runner acquires evidence but never calls ${REQUIRED_WRITER_CALL}; an unwritten package is not persisted evidence`,
+      );
+    } else if (runnerWrites > 1) {
+      add(
+        RUNNER_ENTRY_PATH,
+        "SEALED_PACKAGE_WRITTEN_MORE_THAN_ONCE",
+        `${runnerWrites} writer calls; each item's package is written exactly once`,
+      );
+    }
+
     const runnerCalls = acquisitionCallSites.filter((site) => site === RUNNER_ENTRY_PATH).length;
     if (runnerCalls === 0) {
       add(
@@ -568,7 +711,9 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
     haltCode: violations.length === 0 ? null : "STAGE2_SOURCE_CLOSURE_VIOLATION",
     violations,
     acquisitionCallSites: [...new Set(acquisitionCallSites)],
+    writerCallSites: [...new Set(writerCallSites)],
     authorizedSymbolDeclaredIn: declarationFile(authorizedSymbol),
+    writerSymbolDeclaredIn: declarationFile(writerSymbol),
     filesAnalyzed: sourceFiles.size,
   };
 }

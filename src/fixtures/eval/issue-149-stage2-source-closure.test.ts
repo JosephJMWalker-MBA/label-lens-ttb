@@ -29,7 +29,7 @@ export async function acquireProductionBrandEvidence(input) {
   const detailed = await extractLabelEvidenceDetailed(input);
   return { itemId: input.artifactRef, files: [], fileCount: 0 };
 }
-export function writeSealedEvidencePackage(sealed, options) { return sealed.files.length; }
+export function writeSealedEvidencePackage(sealed, options) { return sealed.fileCount; }
 `,
 };
 
@@ -70,12 +70,16 @@ export function report(sealed) {
     // The identity is a DECLARATION in the adapter module, not a string.
     const report = analyze([runner(CLEAN_RUNNER)]);
     expect(report.authorizedSymbolDeclaredIn).toBe(AUTHORIZED_ADAPTER_MODULE);
+    expect(report.writerSymbolDeclaredIn).toBe(AUTHORIZED_ADAPTER_MODULE);
+    expect(report.writerCallSites).toEqual([RUNNER_ENTRY_PATH]);
 
     // The analyzer's own source must actually ask the checker. A previous
     // version created a Program and then never used it.
     const source = analyzeStage2SourceClosure.toString();
     expect(source).not.toContain("adapterModulePath");
     expect(source).not.toContain("endsWith");
+    // The always-true traversal condition is gone.
+    expect(source).not.toContain(["isAdapter ", "|| true"].join(""));
   });
 
   describe("a name is not a binding", () => {
@@ -255,10 +259,15 @@ export const go = async () => await acquireProductionBrandEvidence(${argument});
     it("does not claim the identifier holds a valid ExtractionInput", () => {
       // The source gate proves the ARGUMENT is an identifier. Whether it holds a
       // well-formed, correctly identified input is a runtime property, checked
-      // by the public API itself. Two controls, stated separately.
+      // by the public API itself — which now also rejects a package-shaped
+      // object at the writer. Two controls, stated separately.
       const anything = `
-import { acquireProductionBrandEvidence } from "./lib/issue-149-candidate-adapter";
-export const go = async () => { const nonsense = 42; return await acquireProductionBrandEvidence(nonsense); };
+import { acquireProductionBrandEvidence, writeSealedEvidencePackage } from "./lib/issue-149-candidate-adapter";
+export const go = async () => {
+  const nonsense = 42;
+  const sealed = await acquireProductionBrandEvidence(nonsense);
+  return writeSealedEvidencePackage(sealed, { directory: outputDirectory });
+};
 `;
       expect(analyze([runner(anything)]).violations).toEqual([]);
     });
@@ -312,13 +321,15 @@ export function summarize(sealed, logger) {
       expect(analyze([runner(CLEAN_RUNNER), helper(reader, "reader")]).violations).toEqual([]);
     });
 
-    it("permits passing the COMPLETE package to the authorized writer", () => {
+    it("rejects a writer call outside the runner, even passing the whole package", () => {
+      // Delegating persistence to a helper is how a second, unauthenticated
+      // write route gets introduced. The writer call stays in the runner.
       const passthrough = `
 import { writeSealedEvidencePackage } from "./issue-149-candidate-adapter";
 export const persist = (sealed, directory) => writeSealedEvidencePackage(sealed, { directory });
 `;
-      expect(analyze([runner(CLEAN_RUNNER), helper(passthrough, "persist")]).violations).toEqual(
-        [],
+      expect(rules(analyze([runner(CLEAN_RUNNER), helper(passthrough, "persist")]))).toContain(
+        "WRITER_INVOKED_OUTSIDE_AUTHORIZED_LOCATION",
       );
     });
 
@@ -336,6 +347,103 @@ export function plan(items) {
       for (const operation of ["filter", "slice", "map", "concat"]) {
         expect(PROHIBITED_SEALED_PACKAGE_OPERATIONS).toContain(operation);
       }
+    });
+  });
+
+  describe("the authenticated writer is the only persistence route", () => {
+    it("requires the acquired package to be written, exactly once", () => {
+      const neverWritten = `
+import { acquireProductionBrandEvidence } from "./lib/issue-149-candidate-adapter";
+export const go = async (extractionInput) => await acquireProductionBrandEvidence(extractionInput);
+`;
+      expect(rules(analyze([runner(neverWritten)]))).toContain(
+        "RUNNER_DOES_NOT_WRITE_THE_SEALED_PACKAGE",
+      );
+
+      const twice = `${CLEAN_RUNNER}
+export const again = (sealed) => writeSealedEvidencePackage(sealed, { directory: elsewhere });
+`;
+      expect(rules(analyze([runner(twice)]))).toContain("SEALED_PACKAGE_WRITTEN_MORE_THAN_ONCE");
+    });
+
+    it("resolves the writer by symbol: alias, namespace and re-export all fail", () => {
+      const aliased = `
+import { writeSealedEvidencePackage as put } from "./issue-149-candidate-adapter";
+export const persist = (sealed) => put(sealed, { directory });
+`;
+      expect(rules(analyze([runner(CLEAN_RUNNER), helper(aliased, "walias")]))).toContain(
+        "WRITER_INVOKED_OUTSIDE_AUTHORIZED_LOCATION",
+      );
+
+      const namespaced = `
+import * as adapter from "./issue-149-candidate-adapter";
+export const persist = (sealed) => adapter.writeSealedEvidencePackage(sealed, { directory });
+`;
+      const namespaceReport = analyze([runner(CLEAN_RUNNER), helper(namespaced, "wns")]);
+      expect(rules(namespaceReport)).toContain("WRITER_INVOKED_OUTSIDE_AUTHORIZED_LOCATION");
+
+      const reexport = `export { writeSealedEvidencePackage } from "./issue-149-candidate-adapter";`;
+      const caller = `
+import { writeSealedEvidencePackage } from "./wreexport";
+export const persist = (sealed) => writeSealedEvidencePackage(sealed, { directory });
+`;
+      expect(
+        rules(
+          analyze([runner(CLEAN_RUNNER), helper(reexport, "wreexport"), helper(caller, "wcaller")]),
+        ),
+      ).toContain("WRITER_INVOKED_OUTSIDE_AUTHORIZED_LOCATION");
+    });
+
+    it("rejects a direct filesystem write, named or through a namespace", () => {
+      const direct = `
+import { writeFileSync } from "node:fs";
+export const persist = (target, bytes) => writeFileSync(target, bytes);
+`;
+      expect(rules(analyze([runner(CLEAN_RUNNER), helper(direct, "fsdirect")]))).toContain(
+        "UNAUTHENTICATED_EVIDENCE_WRITE",
+      );
+
+      const namespaced = `
+import * as fs from "node:fs";
+export const persist = (target, bytes) => fs.createWriteStream(target).end(bytes);
+`;
+      expect(rules(analyze([runner(CLEAN_RUNNER), helper(namespaced, "fsns")]))).toContain(
+        "UNAUTHENTICATED_EVIDENCE_WRITE",
+      );
+
+      const aliased = `
+import { writeFileSync as emit } from "node:fs";
+export const persist = (target, bytes) => emit(target, bytes);
+`;
+      expect(rules(analyze([runner(CLEAN_RUNNER), helper(aliased, "fsalias")]))).toContain(
+        "UNAUTHENTICATED_EVIDENCE_WRITE",
+      );
+    });
+
+    it("follows a DESTRUCTURED alias of the sealed file list", () => {
+      // The rename the property-name rule could not see.
+      const destructured = `
+export function handle(sealed) {
+  const { files: parts } = sealed;
+  return parts.slice(0, 1);
+}
+`;
+      expect(
+        rules(analyze([runner(CLEAN_RUNNER), helper(destructured, "destructured")])),
+      ).toContain("SEALED_PACKAGE_PROJECTED");
+    });
+
+    it("does not claim source analysis proves data lineage", () => {
+      // A renamed value passed through a function boundary is beyond what source
+      // text can establish, and this is stated rather than papered over. The
+      // control that catches it is RUNTIME package authenticity: a package-shaped
+      // object is refused by the writer regardless of how it was constructed.
+      const laundered = `
+export const hide = (parts) => parts.slice(0, 1);
+export function handle(sealed) { return hide(sealed.fileCount === 0 ? [] : takeList(sealed)); }
+`;
+      const report = analyze([runner(CLEAN_RUNNER), helper(laundered, "laundered")]);
+      expect(report.violations).toEqual([]);
     });
   });
 
@@ -360,14 +468,14 @@ export function plan(items) {
       expect(
         analyzeStage2SourceClosure({ files: [runner(CLEAN_RUNNER)] }).violations.map((v) => v.rule),
       ).toContain("ADAPTER_MODULE_MISSING");
-      expect(
-        analyzeStage2SourceClosure({
-          files: [
-            { path: AUTHORIZED_ADAPTER_MODULE, contents: "export const nothing = 1;" },
-            runner(CLEAN_RUNNER),
-          ],
-        }).violations.map((v) => v.rule),
-      ).toContain("ADAPTER_EXPORT_MISSING");
+      const noExports = analyzeStage2SourceClosure({
+        files: [
+          { path: AUTHORIZED_ADAPTER_MODULE, contents: "export const nothing = 1;" },
+          runner(CLEAN_RUNNER),
+        ],
+      }).violations.map((v) => v.rule);
+      expect(noExports).toContain("ADAPTER_EXPORT_MISSING");
+      expect(noExports).toContain("WRITER_EXPORT_MISSING");
     });
 
     it("exempts the adapter, which defines the machinery", () => {

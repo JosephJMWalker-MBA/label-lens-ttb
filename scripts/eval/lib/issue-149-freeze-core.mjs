@@ -296,7 +296,7 @@ export function generateStageOneArtifacts({
     accessBoundary: ID_MAP_ACCESS_BOUNDARY,
     location: DECLARED_ID_MAP_LOCATION,
     entryCount: assigned.length,
-    amendedBy: "preregistration-amendment-13.md",
+    amendedBy: "preregistration-amendment-14.md",
     map: assigned.map((entry) => ({
       opaqueItemId: entry.opaqueItemId,
       historicalCaseId: entry.historicalCaseId,

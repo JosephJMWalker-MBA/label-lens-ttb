@@ -2,7 +2,7 @@
   "artifact": "acquisition-runtime-isolation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-13.md",
+  "amendedBy": "preregistration-amendment-14.md",
   "status": "CONTRACT FROZEN. Not implemented in this amendment.",
   "whyThisExists": {
     "correction": "The Stage 1 isolation tests are STATIC manifest, path and import validation. They read committed planning artifacts and assert their shape. They are NOT runtime proof, and this contract stops them being described as such.",

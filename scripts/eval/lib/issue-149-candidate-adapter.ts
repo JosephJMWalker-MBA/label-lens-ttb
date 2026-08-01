@@ -21,7 +21,7 @@
  * acquisition route.
  */
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join as pathJoin } from "node:path";
+import { join as pathJoin, resolve as pathResolve, sep as pathSep } from "node:path";
 import { types as nodeTypes } from "node:util";
 
 import { extractLabelEvidenceDetailed, type ExtractionDebug } from "@/pipeline/extractor/extractor";
@@ -59,6 +59,9 @@ export class CandidateAdapterError extends Error {
       | "MALFORMED_ARTIFACT_REF"
       | "MALFORMED_EXTRACTION_INPUT"
       | "EXTRACTION_INPUT_IDENTITY_MISMATCH"
+      | "EXTRACTION_INPUT_IMAGE_DIGEST_MISMATCH"
+      | "SEALED_PACKAGE_UNAUTHENTIC"
+      | "SEALED_PACKAGE_INVALID"
       | "SEALED_EVIDENCE_INCOMPLETE"
       | "SEALED_EVIDENCE_WRITE_UNVERIFIED"
       | "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE",
@@ -594,17 +597,21 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> =>
  *   again at copy time is two reads. Every value is captured ONCE here, and the
  *   caller's object is never read again.
  */
-function captureOwnDataValues(
-  target: object,
-  expected: readonly string[],
-  at: string,
-): Record<string, unknown> {
-  if (nodeTypes.isProxy(target)) {
+function assertNotProxy(value: unknown, at: string): void {
+  if (typeof value === "object" && value !== null && nodeTypes.isProxy(value)) {
     throw new CandidateAdapterError(
       "MALFORMED_EXTRACTION_INPUT",
       `${at} is a Proxy; a get trap can return a different value on each read, so its descriptors are not evidence of its values`,
     );
   }
+}
+
+function captureOwnDataValues(
+  target: object,
+  expected: readonly string[],
+  at: string,
+): Record<string, unknown> {
+  assertNotProxy(target, at);
 
   const ownKeys = Reflect.ownKeys(target);
   const symbolKeys = ownKeys.filter((key): key is symbol => typeof key === "symbol");
@@ -680,6 +687,10 @@ function captureOwnDataValues(
  * not claim it is.
  */
 function snapshotAcquisitionInput(input: ExtractionInput): ExtractionInput {
+  // BEFORE any structural operation. `isPlainObject` calls
+  // `Object.getPrototypeOf`, which a Proxy's `getPrototypeOf` trap can answer,
+  // so the Proxy test must come first or the trap runs before it is refused.
+  assertNotProxy(input, "input");
   if (!isPlainObject(input)) {
     throw new CandidateAdapterError(
       "MALFORMED_EXTRACTION_INPUT",
@@ -723,6 +734,8 @@ function snapshotAcquisitionInput(input: ExtractionInput): ExtractionInput {
     }
   }
 
+  // Again before any prototype or property inspection of the nested object.
+  assertNotProxy(raw.ocrEngine, "input.ocrEngine");
   if (!isPlainObject(raw.ocrEngine)) {
     throw new CandidateAdapterError(
       "MALFORMED_EXTRACTION_INPUT",
@@ -772,8 +785,21 @@ function snapshotAcquisitionInput(input: ExtractionInput): ExtractionInput {
   // Built entirely from the captured values. `imageBytes` is copied into a NEW
   // Uint8Array, so a later mutation of the caller's buffer cannot reach the
   // extractor and nothing outside this module aliases the copy.
+  // The private copy, hashed HERE. Validating the FORMAT of derivativeSha256 is
+  // not binding: it proves the string looks like a digest, not that it is the
+  // digest of the bytes that will be recognized. Without this, the sealed
+  // provenance could name an image the acquisition never read.
+  const imageBytes = Uint8Array.from(raw.imageBytes);
+  const imageSha256 = sha256Bytes(imageBytes);
+  if (imageSha256 !== raw.derivativeSha256) {
+    throw new CandidateAdapterError(
+      "EXTRACTION_INPUT_IMAGE_DIGEST_MISMATCH",
+      `input.derivativeSha256 is ${raw.derivativeSha256}, but the private copy of input.imageBytes hashes to ${imageSha256}`,
+    );
+  }
+
   const snapshot = {
-    imageBytes: Uint8Array.from(raw.imageBytes),
+    imageBytes,
     artifactRef: raw.artifactRef,
     derivativeSha256: raw.derivativeSha256,
     processedAt: raw.processedAt as string,
@@ -860,8 +886,17 @@ export interface SealedItemEvidence {
   };
 }
 
-/** The item files a successful extraction seals, in fixed order. */
-export const SEALED_SUCCESS_FILE_SUFFIXES = [
+/**
+ * The item files a successful extraction seals, in fixed order.
+ *
+ * MODULE-PRIVATE. These were runtime exports, which made the runtime surface
+ * five names while the contracts claimed two, and gave a caller the required
+ * path list to build a package-shaped object from. Neither is necessary: the
+ * writer revalidates against these lists itself, and the tests reach them
+ * through the sealed package they actually describe.
+ */
+const SEALED_SUCCESS_FILE_SUFFIXES = [
+  ".provenance.json",
   ".passes.json",
   ".words.jsonl",
   ".lines.jsonl",
@@ -870,11 +905,50 @@ export const SEALED_SUCCESS_FILE_SUFFIXES = [
   ".counts.json",
 ] as const;
 
-/** The one file a failed extraction seals. No partial debug is ever synthesised. */
-export const SEALED_FAILURE_FILE_SUFFIXES = [".failure.json"] as const;
+/**
+ * A failed extraction seals its provenance and exactly one failure record. No
+ * partial debug is ever synthesised — but the failure is still bound to the
+ * exact bytes and frozen configuration that produced it.
+ */
+const SEALED_FAILURE_FILE_SUFFIXES = [".provenance.json", ".failure.json"] as const;
 
 /** Canonical JSON plus a terminal newline. Bytes, from here on. */
 const canonicalLine = (value: unknown): string => `${canonicalize(value)}\n`;
+
+/**
+ * The packages this module actually produced.
+ *
+ * ## Why a WeakSet and not a shape check
+ *
+ * `sealPackage` verified its own file set, but `writeSealedEvidencePackage`
+ * accepted anything structurally compatible and checked only
+ * `fileCount === files.length`. A caller could therefore build a COHERENT
+ * subset — rewriting `files`, `fileCount`, `totalBytes` and `aggregateSha256`
+ * together — and the writer would persist it and return the caller's own
+ * aggregate as if it were the sealer's.
+ *
+ * That is the ownership defect again: the caller could not mutate the authentic
+ * package, but could construct a new package-shaped object. TypeScript's
+ * structural typing cannot tell them apart, `Object.freeze` does not confer
+ * origin, and no source analysis can prove provenance of a runtime value.
+ *
+ * Identity is therefore recorded, not inferred. A package enters this set only
+ * after every internal invariant has succeeded, and nothing — no token, symbol,
+ * constructor, registration function or reference to the set itself — is
+ * exported, so it cannot be forged from outside the module.
+ */
+const AUTHENTIC_PACKAGES = new WeakSet<SealedItemEvidence>();
+const AUTHENTIC_DESCRIPTORS = new WeakSet<SealedEvidenceFile>();
+
+/** Governed path shape: an opaque item file name, with no path structure at all. */
+const SEALED_PATH = /^item-\d{4}\.[a-z]+\.(?:json|jsonl)$/;
+
+const aggregateOf = (files: readonly SealedEvidenceFile[]): string =>
+  sha256Bytes(
+    canonicalize(
+      files.map((file) => ({ path: file.path, byteLength: file.byteLength, sha256: file.sha256 })),
+    ),
+  );
 
 function sealFile(path: string, text: string): SealedEvidenceFile {
   const sealed = Uint8Array.from(Buffer.from(text, "utf8"));
@@ -887,6 +961,7 @@ function sealFile(path: string, text: string): SealedEvidenceFile {
       return Uint8Array.from(sealed);
     },
   };
+  AUTHENTIC_DESCRIPTORS.add(descriptor);
   return Object.freeze(descriptor);
 }
 
@@ -920,21 +995,19 @@ function sealPackage(
     );
   }
 
-  const aggregateSha256 = sha256Bytes(
-    canonicalize(
-      files.map((file) => ({ path: file.path, byteLength: file.byteLength, sha256: file.sha256 })),
-    ),
-  );
-
-  return Object.freeze({
+  const sealed = Object.freeze({
     itemId,
     outcome,
     files: Object.freeze(files.slice()),
     fileCount: files.length,
     totalBytes: files.reduce((sum, file) => sum + file.byteLength, 0),
-    aggregateSha256,
+    aggregateSha256: aggregateOf(files),
     ...(failure === undefined ? {} : { failure }),
   }) as SealedItemEvidence;
+
+  // Only now, after every invariant above has succeeded.
+  AUTHENTIC_PACKAGES.add(sealed);
+  return sealed;
 }
 
 /**
@@ -944,8 +1017,46 @@ function sealPackage(
  * frozen schema validators, so an incomplete or reordered package cannot be
  * produced by this function at all.
  */
+/**
+ * The provenance record, sealed on BOTH outcomes.
+ *
+ * Without it the sealed evidence described what was recognized but not what was
+ * fed in: the pass, word, line, candidate, selection and count files carried no
+ * image digest, no timestamp and no engine, adapter or parser identity, and the
+ * failure record omitted the source-image digest the contract already promised.
+ * The evidence was therefore not internally bound to the bytes and frozen
+ * configuration that produced it.
+ *
+ * It is built from the PRIVATE SNAPSHOT, never from the caller's object, and
+ * `imageSha256` is the digest recomputed over the private copy — not the
+ * caller's claim about it.
+ */
+function provenanceText(snapshot: ExtractionInput, imageSha256: string): string {
+  const engine = snapshot.ocrEngine as unknown as Record<string, unknown>;
+  return canonicalLine({
+    opaqueItemId: snapshot.artifactRef,
+    imageByteLength: snapshot.imageBytes.byteLength,
+    imageSha256,
+    derivativeSha256: snapshot.derivativeSha256,
+    processedAt: snapshot.processedAt,
+    extractionAdapterId: snapshot.extractionAdapterId,
+    extractionAdapterVersion: snapshot.extractionAdapterVersion,
+    ocrEngine: {
+      kind: engine.kind,
+      engineId: engine.engineId,
+      engineVersion: engine.engineVersion,
+      modelId: engine.modelId,
+    },
+    parserId: snapshot.parserId,
+    parserVersion: snapshot.parserVersion,
+    extractionAttemptCount: 1,
+    retried: false,
+  });
+}
+
 function sealSuccessfulItem(
   itemId: string,
+  provenance: string,
   debug: ExtractionDebug,
   diagnosticSelection: FieldSelection,
   candidateRecords: CandidateEvidenceRecord[],
@@ -1007,6 +1118,7 @@ function sealSuccessfulItem(
   });
 
   return sealPackage(itemId, "extracted", [
+    sealFile(`${itemId}.provenance.json`, provenance),
     sealFile(`${itemId}.passes.json`, passesText),
     sealFile(`${itemId}.words.jsonl`, wordLines.join("")),
     sealFile(`${itemId}.lines.jsonl`, lineLines.join("")),
@@ -1021,7 +1133,11 @@ function sealSuccessfulItem(
  * failed item has no pass array, no lines and no candidates, and none is
  * fabricated. There is no retry — the extractor was called once.
  */
-function sealFailedItem(itemId: string, error: ExtractionError): SealedItemEvidence {
+function sealFailedItem(
+  itemId: string,
+  provenance: string,
+  error: ExtractionError,
+): SealedItemEvidence {
   const issues = Array.isArray((error as unknown as { issues?: unknown[] }).issues)
     ? (error as unknown as { issues: unknown[] }).issues.map((issue) => String(issue))
     : [];
@@ -1042,17 +1158,39 @@ function sealFailedItem(itemId: string, error: ExtractionError): SealedItemEvide
   return sealPackage(
     itemId,
     "extraction-failed",
-    [sealFile(`${itemId}.failure.json`, text)],
+    [sealFile(`${itemId}.provenance.json`, provenance), sealFile(`${itemId}.failure.json`, text)],
     failure,
   );
 }
 
 /**
- * Write a COMPLETE sealed package and verify it by reading the bytes back.
+ * Write a COMPLETE, AUTHENTIC sealed package and verify it by reading it back.
  *
- * It takes the whole package. There is deliberately no file-subset parameter:
- * a writer that accepts a caller-chosen subset reintroduces exactly the
- * projection this boundary exists to remove.
+ * ## Authenticity first, shape second
+ *
+ * This function previously accepted anything structurally compatible and
+ * checked only `fileCount === files.length`. That is satisfiable by a caller who
+ * rewrites `files`, `fileCount`, `totalBytes` and `aggregateSha256` together:
+ *
+ * ```ts
+ * const { files: original } = sealed;
+ * const subset = [original[0]];
+ * writeSealedEvidencePackage({ ...sealed, files: subset, fileCount: 1,
+ *   totalBytes: subset[0].byteLength }, { directory });
+ * ```
+ *
+ * A coherent forgery is still a forgery. The package must have been produced by
+ * this module's sealer, and that is checked by IDENTITY, not by shape — a
+ * structural type cannot distinguish them, `Object.freeze` does not confer
+ * origin, and no amount of source analysis can prove the provenance of a runtime
+ * value.
+ *
+ * Every package-level and descriptor-level invariant is then revalidated
+ * independently, and **nothing is written until all of them pass**. A partially
+ * written directory is not a lesser failure; it is a directory that looks like
+ * evidence.
+ *
+ * It takes the whole package. There is deliberately no file-subset parameter.
  */
 export function writeSealedEvidencePackage(
   sealed: SealedItemEvidence,
@@ -1064,15 +1202,94 @@ export function writeSealedEvidencePackage(
   totalBytes: number;
   aggregateSha256: string;
 } {
-  if (sealed.fileCount !== sealed.files.length) {
+  // ---- 1. authenticity ----------------------------------------------------
+  if (
+    typeof sealed !== "object" ||
+    sealed === null ||
+    nodeTypes.isProxy(sealed) ||
+    !AUTHENTIC_PACKAGES.has(sealed)
+  ) {
     throw new CandidateAdapterError(
-      "SEALED_EVIDENCE_INCOMPLETE",
-      `fileCount ${sealed.fileCount} disagrees with files.length ${sealed.files.length}`,
+      "SEALED_PACKAGE_UNAUTHENTIC",
+      "this package was not produced by acquireProductionBrandEvidence; a coherently reconstructed package-shaped object is still a forgery",
     );
   }
-  mkdirSync(options.directory, { recursive: true });
-  for (const file of sealed.files) {
-    const target = pathJoin(options.directory, file.path);
+
+  const fail = (detail: string): never => {
+    throw new CandidateAdapterError("SEALED_PACKAGE_INVALID", detail);
+  };
+
+  // ---- 2. package-level invariants, revalidated ----------------------------
+  if (!OPAQUE_ITEM_ID.test(sealed.itemId))
+    fail(`itemId ${JSON.stringify(sealed.itemId)} is malformed`);
+  if (sealed.outcome !== "extracted" && sealed.outcome !== "extraction-failed") {
+    fail(`outcome ${JSON.stringify(sealed.outcome)} is not a governed outcome`);
+  }
+  const required =
+    sealed.outcome === "extracted" ? SEALED_SUCCESS_FILE_SUFFIXES : SEALED_FAILURE_FILE_SUFFIXES;
+  const expectedPaths = required.map((suffix) => `${sealed.itemId}${suffix}`);
+
+  if (!Array.isArray(sealed.files)) fail("files is not an array");
+  if (sealed.files.length !== expectedPaths.length) {
+    fail(
+      `${sealed.files.length} files for outcome ${sealed.outcome}, which requires ${expectedPaths.length}`,
+    );
+  }
+  if (sealed.fileCount !== sealed.files.length || sealed.fileCount !== expectedPaths.length) {
+    fail(
+      `fileCount ${sealed.fileCount} disagrees with files.length ${sealed.files.length} or the required count ${expectedPaths.length}`,
+    );
+  }
+
+  // ---- 3. descriptor-level invariants, revalidated -------------------------
+  const resolvedDirectory = pathResolve(options.directory);
+  let recomputedTotal = 0;
+  const targets: Array<{ file: SealedEvidenceFile; target: string }> = [];
+
+  sealed.files.forEach((file, index) => {
+    if (!AUTHENTIC_DESCRIPTORS.has(file)) fail(`files[${index}] was not produced by the sealer`);
+    if (!Object.isFrozen(file)) fail(`files[${index}] is not frozen`);
+    if (file.path !== expectedPaths[index]) {
+      fail(
+        `files[${index}].path is ${JSON.stringify(file.path)}, required ${JSON.stringify(expectedPaths[index])}`,
+      );
+    }
+    // Belt and braces: the required list is built from a validated itemId, but
+    // a path is what reaches the filesystem, so its shape is checked directly.
+    if (!SEALED_PATH.test(file.path) || file.path.includes("\0")) {
+      fail(
+        `files[${index}].path ${JSON.stringify(file.path)} is not a bare governed evidence filename`,
+      );
+    }
+
+    const bytes = file.bytes;
+    if (bytes.byteLength !== file.byteLength) {
+      fail(`files[${index}] reads ${bytes.byteLength} bytes but records ${file.byteLength}`);
+    }
+    if (sha256Bytes(bytes) !== file.sha256) fail(`files[${index}] digest disagrees with its bytes`);
+    recomputedTotal += file.byteLength;
+
+    // Containment, resolved rather than assumed.
+    const target = pathResolve(pathJoin(resolvedDirectory, file.path));
+    if (
+      target !== pathJoin(resolvedDirectory, file.path) ||
+      !target.startsWith(`${resolvedDirectory}${pathSep}`)
+    ) {
+      fail(`files[${index}].path escapes the destination directory`);
+    }
+    targets.push({ file, target });
+  });
+
+  if (recomputedTotal !== sealed.totalBytes) {
+    fail(`totalBytes ${sealed.totalBytes} recomputes to ${recomputedTotal}`);
+  }
+  if (aggregateOf(sealed.files) !== sealed.aggregateSha256) {
+    fail(`aggregateSha256 ${sealed.aggregateSha256} recomputes to ${aggregateOf(sealed.files)}`);
+  }
+
+  // ---- 4. only now, write ---------------------------------------------------
+  mkdirSync(resolvedDirectory, { recursive: true });
+  for (const { file, target } of targets) {
     writeFileSync(target, file.bytes);
     const readBack = readFileSync(target);
     if (readBack.byteLength !== file.byteLength || sha256Bytes(readBack) !== file.sha256) {
@@ -1084,7 +1301,7 @@ export function writeSealedEvidencePackage(
   }
   return {
     itemId: sealed.itemId,
-    directory: options.directory,
+    directory: resolvedDirectory,
     filesWritten: sealed.files.length,
     totalBytes: sealed.totalBytes,
     aggregateSha256: sealed.aggregateSha256,
@@ -1098,12 +1315,17 @@ export async function acquireProductionBrandEvidence(
   // line reads the caller's object.
   const snapshot = snapshotAcquisitionInput(input);
   const itemId = snapshot.artifactRef;
+  // Recomputed over the private copy, inside the boundary, BEFORE the extractor
+  // is invoked. `snapshotAcquisitionInput` already halted if it disagreed with
+  // the declared derivativeSha256.
+  const imageSha256 = sha256Bytes(snapshot.imageBytes);
+  const provenance = provenanceText(snapshot, imageSha256);
 
   // Exactly once, with the snapshot. There is no retry path: a failed item
   // produces the preregistered typed failure and is never re-run.
   const detailed = await extractLabelEvidenceDetailed(snapshot);
   if (!detailed.ok) {
-    return sealFailedItem(itemId, detailed.error);
+    return sealFailedItem(itemId, provenance, detailed.error);
   }
 
   const { diagnosticSelection, candidateRecords } = deriveBrandEvidenceFromDebug(
@@ -1114,5 +1336,11 @@ export async function acquireProductionBrandEvidence(
   // Serialized and sealed HERE. No mutable DetailedExtractionResult,
   // ExtractionDebug, FieldSelection, candidate array or pass array leaves this
   // function.
-  return sealSuccessfulItem(itemId, detailed.value.debug, diagnosticSelection, candidateRecords);
+  return sealSuccessfulItem(
+    itemId,
+    provenance,
+    detailed.value.debug,
+    diagnosticSelection,
+    candidateRecords,
+  );
 }

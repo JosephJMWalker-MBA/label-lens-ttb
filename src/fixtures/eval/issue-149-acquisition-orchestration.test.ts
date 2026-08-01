@@ -100,7 +100,9 @@ const inputFor = (artifactRef: string): ExtractionInput =>
   ({
     artifactRef,
     imageBytes: new Uint8Array([1, 2, 3]),
-    derivativeSha256: "a".repeat(64),
+    // The digest of THESE bytes. The boundary recomputes it over its private
+    // copy and halts on disagreement, so a placeholder no longer passes.
+    derivativeSha256: "039058c6f2c0cb492c533b0a4d14ef77cc0f78abccced5287d84a1a2011cfb81",
     processedAt: "2026-07-12T00:00:00Z",
     extractionAdapterId: "local-two-field-extractor",
     extractionAdapterVersion: "1.0.0",
@@ -478,9 +480,13 @@ describe("Issue #149 extractor-owning acquisition", () => {
       message: "bad image",
       issues: ["truncated"],
     });
-    // Exactly one governed failure file. No partial debug is synthesised, so no
-    // pass, line, candidate, selection or counts file exists.
-    expect(result.files.map((file) => file.path)).toEqual(["item-0001.failure.json"]);
+    // Provenance plus exactly one governed failure record. No partial debug is
+    // synthesised, so no pass, line, candidate, selection or counts file exists
+    // — but the failure is still bound to the exact bytes and configuration.
+    expect(result.files.map((file) => file.path)).toEqual([
+      "item-0001.provenance.json",
+      "item-0001.failure.json",
+    ]);
     const record = sealedJson(result, ".failure.json");
     expect(record.errorCode).toBe("IMAGE_DECODE_FAILED");
     expect(record.retried).toBe(false);
@@ -526,8 +532,6 @@ describe("Issue #149 extractor-owning acquisition", () => {
     const namespace = await import("../../../scripts/eval/lib/issue-149-candidate-adapter");
     expect(Object.keys(namespace).sort()).toEqual([
       "CandidateAdapterError",
-      "SEALED_FAILURE_FILE_SUFFIXES",
-      "SEALED_SUCCESS_FILE_SUFFIXES",
       "acquireProductionBrandEvidence",
       "writeSealedEvidencePackage",
     ]);

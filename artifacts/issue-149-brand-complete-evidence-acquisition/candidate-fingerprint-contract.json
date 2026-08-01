@@ -2,7 +2,7 @@
   "artifact": "candidate-fingerprint-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-13.md",
+  "amendedBy": "preregistration-amendment-14.md",
   "status": "ALGORITHM AND TEST CONTRACT FROZEN. The acquisition is not implemented in this amendment.",
   "canonicalizationVersion": "issue-149-candidate-canonical-v1",
   "preimage": {
@@ -133,66 +133,31 @@
       "priorDefect": "Amendment 5 declared six keys and omitted missingTokenCount, which production emits on every candidate, so the closed schema rejected every REAL candidate while the synthetic tests and a hard-coded drift guard both repeated the same wrong list."
     }
   },
-  "candidateEmissionApi": {
-    "module": "scripts/eval/lib/issue-149-candidate-adapter.ts",
-    "function": "acquireProductionBrandEvidence",
-    "signature": "acquireProductionBrandEvidence(input: ExtractionInput): Promise<Result<ProductionBrandEvidenceSuccess, ExtractionError>>",
-    "firstArgument": "the frozen ExtractionInput. NOT ExtractionDebug, NOT a FieldSelection, NOT a candidate array.",
-    "returnsOnSuccess": [
-      "detailed: DetailedExtractionResult",
-      "diagnosticSelection: FieldSelection",
-      "candidateRecords: CandidateEvidenceRecord[]"
-    ],
-    "returnsOnFailure": "the extractor's typed ExtractionError, unchanged, with no diagnostic selection and no candidate record",
-    "theRunnerSuppliesNo": [
+  "acquisitionApi": {
+    "seeCanonicalDefinition": "acquisition-invocation-contract.json#acquisitionApi",
+    "signature": "acquireProductionBrandEvidence(input: ExtractionInput): Promise<SealedItemEvidence>",
+    "notRestatedHere": "The full definition lives in one place. A restated copy is what let the Amendment 12 signature survive here after the boundary changed.",
+    "returnsNoMutableEvidence": [
+      "DetailedExtractionResult",
       "ExtractionDebug",
       "FieldSelection",
       "candidate array",
-      "rankedPosition",
-      "a second opaque identifier"
+      "pass array"
     ],
-    "theRunnerNeverCalls": [
-      "extractLabelEvidenceDetailed",
-      "selectBrandObservationWithCompleteFilterDiagnostics"
+    "sealedSuccessFiles": [
+      "<opaqueItemId>.provenance.json",
+      "<opaqueItemId>.passes.json",
+      "<opaqueItemId>.words.jsonl",
+      "<opaqueItemId>.lines.jsonl",
+      "<opaqueItemId>.candidates.jsonl",
+      "<opaqueItemId>.selection.json",
+      "<opaqueItemId>.counts.json"
     ],
-    "opaqueIdentitySource": "input.artifactRef \u2014 there is no second identifier that could disagree with it",
-    "internalSteps": [
-      "validate input.artifactRef matches ^item-\\\\d{4}$, before any extractor invocation",
-      "call extractLabelEvidenceDetailed(input) exactly once",
-      "return the extractor's typed failure unchanged when it returns !ok",
-      "keep DetailedExtractionResult and ExtractionDebug private until that call succeeds",
-      "reconstruct the exact Brand pass set: primary OBSERVED ? [debug.passes[0]] : debug.passes",
-      "invoke selectBrandObservationWithCompleteFilterDiagnostics internally",
-      "perform full-object parity internally against debug.finalSelections.brand",
-      "finalize the complete internally derived candidate population",
-      "return the original detailed result, the diagnostic selection and the candidate records together"
-    ],
-    "extractorInvokedExactlyOncePerItem": true,
-    "noRetryPath": true,
-    "runnerPersistsPassEvidenceFrom": "evidence.value.detailed.debug.passes",
-    "runnerPersistsCandidateEvidenceFrom": "evidence.value.candidateRecords",
-    "supersededRoutes": [
-      "a bare candidate array (Amendment 8 and earlier)",
-      "a caller-supplied FieldSelection (Amendment 9): a filtered population could be wrapped in a freshly constructed selection",
-      "a caller-supplied ExtractionDebug (Amendment 10): a helper could filter or reorder the passes and reconstruct matching primary and final selections"
-    ],
-    "whyExtractorOwned": "Each earlier signature closed the route it named and left an adjacent one open. Owning the extractor call removes the class: there is no caller-supplied evidence at all, and the runner never holds an intermediate it could alter.",
-    "runtimeExportSurface": ["CandidateAdapterError", "acquireProductionBrandEvidence"],
-    "runtimeExportSurfaceVerifiedBy": "importing the module namespace and inspecting its actual runtime own keys, not a source regex",
-    "haltCodes": {
-      "MALFORMED_ARTIFACT_REF": "input.artifactRef does not match ^item-\\\\d{4}$; raised before the extractor is invoked",
-      "DEBUG_PASSES_ABSENT": "the extractor's debug carries no ordered pass array",
-      "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE": "the internally derived selection differs from debug.finalSelections.brand once only the two complete-diagnostics fields are removed",
-      "COMPLETE_DIAGNOSTICS_ABSENT": "the internally derived selection carries no brandDiagnostics.candidates array",
-      "CANDIDATE_EVIDENCE_TRUNCATED": "the emitted record count does not equal the internally derived diagnostic candidate count",
-      "RANKED_MEMBERSHIP_INCONSISTENT": "decision, ranking and rankedPosition are mutually inconsistent, or a kept population retains no ranked survivor",
-      "RANKED_POSITION_PARITY_FAILURE": "ranked positions are not unique or contiguous, or there is not exactly one selected candidate"
-    },
-    "enforcedBy": [
-      "src/fixtures/eval/issue-149-acquisition-orchestration.test.ts",
-      "src/fixtures/eval/issue-149-ranked-invariants.test.ts",
-      "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts",
-      "src/fixtures/eval/issue-149-stage2-source-closure.test.ts"
+    "sealedFailureFiles": ["<opaqueItemId>.provenance.json", "<opaqueItemId>.failure.json"],
+    "runtimeExportSurface": [
+      "CandidateAdapterError",
+      "acquireProductionBrandEvidence",
+      "writeSealedEvidencePackage"
     ]
   }
 }

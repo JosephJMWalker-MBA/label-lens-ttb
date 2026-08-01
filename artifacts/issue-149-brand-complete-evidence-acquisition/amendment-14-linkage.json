@@ -1,0 +1,88 @@
+{
+  "artifact": "amendment-14-linkage",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "amendment": 14,
+  "record": "preregistration-amendment-14.md",
+  "priorHead": "3e08d41edbd7f4d8c36769ffa77226b2842ede9d",
+  "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+  "title": "Authenticate the sealed package, bind it to input provenance, and reconcile the operative contracts",
+  "defectsClosed": [
+    {
+      "defect": "a coherent forged subset passed the writer",
+      "detail": "writeSealedEvidencePackage accepted any structurally compatible object and checked only fileCount === files.length, so a caller rewriting files, fileCount, totalBytes and aggregateSha256 together had the subset written and its own aggregate returned. A forged descriptor could also carry a traversal path, because the writer joined the supplied path to the destination without checking containment.",
+      "correction": "module-private WeakSets of sealer-produced packages and descriptors, populated only after every internal invariant succeeds and never exported in any form; plus independent revalidation of every package and descriptor invariant, including path shape and resolved containment, before the first write",
+      "haltCodes": ["SEALED_PACKAGE_UNAUTHENTIC", "SEALED_PACKAGE_INVALID"],
+      "notReliedOn": [
+        "TypeScript structural typing",
+        "Object.freeze",
+        "source inspection",
+        "caller convention"
+      ],
+      "provenBy": ["src/fixtures/eval/issue-149-sealed-evidence.test.ts"]
+    },
+    {
+      "defect": "the sealed evidence was not bound to the input provenance",
+      "detail": "The sealed files carried pass, word, line, candidate, selection and count evidence with no image digest, timestamp, adapter, engine or parser identity, and the failure record omitted the source-image digest the contract already promised. The boundary validated the FORMAT of derivativeSha256 but never recomputed the hash of its private imageBytes copy, so the evidence was not bound to the bytes that produced it.",
+      "correction": "the private copy is hashed inside the boundary before OCR and must equal derivativeSha256; a provenance record built from the private snapshot is sealed on BOTH outcomes and covered by the aggregate",
+      "haltCodes": ["EXTRACTION_INPUT_IMAGE_DIGEST_MISMATCH"],
+      "provenBy": ["src/fixtures/eval/issue-149-sealed-evidence.test.ts"]
+    },
+    {
+      "defect": "Proxy rejection ran after a trap could already have fired",
+      "detail": "isPlainObject calls Object.getPrototypeOf, which a Proxy's getPrototypeOf trap answers, and it ran before the isProxy test.",
+      "correction": "assertNotProxy is called on input before isPlainObject(input), and on ocrEngine before any prototype or property inspection of it",
+      "provenBy": ["src/fixtures/eval/issue-149-acquisition-orchestration.test.ts"]
+    },
+    {
+      "defect": "the writer was outside the symbol-resolved closure contract, and a destructured alias evaded the projection rule",
+      "detail": "The analyzer required nothing about writeSealedEvidencePackage: not that it is called, not that it is called once, not that no other filesystem route persists evidence. touchesSealedFiles matched the literal property names files and bytes, so const { files: parts } = sealed lost the name.",
+      "correction": "the writer is resolved by declaration identity like the acquisition call; the runner must call it exactly once; direct fs write routes are rejected; destructured renames of files and bytes are tracked as sealed bindings",
+      "haltCodes": [
+        "WRITER_EXPORT_MISSING",
+        "RUNNER_DOES_NOT_WRITE_THE_SEALED_PACKAGE",
+        "SEALED_PACKAGE_WRITTEN_MORE_THAN_ONCE",
+        "WRITER_INVOKED_OUTSIDE_AUTHORIZED_LOCATION",
+        "UNAUTHENTICATED_EVIDENCE_WRITE"
+      ],
+      "doesNotClaim": "that source analysis proves arbitrary data lineage; a test asserts a laundered value is NOT flagged, and runtime authenticity is what catches it",
+      "provenBy": ["src/fixtures/eval/issue-149-stage2-source-closure.test.ts"]
+    },
+    {
+      "defect": "three operative contracts still described the Amendment 12 API",
+      "detail": "acquisition-invocation-contract.json, candidate-decision-contract.json and candidate-fingerprint-contract.json retained a candidateEmissionApi block describing Promise<Result<ProductionBrandEvidenceSuccess, ExtractionError>> and the runner persisting from evidence.value.detailed.debug.passes. evidence-schema.json and preregistration.md carried the same. The consistency sweep passed because it checked amendment stamps, not phrases.",
+      "correction": "the stale blocks are deleted rather than supplemented; one canonical acquisitionApi and sealedPackageWriter definition, referenced rather than restated; the sweep now fails on the superseded phrases themselves",
+      "provenBy": ["src/fixtures/eval/issue-149-contract-consistency.test.ts"]
+    },
+    {
+      "defect": "the runtime export claim was false",
+      "detail": "The module exported two suffix arrays in addition to the class, the acquisition function and the writer, while the contracts claimed two names. Exporting them also handed a caller the exact path list needed to construct a package-shaped object.",
+      "correction": "the suffix arrays are module-private; the runtime surface is exactly three names, asserted by dynamically importing the real module; assert-adapter-surface.sh now states it checks the SOURCE surface and does not prove the runtime namespace",
+      "provenBy": ["src/fixtures/eval/issue-149-sealed-evidence.test.ts"]
+    }
+  ],
+  "theRepeatedFailureMode": {
+    "statement": "Each review has found the named route closed and an adjacent one left open, and checks that assert the shape of correctness rather than carrying its verdict.",
+    "instances": [
+      "bare candidate array -> FieldSelection -> ExtractionDebug -> ExtractionInput -> returned evidence -> a package-SHAPED object the writer could not tell from a package",
+      "callee name matched -> local function, wrong module, alias, namespace, re-export, second alias -> the writer symbol not resolved at all",
+      "mutation detected -> aliasing and projection -> a destructured rename",
+      "amendment stamps swept -> stale operative blocks beside corrected ones",
+      "printed grep counts -> assertions -> shell assertions described as proving the runtime namespace"
+    ],
+    "structuralFixPattern": "delete the alternative rather than prohibit it by convention; record identity rather than infer it from shape; and make every claim executable at the boundary that actually enforces it"
+  },
+  "notStarted": [
+    "Stage 2 Job A",
+    "discovery",
+    "execute mode",
+    "governed 115-case acquisition OCR",
+    "runtime bundle build",
+    "truth-free preparation artifact",
+    "acquisition runner",
+    "acquisition workflow",
+    "workflow-mode file"
+  ],
+  "productionRuntimeBehaviourChanged": false,
+  "ocrRun": false
+}

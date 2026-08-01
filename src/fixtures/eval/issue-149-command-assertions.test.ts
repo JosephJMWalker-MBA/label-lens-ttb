@@ -50,7 +50,7 @@ describe("Issue #149 Stage 1 command assertions are load-bearing", () => {
   it("passes on the real current adapter", () => {
     const result = runAssertions(ADAPTER);
     expect(result.code).toBe(0);
-    expect(result.output).toContain("ADAPTER_SURFACE_VERIFIED");
+    expect(result.output).toContain("ADAPTER_SOURCE_SURFACE_VERIFIED");
   });
 
   it("fails when the required public API is missing", () => {
@@ -117,6 +117,14 @@ describe("Issue #149 Stage 1 command assertions are load-bearing", () => {
     const result = runAssertions(copy);
     expect(result.code).toBe(1);
     expect(result.output).toContain("RAW_EVIDENCE_RESULT_TYPE_PRESENT");
+  });
+
+  it("does not claim to prove the RUNTIME export namespace", () => {
+    // These are source assertions. The runtime namespace is asserted by
+    // dynamically importing the real module, in issue-149-sealed-evidence.test.ts.
+    const script = readFileSync(SCRIPT, "utf8");
+    expect(script).toContain("NOT prove the runtime export namespace");
+    expect(script).toContain("issue-149-sealed-evidence.test.ts");
   });
 
   it("is invoked by commands.sh, and commands.sh is syntactically valid", () => {

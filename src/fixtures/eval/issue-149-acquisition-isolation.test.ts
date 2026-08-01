@@ -292,12 +292,13 @@ describe("Issue #149 acquisition identity and isolation", () => {
           files: [
             {
               path: "scripts/eval/lib/issue-149-candidate-adapter.ts",
-              contents: "export async function acquireProductionBrandEvidence(i) { return i; }",
+              contents:
+                "export async function acquireProductionBrandEvidence(i) { return i; }\nexport function writeSealedEvidencePackage(s, o) { return s.fileCount; }",
             },
             {
               path: "scripts/eval/issue-149-brand-evidence-acquisition-run.ts",
               contents:
-                'import { acquireProductionBrandEvidence } from "./lib/issue-149-candidate-adapter";\nexport const go = async (input) => await acquireProductionBrandEvidence(input);',
+                'import { acquireProductionBrandEvidence, writeSealedEvidencePackage } from "./lib/issue-149-candidate-adapter";\nexport const go = async (input) => { const sealed = await acquireProductionBrandEvidence(input); return writeSealedEvidencePackage(sealed, { directory }); };',
             },
             { path: "scripts/eval/lib/hash.ts", contents: "export const sha = (b) => digest(b);" },
           ],
@@ -310,8 +311,6 @@ describe("Issue #149 acquisition identity and isolation", () => {
         const namespace = await import("../../../scripts/eval/lib/issue-149-candidate-adapter");
         expect(Object.keys(namespace).sort()).toEqual([
           "CandidateAdapterError",
-          "SEALED_FAILURE_FILE_SUFFIXES",
-          "SEALED_SUCCESS_FILE_SUFFIXES",
           "acquireProductionBrandEvidence",
           "writeSealedEvidencePackage",
         ]);

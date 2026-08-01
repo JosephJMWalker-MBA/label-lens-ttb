@@ -5,11 +5,11 @@ Refs Issue #149. **Evidence acquisition only.** Frozen before any OCR runs.
 Base: `origin/main` `546c3f279ce431a1fd8c0203df7a83553ea866ef`, the merge commit
 of PR #220.
 
-**Amended thirteen times, every time before any governed acquisition OCR.** See
+**Amended fourteen times, every time before any governed acquisition OCR.** See
 `preregistration-amendment.md` and `preregistration-amendment-2.md` through
-`preregistration-amendment-13.md`. All earlier plans are preserved, not
+`preregistration-amendment-14.md`. All earlier plans are preserved, not
 overwritten, and their identities are recorded in `amendment-linkage.json` and
-`amendment-2-linkage.json` through `amendment-13-linkage.json`. **The Stage 1 trusted freeze/staging generator and its temporary
+`amendment-2-linkage.json` through `amendment-14-linkage.json`. **The Stage 1 trusted freeze/staging generator and its temporary
 reproducibility mode have run — that is what produced the three committed
 artifacts. No Stage 2 Job A workflow, truth-free preparation artifact,
 runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR
@@ -532,9 +532,11 @@ reorder `debug.passes`, reconstruct matching `primarySelections` and
 `finalSelections`, and hand over a coherent replacement. Owning the extractor call
 removes the class rather than the instance.
 
-The runner persists pass evidence only from
-`evidence.value.detailed.debug.passes` and candidate evidence only from
-`evidence.value.candidateRecords`.
+The acquisition boundary serializes and seals the complete item evidence itself and returns a frozen
+`SealedItemEvidence`. The runner passes that whole package to `writeSealedEvidencePackage`, which
+verifies the package is one this module produced before writing anything. The runner never holds a
+`DetailedExtractionResult`, an `ExtractionDebug`, a `FieldSelection`, a candidate array or a pass
+array, and therefore has nothing to filter, project, reorder or reconstruct.
 
 On extractor failure the typed `ExtractionError` is returned unchanged, **no
 diagnostic selection or candidate record exists**, the runner persists the
