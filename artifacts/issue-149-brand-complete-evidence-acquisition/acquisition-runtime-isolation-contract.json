@@ -2,7 +2,7 @@
   "artifact": "acquisition-runtime-isolation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-14.md",
+  "amendedBy": "preregistration-stage-2-execute-readiness.md",
   "status": "CONTRACT FROZEN. Not implemented in this amendment.",
   "whyThisExists": {
     "correction": "The Stage 1 isolation tests are STATIC manifest, path and import validation. They read committed planning artifacts and assert their shape. They are NOT runtime proof, and this contract stops them being described as such.",
@@ -187,7 +187,7 @@
         "theDirectRunnerRegexIsNotTransitive": true,
         "theDirectRunnerRegexIsNotTransitiveNote": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts inspects the runner sources only. A helper the runner imports could reach a lower-level candidate function without the runner source containing a prohibited symbol. The Stage 2 source-closure gate owns the transitive property; the first-order regex does not and does not claim to.",
         "requiredSoleEmissionCall": "acquireProductionBrandEvidence",
-        "requiredSoleEmissionCallNote": "It takes an ExtractionInput, copies it into a deeply frozen snapshot before its first await, and calls extractLabelEvidenceDetailed on that snapshot itself, exactly once. There is no caller-supplied debug, selection or candidate array, and no live caller reference to the input the extractor reads.",
+        "requiredSoleEmissionCallNote": "It takes an ExtractionInput, captures its exact own data-property values into a PRIVATE snapshot before its first await, and calls extractLabelEvidenceDetailed on that snapshot itself, exactly once. The top-level snapshot and ocrEngine are frozen; imageBytes is a private copied Uint8Array with no caller-held alias and is NOT frozen, because a nonempty typed array cannot be. There is no caller-supplied debug, selection or candidate array, and no live caller reference to the input the extractor reads.",
         "prohibitedOutsideTheAdapterModule": [
           "selectBrandObservationWithCompleteFilterDiagnostics for Brand acquisition",
           "selectBrandObservationWithCompleteFilterDiagnostics",
@@ -220,7 +220,7 @@
           "finalizeCandidateRecord",
           "stableCandidateId"
         ],
-        "prohibitedWritesNote": "Reading is permitted \u2014 the runner persists detailed.debug.passes. Writing, replacing or reconstructing these is how a filtered or reordered population would be smuggled in.",
+        "prohibitedWritesNote": "SUPERSEDED IN SUBSTANCE. The runner no longer reads or persists detailed.debug.passes at all: the acquisition boundary serializes and seals the evidence, and the runner receives byte descriptors. The completeness control is runtime package authenticity, not a prohibition on writing to objects the runner never holds.",
         "acrossTheCompleteClosure": [
           "exactly one call to acquireProductionBrandEvidence exists",
           "it is in the runner entrypoint",
@@ -429,5 +429,22 @@
     },
     "discoverStopsForOwnerReviewBeforeExecute": true
   },
-  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run."
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run.",
+  "runtimeIdentity": {
+    "pinnedNonRootUid": 10149,
+    "pinnedNonRootGid": 10149,
+    "why": "Discovery observed uid 0. Capabilities were dropped and no-new-privileges was set, but nothing pinned a non-root user. Documenting uid 0 as accepted was not sufficient.",
+    "verifiedBy": "discovery compares process.getuid()/getgid() against ISSUE_149_EXPECTED_UID/GID and fails when they differ"
+  },
+  "supplyChainPinning": {
+    "contract": "execution-supply-chain-pins.json",
+    "actionsPinnedToFullCommitSha": true,
+    "runtimeImagePinnedToLinuxAmd64Digest": true,
+    "why": "A tag is a movable reference; a full commit SHA and an image digest are the only immutable ones."
+  },
+  "executeTransitionIntegrity": {
+    "contract": "execute-authorization.json",
+    "enforcedBy": "scripts/eval/issue-149-execute-gate.mjs",
+    "pathsFilterIsNotTheControl": "GitHub's paths: filter decides WHETHER the workflow runs. It does not restrict what else the triggering push contains, so the changed-file restriction is enforced against the actual commit range."
+  }
 }

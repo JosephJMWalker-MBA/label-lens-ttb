@@ -2,9 +2,9 @@
   "artifact": "execute-readiness-blockers",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 2,
-  "amendedBy": "preregistration-stage-2-discovery.md",
+  "amendedBy": "preregistration-stage-2-execute-readiness.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
-  "status": "EXECUTE_NOT_AUTHORIZED",
+  "status": "ALL_BLOCKERS_RESOLVED_EXECUTE_STILL_NOT_AUTHORIZED",
   "committedMode": "discover",
   "whyThisArtifactExists": "Discovery was authorized specifically so that evidence from the real bundle, mount boundary, environment and container replaces further static speculation. These six items are known execute-path defects that discovery does not exercise. They are recorded rather than silently fixed during discovery, because discovery does not authorize execute and a fix landed here would not have been reviewed against execute.",
   "doNotSilentlyFix": "None of these may be quietly repaired during the discovery sprint unless the fix is REQUIRED to make discover itself run. If such a fix becomes necessary it must be stated explicitly in the return, not folded in.",
@@ -18,7 +18,9 @@
         "no-overwrite semantics on every item file",
         "exclusive creation rather than truncating write"
       ],
-      "affects": "scripts/eval/lib/issue-149-candidate-adapter.ts"
+      "affects": "scripts/eval/lib/issue-149-candidate-adapter.ts",
+      "resolution": "scripts/eval/lib/issue-149-candidate-adapter.ts \u2014 atomic single-use claim, wx exclusive creation, staging directory committed by atomic rename",
+      "resolvedIn": "preregistration-stage-2-execute-readiness.md"
     },
     {
       "id": 2,
@@ -28,7 +30,9 @@
         "a defined cleanup or commit protocol for partial I/O failure",
         "an item is either completely present or completely absent"
       ],
-      "affects": "scripts/eval/lib/issue-149-candidate-adapter.ts"
+      "affects": "scripts/eval/lib/issue-149-candidate-adapter.ts",
+      "resolution": "the commit point is the directory rename; failure injected after every write position leaves no committed item and no staging directory",
+      "resolvedIn": "preregistration-stage-2-execute-readiness.md"
     },
     {
       "id": 3,
@@ -42,7 +46,9 @@
         "scripts/eval/lib/issue-149-stage2-source-closure.ts",
         "scripts/eval/issue-149-brand-evidence-acquisition-run.ts",
         "artifacts/issue-149-brand-complete-evidence-acquisition/evidence-schema.json"
-      ]
+      ],
+      "resolution": "scripts/eval/lib/issue-149-run-evidence-writer.ts \u2014 one authenticated run-level writer; the write prohibition is not weakened",
+      "resolvedIn": "preregistration-stage-2-execute-readiness.md"
     },
     {
       "id": 4,
@@ -55,7 +61,9 @@
       "affects": [
         "scripts/eval/lib/issue-149-candidate-adapter.ts",
         "artifacts/issue-149-brand-complete-evidence-acquisition/region-ocr-result-replay-contract.json"
-      ]
+      ],
+      "resolution": "<itemId>.passes.json holds exactly the thirteen RegionOcrResult fields; identity from the filename, ordinal from array position; bytes decoded back through the replay schema",
+      "resolvedIn": "preregistration-stage-2-execute-readiness.md"
     },
     {
       "id": 5,
@@ -68,7 +76,9 @@
         "scripts/eval/lib/issue-149-candidate-adapter.ts",
         "artifacts/issue-149-brand-complete-evidence-acquisition/determinism-rules.json",
         "artifacts/issue-149-brand-complete-evidence-acquisition/raw-ocr-contract.json"
-      ]
+      ],
+      "resolution": "<itemId>.fingerprints.json seals the per-pass semantic and ordered-words-only fingerprints and the ordered pass-array fingerprint",
+      "resolvedIn": "preregistration-stage-2-execute-readiness.md"
     },
     {
       "id": 6,
@@ -80,7 +90,9 @@
         "artifacts/issue-149-brand-complete-evidence-acquisition/acquisition-runtime-isolation-contract.json",
         "artifacts/issue-149-brand-complete-evidence-acquisition/workflow-plan.md",
         "artifacts/issue-149-brand-complete-evidence-acquisition/raw-ocr-contract.json"
-      ]
+      ],
+      "resolution": "stale claims deleted from the runtime isolation contract, workflow-plan, raw-ocr contract, evidence schema, replay contract and determinism rules",
+      "resolvedIn": "preregistration-stage-2-execute-readiness.md"
     },
     {
       "id": 7,
@@ -90,10 +102,12 @@
         "decide whether the boundary pins a non-root user, and record the decision either way"
       ],
       "foundBy": "isolated discovery, run 30683988763",
-      "doesNotBlockDiscovery": true
+      "doesNotBlockDiscovery": true,
+      "resolution": "Job B runs as uid 10149 / gid 10149, verified by discovery against ISSUE_149_EXPECTED_UID/GID",
+      "resolvedIn": "preregistration-stage-2-execute-readiness.md"
     }
   ],
-  "executeAuthorizationRequires": "every blocker above reviewed and resolved, and execute explicitly authorized by the owner. Changing workflow-mode.txt to execute without that is not authorized by the discovery decision.",
+  "executeAuthorizationRequires": "Every blocker is resolved, but execute is STILL NOT AUTHORIZED. Authorization is a separate, explicit decision recorded in execute-authorization.json, which must name the exact reviewed implementation SHA. Resolving the blockers does not authorize execute.",
   "discoveryDoesNotAuthorizeExecute": true,
   "ocrRun": false,
   "discoveryOutcome": {

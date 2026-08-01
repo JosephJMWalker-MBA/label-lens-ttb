@@ -2,7 +2,7 @@
   "artifact": "acquisition-invocation-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-14.md",
+  "amendedBy": "preregistration-stage-2-execute-readiness.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "route": "the runner calls acquireProductionBrandEvidence(extractionInput), which calls extractLabelEvidenceDetailed itself exactly once and returns a sealed byte package; the runner then passes that whole package to writeSealedEvidencePackage, exactly once",
   "prohibitedRoute": {
@@ -229,6 +229,7 @@
     "sealedSuccessFiles": [
       "<opaqueItemId>.provenance.json",
       "<opaqueItemId>.passes.json",
+      "<opaqueItemId>.fingerprints.json",
       "<opaqueItemId>.words.jsonl",
       "<opaqueItemId>.lines.jsonl",
       "<opaqueItemId>.candidates.jsonl",

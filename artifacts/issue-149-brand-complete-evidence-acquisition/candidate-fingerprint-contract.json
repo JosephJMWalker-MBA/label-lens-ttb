@@ -2,7 +2,7 @@
   "artifact": "candidate-fingerprint-contract",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 1,
-  "amendedBy": "preregistration-amendment-14.md",
+  "amendedBy": "preregistration-stage-2-execute-readiness.md",
   "status": "ALGORITHM AND TEST CONTRACT FROZEN. The acquisition is not implemented in this amendment.",
   "canonicalizationVersion": "issue-149-candidate-canonical-v1",
   "preimage": {
@@ -147,6 +147,7 @@
     "sealedSuccessFiles": [
       "<opaqueItemId>.provenance.json",
       "<opaqueItemId>.passes.json",
+      "<opaqueItemId>.fingerprints.json",
       "<opaqueItemId>.words.jsonl",
       "<opaqueItemId>.lines.jsonl",
       "<opaqueItemId>.candidates.jsonl",

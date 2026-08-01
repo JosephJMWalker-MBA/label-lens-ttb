@@ -20,8 +20,21 @@
  * selection is derived HERE. The invocation contract permits those modules on the
  * acquisition route.
  */
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join as pathJoin, resolve as pathResolve, sep as pathSep } from "node:path";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import {
+  basename as pathBasename,
+  join as pathJoin,
+  resolve as pathResolve,
+  sep as pathSep,
+} from "node:path";
 import { types as nodeTypes } from "node:util";
 
 import { extractLabelEvidenceDetailed, type ExtractionDebug } from "@/pipeline/extractor/extractor";
@@ -38,10 +51,14 @@ import {
 import {
   CANDIDATE_CANONICALIZATION_VERSION,
   type CandidateEvidenceRecord,
+  REGION_OCR_RESULT_KEYS,
+  SEMANTIC_PASS_EXCLUDED_KEYS,
   assertRegionOcrResultRecord,
   canonicalize,
   finalizeCandidateRecord,
+  orderedWordsOnlyFingerprint,
   semanticOrderedPassArrayFingerprint,
+  semanticPassFingerprint,
   sha256Bytes,
 } from "./issue-149-evidence-canonical";
 
@@ -62,6 +79,9 @@ export class CandidateAdapterError extends Error {
       | "EXTRACTION_INPUT_IMAGE_DIGEST_MISMATCH"
       | "SEALED_PACKAGE_UNAUTHENTIC"
       | "SEALED_PACKAGE_INVALID"
+      | "SEALED_PACKAGE_ALREADY_CONSUMED"
+      | "SEALED_EVIDENCE_DESTINATION_EXISTS"
+      | "SEALED_EVIDENCE_COMMIT_FAILED"
       | "SEALED_EVIDENCE_INCOMPLETE"
       | "SEALED_EVIDENCE_WRITE_UNVERIFIED"
       | "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE",
@@ -898,6 +918,7 @@ export interface SealedItemEvidence {
 const SEALED_SUCCESS_FILE_SUFFIXES = [
   ".provenance.json",
   ".passes.json",
+  ".fingerprints.json",
   ".words.jsonl",
   ".lines.jsonl",
   ".candidates.jsonl",
@@ -938,6 +959,17 @@ const canonicalLine = (value: unknown): string => `${canonicalize(value)}\n`;
  * exported, so it cannot be forged from outside the module.
  */
 const AUTHENTIC_PACKAGES = new WeakSet<SealedItemEvidence>();
+
+/**
+ * Packages already claimed for writing.
+ *
+ * Authenticity said the package came from the sealer. It said nothing about how
+ * many times it could be written: the same authentic package could be passed to
+ * the writer repeatedly, and each call would overwrite the previous files. A
+ * single-use claim is taken ATOMICALLY — before any I/O — so a second attempt
+ * fails even if the first is still in flight.
+ */
+const CONSUMED_PACKAGES = new WeakSet<SealedItemEvidence>();
 const AUTHENTIC_DESCRIPTORS = new WeakSet<SealedEvidenceFile>();
 
 /** Governed path shape: an opaque item file name, with no path structure at all. */
@@ -1064,13 +1096,39 @@ function sealSuccessfulItem(
   const passes = debug.passes;
   passes.forEach((pass, index) => assertRegionOcrResultRecord(pass, `debug.passes[${index}]`));
 
-  const passesText = canonicalLine(
-    passes.map((pass, index) => ({
-      opaqueItemId: itemId,
-      passOrdinal: index,
-      ...(pass as unknown as Record<string, unknown>),
-    })),
+  // EXACTLY the thirteen RegionOcrResult fields, in the frozen key order, with
+  // no envelope. The previous shape added `opaqueItemId` and `passOrdinal`,
+  // which contradicted the replay contract's own statement that the persisted
+  // record's own-key set is exactly those thirteen and that unexpected keys are
+  // rejected. Item identity comes from the governed FILENAME and the pass
+  // ordinal from ARRAY POSITION; neither needs to be restated inside a record
+  // whose schema forbids it.
+  const passRecords = passes.map((pass) => {
+    const source = pass as unknown as Record<string, unknown>;
+    const record: Record<string, unknown> = {};
+    for (const key of REGION_OCR_RESULT_KEYS) record[key] = source[key];
+    return record;
+  });
+  // Decoded back through the exact replay schema before it is sealed: the bytes
+  // are validated, not just the object they were built from.
+  const passesText = canonicalLine(passRecords);
+  (JSON.parse(passesText) as unknown[]).forEach((decoded, index) =>
+    assertRegionOcrResultRecord(decoded, `decoded passes[${index}]`),
   );
+
+  // The two promised per-pass fingerprints, sealed rather than described.
+  const fingerprintRecords = passes.map((pass, index) => ({
+    passOrdinal: index,
+    passId: (pass as unknown as { passId: string }).passId,
+    semanticPassFingerprint: semanticPassFingerprint(pass, `passes[${index}]`),
+    orderedWordsOnlyFingerprint: orderedWordsOnlyFingerprint(pass),
+  }));
+  const fingerprintsText = canonicalLine({
+    opaqueItemId: itemId,
+    semanticPassExcludedKeys: [...SEMANTIC_PASS_EXCLUDED_KEYS],
+    orderedPassArraySemanticFingerprint: semanticOrderedPassArrayFingerprint(passes),
+    perPass: fingerprintRecords,
+  });
 
   let wordOrdinal = 0;
   const wordLines: string[] = [];
@@ -1113,13 +1171,14 @@ function sealSuccessfulItem(
     candidateCount: candidateLines.length,
     rankedCount: candidateRecords.filter((record) => record.rankedPosition !== null).length,
     selectedCount: candidateRecords.filter((record) => record.selected).length,
-    semanticOrderedPassArrayFingerprint: semanticOrderedPassArrayFingerprint(passes),
+    orderedPassArraySemanticFingerprint: semanticOrderedPassArrayFingerprint(passes),
     stableCandidateIds: candidateRecords.map((record) => record.stableCandidateId),
   });
 
   return sealPackage(itemId, "extracted", [
     sealFile(`${itemId}.provenance.json`, provenance),
     sealFile(`${itemId}.passes.json`, passesText),
+    sealFile(`${itemId}.fingerprints.json`, fingerprintsText),
     sealFile(`${itemId}.words.jsonl`, wordLines.join("")),
     sealFile(`${itemId}.lines.jsonl`, lineLines.join("")),
     sealFile(`${itemId}.candidates.jsonl`, candidateLines.join("")),
@@ -1270,10 +1329,11 @@ export function writeSealedEvidencePackage(
     recomputedTotal += file.byteLength;
 
     // Containment, resolved rather than assumed.
-    const target = pathResolve(pathJoin(resolvedDirectory, file.path));
+    const itemDirectory = pathJoin(resolvedDirectory, sealed.itemId);
+    const target = pathResolve(pathJoin(itemDirectory, file.path));
     if (
-      target !== pathJoin(resolvedDirectory, file.path) ||
-      !target.startsWith(`${resolvedDirectory}${pathSep}`)
+      target !== pathJoin(itemDirectory, file.path) ||
+      !target.startsWith(`${itemDirectory}${pathSep}`)
     ) {
       fail(`files[${index}].path escapes the destination directory`);
     }
@@ -1287,21 +1347,73 @@ export function writeSealedEvidencePackage(
     fail(`aggregateSha256 ${sealed.aggregateSha256} recomputes to ${aggregateOf(sealed.files)}`);
   }
 
-  // ---- 4. only now, write ---------------------------------------------------
-  mkdirSync(resolvedDirectory, { recursive: true });
-  for (const { file, target } of targets) {
-    writeFileSync(target, file.bytes);
-    const readBack = readFileSync(target);
-    if (readBack.byteLength !== file.byteLength || sha256Bytes(readBack) !== file.sha256) {
-      throw new CandidateAdapterError(
-        "SEALED_EVIDENCE_WRITE_UNVERIFIED",
-        `${file.path} read back as ${readBack.byteLength} bytes / ${sha256Bytes(readBack)}, expected ${file.byteLength} / ${file.sha256}`,
-      );
-    }
+  // ---- 4. claim the package, atomically, before any I/O -------------------
+  //
+  // Synchronous and before the first filesystem call, so two callers cannot both
+  // observe an unconsumed package and both proceed.
+  if (CONSUMED_PACKAGES.has(sealed)) {
+    throw new CandidateAdapterError(
+      "SEALED_PACKAGE_ALREADY_CONSUMED",
+      `${sealed.itemId} has already been written; an item is acquired once and persisted once, and a replayed package would overwrite the evidence of the first write`,
+    );
   }
+  CONSUMED_PACKAGES.add(sealed);
+
+  // ---- 5. refuse a pre-existing destination -------------------------------
+  const committed = pathJoin(resolvedDirectory, sealed.itemId);
+  if (existsSync(committed)) {
+    fail(
+      `the committed destination ${sealed.itemId} already exists; evidence is never overwritten`,
+    );
+  }
+  for (const { target } of targets) {
+    if (existsSync(target)) fail(`${pathBasename(target)} already exists at the destination`);
+  }
+
+  // ---- 6. write into a STAGING directory, then commit by rename -----------
+  //
+  // The transaction protocol, stated exactly:
+  //
+  //   - every file is written into a private staging directory with `wx`
+  //     (exclusive creation, never truncation) and read back;
+  //   - the item becomes COMMITTED at the instant the staging directory is
+  //     renamed to its governed name, which is atomic within a filesystem;
+  //   - before that instant no complete item is visible at the committed path;
+  //   - after it, every file of the item is present.
+  //
+  // Deleting files in a catch block is NOT crash-atomic — a process killed
+  // between two unlinks leaves exactly the partial item it claims to prevent —
+  // and is not used as the commit rule. Staging cleanup is best-effort tidying
+  // of a directory that was never the committed one.
+  mkdirSync(resolvedDirectory, { recursive: true });
+  const staging = mkdtempSync(pathJoin(resolvedDirectory, `.staging-${sealed.itemId}-`));
+  try {
+    for (const file of sealed.files) {
+      const stagedPath = pathJoin(staging, file.path);
+      // `wx` fails if the path exists. It never truncates.
+      writeFileSync(stagedPath, file.bytes, { flag: "wx" });
+      const readBack = readFileSync(stagedPath);
+      if (readBack.byteLength !== file.byteLength || sha256Bytes(readBack) !== file.sha256) {
+        throw new CandidateAdapterError(
+          "SEALED_EVIDENCE_WRITE_UNVERIFIED",
+          `${file.path} read back as ${readBack.byteLength} bytes / ${sha256Bytes(readBack)}, expected ${file.byteLength} / ${file.sha256}`,
+        );
+      }
+    }
+    // THE COMMIT POINT.
+    renameSync(staging, committed);
+  } catch (cause) {
+    rmSync(staging, { recursive: true, force: true });
+    if (cause instanceof CandidateAdapterError) throw cause;
+    throw new CandidateAdapterError(
+      "SEALED_EVIDENCE_COMMIT_FAILED",
+      `${sealed.itemId} was not committed: ${cause instanceof Error ? cause.message : String(cause)}`,
+    );
+  }
+
   return {
     itemId: sealed.itemId,
-    directory: resolvedDirectory,
+    directory: committed,
     filesWritten: sealed.files.length,
     totalBytes: sealed.totalBytes,
     aggregateSha256: sealed.aggregateSha256,

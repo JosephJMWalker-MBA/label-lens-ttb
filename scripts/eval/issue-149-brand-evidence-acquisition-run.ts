@@ -18,7 +18,7 @@
  * while leaving the execute path unanalysed. The gate checks the source; the mode
  * check below decides whether the source is reached.
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -26,6 +26,11 @@ import {
   acquireProductionBrandEvidence,
   writeSealedEvidencePackage,
 } from "./lib/issue-149-candidate-adapter";
+import {
+  sealRunEvidence,
+  writeRunEvidence,
+  type RunItemOutcome,
+} from "./lib/issue-149-run-evidence-writer";
 import { runRuntimeDiscovery } from "./lib/issue-149-runtime-discovery";
 
 const OUTPUT_ROOT = "/output";
@@ -59,50 +64,187 @@ async function discover(): Promise<number> {
 }
 
 /**
- * Execute: acquire and persist one item.
+ * Execute: the complete governed acquisition.
  *
- * NOT REACHABLE IN DISCOVER MODE. Execute authorization is a separate decision
- * and the committed mode file is `discover`.
+ * **NOT REACHABLE IN DISCOVER MODE.** The committed mode is `discover`, the
+ * execute job additionally requires the execute-transition gate to pass, and
+ * that gate rejects today because `execute-authorization.json` says
+ * `EXECUTE_NOT_AUTHORIZED`. This code is implemented and dormant so it can be
+ * reviewed and analysed by the closure gate, not so it can be run.
+ *
+ * The shape is the frozen plan: a PRIMARY pass over all 115 items and a REPEAT
+ * pass over all 115, under the identical frozen configuration, with no retry and
+ * no selective rerun, transactional per-item persistence, governed run-level
+ * counts and manifests, and a semantic determinism comparison in which
+ * timing-only differences are descriptive rather than failures.
  */
 async function execute(): Promise<number> {
-  const manifest = JSON.parse((await import("node:fs")).readFileSync(INPUT_MANIFEST, "utf8")) as {
+  const manifest = JSON.parse(readFileSync(INPUT_MANIFEST, "utf8")) as {
     cases: Array<{ opaqueItemId: string; stagedImageFileName: string; sourceImageSha256: string }>;
   };
 
-  let failures = 0;
-  for (const item of manifest.cases) {
-    const imageBytes = readFileSync(path.join(STAGED_IMAGES, item.stagedImageFileName));
-    const extractionInput = {
-      imageBytes: Uint8Array.from(imageBytes),
-      artifactRef: item.opaqueItemId,
-      derivativeSha256: item.sourceImageSha256,
-      processedAt: "2026-07-12T00:00:00Z",
-      extractionAdapterId: "local-two-field-extractor",
-      extractionAdapterVersion: "1.0.0",
-      ocrEngine: {
-        kind: "ocr" as const,
-        engineId: "tesseract.js",
-        engineVersion: "7.0.0",
-        modelId: "eng",
-      },
-      parserId: "wine-alcohol-parse",
-      parserVersion: "1.0.0",
-    };
+  const runs: Array<{ runId: "primary" | "repeat"; outcomes: RunItemOutcome[] }> = [];
 
-    const sealed = await acquireProductionBrandEvidence(extractionInput);
-    const written = writeSealedEvidencePackage(sealed, { directory: runDirectory() });
-    if (sealed.outcome !== "extracted") failures += 1;
-    process.stdout.write(`${JSON.stringify({ item: item.opaqueItemId, ...written })}\n`);
+  for (const runId of ["primary", "repeat"] as const) {
+    const rawDirectory = path.join(OUTPUT_ROOT, "raw", runId);
+    const outcomes: RunItemOutcome[] = [];
+
+    for (const item of manifest.cases) {
+      const imageBytes = readFileSync(path.join(STAGED_IMAGES, item.stagedImageFileName));
+      const extractionInput = {
+        imageBytes: Uint8Array.from(imageBytes),
+        artifactRef: item.opaqueItemId,
+        derivativeSha256: item.sourceImageSha256,
+        // The identical frozen configuration on BOTH runs. A repeat under a
+        // different configuration would measure the configuration, not the
+        // pipeline.
+        processedAt: FROZEN_PROCESSED_AT,
+        extractionAdapterId: FROZEN_ADAPTER_ID,
+        extractionAdapterVersion: FROZEN_ADAPTER_VERSION,
+        ocrEngine: FROZEN_OCR_ENGINE,
+        parserId: FROZEN_PARSER_ID,
+        parserVersion: FROZEN_PARSER_VERSION,
+      };
+
+      // Exactly once per item, per run. There is no retry and no selective
+      // rerun: a failed item seals its governed failure evidence and the run
+      // continues.
+      const sealed = await acquireProductionBrandEvidence(extractionInput);
+      const written = writeSealedEvidencePackage(sealed, { directory: rawDirectory });
+      outcomes.push({
+        itemId: sealed.itemId,
+        outcome: sealed.outcome,
+        aggregateSha256: sealed.aggregateSha256,
+      });
+      process.stdout.write(`${JSON.stringify({ run: runId, ...written })}\n`);
+    }
+
+    if (outcomes.length !== manifest.cases.length) {
+      throw new Error(
+        `${runId}: ${outcomes.length} items persisted for ${manifest.cases.length} declared`,
+      );
+    }
+    runs.push({ runId, outcomes });
   }
-  return failures === 0 ? 0 : 1;
+
+  // The semantic determinism comparison. Item aggregates cover the sealed bytes,
+  // which include `timings` — so an aggregate difference alone does not mean the
+  // pipeline was nondeterministic. The SEMANTIC fingerprints exclude timings and
+  // are what the verdict rests on; a timing-only difference is recorded
+  // descriptively.
+  const [primary, repeat] = runs;
+  const byItem = new Map(repeat.outcomes.map((outcome) => [outcome.itemId, outcome]));
+  const aggregateDifferences = primary.outcomes.filter(
+    (outcome) => byItem.get(outcome.itemId)?.aggregateSha256 !== outcome.aggregateSha256,
+  );
+  const semanticDifferences = compareSemanticFingerprints(
+    path.join(OUTPUT_ROOT, "raw", "primary"),
+    path.join(OUTPUT_ROOT, "raw", "repeat"),
+  );
+
+  const determinism = {
+    comparedItems: primary.outcomes.length,
+    aggregateDifferingItems: aggregateDifferences.map((outcome) => outcome.itemId),
+    semanticDifferingItems: semanticDifferences,
+    timingOnlyDifferences: aggregateDifferences
+      .map((outcome) => outcome.itemId)
+      .filter((itemId) => !semanticDifferences.includes(itemId)),
+    timingOnlyDifferencesAreDescriptive: true,
+    verdict:
+      semanticDifferences.length === 0 ? "SEMANTICALLY_DETERMINISTIC" : "SEMANTIC_DIFFERENCE",
+  };
+
+  // Governed run-level evidence, through the ONE authenticated run writer. The
+  // runner writes no file itself.
+  for (const run of runs) {
+    const rawDirectory = path.join(OUTPUT_ROOT, "raw", run.runId);
+    const sealedRun = sealRunEvidence({
+      runId: run.runId,
+      rawDirectory,
+      declaredItems: run.outcomes,
+      determinism: run.runId === "primary" ? determinism : { ...determinism, role: "repeat" },
+    });
+    const written = writeRunEvidence(sealedRun, { directory: rawDirectory });
+    process.stdout.write(`${JSON.stringify({ runLevel: run.runId, ...written })}\n`);
+  }
+
+  // The emitted-evidence truth-key scan, over what was actually written.
+  const leaked = scanEmittedEvidenceForForbiddenKeys(path.join(OUTPUT_ROOT, "raw"));
+  if (leaked.length > 0) {
+    process.stderr.write(
+      `${JSON.stringify({ status: "HALTED", reason: "EMITTED_EVIDENCE_FORBIDDEN_KEY", detail: leaked })}\n`,
+    );
+    return 1;
+  }
+
+  process.stdout.write(`${JSON.stringify({ status: "ACQUISITION_COMPLETE", ...determinism })}\n`);
+  return determinism.verdict === "SEMANTICALLY_DETERMINISTIC" ? 0 : 1;
+}
+
+/** The frozen incumbent identities, identical on the primary and repeat runs. */
+const FROZEN_PROCESSED_AT = "2026-07-12T00:00:00Z";
+const FROZEN_ADAPTER_ID = "local-two-field-extractor";
+const FROZEN_ADAPTER_VERSION = "1.0.0";
+const FROZEN_PARSER_ID = "wine-alcohol-parse";
+const FROZEN_PARSER_VERSION = "1.0.0";
+const FROZEN_OCR_ENGINE = {
+  kind: "ocr" as const,
+  engineId: "tesseract.js",
+  engineVersion: "7.0.0",
+  modelId: "eng",
+};
+
+/**
+ * Compare the SEALED semantic fingerprints of two runs.
+ *
+ * Reads `<item>.fingerprints.json` from both, which carries the per-pass
+ * semantic fingerprints (excluding `timings`) and the ordered pass-array
+ * fingerprint. Timing differences cannot reach this comparison by construction.
+ */
+function compareSemanticFingerprints(primaryRaw: string, repeatRaw: string): string[] {
+  const differing: string[] = [];
+  for (const itemId of readdirSync(primaryRaw).filter((entry) => /^item-\d{4}$/.test(entry))) {
+    const file = `${itemId}.fingerprints.json`;
+    const primaryPath = path.join(primaryRaw, itemId, file);
+    const repeatPath = path.join(repeatRaw, itemId, file);
+    if (!existsSync(primaryPath) || !existsSync(repeatPath)) {
+      differing.push(itemId);
+      continue;
+    }
+    if (readFileSync(primaryPath, "utf8") !== readFileSync(repeatPath, "utf8")) {
+      differing.push(itemId);
+    }
+  }
+  return differing;
 }
 
 /**
- * The primary run directory. It is NOT created here: the authenticated writer
- * creates its own destination, and creating it from the runner would be a second
- * filesystem route into the output mount.
+ * Scan the emitted evidence for forbidden truth keys.
+ *
+ * The inventory is the canonical asset mounted with the bundle. No executable
+ * module carries a duplicate literal list.
  */
-const runDirectory = (): string => path.join(OUTPUT_ROOT, "raw", "primary");
+function scanEmittedEvidenceForForbiddenKeys(rawRoot: string): string[] {
+  const inventory = JSON.parse(
+    readFileSync("/opt/acquisition/truth-key-inventory.json", "utf8"),
+  ) as string[];
+  const found: string[] = [];
+  const walk = (dir: string): void => {
+    for (const entry of readdirSync(dir)) {
+      const full = path.join(dir, entry);
+      if (statSync(full).isDirectory()) {
+        walk(full);
+        continue;
+      }
+      const text = readFileSync(full, "utf8");
+      for (const key of inventory) {
+        if (text.includes(`"${key}"`)) found.push(`${full}: ${key}`);
+      }
+    }
+  };
+  if (existsSync(rawRoot)) walk(rawRoot);
+  return found;
+}
 
 /** Recorded so a reader can see the runner never silently changed its own mode. */
 export function declaredModeMarker(mode: RunnerMode): string {
@@ -159,10 +301,3 @@ if (isProgramEntrypoint(process.argv, import.meta.url)) {
     },
   );
 }
-
-// NOTE, recorded as an execute blocker rather than worked around: the frozen
-// schema still requires run-level `counts.json`, `raw-evidence-manifest.json`
-// and `raw-evidence-manifest.sha256`, and there is no governed writer for them
-// while every direct filesystem write route is prohibited. This runner therefore
-// cannot produce a complete run, and execute must not be authorized until that
-// boundary exists. See execute-readiness-blockers.json.

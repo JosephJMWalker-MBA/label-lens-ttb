@@ -19,6 +19,8 @@ import {
   readFileSync,
   readdirSync,
   statSync,
+  unlinkSync,
+  writeFileSync,
 } from "node:fs";
 import path from "node:path";
 
@@ -135,9 +137,14 @@ export interface DiscoveryReport {
   outputFilesCreated: 0;
   platform: Record<string, unknown>;
   findings: DiscoveryFinding[];
-  accessibleFiles: string[];
-  mounts: string[];
-  writablePaths: string[];
+  /** Files under the EXPERIMENT-CONTROLLED mounts. NOT every file in the container. */
+  experimentControlledFiles: string[];
+  /** Mount points with their filesystem type and options, including ro/rw. */
+  mounts: Array<{ mountPoint: string; fsType: string; options: string[] }>;
+  /** Paths that were PROBED, with the result of an actual write attempt. */
+  probedWritablePaths: Array<{ path: string; writable: boolean; method: string }>;
+  /** Writable pseudo-filesystems the runtime imposes, recorded separately. */
+  unavoidableWritablePseudoFilesystems: string[];
   bundleFiles: Array<{ path: string; sha256: string; byteLength: number }>;
   stagedImages: Array<{ file: string; sha256: string; byteLength: number }>;
 }
@@ -185,8 +192,13 @@ export function isWritable(target: string): boolean {
   }
 }
 
-/** Parse /proc/self/mountinfo into (fstype, mountpoint) pairs. */
-export function readMounts(): Array<{ mountPoint: string; fsType: string }> {
+/**
+ * Parse `/proc/self/mounts` into mount point, filesystem type and OPTIONS.
+ *
+ * The options carry `ro`/`rw`, which is the difference between "we mounted it
+ * read-only" and "it is read-only". The previous version discarded them.
+ */
+export function readMounts(): Array<{ mountPoint: string; fsType: string; options: string[] }> {
   let raw = "";
   try {
     raw = readFileSync("/proc/self/mounts", "utf8");
@@ -197,9 +209,29 @@ export function readMounts(): Array<{ mountPoint: string; fsType: string }> {
     .split("\n")
     .filter((line) => line.trim().length > 0)
     .map((line) => {
-      const [, mountPoint, fsType] = line.split(/\s+/);
-      return { mountPoint, fsType };
+      const [, mountPoint, fsType, options] = line.split(/\s+/);
+      return { mountPoint, fsType, options: (options ?? "").split(",") };
     });
+}
+
+/**
+ * Actually try to write.
+ *
+ * `accessSync(W_OK)` asks the kernel about permission bits; it does not tell you
+ * whether the filesystem is read-only, whether the mount rejects the write, or
+ * whether a quota applies. A real create-and-remove is the observation. The probe
+ * file is removed immediately and its name is unmistakable if one ever survives.
+ */
+export function probeWritable(target: string): { path: string; writable: boolean; method: string } {
+  const probe = path.join(target, `.issue-149-write-probe-${process.pid}`);
+  try {
+    writeFileSync(probe, "probe", { flag: "wx" });
+    unlinkSync(probe);
+    return { path: target, writable: true, method: "create-and-remove" };
+  } catch (cause) {
+    const code = (cause as NodeJS.ErrnoException).code ?? "unknown";
+    return { path: target, writable: false, method: `create-refused: ${code}` };
+  }
 }
 
 /**
@@ -219,15 +251,35 @@ export async function runRuntimeDiscovery(
     return ok;
   };
 
-  // 1. platform identity
+  // 1. platform and pinned runtime identity
+  const uid = typeof process.getuid === "function" ? process.getuid() : null;
+  const gid = typeof process.getgid === "function" ? process.getgid() : null;
   const platform = {
     platform: process.platform,
     arch: process.arch,
     nodeVersion: process.version,
     pid: process.pid,
-    uid: typeof process.getuid === "function" ? process.getuid() : null,
+    uid,
+    gid,
+    expectedUid: environment.ISSUE_149_EXPECTED_UID ?? null,
+    expectedGid: environment.ISSUE_149_EXPECTED_GID ?? null,
+    expectedImageDigest: environment.ISSUE_149_EXPECTED_IMAGE_DIGEST ?? null,
   };
   record("platform-is-linux-x64", process.platform === "linux" && process.arch === "x64", platform);
+
+  // The pinned NON-ROOT identity, verified rather than documented as accepted.
+  const expectedUid = Number(environment.ISSUE_149_EXPECTED_UID);
+  const expectedGid = Number(environment.ISSUE_149_EXPECTED_GID);
+  record(
+    "runs-as-the-pinned-non-root-identity",
+    Number.isInteger(expectedUid) &&
+      expectedUid > 0 &&
+      uid === expectedUid &&
+      Number.isInteger(expectedGid) &&
+      expectedGid > 0 &&
+      gid === expectedGid,
+    { uid, gid, expectedUid, expectedGid },
+  );
 
   // 2. bundle manifest verification
   const manifestPath = "/opt/acquisition/bundle-manifest.json";
@@ -308,14 +360,20 @@ export async function runRuntimeDiscovery(
     record("acquisition-input-carries-no-truth-bearing-field", false, "manifest not mounted");
   }
 
-  // 4. complete accessible-file inventory
-  const accessibleFiles = [
+  // 4. the EXPERIMENT-CONTROLLED file inventory
+  //
+  // Named exactly. It walks the four experiment mounts; it is NOT an inventory
+  // of every accessible file in the container, and the previous name said it
+  // was.
+  const experimentControlledFiles = [
     ...listAccessibleFiles("/opt/acquisition"),
     ...listAccessibleFiles("/input"),
     ...listAccessibleFiles("/output"),
   ];
-  record("accessible-file-inventory-collected", accessibleFiles.length > 0, {
-    count: accessibleFiles.length,
+  record("experiment-controlled-file-inventory-collected", experimentControlledFiles.length > 0, {
+    count: experimentControlledFiles.length,
+    roots: ["/opt/acquisition", "/input", "/output"],
+    isNotEveryFileInTheContainer: true,
   });
 
   // 5. mount inventory: four experiment mounts plus the allowlist
@@ -328,26 +386,78 @@ export async function runRuntimeDiscovery(
       !(ALLOWED_RUNTIME_GENERATED_FILES as readonly string[]).includes(mount.mountPoint) &&
       mount.mountPoint !== "/",
   );
+  const readOnlyExperimentMounts = mounts.filter(
+    (mount) =>
+      experimentTargets.includes(mount.mountPoint as (typeof experimentTargets)[number]) &&
+      mount.options.includes("ro"),
+  );
   record("only-allowlisted-mounts-present", unexpected.length === 0, {
     unexpected,
     experimentMountsPresent: experimentTargets.filter((target) => existsSync(target)),
+    experimentMountOptions: mounts
+      .filter((mount) =>
+        experimentTargets.includes(mount.mountPoint as (typeof experimentTargets)[number]),
+      )
+      .map((mount) => ({ mountPoint: mount.mountPoint, options: mount.options })),
   });
+  // The three input mounts must carry `ro` in their actual mount options.
+  record(
+    "input-mounts-are-read-only-by-mount-option",
+    readOnlyExperimentMounts.length === 3,
+    readOnlyExperimentMounts.map((mount) => mount.mountPoint),
+  );
 
-  // 6. read-only root; only the output mount and named tmpfs writable
-  const writableProbes = [
+  // 6. read-only root and the PROBED writable set
+  //
+  // Every one of these is probed by an actual create-and-remove, not by
+  // accessSync: permission bits are not the same fact as a read-only mount.
+  const probeTargets = [
     "/",
     "/opt/acquisition",
     "/input",
     "/input/images",
     "/output",
     ...NAMED_TMPFS_PATHS,
+    "/dev",
+    "/dev/shm",
   ];
-  const writablePaths = writableProbes.filter((target) => existsSync(target) && isWritable(target));
-  const shouldBeWritable = new Set<string>(["/output", ...NAMED_TMPFS_PATHS]);
+  const probedWritablePaths = probeTargets
+    .filter((target) => existsSync(target))
+    .map((target) => probeWritable(target));
+
+  const experimentControlledWritable = probedWritablePaths.filter(
+    (probe) =>
+      probe.writable &&
+      (probe.path === "/" ||
+        probe.path.startsWith("/opt/acquisition") ||
+        probe.path.startsWith("/input") ||
+        probe.path === "/output"),
+  );
+  const unavoidableWritablePseudoFilesystems = probedWritablePaths
+    .filter(
+      (probe) =>
+        probe.writable &&
+        ((NAMED_TMPFS_PATHS as readonly string[]).includes(probe.path) ||
+          probe.path.startsWith("/dev")),
+    )
+    .map((probe) => probe.path);
+
+  // Stated as it is: the experiment-controlled writable surface is EXACTLY the
+  // output mount. The container also imposes writable pseudo-filesystems, and
+  // they are recorded rather than denied.
   record(
-    "read-only-root-and-writable-allowlist",
-    writablePaths.every((target) => shouldBeWritable.has(target)) && !isWritable("/"),
-    { writablePaths, rootWritable: isWritable("/") },
+    "experiment-controlled-writable-surface-is-only-the-output-mount",
+    experimentControlledWritable.length === 1 && experimentControlledWritable[0].path === "/output",
+    {
+      experimentControlledWritable,
+      unavoidableWritablePseudoFilesystems,
+      probedWritablePaths,
+    },
+  );
+  record(
+    "root-filesystem-is-read-only",
+    probedWritablePaths.some((probe) => probe.path === "/" && !probe.writable),
+    probedWritablePaths.find((probe) => probe.path === "/"),
   );
 
   // 7. environment allowlist and credential absence
@@ -380,7 +490,9 @@ export async function runRuntimeDiscovery(
   record("forbidden-paths-unopenable", openable.length === 0, { openable });
 
   // 10. the output mount starts empty
-  const outputFiles = existsSync("/output") ? listAccessibleFiles("/output") : [];
+  const outputFiles = existsSync("/output")
+    ? listAccessibleFiles("/output").filter((file) => !file.includes(".issue-149-write-probe-"))
+    : [];
   record("output-mount-initially-empty", outputFiles.length === 0, outputFiles);
 
   return {
@@ -393,9 +505,10 @@ export async function runRuntimeDiscovery(
     outputFilesCreated: 0,
     platform,
     findings,
-    accessibleFiles,
-    mounts: mounts.map((mount) => `${mount.fsType} ${mount.mountPoint}`).sort(),
-    writablePaths,
+    experimentControlledFiles,
+    mounts: [...mounts].sort((left, right) => left.mountPoint.localeCompare(right.mountPoint)),
+    probedWritablePaths,
+    unavoidableWritablePseudoFilesystems,
     bundleFiles,
     stagedImages,
   };

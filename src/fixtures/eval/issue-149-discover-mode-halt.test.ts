@@ -72,9 +72,10 @@ describe("Issue #149 discover mode halts before any acquisition route", () => {
       outputFilesCreated: 0,
       platform: {},
       findings: [],
-      accessibleFiles: [],
+      experimentControlledFiles: [],
       mounts: [],
-      writablePaths: [],
+      probedWritablePaths: [],
+      unavoidableWritablePseudoFilesystems: [],
       bundleFiles: [],
       stagedImages: [],
     });
@@ -102,9 +103,10 @@ describe("Issue #149 discover mode halts before any acquisition route", () => {
       outputFilesCreated: 0,
       platform: {},
       findings: [{ check: "network-unavailable", ok: false, detail: "CONNECTED" }],
-      accessibleFiles: [],
+      experimentControlledFiles: [],
       mounts: [],
-      writablePaths: [],
+      probedWritablePaths: [],
+      unavoidableWritablePseudoFilesystems: [],
       bundleFiles: [],
       stagedImages: [],
     });
@@ -149,7 +151,7 @@ describe("Issue #149 discover mode halts before any acquisition route", () => {
     expect(mode.trim()).not.toBe("execute");
   });
 
-  it("gates OCR on the mode file in the workflow itself", async () => {
+  it("gates OCR on the mode file and the transition gate", async () => {
     const { readFileSync } = await import("node:fs");
     const workflow = readFileSync(
       ".github/workflows/issue-149-brand-evidence-acquisition.yml",
@@ -160,7 +162,7 @@ describe("Issue #149 discover mode halts before any acquisition route", () => {
       "branches:\n      - research/issue-149-brand-complete-evidence-acquisition",
     );
     expect(workflow).toContain("permissions:\n  contents: read");
-    expect(workflow).toContain("harness revision: 7");
+    expect(workflow).toContain("harness revision: 8");
     for (const forbidden of [
       "schedule:",
       "pull_request_target:",
@@ -172,7 +174,15 @@ describe("Issue #149 discover mode halts before any acquisition route", () => {
     // The OCR job is reachable only through the exact execute mode.
     expect(workflow).toContain("if: needs.resolve-mode.outputs.mode == 'execute'");
     expect(workflow).toContain("if: needs.resolve-mode.outputs.mode == 'discover'");
-    // …and is currently a hard stop.
-    expect(workflow).toContain("Execute is not authorized");
+    // …and cannot start unless the execute-transition gate job succeeded.
+    expect(workflow).toContain("needs: [resolve-mode, execute-transition-gate, job-a-prepare]");
+    // The gate itself rejects today.
+    const authorization = JSON.parse(
+      readFileSync(
+        "artifacts/issue-149-brand-complete-evidence-acquisition/execute-authorization.json",
+        "utf8",
+      ),
+    ) as { status: string };
+    expect(authorization.status).toBe("EXECUTE_NOT_AUTHORIZED");
   });
 });

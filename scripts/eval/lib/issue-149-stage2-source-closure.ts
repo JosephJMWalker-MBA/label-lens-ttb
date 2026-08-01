@@ -67,8 +67,36 @@ export const REQUIRED_ACQUISITION_CALL = "acquireProductionBrandEvidence";
  */
 const PRODUCTION_MODULE_PREFIX = "src/";
 
-/** The one authenticated persistence call, resolved the same way. */
+/** The one authenticated ITEM persistence call, resolved the same way. */
 export const REQUIRED_WRITER_CALL = "writeSealedEvidencePackage";
+
+/**
+ * The one authenticated RUN-LEVEL persistence call.
+ *
+ * Run-level counts and manifests had no permitted writer at all: the item writer
+ * takes a per-item package, and every direct filesystem route is prohibited. The
+ * answer is a second AUTHENTICATED writer, not a hole in the prohibition.
+ */
+export const REQUIRED_RUN_WRITER_CALL = "writeRunEvidence";
+
+/** The module that declares the run-level writer. */
+export const AUTHORIZED_RUN_WRITER_MODULE = "scripts/eval/lib/issue-149-run-evidence-writer.ts";
+
+/**
+ * Modules exempt from the filesystem-WRITE prohibition, each named and reasoned.
+ *
+ * This is deliberately a short, explicit list rather than a pattern. The two
+ * authenticated writers must write — that is what they are — and the runtime
+ * discovery module writes a probe file and immediately removes it, because
+ * `accessSync` answers a question about permission bits rather than about
+ * whether the mount will accept a write. None of them is on the evidence path
+ * except the two writers, which is the point.
+ */
+export const WRITE_EXEMPT_MODULES = [
+  AUTHORIZED_ADAPTER_MODULE,
+  AUTHORIZED_RUN_WRITER_MODULE,
+  "scripts/eval/lib/issue-149-runtime-discovery.ts",
+] as const;
 
 /**
  * Evidence-writing routes prohibited outside the authenticated writer.
@@ -196,6 +224,8 @@ export interface Stage2ClosureReport {
   authorizedSymbolDeclaredIn: string | null;
   /** The resolved declaration the writer call was checked against. */
   writerSymbolDeclaredIn: string | null;
+  /** The module declaring the authenticated run-level writer, when present. */
+  runWriterSymbolDeclaredIn: string | null;
   writerCallSites: string[];
   filesAnalyzed: number;
 }
@@ -416,6 +446,16 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
       );
     }
   }
+  // The run-level writer, resolved by declaration identity like the others.
+  const runWriterSource = sourceFiles.get(AUTHORIZED_RUN_WRITER_MODULE);
+  const runWriterSymbols = new Set<ts.Symbol>();
+  if (runWriterSource !== undefined) {
+    for (const name of [REQUIRED_RUN_WRITER_CALL, "sealRunEvidence"]) {
+      const symbol = resolveAliased(checker, exportedSymbol(checker, runWriterSource, name));
+      if (symbol !== undefined) runWriterSymbols.add(symbol);
+    }
+  }
+
   let writerSymbol: ts.Symbol | undefined;
   if (adapterSource !== undefined) {
     writerSymbol = resolveAliased(
@@ -454,7 +494,9 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
     const isRunner = filePath === RUNNER_ENTRY_PATH;
     const isAdapter = filePath === AUTHORIZED_ADAPTER_MODULE;
     // The adapter defines the machinery; production modules ARE the machinery.
-    const exemptFromCallProhibitions = isAdapter || filePath.startsWith(PRODUCTION_MODULE_PREFIX);
+    const isRunWriter = filePath === AUTHORIZED_RUN_WRITER_MODULE;
+    const exemptFromCallProhibitions =
+      isAdapter || isRunWriter || filePath.startsWith(PRODUCTION_MODULE_PREFIX);
 
     // Locals that were destructured out of a sealed package under a new name.
     const sealedAliases = new Set<string>();
@@ -496,6 +538,16 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
                 `the acquisition call must use a direct import binding, not the member access ${node.expression.getText()}`,
               );
             }
+          }
+        } else if (symbol !== undefined && runWriterSymbols.has(symbol)) {
+          // The authenticated RUN-LEVEL writer. Only the runner may call it, and
+          // it is the only other permitted persistence route.
+          if (!isRunner) {
+            add(
+              filePath,
+              "WRITER_INVOKED_OUTSIDE_AUTHORIZED_LOCATION",
+              `${node.expression.getText()} resolves to the run-level evidence writer, which only the runner entrypoint may call`,
+            );
           }
         } else if (isWriter(symbol)) {
           // --- the authenticated persistence call ------------------------
@@ -574,6 +626,7 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
           // --- direct filesystem evidence writes --------------------------
           // The authenticated writer is the ONLY thing that can persist an
           // authentic package. A direct write bypasses authenticity entirely.
+          const writeExempt = (WRITE_EXEMPT_MODULES as readonly string[]).includes(filePath);
           const nodeFsRoute =
             (imported !== null &&
               (PROHIBITED_WRITE_ROUTES as readonly string[]).includes(imported)) ||
@@ -581,7 +634,7 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
               ts.isIdentifier(node.expression.expression) &&
               isNamespaceImport(checker, node.expression.expression) &&
               (PROHIBITED_WRITE_ROUTES as readonly string[]).includes(node.expression.name.text));
-          if (nodeFsRoute) {
+          if (nodeFsRoute && !writeExempt) {
             add(
               filePath,
               "UNAUTHENTICATED_EVIDENCE_WRITE",
@@ -739,6 +792,7 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
     writerCallSites: [...new Set(writerCallSites)],
     authorizedSymbolDeclaredIn: declarationFile(authorizedSymbol),
     writerSymbolDeclaredIn: declarationFile(writerSymbol),
+    runWriterSymbolDeclaredIn: runWriterSource === undefined ? null : AUTHORIZED_RUN_WRITER_MODULE,
     filesAnalyzed: sourceFiles.size,
   };
 }

@@ -17,7 +17,8 @@
     "raw/<run>/counts.json": "per-case and per-run counting proof",
     "raw/<run>/raw-evidence-manifest.json": "sha256 of every file above",
     "raw/<run>/raw-evidence-manifest.sha256": "aggregate hash",
-    "raw/<run>/<opaqueItemId>.provenance.json": "the input bytes and frozen configuration that produced this item's evidence: image byte length, recomputed image SHA-256, derivativeSha256, processedAt, adapter identity, complete OCR engine identity, parser identity, attempt count 1, retried false"
+    "raw/<run>/<opaqueItemId>.provenance.json": "the input bytes and frozen configuration that produced this item's evidence: image byte length, recomputed image SHA-256, derivativeSha256, processedAt, adapter identity, complete OCR engine identity, parser identity, attempt count 1, retried false",
+    "raw/<run>/<opaqueItemId>.fingerprints.json": "the per-pass semantic fingerprint (excluding timings), the per-pass ordered-words-only fingerprint, and the ordered pass-array semantic fingerprint"
   },
   "runs": ["primary", "repeat"],
   "immutabilityRule": "After a run's raw-evidence-manifest.sha256 is written, no file under raw/<run>/ is rewritten, reformatted or pretty-printed. JSONL is emitted in final form and is excluded from prettier via .prettierignore.",
@@ -33,7 +34,7 @@
     "block, paragraph and line identifiers \u2014 not present on OcrWord",
     "constituent word IDs per reconstructed line \u2014 not emitted by BrandLineDiagnostic"
   ],
-  "amendedBy": "preregistration-amendment-14.md",
+  "amendedBy": "preregistration-stage-2-execute-readiness.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
   "everyRawFilenameUsesOpaqueIdOnly": true,
@@ -90,6 +91,7 @@
     "sealedSuccessFiles": [
       "<opaqueItemId>.provenance.json",
       "<opaqueItemId>.passes.json",
+      "<opaqueItemId>.fingerprints.json",
       "<opaqueItemId>.words.jsonl",
       "<opaqueItemId>.lines.jsonl",
       "<opaqueItemId>.candidates.jsonl",
@@ -114,12 +116,41 @@
     ],
     "imageSha256IsRecomputed": "over the boundary's PRIVATE copy of imageBytes, before the extractor is invoked, and must equal derivativeSha256",
     "aggregateCoversTheProvenanceFile": true,
-    "runLevelFilesRemainTheRunnersResponsibility": [
-      "counts.json",
-      "raw-evidence-manifest.json",
-      "raw-evidence-manifest.sha256"
-    ],
+    "runLevelFilesRemainTheRunnersResponsibility": "SUPERSEDED. Run-level evidence is written by ONE authenticated run-level writer, scripts/eval/lib/issue-149-run-evidence-writer.ts. The runner writes no file itself; there is no direct filesystem route.",
     "theRunnerNeverSerializesFiltersProjectsReordersOrParsesEvidence": true,
-    "contract": "acquisition-invocation-contract.json#acquisitionApi"
+    "contract": "acquisition-invocation-contract.json#acquisitionApi",
+    "runLevelWriter": {
+      "module": "scripts/eval/lib/issue-149-run-evidence-writer.ts",
+      "files": [
+        "counts.json",
+        "raw-evidence-manifest.json",
+        "raw-evidence-manifest.sha256",
+        "determinism-report.json"
+      ],
+      "authenticity": "a module-private WeakSet of summaries produced by sealRunEvidence",
+      "transaction": "exclusive creation into a staging directory, readback, then rename into place",
+      "haltCodes": [
+        "RUN_SUMMARY_UNAUTHENTIC",
+        "RUN_SUMMARY_INVALID",
+        "RUN_EVIDENCE_DESTINATION_EXISTS",
+        "RUN_EVIDENCE_ALREADY_CONSUMED",
+        "RUN_EVIDENCE_WRITE_UNVERIFIED",
+        "RUN_EVIDENCE_COMMIT_FAILED",
+        "RUN_ITEM_SET_INCOMPLETE"
+      ]
+    }
+  },
+  "itemTransactionProtocol": {
+    "commitPoint": "the atomic rename of the item's staging directory to <opaqueItemId>",
+    "beforeCommit": "no complete item is visible at the committed path",
+    "afterCommit": "every file of the item is present",
+    "exclusiveCreation": "every file is written with the wx flag; nothing is ever truncated",
+    "singleUse": "an authentic package is claimed atomically before any I/O and cannot be written twice",
+    "notCrashAtomic": "deleting files in a catch block is NOT the commit rule and is not described as one",
+    "haltCodes": [
+      "SEALED_PACKAGE_ALREADY_CONSUMED",
+      "SEALED_EVIDENCE_DESTINATION_EXISTS",
+      "SEALED_EVIDENCE_COMMIT_FAILED"
+    ]
   }
 }

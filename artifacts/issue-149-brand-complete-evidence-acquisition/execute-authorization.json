@@ -1,0 +1,28 @@
+{
+  "artifact": "execute-authorization",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 2,
+  "status": "EXECUTE_NOT_AUTHORIZED",
+  "reviewedImplementationSha": null,
+  "authorizedBy": null,
+  "authorizedAt": null,
+  "whatAuthorizationMeans": "Execute is authorized against an EXACT reviewed implementation tree, not against a branch. Setting status to EXECUTE_AUTHORIZED without naming the reviewed SHA authorizes nothing, and the gate rejects it.",
+  "howTheGateWorks": {
+    "enforcedBy": "scripts/eval/lib/issue-149-execute-authorization.ts, driven by scripts/eval/issue-149-execute-gate.mjs in the workflow",
+    "whyNotThePathsFilter": "GitHub's paths: filter decides WHETHER the workflow runs when a push touches a matching file. It places no restriction on what else that push contains. A commit could change workflow-mode.txt AND the runner, adapter, a contract or a bundle input and still trigger execute, with the changed code never reviewed. The changed-file restriction is therefore enforced against the actual commit range.",
+    "conditions": [
+      "the artifact names an exact 40-character reviewed implementation SHA",
+      "status is exactly EXECUTE_AUTHORIZED",
+      "the current head descends from that SHA",
+      "every path changed since that SHA is one of the permitted transition files",
+      "the mode file contains exactly the bytes \"execute\\n\""
+    ],
+    "permittedTransitionPaths": [
+      "artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt",
+      "artifacts/issue-149-brand-complete-evidence-acquisition/execute-authorization.json"
+    ],
+    "haltCode": "EXECUTE_TRANSITION_REJECTED"
+  },
+  "currentDecision": "Execute is NOT authorized. This sprint implements the dormant execute path and re-runs discovery; execute requires a later, explicit authorization decision.",
+  "ocrRun": false
+}

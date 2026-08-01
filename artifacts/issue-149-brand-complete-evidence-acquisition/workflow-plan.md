@@ -1,13 +1,28 @@
 # Execution workflow plan
 
-**Specified only. No executable workflow is committed in Stage 1**, so nothing in
-this PR can start OCR.
+**Stage 2 committed the workflow with the mode set to `discover`.** Discovery has
+run and completed successfully. The mode remains `discover`, execute is gated on
+an explicit authorization artifact, and nothing in this PR can start OCR.
 
-## Why it is not committed yet
+**Audit language, stated exactly.** The runtime bundle **did execute**, in
+discover mode — that execution is what produced the boundary report. What did
+**not** execute was the acquisition API, the extractor, the OCR engine, the
+sealed writers or the execute branch. "No bundle was executed" was wrong and is
+corrected here.
 
-A push-triggered workflow becomes live the moment it lands on the branch. Stage 1
-stops for review, so the workflow file and its mode file are added in Stage 2
-together, with the mode set to `discover`.
+## Why the mode file is the control
+
+A push-triggered workflow becomes live the moment it lands on the branch, so the
+workflow file and its mode file were added together with the mode set to
+`discover`.
+
+The `paths:` filter is **not** a restriction on what a push may contain. It
+decides whether this workflow runs when a push touches a matching file; a commit
+could change the mode file *and* the runner and still trigger execute. The
+changed-file restriction is enforced by
+`scripts/eval/issue-149-execute-gate.mjs` against the actual commit range, and
+execute additionally requires `execute-authorization.json` to name the exact
+reviewed implementation SHA.
 
 ## Transport
 

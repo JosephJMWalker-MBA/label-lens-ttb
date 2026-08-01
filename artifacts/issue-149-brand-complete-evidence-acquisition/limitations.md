@@ -177,6 +177,16 @@ there is no evidence object left to project. The source gate rejects the obvious
 projection and parse forms as defense in depth, and is described as defense in
 depth rather than as proof.
 
+## The run-level commit is per-file, not a single rename
+
+An item commits by renaming its staging directory, which is atomic. The run-level
+files land in a directory that already exists — it holds the items — so they are
+renamed individually after all of them have been written and read back. That is
+weaker than a single atomic commit, and it is stated rather than described as
+equivalent: a crash between two renames could leave some run-level files present.
+Every one of them is derived from the committed items, so the recovery is to
+re-derive, not to reconstruct.
+
 ## Scope
 
 115 cases, one corpus, one pipeline, one base. This sprint does not KEEP or KILL

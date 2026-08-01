@@ -633,6 +633,22 @@ export function semanticPassFingerprint(pass: unknown, at = "pass"): string {
 }
 
 /**
+ * Fingerprint over the ORDERED WORD RECORDS ONLY.
+ *
+ * Distinct from the semantic pass fingerprint, which covers every
+ * `RegionOcrResult` field except `timings`. This one covers words alone, so it
+ * changes when text, order or geometry changes and does NOT change when a
+ * non-word pass field does. `raw-ocr-contract.json` names both; two different
+ * digests must not share a name that suggests either could stand for the other.
+ */
+export function orderedWordsOnlyFingerprint(pass: unknown, at = "pass"): string {
+  assertRegionOcrResultRecord(pass, at);
+  return createHash("sha256")
+    .update(Buffer.from(canonicalize((pass as Record<string, unknown>).words), "utf8"))
+    .digest("hex");
+}
+
+/**
  * Semantic fingerprint of the COMPLETE ORDERED pass array. Order is part of the
  * hash: production selects over the array in order, so a reordered replay is a
  * different experiment.

@@ -86,7 +86,7 @@
     }
   ],
   "verdictComputedNotAsserted": true,
-  "amendedBy": "preregistration-amendment-14.md",
+  "amendedBy": "preregistration-stage-2-execute-readiness.md",
   "threeSeparateConcepts": {
     "fullArtifactIntegrity": {
       "covers": "the EXACT persisted bytes of every raw file and manifest, including timings and run metadata",
@@ -147,5 +147,13 @@
   },
   "cropPixelComparisonRemoved": "The 'crop pixels' level compared cropPixelSha256 per pass. That value is not obtainable through the frozen production interface; see raw-ocr-contract.json#unavailableThroughTheFrozenInterface.",
   "rawManifestsUseExactFileBytes": true,
-  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run."
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run.",
+  "sealedFingerprintLocations": {
+    "perPassSemanticFingerprint": "raw/<run>/<opaqueItemId>.fingerprints.json#perPass[].semanticPassFingerprint",
+    "perPassOrderedWordsOnlyFingerprint": "raw/<run>/<opaqueItemId>.fingerprints.json#perPass[].orderedWordsOnlyFingerprint",
+    "orderedPassArraySemanticFingerprint": "raw/<run>/<opaqueItemId>.fingerprints.json#orderedPassArraySemanticFingerprint",
+    "excludedFromEverySemanticFingerprint": ["timings"],
+    "artifactIntegrityStillCoversTimings": "sha256Bytes over the exact persisted bytes, which include timings"
+  },
+  "timingOnlyDifferencesAreDescriptive": "An item whose sealed BYTES differ only because timings differ has identical semantic fingerprints. The determinism verdict rests on the semantic fingerprints; timing-only differences are recorded descriptively and are not a nondeterminism finding."
 }

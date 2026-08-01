@@ -120,6 +120,11 @@ const STALE_TERMS = [
   "runnerPersistsCandidateEvidenceFrom",
   "SEALED_SUCCESS_FILE_SUFFIXES",
   "SEALED_FAILURE_FILE_SUFFIXES",
+  // Stage 2 execute-readiness: superseded sealed-boundary and audit language.
+  "deeply frozen snapshot",
+  "no runtime bundle was executed",
+  "the runner persists detailed.debug.passes",
+  'runLevelFilesRemainTheRunnersResponsibility": "run-level',
   "runCaseArtifacts",
   "ExtractionDebug.finalSelections.brand.brandDiagnostics.candidates",
   "single recorded filterReason",
@@ -234,7 +239,7 @@ describe("Issue #149 Stage 1 contract consistency", () => {
       "acquireProductionBrandEvidence",
       "writeSealedEvidencePackage",
     ]);
-    expect(contract.acquisitionApi.sealedSuccessFiles).toHaveLength(7);
+    expect(contract.acquisitionApi.sealedSuccessFiles).toHaveLength(8);
     expect(contract.acquisitionApi.sealedSuccessFiles[0]).toContain(".provenance.json");
     expect(contract.acquisitionApi.sealedFailureFiles).toEqual([
       "<opaqueItemId>.provenance.json",
@@ -771,6 +776,7 @@ describe("Issue #149 Stage 1 contract consistency", () => {
       const currentStamps = [
         `preregistration-amendment-${CURRENT_AMENDMENT}.md`,
         "preregistration-stage-2-discovery.md",
+        "preregistration-stage-2-execute-readiness.md",
       ];
       if (!currentStamps.includes(contract.amendedBy)) {
         stale.push(`${file} — ${contract.amendedBy}`);

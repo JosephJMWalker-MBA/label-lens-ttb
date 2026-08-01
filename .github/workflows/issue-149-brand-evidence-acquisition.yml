@@ -3,17 +3,29 @@
 # Research-only, scoped to exactly one branch. Not part of the required CI checks
 # and it touches no production path.
 #
-# Transport, frozen in workflow-plan.md and unchanged here:
+# Transport, frozen in workflow-plan.md:
 #   - push-triggered, restricted to the single research branch;
-#   - paths admitting ONLY this workflow file and the committed mode file, so an
-#     ordinary artifact commit cannot rerun the experiment;
+#   - paths admitting only this workflow file, the committed mode file and the
+#     execute-authorization artifact;
 #   - permissions: contents: read — the OCR job cannot push, and the write
 #     permission is never granted to any job here;
 #   - no schedule, no pull_request_target, no repository_dispatch, no unscoped
 #     branch trigger;
 #   - a visible harness revision, bumped in the same commit whenever a harness
 #     fix needs a rerun;
-#   - OCR runs ONLY when the mode is exactly `execute`.
+#   - OCR runs ONLY when the mode is exactly `execute` AND the execute-transition
+#     gate passes.
+#
+# IMPORTANT, and previously stated wrongly in this file: the `paths:` filter
+# decides WHETHER this workflow runs when a push touches a matching file. It does
+# NOT restrict what else that push contains. A commit could change the mode file
+# and the runner in one push and still trigger execute. The changed-file
+# restriction is enforced by scripts/eval/issue-149-execute-gate.mjs against the
+# actual commit range, not by the trigger.
+#
+# Every action is pinned to a full commit SHA and the runtime image to a
+# linux/amd64 manifest digest: a tag can later resolve to different bytes, and a
+# commit SHA and an image digest are the only immutable references.
 #
 # The committed mode is `discover`. Discovery runs inside the same boundary
 # execute will use, runs no OCR, and stops for review.
@@ -26,14 +38,22 @@ on:
     paths:
       - .github/workflows/issue-149-brand-evidence-acquisition.yml
       - artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt
+      - artifacts/issue-149-brand-complete-evidence-acquisition/execute-authorization.json
 
 permissions:
   contents: read
 
 env:
-  # harness revision: 7
-  ISSUE_149_HARNESS_REVISION: "7"
+  # harness revision: 8
+  ISSUE_149_HARNESS_REVISION: "8"
   MODE_FILE: artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt
+  # linux/amd64 manifest digest for node:20-bookworm-slim, resolved and recorded.
+  ISSUE_149_BASE_IMAGE: node@sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c
+  ISSUE_149_BASE_IMAGE_TAG: node:20-bookworm-slim
+  ISSUE_149_BASE_IMAGE_DIGEST: sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c
+  # The pinned non-root runtime identity for the isolated job.
+  ISSUE_149_RUNTIME_UID: "10149"
+  ISSUE_149_RUNTIME_GID: "10149"
 
 jobs:
   resolve-mode:
@@ -42,7 +62,8 @@ jobs:
     outputs:
       mode: ${{ steps.mode.outputs.mode }}
     steps:
-      - uses: actions/checkout@v4
+      # actions/checkout v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - name: Read and validate the committed mode
         id: mode
         run: |
@@ -55,14 +76,30 @@ jobs:
           echo "mode=${MODE}" >> "$GITHUB_OUTPUT"
           echo "declared mode: ${MODE} (harness revision ${ISSUE_149_HARNESS_REVISION})"
 
+  execute-transition-gate:
+    name: Execute-transition integrity gate
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode == 'execute'
+    runs-on: ubuntu-latest
+    steps:
+      # actions/checkout v4 — FULL history, because the gate compares the actual
+      # commit range against the reviewed implementation SHA.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - name: Verify the execute transition
+        run: node scripts/eval/issue-149-execute-gate.mjs
+
   job-a-prepare:
     name: Job A — trusted preparation (no OCR)
     needs: resolve-mode
     if: needs.resolve-mode.outputs.mode != 'complete'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      # actions/checkout v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      # actions/setup-node v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 20
           cache: npm
@@ -81,15 +118,18 @@ jobs:
           shasum -a 256 .local/issue-149-preparation/preparation-artifact.json
           shasum -a 256 .local/issue-149-preparation/bundle/bundle-manifest.json
 
+      # actions/upload-artifact v4
       - name: Upload the truth-free preparation artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: issue-149-truth-free-preparation
           path: .local/issue-149-preparation
           retention-days: 7
 
+      # actions/upload-artifact v4
       - name: Upload the Job A report
-        uses: actions/upload-artifact@v4
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: issue-149-job-a-report
           path: job-a-report.json
@@ -104,45 +144,54 @@ jobs:
       # NO repository checkout. Job B receives ONLY the truth-free preparation
       # artifact, and no GitHub token or repository credential enters the
       # container.
+      # actions/download-artifact v4
       - name: Download the truth-free preparation artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: issue-149-truth-free-preparation
           path: preparation
 
-      - name: Build the isolated runtime image
+      - name: Resolve and record the pinned runtime image
         run: |
           set -euo pipefail
-          cat > Dockerfile <<'DOCKERFILE'
-          FROM node:20-bookworm-slim
-          # No repository COPY. The bundle is bind-mounted read-only at run time.
-          WORKDIR /
-          DOCKERFILE
-          docker build -t issue-149-acquisition:discover -f Dockerfile .
+          docker pull --platform linux/amd64 "${ISSUE_149_BASE_IMAGE}"
+          docker image inspect "${ISSUE_149_BASE_IMAGE}" \
+            --format '{"id":"{{.Id}}","repoDigests":{{json .RepoDigests}},"os":"{{.Os}}","arch":"{{.Architecture}}"}' \
+            | tee image-identity.json
+          # The gate: the resolved image must be the pinned digest.
+          grep -q "${ISSUE_149_BASE_IMAGE_DIGEST#sha256:}" image-identity.json \
+            || { echo "RUNTIME_IMAGE_DIGEST_MISMATCH" >&2; exit 1; }
 
       - name: Run isolated discovery
         run: |
           set -euo pipefail
           mkdir -p output
-          chmod 777 output
+          # The pinned non-root identity must own the output transaction.
+          sudo chown -R "${ISSUE_149_RUNTIME_UID}:${ISSUE_149_RUNTIME_GID}" output
           docker run --rm \
+            --platform linux/amd64 \
             --network none \
             --read-only \
             --cap-drop ALL \
             --security-opt no-new-privileges \
+            --user "${ISSUE_149_RUNTIME_UID}:${ISSUE_149_RUNTIME_GID}" \
             --env-file /dev/null \
             -e ISSUE_149_MODE=discover \
             -e ISSUE_149_HARNESS_REVISION="${ISSUE_149_HARNESS_REVISION}" \
+            -e ISSUE_149_EXPECTED_UID="${ISSUE_149_RUNTIME_UID}" \
+            -e ISSUE_149_EXPECTED_GID="${ISSUE_149_RUNTIME_GID}" \
+            -e ISSUE_149_EXPECTED_IMAGE_DIGEST="${ISSUE_149_BASE_IMAGE_DIGEST}" \
             --tmpfs /tmp:rw,noexec,nosuid,size=64m \
             --tmpfs /run:rw,noexec,nosuid,size=16m \
             -v "$PWD/preparation/bundle:/opt/acquisition:ro" \
             -v "$PWD/preparation/input/truth-free-input-manifest.json:/input/truth-free-input-manifest.json:ro" \
             -v "$PWD/preparation/input/images:/input/images:ro" \
             -v "$PWD/output:/output:rw" \
-            issue-149-acquisition:discover \
-            node /opt/acquisition/acquisition.mjs | tee discovery-report.json
+            "${ISSUE_149_BASE_IMAGE}" \
+            node /opt/acquisition/acquisition.mjs > discovery-report.json
 
       - name: Prove the output mount stayed empty and hash the report
+        if: always()
         run: |
           set -euo pipefail
           echo "output mount contents:"
@@ -151,30 +200,97 @@ jobs:
           shasum -a 256 discovery-report.json | tee discovery-report.sha256
 
       # ALWAYS. A failing discovery run is exactly the run whose report is worth
-      # keeping; the first five attempts produced no artifact because the step
-      # that uploads it never ran.
+      # keeping; earlier attempts produced no artifact because the step that
+      # uploads it never ran.
+      # actions/upload-artifact v4
       - name: Upload the discovery report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: issue-149-discovery-report
           path: |
             discovery-report.json
             discovery-report.sha256
             output-inventory.txt
+            image-identity.json
           retention-days: 30
 
   job-b-execute:
     name: Job B — isolated acquisition OCR
-    needs: [resolve-mode, job-a-prepare]
-    # THE ONLY OCR. Reached only when the committed mode is exactly `execute`.
+    needs: [resolve-mode, execute-transition-gate, job-a-prepare]
+    # THE ONLY OCR. Reachable only when the committed mode is exactly `execute`
+    # AND the execute-transition gate passed: the gate is a `needs:` dependency,
+    # so a rejected transition prevents this job from starting at all.
     if: needs.resolve-mode.outputs.mode == 'execute'
     runs-on: ubuntu-latest
     steps:
-      - name: Execute is not authorized
+      # actions/download-artifact v4
+      - name: Download the truth-free preparation artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: issue-149-truth-free-preparation
+          path: preparation
+
+      - name: Resolve and record the pinned runtime image
         run: |
-          echo "Execute mode is not authorized. The recorded execute-readiness" >&2
-          echo "blockers in artifacts/issue-149-brand-complete-evidence-acquisition/" >&2
-          echo "execute-readiness-blockers.json must be resolved and execute" >&2
-          echo "explicitly authorized before this job may run OCR." >&2
-          exit 1
+          set -euo pipefail
+          docker pull --platform linux/amd64 "${ISSUE_149_BASE_IMAGE}"
+          docker image inspect "${ISSUE_149_BASE_IMAGE}" \
+            --format '{"id":"{{.Id}}","repoDigests":{{json .RepoDigests}},"os":"{{.Os}}","arch":"{{.Architecture}}"}' \
+            | tee image-identity.json
+          grep -q "${ISSUE_149_BASE_IMAGE_DIGEST#sha256:}" image-identity.json \
+            || { echo "RUNTIME_IMAGE_DIGEST_MISMATCH" >&2; exit 1; }
+
+      - name: Acquire the primary and repeat runs
+        run: |
+          set -euo pipefail
+          mkdir -p output
+          sudo chown -R "${ISSUE_149_RUNTIME_UID}:${ISSUE_149_RUNTIME_GID}" output
+          docker run --rm \
+            --platform linux/amd64 \
+            --network none \
+            --read-only \
+            --cap-drop ALL \
+            --security-opt no-new-privileges \
+            --user "${ISSUE_149_RUNTIME_UID}:${ISSUE_149_RUNTIME_GID}" \
+            --env-file /dev/null \
+            -e ISSUE_149_MODE=execute \
+            -e ISSUE_149_HARNESS_REVISION="${ISSUE_149_HARNESS_REVISION}" \
+            -e ISSUE_149_EXPECTED_UID="${ISSUE_149_RUNTIME_UID}" \
+            -e ISSUE_149_EXPECTED_GID="${ISSUE_149_RUNTIME_GID}" \
+            -e ISSUE_149_EXPECTED_IMAGE_DIGEST="${ISSUE_149_BASE_IMAGE_DIGEST}" \
+            --tmpfs /tmp:rw,noexec,nosuid,size=512m \
+            --tmpfs /run:rw,noexec,nosuid,size=16m \
+            -v "$PWD/preparation/bundle:/opt/acquisition:ro" \
+            -v "$PWD/preparation/input/truth-free-input-manifest.json:/input/truth-free-input-manifest.json:ro" \
+            -v "$PWD/preparation/input/images:/input/images:ro" \
+            -v "$PWD/output:/output:rw" \
+            "${ISSUE_149_BASE_IMAGE}" \
+            node /opt/acquisition/acquisition.mjs > acquisition-report.json
+
+      - name: Verify the sealed raw evidence, before any evaluator sees truth
+        run: |
+          set -euo pipefail
+          # Actor 2's raw verification. The post-freeze evaluator receives
+          # nothing until this succeeds.
+          node -e '
+            const { execFileSync } = require("node:child_process");
+            const size = Number(execFileSync("du", ["-sb", "output"], { encoding: "utf8" }).split("\t")[0]);
+            console.log(JSON.stringify({ rawBytes: size, durableArchiveStopRuleMb: 100 }));
+            if (size > 100 * 1024 * 1024) {
+              console.error("RAW_EVIDENCE_EXCEEDS_DURABLE_ARCHIVE_LIMIT");
+              process.exitCode = 1;
+            }
+          '
+
+      # actions/upload-artifact v4
+      - name: Upload the raw evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: issue-149-raw-evidence
+          path: |
+            output
+            acquisition-report.json
+            image-identity.json
+          retention-days: 30

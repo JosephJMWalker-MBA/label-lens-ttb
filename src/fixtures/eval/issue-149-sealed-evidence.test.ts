@@ -46,6 +46,7 @@ import {
 const SEALED_SUCCESS_FILE_SUFFIXES = [
   ".provenance.json",
   ".passes.json",
+  ".fingerprints.json",
   ".words.jsonl",
   ".lines.jsonl",
   ".candidates.jsonl",
@@ -581,8 +582,10 @@ describe("Issue #149 sealed item-evidence package", () => {
       const sealed = await acquire();
       const directory = path.join(scratch, "genuine");
       const report = writeSealedEvidencePackage(sealed, { directory });
-      expect(report.filesWritten).toBe(7);
-      expect(readdirSync(directory).sort()).toEqual(sealed.files.map((file) => file.path).sort());
+      expect(report.filesWritten).toBe(8);
+      expect(readdirSync(report.directory).sort()).toEqual(
+        sealed.files.map((file) => file.path).sort(),
+      );
     });
   });
 
@@ -593,9 +596,9 @@ describe("Issue #149 sealed item-evidence package", () => {
 
     expect(report.filesWritten).toBe(sealed.fileCount);
     expect(report.aggregateSha256).toBe(sealed.aggregateSha256);
-    expect(readdirSync(directory).sort()).toEqual(sealed.files.map((f) => f.path).sort());
+    expect(readdirSync(report.directory).sort()).toEqual(sealed.files.map((f) => f.path).sort());
     for (const file of sealed.files) {
-      const bytes = readFileSync(path.join(directory, file.path));
+      const bytes = readFileSync(path.join(report.directory, file.path));
       expect(bytes.byteLength).toBe(file.byteLength);
       expect(sha256Bytes(bytes)).toBe(file.sha256);
     }
@@ -663,8 +666,8 @@ describe("Issue #149 sealed item-evidence package", () => {
       const sealed = await failing();
       const directory = path.join(scratch, "run-fail");
       writeSealedEvidencePackage(sealed, { directory });
-      expect(existsSync(path.join(directory, "item-0009.failure.json"))).toBe(true);
-      expect(readdirSync(directory).sort()).toEqual([
+      expect(existsSync(path.join(directory, "item-0009", "item-0009.failure.json"))).toBe(true);
+      expect(readdirSync(path.join(directory, "item-0009")).sort()).toEqual([
         "item-0009.failure.json",
         "item-0009.provenance.json",
       ]);

@@ -119,3 +119,15 @@ caller-supplied `ExtractionDebug`, which became a caller-owned mutable
 `ExtractionInput`, which became caller-owned mutable **output**. A projection of
 the output needs no mutation at all, so prohibiting mutation was never going to
 be enough. The alternative is deleted rather than prohibited by convention.
+
+## What has and has not executed
+
+The runtime bundle **executed in discover mode**, inside the isolated boundary,
+and produced the boundary report. The acquisition API, the extractor, the OCR
+engine, the item writer and the run-level writer have **not** executed, and no
+`raw/` evidence exists. Execute is gated on an explicit authorization artifact
+that currently reads `EXECUTE_NOT_AUTHORIZED`.
+
+Saying "no bundle was executed" would be false, and was said once; the distinction
+that matters is between running the bundle and running the acquisition path.
+

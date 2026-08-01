@@ -118,7 +118,7 @@
     "the emitted word count per pass must equal the length of the debug pass word array",
     "any inequality halts with RAW_EVIDENCE_TRUNCATED"
   ],
-  "amendedBy": "preregistration-amendment-14.md",
+  "amendedBy": "preregistration-stage-2-execute-readiness.md",
   "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
   "historicalNote": "Amendment 1 described this evidence as reachable through runCaseArtifacts. That route is prohibited from Amendment 2 onward.",
   "completeRegionOcrResultPersistence": "Every RegionOcrResult field is persisted exactly; see region-ocr-result-replay-contract.json. The per-pass field list here is explanatory and is not a licence to persist a subset.",
@@ -151,7 +151,7 @@
     "noInventedDebug": "No partial debug object may be synthesised after an extractor failure. A failed item has no pass array, no lines and no candidates, and none may be fabricated.",
     "noSelectiveRetry": "A failed item is never retried, in whole or in part. The extractor is called exactly once per item, inside the acquisition boundary.",
     "verdict": "A case-level extraction failure produces the preregistered RUNTIME_FAILURE or INCOMPLETE_EVIDENCE verdict per determinism-rules.json. It is never quietly dropped from the population.",
-    "sealedAsExactlyOneFile": "<opaqueItemId>.failure.json, produced inside the public API"
+    "sealedAsExactlyOneFile": "SUPERSEDED. A failed item seals TWO files: <opaqueItemId>.provenance.json, which binds the failure to the exact input bytes and frozen configuration, and <opaqueItemId>.failure.json, which carries the typed error. No partial debug is synthesised and the item is never retried."
   },
   "derivedVersusTypeFields": "Fields marked derived:true or manifest-sourced are computed by the acquisition or copied from the truth-free manifest. They are labelled as such so no reader mistakes them for properties of RegionOcrResult. The authoritative field list of RegionOcrResult is region-ocr-result-replay-contract.json.",
   "exactRecordSchema": {
@@ -175,5 +175,5 @@
     "governsEveryEmittedFile": "pass records, candidate records, selection records, item-level failure records, count records, manifests and provenance records alike"
   },
   "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run.",
-  "completeRegionOcrResultSealing": "The pass array is validated with assertRegionOcrResultRecord and serialized INSIDE the public API. A pass record that is incomplete \u2014 including a word without a finite rawConfidence \u2014 halts the item with PASS_WORD_INVALID rather than being persisted with a hole in it. See limitations.md."
+  "completeRegionOcrResultSealing": "The pass array is validated with assertRegionOcrResultRecord, serialized as EXACTLY the thirteen RegionOcrResult fields with no envelope, and decoded back through the same schema before sealing. Item identity comes from the governed filename and the pass ordinal from array position. A pass record that is incomplete \u2014 including a word without a finite rawConfidence \u2014 halts the item with PASS_WORD_INVALID rather than being persisted with a hole in it."
 }
