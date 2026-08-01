@@ -2,9 +2,9 @@
   "artifact": "execute-authorization",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 2,
-  "status": "EXECUTE_NOT_AUTHORIZED",
-  "reviewedImplementationSha": null,
-  "authorizedBy": null,
+  "status": "EXECUTE_AUTHORIZED",
+  "reviewedImplementationSha": "f0cf038a4fa1a0a1a61404d864fade1b4fe97ff3",
+  "authorizedBy": "JosephJMWalker-MBA \u2014 effective ONLY after explicit owner approval naming the exact unpushed transition commit SHA. Recording a name here does not itself authorize anything.",
   "authorizedAt": null,
   "whatAuthorizationMeans": "Execute is authorized against an EXACT reviewed implementation tree, not against a branch. Setting status to EXECUTE_AUTHORIZED without naming the reviewed SHA authorizes nothing, and the gate rejects it.",
   "howTheGateWorks": {
@@ -23,7 +23,7 @@
     ],
     "haltCode": "EXECUTE_TRANSITION_REJECTED"
   },
-  "currentDecision": "Execute is NOT authorized. This sprint implements the dormant execute path and re-runs discovery; execute requires a later, explicit authorization decision.",
+  "currentDecision": "LOCAL, UNPUSHED PROPOSAL. This commit exists only for inspection and is NON-OPERATIVE until the owner explicitly authorizes the exact resulting commit SHA. It has not been pushed, no remote ref has been updated, no workflow has run, and authorizedAt remains null precisely because that exact-SHA approval has not occurred.",
   "ocrRun": false,
   "amendedBy": "preregistration-stage-2-final-execute-closure.md",
   "branchLocalGateLimitation": {
@@ -40,5 +40,5 @@
     "6. push only the already-authorized commit",
     "7. the repository gate independently rechecks the reviewed implementation range"
   ],
-  "transitionCommitCreatedInThisSprint": false
+  "transitionCommitCreatedInThisSprint": true
 }
