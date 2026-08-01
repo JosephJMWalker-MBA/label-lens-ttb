@@ -1,0 +1,176 @@
+# Issue #149 — complete current-baseline Brand evidence acquisition.
+#
+# Research-only, scoped to exactly one branch. Not part of the required CI checks
+# and it touches no production path.
+#
+# Transport, frozen in workflow-plan.md and unchanged here:
+#   - push-triggered, restricted to the single research branch;
+#   - paths admitting ONLY this workflow file and the committed mode file, so an
+#     ordinary artifact commit cannot rerun the experiment;
+#   - permissions: contents: read — the OCR job cannot push, and the write
+#     permission is never granted to any job here;
+#   - no schedule, no pull_request_target, no repository_dispatch, no unscoped
+#     branch trigger;
+#   - a visible harness revision, bumped in the same commit whenever a harness
+#     fix needs a rerun;
+#   - OCR runs ONLY when the mode is exactly `execute`.
+#
+# The committed mode is `discover`. Discovery runs inside the same boundary
+# execute will use, runs no OCR, and stops for review.
+name: Issue 149 Brand evidence acquisition
+
+on:
+  push:
+    branches:
+      - research/issue-149-brand-complete-evidence-acquisition
+    paths:
+      - .github/workflows/issue-149-brand-evidence-acquisition.yml
+      - artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt
+
+permissions:
+  contents: read
+
+env:
+  # harness revision: 1
+  ISSUE_149_HARNESS_REVISION: "1"
+  MODE_FILE: artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt
+
+jobs:
+  resolve-mode:
+    name: Resolve declared mode
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.mode.outputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read and validate the committed mode
+        id: mode
+        run: |
+          set -euo pipefail
+          MODE="$(tr -d '[:space:]' < "${MODE_FILE}")"
+          case "${MODE}" in
+            discover|execute|complete) ;;
+            *) echo "MODE_FILE_INVALID: ${MODE}" >&2; exit 1 ;;
+          esac
+          echo "mode=${MODE}" >> "$GITHUB_OUTPUT"
+          echo "declared mode: ${MODE} (harness revision ${ISSUE_149_HARNESS_REVISION})"
+
+  job-a-prepare:
+    name: Job A — trusted preparation (no OCR)
+    needs: resolve-mode
+    if: needs.resolve-mode.outputs.mode != 'complete'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      # Trusted, NOT truth-free: the freeze generator reads the PR #217
+      # attribution artifact and uses governedTruth.present, and only that, for
+      # the 105/10 corpus accounting. The PREPARATION ARTIFACT it emits is what
+      # is truth-free.
+      - name: Prepare (verify, restage, build the allowlisted bundle, scan)
+        run: node scripts/eval/issue-149-job-a-prepare.mjs | tee job-a-report.json
+
+      - name: Record the preparation artifact digest
+        run: |
+          set -euo pipefail
+          shasum -a 256 .local/issue-149-preparation/preparation-artifact.json
+          shasum -a 256 .local/issue-149-preparation/bundle/bundle-manifest.json
+
+      - name: Upload the truth-free preparation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-149-truth-free-preparation
+          path: .local/issue-149-preparation
+          retention-days: 7
+
+      - name: Upload the Job A report
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-149-job-a-report
+          path: job-a-report.json
+          retention-days: 7
+
+  job-b-discover:
+    name: Job B — isolated discovery (no OCR)
+    needs: [resolve-mode, job-a-prepare]
+    if: needs.resolve-mode.outputs.mode == 'discover'
+    runs-on: ubuntu-latest
+    steps:
+      # NO repository checkout. Job B receives ONLY the truth-free preparation
+      # artifact, and no GitHub token or repository credential enters the
+      # container.
+      - name: Download the truth-free preparation artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: issue-149-truth-free-preparation
+          path: preparation
+
+      - name: Build the isolated runtime image
+        run: |
+          set -euo pipefail
+          cat > Dockerfile <<'DOCKERFILE'
+          FROM node:20-bookworm-slim
+          # No repository COPY. The bundle is bind-mounted read-only at run time.
+          WORKDIR /
+          DOCKERFILE
+          docker build -t issue-149-acquisition:discover -f Dockerfile .
+
+      - name: Run isolated discovery
+        run: |
+          set -euo pipefail
+          mkdir -p output
+          chmod 777 output
+          docker run --rm \
+            --network none \
+            --read-only \
+            --cap-drop ALL \
+            --security-opt no-new-privileges \
+            --env-file /dev/null \
+            -e ISSUE_149_MODE=discover \
+            -e ISSUE_149_HARNESS_REVISION="${ISSUE_149_HARNESS_REVISION}" \
+            --tmpfs /tmp:rw,noexec,nosuid,size=64m \
+            --tmpfs /run:rw,noexec,nosuid,size=16m \
+            -v "$PWD/preparation/bundle:/opt/acquisition:ro" \
+            -v "$PWD/preparation/input/truth-free-input-manifest.json:/input/truth-free-input-manifest.json:ro" \
+            -v "$PWD/preparation/input/images:/input/images:ro" \
+            -v "$PWD/output:/output:rw" \
+            issue-149-acquisition:discover \
+            node /opt/acquisition/acquisition.mjs | tee discovery-report.json
+
+      - name: Prove the output mount stayed empty and hash the report
+        run: |
+          set -euo pipefail
+          echo "output mount contents:"
+          find output -type f | tee output-inventory.txt
+          test ! -s output-inventory.txt || { echo "OUTPUT_MOUNT_NOT_EMPTY" >&2; exit 1; }
+          shasum -a 256 discovery-report.json | tee discovery-report.sha256
+
+      - name: Upload the discovery report
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-149-discovery-report
+          path: |
+            discovery-report.json
+            discovery-report.sha256
+            output-inventory.txt
+          retention-days: 30
+
+  job-b-execute:
+    name: Job B — isolated acquisition OCR
+    needs: [resolve-mode, job-a-prepare]
+    # THE ONLY OCR. Reached only when the committed mode is exactly `execute`.
+    if: needs.resolve-mode.outputs.mode == 'execute'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute is not authorized
+        run: |
+          echo "Execute mode is not authorized. The recorded execute-readiness" >&2
+          echo "blockers in artifacts/issue-149-brand-complete-evidence-acquisition/" >&2
+          echo "execute-readiness-blockers.json must be resolved and execute" >&2
+          echo "explicitly authorized before this job may run OCR." >&2
+          exit 1

@@ -50,6 +50,23 @@ export const AUTHORIZED_ADAPTER_MODULE = "scripts/eval/lib/issue-149-candidate-a
 /** The one call the runner entrypoint must make, exactly once. */
 export const REQUIRED_ACQUISITION_CALL = "acquireProductionBrandEvidence";
 
+/**
+ * Production modules the bundle legitimately contains.
+ *
+ * The prohibition exists to stop ACQUISITION code from reaching around the
+ * adapter to a lower-level production function. It was never meant to police
+ * production's own internals — and running the gate against the real Stage 2
+ * closure showed it doing exactly that: `src/pipeline/extractor/extractor.ts`
+ * calls `selectBrandObservation`, because that is what the incumbent extractor
+ * does, and the gate rejected the incumbent for behaving like the incumbent.
+ *
+ * These modules are exempt from the CALL prohibitions. They are not exempt from
+ * analysis, and they remain subject to the dependency-closure and base-drift
+ * gates in Job A, which is what actually constrains which production modules may
+ * be present at all.
+ */
+const PRODUCTION_MODULE_PREFIX = "src/";
+
 /** The one authenticated persistence call, resolved the same way. */
 export const REQUIRED_WRITER_CALL = "writeSealedEvidencePackage";
 
@@ -325,9 +342,15 @@ function accessChain(node: ts.Node): string[] {
  * a count, an identifier or a digest, which a helper may freely read. So the rule
  * is anchored on the `files` member rather than on a general lineage analysis,
  * which source text cannot support.
+ *
+ * It is anchored on `files` ALONE. An earlier version also matched a bare
+ * `bytes`, which rejected `Buffer.from(bytes)` in the canonical evidence helper —
+ * an ordinary parameter that has nothing to do with a sealed package. A chain
+ * that genuinely reaches sealed bytes passes through `files`
+ * (`sealed.files[0].bytes`), or through a destructured rename, which is tracked
+ * separately per file.
  */
-const touchesSealedFiles = (chain: string[]): boolean =>
-  chain.includes("files") || chain.includes("bytes");
+const touchesSealedFiles = (chain: string[]): boolean => chain.includes("files");
 
 export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2ClosureReport {
   const violations: Stage2ClosureViolation[] = [];
@@ -430,6 +453,8 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
   for (const [filePath, source] of sourceFiles) {
     const isRunner = filePath === RUNNER_ENTRY_PATH;
     const isAdapter = filePath === AUTHORIZED_ADAPTER_MODULE;
+    // The adapter defines the machinery; production modules ARE the machinery.
+    const exemptFromCallProhibitions = isAdapter || filePath.startsWith(PRODUCTION_MODULE_PREFIX);
 
     // Locals that were destructured out of a sealed package under a new name.
     const sealedAliases = new Set<string>();
@@ -496,7 +521,7 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
               `${REQUIRED_WRITER_CALL} must receive the acquired package as an identifier, received ${node.arguments.map((a) => a.getText()).join(", ")}`,
             );
           }
-        } else if (!isAdapter) {
+        } else if (!exemptFromCallProhibitions) {
           // --- prohibited calls ------------------------------------------
           const target = ts.isPropertyAccessExpression(node.expression)
             ? node.expression.name
@@ -566,7 +591,7 @@ export function analyzeStage2SourceClosure(input: Stage2ClosureInput): Stage2Clo
         }
 
         // --- sealed-package projection -----------------------------------
-        if (!isAdapter && ts.isPropertyAccessExpression(node.expression)) {
+        if (!exemptFromCallProhibitions && ts.isPropertyAccessExpression(node.expression)) {
           const method = node.expression.name.text;
           const chain = accessChain(node.expression.expression);
           if (

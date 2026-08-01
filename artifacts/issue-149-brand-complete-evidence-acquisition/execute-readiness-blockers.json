@@ -1,0 +1,89 @@
+{
+  "artifact": "execute-readiness-blockers",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 2,
+  "amendedBy": "preregistration-stage-2-discovery.md",
+  "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+  "status": "EXECUTE_NOT_AUTHORIZED",
+  "committedMode": "discover",
+  "whyThisArtifactExists": "Discovery was authorized specifically so that evidence from the real bundle, mount boundary, environment and container replaces further static speculation. These six items are known execute-path defects that discovery does not exercise. They are recorded rather than silently fixed during discovery, because discovery does not authorize execute and a fix landed here would not have been reviewed against execute.",
+  "doNotSilentlyFix": "None of these may be quietly repaired during the discovery sprint unless the fix is REQUIRED to make discover itself run. If such a fix becomes necessary it must be stated explicitly in the return, not folded in.",
+  "blockers": [
+    {
+      "id": 1,
+      "title": "item packages are not single-use and not no-overwrite",
+      "detail": "writeSealedEvidencePackage authenticates package ORIGIN, but it does not mark a genuine package as consumed, does not reject an existing target, and does not use exclusive creation. The same authentic package can therefore be written repeatedly, and writeFileSync overwrites an existing item file.",
+      "requiredBeforeExecute": [
+        "single-use consumption of a genuine package",
+        "no-overwrite semantics on every item file",
+        "exclusive creation rather than truncating write"
+      ],
+      "affects": "scripts/eval/lib/issue-149-candidate-adapter.ts"
+    },
+    {
+      "id": 2,
+      "title": "a filesystem failure can leave a partial item set",
+      "detail": "The writer validates everything before the first write, but the write loop itself is not atomic. A mid-write I/O failure leaves some of an item's files on disk and not others, which is a directory that looks like evidence.",
+      "requiredBeforeExecute": [
+        "a defined cleanup or commit protocol for partial I/O failure",
+        "an item is either completely present or completely absent"
+      ],
+      "affects": "scripts/eval/lib/issue-149-candidate-adapter.ts"
+    },
+    {
+      "id": 3,
+      "title": "run-level evidence has no permitted writer",
+      "detail": "The source-closure analyzer prohibits every direct filesystem-writing route outside writeSealedEvidencePackage, which takes a per-ITEM sealed package. But evidence-schema.json still requires run-level counts.json, raw-evidence-manifest.json and raw-evidence-manifest.sha256, and workflow-plan.md requires both raw manifests and their aggregate hashes. There is currently no route that can write them.",
+      "requiredBeforeExecute": [
+        "one governed run-level manifest and counts writer, or another exact allowlisted persistence boundary"
+      ],
+      "mustNotDo": "weaken the filesystem prohibition, which would reopen the unauthenticated write route Amendment 14 closed",
+      "affects": [
+        "scripts/eval/lib/issue-149-stage2-source-closure.ts",
+        "scripts/eval/issue-149-brand-evidence-acquisition-run.ts",
+        "artifacts/issue-149-brand-complete-evidence-acquisition/evidence-schema.json"
+      ]
+    },
+    {
+      "id": 4,
+      "title": "the persisted pass envelope contradicts the replay schema",
+      "detail": "The adapter serializes each pass as { opaqueItemId, passOrdinal, ...pass }. region-ocr-result-replay-contract.json says the persisted record's own-key set is exactly the thirteen RegionOcrResult fields and that unexpected keys are rejected. The two cannot both be true.",
+      "requiredBeforeExecute": [
+        "either .passes.json contains the exact thirteen-field records, with item identity supplied by the filename and ordinal supplied by array position",
+        "or the contract defines a validated envelope AND an exact replay decoder"
+      ],
+      "affects": [
+        "scripts/eval/lib/issue-149-candidate-adapter.ts",
+        "artifacts/issue-149-brand-complete-evidence-acquisition/region-ocr-result-replay-contract.json"
+      ]
+    },
+    {
+      "id": 5,
+      "title": "promised per-pass and words-only fingerprints are not sealed",
+      "detail": "The package seals the case-level semanticOrderedPassArrayFingerprint. determinism-rules.json and raw-ocr-contract.json also promise a per-pass semantic fingerprint and an ordered-words-only fingerprint; neither is currently in any sealed file.",
+      "requiredBeforeExecute": [
+        "seal both fingerprints, or withdraw the promise from the contracts"
+      ],
+      "affects": [
+        "scripts/eval/lib/issue-149-candidate-adapter.ts",
+        "artifacts/issue-149-brand-complete-evidence-acquisition/determinism-rules.json",
+        "artifacts/issue-149-brand-complete-evidence-acquisition/raw-ocr-contract.json"
+      ]
+    },
+    {
+      "id": 6,
+      "title": "some operative documents still describe superseded sealed-boundary behaviour",
+      "detail": "acquisition-runtime-isolation-contract.json still says the input snapshot is deeply frozen and that the runner persists from detailed.debug.passes. workflow-plan.md still says a failure seals exactly one .failure.json and still names a two-export runtime namespace. raw-ocr-contract.json also says failure is sealed as exactly one file. The actual failure package is provenance plus failure, imageBytes is a private copy rather than frozen, and the runtime namespace has three exports.",
+      "requiredBeforeExecute": ["reconcile all three against the actual sealed boundary"],
+      "doesNotBlockDiscovery": true,
+      "affects": [
+        "artifacts/issue-149-brand-complete-evidence-acquisition/acquisition-runtime-isolation-contract.json",
+        "artifacts/issue-149-brand-complete-evidence-acquisition/workflow-plan.md",
+        "artifacts/issue-149-brand-complete-evidence-acquisition/raw-ocr-contract.json"
+      ]
+    }
+  ],
+  "executeAuthorizationRequires": "every blocker above reviewed and resolved, and execute explicitly authorized by the owner. Changing workflow-mode.txt to execute without that is not authorized by the discovery decision.",
+  "discoveryDoesNotAuthorizeExecute": true,
+  "ocrRun": false
+}

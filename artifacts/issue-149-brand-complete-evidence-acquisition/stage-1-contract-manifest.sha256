@@ -24,6 +24,7 @@ aaff231825dbcdf5182d8cca46fc90cdcab034bdf9f4e81a2ec4b77b6d2ef8ae  artifacts/issu
 90e8c2bdf9d1e1c87bc6e0f0ff093b81ef6bbb8f97f14a9679931d39af038723  artifacts/issue-149-brand-complete-evidence-acquisition/determinism-rules.json
 664f14ea87e63c5e67f9a0bf45963fab04ae24d093422d48f99e81d65b22f6d8  artifacts/issue-149-brand-complete-evidence-acquisition/evidence-schema.json
 82bb3b182a576edccf700112717cf7d1eac85f85f29aa8250df897481af21559  artifacts/issue-149-brand-complete-evidence-acquisition/evidence-volume-rule.json
+bd77baed4656a994d468b2bd2b4c0104f1902f2ccec8b091cd75e0b45d40fd29  artifacts/issue-149-brand-complete-evidence-acquisition/execute-readiness-blockers.json
 d3ade481f87597aa030315985e2c5c394eeec04ff7814a2ac32ed0e90f37ed6f  artifacts/issue-149-brand-complete-evidence-acquisition/git-sha.txt
 1e640490420dab647dedfea0e883443a11da2c303b405fd3eda19a549afc167e  artifacts/issue-149-brand-complete-evidence-acquisition/id-map-contract.json
 65cf99859086cc4b4e40e5bd34c3a29345b8f205e2278e2fb9d8de591748083d  artifacts/issue-149-brand-complete-evidence-acquisition/incumbent-configuration-freeze.json
@@ -46,6 +47,7 @@ d54c44b408a336794c2be3e3b4b65eeb19cbd853c91cb9afeca1a3cc81b5bb2a  artifacts/issu
 b9f41059ae40c69120f26c14b9147e822a0ea6b73577e73690d48f28e4dcf930  artifacts/issue-149-brand-complete-evidence-acquisition/preregistration-amendment-8.md
 91e4e8abdcd740fe3f7a8ddd1995e60141e79f440add1ff10d4721e36807d625  artifacts/issue-149-brand-complete-evidence-acquisition/preregistration-amendment-9.md
 744e02d02f5cb39e5e2ede287ff037e17e6ee64be3a04396f73a0ad2c7aab03b  artifacts/issue-149-brand-complete-evidence-acquisition/preregistration-amendment.md
+76f5d8c8f8f969e183023340d45439fd818c8c47e3f11b9ab7886f8db88cbf3f  artifacts/issue-149-brand-complete-evidence-acquisition/preregistration-stage-2-discovery.md
 54c0c6a0f00d6a5f3db7712cdf76470e926f6c214d320b11c6d3f469a3ce6a2b  artifacts/issue-149-brand-complete-evidence-acquisition/preregistration.md
 d82977e88411c0317c59f051acfe9dc02b7f447fa5f297570597d00452a96608  artifacts/issue-149-brand-complete-evidence-acquisition/preregistration.sha256
 3640990d3f8d1d2dfdd369488a213a5b07f1a0c03d9fc34960b49012495ceed2  artifacts/issue-149-brand-complete-evidence-acquisition/purpose-and-boundaries.md
@@ -55,6 +57,7 @@ f265ab195fc2338fd93a9a85f5d9e0a2cfa0ffdf76b8c766a2a7fbba3bcb298f  artifacts/issu
 80ae4a144259a9a013d8a35163e724cef1dded4e92e0aa4abd0dc74587e1ff6f  artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json
 eeaee7c467c796fa3fabf0c6e08b5caf1a36567690a2d07d00db1bb732d632c8  artifacts/issue-149-brand-complete-evidence-acquisition/truth-free-input-manifest.json
 631ee1df6b4050251c259de53a6153c4e6d2747300a37cda3f700f663864645a  artifacts/issue-149-brand-complete-evidence-acquisition/truth-isolation-plan.json
+e093caa7061ae7c43f137cf1b404c6026002890a280fdd7345a05aadf452d305  artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt
 469b3a43681331f36e7a1d83978863b5a4221b772fbad1f6e4182ebcdc882d4c  artifacts/issue-149-brand-complete-evidence-acquisition/workflow-plan.md
 408a0f6a2008cd1e15dca0121db71dd096b00267feedc435109519341a82f54d  scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs
 a61f6545aa51e5e3c00dc069fe84ef2bb03e22f02eaded610958a15b8e5de0b0  scripts/eval/issue-149-stage-1-contract-manifest.mjs
@@ -63,11 +66,11 @@ a61f6545aa51e5e3c00dc069fe84ef2bb03e22f02eaded610958a15b8e5de0b0  scripts/eval/i
 1ace13b672b3957fb9d435ce256b0572d109cf9d3c7a255b0cc8d0d4ace1d6a6  scripts/eval/lib/issue-149-evidence-canonical.ts
 6fb2eb59fc02c8b3de4a4e7062f02ed72fe876f47a63c2e2c89dd97a47b6adf1  scripts/eval/lib/issue-149-freeze-core.d.mts
 64a0b65aa867e35e926ff1c792f068632fc9bbfb5cbee0613add2f7329b01364  scripts/eval/lib/issue-149-freeze-core.mjs
-4185452ac29c597d24368d7144ecc437ea0715e5c29036ea11ab7725a563b8e2  scripts/eval/lib/issue-149-stage2-source-closure.ts
+0d4648e8b26abea9245948dc844c0b801544eb0f354621fa86b8203ef6c90557  scripts/eval/lib/issue-149-stage2-source-closure.ts
 3eb018d554318a58db087ef410f92db1567e5a28677bf2f70aac494024515c6b  src/fixtures/eval/issue-149-acquisition-isolation.test.ts
 1c2ab973f3d92e4dded2ee6499ff3e31f94843d714c131be781b3339bfc3b028  src/fixtures/eval/issue-149-acquisition-orchestration.test.ts
 94e5f8658c9389ed0b5ea0daa73492c30bb8eb38b1d5c05ba0650077239694d8  src/fixtures/eval/issue-149-bundle-scan.test.ts
-d136cbda9d0b50f9e294b37e1c76414b368453ca4189869f4ca9372f70c8297b  src/fixtures/eval/issue-149-contract-consistency.test.ts
+e86158fa4a99ab9f384573a414d1a9ca5e3d380809be17c9a79a5f7fe3df353f  src/fixtures/eval/issue-149-contract-consistency.test.ts
 4e144e3efb52ca5c4d8ae8eb63786569b79aae909e6cfef8dfb5ae26bbdff296  src/fixtures/eval/issue-149-dependency-closure.test.ts
 7cdfea6e4f591e7e91e844ecc581f71cf42d096a0d9336dc46e82caf31e6b919  src/fixtures/eval/issue-149-evidence-canonical.test.ts
 c39ada5680a0cfa50e44444678a0549c6cbb4de477b11318ba12cd393ed5b2dc  src/fixtures/eval/issue-149-freeze-core-loader.test.ts
@@ -78,4 +81,4 @@ dfaa093b9f3bb7782845c22069f4a93d4abcfc6f47fe11c1cff98926f2a6f587  src/fixtures/e
 84bde166dc8b0b982e1a1f3dafa11683683968a7319eb0e738fdb6209f8433b9  src/fixtures/eval/issue-149-stage-1-manifest.test.ts
 5d3fe14028b90518c2bcd039c12974a64edc9dddc95f9447eb3c2e7772200e26  src/fixtures/eval/issue-149-stage2-source-closure.test.ts
 42ea378611fc16ff3e6448ac38091468500c9957e42965b4ec529cd1cebabf12  src/fixtures/eval/issue-149-staging-independence.test.ts
-# aggregate 5d4921bdec5d0af97282325d5b94676cb2cec05144cfc43da99bc1829fa5e2ec
+# aggregate a4c714410b99253557cfb71a25fc9d0a5c2d5b36907b8301f3d99d622d4645f1

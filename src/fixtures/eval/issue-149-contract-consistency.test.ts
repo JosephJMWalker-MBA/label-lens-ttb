@@ -766,7 +766,13 @@ describe("Issue #149 Stage 1 contract consistency", () => {
       if (HISTORICAL_FILES.has(path.basename(file))) continue;
       const contract = read(file) as { amendedBy?: string };
       if (contract.amendedBy === undefined) continue;
-      if (contract.amendedBy !== `preregistration-amendment-${CURRENT_AMENDMENT}.md`) {
+      // Stage 2 artifacts are governed by the Stage 2 discovery record, not by
+      // the Stage 1 amendment series, so both stamps are current.
+      const currentStamps = [
+        `preregistration-amendment-${CURRENT_AMENDMENT}.md`,
+        "preregistration-stage-2-discovery.md",
+      ];
+      if (!currentStamps.includes(contract.amendedBy)) {
         stale.push(`${file} — ${contract.amendedBy}`);
       }
     }
