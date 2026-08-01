@@ -2,9 +2,9 @@
   "artifact": "execute-authorization",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 2,
-  "status": "EXECUTE_AUTHORIZED",
-  "reviewedImplementationSha": "f0cf038a4fa1a0a1a61404d864fade1b4fe97ff3",
-  "authorizedBy": "JosephJMWalker-MBA \u2014 effective ONLY after explicit owner approval naming the exact unpushed transition commit SHA. Recording a name here does not itself authorize anything.",
+  "status": "EXECUTE_NOT_AUTHORIZED",
+  "reviewedImplementationSha": null,
+  "authorizedBy": null,
   "authorizedAt": null,
   "whatAuthorizationMeans": "Execute is authorized against an EXACT reviewed implementation tree, not against a branch. Setting status to EXECUTE_AUTHORIZED without naming the reviewed SHA authorizes nothing, and the gate rejects it.",
   "howTheGateWorks": {
@@ -23,8 +23,8 @@
     ],
     "haltCode": "EXECUTE_TRANSITION_REJECTED"
   },
-  "currentDecision": "LOCAL, UNPUSHED PROPOSAL. This commit exists only for inspection and is NON-OPERATIVE until the owner explicitly authorizes the exact resulting commit SHA. It has not been pushed, no remote ref has been updated, no workflow has run, and authorizedAt remains null precisely because that exact-SHA approval has not occurred.",
-  "ocrRun": false,
+  "currentDecision": "DISARMED after the first governed execute attempt at a3a09ac15db615e5a5e9e4cb53874a996ab9f2a3. Governed OCR ran and the acquisition process returned exit status 0, but the host verifier and forensic uploader could not traverse container-owned item directories. No raw or forensic artifact was preserved. The determinism verdict, item outcomes and all experimental results are unknown and must not be used. A corrected reviewed implementation and a new exact-SHA authorization are required before any additional governed OCR.",
+  "ocrRun": true,
   "amendedBy": "preregistration-stage-2-final-execute-closure.md",
   "branchLocalGateLimitation": {
     "statement": "A branch-local workflow cannot prove that an unreviewed commit did not replace or remove its own gate. The workflow file and the gate script are both loaded from the current branch head, so a transition commit that modifies the workflow could bypass the gate before the gate has a chance to reject that modification.",
