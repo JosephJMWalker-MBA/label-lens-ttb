@@ -68,11 +68,17 @@ export const ALLOWED_RUNTIME_GENERATED_FILES = [
 /**
  * The exact environment allowlist. Anything else is a failure.
  *
- * `NODE_VERSION` and `YARN_VERSION` are baked into the `node:20-bookworm-slim`
- * image and are present in every container built from it, the same way the
- * pseudo-filesystems are unavoidable. They are allowlisted explicitly rather
- * than quietly ignored. Nothing is inherited from the host: the container is
- * started with an empty env-file and exactly two `-e` variables.
+ * Four of these are not ours and are allowlisted explicitly rather than quietly
+ * ignored, the same way the unavoidable pseudo-filesystems are:
+ *
+ * - `NODE_VERSION` and `YARN_VERSION` are baked into the
+ *   `node:20-bookworm-slim` image;
+ * - `PWD` is set by the container runtime for the working directory;
+ * - `VIPSHOME` is set by sharp's libvips package.
+ *
+ * The last two were found by the first successful in-container discovery run,
+ * which is exactly what discovery is for. Nothing is inherited from the host:
+ * the container starts with an empty env-file and exactly two `-e` variables.
  */
 export const ENVIRONMENT_ALLOWLIST = [
   "PATH",
@@ -80,6 +86,8 @@ export const ENVIRONMENT_ALLOWLIST = [
   "HOSTNAME",
   "NODE_VERSION",
   "YARN_VERSION",
+  "PWD",
+  "VIPSHOME",
   "ISSUE_149_MODE",
   "ISSUE_149_HARNESS_REVISION",
 ] as const;

@@ -31,8 +31,8 @@ permissions:
   contents: read
 
 env:
-  # harness revision: 5
-  ISSUE_149_HARNESS_REVISION: "5"
+  # harness revision: 6
+  ISSUE_149_HARNESS_REVISION: "6"
   MODE_FILE: artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt
 
 jobs:
@@ -150,7 +150,11 @@ jobs:
           test ! -s output-inventory.txt || { echo "OUTPUT_MOUNT_NOT_EMPTY" >&2; exit 1; }
           shasum -a 256 discovery-report.json | tee discovery-report.sha256
 
+      # ALWAYS. A failing discovery run is exactly the run whose report is worth
+      # keeping; the first five attempts produced no artifact because the step
+      # that uploads it never ran.
       - name: Upload the discovery report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: issue-149-discovery-report

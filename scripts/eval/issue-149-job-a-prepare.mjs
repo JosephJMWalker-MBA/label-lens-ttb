@@ -355,7 +355,16 @@ function copyNativeExternals() {
       absent.push(name);
       continue;
     }
-    cpSync(source, path.join(target, name), { recursive: true, dereference: true });
+    // `.bin` holds CLI shims that are SYMLINKS. They are not needed at runtime,
+    // and they did not survive the artifact round-trip: the bundle manifest
+    // recorded `node_modules/sharp/node_modules/.bin/semver` and isolated
+    // discovery then reported it missing, failing manifest verification over a
+    // file the runtime never loads.
+    cpSync(source, path.join(target, name), {
+      recursive: true,
+      dereference: true,
+      filter: (from) => !from.split(path.sep).includes(".bin"),
+    });
     copied.push(name);
 
     const manifestPath = path.join(source, "package.json");
