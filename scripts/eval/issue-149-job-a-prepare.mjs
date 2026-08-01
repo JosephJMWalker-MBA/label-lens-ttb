@@ -275,7 +275,9 @@ async function buildBundle() {
     buildTool: `esbuild ${esbuild.version}`,
     unrestrictedRepositoryCopy: false,
     nativeExternals: NATIVE_EXTERNALS,
-    nativePackagesCopied: nativePackages,
+    nativePackagesCopied: nativePackages.copied,
+    nativePackagesAbsent: nativePackages.absent,
+    nativeDependencyTreeRoot: nativePackages.treeRoot,
     emitted: readdirSync(BUNDLE).sort(),
   });
   step("generate-complete-dependency-graph", {
@@ -303,46 +305,40 @@ async function buildBundle() {
  */
 function copyNativeExternals() {
   const target = path.join(BUNDLE, "node_modules");
-  const resolver = createRequire(path.join(ROOT, "package.json"));
 
   /**
-   * The installed package directory, RESOLVED rather than assumed.
-   *
-   * Two things this must survive, both observed:
-   *   - `${ROOT}/node_modules/<name>` is wrong in a git worktree, where the
-   *     dependency tree lives in the primary checkout and Node resolves upward;
-   *   - `require.resolve("<name>/package.json")` fails on packages whose
-   *     `exports` map does not expose it, which sharp's does not.
-   *
-   * So the MAIN entry is resolved and the tree is walked up to the directory
-   * that sits directly under a `node_modules`.
+   * The installed dependency tree, located by walking UP from the repository
+   * root. In a git worktree the tree lives in the primary checkout, so the root
+   * itself may have no `node_modules` at all.
    */
-  const packageDirectory = (name) => {
-    let current;
-    try {
-      current = path.dirname(resolver.resolve(name));
-    } catch {
-      return null;
-    }
-    const segments = name.split("/").length;
+  const treeRoot = (() => {
+    let current = ROOT;
     while (current !== path.dirname(current)) {
-      const parent = path.dirname(current);
-      const enclosing = segments === 2 ? path.dirname(parent) : parent;
-      if (path.basename(enclosing) === "node_modules") return current;
-      current = parent;
+      const candidate = path.join(current, "node_modules");
+      if (existsSync(path.join(candidate, NATIVE_EXTERNALS[0]))) return candidate;
+      current = path.dirname(current);
     }
-    return null;
-  };
+    throw new JobAError("NATIVE_EXTERNAL_NOT_INSTALLED", NATIVE_EXTERNALS[0]);
+  })();
 
   /**
-   * The TRANSITIVE closure of a native external.
+   * Copy the transitive closure by reading the installed DIRECTORY TREE, not by
+   * asking Node to resolve each package.
    *
-   * The first version followed `optionalDependencies` only — which is where
-   * sharp's platform binaries live — and the container then failed with
-   * `Cannot find package '@img/colour'`, an ordinary runtime `dependencies`
-   * entry. A partial closure is a bundle that loads until it does not.
+   * Module resolution was the wrong instrument, twice over: `<name>/package.json`
+   * is not exposed by sharp's `exports` map, and `require.resolve("<name>")`
+   * throws outright for `@img/sharp-linux-x64`, whose exports expose no entry
+   * point at all. Both failures returned null and were SKIPPED, so the bundle
+   * shipped without the platform binary and the container failed with the same
+   * "Could not load the sharp module" error the previous round was supposed to
+   * fix. What npm actually put on disk is the authority here.
+   *
+   * A declared dependency with no directory is recorded as absent rather than
+   * ignored: platform-specific optional packages for OTHER platforms are
+   * legitimately missing, and the manifest says which ones were.
    */
   const copied = [];
+  const absent = [];
   const seen = new Set();
   const queue = [...NATIVE_EXTERNALS];
 
@@ -351,25 +347,26 @@ function copyNativeExternals() {
     if (seen.has(name)) continue;
     seen.add(name);
 
-    const source = packageDirectory(name);
-    if (source === null) {
-      // A platform-specific optional package for a DIFFERENT platform is
-      // legitimately absent; a required one is not.
+    const source = path.join(treeRoot, name);
+    if (!existsSync(source)) {
       if (NATIVE_EXTERNALS.includes(name)) {
         throw new JobAError("NATIVE_EXTERNAL_NOT_INSTALLED", name);
       }
+      absent.push(name);
       continue;
     }
     cpSync(source, path.join(target, name), { recursive: true, dereference: true });
     copied.push(name);
 
-    const manifest = JSON.parse(readFileSync(path.join(source, "package.json"), "utf8"));
+    const manifestPath = path.join(source, "package.json");
+    if (!existsSync(manifestPath)) continue;
+    const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
     queue.push(
       ...Object.keys(manifest.dependencies ?? {}),
       ...Object.keys(manifest.optionalDependencies ?? {}),
     );
   }
-  return copied.sort();
+  return { copied: copied.sort(), absent: absent.sort(), treeRoot: path.relative(ROOT, treeRoot) };
 }
 
 // ---- 9. prohibited dependencies and base drift -----------------------------
