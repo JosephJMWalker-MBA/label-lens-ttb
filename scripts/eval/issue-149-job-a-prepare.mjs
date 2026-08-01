@@ -25,6 +25,7 @@
  */
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { createRequire } from "node:module";
 import {
   cpSync,
   existsSync,
@@ -55,6 +56,23 @@ const PARSER_EXCEPTION = {
 };
 
 const PROHIBITED_CLOSURE_PREFIXES = ["src/fixtures/", "tests/", "artifacts/", "src/domain/rules/"];
+
+/**
+ * Native modules, which CANNOT be bundled and must ship beside the bundle.
+ *
+ * Observed by running isolated discovery: esbuild happily inlined sharp's
+ * JavaScript wrapper, and the container then failed at import with
+ * `Could not load the "sharp" module using the linux-x64 runtime`, because the
+ * wrapper resolves a platform-specific `.node` binary at load time and no
+ * bundler can inline one.
+ *
+ * They are marked external and their resolved package trees are copied into
+ * `bundle/node_modules/`, so Node resolves them from beside the emitted module.
+ * That keeps the bundle self-contained and leaves the four-mount invariant
+ * untouched. Every copied file is hashed into the bundle manifest and scanned
+ * for prohibited content like any other bundle file.
+ */
+const NATIVE_EXTERNALS = ["sharp"];
 
 class JobAError extends Error {
   constructor(code, detail) {
@@ -215,7 +233,7 @@ async function buildBundle() {
     'import { createRequire as __issue149CreateRequire } from "node:module";\n' +
     "const require = __issue149CreateRequire(import.meta.url);\n";
   const buildCommand =
-    'esbuild scripts/eval/issue-149-brand-evidence-acquisition-run.ts --bundle --platform=node --format=esm --target=node20 --external:node:* --banner:js="<createRequire banner>" --metafile --sourcemap=false --outfile=bundle/acquisition.mjs';
+    'esbuild scripts/eval/issue-149-brand-evidence-acquisition-run.ts --bundle --platform=node --format=esm --target=node20 --external:node:* --external:sharp --banner:js="<createRequire banner>" --metafile --sourcemap=false --outfile=bundle/acquisition.mjs';
 
   const result = await esbuild.build({
     entryPoints: [path.join(ROOT, "scripts/eval/issue-149-brand-evidence-acquisition-run.ts")],
@@ -226,7 +244,7 @@ async function buildBundle() {
     banner: { js: banner },
     metafile: true,
     sourcemap: false,
-    external: ["node:*"],
+    external: ["node:*", ...NATIVE_EXTERNALS],
     outfile: path.join(BUNDLE, "acquisition.mjs"),
     absWorkingDir: ROOT,
     tsconfig: path.join(ROOT, "tsconfig.json"),
@@ -244,6 +262,10 @@ async function buildBundle() {
     path.join(BUNDLE, "truth-key-inventory.json"),
   );
 
+  // The native externals, copied whole from the installed dependency tree.
+  // NOT an unrestricted repository copy: an explicit, named package list.
+  const nativePackages = copyNativeExternals();
+
   const metafile = JSON.stringify(result.metafile, null, 2);
   writeFileSync(path.join(PREP, "metafile.json"), metafile);
   const inputs = Object.keys(result.metafile.inputs).sort();
@@ -252,6 +274,8 @@ async function buildBundle() {
     buildCommand,
     buildTool: `esbuild ${esbuild.version}`,
     unrestrictedRepositoryCopy: false,
+    nativeExternals: NATIVE_EXTERNALS,
+    nativePackagesCopied: nativePackages,
     emitted: readdirSync(BUNDLE).sort(),
   });
   step("generate-complete-dependency-graph", {
@@ -265,6 +289,70 @@ async function buildBundle() {
     buildCommand,
     buildTool: `esbuild ${esbuild.version}`,
   };
+}
+
+/**
+ * Copy each native external's resolved package, plus the platform-specific
+ * implementation packages it depends on, into `bundle/node_modules/`.
+ *
+ * The set is derived from the package's own `optionalDependencies`, so the
+ * platform variant actually installed on this host is what travels. A Job A run
+ * on a host whose platform differs from the container's will therefore produce a
+ * bundle the container cannot load — which is a true statement about that bundle
+ * and is reported by discovery rather than hidden.
+ */
+function copyNativeExternals() {
+  const target = path.join(BUNDLE, "node_modules");
+  const resolver = createRequire(path.join(ROOT, "package.json"));
+
+  /**
+   * The installed package directory, RESOLVED rather than assumed.
+   *
+   * Two things this must survive, both observed:
+   *   - `${ROOT}/node_modules/<name>` is wrong in a git worktree, where the
+   *     dependency tree lives in the primary checkout and Node resolves upward;
+   *   - `require.resolve("<name>/package.json")` fails on packages whose
+   *     `exports` map does not expose it, which sharp's does not.
+   *
+   * So the MAIN entry is resolved and the tree is walked up to the directory
+   * that sits directly under a `node_modules`.
+   */
+  const packageDirectory = (name) => {
+    let current;
+    try {
+      current = path.dirname(resolver.resolve(name));
+    } catch {
+      return null;
+    }
+    const segments = name.split("/").length;
+    while (current !== path.dirname(current)) {
+      const parent = path.dirname(current);
+      const enclosing = segments === 2 ? path.dirname(parent) : parent;
+      if (path.basename(enclosing) === "node_modules") return current;
+      current = parent;
+    }
+    return null;
+  };
+
+  const copied = [];
+  for (const name of NATIVE_EXTERNALS) {
+    const source = packageDirectory(name);
+    if (source === null) throw new JobAError("NATIVE_EXTERNAL_NOT_INSTALLED", name);
+    cpSync(source, path.join(target, name), { recursive: true, dereference: true });
+    copied.push(name);
+
+    const manifest = JSON.parse(readFileSync(path.join(source, "package.json"), "utf8"));
+    for (const dependency of Object.keys(manifest.optionalDependencies ?? {})) {
+      const dependencySource = packageDirectory(dependency);
+      if (dependencySource === null) continue;
+      cpSync(dependencySource, path.join(target, dependency), {
+        recursive: true,
+        dereference: true,
+      });
+      copied.push(dependency);
+    }
+  }
+  return copied.sort();
 }
 
 // ---- 9. prohibited dependencies and base drift -----------------------------

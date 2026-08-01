@@ -31,8 +31,8 @@ permissions:
   contents: read
 
 env:
-  # harness revision: 2
-  ISSUE_149_HARNESS_REVISION: "2"
+  # harness revision: 3
+  ISSUE_149_HARNESS_REVISION: "3"
   MODE_FILE: artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt
 
 jobs:
