@@ -44,8 +44,8 @@ permissions:
   contents: read
 
 env:
-  # harness revision: 11
-  ISSUE_149_HARNESS_REVISION: "11"
+  # harness revision: 12
+  ISSUE_149_HARNESS_REVISION: "12"
   MODE_FILE: artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt
   # linux/amd64 manifest digest for node:20-bookworm-slim, resolved and recorded.
   ISSUE_149_BASE_IMAGE: node@sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c
@@ -442,10 +442,16 @@ jobs:
       # By exact ARTIFACT ID, not only by name. The download action validates the
       # digest itself, but a mismatch there is a warning — not a load-bearing
       # gate — so the comparison below is what actually decides.
+      # By exact ARTIFACT ID. `artifact-ids` puts the workflow into
+      # multiple-artifact mode, which nests each artifact under
+      # `<path>/<artifact-name>/`; `merge-multiple: true` places the contents
+      # directly at `path` instead. The rehearsal caught this: the round-trip
+      # verification found zero items because it was reading the wrong level.
       # actions/download-artifact v4
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           artifact-ids: ${{ needs.job-b-execute.outputs.artifactId }}
+          merge-multiple: true
           path: downloaded
 
       - name: Compare the artifact metadata digest to the upload output
@@ -608,10 +614,11 @@ jobs:
           path: synthetic/raw
           retention-days: 1
 
-      # actions/download-artifact v4
+      # actions/download-artifact v4 — see the note above on merge-multiple.
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           artifact-ids: ${{ steps.rehearsalUpload.outputs.artifact-id }}
+          merge-multiple: true
           path: roundtrip
 
       - name: Verify the round-tripped artifact identity and contents
