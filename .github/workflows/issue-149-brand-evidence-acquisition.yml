@@ -44,8 +44,8 @@ permissions:
   contents: read
 
 env:
-  # harness revision: 10
-  ISSUE_149_HARNESS_REVISION: "10"
+  # harness revision: 11
+  ISSUE_149_HARNESS_REVISION: "11"
   MODE_FILE: artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt
   # linux/amd64 manifest digest for node:20-bookworm-slim, resolved and recorded.
   ISSUE_149_BASE_IMAGE: node@sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c
@@ -124,6 +124,40 @@ jobs:
         with:
           name: issue-149-truth-free-preparation
           path: .local/issue-149-preparation
+          retention-days: 7
+
+      # The HOST verifier bundle. Job B has no checkout, so a verification step
+      # that invokes `npx vite-node scripts/eval/...` cannot run there at all.
+      # This runs with plain pinned Node and is never mounted into the container.
+      # actions/upload-artifact v4
+      - name: Upload the host verifier bundle
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: issue-149-host-verifier
+          path: .local/issue-149-verifier
+          retention-days: 7
+
+      # The MINIMAL Job C inventory, as its own artifact. It is not part of the
+      # truth-free acquisition input and is never mounted with it.
+      # actions/upload-artifact v4
+      - name: Upload the minimal identity inventory
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: issue-149-identity-inventory
+          path: .local/issue-149-identity-inventory
+          retention-days: 7
+
+      # Synthetic evidence for the no-OCR rehearsal. No acquisition API, no
+      # extractor, no OCR, no governed corpus — synthetic item IDs only.
+      - name: Build the synthetic rehearsal evidence
+        run: npx vite-node --config vitest.config.ts scripts/eval/issue-149-build-rehearsal-evidence.ts -- .local/issue-149-rehearsal
+
+      # actions/upload-artifact v4
+      - name: Upload the synthetic rehearsal evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: issue-149-synthetic-rehearsal-evidence
+          path: .local/issue-149-rehearsal
           retention-days: 7
 
       # actions/upload-artifact v4
@@ -218,6 +252,11 @@ jobs:
   job-b-execute:
     name: Job B — isolated acquisition OCR
     needs: [resolve-mode, execute-transition-gate, job-a-prepare]
+    outputs:
+      artifactId: ${{ steps.upload.outputs.artifact-id }}
+      artifactDigest: ${{ steps.upload.outputs.artifact-digest }}
+      artifactUrl: ${{ steps.upload.outputs.artifact-url }}
+      headSha: ${{ github.sha }}
     # THE ONLY OCR. Reachable only when the committed mode is exactly `execute`
     # AND the execute-transition gate passed: the gate is a `needs:` dependency,
     # so a rejected transition prevents this job from starting at all.
@@ -241,11 +280,20 @@ jobs:
           grep -q "${ISSUE_149_BASE_IMAGE_DIGEST#sha256:}" image-identity.json \
             || { echo "RUNTIME_IMAGE_DIGEST_MISMATCH" >&2; exit 1; }
 
+      # actions/download-artifact v4
+      - name: Download the host verifier bundle
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: issue-149-host-verifier
+          path: verifier
+
       - name: Acquire the primary and repeat runs
+        id: acquire
         run: |
-          set -euo pipefail
+          set -uo pipefail
           mkdir -p output
           sudo chown -R "${ISSUE_149_RUNTIME_UID}:${ISSUE_149_RUNTIME_GID}" output
+          set +e
           docker run --rm \
             --platform linux/amd64 \
             --network none \
@@ -267,46 +315,58 @@ jobs:
             -v "$PWD/output:/output:rw" \
             "${ISSUE_149_BASE_IMAGE}" \
             node /opt/acquisition/acquisition.mjs > acquisition-report.json
+          ACQUIRE_STATUS=$?
+          set -e
+          # CAPTURED, not fatal. The path most in need of forensic verification
+          # is a failed acquisition, and letting `set -e` end the job here is
+          # exactly what skipped it. Adjudication happens after preservation.
+          echo "{\"exitStatus\": ${ACQUIRE_STATUS}}" > acquisition-status.json
+          echo "status=${ACQUIRE_STATUS}" >> "$GITHUB_OUTPUT"
+          cat acquisition-status.json
 
-      # ACTOR 2's raw verification. The previous step here ran `du -sb` and
-      # reported a size against the 100 MB threshold, which is a volume
-      # measurement and not verification: it says nothing about item sets, file
-      # sets, digests, run commit state, staging leftovers or the verdict. A
-      # size check that passes on a half-written run reads as one and is worse
-      # than none.
+      # ALWAYS. Actor 2 verifies whatever exists and produces a report even when
+      # the evidence is incomplete. Plain node against the verifier bundle: this
+      # job has no checkout, no package.json and no node_modules.
       - name: Actor 2 — verify the sealed raw evidence
         id: raw
+        if: always()
         run: |
-          set -euo pipefail
-          npx vite-node --config vitest.config.ts \
-            scripts/eval/issue-149-verify-raw-evidence.ts -- \
+          set +e
+          node verifier/verify.mjs \
             --raw output/raw \
             --manifest preparation/input/truth-free-input-manifest.json \
             --report raw-verification-report.json
-          echo "verified=true" >> "$GITHUB_OUTPUT"
+          RAW_STATUS=$?
+          set -e
+          echo "status=${RAW_STATUS}" >> "$GITHUB_OUTPUT"
+          echo "verified=$([ "${RAW_STATUS}" -eq 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
 
-      # JOB C — the read-only historical identity-leak verifier. It receives the
-      # sealed bytes and the minimal identifier inventory only: no acceptable
-      # Brand values, no truth labels, no expected field values, no prior
-      # classifications. A clean report is mandatory before any post-run commit
-      # process or truth-based evaluator. No evaluator is authorized here.
+      # actions/download-artifact v4 — the minimal inventory, downloaded only
+      # now, AFTER the container has exited.
+      - name: Download the minimal identity inventory
+        if: steps.raw.outputs.verified == 'true'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: issue-149-identity-inventory
+          path: identity
+
+      # JOB C. Only after Actor 2 verifies a complete committed artifact. A
+      # missing inventory HALTS; it is never treated as an empty one.
       - name: Job C — historical identity-leak verification
+        id: identity
         if: steps.raw.outputs.verified == 'true'
         run: |
           set -euo pipefail
-          npx vite-node --config vitest.config.ts \
-            scripts/eval/issue-149-verify-raw-evidence.ts -- \
+          node verifier/verify.mjs \
             --raw output/raw \
             --manifest preparation/input/truth-free-input-manifest.json \
             --identity \
-            --id-map artifacts/issue-149-brand-complete-evidence-acquisition/post-freeze/id-map.json \
-            --truth-keys artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json \
+            --identity-inventory identity/identity-inventory.json \
+            --identity-manifest identity/identity-inventory-manifest.json \
             --report identity-leak-report.json
 
-      # The volume rule applies only AFTER complete raw verification. Measuring
-      # first would gate on the size of evidence that had not been verified.
       - name: Apply the durable-archive volume rule
-        if: steps.raw.outputs.verified == 'true'
+        if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success'
         run: |
           set -euo pipefail
           BYTES=$(du -sb output | cut -f1)
@@ -314,76 +374,268 @@ jobs:
           test "${BYTES}" -le 104857600 || {
             echo "RAW_EVIDENCE_EXCEEDS_DURABLE_ARCHIVE_LIMIT" >&2; exit 1; }
 
-      # VERIFIED evidence and PARTIAL output are different artifacts. Uploading
-      # a failed or partial run under the name `issue-149-raw-evidence` would
-      # label incomplete output as completed evidence.
+      # Verified evidence uploads ONLY after Actor 2 and Job C both succeed.
       # actions/upload-artifact v4
       - name: Upload the verified raw evidence
         id: upload
-        if: steps.raw.outputs.verified == 'true'
+        if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: issue-149-raw-evidence
           path: |
             output
             acquisition-report.json
+            acquisition-status.json
             image-identity.json
             raw-verification-report.json
             identity-leak-report.json
           retention-days: 30
 
       # actions/upload-artifact v4
-      - name: Upload forensic output from an incomplete run
-        if: failure() || steps.raw.outputs.verified != 'true'
+      - name: Upload incomplete forensic output
+        if: steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: issue-149-incomplete-forensic-output
           path: |
             output
             acquisition-report.json
+            acquisition-status.json
             image-identity.json
             raw-verification-report.json
+            identity-leak-report.json
           retention-days: 30
 
-      - name: Record the uploaded artifact identity
-        if: steps.upload.outcome == 'success'
+      # ADJUDICATION, last — after the reports and the appropriate artifact have
+      # been preserved. COMPLETE_WITH_NONDETERMINISM is a successful outcome.
+      - name: Adjudicate the acquisition
+        if: always()
         run: |
           set -euo pipefail
-          cat > uploaded-artifact.json <<JSON
-          {
-            "artifactId": "${{ steps.upload.outputs.artifact-id }}",
-            "artifactDigest": "${{ steps.upload.outputs.artifact-digest }}",
-            "artifactUrl": "${{ steps.upload.outputs.artifact-url }}",
-            "retentionDays": 30
-          }
-          JSON
-          cat uploaded-artifact.json
+          echo "acquisition exit: ${{ steps.acquire.outputs.status }}"
+          echo "actor 2 verified: ${{ steps.raw.outputs.verified }}"
+          test "${{ steps.raw.outputs.verified }}" = "true" || {
+            echo "ACQUISITION_NOT_VERIFIED" >&2; exit 1; }
+          test "${{ steps.acquire.outputs.status }}" = "0" || {
+            echo "ACQUISITION_RUNNER_REPORTED_FAILURE" >&2; exit 1; }
 
   verify-uploaded-artifact:
-    name: Verify the uploaded artifact digest
+    name: Verify the uploaded artifact identity and contents
     needs: [resolve-mode, job-b-execute]
     if: needs.resolve-mode.outputs.mode == 'execute'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Narrowly scoped, only to read this run's artifact metadata.
+      actions: read
     steps:
-      # The uploaded artifact is downloaded again and re-verified, BEFORE the
-      # job-local output disappears. An upload whose digest was never checked is
-      # an assumption about durability, not a record of it.
+      - name: Require the artifact identity outputs
+        run: |
+          set -euo pipefail
+          test -n "${{ needs.job-b-execute.outputs.artifactId }}" || {
+            echo "ARTIFACT_ID_ABSENT" >&2; exit 1; }
+          test -n "${{ needs.job-b-execute.outputs.artifactDigest }}" || {
+            echo "ARTIFACT_DIGEST_ABSENT" >&2; exit 1; }
+          test -n "${{ needs.job-b-execute.outputs.headSha }}" || {
+            echo "PRODUCING_HEAD_SHA_ABSENT" >&2; exit 1; }
+
+      # By exact ARTIFACT ID, not only by name. The download action validates the
+      # digest itself, but a mismatch there is a warning — not a load-bearing
+      # gate — so the comparison below is what actually decides.
       # actions/download-artifact v4
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
-          name: issue-149-raw-evidence
+          artifact-ids: ${{ needs.job-b-execute.outputs.artifactId }}
           path: downloaded
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-        with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
-      - name: Re-verify the downloaded evidence
+
+      - name: Compare the artifact metadata digest to the upload output
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          npx vite-node --config vitest.config.ts \
-            scripts/eval/issue-149-verify-raw-evidence.ts -- \
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${{ needs.job-b-execute.outputs.artifactId }}" \
+            > artifact-metadata.json
+          METADATA_DIGEST=$(python3 -c "import json;print(json.load(open('artifact-metadata.json')).get('digest',''))")
+          METADATA_RUN=$(python3 -c "import json;print(json.load(open('artifact-metadata.json')).get('workflow_run',{}).get('id',''))")
+          UPLOAD_DIGEST="${{ needs.job-b-execute.outputs.artifactDigest }}"
+          # Normalize: the upload output and the API may differ only by a
+          # `sha256:` prefix.
+          NORM_META="${METADATA_DIGEST#sha256:}"
+          NORM_UP="${UPLOAD_DIGEST#sha256:}"
+          echo "metadata run ${METADATA_RUN} vs this run ${GITHUB_RUN_ID}"
+          test "${METADATA_RUN}" = "${GITHUB_RUN_ID}" || {
+            echo "ARTIFACT_RUN_ASSOCIATION_MISMATCH" >&2; exit 1; }
+          test -n "${NORM_META}" || { echo "ARTIFACT_METADATA_DIGEST_ABSENT" >&2; exit 1; }
+          test "${NORM_META}" = "${NORM_UP}" || {
+            echo "ARTIFACT_DIGEST_MISMATCH: ${NORM_META} vs ${NORM_UP}" >&2; exit 1; }
+
+      # actions/download-artifact v4 — the verifier travels here too.
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: issue-149-host-verifier
+          path: verifier
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: issue-149-truth-free-preparation
+          path: preparation
+
+      - name: Re-verify the downloaded evidence, content level
+        run: |
+          set -euo pipefail
+          node verifier/verify.mjs \
             --raw downloaded/output/raw \
-            --manifest artifacts/issue-149-brand-complete-evidence-acquisition/truth-free-input-manifest.json \
+            --manifest preparation/input/truth-free-input-manifest.json \
             --report downloaded-verification-report.json
+
+      - name: Create the final verification receipt
+        run: |
+          set -euo pipefail
+          RAW_DIGEST=$(sha256sum downloaded-verification-report.json | cut -d" " -f1)
+          cat > verification-receipt.json <<JSON
+          {
+            "artifactId": "${{ needs.job-b-execute.outputs.artifactId }}",
+            "uploadDigest": "${{ needs.job-b-execute.outputs.artifactDigest }}",
+            "artifactUrl": "${{ needs.job-b-execute.outputs.artifactUrl }}",
+            "headSha": "${{ needs.job-b-execute.outputs.headSha }}",
+            "rawVerificationReportDigest": "${RAW_DIGEST}",
+            "finalStatus": "VERIFIED"
+          }
+          JSON
+          cat verification-receipt.json
+
+      # actions/upload-artifact v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: issue-149-verification-receipt
+          path: |
+            verification-receipt.json
+            artifact-metadata.json
+            downloaded-verification-report.json
+          retention-days: 30
+
+  # ---------------------------------------------------------------------------
+  # The NO-OCR verifier-transport rehearsal.
+  #
+  # The execute job is skipped under `discover`, so ordinary rediscovery never
+  # exercises the host-side verification path at all. This job does — with no
+  # checkout, plain Node, synthetic evidence, and no acquisition, extractor, OCR
+  # or governed raw evidence anywhere in it. It is the executable proof that the
+  # dormant host-side pipeline can actually run in a no-checkout job.
+  # ---------------------------------------------------------------------------
+  verifier-transport-rehearsal:
+    name: Verifier-transport rehearsal (no OCR)
+    needs: [resolve-mode, job-a-prepare]
+    if: needs.resolve-mode.outputs.mode == 'discover'
+    runs-on: ubuntu-latest
+    steps:
+      # NO repository checkout, deliberately.
+      # actions/download-artifact v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: issue-149-host-verifier
+          path: verifier
+      # actions/download-artifact v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: issue-149-synthetic-rehearsal-evidence
+          path: synthetic
+
+      - name: Actor 2 runs with plain Node and no checkout
+        run: |
+          set -euo pipefail
+          test ! -f package.json || { echo "UNEXPECTED_CHECKOUT" >&2; exit 1; }
+          node verifier/verify.mjs \
+            --raw synthetic/raw \
+            --manifest synthetic/expected-items.json \
+            --report rehearsal-raw-report.json
+
+      # actions/download-artifact v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: issue-149-identity-inventory
+          path: identity
+
+      - name: Job C runs, and a MISSING inventory halts
+        run: |
+          set -euo pipefail
+          node verifier/verify.mjs \
+            --raw synthetic/raw \
+            --manifest synthetic/expected-items.json \
+            --identity \
+            --identity-inventory identity/identity-inventory.json \
+            --identity-manifest identity/identity-inventory-manifest.json \
+            --report rehearsal-identity-report.json
+
+          # …and with the inventory absent it MUST fail. A zero-marker scan is
+          # never a clean scan.
+          set +e
+          node verifier/verify.mjs \
+            --raw synthetic/raw \
+            --manifest synthetic/expected-items.json \
+            --identity \
+            --identity-inventory identity/absent.json \
+            --identity-manifest identity/absent-manifest.json \
+            --report rehearsal-absent-report.json
+          ABSENT_STATUS=$?
+          set -e
+          test "${ABSENT_STATUS}" -ne 0 || {
+            echo "MISSING_INVENTORY_DID_NOT_HALT" >&2; exit 1; }
+          echo "missing inventory halted with status ${ABSENT_STATUS}"
+
+      - name: Planted failures must fail
+        run: |
+          set -euo pipefail
+          for PLANT in missing-marker phantom-manifest-entry; do
+            set +e
+            node verifier/verify.mjs \
+              --raw "synthetic/planted-${PLANT}/raw" \
+              --manifest synthetic/expected-items.json \
+              --report "rehearsal-${PLANT}-report.json"
+            STATUS=$?
+            set -e
+            test "${STATUS}" -ne 0 || {
+              echo "PLANTED_${PLANT}_DID_NOT_FAIL" >&2; exit 1; }
+            echo "planted ${PLANT} failed as required"
+          done
+
+      # actions/upload-artifact v4
+      - name: Upload the synthetic evidence, then redownload by ID
+        id: rehearsalUpload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: issue-149-rehearsal-roundtrip
+          path: synthetic/raw
+          retention-days: 1
+
+      # actions/download-artifact v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: ${{ steps.rehearsalUpload.outputs.artifact-id }}
+          path: roundtrip
+
+      - name: Verify the round-tripped artifact identity and contents
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${{ steps.rehearsalUpload.outputs.artifact-id }}" \
+            > rehearsal-artifact-metadata.json
+          META=$(python3 -c "import json;print(json.load(open('rehearsal-artifact-metadata.json')).get('digest',''))")
+          UP="${{ steps.rehearsalUpload.outputs.artifact-digest }}"
+          test "${META#sha256:}" = "${UP#sha256:}" || {
+            echo "REHEARSAL_ARTIFACT_DIGEST_MISMATCH: ${META} vs ${UP}" >&2; exit 1; }
+          node verifier/verify.mjs \
+            --raw roundtrip \
+            --manifest synthetic/expected-items.json \
+            --report rehearsal-roundtrip-report.json
+          echo "round-trip digest verified: ${META}"
+
+      # actions/upload-artifact v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: issue-149-rehearsal-reports
+          path: |
+            rehearsal-*.json
+          retention-days: 7

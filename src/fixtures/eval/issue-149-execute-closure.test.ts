@@ -37,6 +37,8 @@ import {
   type DeterminismReport,
 } from "../../../scripts/eval/lib/issue-149-run-evidence-writer";
 import {
+  IdentityInventoryError,
+  loadIdentityInventory,
   verifyNoHistoricalIdentity,
   verifyRawEvidence,
 } from "../../../scripts/eval/lib/issue-149-raw-verifier";
@@ -457,7 +459,16 @@ describe("Issue #149 actor 2 verifies raw evidence, and Job C scans for identity
       "utf8",
     );
     expect(workflow).toContain("Actor 2 — verify the sealed raw evidence");
-    expect(workflow).toContain("issue-149-verify-raw-evidence.ts");
+    // Plain node against the transported verifier bundle. Job B has no
+    // checkout, so `npx vite-node scripts/eval/...` could never have run there.
+    expect(workflow).toContain("node verifier/verify.mjs");
+    expect(workflow).not.toContain(
+      "npx vite-node --config vitest.config.ts \\\n            scripts/eval/issue-149-verify-raw-evidence.ts",
+    );
+    // Actor 2 runs even when the acquisition failed.
+    expect(workflow).toContain(
+      "Actor 2 — verify the sealed raw evidence\n        id: raw\n        if: always()",
+    );
     // The volume rule runs only AFTER verification.
     expect(workflow.indexOf("Actor 2 — verify")).toBeLessThan(
       workflow.indexOf("Apply the durable-archive volume rule"),
@@ -549,6 +560,233 @@ describe("Issue #149 execute halts before OCR when the preflight fails", () => {
       expect(runner).toContain(claim);
     }
     spy.mockRestore();
+  });
+});
+
+describe("Issue #149 the identity inventory must be present and exact", () => {
+  const inventory = {
+    artifact: "issue-149-identity-inventory",
+    experimentId: "issue-149-brand-complete-evidence-acquisition",
+    historicalCaseIds: ["brand-023"],
+    historicalImagePaths: ["src/fixtures/images/brand-023.png"],
+    forbiddenEvidenceKeys: ["expectedBrand"],
+    containsNo: ["acceptable Brand values"],
+  };
+  const text = `${JSON.stringify(inventory, null, 2)}\n`;
+  const expected = {
+    inventorySha256: sha256Bytes(text),
+    historicalCaseIdCount: 1,
+    historicalImagePathCount: 1,
+    forbiddenEvidenceKeyCount: 1,
+  };
+
+  it("loads a complete, digest-matched inventory", () => {
+    const loaded = loadIdentityInventory({ inventoryText: text, expected });
+    expect(loaded.historicalCaseIds).toEqual(["brand-023"]);
+    expect(loaded.forbiddenEvidenceKeys).toEqual(["expectedBrand"]);
+  });
+
+  it("HALTS on an absent inventory — an absent file is not an empty one", () => {
+    // The exact defect: the CLI turned a missing file into an empty array, so
+    // Job C scanned for zero markers and reported clean.
+    expect(() => loadIdentityInventory({ inventoryText: null, expected })).toThrow(
+      expect.objectContaining({ code: "IDENTITY_INVENTORY_ABSENT" }),
+    );
+    expect(() => loadIdentityInventory({ inventoryText: text, expected: null })).toThrow(
+      expect.objectContaining({ code: "IDENTITY_INVENTORY_ABSENT" }),
+    );
+  });
+
+  it("HALTS on a wrong digest, malformed schema, duplicate, empty or zero-marker inventory", () => {
+    expect(() =>
+      loadIdentityInventory({
+        inventoryText: text,
+        expected: { ...expected, inventorySha256: "0".repeat(64) },
+      }),
+    ).toThrow(expect.objectContaining({ code: "IDENTITY_INVENTORY_DIGEST_MISMATCH" }));
+
+    const variant = (mutate: (draft: Record<string, unknown>) => void): string => {
+      const draft = JSON.parse(JSON.stringify(inventory)) as Record<string, unknown>;
+      mutate(draft);
+      return `${JSON.stringify(draft, null, 2)}\n`;
+    };
+    const cases: Array<[string, string]> = [
+      ["not json", "{oops"],
+      ["extra key", variant((draft) => (draft.extra = true))],
+      ["duplicate marker", variant((draft) => (draft.historicalCaseIds = ["a", "a"]))],
+      ["empty marker", variant((draft) => (draft.historicalCaseIds = [" "]))],
+      ["zero markers", variant((draft) => (draft.historicalCaseIds = []))],
+      ["zero forbidden keys", variant((draft) => (draft.forbiddenEvidenceKeys = []))],
+      ["wrong count", variant((draft) => (draft.historicalCaseIds = ["a", "b"]))],
+    ];
+    for (const [name, body] of cases) {
+      expect(
+        () =>
+          loadIdentityInventory({
+            inventoryText: body,
+            expected: { ...expected, inventorySha256: sha256Bytes(body) },
+          }),
+        `${name} must halt`,
+      ).toThrow(IdentityInventoryError);
+    }
+  });
+});
+
+describe("Issue #149 the run marker schema is closed and exact", () => {
+  const committedRoot = (): string => {
+    const root = freshRoot();
+    writeItem(root, "item-0001");
+    const sealed = sealRunEvidence({
+      runId: "primary",
+      rawDirectory: root,
+      expectedItemIds: ["item-0001"],
+      determinism: { ...DETERMINISM, comparedItems: 1 },
+    });
+    writeRunEvidence(sealed, { directory: root });
+    return root;
+  };
+  const marker = (root: string) =>
+    JSON.parse(readFileSync(path.join(root, RUN_COMMIT_MARKER), "utf8")) as Record<string, unknown>;
+  const rewrite = (root: string, mutate: (draft: Record<string, unknown>) => void): void => {
+    const draft = marker(root);
+    mutate(draft);
+    writeFileSync(path.join(root, RUN_COMMIT_MARKER), `${JSON.stringify(draft)}\n`);
+  };
+
+  it("rejects a digest SUBSET with a correct requiredFiles list", () => {
+    // The exact defect: iterating whatever fileDigests contained meant a marker
+    // with one valid entry and the right requiredFiles read as committed.
+    const root = committedRoot();
+    rewrite(root, (draft) => {
+      draft.fileDigests = (draft.fileDigests as unknown[]).slice(0, 1);
+    });
+    expect(verifyRunCommitted(root)).toMatchObject({
+      committed: false,
+      reason: "RUN_COMMIT_MARKER_DIGEST_SET_MISMATCH",
+    });
+  });
+
+  it("rejects duplicated, extra, reordered or malformed digests", () => {
+    const mutations: Array<[string, (draft: Record<string, unknown>) => void]> = [
+      [
+        "duplicate",
+        (draft) => {
+          const list = draft.fileDigests as unknown[];
+          draft.fileDigests = [list[0], list[0], list[2], list[3]];
+        },
+      ],
+      [
+        "extra",
+        (draft) => {
+          const list = draft.fileDigests as unknown[];
+          draft.fileDigests = [...list, list[0]];
+        },
+      ],
+      [
+        "reordered",
+        (draft) => {
+          draft.fileDigests = [...(draft.fileDigests as unknown[])].reverse();
+        },
+      ],
+      [
+        "malformed",
+        (draft) => {
+          draft.fileDigests = [1, 2, 3, 4];
+        },
+      ],
+    ];
+    for (const [name, mutate] of mutations) {
+      const root = committedRoot();
+      rewrite(root, mutate);
+      const verdict = verifyRunCommitted(root);
+      expect(verdict.committed, `${name} must be uncommitted`).toBe(false);
+      // …and it must be an explicit result, never an uncaught TypeError.
+      expect(typeof verdict.reason).toBe("string");
+    }
+  });
+
+  it("rejects a wrong aggregate, an extra key, a wrong runId and a bad itemCount", () => {
+    const checks: Array<[(draft: Record<string, unknown>) => void, string]> = [
+      [(draft) => (draft.aggregateSha256 = "0".repeat(64)), "RUN_COMMIT_MARKER_AGGREGATE_MISMATCH"],
+      [(draft) => (draft.extra = true), "RUN_COMMIT_MARKER_KEY_SET_MISMATCH"],
+      [(draft) => (draft.runId = "other"), "RUN_COMMIT_MARKER_RUN_ID_MISMATCH"],
+      [(draft) => (draft.itemCount = -1), "RUN_COMMIT_MARKER_ITEM_COUNT_INVALID"],
+      [(draft) => (draft.requiredFiles = ["counts.json"]), "RUN_COMMIT_MARKER_FILE_SET_MISMATCH"],
+    ];
+    for (const [mutate, reason] of checks) {
+      const root = committedRoot();
+      rewrite(root, mutate);
+      expect(verifyRunCommitted(root, { runId: "primary" })).toMatchObject({
+        committed: false,
+        reason,
+      });
+    }
+  });
+
+  it("rejects an unexpected run-level file", () => {
+    const root = committedRoot();
+    writeFileSync(path.join(root, "stray.json"), "{}\n");
+    expect(verifyRunCommitted(root).committed).toBe(false);
+    expect(verifyRunCommitted(root).reason).toContain("UNEXPECTED_RUN_LEVEL_FILE");
+  });
+});
+
+describe("Issue #149 manifest verification is bidirectional", () => {
+  const run = (root: string, runId: string, itemIds: string[]) => {
+    const runRoot = path.join(root, runId);
+    mkdirSync(runRoot, { recursive: true });
+    for (const itemId of itemIds) writeItem(runRoot, itemId);
+    const sealed = sealRunEvidence({
+      runId,
+      rawDirectory: runRoot,
+      expectedItemIds: itemIds,
+      determinism: { ...DETERMINISM, comparedItems: itemIds.length },
+    });
+    writeRunEvidence(sealed, { directory: runRoot });
+    return runRoot;
+  };
+
+  it("rejects a PHANTOM manifest entry naming a file that does not exist", () => {
+    // Verifying only the files on disk against the manifest leaves the manifest
+    // free to contain entries for files that were never written.
+    const root = freshRoot();
+    run(root, "primary", ["item-0001"]);
+    run(root, "repeat", ["item-0001"]);
+    const manifestPath = path.join(root, "primary", "raw-evidence-manifest.json");
+    const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as {
+      itemFiles: Array<{ path: string; byteLength: number; sha256: string }>;
+    };
+    manifest.itemFiles.push({
+      path: "item-0001/item-0001.phantom.json",
+      byteLength: 1,
+      sha256: "0".repeat(64),
+    });
+    writeFileSync(manifestPath, `${JSON.stringify(manifest)}\n`);
+
+    const report = verifyRawEvidence({ rawRoot: root, expectedItemIds: ["item-0001"] });
+    expect(report.ok).toBe(false);
+    const finding = report.findings.find((entry) =>
+      entry.check.includes("manifest-covers-exactly-what-is-on-disk"),
+    );
+    expect(finding?.ok).toBe(false);
+    expect((finding?.detail as { phantom: string[] }).phantom).toContain(
+      "item-0001/item-0001.phantom.json",
+    );
+  });
+
+  it("does NOT claim to have run the forbidden-key scan", () => {
+    const root = freshRoot();
+    run(root, "primary", ["item-0001"]);
+    run(root, "repeat", ["item-0001"]);
+    const report = verifyRawEvidence({ rawRoot: root, expectedItemIds: ["item-0001"] });
+    const delegated = report.findings.find(
+      (entry) => entry.check === "forbidden-evidence-key-scan",
+    );
+    expect(delegated).toBeDefined();
+    expect((delegated?.detail as { adjudicatedHere: boolean }).adjudicatedHere).toBe(false);
+    expect((delegated?.detail as { delegatedTo: string }).delegatedTo).toContain("Job C");
+    // The old finding name asserted a result Actor 2 never computed.
+    expect(report.findings.map((entry) => entry.check)).not.toContain("no-forbidden-evidence-key");
   });
 });
 

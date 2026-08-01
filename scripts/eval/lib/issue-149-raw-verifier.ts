@@ -81,8 +81,9 @@ export function verifyRawEvidence(input: {
   for (const runId of runIds) {
     const runRoot = path.join(rawRoot, runId);
 
-    // 1. the run is COMMITTED — a valid marker binding every run-level digest.
-    const committed = verifyRunCommitted(runRoot);
+    // 1. the run is COMMITTED — a valid marker binding every run-level digest,
+    //    and naming THIS run.
+    const committed = verifyRunCommitted(runRoot, { runId });
     record(`${runId}: run-commit-marker-valid`, committed.committed, committed);
 
     // 2. the exact item set.
@@ -142,6 +143,37 @@ export function verifyRawEvidence(input: {
     record(`${runId}: item-file-sets-exact`, fileSetProblems.length === 0, fileSetProblems);
     record(`${runId}: every-item-file-digest-matches`, digestProblems.length === 0, digestProblems);
 
+    // 3b. THE REVERSE DIRECTION. Checking every file on disk against the
+    //     manifest leaves a manifest free to contain phantom entries pointing at
+    //     files that do not exist, or duplicates. Both directions, or neither.
+    const onDiskPaths = new Set<string>();
+    for (const itemId of items) {
+      for (const file of readdirSync(path.join(runRoot, itemId))) {
+        onDiskPaths.add(`${itemId}/${file}`);
+      }
+    }
+    const declaredPaths = (manifest?.itemFiles ?? []).map((entry) => entry.path);
+    const phantom = declaredPaths.filter((declared) => !onDiskPaths.has(declared));
+    const duplicated = declaredPaths.filter(
+      (declared, index) => declaredPaths.indexOf(declared) !== index,
+    );
+    const unlisted = [...onDiskPaths].filter((actual) => !declaredPaths.includes(actual));
+    const sortedDeclared = [...declaredPaths].sort();
+    const reordered = declaredPaths.some((declared, index) => declared !== sortedDeclared[index]);
+    record(
+      `${runId}: manifest-covers-exactly-what-is-on-disk`,
+      phantom.length === 0 && duplicated.length === 0 && unlisted.length === 0 && !reordered,
+      { phantom, duplicated, unlisted, reordered },
+    );
+
+    // 3c. the manifest's own declared identity.
+    const declaredIdentity = manifest as unknown as { runId?: string; itemCount?: number } | null;
+    record(
+      `${runId}: manifest-identity-exact`,
+      declaredIdentity?.runId === runId && declaredIdentity?.itemCount === expected.length,
+      { runId: declaredIdentity?.runId, itemCount: declaredIdentity?.itemCount },
+    );
+
     // 4. the manifest's own SHA-256 file covers the exact manifest bytes.
     const digestFile = path.join(runRoot, "raw-evidence-manifest.sha256");
     const digestLine = existsSync(digestFile) ? readFileSync(digestFile, "utf8") : "";
@@ -154,7 +186,17 @@ export function verifyRawEvidence(input: {
 
     // 5. counts and determinism are present and covered by the manifest.
     const runFileProblems: string[] = [];
-    for (const file of ["counts.json", "determinism-report.json"]) {
+    const declaredRunPaths = (manifest?.runFiles ?? []).map((entry) => entry.path);
+    const expectedRunPaths = ["counts.json", "determinism-report.json"];
+    if (
+      declaredRunPaths.length !== expectedRunPaths.length ||
+      declaredRunPaths.some((declared, index) => declared !== expectedRunPaths[index])
+    ) {
+      runFileProblems.push(
+        `runFiles ${JSON.stringify(declaredRunPaths)} is not exactly ${JSON.stringify(expectedRunPaths)}`,
+      );
+    }
+    for (const file of expectedRunPaths) {
       const full = path.join(runRoot, file);
       if (!existsSync(full)) {
         runFileProblems.push(`${file} absent`);
@@ -199,8 +241,37 @@ export function verifyRawEvidence(input: {
     determinism,
   );
 
-  // 8. no forbidden evidence key anywhere in the sealed bytes.
-  record("no-forbidden-evidence-key", true, "checked by the identity verifier, separately");
+  // 8. Both runs' determinism reports must agree, apart from the writer-owned
+  //    runId, and both verdicts must be complete outcomes.
+  const reports = runIds.map((runId) => {
+    const file = path.join(rawRoot, runId, "determinism-report.json");
+    return existsSync(file)
+      ? (JSON.parse(readFileSync(file, "utf8")) as Record<string, unknown>)
+      : null;
+  });
+  const withoutRunId = (report: Record<string, unknown> | null): string | null =>
+    report === null
+      ? null
+      : canonicalize(Object.fromEntries(Object.entries(report).filter(([key]) => key !== "runId")));
+  record(
+    "both-determinism-reports-agree-apart-from-runId",
+    reports.every((report) => report !== null) && new Set(reports.map(withoutRunId)).size === 1,
+    reports.map((report) => report?.verdict),
+  );
+
+  // NOT a forbidden-key finding. Actor 2 does not perform that scan, and
+  // recording `ok: true` for a check it did not run was the same defect as a
+  // size check standing in for verification. The result is DELEGATED to Job C
+  // and is not adjudicated here.
+  findings.push({
+    check: "forbidden-evidence-key-scan",
+    ok: true,
+    detail: {
+      adjudicatedHere: false,
+      delegatedTo: "Job C — verifyNoHistoricalIdentity",
+      note: "Actor 2 does not scan for forbidden evidence keys. This entry records the delegation; Job C supplies the actual result and its own halt code.",
+    },
+  });
 
   return {
     ok: findings.every((finding) => finding.ok),
@@ -215,6 +286,146 @@ export function verifyRawEvidence(input: {
 // ---------------------------------------------------------------------------
 // Job C — the read-only historical identity-leak verifier
 // ---------------------------------------------------------------------------
+
+export class IdentityInventoryError extends Error {
+  constructor(
+    readonly code:
+      | "IDENTITY_INVENTORY_ABSENT"
+      | "IDENTITY_INVENTORY_MALFORMED"
+      | "IDENTITY_INVENTORY_DIGEST_MISMATCH",
+    detail: string,
+  ) {
+    super(`${code}: ${detail}`);
+    this.name = "IdentityInventoryError";
+  }
+}
+
+const INVENTORY_KEYS = [
+  "artifact",
+  "experimentId",
+  "historicalCaseIds",
+  "historicalImagePaths",
+  "forbiddenEvidenceKeys",
+  "containsNo",
+] as const;
+
+/**
+ * Load and VERIFY the Job C inventory.
+ *
+ * The previous CLI turned a missing file into an empty array. Job C would then
+ * scan for zero markers and report clean — a load-bearing check that could not
+ * fail, and the exact failure mode this project keeps producing. A zero-marker
+ * scan is never a successful clean scan.
+ */
+export function loadIdentityInventory(input: {
+  inventoryText: string | null;
+  expected: {
+    inventorySha256: string;
+    historicalCaseIdCount: number;
+    historicalImagePathCount: number;
+    forbiddenEvidenceKeyCount: number;
+  } | null;
+}): {
+  historicalCaseIds: string[];
+  historicalImagePaths: string[];
+  forbiddenEvidenceKeys: string[];
+} {
+  if (input.inventoryText === null) {
+    throw new IdentityInventoryError(
+      "IDENTITY_INVENTORY_ABSENT",
+      "the identity inventory is required when --identity is supplied; an absent file is not an empty inventory",
+    );
+  }
+  if (input.expected === null) {
+    throw new IdentityInventoryError(
+      "IDENTITY_INVENTORY_ABSENT",
+      "the identity inventory manifest is required; without it the inventory's digest and counts cannot be checked",
+    );
+  }
+
+  const digest = sha256Bytes(input.inventoryText);
+  if (digest !== input.expected.inventorySha256) {
+    throw new IdentityInventoryError(
+      "IDENTITY_INVENTORY_DIGEST_MISMATCH",
+      `inventory digest ${digest} does not equal the frozen ${input.expected.inventorySha256}`,
+    );
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(input.inventoryText);
+  } catch (cause) {
+    throw new IdentityInventoryError(
+      "IDENTITY_INVENTORY_MALFORMED",
+      cause instanceof Error ? cause.message : String(cause),
+    );
+  }
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new IdentityInventoryError("IDENTITY_INVENTORY_MALFORMED", "not an object");
+  }
+  const record = parsed as Record<string, unknown>;
+  const keys = Object.keys(record).sort();
+  const expectedKeys = [...INVENTORY_KEYS].sort();
+  if (keys.length !== expectedKeys.length || keys.some((key, i) => key !== expectedKeys[i])) {
+    throw new IdentityInventoryError(
+      "IDENTITY_INVENTORY_MALFORMED",
+      `key set ${JSON.stringify(keys)} is not the closed inventory schema`,
+    );
+  }
+
+  const list = (value: unknown, name: string): string[] => {
+    if (!Array.isArray(value) || value.some((entry) => typeof entry !== "string")) {
+      throw new IdentityInventoryError(
+        "IDENTITY_INVENTORY_MALFORMED",
+        `${name} is not a string array`,
+      );
+    }
+    const entries = value as string[];
+    if (entries.some((entry) => entry.trim().length === 0)) {
+      throw new IdentityInventoryError(
+        "IDENTITY_INVENTORY_MALFORMED",
+        `${name} contains an empty marker`,
+      );
+    }
+    if (new Set(entries).size !== entries.length) {
+      throw new IdentityInventoryError(
+        "IDENTITY_INVENTORY_MALFORMED",
+        `${name} contains a duplicate`,
+      );
+    }
+    return entries;
+  };
+
+  const historicalCaseIds = list(record.historicalCaseIds, "historicalCaseIds");
+  const historicalImagePaths = list(record.historicalImagePaths, "historicalImagePaths");
+  const forbiddenEvidenceKeys = list(record.forbiddenEvidenceKeys, "forbiddenEvidenceKeys");
+
+  const counts: Array<[string, number, number]> = [
+    ["historicalCaseIds", historicalCaseIds.length, input.expected.historicalCaseIdCount],
+    ["historicalImagePaths", historicalImagePaths.length, input.expected.historicalImagePathCount],
+    [
+      "forbiddenEvidenceKeys",
+      forbiddenEvidenceKeys.length,
+      input.expected.forbiddenEvidenceKeyCount,
+    ],
+  ];
+  for (const [name, actual, frozen] of counts) {
+    if (actual !== frozen) {
+      throw new IdentityInventoryError(
+        "IDENTITY_INVENTORY_MALFORMED",
+        `${name} has ${actual} entries, frozen count is ${frozen}`,
+      );
+    }
+  }
+  if (forbiddenEvidenceKeys.length === 0 || historicalCaseIds.length === 0) {
+    throw new IdentityInventoryError(
+      "IDENTITY_INVENTORY_MALFORMED",
+      "a zero-marker inventory would make a clean scan meaningless",
+    );
+  }
+
+  return { historicalCaseIds, historicalImagePaths, forbiddenEvidenceKeys };
+}
 
 export interface IdentityLeakReport {
   ok: boolean;

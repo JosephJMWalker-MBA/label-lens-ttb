@@ -78,6 +78,15 @@ export const RUN_EVIDENCE_FILES = [
  */
 export const RUN_COMMIT_MARKER = "RUN_COMMITTED.json";
 
+/** The marker's CLOSED own-key set. */
+export const MARKER_KEYS = [
+  "runId",
+  "itemCount",
+  "requiredFiles",
+  "fileDigests",
+  "aggregateSha256",
+] as const;
+
 /** The exact success and failure file suffix sets an item directory may hold. */
 export const ITEM_SUCCESS_SUFFIXES = [
   ".provenance.json",
@@ -542,68 +551,121 @@ export function writeRunEvidence(
  * files are all present but whose marker is absent, which is exactly the state a
  * crash between renames leaves behind.
  */
-export function verifyRunCommitted(rawDirectory: string): {
+export function verifyRunCommitted(
+  rawDirectory: string,
+  expected?: { runId?: string },
+): {
   committed: boolean;
   reason: string | null;
   runId: string | null;
   itemCount: number | null;
 } {
   const root = resolve(rawDirectory);
+  const uncommitted = (
+    reason: string,
+    runId: string | null = null,
+    itemCount: number | null = null,
+  ) => ({ committed: false, reason, runId, itemCount });
+
   const markerPath = join(root, RUN_COMMIT_MARKER);
-  if (!existsSync(markerPath)) {
-    return { committed: false, reason: "RUN_COMMIT_MARKER_ABSENT", runId: null, itemCount: null };
-  }
-  let marker: {
-    runId: string;
-    itemCount: number;
-    requiredFiles: string[];
-    fileDigests: Array<{ path: string; byteLength: number; sha256: string }>;
-    aggregateSha256: string;
-  };
+  if (!existsSync(markerPath)) return uncommitted("RUN_COMMIT_MARKER_ABSENT");
+
+  let marker: unknown;
   try {
     marker = JSON.parse(readFileSync(markerPath, "utf8"));
   } catch {
-    return {
-      committed: false,
-      reason: "RUN_COMMIT_MARKER_MALFORMED",
-      runId: null,
-      itemCount: null,
-    };
+    return uncommitted("RUN_COMMIT_MARKER_MALFORMED");
+  }
+  if (typeof marker !== "object" || marker === null || Array.isArray(marker)) {
+    return uncommitted("RUN_COMMIT_MARKER_MALFORMED");
   }
 
-  const required = [...RUN_EVIDENCE_FILES].sort();
-  if (
-    !Array.isArray(marker.requiredFiles) ||
-    [...marker.requiredFiles].sort().join(",") !== required.join(",")
-  ) {
-    return {
-      committed: false,
-      reason: "RUN_COMMIT_MARKER_FILE_SET_MISMATCH",
-      runId: marker.runId ?? null,
-      itemCount: marker.itemCount ?? null,
-    };
+  // A CLOSED schema. The previous version iterated whatever `fileDigests`
+  // happened to contain, so a marker listing the correct `requiredFiles` but
+  // only ONE valid digest entry returned committed: true.
+  const record = marker as Record<string, unknown>;
+  const keys = Object.keys(record).sort();
+  const expectedKeys = [...MARKER_KEYS].sort();
+  if (keys.length !== expectedKeys.length || keys.some((key, i) => key !== expectedKeys[i])) {
+    return uncommitted("RUN_COMMIT_MARKER_KEY_SET_MISMATCH");
   }
-  for (const entry of marker.fileDigests) {
+
+  const runId = typeof record.runId === "string" ? record.runId : null;
+  const itemCount = typeof record.itemCount === "number" ? record.itemCount : null;
+  if (runId === null || !/^[a-z0-9-]+$/.test(runId)) {
+    return uncommitted("RUN_COMMIT_MARKER_RUN_ID_INVALID", runId, itemCount);
+  }
+  if (expected?.runId !== undefined && runId !== expected.runId) {
+    return uncommitted("RUN_COMMIT_MARKER_RUN_ID_MISMATCH", runId, itemCount);
+  }
+  if (itemCount === null || !Number.isInteger(itemCount) || itemCount < 0) {
+    return uncommitted("RUN_COMMIT_MARKER_ITEM_COUNT_INVALID", runId, itemCount);
+  }
+
+  // `requiredFiles` must be the frozen list in the frozen ORDER.
+  const required = record.requiredFiles;
+  if (
+    !Array.isArray(required) ||
+    required.length !== RUN_EVIDENCE_FILES.length ||
+    required.some((name, index) => name !== RUN_EVIDENCE_FILES[index])
+  ) {
+    return uncommitted("RUN_COMMIT_MARKER_FILE_SET_MISMATCH", runId, itemCount);
+  }
+
+  // `fileDigests` must be exactly the same four paths, each ONCE, in order.
+  const digests = record.fileDigests;
+  if (!Array.isArray(digests) || digests.length !== RUN_EVIDENCE_FILES.length) {
+    return uncommitted("RUN_COMMIT_MARKER_DIGEST_SET_MISMATCH", runId, itemCount);
+  }
+  for (const [index, entry] of digests.entries()) {
+    if (typeof entry !== "object" || entry === null) {
+      return uncommitted("RUN_COMMIT_MARKER_DIGEST_MALFORMED", runId, itemCount);
+    }
+    const digest = entry as Record<string, unknown>;
+    if (
+      digest.path !== RUN_EVIDENCE_FILES[index] ||
+      typeof digest.byteLength !== "number" ||
+      typeof digest.sha256 !== "string"
+    ) {
+      return uncommitted("RUN_COMMIT_MARKER_DIGEST_SET_MISMATCH", runId, itemCount);
+    }
+  }
+
+  for (const entry of digests as Array<{ path: string; byteLength: number; sha256: string }>) {
     const filePath = join(root, entry.path);
     if (!existsSync(filePath)) {
-      return {
-        committed: false,
-        reason: `RUN_FILE_ABSENT: ${entry.path}`,
-        runId: marker.runId,
-        itemCount: marker.itemCount,
-      };
+      return uncommitted(`RUN_FILE_ABSENT: ${entry.path}`, runId, itemCount);
     }
     const bytes = readFileSync(filePath);
     if (bytes.byteLength !== entry.byteLength || sha256Bytes(bytes) !== entry.sha256) {
-      return {
-        committed: false,
-        reason: `RUN_FILE_DIGEST_MISMATCH: ${entry.path}`,
-        runId: marker.runId,
-        itemCount: marker.itemCount,
-      };
+      return uncommitted(`RUN_FILE_DIGEST_MISMATCH: ${entry.path}`, runId, itemCount);
     }
   }
-  return { committed: true, reason: null, runId: marker.runId, itemCount: marker.itemCount };
+
+  // The aggregate recomputes from the exact ordered digest entries.
+  const recomputed = sha256Bytes(
+    canonicalize(
+      (digests as Array<{ path: string; byteLength: number; sha256: string }>).map((entry) => ({
+        path: entry.path,
+        byteLength: entry.byteLength,
+        sha256: entry.sha256,
+      })),
+    ),
+  );
+  if (record.aggregateSha256 !== recomputed) {
+    return uncommitted("RUN_COMMIT_MARKER_AGGREGATE_MISMATCH", runId, itemCount);
+  }
+
+  // No unexpected run-level file.
+  const allowed = new Set<string>([...RUN_EVIDENCE_FILES, RUN_COMMIT_MARKER]);
+  const stray = readdirSync(root).filter(
+    (entry) => !/^item-\d{4}$/.test(entry) && !allowed.has(entry),
+  );
+  if (stray.length > 0) {
+    return uncommitted(`UNEXPECTED_RUN_LEVEL_FILE: ${stray.join(", ")}`, runId, itemCount);
+  }
+
+  return { committed: true, reason: null, runId, itemCount };
 }
 
 /** Exposed for the determinism comparison; hashes nothing truth-bearing. */

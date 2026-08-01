@@ -782,6 +782,7 @@ describe("Issue #149 Stage 1 contract consistency", () => {
         "preregistration-stage-2-discovery.md",
         "preregistration-stage-2-execute-readiness.md",
         "preregistration-stage-2-final-execute-closure.md",
+        "preregistration-stage-2-verifier-transport.md",
       ];
       if (!currentStamps.includes(contract.amendedBy)) {
         stale.push(`${file} — ${contract.amendedBy}`);

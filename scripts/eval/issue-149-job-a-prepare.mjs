@@ -44,6 +44,9 @@ const ART = path.join(ROOT, "artifacts", EXPERIMENT);
 const STAGED = path.join(ROOT, ".local/issue-149-acquisition-inputs");
 const PREP = path.join(ROOT, ".local/issue-149-preparation");
 const BUNDLE = path.join(PREP, "bundle");
+/** The host verifier bundle and the Job C inventory, OUTSIDE the acquisition input. */
+const VERIFIER = path.join(ROOT, ".local/issue-149-verifier");
+const IDENTITY = path.join(ROOT, ".local/issue-149-identity-inventory");
 
 /** The frozen base whose production-source bytes every closure module must match. */
 const BASE = "546c3f279ce431a1fd8c0203df7a83553ea866ef";
@@ -378,6 +381,155 @@ function copyNativeExternals() {
   return { copied: copied.sort(), absent: absent.sort(), treeRoot: path.relative(ROOT, treeRoot) };
 }
 
+/**
+ * Build the self-contained HOST VERIFIER bundle.
+ *
+ * Job B performs no repository checkout, so a verification step that invokes
+ * `npx vite-node scripts/eval/...` cannot run there at all: the script, the
+ * vitest config, package.json and node_modules are all absent. The verifier
+ * therefore has to travel as a bundle that plain pinned Node can execute.
+ *
+ * It runs on the HOST after the container exits. It is never mounted into the
+ * OCR container, and it carries no governed truth, no acceptable values and no
+ * historical identity inventory — the identity inventory is a separate artifact
+ * that only the host-side Job C step downloads.
+ */
+async function buildVerifierBundle() {
+  const esbuild = await import("esbuild");
+  rmSync(VERIFIER, { recursive: true, force: true });
+  mkdirSync(VERIFIER, { recursive: true });
+
+  const buildCommand =
+    "esbuild scripts/eval/issue-149-verify-raw-evidence.ts --bundle --platform=node --format=esm --target=node20 --external:node:* --metafile --sourcemap=false --outfile=verifier/verify.mjs";
+
+  const result = await esbuild.build({
+    entryPoints: [path.join(ROOT, "scripts/eval/issue-149-verify-raw-evidence.ts")],
+    bundle: true,
+    platform: "node",
+    format: "esm",
+    target: "node20",
+    metafile: true,
+    sourcemap: false,
+    external: ["node:*"],
+    outfile: path.join(VERIFIER, "verify.mjs"),
+    absWorkingDir: ROOT,
+    tsconfig: path.join(ROOT, "tsconfig.json"),
+    logLevel: "silent",
+  });
+
+  const emitted = [];
+  for (const entry of readdirSync(VERIFIER).sort()) {
+    const bytes = readFileSync(path.join(VERIFIER, entry));
+    emitted.push({ path: entry, sha256: sha256(bytes), byteLength: bytes.byteLength });
+  }
+
+  // The verifier bundle is scanned exactly like the acquisition bundle: no
+  // governed truth, no acceptable values, no historical identity.
+  const idMap = JSON.parse(readFileSync(path.join(ART, "post-freeze/id-map.json"), "utf8"));
+  const historical = idMap.map.flatMap((entry) => [
+    entry.historicalCaseId,
+    entry.historicalImagePath,
+  ]);
+  const violations = [];
+  for (const entry of emitted) {
+    const text = readFileSync(path.join(VERIFIER, entry.path)).toString("latin1");
+    for (const value of historical) {
+      if (typeof value === "string" && value.length > 0 && text.includes(value)) {
+        violations.push(`${entry.path}: historical identity`);
+      }
+    }
+  }
+  if (violations.length > 0) throw new JobAError("VERIFIER_BUNDLE_PROHIBITED_CONTENT", violations);
+
+  const manifest = {
+    artifact: "issue-149-host-verifier-bundle-manifest",
+    experimentId: EXPERIMENT,
+    base: BASE,
+    buildCommand,
+    buildTool: `esbuild ${esbuild.version}`,
+    runsWith: "plain pinned Node; no npm install, no npx, no vite-node, no repository checkout",
+    runsOn: "the HOST, after the container exits",
+    mountedIntoTheOcrContainer: false,
+    containsGovernedTruth: false,
+    containsHistoricalIdentityInventory: false,
+    sourceInputCount: Object.keys(result.metafile.inputs).length,
+    emitted,
+  };
+  writeFileSync(
+    path.join(VERIFIER, "verifier-manifest.json"),
+    `${JSON.stringify(manifest, null, 2)}\n`,
+  );
+  const aggregate = sha256(
+    emitted.map((entry) => `${entry.path} ${entry.byteLength} ${entry.sha256}`).join("\n"),
+  );
+
+  step("build-host-verifier-bundle", {
+    buildCommand,
+    buildTool: `esbuild ${esbuild.version}`,
+    emitted: emitted.map((entry) => entry.path),
+    aggregate,
+    prohibitedContent: [],
+  });
+  return { aggregate, emitted };
+}
+
+/**
+ * The MINIMAL Job C identity inventory, as its own artifact.
+ *
+ * It holds the frozen historical ID/path inventory and the forbidden
+ * evidence-key inventory, with their exact digests and counts — and nothing
+ * else. It is NOT part of the truth-free acquisition input and is never mounted
+ * with it; Job B downloads it only for the host-side Job C step, after the
+ * container has exited.
+ */
+function buildIdentityInventory() {
+  rmSync(IDENTITY, { recursive: true, force: true });
+  mkdirSync(IDENTITY, { recursive: true });
+
+  const idMap = JSON.parse(readFileSync(path.join(ART, "post-freeze/id-map.json"), "utf8"));
+  const historicalCaseIds = idMap.map.map((entry) => entry.historicalCaseId);
+  const historicalImagePaths = idMap.map.map((entry) => entry.historicalImagePath);
+  const forbiddenEvidenceKeys = JSON.parse(
+    readFileSync(path.join(ART, "runtime/truth-key-inventory.json"), "utf8"),
+  );
+
+  const inventory = {
+    artifact: "issue-149-identity-inventory",
+    experimentId: EXPERIMENT,
+    historicalCaseIds,
+    historicalImagePaths,
+    forbiddenEvidenceKeys,
+    containsNo: [
+      "acceptable Brand values",
+      "truth labels",
+      "expected field values",
+      "prior per-case classifications",
+    ],
+  };
+  const text = `${JSON.stringify(inventory, null, 2)}\n`;
+  writeFileSync(path.join(IDENTITY, "identity-inventory.json"), text);
+
+  const digest = sha256(text);
+  const expected = {
+    artifact: "issue-149-identity-inventory-manifest",
+    inventorySha256: digest,
+    historicalCaseIdCount: historicalCaseIds.length,
+    historicalImagePathCount: historicalImagePaths.length,
+    forbiddenEvidenceKeyCount: forbiddenEvidenceKeys.length,
+  };
+  writeFileSync(
+    path.join(IDENTITY, "identity-inventory-manifest.json"),
+    `${JSON.stringify(expected, null, 2)}\n`,
+  );
+
+  step("build-minimal-identity-inventory", {
+    ...expected,
+    partOfTheTruthFreeAcquisitionInput: false,
+    mountedWithTheAcquisitionInput: false,
+  });
+  return expected;
+}
+
 // ---- 9. prohibited dependencies and base drift -----------------------------
 function enforceClosurePolicy(inputs) {
   const prohibited = inputs.filter(
@@ -624,6 +776,8 @@ async function main() {
   reproduceAndStage();
   verifyIncumbentIdentities();
   const { inputs, metafileSha256, buildCommand, buildTool } = await buildBundle();
+  const verifier = await buildVerifierBundle();
+  const identity = buildIdentityInventory();
   const sourceInputs = enforceClosurePolicy(inputs);
   runSourceClosureGate(inputs);
   scanBundleContents();
@@ -642,6 +796,8 @@ async function main() {
     ocrRun: false,
     acquisitionApiInvoked: false,
     preparationArtifactDigest: preparation.artifactDigest,
+    verifierBundleAggregate: verifier.aggregate,
+    identityInventorySha256: identity.inventorySha256,
     steps,
   };
 }
