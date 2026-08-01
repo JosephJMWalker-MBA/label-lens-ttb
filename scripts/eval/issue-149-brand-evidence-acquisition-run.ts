@@ -20,6 +20,7 @@
  */
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 import {
   acquireProductionBrandEvidence,
@@ -120,10 +121,29 @@ export async function main(): Promise<number> {
   return execute();
 }
 
-if (
-  process.argv[1] !== undefined &&
-  process.argv[1].includes("issue-149-brand-evidence-acquisition-run")
-) {
+/**
+ * Is this module the program being run?
+ *
+ * Compared by IDENTITY, not by filename. The previous guard matched the source
+ * basename, which the BUNDLED artifact does not carry — the emitted module is
+ * `acquisition.mjs`, so the bundle loaded, matched nothing, and exited silently
+ * having done no work and reported nothing. That is worse than failing.
+ *
+ * `import.meta.url` survives bundling to ES-module output, so this holds for the
+ * source entrypoint and the bundle alike, and is false when a test imports the
+ * module.
+ */
+export function isProgramEntrypoint(argv: string[], moduleUrl: string): boolean {
+  const entry = argv[1];
+  if (entry === undefined) return false;
+  try {
+    return pathToFileURL(entry).href === moduleUrl;
+  } catch {
+    return false;
+  }
+}
+
+if (isProgramEntrypoint(process.argv, import.meta.url)) {
   void main().then(
     (code) => {
       process.exitCode = code;

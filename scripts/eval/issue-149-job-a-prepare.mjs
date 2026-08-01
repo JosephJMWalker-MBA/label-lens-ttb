@@ -192,8 +192,30 @@ async function buildBundle() {
   mkdirSync(BUNDLE, { recursive: true });
 
   const esbuild = await import("esbuild");
+  // SELF-CONTAINED ESM, with a createRequire banner.
+  //
+  // Three facts observed by RUNNING discovery rather than reasoning about it,
+  // each of which changed the build:
+  //   - `--packages=external` left bare npm specifiers in the emitted module,
+  //     which cannot resolve inside the boundary: the container has no
+  //     node_modules and no network. Discovery halted with ERR_MODULE_NOT_FOUND
+  //     for `zod`. Only true node builtins stay external now.
+  //   - with everything bundled, ESM output failed at import time with
+  //     "Dynamic require of child_process is not supported": a bundled CJS
+  //     dependency uses a runtime `require`, which an ES module has no binding
+  //     for.
+  //   - CJS output was not the answer either: another dependency calls
+  //     `createRequire(import.meta.url)`, and `import.meta` does not exist in
+  //     CommonJS, so the bundle threw ERR_INVALID_ARG_VALUE before running a
+  //     single line of its own code.
+  //
+  // The banner defines a real `require` in ES-module scope, which satisfies
+  // esbuild's dynamic-require shim while `import.meta.url` remains available.
+  const banner =
+    'import { createRequire as __issue149CreateRequire } from "node:module";\n' +
+    "const require = __issue149CreateRequire(import.meta.url);\n";
   const buildCommand =
-    "esbuild scripts/eval/issue-149-brand-evidence-acquisition-run.ts --bundle --platform=node --format=esm --target=node20 --packages=external --metafile --sourcemap=false --outfile=bundle/acquisition.mjs";
+    'esbuild scripts/eval/issue-149-brand-evidence-acquisition-run.ts --bundle --platform=node --format=esm --target=node20 --external:node:* --banner:js="<createRequire banner>" --metafile --sourcemap=false --outfile=bundle/acquisition.mjs';
 
   const result = await esbuild.build({
     entryPoints: [path.join(ROOT, "scripts/eval/issue-149-brand-evidence-acquisition-run.ts")],
@@ -201,9 +223,10 @@ async function buildBundle() {
     platform: "node",
     format: "esm",
     target: "node20",
+    banner: { js: banner },
     metafile: true,
     sourcemap: false,
-    packages: "external",
+    external: ["node:*"],
     outfile: path.join(BUNDLE, "acquisition.mjs"),
     absWorkingDir: ROOT,
     tsconfig: path.join(ROOT, "tsconfig.json"),
