@@ -2,9 +2,14 @@
 /**
  * Issue #149 — Stage 1 contract-package manifest.
  *
- * Hashes the WHOLE Stage 1 contract package, not just the preregistration, so a
- * change to any contract, the freeze script or a Stage 1 test cannot leave a
+ * Hashes the whole Stage 1 IMPLEMENTATION package — every contract, the freeze
+ * script and every Stage 1 test — so a change to any of them cannot leave a
  * still-valid manifest behind.
+ *
+ * It deliberately does NOT hash the two transition controls (`workflow-mode.txt`
+ * and `execute-authorization.json`). Those are the mutable controls that
+ * authorize execution; the manifest binds the implementation they authorize. See
+ * TRANSITION_CONTROL_EXCLUSIONS below and transition-control-governance.json.
  *
  * `--verify` checks the committed manifest instead of rewriting it.
  */
@@ -55,9 +60,42 @@ function walk(dir) {
   });
 }
 
-/** Every governed file, in sorted path order, manifest itself excluded. */
+/**
+ * The two TRANSITION CONTROLS, excluded from the immutable manifest.
+ *
+ * The manifest binds the reviewed IMPLEMENTATION. These two files are the
+ * intentionally mutable controls that authorize execution, and the authorized
+ * transition commit is permitted to change exactly them and nothing else.
+ *
+ * Hashing them here made the transition impossible: changing them would make the
+ * manifest stale, and the transition commit cannot also regenerate the manifest
+ * because the execute gate would then see a third changed path and reject the
+ * transition. The result was a transition that necessarily failed both ordinary
+ * `npm test` and Job A's first step.
+ *
+ * Excluding them does NOT make them uncontrolled. Their integrity is enforced by
+ * Git commit identity, exact control-state validation, exact changed-path
+ * validation against the reviewed implementation SHA, full-history ancestry, and
+ * external approval of the exact unpushed transition commit SHA. See
+ * transition-control-governance.json.
+ *
+ * The set is EXACT — two full repository-relative paths. It is deliberately not
+ * a filename pattern, a suffix, a directory or a mutability heuristic, because
+ * any of those could silently grow to exclude a governed contract.
+ */
+export const TRANSITION_CONTROL_EXCLUSIONS = [
+  "artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt",
+  "artifacts/issue-149-brand-complete-evidence-acquisition/execute-authorization.json",
+];
+
+/**
+ * Every governed file, in sorted path order — the manifest itself and the two
+ * transition controls excluded, and nothing else.
+ */
 export function stage1Files() {
-  const governed = walk(ROOT).filter((f) => f !== MANIFEST);
+  const governed = walk(ROOT).filter(
+    (f) => f !== MANIFEST && !TRANSITION_CONTROL_EXCLUSIONS.includes(f),
+  );
   return [...governed, FREEZE_SCRIPT, MANIFEST_SCRIPT, ...CANONICAL_LIBS, ...STAGE_1_TESTS].sort();
 }
 

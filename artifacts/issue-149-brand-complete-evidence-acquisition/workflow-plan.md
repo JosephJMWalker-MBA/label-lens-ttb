@@ -75,6 +75,28 @@ The runtime identity is pinned: the isolated job runs as **uid 10149 / gid
 10149**, and discovery verifies the running identity against the pinned values
 rather than accepting root.
 
+## What the Stage 1 manifest binds, and what it deliberately does not
+
+The Stage 1 contract manifest binds the **immutable implementation and contract
+package**: every governed contract, the freeze script, the canonical libraries
+and every Stage 1 test. Job A verifies it before preparation begins, and the
+ordinary suite verifies every recorded hash against the bytes on disk.
+
+It **excludes exactly two paths** — `workflow-mode.txt` and
+`execute-authorization.json` — because the authorized transition must change them
+*without* changing the reviewed implementation. Hashing them made that transition
+impossible: it would have left the manifest stale, and the transition commit
+cannot also regenerate the manifest, because the execute gate would then observe
+a third changed path and reject the transition. The result was a transition that
+necessarily failed both ordinary `npm test` and Job A's first step.
+
+Exclusion is not absence of control. Those two files are governed by Git commit
+identity, exact control-state validation, exact changed-path validation against
+the reviewed implementation SHA, full-history ancestry in the execute-transition
+gate, and external approval of the exact unpushed transition commit SHA. The
+exclusion set is two full repository-relative paths — not a pattern — and equals
+the gate's permitted transition paths. See `transition-control-governance.json`.
+
 ## Job A — trusted preparation, outside isolation, no OCR
 
 **Job A is trusted, not truth-free — and it physically reads governed truth.**
