@@ -334,23 +334,40 @@ function copyNativeExternals() {
     return null;
   };
 
+  /**
+   * The TRANSITIVE closure of a native external.
+   *
+   * The first version followed `optionalDependencies` only — which is where
+   * sharp's platform binaries live — and the container then failed with
+   * `Cannot find package '@img/colour'`, an ordinary runtime `dependencies`
+   * entry. A partial closure is a bundle that loads until it does not.
+   */
   const copied = [];
-  for (const name of NATIVE_EXTERNALS) {
+  const seen = new Set();
+  const queue = [...NATIVE_EXTERNALS];
+
+  while (queue.length > 0) {
+    const name = queue.shift();
+    if (seen.has(name)) continue;
+    seen.add(name);
+
     const source = packageDirectory(name);
-    if (source === null) throw new JobAError("NATIVE_EXTERNAL_NOT_INSTALLED", name);
+    if (source === null) {
+      // A platform-specific optional package for a DIFFERENT platform is
+      // legitimately absent; a required one is not.
+      if (NATIVE_EXTERNALS.includes(name)) {
+        throw new JobAError("NATIVE_EXTERNAL_NOT_INSTALLED", name);
+      }
+      continue;
+    }
     cpSync(source, path.join(target, name), { recursive: true, dereference: true });
     copied.push(name);
 
     const manifest = JSON.parse(readFileSync(path.join(source, "package.json"), "utf8"));
-    for (const dependency of Object.keys(manifest.optionalDependencies ?? {})) {
-      const dependencySource = packageDirectory(dependency);
-      if (dependencySource === null) continue;
-      cpSync(dependencySource, path.join(target, dependency), {
-        recursive: true,
-        dereference: true,
-      });
-      copied.push(dependency);
-    }
+    queue.push(
+      ...Object.keys(manifest.dependencies ?? {}),
+      ...Object.keys(manifest.optionalDependencies ?? {}),
+    );
   }
   return copied.sort();
 }
