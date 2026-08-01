@@ -44,8 +44,8 @@ permissions:
   contents: read
 
 env:
-  # harness revision: 12
-  ISSUE_149_HARNESS_REVISION: "12"
+  # harness revision: 13
+  ISSUE_149_HARNESS_REVISION: "13"
   MODE_FILE: artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt
   # linux/amd64 manifest digest for node:20-bookworm-slim, resolved and recorded.
   ISSUE_149_BASE_IMAGE: node@sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c
@@ -257,6 +257,8 @@ jobs:
       artifactDigest: ${{ steps.upload.outputs.artifact-digest }}
       artifactUrl: ${{ steps.upload.outputs.artifact-url }}
       headSha: ${{ github.sha }}
+      overLimit: ${{ steps.volume.outputs.overLimit }}
+      rawBytes: ${{ steps.volume.outputs.rawBytes }}
     # THE ONLY OCR. Reachable only when the committed mode is exactly `execute`
     # AND the execute-transition gate passed: the gate is a `needs:` dependency,
     # so a rejected transition prevents this job from starting at all.
@@ -365,17 +367,29 @@ jobs:
             --identity-manifest identity/identity-inventory-manifest.json \
             --report identity-leak-report.json
 
-      - name: Apply the durable-archive volume rule
+      # NONFATAL MEASUREMENT. The previous step exited nonzero here, BEFORE the
+      # verified upload — and GitHub applies an implicit `success()` to any step
+      # whose `if:` has no status-check function, so the verified upload was
+      # skipped and the incomplete-forensic upload was skipped too (its own
+      # condition is false when Actor 2 and Job C succeeded). A run producing
+      # 100 MB + 1 byte would have detected the threshold and then discarded the
+      # only copy of the evidence. The stop is a TERMINAL adjudication now.
+      - name: Measure the archive volume (nonfatal)
+        id: volume
         if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success'
         run: |
           set -euo pipefail
           BYTES=$(du -sb output | cut -f1)
-          echo "{\"rawBytes\": ${BYTES}, \"durableArchiveStopRuleMb\": 100}"
-          test "${BYTES}" -le 104857600 || {
-            echo "RAW_EVIDENCE_EXCEEDS_DURABLE_ARCHIVE_LIMIT" >&2; exit 1; }
+          node verifier/archive-volume.mjs --bytes "${BYTES}" --report archive-volume-report.json
+          OVER=$(python3 -c "import json;print(str(json.load(open('archive-volume-report.json'))['overLimit']).lower())")
+          echo "overLimit=${OVER}" >> "$GITHUB_OUTPUT"
+          echo "rawBytes=${BYTES}" >> "$GITHUB_OUTPUT"
 
       # Verified evidence uploads ONLY after Actor 2 and Job C both succeed.
       # actions/upload-artifact v4
+      # Whenever Actor 2 and Job C succeed — REGARDLESS of overLimit. Complete
+      # evidence above the limit is complete evidence; the limit governs what
+      # happens next, not whether the evidence survives.
       - name: Upload the verified raw evidence
         id: upload
         if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success'
@@ -389,6 +403,7 @@ jobs:
             image-identity.json
             raw-verification-report.json
             identity-leak-report.json
+            archive-volume-report.json
           retention-days: 30
 
       # actions/upload-artifact v4
@@ -408,12 +423,15 @@ jobs:
 
       # ADJUDICATION, last — after the reports and the appropriate artifact have
       # been preserved. COMPLETE_WITH_NONDETERMINISM is a successful outcome.
+      # ACQUISITION adjudication only. The VOLUME decision is deliberately not
+      # made here: it belongs after the artifact and receipt exist.
       - name: Adjudicate the acquisition
         if: always()
         run: |
           set -euo pipefail
           echo "acquisition exit: ${{ steps.acquire.outputs.status }}"
           echo "actor 2 verified: ${{ steps.raw.outputs.verified }}"
+          echo "over archive limit: ${{ steps.volume.outputs.overLimit }} (adjudicated later)"
           test "${{ steps.raw.outputs.verified }}" = "true" || {
             echo "ACQUISITION_NOT_VERIFIED" >&2; exit 1; }
           test "${{ steps.acquire.outputs.status }}" = "0" || {
@@ -455,6 +473,7 @@ jobs:
           path: downloaded
 
       - name: Compare the artifact metadata digest to the upload output
+        id: metadata
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -474,6 +493,7 @@ jobs:
           test -n "${NORM_META}" || { echo "ARTIFACT_METADATA_DIGEST_ABSENT" >&2; exit 1; }
           test "${NORM_META}" = "${NORM_UP}" || {
             echo "ARTIFACT_DIGEST_MISMATCH: ${NORM_META} vs ${NORM_UP}" >&2; exit 1; }
+          echo "METADATA_DIGEST=${METADATA_DIGEST}" >> "$GITHUB_ENV"
 
       # actions/download-artifact v4 — the verifier travels here too.
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
@@ -494,16 +514,28 @@ jobs:
             --report downloaded-verification-report.json
 
       - name: Create the final verification receipt
+        id: receipt
         run: |
           set -euo pipefail
           RAW_DIGEST=$(sha256sum downloaded-verification-report.json | cut -d" " -f1)
+          OVER="${{ needs.job-b-execute.outputs.overLimit }}"
+          DECISION=$([ "${OVER}" = "true" ] \
+            && echo "DURABLE_ARCHIVE_DECISION_REQUIRED" \
+            || echo "ELIGIBLE_FOR_OWNER_COMMIT_PROCESS")
           cat > verification-receipt.json <<JSON
           {
             "artifactId": "${{ needs.job-b-execute.outputs.artifactId }}",
             "uploadDigest": "${{ needs.job-b-execute.outputs.artifactDigest }}",
+            "metadataDigest": "${METADATA_DIGEST}",
             "artifactUrl": "${{ needs.job-b-execute.outputs.artifactUrl }}",
             "headSha": "${{ needs.job-b-execute.outputs.headSha }}",
             "rawVerificationReportDigest": "${RAW_DIGEST}",
+            "rawBytes": ${{ needs.job-b-execute.outputs.rawBytes }},
+            "archiveLimitBytes": 104857600,
+            "overLimit": ${OVER},
+            "decision": "${DECISION}",
+            "retentionBound": true,
+            "isPermanentPreservation": false,
             "finalStatus": "VERIFIED"
           }
           JSON
@@ -519,6 +551,51 @@ jobs:
             artifact-metadata.json
             downloaded-verification-report.json
           retention-days: 30
+
+  # ---------------------------------------------------------------------------
+  # TERMINAL archive adjudication. It runs only after the verified artifact, the
+  # exact-ID redownload, the digest comparison, the content re-verification and
+  # the receipt all exist — so an over-limit stop can never destroy the evidence
+  # it is protecting.
+  # ---------------------------------------------------------------------------
+  archive-adjudication:
+    name: Terminal archive-volume adjudication
+    needs: [resolve-mode, job-b-execute, verify-uploaded-artifact]
+    if: needs.resolve-mode.outputs.mode == 'execute'
+    runs-on: ubuntu-latest
+    steps:
+      # actions/download-artifact v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: issue-149-verification-receipt
+          path: receipt
+      # actions/download-artifact v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: issue-149-host-verifier
+          path: verifier
+
+      - name: Adjudicate the archive volume, after preservation
+        run: |
+          set -euo pipefail
+          python3 -c "
+          import json
+          r = json.load(open('receipt/verification-receipt.json'))
+          json.dump({
+            'rawBytes': r['rawBytes'],
+            'archiveLimitBytes': r['archiveLimitBytes'],
+            'overLimit': r['overLimit'],
+            'decision': r['decision'],
+            'uploadAndVerificationRequired': True,
+            'routeAsIncompleteForensicOutput': False,
+            'haltCode': 'RAW_EVIDENCE_EXCEEDS_DURABLE_ARCHIVE_LIMIT' if r['overLimit'] else None,
+            'meaning': r['decision'],
+          }, open('archive-volume-report.json','w'))
+          "
+          node verifier/archive-adjudication.mjs \
+            --volume-report archive-volume-report.json \
+            --artifact-id "${{ needs.job-b-execute.outputs.artifactId }}" \
+            --receipt receipt/verification-receipt.json
 
   # ---------------------------------------------------------------------------
   # The NO-OCR verifier-transport rehearsal.
@@ -638,6 +715,47 @@ jobs:
             --report rehearsal-roundtrip-report.json
           echo "round-trip digest verified: ${META}"
 
+      # The OVER-LIMIT ordering, rehearsed with a synthetic byte count. It proves
+      # the artifact round trip and the receipt happen BEFORE the deliberate
+      # terminal halt — the ordering whose absence would have destroyed the
+      # evidence the limit exists to protect.
+      - name: Rehearse the over-limit ordering
+        run: |
+          set -euo pipefail
+          # 1. the measurement is NONFATAL, even one byte over.
+          node verifier/archive-volume.mjs --bytes 104857601 --report over-limit-report.json
+          echo "measurement exited 0 while over the limit"
+          python3 -c "
+          import json,sys
+          r=json.load(open('over-limit-report.json'))
+          assert r['overLimit'] is True, r
+          assert r['decision']=='DURABLE_ARCHIVE_DECISION_REQUIRED', r
+          assert r['routeAsIncompleteForensicOutput'] is False, r
+          assert r['uploadAndVerificationRequired'] is True, r
+          "
+
+          # 2. adjudicating BEFORE preservation must refuse.
+          set +e
+          node verifier/archive-adjudication.mjs --volume-report over-limit-report.json --artifact-id "" --receipt missing.json
+          EARLY=$?
+          set -e
+          test "${EARLY}" -ne 0 || { echo "ADJUDICATED_BEFORE_PRESERVATION" >&2; exit 1; }
+          echo "adjudication before preservation refused, status ${EARLY}"
+
+          # 3. with the artifact and receipt present, the over-limit halt fires.
+          echo '{"finalStatus":"VERIFIED"}' > rehearsal-receipt.json
+          set +e
+          node verifier/archive-adjudication.mjs --volume-report over-limit-report.json --artifact-id 12345 --receipt rehearsal-receipt.json
+          LATE=$?
+          set -e
+          test "${LATE}" -ne 0 || { echo "OVER_LIMIT_DID_NOT_HALT" >&2; exit 1; }
+          echo "over-limit halted AFTER preservation, status ${LATE}"
+
+          # 4. and at the limit exactly, it does not.
+          node verifier/archive-volume.mjs --bytes 104857600 --report at-limit-report.json
+          node verifier/archive-adjudication.mjs --volume-report at-limit-report.json --artifact-id 12345 --receipt rehearsal-receipt.json
+          echo "at the limit: eligible"
+
       # actions/upload-artifact v4
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
@@ -645,4 +763,6 @@ jobs:
           name: issue-149-rehearsal-reports
           path: |
             rehearsal-*.json
+            over-limit-report.json
+            at-limit-report.json
           retention-days: 7

@@ -399,23 +399,37 @@ async function buildVerifierBundle() {
   rmSync(VERIFIER, { recursive: true, force: true });
   mkdirSync(VERIFIER, { recursive: true });
 
-  const buildCommand =
-    "esbuild scripts/eval/issue-149-verify-raw-evidence.ts --bundle --platform=node --format=esm --target=node20 --external:node:* --metafile --sourcemap=false --outfile=verifier/verify.mjs";
+  // Three entrypoints, all runnable by plain Node in a job with no checkout.
+  const entrypoints = [
+    ["scripts/eval/issue-149-verify-raw-evidence.ts", "verify.mjs"],
+    ["scripts/eval/issue-149-archive-volume-decision.ts", "archive-volume.mjs"],
+    ["scripts/eval/issue-149-archive-adjudication.ts", "archive-adjudication.mjs"],
+  ];
+  const buildCommand = entrypoints
+    .map(
+      ([entry, out]) =>
+        `esbuild ${entry} --bundle --platform=node --format=esm --target=node20 --external:node:* --metafile --sourcemap=false --outfile=verifier/${out}`,
+    )
+    .join(" && ");
 
-  const result = await esbuild.build({
-    entryPoints: [path.join(ROOT, "scripts/eval/issue-149-verify-raw-evidence.ts")],
-    bundle: true,
-    platform: "node",
-    format: "esm",
-    target: "node20",
-    metafile: true,
-    sourcemap: false,
-    external: ["node:*"],
-    outfile: path.join(VERIFIER, "verify.mjs"),
-    absWorkingDir: ROOT,
-    tsconfig: path.join(ROOT, "tsconfig.json"),
-    logLevel: "silent",
-  });
+  let sourceInputCount = 0;
+  for (const [entry, out] of entrypoints) {
+    const result = await esbuild.build({
+      entryPoints: [path.join(ROOT, entry)],
+      bundle: true,
+      platform: "node",
+      format: "esm",
+      target: "node20",
+      metafile: true,
+      sourcemap: false,
+      external: ["node:*"],
+      outfile: path.join(VERIFIER, out),
+      absWorkingDir: ROOT,
+      tsconfig: path.join(ROOT, "tsconfig.json"),
+      logLevel: "silent",
+    });
+    sourceInputCount += Object.keys(result.metafile.inputs).length;
+  }
 
   const emitted = [];
   for (const entry of readdirSync(VERIFIER).sort()) {
@@ -447,12 +461,13 @@ async function buildVerifierBundle() {
     base: BASE,
     buildCommand,
     buildTool: `esbuild ${esbuild.version}`,
+    entrypoints: entrypoints.map(([, out]) => out),
     runsWith: "plain pinned Node; no npm install, no npx, no vite-node, no repository checkout",
     runsOn: "the HOST, after the container exits",
     mountedIntoTheOcrContainer: false,
     containsGovernedTruth: false,
     containsHistoricalIdentityInventory: false,
-    sourceInputCount: Object.keys(result.metafile.inputs).length,
+    sourceInputCount,
     emitted,
   };
   writeFileSync(

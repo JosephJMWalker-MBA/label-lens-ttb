@@ -108,6 +108,18 @@ would catch it, and it is asserted.
 
 ## The 100 MB fallback is retention-bound, not preservation
 
+The measurement is **nonfatal** and produces a decision; the verified artifact is
+uploaded, redownloaded by exact artifact ID, digest-compared and content-verified
+on **both** sides of the limit, and the stop is a terminal adjudication that runs
+only afterwards.
+
+That ordering was wrong once and is worth stating plainly: the volume step used
+to exit nonzero BEFORE the upload, and GitHub applies an implicit `success()` to
+any later step whose `if:` carries no status-check function — so a run producing
+100 MB plus one byte would have detected the threshold and then discarded the
+only copy of the evidence when the runner disappeared. The limit governs what
+happens to the evidence; it must never be what destroys it.
+
 If the raw evidence exceeds 100 MB the run still completes and the complete
 lossless evidence is uploaded — but as a **temporarily retained workflow
 artifact**, which expires. It is not durable archival, and this package does not

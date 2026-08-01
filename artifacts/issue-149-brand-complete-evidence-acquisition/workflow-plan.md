@@ -30,8 +30,13 @@ The governed Issue #149 pattern, unchanged:
 
 - push-triggered, `branches:` restricted to exactly
   `research/issue-149-brand-complete-evidence-acquisition`;
-- `paths:` admitting **only** the workflow file and
-  `artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt`;
+- `paths:` admitting the workflow file,
+  `artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt` and
+  `artifacts/issue-149-brand-complete-evidence-acquisition/execute-authorization.json`
+  — **three** files, not two. And `paths:` decides only WHETHER the workflow
+  runs; it places no restriction on what else the triggering push contains, so
+  the changed-file restriction is enforced by the execute-transition gate against
+  the actual commit range;
 - `permissions: contents: read` — the OCR job cannot push, and is never granted
   `contents: write`;
 - committed mode file with exactly three legal values: `discover`, `execute`,

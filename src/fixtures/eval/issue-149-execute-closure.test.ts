@@ -43,6 +43,11 @@ import {
   verifyRawEvidence,
 } from "../../../scripts/eval/lib/issue-149-raw-verifier";
 import { canonicalize, sha256Bytes } from "../../../scripts/eval/lib/issue-149-evidence-canonical";
+import {
+  ARCHIVE_LIMIT_BYTES,
+  archiveAdjudication,
+  decideArchiveVolume,
+} from "../../../scripts/eval/lib/issue-149-archive-volume";
 
 const scratch = mkdtempSync(path.join(tmpdir(), "issue-149-execute-closure-"));
 afterAll(() => rmSync(scratch, { recursive: true, force: true }));
@@ -469,9 +474,13 @@ describe("Issue #149 actor 2 verifies raw evidence, and Job C scans for identity
     expect(workflow).toContain(
       "Actor 2 — verify the sealed raw evidence\n        id: raw\n        if: always()",
     );
-    // The volume rule runs only AFTER verification.
+    // The volume MEASUREMENT runs only after verification…
     expect(workflow.indexOf("Actor 2 — verify")).toBeLessThan(
-      workflow.indexOf("Apply the durable-archive volume rule"),
+      workflow.indexOf("Measure the archive volume (nonfatal)"),
+    );
+    // …and it is nonfatal, so it cannot skip the upload that follows it.
+    expect(workflow.indexOf("Measure the archive volume (nonfatal)")).toBeLessThan(
+      workflow.indexOf("Upload the verified raw evidence"),
     );
     // Partial output is not labelled as completed evidence.
     expect(workflow).toContain("issue-149-incomplete-forensic-output");
@@ -787,6 +796,98 @@ describe("Issue #149 manifest verification is bidirectional", () => {
     expect((delegated?.detail as { delegatedTo: string }).delegatedTo).toContain("Job C");
     // The old finding name asserted a result Actor 2 never computed.
     expect(report.findings.map((entry) => entry.check)).not.toContain("no-forbidden-evidence-key");
+  });
+});
+
+describe("Issue #149 the archive limit governs, and never destroys", () => {
+  it("is eligible below and AT the limit, and requires a decision one byte over", () => {
+    expect(ARCHIVE_LIMIT_BYTES).toBe(104857600);
+    expect(decideArchiveVolume(104857599).decision).toBe("ELIGIBLE_FOR_OWNER_COMMIT_PROCESS");
+    // The rule is "exceeds", so equality is not over.
+    expect(decideArchiveVolume(104857600).decision).toBe("ELIGIBLE_FOR_OWNER_COMMIT_PROCESS");
+    expect(decideArchiveVolume(104857601).decision).toBe("DURABLE_ARCHIVE_DECISION_REQUIRED");
+    expect(decideArchiveVolume(104857600).overLimit).toBe(false);
+    expect(decideArchiveVolume(104857601).overLimit).toBe(true);
+  });
+
+  it("requires upload and verification on BOTH sides of the limit", () => {
+    for (const bytes of [0, 104857600, 104857601, 999999999]) {
+      const report = decideArchiveVolume(bytes);
+      expect(report.uploadAndVerificationRequired).toBe(true);
+      // Over-limit evidence is COMPLETE evidence, never forensic output.
+      expect(report.routeAsIncompleteForensicOutput).toBe(false);
+    }
+  });
+
+  it("refuses to adjudicate before the artifact and receipt exist", () => {
+    const report = decideArchiveVolume(104857601);
+    for (const state of [
+      { verifiedArtifactUploaded: false, verificationReceiptCreated: false },
+      { verifiedArtifactUploaded: true, verificationReceiptCreated: false },
+      { verifiedArtifactUploaded: false, verificationReceiptCreated: true },
+    ]) {
+      expect(archiveAdjudication({ report, ...state })).toMatchObject({
+        ok: false,
+        haltCode: "ARCHIVE_ADJUDICATION_BEFORE_PRESERVATION",
+      });
+    }
+  });
+
+  it("halts over the limit ONLY after preservation, and passes at the limit", () => {
+    const preserved = { verifiedArtifactUploaded: true, verificationReceiptCreated: true };
+    expect(
+      archiveAdjudication({ report: decideArchiveVolume(104857601), ...preserved }),
+    ).toMatchObject({ ok: false, haltCode: "RAW_EVIDENCE_EXCEEDS_DURABLE_ARCHIVE_LIMIT" });
+    expect(
+      archiveAdjudication({ report: decideArchiveVolume(104857600), ...preserved }),
+    ).toMatchObject({ ok: true, haltCode: null });
+  });
+
+  it("says plainly that a retention-bound artifact is not permanent preservation", () => {
+    expect(decideArchiveVolume(104857601).meaning).toContain("NOT permanent preservation");
+    expect(decideArchiveVolume(104857601).meaning).toContain("expires");
+  });
+
+  it("orders the workflow so preservation precedes adjudication", () => {
+    const workflow = readFileSync(
+      path.join(process.cwd(), ".github/workflows/issue-149-brand-evidence-acquisition.yml"),
+      "utf8",
+    );
+    // The measurement is nonfatal and no longer gates the upload.
+    expect(workflow).toContain("Measure the archive volume (nonfatal)");
+    expect(workflow).not.toContain('RAW_EVIDENCE_EXCEEDS_DURABLE_ARCHIVE_LIMIT" >&2; exit 1; }');
+    // The verified upload does not depend on the volume outcome.
+    const uploadCondition = workflow.slice(
+      workflow.indexOf("- name: Upload the verified raw evidence"),
+      workflow.indexOf(
+        "retention-days: 30",
+        workflow.indexOf("- name: Upload the verified raw evidence"),
+      ),
+    );
+    expect(uploadCondition).toContain(
+      "if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success'",
+    );
+    expect(uploadCondition).not.toContain("overLimit");
+    // The terminal adjudication runs after upload AND the receipt job.
+    expect(workflow).toContain("needs: [resolve-mode, job-b-execute, verify-uploaded-artifact]");
+    expect(workflow.indexOf("Upload the verified raw evidence")).toBeLessThan(
+      workflow.indexOf("archive-adjudication:"),
+    );
+    // The archive-volume report travels with the evidence.
+    expect(workflow).toContain("archive-volume-report.json");
+  });
+
+  it("keeps the incomplete-forensic route for genuine failures only", () => {
+    const workflow = readFileSync(
+      path.join(process.cwd(), ".github/workflows/issue-149-brand-evidence-acquisition.yml"),
+      "utf8",
+    );
+    const forensic = workflow.slice(workflow.indexOf("- name: Upload incomplete forensic output"));
+    // Conditioned on Actor 2 / Job C failing — never on the volume.
+    expect(forensic).toContain(
+      "if: steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success'",
+    );
+    expect(forensic.slice(0, 400)).not.toContain("overLimit");
   });
 });
 
