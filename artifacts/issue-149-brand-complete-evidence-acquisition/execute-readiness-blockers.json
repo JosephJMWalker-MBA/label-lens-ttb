@@ -81,9 +81,41 @@
         "artifacts/issue-149-brand-complete-evidence-acquisition/workflow-plan.md",
         "artifacts/issue-149-brand-complete-evidence-acquisition/raw-ocr-contract.json"
       ]
+    },
+    {
+      "id": 7,
+      "title": "the isolated container runs as uid 0",
+      "detail": "Discovery reported uid 0 inside the boundary. All Linux capabilities are dropped, no-new-privileges is set, the root filesystem is read-only and only /output and the named tmpfs paths are writable \u2014 but nothing pins a non-root user. This was OBSERVED by discovery rather than assumed, and is recorded rather than changed: altering the boundary is an execute-readiness decision, not a discovery one.",
+      "requiredBeforeExecute": [
+        "decide whether the boundary pins a non-root user, and record the decision either way"
+      ],
+      "foundBy": "isolated discovery, run 30683988763",
+      "doesNotBlockDiscovery": true
     }
   ],
   "executeAuthorizationRequires": "every blocker above reviewed and resolved, and execute explicitly authorized by the owner. Changing workflow-mode.txt to execute without that is not authorized by the discovery decision.",
   "discoveryDoesNotAuthorizeExecute": true,
-  "ocrRun": false
+  "ocrRun": false,
+  "discoveryOutcome": {
+    "status": "DISCOVER_COMPLETE",
+    "run": "https://github.com/JosephJMWalker-MBA/label-lens-ttb/actions/runs/30683988763",
+    "allChecksPassed": true,
+    "checks": 12,
+    "platform": "linux/x64, node v20.20.2, pid 1",
+    "networkDenialObserved": "dns EAI_AGAIN, tcp ENETUNREACH",
+    "experimentMounts": [
+      "/opt/acquisition",
+      "/input/truth-free-input-manifest.json",
+      "/input/images",
+      "/output"
+    ],
+    "unexpectedMounts": [],
+    "writablePaths": ["/output", "/tmp", "/run"],
+    "stagedImagesVerified": 115,
+    "bundleFilesVerified": 145,
+    "ocrEngineInvoked": false,
+    "acquisitionApiInvoked": false,
+    "sealedEvidenceWritten": false,
+    "outputFilesCreated": 0
+  }
 }

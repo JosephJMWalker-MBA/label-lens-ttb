@@ -111,7 +111,10 @@ export function declaredModeMarker(mode: RunnerMode): string {
 
 export async function main(): Promise<number> {
   const mode = resolveRunnerMode(process.env);
-  process.stdout.write(`${declaredModeMarker(mode)}\n`);
+  // STDERR. The wrapper captures stdout as `discovery-report.json` and hashes
+  // it, and the first successful run produced a file that was not valid JSON
+  // because this marker sat ahead of the report and inside its digest.
+  process.stderr.write(`${declaredModeMarker(mode)}\n`);
 
   if (mode !== "execute") {
     // The halt. Discover returns HERE, before any acquisition, extractor, OCR
