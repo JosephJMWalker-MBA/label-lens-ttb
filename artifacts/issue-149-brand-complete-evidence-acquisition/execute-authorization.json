@@ -2,8 +2,8 @@
   "artifact": "execute-authorization",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 2,
-  "status": "EXECUTE_AUTHORIZED",
-  "reviewedImplementationSha": "5c41bae4888e50cffd5104c78744947d4967b439",
+  "status": "EXECUTE_NOT_AUTHORIZED",
+  "reviewedImplementationSha": null,
   "authorizedBy": null,
   "authorizedAt": null,
   "whatAuthorizationMeans": "Execute is authorized against an EXACT reviewed implementation tree, not against a branch. Setting status to EXECUTE_AUTHORIZED without naming the reviewed SHA authorizes nothing, and the gate rejects it.",
@@ -23,7 +23,7 @@
     ],
     "haltCode": "EXECUTE_TRANSITION_REJECTED"
   },
-  "currentDecision": "DISARMED after governed execute attempt 2 using transition 92574bcf7e105b63dfc7036a5b625c3f4b87da97. Workflow 30753920592 was a fresh run and remains run_attempt 1. Infrastructure, forensic preservation, Actor 2, Job C, exact-ID artifact verification and archive adjudication succeeded. The acquisition itself produced primary and repeat runs with 115 extraction-failed outcomes each and zero extracted outcomes. Primary item-0001 reported OCR_UNAVAILABLE / \"__dirname is not defined\". The remaining 229 attempts reported OCR_UNAVAILABLE / missing eng.traineddata. COMPLETE_WITH_NONDETERMINISM is rejected as the scientific classification because its only difference was typed runtime-failure text. The preregistered classification is RUNTIME_FAILURE. No OCR words, reconstructed lines, candidates, selections, authority states, Brand metrics or conclusions exist. Preserved evidence: forensic artifact 8835351859, raw artifact 8835358920, verification receipt 8835361885. Workflow 30753920592 must not be rerun. Another governed execute requires a reviewed OCR-runtime-closure repair and a new exact-SHA authorization.",
+  "currentDecision": "DISARMED after governed execute attempt 30766684792 attempt 1 using transition 7815e73df2ba243b5ce9dc855670b840bc7d47ae. The acquisition exited 1 with ACQUISITION_RUNNER_FAILURE after RUN_SUMMARY_INVALID: determinism report rejected caller-supplied writer-owned summary facts. OCR executed for primary and repeat runs and wrote 115 primary and 115 repeat raw item records, but no terminal acquisition record was emitted, neither run received a commit marker, and finalized raw manifests and run-level files were absent. Forensic handoff, receipt verification, and incomplete-forensic upload succeeded. No complete evidence artifact exists. No scientific result exists, and this attempt must never contribute to Brand metrics. Workflow 30766684792 must not be rerun. Another governed execute requires a reviewed run-summary contract repair and a new exact-SHA authorization.",
   "ocrRun": true,
   "amendedBy": "preregistration-stage-2-final-execute-closure.md",
   "branchLocalGateLimitation": {
