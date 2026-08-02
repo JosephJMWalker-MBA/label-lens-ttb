@@ -2,9 +2,9 @@
   "artifact": "execute-authorization",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 2,
-  "status": "EXECUTE_AUTHORIZED",
-  "reviewedImplementationSha": "073de0d2404b055d8d7a6a72268de27b4f72f3b0",
-  "authorizedBy": "JosephJMWalker-MBA — effective ONLY after explicit owner approval naming the exact unpushed transition commit SHA. Recording a name here does not itself authorize anything.",
+  "status": "EXECUTE_NOT_AUTHORIZED",
+  "reviewedImplementationSha": null,
+  "authorizedBy": null,
   "authorizedAt": null,
   "whatAuthorizationMeans": "Execute is authorized against an EXACT reviewed implementation tree, not against a branch. Setting status to EXECUTE_AUTHORIZED without naming the reviewed SHA authorizes nothing, and the gate rejects it.",
   "howTheGateWorks": {
@@ -23,7 +23,7 @@
     ],
     "haltCode": "EXECUTE_TRANSITION_REJECTED"
   },
-  "currentDecision": "LOCAL, UNPUSHED PROPOSAL prepared against reviewed implementation 073de0d2404b055d8d7a6a72268de27b4f72f3b0 after successful no-OCR discover workflow 30752394332 and ordinary CI 30752396308. The discover validation proved the container-to-host forensic handoff, source preservation, snapshot normalization, Actor 2, Job C, exact-ID round trip and TAR extraction without running governed OCR. The first governed execute attempt remains infrastructure-invalidated and contributes no result. This transition commit is NON-OPERATIVE until the owner explicitly authorizes its exact resulting commit SHA. It has not been pushed, no remote ref has changed, no workflow has run, and authorizedAt remains null because exact-SHA approval has not yet occurred.",
+  "currentDecision": "DISARMED after governed execute attempt 2 using transition 92574bcf7e105b63dfc7036a5b625c3f4b87da97. Workflow 30753920592 was a fresh run and remains run_attempt 1. Infrastructure, forensic preservation, Actor 2, Job C, exact-ID artifact verification and archive adjudication succeeded. The acquisition itself produced primary and repeat runs with 115 extraction-failed outcomes each and zero extracted outcomes. Primary item-0001 reported OCR_UNAVAILABLE / \"__dirname is not defined\". The remaining 229 attempts reported OCR_UNAVAILABLE / missing eng.traineddata. COMPLETE_WITH_NONDETERMINISM is rejected as the scientific classification because its only difference was typed runtime-failure text. The preregistered classification is RUNTIME_FAILURE. No OCR words, reconstructed lines, candidates, selections, authority states, Brand metrics or conclusions exist. Preserved evidence: forensic artifact 8835351859, raw artifact 8835358920, verification receipt 8835361885. Workflow 30753920592 must not be rerun. Another governed execute requires a reviewed OCR-runtime-closure repair and a new exact-SHA authorization.",
   "ocrRun": true,
   "amendedBy": "preregistration-stage-2-final-execute-closure.md",
   "branchLocalGateLimitation": {
