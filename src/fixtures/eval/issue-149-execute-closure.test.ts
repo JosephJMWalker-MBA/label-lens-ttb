@@ -64,11 +64,15 @@ import { finalizeOcrRuntimeInitProbe } from "../../../scripts/eval/issue-149-fin
 import { runProbeLifecycle } from "../../../scripts/eval/issue-149-ocr-runtime-init-probe";
 import {
   OcrRuntimeProbeValidationError,
+  validateOcrRuntimeInitProbeArtifact,
   validateOcrRuntimeInitProbeReport,
 } from "../../../scripts/eval/issue-149-validate-ocr-runtime-init-probe";
+import { adjudicateAcquisitionOutcome } from "../../../scripts/eval/issue-149-adjudicate-acquisition-outcome";
 import type { OcrEngine } from "../../../src/pipeline/extractor/ocr-engine";
 import {
   assertRuntimePackageClosureEqual,
+  canonicalizeRuntimePackageEntries,
+  compareText,
   runtimePackageClosure,
   type RuntimePackageClosure,
 } from "../../../scripts/eval/lib/issue-149-runtime-package-closure.mjs";
@@ -261,6 +265,33 @@ function probeDependencies(
     runtimeGid: () => 10149,
     afterInitialize: options.afterInitialize,
   };
+}
+
+function writeProbeArtifact(
+  directory: string,
+  report: Record<string, unknown>,
+  status: Record<string, unknown>,
+  image: Record<string, unknown> = { id: "image", repoDigests: ["sha256:abc"] },
+): void {
+  mkdirSync(directory, { recursive: true });
+  writeFileSync(
+    path.join(directory, "ocr-runtime-init-image-identity.json"),
+    `${JSON.stringify(image, null, 2)}\n`,
+  );
+  writeFileSync(
+    path.join(directory, "ocr-runtime-init-container-status.json"),
+    `${JSON.stringify(status, null, 2)}\n`,
+  );
+  writeFileSync(
+    path.join(directory, "ocr-runtime-init-probe-report.json"),
+    `${JSON.stringify(report, null, 2)}\n`,
+  );
+}
+
+function acquisitionJsonl(root: string, records: Record<string, unknown>[]): string {
+  const file = path.join(root, "acquisition-report.jsonl");
+  writeFileSync(file, records.map((record) => JSON.stringify(record)).join("\n") + "\n");
+  return file;
 }
 
 describe("Issue #149 the run-level writer derives, and commits unambiguously", () => {
@@ -764,6 +795,8 @@ describe("Issue #149 OCR runtime init probe evidence is load-bearing", () => {
     >;
     const ok: Record<string, unknown> = {
       ...observed,
+      containerExitStatus: 0,
+      reportProducedByContainer: true,
       languageAssetPath: "/opt/acquisition/assets",
       corePath: "/opt/acquisition/node_modules/tesseract.js-core",
     };
@@ -826,6 +859,180 @@ describe("Issue #149 OCR runtime init probe evidence is load-bearing", () => {
     expect(existsSync(path.join(directory, "ocr-runtime-init-probe-report.json"))).toBe(true);
     expect(existsSync(path.join(directory, "ocr-runtime-init-container-status.json"))).toBe(true);
     expect(existsSync(path.join(directory, "ocr-runtime-init-image-identity.json"))).toBe(true);
+  });
+
+  it("binds probe validation to trusted container status and image identity files", async () => {
+    const directory = path.join(freshRoot(), "probe-artifact");
+    const container = (await runProbeLifecycle(probeDependencies(freshRoot()))) as Record<
+      string,
+      unknown
+    >;
+    const image = { id: "image", repoDigests: ["sha256:abc"] };
+    writeProbeArtifact(directory, container, { containerExitStatus: 0 }, image);
+    finalizeOcrRuntimeInitProbe({ directory, containerExitStatus: 0 });
+    const finalized = JSON.parse(
+      readFileSync(path.join(directory, "ocr-runtime-init-probe-report.json"), "utf8"),
+    ) as Record<string, unknown>;
+    const validReport = {
+      ...finalized,
+      languageAssetPath: "/opt/acquisition/assets",
+      corePath: "/opt/acquisition/node_modules/tesseract.js-core",
+    };
+    writeFileSync(
+      path.join(directory, "ocr-runtime-init-probe-report.json"),
+      `${JSON.stringify(validReport, null, 2)}\n`,
+    );
+    expect(() => validateOcrRuntimeInitProbeArtifact(directory)).not.toThrow();
+
+    finalizeOcrRuntimeInitProbe({ directory, containerExitStatus: 9 });
+    const nonzero = {
+      ...validReport,
+      containerExitStatus: 9,
+      reportProducedByContainer: true,
+    };
+    writeFileSync(
+      path.join(directory, "ocr-runtime-init-probe-report.json"),
+      `${JSON.stringify(nonzero, null, 2)}\n`,
+    );
+    expect(() => validateOcrRuntimeInitProbeArtifact(directory)).toThrow(
+      /OCR_RUNTIME_INIT_CONTAINER_NONZERO/,
+    );
+
+    const missingStatus = path.join(freshRoot(), "missing-status");
+    writeProbeArtifact(missingStatus, validReport, { containerExitStatus: 0 }, image);
+    rmSync(path.join(missingStatus, "ocr-runtime-init-container-status.json"));
+    expect(() => validateOcrRuntimeInitProbeArtifact(missingStatus)).toThrow(
+      /OCR_RUNTIME_INIT_STATUS_MISSING_OR_MALFORMED/,
+    );
+
+    const malformedStatus = path.join(freshRoot(), "malformed-status");
+    writeProbeArtifact(malformedStatus, validReport, { containerExitStatus: 0 }, image);
+    writeFileSync(path.join(malformedStatus, "ocr-runtime-init-container-status.json"), "{\n");
+    expect(() => validateOcrRuntimeInitProbeArtifact(malformedStatus)).toThrow(
+      /OCR_RUNTIME_INIT_STATUS_MISSING_OR_MALFORMED/,
+    );
+
+    const statusMismatch = path.join(freshRoot(), "status-mismatch");
+    writeProbeArtifact(statusMismatch, validReport, { containerExitStatus: 1 }, image);
+    expect(() => validateOcrRuntimeInitProbeArtifact(statusMismatch)).toThrow(
+      /OCR_RUNTIME_INIT_STATUS_REPORT_MISMATCH/,
+    );
+
+    const imageMismatch = path.join(freshRoot(), "image-mismatch");
+    writeProbeArtifact(imageMismatch, validReport, { containerExitStatus: 0 }, { id: "other" });
+    expect(() => validateOcrRuntimeInitProbeArtifact(imageMismatch)).toThrow(
+      /OCR_RUNTIME_INIT_IMAGE_IDENTITY_REPORT_MISMATCH|OCR_RUNTIME_INIT_IMAGE_IDENTITY_DIGEST_MISMATCH/,
+    );
+  });
+
+  it("uses fixed code-point ordering for runtime package closure aggregates", () => {
+    const entries = [
+      { path: "z/file.txt", byteLength: 1, sha256: "b" },
+      { path: "A/file.txt", byteLength: 1, sha256: "a" },
+      { path: "_/file.txt", byteLength: 1, sha256: "c" },
+      { path: "a/file.txt", byteLength: 1, sha256: "d" },
+      { path: "a-1/file.txt", byteLength: 1, sha256: "e" },
+    ];
+    const ordered = [...entries].sort((left, right) => compareText(left.path, right.path));
+    expect(ordered.map((entry) => entry.path)).toEqual([
+      "A/file.txt",
+      "_/file.txt",
+      "a-1/file.txt",
+      "a/file.txt",
+      "z/file.txt",
+    ]);
+    expect(canonicalizeRuntimePackageEntries(entries)).toBe(
+      JSON.stringify([
+        ["A/file.txt", 1, "a"],
+        ["_/file.txt", 1, "c"],
+        ["a-1/file.txt", 1, "e"],
+        ["a/file.txt", 1, "d"],
+        ["z/file.txt", 1, "b"],
+      ]),
+    );
+  });
+
+  it("adjudicates acquisition outcomes from the terminal record, not exit status alone", () => {
+    const root = freshRoot();
+    const terminal = (record: Record<string, unknown>, status: number) =>
+      adjudicateAcquisitionOutcome({
+        acquisitionReportPath: acquisitionJsonl(root, [{ item: "noise" }, record]),
+        containerExitStatus: status,
+      });
+
+    for (const verdict of ["COMPLETE_DETERMINISTIC_EVIDENCE", "COMPLETE_WITH_NONDETERMINISM"]) {
+      expect(
+        terminal(
+          {
+            status: "ACQUISITION_COMPLETE",
+            verdict,
+            haltCode: null,
+            scientificResultProduced: true,
+          },
+          0,
+        ).outcomeClass,
+      ).toBe("SCIENTIFIC_RESULT_COMPLETE");
+    }
+
+    expect(
+      terminal(
+        {
+          status: "ACQUISITION_RUNTIME_FAILURE",
+          verdict: "RUNTIME_FAILURE",
+          haltCode: "OCR_RUNTIME_FAILURE",
+          scientificResultProduced: false,
+        },
+        1,
+      ).outcomeClass,
+    ).toBe("OCR_RUNTIME_FAILURE");
+
+    expect(
+      terminal(
+        {
+          status: "ACQUISITION_COMPLETE",
+          verdict: "INCOMPLETE_EVIDENCE",
+          haltCode: "INCOMPLETE_EVIDENCE",
+          scientificResultProduced: false,
+        },
+        1,
+      ).outcomeClass,
+    ).toBe("INCOMPLETE_EVIDENCE");
+
+    expect(
+      adjudicateAcquisitionOutcome({
+        acquisitionReportPath: acquisitionJsonl(root, [{ status: "item" }]),
+        containerExitStatus: 1,
+      }).outcomeClass,
+    ).toBe("ACQUISITION_RUNNER_FAILURE");
+    writeFileSync(path.join(root, "malformed.jsonl"), "{\n");
+    expect(
+      adjudicateAcquisitionOutcome({
+        acquisitionReportPath: path.join(root, "malformed.jsonl"),
+        containerExitStatus: 1,
+      }).outcomeClass,
+    ).toBe("ACQUISITION_RUNNER_FAILURE");
+    expect(
+      terminal(
+        {
+          status: "ACQUISITION_RUNTIME_FAILURE",
+          verdict: "RUNTIME_FAILURE",
+          haltCode: "OCR_RUNTIME_FAILURE",
+          scientificResultProduced: false,
+        },
+        0,
+      ).outcomeClass,
+    ).toBe("ACQUISITION_RUNNER_FAILURE");
+    expect(
+      terminal(
+        {
+          status: "ACQUISITION_COMPLETE",
+          verdict: "COMPLETE_DETERMINISTIC_EVIDENCE",
+          haltCode: null,
+          scientificResultProduced: true,
+        },
+        1,
+      ).outcomeClass,
+    ).toBe("ACQUISITION_RUNNER_FAILURE");
   });
 
   it("requires the workflow artifact to include report, status, and image identity", () => {
@@ -1330,7 +1537,7 @@ describe("Issue #149 the archive limit governs, and never destroys", () => {
       ),
     );
     expect(uploadCondition).toContain(
-      "if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success' && needs.job-b-execute.outputs.acquisitionStatus == '0'",
+      "if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success' && needs.job-b-execute.outputs.acquisitionOutcomeClass == 'SCIENTIFIC_RESULT_COMPLETE'",
     );
     expect(uploadCondition).not.toContain("overLimit");
     // The terminal adjudication runs after upload AND the receipt job.
@@ -1536,7 +1743,9 @@ describe("Issue #149 the archive limit governs, and never destroys", () => {
     const forensic = workflow.slice(workflow.indexOf("- name: Upload incomplete forensic output"));
     // Conditioned on Actor 2 / Job C failing — never on the volume.
     expect(forensic).toContain("if: always() &&");
-    expect(forensic).toContain("needs.job-b-execute.outputs.acquisitionStatus != '0'");
+    expect(forensic).toContain(
+      "needs.job-b-execute.outputs.acquisitionOutcomeClass != 'SCIENTIFIC_RESULT_COMPLETE'",
+    );
     expect(forensic).toContain("steps.raw.outputs.verified != 'true'");
     expect(forensic).toContain("steps.identity.outcome != 'success'");
     expect(forensic).toContain("if-no-files-found: error");
@@ -1547,7 +1756,9 @@ describe("Issue #149 the archive limit governs, and never destroys", () => {
       workflow.indexOf("- name: Upload incomplete forensic output"),
     );
     expect(staging).toContain("if: always() &&");
-    expect(staging).toContain("needs.job-b-execute.outputs.acquisitionStatus != '0'");
+    expect(staging).toContain(
+      "needs.job-b-execute.outputs.acquisitionOutcomeClass != 'SCIENTIFIC_RESULT_COMPLETE'",
+    );
     expect(staging).toContain("steps.raw.outputs.verified != 'true'");
     expect(staging).toContain("steps.identity.outcome != 'success'");
     expect(staging).toContain("raw-verification-report.json");
@@ -1563,10 +1774,14 @@ describe("Issue #149 the archive limit governs, and never destroys", () => {
       workflow.indexOf("- name: Upload the verified raw evidence"),
       workflow.indexOf("- name: Stage incomplete forensic artifact payload"),
     );
-    expect(completeUpload).toContain("needs.job-b-execute.outputs.acquisitionStatus == '0'");
+    expect(completeUpload).toContain(
+      "needs.job-b-execute.outputs.acquisitionOutcomeClass == 'SCIENTIFIC_RESULT_COMPLETE'",
+    );
 
     const terminal = workflow.slice(workflow.indexOf("acquisition-adjudication:"));
     expect(terminal).toContain("OCR_RUNTIME_FAILURE");
+    expect(terminal).toContain("INCOMPLETE_EVIDENCE");
+    expect(terminal).toContain("ACQUISITION_RUNNER_FAILURE");
     expect(terminal.indexOf("ACQUISITION_VERIFICATION_JOB_FAILED")).toBeLessThan(
       terminal.indexOf("OCR_RUNTIME_FAILURE"),
     );

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
@@ -16,6 +17,9 @@ function readJsonIfPresent(file: string): Record<string, unknown> | null {
   }
 }
 
+const sha256File = (file: string): string =>
+  createHash("sha256").update(readFileSync(file)).digest("hex");
+
 export function finalizeOcrRuntimeInitProbe(input: FinalizeProbeInput): Record<string, unknown> {
   mkdirSync(input.directory, { recursive: true });
   const reportPath = path.join(input.directory, "ocr-runtime-init-probe-report.json");
@@ -27,8 +31,18 @@ export function finalizeOcrRuntimeInitProbe(input: FinalizeProbeInput): Record<s
   );
 
   const containerReport = readJsonIfPresent(reportPath);
+  const imageIdentity = readJsonIfPresent(imageIdentityPath);
+  const imageIdentitySha256 = existsSync(imageIdentityPath) ? sha256File(imageIdentityPath) : null;
   if (containerReport) {
-    return containerReport;
+    const finalized = {
+      ...containerReport,
+      containerExitStatus: input.containerExitStatus,
+      reportProducedByContainer: true,
+      imageIdentity,
+      imageIdentitySha256,
+    };
+    writeFileSync(reportPath, `${JSON.stringify(finalized, null, 2)}\n`);
+    return finalized;
   }
 
   const wrapperReport = {
@@ -37,7 +51,8 @@ export function finalizeOcrRuntimeInitProbe(input: FinalizeProbeInput): Record<s
     failureStage: "container",
     failureCode: "OCR_RUNTIME_INIT_CONTAINER_FAILED",
     failureDetail: "container emitted no closed JSON probe report",
-    imageIdentity: readJsonIfPresent(imageIdentityPath),
+    imageIdentity,
+    imageIdentitySha256,
     reportProducedByContainer: false,
     workerInitializationAttempted: false,
     workerInitialized: false,

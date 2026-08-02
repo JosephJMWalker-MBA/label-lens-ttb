@@ -245,6 +245,10 @@ jobs:
       forensicArtifactUrl: ${{ steps.forensicUpload.outputs.artifact-url }}
       headSha: ${{ github.sha }}
       acquisitionStatus: ${{ steps.acquire.outputs.status }}
+      acquisitionOutcomeClass: ${{ steps.outcome.outputs.outcomeClass }}
+      acquisitionVerdict: ${{ steps.outcome.outputs.verdict }}
+      acquisitionHaltCode: ${{ steps.outcome.outputs.haltCode }}
+      acquisitionScientificResultProduced: ${{ steps.outcome.outputs.scientificResultProduced }}
     # THE ONLY OCR. Reachable only when the committed mode is exactly `execute`
     # AND the execute-transition gate passed: the gate is a `needs:` dependency,
     # so a rejected transition prevents this job from starting at all.
@@ -314,6 +318,22 @@ jobs:
           echo "status=${ACQUIRE_STATUS}" >> "$GITHUB_OUTPUT"
           cat acquisition-status.json
 
+      - name: Adjudicate acquisition outcome
+        id: outcome
+        if: always()
+        run: |
+          set -euo pipefail
+          STATUS="${{ steps.acquire.outputs.status }}"
+          test -n "${STATUS}" || STATUS=127
+          node verifier/adjudicate-acquisition-outcome.mjs \
+            acquisition-report.json \
+            "${STATUS}" \
+            acquisition-outcome-report.json
+          echo "outcomeClass=$(python3 -c "import json;print(json.load(open('acquisition-outcome-report.json'))['outcomeClass'])")" >> "$GITHUB_OUTPUT"
+          echo "verdict=$(python3 -c "import json;print(json.load(open('acquisition-outcome-report.json')).get('verdict') or '')")" >> "$GITHUB_OUTPUT"
+          echo "haltCode=$(python3 -c "import json;print(json.load(open('acquisition-outcome-report.json')).get('haltCode') or '')")" >> "$GITHUB_OUTPUT"
+          echo "scientificResultProduced=$(python3 -c "import json;print(str(json.load(open('acquisition-outcome-report.json')).get('scientificResultProduced')).lower())")" >> "$GITHUB_OUTPUT"
+
       - name: Trusted host forensic handoff
         id: handoff
         if: always()
@@ -352,6 +372,7 @@ jobs:
           cp forensic-handoff-report.json forensic-handoff-payload/forensic-handoff-report.json
           cp acquisition-report.json forensic-handoff-payload/acquisition-report.json
           cp acquisition-status.json forensic-handoff-payload/acquisition-status.json
+          cp acquisition-outcome-report.json forensic-handoff-payload/acquisition-outcome-report.json
           cp image-identity.json forensic-handoff-payload/image-identity.json
 
       # actions/upload-artifact v4
@@ -528,7 +549,7 @@ jobs:
           echo "rawBytes=${BYTES}" >> "$GITHUB_OUTPUT"
 
       - name: Stage complete evidence artifact payload
-        if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success' && needs.job-b-execute.outputs.acquisitionStatus == '0'
+        if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success' && needs.job-b-execute.outputs.acquisitionOutcomeClass == 'SCIENTIFIC_RESULT_COMPLETE'
         run: |
           set -euo pipefail
           rm -rf complete-evidence-payload
@@ -537,6 +558,7 @@ jobs:
           cp -R forensic-redownload/forensic-handoff complete-evidence-payload/forensic-handoff
           cp forensic-redownload/acquisition-report.json complete-evidence-payload/acquisition-report.json
           cp forensic-redownload/acquisition-status.json complete-evidence-payload/acquisition-status.json
+          cp forensic-redownload/acquisition-outcome-report.json complete-evidence-payload/acquisition-outcome-report.json
           cp forensic-redownload/image-identity.json complete-evidence-payload/image-identity.json
           cp raw-verification-report.json complete-evidence-payload/raw-verification-report.json
           cp identity-leak-report.json complete-evidence-payload/identity-leak-report.json
@@ -544,7 +566,7 @@ jobs:
 
       - name: Upload the verified raw evidence
         id: upload
-        if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success' && needs.job-b-execute.outputs.acquisitionStatus == '0'
+        if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success' && needs.job-b-execute.outputs.acquisitionOutcomeClass == 'SCIENTIFIC_RESULT_COMPLETE'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: issue-149-raw-evidence
@@ -552,7 +574,7 @@ jobs:
           retention-days: 30
 
       - name: Stage incomplete forensic artifact payload
-        if: always() && (needs.job-b-execute.outputs.acquisitionStatus != '0' || steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success')
+        if: always() && (needs.job-b-execute.outputs.acquisitionOutcomeClass != 'SCIENTIFIC_RESULT_COMPLETE' || steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success')
         run: |
           set -euo pipefail
           rm -rf incomplete-evidence-payload
@@ -561,12 +583,13 @@ jobs:
           cp -R forensic-redownload/host-readable-output incomplete-evidence-payload/host-readable-output
           cp forensic-redownload/acquisition-report.json incomplete-evidence-payload/acquisition-report.json
           cp forensic-redownload/acquisition-status.json incomplete-evidence-payload/acquisition-status.json
+          cp forensic-redownload/acquisition-outcome-report.json incomplete-evidence-payload/acquisition-outcome-report.json
           cp forensic-redownload/image-identity.json incomplete-evidence-payload/image-identity.json
           test ! -f raw-verification-report.json || cp raw-verification-report.json incomplete-evidence-payload/raw-verification-report.json
           test ! -f identity-leak-report.json || cp identity-leak-report.json incomplete-evidence-payload/identity-leak-report.json
 
       - name: Upload incomplete forensic output
-        if: always() && (needs.job-b-execute.outputs.acquisitionStatus != '0' || steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success')
+        if: always() && (needs.job-b-execute.outputs.acquisitionOutcomeClass != 'SCIENTIFIC_RESULT_COMPLETE' || steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success')
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: issue-149-incomplete-forensic-output
@@ -577,7 +600,7 @@ jobs:
   verify-uploaded-artifact:
     name: Verify the uploaded complete evidence artifact
     needs: [resolve-mode, job-b-execute, job-b-verify-evidence]
-    if: needs.resolve-mode.outputs.mode == 'execute' && needs.job-b-verify-evidence.outputs.rawVerified == 'true' && needs.job-b-execute.outputs.acquisitionStatus == '0'
+    if: needs.resolve-mode.outputs.mode == 'execute' && needs.job-b-verify-evidence.outputs.rawVerified == 'true' && needs.job-b-execute.outputs.acquisitionOutcomeClass == 'SCIENTIFIC_RESULT_COMPLETE'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -668,7 +691,7 @@ jobs:
   archive-adjudication:
     name: Terminal archive-volume adjudication
     needs: [resolve-mode, job-b-execute, job-b-verify-evidence, verify-uploaded-artifact]
-    if: needs.resolve-mode.outputs.mode == 'execute' && needs.job-b-verify-evidence.outputs.rawVerified == 'true' && needs.job-b-execute.outputs.acquisitionStatus == '0'
+    if: needs.resolve-mode.outputs.mode == 'execute' && needs.job-b-verify-evidence.outputs.rawVerified == 'true' && needs.job-b-execute.outputs.acquisitionOutcomeClass == 'SCIENTIFIC_RESULT_COMPLETE'
     runs-on: ubuntu-latest
     steps:
       # actions/download-artifact v4
@@ -714,6 +737,8 @@ jobs:
         run: |
           set -euo pipefail
           echo "acquisition exit: ${{ needs.job-b-execute.outputs.acquisitionStatus }}"
+          echo "acquisition outcome: ${{ needs.job-b-execute.outputs.acquisitionOutcomeClass }}"
+          echo "acquisition verdict: ${{ needs.job-b-execute.outputs.acquisitionVerdict }}"
           echo "forensic receipt job: ${{ needs.verify-forensic-handoff.result }}"
           echo "evidence verification job: ${{ needs.job-b-verify-evidence.result }}"
           echo "actor 2 verified: ${{ needs.job-b-verify-evidence.outputs.rawVerified }}"
@@ -721,8 +746,12 @@ jobs:
             echo "FORENSIC_HANDOFF_RECEIPT_NOT_VERIFIED" >&2; exit 1; }
           test "${{ needs.job-b-verify-evidence.result }}" = "success" || {
             echo "ACQUISITION_VERIFICATION_JOB_FAILED" >&2; exit 1; }
-          test "${{ needs.job-b-execute.outputs.acquisitionStatus }}" = "0" || {
-            echo "OCR_RUNTIME_FAILURE" >&2; exit 1; }
+          case "${{ needs.job-b-execute.outputs.acquisitionOutcomeClass }}" in
+            SCIENTIFIC_RESULT_COMPLETE) ;;
+            OCR_RUNTIME_FAILURE) echo "OCR_RUNTIME_FAILURE" >&2; exit 1 ;;
+            INCOMPLETE_EVIDENCE) echo "INCOMPLETE_EVIDENCE" >&2; exit 1 ;;
+            *) echo "ACQUISITION_RUNNER_FAILURE" >&2; exit 1 ;;
+          esac
           test "${{ needs.job-b-verify-evidence.outputs.rawVerified }}" = "true" || {
             echo "ACQUISITION_NOT_VERIFIED" >&2; exit 1; }
 
@@ -800,7 +829,7 @@ jobs:
         run: |
           set -euo pipefail
           node verifier/validate-ocr-runtime-init-probe.mjs \
-            ocr-runtime-init-probe-artifact/ocr-runtime-init-probe-report.json
+            ocr-runtime-init-probe-artifact
 
       - name: Upload OCR runtime init probe report
         if: always()

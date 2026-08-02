@@ -75,13 +75,14 @@ eeaee7c467c796fa3fabf0c6e08b5caf1a36567690a2d07d00db1bb732d632c8  artifacts/issu
 631ee1df6b4050251c259de53a6153c4e6d2747300a37cda3f700f663864645a  artifacts/issue-149-brand-complete-evidence-acquisition/truth-isolation-plan.json
 2f690462226ed58f054151993731acfa64c3936019e7564b4368ac5224a9fef3  artifacts/issue-149-brand-complete-evidence-acquisition/verifier-transport-linkage.json
 4a362867722de7343e11448944d95d0632fe932785cb8b646fa05772d829c963  artifacts/issue-149-brand-complete-evidence-acquisition/workflow-plan.md
+e8bb545fc10f6c899a2fb46bda663efaedff8563d3ebc11a21d7e905d8e289dd  scripts/eval/issue-149-adjudicate-acquisition-outcome.ts
 408a0f6a2008cd1e15dca0121db71dd096b00267feedc435109519341a82f54d  scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs
 78377f02a6fa32a3f8f0a230afccf3371899d71af5e0defe2796eec5bbacdd95  scripts/eval/issue-149-build-rehearsal-evidence.ts
-885b16186921b49dcdc8b0edd4b95e5f8cdd4e641ba371e2a7e4719f5ac1f1c5  scripts/eval/issue-149-finalize-ocr-runtime-init-probe.ts
+822348f2476807f9bfb1bdd2536a0519f637b3827d412a23b597f00ef909e32e  scripts/eval/issue-149-finalize-ocr-runtime-init-probe.ts
 933ab0998a77bd76c408eb2195ccf5cdc756eb781822d2ff685d1c5624a3341f  scripts/eval/issue-149-forensic-handoff.ts
 44df89f05b2785df0d636b020ff9472de9f1033b91edc7854504e5b4a6a9576a  scripts/eval/issue-149-ocr-runtime-init-probe.ts
-046b4698ab2f84ef67c7644a87e1af1c5195b6e273f8103716723e8f7dad8394  scripts/eval/issue-149-stage-1-contract-manifest.mjs
-21ad9cc640058a4cd475476eb01ccc05176cc638f22e62658dbf415ed8dc6153  scripts/eval/issue-149-validate-ocr-runtime-init-probe.ts
+58bfcba5cdc91575c3f4ec85067f3050338989986c6c6bd6bc268a29fdbd59ac  scripts/eval/issue-149-stage-1-contract-manifest.mjs
+8a4f92fd5465bf29af295824f1d750d0dbd4742e2fad33da4ee7c277992057eb  scripts/eval/issue-149-validate-ocr-runtime-init-probe.ts
 889f2bece17ba0b31316a3c60c966699cfb0fe93fca2951d641fe41552656331  scripts/eval/issue-149-validate-rehearsal-attestation.ts
 87d404dd87f242b190f011e2a1a5b92d05ba88235adef1d897783cc3197a7eac  scripts/eval/lib/issue-149-bundle-scan.ts
 0aa409bff81d4fe77654b7cc3bfaef085be243b42b72484a427fd17282861013  scripts/eval/lib/issue-149-candidate-adapter.ts
@@ -89,8 +90,8 @@ cdf8dcff28bbd62d759a7f31fdbe52cd6cde99786670f07ce40c269d7627f122  scripts/eval/l
 6fb2eb59fc02c8b3de4a4e7062f02ed72fe876f47a63c2e2c89dd97a47b6adf1  scripts/eval/lib/issue-149-freeze-core.d.mts
 64a0b65aa867e35e926ff1c792f068632fc9bbfb5cbee0613add2f7329b01364  scripts/eval/lib/issue-149-freeze-core.mjs
 61dbaded798a2cb96876481473443d0a57ee3f30913b6460df55d96f9b87beb0  scripts/eval/lib/issue-149-run-evidence-writer.ts
-6a26ee19b8060162f994781faef0e9a721c0e61a5168c0ca13c79f188a91fc38  scripts/eval/lib/issue-149-runtime-package-closure.d.mts
-384db5aec9618058c9e62c028f465ad7363a504ea356b9dbfa54a964a9ee32df  scripts/eval/lib/issue-149-runtime-package-closure.mjs
+5232a18ccba8f6772b388325a97aaa472a11a6c40388df73dbb91d664613c575  scripts/eval/lib/issue-149-runtime-package-closure.d.mts
+cee4e6d602a78d9de032aab7a807dd1b2ab2ac3f8842cfedc283c0e461e560cc  scripts/eval/lib/issue-149-runtime-package-closure.mjs
 ef105b2eb706e25cb338e26f386f4ff613a103ab76088b67b815a08c624591b7  scripts/eval/lib/issue-149-stage2-source-closure.ts
 3eb018d554318a58db087ef410f92db1567e5a28677bf2f70aac494024515c6b  src/fixtures/eval/issue-149-acquisition-isolation.test.ts
 1c2ab973f3d92e4dded2ee6499ff3e31f94843d714c131be781b3339bfc3b028  src/fixtures/eval/issue-149-acquisition-orchestration.test.ts
@@ -106,4 +107,4 @@ dfaa093b9f3bb7782845c22069f4a93d4abcfc6f47fe11c1cff98926f2a6f587  src/fixtures/e
 9ee4557d83a308834822b5a76b5c3ba851c30c04261d5b70d8e30b70997cf56c  src/fixtures/eval/issue-149-stage-1-manifest.test.ts
 5d3fe14028b90518c2bcd039c12974a64edc9dddc95f9447eb3c2e7772200e26  src/fixtures/eval/issue-149-stage2-source-closure.test.ts
 42ea378611fc16ff3e6448ac38091468500c9957e42965b4ec529cd1cebabf12  src/fixtures/eval/issue-149-staging-independence.test.ts
-# aggregate 5c8c65dcbd0f36791ef3308fb9b1839052bce41b8fb3b9fd19e4906dcf843ba2
+# aggregate 9cabcda0016026119e160e30618bcf0cb1c82aec241decd25770a4293f1732d2

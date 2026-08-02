@@ -1,5 +1,7 @@
 #!/usr/bin/env node
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import path from "node:path";
 
 interface RuntimePackageManifest {
   name: string;
@@ -22,11 +24,32 @@ export class OcrRuntimeProbeValidationError extends Error {
 const packageByName = (packages: RuntimePackageManifest[] | undefined, name: string) =>
   packages?.find((entry) => entry.name === name);
 
+const readJson = (file: string): Record<string, unknown> =>
+  JSON.parse(readFileSync(file, "utf8")) as Record<string, unknown>;
+const sha256File = (file: string): string =>
+  createHash("sha256").update(readFileSync(file)).digest("hex");
+
+const readRequiredJson = (
+  file: string,
+  code: string,
+  reject: (code: string, detail?: unknown) => never,
+): Record<string, unknown> => {
+  try {
+    return readJson(file);
+  } catch (cause) {
+    return reject(code, String(cause));
+  }
+};
+
 export function validateOcrRuntimeInitProbeReport(report: Record<string, unknown>): void {
   const reject = (code: string, detail?: unknown): never => {
     throw new OcrRuntimeProbeValidationError(code, detail);
   };
   if (report.status !== "OK") reject("OCR_RUNTIME_INIT_PROBE_NOT_OK", report.status);
+  if (report.containerExitStatus !== 0)
+    reject("OCR_RUNTIME_INIT_CONTAINER_NONZERO", report.containerExitStatus);
+  if (report.reportProducedByContainer !== true)
+    reject("OCR_RUNTIME_INIT_REPORT_NOT_CONTAINER_PRODUCED");
   if (report.workerInitializationAttempted !== true) reject("OCR_WORKER_INIT_NOT_ATTEMPTED");
   if (report.workerInitialized !== true) reject("OCR_WORKER_NOT_INITIALIZED");
   if (report.workerTerminationAttempted !== true) reject("OCR_WORKER_TERMINATION_NOT_ATTEMPTED");
@@ -62,12 +85,48 @@ export function validateOcrRuntimeInitProbeReport(report: Record<string, unknown
   }
 }
 
-export function main(argv = process.argv): number {
-  const reportPath = argv[2];
-  if (!reportPath) throw new Error("usage: validate-ocr-runtime-init-probe <report.json>");
-  const report = JSON.parse(readFileSync(reportPath, "utf8")) as Record<string, unknown>;
+export function validateOcrRuntimeInitProbeArtifact(directory: string): void {
+  const reject = (code: string, detail?: unknown): never => {
+    throw new OcrRuntimeProbeValidationError(code, detail);
+  };
+  const reportPath = path.join(directory, "ocr-runtime-init-probe-report.json");
+  const statusPath = path.join(directory, "ocr-runtime-init-container-status.json");
+  const imagePath = path.join(directory, "ocr-runtime-init-image-identity.json");
+  const report = readRequiredJson(
+    reportPath,
+    "OCR_RUNTIME_INIT_REPORT_MISSING_OR_MALFORMED",
+    reject,
+  );
+  const status = readRequiredJson(
+    statusPath,
+    "OCR_RUNTIME_INIT_STATUS_MISSING_OR_MALFORMED",
+    reject,
+  );
+  const image = readRequiredJson(
+    imagePath,
+    "OCR_RUNTIME_INIT_IMAGE_IDENTITY_MISSING_OR_MALFORMED",
+    reject,
+  );
+  if (status.containerExitStatus !== report.containerExitStatus) {
+    reject("OCR_RUNTIME_INIT_STATUS_REPORT_MISMATCH", {
+      status,
+      report: report.containerExitStatus,
+    });
+  }
+  if (JSON.stringify(image) !== JSON.stringify(report.imageIdentity)) {
+    reject("OCR_RUNTIME_INIT_IMAGE_IDENTITY_REPORT_MISMATCH");
+  }
+  if (sha256File(imagePath) !== report.imageIdentitySha256) {
+    reject("OCR_RUNTIME_INIT_IMAGE_IDENTITY_DIGEST_MISMATCH");
+  }
   validateOcrRuntimeInitProbeReport(report);
-  process.stdout.write(`${JSON.stringify({ status: "OK", report: reportPath })}\n`);
+}
+
+export function main(argv = process.argv): number {
+  const directory = argv[2];
+  if (!directory) throw new Error("usage: validate-ocr-runtime-init-probe <artifact-dir>");
+  validateOcrRuntimeInitProbeArtifact(directory);
+  process.stdout.write(`${JSON.stringify({ status: "OK", directory })}\n`);
   return 0;
 }
 

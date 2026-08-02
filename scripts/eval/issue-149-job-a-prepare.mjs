@@ -471,6 +471,10 @@ async function buildVerifierBundle() {
     ["scripts/eval/issue-149-archive-volume-decision.ts", "archive-volume.mjs"],
     ["scripts/eval/issue-149-archive-adjudication.ts", "archive-adjudication.mjs"],
     [
+      "scripts/eval/issue-149-adjudicate-acquisition-outcome.ts",
+      "adjudicate-acquisition-outcome.mjs",
+    ],
+    [
       "scripts/eval/issue-149-validate-ocr-runtime-init-probe.ts",
       "validate-ocr-runtime-init-probe.mjs",
     ],

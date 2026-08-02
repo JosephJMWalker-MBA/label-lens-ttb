@@ -6,6 +6,7 @@ export const REQUIRED_RUNTIME_PACKAGES = ["tesseract.js", "tesseract.js-core"];
 
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const sha256File = (file) => sha256(readFileSync(file));
+export const compareText = (left, right) => (left < right ? -1 : left > right ? 1 : 0);
 
 export class RuntimePackageClosureError extends Error {
   constructor(code, detail) {
@@ -19,7 +20,7 @@ export function canonicalizeRuntimePackageEntries(entries) {
   return JSON.stringify(
     entries
       .map((entry) => [entry.path, entry.byteLength, entry.sha256])
-      .sort((left, right) => left[0].localeCompare(right[0])),
+      .sort((left, right) => compareText(left[0], right[0])),
   );
 }
 
@@ -32,7 +33,7 @@ export function runtimePackageManifest(name, directory) {
   const manifest = JSON.parse(readFileSync(packageJson, "utf8"));
   const entries = [];
   const walk = (current) => {
-    for (const entry of readdirSync(current).sort()) {
+    for (const entry of readdirSync(current).sort(compareText)) {
       const absolute = path.join(current, entry);
       const stat = statSync(absolute);
       if (stat.isDirectory()) {
@@ -47,7 +48,7 @@ export function runtimePackageManifest(name, directory) {
     }
   };
   walk(directory);
-  entries.sort((left, right) => left.path.localeCompare(right.path));
+  entries.sort((left, right) => compareText(left.path, right.path));
   return {
     name,
     version: manifest.version ?? null,

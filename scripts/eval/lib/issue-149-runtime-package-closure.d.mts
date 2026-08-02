@@ -19,6 +19,7 @@ export interface RuntimePackageClosure {
 }
 
 export const REQUIRED_RUNTIME_PACKAGES: string[];
+export function compareText(left: string, right: string): -1 | 0 | 1;
 
 export class RuntimePackageClosureError extends Error {
   code: string;
