@@ -738,19 +738,29 @@ jobs:
           name: issue-149-truth-free-preparation
           path: preparation
 
+      - name: Download the host verifier bundle
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: issue-149-host-verifier
+          path: verifier
+
       - name: Resolve and record the pinned runtime image
         run: |
           set -euo pipefail
+          mkdir -p ocr-runtime-init-probe-artifact
           docker pull --platform linux/amd64 "${ISSUE_149_BASE_IMAGE}"
           docker image inspect "${ISSUE_149_BASE_IMAGE}" \
             --format '{"id":"{{.Id}}","repoDigests":{{json .RepoDigests}},"os":"{{.Os}}","arch":"{{.Architecture}}"}' \
-            | tee ocr-runtime-init-image-identity.json
-          grep -q "${ISSUE_149_BASE_IMAGE_DIGEST#sha256:}" ocr-runtime-init-image-identity.json \
+            | tee ocr-runtime-init-probe-artifact/ocr-runtime-init-image-identity.json
+          grep -q "${ISSUE_149_BASE_IMAGE_DIGEST#sha256:}" ocr-runtime-init-probe-artifact/ocr-runtime-init-image-identity.json \
             || { echo "RUNTIME_IMAGE_DIGEST_MISMATCH" >&2; exit 1; }
 
       - name: Initialize OCR runtime without recognition
+        id: probe
         run: |
-          set -euo pipefail
+          set -uo pipefail
+          mkdir -p ocr-runtime-init-probe-artifact
+          set +e
           docker run --rm \
             --platform linux/amd64 \
             --network none \
@@ -765,29 +775,39 @@ jobs:
             --tmpfs /run:rw,noexec,nosuid,size=16m \
             -v "$PWD/preparation/bundle:/opt/acquisition:ro" \
             "${ISSUE_149_BASE_IMAGE}" \
-            node /opt/acquisition/ocr-runtime-init-probe.mjs | tee ocr-runtime-init-probe-report.json
-          node -e '
-            const fs = require("node:fs");
-            const report = JSON.parse(fs.readFileSync("ocr-runtime-init-probe-report.json", "utf8"));
-            if (report.status !== "OK") throw new Error("OCR_RUNTIME_INIT_PROBE_NOT_OK");
-            if (report.workerInitialized !== true) throw new Error("OCR_WORKER_NOT_INITIALIZED");
-            if (report.workerTerminated !== true) throw new Error("OCR_WORKER_NOT_TERMINATED");
-            if (report.recognizeCalls !== 0) throw new Error("OCR_RECOGNITION_OCCURRED");
-            if (report.governedCorpusMounted !== false) throw new Error("GOVERNED_CORPUS_MOUNTED");
-            if (report.governedCorpusUsed !== false) throw new Error("GOVERNED_CORPUS_USED");
-            if (report.acquisitionApiInvoked !== false) throw new Error("ACQUISITION_API_INVOKED");
-            if (report.languageAssetPath !== "/opt/acquisition/assets") throw new Error("OCR_ASSET_PATH_MISMATCH");
-            if (report.corePath !== "/opt/acquisition/node_modules/tesseract.js-core") throw new Error("OCR_CORE_PATH_MISMATCH");
-          '
+            node /opt/acquisition/ocr-runtime-init-probe.mjs \
+            > ocr-runtime-init-probe-artifact/ocr-runtime-init-probe-report.json
+          STATUS=$?
+          set -e
+          echo "containerExitStatus=${STATUS}" >> "$GITHUB_OUTPUT"
+          cat ocr-runtime-init-probe-artifact/ocr-runtime-init-probe-report.json || true
+
+      - name: Finalize OCR runtime init probe report
+        if: always()
+        run: |
+          set -euo pipefail
+          STATUS="${{ steps.probe.outputs.containerExitStatus }}"
+          test -n "${STATUS}" || STATUS=127
+          node verifier/finalize-ocr-runtime-init-probe.mjs ocr-runtime-init-probe-artifact "${STATUS}"
+          test -f ocr-runtime-init-probe-artifact/ocr-runtime-init-image-identity.json || {
+            echo "OCR_RUNTIME_INIT_IMAGE_IDENTITY_MISSING" >&2; exit 1; }
+          test -f ocr-runtime-init-probe-artifact/ocr-runtime-init-container-status.json || {
+            echo "OCR_RUNTIME_INIT_CONTAINER_STATUS_MISSING" >&2; exit 1; }
+          test -f ocr-runtime-init-probe-artifact/ocr-runtime-init-probe-report.json || {
+            echo "OCR_RUNTIME_INIT_CLOSED_REPORT_MISSING" >&2; exit 1; }
+
+      - name: Validate OCR runtime init probe report
+        run: |
+          set -euo pipefail
+          node verifier/validate-ocr-runtime-init-probe.mjs \
+            ocr-runtime-init-probe-artifact/ocr-runtime-init-probe-report.json
 
       - name: Upload OCR runtime init probe report
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: issue-149-ocr-runtime-init-probe
-          path: |
-            ocr-runtime-init-probe-report.json
-            ocr-runtime-init-image-identity.json
+          path: ocr-runtime-init-probe-artifact
           if-no-files-found: error
           retention-days: 30
 

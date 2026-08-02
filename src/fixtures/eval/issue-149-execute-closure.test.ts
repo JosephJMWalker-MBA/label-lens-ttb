@@ -13,6 +13,7 @@ import {
   lstatSync,
   mkdirSync,
   mkdtempSync,
+  cpSync,
   readFileSync,
   readdirSync,
   rmSync,
@@ -59,6 +60,18 @@ import {
   compareAttestationToSourcePreManifest,
   validateRehearsalBuildReport,
 } from "../../../scripts/eval/issue-149-validate-rehearsal-attestation";
+import { finalizeOcrRuntimeInitProbe } from "../../../scripts/eval/issue-149-finalize-ocr-runtime-init-probe";
+import { runProbeLifecycle } from "../../../scripts/eval/issue-149-ocr-runtime-init-probe";
+import {
+  OcrRuntimeProbeValidationError,
+  validateOcrRuntimeInitProbeReport,
+} from "../../../scripts/eval/issue-149-validate-ocr-runtime-init-probe";
+import type { OcrEngine } from "../../../src/pipeline/extractor/ocr-engine";
+import {
+  assertRuntimePackageClosureEqual,
+  runtimePackageClosure,
+  type RuntimePackageClosure,
+} from "../../../scripts/eval/lib/issue-149-runtime-package-closure.mjs";
 
 /**
  * The committed control state: the mode file and the authorization artifact,
@@ -196,6 +209,59 @@ const passesJson = (totalMs: number, words: string[]): string =>
 
 const failureJson = (code: string, message = "runtime unavailable"): string =>
   `${canonicalize({ errorCode: code, errorMessage: message })}\n`;
+
+function writeRuntimePackage(root: string, name: string, version = "7.0.0"): string {
+  const directory = path.join(root, name);
+  mkdirSync(path.join(directory, "src"), { recursive: true });
+  writeFileSync(path.join(directory, "package.json"), `${canonicalize({ name, version })}\n`);
+  writeFileSync(
+    path.join(directory, "src", "index.js"),
+    `module.exports = ${JSON.stringify(name)};\n`,
+  );
+  if (name === "tesseract.js-core")
+    writeFileSync(path.join(directory, "tesseract-core.wasm"), "wasm\n");
+  return directory;
+}
+
+function writeRuntimeClosure(root: string, closure: RuntimePackageClosure): string {
+  const file = path.join(root, "runtime-package-closure.json");
+  writeFileSync(file, `${JSON.stringify(closure, null, 2)}\n`);
+  return file;
+}
+
+function probeDependencies(
+  root: string,
+  options: {
+    createEngine?: () => Promise<OcrEngine>;
+    afterInitialize?: (engine: OcrEngine) => Promise<void>;
+  } = {},
+) {
+  const assets = path.join(root, "assets");
+  const packages = path.join(root, "node_modules");
+  mkdirSync(assets, { recursive: true });
+  writeFileSync(path.join(assets, "eng.traineddata"), "traineddata\n");
+  writeRuntimePackage(packages, "tesseract.js");
+  writeRuntimePackage(packages, "tesseract.js-core");
+  const closure = runtimePackageClosure(packages);
+  return {
+    createEngine:
+      options.createEngine ??
+      (async () => ({
+        recognizeWords: async () => {
+          throw new Error("UNDERLYING_RECOGNIZER_CALLED");
+        },
+        terminate: async () => undefined,
+      })),
+    languageAssetPath: () => assets,
+    corePath: () => path.join(packages, "tesseract.js-core"),
+    packageRoot: packages,
+    expectedClosurePath: writeRuntimeClosure(root, closure),
+    governedCorpusMounted: () => false,
+    runtimeUid: () => 10149,
+    runtimeGid: () => 10149,
+    afterInitialize: options.afterInitialize,
+  };
+}
 
 describe("Issue #149 the run-level writer derives, and commits unambiguously", () => {
   it("derives item outcome and aggregate from the committed files, not from the caller", () => {
@@ -486,6 +552,30 @@ describe("Issue #149 the semantic comparison covers every level", () => {
     expect(isSuccessfulAcquisition(report.verdict)).toBe(false);
   });
 
+  it("classifies one complete all-OCR_UNAVAILABLE run as runtime failure even when the other differs", () => {
+    const primary = freshRoot();
+    const repeat = freshRoot();
+    for (const itemId of ["item-0001", "item-0002"]) {
+      writeItem(primary, itemId, {
+        outcome: "extraction-failed",
+        overrides: { ".failure.json": failureJson("OCR_UNAVAILABLE", "missing eng.traineddata") },
+      });
+      writeItem(repeat, itemId, {
+        outcome: "extraction-failed",
+        overrides: {
+          ".failure.json": failureJson(itemId === "item-0001" ? "OTHER" : "OCR_UNAVAILABLE"),
+        },
+      });
+    }
+    const report = compareRuns({
+      primaryDirectory: primary,
+      repeatDirectory: repeat,
+      expectedItemIds: ["item-0001", "item-0002"],
+    });
+    expect(report.verdict).toBe("RUNTIME_FAILURE");
+    expect(report.scientificResultProduced).toBe(false);
+  });
+
   it("does not turn mixed extraction and item failure into a global runtime failure", () => {
     const primary = freshRoot();
     const repeat = freshRoot();
@@ -550,6 +640,210 @@ describe("Issue #149 the semantic comparison covers every level", () => {
       "utf8",
     );
     expect(runner).toContain("isSuccessfulAcquisition(comparison.verdict) ? 0 : 1");
+  });
+});
+
+describe("Issue #149 OCR runtime init probe evidence is load-bearing", () => {
+  it("reports zero recognition calls when recognition is never attempted", async () => {
+    const root = freshRoot();
+    const report = await runProbeLifecycle(probeDependencies(root));
+    expect(report).toMatchObject({
+      status: "OK",
+      workerInitializationAttempted: true,
+      workerInitialized: true,
+      workerTerminationAttempted: true,
+      workerTerminated: true,
+      recognizeCalls: 0,
+      runtimePackageClosureMatched: true,
+    });
+  });
+
+  it("increments, halts, and never forwards an attempted recognition", async () => {
+    const root = freshRoot();
+    let underlyingCalls = 0;
+    const report = await runProbeLifecycle(
+      probeDependencies(root, {
+        createEngine: async () => ({
+          recognizeWords: async () => {
+            underlyingCalls += 1;
+            return [];
+          },
+          terminate: async () => undefined,
+        }),
+        afterInitialize: async (engine: OcrEngine) => {
+          await engine.recognizeWords(Buffer.from("not-an-image"), 6);
+        },
+      }),
+    );
+    expect(report).toMatchObject({
+      status: "HALTED",
+      failureStage: "after-initialize",
+      failureCode: "OCR_RUNTIME_INIT_PROBE_FAILED",
+      recognizeCalls: 1,
+      workerInitialized: true,
+      workerTerminationAttempted: false,
+    });
+    expect(underlyingCalls).toBe(0);
+  });
+
+  it("preserves accurate partial state for initialization and termination failures", async () => {
+    const initFailure = await runProbeLifecycle(
+      probeDependencies(freshRoot(), {
+        createEngine: async () => {
+          throw new Error("OCR_INIT_FAILED");
+        },
+      }),
+    );
+    expect(initFailure).toMatchObject({
+      status: "HALTED",
+      failureStage: "initialize",
+      workerInitializationAttempted: true,
+      workerInitialized: false,
+      workerTerminationAttempted: false,
+    });
+
+    const terminationFailure = await runProbeLifecycle(
+      probeDependencies(freshRoot(), {
+        createEngine: async () => ({
+          recognizeWords: async () => [],
+          terminate: async () => {
+            throw new Error("OCR_TERMINATE_FAILED");
+          },
+        }),
+      }),
+    );
+    expect(terminationFailure).toMatchObject({
+      status: "HALTED",
+      failureStage: "terminate",
+      workerInitialized: true,
+      workerTerminationAttempted: true,
+      workerTerminated: false,
+    });
+  });
+
+  it("halts missing language data before worker initialization", async () => {
+    const root = freshRoot();
+    const dependencies = probeDependencies(root);
+    rmSync(path.join(root, "assets", "eng.traineddata"));
+    const report = await runProbeLifecycle(dependencies);
+    expect(report).toMatchObject({
+      status: "HALTED",
+      failureStage: "runtime-paths",
+      workerInitializationAttempted: false,
+      workerInitialized: false,
+    });
+    expect(String(report.failureDetail)).toContain("OCR_LANGUAGE_ASSET_MISSING");
+  });
+
+  it("halts missing tesseract package closures and altered copied files", () => {
+    const source = path.join(freshRoot(), "source");
+    const copy = path.join(freshRoot(), "copy");
+    writeRuntimePackage(source, "tesseract.js");
+    writeRuntimePackage(source, "tesseract.js-core");
+    cpSync(source, copy, { recursive: true });
+    const expected = runtimePackageClosure(source);
+    const observed = runtimePackageClosure(copy);
+    expect(() => assertRuntimePackageClosureEqual(expected, observed)).not.toThrow();
+
+    writeFileSync(path.join(copy, "tesseract.js", "src", "index.js"), "altered\n");
+    expect(() => assertRuntimePackageClosureEqual(expected, runtimePackageClosure(copy))).toThrow(
+      /RUNTIME_PACKAGE_CLOSURE_MISMATCH/,
+    );
+    rmSync(path.join(copy, "tesseract.js"), { recursive: true, force: true });
+    expect(() => runtimePackageClosure(copy)).toThrow(/RUNTIME_PACKAGE_MISSING/);
+    const copyMissingCore = path.join(freshRoot(), "copy-missing-core");
+    cpSync(source, copyMissingCore, { recursive: true });
+    rmSync(path.join(copyMissingCore, "tesseract.js-core"), { recursive: true, force: true });
+    expect(() => runtimePackageClosure(copyMissingCore)).toThrow(/RUNTIME_PACKAGE_MISSING/);
+  });
+
+  it("validates reports and rejects forged success, recognition, UID/GID, paths, versions and digests", async () => {
+    const observed = (await runProbeLifecycle(probeDependencies(freshRoot()))) as Record<
+      string,
+      unknown
+    >;
+    const ok: Record<string, unknown> = {
+      ...observed,
+      languageAssetPath: "/opt/acquisition/assets",
+      corePath: "/opt/acquisition/node_modules/tesseract.js-core",
+    };
+    expect(() => validateOcrRuntimeInitProbeReport(ok)).not.toThrow();
+    const rejects = [
+      { workerInitialized: false },
+      { recognizeCalls: 1 },
+      { runtimeUid: 1 },
+      { runtimeGid: 1 },
+      { languageAssetPath: "/wrong" },
+      { corePath: "/wrong" },
+      {
+        observedRuntimePackageClosure: {
+          ...(ok.observedRuntimePackageClosure as RuntimePackageClosure),
+          packages: [
+            {
+              ...(ok.observedRuntimePackageClosure as RuntimePackageClosure).packages[0],
+              version: "0.0.0",
+            },
+            (ok.observedRuntimePackageClosure as RuntimePackageClosure).packages[1],
+          ],
+        },
+      },
+      {
+        observedRuntimePackageClosure: {
+          ...(ok.observedRuntimePackageClosure as RuntimePackageClosure),
+          packages: [
+            {
+              ...(ok.observedRuntimePackageClosure as RuntimePackageClosure).packages[0],
+              aggregateSha256: "0".repeat(64),
+            },
+            (ok.observedRuntimePackageClosure as RuntimePackageClosure).packages[1],
+          ],
+        },
+      },
+    ];
+    for (const patch of rejects) {
+      expect(() => validateOcrRuntimeInitProbeReport({ ...ok, ...patch })).toThrow(
+        OcrRuntimeProbeValidationError,
+      );
+    }
+  });
+
+  it("finalizes container no-report failures into a closed HALTED report", () => {
+    const directory = path.join(freshRoot(), "probe-artifact");
+    mkdirSync(directory, { recursive: true });
+    writeFileSync(
+      path.join(directory, "ocr-runtime-init-image-identity.json"),
+      `${canonicalize({ id: "image" })}\n`,
+    );
+    const report = finalizeOcrRuntimeInitProbe({ directory, containerExitStatus: 42 });
+    expect(report).toMatchObject({
+      status: "HALTED",
+      containerExitStatus: 42,
+      failureCode: "OCR_RUNTIME_INIT_CONTAINER_FAILED",
+      reportProducedByContainer: false,
+      recognizeCalls: null,
+      workerInitialized: false,
+    });
+    expect(existsSync(path.join(directory, "ocr-runtime-init-probe-report.json"))).toBe(true);
+    expect(existsSync(path.join(directory, "ocr-runtime-init-container-status.json"))).toBe(true);
+    expect(existsSync(path.join(directory, "ocr-runtime-init-image-identity.json"))).toBe(true);
+  });
+
+  it("requires the workflow artifact to include report, status, and image identity", () => {
+    const workflow = readFileSync(
+      path.join(process.cwd(), ".github/workflows/issue-149-brand-evidence-acquisition.yml"),
+      "utf8",
+    );
+    const probe = workflow.slice(
+      workflow.indexOf("ocr-runtime-init-probe:"),
+      workflow.indexOf("verifier-transport-rehearsal:"),
+    );
+    expect(probe).toContain("Finalize OCR runtime init probe report");
+    expect(probe).toContain("OCR_RUNTIME_INIT_IMAGE_IDENTITY_MISSING");
+    expect(probe).toContain("OCR_RUNTIME_INIT_CONTAINER_STATUS_MISSING");
+    expect(probe).toContain("OCR_RUNTIME_INIT_CLOSED_REPORT_MISSING");
+    expect(probe).toContain("node verifier/validate-ocr-runtime-init-probe.mjs");
+    expect(probe).toContain("path: ocr-runtime-init-probe-artifact");
+    expect(probe).toContain("if-no-files-found: error");
   });
 });
 
@@ -1298,10 +1592,8 @@ describe("Issue #149 the archive limit governs, and never destroys", () => {
     expect(probe).toContain(
       "LABEL_LENS_OCR_CORE_DIR=/opt/acquisition/node_modules/tesseract.js-core",
     );
-    expect(probe).toContain("report.recognizeCalls !== 0");
-    expect(probe).toContain("report.workerInitialized !== true");
-    expect(probe).toContain("report.workerTerminated !== true");
-    expect(probe).toContain("report.governedCorpusMounted !== false");
+    expect(probe).toContain("node verifier/validate-ocr-runtime-init-probe.mjs");
+    expect(probe).toContain("OCR_RUNTIME_INIT_CLOSED_REPORT_MISSING");
     expect(probe).toContain("if: always()");
   });
 

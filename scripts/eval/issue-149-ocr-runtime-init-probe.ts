@@ -2,85 +2,88 @@
 /**
  * Issue #149 isolated OCR runtime initialization probe.
  *
- * This is a no-recognition runtime-closure check. It imports the production OCR
- * engine factory, initializes and terminates the worker, and never mounts or
- * reads governed evidence.
+ * No recognition is permitted. The recognizer method is instrumented so an
+ * attempted call is measured, halted, and never forwarded to the underlying
+ * production engine.
  */
-import { createHash } from "node:crypto";
-import { createRequire } from "node:module";
-import { existsSync, readFileSync, readdirSync, statSync, type Stats } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import {
   createLocalOcrEngine,
   resolveCorePath,
   resolveLangPath,
+  type OcrEngine,
 } from "../../src/pipeline/extractor/ocr-engine";
+import type { OcrWord } from "../../src/pipeline/extractor/extractor.types";
+import {
+  assertRuntimePackageClosureEqual,
+  runtimePackageClosure,
+  type RuntimePackageClosure,
+} from "./lib/issue-149-runtime-package-closure.mjs";
 
-const require = createRequire(import.meta.url);
-const sha256 = (bytes: string | Buffer) => createHash("sha256").update(bytes).digest("hex");
-const sha256File = (file: string) => sha256(readFileSync(file));
+const EXPECTED_CLOSURE_PATH = "/opt/acquisition/runtime-package-closure.json";
 
-interface PackageClosure {
-  name: string;
-  version: string | null;
-  directory: string;
-  fileCount: number;
-  byteLength: number;
-  aggregateSha256: string;
+export interface ProbeLifecycleState {
+  workerInitializationAttempted: boolean;
+  workerInitialized: boolean;
+  workerTerminationAttempted: boolean;
+  workerTerminated: boolean;
+  recognizeCalls: number;
+  failureStage: string | null;
+  failureCode: string | null;
+  failureDetail: string | null;
 }
 
-function packageRoot(name: string): string {
-  let current = path.dirname(require.resolve(name));
-  while (current !== path.dirname(current)) {
-    if (existsSync(path.join(current, "package.json"))) return current;
-    current = path.dirname(current);
-  }
-  throw new Error(`RUNTIME_PACKAGE_ROOT_NOT_FOUND: ${name}`);
+export interface ProbeDependencies {
+  createEngine: () => Promise<OcrEngine>;
+  languageAssetPath: () => string;
+  corePath: () => string;
+  packageRoot: string;
+  expectedClosurePath: string;
+  governedCorpusMounted: () => boolean;
+  runtimeUid: () => number | null;
+  runtimeGid: () => number | null;
+  afterInitialize?: (engine: OcrEngine) => Promise<void>;
 }
 
-function walkPackageEntries(root: string): Array<{ path: string; stat: Stats; sha256: string }> {
-  const entries: Array<{ path: string; stat: Stats; sha256: string }> = [];
-  const walk = (directory: string) => {
-    for (const entry of readdirSync(directory).sort()) {
-      const absolute = path.join(directory, entry);
-      const stat = statSync(absolute);
-      if (stat.isDirectory()) {
-        walk(absolute);
-      } else if (stat.isFile()) {
-        entries.push({
-          path: path.relative(root, absolute),
-          stat,
-          sha256: sha256File(absolute),
-        });
-      }
-    }
-  };
-  walk(root);
-  return entries;
-}
+const emptyState = (): ProbeLifecycleState => ({
+  workerInitializationAttempted: false,
+  workerInitialized: false,
+  workerTerminationAttempted: false,
+  workerTerminated: false,
+  recognizeCalls: 0,
+  failureStage: null,
+  failureCode: null,
+  failureDetail: null,
+});
 
-function packageClosure(name: string): PackageClosure {
-  const directory = packageRoot(name);
-  const manifest = JSON.parse(readFileSync(path.join(directory, "package.json"), "utf8")) as {
-    version?: string;
-  };
-  const entries = walkPackageEntries(directory);
+const failureCode = (cause: unknown, fallback: string): string =>
+  cause instanceof Error && /^[A-Z0-9_]+:/.test(cause.message)
+    ? cause.message.split(":", 1)[0]
+    : fallback;
+
+const failureDetail = (cause: unknown): string =>
+  cause instanceof Error ? cause.message : String(cause);
+
+function instrumentEngine(engine: OcrEngine, state: ProbeLifecycleState): OcrEngine {
   return {
-    name,
-    version: manifest.version ?? null,
-    directory,
-    fileCount: entries.length,
-    byteLength: entries.reduce((sum, entry) => sum + entry.stat.size, 0),
-    aggregateSha256: sha256(
-      JSON.stringify(entries.map((entry) => [entry.path, entry.stat.size, entry.sha256])),
-    ),
+    async recognizeWords(_png: Buffer, _pageSegMode: number): Promise<OcrWord[]> {
+      state.recognizeCalls += 1;
+      throw new Error("OCR_RECOGNITION_FORBIDDEN_IN_INIT_PROBE");
+    },
+    async terminate(): Promise<void> {
+      await engine.terminate();
+    },
   };
 }
 
-function requireRuntimePaths(): { languageAssetPath: string; corePath: string } {
-  const languageAssetPath = resolveLangPath();
-  const corePath = resolveCorePath();
+function requireRuntimePaths(dependencies: ProbeDependencies): {
+  languageAssetPath: string;
+  corePath: string;
+} {
+  const languageAssetPath = dependencies.languageAssetPath();
+  const corePath = dependencies.corePath();
   if (!existsSync(path.join(languageAssetPath, "eng.traineddata"))) {
     throw new Error(
       `OCR_LANGUAGE_ASSET_MISSING: ${path.join(languageAssetPath, "eng.traineddata")}`,
@@ -92,62 +95,105 @@ function requireRuntimePaths(): { languageAssetPath: string; corePath: string } 
   return { languageAssetPath, corePath };
 }
 
-export async function runProbe(): Promise<Record<string, unknown>> {
-  const { languageAssetPath, corePath } = requireRuntimePaths();
-  let workerInitialized = false;
-  let workerTerminated = false;
-  let recognizeCalls = 0;
-  const engine = await createLocalOcrEngine();
-  workerInitialized = true;
-  try {
-    await engine.terminate();
-    workerTerminated = true;
-  } finally {
-    recognizeCalls = 0;
-  }
+function loadExpectedClosure(file: string): RuntimePackageClosure {
+  if (!existsSync(file)) throw new Error(`RUNTIME_PACKAGE_CLOSURE_MISSING: ${file}`);
+  return JSON.parse(readFileSync(file, "utf8")) as RuntimePackageClosure;
+}
 
-  return {
-    status: "OK",
-    workerInitialized,
-    workerTerminated,
-    recognizeCalls,
-    governedCorpusMounted: existsSync("/input"),
-    governedCorpusUsed: false,
-    acquisitionApiInvoked: false,
-    networkEnabled: false,
-    runtimeUid: process.getuid?.() ?? null,
-    runtimeGid: process.getgid?.() ?? null,
-    languageAssetPath,
-    corePath,
-    tesseractPackages: [packageClosure("tesseract.js"), packageClosure("tesseract.js-core")],
-  };
+export async function runProbeLifecycle(
+  dependencies: ProbeDependencies,
+): Promise<Record<string, unknown>> {
+  const state = emptyState();
+  let languageAssetPath: string | null = null;
+  let corePath: string | null = null;
+  let expectedRuntimePackageClosure: RuntimePackageClosure | null = null;
+  let observedRuntimePackageClosure: RuntimePackageClosure | null = null;
+  let runtimePackageClosureMatched = false;
+
+  try {
+    state.failureStage = "runtime-paths";
+    const paths = requireRuntimePaths(dependencies);
+    languageAssetPath = paths.languageAssetPath;
+    corePath = paths.corePath;
+
+    state.failureStage = "initialize";
+    state.workerInitializationAttempted = true;
+    const productionEngine = await dependencies.createEngine();
+    state.workerInitialized = true;
+    const engine = instrumentEngine(productionEngine, state);
+
+    if (dependencies.afterInitialize) {
+      state.failureStage = "after-initialize";
+      await dependencies.afterInitialize(engine);
+    }
+
+    state.failureStage = "terminate";
+    state.workerTerminationAttempted = true;
+    await engine.terminate();
+    state.workerTerminated = true;
+
+    state.failureStage = "runtime-package-closure";
+    expectedRuntimePackageClosure = loadExpectedClosure(dependencies.expectedClosurePath);
+    observedRuntimePackageClosure = runtimePackageClosure(dependencies.packageRoot);
+    assertRuntimePackageClosureEqual(expectedRuntimePackageClosure, observedRuntimePackageClosure);
+    runtimePackageClosureMatched = true;
+
+    state.failureStage = null;
+    return {
+      status: "OK",
+      ...state,
+      governedCorpusMounted: dependencies.governedCorpusMounted(),
+      governedCorpusUsed: false,
+      acquisitionApiInvoked: false,
+      networkEnabled: false,
+      runtimeUid: dependencies.runtimeUid(),
+      runtimeGid: dependencies.runtimeGid(),
+      languageAssetPath,
+      corePath,
+      expectedRuntimePackageClosure,
+      observedRuntimePackageClosure,
+      runtimePackageClosureMatched,
+    };
+  } catch (cause) {
+    state.failureCode = failureCode(cause, "OCR_RUNTIME_INIT_PROBE_FAILED");
+    state.failureDetail = failureDetail(cause);
+    return {
+      status: "HALTED",
+      ...state,
+      governedCorpusMounted: dependencies.governedCorpusMounted(),
+      governedCorpusUsed: false,
+      acquisitionApiInvoked: false,
+      networkEnabled: false,
+      runtimeUid: dependencies.runtimeUid(),
+      runtimeGid: dependencies.runtimeGid(),
+      languageAssetPath,
+      corePath,
+      expectedRuntimePackageClosure,
+      observedRuntimePackageClosure,
+      runtimePackageClosureMatched,
+    };
+  }
+}
+
+export async function runProbe(): Promise<Record<string, unknown>> {
+  const corePath = resolveCorePath();
+  return runProbeLifecycle({
+    createEngine: createLocalOcrEngine,
+    languageAssetPath: resolveLangPath,
+    corePath: () => corePath,
+    packageRoot: path.dirname(corePath),
+    expectedClosurePath:
+      process.env.LABEL_LENS_OCR_RUNTIME_PACKAGE_CLOSURE ?? EXPECTED_CLOSURE_PATH,
+    governedCorpusMounted: () => existsSync("/input"),
+    runtimeUid: () => process.getuid?.() ?? null,
+    runtimeGid: () => process.getgid?.() ?? null,
+  });
 }
 
 export async function main(): Promise<number> {
-  try {
-    const report = await runProbe();
-    process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
-    return 0;
-  } catch (cause) {
-    process.stdout.write(
-      `${JSON.stringify(
-        {
-          status: "HALTED",
-          workerInitialized: false,
-          workerTerminated: false,
-          recognizeCalls: 0,
-          governedCorpusMounted: existsSync("/input"),
-          governedCorpusUsed: false,
-          acquisitionApiInvoked: false,
-          networkEnabled: false,
-          detail: cause instanceof Error ? cause.message : String(cause),
-        },
-        null,
-        2,
-      )}\n`,
-    );
-    return 1;
-  }
+  const report = await runProbe();
+  process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+  return report.status === "OK" ? 0 : 1;
 }
 
 if (path.resolve(process.argv[1] ?? "") === path.resolve(new URL(import.meta.url).pathname)) {

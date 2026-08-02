@@ -37,6 +37,10 @@ import {
   writeFileSync,
 } from "node:fs";
 import path from "node:path";
+import {
+  assertRuntimePackageClosureEqual,
+  runtimePackageClosure,
+} from "./lib/issue-149-runtime-package-closure.mjs";
 
 const ROOT = process.cwd();
 const EXPERIMENT = "issue-149-brand-complete-evidence-acquisition";
@@ -285,6 +289,10 @@ async function buildBundle() {
   // The native externals, copied whole from the installed dependency tree.
   // NOT an unrestricted repository copy: an explicit, named package list.
   const runtimePackages = copyRuntimeExternals();
+  writeFileSync(
+    path.join(BUNDLE, "runtime-package-closure.json"),
+    `${JSON.stringify(runtimePackages.expectedClosure, null, 2)}\n`,
+  );
 
   const combinedMetafile = {
     acquisition: acquisitionResult.metafile,
@@ -307,6 +315,8 @@ async function buildBundle() {
     runtimePackagesCopied: runtimePackages.copied,
     runtimePackagesAbsent: runtimePackages.absent,
     runtimePackageInventory: runtimePackages.inventory,
+    runtimePackageSourceClosure: runtimePackages.sourceClosure.packages.map(packageSummary),
+    runtimePackageCopiedClosure: runtimePackages.copiedClosure.packages.map(packageSummary),
     runtimeDependencyTreeRoot: runtimePackages.treeRoot,
     emitted: readdirSync(BUNDLE).sort(),
   });
@@ -371,9 +381,9 @@ function copyRuntimeExternals() {
    */
   const copied = [];
   const absent = [];
-  const inventory = [];
   const seen = new Set();
   const queue = [...RUNTIME_EXTERNALS];
+  const sourceClosure = runtimePackageClosure(treeRoot);
 
   while (queue.length > 0) {
     const name = queue.shift();
@@ -399,7 +409,6 @@ function copyRuntimeExternals() {
       filter: (from) => !from.split(path.sep).includes(".bin"),
     });
     copied.push(name);
-    inventory.push(runtimePackageDigest(name, path.join(target, name)));
 
     const manifestPath = path.join(source, "package.json");
     if (!existsSync(manifestPath)) continue;
@@ -409,43 +418,26 @@ function copyRuntimeExternals() {
       ...Object.keys(manifest.optionalDependencies ?? {}),
     );
   }
+  const copiedClosure = runtimePackageClosure(target);
+  assertRuntimePackageClosureEqual(sourceClosure, copiedClosure);
   return {
     copied: copied.sort(),
     absent: absent.sort(),
-    inventory: inventory.sort((left, right) => left.name.localeCompare(right.name)),
+    inventory: copiedClosure.packages.map(packageSummary),
+    sourceClosure,
+    copiedClosure,
+    expectedClosure: copiedClosure,
     treeRoot: path.relative(ROOT, treeRoot),
   };
 }
 
-function runtimePackageDigest(name, directory) {
-  const files = [];
-  const walk = (current) => {
-    for (const entry of readdirSync(current).sort()) {
-      const absolute = path.join(current, entry);
-      const relative = path.relative(directory, absolute);
-      const stat = statSync(absolute);
-      if (stat.isDirectory()) {
-        walk(absolute);
-      } else if (stat.isFile()) {
-        files.push({
-          path: relative,
-          bytes: stat.size,
-          sha256: sha256File(absolute),
-        });
-      }
-    }
-  };
-  walk(directory);
-  const manifestPath = path.join(directory, "package.json");
-  const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, "utf8")) : {};
+function packageSummary(manifest) {
   return {
-    name,
-    version: manifest.version ?? null,
-    fileCount: files.length,
-    byteLength: files.reduce((sum, file) => sum + file.bytes, 0),
-    aggregateSha256: sha256(
-      JSON.stringify(files.map(({ path: filePath, sha256: digest }) => [filePath, digest])),
-    ),
+    name: manifest.name,
+    version: manifest.version,
+    fileCount: manifest.fileCount,
+    byteLength: manifest.byteLength,
+    aggregateSha256: manifest.aggregateSha256,
   };
 }
 
@@ -478,6 +470,14 @@ async function buildVerifierBundle() {
     ],
     ["scripts/eval/issue-149-archive-volume-decision.ts", "archive-volume.mjs"],
     ["scripts/eval/issue-149-archive-adjudication.ts", "archive-adjudication.mjs"],
+    [
+      "scripts/eval/issue-149-validate-ocr-runtime-init-probe.ts",
+      "validate-ocr-runtime-init-probe.mjs",
+    ],
+    [
+      "scripts/eval/issue-149-finalize-ocr-runtime-init-probe.ts",
+      "finalize-ocr-runtime-init-probe.mjs",
+    ],
   ];
   const buildCommand = entrypoints
     .map(
