@@ -27,6 +27,7 @@ import {
   writeSealedEvidencePackage,
 } from "./lib/issue-149-candidate-adapter";
 import { sealRunEvidence, writeRunEvidence } from "./lib/issue-149-run-evidence-writer";
+import type { DeterminismReport } from "./lib/issue-149-run-evidence-writer";
 import {
   comparisonDigest,
   compareRuns,
@@ -48,6 +49,31 @@ export function resolveRunnerMode(environment: NodeJS.ProcessEnv): RunnerMode {
   throw new Error(
     `ISSUE_149_MODE must be exactly discover, execute or complete; received ${JSON.stringify(declared)}`,
   );
+}
+
+export function writerDeterminismFromComparison(
+  comparison: ReturnType<typeof compareRuns>,
+): DeterminismReport {
+  return {
+    verdict: comparison.verdict,
+    comparedItems: comparison.comparedItems,
+    semanticallyDifferingItems: comparison.semanticallyDifferingItems,
+    timingOnlyDifferingItems: comparison.timingOnlyDifferingItems,
+    differencesByLevel: comparison.differencesByLevel,
+    comparedLevels: comparison.comparedLevels,
+  };
+}
+
+function terminalSummaryFromComparison(comparison: ReturnType<typeof compareRuns>) {
+  return {
+    ...writerDeterminismFromComparison(comparison),
+    extractedItemCount: comparison.extractedItemCount,
+    failedItemCount: comparison.failedItemCount,
+    runtimeUnavailableItemCount: comparison.runtimeUnavailableItemCount,
+    runtimeFailureCodes: comparison.runtimeFailureCodes,
+    runtimeFailureDetail: comparison.runtimeFailureDetail,
+    scientificResultProduced: comparison.scientificResultProduced,
+  };
 }
 
 /**
@@ -146,20 +172,8 @@ async function execute(): Promise<number> {
     expectedItemIds,
   });
 
-  const determinism = {
-    verdict: comparison.verdict,
-    comparedItems: comparison.comparedItems,
-    semanticallyDifferingItems: comparison.semanticallyDifferingItems,
-    timingOnlyDifferingItems: comparison.timingOnlyDifferingItems,
-    differencesByLevel: comparison.differencesByLevel,
-    comparedLevels: comparison.comparedLevels,
-    extractedItemCount: comparison.extractedItemCount,
-    failedItemCount: comparison.failedItemCount,
-    runtimeUnavailableItemCount: comparison.runtimeUnavailableItemCount,
-    runtimeFailureCodes: comparison.runtimeFailureCodes,
-    runtimeFailureDetail: comparison.runtimeFailureDetail,
-    scientificResultProduced: comparison.scientificResultProduced,
-  };
+  const determinism = writerDeterminismFromComparison(comparison);
+  const terminalSummary = terminalSummaryFromComparison(comparison);
 
   // Governed run-level evidence, through the ONE authenticated run writer, which
   // derives every item fact from the committed files itself.
@@ -177,7 +191,7 @@ async function execute(): Promise<number> {
           ? "ACQUISITION_RUNTIME_FAILURE"
           : "ACQUISITION_COMPLETE",
       haltCode: comparison.verdict === "RUNTIME_FAILURE" ? "OCR_RUNTIME_FAILURE" : null,
-      ...determinism,
+      ...terminalSummary,
       comparisonDigest: comparisonDigest(comparison),
     })}\n`,
   );

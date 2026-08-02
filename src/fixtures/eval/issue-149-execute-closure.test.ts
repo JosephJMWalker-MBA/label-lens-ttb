@@ -61,6 +61,7 @@ import {
   validateRehearsalBuildReport,
 } from "../../../scripts/eval/issue-149-validate-rehearsal-attestation";
 import { finalizeOcrRuntimeInitProbe } from "../../../scripts/eval/issue-149-finalize-ocr-runtime-init-probe";
+import { writerDeterminismFromComparison } from "../../../scripts/eval/issue-149-brand-evidence-acquisition-run";
 import { runProbeLifecycle } from "../../../scripts/eval/issue-149-ocr-runtime-init-probe";
 import {
   OcrRuntimeProbeValidationError,
@@ -257,6 +258,15 @@ const DETERMINISM: DeterminismReport = {
   comparedLevels: SEMANTIC_LEVELS.map((entry) => entry.level),
 };
 
+const DETERMINISM_KEYS_FOR_TEST = [
+  "verdict",
+  "comparedItems",
+  "semanticallyDifferingItems",
+  "timingOnlyDifferingItems",
+  "differencesByLevel",
+  "comparedLevels",
+] as const;
+
 /** Build a synthetic committed item directory. */
 function writeItem(
   runRoot: string,
@@ -452,6 +462,111 @@ describe("Issue #149 the run-level writer derives, and commits unambiguously", (
     };
     expect(report.runId).toBe("primary");
     expect(report.itemCount).toBe(1);
+  });
+
+  it("rejects the exact run 30766684792 malformed determinism summary shape", () => {
+    const root = freshRoot();
+    writeItem(root, "item-0001");
+    const malformed = {
+      ...DETERMINISM,
+      comparedItems: 1,
+      extractedItemCount: 1,
+      failedItemCount: 0,
+      runtimeUnavailableItemCount: 0,
+      runtimeFailureCodes: [],
+      runtimeFailureDetail: [],
+      scientificResultProduced: true,
+    };
+
+    expect(() =>
+      sealRunEvidence({
+        runId: "primary",
+        rawDirectory: root,
+        expectedItemIds: ["item-0001"],
+        determinism: malformed as unknown as DeterminismReport,
+      }),
+    ).toThrow(
+      /RUN_SUMMARY_INVALID: determinism report: unexpected extractedItemCount; unexpected failedItemCount; unexpected runtimeUnavailableItemCount; unexpected runtimeFailureCodes; unexpected runtimeFailureDetail; unexpected scientificResultProduced/,
+    );
+  });
+
+  it("passes only caller-owned determinism fields from the acquisition comparison to the writer", () => {
+    const root = freshRoot();
+    const primary = path.join(root, "primary");
+    const repeat = path.join(root, "repeat");
+    writeItem(primary, "item-0001");
+    writeItem(repeat, "item-0001");
+
+    const comparison = compareRuns({
+      primaryDirectory: primary,
+      repeatDirectory: repeat,
+      expectedItemIds: ["item-0001"],
+    });
+    const writerInput = writerDeterminismFromComparison(comparison);
+
+    expect(Object.keys(writerInput).sort()).toEqual([...DETERMINISM_KEYS_FOR_TEST].sort());
+    expect("extractedItemCount" in writerInput).toBe(false);
+    expect("failedItemCount" in writerInput).toBe(false);
+    expect("runtimeUnavailableItemCount" in writerInput).toBe(false);
+    expect("runtimeFailureCodes" in writerInput).toBe(false);
+    expect("runtimeFailureDetail" in writerInput).toBe(false);
+    expect("scientificResultProduced" in writerInput).toBe(false);
+
+    const sealed = sealRunEvidence({
+      runId: "primary",
+      rawDirectory: primary,
+      expectedItemIds: ["item-0001"],
+      determinism: writerInput,
+    });
+    writeRunEvidence(sealed, { directory: primary });
+    expect(verifyRunCommitted(primary)).toMatchObject({
+      committed: true,
+      runId: "primary",
+      itemCount: 1,
+    });
+  });
+
+  it("finalizes synthetic 115-item primary and repeat runs with writer-derived markers", () => {
+    const root = freshRoot();
+    const itemIds = Array.from(
+      { length: 115 },
+      (_, index) => `item-${String(index + 1).padStart(4, "0")}`,
+    );
+    for (const runId of ["primary", "repeat"] as const) {
+      const runRoot = path.join(root, runId);
+      for (const itemId of itemIds) writeItem(runRoot, itemId);
+      const sealed = sealRunEvidence({
+        runId,
+        rawDirectory: runRoot,
+        expectedItemIds: itemIds,
+        determinism: { ...DETERMINISM, comparedItems: itemIds.length },
+      });
+      writeRunEvidence(sealed, { directory: runRoot });
+
+      const marker = verifyRunCommitted(runRoot);
+      expect(marker).toMatchObject({ committed: true, runId, itemCount: 115 });
+      const report = JSON.parse(
+        readFileSync(path.join(runRoot, "determinism-report.json"), "utf8"),
+      ) as { runId: string; itemCount: number };
+      expect(report.runId).toBe(runId);
+      expect(report.itemCount).toBe(115);
+    }
+  });
+
+  it("does not create a commit marker when the run cannot be sealed", () => {
+    const root = freshRoot();
+    writeItem(root, "item-0001");
+    rmSync(path.join(root, "item-0001", "item-0001.selection.json"));
+
+    expect(() =>
+      sealRunEvidence({
+        runId: "primary",
+        rawDirectory: root,
+        expectedItemIds: ["item-0001"],
+        determinism: { ...DETERMINISM, comparedItems: 1 },
+      }),
+    ).toThrow(expect.objectContaining({ code: "RUN_ITEM_FILE_SET_INVALID" }));
+    expect(existsSync(path.join(root, RUN_COMMIT_MARKER))).toBe(false);
   });
 
   it("covers the run-level files in the raw manifest, not just the item files", () => {
@@ -1527,12 +1642,12 @@ describe("Issue #149 OCR runtime init probe evidence is load-bearing", () => {
     };
     writeJson(path.join(artifact, "ocr-runtime-init-image-identity.json"), imageIdentity);
     const report = syntheticRuntimeProbeReport(imageIdentity);
-    const {
-      containerExitStatus,
-      reportProducedByContainer,
-      imageIdentity: _image,
-      ...container
-    } = report;
+    const container = Object.fromEntries(
+      Object.entries(report).filter(
+        ([key]) =>
+          !["containerExitStatus", "reportProducedByContainer", "imageIdentity"].includes(key),
+      ),
+    );
     writeJson(path.join(artifact, "ocr-runtime-init-probe-report.json"), container);
 
     execFileSync(
