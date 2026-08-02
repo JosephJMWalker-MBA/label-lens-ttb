@@ -71,7 +71,7 @@ eeaee7c467c796fa3fabf0c6e08b5caf1a36567690a2d07d00db1bb732d632c8  artifacts/issu
 2f690462226ed58f054151993731acfa64c3936019e7564b4368ac5224a9fef3  artifacts/issue-149-brand-complete-evidence-acquisition/verifier-transport-linkage.json
 4a362867722de7343e11448944d95d0632fe932785cb8b646fa05772d829c963  artifacts/issue-149-brand-complete-evidence-acquisition/workflow-plan.md
 408a0f6a2008cd1e15dca0121db71dd096b00267feedc435109519341a82f54d  scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs
-fb13d900312631214fb2532cf18e52e5cb40bdb658e247900612961d05ae32df  scripts/eval/issue-149-forensic-handoff.ts
+933ab0998a77bd76c408eb2195ccf5cdc756eb781822d2ff685d1c5624a3341f  scripts/eval/issue-149-forensic-handoff.ts
 5e3c1cdc9fc222dbf5d424dc3456ca421468f534ee87d03f2e242b5007c311e6  scripts/eval/issue-149-stage-1-contract-manifest.mjs
 87d404dd87f242b190f011e2a1a5b92d05ba88235adef1d897783cc3197a7eac  scripts/eval/lib/issue-149-bundle-scan.ts
 0aa409bff81d4fe77654b7cc3bfaef085be243b42b72484a427fd17282861013  scripts/eval/lib/issue-149-candidate-adapter.ts
@@ -94,4 +94,4 @@ dfaa093b9f3bb7782845c22069f4a93d4abcfc6f47fe11c1cff98926f2a6f587  src/fixtures/e
 e709600f7fe5743ea914e5ad140b9028bbcbee425781973ff3bdea6e9a8afbcc  src/fixtures/eval/issue-149-stage-1-manifest.test.ts
 5d3fe14028b90518c2bcd039c12974a64edc9dddc95f9447eb3c2e7772200e26  src/fixtures/eval/issue-149-stage2-source-closure.test.ts
 42ea378611fc16ff3e6448ac38091468500c9957e42965b4ec529cd1cebabf12  src/fixtures/eval/issue-149-staging-independence.test.ts
-# aggregate b0b96daea0685f48c73700567dae725a84ad5a249656929233a36496af8caa36
+# aggregate d24c2ce2275e707a390f5ea7ebe06c7de7ad5b3f40d76bd380bf6367175915b1

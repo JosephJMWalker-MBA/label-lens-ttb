@@ -339,6 +339,19 @@ jobs:
           shasum -a 256 forensic-handoff/snapshot-manifest.json | tee forensic-handoff/snapshot-manifest.sha256
           shasum -a 256 forensic-handoff/handoff-receipt.json | tee forensic-handoff/handoff-receipt.sha256
 
+      - name: Stage forensic handoff artifact payload
+        if: always()
+        run: |
+          set -euo pipefail
+          rm -rf forensic-handoff-payload
+          mkdir -p forensic-handoff-payload
+          cp -R forensic-handoff forensic-handoff-payload/forensic-handoff
+          cp -R host-readable-output forensic-handoff-payload/host-readable-output
+          cp forensic-handoff-report.json forensic-handoff-payload/forensic-handoff-report.json
+          cp acquisition-report.json forensic-handoff-payload/acquisition-report.json
+          cp acquisition-status.json forensic-handoff-payload/acquisition-status.json
+          cp image-identity.json forensic-handoff-payload/image-identity.json
+
       # actions/upload-artifact v4
       - name: Upload unverified forensic handoff
         id: forensicUpload
@@ -346,13 +359,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: issue-149-unverified-forensic-handoff
-          path: |
-            forensic-handoff
-            host-readable-output
-            forensic-handoff-report.json
-            acquisition-report.json
-            acquisition-status.json
-            image-identity.json
+          path: forensic-handoff-payload
           if-no-files-found: error
           retention-days: 30
 
@@ -393,8 +400,13 @@ jobs:
             > forensic-artifact-metadata.json
           FORENSIC_METADATA_DIGEST=$(python3 -c "import json;print(json.load(open('forensic-artifact-metadata.json')).get('digest',''))")
           FORENSIC_METADATA_RUN=$(python3 -c "import json;print(json.load(open('forensic-artifact-metadata.json')).get('workflow_run',{}).get('id',''))")
+          FORENSIC_METADATA_HEAD=$(python3 -c "import json;print(json.load(open('forensic-artifact-metadata.json')).get('workflow_run',{}).get('head_sha',''))")
           test "${FORENSIC_METADATA_RUN}" = "${GITHUB_RUN_ID}" || {
             echo "FORENSIC_ARTIFACT_RUN_ASSOCIATION_MISMATCH" >&2; exit 1; }
+          test "${FORENSIC_METADATA_HEAD}" = "${GITHUB_SHA}" || {
+            echo "FORENSIC_ARTIFACT_HEAD_ASSOCIATION_MISMATCH" >&2; exit 1; }
+          test "${{ needs.job-b-execute.outputs.headSha }}" = "${GITHUB_SHA}" || {
+            echo "FORENSIC_CARRIED_HEAD_SHA_MISMATCH" >&2; exit 1; }
           FORENSIC_UPLOAD_DIGEST="${{ needs.job-b-execute.outputs.forensicArtifactDigest }}"
           test -n "${FORENSIC_METADATA_DIGEST#sha256:}" || {
             echo "FORENSIC_ARTIFACT_METADATA_DIGEST_ABSENT" >&2; exit 1; }
@@ -513,32 +525,50 @@ jobs:
           echo "overLimit=${OVER}" >> "$GITHUB_OUTPUT"
           echo "rawBytes=${BYTES}" >> "$GITHUB_OUTPUT"
 
+      - name: Stage complete evidence artifact payload
+        if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success'
+        run: |
+          set -euo pipefail
+          rm -rf complete-evidence-payload
+          mkdir -p complete-evidence-payload
+          cp -R forensic-redownload/host-readable-output complete-evidence-payload/host-readable-output
+          cp -R forensic-redownload/forensic-handoff complete-evidence-payload/forensic-handoff
+          cp forensic-redownload/acquisition-report.json complete-evidence-payload/acquisition-report.json
+          cp forensic-redownload/acquisition-status.json complete-evidence-payload/acquisition-status.json
+          cp forensic-redownload/image-identity.json complete-evidence-payload/image-identity.json
+          cp raw-verification-report.json complete-evidence-payload/raw-verification-report.json
+          cp identity-leak-report.json complete-evidence-payload/identity-leak-report.json
+          cp archive-volume-report.json complete-evidence-payload/archive-volume-report.json
+
       - name: Upload the verified raw evidence
         id: upload
         if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: issue-149-raw-evidence
-          path: |
-            forensic-redownload/host-readable-output
-            forensic-redownload/forensic-handoff
-            forensic-redownload/acquisition-report.json
-            forensic-redownload/acquisition-status.json
-            forensic-redownload/image-identity.json
-            raw-verification-report.json
-            identity-leak-report.json
-            archive-volume-report.json
+          path: complete-evidence-payload
           retention-days: 30
+
+      - name: Stage incomplete forensic artifact payload
+        if: steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success'
+        run: |
+          set -euo pipefail
+          rm -rf incomplete-evidence-payload
+          mkdir -p incomplete-evidence-payload
+          cp -R forensic-redownload/forensic-handoff incomplete-evidence-payload/forensic-handoff
+          cp -R forensic-redownload/host-readable-output incomplete-evidence-payload/host-readable-output
+          cp forensic-redownload/acquisition-report.json incomplete-evidence-payload/acquisition-report.json
+          cp forensic-redownload/acquisition-status.json incomplete-evidence-payload/acquisition-status.json
+          cp forensic-redownload/image-identity.json incomplete-evidence-payload/image-identity.json
+          test ! -f raw-verification-report.json || cp raw-verification-report.json incomplete-evidence-payload/raw-verification-report.json
+          test ! -f identity-leak-report.json || cp identity-leak-report.json incomplete-evidence-payload/identity-leak-report.json
 
       - name: Upload incomplete forensic output
         if: steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: issue-149-incomplete-forensic-output
-          path: |
-            forensic-redownload
-            raw-verification-report.json
-            identity-leak-report.json
+          path: incomplete-evidence-payload
           retention-days: 30
 
   verify-uploaded-artifact:
@@ -578,7 +608,15 @@ jobs:
           gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${{ needs.job-b-verify-evidence.outputs.artifactId }}" \
             > artifact-metadata.json
           METADATA_DIGEST=$(python3 -c "import json;print(json.load(open('artifact-metadata.json')).get('digest',''))")
+          METADATA_RUN=$(python3 -c "import json;print(json.load(open('artifact-metadata.json')).get('workflow_run',{}).get('id',''))")
+          METADATA_HEAD=$(python3 -c "import json;print(json.load(open('artifact-metadata.json')).get('workflow_run',{}).get('head_sha',''))")
           UPLOAD_DIGEST="${{ needs.job-b-verify-evidence.outputs.artifactDigest }}"
+          test "${METADATA_RUN}" = "${GITHUB_RUN_ID}" || {
+            echo "ARTIFACT_RUN_ASSOCIATION_MISMATCH" >&2; exit 1; }
+          test "${METADATA_HEAD}" = "${GITHUB_SHA}" || {
+            echo "ARTIFACT_HEAD_ASSOCIATION_MISMATCH" >&2; exit 1; }
+          test "${{ needs.job-b-execute.outputs.headSha }}" = "${GITHUB_SHA}" || {
+            echo "CARRIED_HEAD_SHA_MISMATCH" >&2; exit 1; }
           test "${METADATA_DIGEST#sha256:}" = "${UPLOAD_DIGEST#sha256:}" || {
             echo "ARTIFACT_DIGEST_MISMATCH: ${METADATA_DIGEST} vs ${UPLOAD_DIGEST}" >&2; exit 1; }
           node verifier/verify.mjs \
@@ -674,9 +712,12 @@ jobs:
           set -euo pipefail
           echo "acquisition exit: ${{ needs.job-b-execute.outputs.acquisitionStatus }}"
           echo "forensic receipt job: ${{ needs.verify-forensic-handoff.result }}"
+          echo "evidence verification job: ${{ needs.job-b-verify-evidence.result }}"
           echo "actor 2 verified: ${{ needs.job-b-verify-evidence.outputs.rawVerified }}"
           test "${{ needs.verify-forensic-handoff.result }}" = "success" || {
             echo "FORENSIC_HANDOFF_RECEIPT_NOT_VERIFIED" >&2; exit 1; }
+          test "${{ needs.job-b-verify-evidence.result }}" = "success" || {
+            echo "ACQUISITION_VERIFICATION_JOB_FAILED" >&2; exit 1; }
           test "${{ needs.job-b-verify-evidence.outputs.rawVerified }}" = "true" || {
             echo "ACQUISITION_NOT_VERIFIED" >&2; exit 1; }
           test "${{ needs.job-b-execute.outputs.acquisitionStatus }}" = "0" || {
@@ -825,18 +866,25 @@ jobs:
             echo "planted ${PLANT} failed as required"
           done
 
+      - name: Stage rehearsal roundtrip payload
+        run: |
+          set -euo pipefail
+          rm -rf rehearsal-roundtrip-payload
+          mkdir -p rehearsal-roundtrip-payload
+          cp -R synthetic-snapshot/raw rehearsal-roundtrip-payload/raw
+          cp synthetic-snapshot/expected-items.json rehearsal-roundtrip-payload/expected-items.json
+          cp -R synthetic-snapshot/planted-unreadable-0700 rehearsal-roundtrip-payload/planted-unreadable-0700
+          cp -R rehearsal-forensic-handoff rehearsal-roundtrip-payload/forensic-handoff
+          cp planted-0700-proof.txt rehearsal-roundtrip-payload/planted-0700-proof.txt
+          cp rehearsal-image-identity.json rehearsal-roundtrip-payload/rehearsal-image-identity.json
+
       # actions/upload-artifact v4
       - name: Upload the synthetic evidence, then redownload by ID
         id: rehearsalUpload
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: issue-149-rehearsal-roundtrip
-          path: |
-            synthetic-snapshot/raw
-            synthetic-snapshot/expected-items.json
-            synthetic-snapshot/planted-unreadable-0700
-            rehearsal-forensic-handoff
-            planted-0700-proof.txt
+          path: rehearsal-roundtrip-payload
           if-no-files-found: error
           retention-days: 1
 
@@ -862,6 +910,62 @@ jobs:
             --raw roundtrip/raw \
             --manifest roundtrip/expected-items.json \
             --report rehearsal-roundtrip-report.json
+          python3 - <<'PY'
+          import hashlib, json, pathlib, shutil, subprocess, sys, tarfile
+          root = pathlib.Path("roundtrip/forensic-handoff")
+          receipt = json.loads((root / "handoff-receipt.json").read_text())
+          def digest(path):
+            return hashlib.sha256(path.read_bytes()).hexdigest()
+          assert digest(root / "source-pre-manifest.json") == receipt["sourcePreManifestDigest"]
+          assert digest(root / "source-post-manifest.json") == receipt["sourcePostManifestDigest"]
+          pre = json.loads((root / "source-pre-manifest.json").read_text())
+          post = json.loads((root / "source-post-manifest.json").read_text())
+          assert pre["entries"] == post["entries"]
+          archive = root / "source-tree.tar"
+          extract = pathlib.Path("roundtrip-archive-extract")
+          shutil.rmtree(extract, ignore_errors=True)
+          extract.mkdir()
+          with tarfile.open(archive) as tf:
+            for member in tf.getmembers():
+              name = member.name
+              parts = pathlib.PurePosixPath(name).parts
+              if pathlib.PurePosixPath(name).is_absolute() or ".." in parts:
+                raise SystemExit(f"UNSAFE_TAR_MEMBER:{name}")
+            tf.extractall(extract)
+          def regular_set(base):
+            out = []
+            for path in sorted(p for p in base.rglob("*") if p.is_file()):
+              rel = path.relative_to(base).as_posix()
+              out.append({"path": rel, "length": path.stat().st_size, "digest": digest(path)})
+            return out
+          expected = sorted(
+            (
+              {"path": e["path"], "length": e["length"], "digest": e["digest"]}
+              for e in pre["entries"]
+              if e["type"] == "file"
+            ),
+            key=lambda e: e["path"],
+          )
+          actual = regular_set(extract)
+          if actual != expected:
+            print(json.dumps({"expected": expected, "actual": actual}, indent=2), file=sys.stderr)
+            raise SystemExit("ARCHIVE_CONTENT_SET_MISMATCH")
+          partial = "planted-unreadable-0700/raw/primary/item-9001/partial.txt"
+          matches = [entry for entry in expected if entry["path"] == partial]
+          if len(matches) != 1:
+            raise SystemExit("ARCHIVE_PARTIAL_FILE_NOT_IN_SOURCE_MANIFEST")
+          partial_path = extract / partial
+          if not partial_path.is_file():
+            raise SystemExit("ARCHIVE_PARTIAL_FILE_NOT_EXTRACTED")
+          if partial_path.stat().st_size != matches[0]["length"] or digest(partial_path) != matches[0]["digest"]:
+            raise SystemExit("ARCHIVE_PARTIAL_FILE_DIGEST_MISMATCH")
+          pathlib.Path("rehearsal-archive-extraction-proof.json").write_text(json.dumps({
+            "status": "ARCHIVE_CONTENT_VERIFIED",
+            "fileCount": len(actual),
+            "partialPath": partial,
+            "partialDigest": matches[0]["digest"],
+          }, indent=2) + "\n")
+          PY
           echo "round-trip digest verified: ${META}"
 
       # The OVER-LIMIT ordering, rehearsed with a synthetic byte count. It proves

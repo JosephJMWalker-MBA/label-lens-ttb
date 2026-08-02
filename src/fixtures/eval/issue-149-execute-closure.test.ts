@@ -4,14 +4,18 @@
  * Non-OCR. Synthetic evidence trees and a mocked extractor throughout; the
  * governed corpus is never touched. Every case drives the real implementation.
  */
+import { execFileSync } from "node:child_process";
 import {
+  chmodSync,
   existsSync,
+  linkSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
   readdirSync,
   rmSync,
   statSync,
+  symlinkSync,
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -1018,6 +1022,43 @@ describe("Issue #149 the archive limit governs, and never destroys", () => {
       "needs: [resolve-mode, job-b-execute, verify-forensic-handoff, job-b-verify-evidence]",
     );
     expect(terminal).toContain('test "${{ needs.verify-forensic-handoff.result }}" = "success"');
+    expect(terminal).toContain('test "${{ needs.job-b-verify-evidence.result }}" = "success"');
+    expect(terminal).toContain("ACQUISITION_VERIFICATION_JOB_FAILED");
+  });
+
+  it("uses explicit upload staging roots whose consumers read the same layout", () => {
+    const workflow = readFileSync(
+      path.join(process.cwd(), ".github/workflows/issue-149-brand-evidence-acquisition.yml"),
+      "utf8",
+    );
+    expect(workflow).toContain("Stage rehearsal roundtrip payload");
+    expect(workflow).toContain("path: rehearsal-roundtrip-payload");
+    expect(workflow).toContain("--raw roundtrip/raw");
+    expect(workflow).toContain("--manifest roundtrip/expected-items.json");
+    expect(workflow).toContain('root = pathlib.Path("roundtrip/forensic-handoff")');
+    expect(workflow).toContain('archive = root / "source-tree.tar"');
+    expect(workflow).toContain("planted-unreadable-0700/raw/primary/item-9001/partial.txt");
+
+    expect(workflow).toContain("Stage complete evidence artifact payload");
+    expect(workflow).toContain("path: complete-evidence-payload");
+    expect(workflow).toContain("--raw downloaded/host-readable-output/raw");
+    expect(workflow).toContain("Stage incomplete forensic artifact payload");
+    expect(workflow).toContain("path: incomplete-evidence-payload");
+  });
+
+  it("binds both forensic and complete artifacts to this run and head", () => {
+    const workflow = readFileSync(
+      path.join(process.cwd(), ".github/workflows/issue-149-brand-evidence-acquisition.yml"),
+      "utf8",
+    );
+    expect(workflow).toContain("FORENSIC_METADATA_RUN");
+    expect(workflow).toContain("FORENSIC_METADATA_HEAD");
+    expect(workflow).toContain("FORENSIC_ARTIFACT_HEAD_ASSOCIATION_MISMATCH");
+    expect(workflow).toContain("FORENSIC_CARRIED_HEAD_SHA_MISMATCH");
+    expect(workflow).toContain("METADATA_RUN");
+    expect(workflow).toContain("METADATA_HEAD");
+    expect(workflow).toContain("ARTIFACT_HEAD_ASSOCIATION_MISMATCH");
+    expect(workflow).toContain("CARRIED_HEAD_SHA_MISMATCH");
   });
 
   it("keeps the incomplete-forensic route for genuine failures only", () => {
@@ -1056,6 +1097,213 @@ describe("Issue #149 the forensic handoff closes source and ownership failures",
     expect(source).toContain("snapshotHistograms");
     expect(source).toContain("hostReadable");
     expect(source).toContain("requiredComponentInventory");
+  });
+
+  const handoffScratch = (): string => {
+    const root = path.join(scratch, `handoff-${uniqueRun++}`);
+    mkdirSync(root, { recursive: true });
+    return root;
+  };
+
+  const hostUid = (): number => process.getuid?.() ?? statSync(scratch).uid;
+  const hostGid = (): number => process.getgid?.() ?? statSync(scratch).gid;
+
+  function runHandoff(root: string, source: string): { status: number; stdout: string } {
+    const out = path.join(root, "out");
+    const snapshot = path.join(root, "snapshot");
+    const args = [
+      "vite-node",
+      "--config",
+      "vitest.config.ts",
+      "scripts/eval/issue-149-forensic-handoff.ts",
+      "--source",
+      source,
+      "--out",
+      out,
+      "--snapshot",
+      snapshot,
+      "--host-uid",
+      String(hostUid()),
+      "--host-gid",
+      String(hostGid()),
+      "--acquisition-status",
+      "0",
+    ];
+    try {
+      const stdout = execFileSync("npx", args, { cwd: process.cwd(), encoding: "utf8" });
+      return { status: 0, stdout };
+    } catch (cause) {
+      const failure = cause as { status?: number; stdout?: Buffer | string };
+      return {
+        status: failure.status ?? -1,
+        stdout: Buffer.isBuffer(failure.stdout)
+          ? failure.stdout.toString("utf8")
+          : (failure.stdout ?? ""),
+      };
+    }
+  }
+
+  function readReceipt(root: string): Record<string, unknown> {
+    return JSON.parse(
+      readFileSync(path.join(root, "out", "handoff-receipt.json"), "utf8"),
+    ) as Record<string, unknown>;
+  }
+
+  function writeCompleteSource(source: string): void {
+    mkdirSync(path.join(source, "raw", "primary", "item-9001"), { recursive: true });
+    writeFileSync(
+      path.join(source, "expected-items.json"),
+      '{"cases":[{"opaqueItemId":"item-9001"}]}\n',
+    );
+    writeFileSync(path.join(source, "raw", "primary", "item-9001", "partial.txt"), "preserved\n");
+  }
+
+  function sourceFilesFromManifest(
+    root: string,
+    name: string,
+  ): Array<{
+    path: string;
+    length: number;
+    digest: string;
+  }> {
+    const manifest = JSON.parse(readFileSync(path.join(root, "out", name), "utf8")) as {
+      entries: Array<{ path: string; type: string; length: number; digest: string }>;
+    };
+    return manifest.entries
+      .filter((entry) => entry.type === "file")
+      .map((entry) => ({ path: entry.path, length: entry.length, digest: entry.digest }))
+      .sort((left, right) => left.path.localeCompare(right.path));
+  }
+
+  function snapshotFiles(root: string): Array<{ path: string; length: number; digest: string }> {
+    return sourceFilesFromManifest(root, "snapshot-manifest.json");
+  }
+
+  it("executes the real helper on a complete tree and preserves source/snapshot equivalence", () => {
+    const root = handoffScratch();
+    const source = path.join(root, "source");
+    writeCompleteSource(source);
+
+    const result = runHandoff(root, source);
+    expect(result.status).toBe(0);
+    const receipt = readReceipt(root);
+    expect(receipt.status).toBe("VERIFIED");
+    expect(receipt.haltCode).toBeNull();
+    expect(receipt.sourceMutated).toBe(false);
+    expect(receipt.contentEquivalent).toBe(true);
+    expect(receipt.hostReadable).toBe(true);
+    expect(receipt.sourcePreManifestDigest).toBe(receipt.sourcePostManifestDigest);
+    expect(sourceFilesFromManifest(root, "source-pre-manifest.json")).toEqual(snapshotFiles(root));
+    expect(existsSync(path.join(root, "out", "source-tree.tar"))).toBe(true);
+    expect(receipt.requiredComponentInventory).toEqual({
+      "source-pre-manifest.json": true,
+      "source-post-manifest.json": true,
+      "source-tree.tar": true,
+      "snapshot-manifest.json": true,
+      "handoff-receipt.json": true,
+    });
+    for (const entry of readdirSync(path.join(root, "snapshot", "raw", "primary", "item-9001"))) {
+      expect(
+        statSync(path.join(root, "snapshot", "raw", "primary", "item-9001", entry)).mode & 0o777,
+      ).toBe(0o644);
+    }
+    expect(statSync(path.join(root, "snapshot", "raw", "primary", "item-9001")).mode & 0o777).toBe(
+      0o755,
+    );
+    expect(statSync(path.join(root, "snapshot")).uid).toBe(hostUid());
+    expect(statSync(path.join(root, "snapshot")).gid).toBe(hostGid());
+  });
+
+  it("copies a 0700 source and normalizes the host-readable snapshot without mutating source", () => {
+    const root = handoffScratch();
+    const source = path.join(root, "source");
+    writeCompleteSource(source);
+    chmodSync(source, 0o700);
+
+    const before = statSync(source).mode & 0o777;
+    const result = runHandoff(root, source);
+    expect(result.status).toBe(0);
+    expect(statSync(source).mode & 0o777).toBe(before);
+    expect(statSync(path.join(root, "snapshot")).mode & 0o777).toBe(0o755);
+  });
+
+  it("handles empty and partial sources as closed verified source trees", () => {
+    for (const [label, populate] of [
+      ["empty", (source: string) => mkdirSync(source, { recursive: true })],
+      [
+        "partial",
+        (source: string) => {
+          mkdirSync(path.join(source, "raw", "primary", "item-9001"), { recursive: true });
+          writeFileSync(
+            path.join(source, "raw", "primary", "item-9001", "partial.txt"),
+            "partial\n",
+          );
+        },
+      ],
+    ] as const) {
+      const root = handoffScratch();
+      const source = path.join(root, label);
+      populate(source);
+      const result = runHandoff(root, source);
+      expect(result.status).toBe(0);
+      expect(readReceipt(root)).toMatchObject({
+        status: "VERIFIED",
+        sourceMutated: false,
+        contentEquivalent: true,
+        hostReadable: true,
+      });
+    }
+  });
+
+  it("writes closed halted receipts for absent, symlink, hardlink, and special-file sources", () => {
+    const cases: Array<[string, string, (source: string) => void]> = [
+      ["absent", "FORENSIC_HANDOFF_SOURCE_ABSENT", () => undefined],
+      [
+        "symlink",
+        "FORENSIC_HANDOFF_SYMLINK_REJECTED",
+        (source) => {
+          mkdirSync(source, { recursive: true });
+          symlinkSync("missing-target", path.join(source, "link"));
+        },
+      ],
+      [
+        "hardlink",
+        "FORENSIC_HANDOFF_HARDLINK_REJECTED",
+        (source) => {
+          mkdirSync(source, { recursive: true });
+          const original = path.join(source, "original.txt");
+          writeFileSync(original, "same inode\n");
+          linkSync(original, path.join(source, "linked.txt"));
+        },
+      ],
+    ];
+    for (const [label, haltCode, populate] of cases) {
+      const root = handoffScratch();
+      const source = path.join(root, label);
+      populate(source);
+      const result = runHandoff(root, source);
+      expect(result.status).not.toBe(0);
+      const receipt = readReceipt(root);
+      expect(receipt).toMatchObject({ status: "HALTED", haltCode });
+      expect(
+        (receipt.requiredComponentInventory as Record<string, boolean>)["handoff-receipt.json"],
+      ).toBe(true);
+    }
+
+    const fifoRoot = handoffScratch();
+    const fifoSource = path.join(fifoRoot, "fifo");
+    mkdirSync(fifoSource, { recursive: true });
+    try {
+      execFileSync("mkfifo", [path.join(fifoSource, "pipe")]);
+    } catch {
+      return;
+    }
+    const fifo = runHandoff(fifoRoot, fifoSource);
+    expect(fifo.status).not.toBe(0);
+    expect(readReceipt(fifoRoot)).toMatchObject({
+      status: "HALTED",
+      haltCode: "FORENSIC_HANDOFF_UNEXPECTED_FILE_TYPE",
+    });
   });
 });
 

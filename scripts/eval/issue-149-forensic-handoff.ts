@@ -226,6 +226,8 @@ function halt(
   report.haltCode = code;
   mkdirSync(outRoot, { recursive: true, mode: DIR_MODE });
   writeJson(path.join(outRoot, "handoff-receipt.json"), report, uid, gid);
+  report.requiredComponentInventory = inventory(outRoot);
+  writeJson(path.join(outRoot, "handoff-receipt.json"), report, uid, gid);
   process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
   process.exit(1);
 }
