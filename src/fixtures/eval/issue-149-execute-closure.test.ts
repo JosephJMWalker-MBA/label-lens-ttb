@@ -1094,6 +1094,77 @@ describe("Issue #149 the archive limit governs, and never destroys", () => {
     expect(handoffStep).toContain("node verifier/validate-rehearsal-attestation.mjs");
   });
 
+  it("preserves pre-handoff denial evidence even when later rehearsal stages fail", () => {
+    const workflow = readFileSync(
+      path.join(process.cwd(), ".github/workflows/issue-149-brand-evidence-acquisition.yml"),
+      "utf8",
+    );
+    const rehearsal = workflow.slice(
+      workflow.indexOf("verifier-transport-rehearsal:"),
+      workflow.indexOf("      # The OVER-LIMIT ordering"),
+    );
+    const denialStep = rehearsal.slice(
+      rehearsal.indexOf("- name: Prove planted 0700 evidence is unreadable before handoff"),
+      rehearsal.indexOf("- name: Run the real forensic handoff for rehearsal"),
+    );
+    expect(denialStep).toContain("stdoutByteLength");
+    expect(denialStep).toContain("stdoutSha256");
+    expect(denialStep).toContain("stderrByteLength");
+    expect(denialStep).toContain("stderrSha256");
+    expect(denialStep).toContain("denialDiagnosticMatched");
+    expect(denialStep).toContain("denialDiagnosticPattern");
+    expect(denialStep).toContain("PLANTED_0700_STDOUT_NOT_EMPTY");
+    expect(denialStep).toContain("PLANTED_0700_STDERR_EMPTY");
+
+    const roundtripStaging = rehearsal.slice(
+      rehearsal.indexOf("- name: Stage rehearsal roundtrip payload"),
+      rehearsal.indexOf("- name: Upload the synthetic evidence, then redownload by ID"),
+    );
+    expect(roundtripStaging).toContain(
+      "cp planted-0700-proof.json rehearsal-roundtrip-payload/planted-0700-proof.json",
+    );
+    expect(roundtripStaging).toContain(
+      "cp planted-before-handoff.stdout rehearsal-roundtrip-payload/planted-before-handoff.stdout",
+    );
+    expect(roundtripStaging).toContain(
+      "cp planted-before-handoff.stderr rehearsal-roundtrip-payload/planted-before-handoff.stderr",
+    );
+
+    const roundtripVerification = rehearsal.slice(
+      rehearsal.indexOf("- name: Verify the round-tripped artifact identity and contents"),
+      rehearsal.indexOf("      # The OVER-LIMIT ordering"),
+    );
+    expect(roundtripVerification).toContain("roundtrip/planted-0700-proof.json");
+    expect(roundtripVerification).toContain("roundtrip/planted-before-handoff.stdout");
+    expect(roundtripVerification).toContain("roundtrip/planted-before-handoff.stderr");
+    expect(roundtripVerification).toContain("PLANTED_0700_STDOUT_DIGEST_MISMATCH");
+    expect(roundtripVerification).toContain("PLANTED_0700_STDERR_DIGEST_MISMATCH");
+    expect(roundtripVerification).toContain("PLANTED_0700_STDERR_EMPTY");
+    expect(roundtripVerification).toContain("PLANTED_0700_DENIAL_DIAGNOSTIC_MISMATCH");
+
+    const reportUpload = workflow.slice(
+      workflow.indexOf("name: issue-149-rehearsal-reports"),
+      workflow.indexOf("retention-days: 7", workflow.indexOf("name: issue-149-rehearsal-reports")),
+    );
+    for (const expected of [
+      "rehearsal-build-report.json",
+      "rehearsal-image-identity.json",
+      "planted-0700-proof.json",
+      "planted-before-handoff.stdout",
+      "planted-before-handoff.stderr",
+      "rehearsal-forensic-handoff-report.json",
+      "rehearsal-*.json",
+      "over-limit-report.json",
+      "at-limit-report.json",
+      "if-no-files-found: error",
+    ]) {
+      expect(reportUpload).toContain(expected);
+    }
+    expect(workflow.indexOf("name: issue-149-rehearsal-reports")).toBeGreaterThan(
+      workflow.indexOf("- name: Stage rehearsal roundtrip payload"),
+    );
+  });
+
   it("binds both forensic and complete artifacts to this run and head", () => {
     const workflow = readFileSync(
       path.join(process.cwd(), ".github/workflows/issue-149-brand-evidence-acquisition.yml"),
@@ -1683,6 +1754,89 @@ describe("Issue #149 the rehearsal synthetic builder preserves the output mount 
         ),
       }),
     ).toThrow("REHEARSAL_SOURCE_PRE_DIGEST_MISMATCH");
+  });
+});
+
+describe("Issue #149 the pre-handoff denial proof preserves captured streams", () => {
+  function digest(bytes: Buffer): string {
+    return createHash("sha256").update(bytes).digest("hex");
+  }
+
+  function verifyDeniedReadProof(root: string): void {
+    const proof = JSON.parse(readFileSync(path.join(root, "planted-0700-proof.json"), "utf8")) as {
+      accessDenied: boolean;
+      exitStatus: number;
+      stdoutByteLength: number;
+      stdoutSha256: string;
+      stderrByteLength: number;
+      stderrSha256: string;
+      denialDiagnosticPattern: string;
+    };
+    const stdout = readFileSync(path.join(root, "planted-before-handoff.stdout"));
+    const stderr = readFileSync(path.join(root, "planted-before-handoff.stderr"));
+    if (proof.accessDenied !== true) throw new Error("PLANTED_0700_PROOF_ACCESS_DENIED_FALSE");
+    if (proof.exitStatus === 0) throw new Error("PLANTED_0700_PROOF_EXIT_STATUS_ZERO");
+    if (stdout.byteLength !== 0) throw new Error("PLANTED_0700_STDOUT_NOT_EMPTY");
+    if (stderr.byteLength === 0) throw new Error("PLANTED_0700_STDERR_EMPTY");
+    if (proof.stdoutByteLength !== stdout.byteLength || proof.stdoutSha256 !== digest(stdout)) {
+      throw new Error("PLANTED_0700_STDOUT_DIGEST_MISMATCH");
+    }
+    if (proof.stderrByteLength !== stderr.byteLength || proof.stderrSha256 !== digest(stderr)) {
+      throw new Error("PLANTED_0700_STDERR_DIGEST_MISMATCH");
+    }
+    if (!new RegExp(proof.denialDiagnosticPattern, "i").test(stderr.toString("utf8"))) {
+      throw new Error("PLANTED_0700_DENIAL_DIAGNOSTIC_MISMATCH");
+    }
+  }
+
+  function writeProof(root: string, overrides: Record<string, unknown> = {}): void {
+    mkdirSync(root, { recursive: true });
+    const stdout = Buffer.from("");
+    const stderr = Buffer.from("cat: private: Permission denied\n");
+    writeFileSync(path.join(root, "planted-before-handoff.stdout"), stdout);
+    writeFileSync(path.join(root, "planted-before-handoff.stderr"), stderr);
+    writeFileSync(
+      path.join(root, "planted-0700-proof.json"),
+      `${JSON.stringify(
+        {
+          attemptedPath:
+            "synthetic-container/planted-unreadable-0700/raw/primary/item-9001/partial.txt",
+          hostUid: process.getuid?.() ?? 501,
+          hostGid: process.getgid?.() ?? 20,
+          exitStatus: 1,
+          accessDenied: true,
+          stdoutByteLength: stdout.byteLength,
+          stdoutSha256: digest(stdout),
+          stderrByteLength: stderr.byteLength,
+          stderrSha256: digest(stderr),
+          denialDiagnosticMatched: true,
+          denialDiagnosticPattern: "Permission denied|denied|Operation not permitted",
+          sourceMutated: false,
+          chmodAttempted: false,
+          chownAttempted: false,
+          ...overrides,
+        },
+        null,
+        2,
+      )}\n`,
+    );
+  }
+
+  it("recomputes denial stream lengths and digests and rejects forged evidence", () => {
+    const valid = path.join(scratch, `denial-proof-valid-${uniqueRun++}`);
+    writeProof(valid);
+    expect(() => verifyDeniedReadProof(valid)).not.toThrow();
+
+    const forgedDigest = path.join(scratch, `denial-proof-forged-${uniqueRun++}`);
+    writeProof(forgedDigest, { stderrSha256: "0".repeat(64) });
+    expect(() => verifyDeniedReadProof(forgedDigest)).toThrow(
+      "PLANTED_0700_STDERR_DIGEST_MISMATCH",
+    );
+
+    const emptyStderr = path.join(scratch, `denial-proof-empty-stderr-${uniqueRun++}`);
+    writeProof(emptyStderr, { stderrByteLength: 0 });
+    writeFileSync(path.join(emptyStderr, "planted-before-handoff.stderr"), "");
+    expect(() => verifyDeniedReadProof(emptyStderr)).toThrow("PLANTED_0700_STDERR_EMPTY");
   });
 });
 

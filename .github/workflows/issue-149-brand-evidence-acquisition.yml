@@ -793,17 +793,28 @@ jobs:
           STATUS=$?
           set -e
           test "${STATUS}" -ne 0 || { echo "PLANTED_0700_WAS_READABLE_BEFORE_HANDOFF" >&2; exit 1; }
-          grep -Eiq 'Permission denied|denied|Operation not permitted' planted-before-handoff.stderr || {
+          test ! -s planted-before-handoff.stdout || { echo "PLANTED_0700_STDOUT_NOT_EMPTY" >&2; exit 1; }
+          test -s planted-before-handoff.stderr || { echo "PLANTED_0700_STDERR_EMPTY" >&2; exit 1; }
+          DENIAL_PATTERN='Permission denied|denied|Operation not permitted'
+          grep -Eiq "${DENIAL_PATTERN}" planted-before-handoff.stderr || {
             echo "PLANTED_0700_DENIAL_DIAGNOSTIC_MISSING" >&2; exit 1; }
-          export ATTEMPTED HOST_UID HOST_GID STATUS
+          export ATTEMPTED HOST_UID HOST_GID STATUS DENIAL_PATTERN
           python3 - <<'PY'
-          import json, os, pathlib
+          import hashlib, json, os, pathlib
+          stdout = pathlib.Path("planted-before-handoff.stdout").read_bytes()
+          stderr = pathlib.Path("planted-before-handoff.stderr").read_bytes()
           pathlib.Path("planted-0700-proof.json").write_text(json.dumps({
             "attemptedPath": os.environ["ATTEMPTED"],
             "hostUid": int(os.environ["HOST_UID"]),
             "hostGid": int(os.environ["HOST_GID"]),
             "exitStatus": int(os.environ["STATUS"]),
             "accessDenied": True,
+            "stdoutByteLength": len(stdout),
+            "stdoutSha256": hashlib.sha256(stdout).hexdigest(),
+            "stderrByteLength": len(stderr),
+            "stderrSha256": hashlib.sha256(stderr).hexdigest(),
+            "denialDiagnosticMatched": True,
+            "denialDiagnosticPattern": os.environ["DENIAL_PATTERN"],
             "sourceMutated": False,
             "chmodAttempted": False,
             "chownAttempted": False,
@@ -912,6 +923,8 @@ jobs:
           cp -R rehearsal-forensic-handoff rehearsal-roundtrip-payload/forensic-handoff
           cp rehearsal-build-report.json rehearsal-roundtrip-payload/rehearsal-build-report.json
           cp planted-0700-proof.json rehearsal-roundtrip-payload/planted-0700-proof.json
+          cp planted-before-handoff.stdout rehearsal-roundtrip-payload/planted-before-handoff.stdout
+          cp planted-before-handoff.stderr rehearsal-roundtrip-payload/planted-before-handoff.stderr
           cp rehearsal-image-identity.json rehearsal-roundtrip-payload/rehearsal-image-identity.json
 
       # actions/upload-artifact v4
@@ -947,11 +960,29 @@ jobs:
             --manifest roundtrip/expected-items.json \
             --report rehearsal-roundtrip-report.json
           python3 - <<'PY'
-          import hashlib, json, pathlib, shutil, subprocess, sys, tarfile
+          import hashlib, json, pathlib, re, shutil, subprocess, sys, tarfile
           root = pathlib.Path("roundtrip/forensic-handoff")
           receipt = json.loads((root / "handoff-receipt.json").read_text())
           def digest(path):
             return hashlib.sha256(path.read_bytes()).hexdigest()
+          proof = json.loads(pathlib.Path("roundtrip/planted-0700-proof.json").read_text())
+          stdout = pathlib.Path("roundtrip/planted-before-handoff.stdout").read_bytes()
+          stderr = pathlib.Path("roundtrip/planted-before-handoff.stderr").read_bytes()
+          if proof.get("accessDenied") is not True:
+            raise SystemExit("PLANTED_0700_PROOF_ACCESS_DENIED_FALSE")
+          if int(proof.get("exitStatus", 0)) == 0:
+            raise SystemExit("PLANTED_0700_PROOF_EXIT_STATUS_ZERO")
+          if len(stdout) != 0:
+            raise SystemExit("PLANTED_0700_STDOUT_NOT_EMPTY")
+          if len(stderr) == 0:
+            raise SystemExit("PLANTED_0700_STDERR_EMPTY")
+          if proof.get("stdoutByteLength") != len(stdout) or proof.get("stdoutSha256") != hashlib.sha256(stdout).hexdigest():
+            raise SystemExit("PLANTED_0700_STDOUT_DIGEST_MISMATCH")
+          if proof.get("stderrByteLength") != len(stderr) or proof.get("stderrSha256") != hashlib.sha256(stderr).hexdigest():
+            raise SystemExit("PLANTED_0700_STDERR_DIGEST_MISMATCH")
+          pattern = proof.get("denialDiagnosticPattern")
+          if not isinstance(pattern, str) or not re.search(pattern, stderr.decode("utf-8", "replace"), re.IGNORECASE):
+            raise SystemExit("PLANTED_0700_DENIAL_DIAGNOSTIC_MISMATCH")
           assert digest(root / "source-pre-manifest.json") == receipt["sourcePreManifestDigest"]
           assert digest(root / "source-post-manifest.json") == receipt["sourcePostManifestDigest"]
           pre = json.loads((root / "source-pre-manifest.json").read_text())
@@ -1051,7 +1082,14 @@ jobs:
         with:
           name: issue-149-rehearsal-reports
           path: |
+            rehearsal-build-report.json
+            rehearsal-image-identity.json
+            planted-0700-proof.json
+            planted-before-handoff.stdout
+            planted-before-handoff.stderr
+            rehearsal-forensic-handoff-report.json
             rehearsal-*.json
             over-limit-report.json
             at-limit-report.json
+          if-no-files-found: error
           retention-days: 7
