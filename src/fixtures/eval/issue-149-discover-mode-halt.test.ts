@@ -61,6 +61,32 @@ import {
 const CONTROL_STATE_ROOT = "artifacts/issue-149-brand-complete-evidence-acquisition";
 const LOWER_HEX_40 = /^[0-9a-f]{40}$/;
 
+function issue149WorkflowPathPatterns(): string[] {
+  const workflow = readFileSync(
+    ".github/workflows/issue-149-brand-evidence-acquisition.yml",
+    "utf8",
+  );
+  const pathsBlock = workflow.match(/\n    paths:\n(?<paths>(?:      - .+\n)+)/)?.groups?.paths;
+  if (!pathsBlock) throw new Error("Issue #149 workflow paths block was not found.");
+  return pathsBlock
+    .trim()
+    .split("\n")
+    .map((line) => line.trim().replace(/^- /, ""));
+}
+
+function githubPathPatternMatches(pattern: string, filePath: string): boolean {
+  if (pattern.endsWith("/**")) return filePath.startsWith(pattern.slice(0, -3));
+  if (pattern.endsWith("-**")) return filePath.startsWith(pattern.slice(0, -2));
+  return pattern === filePath;
+}
+
+function wouldTriggerIssue149Workflow(changedPaths: string[]): boolean {
+  const patterns = issue149WorkflowPathPatterns();
+  return changedPaths.some((filePath) =>
+    patterns.some((pattern) => githubPathPatternMatches(pattern, filePath)),
+  );
+}
+
 type ControlState = "discover" | "execute" | "complete";
 
 interface CommittedControlState {
@@ -311,5 +337,21 @@ describe("Issue #149 discover mode halts before any acquisition route", () => {
     } else {
       expect(committed.status).toBe("EXECUTE_AUTHORIZED");
     }
+  });
+
+  it("triggers discover validation for the exact run-summary ownership repair paths only when governed paths change", () => {
+    const repairPathsAt6836f2b = [
+      "artifacts/issue-149-brand-complete-evidence-acquisition/governed-attempt-30766684792-acquisition-runner-failure.json",
+      "artifacts/issue-149-brand-complete-evidence-acquisition/stage-1-contract-manifest.sha256",
+      "scripts/eval/issue-149-brand-evidence-acquisition-run.ts",
+      "src/fixtures/eval/issue-149-execute-closure.test.ts",
+    ];
+
+    expect(wouldTriggerIssue149Workflow(repairPathsAt6836f2b)).toBe(true);
+    expect(wouldTriggerIssue149Workflow(["README.md"])).toBe(false);
+    expect(wouldTriggerIssue149Workflow(["src/server/startup.test.ts"])).toBe(false);
+    expect(
+      wouldTriggerIssue149Workflow(["scripts/eval/run-issue-149-alcohol-reselection.ts"]),
+    ).toBe(false);
   });
 });

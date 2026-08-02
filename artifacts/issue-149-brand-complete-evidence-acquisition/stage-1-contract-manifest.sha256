@@ -77,7 +77,7 @@ d5209a30830c891d059e9e3bb5995ecd8b7794b999c821d0bcffb8cf1b129741  artifacts/issu
 eeaee7c467c796fa3fabf0c6e08b5caf1a36567690a2d07d00db1bb732d632c8  artifacts/issue-149-brand-complete-evidence-acquisition/truth-free-input-manifest.json
 631ee1df6b4050251c259de53a6153c4e6d2747300a37cda3f700f663864645a  artifacts/issue-149-brand-complete-evidence-acquisition/truth-isolation-plan.json
 2f690462226ed58f054151993731acfa64c3936019e7564b4368ac5224a9fef3  artifacts/issue-149-brand-complete-evidence-acquisition/verifier-transport-linkage.json
-4a362867722de7343e11448944d95d0632fe932785cb8b646fa05772d829c963  artifacts/issue-149-brand-complete-evidence-acquisition/workflow-plan.md
+d0cec02dd1c0f6c6bb9482b941e84e9b1aa34bca16f2eadb943912bd65042640  artifacts/issue-149-brand-complete-evidence-acquisition/workflow-plan.md
 bf9d8ddf93da56088273460a3be08124a1a0b87fcbb78608d07e3cf4bd6b33e6  scripts/eval/issue-149-adjudicate-acquisition-outcome.ts
 408a0f6a2008cd1e15dca0121db71dd096b00267feedc435109519341a82f54d  scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs
 78377f02a6fa32a3f8f0a230afccf3371899d71af5e0defe2796eec5bbacdd95  scripts/eval/issue-149-build-rehearsal-evidence.ts
@@ -110,4 +110,4 @@ dfaa093b9f3bb7782845c22069f4a93d4abcfc6f47fe11c1cff98926f2a6f587  src/fixtures/e
 9ee4557d83a308834822b5a76b5c3ba851c30c04261d5b70d8e30b70997cf56c  src/fixtures/eval/issue-149-stage-1-manifest.test.ts
 5d3fe14028b90518c2bcd039c12974a64edc9dddc95f9447eb3c2e7772200e26  src/fixtures/eval/issue-149-stage2-source-closure.test.ts
 42ea378611fc16ff3e6448ac38091468500c9957e42965b4ec529cd1cebabf12  src/fixtures/eval/issue-149-staging-independence.test.ts
-# aggregate 877ab455c2ee51eb8c286e4527935509705d32d0f5a66de9da0d8f380c1438f1
+# aggregate cb531e11f062fcf2d5bbc8160d58c0421c4a6fcab0c21fa28fa62a89fa3cbc49

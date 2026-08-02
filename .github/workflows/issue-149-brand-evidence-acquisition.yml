@@ -5,8 +5,7 @@
 #
 # Transport, frozen in workflow-plan.md:
 #   - push-triggered, restricted to the single research branch;
-#   - paths admitting only this workflow file, the committed mode file and the
-#     execute-authorization artifact;
+#   - paths admitting only this workflow file and governed Issue #149 inputs;
 #   - permissions: contents: read — the OCR job cannot push, and the write
 #     permission is never granted to any job here;
 #   - no schedule, no pull_request_target, no repository_dispatch, no unscoped
@@ -37,8 +36,10 @@ on:
       - research/issue-149-brand-complete-evidence-acquisition
     paths:
       - .github/workflows/issue-149-brand-evidence-acquisition.yml
-      - artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt
-      - artifacts/issue-149-brand-complete-evidence-acquisition/execute-authorization.json
+      - artifacts/issue-149-brand-complete-evidence-acquisition/**
+      - scripts/eval/issue-149-**
+      - scripts/eval/lib/issue-149-**
+      - src/fixtures/eval/issue-149-**
 
 permissions:
   contents: read
