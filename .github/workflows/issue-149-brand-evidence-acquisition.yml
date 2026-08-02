@@ -550,7 +550,7 @@ jobs:
           retention-days: 30
 
       - name: Stage incomplete forensic artifact payload
-        if: steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success'
+        if: always() && (steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success')
         run: |
           set -euo pipefail
           rm -rf incomplete-evidence-payload
@@ -564,11 +564,12 @@ jobs:
           test ! -f identity-leak-report.json || cp identity-leak-report.json incomplete-evidence-payload/identity-leak-report.json
 
       - name: Upload incomplete forensic output
-        if: steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success'
+        if: always() && (steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success')
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: issue-149-incomplete-forensic-output
           path: incomplete-evidence-payload
+          if-no-files-found: error
           retention-days: 30
 
   verify-uploaded-artifact:
@@ -802,8 +803,15 @@ jobs:
             --acquisition-status 0 \
             | tee rehearsal-forensic-handoff-report.json
           test "$(stat -c '%u:%g' synthetic-snapshot/raw/primary/item-9001)" = "${HOST_UID}:${HOST_GID}"
-          find synthetic-snapshot -type d -exec test "$(stat -c '%a' {})" = "755" \;
-          find synthetic-snapshot -type f -exec test "$(stat -c '%a' {})" = "644" \;
+          BAD_DIR="$(find synthetic-snapshot -type d ! -perm 0755 -print -quit)"
+          test -z "${BAD_DIR}" || {
+            echo "SNAPSHOT_DIRECTORY_MODE_MISMATCH: ${BAD_DIR}" >&2; exit 1; }
+          BAD_FILE="$(find synthetic-snapshot -type f ! -perm 0644 -print -quit)"
+          test -z "${BAD_FILE}" || {
+            echo "SNAPSHOT_FILE_MODE_MISMATCH: ${BAD_FILE}" >&2; exit 1; }
+          BAD_OWNER="$(find synthetic-snapshot \( ! -uid "${HOST_UID}" -o ! -gid "${HOST_GID}" \) -print -quit)"
+          test -z "${BAD_OWNER}" || {
+            echo "SNAPSHOT_OWNERSHIP_MISMATCH: ${BAD_OWNER}" >&2; exit 1; }
           test -f rehearsal-forensic-handoff/source-tree.tar
           test -s rehearsal-forensic-handoff/source-tree.tar
           test -f rehearsal-forensic-handoff/handoff-receipt.json

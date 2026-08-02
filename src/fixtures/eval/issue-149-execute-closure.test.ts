@@ -1069,9 +1069,78 @@ describe("Issue #149 the archive limit governs, and never destroys", () => {
     const forensic = workflow.slice(workflow.indexOf("- name: Upload incomplete forensic output"));
     // Conditioned on Actor 2 / Job C failing — never on the volume.
     expect(forensic).toContain(
-      "if: steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success'",
+      "if: always() && (steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success')",
     );
+    expect(forensic).toContain("if-no-files-found: error");
     expect(forensic.slice(0, 400)).not.toContain("overLimit");
+
+    const staging = workflow.slice(
+      workflow.indexOf("- name: Stage incomplete forensic artifact payload"),
+      workflow.indexOf("- name: Upload incomplete forensic output"),
+    );
+    expect(staging).toContain(
+      "if: always() && (steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success')",
+    );
+    expect(staging).toContain("raw-verification-report.json");
+    expect(staging).toContain("identity-leak-report.json");
+  });
+
+  it("uses a fail-capable executable snapshot mode and ownership audit", () => {
+    const audit = (root: string, uid: number, gid: number): { status: number; stderr: string } => {
+      const script = `
+        set -euo pipefail
+        HOST_UID="${uid}"
+        HOST_GID="${gid}"
+        BAD_DIR="$(find "${root}" -type d ! -perm 0755 -print -quit)"
+        test -z "$BAD_DIR" || { echo "SNAPSHOT_DIRECTORY_MODE_MISMATCH: $BAD_DIR" >&2; exit 1; }
+        BAD_FILE="$(find "${root}" -type f ! -perm 0644 -print -quit)"
+        test -z "$BAD_FILE" || { echo "SNAPSHOT_FILE_MODE_MISMATCH: $BAD_FILE" >&2; exit 1; }
+        BAD_OWNER="$(find "${root}" \\( ! -uid "$HOST_UID" -o ! -gid "$HOST_GID" \\) -print -quit)"
+        test -z "$BAD_OWNER" || { echo "SNAPSHOT_OWNERSHIP_MISMATCH: $BAD_OWNER" >&2; exit 1; }
+      `;
+      try {
+        execFileSync("bash", ["-c", script], { encoding: "utf8" });
+        return { status: 0, stderr: "" };
+      } catch (cause) {
+        const failure = cause as { status?: number; stderr?: Buffer | string };
+        return {
+          status: failure.status ?? -1,
+          stderr: Buffer.isBuffer(failure.stderr)
+            ? failure.stderr.toString("utf8")
+            : (failure.stderr ?? ""),
+        };
+      }
+    };
+
+    const root = path.join(scratch, `snapshot-audit-${uniqueRun++}`);
+    const currentUid = process.getuid?.() ?? statSync(scratch).uid;
+    const currentGid = process.getgid?.() ?? statSync(scratch).gid;
+    const tree = path.join(root, "snapshot");
+    mkdirSync(path.join(tree, "dir"), { recursive: true, mode: 0o755 });
+    writeFileSync(path.join(tree, "dir", "file.txt"), "ok\n", { mode: 0o644 });
+    chmodSync(tree, 0o755);
+    chmodSync(path.join(tree, "dir"), 0o755);
+    chmodSync(path.join(tree, "dir", "file.txt"), 0o644);
+    expect(audit(tree, currentUid, currentGid)).toEqual({ status: 0, stderr: "" });
+
+    chmodSync(path.join(tree, "dir"), 0o700);
+    const badDir = audit(tree, currentUid, currentGid);
+    expect(badDir.status).not.toBe(0);
+    expect(badDir.stderr).toContain("SNAPSHOT_DIRECTORY_MODE_MISMATCH");
+    expect(badDir.stderr).not.toContain("cannot stat");
+    chmodSync(path.join(tree, "dir"), 0o755);
+
+    chmodSync(path.join(tree, "dir", "file.txt"), 0o600);
+    const badFile = audit(tree, currentUid, currentGid);
+    expect(badFile.status).not.toBe(0);
+    expect(badFile.stderr).toContain("SNAPSHOT_FILE_MODE_MISMATCH");
+    expect(badFile.stderr).not.toContain("cannot stat");
+    chmodSync(path.join(tree, "dir", "file.txt"), 0o644);
+
+    const badOwner = audit(tree, currentUid + 1, currentGid);
+    expect(badOwner.status).not.toBe(0);
+    expect(badOwner.stderr).toContain("SNAPSHOT_OWNERSHIP_MISMATCH");
+    expect(badOwner.stderr).not.toContain("cannot stat");
   });
 });
 
