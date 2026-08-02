@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 export interface FinalizeProbeInput {
   directory: string;
@@ -86,7 +87,10 @@ export function main(argv = process.argv): number {
   return 0;
 }
 
-if (process.argv[1]?.includes("issue-149-finalize-ocr-runtime-init-probe")) {
+if (
+  process.argv[1] !== undefined &&
+  realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))
+) {
   try {
     process.exitCode = main();
   } catch (cause) {

@@ -29,6 +29,7 @@ import { createRequire } from "node:module";
 import {
   cpSync,
   existsSync,
+  mkdtempSync,
   mkdirSync,
   readFileSync,
   readdirSync,
@@ -36,6 +37,7 @@ import {
   statSync,
   writeFileSync,
 } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import {
   assertRuntimePackageClosureEqual,
@@ -441,6 +443,57 @@ function packageSummary(manifest) {
   };
 }
 
+function writeJson(file, value) {
+  writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`);
+}
+
+function validRuntimeProbeReport(imageIdentity) {
+  const closure = {
+    schemaVersion: "issue-149-runtime-package-closure.v1",
+    packages: [
+      {
+        name: "tesseract.js",
+        version: "7.0.0",
+        fileCount: 1,
+        byteLength: 1,
+        aggregateSha256: sha256("tesseract.js"),
+        entries: [{ path: "package.json", byteLength: 1, sha256: sha256("a") }],
+      },
+      {
+        name: "tesseract.js-core",
+        version: "7.0.0",
+        fileCount: 1,
+        byteLength: 1,
+        aggregateSha256: sha256("tesseract.js-core"),
+        entries: [{ path: "package.json", byteLength: 1, sha256: sha256("b") }],
+      },
+    ],
+  };
+  return {
+    status: "OK",
+    containerExitStatus: 0,
+    reportProducedByContainer: true,
+    imageIdentity,
+    imageIdentitySha256: sha256(`${JSON.stringify(imageIdentity, null, 2)}\n`),
+    workerInitializationAttempted: true,
+    workerInitialized: true,
+    workerTerminationAttempted: true,
+    workerTerminated: true,
+    recognizeCalls: 0,
+    governedCorpusMounted: false,
+    governedCorpusUsed: false,
+    acquisitionApiInvoked: false,
+    networkEnabled: false,
+    runtimeUid: 10149,
+    runtimeGid: 10149,
+    languageAssetPath: "/opt/acquisition/assets",
+    corePath: "/opt/acquisition/node_modules/tesseract.js-core",
+    runtimePackageClosureMatched: true,
+    expectedRuntimePackageClosure: closure,
+    observedRuntimePackageClosure: closure,
+  };
+}
+
 /**
  * Build the self-contained HOST VERIFIER bundle.
  *
@@ -564,6 +617,99 @@ async function buildVerifierBundle() {
     prohibitedContent: [],
   });
   return { aggregate, emitted };
+}
+
+function verifyEmittedHostCliEntrypoints() {
+  const root = mkdtempSync(path.join(os.tmpdir(), "issue-149-host-cli-smoke-"));
+  try {
+    const probeArtifact = path.join(root, "probe-artifact");
+    mkdirSync(probeArtifact, { recursive: true });
+    const imageIdentity = {
+      id: "sha256:synthetic",
+      repoDigests: ["node@sha256:synthetic"],
+      os: "linux",
+      arch: "amd64",
+    };
+    writeJson(path.join(probeArtifact, "ocr-runtime-init-image-identity.json"), imageIdentity);
+    writeJson(path.join(probeArtifact, "ocr-runtime-init-probe-report.json"), {
+      ...validRuntimeProbeReport(imageIdentity),
+      containerExitStatus: undefined,
+      reportProducedByContainer: undefined,
+      imageIdentity: undefined,
+      imageIdentitySha256: undefined,
+    });
+    run("node", [path.join(VERIFIER, "finalize-ocr-runtime-init-probe.mjs"), probeArtifact, "0"]);
+    const statusPath = path.join(probeArtifact, "ocr-runtime-init-container-status.json");
+    const finalizedPath = path.join(probeArtifact, "ocr-runtime-init-probe-report.json");
+    if (!existsSync(statusPath)) {
+      throw new JobAError("EMITTED_FINALIZER_DID_NOT_CREATE_STATUS", statusPath);
+    }
+    const finalized = JSON.parse(readFileSync(finalizedPath, "utf8"));
+    if (finalized.containerExitStatus !== 0 || finalized.reportProducedByContainer !== true) {
+      throw new JobAError("EMITTED_FINALIZER_DID_NOT_CLOSE_REPORT", finalized);
+    }
+
+    run("node", [path.join(VERIFIER, "validate-ocr-runtime-init-probe.mjs"), probeArtifact]);
+    const invalidArtifact = path.join(root, "invalid-probe-artifact");
+    mkdirSync(invalidArtifact, { recursive: true });
+    writeJson(path.join(invalidArtifact, "ocr-runtime-init-probe-report.json"), {
+      status: "OK",
+      recognizeCalls: 1,
+    });
+    let invalidRejected = false;
+    let invalidError = "";
+    try {
+      run("node", [path.join(VERIFIER, "validate-ocr-runtime-init-probe.mjs"), invalidArtifact], {
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+    } catch (cause) {
+      invalidRejected = true;
+      invalidError = String(cause.stderr ?? cause.message ?? cause);
+    }
+    if (
+      !invalidRejected ||
+      !invalidError.includes("OCR_RUNTIME_INIT_STATUS_MISSING_OR_MALFORMED")
+    ) {
+      throw new JobAError("EMITTED_VALIDATOR_DID_NOT_REJECT_INVALID_ARTIFACT", invalidError);
+    }
+
+    const terminalJsonl = path.join(root, "terminal.jsonl");
+    const outcomeReport = path.join(root, "acquisition-outcome-report.json");
+    writeFileSync(
+      terminalJsonl,
+      `${JSON.stringify({
+        status: "ACQUISITION_COMPLETE",
+        verdict: "INCOMPLETE_EVIDENCE",
+        haltCode: null,
+        scientificResultProduced: false,
+      })}\n`,
+    );
+    run("node", [
+      path.join(VERIFIER, "adjudicate-acquisition-outcome.mjs"),
+      terminalJsonl,
+      "1",
+      outcomeReport,
+    ]);
+    const adjudicated = JSON.parse(readFileSync(outcomeReport, "utf8"));
+    if (adjudicated.outcomeClass !== "INCOMPLETE_EVIDENCE") {
+      throw new JobAError("EMITTED_ADJUDICATOR_DID_NOT_CREATE_EXPECTED_OUTCOME", adjudicated);
+    }
+
+    step("verify-emitted-host-cli-entrypoints", {
+      plainNode: true,
+      repositoryCheckoutRequiredAtRuntime: false,
+      ocrRun: false,
+      acquisitionApiInvoked: false,
+      allEntrypointsExecuted: true,
+      finalizerCreatedContainerStatus: true,
+      validatorAcceptedValidArtifact: true,
+      validatorRejectedInvalidArtifact: true,
+      adjudicatorCreatedOutcomeReport: true,
+      expectedOutcomeClass: "INCOMPLETE_EVIDENCE",
+    });
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 }
 
 /**
@@ -870,6 +1016,7 @@ async function main() {
   verifyIncumbentIdentities();
   const { inputs, metafileSha256, buildCommand, buildTool } = await buildBundle();
   const verifier = await buildVerifierBundle();
+  verifyEmittedHostCliEntrypoints();
   const identity = buildIdentityInventory();
   const sourceInputs = enforceClosurePolicy(inputs);
   runSourceClosureGate(inputs);

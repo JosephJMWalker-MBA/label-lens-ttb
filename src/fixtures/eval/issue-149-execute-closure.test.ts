@@ -176,6 +176,77 @@ const freshRoot = (): string => {
   return root;
 };
 
+const writeJson = (file: string, value: unknown): void => {
+  writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`);
+};
+
+const hiddenRuntimeFiles = [
+  "node_modules/bmp-js/.npmignore",
+  "node_modules/is-url/.travis.yml",
+  "node_modules/node-fetch/node_modules/tr46/.npmignore",
+  "node_modules/node-fetch/node_modules/tr46/lib/.gitkeep",
+  "node_modules/zlibjs/bin/.gitkeep",
+] as const;
+
+function syntheticRuntimeProbeReport(imageIdentity: Record<string, unknown>) {
+  const closure = {
+    schemaVersion: "issue-149-runtime-package-closure.v1",
+    packages: [
+      {
+        name: "tesseract.js",
+        version: "7.0.0",
+        fileCount: 1,
+        byteLength: 1,
+        aggregateSha256: sha256Bytes(Buffer.from("tesseract.js")),
+        entries: [
+          {
+            path: "package.json",
+            byteLength: 1,
+            sha256: sha256Bytes(Buffer.from("a")),
+          },
+        ],
+      },
+      {
+        name: "tesseract.js-core",
+        version: "7.0.0",
+        fileCount: 1,
+        byteLength: 1,
+        aggregateSha256: sha256Bytes(Buffer.from("tesseract.js-core")),
+        entries: [
+          {
+            path: "package.json",
+            byteLength: 1,
+            sha256: sha256Bytes(Buffer.from("b")),
+          },
+        ],
+      },
+    ],
+  };
+  return {
+    status: "OK",
+    workerInitializationAttempted: true,
+    workerInitialized: true,
+    workerTerminationAttempted: true,
+    workerTerminated: true,
+    recognizeCalls: 0,
+    governedCorpusMounted: false,
+    governedCorpusUsed: false,
+    acquisitionApiInvoked: false,
+    networkEnabled: false,
+    runtimeUid: 10149,
+    runtimeGid: 10149,
+    languageAssetPath: "/opt/acquisition/assets",
+    corePath: "/opt/acquisition/node_modules/tesseract.js-core",
+    runtimePackageClosureMatched: true,
+    expectedRuntimePackageClosure: closure,
+    observedRuntimePackageClosure: closure,
+    imageIdentity,
+    imageIdentitySha256: sha256Bytes(Buffer.from(`${JSON.stringify(imageIdentity, null, 2)}\n`)),
+    containerExitStatus: 0,
+    reportProducedByContainer: true,
+  };
+}
+
 const DETERMINISM: DeterminismReport = {
   verdict: "COMPLETE_DETERMINISTIC_EVIDENCE",
   comparedItems: 2,
@@ -1344,6 +1415,173 @@ describe("Issue #149 OCR runtime init probe evidence is load-bearing", () => {
     expect(probe).toContain("path: ocr-runtime-init-probe-artifact");
     expect(probe).toContain("if-no-files-found: error");
   });
+
+  it("preserves hidden package files in the truth-free preparation upload", () => {
+    const workflow = readFileSync(
+      path.join(process.cwd(), ".github/workflows/issue-149-brand-evidence-acquisition.yml"),
+      "utf8",
+    );
+    const upload = workflow.slice(
+      workflow.indexOf("- name: Upload the truth-free preparation artifact"),
+      workflow.indexOf("- name: Upload the host verifier bundle"),
+    );
+    expect(upload).toContain("include-hidden-files: true");
+    expect(upload).toContain("name: issue-149-truth-free-preparation");
+    expect(upload).not.toContain("include-hidden-files: false");
+  });
+
+  it("builds the prepared bundle with the hidden package files and emitted CLI smoke", () => {
+    const result = execFileSync("node", ["scripts/eval/issue-149-job-a-prepare.mjs"], {
+      cwd: process.cwd(),
+      encoding: "utf8",
+      maxBuffer: 128 * 1024 * 1024,
+    });
+    const report = JSON.parse(result) as {
+      status: string;
+      ocrRun: boolean;
+      acquisitionApiInvoked: boolean;
+      steps: Array<Record<string, unknown>>;
+    };
+    expect(report.status).toBe("JOB_A_PREPARATION_COMPLETE");
+    expect(report.ocrRun).toBe(false);
+    expect(report.acquisitionApiInvoked).toBe(false);
+    const cliSmoke = report.steps.find(
+      (entry) => entry.name === "verify-emitted-host-cli-entrypoints",
+    );
+    expect(cliSmoke).toMatchObject({
+      plainNode: true,
+      repositoryCheckoutRequiredAtRuntime: false,
+      ocrRun: false,
+      acquisitionApiInvoked: false,
+      allEntrypointsExecuted: true,
+      finalizerCreatedContainerStatus: true,
+      validatorAcceptedValidArtifact: true,
+      validatorRejectedInvalidArtifact: true,
+      adjudicatorCreatedOutcomeReport: true,
+    });
+
+    const bundleRoot = path.join(process.cwd(), ".local/issue-149-preparation/bundle");
+    const manifest = JSON.parse(
+      readFileSync(path.join(bundleRoot, "bundle-manifest.json"), "utf8"),
+    ) as { emitted: Array<{ path: string }> };
+    const emitted = new Set(manifest.emitted.map((entry) => entry.path));
+    for (const relative of hiddenRuntimeFiles) {
+      expect(existsSync(path.join(bundleRoot, relative)), relative).toBe(true);
+      expect(emitted.has(relative), relative).toBe(true);
+    }
+  }, 180_000);
+
+  it("executes the three verifier CLIs under their emitted basenames without running on import", () => {
+    const root = freshRoot();
+    const verifier = path.join(root, "verifier");
+    mkdirSync(verifier, { recursive: true });
+    const builds = [
+      [
+        "scripts/eval/issue-149-finalize-ocr-runtime-init-probe.ts",
+        "finalize-ocr-runtime-init-probe.mjs",
+      ],
+      [
+        "scripts/eval/issue-149-validate-ocr-runtime-init-probe.ts",
+        "validate-ocr-runtime-init-probe.mjs",
+      ],
+      [
+        "scripts/eval/issue-149-adjudicate-acquisition-outcome.ts",
+        "adjudicate-acquisition-outcome.mjs",
+      ],
+    ] as const;
+    for (const [entry, output] of builds) {
+      execFileSync(
+        "npx",
+        [
+          "esbuild",
+          entry,
+          "--bundle",
+          "--platform=node",
+          "--format=esm",
+          "--target=node20",
+          "--external:node:*",
+          `--outfile=${path.join(verifier, output)}`,
+        ],
+        { cwd: process.cwd(), encoding: "utf8", maxBuffer: 64 * 1024 * 1024 },
+      );
+      const imported = execFileSync(
+        "node",
+        [
+          "--input-type=module",
+          "-e",
+          `await import(${JSON.stringify(path.join(verifier, output))})`,
+        ],
+        { cwd: process.cwd(), encoding: "utf8" },
+      );
+      expect(imported).toBe("");
+    }
+
+    const artifact = path.join(root, "probe-artifact");
+    mkdirSync(artifact, { recursive: true });
+    const imageIdentity = {
+      id: "sha256:synthetic",
+      repoDigests: ["node@sha256:synthetic"],
+      os: "linux",
+      arch: "amd64",
+    };
+    writeJson(path.join(artifact, "ocr-runtime-init-image-identity.json"), imageIdentity);
+    const report = syntheticRuntimeProbeReport(imageIdentity);
+    const {
+      containerExitStatus,
+      reportProducedByContainer,
+      imageIdentity: _image,
+      ...container
+    } = report;
+    writeJson(path.join(artifact, "ocr-runtime-init-probe-report.json"), container);
+
+    execFileSync(
+      "node",
+      [path.join(verifier, "finalize-ocr-runtime-init-probe.mjs"), artifact, "0"],
+      {
+        cwd: process.cwd(),
+        encoding: "utf8",
+      },
+    );
+    expect(existsSync(path.join(artifact, "ocr-runtime-init-container-status.json"))).toBe(true);
+    execFileSync("node", [path.join(verifier, "validate-ocr-runtime-init-probe.mjs"), artifact], {
+      cwd: process.cwd(),
+      encoding: "utf8",
+    });
+
+    const invalid = path.join(root, "invalid-probe-artifact");
+    mkdirSync(invalid, { recursive: true });
+    writeJson(path.join(invalid, "ocr-runtime-init-probe-report.json"), {
+      status: "OK",
+      recognizeCalls: 1,
+    });
+    expect(() =>
+      execFileSync("node", [path.join(verifier, "validate-ocr-runtime-init-probe.mjs"), invalid], {
+        cwd: process.cwd(),
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      }),
+    ).toThrow(/OCR_RUNTIME_INIT_STATUS_MISSING_OR_MALFORMED/);
+
+    const terminal = path.join(root, "terminal.jsonl");
+    const outcome = path.join(root, "outcome.json");
+    writeFileSync(
+      terminal,
+      `${JSON.stringify({
+        status: "ACQUISITION_COMPLETE",
+        verdict: "INCOMPLETE_EVIDENCE",
+        haltCode: null,
+        scientificResultProduced: false,
+      })}\n`,
+    );
+    execFileSync(
+      "node",
+      [path.join(verifier, "adjudicate-acquisition-outcome.mjs"), terminal, "1", outcome],
+      { cwd: process.cwd(), encoding: "utf8" },
+    );
+    expect(JSON.parse(readFileSync(outcome, "utf8"))).toMatchObject({
+      outcomeClass: "INCOMPLETE_EVIDENCE",
+    });
+  }, 120_000);
 });
 
 describe("Issue #149 actor 2 verifies raw evidence, and Job C scans for identity", () => {

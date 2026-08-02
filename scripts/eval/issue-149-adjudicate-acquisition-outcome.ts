@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 export type AcquisitionOutcomeClass =
   | "SCIENTIFIC_RESULT_COMPLETE"
@@ -184,7 +185,10 @@ export function main(argv = process.argv): number {
   return 0;
 }
 
-if (process.argv[1]?.includes("issue-149-adjudicate-acquisition-outcome")) {
+if (
+  process.argv[1] !== undefined &&
+  realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))
+) {
   try {
     process.exitCode = main();
   } catch (cause) {

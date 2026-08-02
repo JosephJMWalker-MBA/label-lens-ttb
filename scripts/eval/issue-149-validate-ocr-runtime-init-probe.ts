@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 interface RuntimePackageManifest {
   name: string;
@@ -130,7 +131,10 @@ export function main(argv = process.argv): number {
   return 0;
 }
 
-if (process.argv[1]?.includes("issue-149-validate-ocr-runtime-init-probe")) {
+if (
+  process.argv[1] !== undefined &&
+  realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))
+) {
   try {
     process.exitCode = main();
   } catch (cause) {
