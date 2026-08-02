@@ -2,8 +2,8 @@
   "artifact": "execute-authorization",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 2,
-  "status": "EXECUTE_AUTHORIZED",
-  "reviewedImplementationSha": "61a7c97fabd88571f182e957828bdbfed6630bf9",
+  "status": "EXECUTE_NOT_AUTHORIZED",
+  "reviewedImplementationSha": null,
   "authorizedBy": null,
   "authorizedAt": null,
   "whatAuthorizationMeans": "Execute is authorized against an EXACT reviewed implementation tree, not against a branch. Setting status to EXECUTE_AUTHORIZED without naming the reviewed SHA authorizes nothing, and the gate rejects it.",
@@ -40,5 +40,5 @@
     "6. push only the already-authorized commit",
     "7. the repository gate independently rechecks the reviewed implementation range"
   ],
-  "transitionCommitCreatedInThisSprint": true
+  "transitionCommitCreatedInThisSprint": false
 }
