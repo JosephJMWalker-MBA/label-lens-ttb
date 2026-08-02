@@ -35,6 +35,8 @@ const CANONICAL_LIBS = [
   "scripts/eval/lib/issue-149-evidence-canonical.ts",
   "scripts/eval/lib/issue-149-run-evidence-writer.ts",
   "scripts/eval/issue-149-forensic-handoff.ts",
+  "scripts/eval/issue-149-build-rehearsal-evidence.ts",
+  "scripts/eval/issue-149-validate-rehearsal-attestation.ts",
 ];
 const STAGE_1_TESTS = [
   "src/fixtures/eval/issue-149-acquisition-isolation.test.ts",

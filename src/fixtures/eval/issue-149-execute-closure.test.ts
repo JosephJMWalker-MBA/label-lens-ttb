@@ -5,10 +5,12 @@
  * governed corpus is never touched. Every case drives the real implementation.
  */
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
   chmodSync,
   existsSync,
   linkSync,
+  lstatSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -53,6 +55,10 @@ import {
   archiveAdjudication,
   decideArchiveVolume,
 } from "../../../scripts/eval/lib/issue-149-archive-volume";
+import {
+  compareAttestationToSourcePreManifest,
+  validateRehearsalBuildReport,
+} from "../../../scripts/eval/issue-149-validate-rehearsal-attestation";
 
 /**
  * The committed control state: the mode file and the authorization artifact,
@@ -1046,6 +1052,48 @@ describe("Issue #149 the archive limit governs, and never destroys", () => {
     expect(workflow).toContain("path: incomplete-evidence-payload");
   });
 
+  it("validates private rehearsal source by attestation before handoff and by source-pre comparison after handoff", () => {
+    const workflow = readFileSync(
+      path.join(process.cwd(), ".github/workflows/issue-149-brand-evidence-acquisition.yml"),
+      "utf8",
+    );
+    const rehearsal = workflow.slice(
+      workflow.indexOf("verifier-transport-rehearsal:"),
+      workflow.indexOf("      # The OVER-LIMIT ordering"),
+    );
+    const buildStep = rehearsal.slice(
+      rehearsal.indexOf("- name: Build synthetic evidence inside the pinned container"),
+      rehearsal.indexOf("- name: Prove planted 0700 evidence is unreadable before handoff"),
+    );
+    expect(buildStep).toContain("| tee rehearsal-build-report.json");
+    expect(buildStep).toContain("node verifier/validate-rehearsal-attestation.mjs");
+    expect(buildStep).toContain("--build-report rehearsal-build-report.json");
+    expect(buildStep).not.toContain("stat -c");
+    expect(buildStep).not.toContain("find synthetic-container");
+    expect(buildStep).not.toContain("ls synthetic-container");
+
+    const denialStep = rehearsal.slice(
+      rehearsal.indexOf("- name: Prove planted 0700 evidence is unreadable before handoff"),
+      rehearsal.indexOf("- name: Run the real forensic handoff for rehearsal"),
+    );
+    expect(denialStep).toContain('cat "${ATTEMPTED}"');
+    expect(denialStep).toContain("STATUS=$?");
+    expect(denialStep).toContain('test "${STATUS}" -ne 0');
+    expect(denialStep).toContain("PLANTED_0700_DENIAL_DIAGNOSTIC_MISSING");
+    expect(denialStep).not.toContain("test -r");
+
+    const handoffStep = rehearsal.slice(
+      rehearsal.indexOf("- name: Run the real forensic handoff for rehearsal"),
+      rehearsal.indexOf("- name: Actor 2 runs with plain Node and no checkout"),
+    );
+    expect(handoffStep).toContain("sudo -E");
+    expect(handoffStep).toContain("--source synthetic-container");
+    expect(handoffStep).toContain(
+      "--source-pre-manifest rehearsal-forensic-handoff/source-pre-manifest.json",
+    );
+    expect(handoffStep).toContain("node verifier/validate-rehearsal-attestation.mjs");
+  });
+
   it("binds both forensic and complete artifacts to this run and head", () => {
     const workflow = readFileSync(
       path.join(process.cwd(), ".github/workflows/issue-149-brand-evidence-acquisition.yml"),
@@ -1377,6 +1425,28 @@ describe("Issue #149 the forensic handoff closes source and ownership failures",
 });
 
 describe("Issue #149 the rehearsal synthetic builder preserves the output mount root", () => {
+  type SourceAttestationEntry = {
+    path: string;
+    type: "directory" | "file";
+    mode: string;
+    uid: number;
+    gid: number;
+    length: number | null;
+    sha256: string | null;
+  };
+
+  type RehearsalBuildReport = {
+    status: string;
+    runtimeUid: number;
+    runtimeGid: number;
+    restrictiveUmask: string;
+    sourceAttestation: SourceAttestationEntry[];
+    ocrRun: boolean;
+    acquisitionApiInvoked: boolean;
+    governedCorpusUsed: boolean;
+    plantedFailures: string[];
+  };
+
   function runSyntheticBuilder(output: string): { status: number; stdout: string; stderr: string } {
     const args = [
       "vite-node",
@@ -1406,16 +1476,21 @@ describe("Issue #149 the rehearsal synthetic builder preserves the output mount 
     }
   }
 
-  function expectSyntheticEvidence(root: string, stdout: string): void {
-    const report = JSON.parse(stdout) as {
-      status: string;
-      ocrRun: boolean;
-      acquisitionApiInvoked: boolean;
-      governedCorpusUsed: boolean;
-      plantedFailures: string[];
-    };
+  function sha256File(file: string): string {
+    return createHash("sha256").update(readFileSync(file)).digest("hex");
+  }
+
+  function parseBuildReport(stdout: string): RehearsalBuildReport {
+    return JSON.parse(stdout) as RehearsalBuildReport;
+  }
+
+  function expectSyntheticEvidence(root: string, stdout: string): RehearsalBuildReport {
+    const report = parseBuildReport(stdout);
     expect(report).toMatchObject({
       status: "REHEARSAL_EVIDENCE_BUILT",
+      runtimeUid: process.getuid?.() ?? statSync(root).uid,
+      runtimeGid: process.getgid?.() ?? statSync(root).gid,
+      restrictiveUmask: "077",
       ocrRun: false,
       acquisitionApiInvoked: false,
       governedCorpusUsed: false,
@@ -1429,13 +1504,57 @@ describe("Issue #149 the rehearsal synthetic builder preserves the output mount 
         path.join(root, "planted-unreadable-0700", "raw", "primary", "item-9001", "partial.txt"),
       ),
     ).toBe(true);
+    return report;
+  }
+
+  function expectAttestationMatchesLstat(root: string, report: RehearsalBuildReport): void {
+    const expectedPaths = [
+      "raw",
+      "raw/primary",
+      "raw/primary/item-9001",
+      "planted-unreadable-0700/raw/primary/item-9001",
+      "planted-unreadable-0700/raw/primary/item-9001/partial.txt",
+    ];
+    expect(report.sourceAttestation.map((entry) => entry.path).sort()).toEqual(
+      [...expectedPaths].sort(),
+    );
+    for (const entry of report.sourceAttestation) {
+      const absolute = path.join(root, entry.path);
+      const stat = lstatSync(absolute);
+      expect(entry.type).toBe(stat.isDirectory() ? "directory" : "file");
+      expect(entry.mode).toBe((stat.mode & 0o777).toString(8).padStart(4, "0"));
+      expect(entry.uid).toBe(stat.uid);
+      expect(entry.gid).toBe(stat.gid);
+      if (stat.isFile()) {
+        expect(entry.length).toBe(stat.size);
+        expect(entry.sha256).toBe(sha256File(absolute));
+      } else {
+        expect(entry.length).toBeNull();
+        expect(entry.sha256).toBeNull();
+      }
+    }
+    expect(report.sourceAttestation.find((entry) => entry.path === "raw")?.mode).toBe("0700");
+    expect(
+      report.sourceAttestation.find(
+        (entry) => entry.path === "planted-unreadable-0700/raw/primary/item-9001",
+      )?.mode,
+    ).toBe("0700");
+    expect(
+      report.sourceAttestation.find(
+        (entry) => entry.path === "planted-unreadable-0700/raw/primary/item-9001/partial.txt",
+      )?.mode,
+    ).toBe("0600");
   }
 
   it("creates an absent output directory and writes only synthetic no-OCR evidence", () => {
     const root = path.join(scratch, `rehearsal-builder-absent-${uniqueRun++}`);
     const result = runSyntheticBuilder(root);
     expect(result.status).toBe(0);
-    expectSyntheticEvidence(root, result.stdout);
+    const report = expectSyntheticEvidence(root, result.stdout);
+    expectAttestationMatchesLstat(root, report);
+    expect(() =>
+      validateRehearsalBuildReport(report, report.runtimeUid, report.runtimeGid),
+    ).not.toThrow();
   });
 
   it("preserves an existing output directory identity while removing stale children", () => {
@@ -1452,7 +1571,8 @@ describe("Issue #149 the rehearsal synthetic builder preserves the output mount 
     expect(after.ino).toBe(before.ino);
     expect(existsSync(path.join(root, "stale-file.txt"))).toBe(false);
     expect(existsSync(path.join(root, "stale-dir"))).toBe(false);
-    expectSyntheticEvidence(root, result.stdout);
+    const report = expectSyntheticEvidence(root, result.stdout);
+    expectAttestationMatchesLstat(root, report);
   });
 
   it("rejects filesystem root, symlink roots, and regular-file roots without a success report", () => {
@@ -1476,6 +1596,93 @@ describe("Issue #149 the rehearsal synthetic builder preserves the output mount 
     expect(fileResult.status).not.toBe(0);
     expect(fileResult.stdout).not.toContain("REHEARSAL_EVIDENCE_BUILT");
     expect(fileResult.stderr).toContain("REHEARSAL_OUTPUT_NOT_DIRECTORY");
+  });
+
+  it("halts validation for malformed, false-owner, false-mode, false-length, and false-digest attestations", () => {
+    const root = path.join(scratch, `rehearsal-builder-validator-${uniqueRun++}`);
+    const result = runSyntheticBuilder(root);
+    expect(result.status).toBe(0);
+    const report = expectSyntheticEvidence(root, result.stdout);
+    const validUid = report.runtimeUid;
+    const validGid = report.runtimeGid;
+
+    expect(() =>
+      validateRehearsalBuildReport({ ...report, sourceAttestation: undefined }, validUid, validGid),
+    ).toThrow("REHEARSAL_SOURCE_ATTESTATION_MISSING");
+    expect(() =>
+      validateRehearsalBuildReport({ ...report, runtimeUid: validUid + 1 }, validUid, validGid),
+    ).toThrow("REHEARSAL_RUNTIME_UID_MISMATCH");
+    expect(() =>
+      validateRehearsalBuildReport(
+        {
+          ...report,
+          sourceAttestation: report.sourceAttestation.map((entry) =>
+            entry.path === "planted-unreadable-0700/raw/primary/item-9001"
+              ? { ...entry, mode: "0755" }
+              : entry,
+          ),
+        },
+        validUid,
+        validGid,
+      ),
+    ).toThrow("REHEARSAL_PLANTED_ITEM_MODE_MISMATCH");
+    expect(() =>
+      validateRehearsalBuildReport(
+        {
+          ...report,
+          sourceAttestation: report.sourceAttestation.map((entry) =>
+            entry.path === "planted-unreadable-0700/raw/primary/item-9001/partial.txt"
+              ? { ...entry, length: 11 }
+              : entry,
+          ),
+        },
+        validUid,
+        validGid,
+      ),
+    ).toThrow("REHEARSAL_PLANTED_PARTIAL_DIGEST_MISMATCH");
+    expect(() =>
+      validateRehearsalBuildReport(
+        {
+          ...report,
+          sourceAttestation: report.sourceAttestation.map((entry) =>
+            entry.path === "planted-unreadable-0700/raw/primary/item-9001/partial.txt"
+              ? { ...entry, sha256: "0".repeat(64) }
+              : entry,
+          ),
+        },
+        validUid,
+        validGid,
+      ),
+    ).toThrow("REHEARSAL_PLANTED_PARTIAL_DIGEST_MISMATCH");
+  });
+
+  it("compares builder attestation to source-pre manifest as a load-bearing check", () => {
+    const root = path.join(scratch, `rehearsal-builder-source-pre-${uniqueRun++}`);
+    const result = runSyntheticBuilder(root);
+    expect(result.status).toBe(0);
+    const report = expectSyntheticEvidence(root, result.stdout);
+    const entries = validateRehearsalBuildReport(report, report.runtimeUid, report.runtimeGid);
+    const manifest = {
+      entries: entries.map((entry) => ({
+        path: entry.path,
+        type: entry.type,
+        mode: entry.mode,
+        uid: entry.uid,
+        gid: entry.gid,
+        length: entry.length,
+        digest: entry.sha256,
+      })),
+    };
+    expect(() => compareAttestationToSourcePreManifest(entries, manifest)).not.toThrow();
+    expect(() =>
+      compareAttestationToSourcePreManifest(entries, {
+        entries: manifest.entries.map((entry) =>
+          entry.path === "planted-unreadable-0700/raw/primary/item-9001/partial.txt"
+            ? { ...entry, digest: "0".repeat(64) }
+            : entry,
+        ),
+      }),
+    ).toThrow("REHEARSAL_SOURCE_PRE_DIGEST_MISMATCH");
   });
 });
 

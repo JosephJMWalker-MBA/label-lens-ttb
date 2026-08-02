@@ -44,8 +44,8 @@ permissions:
   contents: read
 
 env:
-  # harness revision: 15
-  ISSUE_149_HARNESS_REVISION: "15"
+  # harness revision: 16
+  ISSUE_149_HARNESS_REVISION: "16"
   MODE_FILE: artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt
   # linux/amd64 manifest digest for node:20-bookworm-slim, resolved and recorded.
   ISSUE_149_BASE_IMAGE: node@sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c
@@ -775,18 +775,40 @@ jobs:
             -v "$PWD/verifier:/opt/verifier:ro" \
             -v "$PWD/synthetic-container:/output:rw" \
             "${ISSUE_149_BASE_IMAGE}" \
-            sh -c 'umask 077; node /opt/verifier/rehearsal-evidence.mjs /output'
-          test "$(stat -c '%u:%g' synthetic-container/raw/primary/item-9001)" = "${ISSUE_149_RUNTIME_UID}:${ISSUE_149_RUNTIME_GID}"
-          test "$(stat -c '%a' synthetic-container/planted-unreadable-0700/raw/primary/item-9001)" = "700"
+            sh -c 'umask 077; node /opt/verifier/rehearsal-evidence.mjs /output' \
+            | tee rehearsal-build-report.json
+          node verifier/validate-rehearsal-attestation.mjs \
+            --build-report rehearsal-build-report.json \
+            --runtime-uid "${ISSUE_149_RUNTIME_UID}" \
+            --runtime-gid "${ISSUE_149_RUNTIME_GID}"
 
       - name: Prove planted 0700 evidence is unreadable before handoff
         run: |
+          set -euo pipefail
+          HOST_UID="$(id -u)"
+          HOST_GID="$(id -g)"
+          ATTEMPTED="synthetic-container/planted-unreadable-0700/raw/primary/item-9001/partial.txt"
           set +e
-          find synthetic-container/planted-unreadable-0700/raw/primary/item-9001 -maxdepth 1 -type f > planted-before-handoff.txt 2> planted-before-handoff.err
+          cat "${ATTEMPTED}" > planted-before-handoff.stdout 2> planted-before-handoff.stderr
           STATUS=$?
           set -e
           test "${STATUS}" -ne 0 || { echo "PLANTED_0700_WAS_READABLE_BEFORE_HANDOFF" >&2; exit 1; }
-          echo "planted 0700 unreadable before handoff with status ${STATUS}" | tee planted-0700-proof.txt
+          grep -Eiq 'Permission denied|denied|Operation not permitted' planted-before-handoff.stderr || {
+            echo "PLANTED_0700_DENIAL_DIAGNOSTIC_MISSING" >&2; exit 1; }
+          export ATTEMPTED HOST_UID HOST_GID STATUS
+          python3 - <<'PY'
+          import json, os, pathlib
+          pathlib.Path("planted-0700-proof.json").write_text(json.dumps({
+            "attemptedPath": os.environ["ATTEMPTED"],
+            "hostUid": int(os.environ["HOST_UID"]),
+            "hostGid": int(os.environ["HOST_GID"]),
+            "exitStatus": int(os.environ["STATUS"]),
+            "accessDenied": True,
+            "sourceMutated": False,
+            "chmodAttempted": False,
+            "chownAttempted": False,
+          }, indent=2) + "\n")
+          PY
 
       - name: Run the real forensic handoff for rehearsal
         run: |
@@ -815,6 +837,11 @@ jobs:
           test -f rehearsal-forensic-handoff/source-tree.tar
           test -s rehearsal-forensic-handoff/source-tree.tar
           test -f rehearsal-forensic-handoff/handoff-receipt.json
+          node verifier/validate-rehearsal-attestation.mjs \
+            --build-report rehearsal-build-report.json \
+            --source-pre-manifest rehearsal-forensic-handoff/source-pre-manifest.json \
+            --runtime-uid "${ISSUE_149_RUNTIME_UID}" \
+            --runtime-gid "${ISSUE_149_RUNTIME_GID}"
 
       - name: Actor 2 runs with plain Node and no checkout
         run: |
@@ -883,7 +910,8 @@ jobs:
           cp synthetic-snapshot/expected-items.json rehearsal-roundtrip-payload/expected-items.json
           cp -R synthetic-snapshot/planted-unreadable-0700 rehearsal-roundtrip-payload/planted-unreadable-0700
           cp -R rehearsal-forensic-handoff rehearsal-roundtrip-payload/forensic-handoff
-          cp planted-0700-proof.txt rehearsal-roundtrip-payload/planted-0700-proof.txt
+          cp rehearsal-build-report.json rehearsal-roundtrip-payload/rehearsal-build-report.json
+          cp planted-0700-proof.json rehearsal-roundtrip-payload/planted-0700-proof.json
           cp rehearsal-image-identity.json rehearsal-roundtrip-payload/rehearsal-image-identity.json
 
       # actions/upload-artifact v4

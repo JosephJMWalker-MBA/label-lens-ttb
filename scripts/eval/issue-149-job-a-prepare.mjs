@@ -404,6 +404,10 @@ async function buildVerifierBundle() {
     ["scripts/eval/issue-149-verify-raw-evidence.ts", "verify.mjs"],
     ["scripts/eval/issue-149-forensic-handoff.ts", "forensic-handoff.mjs"],
     ["scripts/eval/issue-149-build-rehearsal-evidence.ts", "rehearsal-evidence.mjs"],
+    [
+      "scripts/eval/issue-149-validate-rehearsal-attestation.ts",
+      "validate-rehearsal-attestation.mjs",
+    ],
     ["scripts/eval/issue-149-archive-volume-decision.ts", "archive-volume.mjs"],
     ["scripts/eval/issue-149-archive-adjudication.ts", "archive-adjudication.mjs"],
   ];

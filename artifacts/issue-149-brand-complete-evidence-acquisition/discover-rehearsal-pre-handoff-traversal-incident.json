@@ -1,0 +1,25 @@
+{
+  "artifact": "discover-rehearsal-pre-handoff-traversal-incident",
+  "schemaVersion": "issue-149-discover-rehearsal-incident.v1",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "workflowRun": 30731541000,
+  "failedJob": 91452865271,
+  "head": "ddf7d0ce775cfb53c7090936d83af6aadd6a48b4",
+  "mode": "discover",
+  "builderCompleted": true,
+  "builderStatus": "REHEARSAL_EVIDENCE_BUILT",
+  "failedStep": "Build synthetic evidence inside the pinned container",
+  "failurePoint": "after synthetic evidence construction and before trusted forensic handoff",
+  "failure": "stat: cannot statx 'synthetic-container/raw/primary/item-9001': Permission denied",
+  "classification": "DISCOVER_REHEARSAL_INVALIDATED_PRE_HANDOFF_UNPRIVILEGED_TRAVERSAL",
+  "crossUidHandoffObserved": false,
+  "experimentalResultProduced": false,
+  "governedOcrRun": false,
+  "governedRawEvidenceProduced": false,
+  "rerunCount": 0,
+  "notes": [
+    "The output-root preservation correction was validated because the builder completed inside /output.",
+    "The failed command was an ordinary host stat against the intentionally private source tree before the trusted handoff boundary.",
+    "No planted-0700 proof, forensic handoff, Actor 2, Job C, artifact round-trip or TAR extraction observation was produced."
+  ]
+}

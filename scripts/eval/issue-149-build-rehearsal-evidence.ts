@@ -21,6 +21,7 @@ import {
   rmSync,
   writeFileSync,
 } from "node:fs";
+import { createHash } from "node:crypto";
 import path from "node:path";
 
 import { canonicalize } from "./lib/issue-149-evidence-canonical";
@@ -35,6 +36,14 @@ import { SEMANTIC_LEVELS } from "./lib/issue-149-semantic-comparison";
 
 const OUT = path.resolve(process.argv[2] ?? ".local/issue-149-rehearsal");
 const ITEM_IDS = ["item-9001", "item-9002"];
+const RESTRICTIVE_UMASK = "077";
+const ATTESTED_SOURCE_PATHS = [
+  "raw",
+  "raw/primary",
+  "raw/primary/item-9001",
+  "planted-unreadable-0700/raw/primary/item-9001",
+  "planted-unreadable-0700/raw/primary/item-9001/partial.txt",
+] as const;
 
 const DETERMINISM: DeterminismReport = {
   verdict: "COMPLETE_DETERMINISTIC_EVIDENCE",
@@ -90,9 +99,37 @@ function resetOutputDirectory(outputRoot: string): void {
   }
 }
 
+function sha256File(file: string): string {
+  return createHash("sha256").update(readFileSync(file)).digest("hex");
+}
+
+function attestSourceEntry(relativePath: string): {
+  path: string;
+  type: "directory" | "file";
+  mode: string;
+  uid: number;
+  gid: number;
+  length: number | null;
+  sha256: string | null;
+} {
+  const absolute = path.join(OUT, relativePath);
+  const stat = lstatSync(absolute);
+  const type = stat.isDirectory() ? "directory" : stat.isFile() ? "file" : null;
+  if (type === null) throw new Error(`REHEARSAL_ATTESTATION_UNEXPECTED_TYPE: ${relativePath}`);
+  return {
+    path: relativePath.split(path.sep).join(path.posix.sep),
+    type,
+    mode: (stat.mode & 0o777).toString(8).padStart(4, "0"),
+    uid: stat.uid,
+    gid: stat.gid,
+    length: stat.isFile() ? stat.size : null,
+    sha256: stat.isFile() ? sha256File(absolute) : null,
+  };
+}
+
 resetOutputDirectory(OUT);
 
-const priorUmask = process.umask(0o077);
+const priorUmask = process.umask(Number.parseInt(RESTRICTIVE_UMASK, 8));
 
 // The good tree.
 const raw = path.join(OUT, "raw");
@@ -143,9 +180,13 @@ process.stdout.write(
     {
       status: "REHEARSAL_EVIDENCE_BUILT",
       root: OUT,
+      runtimeUid: process.getuid?.() ?? null,
+      runtimeGid: process.getgid?.() ?? null,
+      restrictiveUmask: RESTRICTIVE_UMASK,
       itemIds: ITEM_IDS,
       runs: ["primary", "repeat"],
       plantedFailures: ["missing-marker", "phantom-manifest-entry", "unreadable-0700"],
+      sourceAttestation: ATTESTED_SOURCE_PATHS.map((entry) => attestSourceEntry(entry)),
       ocrRun: false,
       acquisitionApiInvoked: false,
       governedCorpusUsed: false,

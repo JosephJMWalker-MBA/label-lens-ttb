@@ -94,6 +94,8 @@ describe("Issue #149 Stage 1 contract manifest", () => {
     for (const file of [
       "scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs",
       "scripts/eval/issue-149-stage-1-contract-manifest.mjs",
+      "scripts/eval/issue-149-build-rehearsal-evidence.ts",
+      "scripts/eval/issue-149-validate-rehearsal-attestation.ts",
       "scripts/eval/lib/issue-149-bundle-scan.ts",
       "scripts/eval/lib/issue-149-freeze-core.d.mts",
       "scripts/eval/lib/issue-149-freeze-core.mjs",

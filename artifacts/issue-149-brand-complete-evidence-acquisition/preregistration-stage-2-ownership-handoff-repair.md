@@ -24,6 +24,12 @@ Discover workflow `30729062947`, rehearsal job `91446146384`, failed before synt
 
 No cross-UID observation, forensic handoff, Actor 2, Job C, artifact round-trip, TAR extraction proof, governed OCR, governed raw evidence or experimental result was produced. The workflow was not rerun. The audit record is `discover-rehearsal-output-root-incident.json`.
 
+## Discover Rehearsal Pre-Handoff Traversal Incident
+
+Discover workflow `30731541000`, rehearsal job `91452865271`, validated the output-root correction because the pinned container completed the synthetic build and emitted `REHEARSAL_EVIDENCE_BUILT` for `/output`. The same step then attempted an ordinary host `stat` of `synthetic-container/raw/primary/item-9001` before the trusted handoff boundary and failed with `Permission denied`.
+
+This is classified as `DISCOVER_REHEARSAL_INVALIDATED_PRE_HANDOFF_UNPRIVILEGED_TRAVERSAL`. The source tree was intentionally private under uid/gid `10149` and umask `077`; making it host-readable before handoff would weaken the rehearsal. No cross-UID handoff observation, planted-0700 proof, forensic handoff, Actor 2, Job C, artifact round-trip, TAR extraction proof, governed OCR, governed raw evidence or experimental result was produced. The workflow was not rerun. The audit record is `discover-rehearsal-pre-handoff-traversal-incident.json`.
+
 ## Safety State
 
 `workflow-mode.txt` remains exactly `discover\n`. `execute-authorization.json` remains `EXECUTE_NOT_AUTHORIZED` with `reviewedImplementationSha: null` and `ocrRun: true`. No governed OCR may run under this repair.
