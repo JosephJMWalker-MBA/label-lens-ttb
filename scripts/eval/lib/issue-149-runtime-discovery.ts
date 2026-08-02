@@ -98,6 +98,9 @@ export const ENVIRONMENT_ALLOWLIST = [
   "ISSUE_149_EXPECTED_UID",
   "ISSUE_149_EXPECTED_GID",
   "ISSUE_149_EXPECTED_IMAGE_DIGEST",
+  // Required OCR runtime path bindings passed explicitly by the workflow.
+  "LABEL_LENS_OCR_ASSET_DIR",
+  "LABEL_LENS_OCR_CORE_DIR",
 ] as const;
 
 /** Substrings that would indicate a credential reached the boundary. */

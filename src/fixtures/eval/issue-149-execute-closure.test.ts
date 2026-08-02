@@ -76,6 +76,7 @@ import {
   runtimePackageClosure,
   type RuntimePackageClosure,
 } from "../../../scripts/eval/lib/issue-149-runtime-package-closure.mjs";
+import { ENVIRONMENT_ALLOWLIST } from "../../../scripts/eval/lib/issue-149-runtime-discovery";
 
 /**
  * The committed control state: the mode file and the authorization artifact,
@@ -1734,6 +1735,11 @@ describe("Issue #149 actor 2 verifies raw evidence, and Job C scans for identity
 });
 
 describe("Issue #149 execute halts before OCR when the preflight fails", () => {
+  const outsideEnvironmentAllowlist = (environment: Record<string, string>): string[] =>
+    Object.keys(environment)
+      .sort()
+      .filter((key) => !(ENVIRONMENT_ALLOWLIST as readonly string[]).includes(key));
+
   it("runs the preflight before the first acquisition call, using the shared core", () => {
     const runner = readFileSync(
       path.join(process.cwd(), "scripts/eval/issue-149-brand-evidence-acquisition-run.ts"),
@@ -1771,6 +1777,149 @@ describe("Issue #149 execute halts before OCR when the preflight fails", () => {
       expect(runner).toContain(claim);
     }
     spy.mockRestore();
+  });
+
+  it("allowlists only the two required OCR runtime path bindings", () => {
+    const runtimeEnvironment: Record<string, string> = {
+      HOME: "/home/node",
+      HOSTNAME: "isolated",
+      ISSUE_149_EXPECTED_GID: "10149",
+      ISSUE_149_EXPECTED_IMAGE_DIGEST:
+        "sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c",
+      ISSUE_149_EXPECTED_UID: "10149",
+      ISSUE_149_HARNESS_REVISION: "18",
+      ISSUE_149_MODE: "execute",
+      LABEL_LENS_OCR_ASSET_DIR: "/opt/acquisition/assets",
+      LABEL_LENS_OCR_CORE_DIR: "/opt/acquisition/node_modules/tesseract.js-core",
+      NODE_VERSION: "20.20.2",
+      PATH: "/usr/local/bin:/usr/bin:/bin",
+      PWD: "/",
+      VIPSHOME: "/usr/local/lib",
+      YARN_VERSION: "1.22.22",
+    };
+
+    expect(outsideEnvironmentAllowlist(runtimeEnvironment)).toEqual([]);
+    expect(runtimeEnvironment.LABEL_LENS_OCR_ASSET_DIR).toBe("/opt/acquisition/assets");
+    expect(runtimeEnvironment.LABEL_LENS_OCR_CORE_DIR).toBe(
+      "/opt/acquisition/node_modules/tesseract.js-core",
+    );
+    expect(outsideEnvironmentAllowlist({ ...runtimeEnvironment, LABEL_LENS_EXTRA: "no" })).toEqual([
+      "LABEL_LENS_EXTRA",
+    ]);
+    expect(ENVIRONMENT_ALLOWLIST).not.toContain("LABEL_LENS_EXTRA");
+
+    const withoutAsset = { ...runtimeEnvironment };
+    delete withoutAsset.LABEL_LENS_OCR_ASSET_DIR;
+    expect(outsideEnvironmentAllowlist(withoutAsset)).toEqual([]);
+
+    const withoutCore = { ...runtimeEnvironment };
+    delete withoutCore.LABEL_LENS_OCR_CORE_DIR;
+    expect(outsideEnvironmentAllowlist(withoutCore)).toEqual([]);
+  });
+});
+
+describe("Issue #149 incomplete forensic staging preserves pre-output failures", () => {
+  const stageIncompleteForensicPayload = (
+    root: string,
+  ): {
+    payload: string;
+    status: number;
+    files: string[];
+    presence: { hostReadableOutputPresent: boolean };
+    outcomeClass: string;
+  } => {
+    const forensic = path.join(root, "forensic-redownload");
+    mkdirSync(path.join(forensic, "forensic-handoff"), { recursive: true });
+    writeFileSync(path.join(forensic, "forensic-handoff", "handoff-receipt.json"), "{}\n");
+    writeFileSync(path.join(forensic, "acquisition-report.json"), "");
+    writeFileSync(path.join(forensic, "acquisition-status.json"), '{"exitStatus":1}\n');
+    writeFileSync(
+      path.join(forensic, "acquisition-outcome-report.json"),
+      '{"outcomeClass":"ACQUISITION_RUNNER_FAILURE","scientificResultProduced":false}\n',
+    );
+    writeFileSync(path.join(forensic, "image-identity.json"), "{}\n");
+
+    const script = `
+      set -euo pipefail
+      rm -rf incomplete-evidence-payload
+      mkdir -p incomplete-evidence-payload
+      cp -R forensic-redownload/forensic-handoff incomplete-evidence-payload/forensic-handoff
+      if [ -d forensic-redownload/host-readable-output ]; then
+        cp -R forensic-redownload/host-readable-output incomplete-evidence-payload/host-readable-output
+        HOST_READABLE_OUTPUT_PRESENT=true
+      else
+        HOST_READABLE_OUTPUT_PRESENT=false
+      fi
+      printf '{"hostReadableOutputPresent":%s}\\n' "$HOST_READABLE_OUTPUT_PRESENT" > incomplete-evidence-payload/host-readable-output-presence.json
+      cp forensic-redownload/acquisition-report.json incomplete-evidence-payload/acquisition-report.json
+      cp forensic-redownload/acquisition-status.json incomplete-evidence-payload/acquisition-status.json
+      cp forensic-redownload/acquisition-outcome-report.json incomplete-evidence-payload/acquisition-outcome-report.json
+      cp forensic-redownload/image-identity.json incomplete-evidence-payload/image-identity.json
+      test ! -f raw-verification-report.json || cp raw-verification-report.json incomplete-evidence-payload/raw-verification-report.json
+      test ! -f identity-leak-report.json || cp identity-leak-report.json incomplete-evidence-payload/identity-leak-report.json
+      test -n "$(find incomplete-evidence-payload -type f -print -quit)"
+    `;
+    execFileSync("bash", ["-c", script], { cwd: root, encoding: "utf8" });
+
+    const payload = path.join(root, "incomplete-evidence-payload");
+    const files = readdirSync(payload, { recursive: true }).map(String).sort();
+    return {
+      payload,
+      status: 0,
+      files,
+      presence: JSON.parse(
+        readFileSync(path.join(payload, "host-readable-output-presence.json"), "utf8"),
+      ),
+      outcomeClass: JSON.parse(
+        readFileSync(path.join(payload, "acquisition-outcome-report.json"), "utf8"),
+      ).outcomeClass,
+    };
+  };
+
+  it("stages an uploadable forensic package when host-readable output is absent", () => {
+    const root = freshRoot();
+    const staged = stageIncompleteForensicPayload(root);
+
+    expect(staged.status).toBe(0);
+    expect(staged.presence).toEqual({ hostReadableOutputPresent: false });
+    expect(staged.files).toContain("forensic-handoff/handoff-receipt.json");
+    expect(staged.files).toContain("acquisition-report.json");
+    expect(staged.files).toContain("acquisition-status.json");
+    expect(staged.files).toContain("acquisition-outcome-report.json");
+    expect(staged.files).toContain("image-identity.json");
+    expect(staged.files).not.toContain("host-readable-output");
+    expect(staged.outcomeClass).toBe("ACQUISITION_RUNNER_FAILURE");
+    expect(staged.outcomeClass).not.toBe("SCIENTIFIC_RESULT_COMPLETE");
+  });
+
+  it("copies present and partial host-readable output unchanged", () => {
+    const root = freshRoot();
+    mkdirSync(path.join(root, "forensic-redownload", "host-readable-output", "raw", "primary"), {
+      recursive: true,
+    });
+    writeFileSync(
+      path.join(
+        root,
+        "forensic-redownload",
+        "host-readable-output",
+        "raw",
+        "primary",
+        "partial.json",
+      ),
+      "partial\n",
+    );
+
+    const staged = stageIncompleteForensicPayload(root);
+
+    expect(staged.presence).toEqual({ hostReadableOutputPresent: true });
+    expect(
+      readFileSync(
+        path.join(staged.payload, "host-readable-output", "raw", "primary", "partial.json"),
+        "utf8",
+      ),
+    ).toBe("partial\n");
+    expect(staged.outcomeClass).toBe("ACQUISITION_RUNNER_FAILURE");
+    expect(staged.outcomeClass).not.toBe("SCIENTIFIC_RESULT_COMPLETE");
   });
 });
 
@@ -2291,6 +2440,9 @@ describe("Issue #149 the archive limit governs, and never destroys", () => {
     );
     expect(staging).toContain("steps.raw.outputs.verified != 'true'");
     expect(staging).toContain("steps.identity.outcome != 'success'");
+    expect(staging).toContain("host-readable-output-presence.json");
+    expect(staging).toContain("HOST_READABLE_OUTPUT_PRESENT=false");
+    expect(staging).toContain("HOST_READABLE_OUTPUT_PRESENT=true");
     expect(staging).toContain("raw-verification-report.json");
     expect(staging).toContain("identity-leak-report.json");
   });

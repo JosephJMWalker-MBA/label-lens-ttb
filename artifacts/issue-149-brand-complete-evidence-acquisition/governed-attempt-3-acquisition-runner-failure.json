@@ -1,0 +1,81 @@
+{
+  "artifact": "governed-attempt-3-acquisition-runner-failure",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "issue": 149,
+  "transitionSha": "995123aba13694ac64ff7025131a4c10466e0f9a",
+  "workflowRunId": "30764008812",
+  "runAttempt": 1,
+  "headSha": "995123aba13694ac64ff7025131a4c10466e0f9a",
+  "classification": "ACQUISITION_RUNNER_FAILURE",
+  "scientificResultProduced": false,
+  "brandMetricsProduced": false,
+  "rerunPermitted": false,
+  "failureMechanisms": [
+    {
+      "mechanism": "EXECUTE_BOUNDARY_PREFLIGHT_FAILED",
+      "detail": "The isolated acquisition preflight rejected LABEL_LENS_OCR_ASSET_DIR and LABEL_LENS_OCR_CORE_DIR because they were present but outside the exact environment allowlist."
+    },
+    {
+      "mechanism": "INCOMPLETE_FORENSIC_STAGING_FAILED",
+      "detail": "The incomplete-forensic staging step unconditionally copied forensic-redownload/host-readable-output even though acquisition halted before creating that directory."
+    }
+  ],
+  "zeroCallCounts": {
+    "acquisitionApiCalls": 0,
+    "extractorCalls": 0,
+    "itemWriterCalls": 0,
+    "runWriterCalls": 0
+  },
+  "rawEvidenceState": {
+    "primaryRunCommitMarker": "ABSENT",
+    "repeatRunCommitMarker": "ABSENT",
+    "primaryRawManifest": "ABSENT",
+    "repeatRawManifest": "ABSENT",
+    "primaryItemSet": "ABSENT",
+    "repeatItemSet": "ABSENT",
+    "outputFilesCreated": 0
+  },
+  "preservedArtifacts": {
+    "truthFreePreparation": {
+      "id": "8838370888",
+      "sizeBytes": 74052070
+    },
+    "hostVerifier": {
+      "id": "8838371046",
+      "sizeBytes": 27614
+    },
+    "identityInventory": {
+      "id": "8838371199",
+      "sizeBytes": 1716
+    },
+    "jobAReport": {
+      "id": "8838371341",
+      "sizeBytes": 3228
+    },
+    "unverifiedForensicHandoff": {
+      "id": "8838375255",
+      "sizeBytes": 4899,
+      "artifactDigest": "96341f13fd3eff8b2ed09a5dfe5a8690129a6725a3f372e16193788c118de2db",
+      "forensicArchiveDigest": "7ea9ea0ad189ae74e97911608cd2e6278dfb6b8e646f4923a2820122bbf1fd85",
+      "forensicArchiveLength": 10240,
+      "sourcePreManifestDigest": "816706d2ed0c09f3a9490c0e355385eb2ec4d78a92a06b0a6aa7bbd9e7bcbebd",
+      "sourcePostManifestDigest": "816706d2ed0c09f3a9490c0e355385eb2ec4d78a92a06b0a6aa7bbd9e7bcbebd",
+      "snapshotManifestDigest": "7b31669fb1b1ee3a3eebcb2a9e2ff90b5d61db20378e54e4596807fd98bd34ea"
+    },
+    "forensicHandoffReceipt": {
+      "id": "8838377471",
+      "sizeBytes": 1034,
+      "finalStatus": "VERIFIED"
+    },
+    "incompleteForensicOutput": {
+      "id": "8838379984",
+      "sizeBytes": 3251
+    }
+  },
+  "notes": [
+    "Workflow 30764008812 remains run_attempt 1 and must not be rerun.",
+    "No terminal acquisition record was found and no scientific Brand result exists.",
+    "The failed attempt must not be included in Brand metrics or experimental conclusions.",
+    "No unrestricted environment dump or raw secret material is recorded here."
+  ]
+}

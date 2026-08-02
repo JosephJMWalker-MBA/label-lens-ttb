@@ -581,7 +581,13 @@ jobs:
           rm -rf incomplete-evidence-payload
           mkdir -p incomplete-evidence-payload
           cp -R forensic-redownload/forensic-handoff incomplete-evidence-payload/forensic-handoff
-          cp -R forensic-redownload/host-readable-output incomplete-evidence-payload/host-readable-output
+          if [ -d forensic-redownload/host-readable-output ]; then
+            cp -R forensic-redownload/host-readable-output incomplete-evidence-payload/host-readable-output
+            HOST_READABLE_OUTPUT_PRESENT=true
+          else
+            HOST_READABLE_OUTPUT_PRESENT=false
+          fi
+          printf '{"hostReadableOutputPresent":%s}\n' "${HOST_READABLE_OUTPUT_PRESENT}" > incomplete-evidence-payload/host-readable-output-presence.json
           cp forensic-redownload/acquisition-report.json incomplete-evidence-payload/acquisition-report.json
           cp forensic-redownload/acquisition-status.json incomplete-evidence-payload/acquisition-status.json
           cp forensic-redownload/acquisition-outcome-report.json incomplete-evidence-payload/acquisition-outcome-report.json
