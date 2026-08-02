@@ -1,10 +1,146 @@
 # Label Lens TTB
 
-Label Lens TTB is a **domestic-wine label prescreen and internal-review prototype**. It helps sellers assemble label evidence, runs bounded OCR and deterministic checks, and gives authenticated reviewers a traceable package without pretending to make a government decision.
+Label Lens TTB is a **domestic-wine label prescreen, authenticated internal-review prototype, and governed OCR research environment**.
 
-> **OCR and AI may extract evidence. Deterministic rules evaluate that evidence. Human reviewers remain authoritative.**
+It addresses two different questions that regulatory software must not collapse into one:
 
-**Label Lens does not approve or reject labels, is not a TTB system, and is not legal advice.**
+1. **What evidence did the machine extract?**
+2. **Is the evidence chain strong enough for an institution to rely on that output?**
+
+> **Machine extraction may propose evidence. Deterministic rules evaluate that evidence. Human reviewers remain authoritative. Experimental results count only when the evidence chain is independently verifiable.**
+
+Label Lens does not approve or reject labels, is not a TTB system, and is not legal advice.
+
+## Why this project matters
+
+The central risk in regulatory AI is not only that OCR may be wrong. It is that a plausible machine output may be treated as trustworthy without sufficient provenance, isolation, reproducibility, or failure classification.
+
+Label Lens makes those distinctions structural:
+
+- OCR observations retain geometry, confidence, pass provenance, and technical context.
+- Regulatory checks are versioned and deterministic rather than delegated to a generative model.
+- Submitted evidence is preserved in immutable revisions.
+- Reviewer claims and decisions are append-only records.
+- Research acquisition is separated from governed truth and post-freeze evaluation.
+- An OCR process exiting successfully does not count as a scientific observation unless its evidence can be independently verified.
+
+The project therefore demonstrates more than label extraction. It explores **when machine-produced regulatory evidence deserves institutional trust**.
+
+## What this repository demonstrates
+
+| Capability | Demonstration |
+|---|---|
+| Operational application | Sellers assemble label evidence and submit immutable package revisions for authenticated internal review. |
+| Deterministic decision support | OCR extracts bounded observations; versioned rules evaluate them; the interface produces no aggregate approval verdict. |
+| Evidence governance | Integrity records, provenance, authorization boundaries, append-only decisions, and explicit uncertainty remain inspectable. |
+| OCR research infrastructure | A fixed-corpus, truth-isolated, reproducible acquisition path is being built for repeated Brand OCR experiments. |
+| Fail-closed research behavior | Invalidated runs remain recorded but contribute nothing to metrics, comparisons, or conclusions. |
+
+## Current research status — Issue #149 / PR #219
+
+The research branch is a **draft, unmerged, disarmed experiment** for acquiring complete current-baseline Brand OCR and candidate evidence over a fixed 115-image corpus.
+
+| State | Current value |
+|---|---|
+| Research target | Complete, untruncated Brand OCR passes, reconstructed lines, candidates, rankings, selections, and provenance |
+| Corpus | 115 fixed images: 105 Brand-present and 10 Brand-absent |
+| Production behavior | Unchanged |
+| Workflow mode | `discover` |
+| Execute authorization | `EXECUTE_NOT_AUTHORIZED` |
+| Governed execute attempts | 3 |
+| Valid scientific observations | 0 |
+| Brand metrics produced | No |
+| Current implementation state | Attempt 3’s execute-preflight and incomplete-forensic-staging defects are repaired; another execute requires a new exact-SHA review and explicit authorization |
+
+### What the three attempts established
+
+| Attempt | What happened | Scientific treatment |
+|---|---|---|
+| 1 | Governed OCR returned exit status `0`, but the host verifier could not traverse the container-owned evidence tree and no artifact survived workspace destruction. | Infrastructure-invalidated. No observation exists. |
+| 2 | Forensic preservation and downstream infrastructure worked, but the OCR runtime closure failed: all 230 item attempts returned typed runtime failures rather than OCR evidence. | Runtime failure. No Brand result exists. |
+| 3 | The isolated execute preflight halted before the first acquisition call because two required OCR runtime path variables were outside the exact environment allowlist. A separate incomplete-forensic staging assumption also failed. | Acquisition-runner failure. Zero acquisition, extractor, item-writer, or run-writer calls. |
+
+In all three cases, the system refused to turn incomplete or invalid evidence into a result. That behavior is a core outcome of the work:
+
+> **Successful computation is not the same as a valid experimental observation.**
+
+The attempt records are preserved here:
+
+- [`attempt-1-incident.json`](artifacts/issue-149-brand-complete-evidence-acquisition/attempt-1-incident.json)
+- [`governed-attempt-2-runtime-failure.json`](artifacts/issue-149-brand-complete-evidence-acquisition/governed-attempt-2-runtime-failure.json)
+- [`governed-attempt-3-acquisition-runner-failure.json`](artifacts/issue-149-brand-complete-evidence-acquisition/governed-attempt-3-acquisition-runner-failure.json)
+
+The authoritative controls remain visible:
+
+- [`workflow-mode.txt`](artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt)
+- [`execute-authorization.json`](artifacts/issue-149-brand-complete-evidence-acquisition/execute-authorization.json)
+- [`workflow-plan.md`](artifacts/issue-149-brand-complete-evidence-acquisition/workflow-plan.md)
+- [`limitations.md`](artifacts/issue-149-brand-complete-evidence-acquisition/limitations.md)
+
+### Why the research path exists
+
+Earlier Brand studies committed truncated projections of the evidence produced by the incumbent pipeline. That prevented later zero-OCR analysis from fully re-deriving raw recognition, inspecting every candidate, replaying candidate construction, and measuring both upside and exposure.
+
+The Issue #149 path bypasses the truncated evaluation projection without modifying production behavior. It is designed to acquire the incumbent pipeline’s complete evidence under explicit controls:
+
+```text
+Frozen corpus and configuration
+  → trusted staging with opaque item identities
+  → truth-free preparation artifact
+  → isolated acquisition with no checkout, truth, credentials, or network
+  → authenticated sealed evidence packages
+  → host-side integrity and completeness verification
+  → identity-leak verification
+  → post-freeze truth mapping and evaluation
+```
+
+Acquisition and evaluation are deliberately separated. The OCR runner receives opaque item IDs and staged image bytes, not historical case IDs, governed Brand truth, acceptable values, prior classifications, or the post-freeze identity map.
+
+Detailed contracts and preregistration history are under [`artifacts/issue-149-brand-complete-evidence-acquisition/`](artifacts/issue-149-brand-complete-evidence-acquisition/).
+
+---
+
+## Five-minute evaluation guide
+
+### 1. Understand the governing idea
+
+Read the opening sections above and confirm the separation between:
+
+- machine extraction;
+- deterministic evaluation;
+- human authority;
+- experimental evidence validity.
+
+### 2. Test the operational reviewer workflow
+
+1. Open <https://ttb-test.com/login>.
+2. Sign in as `agent@ttb-test.com` using the shared reviewer-demo password below.
+3. Open the agent queue and select a submitted package.
+4. Inspect the immutable revision, seller-declared facts, machine observations, deterministic findings, and authorized artwork panels.
+5. Claim the package so the active reviewer identity is recorded durably.
+6. Choose **Request changes** or **Internally accept** and record the internal rationale.
+7. Verify that the decision is appended without changing the submitted revision.
+8. Confirm that the interface makes no government-approval claim.
+
+### 3. Inspect the research boundary
+
+1. Read [`purpose-and-boundaries.md`](artifacts/issue-149-brand-complete-evidence-acquisition/purpose-and-boundaries.md).
+2. Inspect the fixed population in [`population-freeze.json`](artifacts/issue-149-brand-complete-evidence-acquisition/population-freeze.json).
+3. Review the isolation contract in [`acquisition-runtime-isolation-contract.json`](artifacts/issue-149-brand-complete-evidence-acquisition/acquisition-runtime-isolation-contract.json).
+4. Review the evidence definition in [`evidence-schema.json`](artifacts/issue-149-brand-complete-evidence-acquisition/evidence-schema.json).
+5. Inspect the three failed-attempt records and verify that none is eligible for scientific conclusions.
+6. Confirm that the branch is disarmed through the two control files linked above.
+
+### 4. Review the implementation boundaries
+
+- Product architecture: [`docs/architecture.md`](docs/architecture.md)
+- Architecture decisions: [`docs/adr/`](docs/adr/)
+- Compliance boundary: [`docs/compliance-readiness-boundary.md`](docs/compliance-readiness-boundary.md)
+- Research workflow: [`.github/workflows/issue-149-brand-evidence-acquisition.yml`](.github/workflows/issue-149-brand-evidence-acquisition.yml)
+- Acquisition runner: [`scripts/eval/issue-149-brand-evidence-acquisition-run.ts`](scripts/eval/issue-149-brand-evidence-acquisition-run.ts)
+- Raw evidence verifier: [`scripts/eval/issue-149-verify-raw-evidence.ts`](scripts/eval/issue-149-verify-raw-evidence.ts)
+
+---
 
 ## Live reviewer demo
 
@@ -21,7 +157,9 @@ Label Lens TTB is a **domestic-wine label prescreen and internal-review prototyp
 | Agent/reviewer | `agent@ttb-test.com` | `/agent` |
 | Seller | `seller@ttb-test.com` | `/seller` |
 
-The three accounts use the shared reviewer-demo password [4TESTING1234]. These are public demonstration accounts. Do not upload confidential, proprietary, personal, or regulated information. Demo activity may be visible to other reviewers and may be reset without notice.
+The three accounts use the shared reviewer-demo password `4TESTING1234`.
+
+These are public demonstration accounts. Do not upload confidential, proprietary, personal, or regulated information. Demo activity may be visible to other reviewers and may be reset without notice.
 
 The public deployment is not a COLA integration, production authorization, government identity system, or hardened government environment.
 
@@ -85,29 +223,17 @@ Finding states include `PASS`, `WARN`, `FAIL`, `NEEDS_REVIEW`, and `not_run`. Th
 
 ---
 
-## Five-minute reviewer paths
-
-### Agent/reviewer
-
-1. Open <https://ttb-test.com/login>.
-2. Sign in as `agent@ttb-test.com` using the shared reviewer-demo password.
-3. Open the agent queue and select a submitted package.
-4. Inspect the immutable revision, seller-declared facts, machine observations, deterministic findings, and authorized artwork panels.
-5. Claim the package so the active reviewer identity is recorded durably.
-6. Choose **Request changes** or **Internally accept** and record the internal rationale.
-7. Verify that the resulting decision is appended to the package history without changing the submitted revision.
-8. Confirm that the interface uses internal-review language and makes no government-approval claim.
+## Additional reviewer paths
 
 ### Seller
 
 1. Open <https://ttb-test.com/login>.
-2. Sign in as `seller@ttb-test.com` using the shared reviewer-demo password.
+2. Sign in as `seller@ttb-test.com`.
 3. Open **Prepare a package**, create or restore a browser-local draft, and add the required panel artwork and seller evidence.
 4. Run the package analysis and submit the current draft for internal review.
 5. Verify that the submitted revision and status receipt are persisted and that direct access to `/agent` is denied.
 6. After a reviewer requests changes, reopen the package and verify that Label Lens creates a corrected draft while preserving the prior immutable revision and decision history.
 7. Save the corrected evidence and resubmit it as a new revision.
-8. Confirm that nothing is described as a TTB submission, approval, rejection, or legal determination.
 
 ### Legacy one-image prescreen
 
@@ -120,12 +246,12 @@ Finding states include `PASS`, `WARN`, `FAIL`, `NEEDS_REVIEW`, and `not_run`. Th
 
 ---
 
-## Architecture
+## Product architecture
 
 ```text
 Browser artwork + declared facts
   → image validation
-  → local OCR extraction
+  → bounded OCR extraction
   → typed observations + geometry + provenance
   → versioned deterministic wine rules
   → governed findings
@@ -147,8 +273,6 @@ Production infrastructure includes:
 - standalone migration-artifact verification;
 - MySQL production-graph verification with `better-sqlite3` absent;
 - runtime health and deployed-commit provenance.
-
-Architecture details are in [`docs/architecture.md`](docs/architecture.md) and [`docs/adr/`](docs/adr/).
 
 ---
 
@@ -231,6 +355,7 @@ See [`docs/compliance-readiness-boundary.md`](docs/compliance-readiness-boundary
 - Transmission to TTB or another government system.
 - Beer, malt-beverage, or distilled-spirits scoring.
 - FedRAMP authorization, ATO, certification, or government endorsement.
+- Treating any failed Issue #149 acquisition attempt as experimental evidence.
 
 ---
 
