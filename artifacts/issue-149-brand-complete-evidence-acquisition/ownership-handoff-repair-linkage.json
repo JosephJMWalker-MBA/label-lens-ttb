@@ -4,6 +4,7 @@
   "stage": 2,
   "preregistration": "artifacts/issue-149-brand-complete-evidence-acquisition/preregistration-stage-2-ownership-handoff-repair.md",
   "incident": "artifacts/issue-149-brand-complete-evidence-acquisition/attempt-1-incident.json",
+  "discoverRehearsalIncident": "artifacts/issue-149-brand-complete-evidence-acquisition/discover-rehearsal-output-root-incident.json",
   "implementationSurfaces": [
     "scripts/eval/lib/issue-149-candidate-adapter.ts",
     "scripts/eval/lib/issue-149-run-evidence-writer.ts",

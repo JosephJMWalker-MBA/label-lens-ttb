@@ -10,7 +10,17 @@
  * The item IDs are synthetic (`item-9001`, `item-9002`) and no staged image,
  * historical identifier or governed truth is involved.
  */
-import { chmodSync, cpSync, mkdirSync, rmSync, writeFileSync, readFileSync } from "node:fs";
+import {
+  chmodSync,
+  cpSync,
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import path from "node:path";
 
 import { canonicalize } from "./lib/issue-149-evidence-canonical";
@@ -23,7 +33,7 @@ import {
 } from "./lib/issue-149-run-evidence-writer";
 import { SEMANTIC_LEVELS } from "./lib/issue-149-semantic-comparison";
 
-const OUT = process.argv[2] ?? ".local/issue-149-rehearsal";
+const OUT = path.resolve(process.argv[2] ?? ".local/issue-149-rehearsal");
 const ITEM_IDS = ["item-9001", "item-9002"];
 
 const DETERMINISM: DeterminismReport = {
@@ -59,8 +69,28 @@ function buildRun(root: string, runId: string): void {
   writeRunEvidence(sealed, { directory: runRoot });
 }
 
-rmSync(OUT, { recursive: true, force: true });
-mkdirSync(OUT, { recursive: true });
+function resetOutputDirectory(outputRoot: string): void {
+  const parsed = path.parse(outputRoot);
+  if (outputRoot === parsed.root) {
+    throw new Error(`REHEARSAL_OUTPUT_ROOT_REFUSED: ${outputRoot}`);
+  }
+  if (!existsSync(outputRoot)) {
+    mkdirSync(outputRoot, { recursive: true });
+    return;
+  }
+  const outputStat = lstatSync(outputRoot);
+  if (outputStat.isSymbolicLink()) {
+    throw new Error(`REHEARSAL_OUTPUT_SYMLINK_REFUSED: ${outputRoot}`);
+  }
+  if (!outputStat.isDirectory()) {
+    throw new Error(`REHEARSAL_OUTPUT_NOT_DIRECTORY: ${outputRoot}`);
+  }
+  for (const child of readdirSync(outputRoot)) {
+    rmSync(path.join(outputRoot, child), { recursive: true, force: true });
+  }
+}
+
+resetOutputDirectory(OUT);
 
 const priorUmask = process.umask(0o077);
 

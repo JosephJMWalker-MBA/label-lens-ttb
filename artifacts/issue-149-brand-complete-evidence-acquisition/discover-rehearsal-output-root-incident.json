@@ -1,0 +1,23 @@
+{
+  "artifact": "discover-rehearsal-output-root-incident",
+  "schemaVersion": "issue-149-discover-rehearsal-incident.v1",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "workflowRun": 30729062947,
+  "failedJob": 91446146384,
+  "head": "077e6b504660fbc64b511904f084bd28c2a9f986",
+  "mode": "discover",
+  "failedStep": "Build synthetic evidence inside the pinned container",
+  "failurePoint": "before synthetic evidence construction",
+  "defect": "The synthetic evidence builder was invoked with the writable bind-mount root /output and attempted rmSync(OUT, { recursive: true, force: true }), deleting the mount point itself.",
+  "error": "EROFS: read-only file system, rmdir '/output'",
+  "crossUidObservation": "NOT_OBSERVED",
+  "governedOcr": false,
+  "governedRawEvidence": false,
+  "experimentalResult": false,
+  "rerun": false,
+  "notes": [
+    "The workflow was not rerun.",
+    "The failure occurred before planted 0700 evidence, forensic handoff, Actor 2, Job C, artifact round-trip or TAR extraction proof.",
+    "This discover-only infrastructure failure contributes no metric, comparison, determinism verdict, item outcome or experimental conclusion."
+  ]
+}

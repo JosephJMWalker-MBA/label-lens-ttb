@@ -1376,6 +1376,109 @@ describe("Issue #149 the forensic handoff closes source and ownership failures",
   });
 });
 
+describe("Issue #149 the rehearsal synthetic builder preserves the output mount root", () => {
+  function runSyntheticBuilder(output: string): { status: number; stdout: string; stderr: string } {
+    const args = [
+      "vite-node",
+      "--config",
+      "vitest.config.ts",
+      "scripts/eval/issue-149-build-rehearsal-evidence.ts",
+      output,
+    ];
+    try {
+      const stdout = execFileSync("npx", args, { cwd: process.cwd(), encoding: "utf8" });
+      return { status: 0, stdout, stderr: "" };
+    } catch (cause) {
+      const failure = cause as {
+        status?: number;
+        stdout?: Buffer | string;
+        stderr?: Buffer | string;
+      };
+      return {
+        status: failure.status ?? -1,
+        stdout: Buffer.isBuffer(failure.stdout)
+          ? failure.stdout.toString("utf8")
+          : (failure.stdout ?? ""),
+        stderr: Buffer.isBuffer(failure.stderr)
+          ? failure.stderr.toString("utf8")
+          : (failure.stderr ?? ""),
+      };
+    }
+  }
+
+  function expectSyntheticEvidence(root: string, stdout: string): void {
+    const report = JSON.parse(stdout) as {
+      status: string;
+      ocrRun: boolean;
+      acquisitionApiInvoked: boolean;
+      governedCorpusUsed: boolean;
+      plantedFailures: string[];
+    };
+    expect(report).toMatchObject({
+      status: "REHEARSAL_EVIDENCE_BUILT",
+      ocrRun: false,
+      acquisitionApiInvoked: false,
+      governedCorpusUsed: false,
+    });
+    expect(report.plantedFailures).toContain("unreadable-0700");
+    expect(existsSync(path.join(root, "raw", "primary", "item-9001"))).toBe(true);
+    expect(existsSync(path.join(root, "raw", "repeat", "item-9002"))).toBe(true);
+    expect(existsSync(path.join(root, "expected-items.json"))).toBe(true);
+    expect(
+      existsSync(
+        path.join(root, "planted-unreadable-0700", "raw", "primary", "item-9001", "partial.txt"),
+      ),
+    ).toBe(true);
+  }
+
+  it("creates an absent output directory and writes only synthetic no-OCR evidence", () => {
+    const root = path.join(scratch, `rehearsal-builder-absent-${uniqueRun++}`);
+    const result = runSyntheticBuilder(root);
+    expect(result.status).toBe(0);
+    expectSyntheticEvidence(root, result.stdout);
+  });
+
+  it("preserves an existing output directory identity while removing stale children", () => {
+    const root = path.join(scratch, `rehearsal-builder-existing-${uniqueRun++}`);
+    mkdirSync(path.join(root, "stale-dir", "nested"), { recursive: true });
+    writeFileSync(path.join(root, "stale-file.txt"), "stale\n");
+    writeFileSync(path.join(root, "stale-dir", "nested", "old.txt"), "old\n");
+    const before = statSync(root);
+
+    const result = runSyntheticBuilder(root);
+    expect(result.status).toBe(0);
+    const after = statSync(root);
+    expect(after.dev).toBe(before.dev);
+    expect(after.ino).toBe(before.ino);
+    expect(existsSync(path.join(root, "stale-file.txt"))).toBe(false);
+    expect(existsSync(path.join(root, "stale-dir"))).toBe(false);
+    expectSyntheticEvidence(root, result.stdout);
+  });
+
+  it("rejects filesystem root, symlink roots, and regular-file roots without a success report", () => {
+    const rootResult = runSyntheticBuilder(path.parse(scratch).root);
+    expect(rootResult.status).not.toBe(0);
+    expect(rootResult.stdout).not.toContain("REHEARSAL_EVIDENCE_BUILT");
+    expect(rootResult.stderr).toContain("REHEARSAL_OUTPUT_ROOT_REFUSED");
+
+    const target = path.join(scratch, `rehearsal-builder-target-${uniqueRun++}`);
+    const link = path.join(scratch, `rehearsal-builder-link-${uniqueRun++}`);
+    mkdirSync(target, { recursive: true });
+    symlinkSync(target, link);
+    const linkResult = runSyntheticBuilder(link);
+    expect(linkResult.status).not.toBe(0);
+    expect(linkResult.stdout).not.toContain("REHEARSAL_EVIDENCE_BUILT");
+    expect(linkResult.stderr).toContain("REHEARSAL_OUTPUT_SYMLINK_REFUSED");
+
+    const file = path.join(scratch, `rehearsal-builder-file-${uniqueRun++}`);
+    writeFileSync(file, "not a directory\n");
+    const fileResult = runSyntheticBuilder(file);
+    expect(fileResult.status).not.toBe(0);
+    expect(fileResult.stdout).not.toContain("REHEARSAL_EVIDENCE_BUILT");
+    expect(fileResult.stderr).toContain("REHEARSAL_OUTPUT_NOT_DIRECTORY");
+  });
+});
+
 describe("Issue #149 the authorization boundary is stated honestly", () => {
   it("says a branch-local gate cannot authenticate its own continued existence", () => {
     const authorization = JSON.parse(
