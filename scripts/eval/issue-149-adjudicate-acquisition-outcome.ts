@@ -10,6 +10,10 @@ export type AcquisitionOutcomeClass =
 export interface AcquisitionOutcomeReport {
   containerExitStatus: number;
   terminalRecordFound: boolean;
+  terminalRecordCount: number;
+  reportMalformed: boolean;
+  malformedLineCount: number;
+  reportCoherent: boolean;
   terminalStatus: string | null;
   verdict: string | null;
   haltCode: string | null;
@@ -23,9 +27,13 @@ function parseJsonlTerminal(file: string): {
   terminal: Record<string, unknown> | null;
   count: number;
   malformed: boolean;
+  malformedLineCount: number;
 } {
-  if (!existsSync(file)) return { terminal: null, count: 0, malformed: true };
+  if (!existsSync(file)) {
+    return { terminal: null, count: 0, malformed: true, malformedLineCount: 1 };
+  }
   let malformed = false;
+  let malformedLineCount = 0;
   const terminals: Record<string, unknown>[] = [];
   for (const line of readFileSync(file, "utf8").split(/\r?\n/)) {
     if (line.trim() === "") continue;
@@ -36,12 +44,14 @@ function parseJsonlTerminal(file: string): {
       }
     } catch {
       malformed = true;
+      malformedLineCount += 1;
     }
   }
   return {
-    terminal: terminals.length === 1 ? terminals[0] : null,
+    terminal: terminals.length >= 1 ? terminals[0] : null,
     count: terminals.length,
     malformed,
+    malformedLineCount,
   };
 }
 
@@ -59,23 +69,28 @@ export function adjudicateAcquisitionOutcome(input: {
       ? terminal.scientificResultProduced
       : null;
   const terminalRecordFound = terminal !== null && parsed.count === 1 && !parsed.malformed;
+  const reportCoherent = terminalRecordFound;
   const successfulVerdict =
     verdict === "COMPLETE_DETERMINISTIC_EVIDENCE" || verdict === "COMPLETE_WITH_NONDETERMINISM";
   const coherenceChecks = {
+    reportCoherent,
     terminalRecordFound,
     successfulScientific:
+      reportCoherent &&
       input.containerExitStatus === 0 &&
       terminalStatus === "ACQUISITION_COMPLETE" &&
       successfulVerdict &&
       scientificResultProduced === true &&
       haltCode === null,
     ocrRuntimeFailure:
+      reportCoherent &&
       input.containerExitStatus !== 0 &&
       terminalStatus === "ACQUISITION_RUNTIME_FAILURE" &&
       verdict === "RUNTIME_FAILURE" &&
       scientificResultProduced === false &&
       haltCode === "OCR_RUNTIME_FAILURE",
     incompleteEvidence:
+      reportCoherent &&
       input.containerExitStatus !== 0 &&
       verdict === "INCOMPLETE_EVIDENCE" &&
       scientificResultProduced === false,
@@ -95,6 +110,10 @@ export function adjudicateAcquisitionOutcome(input: {
   return {
     containerExitStatus: input.containerExitStatus,
     terminalRecordFound,
+    terminalRecordCount: parsed.count,
+    reportMalformed: parsed.malformed,
+    malformedLineCount: parsed.malformedLineCount,
+    reportCoherent,
     terminalStatus,
     verdict,
     haltCode,

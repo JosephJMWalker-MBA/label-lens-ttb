@@ -294,6 +294,12 @@ function acquisitionJsonl(root: string, records: Record<string, unknown>[]): str
   return file;
 }
 
+function acquisitionJsonlLines(root: string, lines: string[]): string {
+  const file = path.join(root, `acquisition-report-${lines.length}-${Date.now()}.jsonl`);
+  writeFileSync(file, `${lines.join("\n")}\n`);
+  return file;
+}
+
 describe("Issue #149 the run-level writer derives, and commits unambiguously", () => {
   it("derives item outcome and aggregate from the committed files, not from the caller", () => {
     const root = freshRoot();
@@ -1033,6 +1039,169 @@ describe("Issue #149 OCR runtime init probe evidence is load-bearing", () => {
         1,
       ).outcomeClass,
     ).toBe("ACQUISITION_RUNNER_FAILURE");
+  });
+
+  it("fails closed when acquisition reports mix valid terminals with malformed lines", () => {
+    const root = freshRoot();
+    const cases = [
+      {
+        name: "deterministic-success",
+        status: 0,
+        terminal: {
+          status: "ACQUISITION_COMPLETE",
+          verdict: "COMPLETE_DETERMINISTIC_EVIDENCE",
+          haltCode: null,
+          scientificResultProduced: true,
+        },
+      },
+      {
+        name: "nondeterministic-success",
+        status: 0,
+        terminal: {
+          status: "ACQUISITION_COMPLETE",
+          verdict: "COMPLETE_WITH_NONDETERMINISM",
+          haltCode: null,
+          scientificResultProduced: true,
+        },
+      },
+      {
+        name: "ocr-runtime-failure",
+        status: 1,
+        terminal: {
+          status: "ACQUISITION_RUNTIME_FAILURE",
+          verdict: "RUNTIME_FAILURE",
+          haltCode: "OCR_RUNTIME_FAILURE",
+          scientificResultProduced: false,
+        },
+      },
+      {
+        name: "incomplete-evidence",
+        status: 1,
+        terminal: {
+          status: "ACQUISITION_COMPLETE",
+          verdict: "INCOMPLETE_EVIDENCE",
+          haltCode: "INCOMPLETE_EVIDENCE",
+          scientificResultProduced: false,
+        },
+      },
+    ];
+
+    for (const entry of cases) {
+      const report = adjudicateAcquisitionOutcome({
+        acquisitionReportPath: acquisitionJsonlLines(root, [
+          JSON.stringify({ item: entry.name, status: "ITEM_OBSERVED" }),
+          JSON.stringify(entry.terminal),
+          "{",
+        ]),
+        containerExitStatus: entry.status,
+      });
+      expect(report).toMatchObject({
+        terminalRecordFound: false,
+        terminalRecordCount: 1,
+        reportMalformed: true,
+        malformedLineCount: 1,
+        reportCoherent: false,
+        terminalStatus: entry.terminal.status,
+        verdict: entry.terminal.verdict,
+        haltCode: entry.terminal.haltCode,
+        scientificResultProduced: entry.terminal.scientificResultProduced,
+        outcomeClass: "ACQUISITION_RUNNER_FAILURE",
+        finalDecision: "ACQUISITION_RUNNER_FAILURE",
+      });
+      expect(report.coherenceChecks).toMatchObject({
+        reportCoherent: false,
+        successfulScientific: false,
+        ocrRuntimeFailure: false,
+        incompleteEvidence: false,
+      });
+    }
+  });
+
+  it("fails closed on duplicate terminal records while allowing valid nonterminal JSON records", () => {
+    const root = freshRoot();
+    const completeTerminal = {
+      status: "ACQUISITION_COMPLETE",
+      verdict: "COMPLETE_DETERMINISTIC_EVIDENCE",
+      haltCode: null,
+      scientificResultProduced: true,
+    };
+    const duplicate = adjudicateAcquisitionOutcome({
+      acquisitionReportPath: acquisitionJsonl(root, [
+        { status: "ITEM_OBSERVED", item: "item-0001" },
+        completeTerminal,
+        {
+          status: "ACQUISITION_RUNTIME_FAILURE",
+          verdict: "RUNTIME_FAILURE",
+          haltCode: "OCR_RUNTIME_FAILURE",
+          scientificResultProduced: false,
+        },
+      ]),
+      containerExitStatus: 0,
+    });
+    expect(duplicate).toMatchObject({
+      terminalRecordFound: false,
+      terminalRecordCount: 2,
+      reportMalformed: false,
+      malformedLineCount: 0,
+      reportCoherent: false,
+      outcomeClass: "ACQUISITION_RUNNER_FAILURE",
+      finalDecision: "ACQUISITION_RUNNER_FAILURE",
+    });
+    expect(duplicate.coherenceChecks.successfulScientific).toBe(false);
+
+    const withNonterminals = adjudicateAcquisitionOutcome({
+      acquisitionReportPath: acquisitionJsonl(root, [
+        { status: "ITEM_OBSERVED", item: "item-0001" },
+        { status: "ITEM_SKIPPED", item: "item-0002" },
+        { item: "item-0003", note: "valid nonterminal JSON without acquisition status" },
+        completeTerminal,
+      ]),
+      containerExitStatus: 0,
+    });
+    expect(withNonterminals).toMatchObject({
+      terminalRecordFound: true,
+      terminalRecordCount: 1,
+      reportMalformed: false,
+      malformedLineCount: 0,
+      reportCoherent: true,
+      outcomeClass: "SCIENTIFIC_RESULT_COMPLETE",
+      finalDecision: "SCIENTIFIC_RESULT_COMPLETE",
+    });
+    expect(withNonterminals.coherenceChecks.successfulScientific).toBe(true);
+  });
+
+  it("keeps malformed acquisition reports off completed evidence routing decisions", () => {
+    const root = freshRoot();
+    const malformedSuccess = adjudicateAcquisitionOutcome({
+      acquisitionReportPath: acquisitionJsonlLines(root, [
+        JSON.stringify({
+          status: "ACQUISITION_COMPLETE",
+          verdict: "COMPLETE_DETERMINISTIC_EVIDENCE",
+          haltCode: null,
+          scientificResultProduced: true,
+        }),
+        "{",
+      ]),
+      containerExitStatus: 0,
+    });
+    expect(malformedSuccess.outcomeClass).toBe("ACQUISITION_RUNNER_FAILURE");
+    expect(malformedSuccess.finalDecision).toBe("ACQUISITION_RUNNER_FAILURE");
+    expect(malformedSuccess.coherenceChecks.successfulScientific).toBe(false);
+    expect(malformedSuccess.outcomeClass).not.toBe("SCIENTIFIC_RESULT_COMPLETE");
+
+    const workflow = readFileSync(
+      path.join(process.cwd(), ".github/workflows/issue-149-brand-evidence-acquisition.yml"),
+      "utf8",
+    );
+    const completeUpload = workflow.slice(
+      workflow.indexOf("- name: Upload the verified raw evidence"),
+      workflow.indexOf("- name: Stage incomplete forensic artifact payload"),
+    );
+    expect(completeUpload).toContain(
+      "needs.job-b-execute.outputs.acquisitionOutcomeClass == 'SCIENTIFIC_RESULT_COMPLETE'",
+    );
+    const terminal = workflow.slice(workflow.indexOf("acquisition-adjudication:"));
+    expect(terminal).toContain("ACQUISITION_RUNNER_FAILURE");
   });
 
   it("requires the workflow artifact to include report, status, and image identity", () => {
