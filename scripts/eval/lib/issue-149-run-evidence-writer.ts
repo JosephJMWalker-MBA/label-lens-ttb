@@ -21,6 +21,7 @@
  */
 import { createHash } from "node:crypto";
 import {
+  chmodSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
@@ -35,6 +36,10 @@ import { basename, join, resolve, sep } from "node:path";
 import { types as nodeTypes } from "node:util";
 
 import { canonicalize, sha256Bytes } from "./issue-149-evidence-canonical";
+
+export const ISSUE_149_EVIDENCE_DIRECTORY_MODE = 0o755;
+export const ISSUE_149_EVIDENCE_FILE_MODE = 0o644;
+export const ISSUE_149_RUN_COMMIT_MARKER_MODE = 0o644;
 
 export class RunEvidenceError extends Error {
   constructor(
@@ -481,18 +486,30 @@ export function writeRunEvidence(
     }
   }
 
-  mkdirSync(resolved, { recursive: true });
+  mkdirSync(resolved, { recursive: true, mode: ISSUE_149_EVIDENCE_DIRECTORY_MODE });
+  chmodSync(resolved, ISSUE_149_EVIDENCE_DIRECTORY_MODE);
   const staging = mkdtempSync(join(resolved, `.staging-run-${sealed.runId}-`));
+  chmodSync(staging, ISSUE_149_EVIDENCE_DIRECTORY_MODE);
   let committed = false;
   try {
     for (const file of sealed.files) {
       const stagedPath = join(staging, file.path);
-      writeFileSync(stagedPath, file.bytes, { flag: "wx" });
+      writeFileSync(stagedPath, file.bytes, {
+        flag: "wx",
+        mode: ISSUE_149_EVIDENCE_FILE_MODE,
+      });
+      chmodSync(stagedPath, ISSUE_149_EVIDENCE_FILE_MODE);
       const readBack = readFileSync(stagedPath);
-      if (readBack.byteLength !== file.byteLength || sha256Bytes(readBack) !== file.sha256) {
+      const written = statSync(stagedPath);
+      if (
+        !written.isFile() ||
+        (written.mode & 0o777) !== ISSUE_149_EVIDENCE_FILE_MODE ||
+        readBack.byteLength !== file.byteLength ||
+        sha256Bytes(readBack) !== file.sha256
+      ) {
         throw new RunEvidenceError(
           "RUN_EVIDENCE_WRITE_UNVERIFIED",
-          `${file.path} did not read back as written`,
+          `${file.path} read back as type=${written.isFile() ? "file" : "other"} mode=${(written.mode & 0o777).toString(8)} bytes=${readBack.byteLength} digest=${sha256Bytes(readBack)}, expected type=file mode=644 bytes=${file.byteLength} digest=${file.sha256}`,
         );
       }
     }
@@ -516,7 +533,27 @@ export function writeRunEvidence(
       })),
       aggregateSha256: sealed.aggregateSha256,
     })}\n`;
-    writeFileSync(join(resolved, RUN_COMMIT_MARKER), Buffer.from(marker, "utf8"), { flag: "wx" });
+    const markerPath = join(resolved, RUN_COMMIT_MARKER);
+    writeFileSync(markerPath, Buffer.from(marker, "utf8"), {
+      flag: "wx",
+      mode: ISSUE_149_RUN_COMMIT_MARKER_MODE,
+    });
+    chmodSync(markerPath, ISSUE_149_RUN_COMMIT_MARKER_MODE);
+    const markerBytes = readFileSync(markerPath);
+    const markerStat = statSync(markerPath);
+    const markerDigest = sha256Bytes(markerBytes);
+    const expectedMarkerDigest = sha256Bytes(marker);
+    if (
+      !markerStat.isFile() ||
+      (markerStat.mode & 0o777) !== ISSUE_149_RUN_COMMIT_MARKER_MODE ||
+      markerBytes.byteLength !== Buffer.byteLength(marker) ||
+      markerDigest !== expectedMarkerDigest
+    ) {
+      throw new RunEvidenceError(
+        "RUN_EVIDENCE_WRITE_UNVERIFIED",
+        `${RUN_COMMIT_MARKER} read back as type=${markerStat.isFile() ? "file" : "other"} mode=${(markerStat.mode & 0o777).toString(8)} bytes=${markerBytes.byteLength} digest=${markerDigest}, expected type=file mode=644 bytes=${Buffer.byteLength(marker)} digest=${expectedMarkerDigest}`,
+      );
+    }
     committed = true;
     rmSync(staging, { recursive: true, force: true });
   } catch (cause) {

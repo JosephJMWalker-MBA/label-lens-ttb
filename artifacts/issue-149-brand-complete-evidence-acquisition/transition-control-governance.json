@@ -2,7 +2,7 @@
   "artifact": "transition-control-governance",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 2,
-  "amendedBy": "preregistration-stage-2-archive-stop-correction.md",
+  "amendedBy": "preregistration-stage-2-ownership-handoff-repair.md",
   "purpose": "Record how the two mutable transition-control files are governed, now that they are excluded from the immutable Stage 1 contract manifest.",
   "excludedFromTheStage1Manifest": [
     "artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt",
@@ -57,5 +57,10 @@
   ],
   "externalApprovalRequirement": "The transition commit is created locally and NOT pushed. Its full SHA, parent SHA, exact two-file list and byte diffs are reported, explicit owner authorization naming that SHA is obtained, and only then is it pushed. A branch-local workflow cannot prove that an unreviewed commit did not replace its own gate; that is why approval happens outside the workflow.",
   "thisArtifactIsItselfInTheStage1Manifest": true,
-  "ocrRun": false
+  "ocrRun": true,
+  "provenanceCorrection": {
+    "previousValue": false,
+    "correctedValue": true,
+    "source": "execute-authorization.json records ocrRun true after governed execute attempt 1"
+  }
 }

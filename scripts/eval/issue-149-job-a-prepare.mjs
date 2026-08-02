@@ -399,9 +399,11 @@ async function buildVerifierBundle() {
   rmSync(VERIFIER, { recursive: true, force: true });
   mkdirSync(VERIFIER, { recursive: true });
 
-  // Three entrypoints, all runnable by plain Node in a job with no checkout.
+  // Host entrypoints, all runnable by plain Node in a job with no checkout.
   const entrypoints = [
     ["scripts/eval/issue-149-verify-raw-evidence.ts", "verify.mjs"],
+    ["scripts/eval/issue-149-forensic-handoff.ts", "forensic-handoff.mjs"],
+    ["scripts/eval/issue-149-build-rehearsal-evidence.ts", "rehearsal-evidence.mjs"],
     ["scripts/eval/issue-149-archive-volume-decision.ts", "archive-volume.mjs"],
     ["scripts/eval/issue-149-archive-adjudication.ts", "archive-adjudication.mjs"],
   ];

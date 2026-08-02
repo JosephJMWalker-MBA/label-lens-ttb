@@ -11,6 +11,7 @@ import {
   readFileSync,
   readdirSync,
   rmSync,
+  statSync,
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -514,6 +515,23 @@ describe("Issue #149 actor 2 verifies raw evidence, and Job C scans for identity
     expect(report.ok).toBe(true);
     expect(report.haltCode).toBeNull();
     expect(report.totalBytes).toBeGreaterThan(0);
+  });
+
+  it("writes run evidence and the commit marker host-readable under a restrictive umask", () => {
+    const previous = process.umask(0o077);
+    try {
+      const root = freshRoot();
+      const runRoot = committedRun(root, "primary", ["item-0001", "item-0002"]);
+      expect(statSync(runRoot).mode & 0o777).toBe(0o755);
+      for (const entry of readdirSync(runRoot).filter((name) => !name.startsWith("item-"))) {
+        const entryPath = path.join(runRoot, entry);
+        const stats = statSync(entryPath);
+        expect(stats.isFile()).toBe(true);
+        expect(stats.mode & 0o777).toBe(0o644);
+      }
+    } finally {
+      process.umask(previous);
+    }
   });
 
   it("fails on a missing item, a missing marker, a tampered file and a staging leftover", () => {

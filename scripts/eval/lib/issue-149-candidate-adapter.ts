@@ -21,12 +21,14 @@
  * acquisition route.
  */
 import {
+  chmodSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
   renameSync,
   rmSync,
+  statSync,
   writeFileSync,
 } from "node:fs";
 import {
@@ -61,6 +63,9 @@ import {
   semanticPassFingerprint,
   sha256Bytes,
 } from "./issue-149-evidence-canonical";
+
+const ISSUE_149_EVIDENCE_DIRECTORY_MODE = 0o755;
+const ISSUE_149_EVIDENCE_FILE_MODE = 0o644;
 
 export class CandidateAdapterError extends Error {
   constructor(
@@ -1385,18 +1390,30 @@ export function writeSealedEvidencePackage(
   // between two unlinks leaves exactly the partial item it claims to prevent —
   // and is not used as the commit rule. Staging cleanup is best-effort tidying
   // of a directory that was never the committed one.
-  mkdirSync(resolvedDirectory, { recursive: true });
+  mkdirSync(resolvedDirectory, { recursive: true, mode: ISSUE_149_EVIDENCE_DIRECTORY_MODE });
+  chmodSync(resolvedDirectory, ISSUE_149_EVIDENCE_DIRECTORY_MODE);
   const staging = mkdtempSync(pathJoin(resolvedDirectory, `.staging-${sealed.itemId}-`));
+  chmodSync(staging, ISSUE_149_EVIDENCE_DIRECTORY_MODE);
   try {
     for (const file of sealed.files) {
       const stagedPath = pathJoin(staging, file.path);
       // `wx` fails if the path exists. It never truncates.
-      writeFileSync(stagedPath, file.bytes, { flag: "wx" });
+      writeFileSync(stagedPath, file.bytes, {
+        flag: "wx",
+        mode: ISSUE_149_EVIDENCE_FILE_MODE,
+      });
+      chmodSync(stagedPath, ISSUE_149_EVIDENCE_FILE_MODE);
       const readBack = readFileSync(stagedPath);
-      if (readBack.byteLength !== file.byteLength || sha256Bytes(readBack) !== file.sha256) {
+      const written = statSync(stagedPath);
+      if (
+        !written.isFile() ||
+        (written.mode & 0o777) !== ISSUE_149_EVIDENCE_FILE_MODE ||
+        readBack.byteLength !== file.byteLength ||
+        sha256Bytes(readBack) !== file.sha256
+      ) {
         throw new CandidateAdapterError(
           "SEALED_EVIDENCE_WRITE_UNVERIFIED",
-          `${file.path} read back as ${readBack.byteLength} bytes / ${sha256Bytes(readBack)}, expected ${file.byteLength} / ${file.sha256}`,
+          `${file.path} read back as type=${written.isFile() ? "file" : "other"} mode=${(written.mode & 0o777).toString(8)} bytes=${readBack.byteLength} digest=${sha256Bytes(readBack)}, expected type=file mode=644 bytes=${file.byteLength} digest=${file.sha256}`,
         );
       }
     }

@@ -13,7 +13,7 @@
  * no source-level mutation rule could catch it. The alternative is deleted:
  * serialization happens inside the boundary and what comes back is bytes.
  */
-import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -601,6 +601,27 @@ describe("Issue #149 sealed item-evidence package", () => {
       const bytes = readFileSync(path.join(report.directory, file.path));
       expect(bytes.byteLength).toBe(file.byteLength);
       expect(sha256Bytes(bytes)).toBe(file.sha256);
+    }
+  });
+
+  it("writes host-readable directories and files under a restrictive umask", async () => {
+    const previous = process.umask(0o077);
+    try {
+      const sealed = await acquire("item-0010");
+      const directory = path.join(scratch, "restrictive-umask");
+      const report = writeSealedEvidencePackage(sealed, { directory });
+
+      expect(statSync(directory).mode & 0o777).toBe(0o755);
+      expect(statSync(report.directory).mode & 0o777).toBe(0o755);
+      for (const file of sealed.files) {
+        const filePath = path.join(report.directory, file.path);
+        expect(statSync(filePath).mode & 0o777).toBe(0o644);
+        const bytes = readFileSync(filePath);
+        expect(bytes.byteLength).toBe(file.byteLength);
+        expect(sha256Bytes(bytes)).toBe(file.sha256);
+      }
+    } finally {
+      process.umask(previous);
     }
   });
 
