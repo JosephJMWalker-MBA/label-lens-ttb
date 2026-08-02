@@ -2,9 +2,9 @@
   "artifact": "execute-authorization",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 2,
-  "status": "EXECUTE_NOT_AUTHORIZED",
-  "reviewedImplementationSha": null,
-  "authorizedBy": null,
+  "status": "EXECUTE_AUTHORIZED",
+  "reviewedImplementationSha": "073de0d2404b055d8d7a6a72268de27b4f72f3b0",
+  "authorizedBy": "JosephJMWalker-MBA — effective ONLY after explicit owner approval naming the exact unpushed transition commit SHA. Recording a name here does not itself authorize anything.",
   "authorizedAt": null,
   "whatAuthorizationMeans": "Execute is authorized against an EXACT reviewed implementation tree, not against a branch. Setting status to EXECUTE_AUTHORIZED without naming the reviewed SHA authorizes nothing, and the gate rejects it.",
   "howTheGateWorks": {
@@ -23,7 +23,7 @@
     ],
     "haltCode": "EXECUTE_TRANSITION_REJECTED"
   },
-  "currentDecision": "DISARMED after the first governed execute attempt at a3a09ac15db615e5a5e9e4cb53874a996ab9f2a3. Governed OCR ran and the acquisition process returned exit status 0, but the host verifier and forensic uploader could not traverse container-owned item directories. No raw or forensic artifact was preserved. The determinism verdict, item outcomes and all experimental results are unknown and must not be used. A corrected reviewed implementation and a new exact-SHA authorization are required before any additional governed OCR.",
+  "currentDecision": "LOCAL, UNPUSHED PROPOSAL prepared against reviewed implementation 073de0d2404b055d8d7a6a72268de27b4f72f3b0 after successful no-OCR discover workflow 30752394332 and ordinary CI 30752396308. The discover validation proved the container-to-host forensic handoff, source preservation, snapshot normalization, Actor 2, Job C, exact-ID round trip and TAR extraction without running governed OCR. The first governed execute attempt remains infrastructure-invalidated and contributes no result. This transition commit is NON-OPERATIVE until the owner explicitly authorizes its exact resulting commit SHA. It has not been pushed, no remote ref has changed, no workflow has run, and authorizedAt remains null because exact-SHA approval has not yet occurred.",
   "ocrRun": true,
   "amendedBy": "preregistration-stage-2-final-execute-closure.md",
   "branchLocalGateLimitation": {
