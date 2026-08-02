@@ -489,9 +489,9 @@ export function writeRunEvidence(
   mkdirSync(resolved, { recursive: true, mode: ISSUE_149_EVIDENCE_DIRECTORY_MODE });
   chmodSync(resolved, ISSUE_149_EVIDENCE_DIRECTORY_MODE);
   const staging = mkdtempSync(join(resolved, `.staging-run-${sealed.runId}-`));
-  chmodSync(staging, ISSUE_149_EVIDENCE_DIRECTORY_MODE);
   let committed = false;
   try {
+    chmodSync(staging, ISSUE_149_EVIDENCE_DIRECTORY_MODE);
     for (const file of sealed.files) {
       const stagedPath = join(staging, file.path);
       writeFileSync(stagedPath, file.bytes, {
@@ -555,9 +555,22 @@ export function writeRunEvidence(
       );
     }
     committed = true;
+    const committedStat = statSync(resolved);
+    if (
+      !committedStat.isDirectory() ||
+      (committedStat.mode & 0o777) !== ISSUE_149_EVIDENCE_DIRECTORY_MODE
+    ) {
+      rmSync(markerPath, { force: true });
+      committed = false;
+      throw new RunEvidenceError(
+        "RUN_EVIDENCE_WRITE_UNVERIFIED",
+        `${sealed.runId} directory read back as type=${committedStat.isDirectory() ? "directory" : "other"} mode=${(committedStat.mode & 0o777).toString(8)}, expected type=directory mode=755`,
+      );
+    }
     rmSync(staging, { recursive: true, force: true });
   } catch (cause) {
     rmSync(staging, { recursive: true, force: true });
+    if (!committed) rmSync(join(resolved, RUN_COMMIT_MARKER), { force: true });
     if (cause instanceof RunEvidenceError) throw cause;
     throw new RunEvidenceError(
       "RUN_EVIDENCE_COMMIT_FAILED",

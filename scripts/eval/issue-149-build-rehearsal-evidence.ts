@@ -10,7 +10,7 @@
  * The item IDs are synthetic (`item-9001`, `item-9002`) and no staged image,
  * historical identifier or governed truth is involved.
  */
-import { cpSync, mkdirSync, rmSync, writeFileSync, readFileSync } from "node:fs";
+import { chmodSync, cpSync, mkdirSync, rmSync, writeFileSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import { canonicalize } from "./lib/issue-149-evidence-canonical";
@@ -62,6 +62,8 @@ function buildRun(root: string, runId: string): void {
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 
+const priorUmask = process.umask(0o077);
+
 // The good tree.
 const raw = path.join(OUT, "raw");
 buildRun(raw, "primary");
@@ -94,6 +96,18 @@ manifest.itemFiles.push({
 });
 writeFileSync(manifestPath, `${JSON.stringify(manifest)}\n`);
 
+// Planted failure 3: a partial unreadable tree created by the pinned container
+// UID/GID under umask 077. The host must be unable to traverse this before the
+// trusted handoff, while the archive still preserves it.
+const unreadableItem = path.join(OUT, "planted-unreadable-0700", "raw", "primary", "item-9001");
+mkdirSync(unreadableItem, { recursive: true, mode: 0o700 });
+writeFileSync(path.join(unreadableItem, "partial.txt"), "preserved\n", {
+  mode: 0o600,
+});
+chmodSync(unreadableItem, 0o700);
+
+process.umask(priorUmask);
+
 process.stdout.write(
   `${JSON.stringify(
     {
@@ -101,7 +115,7 @@ process.stdout.write(
       root: OUT,
       itemIds: ITEM_IDS,
       runs: ["primary", "repeat"],
-      plantedFailures: ["missing-marker", "phantom-manifest-entry"],
+      plantedFailures: ["missing-marker", "phantom-manifest-entry", "unreadable-0700"],
       ocrRun: false,
       acquisitionApiInvoked: false,
       governedCorpusUsed: false,

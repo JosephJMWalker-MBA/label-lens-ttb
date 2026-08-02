@@ -240,15 +240,11 @@ jobs:
     name: Job B — isolated acquisition OCR
     needs: [resolve-mode, execute-transition-gate, job-a-prepare]
     outputs:
-      artifactId: ${{ steps.upload.outputs.artifact-id }}
-      artifactDigest: ${{ steps.upload.outputs.artifact-digest }}
-      artifactUrl: ${{ steps.upload.outputs.artifact-url }}
       forensicArtifactId: ${{ steps.forensicUpload.outputs.artifact-id }}
       forensicArtifactDigest: ${{ steps.forensicUpload.outputs.artifact-digest }}
       forensicArtifactUrl: ${{ steps.forensicUpload.outputs.artifact-url }}
       headSha: ${{ github.sha }}
-      overLimit: ${{ steps.volume.outputs.overLimit }}
-      rawBytes: ${{ steps.volume.outputs.rawBytes }}
+      acquisitionStatus: ${{ steps.acquire.outputs.status }}
     # THE ONLY OCR. Reachable only when the committed mode is exactly `execute`
     # AND the execute-transition gate passed: the gate is a `needs:` dependency,
     # so a rejected transition prevents this job from starting at all.
@@ -321,13 +317,25 @@ jobs:
         if: always()
         run: |
           set -euo pipefail
-          sudo -E node verifier/forensic-handoff.mjs \
+          HOST_UID="$(id -u)"
+          HOST_GID="$(id -g)"
+          NODE_BIN="$(command -v node)"
+          sudo -E "${NODE_BIN}" verifier/forensic-handoff.mjs \
             --source output \
             --out forensic-handoff \
             --snapshot host-readable-output \
+            --host-uid "${HOST_UID}" \
+            --host-gid "${HOST_GID}" \
+            --acquisition-status "${{ steps.acquire.outputs.status }}" \
             | tee forensic-handoff-report.json
+          test -f forensic-handoff/source-pre-manifest.json
+          test -f forensic-handoff/source-post-manifest.json
+          test -f forensic-handoff/source-tree.tar
+          test -f forensic-handoff/snapshot-manifest.json
+          test -f forensic-handoff/handoff-receipt.json
           shasum -a 256 forensic-handoff/source-tree.tar | tee forensic-handoff/source-tree.tar.sha256
-          shasum -a 256 forensic-handoff/source-manifest.json | tee forensic-handoff/source-manifest.sha256
+          shasum -a 256 forensic-handoff/source-pre-manifest.json | tee forensic-handoff/source-pre-manifest.sha256
+          shasum -a 256 forensic-handoff/source-post-manifest.json | tee forensic-handoff/source-post-manifest.sha256
           shasum -a 256 forensic-handoff/snapshot-manifest.json | tee forensic-handoff/snapshot-manifest.sha256
           shasum -a 256 forensic-handoff/handoff-receipt.json | tee forensic-handoff/handoff-receipt.sha256
 
@@ -340,6 +348,7 @@ jobs:
           name: issue-149-unverified-forensic-handoff
           path: |
             forensic-handoff
+            host-readable-output
             forensic-handoff-report.json
             acquisition-report.json
             acquisition-status.json
@@ -347,123 +356,10 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      # ALWAYS. Actor 2 verifies whatever exists and produces a report even when
-      # the evidence is incomplete. Plain node against the verifier bundle: this
-      # job has no checkout, no package.json and no node_modules.
-      - name: Actor 2 — verify the sealed raw evidence
-        id: raw
-        if: always()
-        run: |
-          set +e
-          node verifier/verify.mjs \
-            --raw host-readable-output/raw \
-            --manifest preparation/input/truth-free-input-manifest.json \
-            --report raw-verification-report.json
-          RAW_STATUS=$?
-          set -e
-          echo "status=${RAW_STATUS}" >> "$GITHUB_OUTPUT"
-          echo "verified=$([ "${RAW_STATUS}" -eq 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
-
-      # actions/download-artifact v4 — the minimal inventory, downloaded only
-      # now, AFTER the container has exited.
-      - name: Download the minimal identity inventory
-        if: steps.raw.outputs.verified == 'true'
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with:
-          name: issue-149-identity-inventory
-          path: identity
-
-      # JOB C. Only after Actor 2 verifies a complete committed artifact. A
-      # missing inventory HALTS; it is never treated as an empty one.
-      - name: Job C — historical identity-leak verification
-        id: identity
-        if: steps.raw.outputs.verified == 'true'
-        run: |
-          set -euo pipefail
-          node verifier/verify.mjs \
-            --raw host-readable-output/raw \
-            --manifest preparation/input/truth-free-input-manifest.json \
-            --identity \
-            --identity-inventory identity/identity-inventory.json \
-            --identity-manifest identity/identity-inventory-manifest.json \
-            --report identity-leak-report.json
-
-      # NONFATAL MEASUREMENT. The previous step exited nonzero here, BEFORE the
-      # verified upload — and GitHub applies an implicit `success()` to any step
-      # whose `if:` has no status-check function, so the verified upload was
-      # skipped and the incomplete-forensic upload was skipped too (its own
-      # condition is false when Actor 2 and Job C succeeded). A run producing
-      # 100 MB + 1 byte would have detected the threshold and then discarded the
-      # only copy of the evidence. The stop is a TERMINAL adjudication now.
-      - name: Measure the archive volume (nonfatal)
-        id: volume
-        if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success'
-        run: |
-          set -euo pipefail
-          BYTES=$(du -sb host-readable-output | cut -f1)
-          node verifier/archive-volume.mjs --bytes "${BYTES}" --report archive-volume-report.json
-          OVER=$(python3 -c "import json;print(str(json.load(open('archive-volume-report.json'))['overLimit']).lower())")
-          echo "overLimit=${OVER}" >> "$GITHUB_OUTPUT"
-          echo "rawBytes=${BYTES}" >> "$GITHUB_OUTPUT"
-
-      # Verified evidence uploads ONLY after Actor 2 and Job C both succeed.
-      # actions/upload-artifact v4
-      # Whenever Actor 2 and Job C succeed — REGARDLESS of overLimit. Complete
-      # evidence above the limit is complete evidence; the limit governs what
-      # happens next, not whether the evidence survives.
-      - name: Upload the verified raw evidence
-        id: upload
-        if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: issue-149-raw-evidence
-          path: |
-            host-readable-output
-            acquisition-report.json
-            acquisition-status.json
-            image-identity.json
-            raw-verification-report.json
-            identity-leak-report.json
-            archive-volume-report.json
-          retention-days: 30
-
-      # actions/upload-artifact v4
-      - name: Upload incomplete forensic output
-        if: steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: issue-149-incomplete-forensic-output
-          path: |
-            host-readable-output
-            forensic-handoff
-            acquisition-report.json
-            acquisition-status.json
-            image-identity.json
-            raw-verification-report.json
-            identity-leak-report.json
-          retention-days: 30
-
-      # ADJUDICATION, last — after the reports and the appropriate artifact have
-      # been preserved. COMPLETE_WITH_NONDETERMINISM is a successful outcome.
-      # ACQUISITION adjudication only. The VOLUME decision is deliberately not
-      # made here: it belongs after the artifact and receipt exist.
-      - name: Adjudicate the acquisition
-        if: always()
-        run: |
-          set -euo pipefail
-          echo "acquisition exit: ${{ steps.acquire.outputs.status }}"
-          echo "actor 2 verified: ${{ steps.raw.outputs.verified }}"
-          echo "forensic handoff artifact: ${{ steps.forensicUpload.outputs.artifact-id }}"
-          echo "over archive limit: ${{ steps.volume.outputs.overLimit }} (adjudicated later)"
-          test "${{ steps.raw.outputs.verified }}" = "true" || {
-            echo "ACQUISITION_NOT_VERIFIED" >&2; exit 1; }
-          test "${{ steps.acquire.outputs.status }}" = "0" || {
-            echo "ACQUISITION_RUNNER_REPORTED_FAILURE" >&2; exit 1; }
-
-  verify-uploaded-artifact:
-    name: Verify the uploaded artifact identity and contents
+  verify-forensic-handoff:
+    name: Verify forensic handoff by exact artifact ID
     needs: [resolve-mode, job-b-execute]
-    if: needs.resolve-mode.outputs.mode == 'execute'
+    if: always() && needs.resolve-mode.outputs.mode == 'execute'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -473,58 +369,20 @@ jobs:
       - name: Require the artifact identity outputs
         run: |
           set -euo pipefail
-          test -n "${{ needs.job-b-execute.outputs.artifactId }}" || {
-            echo "ARTIFACT_ID_ABSENT" >&2; exit 1; }
-          test -n "${{ needs.job-b-execute.outputs.artifactDigest }}" || {
-            echo "ARTIFACT_DIGEST_ABSENT" >&2; exit 1; }
           test -n "${{ needs.job-b-execute.outputs.headSha }}" || {
             echo "PRODUCING_HEAD_SHA_ABSENT" >&2; exit 1; }
           test -n "${{ needs.job-b-execute.outputs.forensicArtifactId }}" || {
             echo "FORENSIC_ARTIFACT_ID_ABSENT" >&2; exit 1; }
+          test -n "${{ needs.job-b-execute.outputs.forensicArtifactDigest }}" || {
+            echo "FORENSIC_ARTIFACT_DIGEST_ABSENT" >&2; exit 1; }
 
-      # By exact ARTIFACT ID, not only by name. The download action validates the
-      # digest itself, but a mismatch there is a warning — not a load-bearing
-      # gate — so the comparison below is what actually decides.
-      # By exact ARTIFACT ID. `artifact-ids` puts the workflow into
-      # multiple-artifact mode, which nests each artifact under
-      # `<path>/<artifact-name>/`; `merge-multiple: true` places the contents
-      # directly at `path` instead. The rehearsal caught this: the round-trip
-      # verification found zero items because it was reading the wrong level.
       # actions/download-artifact v4
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with:
-          artifact-ids: ${{ needs.job-b-execute.outputs.artifactId }}
-          merge-multiple: true
-          path: downloaded
-
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      - name: Redownload forensic handoff by exact artifact ID
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           artifact-ids: ${{ needs.job-b-execute.outputs.forensicArtifactId }}
           merge-multiple: true
           path: forensic-redownload
-
-      - name: Compare the artifact metadata digest to the upload output
-        id: metadata
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${{ needs.job-b-execute.outputs.artifactId }}" \
-            > artifact-metadata.json
-          METADATA_DIGEST=$(python3 -c "import json;print(json.load(open('artifact-metadata.json')).get('digest',''))")
-          METADATA_RUN=$(python3 -c "import json;print(json.load(open('artifact-metadata.json')).get('workflow_run',{}).get('id',''))")
-          UPLOAD_DIGEST="${{ needs.job-b-execute.outputs.artifactDigest }}"
-          # Normalize: the upload output and the API may differ only by a
-          # `sha256:` prefix.
-          NORM_META="${METADATA_DIGEST#sha256:}"
-          NORM_UP="${UPLOAD_DIGEST#sha256:}"
-          echo "metadata run ${METADATA_RUN} vs this run ${GITHUB_RUN_ID}"
-          test "${METADATA_RUN}" = "${GITHUB_RUN_ID}" || {
-            echo "ARTIFACT_RUN_ASSOCIATION_MISMATCH" >&2; exit 1; }
-          test -n "${NORM_META}" || { echo "ARTIFACT_METADATA_DIGEST_ABSENT" >&2; exit 1; }
-          test "${NORM_META}" = "${NORM_UP}" || {
-            echo "ARTIFACT_DIGEST_MISMATCH: ${NORM_META} vs ${NORM_UP}" >&2; exit 1; }
-          echo "METADATA_DIGEST=${METADATA_DIGEST}" >> "$GITHUB_ENV"
 
       - name: Verify the forensic handoff artifact metadata and manifests
         env:
@@ -549,13 +407,17 @@ jobs:
           receipt = json.loads((root / "handoff-receipt.json").read_text())
           def digest(p):
             return hashlib.sha256(p.read_bytes()).hexdigest()
+          required = ["source-pre-manifest.json", "source-post-manifest.json", "source-tree.tar", "snapshot-manifest.json", "handoff-receipt.json"]
           checks = {
-            "forensicArchiveDigest": digest(root / "source-tree.tar") == receipt["forensicArchive"]["digest"],
-            "forensicArchiveLength": (root / "source-tree.tar").stat().st_size == receipt["forensicArchive"]["length"],
-            "sourceManifestDigest": digest(root / "source-manifest.json") == receipt["sourceManifestDigest"],
+            "requiredComponents": all((root / name).exists() and receipt["requiredComponentInventory"].get(name) is True for name in required),
+            "forensicArchiveDigest": digest(root / "source-tree.tar") == receipt["archiveDigest"],
+            "forensicArchiveLength": (root / "source-tree.tar").stat().st_size == receipt["archiveLength"],
+            "sourcePreManifestDigest": digest(root / "source-pre-manifest.json") == receipt["sourcePreManifestDigest"],
+            "sourcePostManifestDigest": digest(root / "source-post-manifest.json") == receipt["sourcePostManifestDigest"],
             "snapshotManifestDigest": digest(root / "snapshot-manifest.json") == receipt["snapshotManifestDigest"],
             "contentEquivalent": receipt["contentEquivalent"] is True,
-            "sourceNotMutated": receipt["originalTreeModeNormalization"] == "not_mutated",
+            "sourceNotMutated": receipt["sourceMutated"] is False,
+            "hostReadable": receipt["hostReadable"] is True,
           }
           if not all(checks.values()):
             print(json.dumps(checks, indent=2), file=sys.stderr)
@@ -569,7 +431,34 @@ jobs:
           }, indent=2) + "\n")
           PY
 
-      # actions/download-artifact v4 — the verifier travels here too.
+      # actions/upload-artifact v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: issue-149-forensic-handoff-receipt
+          path: |
+            forensic-artifact-metadata.json
+            forensic-redownload-receipt.json
+          retention-days: 30
+
+  job-b-verify-evidence:
+    name: Actor 2 and Job C on host-readable snapshot
+    needs: [resolve-mode, job-b-execute, verify-forensic-handoff]
+    if: needs.resolve-mode.outputs.mode == 'execute'
+    runs-on: ubuntu-latest
+    outputs:
+      artifactId: ${{ steps.upload.outputs.artifact-id }}
+      artifactDigest: ${{ steps.upload.outputs.artifact-digest }}
+      artifactUrl: ${{ steps.upload.outputs.artifact-url }}
+      overLimit: ${{ steps.volume.outputs.overLimit }}
+      rawBytes: ${{ steps.volume.outputs.rawBytes }}
+      rawVerified: ${{ steps.raw.outputs.verified }}
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: ${{ needs.job-b-execute.outputs.forensicArtifactId }}
+          merge-multiple: true
+          path: forensic-redownload
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: issue-149-host-verifier
@@ -579,34 +468,138 @@ jobs:
           name: issue-149-truth-free-preparation
           path: preparation
 
-      - name: Re-verify the downloaded evidence, content level
+      - name: Actor 2 — verify the sealed raw evidence
+        id: raw
+        if: always()
+        run: |
+          set +e
+          node verifier/verify.mjs \
+            --raw forensic-redownload/host-readable-output/raw \
+            --manifest preparation/input/truth-free-input-manifest.json \
+            --report raw-verification-report.json
+          RAW_STATUS=$?
+          set -e
+          echo "status=${RAW_STATUS}" >> "$GITHUB_OUTPUT"
+          echo "verified=$([ "${RAW_STATUS}" -eq 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+      - name: Download the minimal identity inventory
+        if: steps.raw.outputs.verified == 'true'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: issue-149-identity-inventory
+          path: identity
+
+      - name: Job C — historical identity-leak verification
+        id: identity
+        if: steps.raw.outputs.verified == 'true'
         run: |
           set -euo pipefail
+          node verifier/verify.mjs \
+            --raw forensic-redownload/host-readable-output/raw \
+            --manifest preparation/input/truth-free-input-manifest.json \
+            --identity \
+            --identity-inventory identity/identity-inventory.json \
+            --identity-manifest identity/identity-inventory-manifest.json \
+            --report identity-leak-report.json
+
+      - name: Measure the archive volume (nonfatal)
+        id: volume
+        if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success'
+        run: |
+          set -euo pipefail
+          BYTES=$(du -sb forensic-redownload/host-readable-output | cut -f1)
+          node verifier/archive-volume.mjs --bytes "${BYTES}" --report archive-volume-report.json
+          OVER=$(python3 -c "import json;print(str(json.load(open('archive-volume-report.json'))['overLimit']).lower())")
+          echo "overLimit=${OVER}" >> "$GITHUB_OUTPUT"
+          echo "rawBytes=${BYTES}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload the verified raw evidence
+        id: upload
+        if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: issue-149-raw-evidence
+          path: |
+            forensic-redownload/host-readable-output
+            forensic-redownload/forensic-handoff
+            forensic-redownload/acquisition-report.json
+            forensic-redownload/acquisition-status.json
+            forensic-redownload/image-identity.json
+            raw-verification-report.json
+            identity-leak-report.json
+            archive-volume-report.json
+          retention-days: 30
+
+      - name: Upload incomplete forensic output
+        if: steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: issue-149-incomplete-forensic-output
+          path: |
+            forensic-redownload
+            raw-verification-report.json
+            identity-leak-report.json
+          retention-days: 30
+
+  verify-uploaded-artifact:
+    name: Verify the uploaded complete evidence artifact
+    needs: [resolve-mode, job-b-execute, job-b-verify-evidence]
+    if: needs.resolve-mode.outputs.mode == 'execute' && needs.job-b-verify-evidence.outputs.rawVerified == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Require complete evidence artifact identity
+        run: |
+          set -euo pipefail
+          test -n "${{ needs.job-b-verify-evidence.outputs.artifactId }}" || {
+            echo "ARTIFACT_ID_ABSENT" >&2; exit 1; }
+          test -n "${{ needs.job-b-verify-evidence.outputs.artifactDigest }}" || {
+            echo "ARTIFACT_DIGEST_ABSENT" >&2; exit 1; }
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: ${{ needs.job-b-verify-evidence.outputs.artifactId }}
+          merge-multiple: true
+          path: downloaded
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: issue-149-host-verifier
+          path: verifier
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: issue-149-truth-free-preparation
+          path: preparation
+      - name: Re-verify downloaded complete evidence and receipt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${{ needs.job-b-verify-evidence.outputs.artifactId }}" \
+            > artifact-metadata.json
+          METADATA_DIGEST=$(python3 -c "import json;print(json.load(open('artifact-metadata.json')).get('digest',''))")
+          UPLOAD_DIGEST="${{ needs.job-b-verify-evidence.outputs.artifactDigest }}"
+          test "${METADATA_DIGEST#sha256:}" = "${UPLOAD_DIGEST#sha256:}" || {
+            echo "ARTIFACT_DIGEST_MISMATCH: ${METADATA_DIGEST} vs ${UPLOAD_DIGEST}" >&2; exit 1; }
           node verifier/verify.mjs \
             --raw downloaded/host-readable-output/raw \
             --manifest preparation/input/truth-free-input-manifest.json \
             --report downloaded-verification-report.json
-
-      - name: Create the final verification receipt
-        id: receipt
-        run: |
-          set -euo pipefail
           RAW_DIGEST=$(sha256sum downloaded-verification-report.json | cut -d" " -f1)
-          OVER="${{ needs.job-b-execute.outputs.overLimit }}"
+          OVER="${{ needs.job-b-verify-evidence.outputs.overLimit }}"
           DECISION=$([ "${OVER}" = "true" ] \
             && echo "DURABLE_ARCHIVE_DECISION_REQUIRED" \
             || echo "ELIGIBLE_FOR_OWNER_COMMIT_PROCESS")
           cat > verification-receipt.json <<JSON
           {
-            "artifactId": "${{ needs.job-b-execute.outputs.artifactId }}",
+            "artifactId": "${{ needs.job-b-verify-evidence.outputs.artifactId }}",
             "forensicArtifactId": "${{ needs.job-b-execute.outputs.forensicArtifactId }}",
-            "uploadDigest": "${{ needs.job-b-execute.outputs.artifactDigest }}",
-            "forensicUploadDigest": "${{ needs.job-b-execute.outputs.forensicArtifactDigest }}",
+            "uploadDigest": "${{ needs.job-b-verify-evidence.outputs.artifactDigest }}",
             "metadataDigest": "${METADATA_DIGEST}",
-            "artifactUrl": "${{ needs.job-b-execute.outputs.artifactUrl }}",
+            "artifactUrl": "${{ needs.job-b-verify-evidence.outputs.artifactUrl }}",
             "headSha": "${{ needs.job-b-execute.outputs.headSha }}",
             "rawVerificationReportDigest": "${RAW_DIGEST}",
-            "rawBytes": ${{ needs.job-b-execute.outputs.rawBytes }},
+            "rawBytes": ${{ needs.job-b-verify-evidence.outputs.rawBytes }},
             "archiveLimitBytes": 104857600,
             "overLimit": ${OVER},
             "decision": "${DECISION}",
@@ -615,9 +608,6 @@ jobs:
             "finalStatus": "VERIFIED"
           }
           JSON
-          cat verification-receipt.json
-
-      # actions/upload-artifact v4
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -625,8 +615,6 @@ jobs:
           path: |
             verification-receipt.json
             artifact-metadata.json
-            forensic-artifact-metadata.json
-            forensic-redownload-receipt.json
             downloaded-verification-report.json
           retention-days: 30
 
@@ -638,8 +626,8 @@ jobs:
   # ---------------------------------------------------------------------------
   archive-adjudication:
     name: Terminal archive-volume adjudication
-    needs: [resolve-mode, job-b-execute, verify-uploaded-artifact]
-    if: needs.resolve-mode.outputs.mode == 'execute'
+    needs: [resolve-mode, job-b-verify-evidence, verify-uploaded-artifact]
+    if: needs.resolve-mode.outputs.mode == 'execute' && needs.job-b-verify-evidence.outputs.rawVerified == 'true'
     runs-on: ubuntu-latest
     steps:
       # actions/download-artifact v4
@@ -672,8 +660,27 @@ jobs:
           "
           node verifier/archive-adjudication.mjs \
             --volume-report archive-volume-report.json \
-            --artifact-id "${{ needs.job-b-execute.outputs.artifactId }}" \
+            --artifact-id "${{ needs.job-b-verify-evidence.outputs.artifactId }}" \
             --receipt receipt/verification-receipt.json
+
+  acquisition-adjudication:
+    name: Terminal acquisition adjudication after forensic receipt
+    needs: [resolve-mode, job-b-execute, verify-forensic-handoff, job-b-verify-evidence]
+    if: always() && needs.resolve-mode.outputs.mode == 'execute'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Adjudicate after forensic preservation
+        run: |
+          set -euo pipefail
+          echo "acquisition exit: ${{ needs.job-b-execute.outputs.acquisitionStatus }}"
+          echo "forensic receipt job: ${{ needs.verify-forensic-handoff.result }}"
+          echo "actor 2 verified: ${{ needs.job-b-verify-evidence.outputs.rawVerified }}"
+          test "${{ needs.verify-forensic-handoff.result }}" = "success" || {
+            echo "FORENSIC_HANDOFF_RECEIPT_NOT_VERIFIED" >&2; exit 1; }
+          test "${{ needs.job-b-verify-evidence.outputs.rawVerified }}" = "true" || {
+            echo "ACQUISITION_NOT_VERIFIED" >&2; exit 1; }
+          test "${{ needs.job-b-execute.outputs.acquisitionStatus }}" = "0" || {
+            echo "ACQUISITION_RUNNER_REPORTED_FAILURE" >&2; exit 1; }
 
   # ---------------------------------------------------------------------------
   # The NO-OCR verifier-transport rehearsal.
@@ -726,11 +733,9 @@ jobs:
             -v "$PWD/verifier:/opt/verifier:ro" \
             -v "$PWD/synthetic-container:/output:rw" \
             "${ISSUE_149_BASE_IMAGE}" \
-            node /opt/verifier/rehearsal-evidence.mjs /output
-          sudo mkdir -p synthetic-container/planted-unreadable-0700/raw/primary/item-9001
-          echo preserved > synthetic-container/planted-unreadable-0700/raw/primary/item-9001/partial.txt
-          sudo chown -R "${ISSUE_149_RUNTIME_UID}:${ISSUE_149_RUNTIME_GID}" synthetic-container/planted-unreadable-0700
-          sudo chmod 0700 synthetic-container/planted-unreadable-0700/raw/primary/item-9001
+            sh -c 'umask 077; node /opt/verifier/rehearsal-evidence.mjs /output'
+          test "$(stat -c '%u:%g' synthetic-container/raw/primary/item-9001)" = "${ISSUE_149_RUNTIME_UID}:${ISSUE_149_RUNTIME_GID}"
+          test "$(stat -c '%a' synthetic-container/planted-unreadable-0700/raw/primary/item-9001)" = "700"
 
       - name: Prove planted 0700 evidence is unreadable before handoff
         run: |
@@ -744,11 +749,23 @@ jobs:
       - name: Run the real forensic handoff for rehearsal
         run: |
           set -euo pipefail
-          sudo -E node verifier/forensic-handoff.mjs \
+          HOST_UID="$(id -u)"
+          HOST_GID="$(id -g)"
+          NODE_BIN="$(command -v node)"
+          sudo -E "${NODE_BIN}" verifier/forensic-handoff.mjs \
             --source synthetic-container \
             --out rehearsal-forensic-handoff \
             --snapshot synthetic-snapshot \
+            --host-uid "${HOST_UID}" \
+            --host-gid "${HOST_GID}" \
+            --acquisition-status 0 \
             | tee rehearsal-forensic-handoff-report.json
+          test "$(stat -c '%u:%g' synthetic-snapshot/raw/primary/item-9001)" = "${HOST_UID}:${HOST_GID}"
+          find synthetic-snapshot -type d -exec test "$(stat -c '%a' {})" = "755" \;
+          find synthetic-snapshot -type f -exec test "$(stat -c '%a' {})" = "644" \;
+          test -f rehearsal-forensic-handoff/source-tree.tar
+          test -s rehearsal-forensic-handoff/source-tree.tar
+          test -f rehearsal-forensic-handoff/handoff-receipt.json
 
       - name: Actor 2 runs with plain Node and no checkout
         run: |
@@ -795,7 +812,7 @@ jobs:
       - name: Planted failures must fail
         run: |
           set -euo pipefail
-          for PLANT in missing-marker phantom-manifest-entry; do
+          for PLANT in missing-marker phantom-manifest-entry unreadable-0700; do
             set +e
             node verifier/verify.mjs \
               --raw "synthetic-snapshot/planted-${PLANT}/raw" \
@@ -817,6 +834,7 @@ jobs:
           path: |
             synthetic-snapshot/raw
             synthetic-snapshot/expected-items.json
+            synthetic-snapshot/planted-unreadable-0700
             rehearsal-forensic-handoff
             planted-0700-proof.txt
           if-no-files-found: error

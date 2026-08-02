@@ -1393,8 +1393,9 @@ export function writeSealedEvidencePackage(
   mkdirSync(resolvedDirectory, { recursive: true, mode: ISSUE_149_EVIDENCE_DIRECTORY_MODE });
   chmodSync(resolvedDirectory, ISSUE_149_EVIDENCE_DIRECTORY_MODE);
   const staging = mkdtempSync(pathJoin(resolvedDirectory, `.staging-${sealed.itemId}-`));
-  chmodSync(staging, ISSUE_149_EVIDENCE_DIRECTORY_MODE);
+  let renamed = false;
   try {
+    chmodSync(staging, ISSUE_149_EVIDENCE_DIRECTORY_MODE);
     for (const file of sealed.files) {
       const stagedPath = pathJoin(staging, file.path);
       // `wx` fails if the path exists. It never truncates.
@@ -1419,8 +1420,19 @@ export function writeSealedEvidencePackage(
     }
     // THE COMMIT POINT.
     renameSync(staging, committed);
+    renamed = true;
+    const committedStat = statSync(committed);
+    if (
+      !committedStat.isDirectory() ||
+      (committedStat.mode & 0o777) !== ISSUE_149_EVIDENCE_DIRECTORY_MODE
+    ) {
+      throw new CandidateAdapterError(
+        "SEALED_EVIDENCE_WRITE_UNVERIFIED",
+        `${sealed.itemId} committed path read back as type=${committedStat.isDirectory() ? "directory" : "other"} mode=${(committedStat.mode & 0o777).toString(8)}, expected type=directory mode=755`,
+      );
+    }
   } catch (cause) {
-    rmSync(staging, { recursive: true, force: true });
+    rmSync(renamed ? committed : staging, { recursive: true, force: true });
     if (cause instanceof CandidateAdapterError) throw cause;
     throw new CandidateAdapterError(
       "SEALED_EVIDENCE_COMMIT_FAILED",

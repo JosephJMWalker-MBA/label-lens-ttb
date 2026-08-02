@@ -976,12 +976,48 @@ describe("Issue #149 the archive limit governs, and never destroys", () => {
     );
     expect(uploadCondition).not.toContain("overLimit");
     // The terminal adjudication runs after upload AND the receipt job.
-    expect(workflow).toContain("needs: [resolve-mode, job-b-execute, verify-uploaded-artifact]");
+    expect(workflow).toContain(
+      "needs: [resolve-mode, job-b-verify-evidence, verify-uploaded-artifact]",
+    );
     expect(workflow.indexOf("Upload the verified raw evidence")).toBeLessThan(
       workflow.indexOf("archive-adjudication:"),
     );
     // The archive-volume report travels with the evidence.
     expect(workflow).toContain("archive-volume-report.json");
+  });
+
+  it("cannot skip forensic handoff verification on the acquisition failure path", () => {
+    const workflow = readFileSync(
+      path.join(process.cwd(), ".github/workflows/issue-149-brand-evidence-acquisition.yml"),
+      "utf8",
+    );
+    const forensicJob = workflow.slice(
+      workflow.indexOf("verify-forensic-handoff:"),
+      workflow.indexOf("job-b-verify-evidence:"),
+    );
+    expect(forensicJob).toContain("needs: [resolve-mode, job-b-execute]");
+    expect(forensicJob).toContain("if: always() && needs.resolve-mode.outputs.mode == 'execute'");
+    expect(forensicJob).toContain(
+      "artifact-ids: ${{ needs.job-b-execute.outputs.forensicArtifactId }}",
+    );
+    expect(forensicJob).toContain("handoff-receipt.json");
+    expect(forensicJob).toContain("source-pre-manifest.json");
+    expect(forensicJob).toContain("source-post-manifest.json");
+
+    const actorJob = workflow.slice(
+      workflow.indexOf("job-b-verify-evidence:"),
+      workflow.indexOf("verify-uploaded-artifact:"),
+    );
+    expect(actorJob).toContain("needs: [resolve-mode, job-b-execute, verify-forensic-handoff]");
+    expect(
+      actorJob.indexOf("artifact-ids: ${{ needs.job-b-execute.outputs.forensicArtifactId }}"),
+    ).toBeLessThan(actorJob.indexOf("Actor 2 — verify the sealed raw evidence"));
+
+    const terminal = workflow.slice(workflow.indexOf("acquisition-adjudication:"));
+    expect(terminal).toContain(
+      "needs: [resolve-mode, job-b-execute, verify-forensic-handoff, job-b-verify-evidence]",
+    );
+    expect(terminal).toContain('test "${{ needs.verify-forensic-handoff.result }}" = "success"');
   });
 
   it("keeps the incomplete-forensic route for genuine failures only", () => {
@@ -995,6 +1031,31 @@ describe("Issue #149 the archive limit governs, and never destroys", () => {
       "if: steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success'",
     );
     expect(forensic.slice(0, 400)).not.toContain("overLimit");
+  });
+});
+
+describe("Issue #149 the forensic handoff closes source and ownership failures", () => {
+  it("records pre/post source manifests, rejects hardlinks, and reports closed outcomes", () => {
+    const source = readFileSync(
+      path.join(process.cwd(), "scripts/eval/issue-149-forensic-handoff.ts"),
+      "utf8",
+    );
+    expect(source).toContain("source-pre-manifest.json");
+    expect(source).toContain("source-post-manifest.json");
+    expect(source).toContain("sourcePreManifestDigest");
+    expect(source).toContain("sourcePostManifestDigest");
+    expect(source).toContain("sourceMutated");
+    expect(source).toContain("FORENSIC_HANDOFF_SOURCE_MUTATED");
+    expect(source).toContain("FORENSIC_HANDOFF_HARDLINK_REJECTED");
+    expect(source).toContain("nlink");
+    expect(source).toContain("dev");
+    expect(source).toContain("ino");
+    expect(source).toContain('arg("host-uid")');
+    expect(source).toContain('arg("host-gid")');
+    expect(source).toContain("sourceHistograms");
+    expect(source).toContain("snapshotHistograms");
+    expect(source).toContain("hostReadable");
+    expect(source).toContain("requiredComponentInventory");
   });
 });
 

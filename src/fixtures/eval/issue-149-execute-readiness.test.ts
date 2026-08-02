@@ -33,6 +33,7 @@ import {
   writeSealedEvidencePackage,
 } from "../../../scripts/eval/lib/issue-149-candidate-adapter";
 import {
+  RUN_COMMIT_MARKER,
   RUN_EVIDENCE_FILES,
   RunEvidenceError,
   sealRunEvidence,
@@ -64,7 +65,14 @@ vi.mock("@/pipeline/extractor/extractor", async (importOriginal) => ({
  * implementation, so the test exercises the real transaction, not a simulation
  * of it.
  */
-const injection = vi.hoisted(() => ({ failAfter: null as number | null, count: 0 }));
+const injection = vi.hoisted(() => ({
+  failAfter: null as number | null,
+  chmodFailAfter: null as number | null,
+  statFailAfter: null as number | null,
+  count: 0,
+  chmodCount: 0,
+  statCount: 0,
+}));
 
 vi.mock("node:fs", async (importOriginal) => {
   const actual = await importOriginal<typeof import("node:fs")>();
@@ -76,12 +84,44 @@ vi.mock("node:fs", async (importOriginal) => {
     }
     return actual.writeFileSync(...args);
   }) as typeof actual.writeFileSync;
-  return { ...actual, default: { ...actual, writeFileSync }, writeFileSync };
+  const chmodSync = ((...args: Parameters<typeof actual.chmodSync>) => {
+    const current = injection.chmodCount;
+    injection.chmodCount += 1;
+    if (injection.chmodFailAfter !== null && current === injection.chmodFailAfter) {
+      throw Object.assign(new Error("injected chmod failure"), { code: "EACCES" });
+    }
+    return actual.chmodSync(...args);
+  }) as typeof actual.chmodSync;
+  const statSync = ((...args: Parameters<typeof actual.statSync>) => {
+    const current = injection.statCount;
+    injection.statCount += 1;
+    if (injection.statFailAfter !== null && current === injection.statFailAfter) {
+      throw Object.assign(new Error("injected stat failure"), { code: "EIO" });
+    }
+    return actual.statSync(...args);
+  }) as typeof actual.statSync;
+  return {
+    ...actual,
+    default: { ...actual, writeFileSync, chmodSync, statSync },
+    writeFileSync,
+    chmodSync,
+    statSync,
+  };
 });
 
 function injectWriteFailureAfter(position: number | null): void {
   injection.failAfter = position;
   injection.count = 0;
+}
+
+function injectChmodFailureAfter(position: number | null): void {
+  injection.chmodFailAfter = position;
+  injection.chmodCount = 0;
+}
+
+function injectStatFailureAfter(position: number | null): void {
+  injection.statFailAfter = position;
+  injection.statCount = 0;
 }
 
 const ROOT = "artifacts/issue-149-brand-complete-evidence-acquisition";
@@ -344,6 +384,29 @@ describe("Issue #149 item persistence is transactional and single-use", () => {
     }
   });
 
+  it("leaves NO committed-looking item when chmod or committed-stat verification fails", async () => {
+    for (const [kind, inject] of [
+      ["chmod", injectChmodFailureAfter],
+      ["stat", injectStatFailureAfter],
+    ] as const) {
+      const sealed = await acquire(kind === "chmod" ? "item-0006" : "item-0007");
+      const directory = path.join(scratch, `inject-${kind}`);
+      mkdirSync(directory, { recursive: true });
+
+      inject(2);
+      try {
+        expect(() => writeSealedEvidencePackage(sealed, { directory })).toThrow();
+      } finally {
+        inject(null);
+      }
+
+      expect(existsSync(path.join(directory, kind === "chmod" ? "item-0006" : "item-0007"))).toBe(
+        false,
+      );
+      expect(readdirSync(directory).filter((entry) => entry.startsWith(".staging-"))).toEqual([]);
+    }
+  });
+
   it("commits the complete, readback-verified set when nothing fails", async () => {
     const sealed = await acquire("item-0005");
     const directory = path.join(scratch, "complete");
@@ -443,6 +506,36 @@ describe("Issue #149 run-level evidence has one authenticated writer", () => {
       expect.objectContaining({ code: "RUN_EVIDENCE_ALREADY_CONSUMED" }),
     );
     expect(() => writeRunEvidence(seal(), { directory: rawDirectory })).toThrow(RunEvidenceError);
+  });
+
+  it("removes the run commit marker when chmod or stat verification fails", async () => {
+    for (const [kind, inject] of [
+      ["chmod", injectChmodFailureAfter],
+      ["stat", injectStatFailureAfter],
+    ] as const) {
+      const { rawDirectory, expectedItemIds } = await committedRun(
+        `run-${kind}`,
+        kind === "chmod" ? ["item-0015"] : ["item-0016"],
+      );
+      const sealed = sealRunEvidence({
+        runId: "primary",
+        rawDirectory,
+        expectedItemIds,
+        determinism: DETERMINISM,
+      });
+
+      inject(3);
+      try {
+        expect(() => writeRunEvidence(sealed, { directory: rawDirectory })).toThrow();
+      } finally {
+        inject(null);
+      }
+
+      expect(existsSync(path.join(rawDirectory, RUN_COMMIT_MARKER))).toBe(false);
+      expect(
+        readdirSync(rawDirectory).filter((entry) => entry.startsWith(".staging-run-")),
+      ).toEqual([]);
+    }
   });
 
   it("takes no caller-selected subset and no truth-bearing input", () => {
