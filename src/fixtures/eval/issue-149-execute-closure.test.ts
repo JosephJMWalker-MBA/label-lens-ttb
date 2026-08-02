@@ -997,7 +997,7 @@ describe("Issue #149 OCR runtime init probe evidence is load-bearing", () => {
         {
           status: "ACQUISITION_COMPLETE",
           verdict: "INCOMPLETE_EVIDENCE",
-          haltCode: "INCOMPLETE_EVIDENCE",
+          haltCode: null,
           scientificResultProduced: false,
         },
         1,
@@ -1080,7 +1080,7 @@ describe("Issue #149 OCR runtime init probe evidence is load-bearing", () => {
         terminal: {
           status: "ACQUISITION_COMPLETE",
           verdict: "INCOMPLETE_EVIDENCE",
-          haltCode: "INCOMPLETE_EVIDENCE",
+          haltCode: null,
           scientificResultProduced: false,
         },
       },
@@ -1170,6 +1170,116 @@ describe("Issue #149 OCR runtime init probe evidence is load-bearing", () => {
     expect(withNonterminals.coherenceChecks.successfulScientific).toBe(true);
   });
 
+  it("requires exact terminal schema before accepting successful or incomplete outcomes", () => {
+    const root = freshRoot();
+    const successTerminal = {
+      status: "ACQUISITION_COMPLETE",
+      verdict: "COMPLETE_DETERMINISTIC_EVIDENCE",
+      haltCode: null,
+      scientificResultProduced: true,
+    };
+    const adjudicateTerminal = (terminal: Record<string, unknown>, status: number) =>
+      adjudicateAcquisitionOutcome({
+        acquisitionReportPath: acquisitionJsonl(root, [terminal]),
+        containerExitStatus: status,
+      });
+
+    expect(adjudicateTerminal(successTerminal, 0)).toMatchObject({
+      outcomeClass: "SCIENTIFIC_RESULT_COMPLETE",
+      terminalSchemaValid: true,
+      haltCodePresent: true,
+    });
+
+    const missingHaltCode = {
+      status: successTerminal.status,
+      verdict: successTerminal.verdict,
+      scientificResultProduced: successTerminal.scientificResultProduced,
+    };
+    for (const terminal of [
+      missingHaltCode,
+      { ...successTerminal, haltCode: 123 },
+      { ...successTerminal, haltCode: { code: null } },
+      { ...successTerminal, haltCode: false },
+    ]) {
+      const report = adjudicateTerminal(terminal, 0);
+      expect(report).toMatchObject({
+        outcomeClass: "ACQUISITION_RUNNER_FAILURE",
+        finalDecision: "ACQUISITION_RUNNER_FAILURE",
+        terminalSchemaValid: false,
+      });
+      expect(report.terminalFieldErrors).toContain("haltCode");
+      expect(report.coherenceChecks.successfulScientific).toBe(false);
+    }
+
+    const incompleteTerminal = {
+      status: "ACQUISITION_COMPLETE",
+      verdict: "INCOMPLETE_EVIDENCE",
+      haltCode: null,
+      scientificResultProduced: false,
+    };
+    expect(adjudicateTerminal(incompleteTerminal, 1)).toMatchObject({
+      outcomeClass: "INCOMPLETE_EVIDENCE",
+      terminalSchemaValid: true,
+      haltCodePresent: true,
+    });
+    for (const terminal of [
+      { ...incompleteTerminal, haltCode: "INCOMPLETE_EVIDENCE" },
+      { ...incompleteTerminal, status: "ACQUISITION_RUNTIME_FAILURE" },
+    ]) {
+      const report = adjudicateTerminal(terminal, 1);
+      expect(report).toMatchObject({
+        outcomeClass: "ACQUISITION_RUNNER_FAILURE",
+        finalDecision: "ACQUISITION_RUNNER_FAILURE",
+      });
+      expect(report.coherenceChecks.incompleteEvidence).toBe(false);
+    }
+  });
+
+  it("treats JSONL primitives and arrays as malformed acquisition report content", () => {
+    const root = freshRoot();
+    const successTerminal = {
+      status: "ACQUISITION_COMPLETE",
+      verdict: "COMPLETE_DETERMINISTIC_EVIDENCE",
+      haltCode: null,
+      scientificResultProduced: true,
+    };
+    for (const primitiveLine of ['"warning"', "42", "true", "null", "[]"]) {
+      const report = adjudicateAcquisitionOutcome({
+        acquisitionReportPath: acquisitionJsonlLines(root, [
+          JSON.stringify({ item: "item-0001", status: "ITEM_OBSERVED" }),
+          JSON.stringify(successTerminal),
+          primitiveLine,
+        ]),
+        containerExitStatus: 0,
+      });
+      expect(report).toMatchObject({
+        terminalRecordFound: false,
+        terminalRecordCount: 1,
+        reportMalformed: true,
+        malformedLineCount: 1,
+        reportCoherent: false,
+        outcomeClass: "ACQUISITION_RUNNER_FAILURE",
+        finalDecision: "ACQUISITION_RUNNER_FAILURE",
+      });
+      expect(report.coherenceChecks.successfulScientific).toBe(false);
+    }
+
+    const withNonterminalObjects = adjudicateAcquisitionOutcome({
+      acquisitionReportPath: acquisitionJsonl(root, [
+        { item: "item-0001", status: "ITEM_OBSERVED" },
+        { item: "item-0002", status: "ITEM_REJECTED", details: { reason: "valid object" } },
+        successTerminal,
+      ]),
+      containerExitStatus: 0,
+    });
+    expect(withNonterminalObjects).toMatchObject({
+      reportMalformed: false,
+      malformedLineCount: 0,
+      reportCoherent: true,
+      outcomeClass: "SCIENTIFIC_RESULT_COMPLETE",
+    });
+  });
+
   it("keeps malformed acquisition reports off completed evidence routing decisions", () => {
     const root = freshRoot();
     const malformedSuccess = adjudicateAcquisitionOutcome({
@@ -1188,6 +1298,19 @@ describe("Issue #149 OCR runtime init probe evidence is load-bearing", () => {
     expect(malformedSuccess.finalDecision).toBe("ACQUISITION_RUNNER_FAILURE");
     expect(malformedSuccess.coherenceChecks.successfulScientific).toBe(false);
     expect(malformedSuccess.outcomeClass).not.toBe("SCIENTIFIC_RESULT_COMPLETE");
+
+    const malformedSchema = adjudicateAcquisitionOutcome({
+      acquisitionReportPath: acquisitionJsonl(root, [
+        {
+          status: "ACQUISITION_COMPLETE",
+          verdict: "COMPLETE_DETERMINISTIC_EVIDENCE",
+          scientificResultProduced: true,
+        },
+      ]),
+      containerExitStatus: 0,
+    });
+    expect(malformedSchema.outcomeClass).toBe("ACQUISITION_RUNNER_FAILURE");
+    expect(malformedSchema.coherenceChecks.successfulScientific).toBe(false);
 
     const workflow = readFileSync(
       path.join(process.cwd(), ".github/workflows/issue-149-brand-evidence-acquisition.yml"),

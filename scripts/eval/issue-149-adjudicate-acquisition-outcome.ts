@@ -14,9 +14,12 @@ export interface AcquisitionOutcomeReport {
   reportMalformed: boolean;
   malformedLineCount: number;
   reportCoherent: boolean;
+  terminalSchemaValid: boolean;
+  terminalFieldErrors: string[];
+  haltCodePresent: boolean;
   terminalStatus: string | null;
   verdict: string | null;
-  haltCode: string | null;
+  haltCode: unknown;
   scientificResultProduced: boolean | null;
   outcomeClass: AcquisitionOutcomeClass;
   coherenceChecks: Record<string, boolean>;
@@ -38,7 +41,13 @@ function parseJsonlTerminal(file: string): {
   for (const line of readFileSync(file, "utf8").split(/\r?\n/)) {
     if (line.trim() === "") continue;
     try {
-      const record = JSON.parse(line) as Record<string, unknown>;
+      const parsed = JSON.parse(line) as unknown;
+      if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+        malformed = true;
+        malformedLineCount += 1;
+        continue;
+      }
+      const record = parsed as Record<string, unknown>;
       if (typeof record.status === "string" && record.status.startsWith("ACQUISITION_")) {
         terminals.push(record);
       }
@@ -61,14 +70,39 @@ export function adjudicateAcquisitionOutcome(input: {
 }): AcquisitionOutcomeReport {
   const parsed = parseJsonlTerminal(input.acquisitionReportPath);
   const terminal = parsed.terminal;
+  const terminalHas = (field: string): boolean =>
+    terminal !== null && Object.prototype.hasOwnProperty.call(terminal, field);
+  const terminalFieldErrors: string[] = [];
   const terminalStatus = typeof terminal?.status === "string" ? terminal.status : null;
   const verdict = typeof terminal?.verdict === "string" ? terminal.verdict : null;
-  const haltCode = typeof terminal?.haltCode === "string" ? terminal.haltCode : null;
+  const haltCodePresent = terminalHas("haltCode");
+  const haltCode = haltCodePresent ? terminal?.haltCode : undefined;
   const scientificResultProduced =
     typeof terminal?.scientificResultProduced === "boolean"
       ? terminal.scientificResultProduced
       : null;
   const terminalRecordFound = terminal !== null && parsed.count === 1 && !parsed.malformed;
+  if (terminal !== null) {
+    if (!terminalHas("status") || typeof terminal.status !== "string") {
+      terminalFieldErrors.push("status");
+    }
+    if (!terminalHas("verdict") || typeof terminal.verdict !== "string") {
+      terminalFieldErrors.push("verdict");
+    }
+    if (
+      !terminalHas("scientificResultProduced") ||
+      typeof terminal.scientificResultProduced !== "boolean"
+    ) {
+      terminalFieldErrors.push("scientificResultProduced");
+    }
+    if (
+      !haltCodePresent ||
+      !(terminal.haltCode === null || typeof terminal.haltCode === "string")
+    ) {
+      terminalFieldErrors.push("haltCode");
+    }
+  }
+  const terminalSchemaValid = terminal !== null && terminalFieldErrors.length === 0;
   const reportCoherent = terminalRecordFound;
   const successfulVerdict =
     verdict === "COMPLETE_DETERMINISTIC_EVIDENCE" || verdict === "COMPLETE_WITH_NONDETERMINISM";
@@ -77,6 +111,7 @@ export function adjudicateAcquisitionOutcome(input: {
     terminalRecordFound,
     successfulScientific:
       reportCoherent &&
+      terminalSchemaValid &&
       input.containerExitStatus === 0 &&
       terminalStatus === "ACQUISITION_COMPLETE" &&
       successfulVerdict &&
@@ -84,6 +119,7 @@ export function adjudicateAcquisitionOutcome(input: {
       haltCode === null,
     ocrRuntimeFailure:
       reportCoherent &&
+      terminalSchemaValid &&
       input.containerExitStatus !== 0 &&
       terminalStatus === "ACQUISITION_RUNTIME_FAILURE" &&
       verdict === "RUNTIME_FAILURE" &&
@@ -91,9 +127,12 @@ export function adjudicateAcquisitionOutcome(input: {
       haltCode === "OCR_RUNTIME_FAILURE",
     incompleteEvidence:
       reportCoherent &&
+      terminalSchemaValid &&
       input.containerExitStatus !== 0 &&
+      terminalStatus === "ACQUISITION_COMPLETE" &&
       verdict === "INCOMPLETE_EVIDENCE" &&
-      scientificResultProduced === false,
+      scientificResultProduced === false &&
+      haltCode === null,
   };
   let outcomeClass: AcquisitionOutcomeClass = "ACQUISITION_RUNNER_FAILURE";
   let finalDecision = "ACQUISITION_RUNNER_FAILURE";
@@ -114,6 +153,9 @@ export function adjudicateAcquisitionOutcome(input: {
     reportMalformed: parsed.malformed,
     malformedLineCount: parsed.malformedLineCount,
     reportCoherent,
+    terminalSchemaValid,
+    terminalFieldErrors,
+    haltCodePresent,
     terminalStatus,
     verdict,
     haltCode,
