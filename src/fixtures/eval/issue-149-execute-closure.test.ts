@@ -194,6 +194,9 @@ const passesJson = (totalMs: number, words: string[]): string =>
     },
   ])}\n`;
 
+const failureJson = (code: string, message = "runtime unavailable"): string =>
+  `${canonicalize({ errorCode: code, errorMessage: message })}\n`;
+
 describe("Issue #149 the run-level writer derives, and commits unambiguously", () => {
   it("derives item outcome and aggregate from the committed files, not from the caller", () => {
     const root = freshRoot();
@@ -454,6 +457,57 @@ describe("Issue #149 the semantic comparison covers every level", () => {
       expectedItemIds: ["item-0001"],
     });
     expect(report.verdict).toBe("COMPLETE_DETERMINISTIC_EVIDENCE");
+  });
+
+  it("classifies complete all-OCR_UNAVAILABLE evidence as a runtime failure", () => {
+    const primary = freshRoot();
+    const repeat = freshRoot();
+    for (const itemId of ["item-0001", "item-0002"]) {
+      writeItem(primary, itemId, {
+        outcome: "extraction-failed",
+        overrides: { ".failure.json": failureJson("OCR_UNAVAILABLE", "__dirname is not defined") },
+      });
+      writeItem(repeat, itemId, {
+        outcome: "extraction-failed",
+        overrides: { ".failure.json": failureJson("OCR_UNAVAILABLE", "missing eng.traineddata") },
+      });
+    }
+    const report = compareRuns({
+      primaryDirectory: primary,
+      repeatDirectory: repeat,
+      expectedItemIds: ["item-0001", "item-0002"],
+    });
+    expect(report.verdict).toBe("RUNTIME_FAILURE");
+    expect(report.extractedItemCount).toBe(0);
+    expect(report.failedItemCount).toBe(4);
+    expect(report.runtimeUnavailableItemCount).toBe(4);
+    expect(report.runtimeFailureCodes).toEqual(["OCR_UNAVAILABLE"]);
+    expect(report.scientificResultProduced).toBe(false);
+    expect(isSuccessfulAcquisition(report.verdict)).toBe(false);
+  });
+
+  it("does not turn mixed extraction and item failure into a global runtime failure", () => {
+    const primary = freshRoot();
+    const repeat = freshRoot();
+    writeItem(primary, "item-0001");
+    writeItem(primary, "item-0002", {
+      outcome: "extraction-failed",
+      overrides: { ".failure.json": failureJson("OCR_UNAVAILABLE") },
+    });
+    writeItem(repeat, "item-0001");
+    writeItem(repeat, "item-0002", {
+      outcome: "extraction-failed",
+      overrides: { ".failure.json": failureJson("OCR_UNAVAILABLE") },
+    });
+    const report = compareRuns({
+      primaryDirectory: primary,
+      repeatDirectory: repeat,
+      expectedItemIds: ["item-0001", "item-0002"],
+    });
+    expect(report.verdict).toBe("COMPLETE_DETERMINISTIC_EVIDENCE");
+    expect(report.extractedItemCount).toBe(2);
+    expect(report.failedItemCount).toBe(2);
+    expect(report.scientificResultProduced).toBe(true);
   });
 
   it("treats success-versus-failure as an OUTCOME difference", () => {
@@ -982,12 +1036,12 @@ describe("Issue #149 the archive limit governs, and never destroys", () => {
       ),
     );
     expect(uploadCondition).toContain(
-      "if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success'",
+      "if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success' && needs.job-b-execute.outputs.acquisitionStatus == '0'",
     );
     expect(uploadCondition).not.toContain("overLimit");
     // The terminal adjudication runs after upload AND the receipt job.
     expect(workflow).toContain(
-      "needs: [resolve-mode, job-b-verify-evidence, verify-uploaded-artifact]",
+      "needs: [resolve-mode, job-b-execute, job-b-verify-evidence, verify-uploaded-artifact]",
     );
     expect(workflow.indexOf("Upload the verified raw evidence")).toBeLessThan(
       workflow.indexOf("archive-adjudication:"),
@@ -1187,9 +1241,10 @@ describe("Issue #149 the archive limit governs, and never destroys", () => {
     );
     const forensic = workflow.slice(workflow.indexOf("- name: Upload incomplete forensic output"));
     // Conditioned on Actor 2 / Job C failing — never on the volume.
-    expect(forensic).toContain(
-      "if: always() && (steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success')",
-    );
+    expect(forensic).toContain("if: always() &&");
+    expect(forensic).toContain("needs.job-b-execute.outputs.acquisitionStatus != '0'");
+    expect(forensic).toContain("steps.raw.outputs.verified != 'true'");
+    expect(forensic).toContain("steps.identity.outcome != 'success'");
     expect(forensic).toContain("if-no-files-found: error");
     expect(forensic.slice(0, 400)).not.toContain("overLimit");
 
@@ -1197,11 +1252,57 @@ describe("Issue #149 the archive limit governs, and never destroys", () => {
       workflow.indexOf("- name: Stage incomplete forensic artifact payload"),
       workflow.indexOf("- name: Upload incomplete forensic output"),
     );
-    expect(staging).toContain(
-      "if: always() && (steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success')",
-    );
+    expect(staging).toContain("if: always() &&");
+    expect(staging).toContain("needs.job-b-execute.outputs.acquisitionStatus != '0'");
+    expect(staging).toContain("steps.raw.outputs.verified != 'true'");
+    expect(staging).toContain("steps.identity.outcome != 'success'");
     expect(staging).toContain("raw-verification-report.json");
     expect(staging).toContain("identity-leak-report.json");
+  });
+
+  it("routes runtime-failure evidence away from the completed raw-evidence upload", () => {
+    const workflow = readFileSync(
+      path.join(process.cwd(), ".github/workflows/issue-149-brand-evidence-acquisition.yml"),
+      "utf8",
+    );
+    const completeUpload = workflow.slice(
+      workflow.indexOf("- name: Upload the verified raw evidence"),
+      workflow.indexOf("- name: Stage incomplete forensic artifact payload"),
+    );
+    expect(completeUpload).toContain("needs.job-b-execute.outputs.acquisitionStatus == '0'");
+
+    const terminal = workflow.slice(workflow.indexOf("acquisition-adjudication:"));
+    expect(terminal).toContain("OCR_RUNTIME_FAILURE");
+    expect(terminal.indexOf("ACQUISITION_VERIFICATION_JOB_FAILED")).toBeLessThan(
+      terminal.indexOf("OCR_RUNTIME_FAILURE"),
+    );
+  });
+
+  it("runs a discover-only OCR init probe with no governed input mount and no recognition", () => {
+    const workflow = readFileSync(
+      path.join(process.cwd(), ".github/workflows/issue-149-brand-evidence-acquisition.yml"),
+      "utf8",
+    );
+    const probe = workflow.slice(
+      workflow.indexOf("ocr-runtime-init-probe:"),
+      workflow.indexOf("verifier-transport-rehearsal:"),
+    );
+    expect(probe).toContain("if: needs.resolve-mode.outputs.mode == 'discover'");
+    expect(probe).toContain("--network none");
+    expect(probe).toContain("--read-only");
+    expect(probe).toContain('--user "${ISSUE_149_RUNTIME_UID}:${ISSUE_149_RUNTIME_GID}"');
+    expect(probe).toContain('-v "$PWD/preparation/bundle:/opt/acquisition:ro"');
+    expect(probe).not.toContain(":/input");
+    expect(probe).not.toContain(":/output");
+    expect(probe).toContain("LABEL_LENS_OCR_ASSET_DIR=/opt/acquisition/assets");
+    expect(probe).toContain(
+      "LABEL_LENS_OCR_CORE_DIR=/opt/acquisition/node_modules/tesseract.js-core",
+    );
+    expect(probe).toContain("report.recognizeCalls !== 0");
+    expect(probe).toContain("report.workerInitialized !== true");
+    expect(probe).toContain("report.workerTerminated !== true");
+    expect(probe).toContain("report.governedCorpusMounted !== false");
+    expect(probe).toContain("if: always()");
   });
 
   it("uses a fail-capable executable snapshot mode and ownership audit", () => {

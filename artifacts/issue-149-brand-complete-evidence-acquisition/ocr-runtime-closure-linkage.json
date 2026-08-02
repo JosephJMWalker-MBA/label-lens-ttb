@@ -1,0 +1,28 @@
+{
+  "artifact": "ocr-runtime-closure-linkage",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "issue": 149,
+  "scope": "runtime-closure-only",
+  "sourceIncident": "governed-attempt-2-runtime-failure.json",
+  "preregistrationAmendment": "preregistration-stage-2-ocr-runtime-closure.md",
+  "workflowRunNotRerun": "30753920592",
+  "failedTransitionSha": "92574bcf7e105b63dfc7036a5b625c3f4b87da97",
+  "permittedChanges": [
+    "externalize installed tesseract.js and tesseract.js-core runtime package trees beside the acquisition bundle",
+    "include copied runtime package files in bundle manifests, scans and digest reporting",
+    "supply explicit isolated OCR asset and core paths for the execute container",
+    "add a discover-mode no-recognition OCR runtime initialization probe",
+    "classify all-OCR_UNAVAILABLE complete runs as RUNTIME_FAILURE"
+  ],
+  "prohibitedChanges": [
+    "governed corpus OCR",
+    "acquisition API execution during discovery",
+    "execute transition",
+    "Brand candidate, grouping, filtering, ranking or authority rule changes",
+    "frozen population or truth-free input manifest changes",
+    "PR #195 modification",
+    "workflow 30753920592 rerun"
+  ],
+  "scientificResultProduced": false,
+  "ocrRunInThisRepair": false
+}

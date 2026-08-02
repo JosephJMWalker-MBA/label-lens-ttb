@@ -44,8 +44,8 @@ permissions:
   contents: read
 
 env:
-  # harness revision: 16
-  ISSUE_149_HARNESS_REVISION: "16"
+  # harness revision: 17
+  ISSUE_149_HARNESS_REVISION: "17"
   MODE_FILE: artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt
   # linux/amd64 manifest digest for node:20-bookworm-slim, resolved and recorded.
   ISSUE_149_BASE_IMAGE: node@sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c
@@ -295,6 +295,8 @@ jobs:
             -e ISSUE_149_EXPECTED_UID="${ISSUE_149_RUNTIME_UID}" \
             -e ISSUE_149_EXPECTED_GID="${ISSUE_149_RUNTIME_GID}" \
             -e ISSUE_149_EXPECTED_IMAGE_DIGEST="${ISSUE_149_BASE_IMAGE_DIGEST}" \
+            -e LABEL_LENS_OCR_ASSET_DIR=/opt/acquisition/assets \
+            -e LABEL_LENS_OCR_CORE_DIR=/opt/acquisition/node_modules/tesseract.js-core \
             --tmpfs /tmp:rw,noexec,nosuid,size=512m \
             --tmpfs /run:rw,noexec,nosuid,size=16m \
             -v "$PWD/preparation/bundle:/opt/acquisition:ro" \
@@ -526,7 +528,7 @@ jobs:
           echo "rawBytes=${BYTES}" >> "$GITHUB_OUTPUT"
 
       - name: Stage complete evidence artifact payload
-        if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success'
+        if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success' && needs.job-b-execute.outputs.acquisitionStatus == '0'
         run: |
           set -euo pipefail
           rm -rf complete-evidence-payload
@@ -542,7 +544,7 @@ jobs:
 
       - name: Upload the verified raw evidence
         id: upload
-        if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success'
+        if: steps.raw.outputs.verified == 'true' && steps.identity.outcome == 'success' && needs.job-b-execute.outputs.acquisitionStatus == '0'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: issue-149-raw-evidence
@@ -550,7 +552,7 @@ jobs:
           retention-days: 30
 
       - name: Stage incomplete forensic artifact payload
-        if: always() && (steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success')
+        if: always() && (needs.job-b-execute.outputs.acquisitionStatus != '0' || steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success')
         run: |
           set -euo pipefail
           rm -rf incomplete-evidence-payload
@@ -564,7 +566,7 @@ jobs:
           test ! -f identity-leak-report.json || cp identity-leak-report.json incomplete-evidence-payload/identity-leak-report.json
 
       - name: Upload incomplete forensic output
-        if: always() && (steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success')
+        if: always() && (needs.job-b-execute.outputs.acquisitionStatus != '0' || steps.raw.outputs.verified != 'true' || steps.identity.outcome != 'success')
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: issue-149-incomplete-forensic-output
@@ -575,7 +577,7 @@ jobs:
   verify-uploaded-artifact:
     name: Verify the uploaded complete evidence artifact
     needs: [resolve-mode, job-b-execute, job-b-verify-evidence]
-    if: needs.resolve-mode.outputs.mode == 'execute' && needs.job-b-verify-evidence.outputs.rawVerified == 'true'
+    if: needs.resolve-mode.outputs.mode == 'execute' && needs.job-b-verify-evidence.outputs.rawVerified == 'true' && needs.job-b-execute.outputs.acquisitionStatus == '0'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -665,8 +667,8 @@ jobs:
   # ---------------------------------------------------------------------------
   archive-adjudication:
     name: Terminal archive-volume adjudication
-    needs: [resolve-mode, job-b-verify-evidence, verify-uploaded-artifact]
-    if: needs.resolve-mode.outputs.mode == 'execute' && needs.job-b-verify-evidence.outputs.rawVerified == 'true'
+    needs: [resolve-mode, job-b-execute, job-b-verify-evidence, verify-uploaded-artifact]
+    if: needs.resolve-mode.outputs.mode == 'execute' && needs.job-b-verify-evidence.outputs.rawVerified == 'true' && needs.job-b-execute.outputs.acquisitionStatus == '0'
     runs-on: ubuntu-latest
     steps:
       # actions/download-artifact v4
@@ -719,10 +721,75 @@ jobs:
             echo "FORENSIC_HANDOFF_RECEIPT_NOT_VERIFIED" >&2; exit 1; }
           test "${{ needs.job-b-verify-evidence.result }}" = "success" || {
             echo "ACQUISITION_VERIFICATION_JOB_FAILED" >&2; exit 1; }
+          test "${{ needs.job-b-execute.outputs.acquisitionStatus }}" = "0" || {
+            echo "OCR_RUNTIME_FAILURE" >&2; exit 1; }
           test "${{ needs.job-b-verify-evidence.outputs.rawVerified }}" = "true" || {
             echo "ACQUISITION_NOT_VERIFIED" >&2; exit 1; }
-          test "${{ needs.job-b-execute.outputs.acquisitionStatus }}" = "0" || {
-            echo "ACQUISITION_RUNNER_REPORTED_FAILURE" >&2; exit 1; }
+
+  ocr-runtime-init-probe:
+    name: OCR runtime init probe (no recognition)
+    needs: [resolve-mode, job-a-prepare]
+    if: needs.resolve-mode.outputs.mode == 'discover'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download the truth-free preparation artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: issue-149-truth-free-preparation
+          path: preparation
+
+      - name: Resolve and record the pinned runtime image
+        run: |
+          set -euo pipefail
+          docker pull --platform linux/amd64 "${ISSUE_149_BASE_IMAGE}"
+          docker image inspect "${ISSUE_149_BASE_IMAGE}" \
+            --format '{"id":"{{.Id}}","repoDigests":{{json .RepoDigests}},"os":"{{.Os}}","arch":"{{.Architecture}}"}' \
+            | tee ocr-runtime-init-image-identity.json
+          grep -q "${ISSUE_149_BASE_IMAGE_DIGEST#sha256:}" ocr-runtime-init-image-identity.json \
+            || { echo "RUNTIME_IMAGE_DIGEST_MISMATCH" >&2; exit 1; }
+
+      - name: Initialize OCR runtime without recognition
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            --platform linux/amd64 \
+            --network none \
+            --read-only \
+            --cap-drop ALL \
+            --security-opt no-new-privileges \
+            --user "${ISSUE_149_RUNTIME_UID}:${ISSUE_149_RUNTIME_GID}" \
+            --env-file /dev/null \
+            -e LABEL_LENS_OCR_ASSET_DIR=/opt/acquisition/assets \
+            -e LABEL_LENS_OCR_CORE_DIR=/opt/acquisition/node_modules/tesseract.js-core \
+            --tmpfs /tmp:rw,noexec,nosuid,size=512m \
+            --tmpfs /run:rw,noexec,nosuid,size=16m \
+            -v "$PWD/preparation/bundle:/opt/acquisition:ro" \
+            "${ISSUE_149_BASE_IMAGE}" \
+            node /opt/acquisition/ocr-runtime-init-probe.mjs | tee ocr-runtime-init-probe-report.json
+          node -e '
+            const fs = require("node:fs");
+            const report = JSON.parse(fs.readFileSync("ocr-runtime-init-probe-report.json", "utf8"));
+            if (report.status !== "OK") throw new Error("OCR_RUNTIME_INIT_PROBE_NOT_OK");
+            if (report.workerInitialized !== true) throw new Error("OCR_WORKER_NOT_INITIALIZED");
+            if (report.workerTerminated !== true) throw new Error("OCR_WORKER_NOT_TERMINATED");
+            if (report.recognizeCalls !== 0) throw new Error("OCR_RECOGNITION_OCCURRED");
+            if (report.governedCorpusMounted !== false) throw new Error("GOVERNED_CORPUS_MOUNTED");
+            if (report.governedCorpusUsed !== false) throw new Error("GOVERNED_CORPUS_USED");
+            if (report.acquisitionApiInvoked !== false) throw new Error("ACQUISITION_API_INVOKED");
+            if (report.languageAssetPath !== "/opt/acquisition/assets") throw new Error("OCR_ASSET_PATH_MISMATCH");
+            if (report.corePath !== "/opt/acquisition/node_modules/tesseract.js-core") throw new Error("OCR_CORE_PATH_MISMATCH");
+          '
+
+      - name: Upload OCR runtime init probe report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: issue-149-ocr-runtime-init-probe
+          path: |
+            ocr-runtime-init-probe-report.json
+            ocr-runtime-init-image-identity.json
+          if-no-files-found: error
+          retention-days: 30
 
   # ---------------------------------------------------------------------------
   # The NO-OCR verifier-transport rehearsal.

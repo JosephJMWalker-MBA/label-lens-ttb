@@ -153,6 +153,12 @@ async function execute(): Promise<number> {
     timingOnlyDifferingItems: comparison.timingOnlyDifferingItems,
     differencesByLevel: comparison.differencesByLevel,
     comparedLevels: comparison.comparedLevels,
+    extractedItemCount: comparison.extractedItemCount,
+    failedItemCount: comparison.failedItemCount,
+    runtimeUnavailableItemCount: comparison.runtimeUnavailableItemCount,
+    runtimeFailureCodes: comparison.runtimeFailureCodes,
+    runtimeFailureDetail: comparison.runtimeFailureDetail,
+    scientificResultProduced: comparison.scientificResultProduced,
   };
 
   // Governed run-level evidence, through the ONE authenticated run writer, which
@@ -165,7 +171,15 @@ async function execute(): Promise<number> {
   }
 
   process.stdout.write(
-    `${JSON.stringify({ status: "ACQUISITION_COMPLETE", ...determinism, comparisonDigest: comparisonDigest(comparison) })}\n`,
+    `${JSON.stringify({
+      status:
+        comparison.verdict === "RUNTIME_FAILURE"
+          ? "ACQUISITION_RUNTIME_FAILURE"
+          : "ACQUISITION_COMPLETE",
+      haltCode: comparison.verdict === "RUNTIME_FAILURE" ? "OCR_RUNTIME_FAILURE" : null,
+      ...determinism,
+      comparisonDigest: comparisonDigest(comparison),
+    })}\n`,
   );
 
   // A COMPLETE nondeterministic result is a SUCCESSFUL acquisition outcome. It

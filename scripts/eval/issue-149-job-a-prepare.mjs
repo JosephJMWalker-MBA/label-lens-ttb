@@ -61,7 +61,7 @@ const PARSER_EXCEPTION = {
 const PROHIBITED_CLOSURE_PREFIXES = ["src/fixtures/", "tests/", "artifacts/", "src/domain/rules/"];
 
 /**
- * Native modules, which CANNOT be bundled and must ship beside the bundle.
+ * Runtime modules, which CANNOT be safely bundled and must ship beside the bundle.
  *
  * Observed by running isolated discovery: esbuild happily inlined sharp's
  * JavaScript wrapper, and the container then failed at import with
@@ -75,7 +75,7 @@ const PROHIBITED_CLOSURE_PREFIXES = ["src/fixtures/", "tests/", "artifacts/", "s
  * untouched. Every copied file is hashed into the bundle manifest and scanned
  * for prohibited content like any other bundle file.
  */
-const NATIVE_EXTERNALS = ["sharp"];
+const RUNTIME_EXTERNALS = ["sharp", "tesseract.js", "tesseract.js-core"];
 
 class JobAError extends Error {
   constructor(code, detail) {
@@ -235,10 +235,12 @@ async function buildBundle() {
   const banner =
     'import { createRequire as __issue149CreateRequire } from "node:module";\n' +
     "const require = __issue149CreateRequire(import.meta.url);\n";
+  const externalFlags = RUNTIME_EXTERNALS.map((name) => `--external:${name}`).join(" ");
   const buildCommand =
-    'esbuild scripts/eval/issue-149-brand-evidence-acquisition-run.ts --bundle --platform=node --format=esm --target=node20 --external:node:* --external:sharp --banner:js="<createRequire banner>" --metafile --sourcemap=false --outfile=bundle/acquisition.mjs';
+    `esbuild scripts/eval/issue-149-brand-evidence-acquisition-run.ts --bundle --platform=node --format=esm --target=node20 --external:node:* ${externalFlags} --banner:js="<createRequire banner>" --metafile --sourcemap=false --outfile=bundle/acquisition.mjs` +
+    ` && esbuild scripts/eval/issue-149-ocr-runtime-init-probe.ts --bundle --platform=node --format=esm --target=node20 --external:node:* ${externalFlags} --banner:js="<createRequire banner>" --metafile --sourcemap=false --outfile=bundle/ocr-runtime-init-probe.mjs`;
 
-  const result = await esbuild.build({
+  const acquisitionResult = await esbuild.build({
     entryPoints: [path.join(ROOT, "scripts/eval/issue-149-brand-evidence-acquisition-run.ts")],
     bundle: true,
     platform: "node",
@@ -247,8 +249,23 @@ async function buildBundle() {
     banner: { js: banner },
     metafile: true,
     sourcemap: false,
-    external: ["node:*", ...NATIVE_EXTERNALS],
+    external: ["node:*", ...RUNTIME_EXTERNALS],
     outfile: path.join(BUNDLE, "acquisition.mjs"),
+    absWorkingDir: ROOT,
+    tsconfig: path.join(ROOT, "tsconfig.json"),
+    logLevel: "silent",
+  });
+  const probeResult = await esbuild.build({
+    entryPoints: [path.join(ROOT, "scripts/eval/issue-149-ocr-runtime-init-probe.ts")],
+    bundle: true,
+    platform: "node",
+    format: "esm",
+    target: "node20",
+    banner: { js: banner },
+    metafile: true,
+    sourcemap: false,
+    external: ["node:*", ...RUNTIME_EXTERNALS],
+    outfile: path.join(BUNDLE, "ocr-runtime-init-probe.mjs"),
     absWorkingDir: ROOT,
     tsconfig: path.join(ROOT, "tsconfig.json"),
     logLevel: "silent",
@@ -267,20 +284,30 @@ async function buildBundle() {
 
   // The native externals, copied whole from the installed dependency tree.
   // NOT an unrestricted repository copy: an explicit, named package list.
-  const nativePackages = copyNativeExternals();
+  const runtimePackages = copyRuntimeExternals();
 
-  const metafile = JSON.stringify(result.metafile, null, 2);
+  const combinedMetafile = {
+    acquisition: acquisitionResult.metafile,
+    ocrRuntimeInitProbe: probeResult.metafile,
+  };
+  const metafile = JSON.stringify(combinedMetafile, null, 2);
   writeFileSync(path.join(PREP, "metafile.json"), metafile);
-  const inputs = Object.keys(result.metafile.inputs).sort();
+  const inputs = [
+    ...new Set([
+      ...Object.keys(acquisitionResult.metafile.inputs),
+      ...Object.keys(probeResult.metafile.inputs),
+    ]),
+  ].sort();
 
   step("build-allowlisted-runtime-bundle", {
     buildCommand,
     buildTool: `esbuild ${esbuild.version}`,
     unrestrictedRepositoryCopy: false,
-    nativeExternals: NATIVE_EXTERNALS,
-    nativePackagesCopied: nativePackages.copied,
-    nativePackagesAbsent: nativePackages.absent,
-    nativeDependencyTreeRoot: nativePackages.treeRoot,
+    runtimeExternals: RUNTIME_EXTERNALS,
+    runtimePackagesCopied: runtimePackages.copied,
+    runtimePackagesAbsent: runtimePackages.absent,
+    runtimePackageInventory: runtimePackages.inventory,
+    runtimeDependencyTreeRoot: runtimePackages.treeRoot,
     emitted: readdirSync(BUNDLE).sort(),
   });
   step("generate-complete-dependency-graph", {
@@ -306,7 +333,7 @@ async function buildBundle() {
  * bundle the container cannot load — which is a true statement about that bundle
  * and is reported by discovery rather than hidden.
  */
-function copyNativeExternals() {
+function copyRuntimeExternals() {
   const target = path.join(BUNDLE, "node_modules");
 
   /**
@@ -318,10 +345,12 @@ function copyNativeExternals() {
     let current = ROOT;
     while (current !== path.dirname(current)) {
       const candidate = path.join(current, "node_modules");
-      if (existsSync(path.join(candidate, NATIVE_EXTERNALS[0]))) return candidate;
+      if (RUNTIME_EXTERNALS.every((external) => existsSync(path.join(candidate, external)))) {
+        return candidate;
+      }
       current = path.dirname(current);
     }
-    throw new JobAError("NATIVE_EXTERNAL_NOT_INSTALLED", NATIVE_EXTERNALS[0]);
+    throw new JobAError("RUNTIME_EXTERNAL_NOT_INSTALLED", RUNTIME_EXTERNALS);
   })();
 
   /**
@@ -342,8 +371,9 @@ function copyNativeExternals() {
    */
   const copied = [];
   const absent = [];
+  const inventory = [];
   const seen = new Set();
-  const queue = [...NATIVE_EXTERNALS];
+  const queue = [...RUNTIME_EXTERNALS];
 
   while (queue.length > 0) {
     const name = queue.shift();
@@ -352,8 +382,8 @@ function copyNativeExternals() {
 
     const source = path.join(treeRoot, name);
     if (!existsSync(source)) {
-      if (NATIVE_EXTERNALS.includes(name)) {
-        throw new JobAError("NATIVE_EXTERNAL_NOT_INSTALLED", name);
+      if (RUNTIME_EXTERNALS.includes(name)) {
+        throw new JobAError("RUNTIME_EXTERNAL_NOT_INSTALLED", name);
       }
       absent.push(name);
       continue;
@@ -369,6 +399,7 @@ function copyNativeExternals() {
       filter: (from) => !from.split(path.sep).includes(".bin"),
     });
     copied.push(name);
+    inventory.push(runtimePackageDigest(name, path.join(target, name)));
 
     const manifestPath = path.join(source, "package.json");
     if (!existsSync(manifestPath)) continue;
@@ -378,7 +409,44 @@ function copyNativeExternals() {
       ...Object.keys(manifest.optionalDependencies ?? {}),
     );
   }
-  return { copied: copied.sort(), absent: absent.sort(), treeRoot: path.relative(ROOT, treeRoot) };
+  return {
+    copied: copied.sort(),
+    absent: absent.sort(),
+    inventory: inventory.sort((left, right) => left.name.localeCompare(right.name)),
+    treeRoot: path.relative(ROOT, treeRoot),
+  };
+}
+
+function runtimePackageDigest(name, directory) {
+  const files = [];
+  const walk = (current) => {
+    for (const entry of readdirSync(current).sort()) {
+      const absolute = path.join(current, entry);
+      const relative = path.relative(directory, absolute);
+      const stat = statSync(absolute);
+      if (stat.isDirectory()) {
+        walk(absolute);
+      } else if (stat.isFile()) {
+        files.push({
+          path: relative,
+          bytes: stat.size,
+          sha256: sha256File(absolute),
+        });
+      }
+    }
+  };
+  walk(directory);
+  const manifestPath = path.join(directory, "package.json");
+  const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, "utf8")) : {};
+  return {
+    name,
+    version: manifest.version ?? null,
+    fileCount: files.length,
+    byteLength: files.reduce((sum, file) => sum + file.bytes, 0),
+    aggregateSha256: sha256(
+      JSON.stringify(files.map(({ path: filePath, sha256: digest }) => [filePath, digest])),
+    ),
+  };
 }
 
 /**

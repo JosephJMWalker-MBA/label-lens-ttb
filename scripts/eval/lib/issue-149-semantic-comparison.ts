@@ -73,6 +73,12 @@ export interface SemanticComparisonReport {
   differencesByLevel: Record<string, string[]>;
   verdict: AcquisitionVerdict;
   incompleteDetail: string[];
+  extractedItemCount: number;
+  failedItemCount: number;
+  runtimeUnavailableItemCount: number;
+  runtimeFailureCodes: string[];
+  runtimeFailureDetail: string[];
+  scientificResultProduced: boolean;
 }
 
 const itemDirectories = (root: string): string[] =>
@@ -86,6 +92,30 @@ const itemDirectories = (root: string): string[] =>
 
 const readIfPresent = (file: string): string | null =>
   existsSync(file) ? readFileSync(file, "utf8") : null;
+
+const readFailureCode = (directory: string, itemId: string): string | null => {
+  const raw = readIfPresent(path.join(directory, itemId, `${itemId}.failure.json`));
+  if (raw === null) return null;
+  try {
+    const parsed = JSON.parse(raw) as { errorCode?: unknown; code?: unknown };
+    const code = parsed.errorCode ?? parsed.code;
+    return typeof code === "string" ? code : null;
+  } catch {
+    return null;
+  }
+};
+
+const readFailureMessage = (directory: string, itemId: string): string | null => {
+  const raw = readIfPresent(path.join(directory, itemId, `${itemId}.failure.json`));
+  if (raw === null) return null;
+  try {
+    const parsed = JSON.parse(raw) as { errorMessage?: unknown; message?: unknown };
+    const message = parsed.errorMessage ?? parsed.message;
+    return typeof message === "string" ? message : null;
+  } catch {
+    return null;
+  }
+};
 
 /**
  * Compare one item across every level.
@@ -238,6 +268,52 @@ export function compareRuns(input: {
         ),
       );
 
+  const failureFacts = incompleteDetail.length
+    ? []
+    : (["primary", "repeat"] as const).flatMap((runId) => {
+        const directory = runId === "primary" ? primaryDirectory : repeatDirectory;
+        return expected.map((itemId) => {
+          const code = readFailureCode(directory, itemId);
+          const message = readFailureMessage(directory, itemId);
+          return { runId, itemId, code, message, failed: code !== null };
+        });
+      });
+
+  const extractedItemCount = failureFacts.filter((fact) => !fact.failed).length;
+  const failedItemCount = failureFacts.filter((fact) => fact.failed).length;
+  const runtimeUnavailableItemCount = failureFacts.filter(
+    (fact) => fact.code === "OCR_UNAVAILABLE",
+  ).length;
+  const runtimeFailureCodes = [
+    ...new Set(
+      failureFacts.filter((fact) => fact.code !== null).map((fact) => fact.code as string),
+    ),
+  ].sort();
+  const completeRunHasOnlyRuntimeUnavailableFailures =
+    incompleteDetail.length === 0 &&
+    (["primary", "repeat"] as const).some((runId) => {
+      const runFacts = failureFacts.filter((fact) => fact.runId === runId);
+      return (
+        runFacts.length === expected.length &&
+        runFacts.every((fact) => fact.code === "OCR_UNAVAILABLE")
+      );
+    });
+  const runtimeFailureDetail = completeRunHasOnlyRuntimeUnavailableFailures
+    ? [
+        `runtime unavailable failures: ${runtimeUnavailableItemCount}/${failureFacts.length}`,
+        ...[
+          ...new Set(
+            failureFacts
+              .filter((fact) => fact.code === "OCR_UNAVAILABLE" && fact.message !== null)
+              .map((fact) => fact.message as string),
+          ),
+        ]
+          .sort()
+          .slice(0, 5)
+          .map((message) => `OCR_UNAVAILABLE: ${message}`),
+      ]
+    : [];
+
   const semanticallyDifferingItems = items
     .filter((item) => item.differingLevels.length > 0)
     .map((item) => item.itemId);
@@ -256,9 +332,11 @@ export function compareRuns(input: {
   const verdict: AcquisitionVerdict =
     incompleteDetail.length > 0
       ? "INCOMPLETE_EVIDENCE"
-      : semanticallyDifferingItems.length > 0
-        ? "COMPLETE_WITH_NONDETERMINISM"
-        : "COMPLETE_DETERMINISTIC_EVIDENCE";
+      : completeRunHasOnlyRuntimeUnavailableFailures
+        ? "RUNTIME_FAILURE"
+        : semanticallyDifferingItems.length > 0
+          ? "COMPLETE_WITH_NONDETERMINISM"
+          : "COMPLETE_DETERMINISTIC_EVIDENCE";
 
   return {
     comparedItems: items.length,
@@ -269,6 +347,13 @@ export function compareRuns(input: {
     differencesByLevel,
     verdict,
     incompleteDetail,
+    extractedItemCount,
+    failedItemCount,
+    runtimeUnavailableItemCount,
+    runtimeFailureCodes,
+    runtimeFailureDetail,
+    scientificResultProduced:
+      verdict === "COMPLETE_DETERMINISTIC_EVIDENCE" || verdict === "COMPLETE_WITH_NONDETERMINISM",
   };
 }
 
@@ -291,5 +376,10 @@ export const comparisonDigest = (report: SemanticComparisonReport): string =>
       comparedItems: report.comparedItems,
       semanticallyDifferingItems: report.semanticallyDifferingItems,
       differencesByLevel: report.differencesByLevel,
+      extractedItemCount: report.extractedItemCount,
+      failedItemCount: report.failedItemCount,
+      runtimeUnavailableItemCount: report.runtimeUnavailableItemCount,
+      runtimeFailureCodes: report.runtimeFailureCodes,
+      scientificResultProduced: report.scientificResultProduced,
     }),
   );
