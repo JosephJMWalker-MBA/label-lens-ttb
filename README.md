@@ -222,7 +222,7 @@ See [`docs/compliance-readiness-boundary.md`](docs/compliance-readiness-boundary
 
 ---
 
-Governed research harness
+## Governed research harness
 
 Label Lens also includes a research harness for reproducible OCR and extraction experiments. It separates evidence collection, evidence verification, and post-freeze evaluation so that experimental results are not silently altered, recomputed, or judged against truth during acquisition.
 
@@ -239,7 +239,7 @@ fail-closed behavior when evidence, provenance, or measurement contracts are amb
 
 The purpose is not merely to produce a metric. It is to preserve enough evidence and provenance for another reviewer to determine exactly what code ran, what it observed, whether the evidence remained unchanged, and how each conclusion was earned.
 
-The current governed Brand study is preserved in draft PR #219. It remains intentionally unmerged while its post-freeze evaluation is contract-halted.
+The current governed Brand study is preserved in draft PR [#219](https://github.com/JosephJMWalker-MBA/label-lens-ttb/pull/219). It remains intentionally unmerged while its post-freeze evaluation is contract-halted.
 
 ---
 
