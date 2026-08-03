@@ -1828,7 +1828,191 @@ describe("Issue #149 actor 2 verifies raw evidence, and Job C scans for identity
     });
     expect(leaked.ok).toBe(false);
     expect(leaked.haltCode).toBe("TRUTH_ISOLATION_FAILURE");
-    expect(leaked.hits[0].marker).toBe("historical identifier");
+    expect(leaked.hits[0].marker).toBe("historical case ID");
+  });
+
+  it("halts on historical case IDs in metadata, fixture paths in provenance, and config", () => {
+    const root = freshRoot();
+    const runRoot = committedRun(root, "primary", ["item-0001"]);
+    writeFileSync(
+      path.join(runRoot, "item-0001", "item-0001.provenance.json"),
+      `${canonicalize({
+        opaqueItemId: "item-0001",
+        historicalCaseId: "brand-023",
+        sourcePath: "src/fixtures/images/brand-023.png",
+      })}\n`,
+    );
+    writeFileSync(
+      path.join(runRoot, "item-0001", "item-0001.counts.json"),
+      `${canonicalize({ configuration: { requestedCase: "brand-023" } })}\n`,
+    );
+
+    const report = verifyNoHistoricalIdentity({
+      rawRoot: root,
+      historicalCaseIds: ["brand-023"],
+      historicalImagePaths: ["src/fixtures/images/brand-023.png"],
+      forbiddenEvidenceKeys: ["expectedBrand"],
+    });
+
+    expect(report.ok).toBe(false);
+    expect(report.haltCode).toBe("TRUTH_ISOLATION_FAILURE");
+    expect(report.hits.some((hit) => hit.marker === "historical fixture path")).toBe(true);
+    expect(report.hits.some((hit) => hit.reason === "external-identity-field")).toBe(true);
+  });
+
+  it("halts on forbidden evidence keys even when historical strings are source-derived", () => {
+    const root = freshRoot();
+    const runRoot = committedRun(root, "primary", ["item-0001"]);
+    writeFileSync(
+      path.join(runRoot, "item-0001", "item-0001.words.jsonl"),
+      `${canonicalize({ text: "SAKER" })}\n`,
+    );
+    writeFileSync(
+      path.join(runRoot, "item-0001", "item-0001.selection.json"),
+      `${canonicalize({ expectedBrand: "hidden truth" })}\n`,
+    );
+
+    const report = verifyNoHistoricalIdentity({
+      rawRoot: root,
+      historicalCaseIds: ["saker"],
+      historicalImagePaths: [],
+      forbiddenEvidenceKeys: ["expectedBrand"],
+    });
+
+    expect(report.ok).toBe(false);
+    expect(report.hits.map((hit) => hit.marker)).toContain("forbidden key expectedBrand");
+  });
+
+  it("does not halt when a historical case-ID string appears only as OCR-derived visible text", () => {
+    const root = freshRoot();
+    const runRoot = committedRun(root, "primary", ["item-0001"]);
+    writeFileSync(
+      path.join(runRoot, "item-0001", "item-0001.words.jsonl"),
+      `${canonicalize({ text: "info@altacima.cl" })}\n${canonicalize({ text: "www.altacima.cl" })}\n`,
+    );
+    writeFileSync(
+      path.join(runRoot, "item-0001", "item-0001.lines.jsonl"),
+      `${canonicalize({ rawText: "info@altacima.cl - www.altacima.cl", cleanedValue: "infoaltacima.cl www.altacima.cl" })}\n`,
+    );
+    writeFileSync(
+      path.join(runRoot, "item-0001", "item-0001.candidates.jsonl"),
+      `${canonicalize({
+        rawText: "SAKER",
+        cleanedValue: "SAKER",
+        ranking: { comparator: [{ id: "normalized-value-key", value: "saker" }] },
+      })}\n`,
+    );
+    writeFileSync(
+      path.join(runRoot, "item-0001", "item-0001.selection.json"),
+      `${canonicalize({
+        selection: {
+          brandDiagnostics: {
+            candidates: [
+              {
+                rawText: "SAKER",
+                cleanedValue: "SAKER",
+                ranking: { comparator: [{ id: "normalized-value-key", value: "saker" }] },
+              },
+            ],
+            lines: [{ rawText: "info@altacima.cl", cleanedValue: "infoaltacima.cl" }],
+          },
+          observation: {
+            rawText: "SAKER",
+            value: "SAKER",
+            normalizedValue: "saker",
+            ranking: { comparator: [{ id: "normalized-value-key", value: "saker" }] },
+          },
+        },
+      })}\n`,
+    );
+
+    const report = verifyNoHistoricalIdentity({
+      rawRoot: root,
+      historicalCaseIds: ["altacima", "saker"],
+      historicalImagePaths: [],
+      forbiddenEvidenceKeys: ["expectedBrand"],
+    });
+
+    expect(report.ok).toBe(true);
+    expect(report.hits).toEqual([]);
+  });
+
+  it("halts when source-text collision is mixed with an external metadata occurrence", () => {
+    const root = freshRoot();
+    const runRoot = committedRun(root, "primary", ["item-0001"]);
+    writeFileSync(
+      path.join(runRoot, "item-0001", "item-0001.words.jsonl"),
+      `${canonicalize({ text: "SAKER" })}\n`,
+    );
+    writeFileSync(
+      path.join(runRoot, "item-0001", "item-0001.provenance.json"),
+      `${canonicalize({ opaqueItemId: "item-0001", sourceHistoricalCaseId: "saker" })}\n`,
+    );
+
+    const report = verifyNoHistoricalIdentity({
+      rawRoot: root,
+      historicalCaseIds: ["saker"],
+      historicalImagePaths: [],
+      forbiddenEvidenceKeys: ["expectedBrand"],
+    });
+
+    expect(report.ok).toBe(false);
+    expect(report.hits).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          marker: "historical case ID",
+          reason: "external-identity-field",
+        }),
+      ]),
+    );
+  });
+
+  it("handles substring collisions deliberately and fails closed on malformed provenance", () => {
+    const root = freshRoot();
+    const runRoot = committedRun(root, "primary", ["item-0001", "item-0002"]);
+    writeFileSync(
+      path.join(runRoot, "item-0001", "item-0001.words.jsonl"),
+      `${canonicalize({ text: "forsaker" })}\n`,
+    );
+    writeFileSync(path.join(runRoot, "item-0002", "item-0002.provenance.json"), "{saker");
+
+    const report = verifyNoHistoricalIdentity({
+      rawRoot: root,
+      historicalCaseIds: ["saker"],
+      historicalImagePaths: [],
+      forbiddenEvidenceKeys: ["expectedBrand"],
+    });
+
+    expect(report.ok).toBe(false);
+    expect(report.hits).toEqual([
+      expect.objectContaining({
+        file: "primary/item-0002/item-0002.provenance.json",
+        marker: "historical case ID",
+        reason: "non-json-or-binary-field",
+      }),
+    ]);
+  });
+
+  it("does not let primary/repeat agreement override truth-isolation failure", () => {
+    const root = freshRoot();
+    for (const runId of ["primary", "repeat"]) {
+      const runRoot = committedRun(root, runId, ["item-0001"]);
+      writeFileSync(
+        path.join(runRoot, "item-0001", "item-0001.provenance.json"),
+        `${canonicalize({ opaqueItemId: "item-0001", sourceHistoricalCaseId: "brand-023" })}\n`,
+      );
+    }
+
+    const report = verifyNoHistoricalIdentity({
+      rawRoot: root,
+      historicalCaseIds: ["brand-023"],
+      historicalImagePaths: [],
+      forbiddenEvidenceKeys: ["expectedBrand"],
+    });
+
+    expect(report.ok).toBe(false);
+    expect(report.hits).toHaveLength(2);
+    expect(report.haltCode).toBe("TRUTH_ISOLATION_FAILURE");
   });
 
   it("finds a planted forbidden evidence key", () => {

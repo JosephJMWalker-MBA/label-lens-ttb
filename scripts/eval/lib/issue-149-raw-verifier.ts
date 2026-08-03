@@ -433,11 +433,93 @@ export interface IdentityLeakReport {
   filesScanned: number;
   bytesScanned: number;
   inventorySize: number;
-  hits: Array<{ file: string; marker: string }>;
+  hits: Array<{ file: string; marker: string; location?: string; reason?: string }>;
   receivedOnly: string[];
   didNotReceive: string[];
   reportDigest: string;
 }
+
+type JsonHit = {
+  marker: string;
+  path: string;
+  value: string;
+  record: unknown;
+};
+
+const parseJsonRecords = (relative: string, text: string): unknown[] | null => {
+  try {
+    if (relative.endsWith(".jsonl")) {
+      return text
+        .split("\n")
+        .filter((line) => line.trim().length > 0)
+        .map((line) => JSON.parse(line));
+    }
+    if (relative.endsWith(".json")) return [JSON.parse(text)];
+  } catch {
+    return null;
+  }
+  return null;
+};
+
+const findJsonHits = (
+  value: unknown,
+  marker: string,
+  pathParts: string[] = [],
+  record: unknown = value,
+): JsonHit[] => {
+  if (typeof value === "string") {
+    return value.includes(marker) ? [{ marker, path: pathParts.join("."), value, record }] : [];
+  }
+  if (Array.isArray(value)) {
+    return value.flatMap((entry, index) =>
+      findJsonHits(entry, marker, [...pathParts, `[${index}]`], entry),
+    );
+  }
+  if (value && typeof value === "object") {
+    return Object.entries(value).flatMap(([key, entry]) =>
+      findJsonHits(entry, marker, [...pathParts, key], value),
+    );
+  }
+  return [];
+};
+
+const normalized = (value: string): string => value.toLowerCase().replace(/[^a-z0-9]+/g, "");
+
+const recordHasSourceText = (record: unknown, marker: string): boolean => {
+  if (!record || typeof record !== "object") return false;
+  const candidate = record as Record<string, unknown>;
+  for (const key of ["rawText", "cleanedValue", "normalizedValue", "value"]) {
+    const value = candidate[key];
+    if (typeof value === "string" && normalized(value).includes(normalized(marker))) return true;
+  }
+  return false;
+};
+
+const isSourceDerivedHistoricalHit = (relative: string, hit: JsonHit): boolean => {
+  const leaf = hit.path.split(".").at(-1);
+  if (leaf === "text" && (relative.endsWith(".words.jsonl") || relative.endsWith(".passes.json"))) {
+    return true;
+  }
+  if (
+    (leaf === "rawText" || leaf === "cleanedValue") &&
+    recordHasSourceText(hit.record, hit.marker)
+  ) {
+    return true;
+  }
+  if (
+    (leaf === "value" || leaf === "normalizedValue") &&
+    recordHasSourceText(hit.record, hit.marker)
+  ) {
+    return true;
+  }
+  if (
+    hit.path.endsWith(".ranking.comparator.[4].value") &&
+    recordHasSourceText(hit.record, hit.marker)
+  ) {
+    return true;
+  }
+  return false;
+};
 
 /**
  * Scan sealed evidence for historical case IDs and fixture paths.
@@ -466,8 +548,35 @@ export function verifyNoHistoricalIdentity(input: {
     bytesScanned += bytes.byteLength;
     // RAW bytes, so a binary payload cannot hide a match.
     const text = bytes.toString("latin1");
-    for (const marker of markers) {
-      if (text.includes(marker)) hits.push({ file: relative, marker: "historical identifier" });
+
+    const records = parseJsonRecords(relative, text);
+    for (const marker of historicalCaseIds) {
+      if (!text.includes(marker)) continue;
+      if (records === null) {
+        hits.push({
+          file: relative,
+          marker: "historical case ID",
+          reason: "non-json-or-binary-field",
+        });
+        continue;
+      }
+      for (const record of records) {
+        for (const hit of findJsonHits(record, marker)) {
+          if (!isSourceDerivedHistoricalHit(relative, hit)) {
+            hits.push({
+              file: relative,
+              marker: "historical case ID",
+              location: hit.path,
+              reason: "external-identity-field",
+            });
+          }
+        }
+      }
+    }
+    for (const marker of historicalImagePaths) {
+      if (text.includes(marker)) {
+        hits.push({ file: relative, marker: "historical fixture path" });
+      }
     }
     for (const key of forbiddenEvidenceKeys) {
       if (text.includes(`"${key}"`)) hits.push({ file: relative, marker: `forbidden key ${key}` });

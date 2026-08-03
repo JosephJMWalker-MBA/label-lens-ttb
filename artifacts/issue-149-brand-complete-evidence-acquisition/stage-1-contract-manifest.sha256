@@ -36,6 +36,7 @@ d3ade481f87597aa030315985e2c5c394eeec04ff7814a2ac32ed0e90f37ed6f  artifacts/issu
 8779934ceb10354b586d6da2041ec31cc0de11ffc11d3c1afc8dca9129614b18  artifacts/issue-149-brand-complete-evidence-acquisition/governed-attempt-2-runtime-failure.json
 c622dfbd35fa827bf1f01e548beac5194c353769bfe8e7b38b8a6c7b65a297f5  artifacts/issue-149-brand-complete-evidence-acquisition/governed-attempt-3-acquisition-runner-failure.json
 622eb33a571750b0143b05f249d6b082b17772b019cd1eef994a4ea203d7f9b1  artifacts/issue-149-brand-complete-evidence-acquisition/governed-attempt-30766684792-acquisition-runner-failure.json
+43ef5903b9e39a8215d9b71443100614582e6edbd2355f517e7e32fab50d0aef  artifacts/issue-149-brand-complete-evidence-acquisition/governed-attempt-30772967991-truth-isolation-failure.json
 1e640490420dab647dedfea0e883443a11da2c303b405fd3eda19a549afc167e  artifacts/issue-149-brand-complete-evidence-acquisition/id-map-contract.json
 65cf99859086cc4b4e40e5bd34c3a29345b8f205e2278e2fb9d8de591748083d  artifacts/issue-149-brand-complete-evidence-acquisition/incumbent-configuration-freeze.json
 914b906d6db8526ca8f14db8a08f6077f4c8887f80d8e3cc854670ebea53535f  artifacts/issue-149-brand-complete-evidence-acquisition/invocation-matrix.json
@@ -110,4 +111,4 @@ dfaa093b9f3bb7782845c22069f4a93d4abcfc6f47fe11c1cff98926f2a6f587  src/fixtures/e
 9ee4557d83a308834822b5a76b5c3ba851c30c04261d5b70d8e30b70997cf56c  src/fixtures/eval/issue-149-stage-1-manifest.test.ts
 5d3fe14028b90518c2bcd039c12974a64edc9dddc95f9447eb3c2e7772200e26  src/fixtures/eval/issue-149-stage2-source-closure.test.ts
 42ea378611fc16ff3e6448ac38091468500c9957e42965b4ec529cd1cebabf12  src/fixtures/eval/issue-149-staging-independence.test.ts
-# aggregate cb531e11f062fcf2d5bbc8160d58c0421c4a6fcab0c21fa28fa62a89fa3cbc49
+# aggregate ef9f553f0aa9555f605b11f9e0bd538291929a549145a8248349c2a2f84838ad
