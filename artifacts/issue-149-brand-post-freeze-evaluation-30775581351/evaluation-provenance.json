@@ -78,6 +78,7 @@
       "command": "node scripts/eval/issue-149-stage-1-working-tree.mjs --mode-from-env",
       "lifecycle": "npm posttest",
       "status": "HALTED_NONZERO",
+      "commandExitCode": 1,
       "notRepresentedAsPassingValidationCommand": true,
       "mode": "local",
       "reason": "STAGE_1_MODIFICATION_OUTSIDE_GOVERNED_PACKAGE",
@@ -86,6 +87,31 @@
         "scripts/eval/issue-149-post-freeze-evaluate-30775581351.ts",
         "src/fixtures/eval/issue-149-post-freeze-evaluation.test.ts"
       ],
+      "detailSource": {
+        "type": "nonOcrReproduction",
+        "procedure": [
+          "Created disposable detached worktree at 391b8fd342a34824174fdeffdf943110cddb9476.",
+          "Applied exact diff 391b8fd342a34824174fdeffdf943110cddb9476..83af386e37b8dc840325289441738cd55caa3bd9 as uncommitted working-tree changes.",
+          "Ran only node scripts/eval/issue-149-stage-1-working-tree.mjs --local.",
+          "Captured complete JSON output and exit code, then removed the disposable worktree."
+        ],
+        "reproducedCommand": "node scripts/eval/issue-149-stage-1-working-tree.mjs --local",
+        "reproducedExitCode": 1,
+        "reproducedJsonOutput": {
+          "status": "HALTED",
+          "reason": "STAGE_1_MODIFICATION_OUTSIDE_GOVERNED_PACKAGE",
+          "mode": "local",
+          "detail": [
+            "artifacts/issue-149-brand-post-freeze-evaluation-30775581351/",
+            "scripts/eval/issue-149-post-freeze-evaluate-30775581351.ts",
+            "src/fixtures/eval/issue-149-post-freeze-evaluation.test.ts"
+          ],
+          "ocrRun": false
+        }
+      },
+      "vitestPassedBeforePosttestHalted": true,
+      "completeNpmTestCommandNonzero": true,
+      "completeNpmTestCommandRepresentedAsPassing": false,
       "ocrRun": false,
       "interpretation": "Local mode examines the active repository amendment and rejects changed paths outside the Stage 1 governed package. The Actor 3 files are intentionally outside that package. This halt does not mean tests modified or invalidated the Stage 1 package."
     }
