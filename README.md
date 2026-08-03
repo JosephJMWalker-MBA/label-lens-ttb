@@ -243,6 +243,16 @@ The current governed Brand study is preserved in draft PR [#219](https://github.
 
 ---
 
+## License and permitted use
+
+Copyright © 2026 Joseph J. M. Walker. All rights reserved.
+
+This repository is publicly available for evaluation and review, but it is not open-source software. No permission is granted to copy, modify, redistribute, commercialize, deploy, or incorporate its code, research harness, protocols, or artifacts into another project without prior written permission.
+
+See [`LICENSE`](LICENSE).
+
+---
+
 ## Deliberately out of scope
 
 - TTB approval or rejection.
