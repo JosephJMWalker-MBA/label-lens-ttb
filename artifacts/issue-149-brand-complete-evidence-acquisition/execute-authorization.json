@@ -2,8 +2,8 @@
   "artifact": "execute-authorization",
   "experimentId": "issue-149-brand-complete-evidence-acquisition",
   "stage": 2,
-  "status": "EXECUTE_AUTHORIZED",
-  "reviewedImplementationSha": "3d19832a38a107c9355b4dc3b7e961c4a1b34826",
+  "status": "EXECUTE_NOT_AUTHORIZED",
+  "reviewedImplementationSha": null,
   "authorizedBy": null,
   "authorizedAt": null,
   "whatAuthorizationMeans": "Execute is authorized against an EXACT reviewed implementation tree, not against a branch. Setting status to EXECUTE_AUTHORIZED without naming the reviewed SHA authorizes nothing, and the gate rejects it.",
@@ -23,7 +23,7 @@
     ],
     "haltCode": "EXECUTE_TRANSITION_REJECTED"
   },
-  "currentDecision": "DISARMED after governed execute attempt 30766684792 attempt 1 using transition 7815e73df2ba243b5ce9dc855670b840bc7d47ae. The acquisition exited 1 with ACQUISITION_RUNNER_FAILURE after RUN_SUMMARY_INVALID: determinism report rejected caller-supplied writer-owned summary facts. OCR executed for primary and repeat runs and wrote 115 primary and 115 repeat raw item records, but no terminal acquisition record was emitted, neither run received a commit marker, and finalized raw manifests and run-level files were absent. Forensic handoff, receipt verification, and incomplete-forensic upload succeeded. No complete evidence artifact exists. No scientific result exists, and this attempt must never contribute to Brand metrics. Workflow 30766684792 must not be rerun. Another governed execute requires a reviewed run-summary contract repair and a new exact-SHA authorization.",
+  "currentDecision": "DISARMED after governed execute attempt 30772967991 attempt 1 using transition 4c09f92301fc5c8bee9c40dbe0d1f6e87773700b. Raw acquisition and deterministic verification completed, with valid primary and repeat commit markers for 115 items and COMPLETE_DETERMINISTIC_EVIDENCE reported by acquisition. Job C then failed truth-isolation verification with TRUTH_ISOLATION_FAILURE before complete-evidence packaging. No complete evidence artifact exists. No valid scientific result exists, and this attempt must never contribute to Brand metrics. Workflow 30772967991 must not be rerun. Another governed execute requires a reviewed truth-isolation incident repair and a new exact-SHA authorization.",
   "ocrRun": true,
   "amendedBy": "preregistration-stage-2-final-execute-closure.md",
   "branchLocalGateLimitation": {
