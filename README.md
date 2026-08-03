@@ -21,7 +21,7 @@ Label Lens TTB is a **domestic-wine label prescreen and internal-review prototyp
 | Agent/reviewer | `agent@ttb-test.com` | `/agent` |
 | Seller | `seller@ttb-test.com` | `/seller` |
 
-The three accounts use the shared reviewer-demo password [4TESTING1234]. These are public demonstration accounts. Do not upload confidential, proprietary, personal, or regulated information. Demo activity may be visible to other reviewers and may be reset without notice.
+The three accounts use the shared reviewer-demo password [4TESTING1234]. Do not include brackets with password. These are public demonstration accounts. Do not upload confidential, proprietary, personal, or regulated information. Demo activity may be visible to other reviewers and may be reset without notice.
 
 The public deployment is not a COLA integration, production authorization, government identity system, or hardened government environment.
 
@@ -219,6 +219,27 @@ Production prechecks fail closed when `LABEL_LENS_APPEND_SIGNING_KEY` is missing
 - The public demo is not a hardened production environment.
 
 See [`docs/compliance-readiness-boundary.md`](docs/compliance-readiness-boundary.md).
+
+---
+
+Governed research harness
+
+Label Lens also includes a research harness for reproducible OCR and extraction experiments. It separates evidence collection, evidence verification, and post-freeze evaluation so that experimental results are not silently altered, recomputed, or judged against truth during acquisition.
+
+The harness uses:
+
+explicit discover and execute modes;
+authorization bound to an exact reviewed commit;
+immutable evidence packages, manifests, and SHA-256 identities;
+separate acquisition, preservation, and evaluation actors;
+deterministic repeat runs;
+truth-isolation checks;
+permanent capture of incomplete and halted experiments;
+fail-closed behavior when evidence, provenance, or measurement contracts are ambiguous.
+
+The purpose is not merely to produce a metric. It is to preserve enough evidence and provenance for another reviewer to determine exactly what code ran, what it observed, whether the evidence remained unchanged, and how each conclusion was earned.
+
+The current governed Brand study is preserved in draft PR #219. It remains intentionally unmerged while its post-freeze evaluation is contract-halted.
 
 ---
 
