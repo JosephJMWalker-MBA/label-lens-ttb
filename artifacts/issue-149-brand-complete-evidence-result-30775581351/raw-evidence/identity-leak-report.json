@@ -1,0 +1,342 @@
+{
+  "rawVerification": {
+    "ok": true,
+    "haltCode": null,
+    "runs": [
+      "primary",
+      "repeat"
+    ],
+    "expectedItemCount": 115,
+    "findings": [
+      {
+        "check": "primary: run-commit-marker-valid",
+        "ok": true,
+        "detail": {
+          "committed": true,
+          "reason": null,
+          "runId": "primary",
+          "itemCount": 115
+        }
+      },
+      {
+        "check": "primary: exact-item-set",
+        "ok": true,
+        "detail": {
+          "found": 115,
+          "expected": 115,
+          "missing": [],
+          "unexpected": []
+        }
+      },
+      {
+        "check": "primary: raw-manifest-present",
+        "ok": true,
+        "detail": "forensic-redownload/host-readable-output/raw/primary/raw-evidence-manifest.json"
+      },
+      {
+        "check": "primary: item-file-sets-exact",
+        "ok": true,
+        "detail": []
+      },
+      {
+        "check": "primary: every-item-file-digest-matches",
+        "ok": true,
+        "detail": []
+      },
+      {
+        "check": "primary: manifest-covers-exactly-what-is-on-disk",
+        "ok": true,
+        "detail": {
+          "phantom": [],
+          "duplicated": [],
+          "unlisted": [],
+          "reordered": false
+        }
+      },
+      {
+        "check": "primary: manifest-identity-exact",
+        "ok": true,
+        "detail": {
+          "runId": "primary",
+          "itemCount": 115
+        }
+      },
+      {
+        "check": "primary: raw-manifest-sha256-covers-manifest-bytes",
+        "ok": true,
+        "detail": {
+          "digestLine": "be632ec95d4da81e9db49d6cf8f4a0c0fee28a7294414f270ad6c6ec4c3573cc  raw-evidence-manifest.json"
+        }
+      },
+      {
+        "check": "primary: run-level-files-covered",
+        "ok": true,
+        "detail": []
+      },
+      {
+        "check": "primary: no-staging-or-unexpected-files",
+        "ok": true,
+        "detail": []
+      },
+      {
+        "check": "primary: no-staging-directory",
+        "ok": true,
+        "detail": []
+      },
+      {
+        "check": "repeat: run-commit-marker-valid",
+        "ok": true,
+        "detail": {
+          "committed": true,
+          "reason": null,
+          "runId": "repeat",
+          "itemCount": 115
+        }
+      },
+      {
+        "check": "repeat: exact-item-set",
+        "ok": true,
+        "detail": {
+          "found": 115,
+          "expected": 115,
+          "missing": [],
+          "unexpected": []
+        }
+      },
+      {
+        "check": "repeat: raw-manifest-present",
+        "ok": true,
+        "detail": "forensic-redownload/host-readable-output/raw/repeat/raw-evidence-manifest.json"
+      },
+      {
+        "check": "repeat: item-file-sets-exact",
+        "ok": true,
+        "detail": []
+      },
+      {
+        "check": "repeat: every-item-file-digest-matches",
+        "ok": true,
+        "detail": []
+      },
+      {
+        "check": "repeat: manifest-covers-exactly-what-is-on-disk",
+        "ok": true,
+        "detail": {
+          "phantom": [],
+          "duplicated": [],
+          "unlisted": [],
+          "reordered": false
+        }
+      },
+      {
+        "check": "repeat: manifest-identity-exact",
+        "ok": true,
+        "detail": {
+          "runId": "repeat",
+          "itemCount": 115
+        }
+      },
+      {
+        "check": "repeat: raw-manifest-sha256-covers-manifest-bytes",
+        "ok": true,
+        "detail": {
+          "digestLine": "3a2c4ea43a0ccd6c19c4051e6fdc214cbcb3ae8c241435947c80063ce7b93aab  raw-evidence-manifest.json"
+        }
+      },
+      {
+        "check": "repeat: run-level-files-covered",
+        "ok": true,
+        "detail": []
+      },
+      {
+        "check": "repeat: no-staging-or-unexpected-files",
+        "ok": true,
+        "detail": []
+      },
+      {
+        "check": "repeat: no-staging-directory",
+        "ok": true,
+        "detail": []
+      },
+      {
+        "check": "acquisition-verdict-is-a-complete-outcome",
+        "ok": true,
+        "detail": {
+          "comparedItems": 115,
+          "comparedLevels": [
+            "outcome",
+            "sourceProvenanceAndConfiguration",
+            "passSemanticsExcludingTimings",
+            "orderedOcrWords",
+            "reconstructedLines",
+            "candidateRecordsAndStableIdentities",
+            "rankingSelectionAuthorityAndAbstention",
+            "itemCounts",
+            "typedFailureEvidence"
+          ],
+          "differencesByLevel": {},
+          "itemCount": 115,
+          "runId": "primary",
+          "semanticallyDifferingItems": [],
+          "timingOnlyDifferingItems": [
+            "item-0001",
+            "item-0002",
+            "item-0003",
+            "item-0004",
+            "item-0005",
+            "item-0006",
+            "item-0007",
+            "item-0008",
+            "item-0009",
+            "item-0010",
+            "item-0011",
+            "item-0012",
+            "item-0013",
+            "item-0014",
+            "item-0015",
+            "item-0016",
+            "item-0017",
+            "item-0018",
+            "item-0019",
+            "item-0020",
+            "item-0021",
+            "item-0022",
+            "item-0023",
+            "item-0024",
+            "item-0025",
+            "item-0026",
+            "item-0027",
+            "item-0028",
+            "item-0029",
+            "item-0030",
+            "item-0031",
+            "item-0032",
+            "item-0033",
+            "item-0034",
+            "item-0035",
+            "item-0036",
+            "item-0037",
+            "item-0038",
+            "item-0039",
+            "item-0040",
+            "item-0041",
+            "item-0042",
+            "item-0043",
+            "item-0044",
+            "item-0045",
+            "item-0046",
+            "item-0047",
+            "item-0048",
+            "item-0049",
+            "item-0050",
+            "item-0051",
+            "item-0052",
+            "item-0053",
+            "item-0054",
+            "item-0055",
+            "item-0056",
+            "item-0057",
+            "item-0058",
+            "item-0059",
+            "item-0060",
+            "item-0061",
+            "item-0062",
+            "item-0063",
+            "item-0064",
+            "item-0065",
+            "item-0066",
+            "item-0067",
+            "item-0068",
+            "item-0069",
+            "item-0070",
+            "item-0071",
+            "item-0072",
+            "item-0073",
+            "item-0074",
+            "item-0075",
+            "item-0076",
+            "item-0077",
+            "item-0078",
+            "item-0079",
+            "item-0080",
+            "item-0081",
+            "item-0082",
+            "item-0083",
+            "item-0084",
+            "item-0085",
+            "item-0086",
+            "item-0087",
+            "item-0088",
+            "item-0089",
+            "item-0090",
+            "item-0091",
+            "item-0092",
+            "item-0093",
+            "item-0094",
+            "item-0095",
+            "item-0096",
+            "item-0097",
+            "item-0098",
+            "item-0099",
+            "item-0100",
+            "item-0101",
+            "item-0102",
+            "item-0103",
+            "item-0104",
+            "item-0105",
+            "item-0106",
+            "item-0107",
+            "item-0108",
+            "item-0109",
+            "item-0110",
+            "item-0111",
+            "item-0112",
+            "item-0113",
+            "item-0114",
+            "item-0115"
+          ],
+          "verdict": "COMPLETE_DETERMINISTIC_EVIDENCE"
+        }
+      },
+      {
+        "check": "both-determinism-reports-agree-apart-from-runId",
+        "ok": true,
+        "detail": [
+          "COMPLETE_DETERMINISTIC_EVIDENCE",
+          "COMPLETE_DETERMINISTIC_EVIDENCE"
+        ]
+      },
+      {
+        "check": "forbidden-evidence-key-scan",
+        "ok": true,
+        "detail": {
+          "adjudicatedHere": false,
+          "delegatedTo": "Job C — verifyNoHistoricalIdentity",
+          "note": "Actor 2 does not scan for forbidden evidence keys. This entry records the delegation; Job C supplies the actual result and its own halt code."
+        }
+      }
+    ],
+    "totalBytes": 47257276
+  },
+  "identityVerification": {
+    "ok": true,
+    "haltCode": null,
+    "filesScanned": 1850,
+    "bytesScanned": 47516390,
+    "inventorySize": 230,
+    "hits": [],
+    "receivedOnly": [
+      "the sealed raw artifact, read-only",
+      "the minimal historical case-ID and fixture-path inventory",
+      "the forbidden evidence-key inventory"
+    ],
+    "didNotReceive": [
+      "acceptable Brand values",
+      "truth labels",
+      "expected field values",
+      "prior per-case classifications"
+    ],
+    "reportDigest": "1627b8da80f1fe64fd9047590e4155e4333f82e8d1c267f46f5b5345489f616e"
+  },
+  "ok": true
+}

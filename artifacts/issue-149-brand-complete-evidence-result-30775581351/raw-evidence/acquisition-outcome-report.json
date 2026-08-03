@@ -1,0 +1,24 @@
+{
+  "containerExitStatus": 0,
+  "terminalRecordFound": true,
+  "terminalRecordCount": 1,
+  "reportMalformed": false,
+  "malformedLineCount": 0,
+  "reportCoherent": true,
+  "terminalSchemaValid": true,
+  "terminalFieldErrors": [],
+  "haltCodePresent": true,
+  "terminalStatus": "ACQUISITION_COMPLETE",
+  "verdict": "COMPLETE_DETERMINISTIC_EVIDENCE",
+  "haltCode": null,
+  "scientificResultProduced": true,
+  "outcomeClass": "SCIENTIFIC_RESULT_COMPLETE",
+  "coherenceChecks": {
+    "reportCoherent": true,
+    "terminalRecordFound": true,
+    "successfulScientific": true,
+    "ocrRuntimeFailure": false,
+    "incompleteEvidence": false
+  },
+  "finalDecision": "SCIENTIFIC_RESULT_COMPLETE"
+}

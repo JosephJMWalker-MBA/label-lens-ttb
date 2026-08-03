@@ -1,0 +1,10 @@
+{
+  "rawBytes": 47516390,
+  "archiveLimitBytes": 104857600,
+  "overLimit": false,
+  "decision": "ELIGIBLE_FOR_OWNER_COMMIT_PROCESS",
+  "uploadAndVerificationRequired": true,
+  "routeAsIncompleteForensicOutput": false,
+  "haltCode": null,
+  "meaning": "Complete, verified evidence within the durable-archive limit. Eligible for the owner's commit process."
+}
