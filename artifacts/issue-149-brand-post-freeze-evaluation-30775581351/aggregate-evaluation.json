@@ -1,0 +1,60 @@
+{
+  "artifact": "issue-149-brand-post-freeze-aggregate-evaluation",
+  "brandAbsent": {
+    "abstentionReasonFrequencies": {
+      "null": 10
+    },
+    "anyCandidateFormed": 10,
+    "anyCandidateKept": 0,
+    "brandValueSelected": 0,
+    "denominator": 10,
+    "falseCertainty": 0,
+    "finalAuthorityStateCounts": {
+      "NOT_OBSERVED": 10
+    },
+    "rawOcrContainedBrandLikeText": 10
+  },
+  "brandPresent": {
+    "abstentionReasonFrequencies": {
+      "null": 105
+    },
+    "acceptableBrandSelected": 29,
+    "bestTruthRankDistribution": {
+      "0": 35,
+      "1": 2,
+      "2": 7,
+      "3": 3,
+      "4": 1,
+      "7": 1,
+      "null": 56
+    },
+    "denominator": 105,
+    "finalAuthorityStateCounts": {
+      "AMBIGUOUS": 101,
+      "OBSERVED": 4
+    },
+    "rejectionReasonFrequencies": {
+      "domain-like": 22,
+      "location-or-appellation": 3,
+      "non-brand-keyword": 26,
+      "producer-line": 16,
+      "sentence-fragment": 50,
+      "too-many-words": 61
+    },
+    "selectedCorrectnessCounts": {
+      "correct": 29,
+      "incorrect": 76
+    },
+    "truthBearingCandidateEnteredFinalRanking": 49,
+    "truthBearingCandidateFormed": 79,
+    "truthBearingCandidateFormedCannotCompareSemantically": 2,
+    "truthBearingCandidateKept": 49,
+    "truthPresentInRawOcr": 87,
+    "truthPresentOnReconstructedLine": 80
+  },
+  "caseCount": 115,
+  "primaryRepeatSemanticDifferenceCount": 0,
+  "primaryRepeatSemanticDifferences": [],
+  "runId": "30775581351",
+  "status": "HALTED_FIELD_CONTRACT_AMBIGUITY"
+}

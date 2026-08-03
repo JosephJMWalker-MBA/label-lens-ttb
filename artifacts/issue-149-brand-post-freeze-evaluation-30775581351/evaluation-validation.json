@@ -1,0 +1,54 @@
+{
+  "artifact": "issue-149-brand-post-freeze-evaluation-validation",
+  "brandAbsentCount": 10,
+  "brandPresentCount": 105,
+  "contractAmbiguities": [
+    {
+      "detail": [
+        {
+          "candidateOrdinal": 0,
+          "cleanedMatch": false,
+          "opaqueItemId": "item-0016",
+          "rawMatch": true
+        }
+      ],
+      "field": "truthBearingCandidateFormed",
+      "opaqueItemId": "item-0016"
+    },
+    {
+      "detail": [
+        {
+          "candidateOrdinal": 0,
+          "cleanedMatch": false,
+          "opaqueItemId": "item-0074",
+          "rawMatch": true
+        }
+      ],
+      "field": "truthBearingCandidateFormed",
+      "opaqueItemId": "item-0074"
+    }
+  ],
+  "haltedFields": [
+    {
+      "field": "truthBearingCandidateFormed",
+      "opaqueItemId": "item-0016",
+      "status": "CANNOT_COMPARE_SEMANTICALLY"
+    },
+    {
+      "field": "truthBearingCandidateFormed",
+      "opaqueItemId": "item-0074",
+      "status": "CANNOT_COMPARE_SEMANTICALLY"
+    }
+  ],
+  "idMapCount": 115,
+  "immutableEvidenceWritten": false,
+  "inputValidation": {
+    "acquisitionOutcomeClass": "SCIENTIFIC_RESULT_COMPLETE",
+    "excludedRun30772967991": "INCOMPLETE_EVIDENCE",
+    "identityHits": [],
+    "identityVerificationOk": true,
+    "rawVerificationOk": true
+  },
+  "perCaseCount": 115,
+  "primaryRepeatSemanticDifferenceCount": 0
+}

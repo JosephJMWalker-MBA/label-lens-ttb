@@ -1,0 +1,19 @@
+{
+  "actor3Authorization": true,
+  "artifact": "issue-149-brand-post-freeze-evaluation-provenance",
+  "baseSha": "391b8fd342a34824174fdeffdf943110cddb9476",
+  "currentResultSha256": "7529022a8f5d6a3381006de5662b5a755e04c297e30a664b94d26b5fe03b8d49",
+  "executeSha": "981e04b64c37955b6db8a8aed93c6ffc54c1e114",
+  "idMap": "artifacts/issue-149-brand-complete-evidence-acquisition/post-freeze/id-map.json",
+  "noAcquisition": true,
+  "noOcr": true,
+  "noReplay": true,
+  "normalizationImports": [
+    "src/fixtures/eval/metrics.ts#normalizeKey",
+    "src/fixtures/eval/metrics.ts#brandNormalizedMatch",
+    "src/fixtures/eval/metrics.ts#normalizedIncludes"
+  ],
+  "rawRoot": "artifacts/issue-149-brand-complete-evidence-result-30775581351/raw-evidence/host-readable-output/raw",
+  "runId": "30775581351",
+  "truthManifest": "src/fixtures/eval/eval-manifest.json"
+}
