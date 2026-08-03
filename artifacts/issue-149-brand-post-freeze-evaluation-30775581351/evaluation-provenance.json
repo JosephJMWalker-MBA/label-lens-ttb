@@ -15,5 +15,79 @@
   ],
   "rawRoot": "artifacts/issue-149-brand-complete-evidence-result-30775581351/raw-evidence/host-readable-output/raw",
   "runId": "30775581351",
-  "truthManifest": "src/fixtures/eval/eval-manifest.json"
+  "truthManifest": "src/fixtures/eval/eval-manifest.json",
+  "validationScope": {
+    "actor3EvaluatorOnly": {
+      "noOcr": true,
+      "noAcquisition": true,
+      "noReplay": true,
+      "noNetworkRequest": true,
+      "wroteInsideImmutableEvidence": false,
+      "usedOnlyDeclaredCommittedInputs": true,
+      "declaredInputPathInventory": {
+        "immutableRawEvidenceRoot": "artifacts/issue-149-brand-complete-evidence-result-30775581351/raw-evidence/host-readable-output/raw",
+        "idMap": "artifacts/issue-149-brand-complete-evidence-acquisition/post-freeze/id-map.json",
+        "truthManifest": "src/fixtures/eval/eval-manifest.json",
+        "priorComparisonInputsLoadedOnlyAfterCurrentHashFreeze": [
+          "artifacts/brand-evidence-path-diagnosis/cases.json",
+          "artifacts/issue-149-brand-current-baseline-failure-decomposition/per-case-attribution.json",
+          "artifacts/issue-149-brand-candidate-construction-filter-decomposition/per-case-stage-attribution.json"
+        ]
+      },
+      "twoCleanExecutionsByteIdentical": true,
+      "noOcrScopeClarification": "The noOcr flag applies only to the Actor 3 evaluator. It does not claim that unrelated repository validation commands performed no OCR."
+    },
+    "broadLocalRepositoryTestCommand": {
+      "command": "npm test",
+      "executed": true,
+      "vitestPhase": {
+        "status": "PASSED",
+        "filesPassed": 185,
+        "filesSkipped": 3,
+        "testsPassed": 2329,
+        "testsSkipped": 3
+      },
+      "includedExistingRealOcrTests": true,
+      "noGlobalLocalOcrClaim": true,
+      "actor3EvaluatorRerunByUnrelatedOcrTests": false,
+      "unrelatedOcrOutputsEnteredActor3InputsOrOutputs": false,
+      "nonEntryVerificationBasis": {
+        "evaluatorDeclaredInputPathInventory": {
+          "immutableRawEvidenceRoot": "artifacts/issue-149-brand-complete-evidence-result-30775581351/raw-evidence/host-readable-output/raw",
+          "idMap": "artifacts/issue-149-brand-complete-evidence-acquisition/post-freeze/id-map.json",
+          "truthManifest": "src/fixtures/eval/eval-manifest.json",
+          "priorComparisonInputsLoadedOnlyAfterCurrentHashFreeze": [
+            "artifacts/brand-evidence-path-diagnosis/cases.json",
+            "artifacts/issue-149-brand-current-baseline-failure-decomposition/per-case-attribution.json",
+            "artifacts/issue-149-brand-candidate-construction-filter-decomposition/per-case-stage-attribution.json"
+          ]
+        },
+        "localTestOutputPathsInDeclaredInputInventory": [],
+        "currentResultSha256AfterBroadSuite": "7529022a8f5d6a3381006de5662b5a755e04c297e30a664b94d26b5fe03b8d49",
+        "immutableEvidenceManifestUnchanged": "2d7607b9f2ed4ce707b4c4ed69c101b81b67612e059fd82ce5304c1c5892b67f",
+        "committedActor3ScientificOutputFileSha256": {
+          "current-per-case-evaluation.json": "7529022a8f5d6a3381006de5662b5a755e04c297e30a664b94d26b5fe03b8d49",
+          "current-per-case-evaluation.sha256": "d4094fab84bd3f29ba91ffa2f94b66b7eb6d1e89bb7d1547e3e9c92a1c1cf826",
+          "aggregate-evaluation.json": "f6e4337b5e17f5b6a88d3deef0a4a9d951f07e06eda5da1fc52bd4325d5f8117",
+          "historical-cross-check.json": "f3e4944eda6e6ac023bef39c8cbaa42edf86bf11de979247b95dc578c80bdf20",
+          "limitations.md": "aa56546f4bb356cbf5608c42497914a7792406efa9a9217fcb6af0f8819cbf76"
+        }
+      }
+    },
+    "localPosttest": {
+      "command": "node scripts/eval/issue-149-stage-1-working-tree.mjs --mode-from-env",
+      "lifecycle": "npm posttest",
+      "status": "HALTED_NONZERO",
+      "notRepresentedAsPassingValidationCommand": true,
+      "mode": "local",
+      "reason": "STAGE_1_MODIFICATION_OUTSIDE_GOVERNED_PACKAGE",
+      "detail": [
+        "artifacts/issue-149-brand-post-freeze-evaluation-30775581351/",
+        "scripts/eval/issue-149-post-freeze-evaluate-30775581351.ts",
+        "src/fixtures/eval/issue-149-post-freeze-evaluation.test.ts"
+      ],
+      "ocrRun": false,
+      "interpretation": "Local mode examines the active repository amendment and rejects changed paths outside the Stage 1 governed package. The Actor 3 files are intentionally outside that package. This halt does not mean tests modified or invalidated the Stage 1 package."
+    }
+  }
 }
