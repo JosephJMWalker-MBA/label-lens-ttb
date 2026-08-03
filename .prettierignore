@@ -42,3 +42,9 @@ artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-invent
 artifacts/issue-149-brand-complete-evidence-acquisition/truth-free-input-manifest.json
 artifacts/issue-149-brand-complete-evidence-acquisition/population-freeze.json
 artifacts/issue-149-brand-complete-evidence-acquisition/post-freeze/id-map.json
+
+# Immutable Issue #149 scientific evidence, committed byte-for-byte from the
+# verified workflow artifacts for run 30775581351. These files include JSONL
+# streams with historical .json suffixes and must never be parsed, formatted,
+# rewritten, or normalized by Prettier.
+artifacts/issue-149-brand-complete-evidence-result-30775581351/
