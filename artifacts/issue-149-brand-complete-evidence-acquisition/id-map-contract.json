@@ -1,0 +1,45 @@
+{
+  "artifact": "id-map-contract",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "location": "artifacts/issue-149-brand-complete-evidence-acquisition/post-freeze/id-map.json",
+  "schema": {
+    "opaqueItemId": "string, item-NNNN",
+    "historicalCaseId": "string",
+    "historicalImagePath": "string",
+    "sourceImageSha256": "string, 64 hex",
+    "sourceImageByteSize": "number"
+  },
+  "accessBoundary": {
+    "supersededClaim": "readable only after both raw manifests are written",
+    "whyItWasFalse": "Trusted staging generates and verifies the map before isolated acquisition begins, and the map is committed on PR #219 where any checkout can read it. Unreadability was never the control.",
+    "trustedStagingMayReadGenerateAndVerify": true,
+    "insideStagedImageDirectory": false,
+    "insideRawEvidenceDirectory": false,
+    "mountedIntoIsolatedDiscovery": false,
+    "mountedIntoIsolatedExecution": false,
+    "importedByAcquisitionCode": false,
+    "mayNotBeUsedAgainstAcquiredEvidenceUntil": "both raw manifests are sealed AND the read-only identity-leak verification has run clean and is authorized",
+    "onlyActorAuthorizedToUseItForTruthBasedEvaluation": "actor 3, the post-freeze evaluation process",
+    "physicalInaccessibilityClaimed": false
+  },
+  "acquisitionInputDirectory": ".local/issue-149-acquisition-inputs",
+  "acquisitionInputDirectoryContents": "staged images only, named item-NNNN.<ext>",
+  "acquisitionInputDirectoryTracked": false,
+  "trustedStagingStep": {
+    "script": "scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs",
+    "why": "Something must know which historical image becomes which opaque id, because something must copy it. That knowledge lives in the staging step, which runs BEFORE and OUTSIDE the acquisition process. The acquisition process receives only the staged directory.",
+    "isNotTheAcquisitionProcess": true
+  },
+  "testedBy": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts",
+  "assertionsUnderTest": [
+    "115 contiguous opaque ids from item-0001",
+    "acquisition input carries exactly four keys and no historical identifier or path",
+    "every staged filename matches ^item-\\d{4}\\.[a-z0-9]+$",
+    "the map lives under post-freeze/, never under raw/, and never under the staged input directory",
+    "the map declares itself unmounted and unimported",
+    "every opaque id maps to exactly one historical case, with matching image hash and size"
+  ],
+  "amendedBy": "preregistration-amendment-14.md",
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run."
+}

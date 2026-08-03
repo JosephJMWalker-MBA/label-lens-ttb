@@ -1,0 +1,44 @@
+{
+  "artifact": "execute-authorization",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 2,
+  "status": "EXECUTE_NOT_AUTHORIZED",
+  "reviewedImplementationSha": null,
+  "authorizedBy": null,
+  "authorizedAt": null,
+  "whatAuthorizationMeans": "Execute is authorized against an EXACT reviewed implementation tree, not against a branch. Setting status to EXECUTE_AUTHORIZED without naming the reviewed SHA authorizes nothing, and the gate rejects it.",
+  "howTheGateWorks": {
+    "enforcedBy": "scripts/eval/lib/issue-149-execute-authorization.ts, driven by scripts/eval/issue-149-execute-gate.mjs in the workflow",
+    "whyNotThePathsFilter": "GitHub's paths: filter decides WHETHER the workflow runs when a push touches a matching file. It places no restriction on what else that push contains. A commit could change workflow-mode.txt AND the runner, adapter, a contract or a bundle input and still trigger execute, with the changed code never reviewed. The changed-file restriction is therefore enforced against the actual commit range.",
+    "conditions": [
+      "the artifact names an exact 40-character reviewed implementation SHA",
+      "status is exactly EXECUTE_AUTHORIZED",
+      "the current head descends from that SHA",
+      "every path changed since that SHA is one of the permitted transition files",
+      "the mode file contains exactly the bytes \"execute\\n\""
+    ],
+    "permittedTransitionPaths": [
+      "artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt",
+      "artifacts/issue-149-brand-complete-evidence-acquisition/execute-authorization.json"
+    ],
+    "haltCode": "EXECUTE_TRANSITION_REJECTED"
+  },
+  "currentDecision": "DISARMED after governed execute attempt 30772967991 attempt 1 using transition 4c09f92301fc5c8bee9c40dbe0d1f6e87773700b. Raw acquisition and deterministic verification completed, with valid primary and repeat commit markers for 115 items and COMPLETE_DETERMINISTIC_EVIDENCE reported by acquisition. Job C then failed truth-isolation verification with TRUTH_ISOLATION_FAILURE before complete-evidence packaging. No complete evidence artifact exists. No valid scientific result exists, and this attempt must never contribute to Brand metrics. Workflow 30772967991 must not be rerun. Another governed execute requires a reviewed truth-isolation incident repair and a new exact-SHA authorization.",
+  "ocrRun": true,
+  "amendedBy": "preregistration-stage-2-final-execute-closure.md",
+  "branchLocalGateLimitation": {
+    "statement": "A branch-local workflow cannot prove that an unreviewed commit did not replace or remove its own gate. The workflow file and the gate script are both loaded from the current branch head, so a transition commit that modifies the workflow could bypass the gate before the gate has a chance to reject that modification.",
+    "thereforeTheGateIs": "defense in depth against ordinary accidental co-changes, NOT self-authenticating authorization",
+    "whatActuallyAuthorizes": "an externally reviewed transition commit, identified by its full SHA before it is pushed"
+  },
+  "frozenAuthorizationProcedure": [
+    "1. create the authorization-and-mode transition commit LOCALLY",
+    "2. it changes exactly two files: workflow-mode.txt and execute-authorization.json",
+    "3. do not push it",
+    "4. report its full commit SHA, its parent SHA, the exact two-file list and the byte diffs",
+    "5. obtain explicit owner authorization naming that transition commit SHA",
+    "6. push only the already-authorized commit",
+    "7. the repository gate independently rechecks the reviewed implementation range"
+  ],
+  "transitionCommitCreatedInThisSprint": false
+}

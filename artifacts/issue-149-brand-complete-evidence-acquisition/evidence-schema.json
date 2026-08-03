@@ -1,0 +1,215 @@
+{
+  "artifact": "evidence-schema",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "containsCompleteRawOcrWords": true,
+  "containsCompleteCandidateDecisions": true,
+  "proofOfCompleteness": {
+    "rawOcrWords": "raw/<run>/<opaqueItemId>.words.jsonl carries one record per OcrWord for every pass, and the acquisition asserts emittedWordCount === debug.passes[i].words.length for every pass. Any inequality halts with RAW_EVIDENCE_TRUNCATED. No sampleWords cap, no first-25 cap and no 120-character text truncation is applied, because the evidence is read from the debug object returned by a direct extractLabelEvidenceDetailed call rather than from the capped CaseReport projection.",
+    "candidateDecisions": "raw/<run>/<opaqueItemId>.candidates.jsonl carries one record per BrandCandidateDiagnostic, kept AND rejected, each with the complete PR #220 filterChecks and activeRejectionReasons. The acquisition asserts emittedCandidateCount === brandDiagnostics.candidates.length read before any projection, that ordinals are contiguous from 0 and unique, and that stable candidate IDs are unique within the case. Halts with CANDIDATE_EVIDENCE_TRUNCATED, CANDIDATE_ID_COLLISION or COMPLETE_DIAGNOSTICS_ABSENT."
+  },
+  "layout": {
+    "itemDirectory": "raw/<run>/<opaqueItemId>/",
+    "itemFiles": "raw/<run>/<opaqueItemId>/<opaqueItemId>.<type> \u2014 the item's identity is the DIRECTORY and the filename prefix; there is no flat path form",
+    "supersededFlatLayout": "raw/<run>/<opaqueItemId>.<type> was the Stage 1 description and is not what the writer produces",
+    "successFiles": [
+      ".provenance.json",
+      ".passes.json",
+      ".fingerprints.json",
+      ".words.jsonl",
+      ".lines.jsonl",
+      ".candidates.jsonl",
+      ".selection.json",
+      ".counts.json"
+    ],
+    "failureFiles": [".provenance.json", ".failure.json"],
+    "runFiles": [
+      "counts.json",
+      "raw-evidence-manifest.json",
+      "raw-evidence-manifest.sha256",
+      "determinism-report.json",
+      "RUN_COMMITTED.json"
+    ],
+    "runCommitMarker": "RUN_COMMITTED.json \u2014 written LAST with exclusive creation. Its schema is CLOSED: exact own-key set, requiredFiles in frozen order, fileDigests exactly the same four paths each once in order, every digest matching, and the aggregate recomputed. A subset of digests no longer reads as committed."
+  },
+  "runs": ["primary", "repeat"],
+  "immutabilityRule": "After a run's raw-evidence-manifest.sha256 is written, no file under raw/<run>/ is rewritten, reformatted or pretty-printed. JSONL is emitted in final form and is excluded from prettier via .prettierignore.",
+  "truthBearingFieldsAbsentByConstruction": "every key in the canonical inventory asset; see forbiddenEvidenceKeyInventory for the path and digest. The list is not restated here.",
+  "truthIsolationAssertion": {
+    "inBoundaryKeyAndFileScan": "Inside the isolated boundary the acquisition scans every emitted file for the forbidden evidence KEY inventory, and for unexpected mounted or emitted files. Halt: TRUTH_ISOLATION_FAILURE.",
+    "postSealHistoricalValueScan": "AFTER both raw manifests are sealed, a separate read-only verifier \u2014 which holds the historical case-ID and fixture-path inventory the runtime never receives \u2014 scans the frozen bytes for those VALUES. Halt: TRUTH_ISOLATION_FAILURE.",
+    "correctionOfPriorClaim": "An earlier revision said historical IDs and paths were scanned before each manifest was written. The isolated runtime cannot do that: it does not hold the inventory, and handing it over would be the leak. The two scans are distinct in scope, actor and timing.",
+    "haltCode": "TRUTH_ISOLATION_FAILURE"
+  },
+  "knownGapsCarriedFromTheContracts": [
+    "word baseline geometry \u2014 not present on OcrWord",
+    "block, paragraph and line identifiers \u2014 not present on OcrWord",
+    "constituent word IDs per reconstructed line \u2014 not emitted by BrandLineDiagnostic"
+  ],
+  "amendedBy": "preregistration-stage-2-verifier-transport.md",
+  "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+  "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
+  "everyRawFilenameUsesOpaqueIdOnly": true,
+  "resolvedGap": "Every individual filter check and every active rejection reason per candidate, previously unavailable, is supplied by merged PR #220.",
+  "completeDiagnosticsSource": "the diagnosticSelection candidate array produced by selectBrandObservationWithCompleteFilterDiagnostics over the exact production pass set, NOT debug.finalSelections. See brand-diagnostic-parity-contract.json.",
+  "candidateIdentity": {
+    "fields": [
+      "opaqueItemId",
+      "candidateOrdinal",
+      "completeCandidateArrayLength",
+      "canonicalRecordSha256",
+      "stableCandidateId"
+    ],
+    "canonicalizationVersion": "issue-149-candidate-canonical-v1",
+    "contract": "candidate-fingerprint-contract.json"
+  },
+  "candidateRecordSchema": "candidate-decision-contract.json#requiredOwnPropertiesBeforeFinalization; enforced by finalizeCandidateRecord in scripts/eval/lib/issue-149-evidence-canonical.ts",
+  "passRecordSchema": "region-ocr-result-replay-contract.json#persistEveryFieldOfRegionOcrResult",
+  "itemLevelFailureRecords": "raw-ocr-contract.json#itemLevelFailureEvidence",
+  "forbiddenEvidenceKeyInventory": {
+    "authoritativeAsset": "artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json",
+    "bundlePath": "runtime/truth-key-inventory.json",
+    "assetSha256": "80ae4a144259a9a013d8a35163e724cef1dded4e92e0aa4abd0dc74587e1ff6f",
+    "canonicalFormatting": "a bare JSON array of the key names in authoritative order, no whitespace, one terminal newline",
+    "keyCount": 10,
+    "keysNotRestatedHere": true,
+    "keysNotRestatedHereWhy": "Amendment 6 declared the asset authoritative and then copied the array into four contracts and a test, which is four more places to drift. Operative contracts reference the path and hash; the runtime, the freeze script, the bundle scanner and the consistency test all READ the asset.",
+    "readByTheRuntimeEmittedEvidenceScanner": true,
+    "readByTheStagingLeakScan": true,
+    "readByTheHostBundleScanner": true,
+    "fieldNamesVersusValues": "These are FIELD NAMES, prohibited inside acquisition output. The historical identifier and fixture-path VALUES are checked after sealing by the read-only identity-leak verifier, which holds an inventory the isolated runtime never receives.",
+    "governsEveryEmittedFile": "pass records, candidate records, selection records, item-level failure records, count records, manifests and provenance records alike"
+  },
+  "supportProvenanceLevel": {
+    "candidateRecordSupportPassIds": "the support IDs exposed on the PUBLIC BrandCandidateDiagnostic \u2014 that is, the support the candidate had BEFORE any later merge",
+    "candidateProvenance": "the PUBLIC diagnostic provenance, likewise pre-merge",
+    "whyPreMerge": "Production merges support-pass information during candidate deduplication (dedupeBestCandidates -> mergeCandidateSupport, field-selection.ts:466, 2175-2195). The public diagnostic objects are constructed before that, and the only values written back to them afterwards are score, ranking and decision. supportPassIds is never written back.",
+    "finalSelectionSupportingPassIds": "persisted SEPARATELY from FieldSelection.supportingPassIds for the selected observation, where the post-merge value IS exposed",
+    "alternateProvenance": "persisted wherever FieldSelection exposes it",
+    "completePostDeduplicationMergedSupportForEveryFinalRankedCandidate": {
+      "available": false,
+      "why": "The merged support set exists only on the internal Candidate objects inside the ranked array. It is not written back to the public diagnostics and is not otherwise exposed.",
+      "notReconstructedInTheAdapter": true,
+      "notReconstructedWhy": "Recomputing the merge outside production would be a second implementation of deduplication, and labelling its output as production's merged support would misstate what the pipeline produced.",
+      "wouldRequire": "a production change to expose it, which this amendment forbids",
+      "recordedAs": "a genuine remaining limitation"
+    },
+    "doNotCall": "the candidate-record supportPassIds the final post-deduplication support set for every ranked candidate"
+  },
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run.",
+  "producedBy": {
+    "sealedInsideThePublicApi": true,
+    "signature": "acquireProductionBrandEvidence(input: ExtractionInput): Promise<SealedItemEvidence>",
+    "sealedSuccessFiles": [
+      "<opaqueItemId>.provenance.json",
+      "<opaqueItemId>.passes.json",
+      "<opaqueItemId>.fingerprints.json",
+      "<opaqueItemId>.words.jsonl",
+      "<opaqueItemId>.lines.jsonl",
+      "<opaqueItemId>.candidates.jsonl",
+      "<opaqueItemId>.selection.json",
+      "<opaqueItemId>.counts.json"
+    ],
+    "sealedFailureFiles": ["<opaqueItemId>.provenance.json", "<opaqueItemId>.failure.json"],
+    "provenanceSealedOnBothOutcomes": true,
+    "provenanceKeys": [
+      "opaqueItemId",
+      "imageByteLength",
+      "imageSha256",
+      "derivativeSha256",
+      "processedAt",
+      "extractionAdapterId",
+      "extractionAdapterVersion",
+      "ocrEngine",
+      "parserId",
+      "parserVersion",
+      "extractionAttemptCount",
+      "retried"
+    ],
+    "imageSha256IsRecomputed": "over the boundary's PRIVATE copy of imageBytes, before the extractor is invoked, and must equal derivativeSha256",
+    "aggregateCoversTheProvenanceFile": true,
+    "runLevelFilesRemainTheRunnersResponsibility": "SUPERSEDED. Run-level evidence is written by ONE authenticated run-level writer, scripts/eval/lib/issue-149-run-evidence-writer.ts. The runner writes no file itself; there is no direct filesystem route.",
+    "theRunnerNeverSerializesFiltersProjectsReordersOrParsesEvidence": true,
+    "contract": "acquisition-invocation-contract.json#acquisitionApi",
+    "runLevelWriter": {
+      "module": "scripts/eval/lib/issue-149-run-evidence-writer.ts",
+      "files": [
+        "counts.json",
+        "raw-evidence-manifest.json",
+        "raw-evidence-manifest.sha256",
+        "determinism-report.json",
+        "RUN_COMMITTED.json"
+      ],
+      "authenticity": "a module-private WeakSet of summaries produced by sealRunEvidence",
+      "transaction": "exclusive creation into a staging directory, readback, then rename into place",
+      "haltCodes": [
+        "RUN_SUMMARY_UNAUTHENTIC",
+        "RUN_SUMMARY_INVALID",
+        "RUN_EVIDENCE_DESTINATION_EXISTS",
+        "RUN_EVIDENCE_ALREADY_CONSUMED",
+        "RUN_EVIDENCE_WRITE_UNVERIFIED",
+        "RUN_EVIDENCE_COMMIT_FAILED",
+        "RUN_ITEM_SET_INCOMPLETE"
+      ],
+      "derivesEveryItemFactFromCommittedFiles": true,
+      "acceptsFromTheCaller": ["the closed expected item ID set", "a closed determinism report"]
+    }
+  },
+  "itemTransactionProtocol": {
+    "commitPoint": "the atomic rename of the item's staging directory to <opaqueItemId>",
+    "beforeCommit": "no complete item is visible at the committed path",
+    "afterCommit": "every file of the item is present",
+    "exclusiveCreation": "every file is written with the wx flag; nothing is ever truncated",
+    "singleUse": "an authentic package is claimed atomically before any I/O and cannot be written twice",
+    "notCrashAtomic": "deleting files in a catch block is NOT the commit rule and is not described as one",
+    "haltCodes": [
+      "SEALED_PACKAGE_ALREADY_CONSUMED",
+      "SEALED_EVIDENCE_DESTINATION_EXISTS",
+      "SEALED_EVIDENCE_COMMIT_FAILED"
+    ]
+  },
+  "actor2RawVerification": {
+    "module": "scripts/eval/lib/issue-149-raw-verifier.ts",
+    "verifies": [
+      "exact item sets for both runs",
+      "exact success/failure file set per item",
+      "every item file digest against the manifest",
+      "valid run commit markers",
+      "counts and determinism covered by the manifest",
+      "the manifest's own SHA-256 file",
+      "no staging directories or unexpected files",
+      "the final acquisition verdict"
+    ],
+    "isNotASizeCheck": "a du -sb measurement is a volume statement, not verification, and passing one on a half-written run reads as verification",
+    "transport": "runs on the HOST from a self-contained verifier bundle under plain pinned Node. Job B performs no repository checkout, so the earlier `npx vite-node scripts/eval/...` invocation could not have run there at all.",
+    "runsEvenWhenTheAcquisitionFailed": true,
+    "priorDefect": "The step had no always() condition and the container ran under `set -euo pipefail`, so a nonzero runner status ended the job before it. The path most in need of forensic verification was the one that skipped it.",
+    "verifiesTheManifestInBothDirections": true,
+    "doesNotAdjudicateForbiddenKeys": "Actor 2 records a DELEGATION entry, not a result. It previously emitted `no-forbidden-evidence-key: true` for a scan it never performed."
+  },
+  "jobCIdentityVerification": {
+    "module": "scripts/eval/lib/issue-149-raw-verifier.ts#verifyNoHistoricalIdentity",
+    "receives": [
+      "the sealed raw artifact, read-only",
+      "the minimal historical case-ID and fixture-path inventory",
+      "the forbidden evidence-key inventory"
+    ],
+    "doesNotReceive": [
+      "acceptable Brand values",
+      "truth labels",
+      "expected field values",
+      "prior classifications"
+    ],
+    "haltCode": "TRUTH_ISOLATION_FAILURE",
+    "reportLocation": "outside raw/, with its own digest",
+    "transport": "the minimal identity inventory is its own artifact, downloaded on the host only after the container exits; it is not part of the truth-free acquisition input and is never mounted with it",
+    "missingInventoryHalts": true,
+    "priorDefect": "The CLI converted an absent ID map or truth-key file into an empty array, so Job C would scan zero markers and could report clean. A zero-marker scan is never a successful clean scan.",
+    "haltCodes": [
+      "IDENTITY_INVENTORY_ABSENT",
+      "IDENTITY_INVENTORY_MALFORMED",
+      "IDENTITY_INVENTORY_DIGEST_MISMATCH",
+      "TRUTH_ISOLATION_FAILURE"
+    ]
+  }
+}

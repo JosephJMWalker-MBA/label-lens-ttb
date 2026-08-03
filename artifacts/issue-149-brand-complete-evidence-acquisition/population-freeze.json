@@ -1,0 +1,44 @@
+{
+  "artifact": "population-freeze",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "ocrRun": false,
+  "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+  "pr220MergeCommit": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+  "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
+  "frozenFrom": [
+    "artifacts/issue-149-brand-current-baseline-failure-decomposition/per-case-attribution.json",
+    "artifacts/issue-149-brand-candidate-construction-filter-decomposition/population-freeze.json"
+  ],
+  "corpusSource": "src/fixtures/eval/eval-manifest.json",
+  "expectedCounts": {
+    "total": 115,
+    "brandPresent": 105,
+    "brandAbsent": 10
+  },
+  "verifiedCounts": {
+    "total": 115,
+    "brandPresent": 105,
+    "brandAbsent": 10
+  },
+  "distinctSourceImages": 115,
+  "everyImageHashVerified": true,
+  "totalSourceImageBytes": 38683897,
+  "pr218SubsetCaseCount": 44,
+  "pr218SubsetIsSubsetOfPopulation": true,
+  "casesExpanded": false,
+  "casesSubstituted": false,
+  "casesExcluded": false,
+  "historicalIdentityLocation": "post-freeze/id-map.json only",
+  "brandPresenceFlagNote": "brandPresent appears in this accounting artifact and in the post-freeze area only. It is NOT written into the acquisition input and NOT derivable from an opaque identifier.",
+  "haltConditions": [
+    "an unexpected case count",
+    "a missing or additional case",
+    "an image hash or byte-size mismatch",
+    "a case whose manifest status is not `included`",
+    "a PR #218 frozen case absent from this population",
+    "an opaque identifier collision",
+    "a historical case ID, fixture path or prohibited key surviving into the acquisition input",
+    "a staged filename that is not the opaque pattern"
+  ]
+}

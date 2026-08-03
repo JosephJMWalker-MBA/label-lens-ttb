@@ -1,0 +1,44 @@
+{
+  "artifact": "amendment-2-linkage",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "amendmentNumber": 2,
+  "amendedBeforeAnyAcquisitionOcr": true,
+  "governedAcquisitionOcrBeforeAmendment2": {
+    "occurred": false,
+    "underOriginalPlan": false,
+    "underAmendment1": false,
+    "evidence": "No raw/ directory, no raw-evidence manifest and no execution workflow has ever existed on this branch."
+  },
+  "originalStage1": {
+    "head": "7600b0a9ba5ce6995274a517121f1eda18a30424",
+    "base": "8f0c6a7ca7c271eed14d9084ed6da7fe11f897a9",
+    "preregistrationSha256": "7b691c78a9de008039ccc1a7f94824015373b1caec58f8235c78a03587c641fb",
+    "preservedNotOverwritten": true
+  },
+  "amendment1": {
+    "head": "26157cfe036fb8b1506431d1aa9309029ac2dcdb",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "cfc118c670a9c69f783f3ca58174113711b553baf1278da31a35e31121bf13ad",
+    "preservedNotOverwritten": true,
+    "historicalMeaningRewritten": false,
+    "note": "Amendment 1's corrections stand. Amendment 2 builds on them and does not reinterpret them."
+  },
+  "amendment2": {
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "9287ecc0d5d01bae83316c9d0dcb462d6eca566c925405cde83631fa65c89d35",
+    "stage1ContractManifestAggregate": {
+      "recordedIn": "artifacts/issue-149-brand-complete-evidence-acquisition/stage-1-contract-manifest.sha256",
+      "notDuplicatedHere": true,
+      "why": "The aggregate covers every governed file. Writing it into a file the manifest itself hashes would be self-referential: recording it would change the value being recorded. It lives in exactly one place, on the manifest's own trailing `# aggregate` line, which the manifest excludes from its own file list."
+    }
+  },
+  "corrections": [
+    "acquisition route moved off runCaseArtifacts to a direct extractLabelEvidenceDetailed call",
+    "complete diagnostics obtained by an exact-pass-set call with a parity assertion against debug.finalSelections.brand",
+    "stale contract language swept, with historical records explicitly labelled",
+    "isolation claim corrected: Stage 1 tests are static validation, runtime isolation is a discover-mode gate",
+    "candidate fingerprint defined over a non-circular preimage with an exact canonicalization",
+    "whole Stage 1 contract package hashed, not just the preregistration",
+    "100 MB fallback reworded as a temporarily retained workflow artifact"
+  ]
+}

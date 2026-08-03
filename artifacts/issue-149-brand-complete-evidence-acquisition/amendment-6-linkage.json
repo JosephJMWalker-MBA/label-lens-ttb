@@ -1,0 +1,139 @@
+{
+  "artifact": "amendment-6-linkage",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "amendmentNumber": 6,
+  "amendedBeforeAnyGovernedAcquisitionOcr": true,
+  "amendedBeforeTrustedPreparation": true,
+  "amendedBeforeDiscovery": true,
+  "runStatusBeforeAmendment6": {
+    "governed115CaseAcquisitionOcr": false,
+    "acquisitionRunnerOcr": false,
+    "trustedPreparation": false,
+    "discoverMode": false,
+    "executeMode": false,
+    "runtimeBundleBuilt": false,
+    "evidence": "No raw/ directory, no raw-evidence manifest, no workflow file, no workflow-mode.txt and no acquisition runner has ever existed on this branch.",
+    "ordinarySuiteBundledImageOcr": {
+      "runs": true,
+      "files": [
+        "src/fixtures/corpus-real-ocr.test.ts",
+        "src/pipeline/extractor/extractor.test.ts",
+        "src/pipeline/extractor/extractor-precheck.integration.test.ts",
+        "src/fixtures/eval/eval-harness.integration.test.ts"
+      ],
+      "note": "Unmodified, pre-existing tests over bundled fixture images. Not the governed 115-case corpus. Disclosed here so no document in the package carries an unqualified 'no OCR has run'."
+    }
+  },
+  "originalStage1": {
+    "head": "7600b0a9ba5ce6995274a517121f1eda18a30424",
+    "base": "8f0c6a7ca7c271eed14d9084ed6da7fe11f897a9",
+    "preregistrationSha256": "7b691c78a9de008039ccc1a7f94824015373b1caec58f8235c78a03587c641fb",
+    "preservedNotOverwritten": true
+  },
+  "amendment1": {
+    "head": "26157cfe036fb8b1506431d1aa9309029ac2dcdb",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "cfc118c670a9c69f783f3ca58174113711b553baf1278da31a35e31121bf13ad",
+    "preservedNotOverwritten": true
+  },
+  "amendment2": {
+    "head": "ad1c296194e21e91af8333953ad47abe396495dc",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "9287ecc0d5d01bae83316c9d0dcb462d6eca566c925405cde83631fa65c89d35",
+    "preservedNotOverwritten": true
+  },
+  "amendment3": {
+    "head": "37e1a3ea752c12b230d468c10f604b8550d37ce1",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "3cf3d25fbb892dabc66e58796841c542fcc4eb79f7cd5d561271a7689ed87786",
+    "preservedNotOverwritten": true
+  },
+  "amendment4": {
+    "head": "cb574539d5e541446ec58d2b2bc62b9fda480048",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "87302e60a0629f6d657f4f118c8d73a50ea93aa3d321c15f77b5974ae75d28a3",
+    "preservedNotOverwritten": true,
+    "historicalMeaningRewritten": false,
+    "note": "Amendment 4's nine reconciliations stand. Amendment 5 closes five implementation-readiness gaps that survived it."
+  },
+  "amendment5": {
+    "head": "fca0755d629af2a15206d4cc5f5251768223e2f7",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "274e45779c849d4e6ada50e10b74d1fc8f6b1396f68b540ae02156e640422332",
+    "preservedNotOverwritten": true,
+    "historicalMeaningRewritten": false,
+    "uncharacterizedLocalTestFlake": {
+      "reported": true,
+      "detail": "One local full-suite run reported a single failure whose identity was not captured before the output scrolled. Two subsequent local runs and ordinary CI were clean.",
+      "causeInvented": false,
+      "retainedVerbatim": true
+    },
+    "note": "Amendment 5's closures stand. Amendment 6 fixes two execution blockers it introduced or left, and unifies contracts it left inconsistent."
+  },
+  "amendment6": {
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "headAtAmendmentStart": "fca0755d629af2a15206d4cc5f5251768223e2f7",
+    "preregistrationSha256": {
+      "recordedIn": "artifacts/issue-149-brand-complete-evidence-acquisition/preregistration.sha256",
+      "notDuplicatedHere": true
+    },
+    "stage1ContractManifestAggregate": {
+      "recordedIn": "artifacts/issue-149-brand-complete-evidence-acquisition/stage-1-contract-manifest.sha256",
+      "notDuplicatedHere": true,
+      "why": "The aggregate covers every governed file. Writing it into a file the manifest itself hashes would be self-referential."
+    }
+  },
+  "executionBlockersClosed": [
+    {
+      "id": "ocrConfidence-seven-fields",
+      "defect": "Amendment 5's closed schema declared six AnalyzerOcrConfidence keys; production emits seven, including a required missingTokenCount. Every real candidate would have been rejected as carrying an unexpected key.",
+      "whyCiStayedGreen": "The synthetic tests and the hard-coded drift guard repeated the same wrong list.",
+      "fix": "missingTokenCount added everywhere, with arithmetic invariants; a production-compatibility test drives the real selector and finalizes actual emitted candidates through one reference adapter; the drift guard is rebuilt on typed exemplars and real selector output.",
+      "referenceAdapter": "scripts/eval/lib/issue-149-candidate-adapter.ts",
+      "compatibilityTest": "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts"
+    },
+    {
+      "id": "wine-alcohol-parse-dependency",
+      "defect": "The closure gate rejected every transitive dependency under src/domain/rules/**, but field-selection.ts imports @/domain/rules/wine-alcohol-parse on line 1. Trusted preparation would have halted while bundling the incumbent.",
+      "fix": "one frozen path-and-hash exception; every other rules module stays prohibited",
+      "path": "src/domain/rules/wine-alcohol-parse.ts",
+      "sha256": "2ec1368cf3f4fcfab264d1507f98267aa6f6112091332d4dda5a76152ea816e7",
+      "transitiveImports": [],
+      "contractTest": "src/fixtures/eval/issue-149-dependency-closure.test.ts"
+    }
+  ],
+  "forbiddenEvidenceKeyInventory": {
+    "authoritativeAsset": "artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json",
+    "assetSha256": "80ae4a144259a9a013d8a35163e724cef1dded4e92e0aa4abd0dc74587e1ff6f",
+    "keyCount": 10,
+    "priorDefect": "Three different sets were in play \u2014 ten keys, seven keys and five keys \u2014 so brandPresent, historicalCaseId and historicalImagePath were absent from the executable emitted-field scanner."
+  },
+  "corrections": [
+    "AnalyzerOcrConfidence corrected to seven fields with enforced arithmetic invariants",
+    "a single reference candidate adapter, required for Stage 2 and tested against real selector output",
+    "the production drift guard rebuilt on typed exemplars instead of asserted key lists",
+    "one frozen path-and-hash exception for the incumbent's mandatory wine-alcohol-parse dependency, plus a production-source base-drift gate",
+    "one authoritative ten-key forbidden-evidence inventory, held in a canonical asset and governing every emitted file",
+    "the ID-map readable-only-after rule replaced with accurate staging, mounting and authorization controls",
+    "the Stage 2 workflow frozen as three separate jobs, with Job A trusted rather than the workflow being called truth-free",
+    "a clean Job C identity-leak report made a mandatory precondition for both commitment and evaluation",
+    "the bundle scanner's source-text inference replaced with a canonical inventory asset and a raw-byte scan covering binary files",
+    "stale statements corrected: the recognizer claim, the actor-3 access claim, the before-truth-is-loaded framing, and git-sha.txt"
+  ],
+  "unchangedByThisAmendment": [
+    "the frozen 115-item population and its opaque identifiers",
+    "the incumbent configuration pins, including field-selection.ts 8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
+    "two exact corpus runs with no retries and no selective rerun",
+    "the direct extractLabelEvidenceDetailed route and the runCaseArtifacts prohibition",
+    "full-object canonical diagnostic parity",
+    "the four experiment-controlled mounts",
+    "the closed RegionOcrResult schema and the omitted-originalGeometry rule",
+    "exact-byte artifact integrity versus semantic fingerprints",
+    "the prohibition on modifying PR #195 or any production behaviour"
+  ],
+  "capability3": {
+    "status": "SATISFIABLE",
+    "by": "a separately governed, zero-OCR replay of the persisted complete ordered RegionOcrResult array",
+    "performedHere": false
+  }
+}

@@ -1,6 +1,6 @@
 // @vitest-environment node
 /* eslint-disable @typescript-eslint/no-explicit-any -- integration test drives loosely-typed dual-dialect Drizzle handles */
-import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { sql } from "drizzle-orm";
 
 const TEST_DB_FILE = ".local/test-bootstrap.db";
@@ -15,6 +15,7 @@ vi.hoisted(() => {
 });
 
 import { createTestSqliteDb } from "../../../tests/integration/test-db-setup";
+import { createIsolatedMysqlDatabase } from "../../../tests/integration/mysql-test-database";
 import { BootstrapConfigError, parseSpecsFromEnv, redactEmail, runBootstrap } from "./bootstrap";
 
 const MYSQL_DATABASE_URL = process.env.DATABASE_URL;
@@ -77,18 +78,27 @@ for (const dialect of DIALECTS) {
     let schema: any;
     let isSQLite: boolean;
     let auth: any;
+    let isolatedMysql: Awaited<ReturnType<typeof createIsolatedMysqlDatabase>> | undefined;
+    let activeDatabaseUrl: string;
 
     async function load() {
       vi.resetModules();
       if (dialect === "sqlite") {
         const sqlite = createTestSqliteDb(TEST_DB_FILE, true);
         sqlite.close();
-        process.env.DATABASE_URL = `file:${TEST_DB_FILE}`;
+        activeDatabaseUrl = `file:${TEST_DB_FILE}`;
       } else {
-        process.env.DATABASE_URL = MYSQL_DATABASE_URL as string;
+        isolatedMysql = await createIsolatedMysqlDatabase(
+          MYSQL_DATABASE_URL as string,
+          "bootstrap",
+        );
+        activeDatabaseUrl = isolatedMysql.databaseUrl;
+        const { applyMigrations } = await import("../migrate");
+        await applyMigrations(activeDatabaseUrl);
       }
+      process.env.DATABASE_URL = activeDatabaseUrl;
       const clientMod = await import("@/db/client");
-      clientMod.initializeDatabase(process.env.DATABASE_URL as string);
+      clientMod.initializeDatabase(activeDatabaseUrl);
       db = clientMod.db;
       schema = clientMod.schema;
       isSQLite = clientMod.isSQLite;
@@ -121,6 +131,21 @@ for (const dialect of DIALECTS) {
 
     beforeAll(load);
     beforeEach(clearAuthTables);
+    afterAll(async () => {
+      await isolatedMysql?.drop();
+    });
+
+    if (dialect === "mysql") {
+      it("uses a suite-owned database instead of the shared MySQL test database", async () => {
+        expect(activeDatabaseUrl).toBe(isolatedMysql?.databaseUrl);
+        expect(activeDatabaseUrl).not.toBe(MYSQL_DATABASE_URL);
+
+        const activeName = new URL(activeDatabaseUrl).pathname.replace(/^\/+/, "");
+        const sharedName = new URL(MYSQL_DATABASE_URL as string).pathname.replace(/^\/+/, "");
+        expect(activeName).toMatch(/^test_bootstrap_[0-9a-f]{12}$/);
+        expect(activeName).not.toBe(sharedName);
+      });
+    }
 
     it("creates accounts with correct roles, then is idempotent", async () => {
       const first = await runBootstrap({ auth, db, schema }, { env: BASE_ENV });

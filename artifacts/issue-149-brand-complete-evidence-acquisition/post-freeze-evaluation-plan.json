@@ -1,0 +1,267 @@
+{
+  "artifact": "post-freeze-evaluation-plan",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "precondition": "Both raw-evidence manifests exist and their aggregate SHA-256 files verify, AND the 100 MB repository-footprint gate has been evaluated and did not stop the run.",
+  "purpose": "Validation of evidence completeness only.",
+  "normalization": {
+    "source": "src/fixtures/eval/metrics.ts",
+    "functions": ["normalizeKey", "brandNormalizedMatch", "normalizedIncludes"],
+    "changed": false,
+    "newAliasAdded": false,
+    "truthGuidedCorrectionApplied": false
+  },
+  "rederivations": [
+    {
+      "field": "truthInRawOcr",
+      "from": "the complete word evidence across every Brand-eligible pass",
+      "previouslyCarriedNotRederivable": true
+    },
+    {
+      "field": "truthOnReconstructedLine",
+      "from": "all reconstructed lines, with no 12-line cap"
+    },
+    {
+      "field": "truthBearingCandidateFormed",
+      "from": "the complete candidate array including rejected candidates"
+    },
+    {
+      "field": "truthBearingCandidateKept",
+      "from": "kept flags on truth-matching candidates"
+    },
+    {
+      "field": "filtersRejectingEachTruthBearingCandidate",
+      "from": "the complete activeRejectionReasons array recorded against each truth-matching rejected candidate",
+      "limitation": "None remaining from the ladder: merged PR #220 records every rule that would reject a candidate. A one-filter counterfactual is still not answered by those reasons alone, because candidates are constructed from the passes; it is answered by a separately governed zero-OCR replay of the persisted complete ordered RegionOcrResult array, which is not performed here."
+    },
+    {
+      "field": "truthRank",
+      "from": "position in the complete ranked list"
+    },
+    {
+      "field": "selectedCorrectness",
+      "from": "the final selected value"
+    },
+    {
+      "field": "finalAuthorityResult",
+      "from": "the final state and abstention reason"
+    }
+  ],
+  "crossCheckAgainst": [
+    "artifacts/brand-evidence-path-diagnosis/cases.json",
+    "artifacts/issue-149-brand-current-baseline-failure-decomposition/per-case-attribution.json",
+    "artifacts/issue-149-brand-candidate-construction-filter-decomposition/per-case-stage-attribution.json"
+  ],
+  "differenceVocabulary": [
+    {
+      "code": "CURRENT_RERUN_CONFIRMS_PRIOR_FIELD",
+      "meaning": "the rerun reproduces the previously carried value"
+    },
+    {
+      "code": "PRIOR_FIELD_NOT_REPRODUCED",
+      "meaning": "the rerun disagrees and the difference is not explained by a known pipeline change"
+    },
+    {
+      "code": "CURRENT_PIPELINE_DIFFERENCE",
+      "meaning": "the rerun disagrees and a specific, identified change between the two bases accounts for it"
+    },
+    {
+      "code": "NONDETERMINISTIC_EVIDENCE",
+      "meaning": "the primary and repeat runs themselves disagree on this field"
+    },
+    {
+      "code": "CANNOT_COMPARE_SEMANTICALLY",
+      "meaning": "the prior field and the new field do not measure the same thing"
+    }
+  ],
+  "prohibited": [
+    "silently replacing a prior record",
+    "claiming current-equivalence where a measurement now disagrees",
+    "modifying any acquired artifact",
+    "simulating removal of a filter",
+    "recommending a filter treatment",
+    "choosing a successor treatment",
+    "treating the diagnostic selection rather than debug.finalSelections as the behavioural authority"
+  ],
+  "expectedUseOfTheResult": "A later, separately preregistered zero-OCR study may use this evidence. This sprint does not perform, design or recommend that study's treatment.",
+  "amendedBy": "preregistration-amendment-14.md",
+  "actorsAndBoundaries": {
+    "jobA_trustedPreparation": {
+      "runsOcr": false,
+      "checksOutTheRepository": true,
+      "mayReadHistoricalIdentityAndTheEvaluationManifest": true,
+      "why": "Staging cannot freeze the corpus, assign opaque identifiers or write the post-freeze map without them.",
+      "does": [
+        "verify the Stage 1 package against stage-1-contract-manifest.sha256",
+        "verify preregistration.sha256",
+        "run staging and verify source images and the post-freeze map",
+        "verify the incumbent configuration pins and the production-source base-drift gate",
+        "build the allowlisted runtime bundle and generate its dependency closure",
+        "write the bundle manifest and run the pre-isolation bundle scan"
+      ],
+      "emitsTruthFreePreparationArtifactContainingOnly": [
+        "the runtime bundle",
+        "the bundle manifest",
+        "the truth-free input manifest",
+        "the staged opaque images",
+        "the empty-output specification"
+      ],
+      "mustNotPlaceInThatArtifact": [
+        "historical case identifiers",
+        "historical fixture paths",
+        "the post-freeze ID map",
+        "governed truth",
+        "acceptable values",
+        "prior per-case records"
+      ],
+      "isNotTruthFreeItself": true,
+      "isNotTruthFreeItselfNote": "Job A is TRUSTED, not truth-free. Calling the whole workflow truth-free would be false. What is truth-free is the artifact it emits and the isolated job that consumes it.",
+      "receivesGovernedTruth": true,
+      "receivesGovernedTruthNote": "Job A PHYSICALLY reads a truth-bearing source. Showing it as 'governed truth: no' was wrong. See governedTruthAccess for exactly what it may read and what it may use.",
+      "governedTruthAccess": {
+        "physicallyReadsATruthBearingSource": true,
+        "supersededClaim": "Job A receives no governed truth.",
+        "whyItWasFalse": "The freeze script reads artifacts/issue-149-brand-current-baseline-failure-decomposition/per-case-attribution.json and accesses c.governedTruth.present to enforce the frozen 105/10 Brand-present split. Acceptable Brand values and other governed truth live in the same case objects, so they are physically in the process's address space whether or not they are used.",
+        "mayPhysicallyRead": [
+          "the PR #217 per-case attribution artifact",
+          "governedTruth.present",
+          "acceptableValues and other truth fields that coexist in that source object",
+          "the evaluation manifest",
+          "historical identity and source image paths"
+        ],
+        "mayUseOnly": [
+          "case identity and inclusion status",
+          "source-image path, SHA-256 and byte size",
+          "governedTruth.present, SOLELY for the preregistered 105/10 corpus-accounting assertion",
+          "PR #218 membership, for the frozen-subset assertion"
+        ],
+        "mustNotUseAcceptableValuesOrTruthTextFor": [
+          "inclusion or exclusion",
+          "opaque-ID assignment",
+          "image ordering",
+          "staged filenames",
+          "preprocessing",
+          "runtime bundle construction",
+          "any acquisition input or emitted field"
+        ],
+        "preparationArtifactRemainsTruthFree": true,
+        "jobBRemainsTruthFree": true,
+        "firstPhysicalAccessToATruthBearingSourceOccursIn": "trusted Job A",
+        "evaluationUseTruthBoundaryRemains": "between actor 2 and actor 3",
+        "onlyActor3MayUseGovernedTruthAgainstAcquiredEvidence": true,
+        "noninterferenceClaimIsBounded": "Complete noninterference from governedTruth.present is NOT claimed: the script intentionally uses that flag for the 105/10 accounting assertion. What is claimed, and tested, is that acceptable Brand values and other truth TEXT do not influence the truth-free input manifest, the opaque ordering or the staged filenames.",
+        "stagingIndependenceTestedBy": "src/fixtures/eval/issue-149-staging-independence.test.ts"
+      },
+      "distinctFromStage1TrustedStaging": "Stage 1 trusted staging has ALREADY run: it froze and verified the corpus and generated the three committed artifacts. Stage 2 Job A additionally builds and scans the runtime bundle and emits the truth-free preparation artifact. Neither of those has happened."
+    },
+    "jobB_isolatedDiscoverOrExecute": {
+      "checksOutTheRepository": false,
+      "receivesTheRepositoryWorkspace": false,
+      "receivesOnly": "Job A's truth-free preparation artifact",
+      "containerMounts": "the four governed experiment-controlled data mounts, plus the frozen pseudo-filesystem allowlist and named tmpfs scratch",
+      "gitHubTokenOrRepositoryCredentialEntersTheContainer": false,
+      "discoverStopsForOwnerReviewBeforeExecute": true,
+      "executeUploads": "one sealed evidence artifact plus its externally recorded digest",
+      "receivesGovernedTruth": false,
+      "receivesTheIdMap": false,
+      "commitsToGit": false
+    },
+    "jobC_readOnlyIdentityLeakVerifier": {
+      "runsOnlyAfter": "both raw manifests are sealed and the evidence artifact exists",
+      "evidenceExposure": "downloaded or mounted READ-ONLY",
+      "receives": [
+        "the sealed evidence, read-only",
+        "a minimal historical case-ID and fixture-path inventory"
+      ],
+      "doesNotReceive": [
+        "acceptable Brand values",
+        "governed truth labels",
+        "prior per-case classifications"
+      ],
+      "does": [
+        "verify the evidence artifact digest",
+        "verify both raw manifests against the frozen bytes",
+        "scan the frozen bytes for historical case IDs and historical fixture paths"
+      ],
+      "mayNot": [
+        "modify any raw file",
+        "rewrite, reformat or re-emit any raw file",
+        "replace any raw file",
+        "perform any truth-based evaluation"
+      ],
+      "reportLocation": "outside raw/, with its own SHA-256",
+      "onHit": "TRUTH_ISOLATION_FAILURE",
+      "cleanReportIsAMandatoryPreconditionFor": [
+        "actor 2 committing evidence",
+        "actor 3 beginning post-freeze evaluation"
+      ]
+    },
+    "actor2_postRunCommitProcess": {
+      "authorization": "explicit owner authorization, separate from the OCR run",
+      "isNotTheOcrProcess": true,
+      "preconditions": [
+        "the Job C identity-leak report exists and is clean",
+        "the evidence artifact digest verifies",
+        "both raw manifests verify"
+      ],
+      "appliesWhen": "total evidence footprint is at or below 100 MB",
+      "physicalInaccessibilityClaimed": false,
+      "mayOperateInARepositoryCheckout": true,
+      "theControlThatActuallyProtectsTheEvidence": "immutable-byte equality, not file inaccessibility",
+      "evidenceInput": "the verified workflow artifact \u2014 not a regenerated, re-serialized or locally rebuilt copy",
+      "mustDo": [
+        "verify the outer artifact digest against the value the OCR job recorded",
+        "verify BOTH raw manifests (primary and repeat) against the artifact contents",
+        "verify the Job C identity-leak report is present and clean",
+        "commit exactly those immutable bytes",
+        "verify that every committed file's SHA-256 equals the artifact manifest entry",
+        "stop after exact commitment and verification"
+      ],
+      "mustNotDo": [
+        "transform any evidence file",
+        "filter, subset or selectively omit any evidence file",
+        "regenerate or recompute any evidence file",
+        "re-serialize, reformat or pretty-print any evidence file",
+        "reorder records within any evidence file",
+        "use truth or historical identity as an input to any decision it makes"
+      ],
+      "anyChangedByteFailsVerification": true,
+      "truthIsNotAnInputToItsOperation": true,
+      "truthIsNotAnInputNote": "Actor 2 makes no content-dependent decision at all: it commits the bytes it verified, or it fails.",
+      "haltCodes": {
+        "ARTIFACT_DIGEST_MISMATCH": "the downloaded artifact does not match the digest the OCR job recorded",
+        "RAW_MANIFEST_MISMATCH": "a raw file's SHA-256 does not match its manifest entry",
+        "IDENTITY_VERIFIER_REPORT_MISSING_OR_UNCLEAN": "the Job C report is absent, unverifiable or reports a hit",
+        "COMMITTED_BYTES_DIFFER": "a committed file's SHA-256 does not equal the artifact manifest entry"
+      }
+    },
+    "actor3_postFreezeEvaluationProcess": {
+      "authorization": "separate authorization again, after actor 2 stops for review",
+      "preconditions": [
+        "the Job C identity-leak report exists and is clean",
+        "both raw manifests verify",
+        "the raw evidence is committed and immutable"
+      ],
+      "isTheOnlyActorAuthorizedToUseTheMapOrGovernedTruthForEvaluation": true,
+      "physicalExclusivityClaimed": false,
+      "physicalExclusivityNote": "Other processes can READ post-freeze/id-map.json \u2014 it is committed on this branch. What is exclusive is AUTHORIZATION to use it, and governed truth, for evaluation. An earlier revision claimed actor 3 was the only actor that may open the map; that was an access claim the design does not enforce.",
+      "mayUse": [
+        "artifacts/issue-149-brand-complete-evidence-acquisition/post-freeze/id-map.json",
+        "the governed Brand truth",
+        "acceptable Brand values",
+        "prior per-case classifications and PR #217/#218 records"
+      ],
+      "mayNotModify": "any raw evidence file, for any reason"
+    },
+    "above100MB": {
+      "jobBStill": "uploads and verifies the complete lossless artifact",
+      "thenStopsBefore": ["Git commitment", "post-freeze truth evaluation"],
+      "jobCStillRuns": true,
+      "jobCStillRunsWhy": "Identity-leak verification does not depend on whether the evidence is committed.",
+      "requires": "an explicit owner decision about durable archival before anything continues",
+      "actor2AndActor3DoNotRun": true
+    }
+  },
+  "truthBoundaryLocation": "The EVALUATION-USE boundary sits between actor 2 and actor 3. It is not the first physical access to truth-bearing files: that occurs in trusted Job A, which reads the PR #217 attribution artifact. Job B is isolated and truth-free; Job C holds only a minimal identifier inventory and no truth.",
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run."
+}

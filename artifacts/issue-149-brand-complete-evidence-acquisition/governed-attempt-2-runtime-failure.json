@@ -1,0 +1,36 @@
+{
+  "artifact": "governed-attempt-2-runtime-failure",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "issue": 149,
+  "transitionSha": "92574bcf7e105b63dfc7036a5b625c3f4b87da97",
+  "workflowRunId": "30753920592",
+  "runAttempt": 1,
+  "classification": "RUNTIME_FAILURE",
+  "infrastructurePreservationSucceeded": true,
+  "primaryExtracted": 0,
+  "primaryFailed": 115,
+  "repeatExtracted": 0,
+  "repeatFailed": 115,
+  "firstFailure": {
+    "code": "OCR_UNAVAILABLE",
+    "detail": "__dirname is not defined"
+  },
+  "remainingFailureCount": 229,
+  "remainingFailure": {
+    "code": "OCR_UNAVAILABLE",
+    "detail": "missing eng.traineddata"
+  },
+  "brandMetricsProduced": false,
+  "scientificResultProduced": false,
+  "rerunPermitted": false,
+  "preservedArtifacts": {
+    "forensic": "8835351859",
+    "raw": "8835358920",
+    "receipt": "8835361885"
+  },
+  "notes": [
+    "Workflow 30753920592 remains run_attempt 1 and must not be rerun.",
+    "The preserved files are runtime-failure evidence, not completed raw experimental evidence.",
+    "No OCR words, reconstructed lines, candidates, rankings, selections, authority decisions, Brand metrics or experimental conclusions were produced."
+  ]
+}

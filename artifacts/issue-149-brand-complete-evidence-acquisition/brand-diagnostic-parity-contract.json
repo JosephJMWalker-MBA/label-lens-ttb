@@ -1,0 +1,125 @@
+{
+  "artifact": "brand-diagnostic-parity-contract",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "amendedBy": "preregistration-amendment-14.md",
+  "correctionOf": {
+    "priorClaim": "complete diagnostics live directly in ExtractionDebug.finalSelections.brand.brandDiagnostics.candidates",
+    "whyWrong": "extractLabelEvidenceDetailed calls the ordinary selectBrandObservation, so debug.finalSelections carries the DEFAULT shape with neither filterChecks nor activeRejectionReasons. The prior claim was false and is corrected here, before any acquisition OCR."
+  },
+  "howCompleteDiagnosticsAreObtained": {
+    "step1": "run the production extractor once via extractLabelEvidenceDetailed and keep its debug object",
+    "step2": "reconstruct the exact pass set production used for its FINAL Brand selection",
+    "step3": "call selectBrandObservationWithCompleteFilterDiagnostics over that exact pass set",
+    "code": "const brandPasses = debug.primarySelections.brand.observation.state === \"OBSERVED\" ? [debug.passes[0]] : debug.passes;\nconst diagnosticSelection = selectBrandObservationWithCompleteFilterDiagnostics(brandPasses);",
+    "unconditionalAllPassesProhibited": true,
+    "unconditionalAllPassesProhibitedWhy": "Production retains the PRIMARY selection when primary Brand is OBSERVED, and only otherwise selects over the complete pass array. Calling the diagnostic selector over all passes unconditionally would produce a different candidate population from production on every OBSERVED case.",
+    "obtainedInsideTheAdapter": true,
+    "theRunnerNeverCallsTheSelector": true
+  },
+  "mirrorsProductionBecause": {
+    "source": "src/pipeline/extractor/extractor.ts",
+    "productionCode": "primaryBrand = selectBrandObservation([primaryPass]); ... brand = primaryBrand.observation.state === \"OBSERVED\" ? primaryBrand : selectBrandObservation(passes);",
+    "primaryPassIsPassesIndexZero": true
+  },
+  "parityAssertion": {
+    "when": "for every case, before any evidence is emitted",
+    "rule": "diagnosticSelection must be behaviourally identical to debug.finalSelections.brand after removing ONLY filterChecks and activeRejectionReasons",
+    "authority": "debug.finalSelections.brand \u2014 the default final selection remains the authority against which parity is tested; the diagnostic selection is never treated as the authority",
+    "comparedFields": [
+      "observation.state",
+      "observation.value",
+      "observation.confidence",
+      "observation.ocrEvidenceScore",
+      "observation.alternates",
+      "sourceRegion",
+      "source",
+      "supportingPassIds",
+      "recoveryPassUsed",
+      "brandDiagnostics.abstentionReason",
+      "brandDiagnostics.candidates.length",
+      "brandDiagnostics.candidates order",
+      "per candidate: rawText",
+      "per candidate: cleanedValue",
+      "per candidate: kept",
+      "per candidate: filterReason",
+      "per candidate: decision",
+      "per candidate: score",
+      "per candidate: ranking",
+      "per candidate: candidateProvenance",
+      "per candidate: assembly",
+      "per candidate: lineIndexes"
+    ],
+    "haltCode": "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE",
+    "onHalt": "no evidence is emitted for that case and the run stops; no case is retried and no mismatch is repaired",
+    "authoritativeAlgorithm": [
+      "deep-clone diagnosticSelection",
+      "remove ONLY filterChecks and activeRejectionReasons from every Brand candidate",
+      "canonicalize that complete FieldSelection with issue-149-candidate-canonical-v1",
+      "canonicalize debug.finalSelections.brand with the same algorithm",
+      "require EXACT string equality of the two canonical forms"
+    ],
+    "isFullObjectEquality": true,
+    "fieldAllowlistIsAuthoritative": false,
+    "comparedFieldsNote": "The list below is EXPLANATORY ONLY and is not authoritative. Full-object canonical equality is the invariant, so brandDiagnostics.lines, every candidate property, all observation and provenance fields, and ANY future enumerable field added to FieldSelection are compared automatically.",
+    "explicitlyIncludes": [
+      "brandDiagnostics.lines",
+      "every candidate property",
+      "all observation and provenance fields",
+      "any future enumerable field on FieldSelection"
+    ],
+    "priorDefect": "Amendment 2 made a 21-field allowlist authoritative. It omitted brandDiagnostics.lines, and a future field could have escaped comparison silently."
+  },
+  "candidateEvidenceSource": {
+    "isThe": "diagnosticSelection candidate array",
+    "isNot": "debug.finalSelections.brand.brandDiagnostics.candidates",
+    "why": "only the diagnostic selection carries filterChecks and activeRejectionReasons; parity proves the two are otherwise the same array"
+  },
+  "costOfTheSecondCall": {
+    "extraOcrPasses": 0,
+    "note": "selectBrandObservationWithCompleteFilterDiagnostics is a pure re-selection over pass results already produced. It runs no OCR and reads no image."
+  },
+  "stage2TestContract": {
+    "required": true,
+    "kind": "focused synthetic parity test",
+    "mustProve": [
+      "a synthetic pass set where primary Brand is OBSERVED compares only [passes[0]]",
+      "a synthetic pass set where primary Brand is not OBSERVED compares the complete pass array",
+      "canonical equality holds once the two diagnostic fields are removed",
+      "an injected difference in brandDiagnostics.lines is detected",
+      "an injected difference in a candidate property is detected",
+      "an injected difference in an observation field is detected",
+      "the halt code is BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE"
+    ],
+    "implementedInThisAmendment": true,
+    "implementedIn": [
+      "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts",
+      "src/fixtures/eval/issue-149-ranked-invariants.test.ts"
+    ],
+    "implementedNote": "Amendment 10 added and ran these tests; the contract still said they were not implemented. Amendment 11 corrects that and adds the ranked-invariant tests that reach past parity."
+  },
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run.",
+  "candidateEvidenceSourceProperty": "the INTERNALLY derived diagnosticSelection.brandDiagnostics.candidates \u2014 never a caller-supplied selection or array",
+  "parityIsInternalToThePublicApi": {
+    "performedInside": "acquireProductionBrandEvidence",
+    "algorithm": [
+      "deep-clone the internally derived diagnosticSelection",
+      "remove ONLY filterChecks and activeRejectionReasons from every Brand candidate",
+      "canonicalize the complete stripped FieldSelection",
+      "canonicalize debug.finalSelections.brand with the same frozen algorithm",
+      "require exact canonical equality"
+    ],
+    "automaticallyIncludes": [
+      "brandDiagnostics.lines",
+      "all observation fields",
+      "all provenance fields",
+      "every candidate field",
+      "future enumerable FieldSelection fields"
+    ],
+    "authority": "debug.finalSelections.brand",
+    "theDerivedSelectionSuppliesOnly": ["filterChecks", "activeRejectionReasons"],
+    "noEvidenceReturnedOnFailure": true,
+    "haltCode": "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE",
+    "candidateEvidenceComesFrom": "the internally derived diagnostic selection inside the extractor-owning public API"
+  }
+}

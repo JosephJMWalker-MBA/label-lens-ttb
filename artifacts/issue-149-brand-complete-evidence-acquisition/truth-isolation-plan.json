@@ -1,0 +1,262 @@
+{
+  "artifact": "truth-isolation-plan",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "acquisitionInput": ".local/issue-149-acquisition-inputs (staged images only) plus truth-free-input-manifest.json",
+  "acquisitionInputFields": [
+    "opaqueItemId",
+    "stagedImageFileName",
+    "sourceImageSha256",
+    "sourceImageByteSize"
+  ],
+  "theAcquisitionProcessNeverReceives": {
+    "historicalCaseIds": false,
+    "brandBearingFilenames": false,
+    "historicalFixturePaths": false,
+    "governedBrandTruth": false,
+    "acceptableBrandValues": false,
+    "priorPerCaseClassifications": false,
+    "pr217OrPr218ResultRecords": false,
+    "thePostFreezeIdMap": false,
+    "note": "Every entry is false. Enforced by construction in the staging step, asserted by the freeze script, and tested in src/fixtures/eval/issue-149-acquisition-isolation.test.ts."
+  },
+  "scanBeforeFreeze": {
+    "scope": "the acquisition input, the staged directory listing, the mounted file set, and every file under raw/<run>/ \u2014 as scanned FROM INSIDE the isolated boundary",
+    "scansFor": [
+      "the forbidden evidence key inventory, in every emitted file",
+      "unexpected mounted files",
+      "unexpected emitted files"
+    ],
+    "doesNotScanFor": [
+      "governed Brand strings appearing inside OCR transcripts or candidate values"
+    ],
+    "whyNot": "A legitimate OCR transcript may naturally contain the Brand text. Such text is EVIDENCE, not proof of truth leakage. Comparing emitted evidence against governed Brand strings before the freeze would misclassify a correct reading as a leak, and would require opening a truth file before the truth boundary. Truth-string inventory and comparison belong to post-freeze evaluation only.",
+    "hardFailure": "any scanned-for item present halts with TRUTH_ISOLATION_FAILURE",
+    "movedToPhase3ReadOnlyVerifier": [
+      "historical case IDs",
+      "historical fixture paths",
+      "governed truth files",
+      "acceptable-value files",
+      "prior per-case evaluation artifacts",
+      "the post-freeze ID map"
+    ],
+    "movedToPhase3Why": "The isolated runtime cannot scan for an inventory it does not hold, and handing it that inventory would itself be the leak. Those checks run read-only, after sealing, outside the boundary."
+  },
+  "postFreezeTruthUse": {
+    "permitted": [
+      "load the post-freeze id map to attach historical case identity",
+      "load governed truth to rederive the previously carried determinations",
+      "inventory and compare truth strings against the acquired evidence",
+      "compare the new current-base snapshot with the older evidence artifact",
+      "report differences"
+    ],
+    "forbidden": [
+      "modifying any acquired artifact",
+      "reordering, re-emitting or reformatting any frozen raw file",
+      "simulating a filter relaxation",
+      "recommending a filter treatment"
+    ]
+  },
+  "amendedBy": "preregistration-amendment-14.md",
+  "opaqueIdentity": {
+    "scheme": "item-NNNN, 1-based, zero-padded to four digits",
+    "assignmentOrder": "ascending source-image SHA-256, so the sequence is deterministic and carries no ordering signal from the historical names",
+    "stagedFilename": "item-NNNN.<ext>, generic and derived only from the opaque id and the original extension"
+  },
+  "trustedStagingStep": {
+    "script": "scripts/eval/issue-149-brand-evidence-acquisition-freeze.mjs",
+    "knowsTheMapping": true,
+    "why": "Something must know which historical image becomes which opaque id, because something must copy it.",
+    "runsBeforeAndOutsideAcquisition": true,
+    "isNotTheAcquisitionProcess": true
+  },
+  "stage1TestsAre": {
+    "kind": "static manifest, path and import validation",
+    "isRuntimeProof": false,
+    "why": "The Stage 1 tests read committed planning artifacts and assert their shape. They cannot demonstrate that a future process is unable to read the repository checkout.",
+    "actualIsolationGate": "a mandatory discover-mode gate inside the runtime boundary; see acquisition-runtime-isolation-contract.json"
+  },
+  "truthBoundaryChronology": {
+    "supersededClaim": "Both runs complete, and both raw-evidence manifests are written and hashed, BEFORE the post-freeze id map or any governed truth file is opened.",
+    "whyItWasFalse": "Trusted staging necessarily opens the evaluation manifest and the historical identities in order to freeze the corpus, assign opaque ids and write the post-freeze map. That happens BEFORE acquisition, so no component could truthfully claim nothing had opened them before the runs. The invariant that matters was never global ordering; it is who receives what.",
+    "phase1TrustedStaging": {
+      "mayRead": [
+        "the PR #217 per-case attribution artifact",
+        "governedTruth.present",
+        "acceptableValues and other truth fields that coexist in that source object",
+        "the evaluation manifest",
+        "historical identity and source image paths"
+      ],
+      "onlyInOrderTo": [
+        "freeze the 115-item population",
+        "assign opaque item-NNNN identifiers",
+        "stage images under generic filenames",
+        "verify source-image SHA-256 and byte size",
+        "write and verify post-freeze/id-map.json"
+      ],
+      "isOutsideTheAcquisitionProcess": true,
+      "mustNotSupplyHistoricalIdentityOrTruthTo": [
+        "the runtime bundle",
+        "the truth-free manifest",
+        "the process environment",
+        "any mounted data"
+      ],
+      "runsNoOcr": true,
+      "isJobA": true,
+      "isTrustedNotTruthFree": true,
+      "governedTruthAccess": {
+        "physicallyReadsATruthBearingSource": true,
+        "supersededClaim": "Job A receives no governed truth.",
+        "whyItWasFalse": "The freeze script reads artifacts/issue-149-brand-current-baseline-failure-decomposition/per-case-attribution.json and accesses c.governedTruth.present to enforce the frozen 105/10 Brand-present split. Acceptable Brand values and other governed truth live in the same case objects, so they are physically in the process's address space whether or not they are used.",
+        "mayPhysicallyRead": [
+          "the PR #217 per-case attribution artifact",
+          "governedTruth.present",
+          "acceptableValues and other truth fields that coexist in that source object",
+          "the evaluation manifest",
+          "historical identity and source image paths"
+        ],
+        "mayUseOnly": [
+          "case identity and inclusion status",
+          "source-image path, SHA-256 and byte size",
+          "governedTruth.present, SOLELY for the preregistered 105/10 corpus-accounting assertion",
+          "PR #218 membership, for the frozen-subset assertion"
+        ],
+        "mustNotUseAcceptableValuesOrTruthTextFor": [
+          "inclusion or exclusion",
+          "opaque-ID assignment",
+          "image ordering",
+          "staged filenames",
+          "preprocessing",
+          "runtime bundle construction",
+          "any acquisition input or emitted field"
+        ],
+        "preparationArtifactRemainsTruthFree": true,
+        "jobBRemainsTruthFree": true,
+        "firstPhysicalAccessToATruthBearingSourceOccursIn": "trusted Job A",
+        "evaluationUseTruthBoundaryRemains": "between actor 2 and actor 3",
+        "onlyActor3MayUseGovernedTruthAgainstAcquiredEvidence": true,
+        "noninterferenceClaimIsBounded": "Complete noninterference from governedTruth.present is NOT claimed: the script intentionally uses that flag for the 105/10 accounting assertion. What is claimed, and tested, is that acceptable Brand values and other truth TEXT do not influence the truth-free input manifest, the opaque ordering or the staged filenames.",
+        "stagingIndependenceTestedBy": "src/fixtures/eval/issue-149-staging-independence.test.ts"
+      }
+    },
+    "phase2IsolatedAcquisition": {
+      "receivesNo": [
+        "historical case identifiers",
+        "historical fixture paths",
+        "the post-freeze ID map",
+        "governed Brand truth",
+        "acceptable values",
+        "prior per-case classifications"
+      ],
+      "scansItsOwn": ["mounted input set", "mount list", "emitted records"],
+      "scansFor": [
+        "prohibited truth-bearing JSON keys",
+        "unexpected mounted files",
+        "unexpected emitted files"
+      ],
+      "cannotScanFor": "historical case IDs and historical fixture paths, because it does not hold that inventory \u2014 and giving it the inventory would be the leak it is meant to prevent",
+      "writesAndSeals": "each raw manifest inside the isolated boundary",
+      "isJobB": true,
+      "checksOutTheRepository": false,
+      "receivesOnly": "Job A's truth-free preparation artifact"
+    },
+    "phase3ReadOnlyIdentityLeakVerification": {
+      "runsAfter": "both raw manifests are sealed",
+      "why": "The exact historical case-ID and fixture-path inventory cannot be placed inside the acquisition runtime merely so it can scan for itself. The scan therefore runs OUTSIDE, against evidence that is already frozen.",
+      "evidenceExposure": "remounted or otherwise exposed READ-ONLY",
+      "mayRead": [
+        "the historical case-ID and fixture-path inventory",
+        "the sealed raw evidence bytes"
+      ],
+      "does": [
+        "scan the already-frozen bytes for historical case IDs",
+        "scan them for historical fixture paths",
+        "verify both raw manifests still match the bytes"
+      ],
+      "mayNot": [
+        "modify any raw file",
+        "rewrite, reformat or re-emit any raw file",
+        "replace any raw file",
+        "perform any truth-based evaluation"
+      ],
+      "reportLocation": "outside raw/",
+      "onHit": "TRUTH_ISOLATION_FAILURE",
+      "isNotPostFreezeEvaluation": true,
+      "isJobC": true,
+      "receivesNoTruthLabelsOrAcceptableValues": true,
+      "reportIsAMandatoryPreconditionFor": [
+        "actor 2 committing evidence",
+        "actor 3 beginning post-freeze evaluation"
+      ],
+      "reportHasItsOwnSha256": true
+    },
+    "phase4PostFreezeEvaluation": {
+      "isTheOnlyPhaseThatUsesGovernedTruthAgainstEvidence": true,
+      "runsAfter": "phase 3 reports clean and the raw evidence is committed",
+      "seePlan": "post-freeze-evaluation-plan.json"
+    }
+  },
+  "forbiddenEvidenceKeyInventory": {
+    "authoritativeAsset": "artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json",
+    "bundlePath": "runtime/truth-key-inventory.json",
+    "assetSha256": "80ae4a144259a9a013d8a35163e724cef1dded4e92e0aa4abd0dc74587e1ff6f",
+    "canonicalFormatting": "a bare JSON array of the key names in authoritative order, no whitespace, one terminal newline",
+    "keyCount": 10,
+    "keysNotRestatedHere": true,
+    "keysNotRestatedHereWhy": "Amendment 6 declared the asset authoritative and then copied the array into four contracts and a test, which is four more places to drift. Operative contracts reference the path and hash; the runtime, the freeze script, the bundle scanner and the consistency test all READ the asset.",
+    "readByTheRuntimeEmittedEvidenceScanner": true,
+    "readByTheStagingLeakScan": true,
+    "readByTheHostBundleScanner": true,
+    "fieldNamesVersusValues": "These are FIELD NAMES, prohibited inside acquisition output. The historical identifier and fixture-path VALUES are checked after sealing by the read-only identity-leak verifier, which holds an inventory the isolated runtime never receives.",
+    "governsEveryEmittedFile": "pass records, candidate records, selection records, item-level failure records, count records, manifests and provenance records alike"
+  },
+  "jobATruthAccess": {
+    "physicallyReadsATruthBearingSource": true,
+    "supersededClaim": "Job A receives no governed truth.",
+    "whyItWasFalse": "The freeze script reads artifacts/issue-149-brand-current-baseline-failure-decomposition/per-case-attribution.json and accesses c.governedTruth.present to enforce the frozen 105/10 Brand-present split. Acceptable Brand values and other governed truth live in the same case objects, so they are physically in the process's address space whether or not they are used.",
+    "mayPhysicallyRead": [
+      "the PR #217 per-case attribution artifact",
+      "governedTruth.present",
+      "acceptableValues and other truth fields that coexist in that source object",
+      "the evaluation manifest",
+      "historical identity and source image paths"
+    ],
+    "mayUseOnly": [
+      "case identity and inclusion status",
+      "source-image path, SHA-256 and byte size",
+      "governedTruth.present, SOLELY for the preregistered 105/10 corpus-accounting assertion",
+      "PR #218 membership, for the frozen-subset assertion"
+    ],
+    "mustNotUseAcceptableValuesOrTruthTextFor": [
+      "inclusion or exclusion",
+      "opaque-ID assignment",
+      "image ordering",
+      "staged filenames",
+      "preprocessing",
+      "runtime bundle construction",
+      "any acquisition input or emitted field"
+    ],
+    "preparationArtifactRemainsTruthFree": true,
+    "jobBRemainsTruthFree": true,
+    "firstPhysicalAccessToATruthBearingSourceOccursIn": "trusted Job A",
+    "evaluationUseTruthBoundaryRemains": "between actor 2 and actor 3",
+    "onlyActor3MayUseGovernedTruthAgainstAcquiredEvidence": true,
+    "noninterferenceClaimIsBounded": "Complete noninterference from governedTruth.present is NOT claimed: the script intentionally uses that flag for the 105/10 accounting assertion. What is claimed, and tested, is that acceptable Brand values and other truth TEXT do not influence the truth-free input manifest, the opaque ordering or the staged filenames.",
+    "stagingIndependenceTestedBy": "src/fixtures/eval/issue-149-staging-independence.test.ts",
+    "provenBy": {
+      "proxyAccessProof": "src/fixtures/eval/issue-149-staging-independence.test.ts wraps every governedTruth object in a Proxy that throws on reading or enumerating any property except `present`, then runs the REAL core. A successful run is direct evidence that nothing else is read.",
+      "recursiveMutationProof": "the same file recursively mutates every non-`present` leaf \u2014 strings, booleans, finite numbers, arrays and nested objects \u2014 and asserts all three generated outputs stay byte-identical.",
+      "priorGap": "An earlier mutation test changed only strings and arrays, so the Boolean field knownAmbiguous in the frozen source was never mutated."
+    }
+  },
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run.",
+  "stagingByteChannel": {
+    "singleChannel": "loadSourceImage",
+    "theExactVerifiedBufferIsWhatIsStaged": true,
+    "coreResolvesNoSourcePathItself": true,
+    "priorDefect": "The core verified bytes through loadSourceImage and then staged with a separate copyFileSync from process.cwd() and the historical path. The post-copy digest check prevented a silent mismatch, so this was not evidence contamination \u2014 but the injected loader was not actually the staging source, and the core had two byte channels.",
+    "transientBytesNeverSerialized": true,
+    "provenBy": "src/fixtures/eval/issue-149-freeze-core-loader.test.ts",
+    "provenByNote": "It stages 115 virtual images whose paths do not exist on disk, so a second byte channel could not have satisfied it."
+  }
+}

@@ -5,9 +5,10 @@ import os from "node:os";
 import path from "node:path";
 
 import { sql } from "drizzle-orm";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { panelStorageKey, resubmissionPanelStorageKey } from "@/lib/panel-storage";
+import { createIsolatedMysqlDatabase } from "../../tests/integration/mysql-test-database";
 import { applyMigrations, resolveMigrationsDir } from "./migrate";
 
 /**
@@ -337,6 +338,18 @@ if (RUN_MYSQL_TESTS) {
   }
 
   describe("applyMigrations (mysql upgrade path)", () => {
+    let isolatedMysql: Awaited<ReturnType<typeof createIsolatedMysqlDatabase>> | undefined;
+    let isolatedMysqlUrl: string;
+
+    beforeAll(async () => {
+      isolatedMysql = await createIsolatedMysqlDatabase(MYSQL_DATABASE_URL, "migrate_upgrade");
+      isolatedMysqlUrl = isolatedMysql.databaseUrl;
+    });
+
+    afterAll(async () => {
+      await isolatedMysql?.drop();
+    });
+
     it("widens submitted panel identity and storage keys without rewriting existing values", async () => {
       const previousMigrationsDir = process.env.LABEL_LENS_MIGRATIONS_DIR;
       const previousDialect = process.env.LABEL_LENS_DB_DIALECT;
@@ -346,27 +359,27 @@ if (RUN_MYSQL_TESTS) {
       try {
         process.env.LABEL_LENS_DB_DIALECT = "mysql";
 
-        await dropAllMysqlTables(MYSQL_DATABASE_URL);
+        await dropAllMysqlTables(isolatedMysqlUrl);
         process.env.LABEL_LENS_MIGRATIONS_DIR = makeMigrationSubsetAt(tmp, [
           "0000_smooth_felicia_hardy",
           "0001_tiny_marauders",
           "0002_issue_165_agent_decisions",
           "0003_issue_167_seller_resubmissions",
         ]);
-        await applyMigrations(MYSQL_DATABASE_URL);
+        await applyMigrations(isolatedMysqlUrl);
 
-        expect(await mysqlSubmittedPanelColumnType(MYSQL_DATABASE_URL, "id")).toEqual({
+        expect(await mysqlSubmittedPanelColumnType(isolatedMysqlUrl, "id")).toEqual({
           dataType: "varchar",
           characterMaximumLength: 36,
           columnKey: "PRI",
         });
-        expect(await mysqlSubmittedPanelColumnType(MYSQL_DATABASE_URL, "storage_key")).toEqual({
+        expect(await mysqlSubmittedPanelColumnType(isolatedMysqlUrl, "storage_key")).toEqual({
           dataType: "varchar",
           characterMaximumLength: 500,
           columnKey: "",
         });
 
-        connection = await mysql.createConnection(MYSQL_DATABASE_URL);
+        connection = await mysql.createConnection(isolatedMysqlUrl);
         const now = new Date("2026-07-22T00:00:00.000Z");
         const userId = "44444444-4444-4444-8444-444444444444";
         const existingSubmissionId = "pkg-existing-panel";
@@ -416,21 +429,21 @@ if (RUN_MYSQL_TESTS) {
         connection = undefined;
 
         delete process.env.LABEL_LENS_MIGRATIONS_DIR;
-        await applyMigrations(MYSQL_DATABASE_URL);
-        await applyMigrations(MYSQL_DATABASE_URL);
+        await applyMigrations(isolatedMysqlUrl);
+        await applyMigrations(isolatedMysqlUrl);
 
-        expect(await mysqlSubmittedPanelColumnType(MYSQL_DATABASE_URL, "id")).toEqual({
+        expect(await mysqlSubmittedPanelColumnType(isolatedMysqlUrl, "id")).toEqual({
           dataType: "varchar",
           characterMaximumLength: 255,
           columnKey: "PRI",
         });
-        expect(await mysqlSubmittedPanelColumnType(MYSQL_DATABASE_URL, "storage_key")).toEqual({
+        expect(await mysqlSubmittedPanelColumnType(isolatedMysqlUrl, "storage_key")).toEqual({
           dataType: "varchar",
           characterMaximumLength: 1024,
           columnKey: "",
         });
 
-        connection = await mysql.createConnection(MYSQL_DATABASE_URL);
+        connection = await mysql.createConnection(isolatedMysqlUrl);
         const [preservedRows] = await connection.execute(
           "SELECT storage_key AS storageKey FROM submitted_panels WHERE id = ?",
           [existingPanelId],
@@ -556,8 +569,8 @@ if (RUN_MYSQL_TESTS) {
       } finally {
         if (connection) await connection.end();
         delete process.env.LABEL_LENS_MIGRATIONS_DIR;
-        await dropAllMysqlTables(MYSQL_DATABASE_URL);
-        await applyMigrations(MYSQL_DATABASE_URL);
+        await dropAllMysqlTables(isolatedMysqlUrl);
+        await applyMigrations(isolatedMysqlUrl);
 
         if (previousMigrationsDir === undefined) delete process.env.LABEL_LENS_MIGRATIONS_DIR;
         else process.env.LABEL_LENS_MIGRATIONS_DIR = previousMigrationsDir;
@@ -576,22 +589,22 @@ if (RUN_MYSQL_TESTS) {
           "test-only-upgrade-integrity-secret-at-least-32-chars";
         process.env.LABEL_LENS_DB_DIALECT = "mysql";
 
-        await dropAllMysqlTables(MYSQL_DATABASE_URL);
+        await dropAllMysqlTables(isolatedMysqlUrl);
         process.env.LABEL_LENS_MIGRATIONS_DIR = makeMigrationSubsetAt(tmp, [
           "0000_smooth_felicia_hardy",
         ]);
-        await applyMigrations(MYSQL_DATABASE_URL);
+        await applyMigrations(isolatedMysqlUrl);
 
-        expect(await mysqlColumnType(MYSQL_DATABASE_URL)).toEqual({
+        expect(await mysqlColumnType(isolatedMysqlUrl)).toEqual({
           dataType: "text",
           characterMaximumLength: 65_535,
         });
 
         delete process.env.LABEL_LENS_MIGRATIONS_DIR;
-        process.env.DATABASE_URL = MYSQL_DATABASE_URL;
+        process.env.DATABASE_URL = isolatedMysqlUrl;
         vi.resetModules();
         const clientMod = await import("@/db/client");
-        clientMod.initializeDatabase(MYSQL_DATABASE_URL);
+        clientMod.initializeDatabase(isolatedMysqlUrl);
         const { db, schema } = clientMod;
         const { signRevision } = await import("@/lib/integrity");
 
@@ -644,18 +657,18 @@ if (RUN_MYSQL_TESTS) {
           recordedAt: now,
         });
 
-        const legacyStoredRevision = await mysqlRevisionIntegrity(MYSQL_DATABASE_URL, revisionId);
+        const legacyStoredRevision = await mysqlRevisionIntegrity(isolatedMysqlUrl, revisionId);
         expect(legacyStoredRevision).toEqual({
           canonicalJson,
           integritySignature: signature,
         });
 
-        await applyMigrations(MYSQL_DATABASE_URL);
-        expect(await mysqlColumnType(MYSQL_DATABASE_URL)).toEqual({
+        await applyMigrations(isolatedMysqlUrl);
+        expect(await mysqlColumnType(isolatedMysqlUrl)).toEqual({
           dataType: "mediumtext",
           characterMaximumLength: 16_777_215,
         });
-        expect(await mysqlSubmittedPanelColumnType(MYSQL_DATABASE_URL, "id")).toEqual({
+        expect(await mysqlSubmittedPanelColumnType(isolatedMysqlUrl, "id")).toEqual({
           dataType: "varchar",
           characterMaximumLength: 255,
           columnKey: "PRI",
@@ -663,7 +676,7 @@ if (RUN_MYSQL_TESTS) {
 
         vi.resetModules();
         const freshClient = await import("@/db/client");
-        freshClient.initializeDatabase(MYSQL_DATABASE_URL);
+        freshClient.initializeDatabase(isolatedMysqlUrl);
         const { buildSubmissionDetail: buildFreshSubmissionDetail } =
           await import("@/server/submissions/detail");
 
@@ -685,8 +698,8 @@ if (RUN_MYSQL_TESTS) {
         expect(truncatedDetail).toEqual({ ok: false, reason: "integrity_failed" });
       } finally {
         delete process.env.LABEL_LENS_MIGRATIONS_DIR;
-        await dropAllMysqlTables(MYSQL_DATABASE_URL);
-        await applyMigrations(MYSQL_DATABASE_URL);
+        await dropAllMysqlTables(isolatedMysqlUrl);
+        await applyMigrations(isolatedMysqlUrl);
 
         if (previousMigrationsDir === undefined) delete process.env.LABEL_LENS_MIGRATIONS_DIR;
         else process.env.LABEL_LENS_MIGRATIONS_DIR = previousMigrationsDir;

@@ -1,0 +1,86 @@
+{
+  "artifact": "governed-attempt-acquisition-runner-failure",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "issue": 149,
+  "pullRequest": 219,
+  "workflowRunId": "30766684792",
+  "runAttempt": 1,
+  "headSha": "7815e73df2ba243b5ce9dc855670b840bc7d47ae",
+  "classification": "ACQUISITION_RUNNER_FAILURE",
+  "scientificResultProduced": false,
+  "brandMetricsProduced": false,
+  "rerunPermitted": false,
+  "acquisitionExitStatus": 1,
+  "firstLoadBearingFailure": "RUN_SUMMARY_INVALID: determinism report: unexpected extractedItemCount; unexpected failedItemCount; unexpected runtimeUnavailableItemCount; unexpected runtimeFailureCodes; unexpected runtimeFailureDetail; unexpected scientificResultProduced. runId and itemCount are the writer's own facts and cannot be supplied.",
+  "observedRawRecords": {
+    "primary": 115,
+    "repeat": 115,
+    "total": 230,
+    "evidenceStatus": "UNCOMMITTED_NOT_VALID_EXPERIMENTAL_EVIDENCE"
+  },
+  "runFinalizationState": {
+    "primaryRunCommitMarker": "ABSENT",
+    "repeatRunCommitMarker": "ABSENT",
+    "primaryRawManifest": "ABSENT",
+    "repeatRawManifest": "ABSENT",
+    "runLevelFiles": "ABSENT",
+    "terminalAcquisitionRecord": "ABSENT",
+    "completeEvidenceArtifact": "ABSENT"
+  },
+  "preservationState": {
+    "forensicHandoff": "SUCCEEDED",
+    "forensicReceiptVerification": "SUCCEEDED",
+    "incompleteForensicUpload": "SUCCEEDED",
+    "actor2RawEvidenceVerification": "REJECTED_AS_EXPECTED"
+  },
+  "preservedArtifacts": {
+    "truthFreePreparation": {
+      "id": "8839191086",
+      "sizeBytes": 74052129,
+      "digest": "sha256:2876d846b7b9a983c85e6227a7c3d1933d326e34befe3cd5b745c8d81c80dd99"
+    },
+    "hostVerifier": {
+      "id": "8839191320",
+      "sizeBytes": 27614,
+      "digest": "sha256:62b7971fd12934e3f2d93ca5964ded685b2b2f678b8f36d69a610cd7d1adbc77"
+    },
+    "identityInventory": {
+      "id": "8839191562",
+      "sizeBytes": 1716,
+      "digest": "sha256:a673ffc8bc5f6c2850095e592955ff0b6d3a40682d34b09b37ecafe8f9f007b4"
+    },
+    "jobAReport": {
+      "id": "8839191776",
+      "sizeBytes": 3225,
+      "digest": "sha256:f4c542a34d5fe3126a4221a75f7abc5e572beea73cf9703730c246893267e120"
+    },
+    "unverifiedForensicHandoff": {
+      "id": "8839335113",
+      "sizeBytes": 10992604,
+      "digest": "sha256:d220f52d88a0678469cf4344205866f1457241d597a22e3aa31d58b5a50eb46c",
+      "forensicArchiveDigest": "09c64ef812feaec238dfb58ed1583d62a775aab90fd0612a0503a22996b872e5",
+      "forensicArchiveLength": 48793600,
+      "sourcePreManifestDigest": "dbfc7bb76a4135ece07ac7e46e57810917e67ffdbe70df890e850577c503426f",
+      "sourcePostManifestDigest": "dbfc7bb76a4135ece07ac7e46e57810917e67ffdbe70df890e850577c503426f",
+      "snapshotManifestDigest": "1c02875b59f9f6556f47534b4136877ca6b08ba8bfd88e88d3019b8e5ceac320"
+    },
+    "forensicHandoffReceipt": {
+      "id": "8839338053",
+      "sizeBytes": 1039,
+      "digest": "sha256:acfe9d52e9b9e89a91c5fed62440b33648b08b683ac8b636c582e2e31e40b9d3",
+      "finalStatus": "VERIFIED"
+    },
+    "incompleteForensicOutput": {
+      "id": "8839341317",
+      "sizeBytes": 11007950,
+      "digest": "sha256:4839553a4e7f7526005bf0f69b8d7dcabadd4a79301e73459ef51c995718c2b3"
+    }
+  },
+  "notes": [
+    "Workflow 30766684792 attempt 1 must not be rerun.",
+    "No terminal acquisition record was emitted and no scientific Brand result exists.",
+    "The 230 raw item records are uncommitted forensic material only and must not be treated as valid experimental evidence.",
+    "This attempt must never contribute to Brand metrics or experimental conclusions.",
+    "No raw secrets, unrestricted environment dump, OCR words, reconstructed lines, candidate selections, authority states or Brand metrics are recorded here."
+  ]
+}

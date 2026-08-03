@@ -1,0 +1,120 @@
+{
+  "artifact": "incumbent-configuration-freeze",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+  "productionEquivalentPath": "the unmodified incumbent extractor, reached by calling extractLabelEvidenceDetailed DIRECTLY. The evaluation harness is not on the acquisition route; see acquisition-invocation-contract.json.",
+  "engine": {
+    "tesseractJs": "7.0.0",
+    "tesseractJsCore": "7.0.0",
+    "versionSource": "package-lock.json resolved versions",
+    "oem": 1,
+    "oemMeaning": "LSTM only",
+    "oemSource": "src/pipeline/extractor/ocr-engine.ts:155",
+    "assetsLocal": true,
+    "networkDownloadsDuringOcr": false
+  },
+  "traineddata": {
+    "path": "src/pipeline/extractor/assets/eng.traineddata",
+    "sha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747",
+    "byteSize": 5199098
+  },
+  "pageSegModes": {
+    "constants": {
+      "SPARSE_TEXT": 11,
+      "SINGLE_LINE": 7
+    },
+    "source": "src/pipeline/extractor/ocr-engine.ts:110",
+    "usedByEveryBrandEligibleTemplate": 11,
+    "note": "Every pass template in regions.ts sets pageSegMode SPARSE_TEXT (11). No template is altered by this sprint."
+  },
+  "passPlanning": {
+    "primary": "planPrimaryOcrPass",
+    "recovery": "planRecoveryOcrPasses",
+    "recoveryTriggers": "needsBrandRecovery when the primary Brand state is NOT_OBSERVED; needsAlcoholRecovery likewise. Unchanged.",
+    "sellerRegionPass": "planSellerRegionOcrPass is NOT exercised: sellerRegionTargets is empty in this acquisition, and its output never feeds the Brand observation in any case.",
+    "source": "src/pipeline/extractor/regions.ts, src/pipeline/extractor/extractor.ts"
+  },
+  "cropAndTransform": {
+    "source": "PassTemplate entries in src/pipeline/extractor/regions.ts",
+    "fieldsPersisted": [
+      "crop",
+      "rotate",
+      "scale",
+      "originalWidth",
+      "originalHeight",
+      "preprocessing"
+    ],
+    "changedByThisSprint": false
+  },
+  "brandPath": {
+    "lineReconstruction": "unchanged",
+    "candidateConstruction": "unchanged",
+    "filterLadder": "unchanged",
+    "ranking": "unchanged",
+    "selection": "unchanged",
+    "authorityStateComputation": "unchanged",
+    "entryPoint": "selectBrandObservation",
+    "optionalTreatmentEntryPointCalled": false,
+    "optionalTreatmentEntryPointName": "selectBrandObservationWithCoherentLineMergeTreatment",
+    "optionalTreatmentNote": "This opt-in entry point exists in field-selection.ts and is NOT called. DEFAULT_BRAND_SELECTION_OPTIONS.allowCoherentPlausibleLineMerge stays false.",
+    "experimentalFlagsEnabled": []
+  },
+  "generationTimeCapsInProduction": {
+    "MAX_BRAND_WORDS": 4,
+    "MAX_MULTI_LINE_SEEDS_PER_LINE": 3,
+    "source": "src/pipeline/extractor/field-selection.ts:1293-1295",
+    "consequence": "These are production behaviour, not evidence caps. Sub-span windows longer than 4 words are never FORMED, so acquisition cannot enumerate a candidate production never built. Whole-line candidates longer than 4 words ARE formed and then rejected with too-many-words, so those do appear. This boundary is recorded because it limits what any later counterfactual can claim about 'all candidate windows considered'.",
+    "changedByThisSprint": false
+  },
+  "haltConditions": [
+    "a changed tesseract.js or tesseract.js-core version",
+    "a changed eng.traineddata SHA-256",
+    "a changed OEM or page-segmentation mode",
+    "a changed pass template, crop geometry or transform",
+    "any experimental flag or optional Brand treatment entry point being reachable"
+  ],
+  "amendedBy": "preregistration-amendment-14.md",
+  "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
+  "historicalNote": "The original plan and Amendment 1 routed acquisition through runCaseArtifacts. That route is prohibited from Amendment 2 onward because it reads governed truth and uses the historical case id as artifactRef.",
+  "completeFilterDiagnostics": {
+    "entryPoint": "selectBrandObservationWithCompleteFilterDiagnostics",
+    "obtainedBy": "a separate exact-pass-set call; see brand-diagnostic-parity-contract.json",
+    "notPresentInDebugFinalSelections": true,
+    "invariantPrefix": "BRAND_FILTER_DIAGNOSTIC_INVARIANT_FAILURE"
+  },
+  "fixedProcessedAt": "see extractionInputIdentities.processedAt \u2014 this file declares exactly one processedAt literal, and it is not repeated here",
+  "extractionInputIdentities": {
+    "derivedFrom": "src/fixtures/eval/eval-harness.ts lines 62-69 and package-lock.json. These are the incumbent evaluation path's own identity constants, copied as literal values so the acquisition's provenance matches without importing the harness.",
+    "invented": false,
+    "extractionAdapterId": "local-two-field-extractor",
+    "extractionAdapterVersion": "1.0.0",
+    "ocrEngine": {
+      "kind": "ocr",
+      "engineId": "tesseract.js",
+      "engineVersion": "7.0.0",
+      "modelId": "eng"
+    },
+    "parserId": "wine-alcohol-parse",
+    "parserVersion": "1.0.0",
+    "processedAt": "2026-07-12T00:00:00Z",
+    "processedAtNote": "The incumbent evaluation path's own fixed constant (EVAL_PROCESSED_AT). Fixed, so it never varies between the primary and repeat runs and can never become a source of nondeterminism.",
+    "engineVersionCrossCheck": "tesseract.js 7.0.0 in package-lock.json, matching ocrEngine.engineVersion",
+    "noneInferredAtRuntime": true
+  },
+  "fixedProcessedAtCorrection": "Amendment 4. This key previously carried a second, contradictory timestamp literal alongside the authoritative nested identity. Two authoritative values cannot both be right, and the Amendment 3 tests only inspected the nested one, so the contradiction passed CI. The stale literal is removed and is quoted only in preregistration-amendment-4.md; extractionInputIdentities.processedAt is now the single source.",
+  "mandatoryProductionDependencies": [
+    {
+      "path": "src/domain/rules/wine-alcohol-parse.ts",
+      "sha256": "2ec1368cf3f4fcfab264d1507f98267aa6f6112091332d4dda5a76152ea816e7",
+      "importedBy": "src/pipeline/extractor/field-selection.ts, line 1",
+      "transitiveImports": [],
+      "role": "the bounded deterministic incumbent Alcohol parser reached by the unchanged extractor path"
+    }
+  ],
+  "productionSourceBaseDrift": {
+    "everySourceInTheRuntimeClosureMustMatchItsBytesAt": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "haltCode": "PRODUCTION_SOURCE_DRIFTED_FROM_BASE"
+  },
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run."
+}

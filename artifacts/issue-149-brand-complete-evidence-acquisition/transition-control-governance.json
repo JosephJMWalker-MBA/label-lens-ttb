@@ -1,0 +1,66 @@
+{
+  "artifact": "transition-control-governance",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 2,
+  "amendedBy": "preregistration-stage-2-ownership-handoff-repair.md",
+  "purpose": "Record how the two mutable transition-control files are governed, now that they are excluded from the immutable Stage 1 contract manifest.",
+  "excludedFromTheStage1Manifest": [
+    "artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt",
+    "artifacts/issue-149-brand-complete-evidence-acquisition/execute-authorization.json"
+  ],
+  "noOtherArtifactIsExcluded": true,
+  "exclusionIsByExactPath": "Two full repository-relative paths. NOT a filename pattern, suffix, directory or mutability heuristic — any of those could silently grow to exclude a governed contract.",
+  "whyTheyMustBeMutable": {
+    "statement": "The authorized transition changes exactly these two files and nothing else. Hashing them in the Stage 1 manifest made that transition impossible.",
+    "mechanism": "Changing them would make the manifest stale, and the transition commit cannot also regenerate the manifest because the execute gate would then observe a third changed path and reject the transition.",
+    "consequenceIfLeftUncorrected": [
+      "the Stage 1 manifest test would fail in ordinary npm test",
+      "scripts/eval/issue-149-stage-1-contract-manifest.mjs --verify would fail",
+      "Job A would halt at its first step, before bundle preparation"
+    ]
+  },
+  "whatTheStage1ManifestBinds": "the immutable reviewed IMPLEMENTATION and contract package: every governed contract, the freeze script, the canonical libraries and every Stage 1 test",
+  "boundToTheImplementationBy": "execute-authorization.json#reviewedImplementationSha, which names the exact reviewed implementation head",
+  "exclusionDoesNotMeanUncontrolled": {
+    "statement": "These files are governed by a DIFFERENT mechanism, not by none.",
+    "controls": [
+      "Git commit identity: the transition is a specific commit with a specific parent",
+      "exact control-state validation: the mode bytes and the authorization status and reviewed SHA must form one of the three coherent states",
+      "exact changed-path validation: every path changed since the reviewed implementation SHA must be one of the two permitted transition paths",
+      "full-history ancestry: the execute-transition gate job checks out with fetch-depth 0 and verifies the head descends from the reviewed SHA",
+      "external approval: the unpushed transition commit is reviewed and authorized by its exact SHA before it is pushed"
+    ]
+  },
+  "permittedTransitionPaths": [
+    "artifacts/issue-149-brand-complete-evidence-acquisition/workflow-mode.txt",
+    "artifacts/issue-149-brand-complete-evidence-acquisition/execute-authorization.json"
+  ],
+  "exclusionSetEqualsPermittedTransitionPaths": true,
+  "exactModeBytes": {
+    "discover": "discover\n",
+    "execute": "execute\n",
+    "complete": "complete\n",
+    "noTrimmingOrWhitespaceNormalization": true
+  },
+  "coherentControlStates": [
+    { "mode": "discover\n", "status": "EXECUTE_NOT_AUTHORIZED", "reviewedImplementationSha": null },
+    {
+      "mode": "execute\n",
+      "status": "EXECUTE_AUTHORIZED",
+      "reviewedImplementationSha": "[0-9a-f]{40}"
+    },
+    {
+      "mode": "complete\n",
+      "status": "EXECUTE_AUTHORIZED",
+      "reviewedImplementationSha": "[0-9a-f]{40}"
+    }
+  ],
+  "externalApprovalRequirement": "The transition commit is created locally and NOT pushed. Its full SHA, parent SHA, exact two-file list and byte diffs are reported, explicit owner authorization naming that SHA is obtained, and only then is it pushed. A branch-local workflow cannot prove that an unreviewed commit did not replace its own gate; that is why approval happens outside the workflow.",
+  "thisArtifactIsItselfInTheStage1Manifest": true,
+  "ocrRun": true,
+  "provenanceCorrection": {
+    "previousValue": false,
+    "correctedValue": true,
+    "source": "execute-authorization.json records ocrRun true after governed execute attempt 1"
+  }
+}

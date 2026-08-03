@@ -1,0 +1,45 @@
+{
+  "artifact": "reconstructed-line-contract",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "sourceOfTruthForShape": "BrandSelectionDiagnostics.lines: BrandLineDiagnostic[] (src/pipeline/extractor/field-selection.ts:155,203)",
+  "reachableWithoutProductionChange": true,
+  "reachableVia": "ExtractionDebug.finalSelections.brand.brandDiagnostics.lines — the untruncated production array",
+  "capExplicitlyNotApplied": {
+    "MAX_BRAND_LINES": 12,
+    "where": "src/fixtures/eval/eval-harness.ts:72, applied at lines 325 and 436 when projecting the CaseReport",
+    "bypassedBy": "reading brandDiagnostics.lines directly instead of CaseDiagnostics.brandLineTexts"
+  },
+  "perLineFields": {
+    "lineIndex": { "available": true, "note": "position in the emitted order, preserved exactly" },
+    "exactLineText": {
+      "available": true,
+      "field": "BrandLineDiagnostic.rawText",
+      "truncated": false
+    },
+    "cleanedValue": { "available": true },
+    "confidenceInputs": { "available": true, "fields": ["confidence", "prominence"] },
+    "reconstructionProvenance": {
+      "available": true,
+      "fields": ["regionName", "passId", "passKind"]
+    },
+    "keptFlag": { "available": true },
+    "lineReason": { "available": true, "field": "BrandLineDiagnostic.reason" },
+    "constituentWordIds": {
+      "available": false,
+      "why": "BrandLineDiagnostic records the assembled text and its pass provenance, not the identifiers of the words that composed it. Emitting word membership would require changing production diagnostics.",
+      "recordedAs": "absent, with this reason",
+      "mitigation": "Candidate records carry lineIndexes, so candidate-to-line membership IS recoverable; only word-to-line membership is not."
+    },
+    "lineGeometry": {
+      "available": false,
+      "why": "BrandLineDiagnostic carries prominence (height) but no bounding box. A full line box would require a production change.",
+      "recordedAs": "prominence recorded; bounding box absent, with this reason"
+    }
+  },
+  "truncationAssertions": [
+    "the emitted line count per case must equal brandDiagnostics.lines.length",
+    "any inequality halts with LINE_EVIDENCE_TRUNCATED",
+    "observed maximum lines per case is recorded"
+  ]
+}

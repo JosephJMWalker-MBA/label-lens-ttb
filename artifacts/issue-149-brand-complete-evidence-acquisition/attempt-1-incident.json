@@ -1,0 +1,27 @@
+{
+  "artifact": "attempt-1-incident",
+  "schemaVersion": "issue-149-attempt-incident.v1",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "attempt": 1,
+  "executeCommit": "a3a09ac15db615e5a5e9e4cb53874a996ab9f2a3",
+  "reviewedHead": "f0cf038a4fa1a0a1a61404d864fade1b4fe97ff3",
+  "workflowRun": 30722508163,
+  "workflowRunAttempt": 1,
+  "rerunCount": 0,
+  "acquisitionExitStatus": 0,
+  "actor2Halt": "VERIFICATION_UNEXPECTED_FAILURE",
+  "eaccesDetail": "EACCES: permission denied, scandir 'output/raw/primary/item-0001'",
+  "failedForensicUpload": true,
+  "rawArtifact": "ABSENT",
+  "forensicArtifact": "ABSENT",
+  "classification": "INFRASTRUCTURE_INVALIDATED_NO_OBSERVATION",
+  "determinism": "UNKNOWN",
+  "itemOutcomes": "UNKNOWN",
+  "metricsEligibility": false,
+  "contributesExperimentalResult": false,
+  "notes": [
+    "Governed OCR ran once inside the pinned container as uid/gid 10149.",
+    "The host runner could not traverse container-owned item directories inherited from mkdtemp mode 0700.",
+    "No evidence artifact was preserved before runner workspace destruction."
+  ]
+}

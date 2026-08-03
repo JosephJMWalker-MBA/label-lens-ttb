@@ -1,0 +1,136 @@
+{
+  "artifact": "governed-attempt-30772967991-truth-isolation-failure",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "run": {
+    "runId": "30772967991",
+    "attempt": 1,
+    "headSha": "4c09f92301fc5c8bee9c40dbe0d1f6e87773700b",
+    "transitionSha": "4c09f92301fc5c8bee9c40dbe0d1f6e87773700b",
+    "classification": "INCOMPLETE_EVIDENCE",
+    "haltCode": "TRUTH_ISOLATION_FAILURE"
+  },
+  "terminalStatus": {
+    "rawAcquisitionCompleted": true,
+    "rawVerificationPassed": true,
+    "identityVerificationPassed": false,
+    "completeEvidenceArtifactProduced": false,
+    "validScientificResultExists": false,
+    "brandMetricsUsable": false,
+    "rerunPermitted": false,
+    "retrospectivePromotionPermitted": false
+  },
+  "verifiedRawProperties": {
+    "primaryCommitMarkerValid": true,
+    "repeatCommitMarkerValid": true,
+    "primaryItemCount": 115,
+    "repeatItemCount": 115,
+    "exactItemSetsAndManifestsValid": true,
+    "itemFileDigestsValid": true,
+    "stagingOrUnexpectedFiles": false,
+    "primaryAndRepeatDeterminismReportsAgree": true,
+    "semanticallyDifferingItems": [],
+    "timingOnlyDifferenceCount": 115,
+    "acquisitionVerdict": "COMPLETE_DETERMINISTIC_EVIDENCE"
+  },
+  "jobCScan": {
+    "filesScanned": 1850,
+    "bytesScanned": 47516364,
+    "identityInventorySize": 230,
+    "reportDigest": "d585c4c94ec850baa04f11b83c8acb71cf026c39c2e60f790589602b29e26b07"
+  },
+  "rootCause": {
+    "class": "LEGITIMATE_SOURCE_DERIVED_COLLISION",
+    "summary": "Job C scanned all sealed raw evidence bytes for historical case-ID substrings without field-aware provenance. Two historical case-ID strings also appear as visible label text in the current truth-free source images. OCR extracted those strings, and they propagated deterministically into word, line, candidate, ranking and selection records. No hit was a forbidden evidence key or historical fixture path, and no hit first appeared in provenance, configuration, source path metadata or another hidden external-identity field.",
+    "failedVerifierBehavior": "unrestricted substring matching over every raw JSON byte",
+    "repairedVerifierContract": "historical fixture paths and forbidden evidence keys remain fail-closed anywhere; historical case-ID strings halt in provenance, configuration, malformed JSON, binary or other external fields, but OCR-derived text and its structured candidate/selection propagation do not halt when the containing record carries local OCR text provenance"
+  },
+  "identifierDigests": [
+    {
+      "category": "historical case ID",
+      "redaction": "historical-case-id-a",
+      "sha256": "a869def708872b8cea22f17fda802c58938e9b2c86ecbf134882a522ddf660e5",
+      "sourceImageVisibility": "visible on item-0012, item-0030 and item-0115"
+    },
+    {
+      "category": "historical case ID",
+      "redaction": "historical-case-id-b",
+      "sha256": "b33c4203deaf4b389ddc6e9ce590b96e94422515a8062fb5eb8527be13645cb2",
+      "sourceImageVisibility": "visible on item-0090"
+    }
+  ],
+  "affectedItems": [
+    {
+      "itemId": "item-0012",
+      "runs": ["primary", "repeat"],
+      "identifierRedaction": "historical-case-id-a",
+      "firstOccurrence": "OCR word text",
+      "visibleInSourceImage": true,
+      "files": [
+        "item-0012.words.jsonl",
+        "item-0012.passes.json",
+        "item-0012.lines.jsonl",
+        "item-0012.candidates.jsonl",
+        "item-0012.selection.json"
+      ],
+      "propagation": "OCR words -> reconstructed line rawText/cleanedValue -> candidate rawText/cleanedValue and normalized ranking comparator -> selection diagnostics and observation alternate"
+    },
+    {
+      "itemId": "item-0030",
+      "runs": ["primary", "repeat"],
+      "identifierRedaction": "historical-case-id-a",
+      "firstOccurrence": "OCR word text",
+      "visibleInSourceImage": true,
+      "files": [
+        "item-0030.words.jsonl",
+        "item-0030.passes.json",
+        "item-0030.lines.jsonl",
+        "item-0030.candidates.jsonl",
+        "item-0030.selection.json"
+      ],
+      "propagation": "OCR words -> reconstructed line rawText/cleanedValue -> candidate rawText/cleanedValue and normalized ranking comparator -> selection diagnostics and observation"
+    },
+    {
+      "itemId": "item-0090",
+      "runs": ["primary", "repeat"],
+      "identifierRedaction": "historical-case-id-b",
+      "firstOccurrence": "candidate value derived from OCR line text",
+      "visibleInSourceImage": true,
+      "files": ["item-0090.candidates.jsonl", "item-0090.selection.json"],
+      "propagation": "OCR line text -> selected candidate rawText/cleanedValue -> normalized ranking comparator -> selection diagnostics and observation"
+    },
+    {
+      "itemId": "item-0115",
+      "runs": ["primary", "repeat"],
+      "identifierRedaction": "historical-case-id-a",
+      "firstOccurrence": "OCR word text",
+      "visibleInSourceImage": true,
+      "files": [
+        "item-0115.words.jsonl",
+        "item-0115.passes.json",
+        "item-0115.lines.jsonl",
+        "item-0115.candidates.jsonl",
+        "item-0115.selection.json"
+      ],
+      "propagation": "OCR words -> reconstructed line rawText/cleanedValue -> candidate rawText/cleanedValue and normalized ranking comparator -> selection diagnostics and observation"
+    }
+  ],
+  "hitMatrixSummary": {
+    "originalJobCHitCount": 34,
+    "runsAffected": ["primary", "repeat"],
+    "itemsAffected": ["item-0012", "item-0030", "item-0090", "item-0115"],
+    "forbiddenEvidenceKeyHits": 0,
+    "historicalFixturePathHits": 0,
+    "externalMetadataHits": 0,
+    "sourceDerivedCollisionHits": 34,
+    "primaryRepeatSymmetric": true
+  },
+  "futureVerifierCheckAfterRepair": {
+    "rawRoot": "preserved incomplete forensic artifact from run 30772967991",
+    "result": {
+      "ok": true,
+      "haltCode": null,
+      "hitCount": 0
+    },
+    "meaning": "The revised contract would classify these specific strings as source-derived collisions in a future attempt only. It does not validate or promote run 30772967991."
+  }
+}

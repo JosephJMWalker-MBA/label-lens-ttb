@@ -1,0 +1,28 @@
+{
+  "artifact": "archive-stop-correction-linkage",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 2,
+  "record": "preregistration-stage-2-archive-stop-correction.md",
+  "priorHead": "c46e7c4e029f6e66300420da7b184127ca1b1442",
+  "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+  "defectClosed": {
+    "title": "the greater-than-100-MB path destroyed the only durable copy",
+    "detail": "The volume step exited nonzero before the verified upload. GitHub applies an implicit success() to any step whose if: contains no status-check function, so the verified upload was skipped \u2014 and the incomplete-forensic upload was skipped too, its explicit condition being false when Actor 2 and Job C succeeded. A run producing 104857601 bytes would have detected the threshold and then discarded the evidence when the runner disappeared.",
+    "correction": "the measurement is nonfatal and produces a decision; the verified artifact is uploaded, redownloaded by exact ID, digest-compared and content-verified on both sides of the limit; the stop is a terminal adjudication that runs only after the artifact and receipt exist",
+    "haltCode": "RAW_EVIDENCE_EXCEEDS_DURABLE_ARCHIVE_LIMIT",
+    "orderingHaltCode": "ARCHIVE_ADJUDICATION_BEFORE_PRESERVATION"
+  },
+  "boundary": {
+    "104857599": "ELIGIBLE_FOR_OWNER_COMMIT_PROCESS",
+    "104857600": "ELIGIBLE_FOR_OWNER_COMMIT_PROCESS",
+    "104857601": "DURABLE_ARCHIVE_DECISION_REQUIRED"
+  },
+  "overLimitIsNotIncompleteEvidence": true,
+  "retentionBoundIsNotPermanentPreservation": true,
+  "wordingCorrected": ["the trigger paths set contains three files, not two"],
+  "modeRemained": "discover",
+  "executeAuthorization": "EXECUTE_NOT_AUTHORIZED",
+  "transitionCommitCreated": false,
+  "governedOcrRun": false,
+  "rawEvidenceProduced": false
+}

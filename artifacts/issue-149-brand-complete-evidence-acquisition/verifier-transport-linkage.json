@@ -1,0 +1,66 @@
+{
+  "artifact": "verifier-transport-linkage",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 2,
+  "record": "preregistration-stage-2-verifier-transport.md",
+  "priorHead": "28b792a5d9f848888c6710728e5322fbf3fe4adb",
+  "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+  "defectsClosed": [
+    {
+      "id": 1,
+      "title": "Actor 2 and Job C could not run in the execute job",
+      "detail": "job-b-execute has no checkout and invoked npx vite-node against repository-relative TypeScript; the script, vitest.config.ts, package.json and node_modules were all absent. Job C additionally referenced repository-relative ID-map and truth-key files deliberately excluded from the truth-free preparation artifact.",
+      "correction": "Job A builds a self-contained host verifier bundle runnable by plain pinned Node, and a separate minimal identity inventory artifact downloaded only for the host-side Job C step"
+    },
+    {
+      "id": 2,
+      "title": "a missing identity inventory became an empty one",
+      "detail": "The CLI defaulted an absent ID map or truth-key file to [], so Job C scanned zero markers and could report clean.",
+      "correction": "the fallback is deleted; presence, closed schema, frozen digest, exact counts and no duplicate or empty marker are all required",
+      "haltCodes": [
+        "IDENTITY_INVENTORY_ABSENT",
+        "IDENTITY_INVENTORY_MALFORMED",
+        "IDENTITY_INVENTORY_DIGEST_MISMATCH"
+      ]
+    },
+    {
+      "id": 3,
+      "title": "a failed acquisition bypassed Actor 2",
+      "detail": "set -euo pipefail ended the job on a nonzero runner status before the Actor 2 step, which had no always() condition. The forensic upload lacked the mandatory raw-verification report.",
+      "correction": "the container status is captured into acquisition-status.json without terminating the step; Actor 2 runs with if: always(); Job C, the volume rule and the verified upload are each conditioned on the previous succeeding; adjudication happens last, after preservation"
+    },
+    {
+      "id": 4,
+      "title": "marker and manifest verification were not exact",
+      "detail": "verifyRunCommitted iterated whatever fileDigests contained, so a one-entry subset with a correct requiredFiles list read as committed. Actor 2 verified disk against the manifest but not the reverse, so phantom entries passed. Its no-forbidden-evidence-key finding was hardcoded true.",
+      "correction": "a closed marker schema with exact ordered digests and a recomputed aggregate; bidirectional manifest verification; and the forbidden-key finding replaced by an explicit delegation record"
+    },
+    {
+      "id": 5,
+      "title": "the uploaded artifact identity was recorded but not carried or compared",
+      "detail": "uploaded-artifact.json was written and never uploaded, exposed or compared. GitHub's download-action digest check produces a warning, not a load-bearing failure.",
+      "correction": "artifact ID, digest, URL and producing head SHA are job outputs; the follow-up job downloads by exact artifact ID, compares the metadata digest and run association with narrowly scoped actions: read, re-verifies contents, and uploads a verification receipt"
+    }
+  ],
+  "rehearsal": {
+    "name": "verifier-transport-rehearsal",
+    "runsUnderMode": "discover",
+    "noCheckout": true,
+    "proves": [
+      "Actor 2 runs with plain Node and no checkout",
+      "Job C runs with the separate inventory",
+      "a missing inventory halts",
+      "a planted missing marker fails",
+      "a planted phantom manifest entry fails",
+      "an upload/redownload by artifact ID matches its metadata digest"
+    ],
+    "invokesAcquisitionApi": false,
+    "invokesOcr": false,
+    "writesGovernedRawEvidence": false
+  },
+  "modeRemained": "discover",
+  "executeAuthorization": "EXECUTE_NOT_AUTHORIZED",
+  "transitionCommitCreated": false,
+  "governedOcrRun": false,
+  "rawEvidenceProduced": false
+}

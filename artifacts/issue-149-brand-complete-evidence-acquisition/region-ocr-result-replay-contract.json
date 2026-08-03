@@ -1,0 +1,117 @@
+{
+  "artifact": "region-ocr-result-replay-contract",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "amendedBy": "preregistration-stage-2-execute-readiness.md",
+  "purpose": "Freeze the complete RegionOcrResult persistence that makes a later zero-OCR selector replay possible. This is what actually underwrites capability 3; complete rejection reasons alone do not.",
+  "whyRejectionReasonsAloneAreInsufficient": [
+    "a rejected span returns from analyzeBrandSpan BEFORE a Candidate object is constructed",
+    "its brandClass is therefore never calculated",
+    "its geometry and words are never placed on a candidate",
+    "scoring and ranking run only over candidates that passed the filter ladder, so a rejected span carries no hypothetical score, ranking or ordering",
+    "filter outcomes also change later candidate formation: shouldTrimWholeLineCandidate gates line-window generation, and kept candidates become the seeds for multi-line merges"
+  ],
+  "correctRationaleForCapability3": "The acquisition preserves the COMPLETE ordered RegionOcrResult array per case. A separately governed, zero-OCR treatment selector can later replay selection over that frozen pass evidence with exactly one filter changed, reconstructing candidate formation, scoring and ranking as production would have produced them. Capability 3 is expected to be satisfiable because of that replay, not because rejection reasons exist.",
+  "thatReplayIsNotAuthorizedHere": true,
+  "persistEveryFieldOfRegionOcrResult": {
+    "passId": "string",
+    "regionName": "string",
+    "passKind": "OcrPassKind",
+    "triggerReasons": "OcrPassTriggerReason[], array order preserved",
+    "preprocessing": "string[], array order preserved",
+    "fieldEligibility": "OcrFieldEligibility, persisted whole",
+    "transform": "RegionTransform, persisted whole: crop, rotate, scale, originalWidth, originalHeight",
+    "transformedSize": "{ width, height }",
+    "pageSegMode": "number",
+    "rawWordCount": "number",
+    "discardedWordCount": "number",
+    "timings": "OcrPassTimings, persisted whole: preprocessMs, ocrMs, inverseMappingMs, totalMs",
+    "words": "OcrWord[], array order preserved, each with text, rawConfidence, bbox and optional originalGeometry"
+  },
+  "informalSubsetProhibited": true,
+  "informalSubsetProhibitedNote": "The earlier raw-ocr-contract described an informal subset of these fields. A replay needs the whole type, so every field above is persisted exactly and none is summarised.",
+  "arrayOrder": {
+    "passArrayOrderPreserved": true,
+    "wordArrayOrderPreserved": true,
+    "why": "Production selects over the pass array in order and groups words in emitted order. A reordered replay would not be the same experiment."
+  },
+  "assertions": {
+    "perPass": [
+      "the record validates against the exact closed RegionOcrResult schema",
+      "emitted word count equals words.length",
+      "rawWordCount and discardedWordCount are persisted as produced, never recomputed",
+      "a SEMANTIC per-pass fingerprint is computed over the validated record with timings removed"
+    ],
+    "perCase": [
+      "the emitted pass count equals debug.passes.length",
+      "pass order matches debug.passes order exactly",
+      "a SEMANTIC fingerprint is computed over the COMPLETE ORDERED pass array with timings removed from each pass"
+    ],
+    "canonicalization": "issue-149-candidate-canonical-v1, the same algorithm used for candidate records",
+    "haltCodes": {
+      "PASS_EVIDENCE_TRUNCATED": "emitted pass or word count disagrees with the debug object",
+      "PASS_ORDER_MISMATCH": "persisted pass order differs from debug.passes order"
+    }
+  },
+  "implementedInThisAmendment": false,
+  "timingsCorrection": {
+    "priorDefect": "Amendment 3 required a canonical fingerprint over the COMPLETE pass record including timings, while determinism-rules.json required exact fingerprint agreement between the primary and repeat runs. performance.now() timings differ by construction, so that pair guaranteed a nondeterminism verdict on every run.",
+    "resolution": "timings are PERSISTED in full for completeness and covered by the artifact integrity hashes, but are EXCLUDED from every semantic fingerprint and from the determinism equality gate. See determinism-rules.json.",
+    "timingsAreStillPersisted": true,
+    "timingsExcludedFromSemanticFingerprintsOnly": true
+  },
+  "exactPersistedRecordSchema": {
+    "ownKeySetIsExactlyThese13": [
+      "passId",
+      "regionName",
+      "passKind",
+      "triggerReasons",
+      "preprocessing",
+      "fieldEligibility",
+      "transform",
+      "transformedSize",
+      "pageSegMode",
+      "rawWordCount",
+      "discardedWordCount",
+      "timings",
+      "words"
+    ],
+    "keySetIsClosed": true,
+    "missingKeyRejected": true,
+    "unexpectedKeyRejected": true,
+    "runMetadataRejected": true,
+    "runMetadataNote": "Wall-clock start and end, workflow run ID, artifact ID, artifact expiration and runner/host identity live BESIDE the evidence, in a separate provenance record. On a pass record they are an unexpected key and are rejected, so they can never enter a semantic fingerprint by accident.",
+    "nestedShapesValidated": {
+      "passKind": "an actual OcrPassKind",
+      "triggerReasons": "actual OcrPassTriggerReason values, array order preserved",
+      "preprocessing": "non-empty strings, array order preserved",
+      "fieldEligibility": "exactly { brand, alcohol }, both boolean",
+      "transform": "exactly { crop:{left,top,width,height}, rotate, scale, originalWidth, originalHeight }, rotate one of 0/90/180/270",
+      "transformedSize": "exactly { width, height }",
+      "pageSegMode": "integer",
+      "rawWordCount": "non-negative integer",
+      "discardedWordCount": "non-negative integer",
+      "timings": "exactly { preprocessMs, ocrMs, inverseMappingMs, totalMs }",
+      "words": "OcrWord[], array order preserved"
+    },
+    "perWord": {
+      "text": "string, persisted always",
+      "rawConfidence": "finite number, persisted always",
+      "bbox": "exactly { x0, y0, x1, y1 }, persisted always",
+      "originalGeometry": "persisted ONLY when production emitted it; absence is OMISSION, never null; when present it is exactly { imageIndex, x, y, width, height, imageWidth, imageHeight }"
+    },
+    "referenceValidator": "assertRegionOcrResultRecord in scripts/eval/lib/issue-149-evidence-canonical.ts",
+    "haltCodes": [
+      "PASS_RECORD_NOT_AN_OBJECT",
+      "PASS_RECORD_KEY_SET_MISMATCH",
+      "PASS_RECORD_FIELD_INVALID",
+      "PASS_WORD_INVALID",
+      "PASS_WORD_ORIGINAL_GEOMETRY_NULL",
+      "PASS_ARRAY_INVALID"
+    ]
+  },
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run.",
+  "arrayOrderFrozenBeforeSerialization": "The ordered pass array, the ordered word stream, the ordered line diagnostics and the ordered candidate records are all serialized inside the acquisition boundary, in the order production produced them. The runner receives bytes and cannot reorder them.",
+  "sealedEvidenceIsNotParsedByTheRunner": true,
+  "exactThirteenKeyRecordsPersisted": "<opaqueItemId>.passes.json holds an ordered array of records whose own-key set is EXACTLY the thirteen RegionOcrResult fields. No opaqueItemId and no passOrdinal is added; identity comes from the filename and ordinal from array position. The serialized bytes are decoded back through assertRegionOcrResultRecord before sealing."
+}

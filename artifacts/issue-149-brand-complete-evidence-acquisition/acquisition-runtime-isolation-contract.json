@@ -1,0 +1,450 @@
+{
+  "artifact": "acquisition-runtime-isolation-contract",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "amendedBy": "preregistration-stage-2-execute-readiness.md",
+  "status": "CONTRACT FROZEN. Not implemented in this amendment.",
+  "whyThisExists": {
+    "correction": "The Stage 1 isolation tests are STATIC manifest, path and import validation. They read committed planning artifacts and assert their shape. They are NOT runtime proof, and this contract stops them being described as such.",
+    "actualIsolationIs": "a mandatory discover-mode gate that must run inside the same runtime boundary intended for execute mode, before execute is authorized"
+  },
+  "theAcquisitionProcessReceivesNo": {
+    "repositoryCheckout": false,
+    "gitDirectory": false,
+    "artifactsDirectory": false,
+    "fixturesDirectory": false,
+    "evalManifest": false,
+    "postFreezeIdMap": false,
+    "governedTruth": false,
+    "priorPerCaseReports": false,
+    "githubTokenOrRepositoryCredential": false,
+    "unrestrictedEnvironmentInheritance": false,
+    "note": "Every entry is false: none of these is present inside the acquisition runtime boundary."
+  },
+  "runtimeHardening": {
+    "network": "disabled",
+    "rootFilesystem": "read-only",
+    "linuxCapabilities": "all dropped",
+    "noNewPrivileges": true,
+    "writableSpace": "exactly two classes: the experiment output mount (read-write), and explicitly named tmpfs paths for process and runtime temporary files. No other experiment-controlled path is writable.",
+    "environment": "explicit allowlist only; no inheritance"
+  },
+  "authorizedMounts": [
+    {
+      "ordinal": 1,
+      "path": "the allowlisted runtime bundle",
+      "mode": "read-only"
+    },
+    {
+      "ordinal": 2,
+      "path": "truth-free-input-manifest.json",
+      "mode": "read-only"
+    },
+    {
+      "ordinal": 3,
+      "path": "the staged opaque images",
+      "mode": "read-only"
+    },
+    {
+      "ordinal": 4,
+      "path": "an initially empty output directory",
+      "mode": "read-write"
+    }
+  ],
+  "runtimeBundle": {
+    "mayContainOnly": [
+      "compiled acquisition code",
+      "production extractor dependencies",
+      "PR #220 field-selection code",
+      "the frozen eng.traineddata",
+      "package and runtime files required to execute"
+    ],
+    "builtWithUnrestrictedRepositoryCopy": false,
+    "builtWithUnrestrictedRepositoryCopyNote": "A blanket COPY of the repository is prohibited: it would place .git, artifacts/, fixtures and the eval manifest inside the boundary and silently defeat every isolation claim above.",
+    "bundleManifest": {
+      "required": true,
+      "contents": "every SOURCE input path and every EMITTED path, each with its SHA-256, plus the build command, tool version and metafile digest",
+      "verifiedIn": "generated and verified in phase 1 trusted host preparation; re-verified against the mounted bundle in isolated discover"
+    },
+    "dependencyClosureGate": {
+      "why": "The Stage 1 source guard inspects only the two runner files. A runner could import an apparently innocuous helper that itself imports fixtures or a truth-bearing module. First-order source inspection cannot see that; a dependency closure can.",
+      "ownedBy": "phase 1 trusted host preparation. Isolated discover verifies the resulting bundle and manifest, but does not and cannot own the transitive proof.",
+      "required": true,
+      "mustGenerate": "a complete dependency closure \u2014 a bundler metafile or an equivalent full module graph \u2014 enumerating EVERY source module that contributed to the built runtime, transitively, not only the runner's first-order imports",
+      "failIfAnyTransitiveSourceInputIsUnderOrDerivedFrom": [
+        "src/fixtures/**",
+        "tests/**",
+        "artifacts/**",
+        "src/domain/rules/**",
+        "the eval manifest",
+        "governed truth",
+        "prior per-case reports"
+      ],
+      "sourceMapsAndEmbeddedSources": {
+        "embeddedSourceContentFromProhibitedPathsPermitted": false,
+        "why": "A source map with inlined sourcesContent would carry prohibited file contents into the bundle even though no prohibited path appears in the emitted graph.",
+        "rule": "either emit no source maps, or emit them with sourcesContent stripped and prove no prohibited path appears in the sources array"
+      },
+      "bundleManifestMustRecord": [
+        "every SOURCE input path with its SHA-256",
+        "for each production source input, the SHA-256 it has at the frozen base commit",
+        "every EMITTED runtime path with its SHA-256",
+        "the exact build command",
+        "the exact build tool name and version",
+        "the SHA-256 of the dependency graph / metafile itself",
+        "the designated truth-key inventory asset path and its SHA-256",
+        "the separately reviewed Stage 2 evaluation-script paths and their SHA-256 values"
+      ],
+      "preIsolationBundleScan": {
+        "runsIn": "phase 1, on the BUILT bundle, before anything is mounted",
+        "referenceImplementation": "scripts/eval/lib/issue-149-bundle-scan.ts",
+        "selfTriggeringDefect": "A blanket executable scan for the forbidden keys would have rejected the truth-isolation scanner, which must know those keys to scan emitted evidence.",
+        "sourceTextInferenceDefect": "Amendment 5 solved that by inspecting the scanner's SOURCE TEXT: every frozen token had to appear somewhere, and a regex looked for some additions. That proves neither direction. A key left only in a COMMENT satisfied the presence test, and an addition outside the regex's recognized prefixes \u2014 matchesExpectedResult, for instance \u2014 widened the scanner undetected.",
+        "strategy": "dedicated canonical inventory ASSET; array equality is decidable, source-text presence is not",
+        "inventoryAsset": {
+          "bundlePath": "runtime/truth-key-inventory.json",
+          "authoritativeCopy": "artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json",
+          "content": "a bare canonical JSON array of the authoritative key names, in authoritative order, and nothing else",
+          "exactByteSha256": "80ae4a144259a9a013d8a35163e724cef1dded4e92e0aa4abd0dc74587e1ff6f",
+          "keyCount": 10,
+          "keysNotRestatedHere": true,
+          "recordedInBundleManifest": true,
+          "readByTheRuntimeEmittedEvidenceScanner": true,
+          "executableCodeCarriesNoDuplicateLiteralInventory": true
+        },
+        "frozenScope": [
+          "scan the RAW BYTES of every bundle file, including binary assets, for historical case IDs and historical fixture paths",
+          "parse the designated inventory asset",
+          "require exact array equality with the authoritative inventory, order included",
+          "require the asset's exact byte digest to match the bundle manifest",
+          "permit forbidden-key strings only in that one asset",
+          "reject them in every other executable, data or configuration file",
+          "never receive or scan a Brand-value inventory"
+        ],
+        "brandStringsNeverScanned": true,
+        "brandStringsNeverScannedWhy": "A legitimate transcript may naturally contain the Brand text. That is evidence, not leakage. The scan takes no Brand inventory as a parameter, so it cannot be reconfigured into comparing evidence against Brand truth.",
+        "haltCode": "BUNDLE_PROHIBITED_CONTENT",
+        "violationRules": [
+          "HISTORICAL_CASE_ID",
+          "HISTORICAL_FIXTURE_PATH",
+          "INVENTORY_ASSET_MISSING",
+          "INVENTORY_ASSET_DIGEST_MISMATCH",
+          "INVENTORY_ASSET_UNPARSEABLE",
+          "INVENTORY_ARRAY_NOT_EQUAL",
+          "TRUTH_KEY_OUTSIDE_INVENTORY_ASSET"
+        ],
+        "testedBy": "src/fixtures/eval/issue-149-bundle-scan.test.ts"
+      },
+      "haltCodes": {
+        "BUNDLE_PROHIBITED_DEPENDENCY": "a transitive source input resolves under a prohibited path",
+        "BUNDLE_MANIFEST_INCOMPLETE": "a source or emitted path is missing from the manifest, or the metafile digest does not match",
+        "BUNDLE_PROHIBITED_CONTENT": "the pre-isolation scan found a historical identifier, fixture path or truth-bearing key",
+        "PRODUCTION_SOURCE_DRIFTED_FROM_BASE": "a production runtime source input does not match its bytes at the frozen base commit"
+      },
+      "directRunnerGuardStillApplies": true,
+      "directRunnerGuardIsNotTransitive": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts inspects the runner sources only. It is a useful first-order gate and is explicitly not a transitive proof.",
+      "frozenExceptions": [
+        {
+          "path": "src/domain/rules/wine-alcohol-parse.ts",
+          "sha256": "2ec1368cf3f4fcfab264d1507f98267aa6f6112091332d4dda5a76152ea816e7",
+          "sha256ComputedAt": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+          "reason": "Mandatory deterministic incumbent Alcohol parser, reached by the UNCHANGED extractor path: field-selection.ts line 1 imports @/domain/rules/wine-alcohol-parse. Without it the direct extractLabelEvidenceDetailed route cannot run at all.",
+          "isNotAnEvaluationTruthModule": true,
+          "whyNotTruth": "It is a bounded deterministic parser over label text. It reads no governed truth, no acceptable values and no per-case record.",
+          "transitiveImports": [],
+          "transitiveImportsVerifiedBy": "src/fixtures/eval/issue-149-dependency-closure.test.ts",
+          "isTheOnlyExceptionUnder": "src/domain/rules/**",
+          "priorDefect": "Amendment 5 prohibited every transitive dependency under src/domain/rules/**, so host preparation would have halted with BUNDLE_PROHIBITED_DEPENDENCY while bundling the exact incumbent extractor it is required to run."
+        }
+      ],
+      "frozenExceptionsAreExhaustive": true,
+      "frozenExceptionsRule": "An exception is a PATH AND CONTENT HASH pair. A different path under the same directory is not covered, and the same path with different bytes is not covered.",
+      "productionSourceBaseDriftGate": {
+        "everyProductionRuntimeSourceInputMustMatchItsBytesAt": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+        "why": "A bundle manifest that merely records whatever production source happened to be present proves the bundle is internally consistent, not that it is the INCUMBENT. The acquisition claims to observe the incumbent path at a named commit; that claim needs the bytes pinned to that commit.",
+        "appliesTo": "every production source file in the dependency closure, not only the named exception",
+        "haltCode": "PRODUCTION_SOURCE_DRIFTED_FROM_BASE",
+        "stage2ScriptsAreSeparate": "Stage 2 acquisition scripts under the explicitly approved evaluation paths are not production sources. They are hashed and reviewed separately, and are listed distinctly in the bundle manifest."
+      },
+      "forbiddenEvidenceKeyInventory": {
+        "authoritativeAsset": "artifacts/issue-149-brand-complete-evidence-acquisition/runtime/truth-key-inventory.json",
+        "bundlePath": "runtime/truth-key-inventory.json",
+        "assetSha256": "80ae4a144259a9a013d8a35163e724cef1dded4e92e0aa4abd0dc74587e1ff6f",
+        "canonicalFormatting": "a bare JSON array of the key names in authoritative order, no whitespace, one terminal newline",
+        "keyCount": 10,
+        "keysNotRestatedHere": true,
+        "keysNotRestatedHereWhy": "Amendment 6 declared the asset authoritative and then copied the array into four contracts and a test, which is four more places to drift. Operative contracts reference the path and hash; the runtime, the freeze script, the bundle scanner and the consistency test all READ the asset.",
+        "readByTheRuntimeEmittedEvidenceScanner": true,
+        "readByTheStagingLeakScan": true,
+        "readByTheHostBundleScanner": true,
+        "fieldNamesVersusValues": "These are FIELD NAMES, prohibited inside acquisition output. The historical identifier and fixture-path VALUES are checked after sealing by the read-only identity-leak verifier, which holds an inventory the isolated runtime never receives.",
+        "governsEveryEmittedFile": "pass records, candidate records, selection records, item-level failure records, count records, manifests and provenance records alike"
+      },
+      "candidateEmissionClosureGate": {
+        "ownedBy": "phase 1 trusted host preparation (Job A)",
+        "scansEveryStage2AcquisitionSourceInput": true,
+        "notMerelyTheTwoRunnerEntryFiles": true,
+        "theDirectRunnerRegexIsNotTransitive": true,
+        "theDirectRunnerRegexIsNotTransitiveNote": "src/fixtures/eval/issue-149-acquisition-isolation.test.ts inspects the runner sources only. A helper the runner imports could reach a lower-level candidate function without the runner source containing a prohibited symbol. The Stage 2 source-closure gate owns the transitive property; the first-order regex does not and does not claim to.",
+        "requiredSoleEmissionCall": "acquireProductionBrandEvidence",
+        "requiredSoleEmissionCallNote": "It takes an ExtractionInput, captures its exact own data-property values into a PRIVATE snapshot before its first await, and calls extractLabelEvidenceDetailed on that snapshot itself, exactly once. The top-level snapshot and ocrEngine are frozen; imageBytes is a private copied Uint8Array with no caller-held alias and is NOT frozen, because a nonempty typed array cannot be. There is no caller-supplied debug, selection or candidate array, and no live caller reference to the input the extractor reads.",
+        "prohibitedOutsideTheAdapterModule": [
+          "selectBrandObservationWithCompleteFilterDiagnostics for Brand acquisition",
+          "selectBrandObservationWithCompleteFilterDiagnostics",
+          "finalizeProductionCandidateArray",
+          "toCandidateEvidenceRecord",
+          "finalizeProductionCandidate",
+          "finalizeCandidateRecord for Brand candidate emission",
+          "stableCandidateId for Brand candidate emission",
+          "CandidateAdapterContext",
+          "TEST_ONLY_candidateAdapterInternals",
+          "caller construction or replacement of brandDiagnostics.candidates",
+          "caller-constructed rankedPosition"
+        ],
+        "theAdapterModuleItself": "scripts/eval/lib/issue-149-candidate-adapter.ts \u2014 it defines the private functions and is the one file exempt from the reference prohibition",
+        "noRuntimeTestBackdoor": true,
+        "noRuntimeTestBackdoorNote": "TEST_ONLY_candidateAdapterInternals was a real exported object holding both lower-level functions, so the private functions were reachable at runtime. It is removed; the adapter exports exactly one candidate-emission function.",
+        "haltCode": "STAGE2_SOURCE_CLOSURE_VIOLATION",
+        "referenceAnalyzer": "scripts/eval/lib/issue-149-stage2-source-closure.ts",
+        "referenceAnalyzerNote": "One host-only implementation. It builds a ts.Program over the supplied closure and resolves every callee through program.getTypeChecker(), checker.getSymbolAtLocation() and checker.getAliasedSymbol(), comparing the resolved DECLARATION against the adapter module's exported declaration. Job A and the Stage 1 synthetic tests use it.",
+        "onlyTheRunnerEntrypointMustInvokeTheApi": true,
+        "onlyTheRunnerEntrypointMustInvokeTheApiNote": "Helper modules for pass validation, semantic fingerprinting, exact-byte hashing, manifest writing and evidence scanning are legitimate Stage 2 sources and must NOT be required to call the acquisition API. They must only be free of prohibited routes. The previous detector added 'does not invoke the API' to every inspected file, which would have rejected all of them.",
+        "prohibitedCallsOutsideTheAdapterModule": [
+          "extractLabelEvidenceDetailed",
+          "selectBrandObservation",
+          "selectBrandObservationWithCompleteFilterDiagnostics",
+          "finalizeProductionBrandEvidence",
+          "finalizeProductionCandidateArray",
+          "toCandidateEvidenceRecord",
+          "finalizeProductionCandidate",
+          "finalizeCandidateRecord",
+          "stableCandidateId"
+        ],
+        "prohibitedWritesNote": "SUPERSEDED IN SUBSTANCE. The runner no longer reads or persists detailed.debug.passes at all: the acquisition boundary serializes and seals the evidence, and the runner receives byte descriptors. The completeness control is runtime package authenticity, not a prohibition on writing to objects the runner never holds.",
+        "acrossTheCompleteClosure": [
+          "exactly one call to acquireProductionBrandEvidence exists",
+          "it is in the runner entrypoint",
+          "zero direct extractor calls exist outside the adapter",
+          "zero direct selector calls exist outside the adapter"
+        ],
+        "violationRules": [
+          "RUNNER_DOES_NOT_INVOKE_ACQUISITION",
+          "RUNNER_INVOKES_ACQUISITION_MORE_THAN_ONCE",
+          "ACQUISITION_INVOKED_OUTSIDE_RUNNER",
+          "PROHIBITED_CALL",
+          "PROHIBITED_WRITE",
+          "RUNNER_ENTRY_MISSING"
+        ],
+        "testedBy": "src/fixtures/eval/issue-149-stage2-source-closure.test.ts",
+        "supersededRoutes": [
+          "a bare candidate array (Amendment 8 and earlier)",
+          "a caller-supplied FieldSelection (Amendment 9): a filtered population could be wrapped in a freshly constructed selection",
+          "a caller-supplied ExtractionDebug (Amendment 10): a helper could filter or reorder the passes and reconstruct matching selections"
+        ],
+        "symbolResolvedNotNameMatched": true,
+        "symbolResolvedNotNameMatchedNote": "The previous version created a ts.Program and then never asked it anything: it compared callee TEXT against a manually built import-name map. That left an aliased acquisition call outside the runner undetected (callee text `run` is neither the authorized name nor a prohibited one), and reported two imports of the authorized function under different local names as ONE call. A name is not an identity.",
+        "frozenPathsNotCallerSelectable": {
+          "runnerEntry": "scripts/eval/issue-149-brand-evidence-acquisition-run.ts",
+          "authorizedAdapterModule": "scripts/eval/lib/issue-149-candidate-adapter.ts",
+          "note": "The adapterModulePath override is removed. A gate whose authorized module the caller chooses authorizes whatever the caller points it at."
+        },
+        "requiredCallShape": {
+          "inTheFrozenRunnerEntrypoint": true,
+          "resolvesToTheExactAdapterExport": true,
+          "exactlyOnceAcrossTheCompleteClosure": true,
+          "awaited": true,
+          "receivesOneIdentifierArgument": true
+        },
+        "resolutionApi": [
+          "program.getTypeChecker",
+          "checker.getSymbolAtLocation",
+          "checker.getAliasedSymbol"
+        ],
+        "authorizationIsNeverEstablishedBy": [
+          "textual callee names",
+          "a manually constructed import-name map alone",
+          "path suffix matching",
+          "endsWith",
+          "caller-selectable adapter paths"
+        ],
+        "resolvedAndRejected": [
+          "aliased acquisition calls outside the runner",
+          "a second acquisition call through another alias",
+          "namespace calls",
+          "re-exported calls",
+          "prohibited extractor or selector calls through aliases, namespaces or re-exports",
+          "local same-name functions",
+          "function-parameter shadowing",
+          "catch-binding shadowing",
+          "block-local shadowing",
+          "destructured aliases"
+        ],
+        "twoSeparateControls": {
+          "sourceGate": "proves WHICH function is called, from where, how often, and that the argument is an identifier. It does NOT and cannot prove the identifier holds a valid ExtractionInput.",
+          "runtimeGate": "acquireProductionBrandEvidence performs the schema, own-key, Proxy, descriptor and frozen-identity validation itself, at call time.",
+          "neitherSubstitutesForTheOther": true
+        },
+        "mutationAnalysisIsNotCompletenessControl": {
+          "priorOverclaim": "Amendment 12 described the adjacent-pair mutation detector as making arbitrary evidence objects unchangeable. It did not: provenance is lost as soon as a value is aliased (`const passes = e.value.detailed.debug.passes; passes.splice(0,1)`), and a non-mutating PROJECTION (`slice`, `filter`, `map`, `concat`, spread) produces incomplete evidence with no mutation at all. Source text cannot establish data lineage through either.",
+          "primaryControl": "the RUNTIME sealed package: the public API returns bytes, so there is nothing to project",
+          "sourceAnalysisRole": "defense in depth"
+        },
+        "sealedPackageRules": {
+          "prohibitedOperationsOnSealedFiles": [
+            "filter",
+            "slice",
+            "map",
+            "concat",
+            "reverse",
+            "sort",
+            "splice",
+            "push",
+            "pop",
+            "shift",
+            "unshift",
+            "find",
+            "flatMap",
+            "spread into a new array",
+            "single-element index"
+          ],
+          "prohibitedParsingOfSealedBytes": true,
+          "prohibitedSubsetSelection": true,
+          "required": "one complete package write with exact readback verification",
+          "permitted": [
+            "reading itemId",
+            "reading outcome",
+            "reading fileCount",
+            "reading totalBytes",
+            "reading aggregateSha256",
+            "passing the COMPLETE package to the authorized writer",
+            "logging non-evidence status metadata"
+          ],
+          "haltCodes": ["SEALED_PACKAGE_PROJECTED", "SEALED_EVIDENCE_PARSED"]
+        }
+      }
+    }
+  },
+  "discoverModeGate": {
+    "runsInsideTheSameRuntimeBoundaryAsExecute": true,
+    "runsOcr": false,
+    "mustDo": [
+      "recursively list every accessible mounted file",
+      "report mount information",
+      "report the allowlisted environment",
+      "assert network is unavailable",
+      "assert known forbidden paths cannot be opened",
+      "assert the repository root is unavailable",
+      "assert the post-freeze ID map is unavailable",
+      "assert the eval manifest and fixture paths are unavailable",
+      "verify the runtime bundle manifest",
+      "verify that only the four authorized experiment data mounts exist, plus the allowlisted pseudo-filesystem classes"
+    ],
+    "thenStopsForReview": true,
+    "executeAuthorizedOnlyAfter": "the discover-mode evidence is reviewed and execute is explicitly authorized"
+  },
+  "implementedInThisAmendment": false,
+  "writableSpaceCorrection": {
+    "priorContradiction": "Amendment 2 said writable space was tmpfs-only AND authorized a read-write output mount. Both could not be true.",
+    "resolution": "The output mount is a real read-write bind mount, not a tmpfs, so evidence survives the container. tmpfs covers only process/runtime scratch. The two are named separately.",
+    "authorizedWritablePaths": [
+      {
+        "path": "the experiment output mount",
+        "kind": "bind, read-write",
+        "survivesContainer": true
+      },
+      {
+        "path": "explicitly named tmpfs paths",
+        "kind": "tmpfs",
+        "survivesContainer": false,
+        "purpose": "process and runtime temporary files only"
+      }
+    ]
+  },
+  "mountInvariant": {
+    "exactlyFourExperimentControlledDataMounts": true,
+    "plusAllowlistedRuntimePseudoFilesystems": true,
+    "correction": "Amendment 2 said 'exactly four mounts'. That is not implementable: every container carries required runtime mounts. The invariant is four EXPERIMENT-CONTROLLED data mounts plus an explicit allowlist of unavoidable pseudo-filesystems.",
+    "allowedPseudoFilesystemClasses": [
+      "proc",
+      "sysfs",
+      "devtmpfs / devpts / mqueue / shm",
+      "cgroup and cgroup2",
+      "tmpfs for the explicitly named scratch paths",
+      "container-runtime generated files: /etc/hosts, /etc/hostname, /etc/resolv.conf"
+    ],
+    "anythingElseIsAFailure": true
+  },
+  "twoPhaseDesign": {
+    "correction": "Amendment 2's discover steps required the checkout, the freeze script, artifacts and the ID map \u2014 none of which exists inside the isolated boundary. The plan is split so each check runs where it can actually run.",
+    "phase1TrustedHostPreparation": {
+      "runsInsideIsolatedBoundary": false,
+      "runsOcr": false,
+      "steps": [
+        "checkout and verify the Stage 1 contract package against stage-1-contract-manifest.sha256",
+        "verify preregistration.sha256",
+        "run the freeze/staging script",
+        "verify the source images and the post-freeze id map",
+        "build the allowlisted runtime bundle WITHOUT an unrestricted repository COPY",
+        "generate the complete dependency closure / metafile for every runtime input module",
+        "fail closed on any transitive source input under a prohibited path",
+        "write the runtime bundle manifest: source paths, emitted paths, per-path SHA-256, build command, tool version, metafile digest",
+        "scan the BUILT bundle for historical case IDs, historical fixture paths and prohibited truth-bearing keys",
+        "prepare an initially empty output directory"
+      ],
+      "hasAccessTo": "the repository checkout, artifacts, fixtures and the post-freeze id map, because preparation legitimately needs them"
+    },
+    "phase2IsolatedDiscover": {
+      "runsInsideExactExecuteBoundary": true,
+      "runsOcr": false,
+      "receivesOnly": "the four experiment-controlled data mounts",
+      "mayNotAccess": [
+        "the checkout",
+        "artifacts/",
+        "fixtures",
+        "the post-freeze id map",
+        "governed truth",
+        "the original source image paths"
+      ],
+      "mustVerify": [
+        "the runtime bundle manifest, including that every mounted emitted path matches its recorded SHA-256",
+        "the truth-free manifest",
+        "staged opaque image hashes and byte sizes",
+        "the environment allowlist",
+        "the experiment-controlled mount list",
+        "the pseudo-filesystem mount allowlist",
+        "read-only root",
+        "that only the output mount and the named tmpfs paths are writable",
+        "that forbidden paths cannot be opened",
+        "that network is unavailable",
+        "that no credential is present"
+      ],
+      "checksMovedToPhase1": [
+        "verifying preregistration.md",
+        "re-running the freeze script",
+        "reading fixtures",
+        "reading post-freeze/id-map.json"
+      ],
+      "checksMovedToPhase1Note": "These require files that do not exist inside the boundary. Claiming they run inside the container would be false.",
+      "doesNotOwn": "the transitive dependency proof. It can confirm the bundle it was given matches the manifest; it cannot reconstruct how that bundle was built."
+    },
+    "discoverStopsForOwnerReviewBeforeExecute": true
+  },
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run.",
+  "runtimeIdentity": {
+    "pinnedNonRootUid": 10149,
+    "pinnedNonRootGid": 10149,
+    "why": "Discovery observed uid 0. Capabilities were dropped and no-new-privileges was set, but nothing pinned a non-root user. Documenting uid 0 as accepted was not sufficient.",
+    "verifiedBy": "discovery compares process.getuid()/getgid() against ISSUE_149_EXPECTED_UID/GID and fails when they differ"
+  },
+  "supplyChainPinning": {
+    "contract": "execution-supply-chain-pins.json",
+    "actionsPinnedToFullCommitSha": true,
+    "runtimeImagePinnedToLinuxAmd64Digest": true,
+    "why": "A tag is a movable reference; a full commit SHA and an image digest are the only immutable ones."
+  },
+  "executeTransitionIntegrity": {
+    "contract": "execute-authorization.json",
+    "enforcedBy": "scripts/eval/issue-149-execute-gate.mjs",
+    "pathsFilterIsNotTheControl": "GitHub's paths: filter decides WHETHER the workflow runs. It does not restrict what else the triggering push contains, so the changed-file restriction is enforced against the actual commit range."
+  }
+}

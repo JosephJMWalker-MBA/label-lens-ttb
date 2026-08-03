@@ -1,0 +1,241 @@
+# Limitations
+
+Stage 1 contract generation and trusted freeze/staging are complete, and **Stage 2
+Job A and isolated discovery have run**. Job A builds the allowlisted runtime
+bundle and emits the truth-free preparation artifact; the **runtime bundle
+executes in `discover` mode** inside the isolated boundary and produces the
+boundary report.
+
+**What has NOT run: execute mode, the acquisition API, the extractor, the OCR
+engine, the item and run writers, and any governed 115-case acquisition OCR.** No
+`raw/` evidence exists. The execute path is implemented and dormant, and
+`execute-authorization.json` reads `EXECUTE_NOT_AUTHORIZED`.
+
+The ordinary repository suite continues to run its pre-existing bundled-image OCR
+tests, disclosed separately.
+
+## What is available, and what genuinely is not
+
+### Complete filter checks — AVAILABLE
+
+Merged PR #220 evaluates all ten ladder rules under an evaluation-only,
+default-off entry point (`selectBrandObservationWithCompleteFilterDiagnostics`)
+and exports `BRAND_FILTER_CHECK_ORDER` and the invariant assertions. For every
+candidate the acquisition records `filterChecks` (all ten rules with whether each
+failed) and `activeRejectionReasons` (every failed rule in ladder order).
+
+The earlier statements that the checks were unavailable, that the predicates were
+module-local and unexported, and that this was "the most consequential limitation
+in the package" were true before PR #220 and are false now. They are preserved
+only in the historical amendment records.
+
+### The one-filter counterfactual — SATISFIABLE BY REPLAY, not by reasons
+
+The superseded claim was that unknown *later* rules made a one-filter
+counterfactual an upper bound. That is no longer the binding constraint: every
+rule that would reject a candidate is recorded.
+
+The real constraint is different, and Amendment 3 named it. Rejection reasons say
+why a candidate was rejected; they do not say what the selector would have
+produced under a different filter, because candidates are *constructed from the
+passes*. A rejected span returns from `analyzeBrandSpan` before a `Candidate`
+object exists, so it carries no `brandClass`, no geometry-on-candidate, no score
+and no ranking — and filter outcomes feed forward into line-window and multi-line
+candidate formation.
+
+What makes the counterfactual reachable is the **complete ordered
+`RegionOcrResult` array**, persisted per case
+(`region-ocr-result-replay-contract.json`). A separately governed, zero-OCR
+selector can replay it with exactly one filter changed. **This sprint does not
+run that replay and authorizes no filter change.**
+
+### Post-deduplication merged support — NOT AVAILABLE
+
+Production merges support-pass information during candidate deduplication
+(`dedupeBestCandidates` → `mergeCandidateSupport`,
+`field-selection.ts:466, 2175-2195`). The public `BrandCandidateDiagnostic`
+objects are constructed *before* that merge, and the only values written back to
+them afterwards are `score`, `ranking` and `decision`. `supportPassIds` is never
+written back.
+
+So the candidate record's `supportPassIds` and `candidateProvenance` are the
+**pre-merge** support the diagnostic carried. They must not be described as the
+final post-deduplication support set for every ranked candidate.
+
+What *is* available: `FieldSelection.supportingPassIds` exposes the post-merge
+support for the **selected observation**, and it is persisted separately.
+Alternate provenance is persisted wherever `FieldSelection` exposes it. The
+complete merged support for every final ranked candidate is not exposed, is **not
+reconstructed in the acquisition adapter** — that would be a second
+implementation of deduplication presented as production's output — and would
+require a production change this sprint forbids.
+
+## Requirements that genuinely cannot be met
+
+**Word baseline geometry, and block/paragraph/line identifiers.** `OcrWord`
+carries text, raw confidence, a bounding box and an optional original geometry.
+Nothing else. The brief asks for these "where available"; they are not available.
+
+**Constituent word IDs per reconstructed line.** `BrandLineDiagnostic` records
+assembled text and pass provenance, not word membership. Candidate-to-line
+membership is recoverable through `lineIndexes`; word-to-line membership is not.
+
+Both were re-verified against the real types at base `546c3f27…`. Neither is
+invented or approximated.
+
+## The Stage 1 isolation tests are static, not runtime proof
+
+They read committed planning artifacts and assert manifest shape, path separation
+and import prohibitions. **They cannot demonstrate that a future process is unable
+to read the repository checkout.** Actual process-level isolation is a mandatory
+discover-mode gate inside the runtime boundary, frozen in
+`acquisition-runtime-isolation-contract.json` and deliberately not implemented
+here. Until that gate has run and been reviewed, the isolation claim in this
+package is a design commitment, not a measurement.
+
+## The staging step is trusted, by necessity
+
+Something must know which historical image becomes `item-0001`, because something
+must copy it. That knowledge lives in the freeze script, which runs before and
+outside the acquisition process. The acquisition process sees only a directory of
+`item-NNNN.<ext>` files.
+
+This is a real trust boundary, not an absence of one: if the staging step were
+wrong, every downstream mapping would be wrong in the same way. It is tested, but
+it is tested against its own output, so a systematic staging error would not be
+caught by these tests. The image SHA-256 carried on both sides is the check that
+would catch it, and it is asserted.
+
+## The 100 MB fallback is retention-bound, not preservation
+
+The measurement is **nonfatal** and produces a decision; the verified artifact is
+uploaded, redownloaded by exact artifact ID, digest-compared and content-verified
+on **both** sides of the limit, and the stop is a terminal adjudication that runs
+only afterwards.
+
+That ordering was wrong once and is worth stating plainly: the volume step used
+to exit nonzero BEFORE the upload, and GitHub applies an implicit `success()` to
+any later step whose `if:` carries no status-check function — so a run producing
+100 MB plus one byte would have detected the threshold and then discarded the
+only copy of the evidence when the runner disappeared. The limit governs what
+happens to the evidence; it must never be what destroys it.
+
+If the raw evidence exceeds 100 MB the run still completes and the complete
+lossless evidence is uploaded — but as a **temporarily retained workflow
+artifact**, which expires. It is not durable archival, and this package does not
+call it that. The procedure records the artifact ID, exact bytes, SHA-256,
+configured retention and expected expiration, stops before post-freeze truth
+evaluation, and requires an explicit owner decision about durable archival before
+continuing.
+
+Two real consequences. A reviewer working only from the repository would not see
+the evidence. And if no durable destination is chosen before expiry, the evidence
+is **gone** — the run would have to be repeated. The gate makes that visible
+rather than silent, but it does not prevent it.
+
+## Production caps candidate generation, and that bounds any counterfactual
+
+`MAX_BRAND_WORDS = 4` and `MAX_MULTI_LINE_SEEDS_PER_LINE = 3` mean windows longer
+than four words are never formed. Acquisition can only enumerate candidates
+production actually built, so "all candidate windows considered" means *all
+windows production considered*, not all windows conceivable. Whole-line
+candidates longer than four words are formed and then rejected with
+`too-many-words`, so those do appear.
+
+## The repeat measures stability, not truth
+
+Two runs on one host, one build, one day. Agreement establishes that the evidence
+package is reproducible under those conditions. It does not establish
+cross-host or cross-build determinism, and it does not make either run more
+correct than the other. Under disagreement both runs are preserved and neither is
+designated canonical.
+
+## The acquisition validates evidence, not the pipeline
+
+Nothing here tests whether the Brand path is correct, well-tuned or
+production-suitable. It records what the path does. A field that reproduces its
+prior value confirms the evidence chain, not the behaviour.
+
+## Cross-check outcomes may be genuinely ambiguous
+
+`PRIOR_FIELD_NOT_REPRODUCED` and `CURRENT_PIPELINE_DIFFERENCE` are separated by a
+judgement about whether an identified change accounts for the difference. Where
+that judgement cannot be made from the diffs, `CANNOT_COMPARE_SEMANTICALLY` is
+the honest code, and it will be used rather than forcing one of the other two.
+
+## Volume, and what it costs to keep
+
+The estimate below is grounded in the committed 15-case baseline report, not
+guessed, but it is an extrapolation from 15 cases to 115 and the real figure will
+differ. If the raw evidence turns out substantially larger than estimated, that
+is a fact to report, not a reason to reintroduce a cap.
+
+## A pass whose word carries no finite `rawConfidence` halts the item
+
+The sealed pass schema requires a finite `rawConfidence` on every `OcrWord`.
+`OcrWord.rawConfidence` is a REQUIRED number in production's own type, so this is
+a pass production's types say cannot occur — but production's
+`rawConfidenceOf` explicitly tolerates a non-finite value and counts it in
+`ocrConfidence.missingTokenCount`, so the two are not perfectly aligned.
+
+If the engine ever produced such a word, the item halts with `PASS_WORD_INVALID`
+rather than being persisted with a hole in it, and is reported as a failed item.
+That is the intended behaviour and is stated here rather than discovered later.
+The consequence is that a nonzero `missingTokenCount` reachable through a
+non-finite confidence is a population the sealing schema will not persist.
+
+## The source-closure gate does not prove evidence completeness
+
+The Stage 2 source analyzer resolves symbols and rejects prohibited calls,
+aliases, namespaces, re-exports and shadowing. It does **not** establish data
+lineage: once a value is aliased (`const passes = sealed.files;`) or projected
+(`sealed.files.slice(0, 1)`), source text cannot show what the resulting value
+descends from. Amendment 12 overclaimed here.
+
+Completeness is a **runtime** control: the public API returns sealed bytes, so
+there is no evidence object left to project. The source gate rejects the obvious
+projection and parse forms as defense in depth, and is described as defense in
+depth rather than as proof.
+
+## The run-level commit is a marker, not a single rename
+
+An item commits by renaming its staging directory, which is atomic. The run-level
+files land in a directory that already exists — it holds the items — so they are
+renamed individually. That window is closed by an **exclusive commit marker**
+written last, `RUN_COMMITTED.json`, which binds every run-level digest: a run
+without a valid marker is UNCOMMITTED no matter which of its files are present,
+and actor 2 treats it as such.
+
+What remains true and is stated rather than smoothed over: the marker makes the
+partial state DETECTABLE, not impossible. A crash between renames still leaves
+files on disk; they simply cannot be mistaken for a committed run. Recovery is
+explicit re-derivation from the committed items, never reconstruction.
+
+## The branch-local execute gate cannot authenticate itself
+
+The changed-file gate compares the actual commit range against a reviewed SHA,
+which catches ordinary accidental co-changes. It cannot prove that an unreviewed
+commit did not replace or remove the gate itself: the workflow and the gate
+script are both loaded from the current branch head. It is defense in depth. What
+actually authorizes execute is an externally reviewed transition commit,
+identified by its full SHA **before** it is pushed.
+
+## Verification steps that ran but could not fail — a recurring class
+
+Three checks in this package executed, reported, and could not have failed:
+
+- a `du -sb` size measurement standing in for raw verification;
+- an `ok: true` finding for a forbidden-key scan Actor 2 never performed;
+- a content re-verification reading a path that the artifact download never
+  created, so it verified an empty tree.
+
+Two were found by review; the third by the no-OCR rehearsal, before it mattered.
+The rehearsal exists because a dormant path cannot be trusted on inspection
+alone, and it is the reason the third was caught rather than discovered during
+execute.
+
+## Scope
+
+115 cases, one corpus, one pipeline, one base. This sprint does not KEEP or KILL
+anything, chooses no successor treatment, simulates no relaxation, and authorizes
+no production change.

@@ -1,0 +1,84 @@
+{
+  "artifact": "evidence-volume-rule",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "principle": "Preserve complete, uncapped evidence. This is a Git storage gate, never an evidence-completeness exception.",
+  "expectedTotalEstimate": "15-40 MB for primary plus repeat, extrapolated from the committed 15-case baseline",
+  "gate": {
+    "atOrBelow100MB": "upload and verify the artifact, then stop; a separate owner-authorized post-run process commits the evidence",
+    "above100MB": "complete the run, upload the complete lossless evidence as a TEMPORARILY RETAINED workflow artifact, and stop before committing raw evidence to Git"
+  },
+  "reportedEitherWay": [
+    "exact total bytes",
+    "bytes by category: pass records, word records, line records, candidate records, manifests",
+    "the largest individual files"
+  ],
+  "neverPermitted": [
+    "truncating evidence",
+    "sampling evidence",
+    "discarding evidence",
+    "destructively recompressing evidence",
+    "omitting evidence"
+  ],
+  "ifTheGateFires": "The evidence still exists in full as a workflow artifact. Only its commitment to Git is withheld, and that fact is reported rather than resolved by shrinking the evidence.",
+  "amendedBy": "preregistration-stage-2-archive-stop-correction.md",
+  "above100MBProcedure": [
+    "upload the complete lossless evidence artifact",
+    "record the artifact ID, exact bytes, SHA-256, configured retention and expected expiration",
+    "stop before post-freeze truth evaluation",
+    "stop before claiming durable preservation",
+    "require an explicit owner decision about durable archival before continuing",
+    "do not delete local job output before successful artifact upload AND digest verification",
+    "do not truncate, sample or destructively recompress"
+  ],
+  "retentionLanguage": {
+    "required": "temporarily retained workflow artifact",
+    "prohibited": "permanently preserved",
+    "why": "A workflow artifact is retention-bound and expires. Calling it permanent preservation would overstate what exists, and would let the evidence quietly disappear at expiry with the record still claiming it is safe.",
+    "permittedOnlyIf": "a durable archival destination has actually been verified"
+  },
+  "workflowPermissions": "contents: read",
+  "ocrWorkflowNeverPushes": true,
+  "priorDefect": "The volume step exited nonzero BEFORE the verified upload. GitHub applies an implicit success() to any step whose if: contains no status-check function, so the verified upload was skipped \u2014 and the incomplete-forensic upload was skipped too, because its own condition is false when Actor 2 and Job C succeeded. A run producing 100 MB plus one byte would have detected the threshold and then discarded the only durable copy of the evidence.",
+  "transport": {
+    "atEverySize": [
+      "upload the complete lossless evidence as a workflow artifact",
+      "record the artifact ID, exact byte size, SHA-256, retention and expiration",
+      "verify the uploaded artifact digest BEFORE deleting any job-local output"
+    ],
+    "atOrBelow100MB": [
+      "stop after artifact verification",
+      "a separate owner-authorized post-run process downloads the artifact, verifies its digest, and commits the raw evidence to PR #219",
+      "that post-run process is NOT the OCR process",
+      "it has no access to governed truth until both raw manifests verify"
+    ],
+    "above100MB": [
+      "stop before Git commitment",
+      "stop before post-freeze truth evaluation",
+      "require the durable-archive owner decision"
+    ],
+    "contentsWriteGrantedToOcrJob": false
+  },
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run.",
+  "orderingIsFrozen": [
+    "1. Actor 2 verifies the evidence",
+    "2. Job C verifies identity isolation",
+    "3. the archive volume is MEASURED, nonfatally, into archive-volume-report.json",
+    "4. the complete lossless artifact is uploaded, regardless of the measurement",
+    "5. it is redownloaded by exact artifact ID, its metadata digest compared and its contents re-verified",
+    "6. the verification receipt is created and uploaded",
+    "7. ONLY THEN is the volume adjudicated"
+  ],
+  "limitBytes": 104857600,
+  "atTheLimitIsEligible": "the rule is 'exceeds', so exactly 104857600 bytes is eligible",
+  "overLimitIsNotIncompleteEvidence": "Complete, verified evidence above the limit is complete evidence. It is never uploaded under issue-149-incomplete-forensic-output.",
+  "overLimitMeans": [
+    "do not commit raw evidence to Git",
+    "do not begin truth-based evaluation",
+    "require an explicit owner durable-archive decision",
+    "preserve the retention-bound workflow artifact for that decision"
+  ],
+  "retentionBoundIsNotPermanentPreservation": true,
+  "decisionFunction": "scripts/eval/lib/issue-149-archive-volume.ts#decideArchiveVolume",
+  "adjudicationFunction": "scripts/eval/lib/issue-149-archive-volume.ts#archiveAdjudication"
+}

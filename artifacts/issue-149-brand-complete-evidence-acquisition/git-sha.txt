@@ -1,0 +1,73 @@
+546c3f279ce431a1fd8c0203df7a83553ea866ef
+base: origin/main 546c3f279ce431a1fd8c0203df7a83553ea866ef (merge commit of PR #220)
+
+CURRENT — stage 1, amendment 14:
+  preregistration sha256: see preregistration.sha256
+  stage 1 contract-package aggregate: see stage-1-contract-manifest.sha256
+  field-selection.ts sha256 at this base: 8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c
+  OCR status: No governed 115-case acquisition OCR, acquisition runner OCR,
+    discovery or execute-mode OCR has run. The ordinary repository suite
+    continues to run its pre-existing bundled-image OCR tests, disclosed
+    separately.
+  runtime status: The Stage 1 trusted freeze/staging generator and its temporary
+    --check reproducibility mode have run. No Stage 2 Job A workflow, truth-free
+    preparation artifact, runtime-bundle build, discovery, execute mode or
+    governed 115-case acquisition OCR has run. No acquisition runner, execution
+    workflow, workflow-mode.txt or raw/ directory exists.
+
+HISTORICAL — amendment 13:
+  head: 3e08d41edbd7f4d8c36769ffa77226b2842ede9d
+  preregistration sha256: 9fedf0953d428d21cc4336826295ac6cd32585efdd0c3f964439abef66f26c6a
+
+HISTORICAL — amendment 12:
+  head: c8154b016a80ab9a9463e71914db9bce68cb382a
+  preregistration sha256: db8a9582cb01db8846efcc3f93f942dc6044754f22377c5f149bf97de9c5f3e5
+
+HISTORICAL — amendment 11:
+  head: 198cb370bfd5c436b62bda64dd1e5ffdd40810dd
+  preregistration sha256: 6030ec7d3c5af3b4ed89edccd45615cd8fcf249a7a708a9aaddbac2d660407e6
+
+HISTORICAL — original Stage 1:
+  head: 7600b0a9ba5ce6995274a517121f1eda18a30424
+  base: 8f0c6a7ca7c271eed14d9084ed6da7fe11f897a9
+  preregistration sha256: 7b691c78a9de008039ccc1a7f94824015373b1caec58f8235c78a03587c641fb
+
+HISTORICAL — amendment 1:
+  head: 26157cfe036fb8b1506431d1aa9309029ac2dcdb
+  preregistration sha256: cfc118c670a9c69f783f3ca58174113711b553baf1278da31a35e31121bf13ad
+
+HISTORICAL — amendment 2:
+  head: ad1c296194e21e91af8333953ad47abe396495dc
+  preregistration sha256: 9287ecc0d5d01bae83316c9d0dcb462d6eca566c925405cde83631fa65c89d35
+
+HISTORICAL — amendment 3:
+  head: 37e1a3ea752c12b230d468c10f604b8550d37ce1
+  preregistration sha256: 3cf3d25fbb892dabc66e58796841c542fcc4eb79f7cd5d561271a7689ed87786
+
+HISTORICAL — amendment 4:
+  head: cb574539d5e541446ec58d2b2bc62b9fda480048
+  preregistration sha256: 87302e60a0629f6d657f4f118c8d73a50ea93aa3d321c15f77b5974ae75d28a3
+
+HISTORICAL — amendment 5:
+  head: fca0755d629af2a15206d4cc5f5251768223e2f7
+  preregistration sha256: 274e45779c849d4e6ada50e10b74d1fc8f6b1396f68b540ae02156e640422332
+
+HISTORICAL — amendment 6:
+  head: ad8351ee84f073f13b869871115748a0700beea7
+  preregistration sha256: 15771503f342652fd69ea1edf24d470a0e61324adac1451d32532b47e77627a1
+
+HISTORICAL — amendment 7:
+  head: d23554cb7a56a480f884c9ca8365b5b3c7d4d288
+  preregistration sha256: c407f4634d1fb71d836b459a09b2da28b8b46ca5d44b619776a3e15f0d8e7747
+
+HISTORICAL — amendment 8:
+  head: dd50a9e258705b77d2109514f4a495c64b364036
+  preregistration sha256: 7edbaeace6217c0fb1b51d20c3b3db2d4e024a84ba31d697a3a354f43f2a5d85
+
+HISTORICAL — amendment 9:
+  head: 849ecbb1e50eab4d9f5ec53edf5f92dc56015d05
+  preregistration sha256: 15fe208b96fc9b1fdff53f0637b5a002d31d4393d3e8e48354937ec051678176
+
+HISTORICAL — amendment 10:
+  head: 6eae8463c4c4b037a581906a892db8ae36fba1f9
+  preregistration sha256: e40dca9caf5ba757a3a121c56707e3f8e5616fc38ebf1a24ee933cfa7368387a

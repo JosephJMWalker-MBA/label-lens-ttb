@@ -1,0 +1,172 @@
+{
+  "artifact": "determinism-rules",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "comparisonLevels": [
+    {
+      "level": "source image",
+      "compare": "sourceImageSha256 and byte size"
+    },
+    {
+      "level": "OCR words",
+      "compare": "ordered word records: text, rawConfidence, bbox, originalGeometry"
+    },
+    {
+      "level": "complete pass records",
+      "compare": "every RegionOcrResult field except timings, in pass order"
+    },
+    {
+      "level": "reconstructed lines",
+      "compare": "ordered line records: rawText, cleanedValue, confidence, prominence, kept, reason, provenance"
+    },
+    {
+      "level": "candidate decisions",
+      "compare": "the complete ordered candidate array, field by field, including rejected candidates, the authoritative filterReason, the complete ranking object, regionName, and the COMPLETE filterChecks and activeRejectionReasons arrays compared element by element"
+    },
+    {
+      "level": "ranking order",
+      "compare": "position in the complete ranked list for every ranked candidate"
+    },
+    {
+      "level": "selected value",
+      "compare": "final selected value per case"
+    },
+    {
+      "level": "authority state",
+      "compare": "final state and abstention reason per case"
+    },
+    {
+      "level": "semantic fingerprints",
+      "compare": "the semantic per-pass and semantic ordered-pass-array fingerprints, which exclude timings"
+    },
+    {
+      "level": "candidate identity",
+      "compare": "candidateOrdinal, completeCandidateArrayLength, canonicalRecordSha256 and stableCandidateId for every candidate"
+    },
+    {
+      "level": "diagnostic parity",
+      "compare": "that the BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE assertion passed for every case in both runs"
+    }
+  ],
+  "everyDifferenceReported": true,
+  "rerunOnDifference": false,
+  "repairOnDifference": false,
+  "favourableRunSelection": {
+    "permitted": false,
+    "rule": "Under nondeterminism BOTH runs are preserved in full. Neither is designated canonical, and no downstream artifact may silently prefer one."
+  },
+  "acquisitionVerdicts": [
+    {
+      "verdict": "COMPLETE_DETERMINISTIC_EVIDENCE",
+      "requiresAll": [
+        "both runs complete",
+        "all 115 cases present in both",
+        "no truncation at any level",
+        "truth isolation passes",
+        "all required fields present",
+        "primary and repeat evidence match exactly at every SEMANTIC comparison level"
+      ]
+    },
+    {
+      "verdict": "COMPLETE_WITH_NONDETERMINISM",
+      "when": "evidence is complete and truth-isolated, but one or more primary/repeat records differ at a SEMANTIC comparison level",
+      "notTriggeredBy": "a difference confined to timings or run metadata"
+    },
+    {
+      "verdict": "INCOMPLETE_EVIDENCE",
+      "when": "a required field, case, candidate or OCR record is missing or truncated"
+    },
+    {
+      "verdict": "TRUTH_ISOLATION_FAILURE",
+      "when": "truth or expected outcomes entered acquisition before the raw freeze"
+    },
+    {
+      "verdict": "RUNTIME_FAILURE",
+      "when": "the fixed acquisition could not complete"
+    }
+  ],
+  "verdictComputedNotAsserted": true,
+  "amendedBy": "preregistration-stage-2-final-execute-closure.md",
+  "threeSeparateConcepts": {
+    "fullArtifactIntegrity": {
+      "covers": "the EXACT persisted bytes of every raw file and manifest, including timings and run metadata",
+      "computedAs": "sha256Bytes(file bytes) per file, plus an aggregate over the sorted manifest lines",
+      "referenceImplementation": "sha256Bytes in scripts/eval/lib/issue-149-evidence-canonical.ts",
+      "isNotACanonicalObjectDigest": true,
+      "priorDefect": "Amendment 4 exported fullRecordIntegritySha256, which canonicalized an object first and therefore could not see whitespace, key order or a terminal newline \u2014 while this contract defined artifact integrity as SHA-256 over file bytes. That name is removed rather than reinterpreted.",
+      "proves": "immutability of what was written; a changed byte, including whitespace or a terminal newline, changes the value",
+      "expectedToMatchBetweenPrimaryAndRepeat": false,
+      "why": "Two runs legitimately differ in timings and run metadata. An integrity hash that matched across runs would mean the second run had not been recorded independently."
+    },
+    "semanticPassFingerprint": {
+      "computedOver": "the VALIDATED complete RegionOcrResult record",
+      "excludesExactly": ["timings"],
+      "includesEveryOtherField": [
+        "passId",
+        "regionName",
+        "passKind",
+        "triggerReasons",
+        "preprocessing",
+        "fieldEligibility",
+        "transform",
+        "transformedSize",
+        "pageSegMode",
+        "rawWordCount",
+        "discardedWordCount",
+        "words"
+      ],
+      "arrayOrderPreserved": true,
+      "canonicalization": "issue-149-candidate-canonical-v1",
+      "validatesFirst": "assertRegionOcrResultRecord \u2014 an invalid or metadata-bearing pass is rejected, not hashed"
+    },
+    "semanticOrderedPassArrayFingerprint": {
+      "computedOver": "the complete ordered pass array after removing timings from each pass",
+      "arrayOrderPreserved": true,
+      "why": "Production selects over the pass array in order; a reordered replay is a different experiment.",
+      "validatesEachPassFirst": true
+    },
+    "canonicalObjectDigest": {
+      "computedAs": "canonicalRecordDigest(record) \u2014 canonical JSON over a parsed object",
+      "isNotAnArtifactIntegrityProof": true,
+      "why": "Canonicalization deliberately erases key order and formatting, so it cannot prove a file is unaltered. It compares two parsed structures, nothing more."
+    }
+  },
+  "excludedFromTheSemanticEqualityGate": {
+    "timings": ["preprocessMs", "ocrMs", "inverseMappingMs", "totalMs"],
+    "runMetadata": [
+      "wall-clock start and end",
+      "workflow run ID",
+      "artifact ID",
+      "artifact expiration",
+      "runner and host identity"
+    ],
+    "why": "These are provenance and telemetry, not OCR output. A difference in any of them says nothing about whether the recognizer produced the same result.",
+    "stillPersistedInFull": true,
+    "stillComparedAndReported": true,
+    "butNeverAloneAVerdict": "A difference confined to timings or run metadata must NOT produce COMPLETE_WITH_NONDETERMINISM. It is reported descriptively."
+  },
+  "cropPixelComparisonRemoved": "The 'crop pixels' level compared cropPixelSha256 per pass. That value is not obtainable through the frozen production interface; see raw-ocr-contract.json#unavailableThroughTheFrozenInterface.",
+  "rawManifestsUseExactFileBytes": true,
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run.",
+  "sealedFingerprintLocations": {
+    "perPassSemanticFingerprint": "raw/<run>/<opaqueItemId>.fingerprints.json#perPass[].semanticPassFingerprint",
+    "perPassOrderedWordsOnlyFingerprint": "raw/<run>/<opaqueItemId>.fingerprints.json#perPass[].orderedWordsOnlyFingerprint",
+    "orderedPassArraySemanticFingerprint": "raw/<run>/<opaqueItemId>.fingerprints.json#orderedPassArraySemanticFingerprint",
+    "excludedFromEverySemanticFingerprint": ["timings"],
+    "artifactIntegrityStillCoversTimings": "sha256Bytes over the exact persisted bytes, which include timings"
+  },
+  "timingOnlyDifferencesAreDescriptive": "An item whose sealed BYTES differ only because timings differ has identical semantic fingerprints. The determinism verdict rests on the semantic fingerprints; timing-only differences are recorded descriptively and are not a nondeterminism finding.",
+  "comparedSemanticLevels": [
+    "outcome",
+    "sourceProvenanceAndConfiguration",
+    "passSemanticsExcludingTimings",
+    "orderedOcrWords",
+    "reconstructedLines",
+    "candidateRecordsAndStableIdentities",
+    "rankingSelectionAuthorityAndAbstention",
+    "itemCounts",
+    "typedFailureEvidence"
+  ],
+  "timingOnlyIsAFindingNotADefault": "A difference is timing-only ONLY when no semantic level differs AND the remaining byte difference is confined to `timings`, which is checked by comparing the pass records with `timings` removed. Classifying an aggregate difference as timing-only because the PASS fingerprints matched was wrong: a nondeterministic downstream ordering changes candidates or selection while leaving passes identical.",
+  "completeNondeterminismIsASuccessfulOutcome": "COMPLETE_WITH_NONDETERMINISM is a preregistered valid experimental outcome. Both runs are preserved, raw verification and artifact upload continue, and the process status is successful. A nonzero status would skip the verification and upload steps that a nondeterministic result most needs. Nonzero is reserved for INCOMPLETE_EVIDENCE, TRUTH_ISOLATION_FAILURE and RUNTIME_FAILURE."
+}

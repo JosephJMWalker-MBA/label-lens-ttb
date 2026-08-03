@@ -1,0 +1,91 @@
+{
+  "artifact": "amendment-4-linkage",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "amendmentNumber": 4,
+  "amendedBeforeAnyAcquisitionOcr": true,
+  "amendedBeforeDiscovery": true,
+  "governedAcquisitionOcrBeforeAmendment4": {
+    "occurred": false,
+    "underOriginalPlan": false,
+    "underAmendment1": false,
+    "underAmendment2": false,
+    "underAmendment3": false,
+    "discoverModeEntered": false,
+    "executeModeEntered": false,
+    "evidence": "No raw/ directory, no raw-evidence manifest, no workflow file, no workflow-mode.txt and no acquisition runner has ever existed on this branch."
+  },
+  "originalStage1": {
+    "head": "7600b0a9ba5ce6995274a517121f1eda18a30424",
+    "base": "8f0c6a7ca7c271eed14d9084ed6da7fe11f897a9",
+    "preregistrationSha256": "7b691c78a9de008039ccc1a7f94824015373b1caec58f8235c78a03587c641fb",
+    "preservedNotOverwritten": true
+  },
+  "amendment1": {
+    "head": "26157cfe036fb8b1506431d1aa9309029ac2dcdb",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "cfc118c670a9c69f783f3ca58174113711b553baf1278da31a35e31121bf13ad",
+    "preservedNotOverwritten": true
+  },
+  "amendment2": {
+    "head": "ad1c296194e21e91af8333953ad47abe396495dc",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "9287ecc0d5d01bae83316c9d0dcb462d6eca566c925405cde83631fa65c89d35",
+    "preservedNotOverwritten": true
+  },
+  "amendment3": {
+    "head": "37e1a3ea752c12b230d468c10f604b8550d37ce1",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "3cf3d25fbb892dabc66e58796841c542fcc4eb79f7cd5d561271a7689ed87786",
+    "preservedNotOverwritten": true,
+    "historicalMeaningRewritten": false,
+    "note": "Amendment 3's eight corrections stand. Amendment 4 reconciles contradictions that survived it, and does not reinterpret what Amendment 3 got right."
+  },
+  "amendment4": {
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "headAtAmendmentStart": "37e1a3ea752c12b230d468c10f604b8550d37ce1",
+    "preregistrationSha256": {
+      "recordedIn": "artifacts/issue-149-brand-complete-evidence-acquisition/preregistration.sha256",
+      "notDuplicatedHere": true
+    },
+    "stage1ContractManifestAggregate": {
+      "recordedIn": "artifacts/issue-149-brand-complete-evidence-acquisition/stage-1-contract-manifest.sha256",
+      "notDuplicatedHere": true,
+      "why": "The aggregate covers every governed file. Writing it into a file the manifest itself hashes would be self-referential: recording it would change the value being recorded. It lives on the manifest's own trailing `# aggregate` line, which the manifest excludes from its own file list."
+    }
+  },
+  "operationalIncident": {
+    "recordedIn": "artifacts/issue-149-brand-complete-evidence-acquisition/branch-pointer-incident.md",
+    "kind": "audit event, not an experimental result",
+    "summary": "A push used a stale local branch as its source refspec, resetting the remote research branch to 8b36245ec0eb7df68bc2812614d1c10d4a475baa and briefly closing PR #219.",
+    "correctedWithin": "the same minute, by pushing HEAD and reopening the PR",
+    "commitsLost": 0,
+    "workflowOrAcquisitionExistedAtTheTime": false,
+    "contractsHashesOrVerdictsAffected": false,
+    "preventionRule": "manual pushes use HEAD:<remote-branch>; force updates use --force-with-lease pinned to the expected remote head; both ends are verified before pushing"
+  },
+  "corrections": [
+    "exactly one processedAt literal remains (2026-07-12T00:00:00Z); the contradicting top-level value is removed and a recursive scan enforces it",
+    "workflow-plan.md split into phase 1 trusted host preparation and phase 2 isolated discover, with host-only steps removed from discovery and all four experiment-controlled mounts named in execute",
+    "the canonical reference implementation moved to scripts/eval/lib/issue-149-evidence-canonical.ts, outside src/fixtures/**, and explicitly permitted to the runner",
+    "an explicit CandidateEvidenceRecord schema with 28 required own properties; finalizeCandidateRecord fails closed before hashing; filterReason keeps production's name; regionName and the complete ranking object are required",
+    "stale-contract sweep completed across every operative document, strengthened to test concepts rather than exact old sentences",
+    "cropPixelSha256 and per-pass warningsAndErrors withdrawn as unreachable through the frozen interface, replaced by item-level typed failure evidence from the extractor Result",
+    "artifact integrity separated from semantic determinism; timings and run metadata excluded from the semantic equality gate; the words-only digest renamed orderedWordsOnlyFingerprint",
+    "a transitive dependency-closure gate frozen in phase 1 host preparation, with a bundle manifest recording source inputs, emitted paths, build command, tool version and metafile digest",
+    "the three post-freeze actors and the location of the truth boundary named explicitly"
+  ],
+  "unchangedByThisAmendment": [
+    "the frozen 115-item population and its opaque identifiers",
+    "the incumbent configuration pins, including field-selection.ts 8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
+    "two exact corpus runs with no retries and no selective rerun",
+    "the pre-freeze scan's key-and-path scope",
+    "the direct extractLabelEvidenceDetailed route and the runCaseArtifacts prohibition",
+    "full-object canonical diagnostic parity",
+    "the prohibition on modifying PR #195 or any production behaviour"
+  ],
+  "capability3": {
+    "status": "SATISFIABLE",
+    "by": "a separately governed, zero-OCR replay of the persisted complete ordered RegionOcrResult array",
+    "performedHere": false
+  }
+}

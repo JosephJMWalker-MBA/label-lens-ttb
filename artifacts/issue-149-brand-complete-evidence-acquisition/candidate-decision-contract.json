@@ -1,0 +1,337 @@
+{
+  "artifact": "candidate-decision-contract",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "stage": 1,
+  "amendedBy": "preregistration-stage-2-execute-readiness.md",
+  "sourceOfTruthForShape": "BrandCandidateDiagnostic in src/pipeline/extractor/field-selection.ts at PR #220 merge commit 546c3f279ce431a1fd8c0203df7a83553ea866ef",
+  "fieldSelectionSha256": "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
+  "entryPoint": "selectBrandObservationWithCompleteFilterDiagnostics",
+  "entryPointIsEvaluationOnly": true,
+  "productionEntryPointUnchangedAndDefaultOff": "selectBrandObservation",
+  "reachableVia": "the diagnosticSelection candidate array from selectBrandObservationWithCompleteFilterDiagnostics over the exact production pass set. NOT debug.finalSelections, which carries the default shape. See brand-diagnostic-parity-contract.json.",
+  "prohibitedProjectionExplicitlyNotUsed": "brandCandidateDecisions.filter(kept && ranking).slice(0, 6)",
+  "predicatesRecomputedInHarness": false,
+  "predicatesRecomputedNote": "The ACQUISITION consumes the diagnostics PR #220 emits. It does not re-evaluate any predicate, so there is no second implementation that could drift from production. The evaluation harness is not on the acquisition route at all; saying 'the harness consumes' them was wrong and is corrected in Amendment 4.",
+  "invariantPrefix": "BRAND_FILTER_DIAGNOSTIC_INVARIANT_FAILURE",
+  "filterLadderOrder": [
+    "producer-line",
+    "no-letters-or-too-short",
+    "non-brand-keyword",
+    "too-many-words",
+    "domain-like",
+    "varietal-or-designation",
+    "generic-product-language",
+    "location-or-appellation",
+    "low-information-fragment",
+    "sentence-fragment"
+  ],
+  "perCandidatePersisted": {
+    "canonicalizationVersion": "string, must equal issue-149-candidate-canonical-v1",
+    "opaqueItemId": "string matching ^item-\\d{4}$",
+    "candidateOrdinal": "non-negative integer, the index in the exact unprojected production candidate array; must be < completeCandidateArrayLength",
+    "completeCandidateArrayLength": "positive integer, the unprojected array length for this case",
+    "rawText": "string, untruncated",
+    "cleanedValue": "string | null, untruncated",
+    "confidence": "finite number",
+    "ocrEvidenceScore": "finite number",
+    "ocrConfidence": "AnalyzerOcrConfidence, persisted whole \u2014 all SEVEN fields including missingTokenCount",
+    "prominence": "finite number",
+    "regionName": "string, the top-level BrandCandidateDiagnostic.regionName; NOT only the copy inside candidateProvenance",
+    "passId": "string",
+    "passKind": "string",
+    "supportPassIds": "string[] \u2014 the PUBLIC diagnostic support IDs, pre-deduplication-merge. NOT the final merged support set.",
+    "candidateProvenance": "AnalyzerCandidateProvenance, persisted whole",
+    "assembly": "string",
+    "lineIndexes": "integer[]",
+    "kept": "boolean",
+    "filterReason": "BrandLineReason, NEVER null \u2014 the REAL production property name. For a rejected candidate it equals activeRejectionReasons[0]; for a kept candidate it is candidate-positive or candidate-plausible.",
+    "decision": "string | null",
+    "score": "BrandCandidateScore | null, persisted whole",
+    "ranking": "AnalyzerCandidateRanking | null, persisted WHOLE \u2014 strategy, orderingMode, comparator, rankingScore and scoreFactors. Persisting only rankingScore would discard the comparator and ordering mode a replay needs.",
+    "filterChecks": "complete ordered BrandFilterCheck[], all ten rules",
+    "activeRejectionReasons": "complete ordered BrandFilterCheckName[]",
+    "rankingEligible": "boolean, DERIVED from the presence of the ranking object. It means RANKING SEMANTICS WERE COMPUTED, which is not the same as final ranked membership.",
+    "rankingScore": "number | null, a convenience copy of ranking.rankingScore; the complete ranking object above remains authoritative",
+    "rankedPosition": "integer | null \u2014 position in production's FINAL ranked array, which is exactly the set of candidates carrying a decision. Null for a candidate that has ranking semantics but was removed by family reduction or normalized-value deduplication, and null for every rejected candidate.",
+    "selected": "boolean, DERIVED by the acquisition from decision",
+    "canonicalRecordSha256": "DERIVED. string, full 64 lowercase hex over the canonical preimage in candidate-fingerprint-contract.json",
+    "stableCandidateId": "DERIVED. `${opaqueItemId}:${candidateOrdinal}:${canonicalRecordSha256}` \u2014 never a truncated digest"
+  },
+  "perCasePersisted": ["finalSelectedValue", "finalAuthorityState", "abstentionReason"],
+  "assertions": [
+    "ordinals begin at 0",
+    "ordinals are contiguous",
+    "every ordinal occurs exactly once",
+    "stable candidate IDs are unique within each case",
+    "emitted candidate count equals the unprojected diagnostic-array count",
+    "no record is silently overwritten or deduplicated",
+    "filterChecks is present on every candidate",
+    "activeRejectionReasons is present on every candidate"
+  ],
+  "haltCodes": {
+    "CANDIDATE_ID_COLLISION": "two candidates in one case produced the same stable id, or an ordinal repeated",
+    "CANDIDATE_EVIDENCE_TRUNCATED": "emitted count does not equal the unprojected diagnostic-array count",
+    "COMPLETE_DIAGNOSTICS_ABSENT": "the selection carries no brandDiagnostics, or brandDiagnostics.candidates is not an array",
+    "BRAND_DIAGNOSTIC_SELECTION_PARITY_FAILURE": "the internally derived selection differs from the authority once only the two complete-diagnostics fields are removed",
+    "MISSING_REQUIRED_FIELD": "a required own property is absent",
+    "UNEXPECTED_FIELD": "an undeclared key is present; the schema is closed",
+    "FIELD_TYPE_MISMATCH": "a field does not satisfy the frozen type or enum",
+    "MALFORMED_OPAQUE_ITEM_ID": "opaqueItemId does not match ^item-\\d{4}$",
+    "MALFORMED_CANDIDATE_ORDINAL": "candidateOrdinal is not a non-negative integer",
+    "MALFORMED_ARRAY_LENGTH": "completeCandidateArrayLength is not a positive integer",
+    "ORDINAL_OUT_OF_RANGE": "candidateOrdinal is not below completeCandidateArrayLength",
+    "WRONG_CANONICALIZATION_VERSION": "canonicalizationVersion does not equal the frozen version",
+    "FILTER_LADDER_INVARIANT_VIOLATED": "filterChecks, activeRejectionReasons and kept/filterReason are mutually inconsistent",
+    "DERIVED_FIELD_INCONSISTENT": "rankingEligible, rankingScore or selected is not derivable from ranking or decision",
+    "ALREADY_FINALIZED": "a derived identity field was present before finalization",
+    "MISSING_DIGEST": "canonicalRecordSha256 is absent",
+    "MALFORMED_DIGEST": "canonicalRecordSha256 is not lowercase 64-hex",
+    "DIGEST_DOES_NOT_MATCH_RECORD": "the supplied digest does not equal the recomputation over the complete record",
+    "PROVENANCE_DISAGREES_WITH_CANDIDATE": "a fact the diagnostic states twice disagrees with itself",
+    "MALFORMED_OPAQUE_ITEM_ID_AT_ADAPTER": "the adapter received an opaqueItemId outside ^item-\\d{4}$",
+    "KEPT_CANDIDATE_EVIDENCE_INCOMPLETE": "a kept candidate is missing score or ranking, or declares rankingEligible false",
+    "DEBUG_PASSES_ABSENT": "debug.passes is absent, not an array, or empty",
+    "MALFORMED_ARTIFACT_REF": "input.artifactRef does not match ^item-\\d{4}$"
+  },
+  "storageFormat": {
+    "layout": "one JSONL file per case per run, one JSON object per candidate decision",
+    "prettyPrintedAfterFreeze": false
+  },
+  "truthLabelsAttachedDuringAcquisition": false,
+  "resolvedLimitation": {
+    "was": "every individual filter check and every active rejection reason were unavailable, because the ladder short-circuits and production recorded only the first firing rule",
+    "now": "RESOLVED by merged PR #220, which evaluates all ten rules under an evaluation-only, default-off entry point and enforces eight runtime invariants",
+    "consequence": "For every candidate the complete set of ladder rules that would reject it is recorded. That answers WHY a candidate was rejected. It does NOT by itself answer what the selector would have produced under a different filter, because candidates are constructed from the passes: see region-ocr-result-replay-contract.json, which is what actually underwrites capability 3.",
+    "correctionOfPriorConsequenceClaim": "Amendment 2 claimed a one-filter counterfactual was 'no longer bounded by unknown later rules' and therefore satisfied. That conflated rejection reasons with replay and is superseded."
+  },
+  "historicalNote": "An earlier revision of this contract named debug.finalSelections.brand.brandDiagnostics.candidates as the source of complete diagnostics. That was incorrect and is corrected here.",
+  "fieldNameCorrection": "Amendment 3 named the persisted field authoritativeFilterReason while the real BrandCandidateDiagnostic property and the fingerprint record both used filterReason. One name is kept, and it is production's: filterReason.",
+  "requiredOwnPropertiesBeforeFinalization": [
+    "canonicalizationVersion",
+    "opaqueItemId",
+    "candidateOrdinal",
+    "completeCandidateArrayLength",
+    "rawText",
+    "cleanedValue",
+    "confidence",
+    "ocrEvidenceScore",
+    "ocrConfidence",
+    "prominence",
+    "regionName",
+    "passId",
+    "passKind",
+    "supportPassIds",
+    "candidateProvenance",
+    "assembly",
+    "lineIndexes",
+    "kept",
+    "filterReason",
+    "decision",
+    "score",
+    "ranking",
+    "filterChecks",
+    "activeRejectionReasons",
+    "rankingEligible",
+    "rankingScore",
+    "rankedPosition",
+    "selected"
+  ],
+  "absentProductionOptionalsNormalizedToNull": [
+    "decision",
+    "score",
+    "ranking",
+    "rankingScore",
+    "rankedPosition",
+    "cleanedValue"
+  ],
+  "absentOptionalNormalizationNote": "decision, score and ranking are optional on BrandCandidateDiagnostic. The acquisition writes an explicit null when production omits them, so the canonical key set is identical across every record and a MISSING field can never be mistaken for an absent-and-therefore-omitted one. Omission is rejected; null is valid.",
+  "finalizationGate": {
+    "implementation": "finalizeCandidateRecord in scripts/eval/lib/issue-149-evidence-canonical.ts",
+    "validatesBeforeHashing": [
+      "opaqueItemId matches ^item-\\d{4}$",
+      "candidateOrdinal is a non-negative integer",
+      "completeCandidateArrayLength is a positive integer",
+      "candidateOrdinal < completeCandidateArrayLength",
+      "every required evidence key is an own property",
+      "every field satisfies the frozen type predicate",
+      "canonicalizationVersion equals the frozen version",
+      "neither derived identity field is already present"
+    ],
+    "thenAndOnlyThen": [
+      "compute canonicalRecordSha256",
+      "attach the digest",
+      "verify the digest",
+      "attach stableCandidateId"
+    ],
+    "haltCodes": [
+      "MISSING_REQUIRED_FIELD",
+      "FIELD_TYPE_MISMATCH",
+      "MALFORMED_OPAQUE_ITEM_ID",
+      "MALFORMED_CANDIDATE_ORDINAL",
+      "MALFORMED_ARRAY_LENGTH",
+      "ORDINAL_OUT_OF_RANGE",
+      "WRONG_CANONICALIZATION_VERSION",
+      "ALREADY_FINALIZED",
+      "MISSING_DIGEST",
+      "MALFORMED_DIGEST",
+      "DIGEST_DOES_NOT_MATCH_RECORD"
+    ],
+    "priorDefect": "Amendment 3 had no complete-record schema, so finalizeCandidateRecord accepted { opaqueItemId, candidateOrdinal } and produced a well-formed identity over no evidence.",
+    "stableCandidateIdValidatesTheCompletePreimage": true,
+    "priorDefectAmendment4": "stableCandidateId checked only that a digest was present, well formed and self-consistent. A caller could hash a two-field partial and pass the result back in; the digest matched because it was computed over exactly that partial. A self-consistent digest over incomplete evidence is still incomplete evidence."
+  },
+  "stableCandidateIdNeverFinalizesPartialRecords": true,
+  "keySetIsClosed": true,
+  "closedKeySetRule": {
+    "beforeFinalization": "the own-key set must EQUAL requiredOwnPropertiesBeforeFinalization exactly",
+    "afterFinalization": "the own-key set must EQUAL those keys plus canonicalRecordSha256 and stableCandidateId, exactly",
+    "unexpectedKeyRejected": true,
+    "why": "An open key set would let an undeclared acquisition, truth, debug or convenience property enter the fingerprint silently, so the digest would cover something the contract never described.",
+    "haltCode": "UNEXPECTED_FIELD"
+  },
+  "crossFieldInvariants": [
+    "filterChecks contains exactly all ten ladder rules, once each, in frozen order",
+    "activeRejectionReasons equals the failed checks in ladder order",
+    "a rejected candidate has at least one active reason, and the first equals filterReason",
+    "a kept candidate has no active reason and no failed check, and its filterReason is candidate-positive or candidate-plausible",
+    "rankingEligible equals ranking !== null",
+    "rankingScore equals ranking?.rankingScore ?? null",
+    "selected equals decision === 'selected'"
+  ],
+  "enumValuesAreIncumbentValues": {
+    "passKind": "OcrPassKind",
+    "assembly": "BrandCandidateAssembly",
+    "filterReason": "BrandLineReason, never null",
+    "decision": "null or BrandCandidateDecision",
+    "checkNames": "BrandFilterCheckName",
+    "rankingStrategyAndMode": "AnalyzerCandidateRankingStrategy and AnalyzerCandidateRankingMode",
+    "driftGuard": "src/fixtures/eval/issue-149-frozen-vocabulary.test.ts asserts every copied vocabulary equals the production constant"
+  },
+  "nestedStructuresValidatedCompletely": [
+    "ocrConfidence",
+    "candidateProvenance",
+    "score",
+    "ranking"
+  ],
+  "brandClassNotPersisted": {
+    "explicitBrandClassFieldPersisted": false,
+    "why": "There is no brandClass on BrandCandidateDiagnostic. For a KEPT candidate the distinction is recorded by filterReason: candidate-positive versus candidate-plausible. A REJECTED span returns from analyzeBrandSpan before a Candidate object exists, so production never calculates a brandClass for it and none can be persisted."
+  },
+  "referenceAdapter": {
+    "path": "scripts/eval/lib/issue-149-candidate-adapter.ts",
+    "requiredForStage2": true,
+    "why": "One mapping from BrandCandidateDiagnostic to the persisted record. A second mapping could drift from production's shape without any test noticing.",
+    "crossFieldChecksOnRepeatedFacts": [
+      "confidence equals ocrEvidenceScore",
+      "passId equals candidateProvenance.passId",
+      "passKind equals candidateProvenance.passKind",
+      "regionName equals candidateProvenance.regionName",
+      "supportPassIds equals candidateProvenance.supportingPassIds",
+      "candidateProvenance.recoveryPassUsed equals passKind !== 'full-image-primary'"
+    ],
+    "testedAgainstRealSelectorOutputBy": "src/fixtures/eval/issue-149-production-candidate-compatibility.test.ts"
+  },
+  "supportProvenanceLevel": {
+    "candidateRecordSupportPassIds": "the support IDs exposed on the PUBLIC BrandCandidateDiagnostic \u2014 that is, the support the candidate had BEFORE any later merge",
+    "candidateProvenance": "the PUBLIC diagnostic provenance, likewise pre-merge",
+    "whyPreMerge": "Production merges support-pass information during candidate deduplication (dedupeBestCandidates -> mergeCandidateSupport, field-selection.ts:466, 2175-2195). The public diagnostic objects are constructed before that, and the only values written back to them afterwards are score, ranking and decision. supportPassIds is never written back.",
+    "finalSelectionSupportingPassIds": "persisted SEPARATELY from FieldSelection.supportingPassIds for the selected observation, where the post-merge value IS exposed",
+    "alternateProvenance": "persisted wherever FieldSelection exposes it",
+    "completePostDeduplicationMergedSupportForEveryFinalRankedCandidate": {
+      "available": false,
+      "why": "The merged support set exists only on the internal Candidate objects inside the ranked array. It is not written back to the public diagnostics and is not otherwise exposed.",
+      "notReconstructedInTheAdapter": true,
+      "notReconstructedWhy": "Recomputing the merge outside production would be a second implementation of deduplication, and labelling its output as production's merged support would misstate what the pipeline produced.",
+      "wouldRequire": "a production change to expose it, which this amendment forbids",
+      "recordedAs": "a genuine remaining limitation"
+    },
+    "doNotCall": "the candidate-record supportPassIds the final post-deduplication support set for every ranked candidate"
+  },
+  "finalRankedMembership": {
+    "membershipIs": "the set of candidates whose decision is defined",
+    "notThePresenceOfRanking": true,
+    "whyNot": "Production assigns ranking semantics to every scored candidate, then reduces them with bestFamilyCandidates and dedupeBestCandidates, sorts the survivors with compareCandidateRanking, and assigns a decision only to that final array (field-selection.ts:2556-2578).",
+    "orderedBy": "production's exported compareCandidateRanking, applied through a minimal structural wrapper; NOT rankingScore alone",
+    "whyNotRankingScoreAlone": "The comparator is an ordered list that can prioritise score eligibility, prominence, OCR evidence and normalized value under three ordering modes. Sorting on rankingScore alone reorders prominence-first candidates and breaks equal-score ties differently from production.",
+    "tieOrder": "the original diagnostic-array order, preserved when the production comparator returns zero",
+    "positions": "contiguous 0..N-1, unique",
+    "selectedCandidate": "exactly one when N > 0, and it must be position 0",
+    "noCandidateOutsideMembershipReceivesAPosition": true,
+    "haltCodes": {
+      "RANKED_MEMBERSHIP_INCONSISTENT": "a decision without ranking semantics, a rankedPosition without a decision, a decision without a rankedPosition, a selected candidate away from position 0, position 0 held by a non-selected candidate, or a rejected candidate carrying any of the three",
+      "RANKED_POSITION_PARITY_FAILURE": "positions not unique, not contiguous from 0, more than one selected candidate, or a non-empty ranked set without exactly one selected candidate"
+    },
+    "arrayLevelInvariantsEnforcedIn": "the module-private array-invariant check, reached only through acquireProductionBrandEvidence \u2014 a single-record validator cannot prove uniqueness or contiguity, and claiming it could would be an overclaim",
+    "priorDefect": "An earlier adapter took every diagnostic carrying a ranking, sorted by rankingScore descending, and gave them all positions. That assigned fake positions to deduplicated candidates and produced an order production never produced."
+  },
+  "keptCandidateEvidence": {
+    "everyKeptCandidate": [
+      "score is non-null and satisfies the complete BrandCandidateScore schema",
+      "ranking is non-null and satisfies the complete ranking schema",
+      "rankingEligible is true",
+      "rankingScore equals ranking.rankingScore"
+    ],
+    "aKeptCandidateMayLackADecision": "yes \u2014 family reduction or normalized-value deduplication removed it. decision and rankedPosition are then both null while score and ranking remain.",
+    "everyRejectedCandidate": [
+      "score is null",
+      "ranking is null",
+      "rankingEligible is false",
+      "rankingScore is null",
+      "decision is null",
+      "rankedPosition is null",
+      "selected is false"
+    ],
+    "why": "Production scores and assigns ranking semantics to every kept candidate before family reduction and deduplication (field-selection.ts:2536-2543). A rejected span returns from analyzeBrandSpan before a Candidate object is constructed, so it can carry none of it.",
+    "priorDefect": "The validator permitted a kept candidate with score, ranking, rankingEligible, decision and rankedPosition all null or false, and did not require a rejected candidate's score to be null.",
+    "haltCode": "KEPT_CANDIDATE_EVIDENCE_INCOMPLETE"
+  },
+  "keptPopulationMustRetainARankedSurvivor": {
+    "relation": "(any candidate is kept) === (at least one candidate carries a decision)",
+    "why": "Production always builds a non-empty ranked list and assigns exactly one selected decision whenever kept candidates exist. A kept candidate may individually lack a decision only because family reduction or deduplication removed it \u2014 which requires that another kept candidate survived.",
+    "whenNoKeptCandidates": [
+      "zero decision-bearing candidates",
+      "zero ranked positions",
+      "no selected candidate"
+    ],
+    "whenAtLeastOneKeptCandidate": [
+      "at least one decision-bearing final ranked member",
+      "exactly one selected candidate",
+      "the selected candidate is position 0",
+      "ranked positions are unique and contiguous",
+      "every decision-bearing candidate is kept",
+      "every ranked member carries score and ranking semantics"
+    ],
+    "priorGap": "The array adapter derived membership from candidates carrying a decision and checked selection only when that set was non-empty. If every kept candidate's decision disappeared, the ranked set was empty and every record still passed.",
+    "haltCode": "RANKED_MEMBERSHIP_INCONSISTENT",
+    "enforcedIn": "the internal array-invariant check reached through acquireProductionBrandEvidence",
+    "reachedPastParityBy": "src/fixtures/eval/issue-149-ranked-invariants.test.ts"
+  },
+  "acquisitionApi": {
+    "seeCanonicalDefinition": "acquisition-invocation-contract.json#acquisitionApi",
+    "signature": "acquireProductionBrandEvidence(input: ExtractionInput): Promise<SealedItemEvidence>",
+    "notRestatedHere": "The full definition lives in one place. A restated copy is what let the Amendment 12 signature survive here after the boundary changed.",
+    "returnsNoMutableEvidence": [
+      "DetailedExtractionResult",
+      "ExtractionDebug",
+      "FieldSelection",
+      "candidate array",
+      "pass array"
+    ],
+    "sealedSuccessFiles": [
+      "<opaqueItemId>.provenance.json",
+      "<opaqueItemId>.passes.json",
+      "<opaqueItemId>.fingerprints.json",
+      "<opaqueItemId>.words.jsonl",
+      "<opaqueItemId>.lines.jsonl",
+      "<opaqueItemId>.candidates.jsonl",
+      "<opaqueItemId>.selection.json",
+      "<opaqueItemId>.counts.json"
+    ],
+    "sealedFailureFiles": ["<opaqueItemId>.provenance.json", "<opaqueItemId>.failure.json"],
+    "runtimeExportSurface": [
+      "CandidateAdapterError",
+      "acquireProductionBrandEvidence",
+      "writeSealedEvidencePackage"
+    ]
+  }
+}

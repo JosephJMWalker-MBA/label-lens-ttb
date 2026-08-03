@@ -1,9 +1,10 @@
 // @vitest-environment node
 /* eslint-disable @typescript-eslint/no-explicit-any -- integration path drives loosely-typed Drizzle handles */
-import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { runStartup, type StartupBootstrapResult } from "./startup";
 import { BootstrapConfigError, parseSpecsFromEnv } from "./auth/bootstrap";
+import { createIsolatedMysqlDatabase } from "../../tests/integration/mysql-test-database";
 
 const RUN_MYSQL_TESTS = process.env.RUN_MYSQL_TESTS === "1";
 
@@ -175,6 +176,7 @@ describe("runStartup (unit)", () => {
 // gated behind a successful migration and provisioning.
 if (RUN_MYSQL_TESTS) {
   describe("runStartup (mysql integration)", () => {
+    let isolatedMysql: Awaited<ReturnType<typeof createIsolatedMysqlDatabase>> | undefined;
     let db: any;
     let schema: any;
     let auth: any;
@@ -189,13 +191,18 @@ if (RUN_MYSQL_TESTS) {
       LABEL_LENS_BOOTSTRAP_AGENT_PASSWORD: "startup-agent-password-1234",
       LABEL_LENS_BOOTSTRAP_SELLER_EMAIL: "startup-seller@example.test",
       LABEL_LENS_BOOTSTRAP_SELLER_PASSWORD: "startup-seller-password-1234",
-      DATABASE_URL: process.env.DATABASE_URL,
+      DATABASE_URL: "",
     } as unknown as NodeJS.ProcessEnv;
 
     beforeAll(async () => {
+      isolatedMysql = await createIsolatedMysqlDatabase(
+        process.env.DATABASE_URL as string,
+        "startup",
+      );
+      env.DATABASE_URL = isolatedMysql.databaseUrl;
       vi.resetModules();
       const clientMod = await import("@/db/client");
-      clientMod.initializeDatabase(process.env.DATABASE_URL as string);
+      clientMod.initializeDatabase(env.DATABASE_URL as string);
       db = clientMod.db;
       schema = clientMod.schema;
       auth = (await import("@/lib/auth")).auth;
@@ -203,7 +210,11 @@ if (RUN_MYSQL_TESTS) {
       runBootstrap = (await import("./auth/bootstrap")).runBootstrap;
       // Ensure the schema exists before per-test clearing; the test then calls
       // applyMigrations again through runStartup to prove it is idempotent.
-      await applyMigrations(process.env.DATABASE_URL as string);
+      await applyMigrations(env.DATABASE_URL as string);
+    });
+
+    afterAll(async () => {
+      await isolatedMysql?.drop();
     });
 
     beforeEach(async () => {

@@ -1,0 +1,16 @@
+{
+  "artifactId": "8842152622",
+  "forensicArtifactId": "8842146705",
+  "uploadDigest": "5bfadeeee20a8480b59b2a7a0a88588fb04780d7b7953c9cffbf10f1fb430c0e",
+  "metadataDigest": "sha256:5bfadeeee20a8480b59b2a7a0a88588fb04780d7b7953c9cffbf10f1fb430c0e",
+  "artifactUrl": "https://github.com/JosephJMWalker-MBA/label-lens-ttb/actions/runs/30775581351/artifacts/8842152622",
+  "headSha": "981e04b64c37955b6db8a8aed93c6ffc54c1e114",
+  "rawVerificationReportDigest": "6f12b9fd1f8e240707025891bf7354a1a58b3701716cd717fc02aa62cf9a6cbb",
+  "rawBytes": 47516390,
+  "archiveLimitBytes": 104857600,
+  "overLimit": false,
+  "decision": "ELIGIBLE_FOR_OWNER_COMMIT_PROCESS",
+  "retentionBound": true,
+  "isPermanentPreservation": false,
+  "finalStatus": "VERIFIED"
+}

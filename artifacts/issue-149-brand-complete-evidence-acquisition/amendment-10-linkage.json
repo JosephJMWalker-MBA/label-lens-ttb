@@ -1,0 +1,144 @@
+{
+  "artifact": "amendment-10-linkage",
+  "experimentId": "issue-149-brand-complete-evidence-acquisition",
+  "amendmentNumber": 10,
+  "stage1ExecutionStatus": "The Stage 1 trusted freeze/staging generator and its temporary reproducibility mode have run. No Stage 2 Job A workflow, truth-free preparation artifact, runtime-bundle build, discovery, execute mode or governed 115-case acquisition OCR has run.",
+  "runStatusBeforeAmendment10": {
+    "stage1TrustedFreezeStagingGenerator": true,
+    "stage1CheckReproducibilityMode": true,
+    "stage2JobAWorkflow": false,
+    "truthFreePreparationArtifact": false,
+    "runtimeBundleBuilt": false,
+    "discoverMode": false,
+    "executeMode": false,
+    "governed115CaseAcquisitionOcr": false,
+    "acquisitionRunnerOcr": false,
+    "evidence": "No raw/ directory, no raw-evidence manifest, no workflow file, no workflow-mode.txt and no acquisition runner has ever existed on this branch.",
+    "auditLanguageCorrection": "Earlier amendments said no trusted preparation had run. The generator that produced the three committed artifacts IS trusted staging, and --check calls the same core. That was an audit-language error, not evidence contamination.",
+    "ordinarySuiteBundledImageOcr": {
+      "runs": true,
+      "files": [
+        "src/fixtures/corpus-real-ocr.test.ts",
+        "src/pipeline/extractor/extractor.test.ts",
+        "src/pipeline/extractor/extractor-precheck.integration.test.ts",
+        "src/fixtures/eval/eval-harness.integration.test.ts"
+      ],
+      "note": "Unmodified, pre-existing tests over bundled fixture images. Not the governed 115-case corpus. Disclosed here so no document in the package carries an unqualified 'no OCR has run'."
+    }
+  },
+  "originalStage1": {
+    "head": "7600b0a9ba5ce6995274a517121f1eda18a30424",
+    "base": "8f0c6a7ca7c271eed14d9084ed6da7fe11f897a9",
+    "preregistrationSha256": "7b691c78a9de008039ccc1a7f94824015373b1caec58f8235c78a03587c641fb",
+    "preservedNotOverwritten": true
+  },
+  "amendment1": {
+    "head": "26157cfe036fb8b1506431d1aa9309029ac2dcdb",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "cfc118c670a9c69f783f3ca58174113711b553baf1278da31a35e31121bf13ad",
+    "preservedNotOverwritten": true
+  },
+  "amendment2": {
+    "head": "ad1c296194e21e91af8333953ad47abe396495dc",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "9287ecc0d5d01bae83316c9d0dcb462d6eca566c925405cde83631fa65c89d35",
+    "preservedNotOverwritten": true
+  },
+  "amendment3": {
+    "head": "37e1a3ea752c12b230d468c10f604b8550d37ce1",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "3cf3d25fbb892dabc66e58796841c542fcc4eb79f7cd5d561271a7689ed87786",
+    "preservedNotOverwritten": true
+  },
+  "amendment4": {
+    "head": "cb574539d5e541446ec58d2b2bc62b9fda480048",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "87302e60a0629f6d657f4f118c8d73a50ea93aa3d321c15f77b5974ae75d28a3",
+    "preservedNotOverwritten": true,
+    "historicalMeaningRewritten": false,
+    "note": "Amendment 4's nine reconciliations stand. Amendment 5 closes five implementation-readiness gaps that survived it."
+  },
+  "amendment5": {
+    "head": "fca0755d629af2a15206d4cc5f5251768223e2f7",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "274e45779c849d4e6ada50e10b74d1fc8f6b1396f68b540ae02156e640422332",
+    "preservedNotOverwritten": true,
+    "historicalMeaningRewritten": false,
+    "uncharacterizedLocalTestFlake": {
+      "reported": true,
+      "detail": "One local full-suite run reported a single failure whose identity was not captured before the output scrolled. Two subsequent local runs and ordinary CI were clean.",
+      "causeInvented": false,
+      "retainedVerbatim": true
+    },
+    "note": "Amendment 5's closures stand. Amendment 6 fixes two execution blockers it introduced or left, and unifies contracts it left inconsistent."
+  },
+  "amendment6": {
+    "head": "ad8351ee84f073f13b869871115748a0700beea7",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "15771503f342652fd69ea1edf24d470a0e61324adac1451d32532b47e77627a1",
+    "preservedNotOverwritten": true,
+    "historicalMeaningRewritten": false,
+    "note": "Amendment 6's corrections stand. Amendment 7 fixes three execution blockers it left or introduced, and completes the single-source inventory design it declared."
+  },
+  "amendment7": {
+    "head": "d23554cb7a56a480f884c9ca8365b5b3c7d4d288",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "c407f4634d1fb71d836b459a09b2da28b8b46ca5d44b619776a3e15f0d8e7747",
+    "preservedNotOverwritten": true,
+    "historicalMeaningRewritten": false,
+    "note": "Amendment 7's corrections stand. Amendment 8 closes the candidate-emission API, replaces a copied staging algorithm with the real one, makes failure-path cleanup real, corrects the audit language, and requires complete kept-candidate evidence."
+  },
+  "amendment8": {
+    "head": "dd50a9e258705b77d2109514f4a495c64b364036",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "7edbaeace6217c0fb1b51d20c3b3db2d4e024a84ba31d697a3a354f43f2a5d85",
+    "preservedNotOverwritten": true,
+    "historicalMeaningRewritten": false,
+    "note": "Amendment 8's closures stand. Amendment 9 fixes the property path and bare-array signature it froze, adds the missing global ranked-survivor invariant, removes the runtime test backdoor, isolates the drift test from tracked artifacts, and closes the second source-image byte channel."
+  },
+  "amendment9": {
+    "head": "849ecbb1e50eab4d9f5ec53edf5f92dc56015d05",
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "preregistrationSha256": "15fe208b96fc9b1fdff53f0637b5a002d31d4393d3e8e48354937ec051678176",
+    "preservedNotOverwritten": true,
+    "historicalMeaningRewritten": false,
+    "note": "Amendment 9 removed the bare-array route but left an equivalent one: a filtered population wrapped in a freshly constructed FieldSelection. Amendment 10 closes it structurally by taking ExtractionDebug."
+  },
+  "amendment10": {
+    "base": "546c3f279ce431a1fd8c0203df7a83553ea866ef",
+    "headAtAmendmentStart": "849ecbb1e50eab4d9f5ec53edf5f92dc56015d05",
+    "preregistrationSha256": {
+      "recordedIn": "artifacts/issue-149-brand-complete-evidence-acquisition/preregistration.sha256",
+      "notDuplicatedHere": true
+    },
+    "stage1ContractManifestAggregate": {
+      "recordedIn": "artifacts/issue-149-brand-complete-evidence-acquisition/stage-1-contract-manifest.sha256",
+      "notDuplicatedHere": true
+    }
+  },
+  "corrections": [
+    "the one public API takes the complete ExtractionDebug and derives the pass set, the diagnostic selection, the parity assertion and the candidate population internally; no public function accepts a FieldSelection or a candidate array",
+    "parity moved inside that boundary as full-object canonical equality, returning no evidence on failure",
+    "selectionOf() and every caller-created selection route removed from the tests; the all-rejected case comes from a real pass set rather than a filtered population",
+    "runner and transitive closure gates renamed to finalizeProductionBrandEvidence, prohibiting the diagnostic selector and any construction or replacement of brandDiagnostics.candidates outside the adapter",
+    "the adapter export surface is read from the real runtime namespace instead of inferred from source regexes",
+    "the staging truth-access boundary proven with a Proxy over the real core, plus a recursive mutation that reaches booleans including knownAmbiguous",
+    "the tracked-write source scan relabelled a supplementary heuristic, with an authoritative manifest-verify and untracked-file check added"
+  ],
+  "unchangedByThisAmendment": [
+    "the frozen 115-item population and its opaque identifiers",
+    "the incumbent configuration pins, including field-selection.ts 8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
+    "two exact corpus runs with no retries and no selective rerun",
+    "the direct extractLabelEvidenceDetailed route and the runCaseArtifacts prohibition",
+    "full-object canonical diagnostic parity",
+    "the four experiment-controlled mounts",
+    "the closed RegionOcrResult schema and the omitted-originalGeometry rule",
+    "exact-byte artifact integrity versus semantic fingerprints",
+    "the prohibition on modifying PR #195 or any production behaviour"
+  ],
+  "capability3": {
+    "status": "SATISFIABLE",
+    "by": "a separately governed, zero-OCR replay of the persisted complete ordered RegionOcrResult array",
+    "performedHere": false
+  }
+}

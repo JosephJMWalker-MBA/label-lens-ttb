@@ -1,0 +1,49 @@
+{
+  "recordVersion": "issue-149-discover-validation-failure.v1",
+  "headSha": "cc13dd0033fbdd813dcfaa0081b11fcf2eaad4d4",
+  "workflowRun": 30761150232,
+  "runAttempt": 1,
+  "classification": "DISCOVER_VALIDATION_FAILURE",
+  "mode": "discover",
+  "governedOcrRun": false,
+  "acquisitionApiInvoked": false,
+  "scientificResultProduced": false,
+  "brandMetricsProduced": false,
+  "outputFilesCreated": 0,
+  "runtimeProbeContainerExitStatus": 0,
+  "workerInitialized": true,
+  "workerTerminated": true,
+  "recognizeCalls": 0,
+  "runtimePackageClosureMatched": true,
+  "formalRuntimeProbeAccepted": false,
+  "discoveryFailure": "bundle manifest mismatch after hidden-file artifact omission",
+  "finalizerFailure": "bundled CLI main guard did not match emitted basename",
+  "latentAffectedCliEntrypoints": [
+    "validate-ocr-runtime-init-probe.mjs",
+    "adjudicate-acquisition-outcome.mjs"
+  ],
+  "artifacts": [
+    {
+      "name": "issue-149-discovery-report",
+      "id": 8837517077
+    },
+    {
+      "name": "issue-149-ocr-runtime-init-probe",
+      "id": 8837518488
+    },
+    {
+      "name": "issue-149-job-a-report",
+      "id": 8837514447
+    },
+    {
+      "name": "issue-149-truth-free-preparation",
+      "id": 8837514177
+    },
+    {
+      "name": "issue-149-host-verifier",
+      "id": 8837514269
+    }
+  ],
+  "rerunPermitted": false,
+  "nextValidation": "fresh discover workflow after reviewed correction and exact push"
+}
