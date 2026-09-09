@@ -1,0 +1,63 @@
+{
+  "artifact": "old-vs-new-disagreement",
+  "experimentId": "issue-149-brand-raw-ocr-rederivation",
+  "brandPresentCases": 105,
+  "priorPresent": 81,
+  "freshPresent": 79,
+  "agreementCases": 103,
+  "disagreementCases": 2,
+  "agreementRate": 0.9809523809523809,
+  "crossTabulation": {
+    "prior=present | fresh=EXACT_RAW_MATCH": 78,
+    "prior=absent | fresh=NOT_PRESENT": 16,
+    "prior=absent | fresh=PARTIAL_INSUFFICIENT": 8,
+    "prior=present | fresh=PARTIAL_INSUFFICIENT": 2,
+    "prior=present | fresh=NORMALIZED_RAW_MATCH": 1
+  },
+  "disagreements": [
+    {
+      "caseId": "approved-wine-072",
+      "groundTruthBrand": [
+        "Ava Gardner"
+      ],
+      "priorTruthInRawOcr": true,
+      "freshClassification": "PARTIAL_INSUFFICIENT",
+      "freshTruthInRawOcr": false,
+      "normalizedMatchedTokens": [
+        "about",
+        "the",
+        "museum",
+        "check",
+        "out",
+        "wwwavagardnerorg"
+      ],
+      "explanation": "glued truth \"avagardner\" occurs only inside run \"aboutthemuseumcheckoutwwwavagardnerorg\"",
+      "downstreamFilterReasonsForContext": [
+        "domain-like"
+      ]
+    },
+    {
+      "caseId": "amuninni-ferracane",
+      "groundTruthBrand": [
+        "Amuninni",
+        "Fabio Ferracane"
+      ],
+      "priorTruthInRawOcr": true,
+      "freshClassification": "PARTIAL_INSUFFICIENT",
+      "freshTruthInRawOcr": false,
+      "normalizedMatchedTokens": [
+        "imported",
+        "by",
+        "my",
+        "inv",
+        "envy",
+        "amuninnivini"
+      ],
+      "explanation": "glued truth \"amuninni\" occurs only inside run \"importedbymyinvenvyamuninnivini\"",
+      "downstreamFilterReasonsForContext": [
+        "sentence-fragment"
+      ]
+    }
+  ],
+  "note": "Disagreements are preserved, not reconciled. In both, the inherited whole-dump substring test matched glyphs that never formed the brand as a readable OCR unit."
+}

@@ -1,0 +1,51 @@
+{
+  "artifact": "aggregate-rederivation",
+  "experimentId": "issue-149-brand-raw-ocr-rederivation",
+  "matchingRuleSha256": "b9e9a6bb191f80bcf380e7d1707bcbde1c60d19b31f940b8b18585285ae9f1bc",
+  "population": {
+    "cases": 115,
+    "brandPresent": 105,
+    "brandAbsent": 10,
+    "source": "artifacts/brand-evidence-path-diagnosis/cases.json"
+  },
+  "freshClassification": {
+    "EXACT_RAW_MATCH": 78,
+    "NORMALIZED_RAW_MATCH": 1,
+    "PARTIAL_INSUFFICIENT": 10,
+    "NOT_PRESENT": 16,
+    "UNDETERMINABLE": 0
+  },
+  "freshTruthInRawOcr": 79,
+  "priorTruthInRawOcr": 81,
+  "agreementRate": 0.9809523809523809,
+  "agreementCases": 103,
+  "disagreementCases": 2,
+  "priorPositivesOverturned": 2,
+  "priorNegativesOverturned": 0,
+  "overturnedPositiveCaseIds": [
+    "approved-wine-072",
+    "amuninni-ferracane"
+  ],
+  "overturnedNegativeCaseIds": [],
+  "rebuiltCascade": {
+    "governedTruth": 105,
+    "truthPresentInRawOcr_fresh": 79,
+    "truthSurvivesCandidateConstruction": 37,
+    "truthInTop3": 33,
+    "truthInTop1": 29,
+    "truthSelected": 29,
+    "lostRawOcrToCandidateConstruction_fresh": 42,
+    "lostGovernedTruthToRawOcr_fresh": 26
+  },
+  "filterDecompositionFresh": {
+    "basis": "cases with fresh raw-OCR presence that did not survive candidate construction and carry at least one filter reason",
+    "filterRejectionCases": 39,
+    "tooManyWordsBlocker": 23,
+    "tooManyWordsSoleBlocker": 17,
+    "distinctBrandIdentitiesInSoleBlocker": 14
+  },
+  "productionFilesChanged": 0,
+  "filtersModified": false,
+  "truthChanged": false,
+  "corpusChanged": false
+}
