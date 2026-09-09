@@ -1,0 +1,8 @@
+branch=experiment/alcohol-reselection-a-recheck
+base=4bb3140b56dd1b9aee2c7b015e90a09d0902fe34
+base_subject=Document proprietary evaluation-only use terms
+landed_experiment=artifacts/issue-149-alcohol-reselection (PR #202, 4fe681a)
+landed_experiment_base=5d22a6be0407e8df4870983aab9107bc89f7c5d0
+landed_decision=KILL
+fresh_corpus_execution=false
+production_enabled=false
