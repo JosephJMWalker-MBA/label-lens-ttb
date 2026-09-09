@@ -17,46 +17,23 @@
   "disagreements": [
     {
       "caseId": "approved-wine-072",
-      "groundTruthBrand": [
-        "Ava Gardner"
-      ],
+      "groundTruthBrand": ["Ava Gardner"],
       "priorTruthInRawOcr": true,
       "freshClassification": "PARTIAL_INSUFFICIENT",
       "freshTruthInRawOcr": false,
-      "normalizedMatchedTokens": [
-        "about",
-        "the",
-        "museum",
-        "check",
-        "out",
-        "wwwavagardnerorg"
-      ],
+      "normalizedMatchedTokens": ["about", "the", "museum", "check", "out", "wwwavagardnerorg"],
       "explanation": "glued truth \"avagardner\" occurs only inside run \"aboutthemuseumcheckoutwwwavagardnerorg\"",
-      "downstreamFilterReasonsForContext": [
-        "domain-like"
-      ]
+      "downstreamFilterReasonsForContext": ["domain-like"]
     },
     {
       "caseId": "amuninni-ferracane",
-      "groundTruthBrand": [
-        "Amuninni",
-        "Fabio Ferracane"
-      ],
+      "groundTruthBrand": ["Amuninni", "Fabio Ferracane"],
       "priorTruthInRawOcr": true,
       "freshClassification": "PARTIAL_INSUFFICIENT",
       "freshTruthInRawOcr": false,
-      "normalizedMatchedTokens": [
-        "imported",
-        "by",
-        "my",
-        "inv",
-        "envy",
-        "amuninnivini"
-      ],
+      "normalizedMatchedTokens": ["imported", "by", "my", "inv", "envy", "amuninnivini"],
       "explanation": "glued truth \"amuninni\" occurs only inside run \"importedbymyinvenvyamuninnivini\"",
-      "downstreamFilterReasonsForContext": [
-        "sentence-fragment"
-      ]
+      "downstreamFilterReasonsForContext": ["sentence-fragment"]
     }
   ],
   "note": "Disagreements are preserved, not reconciled. In both, the inherited whole-dump substring test matched glyphs that never formed the brand as a readable OCR unit."

@@ -5,9 +5,21 @@
   "repeatRunExecutedRuleViaSharedModule": true,
   "note": "The primary run carried the rule inline; the repeat run executed it through src/fixtures/eval/issue-149-brand-raw-ocr-match.ts. Byte-identical output therefore proves determinism AND that the extraction into the shared module was faithful.",
   "digests": {
-    "aggregate.json": {"primary": "ec1d09d19270da5d55d3f2fa0162baa33f03cd909057436a183049a312cdf888", "repeat": "ec1d09d19270da5d55d3f2fa0162baa33f03cd909057436a183049a312cdf888", "identical": true},
-    "case-level-rederivation.json": {"primary": "ddbc16bcda26526f35dae39d00454e3345de21d3dbf455adc31049bb7e010b4a", "repeat": "ddbc16bcda26526f35dae39d00454e3345de21d3dbf455adc31049bb7e010b4a", "identical": true},
-    "raw-word-evidence.jsonl": {"primary": "84ee0d12a5dabf0702003ddce03a27ecff1130d388ae5a15bb6b8ce0fab78148", "repeat": "84ee0d12a5dabf0702003ddce03a27ecff1130d388ae5a15bb6b8ce0fab78148", "identical": true}
+    "aggregate.json": {
+      "primary": "ec1d09d19270da5d55d3f2fa0162baa33f03cd909057436a183049a312cdf888",
+      "repeat": "ec1d09d19270da5d55d3f2fa0162baa33f03cd909057436a183049a312cdf888",
+      "identical": true
+    },
+    "case-level-rederivation.json": {
+      "primary": "ddbc16bcda26526f35dae39d00454e3345de21d3dbf455adc31049bb7e010b4a",
+      "repeat": "ddbc16bcda26526f35dae39d00454e3345de21d3dbf455adc31049bb7e010b4a",
+      "identical": true
+    },
+    "raw-word-evidence.jsonl": {
+      "primary": "84ee0d12a5dabf0702003ddce03a27ecff1130d388ae5a15bb6b8ce0fab78148",
+      "repeat": "84ee0d12a5dabf0702003ddce03a27ecff1130d388ae5a15bb6b8ce0fab78148",
+      "identical": true
+    }
   },
   "allIdentical": true
 }

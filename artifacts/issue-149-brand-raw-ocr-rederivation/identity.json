@@ -12,8 +12,14 @@
   "inheritedFieldOrigin": "eval-harness.ts brandOcrContainsAcceptable; identical to truthInRawOcr in 115/115 cases",
   "committedCorpusReport": "docs/extraction-full-corpus/extractor-report.json",
   "committedCorpusReportSha256": "7d695528354f2939094ccacf40999aa4ad31eb7dadb5be3ca7f291875f20566c",
-  "committedReportWordCoverage": {"regions": 232, "regionsTruncated": 214, "totalWordCount": 19914, "totalCommittedSampleWords": 5611, "sampleCapPerRegion": 25},
+  "committedReportWordCoverage": {
+    "regions": 232,
+    "regionsTruncated": 214,
+    "totalWordCount": 19914,
+    "totalCommittedSampleWords": 5611,
+    "sampleCapPerRegion": 25
+  },
   "matchingRuleSha256": "b9e9a6bb191f80bcf380e7d1707bcbde1c60d19b31f940b8b18585285ae9f1bc",
-  "ocrEngine": {"engineId": "tesseract.js", "engineVersion": "7.0.0", "modelId": "eng"},
+  "ocrEngine": { "engineId": "tesseract.js", "engineVersion": "7.0.0", "modelId": "eng" },
   "nodeVersion": "v22.17.0"
 }

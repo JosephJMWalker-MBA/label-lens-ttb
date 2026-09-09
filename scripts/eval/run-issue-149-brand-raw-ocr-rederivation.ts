@@ -234,7 +234,8 @@ async function main(): Promise<void> {
     },
     freshTruthInRawOcr: freshPresent.length,
     priorTruthInRawOcr: priorPresent.length,
-    agreementRate: bp.length === 0 ? null : bp.filter((row) => row.agreesWithPrior === true).length / bp.length,
+    agreementRate:
+      bp.length === 0 ? null : bp.filter((row) => row.agreesWithPrior === true).length / bp.length,
     agreementCases: bp.filter((row) => row.agreesWithPrior === true).length,
     disagreementCases: bp.filter((row) => row.agreesWithPrior === false).length,
     priorPositivesOverturned: overturnedPositives.length,
@@ -252,7 +253,8 @@ async function main(): Promise<void> {
       lostGovernedTruthToRawOcr_fresh: bp.length - freshPresent.length,
     },
     filterDecompositionFresh: {
-      basis: "cases with fresh raw-OCR presence that did not survive candidate construction and carry at least one filter reason",
+      basis:
+        "cases with fresh raw-OCR presence that did not survive candidate construction and carry at least one filter reason",
       filterRejectionCases: filterRows.length,
       tooManyWordsBlocker: tmw.length,
       tooManyWordsSoleBlocker: tmwSole.length,
