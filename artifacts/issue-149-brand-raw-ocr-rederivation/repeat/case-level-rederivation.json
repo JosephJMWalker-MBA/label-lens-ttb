@@ -1,0 +1,3030 @@
+[
+  {
+    "caseId": "luigi-giovanni-live",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Luigi & Giovanni"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#luigi-giovanni-live",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 65,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "luigi",
+      "giovanni"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "non-brand-keyword"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "alfredos-wine",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Alfredo's Wine",
+      "Alfredo's"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#alfredos-wine",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 66,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "alfredos",
+      "wine"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "non-brand-keyword"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "la-fattoria-rotated",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "La Fattoria"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#la-fattoria-rotated",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 95,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": null,
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-004",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "La Fattoria"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-004",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 103,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": null,
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-005",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "La Fattoria"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-005",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 54,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": null,
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-006",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Dark Horse"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-006",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 159,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "dark",
+      "horse"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "casanova-della-spinetta",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Casanova della Spinetta",
+      "Casanova Della Spinetta"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#casanova-della-spinetta",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 111,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "casanova",
+      "della",
+      "spinetta"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-008",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Vino Alpino"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-008",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 106,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "vino",
+      "alpino"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "sentence-fragment",
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-009",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Vino Alpino"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-009",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 106,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "vino",
+      "alpino"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "domain-like",
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "domaine-follin-arbelet",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Domaine Follin-Arbelet"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#domaine-follin-arbelet",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 81,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "domaine",
+      "follinarbelet"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-011",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "MariaAntonietta"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-011",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 69,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": null,
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-012",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Cooley Bay"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-012",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 126,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "cooley",
+      "bay"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-013",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Afflicted"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-013",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 199,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "afflicted"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": true,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-014",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Tre Cori"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-014",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 167,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "tre",
+      "cori"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "patricia-green-cellars",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Patricia Green Cellars"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#patricia-green-cellars",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 199,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "patricia",
+      "green",
+      "cellars"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words",
+      "domain-like",
+      "producer-line"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-016",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Marques de Navarro"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-016",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 128,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "marques",
+      "de",
+      "navarro"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-017",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "La Borde Noire"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-017",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 86,
+    "freshClassification": "PARTIAL_INSUFFICIENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": [
+      "la",
+      "noire"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": "2/3 truth tokens present, not contiguous",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-018",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Poqr Krya",
+      "POQR KRYA"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-018",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 189,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "poqr",
+      "krya"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-019",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Kyrios"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-019",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 133,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "kyrios"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-020",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Courtieu",
+      "Chateau Courtieu"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-020",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 153,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "courtieu"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "saker",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Saker"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#saker",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 64,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "saker"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [
+      "producer-line"
+    ],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-022",
+    "brandPresent": false,
+    "groundTruthBrand": [],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-022",
+    "brandEligiblePasses": 0,
+    "totalBrandPassWords": 0,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": "brand-absent control; not classified",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": null,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-023",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Podere don Cataldo",
+      "Podere Don Cataldo"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-023",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 96,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": null,
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-024",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Chateau de Laville"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-024",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 145,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "chateau",
+      "de",
+      "laville"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "nebla-mencia",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Nebla"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#nebla-mencia",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 160,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "nebla"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-026",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Principe Diphesa"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-026",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 98,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "principe",
+      "diphesa"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-027",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "The Golden Girls",
+      "Golden Girls"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-027",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 74,
+    "freshClassification": "PARTIAL_INSUFFICIENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": [
+      "the"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": "1/3 truth tokens present, not contiguous",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-028",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Field",
+      "Field Vineyards"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-028",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 111,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "field"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [
+      "producer-line",
+      "non-brand-keyword"
+    ],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-031",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "embeleso"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-031",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 193,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": null,
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-032",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Travers Reserve"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-032",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 86,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "travers",
+      "reserve"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-033",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Haywater Cove"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-033",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 203,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "haywater",
+      "cove"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-034",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Nico"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-034",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 147,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "nico"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-035",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Hubert Lamy"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-035",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 11,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": null,
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-037",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Touch"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-037",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 101,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "touch"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words",
+      "sentence-fragment"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-038",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Big Red Sunshine"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-038",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 161,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "big",
+      "red",
+      "sunshine"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-039",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Domaine Julien Auroux"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-039",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 102,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "domaine",
+      "julien",
+      "auroux"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [
+      "producer-line"
+    ],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "chateau-bonneau",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Château Bonneau",
+      "Chateau Bonneau"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#chateau-bonneau",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 63,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "chateau",
+      "bonneau"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-041",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Petite Nature"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-041",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 66,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "petite",
+      "nature"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-042",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Domaine Quivy"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-042",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 81,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "domaine",
+      "quivy"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-043",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Fulcrum"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-043",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 77,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "fulcrum"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [
+      "non-brand-keyword"
+    ],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-044",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Sweet Seduction"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-044",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 106,
+    "freshClassification": "PARTIAL_INSUFFICIENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": [
+      "sweet"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": "1/2 truth tokens present, not contiguous",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-045",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Meeting of the Minds"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-045",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 177,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "meeting",
+      "of",
+      "the",
+      "minds"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-046",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Curious"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-046",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 129,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "curious"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "sentence-fragment"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-047",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Etiris GX"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-047",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 99,
+    "freshClassification": "PARTIAL_INSUFFICIENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": [
+      "gx"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": "1/2 truth tokens present, not contiguous",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-048",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Pacha"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-048",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 198,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "pacha"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-049",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Caywood Vineyard"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-049",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 254,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": null,
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "le-temps-des-fleurs",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Le Temps des Fleurs",
+      "Le Temps Des Fleurs"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#le-temps-des-fleurs",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 90,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "le",
+      "temps",
+      "des",
+      "fleurs"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-051",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Pacheca"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-051",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 189,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "pacheca"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words",
+      "non-brand-keyword"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-052",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Mountain Valley Winery"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-052",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 84,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "mountain",
+      "valley",
+      "winery"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-053",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Golden Road Vineyards"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-053",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 57,
+    "freshClassification": "PARTIAL_INSUFFICIENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": [
+      "vineyards"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": "1/3 truth tokens present, not contiguous",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-054",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Henri Dufreres"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-054",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 97,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "henri",
+      "dufreres"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-055",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Francois Villard"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-055",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 79,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "francois",
+      "villard"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-056",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Prinsi"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-056",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 87,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "prinsi"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-057",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Prinsi"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-057",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 91,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "prinsi"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-058",
+    "brandPresent": false,
+    "groundTruthBrand": [],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-058",
+    "brandEligiblePasses": 0,
+    "totalBrandPassWords": 0,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": "brand-absent control; not classified",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": null,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-059",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Domenico Negro",
+      "Dominico Negro"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-059",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 97,
+    "freshClassification": "PARTIAL_INSUFFICIENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": [
+      "negro"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": "1/2 truth tokens present, not contiguous",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "three-steves-winery",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "3 Steves Winery"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#three-steves-winery",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 252,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "3",
+      "steves",
+      "winery"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [
+      "non-brand-keyword",
+      "too-many-words",
+      "producer-line"
+    ],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-061",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Aphrodite"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-061",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 57,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "aphrodite"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-062",
+    "brandPresent": false,
+    "groundTruthBrand": [],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-062",
+    "brandEligiblePasses": 0,
+    "totalBrandPassWords": 0,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": "brand-absent control; not classified",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": null,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-063",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Prinsi"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-063",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 89,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "prinsi"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "producer-line"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-064",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Prinsi"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-064",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 86,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "prinsi"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "producer-line"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-065",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Prinsi"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-065",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 88,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "prinsi"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "producer-line"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-066",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Domaine Juliette Avril"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-066",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 98,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "domaine",
+      "juliette",
+      "avril"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "producer-line"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-067",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Domaine Juliette Avril"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-067",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 97,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "domaine",
+      "juliette",
+      "avril"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "producer-line"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-068",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Sara"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-068",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 93,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "sara"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-069",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "AltaCima 4.090",
+      "AltaCima"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-069",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 155,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "altacima",
+      "4090"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [
+      "too-many-words",
+      "domain-like"
+    ],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "altacima",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "AltaCima 4.090",
+      "AltaCima"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#altacima",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 157,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "altacima",
+      "4090"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-071",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "AltaCima 6.330",
+      "AltaCima"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-071",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 192,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "altacima",
+      "6330"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": true,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-072",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Ava Gardner"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-072",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 185,
+    "freshClassification": "PARTIAL_INSUFFICIENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": [
+      "about",
+      "the",
+      "museum",
+      "check",
+      "out",
+      "wwwavagardnerorg"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": "glued truth \"avagardner\" occurs only inside run \"aboutthemuseumcheckoutwwwavagardnerorg\"",
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": false,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "domain-like"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-073",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Mike's Farm, Inc.",
+      "Mike's Farm"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-073",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 75,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "mikes",
+      "farm",
+      "inc"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-074",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Mike's Farm, Inc.",
+      "Mike's Farm"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-074",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 61,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": null,
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-075",
+    "brandPresent": false,
+    "groundTruthBrand": [],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-075",
+    "brandEligiblePasses": 0,
+    "totalBrandPassWords": 0,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": "brand-absent control; not classified",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": null,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-076",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Etim"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-076",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 142,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "etim"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-077",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Valdinera"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-077",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 127,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "valdinera"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [
+      "producer-line"
+    ],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-078",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Pietta"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-078",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 77,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "pietta"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words",
+      "non-brand-keyword"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-079",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Le Caniette"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-079",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 107,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "le",
+      "caniette"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": true,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "le-caniette",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Le Caniette"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#le-caniette",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 103,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "le",
+      "caniette"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-081",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Corte Adagio"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-081",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 89,
+    "freshClassification": "NORMALIZED_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "corteadagio"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": "brand merged into one OCR token",
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-082",
+    "brandPresent": false,
+    "groundTruthBrand": [],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-082",
+    "brandEligiblePasses": 0,
+    "totalBrandPassWords": 0,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": "brand-absent control; not classified",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": null,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-083",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Barn Sill Wine Co.",
+      "Barn Sill Wine Co"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-083",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 73,
+    "freshClassification": "PARTIAL_INSUFFICIENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": [
+      "wine"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": "1/4 truth tokens present, not contiguous",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-084",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Filadoro"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-084",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 90,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "filadoro"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "sentence-fragment",
+      "domain-like"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-085",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Mosaikon"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-085",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 93,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": null,
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-086",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "3 Steves Winery"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-086",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 228,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "3",
+      "steves",
+      "winery"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [
+      "domain-like",
+      "producer-line"
+    ],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-087",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Viridis"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-087",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 136,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "viridis"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [
+      "non-brand-keyword"
+    ],
+    "truthInTop3": true,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-088",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "La Mesma"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-088",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 113,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "la",
+      "mesma"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "producer-line",
+      "domain-like"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-089",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "La Mesma"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-089",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 105,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "la",
+      "mesma"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "producer-line",
+      "domain-like"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-090",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "La Mesma"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-090",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 106,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "la",
+      "mesma"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "domain-like"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-091",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Rias"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-091",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 99,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": null,
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-092",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Twin Suns"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-092",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 150,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": null,
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-093",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Fontanavecchia"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-093",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 95,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "fontanavecchia"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-094",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Fontanavecchia"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-094",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 95,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "fontanavecchia"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-095",
+    "brandPresent": false,
+    "groundTruthBrand": [],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-095",
+    "brandEligiblePasses": 0,
+    "totalBrandPassWords": 0,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": "brand-absent control; not classified",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": null,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-096",
+    "brandPresent": false,
+    "groundTruthBrand": [],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-096",
+    "brandEligiblePasses": 0,
+    "totalBrandPassWords": 0,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": "brand-absent control; not classified",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": null,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-097",
+    "brandPresent": false,
+    "groundTruthBrand": [],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-097",
+    "brandEligiblePasses": 0,
+    "totalBrandPassWords": 0,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": "brand-absent control; not classified",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": null,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-098",
+    "brandPresent": false,
+    "groundTruthBrand": [],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-098",
+    "brandEligiblePasses": 0,
+    "totalBrandPassWords": 0,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": "brand-absent control; not classified",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": null,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-099",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Fontanavecchia"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-099",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 96,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "fontanavecchia"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "amuninni-ferracane",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Amuninni",
+      "Fabio Ferracane"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#amuninni-ferracane",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 69,
+    "freshClassification": "PARTIAL_INSUFFICIENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": [
+      "imported",
+      "by",
+      "my",
+      "inv",
+      "envy",
+      "amuninnivini"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": "glued truth \"amuninni\" occurs only inside run \"importedbymyinvenvyamuninnivini\"",
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": false,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "sentence-fragment"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-101",
+    "brandPresent": false,
+    "groundTruthBrand": [],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-101",
+    "brandEligiblePasses": 0,
+    "totalBrandPassWords": 0,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": "brand-absent control; not classified",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": null,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-102",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Twin Suns"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-102",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 125,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": null,
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-103",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Tenute Valso"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-103",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 83,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "tenute",
+      "valso"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-104",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Blazic"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-104",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 107,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "blazic"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [
+      "sentence-fragment"
+    ],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-105",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Luigi & Giovanni"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-105",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 67,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "luigi",
+      "giovanni"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "non-brand-keyword"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-106",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Alfredo's Wine",
+      "Alfredos Wine"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-106",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 67,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "alfredos",
+      "wine"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "non-brand-keyword"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-107",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "La Fattoria"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-107",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 71,
+    "freshClassification": "PARTIAL_INSUFFICIENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": [
+      "fattoria"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": "1/2 truth tokens present, not contiguous",
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-108",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "La Fattoria"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-108",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 45,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": null,
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "approved-wine-109",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Sangouard-Chene"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-109",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 92,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "sangouardchene"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "approved-wine-110",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Cooley Bay"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#approved-wine-110",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 128,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "cooley",
+      "bay"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "m-cellars-baseline",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "M Cellars"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#m-cellars-baseline",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 124,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "m",
+      "cellars"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "too-many-words"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "wine-multi-artifact-04",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Dry Cellar"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#wine-multi-artifact-04",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 169,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": null,
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "wine-multi-artifact-05",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Blazic"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#wine-multi-artifact-05",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 150,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "blazic"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "domain-like"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "wine-multi-artifact-06",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Mauro Molino"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#wine-multi-artifact-06",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 102,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "mauro",
+      "molino"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "wine-multi-artifact-07",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Mike's Farm",
+      "Mike's Farm, Inc."
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#wine-multi-artifact-07",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 109,
+    "freshClassification": "NOT_PRESENT",
+    "freshTruthInRawOcr": false,
+    "normalizedMatchedTokens": null,
+    "matchedPassId": null,
+    "explanation": null,
+    "priorTruthInRawOcr": false,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "wine-multi-artifact-08",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Pindar"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#wine-multi-artifact-08",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 89,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "pindar"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": false,
+    "truthAmongKeptCandidates": false,
+    "truthFilterReasons": [
+      "producer-line"
+    ],
+    "truthInTop3": false,
+    "truthInTop1": false,
+    "selectedNormalizedMatch": false
+  },
+  {
+    "caseId": "wine-multi-artifact-09",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Duck Walk Vineyards"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#wine-multi-artifact-09",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 96,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "duck",
+      "walk",
+      "vineyards"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  },
+  {
+    "caseId": "wine-multi-artifact-10",
+    "brandPresent": true,
+    "groundTruthBrand": [
+      "Mauro Molino"
+    ],
+    "rawOcrEvidenceRef": "raw-word-evidence.jsonl#wine-multi-artifact-10",
+    "brandEligiblePasses": 1,
+    "totalBrandPassWords": 90,
+    "freshClassification": "EXACT_RAW_MATCH",
+    "freshTruthInRawOcr": true,
+    "normalizedMatchedTokens": [
+      "mauro",
+      "molino"
+    ],
+    "matchedPassId": "pass-0-full-image",
+    "explanation": null,
+    "priorTruthInRawOcr": true,
+    "agreesWithPrior": true,
+    "truthReachedCandidate": true,
+    "truthAmongKeptCandidates": true,
+    "truthFilterReasons": [],
+    "truthInTop3": true,
+    "truthInTop1": true,
+    "selectedNormalizedMatch": true
+  }
+]

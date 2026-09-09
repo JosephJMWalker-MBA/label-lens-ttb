@@ -1,0 +1,25 @@
+{
+  "artifact": "identity",
+  "experimentId": "issue-149-brand-raw-ocr-rederivation",
+  "baseSha": "4bb3140b56dd1b9aee2c7b015e90a09d0902fe34",
+  "branch": "research/brand-raw-ocr-rederivation",
+  "originMain": "4bb3140b56dd1b9aee2c7b015e90a09d0902fe34",
+  "corpusManifestSha256": "97aae943a57def5a57be38468556da8c5db1d0c5c0fde6136590b56107689668",
+  "corpusOverridesSha256": "de29d387b923a2a69690ea48a27c1d74759d9178837ab7fe047cbd8d18074773",
+  "metricsSha256": "712a65a10615624121e214d43ae0b75c136d2c7187fb70b7d9a2917609467172",
+  "populationArtifact": "artifacts/brand-evidence-path-diagnosis/cases.json",
+  "populationArtifactSha256": "91eec356e7a97fdf55b2d66a070f81b707bdb62a82f43c05608094ebb3aa59ae",
+  "inheritedFieldOrigin": "eval-harness.ts brandOcrContainsAcceptable; identical to truthInRawOcr in 115/115 cases",
+  "committedCorpusReport": "docs/extraction-full-corpus/extractor-report.json",
+  "committedCorpusReportSha256": "7d695528354f2939094ccacf40999aa4ad31eb7dadb5be3ca7f291875f20566c",
+  "committedReportWordCoverage": {
+    "regions": 232,
+    "regionsTruncated": 214,
+    "totalWordCount": 19914,
+    "totalCommittedSampleWords": 5611,
+    "sampleCapPerRegion": 25
+  },
+  "matchingRuleSha256": "b9e9a6bb191f80bcf380e7d1707bcbde1c60d19b31f940b8b18585285ae9f1bc",
+  "ocrEngine": { "engineId": "tesseract.js", "engineVersion": "7.0.0", "modelId": "eng" },
+  "nodeVersion": "v22.17.0"
+}

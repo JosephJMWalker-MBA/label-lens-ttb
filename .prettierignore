@@ -33,3 +33,14 @@ artifacts/issue-149-brand-ppocrv6-small-onnx-contrast/vendor/inference.yml
 # raw-output-manifest.json before the truth boundary is crossed, so reformatting
 # would invalidate the manifest that proves the evidence is unaltered.
 artifacts/issue-149-brand-ppocrv6-small-onnx-contrast/raw/
+
+# Frozen re-derivation evidence. The primary and repeat runs are compared
+# byte-for-byte and their SHA-256 digests are recorded in determinism.json, so
+# reformatting would invalidate the determinism proof. The analysis outputs in
+# the same package (identity.json, determinism.json, old-vs-new-disagreement.json)
+# are not digest-covered and are formatted normally.
+artifacts/issue-149-brand-raw-ocr-rederivation/aggregate.json
+artifacts/issue-149-brand-raw-ocr-rederivation/case-level-rederivation.json
+artifacts/issue-149-brand-raw-ocr-rederivation/raw-word-evidence.jsonl
+artifacts/issue-149-brand-raw-ocr-rederivation/primary/
+artifacts/issue-149-brand-raw-ocr-rederivation/repeat/
