@@ -108,11 +108,20 @@ interface BrandSelectionOptions {
    * predicate is evaluated and no diagnostic field is emitted.
    */
   collectCompleteFilterDiagnostics: boolean;
+  /**
+   * Evaluation-only. When false — the production default — the `too-many-words`
+   * ladder rule blocks candidates exactly as it always has. When true the rule
+   * is treated as absent from the ladder: it neither rejects a candidate nor
+   * reports a failed check, so the diagnostic invariants continue to hold.
+   * Used only by the Issue #149 filter-cost counterfactual.
+   */
+  counterfactualDisableTooManyWords: boolean;
 }
 
 const DEFAULT_BRAND_SELECTION_OPTIONS: BrandSelectionOptions = {
   allowCoherentPlausibleLineMerge: false,
   collectCompleteFilterDiagnostics: false,
+  counterfactualDisableTooManyWords: false,
 };
 
 /** An observation plus the region the selected value came from (for provenance). */
@@ -1839,7 +1848,7 @@ function buildBrandSpan(
   };
 }
 
-function analyzeBrandSpan(span: BrandSpan): BrandCandidateAnalysis {
+function analyzeBrandSpan(span: BrandSpan, disableTooManyWords = false): BrandCandidateAnalysis {
   const base = {
     id: span.id,
     rawText: span.rawText,
@@ -1893,7 +1902,7 @@ function analyzeBrandSpan(span: BrandSpan): BrandCandidateAnalysis {
       },
     };
   }
-  if (span.value.split(" ").length > MAX_BRAND_WORDS) {
+  if (!disableTooManyWords && span.value.split(" ").length > MAX_BRAND_WORDS) {
     return {
       diagnostic: {
         ...base,
@@ -2004,12 +2013,15 @@ function analyzeBrandSpan(span: BrandSpan): BrandCandidateAnalysis {
  *
  * This function is never called on the production path.
  */
-function evaluateBrandFilterChecks(span: BrandSpan): BrandFilterCheck[] {
+function evaluateBrandFilterChecks(
+  span: BrandSpan,
+  disableTooManyWords = false,
+): BrandFilterCheck[] {
   const failed: Record<BrandFilterCheckName, boolean> = {
     "producer-line": isProducerLine(span.words),
     "no-letters-or-too-short": span.value.length < 2 || !/[a-z]/i.test(span.value),
     "non-brand-keyword": hasNonBrandKeyword(span.rawText, span.value),
-    "too-many-words": span.value.split(" ").length > MAX_BRAND_WORDS,
+    "too-many-words": disableTooManyWords ? false : span.value.split(" ").length > MAX_BRAND_WORDS,
     "domain-like": isDomainLike(span.value),
     "varietal-or-designation": isPurelyVarietalOrDesignation(span.value),
     "generic-product-language": isGenericProductLanguage(span.value),
@@ -2102,9 +2114,9 @@ function analyzeBrandSpanWithOptions(
   span: BrandSpan,
   options: BrandSelectionOptions,
 ): BrandCandidateAnalysis {
-  const analysis = analyzeBrandSpan(span);
+  const analysis = analyzeBrandSpan(span, options.counterfactualDisableTooManyWords);
   if (!options.collectCompleteFilterDiagnostics) return analysis;
-  const filterChecks = evaluateBrandFilterChecks(span);
+  const filterChecks = evaluateBrandFilterChecks(span, options.counterfactualDisableTooManyWords);
   const activeRejectionReasons = filterChecks.filter((c) => c.failed).map((c) => c.check);
   assertBrandFilterDiagnosticInvariants(analysis.diagnostic, filterChecks, activeRejectionReasons);
   return {
@@ -2461,6 +2473,24 @@ export function selectBrandObservationWithCompleteFilterDiagnostics(
   return selectBrandObservationWithOptions(results, {
     ...DEFAULT_BRAND_SELECTION_OPTIONS,
     collectCompleteFilterDiagnostics: true,
+  });
+}
+
+/**
+ * Evaluation-only. The Issue #149 `too-many-words` counterfactual: the rule is
+ * treated as absent from the filter ladder, so a candidate rejected solely by it
+ * becomes eligible and is scored, ranked, selected and gated by the ordinary
+ * production logic. Complete filter diagnostics are collected alongside.
+ *
+ * Never called by production.
+ */
+export function selectBrandObservationWithTooManyWordsCounterfactual(
+  results: RegionOcrResult[],
+): FieldSelection {
+  return selectBrandObservationWithOptions(results, {
+    ...DEFAULT_BRAND_SELECTION_OPTIONS,
+    collectCompleteFilterDiagnostics: true,
+    counterfactualDisableTooManyWords: true,
   });
 }
 

@@ -1,0 +1,16 @@
+{
+  "artifact": "identity",
+  "experimentId": "issue-149-brand-too-many-words-counterfactual",
+  "baseSha": "4bb3140b56dd1b9aee2c7b015e90a09d0902fe34",
+  "branch": "research/brand-too-many-words-counterfactual",
+  "frozenBase": "4bb3140b56dd1b9aee2c7b015e90a09d0902fe34",
+  "originMainAtWriteTime": "2818505bc8f6a40141e268c0568dcd557d96db44",
+  "population": "artifacts/brand-evidence-path-diagnosis/cases.json",
+  "populationSha256": "91eec356e7a97fdf55b2d66a070f81b707bdb62a82f43c05608094ebb3aa59ae",
+  "corpusManifestSha256": "97aae943a57def5a57be38468556da8c5db1d0c5c0fde6136590b56107689668",
+  "metricsSha256": "712a65a10615624121e214d43ae0b75c136d2c7187fb70b7d9a2917609467172",
+  "preregistrationSha256": "0f990f390a2e2325d6873280f0539a6c5c8b1ee3591ca363e2b0f7710d4b2522",
+  "ocrEngine": { "engineId": "tesseract.js", "engineVersion": "7.0.0", "modelId": "eng" },
+  "seam": "selectBrandObservationWithTooManyWordsCounterfactual (default-off, evaluation-only)",
+  "nodeVersion": "v22.17.0"
+}

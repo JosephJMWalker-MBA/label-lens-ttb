@@ -1,0 +1,25 @@
+{
+  "artifact": "decision",
+  "experimentId": "issue-149-brand-too-many-words-counterfactual",
+  "preregistrationSha256": "0f990f390a2e2325d6873280f0539a6c5c8b1ee3591ca363e2b0f7710d4b2522",
+  "decision": "GLOBAL_RELAXATION_KILL",
+  "killClausesTriggered": [
+    "introduces a new wrong OBSERVED result (0 -> 1)",
+    "displaces currently correct selected Brands without compensating evidence (3 displaced, 0 improved)",
+    "admits substantial candidate noise without meaningful truth recovery (104 admitted, 0 truth-bearing)"
+  ],
+  "narrowerRuleResearchEarned": false,
+  "narrowerRuleRationale": "The CONTINUE rule requires that the counterfactual recover meaningful true Brand evidence. It recovered none: 0 of 104 admitted candidates equal the governed brand, and 0 of the sole-blocker cases carried a truth-bearing blocked candidate. No narrower predicate over the same candidate set can promote a candidate that was never formed. The 9 admitted candidates that CONTAIN the brand implicate candidate-window generation, not filter breadth.",
+  "productionFilesChanged": 0,
+  "productionBehaviorChanged": false,
+  "productionParity": "115/115 byte-identical",
+  "filtersModified": false,
+  "filterRelaxationImplemented": false,
+  "authorizes": [],
+  "doesNotAuthorize": [
+    "any production filter change",
+    "modifying or narrowing too-many-words",
+    "candidate-window or segmentation work",
+    "any authority-threshold change"
+  ]
+}

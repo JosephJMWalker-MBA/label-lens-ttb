@@ -1,0 +1,73 @@
+{
+  "artifact": "contains-versus-equals",
+  "question": "Do the candidates too-many-words blocks actually carry the Brand as a usable value?",
+  "admittedTotal": 104,
+  "admittedContainingBrand": 9,
+  "admittedEqualToBrand": 0,
+  "interpretation": "Removing the filter admits long lines that CONTAIN the brand among other words. None is equal to the brand, so none can be selected as a correct Brand value. The constraint is candidate-window formation, not filter breadth.",
+  "examples": [
+    {
+      "caseId": "approved-wine-018",
+      "acceptable": ["Poqr Krya", "POQR KRYA"],
+      "admittedValue": "Poqr Krya Red Still Wine 2022 Vayots Dzor",
+      "wordCount": 8,
+      "truthTier": "NON_TRUTH"
+    },
+    {
+      "caseId": "approved-wine-042",
+      "acceptable": ["Domaine Quivy"],
+      "admittedValue": "CHAPELLE CHAMBERTIN GRAND CRU DOMAINE QUIVY",
+      "wordCount": 6,
+      "truthTier": "NON_TRUTH"
+    },
+    {
+      "caseId": "approved-wine-052",
+      "acceptable": ["Mountain Valley Winery"],
+      "admittedValue": "MOUNTAIN VALLEY WINERY, PIGEON FORGE, TN, 37863",
+      "wordCount": 7,
+      "truthTier": "NON_TRUTH"
+    },
+    {
+      "caseId": "approved-wine-078",
+      "acceptable": ["Pietta"],
+      "admittedValue": "BOTTLE BY SOCIETA AGRICOLA PIETTA S.S",
+      "wordCount": 6,
+      "truthTier": "NON_TRUTH"
+    },
+    {
+      "caseId": "approved-wine-079",
+      "acceptable": ["Le Caniette"],
+      "admittedValue": "LE CANIETTE di Vagnoni G & L",
+      "wordCount": 7,
+      "truthTier": "NON_TRUTH"
+    },
+    {
+      "caseId": "le-caniette",
+      "acceptable": ["Le Caniette"],
+      "admittedValue": "LE CANIETTE di Vagnoni G & L",
+      "wordCount": 7,
+      "truthTier": "NON_TRUTH"
+    },
+    {
+      "caseId": "approved-wine-093",
+      "acceptable": ["Fontanavecchia"],
+      "admittedValue": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+      "wordCount": 6,
+      "truthTier": "NON_TRUTH"
+    },
+    {
+      "caseId": "approved-wine-094",
+      "acceptable": ["Fontanavecchia"],
+      "admittedValue": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+      "wordCount": 6,
+      "truthTier": "NON_TRUTH"
+    },
+    {
+      "caseId": "approved-wine-099",
+      "acceptable": ["Fontanavecchia"],
+      "admittedValue": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+      "wordCount": 6,
+      "truthTier": "NON_TRUTH"
+    }
+  ]
+}

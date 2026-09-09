@@ -33,3 +33,11 @@ artifacts/issue-149-brand-ppocrv6-small-onnx-contrast/vendor/inference.yml
 # raw-output-manifest.json before the truth boundary is crossed, so reformatting
 # would invalidate the manifest that proves the evidence is unaltered.
 artifacts/issue-149-brand-ppocrv6-small-onnx-contrast/raw/
+
+# Frozen counterfactual evidence: primary and repeat are compared byte-for-byte
+# and their digests are recorded in determinism.json.
+artifacts/issue-149-brand-too-many-words-counterfactual/aggregate.json
+artifacts/issue-149-brand-too-many-words-counterfactual/case-level-results.json
+artifacts/issue-149-brand-too-many-words-counterfactual/admitted-candidates.jsonl
+artifacts/issue-149-brand-too-many-words-counterfactual/primary/
+artifacts/issue-149-brand-too-many-words-counterfactual/repeat/

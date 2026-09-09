@@ -1,0 +1,23 @@
+{
+  "artifact": "determinism",
+  "experimentId": "issue-149-brand-too-many-words-counterfactual",
+  "runs": 2,
+  "digests": {
+    "aggregate.json": {
+      "primary": "1990ffc41f8e835a96780719d4a4dd515808c405c40fbd72557b4ddbffe40d73",
+      "repeat": "1990ffc41f8e835a96780719d4a4dd515808c405c40fbd72557b4ddbffe40d73",
+      "identical": true
+    },
+    "case-level-results.json": {
+      "primary": "ebc50dd71918c976efcc96ef0623cc3d40d263018c7cf1a48eebd4ba2e431c24",
+      "repeat": "ebc50dd71918c976efcc96ef0623cc3d40d263018c7cf1a48eebd4ba2e431c24",
+      "identical": true
+    },
+    "admitted-candidates.jsonl": {
+      "primary": "ec57161b0e4d482aa1e6905ae463b080808deb49cbedcd389e497f24093acf89",
+      "repeat": "ec57161b0e4d482aa1e6905ae463b080808deb49cbedcd389e497f24093acf89",
+      "identical": true
+    }
+  },
+  "allIdentical": true
+}
