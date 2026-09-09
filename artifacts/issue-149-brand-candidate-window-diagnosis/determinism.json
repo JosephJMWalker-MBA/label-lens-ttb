@@ -1,19 +1,18 @@
 {
   "artifact": "determinism",
   "runs": 2,
-  "classifier": "amendment-1 precedence",
+  "classifier": "amendment-2 taxonomy",
   "digests": {
     "aggregate.json": {
-      "primary": "1b8e25934343b1580850cf6965130e887e100b0a7f26f841681c4bbf6f5bc810",
-      "repeat": "1b8e25934343b1580850cf6965130e887e100b0a7f26f841681c4bbf6f5bc810",
+      "primary": "419af256fb42c1542a1201c3d9c52babfaa4333bf928ceeb800148622fab4dcd",
+      "repeat": "419af256fb42c1542a1201c3d9c52babfaa4333bf928ceeb800148622fab4dcd",
       "identical": true
     },
     "case-level-diagnosis.json": {
-      "primary": "d158db203dd245394e2a723cecc37407ac7f2f4aa975b850ff3bda5d8e6f9fe7",
-      "repeat": "d158db203dd245394e2a723cecc37407ac7f2f4aa975b850ff3bda5d8e6f9fe7",
+      "primary": "0e3473ef2c2a577b59745f09b13217037acc0b682cea90bf3064d655f7e1f0a8",
+      "repeat": "0e3473ef2c2a577b59745f09b13217037acc0b682cea90bf3064d655f7e1f0a8",
       "identical": true
     }
   },
-  "allIdentical": true,
-  "note": "aggregate.json is byte-identical to the pre-amendment run because no count moved; case-level-diagnosis.json changed because explanations and stage labels now reflect the amended precedence."
+  "allIdentical": true
 }

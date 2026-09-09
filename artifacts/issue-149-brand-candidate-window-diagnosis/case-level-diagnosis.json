@@ -32,6 +32,8 @@
       "keptCandidates": 2
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -67,8 +69,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"GOVERMENT WARNING 1 ACCORDING TO THE SURGEON GENERAL, LUIGI & GIOVANNI\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "alfredos-wine",
@@ -107,6 +109,8 @@
       "keptCandidates": 2
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -160,8 +164,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"GOVERMENT WARNING 1 ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "la-fattoria-rotated",
@@ -220,6 +224,8 @@
       "keptCandidates": 5
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -258,8 +264,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Zwosos SWi-Sv ws DARK HORSE.\",\"e DARKHORSEWINE.COM\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "casanova-della-spinetta",
@@ -307,6 +313,8 @@
       "keptCandidates": 11
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -395,8 +403,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Vino Alpino LLC\",\"WWW vinoalpino com\",\"infovinoalpino.com 4 Pordfolil IMPORTS ison Mill\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "approved-wine-009",
@@ -431,6 +439,8 @@
       "keptCandidates": 11
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -520,8 +530,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Vino Alpino LLC\",\"www.vinoalpino.com\",\"infovinoalpino.com Curated Pordfolilo IMPORTS larrison Miller\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "domaine-follin-arbelet",
@@ -572,6 +582,8 @@
       "keptCandidates": 3
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -622,8 +634,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Learn more about us online at cooleybay.com\",\"Cooley Bay Winery\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "approved-wine-013",
@@ -680,6 +692,8 @@
       "keptCandidates": 4
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -733,8 +747,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"or more information about this wine website and Patricia Green Cellars\",\"PATRICIAGREENCELLARS.COM A R\",\"PRODUCED & BOTTLED BY PATRICIA GREEN CELLARS\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "approved-wine-016",
@@ -770,6 +784,8 @@
       "keptCandidates": 1
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -793,8 +809,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Our Wine , Marques de Navarro Reflects with elegance the varietal character and the freshness\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "approved-wine-017",
@@ -847,6 +863,8 @@
       "keptCandidates": 3
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -884,8 +902,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Poqr Krya Red Still Wine 2022 Vayots Dzor\",\"Poqr krya is a joint venture of Krya wines and local\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "approved-wine-019",
@@ -966,6 +984,8 @@
       "keptCandidates": 4
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -1117,6 +1137,8 @@
       "keptCandidates": 2
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -1154,8 +1176,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Touch Wine Is made from\",\"touch you...\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "approved-wine-038",
@@ -1191,6 +1213,8 @@
       "keptCandidates": 1
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -1228,8 +1252,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"can be hip or a regular L-7, but Big Red Sunshine is ready to-hang loose\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "approved-wine-039",
@@ -1271,6 +1295,8 @@
       "keptCandidates": 9
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": false,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": false,
     "partialCandidateGenerated": true,
@@ -1347,6 +1373,8 @@
       "keptCandidates": 2
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -1369,8 +1397,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"CHAPELLE CHAMBERTIN GRAND CRU DOMAINE QUIVY\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "approved-wine-043",
@@ -1423,6 +1451,8 @@
       "keptCandidates": 1
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -1446,8 +1476,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Samson and Delilah, this Meeting of the Minds is fire.\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "approved-wine-046",
@@ -1486,6 +1516,8 @@
       "keptCandidates": 3
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -1552,8 +1584,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Red Wine Blend Curious\",\"delicious and delightfully Curious.\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "approved-wine-047",
@@ -1610,6 +1642,8 @@
       "keptCandidates": 5
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -1675,8 +1709,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Pacha RESERVA - CARMENERE\",\"Pacha, in local language means the earth or the world, a concept closely\",\"Pacha Mama mother earth, right in front of the impressive Cordillera de\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "approved-wine-049",
@@ -1736,6 +1770,8 @@
       "keptCandidates": 4
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -1785,8 +1821,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"PACHECA DOURO D.O.C\",\"par Quinta da Pacheca Soc. Agricola e Turistica, Lda. Cambres-Lamego, Portugal\",\"PACHECA NET mL 2\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "approved-wine-052",
@@ -1822,6 +1858,8 @@
       "keptCandidates": 6
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -1868,8 +1906,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"MOUNTAIN VALLEY WINERY, PIGEON FORGE, TN, 37863\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "approved-wine-053",
@@ -1912,6 +1950,8 @@
       "keptCandidates": 14
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": false,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": false,
     "partialCandidateGenerated": false,
@@ -1920,7 +1960,7 @@
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
     "failureClass": "E_WINDOW_NOT_ENUMERATED",
-    "explanation": "The truth token run sits inside a reconstructed line, but no generated candidate equals, contains, or partially matches the Brand."
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window."
   },
   {
     "caseId": "approved-wine-055",
@@ -2018,6 +2058,8 @@
       "keptCandidates": 5
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -2054,8 +2096,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "approved-wine-064",
@@ -2089,6 +2131,8 @@
       "keptCandidates": 7
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -2125,8 +2169,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "approved-wine-065",
@@ -2160,6 +2204,8 @@
       "keptCandidates": 5
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -2196,8 +2242,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "approved-wine-066",
@@ -2233,6 +2279,8 @@
       "keptCandidates": 5
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -2269,8 +2317,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Produced and Bottled by Domaine Juliette Avril\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "approved-wine-067",
@@ -2306,6 +2354,8 @@
       "keptCandidates": 3
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -2342,8 +2392,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Produced and Bottled by Domaine Juliette Avril\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "approved-wine-068",
@@ -2441,6 +2491,8 @@
       "keptCandidates": 5
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -2478,8 +2530,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Martinell, who was student of Antoni Gaudi. Etim Blanc\",\"MONTSANT www.etim.cat\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "approved-wine-077",
@@ -2526,6 +2578,8 @@
       "keptCandidates": 2
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -2563,8 +2617,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"BOTTLE BY SOCIETA AGRICOLA PIETTA S.S\",\"PIETTA CAR MAY OROPERATE CAUSE HEALTHPROBLEMS. MACHINERY, AND\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "approved-wine-079",
@@ -2638,6 +2692,8 @@
       "keptCandidates": 5
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -2675,8 +2731,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"FILADORO GIUSEPPA AZ.AGR.\",\"www.filadoro.it\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "approved-wine-085",
@@ -2740,6 +2796,8 @@
       "keptCandidates": 6
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -2793,8 +2851,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"LA MESMA Yellow Label\",\"Estate Bottled by Az. Agr. La Mesma srl Soc. Agr. Gavi - Italy\",\"www. lamesma.it\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "approved-wine-089",
@@ -2834,6 +2892,8 @@
       "keptCandidates": 5
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -2887,8 +2947,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"LA MESMA Black Label\",\"Estate Bottled by Az. Agr. La Mesma srl Soc. Agr. Gavi - Italy\",\"www.lamesma.it\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "approved-wine-090",
@@ -2923,6 +2983,8 @@
       "keptCandidates": 6
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -2958,8 +3020,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"LA MESMA Indi\",\"www.lamesma.it\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "approved-wine-091",
@@ -3009,6 +3071,8 @@
       "keptCandidates": 6
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -3031,8 +3095,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"A. A. FONTANAVECCHIA DI LIBERO RILLO\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "approved-wine-094",
@@ -3066,6 +3130,8 @@
       "keptCandidates": 6
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -3088,8 +3154,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"A. A. FONTANAVECCHIA DI LIBERO RILLO\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "approved-wine-095",
@@ -3155,6 +3221,8 @@
       "keptCandidates": 6
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -3177,8 +3245,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"A. A. FONTANAVECCHIA DI LIBERO RILLO\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "amuninni-ferracane",
@@ -3237,6 +3305,8 @@
       "keptCandidates": 4
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -3273,8 +3343,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"FOR TENUTE VALSO - 91011 ALCAMO - ITALIA\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "approved-wine-104",
@@ -3317,6 +3387,8 @@
       "keptCandidates": 3
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -3352,8 +3424,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"GOVERMENT WARNING 1 ACCORDING TO THE SURGEON GENERAL, LUIGI & GIOVANNI\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "approved-wine-106",
@@ -3393,6 +3465,8 @@
       "keptCandidates": 2
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -3459,8 +3533,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"GOVERMENT WARNING 1 ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "approved-wine-107",
@@ -3519,6 +3593,8 @@
       "keptCandidates": 5
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -3569,8 +3645,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Learn more about us online at cooleybay.com\",\"Cooley Bay Winery\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "m-cellars-baseline",
@@ -3605,6 +3681,8 @@
       "keptCandidates": 4
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -3640,8 +3718,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Welcome to our family. M Cellars wines are estate\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "wine-multi-artifact-04",
@@ -3693,6 +3771,8 @@
       "keptCandidates": 15
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -3756,8 +3836,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"BLAZIC COLLIO\",\"BLAZIC FRANCO\",\"WWW.BLAZIC.IT\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "wine-multi-artifact-06",
@@ -3792,6 +3872,8 @@
       "keptCandidates": 8
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": true,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": true,
@@ -3852,8 +3934,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"AZIENDA AGRICOLA MAURO MOLINO\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted and a partial span was emitted."
   },
   {
     "caseId": "wine-multi-artifact-07",
@@ -3895,6 +3977,8 @@
       "keptCandidates": 7
     },
     "exactCandidateGenerated": false,
+    "overwidePhenotypeFlag": true,
+    "partialPhenotypeFlag": false,
     "exactCandidateKept": false,
     "overwideCandidateGenerated": true,
     "partialCandidateGenerated": false,
@@ -3919,8 +4003,8 @@
     ],
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "span/window enumeration",
-    "failureClass": "B_OVERWIDE_WINDOW",
-    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"ESTATE BOTTLED BY PINDAR VINEYARDS\"]"
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window. Secondary phenotype: an overwide span was emitted."
   },
   {
     "caseId": "wine-multi-artifact-09",

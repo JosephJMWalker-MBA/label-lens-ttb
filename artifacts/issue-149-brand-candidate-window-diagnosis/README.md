@@ -13,7 +13,12 @@ changed. No filter, window width, OCR, ranking, selection or authority was touch
 | Base SHA | `2818505bc8f6a40141e268c0568dcd557d96db44` (current `main`, includes PR #223) |
 | Branch | `research/brand-candidate-window-diagnosis` |
 | Frozen definitions | `deed0705e41db544d65bb60ecafdf10e6602b4745c31a66a6745f1c52e23a9ea`, frozen before counting |
-| Amendment 1 | `7ec0e4a74014b5f7f532862f60cb808aa574524c9a6e2e010326301c56da3ace` — classifier precedence, made **after** the first aggregate was inspected; both hashes retained |
+| Amendment 1 | `7ec0e4a74014b5f7f532862f60cb808aa574524c9a6e2e010326301c56da3ace` — classifier precedence |
+| Amendment 2 | `a85abaedc4733e353ba5ce98dc1093276bf2433d58511ba823cc6a30c20a3910` — `B`/`C` become secondary phenotypes |
+
+Both amendments were made **after** aggregate results were inspected and are
+disclosed as such in their own files. All three hashes are retained; nothing was
+replaced.
 | Upstream authority | PR #223 fresh raw-OCR truth presence, reused unchanged |
 | Diagnostic surfaces | `selectBrandObservationWithCompleteFilterDiagnostics` (#220) and `classifyRawOcrMatch` (#223), both already in `main` |
 
@@ -49,22 +54,32 @@ silently classified.
 
 ## The 42-case classification
 
-| Class | Cases |
+**Primary — earliest actual loss** (Amendment 2: the question is why the correct
+candidate ceased to exist, not what wrong candidate happened to exist nearby):
+
+| Primary class | Cases |
 | --- | --- |
-| **A** — exact candidate generated then filtered | **0** |
-| **B** — overwide window | **39** |
-| **C** — partial window | 0 |
-| **D** — truth spans multiple generation units | 1 |
-| **E** — window not enumerated | 1 |
-| **F** — normalization / tokenization mismatch | 1 |
+| **A** — exact correct candidate generated, then filtered | **0** |
+| **F** — exact truth span emitted, value construction prevented an exact candidate | 1 |
+| **D** — truth crosses a line/region/pass boundary | 1 |
+| **E** — exact truth run available inside one unit, exact window never enumerated | **40** |
 | G / H | 0 / 0 |
 
-**Roll-up:** filter loss **0** · window/span-formation loss **40** · structural
-segmentation **1** · value construction **1**.
+**Secondary window phenotypes** — counted independently, not mutually exclusive:
 
-Not one case had a candidate *equal to* the Brand generated and then rejected.
+| Flag | Cases |
+| --- | --- |
+| **B** — an overwide candidate was also generated | 40 |
+| **C** — a partial candidate was also generated | 21 |
+| both flags | 20 |
+| neither flag | 1 (`approved-wine-054`) |
 
-## Class B divides into two mechanisms with different repairs
+**Roll-up (unchanged by Amendment 2):** filter loss **0** · window/span formation
+**40** · structural segmentation **1** · value construction **1**. It was
+previously `B + C + E` and is now `E` alone, so the total is identical — a
+consistency check on the refinement.
+
+## The overwide phenotype divides into two mechanisms with different repairs
 
 **12 kept-overwide** — an overwide candidate survives filtering and is surfaced,
 so the pipeline answers with a near miss (2–4 extra words):
@@ -98,7 +113,7 @@ filters then removed it (median 5 extra words, max 12):
 | | |
 | --- | --- |
 | Cases with an **exact** candidate rejected by `too-many-words` | **0** |
-| Class-B cases where `too-many-words` rejected only an **overwide** span | **35** |
+| Cases where an **overwide** span carried `too-many-words` | **36** |
 
 This is why 23 blocker cases, 17 sole-blocker cases and 0 recovered by global
 removal coexist without contradiction. The earlier decomposition attributed the

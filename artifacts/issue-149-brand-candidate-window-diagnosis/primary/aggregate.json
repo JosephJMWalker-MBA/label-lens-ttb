@@ -15,15 +15,20 @@
     "brandPresent": 105,
     "inScope": 42
   },
-  "classification": {
+  "primaryClassification": {
     "A_EXACT_CANDIDATE_GENERATED_AND_FILTERED": 0,
-    "B_OVERWIDE_WINDOW": 39,
-    "C_PARTIAL_WINDOW": 0,
-    "D_TRUTH_SPANS_MULTIPLE_GENERATION_UNITS": 1,
-    "E_WINDOW_NOT_ENUMERATED": 1,
     "F_NORMALIZATION_TOKENIZATION_MISMATCH": 1,
+    "D_TRUTH_SPANS_MULTIPLE_GENERATION_UNITS": 1,
+    "E_WINDOW_NOT_ENUMERATED": 40,
     "G_OTHER": 0,
     "H_UNDETERMINABLE": 0
+  },
+  "secondaryWindowPhenotypes": {
+    "note": "Counted independently of the primary class; a case may carry both flags or neither.",
+    "B_overwideCandidateAlsoGenerated": 40,
+    "C_partialCandidateAlsoGenerated": 21,
+    "bothFlags": 20,
+    "neitherFlag": 1
   },
   "rollUp": {
     "FILTER_LOSS": 0,
@@ -34,7 +39,7 @@
   },
   "tooManyWordsReconciliation": {
     "casesWhereExactCandidateRejectedByTooManyWords": 0,
-    "casesWhereTooManyWordsRejectedOnlyAnOverwideSpan": 39
+    "casesWhereTooManyWordsRejectedOnlyAnOverwideSpan": 40
   },
   "productionFilesChanged": 0,
   "productionBehaviorChanged": false

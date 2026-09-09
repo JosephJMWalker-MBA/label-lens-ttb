@@ -223,20 +223,19 @@ async function main(): Promise<void> {
       failureClass = "D_TRUTH_SPANS_MULTIPLE_GENERATION_UNITS";
       explanation =
         "The truth token run is present in raw OCR but not contiguous within any single reconstructed line, so span enumeration never had a unit containing it.";
-    } else if (overwide.length > 0) {
-      failureClass = "B_OVERWIDE_WINDOW";
-      explanation = `No exact candidate. Generated windows carry the Brand inside longer values: ${JSON.stringify(
-        overwide.slice(0, 3).map((c) => valueOf(c)),
-      )}`;
-    } else if (partial.length > 0) {
-      failureClass = "C_PARTIAL_WINDOW";
-      explanation = `No exact or overwide candidate. Generated windows capture only part of the Brand: ${JSON.stringify(
-        partial.slice(0, 3).map((c) => valueOf(c)),
-      )}`;
     } else {
+      // Amendment 2: the exact truth run exists inside an eligible generation
+      // unit and no exact candidate or exact span was produced, so the earliest
+      // actual loss is that the available correct window was never enumerated.
+      // Overwide and partial spans are symptoms, recorded as secondary flags.
       failureClass = "E_WINDOW_NOT_ENUMERATED";
+      const symptoms = [
+        overwide.length > 0 ? "an overwide span was emitted" : null,
+        partial.length > 0 ? "a partial span was emitted" : null,
+      ].filter(Boolean);
       explanation =
-        "The truth token run sits inside a reconstructed line, but no generated candidate equals, contains, or partially matches the Brand.";
+        `The exact truth token run sits inside one eligible generation unit, but the generator never emitted that exact window.` +
+        (symptoms.length > 0 ? ` Secondary phenotype: ${symptoms.join(" and ")}.` : "");
     }
 
     rows.push({
@@ -254,6 +253,8 @@ async function main(): Promise<void> {
         keptCandidates: candidates.filter((c) => c.kept).length,
       },
       exactCandidateGenerated: exactPreFilter.length > 0,
+      overwidePhenotypeFlag: overwide.length > 0,
+      partialPhenotypeFlag: partial.length > 0,
       exactCandidateKept: exactKept,
       overwideCandidateGenerated: overwide.length > 0,
       partialCandidateGenerated: partial.length > 0,
@@ -292,8 +293,7 @@ async function main(): Promise<void> {
   const scope = rows.filter((r) => r.inScope === true) as Array<Record<string, any>>;
   const count = (c: FailureClass) => scope.filter((r) => r.failureClass === c).length;
   const filterLoss = count("A_EXACT_CANDIDATE_GENERATED_AND_FILTERED");
-  const windowLoss =
-    count("B_OVERWIDE_WINDOW") + count("C_PARTIAL_WINDOW") + count("E_WINDOW_NOT_ENUMERATED");
+  const windowLoss = count("E_WINDOW_NOT_ENUMERATED");
 
   const aggregate = {
     artifact: "aggregate",
@@ -308,15 +308,25 @@ async function main(): Promise<void> {
         .length,
       inScope: scope.length,
     },
-    classification: {
+    primaryClassification: {
       A_EXACT_CANDIDATE_GENERATED_AND_FILTERED: filterLoss,
-      B_OVERWIDE_WINDOW: count("B_OVERWIDE_WINDOW"),
-      C_PARTIAL_WINDOW: count("C_PARTIAL_WINDOW"),
+      F_NORMALIZATION_TOKENIZATION_MISMATCH: count("F_NORMALIZATION_TOKENIZATION_MISMATCH"),
       D_TRUTH_SPANS_MULTIPLE_GENERATION_UNITS: count("D_TRUTH_SPANS_MULTIPLE_GENERATION_UNITS"),
       E_WINDOW_NOT_ENUMERATED: count("E_WINDOW_NOT_ENUMERATED"),
-      F_NORMALIZATION_TOKENIZATION_MISMATCH: count("F_NORMALIZATION_TOKENIZATION_MISMATCH"),
       G_OTHER: count("G_OTHER"),
       H_UNDETERMINABLE: count("H_UNDETERMINABLE"),
+    },
+    secondaryWindowPhenotypes: {
+      note: "Counted independently of the primary class; a case may carry both flags or neither.",
+      B_overwideCandidateAlsoGenerated: scope.filter((r) => r.overwidePhenotypeFlag === true)
+        .length,
+      C_partialCandidateAlsoGenerated: scope.filter((r) => r.partialPhenotypeFlag === true).length,
+      bothFlags: scope.filter(
+        (r) => r.overwidePhenotypeFlag === true && r.partialPhenotypeFlag === true,
+      ).length,
+      neitherFlag: scope.filter(
+        (r) => r.overwidePhenotypeFlag !== true && r.partialPhenotypeFlag !== true,
+      ).length,
     },
     rollUp: {
       FILTER_LOSS: filterLoss,
@@ -334,7 +344,9 @@ async function main(): Promise<void> {
           ),
       ).length,
       casesWhereTooManyWordsRejectedOnlyAnOverwideSpan: scope.filter(
-        (r) => r.failureClass === "B_OVERWIDE_WINDOW",
+        (r) =>
+          r.overwidePhenotypeFlag === true &&
+          r.failureClass !== "A_EXACT_CANDIDATE_GENERATED_AND_FILTERED",
       ).length,
     },
     productionFilesChanged: 0,
