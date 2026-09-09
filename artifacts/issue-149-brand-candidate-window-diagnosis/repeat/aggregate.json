@@ -1,0 +1,41 @@
+{
+  "artifact": "aggregate",
+  "experimentId": "issue-149-brand-candidate-window-diagnosis",
+  "frozenDefinitionsSha256": "deed0705e41db544d65bb60ecafdf10e6602b4745c31a66a6745f1c52e23a9ea",
+  "instrumentationCompleteness": {
+    "casesWithRejectedCandidatesVisible": 115,
+    "maxCandidatesInOneCase": 72,
+    "casesOverHarnessCandidateCap24": 41,
+    "maxLinesInOneCase": 67,
+    "casesOverHarnessLineCap12": 108,
+    "rejectedCandidatesMissingReasons": 0
+  },
+  "population": {
+    "cases": 115,
+    "brandPresent": 105,
+    "inScope": 42
+  },
+  "classification": {
+    "A_EXACT_CANDIDATE_GENERATED_AND_FILTERED": 0,
+    "B_OVERWIDE_WINDOW": 39,
+    "C_PARTIAL_WINDOW": 0,
+    "D_TRUTH_SPANS_MULTIPLE_GENERATION_UNITS": 1,
+    "E_WINDOW_NOT_ENUMERATED": 1,
+    "F_NORMALIZATION_TOKENIZATION_MISMATCH": 1,
+    "G_OTHER": 0,
+    "H_UNDETERMINABLE": 0
+  },
+  "rollUp": {
+    "FILTER_LOSS": 0,
+    "WINDOW_SPAN_FORMATION_LOSS": 40,
+    "STRUCTURAL_SEGMENTATION_LOSS": 1,
+    "VALUE_CONSTRUCTION_LOSS": 1,
+    "OTHER": 0
+  },
+  "tooManyWordsReconciliation": {
+    "casesWhereExactCandidateRejectedByTooManyWords": 0,
+    "casesWhereTooManyWordsRejectedOnlyAnOverwideSpan": 39
+  },
+  "productionFilesChanged": 0,
+  "productionBehaviorChanged": false
+}

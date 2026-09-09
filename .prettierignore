@@ -44,3 +44,9 @@ artifacts/issue-149-brand-raw-ocr-rederivation/case-level-rederivation.json
 artifacts/issue-149-brand-raw-ocr-rederivation/raw-word-evidence.jsonl
 artifacts/issue-149-brand-raw-ocr-rederivation/primary/
 artifacts/issue-149-brand-raw-ocr-rederivation/repeat/
+
+# Frozen candidate-window diagnosis evidence; digests recorded in determinism.json.
+artifacts/issue-149-brand-candidate-window-diagnosis/aggregate.json
+artifacts/issue-149-brand-candidate-window-diagnosis/case-level-diagnosis.json
+artifacts/issue-149-brand-candidate-window-diagnosis/primary/
+artifacts/issue-149-brand-candidate-window-diagnosis/repeat/

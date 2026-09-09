@@ -1,0 +1,3941 @@
+[
+  {
+    "caseId": "luigi-giovanni-live",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Luigi & Giovanni"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "luigi",
+        "giovanni"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 3,
+          "rawText": "GOVERMENT WARNING: (1) ACCORDING TO THE SURGEON GENERAL, LUIGI & GIOVANNI"
+        }
+      ],
+      "totalLines": 8,
+      "totalCandidates": 8,
+      "keptCandidates": 2
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "GOVERMENT WARNING: (1) ACCORDING TO THE SURGEON GENERAL, LUIGI & GIOVANNI",
+        "value": "GOVERMENT WARNING 1 ACCORDING TO THE SURGEON GENERAL, LUIGI & GIOVANNI",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          3
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "non-brand-keyword",
+          "too-many-words"
+        ]
+      },
+      {
+        "rawText": "VANNI",
+        "value": "VANNI",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          1
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"GOVERMENT WARNING 1 ACCORDING TO THE SURGEON GENERAL, LUIGI & GIOVANNI\"]"
+  },
+  {
+    "caseId": "alfredos-wine",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Alfredo's Wine",
+      "Alfredo's"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "alfredos",
+        "wine"
+      ],
+      [
+        "alfredos"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 4,
+          "rawText": "GOVERMENT WARNING: (1) ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE"
+        }
+      ],
+      "totalLines": 9,
+      "totalCandidates": 9,
+      "keptCandidates": 2
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "GOVERMENT WARNING: (1) ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE",
+        "value": "GOVERMENT WARNING 1 ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          4
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "non-brand-keyword",
+          "too-many-words"
+        ]
+      },
+      {
+        "rawText": "DO S",
+        "value": "DO S",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          0
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "low-information-fragment"
+        ]
+      },
+      {
+        "rawText": "i",
+        "value": "i",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          2
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "no-letters-or-too-short",
+          "low-information-fragment",
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"GOVERMENT WARNING 1 ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE\"]"
+  },
+  {
+    "caseId": "la-fattoria-rotated",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-004",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-005",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-006",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Dark Horse"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "dark",
+        "horse"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 0,
+          "rawText": "=Zwosos SWi-Sv ws DARK HORSE."
+        }
+      ],
+      "totalLines": 29,
+      "totalCandidates": 29,
+      "keptCandidates": 5
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "=Zwosos SWi-Sv ws DARK HORSE.",
+        "value": "Zwosos SWi-Sv ws DARK HORSE.",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          0
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "e DARKHORSEWINE.COM",
+        "value": "e DARKHORSEWINE.COM",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          25
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "domain-like",
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Zwosos SWi-Sv ws DARK HORSE.\",\"e DARKHORSEWINE.COM\"]"
+  },
+  {
+    "caseId": "casanova-della-spinetta",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-008",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Vino Alpino"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "vino",
+        "alpino"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 13,
+          "rawText": "Vino Alpino LLC"
+        },
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 16,
+          "rawText": "WWW vinoalpino com"
+        }
+      ],
+      "totalLines": 26,
+      "totalCandidates": 26,
+      "keptCandidates": 11
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "Vino Alpino LLC",
+        "value": "Vino Alpino LLC",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          13
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "WWW vinoalpino com",
+        "value": "WWW vinoalpino com",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          16
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "info@vinoalpino.com 4 Pordfolil IMPORTS ison Mill",
+        "value": "infovinoalpino.com 4 Pordfolil IMPORTS ison Mill",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          17
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "domain-like",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "|G: @vinoalpinoimports",
+        "value": "G vinoalpinoimports",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          18
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "VINO",
+        "value": "VINO",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          12
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "generic-product-language"
+        ]
+      },
+      {
+        "rawText": "ALPINO",
+        "value": "ALPINO",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          15
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Vino Alpino LLC\",\"WWW vinoalpino com\",\"infovinoalpino.com 4 Pordfolil IMPORTS ison Mill\"]"
+  },
+  {
+    "caseId": "approved-wine-009",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Vino Alpino"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "vino",
+        "alpino"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 13,
+          "rawText": "Vino Alpino LLC"
+        }
+      ],
+      "totalLines": 26,
+      "totalCandidates": 26,
+      "keptCandidates": 11
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "Vino Alpino LLC",
+        "value": "Vino Alpino LLC",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          13
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "www.vinoalpino.com",
+        "value": "www.vinoalpino.com",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          16
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "domain-like",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "info@vinoalpino.com Curated Pordfolilo IMPORTS larrison Miller",
+        "value": "infovinoalpino.com Curated Pordfolilo IMPORTS larrison Miller",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          17
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "domain-like",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "|G: @vinoalpinoimports",
+        "value": "G vinoalpinoimports",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          18
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "VINO",
+        "value": "VINO",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          12
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "generic-product-language"
+        ]
+      },
+      {
+        "rawText": "ALPINO",
+        "value": "ALPINO",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          15
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Vino Alpino LLC\",\"www.vinoalpino.com\",\"infovinoalpino.com Curated Pordfolilo IMPORTS larrison Miller\"]"
+  },
+  {
+    "caseId": "domaine-follin-arbelet",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-011",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-012",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Cooley Bay"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "cooley",
+        "bay"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 13,
+          "rawText": "Cooley Bay Winery"
+        }
+      ],
+      "totalLines": 24,
+      "totalCandidates": 24,
+      "keptCandidates": 3
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "Learn more about us online at cooleybay.com",
+        "value": "Learn more about us online at cooleybay.com",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          11
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "domain-like",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "Cooley Bay Winery",
+        "value": "Cooley Bay Winery",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          13
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "Bay",
+        "value": "Bay",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          1
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "low-information-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Learn more about us online at cooleybay.com\",\"Cooley Bay Winery\"]"
+  },
+  {
+    "caseId": "approved-wine-013",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-014",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "patricia-green-cellars",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Patricia Green Cellars"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "patricia",
+        "green",
+        "cellars"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 10,
+          "rawText": "‘or more information about this wine website: and Patricia Green Cellars"
+        },
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 13,
+          "rawText": "PRODUCED & BOTTLED BY PATRICIA GREEN CELLARS"
+        }
+      ],
+      "totalLines": 21,
+      "totalCandidates": 21,
+      "keptCandidates": 4
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "‘or more information about this wine website: and Patricia Green Cellars",
+        "value": "or more information about this wine website and Patricia Green Cellars",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          10
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "PATRICIAGREENCELLARS.COM (A (R/",
+        "value": "PATRICIAGREENCELLARS.COM A R",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          12
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "domain-like"
+        ]
+      },
+      {
+        "rawText": "PRODUCED & BOTTLED BY PATRICIA GREEN CELLARS",
+        "value": "PRODUCED & BOTTLED BY PATRICIA GREEN CELLARS",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          13
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "producer-line",
+          "non-brand-keyword",
+          "too-many-words"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"or more information about this wine website and Patricia Green Cellars\",\"PATRICIAGREENCELLARS.COM A R\",\"PRODUCED & BOTTLED BY PATRICIA GREEN CELLARS\"]"
+  },
+  {
+    "caseId": "approved-wine-016",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Marques de Navarro"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "marques",
+        "de",
+        "navarro"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 2,
+          "rawText": "Our Wine , Marques de Navarro Reflects with elegance the varietal character and the freshness"
+        }
+      ],
+      "totalLines": 17,
+      "totalCandidates": 17,
+      "keptCandidates": 1
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "Our Wine , Marques de Navarro Reflects with elegance the varietal character and the freshness",
+        "value": "Our Wine , Marques de Navarro Reflects with elegance the varietal character and the freshness",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          2
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Our Wine , Marques de Navarro Reflects with elegance the varietal character and the freshness\"]"
+  },
+  {
+    "caseId": "approved-wine-017",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-018",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Poqr Krya",
+      "POQR KRYA"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "poqr",
+        "krya"
+      ],
+      [
+        "poqr",
+        "krya"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 1,
+          "rawText": "Poqr Krya Red Still Wine 2022 Vayots Dzor"
+        },
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 3,
+          "rawText": "Poqr krya is a joint venture of Krya wines and local"
+        }
+      ],
+      "totalLines": 40,
+      "totalCandidates": 40,
+      "keptCandidates": 3
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "Poqr Krya Red Still Wine 2022 Vayots Dzor",
+        "value": "Poqr Krya Red Still Wine 2022 Vayots Dzor",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          1
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words"
+        ]
+      },
+      {
+        "rawText": "Poqr krya is a joint venture of Krya wines and local",
+        "value": "Poqr krya is a joint venture of Krya wines and local",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          3
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Poqr Krya Red Still Wine 2022 Vayots Dzor\",\"Poqr krya is a joint venture of Krya wines and local\"]"
+  },
+  {
+    "caseId": "approved-wine-019",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-020",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "saker",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-022",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": false,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-023",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-024",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Chateau de Laville"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "chateau",
+        "de",
+        "laville"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 0,
+          "rawText": "CHATEAU dé LAVILLE"
+        },
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 3,
+          "rawText": "Le Chateau de Laville est situé sur un des points culminants de la"
+        }
+      ],
+      "totalLines": 27,
+      "totalCandidates": 27,
+      "keptCandidates": 4
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": true,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "Le Chateau de Laville est situé sur un des points culminants de la",
+        "value": "Le Chateau de Laville est situ sur un des points culminants de la",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          3
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "i",
+        "value": "i",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          21
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "no-letters-or-too-short",
+          "low-information-fragment",
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "candidate value construction",
+    "failureClass": "F_NORMALIZATION_TOKENIZATION_MISMATCH",
+    "explanation": "A span covering exactly the truth token run was emitted, but its constructed value does not equal the Brand: [{\"rawText\":\"CHATEAU dé LAVILLE\",\"value\":\"CHATEAU d LAVILLE\"}]"
+  },
+  {
+    "caseId": "nebla-mencia",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-026",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-027",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-028",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-031",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-032",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-033",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-034",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-035",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-037",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Touch"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "touch"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 0,
+          "rawText": "Touch Wine Is made from"
+        },
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 3,
+          "rawText": "touch you..."
+        }
+      ],
+      "totalLines": 24,
+      "totalCandidates": 24,
+      "keptCandidates": 2
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "Touch Wine Is made from",
+        "value": "Touch Wine Is made from",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          0
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "touch you...",
+        "value": "touch you...",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          3
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Touch Wine Is made from\",\"touch you...\"]"
+  },
+  {
+    "caseId": "approved-wine-038",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Big Red Sunshine"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "big",
+        "red",
+        "sunshine"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 4,
+          "rawText": "can be hip or a regular L-7, but Big Red Sunshine is ready to-hang loose"
+        }
+      ],
+      "totalLines": 17,
+      "totalCandidates": 17,
+      "keptCandidates": 1
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "can be hip or a regular L-7, but Big Red Sunshine is ready to-hang loose",
+        "value": "can be hip or a regular L-7, but Big Red Sunshine is ready to-hang loose",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          4
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "IN",
+        "value": "IN",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          8
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "low-information-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"can be hip or a regular L-7, but Big Red Sunshine is ready to-hang loose\"]"
+  },
+  {
+    "caseId": "approved-wine-039",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "chateau-bonneau",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Château Bonneau",
+      "Chateau Bonneau"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "chateau",
+        "bonneau"
+      ],
+      [
+        "chateau",
+        "bonneau"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [],
+      "totalLines": 22,
+      "totalCandidates": 22,
+      "keptCandidates": 9
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": false,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "CHATEAU",
+        "value": "CHATEAU",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          2
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "BONNEAU",
+        "value": "BONNEAU",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          3
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "line/region structure",
+    "failureClass": "D_TRUTH_SPANS_MULTIPLE_GENERATION_UNITS",
+    "explanation": "The truth token run is present in raw OCR but not contiguous within any single reconstructed line, so span enumeration never had a unit containing it."
+  },
+  {
+    "caseId": "approved-wine-041",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-042",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Domaine Quivy"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "domaine",
+        "quivy"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 1,
+          "rawText": "CHAPELLE CHAMBERTIN GRAND CRU DOMAINE QUIVY"
+        }
+      ],
+      "totalLines": 16,
+      "totalCandidates": 16,
+      "keptCandidates": 2
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "CHAPELLE CHAMBERTIN GRAND CRU DOMAINE QUIVY",
+        "value": "CHAPELLE CHAMBERTIN GRAND CRU DOMAINE QUIVY",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          1
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"CHAPELLE CHAMBERTIN GRAND CRU DOMAINE QUIVY\"]"
+  },
+  {
+    "caseId": "approved-wine-043",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-044",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-045",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Meeting of the Minds"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "meeting",
+        "of",
+        "the",
+        "minds"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 12,
+          "rawText": "Samson and Delilah, this Meeting of the Minds is fire."
+        }
+      ],
+      "totalLines": 22,
+      "totalCandidates": 22,
+      "keptCandidates": 1
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "Samson and Delilah, this Meeting of the Minds is fire.",
+        "value": "Samson and Delilah, this Meeting of the Minds is fire.",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          12
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Samson and Delilah, this Meeting of the Minds is fire.\"]"
+  },
+  {
+    "caseId": "approved-wine-046",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Curious"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "curious"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 0,
+          "rawText": "Red Wine Blend “Curious”"
+        },
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 7,
+          "rawText": "delicious and delightfully Curious."
+        }
+      ],
+      "totalLines": 28,
+      "totalCandidates": 28,
+      "keptCandidates": 3
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "Red Wine Blend “Curious”",
+        "value": "Red Wine Blend Curious",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          0
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "delicious and delightfully Curious.",
+        "value": "delicious and delightfully Curious.",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          7
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": ": i",
+        "value": "i",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          8
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "no-letters-or-too-short",
+          "low-information-fragment",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "i",
+        "value": "i",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          10
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "no-letters-or-too-short",
+          "low-information-fragment",
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Red Wine Blend Curious\",\"delicious and delightfully Curious.\"]"
+  },
+  {
+    "caseId": "approved-wine-047",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-048",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Pacha"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "pacha"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 0,
+          "rawText": "Pacha RESERVA - CARMENERE"
+        },
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 2,
+          "rawText": "Pacha, in local language means “the earth or the world”, a concept closely"
+        },
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 4,
+          "rawText": "“Pacha Mama” (mother earth), right in front of the impressive Cordillera de"
+        },
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 6,
+          "rawText": "creating a beautiful connection between the origin and your glass. Pacha"
+        }
+      ],
+      "totalLines": 29,
+      "totalCandidates": 29,
+      "keptCandidates": 5
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "Pacha RESERVA - CARMENERE",
+        "value": "Pacha RESERVA - CARMENERE",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          0
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "Pacha, in local language means “the earth or the world”, a concept closely",
+        "value": "Pacha, in local language means the earth or the world, a concept closely",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          2
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "“Pacha Mama” (mother earth), right in front of the impressive Cordillera de",
+        "value": "Pacha Mama mother earth, right in front of the impressive Cordillera de",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          4
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "creating a beautiful connection between the origin and your glass. Pacha",
+        "value": "creating a beautiful connection between the origin and your glass. Pacha",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          6
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Pacha RESERVA - CARMENERE\",\"Pacha, in local language means the earth or the world, a concept closely\",\"Pacha Mama mother earth, right in front of the impressive Cordillera de\"]"
+  },
+  {
+    "caseId": "approved-wine-049",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "le-temps-des-fleurs",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-051",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Pacheca"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "pacheca"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 0,
+          "rawText": "PACHECA DOURO/ D.O.C"
+        },
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 13,
+          "rawText": "par: Quinta da Pacheca Soc. Agricola e Turistica, Lda. Cambres-Lamego, Portugal"
+        },
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 17,
+          "rawText": "PACHECA NET mL 2)"
+        }
+      ],
+      "totalLines": 22,
+      "totalCandidates": 22,
+      "keptCandidates": 4
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "PACHECA DOURO/ D.O.C",
+        "value": "PACHECA DOURO D.O.C",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          0
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "par: Quinta da Pacheca Soc. Agricola e Turistica, Lda. Cambres-Lamego, Portugal",
+        "value": "par Quinta da Pacheca Soc. Agricola e Turistica, Lda. Cambres-Lamego, Portugal",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          13
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "PACHECA NET mL 2)",
+        "value": "PACHECA NET mL 2",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          17
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "non-brand-keyword"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"PACHECA DOURO D.O.C\",\"par Quinta da Pacheca Soc. Agricola e Turistica, Lda. Cambres-Lamego, Portugal\",\"PACHECA NET mL 2\"]"
+  },
+  {
+    "caseId": "approved-wine-052",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Mountain Valley Winery"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "mountain",
+        "valley",
+        "winery"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 5,
+          "rawText": "MOUNTAIN VALLEY WINERY, PIGEON FORGE, TN, 37863"
+        }
+      ],
+      "totalLines": 22,
+      "totalCandidates": 22,
+      "keptCandidates": 6
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "MOUNTAIN VALLEY WINERY, PIGEON FORGE, TN, 37863",
+        "value": "MOUNTAIN VALLEY WINERY, PIGEON FORGE, TN, 37863",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          5
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words"
+        ]
+      },
+      {
+        "rawText": "MOUNTAIN",
+        "value": "MOUNTAIN",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          0
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "VALLEY",
+        "value": "VALLEY",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          1
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"MOUNTAIN VALLEY WINERY, PIGEON FORGE, TN, 37863\"]"
+  },
+  {
+    "caseId": "approved-wine-053",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-054",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Henri Dufreres"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "henri",
+        "dufreres"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 0,
+          "rawText": "Henri Dufréres 2024"
+        }
+      ],
+      "totalLines": 33,
+      "totalCandidates": 33,
+      "keptCandidates": 14
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": false,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "E_WINDOW_NOT_ENUMERATED",
+    "explanation": "The truth token run sits inside a reconstructed line, but no generated candidate equals, contains, or partially matches the Brand."
+  },
+  {
+    "caseId": "approved-wine-055",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-056",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-057",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-058",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": false,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-059",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "three-steves-winery",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-061",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-062",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": false,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-063",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Prinsi"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "prinsi"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 7,
+          "rawText": "AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI"
+        }
+      ],
+      "totalLines": 19,
+      "totalCandidates": 19,
+      "keptCandidates": 5
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI",
+        "value": "AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          7
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "producer-line",
+          "non-brand-keyword",
+          "too-many-words"
+        ]
+      },
+      {
+        "rawText": "Prins",
+        "value": "Prins",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          0
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI\"]"
+  },
+  {
+    "caseId": "approved-wine-064",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Prinsi"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "prinsi"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 7,
+          "rawText": "AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI"
+        }
+      ],
+      "totalLines": 20,
+      "totalCandidates": 20,
+      "keptCandidates": 7
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI",
+        "value": "AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          7
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "producer-line",
+          "non-brand-keyword",
+          "too-many-words"
+        ]
+      },
+      {
+        "rawText": "Prins",
+        "value": "Prins",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          0
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI\"]"
+  },
+  {
+    "caseId": "approved-wine-065",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Prinsi"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "prinsi"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 6,
+          "rawText": "AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI"
+        }
+      ],
+      "totalLines": 17,
+      "totalCandidates": 17,
+      "keptCandidates": 5
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI",
+        "value": "AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          6
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "producer-line",
+          "non-brand-keyword",
+          "too-many-words"
+        ]
+      },
+      {
+        "rawText": "Prins",
+        "value": "Prins",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          0
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI\"]"
+  },
+  {
+    "caseId": "approved-wine-066",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Domaine Juliette Avril"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "domaine",
+        "juliette",
+        "avril"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 3,
+          "rawText": "Produced and Bottled by Domaine Juliette Avril"
+        }
+      ],
+      "totalLines": 23,
+      "totalCandidates": 23,
+      "keptCandidates": 5
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "Produced and Bottled by Domaine Juliette Avril",
+        "value": "Produced and Bottled by Domaine Juliette Avril",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          3
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "producer-line",
+          "non-brand-keyword",
+          "too-many-words"
+        ]
+      },
+      {
+        "rawText": "DOMAINE",
+        "value": "DOMAINE",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          0
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Produced and Bottled by Domaine Juliette Avril\"]"
+  },
+  {
+    "caseId": "approved-wine-067",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Domaine Juliette Avril"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "domaine",
+        "juliette",
+        "avril"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 3,
+          "rawText": "Produced and Bottled by Domaine Juliette Avril"
+        }
+      ],
+      "totalLines": 21,
+      "totalCandidates": 21,
+      "keptCandidates": 3
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "Produced and Bottled by Domaine Juliette Avril",
+        "value": "Produced and Bottled by Domaine Juliette Avril",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          3
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "producer-line",
+          "non-brand-keyword",
+          "too-many-words"
+        ]
+      },
+      {
+        "rawText": "DOMAINE",
+        "value": "DOMAINE",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          0
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Produced and Bottled by Domaine Juliette Avril\"]"
+  },
+  {
+    "caseId": "approved-wine-068",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-069",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "altacima",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-071",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-072",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-073",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-074",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-075",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": false,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-076",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Etim"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "etim"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 8,
+          "rawText": "Martinell, who was student of Antoni Gaudi. Etim Blanc"
+        }
+      ],
+      "totalLines": 27,
+      "totalCandidates": 27,
+      "keptCandidates": 5
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "Martinell, who was student of Antoni Gaudi. Etim Blanc",
+        "value": "Martinell, who was student of Antoni Gaudi. Etim Blanc",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          8
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "MONTSANT www.etim.cat",
+        "value": "MONTSANT www.etim.cat",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          22
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "domain-like"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Martinell, who was student of Antoni Gaudi. Etim Blanc\",\"MONTSANT www.etim.cat\"]"
+  },
+  {
+    "caseId": "approved-wine-077",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-078",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Pietta"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "pietta"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 5,
+          "rawText": "BOTTLE BY: SOCIETA’ AGRICOLA PIETTA S.S"
+        },
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 18,
+          "rawText": "PIETTA CAR MAY OROPERATE CAUSE HEALTHPROBLEMS. MACHINERY, AND"
+        }
+      ],
+      "totalLines": 20,
+      "totalCandidates": 20,
+      "keptCandidates": 2
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "BOTTLE BY: SOCIETA’ AGRICOLA PIETTA S.S",
+        "value": "BOTTLE BY SOCIETA AGRICOLA PIETTA S.S",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          5
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words"
+        ]
+      },
+      {
+        "rawText": "PIETTA CAR MAY OROPERATE CAUSE HEALTHPROBLEMS. MACHINERY, AND",
+        "value": "PIETTA CAR MAY OROPERATE CAUSE HEALTHPROBLEMS. MACHINERY, AND",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          18
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "non-brand-keyword",
+          "too-many-words"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"BOTTLE BY SOCIETA AGRICOLA PIETTA S.S\",\"PIETTA CAR MAY OROPERATE CAUSE HEALTHPROBLEMS. MACHINERY, AND\"]"
+  },
+  {
+    "caseId": "approved-wine-079",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "le-caniette",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-081",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-082",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": false,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-083",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-084",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Filadoro"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "filadoro"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 5,
+          "rawText": "FILADORO GIUSEPPA AZ.AGR."
+        }
+      ],
+      "totalLines": 24,
+      "totalCandidates": 24,
+      "keptCandidates": 5
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "FILADORO GIUSEPPA AZ.AGR.",
+        "value": "FILADORO GIUSEPPA AZ.AGR.",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          5
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "www.filadoro.it",
+        "value": "www.filadoro.it",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          7
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "domain-like",
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"FILADORO GIUSEPPA AZ.AGR.\",\"www.filadoro.it\"]"
+  },
+  {
+    "caseId": "approved-wine-085",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-086",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-087",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-088",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "La Mesma"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "la",
+        "mesma"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 0,
+          "rawText": "LA MESMA Yellow Label"
+        },
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 7,
+          "rawText": "Estate Bottled by: Az. Agr. La Mesma srl Soc. Agr. Gavi - Italy"
+        }
+      ],
+      "totalLines": 19,
+      "totalCandidates": 19,
+      "keptCandidates": 6
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "LA MESMA Yellow Label",
+        "value": "LA MESMA Yellow Label",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          0
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "Estate Bottled by: Az. Agr. La Mesma srl Soc. Agr. Gavi - Italy",
+        "value": "Estate Bottled by Az. Agr. La Mesma srl Soc. Agr. Gavi - Italy",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          7
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "producer-line",
+          "non-brand-keyword",
+          "too-many-words",
+          "location-or-appellation",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "www. lamesma.it",
+        "value": "www. lamesma.it",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          8
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "domain-like",
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"LA MESMA Yellow Label\",\"Estate Bottled by Az. Agr. La Mesma srl Soc. Agr. Gavi - Italy\",\"www. lamesma.it\"]"
+  },
+  {
+    "caseId": "approved-wine-089",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "La Mesma"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "la",
+        "mesma"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 0,
+          "rawText": "LA MESMA Black Label"
+        },
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 7,
+          "rawText": "Estate Bottled by: Az. Agr. La Mesma srl Soc. Agr. Gavi - Italy"
+        }
+      ],
+      "totalLines": 19,
+      "totalCandidates": 19,
+      "keptCandidates": 5
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "LA MESMA Black Label",
+        "value": "LA MESMA Black Label",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          0
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "Estate Bottled by: Az. Agr. La Mesma srl Soc. Agr. Gavi - Italy",
+        "value": "Estate Bottled by Az. Agr. La Mesma srl Soc. Agr. Gavi - Italy",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          7
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "producer-line",
+          "non-brand-keyword",
+          "too-many-words",
+          "location-or-appellation",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "www.lamesma.it",
+        "value": "www.lamesma.it",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          8
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "domain-like",
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"LA MESMA Black Label\",\"Estate Bottled by Az. Agr. La Mesma srl Soc. Agr. Gavi - Italy\",\"www.lamesma.it\"]"
+  },
+  {
+    "caseId": "approved-wine-090",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "La Mesma"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "la",
+        "mesma"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 0,
+          "rawText": "LA MESMA Indi"
+        }
+      ],
+      "totalLines": 20,
+      "totalCandidates": 20,
+      "keptCandidates": 6
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "LA MESMA Indi",
+        "value": "LA MESMA Indi",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          0
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "www.lamesma.it",
+        "value": "www.lamesma.it",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          9
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "domain-like",
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"LA MESMA Indi\",\"www.lamesma.it\"]"
+  },
+  {
+    "caseId": "approved-wine-091",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-092",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-093",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Fontanavecchia"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "fontanavecchia"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 7,
+          "rawText": "A. A. FONTANAVECCHIA DI LIBERO RILLO"
+        }
+      ],
+      "totalLines": 20,
+      "totalCandidates": 20,
+      "keptCandidates": 6
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+        "value": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          7
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"A. A. FONTANAVECCHIA DI LIBERO RILLO\"]"
+  },
+  {
+    "caseId": "approved-wine-094",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Fontanavecchia"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "fontanavecchia"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 8,
+          "rawText": "A. A. FONTANAVECCHIA DI LIBERO RILLO"
+        }
+      ],
+      "totalLines": 21,
+      "totalCandidates": 21,
+      "keptCandidates": 6
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+        "value": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          8
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"A. A. FONTANAVECCHIA DI LIBERO RILLO\"]"
+  },
+  {
+    "caseId": "approved-wine-095",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": false,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-096",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": false,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-097",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": false,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-098",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": false,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-099",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Fontanavecchia"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "fontanavecchia"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 8,
+          "rawText": "A. A. FONTANAVECCHIA DI LIBERO RILLO"
+        }
+      ],
+      "totalLines": 21,
+      "totalCandidates": 21,
+      "keptCandidates": 6
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+        "value": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          8
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"A. A. FONTANAVECCHIA DI LIBERO RILLO\"]"
+  },
+  {
+    "caseId": "amuninni-ferracane",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-101",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": false,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-102",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-103",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Tenute Valso"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "tenute",
+        "valso"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 7,
+          "rawText": "FOR TENUTE VALSO - 91011 ALCAMO - ITALIA"
+        }
+      ],
+      "totalLines": 19,
+      "totalCandidates": 19,
+      "keptCandidates": 4
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "FOR TENUTE VALSO - 91011 ALCAMO - ITALIA",
+        "value": "FOR TENUTE VALSO - 91011 ALCAMO - ITALIA",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          7
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "location-or-appellation",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "TENUTE",
+        "value": "TENUTE",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          0
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"FOR TENUTE VALSO - 91011 ALCAMO - ITALIA\"]"
+  },
+  {
+    "caseId": "approved-wine-104",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-105",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Luigi & Giovanni"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "luigi",
+        "giovanni"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 5,
+          "rawText": "GOVERMENT WARNING: (1) ACCORDING TO THE SURGEON GENERAL, LUIGI & GIOVANNI"
+        }
+      ],
+      "totalLines": 10,
+      "totalCandidates": 10,
+      "keptCandidates": 3
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "GOVERMENT WARNING: (1) ACCORDING TO THE SURGEON GENERAL, LUIGI & GIOVANNI",
+        "value": "GOVERMENT WARNING 1 ACCORDING TO THE SURGEON GENERAL, LUIGI & GIOVANNI",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          5
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "non-brand-keyword",
+          "too-many-words"
+        ]
+      },
+      {
+        "rawText": "VANNI",
+        "value": "VANNI",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          0
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"GOVERMENT WARNING 1 ACCORDING TO THE SURGEON GENERAL, LUIGI & GIOVANNI\"]"
+  },
+  {
+    "caseId": "approved-wine-106",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Alfredo's Wine",
+      "Alfredos Wine"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "alfredos",
+        "wine"
+      ],
+      [
+        "alfredos",
+        "wine"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 7,
+          "rawText": "GOVERMENT WARNING: (1) ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE"
+        }
+      ],
+      "totalLines": 12,
+      "totalCandidates": 12,
+      "keptCandidates": 2
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "GOVERMENT WARNING: (1) ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE",
+        "value": "GOVERMENT WARNING 1 ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          7
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "non-brand-keyword",
+          "too-many-words"
+        ]
+      },
+      {
+        "rawText": "REDO",
+        "value": "REDO",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          2
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "S",
+        "value": "S",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          3
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "no-letters-or-too-short",
+          "low-information-fragment"
+        ]
+      },
+      {
+        "rawText": "i",
+        "value": "i",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          4
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "no-letters-or-too-short",
+          "low-information-fragment",
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"GOVERMENT WARNING 1 ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE\"]"
+  },
+  {
+    "caseId": "approved-wine-107",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-108",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "approved-wine-109",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "approved-wine-110",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Cooley Bay"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "cooley",
+        "bay"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 13,
+          "rawText": "Cooley Bay Winery"
+        }
+      ],
+      "totalLines": 24,
+      "totalCandidates": 24,
+      "keptCandidates": 5
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "Learn more about us online at cooleybay.com",
+        "value": "Learn more about us online at cooleybay.com",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          11
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "domain-like",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "Cooley Bay Winery",
+        "value": "Cooley Bay Winery",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          13
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "Bay",
+        "value": "Bay",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          1
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "low-information-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Learn more about us online at cooleybay.com\",\"Cooley Bay Winery\"]"
+  },
+  {
+    "caseId": "m-cellars-baseline",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "M Cellars"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "m",
+        "cellars"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 3,
+          "rawText": "Welcome to our family. M Cellars wines are estate"
+        }
+      ],
+      "totalLines": 21,
+      "totalCandidates": 21,
+      "keptCandidates": 4
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "Welcome to our family. M Cellars wines are estate",
+        "value": "Welcome to our family. M Cellars wines are estate",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          3
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "too-many-words",
+          "sentence-fragment"
+        ]
+      },
+      {
+        "rawText": "CELLARS",
+        "value": "CELLARS",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          20
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"Welcome to our family. M Cellars wines are estate\"]"
+  },
+  {
+    "caseId": "wine-multi-artifact-04",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "wine-multi-artifact-05",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Blazic"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "blazic"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 1,
+          "rawText": "BLAZIC COLLIO"
+        },
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 8,
+          "rawText": "BLAZIC FRANCO"
+        },
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 27,
+          "rawText": "PRODUCED ANC TLED BY: Az. Agr. BLAZIC FRANCO,"
+        }
+      ],
+      "totalLines": 36,
+      "totalCandidates": 36,
+      "keptCandidates": 15
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "BLAZIC COLLIO",
+        "value": "BLAZIC COLLIO",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          1
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "BLAZIC FRANCO",
+        "value": "BLAZIC FRANCO",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          8
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "WWW.BLAZIC.IT",
+        "value": "WWW.BLAZIC.IT",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          11
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "domain-like"
+        ]
+      },
+      {
+        "rawText": "PRODUCED ANC TLED BY: Az. Agr. BLAZIC FRANCO,",
+        "value": "PRODUCED ANC TLED BY Az. Agr. BLAZIC FRANCO,",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          27
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "producer-line",
+          "non-brand-keyword",
+          "too-many-words",
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"BLAZIC COLLIO\",\"BLAZIC FRANCO\",\"WWW.BLAZIC.IT\"]"
+  },
+  {
+    "caseId": "wine-multi-artifact-06",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Mauro Molino"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "mauro",
+        "molino"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 12,
+          "rawText": "AZIENDA AGRICOLA MAURO MOLINO"
+        }
+      ],
+      "totalLines": 28,
+      "totalCandidates": 28,
+      "keptCandidates": 8
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": true,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "AZIENDA AGRICOLA MAURO MOLINO",
+        "value": "AZIENDA AGRICOLA MAURO MOLINO",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          12
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "MAURO =",
+        "value": "MAURO",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          1
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "MOLINO",
+        "value": "MOLINO",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          2
+        ],
+        "kept": true,
+        "activeRejectionReasons": []
+      },
+      {
+        "rawText": "i",
+        "value": "i",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          6
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "no-letters-or-too-short",
+          "low-information-fragment",
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"AZIENDA AGRICOLA MAURO MOLINO\"]"
+  },
+  {
+    "caseId": "wine-multi-artifact-07",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": false,
+    "exactCandidateKept": false
+  },
+  {
+    "caseId": "wine-multi-artifact-08",
+    "evaluable": true,
+    "inScope": true,
+    "governedBrand": [
+      "Pindar"
+    ],
+    "freshRawOcrClassification": "EXACT_RAW_MATCH",
+    "rawTruthBearingTokenRun": [
+      [
+        "pindar"
+      ]
+    ],
+    "provenance": {
+      "brandEligiblePasses": [
+        {
+          "passId": "pass-0-full-image",
+          "regionName": "full-image"
+        }
+      ],
+      "unitsContainingTruth": [
+        {
+          "passId": "pass-0-full-image",
+          "lineIndex": 9,
+          "rawText": "ESTATE BOTTLED BY PINDAR VINEYARDS"
+        }
+      ],
+      "totalLines": 27,
+      "totalCandidates": 27,
+      "keptCandidates": 7
+    },
+    "exactCandidateGenerated": false,
+    "exactCandidateKept": false,
+    "overwideCandidateGenerated": true,
+    "partialCandidateGenerated": false,
+    "spanCoveringTruthExactlyEmitted": false,
+    "relevantGeneratedSpans": [
+      {
+        "rawText": "ESTATE BOTTLED BY PINDAR VINEYARDS",
+        "value": "ESTATE BOTTLED BY PINDAR VINEYARDS",
+        "assembly": "whole-line",
+        "passId": "pass-0-full-image",
+        "regionName": "full-image",
+        "lineIndexes": [
+          9
+        ],
+        "kept": false,
+        "activeRejectionReasons": [
+          "producer-line",
+          "non-brand-keyword",
+          "too-many-words"
+        ]
+      }
+    ],
+    "filterReasonsIfExactCandidateExisted": null,
+    "earliestDemonstratedFailureStage": "span/window enumeration",
+    "failureClass": "B_OVERWIDE_WINDOW",
+    "explanation": "No exact candidate. Generated windows carry the Brand inside longer values: [\"ESTATE BOTTLED BY PINDAR VINEYARDS\"]"
+  },
+  {
+    "caseId": "wine-multi-artifact-09",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  },
+  {
+    "caseId": "wine-multi-artifact-10",
+    "evaluable": true,
+    "inScope": false,
+    "brandPresent": true,
+    "freshTruthInRawOcr": true,
+    "exactCandidateKept": true
+  }
+]
