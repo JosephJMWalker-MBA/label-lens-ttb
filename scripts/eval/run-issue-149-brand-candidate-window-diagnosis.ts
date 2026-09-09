@@ -196,23 +196,33 @@ async function main(): Promise<void> {
     let failureClass: FailureClass;
     let explanation: string;
 
-    if (unitsContainingTruth.length === 0) {
+    // Amendment 1 precedence: exact candidate existence is tested FIRST, because
+    // its existence falsifies a window-formation loss for that case. An emitted
+    // exact span is tested next, for the same reason one stage later.
+    if (exactPreFilter.length > 0) {
+      const kept = exactPreFilter.filter((c) => c.kept);
+      if (kept.length > 0) {
+        failureClass = "G_OTHER";
+        explanation =
+          "SCOPE VIOLATION: an exact candidate was kept, so this case should not be in the loss population. Investigate.";
+      } else {
+        failureClass = "A_EXACT_CANDIDATE_GENERATED_AND_FILTERED";
+        explanation = `A pre-filter candidate equal to the Brand was generated and rejected: ${JSON.stringify(
+          exactPreFilter.map((c) => ({
+            value: valueOf(c),
+            reasons: c.activeRejectionReasons ?? [c.filterReason],
+          })),
+        )}`;
+      }
+    } else if (spanCoveringTruthExactly.length > 0) {
+      failureClass = "F_NORMALIZATION_TOKENIZATION_MISMATCH";
+      explanation = `A span covering exactly the truth token run was emitted, so enumeration succeeded; its constructed value does not equal the Brand: ${JSON.stringify(
+        spanCoveringTruthExactly.map((c) => ({ rawText: c.rawText, value: valueOf(c) })),
+      )}`;
+    } else if (unitsContainingTruth.length === 0) {
       failureClass = "D_TRUTH_SPANS_MULTIPLE_GENERATION_UNITS";
       explanation =
         "The truth token run is present in raw OCR but not contiguous within any single reconstructed line, so span enumeration never had a unit containing it.";
-    } else if (exactPreFilter.length > 0) {
-      failureClass = "A_EXACT_CANDIDATE_GENERATED_AND_FILTERED";
-      explanation = `A pre-filter candidate equal to the Brand was generated and rejected: ${JSON.stringify(
-        exactPreFilter.map((c) => ({
-          value: valueOf(c),
-          reasons: c.activeRejectionReasons ?? [c.filterReason],
-        })),
-      )}`;
-    } else if (spanCoveringTruthExactly.length > 0) {
-      failureClass = "F_NORMALIZATION_TOKENIZATION_MISMATCH";
-      explanation = `A span covering exactly the truth token run was emitted, but its constructed value does not equal the Brand: ${JSON.stringify(
-        spanCoveringTruthExactly.map((c) => ({ rawText: c.rawText, value: valueOf(c) })),
-      )}`;
     } else if (overwide.length > 0) {
       failureClass = "B_OVERWIDE_WINDOW";
       explanation = `No exact candidate. Generated windows carry the Brand inside longer values: ${JSON.stringify(
@@ -263,12 +273,12 @@ async function main(): Promise<void> {
           ? exactPreFilter.map((c) => c.activeRejectionReasons ?? [c.filterReason])
           : null,
       earliestDemonstratedFailureStage:
-        failureClass === "D_TRUTH_SPANS_MULTIPLE_GENERATION_UNITS"
-          ? "line/region structure"
-          : failureClass === "A_EXACT_CANDIDATE_GENERATED_AND_FILTERED"
-            ? "filtering"
-            : failureClass === "F_NORMALIZATION_TOKENIZATION_MISMATCH"
-              ? "candidate value construction"
+        failureClass === "A_EXACT_CANDIDATE_GENERATED_AND_FILTERED"
+          ? "filtering"
+          : failureClass === "F_NORMALIZATION_TOKENIZATION_MISMATCH"
+            ? "candidate value construction"
+            : failureClass === "D_TRUTH_SPANS_MULTIPLE_GENERATION_UNITS"
+              ? "line/region structure"
               : "span/window enumeration",
       failureClass,
       explanation,

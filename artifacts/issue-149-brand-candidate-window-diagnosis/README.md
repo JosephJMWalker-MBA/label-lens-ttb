@@ -13,6 +13,7 @@ changed. No filter, window width, OCR, ranking, selection or authority was touch
 | Base SHA | `2818505bc8f6a40141e268c0568dcd557d96db44` (current `main`, includes PR #223) |
 | Branch | `research/brand-candidate-window-diagnosis` |
 | Frozen definitions | `deed0705e41db544d65bb60ecafdf10e6602b4745c31a66a6745f1c52e23a9ea`, frozen before counting |
+| Amendment 1 | `7ec0e4a74014b5f7f532862f60cb808aa574524c9a6e2e010326301c56da3ace` — classifier precedence, made **after** the first aggregate was inspected; both hashes retained |
 | Upstream authority | PR #223 fresh raw-OCR truth presence, reused unchanged |
 | Diagnostic surfaces | `selectBrandObservationWithCompleteFilterDiagnostics` (#220) and `classifyRawOcrMatch` (#223), both already in `main` |
 
@@ -31,6 +32,20 @@ Committed diagnostics were insufficient, and the fresh run proves it:
 
 Because both surfaces already exist in `main`, no production module was touched
 and there is no default-path parity gap to prove.
+
+## Amendment 1 — classifier precedence
+
+The original order tested `D` before `A`, a taxonomy-driven order rather than an
+evidence-driven one: it could have recorded a structural loss for a case where an
+exact candidate had in fact been generated and filtered. Precedence is now
+`A → F → D → B → C → E`, so exact-candidate existence is tested first and an
+emitted exact span second.
+
+**Disclosure: the amendment was made after the first aggregate was inspected.**
+It changed no count. Verified directly: **0 of 42** in-scope cases have an exact
+pre-filter candidate, the single `D` case included, and **0** have a kept exact
+candidate. A kept exact candidate is now flagged as a scope violation rather than
+silently classified.
 
 ## The 42-case classification
 

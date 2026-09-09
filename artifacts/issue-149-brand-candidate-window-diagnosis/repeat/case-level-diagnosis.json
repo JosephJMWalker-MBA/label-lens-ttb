@@ -1006,7 +1006,7 @@
     "filterReasonsIfExactCandidateExisted": null,
     "earliestDemonstratedFailureStage": "candidate value construction",
     "failureClass": "F_NORMALIZATION_TOKENIZATION_MISMATCH",
-    "explanation": "A span covering exactly the truth token run was emitted, but its constructed value does not equal the Brand: [{\"rawText\":\"CHATEAU dé LAVILLE\",\"value\":\"CHATEAU d LAVILLE\"}]"
+    "explanation": "A span covering exactly the truth token run was emitted, so enumeration succeeded; its constructed value does not equal the Brand: [{\"rawText\":\"CHATEAU dé LAVILLE\",\"value\":\"CHATEAU d LAVILLE\"}]"
   },
   {
     "caseId": "nebla-mencia",
