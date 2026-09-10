@@ -1,0 +1,42 @@
+{
+  "artifact": "aggregate",
+  "experimentId": "issue-149-brand-production-ranking-census",
+  "baseSha": "195182c5ccef51e4a15767801d184d12ab07e52a",
+  "taxonomySha256": "f8bae5a9fd3ecf1f7761ebf5473354c90ce61abf5263bab2ba4d86f31e41dc3f",
+  "diagnosticsParity": {
+    "mismatches": 0,
+    "exact": true,
+    "note": "diagnostics variant compared to the real analyzer response value and state"
+  },
+  "cascade": {
+    "brandPresent": 105,
+    "rawTruthPresent": 79,
+    "exactCandidateGenerated": 37,
+    "exactSurvivesFiltering": 37,
+    "exactSurvivesFamilyDedupe": 37,
+    "finalTop3": 34,
+    "finalTop1": 29,
+    "correctlySelected": 29,
+    "correctlyAuthoritative": 4
+  },
+  "mechanisms": {
+    "CANDIDATE_NOT_GENERATED": 68,
+    "FILTER_LOSS": 0,
+    "FAMILY_OR_DEDUPE_SUPPRESSION": 0,
+    "ELIGIBILITY_GATE": 3,
+    "SCORE_ORDERING": 5,
+    "TIE_BREAK": 0,
+    "CORRECT_SELECTED_BUT_AUTHORITY_RESTRAINED": 25,
+    "CORRECT_AND_AUTHORITATIVE": 4,
+    "OTHER": 0,
+    "UNDETERMINABLE": 0
+  },
+  "trueComparatorRankingFailures": 8,
+  "preComparatorLosses": 0,
+  "productionStateDistribution": {
+    "AMBIGUOUS": 101,
+    "OBSERVED": 4
+  },
+  "correctScoresHigherButEliminatedEarly": [],
+  "productionBehaviorChanged": false
+}

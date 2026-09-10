@@ -50,3 +50,9 @@ artifacts/issue-149-brand-candidate-window-diagnosis/aggregate.json
 artifacts/issue-149-brand-candidate-window-diagnosis/case-level-diagnosis.json
 artifacts/issue-149-brand-candidate-window-diagnosis/primary/
 artifacts/issue-149-brand-candidate-window-diagnosis/repeat/
+
+# Frozen production census evidence; digests in determinism.json.
+artifacts/issue-149-brand-production-ranking-census/aggregate.json
+artifacts/issue-149-brand-production-ranking-census/case-level-census.json
+artifacts/issue-149-brand-production-ranking-census/primary/
+artifacts/issue-149-brand-production-ranking-census/repeat/
