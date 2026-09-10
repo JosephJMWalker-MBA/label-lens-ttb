@@ -1,0 +1,14 @@
+{
+  "artifact": "identity",
+  "experimentId": "issue-149-brand-oracle-exact-window",
+  "baseSha": "195182c5ccef51e4a15767801d184d12ab07e52a",
+  "branch": "research/brand-oracle-exact-window-counterfactual",
+  "originMain": "195182c5ccef51e4a15767801d184d12ab07e52a",
+  "diagnosisDependency": "artifacts/issue-149-brand-candidate-window-diagnosis (PR #224) — the 40 class-E cases",
+  "populationSha256": "91eec356e7a97fdf55b2d66a070f81b707bdb62a82f43c05608094ebb3aa59ae",
+  "corpusManifestSha256": "97aae943a57def5a57be38468556da8c5db1d0c5c0fde6136590b56107689668",
+  "oracleRuleSha256": "b57d6fc6cbd5698bf5748c8af5bc9a429a38eee8d9d54b1b1dd795b4fb118def",
+  "seam": "oracleExactWindows, default [], via selectBrandObservationWithOracleExactWindows",
+  "ocrEngine": { "engineId": "tesseract.js", "engineVersion": "7.0.0", "modelId": "eng" },
+  "nodeVersion": "v22.17.0"
+}

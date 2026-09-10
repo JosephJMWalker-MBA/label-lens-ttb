@@ -1,0 +1,4013 @@
+[
+  {
+    "caseId": "luigi-giovanni-live",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Luigi & Giovanni"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "VANNI",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 2,
+      "totalCandidates": 8
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "VANNI",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 9
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "LUIGI & GIOVANNI",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "alfredos-wine",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Alfredo's Wine",
+      "Alfredo's"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "HLTRE",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 2,
+      "totalCandidates": 9
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "HLTRE",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 4,
+      "totalCandidates": 11
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "ALFREDO'S WINE",
+        "kept": true,
+        "reasons": []
+      },
+      {
+        "value": "ALFREDO'S",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "la-fattoria-rotated",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "La Fattoria"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "cCTIO",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 57
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "cCTIO",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 57
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-004",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "La Fattoria"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "NORTH COAST CA OF",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 11,
+      "totalCandidates": 62
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "NORTH COAST CA OF",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 11,
+      "totalCandidates": 62
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-005",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "La Fattoria"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "0 Ao BARBERA",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 8,
+      "totalCandidates": 27
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "0 Ao BARBERA",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 8,
+      "totalCandidates": 27
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-006",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Dark Horse"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "2 LRS3 aoc",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 29
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "2 LRS3 aoc",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 30
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [
+      {
+        "value": "DARK HORSE.",
+        "kept": false,
+        "reasons": [
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_FILTER",
+    "changed": false
+  },
+  {
+    "caseId": "casanova-della-spinetta",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Casanova della Spinetta",
+      "Casanova Della Spinetta"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "CASANOVA DELLA SPINETTA",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 7,
+      "totalCandidates": 28
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "CASANOVA DELLA SPINETTA",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 7,
+      "totalCandidates": 28
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-008",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Vino Alpino"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Azienda Agricola Terre Sparse",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 11,
+      "totalCandidates": 26
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Azienda Agricola Terre Sparse",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 12,
+      "totalCandidates": 27
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "Vino Alpino",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-009",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Vino Alpino"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Azienda Agricola Terre Sparse",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 11,
+      "totalCandidates": 26
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Azienda Agricola Terre Sparse",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 12,
+      "totalCandidates": 27
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "Vino Alpino",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "domaine-follin-arbelet",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Domaine Follin-Arbelet"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "DOMAINE FOLLIN-ARBELET",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 6,
+      "totalCandidates": 20
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "DOMAINE FOLLIN-ARBELET",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 6,
+      "totalCandidates": 20
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-011",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "MariaAntonietta"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Societa Agricola Maria Antonie",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 2,
+      "totalCandidates": 15
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Societa Agricola Maria Antonie",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 2,
+      "totalCandidates": 15
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-012",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Cooley Bay"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Cool&y",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 24
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Cool&y",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 4,
+      "totalCandidates": 25
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "Cooley Bay",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-013",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Afflicted"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Play ers Heart",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 2,
+      "totalCandidates": 28
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Play ers Heart",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 2,
+      "totalCandidates": 28
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-014",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Tre Cori"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "TRE CORI",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 3,
+      "totalCandidates": 38
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "TRE CORI",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 3,
+      "totalCandidates": 38
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "patricia-green-cellars",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Patricia Green Cellars"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "ESTATE VINEYARD",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 4,
+      "totalCandidates": 21
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "ESTATE VINEYARD",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 6,
+      "totalCandidates": 23
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "Patricia Green Cellars",
+        "kept": true,
+        "reasons": []
+      },
+      {
+        "value": "PATRICIA GREEN CELLARS",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-016",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Marques de Navarro"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "MARQUES vo NAVARRO",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 1,
+      "totalCandidates": 17
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "MARQUES vo NAVARRO",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 2,
+      "totalCandidates": 18
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "Marques de Navarro",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-017",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "La Borde Noire"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "oABORDE NOIRE",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 7,
+      "totalCandidates": 21
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "oABORDE NOIRE",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 7,
+      "totalCandidates": 21
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-018",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Poqr Krya",
+      "POQR KRYA"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Indigenous blend",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 40
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Indigenous blend",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 7,
+      "totalCandidates": 44
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "Poqr Krya",
+        "kept": true,
+        "reasons": []
+      },
+      {
+        "value": "Poqr Krya",
+        "kept": true,
+        "reasons": []
+      },
+      {
+        "value": "Poqr krya",
+        "kept": true,
+        "reasons": []
+      },
+      {
+        "value": "Poqr krya",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-019",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Kyrios"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "KYRIOS",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 2,
+      "totalCandidates": 23
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "KYRIOS",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 2,
+      "totalCandidates": 23
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-020",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Courtieu",
+      "Chateau Courtieu"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "COURTIEU",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 5,
+      "totalCandidates": 27
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "COURTIEU",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 5,
+      "totalCandidates": 27
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "saker",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Saker"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "SAKER",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 2,
+      "totalCandidates": 13
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "SAKER",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 2,
+      "totalCandidates": 13
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-022",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": false,
+    "acceptable": [],
+    "baseline": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 17
+    },
+    "treatment": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 17
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-023",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Podere don Cataldo",
+      "Podere Don Cataldo"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "PRIMITIVO",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 22
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "PRIMITIVO",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 22
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-024",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Chateau de Laville"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "CADILLAC COTES DE BORDEAUX",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 4,
+      "totalCandidates": 27
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "CADILLAC COTES DE BORDEAUX",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 4,
+      "totalCandidates": 27
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "nebla-mencia",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Nebla"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "NEBLA",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 6,
+      "totalCandidates": 29
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "NEBLA",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 6,
+      "totalCandidates": 29
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-026",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Principe Diphesa"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "PRINCIPE. DIPHESA",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 10,
+      "totalCandidates": 23
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "PRINCIPE. DIPHESA",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 10,
+      "totalCandidates": 23
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-027",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "The Golden Girls",
+      "Golden Girls"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "N Gy A001",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 1,
+      "totalCandidates": 21
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "N Gy A001",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 1,
+      "totalCandidates": 21
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-028",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Field",
+      "Field Vineyards"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "FIELD",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 1,
+      "totalCandidates": 16
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "FIELD",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 1,
+      "totalCandidates": 16
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-031",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "embeleso"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Contiene Sulfitos Enthalt Sulfite",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 32
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Contiene Sulfitos Enthalt Sulfite",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 32
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-032",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Travers Reserve"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "TRAVERS RESERVE",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 3,
+      "totalCandidates": 20
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "TRAVERS RESERVE",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 3,
+      "totalCandidates": 20
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-033",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Haywater Cove"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "COVE",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 34
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "COVE",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 34
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-034",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Nico"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "NICO",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 4,
+      "totalCandidates": 38
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "NICO",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 4,
+      "totalCandidates": 38
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-035",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Hubert Lamy"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "CHASSAGNE-MONTRACHET",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 8
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "CHASSAGNE-MONTRACHET",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 8
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-037",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Touch"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Strumica - Radovish Region",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 2,
+      "totalCandidates": 24
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Strumica - Radovish Region",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 3,
+      "totalCandidates": 26
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "Touch",
+        "kept": true,
+        "reasons": []
+      },
+      {
+        "value": "touch",
+        "kept": false,
+        "reasons": [
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-038",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Big Red Sunshine"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "2024 SOUTH COAST PRIMITIVO",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 1,
+      "totalCandidates": 17
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "2024 SOUTH COAST PRIMITIVO",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 2,
+      "totalCandidates": 18
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "Big Red Sunshine",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-039",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Domaine Julien Auroux"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "DOMAINE JULIEN AUROUX",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 4,
+      "totalCandidates": 18
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "DOMAINE JULIEN AUROUX",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 4,
+      "totalCandidates": 18
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "chateau-bonneau",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Château Bonneau",
+      "Chateau Bonneau"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "BONNEAU",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 9,
+      "totalCandidates": 22
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "BONNEAU",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 9,
+      "totalCandidates": 22
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-041",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Petite Nature"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Petite Nature",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 5,
+      "totalCandidates": 15
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Petite Nature",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 5,
+      "totalCandidates": 15
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-042",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Domaine Quivy"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "PRODUCT OF FRANCE",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 2,
+      "totalCandidates": 16
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "DOMAINE QUIVY",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 3,
+      "totalCandidates": 17
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "DOMAINE QUIVY",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_AUTHORITY",
+    "changed": true
+  },
+  {
+    "caseId": "approved-wine-043",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Fulcrum"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "FULCRUM",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 5,
+      "totalCandidates": 18
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "FULCRUM",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 5,
+      "totalCandidates": 18
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-044",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Sweet Seduction"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "VEEL",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 23
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "VEEL",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 23
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-045",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Meeting of the Minds"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Meeting of ihe Minds",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 1,
+      "totalCandidates": 22
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Meeting of ihe Minds",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 2,
+      "totalCandidates": 23
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "Meeting of the Minds",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-046",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Curious"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Red Wine Blend Curious",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 28
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Red Wine Blend Curious",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 4,
+      "totalCandidates": 30
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "Curious",
+        "kept": true,
+        "reasons": []
+      },
+      {
+        "value": "Curious.",
+        "kept": false,
+        "reasons": [
+          "sentence-fragment"
+        ]
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-047",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Etiris GX"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "DENOMINACIO D'ORIGEN",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 14,
+      "totalCandidates": 31
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "DENOMINACIO D'ORIGEN",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 14,
+      "totalCandidates": 31
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-048",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Pacha"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Pacha RESERVA - CARMENERE",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 29
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Pacha RESERVA - CARMENERE",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 8,
+      "totalCandidates": 33
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "Pacha",
+        "kept": true,
+        "reasons": []
+      },
+      {
+        "value": "Pacha,",
+        "kept": false,
+        "reasons": [
+          "sentence-fragment"
+        ]
+      },
+      {
+        "value": "Pacha",
+        "kept": true,
+        "reasons": []
+      },
+      {
+        "value": "Pacha",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-049",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Caywood Vineyard"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "CAYWOQOD VINEYARD",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 10,
+      "totalCandidates": 72
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "CAYWOQOD VINEYARD",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 10,
+      "totalCandidates": 72
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "le-temps-des-fleurs",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Le Temps des Fleurs",
+      "Le Temps Des Fleurs"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "LE TEMPS DES FLEURS",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 2,
+      "totalCandidates": 18
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "LE TEMPS DES FLEURS",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 2,
+      "totalCandidates": 18
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-051",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Pacheca"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "PACHECA DOURO D.O.C",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 4,
+      "totalCandidates": 22
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "PACHECA DOURO D.O.C",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 7,
+      "totalCandidates": 25
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "PACHECA",
+        "kept": true,
+        "reasons": []
+      },
+      {
+        "value": "Pacheca",
+        "kept": true,
+        "reasons": []
+      },
+      {
+        "value": "PACHECA",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-052",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Mountain Valley Winery"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "OLp VINE ZINFANDEL",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 6,
+      "totalCandidates": 22
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "OLp VINE ZINFANDEL",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 7,
+      "totalCandidates": 23
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "MOUNTAIN VALLEY WINERY,",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-053",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Golden Road Vineyards"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Vineya",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 24
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Vineya",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 24
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-054",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Henri Dufreres"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "IA5 ME15",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 14,
+      "totalCandidates": 33
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "IA5 ME15",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 15,
+      "totalCandidates": 34
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": "UNDETERMINABLE_ORACLE_NOT_PRODUCED",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-055",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Francois Villard"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "FRANCOIS VILLARD",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 7,
+      "totalCandidates": 24
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "FRANCOIS VILLARD",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 7,
+      "totalCandidates": 24
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-056",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Prinsi"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "CAMP dPIETRU",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 4,
+      "totalCandidates": 18
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "CAMP dPIETRU",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 4,
+      "totalCandidates": 18
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-057",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Prinsi"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "JI Lill",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 6,
+      "totalCandidates": 20
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "JI Lill",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 6,
+      "totalCandidates": 20
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-058",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": false,
+    "acceptable": [],
+    "baseline": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 22
+    },
+    "treatment": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 22
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-059",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Domenico Negro",
+      "Dominico Negro"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "JI mmm Ill",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 1,
+      "totalCandidates": 18
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "JI mmm Ill",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 1,
+      "totalCandidates": 18
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "three-steves-winery",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "3 Steves Winery"
+    ],
+    "baseline": {
+      "state": "OBSERVED",
+      "value": "3 STEVES WINERY",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 1,
+      "totalCandidates": 26
+    },
+    "treatment": {
+      "state": "OBSERVED",
+      "value": "3 STEVES WINERY",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 1,
+      "totalCandidates": 26
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-061",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Aphrodite"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "APHRODITE",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 2,
+      "totalCandidates": 19
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "APHRODITE",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 2,
+      "totalCandidates": 19
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-062",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": false,
+    "acceptable": [],
+    "baseline": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 28
+    },
+    "treatment": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 28
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-063",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Prinsi"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "TRE FICHI",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 19
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "TRE FICHI",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 6,
+      "totalCandidates": 20
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "PRINSI",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-064",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Prinsi"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Prins",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 7,
+      "totalCandidates": 20
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Prins",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 8,
+      "totalCandidates": 21
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "PRINSI",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-065",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Prinsi"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Prins",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 17
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Prins",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 6,
+      "totalCandidates": 18
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "PRINSI",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-066",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Domaine Juliette Avril"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "JULIETTE VRIL",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 23
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "JULIETTE VRIL",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 6,
+      "totalCandidates": 24
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "Domaine Juliette Avril",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-067",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Domaine Juliette Avril"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "JULIETTE VRIL",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 21
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "JULIETTE VRIL",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 4,
+      "totalCandidates": 22
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "Domaine Juliette Avril",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-068",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Sara"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "SARA",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 6,
+      "totalCandidates": 24
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "SARA",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 6,
+      "totalCandidates": 24
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-069",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "AltaCima 4.090",
+      "AltaCima"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "ALTACIMA 4.090",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 2,
+      "totalCandidates": 26
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "ALTACIMA 4.090",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 2,
+      "totalCandidates": 26
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "altacima",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "AltaCima 4.090",
+      "AltaCima"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "ALTACIMA 4.090",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 3,
+      "totalCandidates": 30
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "ALTACIMA 4.090",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 3,
+      "totalCandidates": 30
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-071",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "AltaCima 6.330",
+      "AltaCima"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "LATE HARVEST 2013",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 3,
+      "totalCandidates": 36
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "LATE HARVEST 2013",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 3,
+      "totalCandidates": 36
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-072",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Ava Gardner"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "HINNANT FAMILY VINEYARDS",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 2,
+      "totalCandidates": 34
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "HINNANT FAMILY VINEYARDS",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 2,
+      "totalCandidates": 34
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-073",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Mike's Farm, Inc.",
+      "Mike's Farm"
+    ],
+    "baseline": {
+      "state": "OBSERVED",
+      "value": "Mike's Farm, Inc.",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 4,
+      "totalCandidates": 16
+    },
+    "treatment": {
+      "state": "OBSERVED",
+      "value": "Mike's Farm, Inc.",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 4,
+      "totalCandidates": 16
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-074",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Mike's Farm, Inc.",
+      "Mike's Farm"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "HINNANT VINEYARDS",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 13
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "HINNANT VINEYARDS",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 13
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-075",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": false,
+    "acceptable": [],
+    "baseline": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 34
+    },
+    "treatment": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 34
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-076",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Etim"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Flore",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 27
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Flore",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 6,
+      "totalCandidates": 28
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "Etim",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-077",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Valdinera"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "VALDINERA",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 1,
+      "totalCandidates": 17
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "VALDINERA",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 1,
+      "totalCandidates": 17
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-078",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Pietta"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "MUSCOLINE-ITALIA",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 2,
+      "totalCandidates": 20
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "MUSCOLINE-ITALIA",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 4,
+      "totalCandidates": 22
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "PIETTA",
+        "kept": true,
+        "reasons": []
+      },
+      {
+        "value": "PIETTA",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-079",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Le Caniette"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "OFFIDA",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 3,
+      "totalCandidates": 24
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "OFFIDA",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 3,
+      "totalCandidates": 24
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "le-caniette",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Le Caniette"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "INDICAZIONE GEOGRAFICA PROTETTA",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 4,
+      "totalCandidates": 26
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "INDICAZIONE GEOGRAFICA PROTETTA",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 4,
+      "totalCandidates": 26
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-081",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Corte Adagio"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "CORTEADAGIO",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 1,
+      "totalCandidates": 15
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "CORTEADAGIO",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 1,
+      "totalCandidates": 15
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-082",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": false,
+    "acceptable": [],
+    "baseline": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 20
+    },
+    "treatment": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 20
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-083",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Barn Sill Wine Co.",
+      "Barn Sill Wine Co"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Bam il",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 18
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Bam il",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 18
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-084",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Filadoro"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "BUTA DISTRIBUTORS INC",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 24
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "BUTA DISTRIBUTORS INC",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 6,
+      "totalCandidates": 25
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "FILADORO",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-085",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Mosaikon"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Denominazione Origine Controllata",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 17
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Denominazione Origine Controllata",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 17
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-086",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "3 Steves Winery"
+    ],
+    "baseline": {
+      "state": "OBSERVED",
+      "value": "3 STEVES WINERY",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 1,
+      "totalCandidates": 17
+    },
+    "treatment": {
+      "state": "OBSERVED",
+      "value": "3 STEVES WINERY",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 1,
+      "totalCandidates": 17
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-087",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Viridis"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "LANGHE SAUVIGNON Tuga",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 4,
+      "totalCandidates": 37
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "LANGHE SAUVIGNON Tuga",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 4,
+      "totalCandidates": 37
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-088",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "La Mesma"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "LA MESMA Yellow Label",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 6,
+      "totalCandidates": 19
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "LA MESMA Yellow Label",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 8,
+      "totalCandidates": 21
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "LA MESMA",
+        "kept": true,
+        "reasons": []
+      },
+      {
+        "value": "La Mesma",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-089",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "La Mesma"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "LA MESMA Black Label",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 19
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "LA MESMA Black Label",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 7,
+      "totalCandidates": 21
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "LA MESMA",
+        "kept": true,
+        "reasons": []
+      },
+      {
+        "value": "La Mesma",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-090",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "La Mesma"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "WHITE WINE 2018 Lo219",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 6,
+      "totalCandidates": 20
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "WHITE WINE 2018 Lo219",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 7,
+      "totalCandidates": 21
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "LA MESMA",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-091",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Rias"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "D CONTROLLATA E",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 8,
+      "totalCandidates": 25
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "D CONTROLLATA E",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 8,
+      "totalCandidates": 25
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-092",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Twin Suns"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Hn SANTA BARBARA",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 25
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Hn SANTA BARBARA",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 25
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-093",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Fontanavecchia"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "DELRAY BEACH, FL, USA",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 6,
+      "totalCandidates": 20
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "DELRAY BEACH, FL, USA",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 7,
+      "totalCandidates": 21
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "FONTANAVECCHIA",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-094",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Fontanavecchia"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "DELRAY BEACH. FL, USA",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 6,
+      "totalCandidates": 21
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "DELRAY BEACH. FL, USA",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 7,
+      "totalCandidates": 22
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "FONTANAVECCHIA",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-095",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": false,
+    "acceptable": [],
+    "baseline": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 10
+    },
+    "treatment": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 10
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-096",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": false,
+    "acceptable": [],
+    "baseline": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 22
+    },
+    "treatment": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 22
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-097",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": false,
+    "acceptable": [],
+    "baseline": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 19
+    },
+    "treatment": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 19
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-098",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": false,
+    "acceptable": [],
+    "baseline": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 10
+    },
+    "treatment": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 10
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-099",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Fontanavecchia"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "DELRAY BEACH, FL, USA",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 6,
+      "totalCandidates": 21
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "DELRAY BEACH, FL, USA",
+      "correct": false,
+      "top1": false,
+      "top3": true,
+      "keptCandidates": 7,
+      "totalCandidates": 22
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "FONTANAVECCHIA",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "amuninni-ferracane",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Amuninni",
+      "Fabio Ferracane"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "INV ENVY",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 16
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "INV ENVY",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 16
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-101",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": false,
+    "acceptable": [],
+    "baseline": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 18
+    },
+    "treatment": {
+      "state": "NOT_OBSERVED",
+      "value": null,
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 0,
+      "totalCandidates": 18
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-102",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Twin Suns"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Mevushal Kosher for Passover",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 2,
+      "totalCandidates": 17
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Mevushal Kosher for Passover",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 2,
+      "totalCandidates": 17
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-103",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Tenute Valso"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "SNA VALSO",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 4,
+      "totalCandidates": 19
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "SNA VALSO",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 20
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "TENUTE VALSO",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-104",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Blazic"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "BLAZIC",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 4,
+      "totalCandidates": 20
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "BLAZIC",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 4,
+      "totalCandidates": 20
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-105",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Luigi & Giovanni"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "VANNI",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 3,
+      "totalCandidates": 10
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "VANNI",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 4,
+      "totalCandidates": 11
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "LUIGI & GIOVANNI",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-106",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Alfredo's Wine",
+      "Alfredos Wine"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "REDO",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 2,
+      "totalCandidates": 12
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "REDO",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 4,
+      "totalCandidates": 14
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "ALFREDO'S WINE",
+        "kept": true,
+        "reasons": []
+      },
+      {
+        "value": "ALFREDO'S WINE",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-107",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "La Fattoria"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "FATTORIA",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 4,
+      "totalCandidates": 33
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "FATTORIA",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 4,
+      "totalCandidates": 33
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-108",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "La Fattoria"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "8 Ao VINO BIANCO",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 27
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "8 Ao VINO BIANCO",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 27
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-109",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Sangouard-Chene"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "SANGOUARD-CHENE",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 2,
+      "totalCandidates": 18
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "SANGOUARD-CHENE",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 2,
+      "totalCandidates": 18
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "approved-wine-110",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Cooley Bay"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Cool&y",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 24
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Cool&y",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 6,
+      "totalCandidates": 25
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "Cooley Bay",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "m-cellars-baseline",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "M Cellars"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "CELLARS",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 4,
+      "totalCandidates": 21
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "CELLARS",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 22
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "M Cellars",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "wine-multi-artifact-04",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Dry Cellar"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Donovan Visayas",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 6,
+      "totalCandidates": 32
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Donovan Visayas",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 6,
+      "totalCandidates": 32
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "wine-multi-artifact-05",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Blazic"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "BLAZIC COLLIO",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 15,
+      "totalCandidates": 36
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "BLAZIC COLLIO",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 18,
+      "totalCandidates": 39
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "BLAZIC",
+        "kept": true,
+        "reasons": []
+      },
+      {
+        "value": "BLAZIC",
+        "kept": true,
+        "reasons": []
+      },
+      {
+        "value": "BLAZIC",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "wine-multi-artifact-06",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Mauro Molino"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "MOLINO",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 8,
+      "totalCandidates": 28
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "MOLINO",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 9,
+      "totalCandidates": 29
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "MAURO MOLINO",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "wine-multi-artifact-07",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Mike's Farm",
+      "Mike's Farm, Inc."
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "North Carolina Nuscadine Nig",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 28
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "North Carolina Nuscadine Nig",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 5,
+      "totalCandidates": 28
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "wine-multi-artifact-08",
+    "evaluable": true,
+    "treated": true,
+    "brandPresent": true,
+    "acceptable": [
+      "Pindar"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "Z-lor",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 7,
+      "totalCandidates": 27
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "Z-lor",
+      "correct": false,
+      "top1": false,
+      "top3": false,
+      "keptCandidates": 8,
+      "totalCandidates": 28
+    },
+    "oracleCandidateProduced": true,
+    "oracleSurvivedFilters": true,
+    "oracleValues": [
+      {
+        "value": "PINDAR",
+        "kept": true,
+        "reasons": []
+      }
+    ],
+    "outcomeClass": "ENUMERATION_PLUS_RANKING",
+    "changed": false
+  },
+  {
+    "caseId": "wine-multi-artifact-09",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Duck Walk Vineyards"
+    ],
+    "baseline": {
+      "state": "OBSERVED",
+      "value": "DUCK WALK VINEYARDS",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 6,
+      "totalCandidates": 27
+    },
+    "treatment": {
+      "state": "OBSERVED",
+      "value": "DUCK WALK VINEYARDS",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 6,
+      "totalCandidates": 27
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  },
+  {
+    "caseId": "wine-multi-artifact-10",
+    "evaluable": true,
+    "treated": false,
+    "brandPresent": true,
+    "acceptable": [
+      "Mauro Molino"
+    ],
+    "baseline": {
+      "state": "AMBIGUOUS",
+      "value": "MAURO MOLINO",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 4,
+      "totalCandidates": 21
+    },
+    "treatment": {
+      "state": "AMBIGUOUS",
+      "value": "MAURO MOLINO",
+      "correct": true,
+      "top1": true,
+      "top3": true,
+      "keptCandidates": 4,
+      "totalCandidates": 21
+    },
+    "oracleCandidateProduced": false,
+    "oracleSurvivedFilters": false,
+    "oracleValues": [],
+    "outcomeClass": null,
+    "changed": false
+  }
+]

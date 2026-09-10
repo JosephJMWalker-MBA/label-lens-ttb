@@ -1,0 +1,28 @@
+{
+  "artifact": "decision",
+  "experimentId": "issue-149-brand-oracle-exact-window",
+  "oracleRuleSha256": "b57d6fc6cbd5698bf5748c8af5bc9a429a38eee8d9d54b1b1dd795b4fb118def",
+  "deployable": false,
+  "ceilingMeasurementOnly": true,
+  "verdict": "DOWNSTREAM_BOTTLENECK_ALSO_PRESENT",
+  "secondaryVerdict": "ENUMERATION_THESIS_WEAKENED_AS_A_STANDALONE_LEVER",
+  "basis": [
+    "39 of 40 oracle candidates were produced and 38 survived the filters, so supply was not the limiting step",
+    "37 of them then lost at ranking; only 1 case became correctly selected and it remained AMBIGUOUS",
+    "0 cases reached correct OBSERVED, so ENUMERATION_ONLY is 0",
+    "no wrong OBSERVED was introduced and no currently-correct case was displaced"
+  ],
+  "enumerationResearchEarned": false,
+  "rationale": "Enumeration is necessary but demonstrably insufficient. Making the already-visible exact window available clears filtering in 38 of 39 cases and then loses to ranking in 37. A generator alone would convert almost none of the 40 into correct Brands, so generator work cannot be justified on this evidence without ranking work beside it.",
+  "productionBehaviorChangedByDefault": false,
+  "productionParity": "115/115 byte-identical, re-verified after the instrument correction",
+  "authorizes": [],
+  "doesNotAuthorize": [
+    "generalized subspan enumeration",
+    "any filter change",
+    "any ranking change",
+    "any authority change",
+    "OCR changes",
+    "vision or localization models"
+  ]
+}

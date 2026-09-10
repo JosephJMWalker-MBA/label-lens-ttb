@@ -108,11 +108,25 @@ interface BrandSelectionOptions {
    * predicate is evaluated and no diagnostic field is emitted.
    */
   collectCompleteFilterDiagnostics: boolean;
+  /**
+   * Evaluation-only, Issue #149 oracle exact-window counterfactual. Each entry
+   * is a normalized token run. When a reconstructed line contains one of these
+   * runs contiguously, ONE additional `line-window` span covering exactly that
+   * run is emitted for that line, in that line's own candidate family, and then
+   * flows through the unchanged filters, scoring, ranking, selection and
+   * authority with no privilege of any kind.
+   *
+   * Empty — the production default — emits nothing and changes no behaviour.
+   * This is an offline upper-bound instrument and is NOT deployable: the runs
+   * are identified using governed truth.
+   */
+  oracleExactWindows: string[][];
 }
 
 const DEFAULT_BRAND_SELECTION_OPTIONS: BrandSelectionOptions = {
   allowCoherentPlausibleLineMerge: false,
   collectCompleteFilterDiagnostics: false,
+  oracleExactWindows: [],
 };
 
 /** An observation plus the region the selected value came from (for provenance). */
@@ -2118,6 +2132,42 @@ function shouldTrimWholeLineCandidate(candidate: Candidate | undefined): boolean
   return residualPenalty(candidate.words) > 0.25;
 }
 
+/** Normalization used only by the oracle instrument, matching the frozen rule. */
+function oracleNormalizeToken(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+}
+
+/**
+ * The earliest contiguous run of `line` whose per-token normalization equals
+ * `run`, or null. Deterministic: earliest start index wins.
+ */
+function oracleWindowInLine(line: OcrWord[], run: string[]): OcrWord[] | null {
+  if (run.length === 0) return null;
+  const tokens = line.map((word) => oracleNormalizeToken(word.text));
+  for (let start = 0; start < line.length; start++) {
+    // The window must begin on a token that carries characters, so a leading
+    // separator is never absorbed into the span.
+    if (tokens[start].length === 0) continue;
+    let matched = 0;
+    for (let end = start; end < line.length; end++) {
+      const token = tokens[end];
+      // Tokens that normalize away — "&", "-", stray punctuation — are skipped
+      // for MATCHING but remain inside the emitted slice, exactly as a real
+      // sub-window of this line would carry them. This mirrors the frozen
+      // PR #223 rule, which drops empty tokens before comparing.
+      if (token.length === 0) continue;
+      if (token !== run[matched]) break;
+      matched += 1;
+      if (matched === run.length) return line.slice(start, end + 1);
+    }
+  }
+  return null;
+}
+
 function lineWindows(line: OcrWord[]): OcrWord[][] {
   const windows: OcrWord[][] = [];
   for (let start = 0; start < line.length; start++) {
@@ -2386,6 +2436,25 @@ function selectBrandObservationWithOptions(
         seedsByLine[lineIndex].push(wholeLine.candidate);
       }
 
+      // Oracle exact-window instrument. Emitted independently of the trim gate,
+      // because the question is what downstream does when the window EXISTS —
+      // the gate is precisely what withholds it today. The span is built from
+      // the line's own OcrWords, so text, confidence and geometry are the real
+      // ones, and it joins this line's candidate family like any other window.
+      for (const run of options.oracleExactWindows) {
+        const oracleWindow = oracleWindowInLine(line, run);
+        if (!oracleWindow || oracleWindow.length === line.length) continue;
+        const oracleAnalysis = analyzeBrandSpanWithOptions(
+          buildBrandSpan(nextCandidateId(), oracleWindow, result, "line-window", [lineIndex]),
+          options,
+        );
+        candidateDiagnostics.push(oracleAnalysis.diagnostic);
+        if (oracleAnalysis.candidate) {
+          candidates.push(oracleAnalysis.candidate);
+          seedsByLine[lineIndex].push(oracleAnalysis.candidate);
+        }
+      }
+
       if (!shouldTrimWholeLineCandidate(wholeLine.candidate)) continue;
       for (const window of lineWindows(line)) {
         const windowAnalysis = analyzeBrandSpanWithOptions(
@@ -2461,6 +2530,26 @@ export function selectBrandObservationWithCompleteFilterDiagnostics(
   return selectBrandObservationWithOptions(results, {
     ...DEFAULT_BRAND_SELECTION_OPTIONS,
     collectCompleteFilterDiagnostics: true,
+  });
+}
+
+/**
+ * Evaluation-only. Issue #149 oracle exact-window counterfactual.
+ *
+ * NOT DEPLOYABLE. `runs` are identified offline using governed Brand truth, so
+ * this measures downstream headroom only — an upper bound on what a better
+ * enumerator could achieve, never a production mechanism.
+ *
+ * Never called by production.
+ */
+export function selectBrandObservationWithOracleExactWindows(
+  results: RegionOcrResult[],
+  runs: string[][],
+): FieldSelection {
+  return selectBrandObservationWithOptions(results, {
+    ...DEFAULT_BRAND_SELECTION_OPTIONS,
+    collectCompleteFilterDiagnostics: true,
+    oracleExactWindows: runs,
   });
 }
 

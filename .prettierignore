@@ -50,3 +50,11 @@ artifacts/issue-149-brand-candidate-window-diagnosis/aggregate.json
 artifacts/issue-149-brand-candidate-window-diagnosis/case-level-diagnosis.json
 artifacts/issue-149-brand-candidate-window-diagnosis/primary/
 artifacts/issue-149-brand-candidate-window-diagnosis/repeat/
+
+# Frozen oracle counterfactual evidence; digests recorded in determinism.json.
+artifacts/issue-149-brand-oracle-exact-window/aggregate.json
+artifacts/issue-149-brand-oracle-exact-window/case-level-results.json
+artifacts/issue-149-brand-oracle-exact-window/search-space.json
+artifacts/issue-149-brand-oracle-exact-window/primary/
+artifacts/issue-149-brand-oracle-exact-window/repeat/
+artifacts/issue-149-brand-oracle-exact-window/superseded-pre-separator-fix/

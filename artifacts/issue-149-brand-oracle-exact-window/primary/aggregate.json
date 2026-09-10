@@ -1,0 +1,71 @@
+{
+  "artifact": "aggregate",
+  "experimentId": "issue-149-brand-oracle-exact-window",
+  "oracleRuleSha256": "b57d6fc6cbd5698bf5748c8af5bc9a429a38eee8d9d54b1b1dd795b4fb118def",
+  "deployable": false,
+  "ceilingMeasurementOnly": true,
+  "population": {
+    "evaluable": 115,
+    "treatedClassE": 40,
+    "untreated": 75
+  },
+  "fortyCaseResults": {
+    "oracleCandidateProduced": 39,
+    "survivesFilters": 38,
+    "reachesTop3": 13,
+    "reachesTop1": 1,
+    "selected": 1,
+    "selectedCorrectly": 1,
+    "reachesObserved": 0,
+    "correctObserved": 0,
+    "wrongObserved": 0
+  },
+  "outcomeClassification": {
+    "ENUMERATION_ONLY": 0,
+    "ENUMERATION_PLUS_FILTER": 1,
+    "ENUMERATION_PLUS_RANKING": 37,
+    "ENUMERATION_PLUS_AUTHORITY": 1,
+    "UNDETERMINABLE_ORACLE_NOT_PRODUCED": 1
+  },
+  "fullCorpusSafety": {
+    "baselineCorrectSelected": 29,
+    "treatmentCorrectSelected": 30,
+    "baselineWrongSelected": 76,
+    "treatmentWrongSelected": 75,
+    "baselineCorrectObserved": 4,
+    "treatmentCorrectObserved": 4,
+    "baselineWrongObserved": 0,
+    "treatmentWrongObserved": 0,
+    "top1Changes": 1,
+    "top3Changes": 13,
+    "currentlyCorrectDisplaced": 0,
+    "brandAbsentBecamePositive": 0,
+    "baselineKeptCandidateTotal": 482,
+    "treatmentKeptCandidateTotal": 536
+  },
+  "integrity": {
+    "untreatedCasesChanged": 0,
+    "untreatedChangedCaseIds": [],
+    "clean": true
+  },
+  "searchSpace": {
+    "samples": 41,
+    "truthTokenLength": {
+      "min": 1,
+      "median": 2,
+      "max": 4
+    },
+    "containingLineLength": {
+      "min": 2,
+      "median": 6,
+      "max": 15
+    },
+    "contiguousSubspans": {
+      "min": 3,
+      "median": 21,
+      "max": 120
+    }
+  },
+  "productionBehaviorChangedByDefault": false,
+  "productionParity": "115/115 byte-identical"
+}
