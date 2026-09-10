@@ -1,0 +1,48 @@
+{
+  "artifact": "aggregate",
+  "experimentId": "issue-149-brand-structure-residual",
+  "sPrimeRuleSha256": "ca07f75d1f2710a03ad8b51fef20c33486779bd2ea8c9d934fff271eb8be6bd0",
+  "evaluationDependency": "6a969e4b (ranking diagnosis) -> 8de5b9fc (oracle)",
+  "baselineReproduction": {
+    "casesChecked": 115,
+    "reproduced": 115,
+    "exact": true,
+    "failures": []
+  },
+  "population": {
+    "targeted": 37,
+    "instanceOnlyDedupe": 2
+  },
+  "arms": {
+    "baseline": {
+      "correctTop3": 16,
+      "correctTop1": 0,
+      "correctlySelected": 0,
+      "oracleSurvivesFamily": 27,
+      "recoveredVsBaseline": 0,
+      "regressedVsBaseline": 0
+    },
+    "E+S": {
+      "correctTop3": 21,
+      "correctTop1": 11,
+      "correctlySelected": 11,
+      "oracleSurvivesFamily": 26,
+      "recoveredVsBaseline": 11,
+      "regressedVsBaseline": 0
+    },
+    "E+Sprime": {
+      "correctTop3": 28,
+      "correctTop1": 16,
+      "correctlySelected": 16,
+      "oracleSurvivesFamily": 27,
+      "recoveredVsBaseline": 16,
+      "regressedVsBaseline": 0
+    }
+  },
+  "structureEffect": {
+    "recoveredByStructureNeutralization": 7,
+    "regressedByStructureNeutralization": 2,
+    "stillUnresolvedUnderSPrime": 21
+  },
+  "productionBehaviorChanged": false
+}

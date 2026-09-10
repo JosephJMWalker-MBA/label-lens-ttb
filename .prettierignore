@@ -70,3 +70,9 @@ artifacts/issue-149-brand-ranking-stage-counterfactuals/aggregate.json
 artifacts/issue-149-brand-ranking-stage-counterfactuals/case-level-arms.json
 artifacts/issue-149-brand-ranking-stage-counterfactuals/primary/
 artifacts/issue-149-brand-ranking-stage-counterfactuals/repeat/
+
+# Frozen S-prime residual evidence; digests in determinism.json.
+artifacts/issue-149-brand-structure-residual/aggregate.json
+artifacts/issue-149-brand-structure-residual/case-level-arms.json
+artifacts/issue-149-brand-structure-residual/primary/
+artifacts/issue-149-brand-structure-residual/repeat/

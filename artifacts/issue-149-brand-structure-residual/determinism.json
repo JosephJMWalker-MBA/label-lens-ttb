@@ -1,0 +1,18 @@
+{
+  "artifact": "determinism",
+  "runs": 2,
+  "digests": {
+    "aggregate.json": {
+      "primary": "828e5593547f8312e56430eaea8cbac54ecea71888b643d9562180aa5d628d2a",
+      "repeat": "828e5593547f8312e56430eaea8cbac54ecea71888b643d9562180aa5d628d2a",
+      "identical": true
+    },
+    "case-level-arms.json": {
+      "primary": "229b8cbd08f789b2d1db9952f5e47d63102aa8a05d1700ba35ac5504e2db4118",
+      "repeat": "229b8cbd08f789b2d1db9952f5e47d63102aa8a05d1700ba35ac5504e2db4118",
+      "identical": true
+    }
+  },
+  "allIdentical": true,
+  "note": "fail-closed: a missing or empty artifact is reported as a failure, not as an identical match"
+}

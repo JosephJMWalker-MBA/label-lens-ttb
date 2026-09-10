@@ -1,0 +1,23 @@
+{
+  "artifact": "decision",
+  "experimentId": "issue-149-brand-structure-residual",
+  "sPrimeRuleSha256": "ca07f75d1f2710a03ad8b51fef20c33486779bd2ea8c9d934fff271eb8be6bd0",
+  "verdict": "RESIDUAL_LENGTH_HYPOTHESIS_PARTIAL",
+  "sixSupersetCasesMoved": 2,
+  "sixSupersetCasesUnmoved": 4,
+  "basis": [
+    "Only 2 of the 6 predicted superset cases flip: Pacheca and Mauro Molino",
+    "Cooley Bay Winery still beats Cooley Bay in both cases, and Red Wine Blend Curious still beats Curious, despite the winner carrying structure 1.000 against the exact Brand at 0.250-0.750",
+    "5 additional non-superset cases also flip, so the effect is not specific to the superset mechanism the hypothesis named",
+    "2 cases regress: luigi-giovanni-live selects the fragment VANNI and approved-wine-067 selects JULIETTE VRIL"
+  ],
+  "remainingSupersetFailuresRequire": "a semantic-ranking explanation, not another size or length adjustment",
+  "sPrimeIsNotAProductionCandidate": true,
+  "sPrimeRationale": "S-prime strips brandClass positivity along with the length effect, and the two regressions show structure carries genuine semantic work: without it short low-information fragments win. Recovery of 16 of 37 with regressions and semantic damage does not motivate a ranking change.",
+  "escalationTriggered": false,
+  "carriedForwardGapsStillUnreported": [
+    "per-arm authority state",
+    "full-corpus collateral for E and S"
+  ],
+  "productionBehaviorChanged": false
+}
