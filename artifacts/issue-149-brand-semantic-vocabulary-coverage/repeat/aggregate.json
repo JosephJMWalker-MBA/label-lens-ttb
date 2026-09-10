@@ -1,0 +1,37 @@
+{
+  "artifact": "aggregate",
+  "experimentId": "issue-149-brand-semantic-vocabulary-coverage",
+  "inventorySha256": "b372744662a2d5c7bd3d5ec1c1deef69100d62434218e28a30da3eb2cce8c14a",
+  "population": {
+    "unresolved": 21,
+    "control": 16
+  },
+  "classification": {
+    "EXISTING_VOCABULARY_PREDICATE_FALSE_NEGATIVE": 2,
+    "CONTEXT_REQUIRED_BUT_NOT_PROPAGATED": 0,
+    "VOCABULARY_ABSENT": 18,
+    "AMBIGUOUS_EVEN_WITH_CURRENT_CONTEXT": 1,
+    "OTHER": 0,
+    "UNDETERMINABLE": 0
+  },
+  "triggerPrevalence": {
+    "note": "wrong-winner rate vs correct-Brand rate; a trigger firing equally on both is not usable negative evidence",
+    "brandDesignatorInCandidate": {
+      "wrong": 0.143,
+      "control": 0.125
+    },
+    "nonBrandRegexInCandidate": {
+      "wrong": 0,
+      "control": 0
+    },
+    "nonBrandRegexInLine": {
+      "wrong": 0,
+      "control": 0.313
+    },
+    "producerWordInLine": {
+      "wrong": 0,
+      "control": 0.25
+    }
+  },
+  "productionBehaviorChanged": false
+}

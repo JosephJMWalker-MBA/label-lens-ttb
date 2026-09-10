@@ -82,3 +82,9 @@ artifacts/issue-149-brand-semantic-ranking-diagnosis/aggregate.json
 artifacts/issue-149-brand-semantic-ranking-diagnosis/case-level-arms.json
 artifacts/issue-149-brand-semantic-ranking-diagnosis/primary/
 artifacts/issue-149-brand-semantic-ranking-diagnosis/repeat/
+
+# Frozen vocabulary coverage evidence; digests in determinism.json.
+artifacts/issue-149-brand-semantic-vocabulary-coverage/aggregate.json
+artifacts/issue-149-brand-semantic-vocabulary-coverage/case-level-audit.json
+artifacts/issue-149-brand-semantic-vocabulary-coverage/primary/
+artifacts/issue-149-brand-semantic-vocabulary-coverage/repeat/

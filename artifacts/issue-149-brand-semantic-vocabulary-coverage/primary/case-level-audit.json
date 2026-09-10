@@ -1,0 +1,836 @@
+[
+  {
+    "caseId": "luigi-giovanni-live",
+    "resolved": false,
+    "governedBrand": "Luigi & Giovanni",
+    "winner": "VANNI",
+    "winnerLine": "VANNI",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "alfredos-wine",
+    "resolved": true,
+    "governedBrand": "Alfredo's Wine",
+    "winner": "ALFREDO'S WINE",
+    "winnerLine": "GOVERMENT WARNING: (1) ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": true
+    },
+    "winnerLineKept": false,
+    "winnerLineReason": "non-brand-keyword",
+    "classification": "CONTROL_CORRECT",
+    "blockingCondition": null
+  },
+  {
+    "caseId": "approved-wine-008",
+    "resolved": false,
+    "governedBrand": "Vino Alpino",
+    "winner": "Azienda Agricola Terre Sparse",
+    "winnerLine": "Azienda Agricola Terre Sparse",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "approved-wine-009",
+    "resolved": false,
+    "governedBrand": "Vino Alpino",
+    "winner": "Azienda Agricola Terre Sparse",
+    "winnerLine": "Azienda Agricola Terre Sparse",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "approved-wine-012",
+    "resolved": false,
+    "governedBrand": "Cooley Bay",
+    "winner": "Cooley Bay Winery",
+    "winnerLine": "Cooley Bay Winery",
+    "isSupersetOfBrand": true,
+    "vocabInCandidate": {
+      "brandDesignator": [
+        "Winery"
+      ],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-positive",
+    "classification": "EXISTING_VOCABULARY_PREDICATE_FALSE_NEGATIVE",
+    "blockingCondition": "BRAND_DESIGNATOR [\"Winery\"] has POSITIVE polarity via hasPositiveBrandSignal, so the superset scores brandClass=positive (+2.0) while the exact Brand is only plausible"
+  },
+  {
+    "caseId": "patricia-green-cellars",
+    "resolved": true,
+    "governedBrand": "Patricia Green Cellars",
+    "winner": "PATRICIA GREEN CELLARS",
+    "winnerLine": "PRODUCED & BOTTLED BY PATRICIA GREEN CELLARS",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [
+        "CELLARS"
+      ],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [
+        "PRODUCED",
+        "BOTTLED"
+      ],
+      "hasByToken": true,
+      "nonBrandLineRegex": true
+    },
+    "winnerLineKept": false,
+    "winnerLineReason": "producer-line",
+    "classification": "CONTROL_CORRECT",
+    "blockingCondition": null
+  },
+  {
+    "caseId": "approved-wine-016",
+    "resolved": true,
+    "governedBrand": "Marques de Navarro",
+    "winner": "Marques de Navarro",
+    "winnerLine": "Our Wine , Marques de Navarro Reflects with elegance the varietal character and the freshness",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "classification": "CONTROL_CORRECT",
+    "blockingCondition": null
+  },
+  {
+    "caseId": "approved-wine-018",
+    "resolved": false,
+    "governedBrand": "Poqr Krya",
+    "winner": "Indigenous blend",
+    "winnerLine": "Indigenous blend",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "approved-wine-037",
+    "resolved": true,
+    "governedBrand": "Touch",
+    "winner": "Touch",
+    "winnerLine": "Touch Wine Is made from",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [
+        "made"
+      ],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "classification": "CONTROL_CORRECT",
+    "blockingCondition": null
+  },
+  {
+    "caseId": "approved-wine-038",
+    "resolved": true,
+    "governedBrand": "Big Red Sunshine",
+    "winner": "Big Red Sunshine",
+    "winnerLine": "can be hip or a regular L-7, but Big Red Sunshine is ready to-hang loose",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "classification": "CONTROL_CORRECT",
+    "blockingCondition": null
+  },
+  {
+    "caseId": "approved-wine-045",
+    "resolved": true,
+    "governedBrand": "Meeting of the Minds",
+    "winner": "Meeting of the Minds",
+    "winnerLine": "Samson and Delilah, this Meeting of the Minds is fire.",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "classification": "CONTROL_CORRECT",
+    "blockingCondition": null
+  },
+  {
+    "caseId": "approved-wine-046",
+    "resolved": false,
+    "governedBrand": "Curious",
+    "winner": "Red Wine Blend Curious",
+    "winnerLine": "Red Wine Blend “Curious”",
+    "isSupersetOfBrand": true,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "approved-wine-048",
+    "resolved": false,
+    "governedBrand": "Pacha",
+    "winner": "Winemaker",
+    "winnerLine": "Winemaker",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "approved-wine-051",
+    "resolved": true,
+    "governedBrand": "Pacheca",
+    "winner": "Pacheca",
+    "winnerLine": "par: Quinta da Pacheca Soc. Agricola e Turistica, Lda. Cambres-Lamego, Portugal",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "classification": "CONTROL_CORRECT",
+    "blockingCondition": null
+  },
+  {
+    "caseId": "approved-wine-052",
+    "resolved": true,
+    "governedBrand": "Mountain Valley Winery",
+    "winner": "MOUNTAIN VALLEY WINERY,",
+    "winnerLine": "MOUNTAIN VALLEY WINERY, PIGEON FORGE, TN, 37863",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [
+        "WINERY"
+      ],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "classification": "CONTROL_CORRECT",
+    "blockingCondition": null
+  },
+  {
+    "caseId": "approved-wine-063",
+    "resolved": false,
+    "governedBrand": "Prinsi",
+    "winner": "TRE FICHI",
+    "winnerLine": "TRE FICHI",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "approved-wine-064",
+    "resolved": false,
+    "governedBrand": "Prinsi",
+    "winner": "AZIENDA AGRICOLA",
+    "winnerLine": "AZIENDA AGRICOLA",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "approved-wine-065",
+    "resolved": false,
+    "governedBrand": "Prinsi",
+    "winner": "AZIENDA AGRICOLA",
+    "winnerLine": "AZIENDA AGRICOLA",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "approved-wine-066",
+    "resolved": true,
+    "governedBrand": "Domaine Juliette Avril",
+    "winner": "Domaine Juliette Avril",
+    "winnerLine": "Produced and Bottled by Domaine Juliette Avril",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [
+        "Produced",
+        "Bottled"
+      ],
+      "hasByToken": true,
+      "nonBrandLineRegex": true
+    },
+    "winnerLineKept": false,
+    "winnerLineReason": "producer-line",
+    "classification": "CONTROL_CORRECT",
+    "blockingCondition": null
+  },
+  {
+    "caseId": "approved-wine-067",
+    "resolved": false,
+    "governedBrand": "Domaine Juliette Avril",
+    "winner": "JULIETTE VRIL",
+    "winnerLine": "JULIETTE VRIL",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "approved-wine-076",
+    "resolved": true,
+    "governedBrand": "Etim",
+    "winner": "Etim",
+    "winnerLine": "Martinell, who was student of Antoni Gaudi. Etim Blanc",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "classification": "CONTROL_CORRECT",
+    "blockingCondition": null
+  },
+  {
+    "caseId": "approved-wine-078",
+    "resolved": false,
+    "governedBrand": "Pietta",
+    "winner": "MUSCOLINE-ITALIA",
+    "winnerLine": "MUSCOLINE-ITALIA",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "approved-wine-084",
+    "resolved": false,
+    "governedBrand": "Filadoro",
+    "winner": "BUTA DISTRIBUTORS INC",
+    "winnerLine": "BUTA DISTRIBUTORS INC",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "approved-wine-088",
+    "resolved": false,
+    "governedBrand": "La Mesma",
+    "winner": "GAVI",
+    "winnerLine": "GAVI",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "approved-wine-089",
+    "resolved": false,
+    "governedBrand": "La Mesma",
+    "winner": "GAVI",
+    "winnerLine": "GAVI",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "approved-wine-090",
+    "resolved": false,
+    "governedBrand": "La Mesma",
+    "winner": "GAVI",
+    "winnerLine": "GAVI",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "approved-wine-093",
+    "resolved": false,
+    "governedBrand": "Fontanavecchia",
+    "winner": "TABURNO",
+    "winnerLine": "TABURNO",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "approved-wine-094",
+    "resolved": true,
+    "governedBrand": "Fontanavecchia",
+    "winner": "FONTANAVECCHIA",
+    "winnerLine": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "classification": "CONTROL_CORRECT",
+    "blockingCondition": null
+  },
+  {
+    "caseId": "approved-wine-099",
+    "resolved": true,
+    "governedBrand": "Fontanavecchia",
+    "winner": "FONTANAVECCHIA",
+    "winnerLine": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "classification": "CONTROL_CORRECT",
+    "blockingCondition": null
+  },
+  {
+    "caseId": "approved-wine-103",
+    "resolved": true,
+    "governedBrand": "Tenute Valso",
+    "winner": "TENUTE VALSO",
+    "winnerLine": "FOR TENUTE VALSO - 91011 ALCAMO - ITALIA",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "classification": "CONTROL_CORRECT",
+    "blockingCondition": null
+  },
+  {
+    "caseId": "approved-wine-105",
+    "resolved": false,
+    "governedBrand": "Luigi & Giovanni",
+    "winner": "CALIFORNIA",
+    "winnerLine": "CALIFORNIA",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "approved-wine-106",
+    "resolved": true,
+    "governedBrand": "Alfredo's Wine",
+    "winner": "ALFREDO'S WINE",
+    "winnerLine": "GOVERMENT WARNING: (1) ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": true
+    },
+    "winnerLineKept": false,
+    "winnerLineReason": "non-brand-keyword",
+    "classification": "CONTROL_CORRECT",
+    "blockingCondition": null
+  },
+  {
+    "caseId": "approved-wine-110",
+    "resolved": false,
+    "governedBrand": "Cooley Bay",
+    "winner": "Cooley Bay Winery",
+    "winnerLine": "Cooley Bay Winery",
+    "isSupersetOfBrand": true,
+    "vocabInCandidate": {
+      "brandDesignator": [
+        "Winery"
+      ],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-positive",
+    "classification": "EXISTING_VOCABULARY_PREDICATE_FALSE_NEGATIVE",
+    "blockingCondition": "BRAND_DESIGNATOR [\"Winery\"] has POSITIVE polarity via hasPositiveBrandSignal, so the superset scores brandClass=positive (+2.0) while the exact Brand is only plausible"
+  },
+  {
+    "caseId": "m-cellars-baseline",
+    "resolved": false,
+    "governedBrand": "M Cellars",
+    "winner": "CELLARS",
+    "winnerLine": "CELLARS",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [
+        "CELLARS"
+      ],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-positive",
+    "classification": "AMBIGUOUS_EVEN_WITH_CURRENT_CONTEXT",
+    "blockingCondition": null
+  },
+  {
+    "caseId": "wine-multi-artifact-05",
+    "resolved": false,
+    "governedBrand": "Blazic",
+    "winner": "COLLIO",
+    "winnerLine": "COLLIO",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "VOCABULARY_ABSENT",
+    "blockingCondition": "no existing Brand vocabulary matches any token of the winner"
+  },
+  {
+    "caseId": "wine-multi-artifact-06",
+    "resolved": true,
+    "governedBrand": "Mauro Molino",
+    "winner": "MAURO MOLINO",
+    "winnerLine": "AZIENDA AGRICOLA MAURO MOLINO",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [],
+      "hasByToken": false,
+      "nonBrandLineRegex": false
+    },
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "classification": "CONTROL_CORRECT",
+    "blockingCondition": null
+  },
+  {
+    "caseId": "wine-multi-artifact-08",
+    "resolved": true,
+    "governedBrand": "Pindar",
+    "winner": "PINDAR",
+    "winnerLine": "ESTATE BOTTLED BY PINDAR VINEYARDS",
+    "isSupersetOfBrand": false,
+    "vocabInCandidate": {
+      "brandDesignator": [],
+      "producerWord": [],
+      "nonBrandLineRegex": false
+    },
+    "vocabInLine": {
+      "producerWord": [
+        "BOTTLED"
+      ],
+      "hasByToken": true,
+      "nonBrandLineRegex": true
+    },
+    "winnerLineKept": false,
+    "winnerLineReason": "producer-line",
+    "classification": "CONTROL_CORRECT",
+    "blockingCondition": null
+  }
+]
