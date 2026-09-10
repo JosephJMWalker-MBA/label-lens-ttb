@@ -76,3 +76,9 @@ artifacts/issue-149-brand-structure-residual/aggregate.json
 artifacts/issue-149-brand-structure-residual/case-level-arms.json
 artifacts/issue-149-brand-structure-residual/primary/
 artifacts/issue-149-brand-structure-residual/repeat/
+
+# Frozen semantic diagnosis evidence; digests in determinism.json.
+artifacts/issue-149-brand-semantic-ranking-diagnosis/aggregate.json
+artifacts/issue-149-brand-semantic-ranking-diagnosis/case-level-arms.json
+artifacts/issue-149-brand-semantic-ranking-diagnosis/primary/
+artifacts/issue-149-brand-semantic-ranking-diagnosis/repeat/

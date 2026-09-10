@@ -1,0 +1,2114 @@
+[
+  {
+    "caseId": "luigi-giovanni-live",
+    "governedBrand": [
+      "Luigi & Giovanni"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "VANNI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "TASTE OF ITALY",
+        "winner": "VANNI"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "LUIGI & GIOVANNI",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "LUIGI & GIOVANNI"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "VANNI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "VANNI",
+        "winner": "VANNI"
+      }
+    },
+    "oracleStructure": 0.75,
+    "winnerStructureUnderES": 0.75,
+    "winnerUnderSPrime": "VANNI",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "VANNI",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "GOVERMENT WARNING: (1) ACCORDING TO THE SURGEON GENERAL, LUIGI & GIOVANNI",
+    "oracleLineKept": false,
+    "oracleLineReason": "non-brand-keyword",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": true
+  },
+  {
+    "caseId": "alfredos-wine",
+    "governedBrand": [
+      "Alfredo's Wine",
+      "Alfredo's"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "HLTRE",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WIN t",
+        "winner": "HLTRE"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "ALFREDO'S WINE",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "ALFREDO'S WINE"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "ALFREDO'S WINE",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "ALFREDO'S WINE"
+      }
+    },
+    "oracleStructure": 1,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "ALFREDO'S WINE",
+    "winnerRole": "OVERWIDE_BRAND_SUPERSET",
+    "failureType": "RESOLVED_UNDER_SPRIME",
+    "winnerLineText": "GOVERMENT WARNING: (1) ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE",
+    "winnerLineKept": false,
+    "winnerLineReason": "non-brand-keyword",
+    "oracleLineText": "GOVERMENT WARNING: (1) ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE",
+    "oracleLineKept": false,
+    "oracleLineReason": "non-brand-keyword",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-008",
+    "governedBrand": [
+      "Vino Alpino"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Azienda Agricola Terre Sparse"
+      }
+    },
+    "oracleStructure": 0.75,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "Azienda Agricola Terre Sparse",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "Azienda Agricola Terre Sparse",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "Vino Alpino LLC",
+    "oracleLineKept": true,
+    "oracleLineReason": "candidate-plausible",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-009",
+    "governedBrand": [
+      "Vino Alpino"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Azienda Agricola Terre Sparse"
+      }
+    },
+    "oracleStructure": 0.75,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "Azienda Agricola Terre Sparse",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "Azienda Agricola Terre Sparse",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "Vino Alpino LLC",
+    "oracleLineKept": true,
+    "oracleLineReason": "candidate-plausible",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-012",
+    "governedBrand": [
+      "Cooley Bay"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cool&y",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Cool&y"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cooley Bay Winery",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Cooley Bay Winery"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cooley Bay Winery",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Cooley Bay Winery"
+      }
+    },
+    "oracleStructure": 0.75,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "Cooley Bay Winery",
+    "winnerRole": "OVERWIDE_BRAND_SUPERSET",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "Cooley Bay Winery",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-positive",
+    "oracleLineText": "Cooley Bay Winery",
+    "oracleLineKept": true,
+    "oracleLineReason": "candidate-positive",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "patricia-green-cellars",
+    "governedBrand": [
+      "Patricia Green Cellars"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": true,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "ESTATE VINEYARD",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "ESTATE VINEYARD"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "PATRICIA GREEN CELLARS",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "PATRICIA GREEN CELLARS"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "PATRICIA GREEN CELLARS",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "PATRICIA GREEN CELLARS"
+      }
+    },
+    "oracleStructure": 1,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "PATRICIA GREEN CELLARS",
+    "winnerRole": "PRODUCER_OR_WINERY_NAME",
+    "failureType": "RESOLVED_UNDER_SPRIME",
+    "winnerLineText": "PRODUCED & BOTTLED BY PATRICIA GREEN CELLARS",
+    "winnerLineKept": false,
+    "winnerLineReason": "producer-line",
+    "oracleLineText": "‘or more information about this wine website: and Patricia Green Cellars",
+    "oracleLineKept": false,
+    "oracleLineReason": "too-many-words",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-016",
+    "governedBrand": [
+      "Marques de Navarro"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "MARQUES vo NAVARRO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "MARQUES vo NAVARRO",
+        "winner": "MARQUES vo NAVARRO"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Marques de Navarro",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Marques de Navarro"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Marques de Navarro",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Marques de Navarro"
+      }
+    },
+    "oracleStructure": 0.75,
+    "winnerStructureUnderES": 0.75,
+    "winnerUnderSPrime": "Marques de Navarro",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "RESOLVED_UNDER_SPRIME",
+    "winnerLineText": "Our Wine , Marques de Navarro Reflects with elegance the varietal character and the freshness",
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "oracleLineText": "Our Wine , Marques de Navarro Reflects with elegance the varietal character and the freshness",
+    "oracleLineKept": false,
+    "oracleLineReason": "too-many-words",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-018",
+    "governedBrand": [
+      "Poqr Krya",
+      "POQR KRYA"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Indigenous blend",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Indigenous blend",
+        "winner": "Indigenous blend"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Indigenous blend",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Indigenous blend",
+        "winner": "Indigenous blend"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Indigenous blend",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Indigenous blend",
+        "winner": "Indigenous blend"
+      }
+    },
+    "oracleStructure": 0.75,
+    "winnerStructureUnderES": 0.75,
+    "winnerUnderSPrime": "Indigenous blend",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "Indigenous blend",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "Poqr Krya Red Still Wine 2022 Vayots Dzor",
+    "oracleLineKept": false,
+    "oracleLineReason": "too-many-words",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-037",
+    "governedBrand": [
+      "Touch"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Strumica - Radovish Region",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Product of North Macedonia",
+        "winner": "Strumica - Radovish Region"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Strumica - Radovish Region",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Strumica - Radovish Region",
+        "winner": "Strumica - Radovish Region"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Touch",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Touch"
+      }
+    },
+    "oracleStructure": 0.25,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "Touch",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "RESOLVED_UNDER_SPRIME",
+    "winnerLineText": "Touch Wine Is made from",
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "oracleLineText": "Touch Wine Is made from",
+    "oracleLineKept": false,
+    "oracleLineReason": "too-many-words",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": true,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-038",
+    "governedBrand": [
+      "Big Red Sunshine"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "2024 SOUTH COAST PRIMITIVO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "2024 SOUTH COAST PRIMITIVO",
+        "winner": "2024 SOUTH COAST PRIMITIVO"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Big Red Sunshine",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Big Red Sunshine"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Big Red Sunshine",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Big Red Sunshine"
+      }
+    },
+    "oracleStructure": 1,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "Big Red Sunshine",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "RESOLVED_UNDER_SPRIME",
+    "winnerLineText": "can be hip or a regular L-7, but Big Red Sunshine is ready to-hang loose",
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "oracleLineText": "can be hip or a regular L-7, but Big Red Sunshine is ready to-hang loose",
+    "oracleLineKept": false,
+    "oracleLineReason": "too-many-words",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-045",
+    "governedBrand": [
+      "Meeting of the Minds"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Meeting of ihe Minds",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Meeting of ihe Minds",
+        "winner": "Meeting of ihe Minds"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Meeting of the Minds",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Meeting of the Minds"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Meeting of the Minds",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Meeting of the Minds"
+      }
+    },
+    "oracleStructure": 1,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "Meeting of the Minds",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "RESOLVED_UNDER_SPRIME",
+    "winnerLineText": "Samson and Delilah, this Meeting of the Minds is fire.",
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "oracleLineText": "Samson and Delilah, this Meeting of the Minds is fire.",
+    "oracleLineKept": false,
+    "oracleLineReason": "too-many-words",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-046",
+    "governedBrand": [
+      "Curious"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Red Wine Blend Curious",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Red Wine Blend Curious"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Red Wine Blend Curious",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Red Wine Blend Curious"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Red Wine Blend Curious",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Red Wine Blend Curious"
+      }
+    },
+    "oracleStructure": 0.25,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "Red Wine Blend Curious",
+    "winnerRole": "OVERWIDE_BRAND_SUPERSET",
+    "failureType": "CONTEXT_NOT_PROPAGATED",
+    "winnerLineText": "Red Wine Blend “Curious”",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "Red Wine Blend “Curious”",
+    "oracleLineKept": true,
+    "oracleLineReason": "candidate-plausible",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-048",
+    "governedBrand": [
+      "Pacha"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Pacha RESERVA - CARMENERE",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Seattle WA",
+        "winner": "Pacha RESERVA - CARMENERE"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Andes Wine Imports LLC",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Winemaker",
+        "winner": "Andes Wine Imports LLC"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Winemaker",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Andes Wine Imports LLC",
+        "winner": "Winemaker"
+      }
+    },
+    "oracleStructure": 0.25,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "Winemaker",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "Winemaker",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "Pacha RESERVA - CARMENERE",
+    "oracleLineKept": true,
+    "oracleLineReason": "candidate-plausible",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-051",
+    "governedBrand": [
+      "Pacheca"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "PACHECA DOURO D.O.C",
+        "selectedCorrectly": false,
+        "causalCompetitor": "SELO GROUP 1 afr",
+        "winner": "PACHECA DOURO D.O.C"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "PACHECA DOURO D.O.C",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "PACHECA DOURO D.O.C"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Pacheca",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Pacheca"
+      }
+    },
+    "oracleStructure": 0.25,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "Pacheca",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "RESOLVED_UNDER_SPRIME",
+    "winnerLineText": "par: Quinta da Pacheca Soc. Agricola e Turistica, Lda. Cambres-Lamego, Portugal",
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "oracleLineText": "PACHECA DOURO/ D.O.C",
+    "oracleLineKept": true,
+    "oracleLineReason": "candidate-plausible",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": true,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-052",
+    "governedBrand": [
+      "Mountain Valley Winery"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "OLp VINE ZINFANDEL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "VALLEY",
+        "winner": "OLp VINE ZINFANDEL"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "MOUNTAIN VALLEY WINERY,",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "MOUNTAIN VALLEY WINERY,"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "MOUNTAIN VALLEY WINERY,",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "MOUNTAIN VALLEY WINERY,"
+      }
+    },
+    "oracleStructure": 1,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "MOUNTAIN VALLEY WINERY,",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "RESOLVED_UNDER_SPRIME",
+    "winnerLineText": "MOUNTAIN VALLEY WINERY, PIGEON FORGE, TN, 37863",
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "oracleLineText": "MOUNTAIN VALLEY WINERY, PIGEON FORGE, TN, 37863",
+    "oracleLineKept": false,
+    "oracleLineReason": "too-many-words",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-063",
+    "governedBrand": [
+      "Prinsi"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "TRE FICHI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "TRE FICHI"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "TRE FICHI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "TRE FICHI"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "TRE FICHI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "TRE FICHI"
+      }
+    },
+    "oracleStructure": 0.25,
+    "winnerStructureUnderES": 0.75,
+    "winnerUnderSPrime": "TRE FICHI",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "TRE FICHI",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI",
+    "oracleLineKept": false,
+    "oracleLineReason": "producer-line",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-064",
+    "governedBrand": [
+      "Prinsi"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Prins",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Cordova, TN",
+        "winner": "Prins"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "AZIENDA AGRICOLA"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "AZIENDA AGRICOLA"
+      }
+    },
+    "oracleStructure": 0.25,
+    "winnerStructureUnderES": 0.75,
+    "winnerUnderSPrime": "AZIENDA AGRICOLA",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "AZIENDA AGRICOLA",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI",
+    "oracleLineKept": false,
+    "oracleLineReason": "producer-line",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-065",
+    "governedBrand": [
+      "Prinsi"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Prins",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "Prins"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "AZIENDA AGRICOLA"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "AZIENDA AGRICOLA"
+      }
+    },
+    "oracleStructure": 0.25,
+    "winnerStructureUnderES": 0.75,
+    "winnerUnderSPrime": "AZIENDA AGRICOLA",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "AZIENDA AGRICOLA",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI",
+    "oracleLineKept": false,
+    "oracleLineReason": "producer-line",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-066",
+    "governedBrand": [
+      "Domaine Juliette Avril"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "JULIETTE VRIL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "PRODUCT OF FRANCE",
+        "winner": "JULIETTE VRIL"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Domaine Juliette Avril",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Domaine Juliette Avril"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Domaine Juliette Avril",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Domaine Juliette Avril"
+      }
+    },
+    "oracleStructure": 1,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "Domaine Juliette Avril",
+    "winnerRole": "PRODUCER_OR_WINERY_NAME",
+    "failureType": "RESOLVED_UNDER_SPRIME",
+    "winnerLineText": "Produced and Bottled by Domaine Juliette Avril",
+    "winnerLineKept": false,
+    "winnerLineReason": "producer-line",
+    "oracleLineText": "Produced and Bottled by Domaine Juliette Avril",
+    "oracleLineKept": false,
+    "oracleLineReason": "producer-line",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-067",
+    "governedBrand": [
+      "Domaine Juliette Avril"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "JULIETTE VRIL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "PRODUCT OF FRANCE",
+        "winner": "JULIETTE VRIL"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Domaine Juliette Avril",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Domaine Juliette Avril"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "JULIETTE VRIL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "JULIETTE VRIL",
+        "winner": "JULIETTE VRIL"
+      }
+    },
+    "oracleStructure": 1,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "JULIETTE VRIL",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "JULIETTE VRIL",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "Produced and Bottled by Domaine Juliette Avril",
+    "oracleLineKept": false,
+    "oracleLineReason": "producer-line",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": true
+  },
+  {
+    "caseId": "approved-wine-076",
+    "governedBrand": [
+      "Etim"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Flore",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AGRICOLA FALSET-MARGA",
+        "winner": "Flore"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "R.E.2163T FALSET",
+        "selectedCorrectly": false,
+        "causalCompetitor": "DENOMINACIO DORIGEN",
+        "winner": "R.E.2163T FALSET"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Etim",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Etim"
+      }
+    },
+    "oracleStructure": 0.25,
+    "winnerStructureUnderES": 0.75,
+    "winnerUnderSPrime": "Etim",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "RESOLVED_UNDER_SPRIME",
+    "winnerLineText": "Martinell, who was student of Antoni Gaudi. Etim Blanc",
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "oracleLineText": "Martinell, who was student of Antoni Gaudi. Etim Blanc",
+    "oracleLineKept": false,
+    "oracleLineReason": "too-many-words",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": true,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-078",
+    "governedBrand": [
+      "Pietta"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": true,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "MUSCOLINE-ITALIA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "GARDA",
+        "winner": "MUSCOLINE-ITALIA"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "MUSCOLINE-ITALIA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "MUSCOLINE-ITALIA",
+        "winner": "MUSCOLINE-ITALIA"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "MUSCOLINE-ITALIA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "MUSCOLINE-ITALIA",
+        "winner": "MUSCOLINE-ITALIA"
+      }
+    },
+    "oracleStructure": 0.25,
+    "winnerStructureUnderES": 0.25,
+    "winnerUnderSPrime": "MUSCOLINE-ITALIA",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "MUSCOLINE-ITALIA",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "BOTTLE BY: SOCIETA’ AGRICOLA PIETTA S.S",
+    "oracleLineKept": false,
+    "oracleLineReason": "too-many-words",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-084",
+    "governedBrand": [
+      "Filadoro"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "BUTA DISTRIBUTORS INC",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Boca Raton - FL",
+        "winner": "BUTA DISTRIBUTORS INC"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "BUTA DISTRIBUTORS INC",
+        "selectedCorrectly": false,
+        "causalCompetitor": "BUTA DISTRIBUTORS INC",
+        "winner": "BUTA DISTRIBUTORS INC"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "BUTA DISTRIBUTORS INC",
+        "selectedCorrectly": false,
+        "causalCompetitor": "BUTA DISTRIBUTORS INC",
+        "winner": "BUTA DISTRIBUTORS INC"
+      }
+    },
+    "oracleStructure": 0.25,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "BUTA DISTRIBUTORS INC",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "BUTA DISTRIBUTORS INC",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "FILADORO GIUSEPPA AZ.AGR.",
+    "oracleLineKept": false,
+    "oracleLineReason": "sentence-fragment",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-088",
+    "governedBrand": [
+      "La Mesma"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "LA MESMA Yellow Label",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "LA MESMA Yellow Label"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "WHITE WINE 2018 Lo119",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "WHITE WINE 2018 Lo119"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "GAVI",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "GAVI"
+      }
+    },
+    "oracleStructure": 0.5,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "GAVI",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "GAVI",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "LA MESMA Yellow Label",
+    "oracleLineKept": true,
+    "oracleLineReason": "candidate-plausible",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-089",
+    "governedBrand": [
+      "La Mesma"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "LA MESMA Black Label",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "LA MESMA Black Label"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DEL COMUNE DI GAVI",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "DEL COMUNE DI GAVI"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "GAVI",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "GAVI"
+      }
+    },
+    "oracleStructure": 0.5,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "GAVI",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "GAVI",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "LA MESMA Black Label",
+    "oracleLineKept": true,
+    "oracleLineReason": "candidate-plausible",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-090",
+    "governedBrand": [
+      "La Mesma"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "WHITE WINE 2018 Lo219",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "WHITE WINE 2018 Lo219"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DEL COMUNE DI GAVI",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "DEL COMUNE DI GAVI"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "GAVI",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "GAVI"
+      }
+    },
+    "oracleStructure": 0.5,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "GAVI",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "GAVI",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "LA MESMA Indi",
+    "oracleLineKept": true,
+    "oracleLineReason": "candidate-plausible",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-093",
+    "governedBrand": [
+      "Fontanavecchia"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DELRAY BEACH, FL, USA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "FALANGHINADELSANNIO",
+        "winner": "DELRAY BEACH, FL, USA"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "WHITE WINE OF SANNIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "TABURNO",
+        "winner": "WHITE WINE OF SANNIO"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "TABURNO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "TABURNO",
+        "winner": "TABURNO"
+      }
+    },
+    "oracleStructure": 0.25,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "TABURNO",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "TABURNO",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+    "oracleLineKept": false,
+    "oracleLineReason": "too-many-words",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-094",
+    "governedBrand": [
+      "Fontanavecchia"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "DELRAY BEACH. FL, USA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WHITE WINE OF SANNIO",
+        "winner": "DELRAY BEACH. FL, USA"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "WHITE WINE OF SANNIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "DENOMINAZIONE DI ORIGINE PROTETTA",
+        "winner": "WHITE WINE OF SANNIO"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "FONTANAVECCHIA",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "FONTANAVECCHIA"
+      }
+    },
+    "oracleStructure": 0.25,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "FONTANAVECCHIA",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "RESOLVED_UNDER_SPRIME",
+    "winnerLineText": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "oracleLineText": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+    "oracleLineKept": false,
+    "oracleLineReason": "too-many-words",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": true,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-099",
+    "governedBrand": [
+      "Fontanavecchia"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "DELRAY BEACH, FL, USA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WHITE WINE OF SANNIO",
+        "winner": "DELRAY BEACH, FL, USA"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "WHITE WINE OF SANNIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "DELRAY BEACH, FL, USA",
+        "winner": "WHITE WINE OF SANNIO"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "FONTANAVECCHIA",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "FONTANAVECCHIA"
+      }
+    },
+    "oracleStructure": 0.25,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "FONTANAVECCHIA",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "RESOLVED_UNDER_SPRIME",
+    "winnerLineText": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "oracleLineText": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+    "oracleLineKept": false,
+    "oracleLineReason": "too-many-words",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": true,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-103",
+    "governedBrand": [
+      "Tenute Valso"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "SNA VALSO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "TENUTE",
+        "winner": "SNA VALSO"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "TENUTE VALSO",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "TENUTE VALSO"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "TENUTE VALSO",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "TENUTE VALSO"
+      }
+    },
+    "oracleStructure": 0.75,
+    "winnerStructureUnderES": 0.75,
+    "winnerUnderSPrime": "TENUTE VALSO",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "RESOLVED_UNDER_SPRIME",
+    "winnerLineText": "FOR TENUTE VALSO - 91011 ALCAMO - ITALIA",
+    "winnerLineKept": false,
+    "winnerLineReason": "too-many-words",
+    "oracleLineText": "FOR TENUTE VALSO - 91011 ALCAMO - ITALIA",
+    "oracleLineKept": false,
+    "oracleLineReason": "too-many-words",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-105",
+    "governedBrand": [
+      "Luigi & Giovanni"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "VANNI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "CALIFORNIA",
+        "winner": "VANNI"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "CALIFORNIA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "VANNI",
+        "winner": "CALIFORNIA"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "CALIFORNIA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "VANNI",
+        "winner": "CALIFORNIA"
+      }
+    },
+    "oracleStructure": 0.75,
+    "winnerStructureUnderES": 0.25,
+    "winnerUnderSPrime": "CALIFORNIA",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "CALIFORNIA",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "GOVERMENT WARNING: (1) ACCORDING TO THE SURGEON GENERAL, LUIGI & GIOVANNI",
+    "oracleLineKept": false,
+    "oracleLineReason": "non-brand-keyword",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-106",
+    "governedBrand": [
+      "Alfredo's Wine",
+      "Alfredos Wine"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "REDO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WIN t",
+        "winner": "REDO"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "ALFREDO'S WINE",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "ALFREDO'S WINE"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "ALFREDO'S WINE",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "ALFREDO'S WINE"
+      }
+    },
+    "oracleStructure": 1,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "ALFREDO'S WINE",
+    "winnerRole": "IMPORTER_DISTRIBUTOR",
+    "failureType": "RESOLVED_UNDER_SPRIME",
+    "winnerLineText": "GOVERMENT WARNING: (1) ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE",
+    "winnerLineKept": false,
+    "winnerLineReason": "non-brand-keyword",
+    "oracleLineText": "GOVERMENT WARNING: (1) ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE",
+    "oracleLineKept": false,
+    "oracleLineReason": "non-brand-keyword",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "approved-wine-110",
+    "governedBrand": [
+      "Cooley Bay"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cool&y",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Cool&y"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cooley Bay Winery",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Cooley Bay Winery"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cooley Bay Winery",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Cooley Bay Winery"
+      }
+    },
+    "oracleStructure": 0.75,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "Cooley Bay Winery",
+    "winnerRole": "OVERWIDE_BRAND_SUPERSET",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "Cooley Bay Winery",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-positive",
+    "oracleLineText": "Cooley Bay Winery",
+    "oracleLineKept": true,
+    "oracleLineReason": "candidate-positive",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "m-cellars-baseline",
+    "governedBrand": [
+      "M Cellars"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "CELLARS",
+        "selectedCorrectly": false,
+        "causalCompetitor": "SINCE 2008 Proprietors",
+        "winner": "CELLARS"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "CELLARS",
+        "selectedCorrectly": false,
+        "causalCompetitor": "CELLARS",
+        "winner": "CELLARS"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "CELLARS",
+        "selectedCorrectly": false,
+        "causalCompetitor": "CELLARS",
+        "winner": "CELLARS"
+      }
+    },
+    "oracleStructure": 0.75,
+    "winnerStructureUnderES": 0.5,
+    "winnerUnderSPrime": "CELLARS",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "CELLARS",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-positive",
+    "oracleLineText": "Welcome to our family. M Cellars wines are estate",
+    "oracleLineKept": false,
+    "oracleLineReason": "too-many-words",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "wine-multi-artifact-05",
+    "governedBrand": [
+      "Blazic"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 12,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "BLAZIC COLLIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "ONTROLLATA",
+        "winner": "BLAZIC COLLIO"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 9,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "BLAZIC FRANCO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "LSA17",
+        "winner": "BLAZIC FRANCO"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "COLLIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "LSA17",
+        "winner": "COLLIO"
+      }
+    },
+    "oracleStructure": 0.25,
+    "winnerStructureUnderES": 0.75,
+    "winnerUnderSPrime": "COLLIO",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE",
+    "winnerLineText": "COLLIO",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "BLAZIC COLLIO",
+    "oracleLineKept": true,
+    "oracleLineReason": "candidate-plausible",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": false,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "wine-multi-artifact-06",
+    "governedBrand": [
+      "Mauro Molino"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "MOLINO",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "MOLINO"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA MAURO MOLINO",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "AZIENDA AGRICOLA MAURO MOLINO"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "MAURO MOLINO",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "MAURO MOLINO"
+      }
+    },
+    "oracleStructure": 0.75,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "MAURO MOLINO",
+    "winnerRole": "OTHER_BRANDLIKE_TEXT",
+    "failureType": "RESOLVED_UNDER_SPRIME",
+    "winnerLineText": "AZIENDA AGRICOLA MAURO MOLINO",
+    "winnerLineKept": true,
+    "winnerLineReason": "candidate-plausible",
+    "oracleLineText": "AZIENDA AGRICOLA MAURO MOLINO",
+    "oracleLineKept": true,
+    "oracleLineReason": "candidate-plausible",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": true,
+    "regressedByStructureNeutralization": false
+  },
+  {
+    "caseId": "wine-multi-artifact-08",
+    "governedBrand": [
+      "Pindar"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "baseline": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Z-lor",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Bttl. numbers",
+        "winner": "Z-lor"
+      },
+      "E+S": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Harvest Brix 386",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Varietal Gewurztraminer",
+        "winner": "Harvest Brix 386"
+      },
+      "E+Sprime": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "PINDAR",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "PINDAR"
+      }
+    },
+    "oracleStructure": 0.25,
+    "winnerStructureUnderES": 1,
+    "winnerUnderSPrime": "PINDAR",
+    "winnerRole": "PRODUCER_OR_WINERY_NAME",
+    "failureType": "RESOLVED_UNDER_SPRIME",
+    "winnerLineText": "ESTATE BOTTLED BY PINDAR VINEYARDS",
+    "winnerLineKept": false,
+    "winnerLineReason": "producer-line",
+    "oracleLineText": "ESTATE BOTTLED BY PINDAR VINEYARDS",
+    "oracleLineKept": false,
+    "oracleLineReason": "producer-line",
+    "winnerFilterChecksAllPassed": true,
+    "recoveredByStructureNeutralization": true,
+    "regressedByStructureNeutralization": false
+  }
+]

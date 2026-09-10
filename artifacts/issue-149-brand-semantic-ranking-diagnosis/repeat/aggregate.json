@@ -1,0 +1,67 @@
+{
+  "artifact": "aggregate",
+  "experimentId": "issue-149-brand-semantic-ranking-diagnosis",
+  "inventorySha256": "763eebbc77db4d5f402ddd86997969e1aa929c63f3fc72fe48e7b214a55f23ae",
+  "evaluationDependency": "6a969e4b (ranking diagnosis) -> 8de5b9fc (oracle)",
+  "baselineReproduction": {
+    "casesChecked": 115,
+    "reproduced": 115,
+    "exact": true,
+    "failures": []
+  },
+  "population": {
+    "targeted": 37,
+    "instanceOnlyDedupe": 2
+  },
+  "arms": {
+    "baseline": {
+      "correctTop3": 16,
+      "correctTop1": 0,
+      "correctlySelected": 0,
+      "oracleSurvivesFamily": 27,
+      "recoveredVsBaseline": 0,
+      "regressedVsBaseline": 0
+    },
+    "E+S": {
+      "correctTop3": 21,
+      "correctTop1": 11,
+      "correctlySelected": 11,
+      "oracleSurvivesFamily": 26,
+      "recoveredVsBaseline": 11,
+      "regressedVsBaseline": 0
+    },
+    "E+Sprime": {
+      "correctTop3": 28,
+      "correctTop1": 16,
+      "correctlySelected": 16,
+      "oracleSurvivesFamily": 27,
+      "recoveredVsBaseline": 16,
+      "regressedVsBaseline": 0
+    }
+  },
+  "semanticDiagnosis": {
+    "unresolvedUnderSPrime": 21,
+    "failureTypes": {
+      "SEMANTICALLY_AMBIGUOUS_FROM_CURRENT_EVIDENCE": 20,
+      "RESOLVED_UNDER_SPRIME": 16,
+      "CONTEXT_NOT_PROPAGATED": 1
+    },
+    "unresolvedWinnerRoles": {
+      "OTHER_BRANDLIKE_TEXT": 18,
+      "OVERWIDE_BRAND_SUPERSET": 3
+    },
+    "controlWinnerRoles": {
+      "OVERWIDE_BRAND_SUPERSET": 1,
+      "PRODUCER_OR_WINERY_NAME": 3,
+      "OTHER_BRANDLIKE_TEXT": 11,
+      "IMPORTER_DISTRIBUTOR": 1
+    },
+    "controlWinnerLineRejected": 15
+  },
+  "structureEffect": {
+    "recoveredByStructureNeutralization": 7,
+    "regressedByStructureNeutralization": 2,
+    "stillUnresolvedUnderSPrime": 21
+  },
+  "productionBehaviorChanged": false
+}
