@@ -1,0 +1,239 @@
+{
+  "artifact": "aggregate",
+  "experimentId": "issue-149-brand-bounded-semantic-counterfactual",
+  "switchesSha256": "14a3fce976f034e6132ce6a32799d4952d98cfa673b016ba2fca3278c0b13818",
+  "baselineReproduction": {
+    "casesChecked": 115,
+    "mismatches": 0,
+    "exact": true,
+    "note": "baseline arm compared to the real analyzer response value AND state, so authority is reproduced not simulated",
+    "examples": []
+  },
+  "arms": {
+    "G0P0": {
+      "correctSelected": 29,
+      "wrongSelected": 76,
+      "correctObserved": 4,
+      "wrongObserved": 0,
+      "ambiguous": 101,
+      "notObserved": 10,
+      "brandAbsentPositive": 0,
+      "regressedVsBaseline": 0,
+      "improvedVsBaseline": 0,
+      "totalSuppressedCandidates": 0
+    },
+    "G1P0": {
+      "correctSelected": 29,
+      "wrongSelected": 76,
+      "correctObserved": 4,
+      "wrongObserved": 0,
+      "ambiguous": 101,
+      "notObserved": 10,
+      "brandAbsentPositive": 0,
+      "regressedVsBaseline": 0,
+      "improvedVsBaseline": 0,
+      "totalSuppressedCandidates": 8
+    },
+    "G0P1": {
+      "correctSelected": 29,
+      "wrongSelected": 76,
+      "correctObserved": 4,
+      "wrongObserved": 0,
+      "ambiguous": 101,
+      "notObserved": 10,
+      "brandAbsentPositive": 0,
+      "regressedVsBaseline": 0,
+      "improvedVsBaseline": 0,
+      "totalSuppressedCandidates": 5
+    },
+    "G1P1": {
+      "correctSelected": 29,
+      "wrongSelected": 76,
+      "correctObserved": 4,
+      "wrongObserved": 0,
+      "ambiguous": 101,
+      "notObserved": 10,
+      "brandAbsentPositive": 0,
+      "regressedVsBaseline": 0,
+      "improvedVsBaseline": 0,
+      "totalSuppressedCandidates": 13
+    }
+  },
+  "targetCases": [
+    {
+      "caseId": "approved-wine-008",
+      "governedBrand": "Vino Alpino",
+      "baselineWinner": "Azienda Agricola Terre Sparse",
+      "baselineCorrect": false,
+      "treatedWinner": "Cascinette d'ivrea Italy",
+      "treatedCorrect": false,
+      "treatedState": "AMBIGUOUS",
+      "suppressed": [
+        "Azienda Agricola Terre Sparse"
+      ]
+    },
+    {
+      "caseId": "approved-wine-009",
+      "governedBrand": "Vino Alpino",
+      "baselineWinner": "Azienda Agricola Terre Sparse",
+      "baselineCorrect": false,
+      "treatedWinner": "Cascinette d'ivrea Italy",
+      "treatedCorrect": false,
+      "treatedState": "AMBIGUOUS",
+      "suppressed": [
+        "Azienda Agricola Terre Sparse"
+      ]
+    },
+    {
+      "caseId": "approved-wine-064",
+      "governedBrand": "Prinsi",
+      "baselineWinner": "Prins",
+      "baselineCorrect": false,
+      "treatedWinner": "Prins",
+      "treatedCorrect": false,
+      "treatedState": "AMBIGUOUS",
+      "suppressed": [
+        "AZIENDA AGRICOLA"
+      ]
+    },
+    {
+      "caseId": "approved-wine-065",
+      "governedBrand": "Prinsi",
+      "baselineWinner": "Prins",
+      "baselineCorrect": false,
+      "treatedWinner": "Prins",
+      "treatedCorrect": false,
+      "treatedState": "AMBIGUOUS",
+      "suppressed": [
+        "AZIENDA AGRICOLA"
+      ]
+    },
+    {
+      "caseId": "approved-wine-078",
+      "governedBrand": "Pietta",
+      "baselineWinner": "MUSCOLINE-ITALIA",
+      "baselineCorrect": false,
+      "treatedWinner": "MUSCOLINE-ITALIA",
+      "treatedCorrect": false,
+      "treatedState": "AMBIGUOUS",
+      "suppressed": []
+    },
+    {
+      "caseId": "approved-wine-088",
+      "governedBrand": "La Mesma",
+      "baselineWinner": "LA MESMA Yellow Label",
+      "baselineCorrect": false,
+      "treatedWinner": "LA MESMA Yellow Label",
+      "treatedCorrect": false,
+      "treatedState": "AMBIGUOUS",
+      "suppressed": [
+        "GAVI"
+      ]
+    },
+    {
+      "caseId": "approved-wine-089",
+      "governedBrand": "La Mesma",
+      "baselineWinner": "LA MESMA Black Label",
+      "baselineCorrect": false,
+      "treatedWinner": "LA MESMA Black Label",
+      "treatedCorrect": false,
+      "treatedState": "AMBIGUOUS",
+      "suppressed": [
+        "GAVI"
+      ]
+    },
+    {
+      "caseId": "approved-wine-090",
+      "governedBrand": "La Mesma",
+      "baselineWinner": "WHITE WINE 2018 Lo219",
+      "baselineCorrect": false,
+      "treatedWinner": "WHITE WINE 2018 Lo219",
+      "treatedCorrect": false,
+      "treatedState": "AMBIGUOUS",
+      "suppressed": [
+        "GAVI"
+      ]
+    },
+    {
+      "caseId": "approved-wine-093",
+      "governedBrand": "Fontanavecchia",
+      "baselineWinner": "DELRAY BEACH, FL, USA",
+      "baselineCorrect": false,
+      "treatedWinner": "FALANGHINADELSANNIO",
+      "treatedCorrect": false,
+      "treatedState": "AMBIGUOUS",
+      "suppressed": [
+        "TABURNO"
+      ]
+    },
+    {
+      "caseId": "approved-wine-105",
+      "governedBrand": "Luigi & Giovanni",
+      "baselineWinner": "VANNI",
+      "baselineCorrect": false,
+      "treatedWinner": "VANNI",
+      "treatedCorrect": false,
+      "treatedState": "AMBIGUOUS",
+      "suppressed": [
+        "CALIFORNIA"
+      ]
+    },
+    {
+      "caseId": "wine-multi-artifact-05",
+      "governedBrand": "Blazic",
+      "baselineWinner": "BLAZIC COLLIO",
+      "baselineCorrect": false,
+      "treatedWinner": "BLAZIC COLLIO",
+      "treatedCorrect": false,
+      "treatedState": "AMBIGUOUS",
+      "suppressed": [
+        "COLLIO"
+      ]
+    }
+  ],
+  "outOfTargetTreatmentHits": [
+    {
+      "caseId": "approved-wine-063",
+      "brandPresent": true,
+      "governedBrand": [
+        "Prinsi"
+      ],
+      "suppressed": [
+        "AZIENDA AGRICOLA"
+      ],
+      "baselineCorrect": false,
+      "treatedCorrect": false,
+      "baselineState": "AMBIGUOUS",
+      "treatedState": "AMBIGUOUS"
+    },
+    {
+      "caseId": "approved-wine-104",
+      "brandPresent": true,
+      "governedBrand": [
+        "Blazic"
+      ],
+      "suppressed": [
+        "Collio"
+      ],
+      "baselineCorrect": true,
+      "treatedCorrect": true,
+      "baselineState": "AMBIGUOUS",
+      "treatedState": "AMBIGUOUS"
+    },
+    {
+      "caseId": "approved-wine-108",
+      "brandPresent": true,
+      "governedBrand": [
+        "La Fattoria"
+      ],
+      "suppressed": [
+        "CALIFORNIA"
+      ],
+      "baselineCorrect": false,
+      "treatedCorrect": false,
+      "baselineState": "AMBIGUOUS",
+      "treatedState": "AMBIGUOUS"
+    }
+  ],
+  "productionBehaviorChanged": false
+}

@@ -1,0 +1,18 @@
+{
+  "artifact": "determinism",
+  "runs": 2,
+  "digests": {
+    "aggregate.json": {
+      "primary": "bc924b88fbce6e18f58033626f60a2a7024aeb9c5e0345f4d96e02e621f2a59c",
+      "repeat": "bc924b88fbce6e18f58033626f60a2a7024aeb9c5e0345f4d96e02e621f2a59c",
+      "identical": true
+    },
+    "case-level.json": {
+      "primary": "982383aae539683be9121c82c84c2513a302d538a5020b4d19b2220aae62f8dc",
+      "repeat": "982383aae539683be9121c82c84c2513a302d538a5020b4d19b2220aae62f8dc",
+      "identical": true
+    }
+  },
+  "allIdentical": true,
+  "failClosed": true
+}

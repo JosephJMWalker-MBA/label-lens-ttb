@@ -121,12 +121,23 @@ interface BrandSelectionOptions {
    * are identified using governed truth.
    */
   oracleExactWindows: string[][];
+  /**
+   * Evaluation-only, Issue #149 bounded semantic counterfactual. Exact
+   * normalized candidate values treated as the existing
+   * `location-or-appellation` (G) and `producer-line` (P) semantic negatives.
+   * Empty — the production default — changes nothing. Whole-value equality only:
+   * no substring, stem or morphology generalization.
+   */
+  counterfactualGeographyForms: string[];
+  counterfactualProducerForms: string[];
 }
 
 const DEFAULT_BRAND_SELECTION_OPTIONS: BrandSelectionOptions = {
   allowCoherentPlausibleLineMerge: false,
   collectCompleteFilterDiagnostics: false,
   oracleExactWindows: [],
+  counterfactualGeographyForms: [],
+  counterfactualProducerForms: [],
 };
 
 /** An observation plus the region the selected value came from (for provenance). */
@@ -1853,7 +1864,12 @@ function buildBrandSpan(
   };
 }
 
-function analyzeBrandSpan(span: BrandSpan): BrandCandidateAnalysis {
+function analyzeBrandSpan(
+  span: BrandSpan,
+  geographyForms: readonly string[] = [],
+  producerForms: readonly string[] = [],
+): BrandCandidateAnalysis {
+  const counterfactualKey = counterfactualValueKey(span.value);
   const base = {
     id: span.id,
     rawText: span.rawText,
@@ -1880,7 +1896,7 @@ function analyzeBrandSpan(span: BrandSpan): BrandCandidateAnalysis {
     lineIndexes: span.lineIndexes,
   };
 
-  if (isProducerLine(span.words)) {
+  if (isProducerLine(span.words) || producerForms.includes(counterfactualKey)) {
     return {
       diagnostic: {
         ...base,
@@ -1943,7 +1959,7 @@ function analyzeBrandSpan(span: BrandSpan): BrandCandidateAnalysis {
       },
     };
   }
-  if (isLocationOrAppellationLike(span.value)) {
+  if (isLocationOrAppellationLike(span.value) || geographyForms.includes(counterfactualKey)) {
     return {
       diagnostic: {
         ...base,
@@ -2018,16 +2034,22 @@ function analyzeBrandSpan(span: BrandSpan): BrandCandidateAnalysis {
  *
  * This function is never called on the production path.
  */
-function evaluateBrandFilterChecks(span: BrandSpan): BrandFilterCheck[] {
+function evaluateBrandFilterChecks(
+  span: BrandSpan,
+  geographyForms: readonly string[] = [],
+  producerForms: readonly string[] = [],
+): BrandFilterCheck[] {
+  const counterfactualKey = counterfactualValueKey(span.value);
   const failed: Record<BrandFilterCheckName, boolean> = {
-    "producer-line": isProducerLine(span.words),
+    "producer-line": isProducerLine(span.words) || producerForms.includes(counterfactualKey),
     "no-letters-or-too-short": span.value.length < 2 || !/[a-z]/i.test(span.value),
     "non-brand-keyword": hasNonBrandKeyword(span.rawText, span.value),
     "too-many-words": span.value.split(" ").length > MAX_BRAND_WORDS,
     "domain-like": isDomainLike(span.value),
     "varietal-or-designation": isPurelyVarietalOrDesignation(span.value),
     "generic-product-language": isGenericProductLanguage(span.value),
-    "location-or-appellation": isLocationOrAppellationLike(span.value),
+    "location-or-appellation":
+      isLocationOrAppellationLike(span.value) || geographyForms.includes(counterfactualKey),
     "low-information-fragment": isLowInformationFragment(span.value),
     "sentence-fragment": isSentenceFragment(span.rawText, span.value),
   };
@@ -2116,9 +2138,17 @@ function analyzeBrandSpanWithOptions(
   span: BrandSpan,
   options: BrandSelectionOptions,
 ): BrandCandidateAnalysis {
-  const analysis = analyzeBrandSpan(span);
+  const analysis = analyzeBrandSpan(
+    span,
+    options.counterfactualGeographyForms,
+    options.counterfactualProducerForms,
+  );
   if (!options.collectCompleteFilterDiagnostics) return analysis;
-  const filterChecks = evaluateBrandFilterChecks(span);
+  const filterChecks = evaluateBrandFilterChecks(
+    span,
+    options.counterfactualGeographyForms,
+    options.counterfactualProducerForms,
+  );
   const activeRejectionReasons = filterChecks.filter((c) => c.failed).map((c) => c.check);
   assertBrandFilterDiagnosticInvariants(analysis.diagnostic, filterChecks, activeRejectionReasons);
   return {
@@ -2166,6 +2196,18 @@ function oracleWindowInLine(line: OcrWord[], run: string[]): OcrWord[] | null {
     }
   }
   return null;
+}
+
+/** Normalized whole-value key used only by the bounded semantic counterfactual. */
+function counterfactualValueKey(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .split(/\s+/)
+    .map((token) => token.replace(/[^a-z0-9]/g, ""))
+    .filter(Boolean)
+    .join(" ");
 }
 
 function lineWindows(line: OcrWord[]): OcrWord[][] {
@@ -2550,6 +2592,27 @@ export function selectBrandObservationWithOracleExactWindows(
     ...DEFAULT_BRAND_SELECTION_OPTIONS,
     collectCompleteFilterDiagnostics: true,
     oracleExactWindows: runs,
+  });
+}
+
+/**
+ * Evaluation-only. Issue #149 bounded semantic counterfactual. Candidates whose
+ * whole normalized value equals a supplied form are dispositioned as the
+ * existing `location-or-appellation` / `producer-line` semantic negatives, then
+ * flow through the unchanged ranking, selection and authority code.
+ *
+ * Never called by production.
+ */
+export function selectBrandObservationWithBoundedSemanticForms(
+  results: RegionOcrResult[],
+  geographyForms: string[],
+  producerForms: string[],
+): FieldSelection {
+  return selectBrandObservationWithOptions(results, {
+    ...DEFAULT_BRAND_SELECTION_OPTIONS,
+    collectCompleteFilterDiagnostics: true,
+    counterfactualGeographyForms: geographyForms,
+    counterfactualProducerForms: producerForms,
   });
 }
 

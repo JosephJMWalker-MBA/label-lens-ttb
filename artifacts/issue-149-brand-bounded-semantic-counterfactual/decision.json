@@ -1,0 +1,18 @@
+{
+  "artifact": "decision",
+  "experimentId": "issue-149-brand-bounded-semantic-counterfactual",
+  "switchesSha256": "14a3fce976f034e6132ce6a32799d4952d98cfa673b016ba2fca3278c0b13818",
+  "baselineReproduction": "EXACT on value and state, 115/115; authority measured not simulated",
+  "productionParity": "115/115 byte-identical",
+  "gVerdict": "COUNTERFACTUAL_KILL",
+  "pVerdict": "COUNTERFACTUAL_KILL",
+  "combinedVerdict": "COUNTERFACTUAL_KILL",
+  "basis": [
+    "Zero recovery in every arm: correct selections stay at 29 of 115 under G1P0, G0P1 and G1P1",
+    "13 candidates suppressed under G1P1 and not one converted a wrong selection into a correct one",
+    "No collateral either: zero regressions, wrong OBSERVED stays 0, Brand-absent positives stay 0"
+  ],
+  "methodologicalFinding": "The 11 targets were identified from winners under the E+S-prime counterfactual, but this experiment runs on unmodified production ranking, where those cases have different winners. The treatment was derived in one ranking regime and applied in another.",
+  "predicateDesignResearchEarned": false,
+  "productionBehaviorChanged": false
+}

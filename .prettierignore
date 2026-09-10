@@ -94,3 +94,9 @@ artifacts/issue-149-brand-semantic-vocabulary-gap-sizing/aggregate.json
 artifacts/issue-149-brand-semantic-vocabulary-gap-sizing/case-level-lexicon.json
 artifacts/issue-149-brand-semantic-vocabulary-gap-sizing/primary/
 artifacts/issue-149-brand-semantic-vocabulary-gap-sizing/repeat/
+
+# Frozen bounded semantic counterfactual evidence; digests in determinism.json.
+artifacts/issue-149-brand-bounded-semantic-counterfactual/aggregate.json
+artifacts/issue-149-brand-bounded-semantic-counterfactual/case-level.json
+artifacts/issue-149-brand-bounded-semantic-counterfactual/primary/
+artifacts/issue-149-brand-bounded-semantic-counterfactual/repeat/
