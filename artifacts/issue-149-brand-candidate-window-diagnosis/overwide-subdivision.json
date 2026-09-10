@@ -1,0 +1,272 @@
+{
+  "artifact": "overwide-subdivision",
+  "note": "Class B splits into two mechanisms with different repairs. Kept-overwide surfaces a near miss as the Brand; rejected-only means line grouping merged the Brand into unrelated text and filters then removed it.",
+  "total": 39,
+  "keptOverwide": 12,
+  "rejectedOnly": 27,
+  "keptOverwideCases": [
+    {
+      "caseId": "approved-wine-008",
+      "brand": "Vino Alpino",
+      "keptOverwideValue": "Vino Alpino LLC",
+      "extraWords": 1
+    },
+    {
+      "caseId": "approved-wine-009",
+      "brand": "Vino Alpino",
+      "keptOverwideValue": "Vino Alpino LLC",
+      "extraWords": 1
+    },
+    {
+      "caseId": "approved-wine-012",
+      "brand": "Cooley Bay",
+      "keptOverwideValue": "Cooley Bay Winery",
+      "extraWords": 1
+    },
+    {
+      "caseId": "approved-wine-046",
+      "brand": "Curious",
+      "keptOverwideValue": "Red Wine Blend Curious",
+      "extraWords": 3
+    },
+    {
+      "caseId": "approved-wine-048",
+      "brand": "Pacha",
+      "keptOverwideValue": "Pacha RESERVA - CARMENERE",
+      "extraWords": 3
+    },
+    {
+      "caseId": "approved-wine-051",
+      "brand": "Pacheca",
+      "keptOverwideValue": "PACHECA DOURO D.O.C",
+      "extraWords": 2
+    },
+    {
+      "caseId": "approved-wine-088",
+      "brand": "La Mesma",
+      "keptOverwideValue": "LA MESMA Yellow Label",
+      "extraWords": 2
+    },
+    {
+      "caseId": "approved-wine-089",
+      "brand": "La Mesma",
+      "keptOverwideValue": "LA MESMA Black Label",
+      "extraWords": 2
+    },
+    {
+      "caseId": "approved-wine-090",
+      "brand": "La Mesma",
+      "keptOverwideValue": "LA MESMA Indi",
+      "extraWords": 1
+    },
+    {
+      "caseId": "approved-wine-110",
+      "brand": "Cooley Bay",
+      "keptOverwideValue": "Cooley Bay Winery",
+      "extraWords": 1
+    },
+    {
+      "caseId": "wine-multi-artifact-05",
+      "brand": "Blazic",
+      "keptOverwideValue": "BLAZIC COLLIO",
+      "extraWords": 1
+    },
+    {
+      "caseId": "wine-multi-artifact-06",
+      "brand": "Mauro Molino",
+      "keptOverwideValue": "AZIENDA AGRICOLA MAURO MOLINO",
+      "extraWords": 2
+    }
+  ],
+  "rejectedOnlyCases": [
+    {
+      "caseId": "luigi-giovanni-live",
+      "brand": "Luigi & Giovanni",
+      "widestRejectedValue": "GOVERMENT WARNING 1 ACCORDING TO THE SURGEON GENERAL, LUIGI & GIOVANNI",
+      "reasons": ["non-brand-keyword", "too-many-words"],
+      "extraWords": 8
+    },
+    {
+      "caseId": "alfredos-wine",
+      "brand": "Alfredo's Wine",
+      "widestRejectedValue": "GOVERMENT WARNING 1 ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE",
+      "reasons": ["non-brand-keyword", "too-many-words"],
+      "extraWords": 8
+    },
+    {
+      "caseId": "approved-wine-006",
+      "brand": "Dark Horse",
+      "widestRejectedValue": "Zwosos SWi-Sv ws DARK HORSE.",
+      "reasons": ["too-many-words", "sentence-fragment"],
+      "extraWords": 3
+    },
+    {
+      "caseId": "patricia-green-cellars",
+      "brand": "Patricia Green Cellars",
+      "widestRejectedValue": "or more information about this wine website and Patricia Green Cellars",
+      "reasons": ["too-many-words", "sentence-fragment"],
+      "extraWords": 8
+    },
+    {
+      "caseId": "approved-wine-016",
+      "brand": "Marques de Navarro",
+      "widestRejectedValue": "Our Wine , Marques de Navarro Reflects with elegance the varietal character and the freshness",
+      "reasons": ["too-many-words", "sentence-fragment"],
+      "extraWords": 12
+    },
+    {
+      "caseId": "approved-wine-018",
+      "brand": "Poqr Krya",
+      "widestRejectedValue": "Poqr Krya Red Still Wine 2022 Vayots Dzor",
+      "reasons": ["too-many-words"],
+      "extraWords": 6
+    },
+    {
+      "caseId": "approved-wine-037",
+      "brand": "Touch",
+      "widestRejectedValue": "Touch Wine Is made from",
+      "reasons": ["too-many-words", "sentence-fragment"],
+      "extraWords": 4
+    },
+    {
+      "caseId": "approved-wine-038",
+      "brand": "Big Red Sunshine",
+      "widestRejectedValue": "can be hip or a regular L-7, but Big Red Sunshine is ready to-hang loose",
+      "reasons": ["too-many-words", "sentence-fragment"],
+      "extraWords": 12
+    },
+    {
+      "caseId": "approved-wine-042",
+      "brand": "Domaine Quivy",
+      "widestRejectedValue": "CHAPELLE CHAMBERTIN GRAND CRU DOMAINE QUIVY",
+      "reasons": ["too-many-words"],
+      "extraWords": 4
+    },
+    {
+      "caseId": "approved-wine-045",
+      "brand": "Meeting of the Minds",
+      "widestRejectedValue": "Samson and Delilah, this Meeting of the Minds is fire.",
+      "reasons": ["too-many-words", "sentence-fragment"],
+      "extraWords": 6
+    },
+    {
+      "caseId": "approved-wine-052",
+      "brand": "Mountain Valley Winery",
+      "widestRejectedValue": "MOUNTAIN VALLEY WINERY, PIGEON FORGE, TN, 37863",
+      "reasons": ["too-many-words"],
+      "extraWords": 4
+    },
+    {
+      "caseId": "approved-wine-063",
+      "brand": "Prinsi",
+      "widestRejectedValue": "AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI",
+      "reasons": ["producer-line", "non-brand-keyword", "too-many-words"],
+      "extraWords": 5
+    },
+    {
+      "caseId": "approved-wine-064",
+      "brand": "Prinsi",
+      "widestRejectedValue": "AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI",
+      "reasons": ["producer-line", "non-brand-keyword", "too-many-words"],
+      "extraWords": 5
+    },
+    {
+      "caseId": "approved-wine-065",
+      "brand": "Prinsi",
+      "widestRejectedValue": "AZIENDA ESTATE AGRICOLA BOTTLED BY PRINSI",
+      "reasons": ["producer-line", "non-brand-keyword", "too-many-words"],
+      "extraWords": 5
+    },
+    {
+      "caseId": "approved-wine-066",
+      "brand": "Domaine Juliette Avril",
+      "widestRejectedValue": "Produced and Bottled by Domaine Juliette Avril",
+      "reasons": ["producer-line", "non-brand-keyword", "too-many-words"],
+      "extraWords": 4
+    },
+    {
+      "caseId": "approved-wine-067",
+      "brand": "Domaine Juliette Avril",
+      "widestRejectedValue": "Produced and Bottled by Domaine Juliette Avril",
+      "reasons": ["producer-line", "non-brand-keyword", "too-many-words"],
+      "extraWords": 4
+    },
+    {
+      "caseId": "approved-wine-076",
+      "brand": "Etim",
+      "widestRejectedValue": "Martinell, who was student of Antoni Gaudi. Etim Blanc",
+      "reasons": ["too-many-words", "sentence-fragment"],
+      "extraWords": 8
+    },
+    {
+      "caseId": "approved-wine-078",
+      "brand": "Pietta",
+      "widestRejectedValue": "BOTTLE BY SOCIETA AGRICOLA PIETTA S.S",
+      "reasons": ["too-many-words"],
+      "extraWords": 5
+    },
+    {
+      "caseId": "approved-wine-084",
+      "brand": "Filadoro",
+      "widestRejectedValue": "FILADORO GIUSEPPA AZ.AGR.",
+      "reasons": ["sentence-fragment"],
+      "extraWords": 2
+    },
+    {
+      "caseId": "approved-wine-093",
+      "brand": "Fontanavecchia",
+      "widestRejectedValue": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+      "reasons": ["too-many-words"],
+      "extraWords": 5
+    },
+    {
+      "caseId": "approved-wine-094",
+      "brand": "Fontanavecchia",
+      "widestRejectedValue": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+      "reasons": ["too-many-words"],
+      "extraWords": 5
+    },
+    {
+      "caseId": "approved-wine-099",
+      "brand": "Fontanavecchia",
+      "widestRejectedValue": "A. A. FONTANAVECCHIA DI LIBERO RILLO",
+      "reasons": ["too-many-words"],
+      "extraWords": 5
+    },
+    {
+      "caseId": "approved-wine-103",
+      "brand": "Tenute Valso",
+      "widestRejectedValue": "FOR TENUTE VALSO - 91011 ALCAMO - ITALIA",
+      "reasons": ["too-many-words", "location-or-appellation", "sentence-fragment"],
+      "extraWords": 6
+    },
+    {
+      "caseId": "approved-wine-105",
+      "brand": "Luigi & Giovanni",
+      "widestRejectedValue": "GOVERMENT WARNING 1 ACCORDING TO THE SURGEON GENERAL, LUIGI & GIOVANNI",
+      "reasons": ["non-brand-keyword", "too-many-words"],
+      "extraWords": 8
+    },
+    {
+      "caseId": "approved-wine-106",
+      "brand": "Alfredo's Wine",
+      "widestRejectedValue": "GOVERMENT WARNING 1 ACCORDING TO THE SURGEON GENERAL, ALFREDO'S WINE",
+      "reasons": ["non-brand-keyword", "too-many-words"],
+      "extraWords": 8
+    },
+    {
+      "caseId": "m-cellars-baseline",
+      "brand": "M Cellars",
+      "widestRejectedValue": "Welcome to our family. M Cellars wines are estate",
+      "reasons": ["too-many-words", "sentence-fragment"],
+      "extraWords": 7
+    },
+    {
+      "caseId": "wine-multi-artifact-08",
+      "brand": "Pindar",
+      "widestRejectedValue": "ESTATE BOTTLED BY PINDAR VINEYARDS",
+      "reasons": ["producer-line", "non-brand-keyword", "too-many-words"],
+      "extraWords": 4
+    }
+  ]
+}

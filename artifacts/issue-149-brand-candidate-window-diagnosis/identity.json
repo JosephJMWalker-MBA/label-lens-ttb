@@ -1,0 +1,19 @@
+{
+  "artifact": "identity",
+  "experimentId": "issue-149-brand-candidate-window-diagnosis",
+  "baseSha": "2818505bc8f6a40141e268c0568dcd557d96db44",
+  "branch": "research/brand-candidate-window-diagnosis",
+  "originMain": "2818505bc8f6a40141e268c0568dcd557d96db44",
+  "upstreamAuthority": "artifacts/issue-149-brand-raw-ocr-rederivation (PR #223) — fresh raw-OCR truth presence",
+  "population": "artifacts/brand-evidence-path-diagnosis/cases.json",
+  "populationSha256": "91eec356e7a97fdf55b2d66a070f81b707bdb62a82f43c05608094ebb3aa59ae",
+  "corpusManifestSha256": "97aae943a57def5a57be38468556da8c5db1d0c5c0fde6136590b56107689668",
+  "frozenDefinitionsSha256": "deed0705e41db544d65bb60ecafdf10e6602b4745c31a66a6745f1c52e23a9ea",
+  "diagnosticSurfaces": [
+    "selectBrandObservationWithCompleteFilterDiagnostics (PR #220, already in main)",
+    "classifyRawOcrMatch (PR #223, already in main)"
+  ],
+  "productionModulesModified": 0,
+  "ocrEngine": { "engineId": "tesseract.js", "engineVersion": "7.0.0", "modelId": "eng" },
+  "nodeVersion": "v22.17.0"
+}

@@ -1,0 +1,18 @@
+{
+  "artifact": "determinism",
+  "runs": 2,
+  "classifier": "amendment-2 taxonomy",
+  "digests": {
+    "aggregate.json": {
+      "primary": "419af256fb42c1542a1201c3d9c52babfaa4333bf928ceeb800148622fab4dcd",
+      "repeat": "419af256fb42c1542a1201c3d9c52babfaa4333bf928ceeb800148622fab4dcd",
+      "identical": true
+    },
+    "case-level-diagnosis.json": {
+      "primary": "0e3473ef2c2a577b59745f09b13217037acc0b682cea90bf3064d655f7e1f0a8",
+      "repeat": "0e3473ef2c2a577b59745f09b13217037acc0b682cea90bf3064d655f7e1f0a8",
+      "identical": true
+    }
+  },
+  "allIdentical": true
+}
