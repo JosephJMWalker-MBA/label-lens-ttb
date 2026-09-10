@@ -1,0 +1,164 @@
+[
+  {
+    "caseId": "luigi-giovanni-live",
+    "governedBrand": "Luigi & Giovanni",
+    "winner": "VANNI",
+    "normalized": "vanni",
+    "concept": "OCR_FRAGMENT_OF_BRAND",
+    "phraseFrequency": 1,
+    "conceptFrequency": 2
+  },
+  {
+    "caseId": "approved-wine-008",
+    "governedBrand": "Vino Alpino",
+    "winner": "Azienda Agricola Terre Sparse",
+    "normalized": "azienda agricola terre sparse",
+    "concept": "PRODUCER_ENTITY_DESIGNATION",
+    "phraseFrequency": 2,
+    "conceptFrequency": 4
+  },
+  {
+    "caseId": "approved-wine-009",
+    "governedBrand": "Vino Alpino",
+    "winner": "Azienda Agricola Terre Sparse",
+    "normalized": "azienda agricola terre sparse",
+    "concept": "PRODUCER_ENTITY_DESIGNATION",
+    "phraseFrequency": 2,
+    "conceptFrequency": 4
+  },
+  {
+    "caseId": "approved-wine-018",
+    "governedBrand": "Poqr Krya",
+    "winner": "Indigenous blend",
+    "normalized": "indigenous blend",
+    "concept": "PRODUCT_DESCRIPTOR",
+    "phraseFrequency": 1,
+    "conceptFrequency": 2
+  },
+  {
+    "caseId": "approved-wine-046",
+    "governedBrand": "Curious",
+    "winner": "Red Wine Blend Curious",
+    "normalized": "red wine blend curious",
+    "concept": "PRODUCT_DESCRIPTOR",
+    "phraseFrequency": 1,
+    "conceptFrequency": 2
+  },
+  {
+    "caseId": "approved-wine-048",
+    "governedBrand": "Pacha",
+    "winner": "Winemaker",
+    "normalized": "winemaker",
+    "concept": "WINEMAKING_ROLE",
+    "phraseFrequency": 1,
+    "conceptFrequency": 1
+  },
+  {
+    "caseId": "approved-wine-063",
+    "governedBrand": "Prinsi",
+    "winner": "TRE FICHI",
+    "normalized": "tre fichi",
+    "concept": "OTHER_PROPER_NAME",
+    "phraseFrequency": 1,
+    "conceptFrequency": 1
+  },
+  {
+    "caseId": "approved-wine-064",
+    "governedBrand": "Prinsi",
+    "winner": "AZIENDA AGRICOLA",
+    "normalized": "azienda agricola",
+    "concept": "PRODUCER_ENTITY_DESIGNATION",
+    "phraseFrequency": 2,
+    "conceptFrequency": 4
+  },
+  {
+    "caseId": "approved-wine-065",
+    "governedBrand": "Prinsi",
+    "winner": "AZIENDA AGRICOLA",
+    "normalized": "azienda agricola",
+    "concept": "PRODUCER_ENTITY_DESIGNATION",
+    "phraseFrequency": 2,
+    "conceptFrequency": 4
+  },
+  {
+    "caseId": "approved-wine-067",
+    "governedBrand": "Domaine Juliette Avril",
+    "winner": "JULIETTE VRIL",
+    "normalized": "juliette vril",
+    "concept": "OCR_FRAGMENT_OF_BRAND",
+    "phraseFrequency": 1,
+    "conceptFrequency": 2
+  },
+  {
+    "caseId": "approved-wine-078",
+    "governedBrand": "Pietta",
+    "winner": "MUSCOLINE-ITALIA",
+    "normalized": "muscoline-italia",
+    "concept": "APPELLATION_OR_GEOGRAPHY",
+    "phraseFrequency": 1,
+    "conceptFrequency": 7
+  },
+  {
+    "caseId": "approved-wine-084",
+    "governedBrand": "Filadoro",
+    "winner": "BUTA DISTRIBUTORS INC",
+    "normalized": "buta distributors inc",
+    "concept": "DISTRIBUTOR_IMPORTER",
+    "phraseFrequency": 1,
+    "conceptFrequency": 1
+  },
+  {
+    "caseId": "approved-wine-088",
+    "governedBrand": "La Mesma",
+    "winner": "GAVI",
+    "normalized": "gavi",
+    "concept": "APPELLATION_OR_GEOGRAPHY",
+    "phraseFrequency": 3,
+    "conceptFrequency": 7
+  },
+  {
+    "caseId": "approved-wine-089",
+    "governedBrand": "La Mesma",
+    "winner": "GAVI",
+    "normalized": "gavi",
+    "concept": "APPELLATION_OR_GEOGRAPHY",
+    "phraseFrequency": 3,
+    "conceptFrequency": 7
+  },
+  {
+    "caseId": "approved-wine-090",
+    "governedBrand": "La Mesma",
+    "winner": "GAVI",
+    "normalized": "gavi",
+    "concept": "APPELLATION_OR_GEOGRAPHY",
+    "phraseFrequency": 3,
+    "conceptFrequency": 7
+  },
+  {
+    "caseId": "approved-wine-093",
+    "governedBrand": "Fontanavecchia",
+    "winner": "TABURNO",
+    "normalized": "taburno",
+    "concept": "APPELLATION_OR_GEOGRAPHY",
+    "phraseFrequency": 1,
+    "conceptFrequency": 7
+  },
+  {
+    "caseId": "approved-wine-105",
+    "governedBrand": "Luigi & Giovanni",
+    "winner": "CALIFORNIA",
+    "normalized": "california",
+    "concept": "APPELLATION_OR_GEOGRAPHY",
+    "phraseFrequency": 1,
+    "conceptFrequency": 7
+  },
+  {
+    "caseId": "wine-multi-artifact-05",
+    "governedBrand": "Blazic",
+    "winner": "COLLIO",
+    "normalized": "collio",
+    "concept": "APPELLATION_OR_GEOGRAPHY",
+    "phraseFrequency": 1,
+    "conceptFrequency": 7
+  }
+]

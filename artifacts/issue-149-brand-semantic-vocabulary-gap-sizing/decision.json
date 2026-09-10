@@ -1,0 +1,23 @@
+{
+  "artifact": "decision",
+  "experimentId": "issue-149-brand-semantic-vocabulary-gap-sizing",
+  "methodSha256": "35f75024b616f858b6224a1814987640403e02d52fd5caf25533fbd12b09c00d",
+  "verdict": "BOUNDED_LEXICON_HYPOTHESIS_PARTIAL",
+  "boundedCore": {
+    "concepts": ["APPELLATION_OR_GEOGRAPHY", "PRODUCER_ENTITY_DESIGNATION"],
+    "cases": 11,
+    "governedBrandTokenCollisions": 0
+  },
+  "longTail": {
+    "singletonConcepts": 3,
+    "collisionRiskyConcepts": ["PRODUCT_DESCRIPTOR"]
+  },
+  "notVocabularyShaped": {
+    "concept": "OCR_FRAGMENT_OF_BRAND",
+    "cases": 2,
+    "note": "VANNI and JULIETTE VRIL are OCR fragments of the Brand itself, the pair that structure protected before S-prime; counting them toward a lexicon opportunity would inflate it"
+  },
+  "predicateDesigned": false,
+  "vocabularyAdded": false,
+  "productionBehaviorChanged": false
+}

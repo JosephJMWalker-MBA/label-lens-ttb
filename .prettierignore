@@ -88,3 +88,9 @@ artifacts/issue-149-brand-semantic-vocabulary-coverage/aggregate.json
 artifacts/issue-149-brand-semantic-vocabulary-coverage/case-level-audit.json
 artifacts/issue-149-brand-semantic-vocabulary-coverage/primary/
 artifacts/issue-149-brand-semantic-vocabulary-coverage/repeat/
+
+# Frozen gap-sizing evidence; digests in determinism.json.
+artifacts/issue-149-brand-semantic-vocabulary-gap-sizing/aggregate.json
+artifacts/issue-149-brand-semantic-vocabulary-gap-sizing/case-level-lexicon.json
+artifacts/issue-149-brand-semantic-vocabulary-gap-sizing/primary/
+artifacts/issue-149-brand-semantic-vocabulary-gap-sizing/repeat/

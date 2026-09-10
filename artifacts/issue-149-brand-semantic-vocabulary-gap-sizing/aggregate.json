@@ -1,0 +1,489 @@
+{
+  "artifact": "aggregate",
+  "experimentId": "issue-149-brand-semantic-vocabulary-gap-sizing",
+  "methodSha256": "35f75024b616f858b6224a1814987640403e02d52fd5caf25533fbd12b09c00d",
+  "population": {
+    "vocabularyAbsent": 18,
+    "controls": 16,
+    "keptCandidatesCaptured": 482,
+    "governedBrandValues": 124
+  },
+  "distinctExactPhrases": 14,
+  "distinctConcepts": 7,
+  "conceptFrequency": {
+    "APPELLATION_OR_GEOGRAPHY": 7,
+    "PRODUCER_ENTITY_DESIGNATION": 4,
+    "OCR_FRAGMENT_OF_BRAND": 2,
+    "PRODUCT_DESCRIPTOR": 2,
+    "WINEMAKING_ROLE": 1,
+    "OTHER_PROPER_NAME": 1,
+    "DISTRIBUTOR_IMPORTER": 1
+  },
+  "coverageCurve": {
+    "top1": 7,
+    "top2": 11,
+    "top3": 13,
+    "top5": 16,
+    "of": 18
+  },
+  "singletonConcepts": [
+    "WINEMAKING_ROLE",
+    "OTHER_PROPER_NAME",
+    "DISTRIBUTOR_IMPORTER"
+  ],
+  "phraseCollisions": [
+    {
+      "phrase": "vanni",
+      "concept": "OCR_FRAGMENT_OF_BRAND",
+      "occurrencesAmong18": 1,
+      "vsGovernedBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 124
+      },
+      "vsControlBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 16
+      },
+      "vsAllKeptCandidates": {
+        "exact": 2,
+        "token": 2,
+        "total": 482
+      },
+      "vsBrandAbsentCandidates": {
+        "exact": 0,
+        "token": 0,
+        "total": 0
+      }
+    },
+    {
+      "phrase": "azienda agricola terre sparse",
+      "concept": "PRODUCER_ENTITY_DESIGNATION",
+      "occurrencesAmong18": 2,
+      "vsGovernedBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 124
+      },
+      "vsControlBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 16
+      },
+      "vsAllKeptCandidates": {
+        "exact": 2,
+        "token": 9,
+        "total": 482
+      },
+      "vsBrandAbsentCandidates": {
+        "exact": 0,
+        "token": 0,
+        "total": 0
+      }
+    },
+    {
+      "phrase": "indigenous blend",
+      "concept": "PRODUCT_DESCRIPTOR",
+      "occurrencesAmong18": 1,
+      "vsGovernedBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 124
+      },
+      "vsControlBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 16
+      },
+      "vsAllKeptCandidates": {
+        "exact": 1,
+        "token": 2,
+        "total": 482
+      },
+      "vsBrandAbsentCandidates": {
+        "exact": 0,
+        "token": 0,
+        "total": 0
+      }
+    },
+    {
+      "phrase": "red wine blend curious",
+      "concept": "PRODUCT_DESCRIPTOR",
+      "occurrencesAmong18": 1,
+      "vsGovernedBrands": {
+        "exact": 0,
+        "token": 7,
+        "total": 124
+      },
+      "vsControlBrands": {
+        "exact": 0,
+        "token": 3,
+        "total": 16
+      },
+      "vsAllKeptCandidates": {
+        "exact": 1,
+        "token": 14,
+        "total": 482
+      },
+      "vsBrandAbsentCandidates": {
+        "exact": 0,
+        "token": 0,
+        "total": 0
+      }
+    },
+    {
+      "phrase": "winemaker",
+      "concept": "WINEMAKING_ROLE",
+      "occurrencesAmong18": 1,
+      "vsGovernedBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 124
+      },
+      "vsControlBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 16
+      },
+      "vsAllKeptCandidates": {
+        "exact": 1,
+        "token": 1,
+        "total": 482
+      },
+      "vsBrandAbsentCandidates": {
+        "exact": 0,
+        "token": 0,
+        "total": 0
+      }
+    },
+    {
+      "phrase": "tre fichi",
+      "concept": "OTHER_PROPER_NAME",
+      "occurrencesAmong18": 1,
+      "vsGovernedBrands": {
+        "exact": 0,
+        "token": 1,
+        "total": 124
+      },
+      "vsControlBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 16
+      },
+      "vsAllKeptCandidates": {
+        "exact": 1,
+        "token": 2,
+        "total": 482
+      },
+      "vsBrandAbsentCandidates": {
+        "exact": 0,
+        "token": 0,
+        "total": 0
+      }
+    },
+    {
+      "phrase": "azienda agricola",
+      "concept": "PRODUCER_ENTITY_DESIGNATION",
+      "occurrencesAmong18": 2,
+      "vsGovernedBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 124
+      },
+      "vsControlBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 16
+      },
+      "vsAllKeptCandidates": {
+        "exact": 3,
+        "token": 9,
+        "total": 482
+      },
+      "vsBrandAbsentCandidates": {
+        "exact": 0,
+        "token": 0,
+        "total": 0
+      }
+    },
+    {
+      "phrase": "juliette vril",
+      "concept": "OCR_FRAGMENT_OF_BRAND",
+      "occurrencesAmong18": 1,
+      "vsGovernedBrands": {
+        "exact": 0,
+        "token": 2,
+        "total": 124
+      },
+      "vsControlBrands": {
+        "exact": 0,
+        "token": 1,
+        "total": 16
+      },
+      "vsAllKeptCandidates": {
+        "exact": 2,
+        "token": 2,
+        "total": 482
+      },
+      "vsBrandAbsentCandidates": {
+        "exact": 0,
+        "token": 0,
+        "total": 0
+      }
+    },
+    {
+      "phrase": "muscoline-italia",
+      "concept": "APPELLATION_OR_GEOGRAPHY",
+      "occurrencesAmong18": 1,
+      "vsGovernedBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 124
+      },
+      "vsControlBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 16
+      },
+      "vsAllKeptCandidates": {
+        "exact": 1,
+        "token": 1,
+        "total": 482
+      },
+      "vsBrandAbsentCandidates": {
+        "exact": 0,
+        "token": 0,
+        "total": 0
+      }
+    },
+    {
+      "phrase": "buta distributors inc",
+      "concept": "DISTRIBUTOR_IMPORTER",
+      "occurrencesAmong18": 1,
+      "vsGovernedBrands": {
+        "exact": 0,
+        "token": 3,
+        "total": 124
+      },
+      "vsControlBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 16
+      },
+      "vsAllKeptCandidates": {
+        "exact": 1,
+        "token": 3,
+        "total": 482
+      },
+      "vsBrandAbsentCandidates": {
+        "exact": 0,
+        "token": 0,
+        "total": 0
+      }
+    },
+    {
+      "phrase": "gavi",
+      "concept": "APPELLATION_OR_GEOGRAPHY",
+      "occurrencesAmong18": 3,
+      "vsGovernedBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 124
+      },
+      "vsControlBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 16
+      },
+      "vsAllKeptCandidates": {
+        "exact": 3,
+        "token": 6,
+        "total": 482
+      },
+      "vsBrandAbsentCandidates": {
+        "exact": 0,
+        "token": 0,
+        "total": 0
+      }
+    },
+    {
+      "phrase": "taburno",
+      "concept": "APPELLATION_OR_GEOGRAPHY",
+      "occurrencesAmong18": 1,
+      "vsGovernedBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 124
+      },
+      "vsControlBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 16
+      },
+      "vsAllKeptCandidates": {
+        "exact": 1,
+        "token": 1,
+        "total": 482
+      },
+      "vsBrandAbsentCandidates": {
+        "exact": 0,
+        "token": 0,
+        "total": 0
+      }
+    },
+    {
+      "phrase": "california",
+      "concept": "APPELLATION_OR_GEOGRAPHY",
+      "occurrencesAmong18": 1,
+      "vsGovernedBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 124
+      },
+      "vsControlBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 16
+      },
+      "vsAllKeptCandidates": {
+        "exact": 2,
+        "token": 7,
+        "total": 482
+      },
+      "vsBrandAbsentCandidates": {
+        "exact": 0,
+        "token": 0,
+        "total": 0
+      }
+    },
+    {
+      "phrase": "collio",
+      "concept": "APPELLATION_OR_GEOGRAPHY",
+      "occurrencesAmong18": 1,
+      "vsGovernedBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 124
+      },
+      "vsControlBrands": {
+        "exact": 0,
+        "token": 0,
+        "total": 16
+      },
+      "vsAllKeptCandidates": {
+        "exact": 2,
+        "token": 3,
+        "total": 482
+      },
+      "vsBrandAbsentCandidates": {
+        "exact": 0,
+        "token": 0,
+        "total": 0
+      }
+    }
+  ],
+  "conceptCollisions": [
+    {
+      "concept": "OCR_FRAGMENT_OF_BRAND",
+      "cases": 2,
+      "vocabularyTokens": [
+        "vanni",
+        "juliette",
+        "vril"
+      ],
+      "tokenCollisionInGovernedBrands": 2,
+      "governedBrandTotal": 124,
+      "tokenCollisionInKeptCandidates": 4,
+      "keptCandidateTotal": 482
+    },
+    {
+      "concept": "PRODUCER_ENTITY_DESIGNATION",
+      "cases": 4,
+      "vocabularyTokens": [
+        "azienda",
+        "agricola",
+        "terre",
+        "sparse"
+      ],
+      "tokenCollisionInGovernedBrands": 0,
+      "governedBrandTotal": 124,
+      "tokenCollisionInKeptCandidates": 9,
+      "keptCandidateTotal": 482
+    },
+    {
+      "concept": "PRODUCT_DESCRIPTOR",
+      "cases": 2,
+      "vocabularyTokens": [
+        "indigenous",
+        "blend",
+        "red",
+        "wine",
+        "curious"
+      ],
+      "tokenCollisionInGovernedBrands": 7,
+      "governedBrandTotal": 124,
+      "tokenCollisionInKeptCandidates": 14,
+      "keptCandidateTotal": 482
+    },
+    {
+      "concept": "WINEMAKING_ROLE",
+      "cases": 1,
+      "vocabularyTokens": [
+        "winemaker"
+      ],
+      "tokenCollisionInGovernedBrands": 0,
+      "governedBrandTotal": 124,
+      "tokenCollisionInKeptCandidates": 1,
+      "keptCandidateTotal": 482
+    },
+    {
+      "concept": "OTHER_PROPER_NAME",
+      "cases": 1,
+      "vocabularyTokens": [
+        "tre",
+        "fichi"
+      ],
+      "tokenCollisionInGovernedBrands": 1,
+      "governedBrandTotal": 124,
+      "tokenCollisionInKeptCandidates": 2,
+      "keptCandidateTotal": 482
+    },
+    {
+      "concept": "APPELLATION_OR_GEOGRAPHY",
+      "cases": 7,
+      "vocabularyTokens": [
+        "muscolineitalia",
+        "gavi",
+        "taburno",
+        "california",
+        "collio"
+      ],
+      "tokenCollisionInGovernedBrands": 0,
+      "governedBrandTotal": 124,
+      "tokenCollisionInKeptCandidates": 18,
+      "keptCandidateTotal": 482
+    },
+    {
+      "concept": "DISTRIBUTOR_IMPORTER",
+      "cases": 1,
+      "vocabularyTokens": [
+        "buta",
+        "distributors",
+        "inc"
+      ],
+      "tokenCollisionInGovernedBrands": 3,
+      "governedBrandTotal": 124,
+      "tokenCollisionInKeptCandidates": 3,
+      "keptCandidateTotal": 482
+    }
+  ],
+  "keptSeparate": {
+    "existingVocabularyPolarityCases": [
+      "approved-wine-012",
+      "approved-wine-110"
+    ],
+    "visionEarnedCase": "m-cellars-baseline"
+  },
+  "productionBehaviorChanged": false
+}
