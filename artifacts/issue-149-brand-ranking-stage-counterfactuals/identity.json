@@ -1,0 +1,15 @@
+{
+  "artifact": "identity",
+  "experimentId": "issue-149-brand-ranking-stage-counterfactuals",
+  "baseSha": "6a969e4bacf853b2fdbb37d80ef6400cea13c8a8",
+  "branch": "research/brand-ranking-stage-counterfactuals",
+  "evaluationDependency": {
+    "rankingDiagnosis": "6a969e4bacf853b2fdbb37d80ef6400cea13c8a8",
+    "oracleCheckpoint": "8de5b9fc05b61ad423b63d6c02bcb11f5a9c1db2",
+    "note": "ancestry is an evaluation dependency only; not a claim the oracle seam belongs in production"
+  },
+  "switchesSha256": "80f849ee47acf037bb4e6ea102b3b7bb0077c7473298c0ba8e44f9db5aec72bb",
+  "baselineReproduction": "115/115 exact",
+  "productionBehaviorChanged": false,
+  "nodeVersion": "v22.17.0"
+}

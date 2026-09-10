@@ -1,0 +1,3742 @@
+[
+  {
+    "caseId": "luigi-giovanni-live",
+    "governedBrand": [
+      "Luigi & Giovanni"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "VANNI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "TASTE OF ITALY",
+        "winner": "VANNI"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "VANNI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "TASTE OF ITALY",
+        "winner": "VANNI"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "VANNI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "VANNI",
+        "winner": "VANNI"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "VANNI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "TASTE OF ITALY",
+        "winner": "VANNI"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "VANNI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "VANNI",
+        "winner": "VANNI"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "VANNI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "TASTE OF ITALY",
+        "winner": "VANNI"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "LUIGI & GIOVANNI",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "LUIGI & GIOVANNI"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "LUIGI & GIOVANNI",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "LUIGI & GIOVANNI"
+      }
+    },
+    "minimumSufficientSets": [
+      "E+S"
+    ]
+  },
+  {
+    "caseId": "alfredos-wine",
+    "governedBrand": [
+      "Alfredo's Wine",
+      "Alfredo's"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "HLTRE",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WIN t",
+        "winner": "HLTRE"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "HLTRE",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WIN t",
+        "winner": "HLTRE"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "ALFREDO'S WINE",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "ALFREDO'S WINE"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "HLTRE",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WIN t",
+        "winner": "HLTRE"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "ALFREDO'S WINE",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "ALFREDO'S WINE"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "HLTRE",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WIN t",
+        "winner": "HLTRE"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "ALFREDO'S WINE",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "ALFREDO'S WINE"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "ALFREDO'S WINE",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "ALFREDO'S WINE"
+      }
+    },
+    "minimumSufficientSets": [
+      "E"
+    ]
+  },
+  {
+    "caseId": "approved-wine-008",
+    "governedBrand": [
+      "Vino Alpino"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Via Chiaverano 21",
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Via Chiaverano 21",
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Vino Rosso",
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Vino Rosso",
+        "winner": "Azienda Agricola Terre Sparse"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-009",
+    "governedBrand": [
+      "Vino Alpino"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Via Chiaverano 21",
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Via Chiaverano 21",
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Vino Rosso",
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Azienda Agricola Terre Sparse"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Azienda Agricola Terre Sparse",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Vino Rosso",
+        "winner": "Azienda Agricola Terre Sparse"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-012",
+    "governedBrand": [
+      "Cooley Bay"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cool&y",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Cool&y"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cool&y",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Cooley Bay Winery",
+        "winner": "Cool&y"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cooley Bay Winery",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Cooley Bay Winery"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cool&y",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Cool&y"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Cooley Bay Winery",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Texas Tempranillo 750ml",
+        "winner": "Cooley Bay Winery"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cool&y",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Cooley Bay Winery",
+        "winner": "Cool&y"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cooley Bay Winery",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Cooley Bay Winery"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Cooley Bay Winery",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Cooley Bay Winery",
+        "winner": "Cooley Bay Winery"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "patricia-green-cellars",
+    "governedBrand": [
+      "Patricia Green Cellars"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": true,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "ESTATE VINEYARD",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "ESTATE VINEYARD"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "ESTATE VINEYARD",
+        "selectedCorrectly": false,
+        "causalCompetitor": "PATRICIA GREEN CELLARS",
+        "winner": "ESTATE VINEYARD"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "ESTATE VINEYARD",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "ESTATE VINEYARD"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "PATRICIA GREEN CELLARS",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "PATRICIA GREEN CELLARS"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "ESTATE VINEYARD",
+        "selectedCorrectly": false,
+        "causalCompetitor": "PATRICIA GREEN CELLARS",
+        "winner": "ESTATE VINEYARD"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "PATRICIA GREEN CELLARS",
+        "selectedCorrectly": true,
+        "causalCompetitor": "PATRICIA GREEN CELLARS",
+        "winner": "PATRICIA GREEN CELLARS"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "PATRICIA GREEN CELLARS",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "PATRICIA GREEN CELLARS"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "PATRICIA GREEN CELLARS",
+        "selectedCorrectly": true,
+        "causalCompetitor": "PATRICIA GREEN CELLARS",
+        "winner": "PATRICIA GREEN CELLARS"
+      }
+    },
+    "minimumSufficientSets": [
+      "S"
+    ]
+  },
+  {
+    "caseId": "approved-wine-016",
+    "governedBrand": [
+      "Marques de Navarro"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "MARQUES vo NAVARRO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "MARQUES vo NAVARRO",
+        "winner": "MARQUES vo NAVARRO"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "MARQUES vo NAVARRO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "MARQUES vo NAVARRO",
+        "winner": "MARQUES vo NAVARRO"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "MARQUES vo NAVARRO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "MARQUES vo NAVARRO",
+        "winner": "MARQUES vo NAVARRO"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Marques de Navarro",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Marques de Navarro"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "MARQUES vo NAVARRO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "MARQUES vo NAVARRO",
+        "winner": "MARQUES vo NAVARRO"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Marques de Navarro",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Marques de Navarro"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Marques de Navarro",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Marques de Navarro"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Marques de Navarro",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Marques de Navarro"
+      }
+    },
+    "minimumSufficientSets": [
+      "S"
+    ]
+  },
+  {
+    "caseId": "approved-wine-018",
+    "governedBrand": [
+      "Poqr Krya",
+      "POQR KRYA"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Indigenous blend",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Indigenous blend",
+        "winner": "Indigenous blend"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Indigenous blend",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Indigenous blend",
+        "winner": "Indigenous blend"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Indigenous blend",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Indigenous blend",
+        "winner": "Indigenous blend"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Indigenous blend",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Indigenous blend",
+        "winner": "Indigenous blend"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Indigenous blend",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Indigenous blend",
+        "winner": "Indigenous blend"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Indigenous blend",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Indigenous blend",
+        "winner": "Indigenous blend"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Indigenous blend",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Indigenous blend",
+        "winner": "Indigenous blend"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Indigenous blend",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Indigenous blend",
+        "winner": "Indigenous blend"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-037",
+    "governedBrand": [
+      "Touch"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Strumica - Radovish Region",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Product of North Macedonia",
+        "winner": "Strumica - Radovish Region"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Strumica - Radovish Region",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Product of North Macedonia",
+        "winner": "Strumica - Radovish Region"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Strumica - Radovish Region",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Product of North Macedonia",
+        "winner": "Strumica - Radovish Region"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Strumica - Radovish Region",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Strumica - Radovish Region",
+        "winner": "Strumica - Radovish Region"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Strumica - Radovish Region",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Product of North Macedonia",
+        "winner": "Strumica - Radovish Region"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Strumica - Radovish Region",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Strumica - Radovish Region",
+        "winner": "Strumica - Radovish Region"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Strumica - Radovish Region",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Strumica - Radovish Region",
+        "winner": "Strumica - Radovish Region"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Strumica - Radovish Region",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Strumica - Radovish Region",
+        "winner": "Strumica - Radovish Region"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-038",
+    "governedBrand": [
+      "Big Red Sunshine"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "2024 SOUTH COAST PRIMITIVO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "2024 SOUTH COAST PRIMITIVO",
+        "winner": "2024 SOUTH COAST PRIMITIVO"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "2024 SOUTH COAST PRIMITIVO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "2024 SOUTH COAST PRIMITIVO",
+        "winner": "2024 SOUTH COAST PRIMITIVO"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "2024 SOUTH COAST PRIMITIVO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "2024 SOUTH COAST PRIMITIVO",
+        "winner": "2024 SOUTH COAST PRIMITIVO"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Big Red Sunshine",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Big Red Sunshine"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "2024 SOUTH COAST PRIMITIVO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "2024 SOUTH COAST PRIMITIVO",
+        "winner": "2024 SOUTH COAST PRIMITIVO"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Big Red Sunshine",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Big Red Sunshine"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Big Red Sunshine",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Big Red Sunshine"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Big Red Sunshine",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Big Red Sunshine"
+      }
+    },
+    "minimumSufficientSets": [
+      "S"
+    ]
+  },
+  {
+    "caseId": "approved-wine-045",
+    "governedBrand": [
+      "Meeting of the Minds"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Meeting of ihe Minds",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Meeting of ihe Minds",
+        "winner": "Meeting of ihe Minds"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Meeting of ihe Minds",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Meeting of ihe Minds",
+        "winner": "Meeting of ihe Minds"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Meeting of ihe Minds",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Meeting of ihe Minds",
+        "winner": "Meeting of ihe Minds"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Meeting of the Minds",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Meeting of the Minds"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Meeting of ihe Minds",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Meeting of ihe Minds",
+        "winner": "Meeting of ihe Minds"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Meeting of the Minds",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Meeting of the Minds"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Meeting of the Minds",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Meeting of the Minds"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Meeting of the Minds",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Meeting of the Minds"
+      }
+    },
+    "minimumSufficientSets": [
+      "S"
+    ]
+  },
+  {
+    "caseId": "approved-wine-046",
+    "governedBrand": [
+      "Curious"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Red Wine Blend Curious",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Red Wine Blend Curious"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Red Wine Blend Curious",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Acampo, CA BW-CA-6492",
+        "winner": "Red Wine Blend Curious"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Red Wine Blend Curious",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Red Wine Blend Curious"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Red Wine Blend Curious",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Red Wine Blend Curious"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Red Wine Blend Curious",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Acampo, CA BW-CA-6492",
+        "winner": "Red Wine Blend Curious"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Red Wine Blend Curious",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Red Wine Blend Curious",
+        "winner": "Red Wine Blend Curious"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Red Wine Blend Curious",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Red Wine Blend Curious"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Red Wine Blend Curious",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Red Wine Blend Curious",
+        "winner": "Red Wine Blend Curious"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-048",
+    "governedBrand": [
+      "Pacha"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Pacha RESERVA - CARMENERE",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Seattle WA",
+        "winner": "Pacha RESERVA - CARMENERE"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Pacha RESERVA - CARMENERE",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Vifia Marty SpA",
+        "winner": "Pacha RESERVA - CARMENERE"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Pacha RESERVA - CARMENERE",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Winemaker",
+        "winner": "Pacha RESERVA - CARMENERE"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Pacha RESERVA - CARMENERE",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Seattle WA",
+        "winner": "Pacha RESERVA - CARMENERE"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Pacha RESERVA - CARMENERE",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Vifia Marty SpA",
+        "winner": "Pacha RESERVA - CARMENERE"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Pacha RESERVA - CARMENERE",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Vifia Marty SpA",
+        "winner": "Pacha RESERVA - CARMENERE"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Andes Wine Imports LLC",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Winemaker",
+        "winner": "Andes Wine Imports LLC"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Andes Wine Imports LLC",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Winemaker",
+        "winner": "Andes Wine Imports LLC"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-051",
+    "governedBrand": [
+      "Pacheca"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "PACHECA DOURO D.O.C",
+        "selectedCorrectly": false,
+        "causalCompetitor": "SELO GROUP 1 afr",
+        "winner": "PACHECA DOURO D.O.C"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "PACHECA DOURO D.O.C",
+        "selectedCorrectly": false,
+        "causalCompetitor": "SELO GROUP 1 afr",
+        "winner": "PACHECA DOURO D.O.C"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "PACHECA DOURO D.O.C",
+        "selectedCorrectly": false,
+        "causalCompetitor": "RESERVA VINHAS VELHAS 2023",
+        "winner": "PACHECA DOURO D.O.C"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "PACHECA DOURO D.O.C",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "PACHECA DOURO D.O.C"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "PACHECA DOURO D.O.C",
+        "selectedCorrectly": false,
+        "causalCompetitor": "RESERVA VINHAS VELHAS 2023",
+        "winner": "PACHECA DOURO D.O.C"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "PACHECA DOURO D.O.C",
+        "selectedCorrectly": false,
+        "causalCompetitor": "SELO GROUP 1 afr",
+        "winner": "PACHECA DOURO D.O.C"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "PACHECA DOURO D.O.C",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "PACHECA DOURO D.O.C"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "PACHECA DOURO D.O.C",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Pacheca",
+        "winner": "PACHECA DOURO D.O.C"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-052",
+    "governedBrand": [
+      "Mountain Valley Winery"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "OLp VINE ZINFANDEL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "VALLEY",
+        "winner": "OLp VINE ZINFANDEL"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "OLp VINE ZINFANDEL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "VALLEY",
+        "winner": "OLp VINE ZINFANDEL"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "MOUNTAIN VALLEY WINERY,",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "MOUNTAIN VALLEY WINERY,"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "OLp VINE ZINFANDEL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "MOUNTAIN",
+        "winner": "OLp VINE ZINFANDEL"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "MOUNTAIN VALLEY WINERY,",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "MOUNTAIN VALLEY WINERY,"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "OLp VINE ZINFANDEL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "MOUNTAIN",
+        "winner": "OLp VINE ZINFANDEL"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "MOUNTAIN VALLEY WINERY,",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "MOUNTAIN VALLEY WINERY,"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "MOUNTAIN VALLEY WINERY,",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "MOUNTAIN VALLEY WINERY,"
+      }
+    },
+    "minimumSufficientSets": [
+      "E"
+    ]
+  },
+  {
+    "caseId": "approved-wine-063",
+    "governedBrand": [
+      "Prinsi"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "TRE FICHI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "TRE FICHI"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "TRE FICHI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "TRE FICHI"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Prins",
+        "winner": "AZIENDA AGRICOLA"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "TRE FICHI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "TRE FICHI"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Prins",
+        "winner": "AZIENDA AGRICOLA"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "TRE FICHI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "TRE FICHI"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "TRE FICHI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "TRE FICHI"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "TRE FICHI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "TRE FICHI"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-064",
+    "governedBrand": [
+      "Prinsi"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Prins",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Cordova, TN",
+        "winner": "Prins"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Prins",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Cordova, TN",
+        "winner": "Prins"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Prins",
+        "winner": "AZIENDA AGRICOLA"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Sang",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Cordova, TN",
+        "winner": "Sang"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Prins",
+        "winner": "AZIENDA AGRICOLA"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Sang",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Cordova, TN",
+        "winner": "Sang"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "AZIENDA AGRICOLA"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "AZIENDA AGRICOLA"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-065",
+    "governedBrand": [
+      "Prinsi"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Prins",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "Prins"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Prins",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "Prins"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Cordova, TN 3065172201",
+        "winner": "AZIENDA AGRICOLA"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Prins",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "Prins"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Cordova, TN 3065172201",
+        "winner": "AZIENDA AGRICOLA"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Prins",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "Prins"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "AZIENDA AGRICOLA"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA",
+        "winner": "AZIENDA AGRICOLA"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-066",
+    "governedBrand": [
+      "Domaine Juliette Avril"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "JULIETTE VRIL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "PRODUCT OF FRANCE",
+        "winner": "JULIETTE VRIL"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "JULIETTE VRIL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "PRODUCT OF FRANCE",
+        "winner": "JULIETTE VRIL"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "JULIETTE VRIL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "JULIETTE VRIL",
+        "winner": "JULIETTE VRIL"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "JULIETTE VRIL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "PRODUCT OF FRANCE",
+        "winner": "JULIETTE VRIL"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "JULIETTE VRIL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "JULIETTE VRIL",
+        "winner": "JULIETTE VRIL"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "JULIETTE VRIL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "PRODUCT OF FRANCE",
+        "winner": "JULIETTE VRIL"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Domaine Juliette Avril",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Domaine Juliette Avril"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Domaine Juliette Avril",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Domaine Juliette Avril"
+      }
+    },
+    "minimumSufficientSets": [
+      "E+S"
+    ]
+  },
+  {
+    "caseId": "approved-wine-067",
+    "governedBrand": [
+      "Domaine Juliette Avril"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "JULIETTE VRIL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "PRODUCT OF FRANCE",
+        "winner": "JULIETTE VRIL"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "JULIETTE VRIL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "PRODUCT OF FRANCE",
+        "winner": "JULIETTE VRIL"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "JULIETTE VRIL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "JULIETTE VRIL",
+        "winner": "JULIETTE VRIL"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "JULIETTE VRIL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "PRODUCT OF FRANCE",
+        "winner": "JULIETTE VRIL"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "JULIETTE VRIL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "JULIETTE VRIL",
+        "winner": "JULIETTE VRIL"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "JULIETTE VRIL",
+        "selectedCorrectly": false,
+        "causalCompetitor": "PRODUCT OF FRANCE",
+        "winner": "JULIETTE VRIL"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Domaine Juliette Avril",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Domaine Juliette Avril"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "Domaine Juliette Avril",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "Domaine Juliette Avril"
+      }
+    },
+    "minimumSufficientSets": [
+      "E+S"
+    ]
+  },
+  {
+    "caseId": "approved-wine-076",
+    "governedBrand": [
+      "Etim"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Flore",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AGRICOLA FALSET-MARGA",
+        "winner": "Flore"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Flore",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AGRICOLA FALSET-MARGA",
+        "winner": "Flore"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "AGRICOLA FALSET-MARGA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Flore",
+        "winner": "AGRICOLA FALSET-MARGA"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Flore",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AGRICOLA FALSET-MARGA",
+        "winner": "Flore"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "AGRICOLA FALSET-MARGA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Flore",
+        "winner": "AGRICOLA FALSET-MARGA"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Flore",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AGRICOLA FALSET-MARGA",
+        "winner": "Flore"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "R.E.2163T FALSET",
+        "selectedCorrectly": false,
+        "causalCompetitor": "DENOMINACIO DORIGEN",
+        "winner": "R.E.2163T FALSET"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "R.E.2163T FALSET",
+        "selectedCorrectly": false,
+        "causalCompetitor": "DENOMINACIO DORIGEN",
+        "winner": "R.E.2163T FALSET"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-078",
+    "governedBrand": [
+      "Pietta"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": true,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "MUSCOLINE-ITALIA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "GARDA",
+        "winner": "MUSCOLINE-ITALIA"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "MUSCOLINE-ITALIA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "GARDA",
+        "winner": "MUSCOLINE-ITALIA"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "MUSCOLINE-ITALIA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "GARDA",
+        "winner": "MUSCOLINE-ITALIA"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "MUSCOLINE-ITALIA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "GARDA",
+        "winner": "MUSCOLINE-ITALIA"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "MUSCOLINE-ITALIA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "GARDA",
+        "winner": "MUSCOLINE-ITALIA"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "MUSCOLINE-ITALIA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "MUSCOLINE-ITALIA",
+        "winner": "MUSCOLINE-ITALIA"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "MUSCOLINE-ITALIA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "MUSCOLINE-ITALIA",
+        "winner": "MUSCOLINE-ITALIA"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "MUSCOLINE-ITALIA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "MUSCOLINE-ITALIA",
+        "winner": "MUSCOLINE-ITALIA"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-084",
+    "governedBrand": [
+      "Filadoro"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "BUTA DISTRIBUTORS INC",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Boca Raton - FL",
+        "winner": "BUTA DISTRIBUTORS INC"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "BUTA DISTRIBUTORS INC",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Boca Raton - FL",
+        "winner": "BUTA DISTRIBUTORS INC"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "BUTA DISTRIBUTORS INC",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Boca Raton - FL",
+        "winner": "BUTA DISTRIBUTORS INC"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "BUTA DISTRIBUTORS INC",
+        "selectedCorrectly": false,
+        "causalCompetitor": "BUTA DISTRIBUTORS INC",
+        "winner": "BUTA DISTRIBUTORS INC"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "BUTA DISTRIBUTORS INC",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Boca Raton - FL",
+        "winner": "BUTA DISTRIBUTORS INC"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "BUTA DISTRIBUTORS INC",
+        "selectedCorrectly": false,
+        "causalCompetitor": "BUTA DISTRIBUTORS INC",
+        "winner": "BUTA DISTRIBUTORS INC"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "BUTA DISTRIBUTORS INC",
+        "selectedCorrectly": false,
+        "causalCompetitor": "BUTA DISTRIBUTORS INC",
+        "winner": "BUTA DISTRIBUTORS INC"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "BUTA DISTRIBUTORS INC",
+        "selectedCorrectly": false,
+        "causalCompetitor": "BUTA DISTRIBUTORS INC",
+        "winner": "BUTA DISTRIBUTORS INC"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-088",
+    "governedBrand": [
+      "La Mesma"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "LA MESMA Yellow Label",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "LA MESMA Yellow Label"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "LA MESMA Yellow Label",
+        "selectedCorrectly": false,
+        "causalCompetitor": "GAVI",
+        "winner": "LA MESMA Yellow Label"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "LA MESMA Yellow Label",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "LA MESMA Yellow Label"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "WHITE WINE 2018 Lo119",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "WHITE WINE 2018 Lo119"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "LA MESMA Yellow Label",
+        "selectedCorrectly": false,
+        "causalCompetitor": "GAVI",
+        "winner": "LA MESMA Yellow Label"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 7,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "WHITE WINE 2018 Lo119",
+        "selectedCorrectly": false,
+        "causalCompetitor": "La Mesma",
+        "winner": "WHITE WINE 2018 Lo119"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "WHITE WINE 2018 Lo119",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "WHITE WINE 2018 Lo119"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 7,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "WHITE WINE 2018 Lo119",
+        "selectedCorrectly": false,
+        "causalCompetitor": "La Mesma",
+        "winner": "WHITE WINE 2018 Lo119"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-089",
+    "governedBrand": [
+      "La Mesma"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "LA MESMA Black Label",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "LA MESMA Black Label"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "LA MESMA Black Label",
+        "selectedCorrectly": false,
+        "causalCompetitor": "GAVI",
+        "winner": "LA MESMA Black Label"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "LA MESMA Black Label",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "LA MESMA Black Label"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DEL COMUNE DI GAVI",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "DEL COMUNE DI GAVI"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "LA MESMA Black Label",
+        "selectedCorrectly": false,
+        "causalCompetitor": "GAVI",
+        "winner": "LA MESMA Black Label"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DEL COMUNE DI GAVI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "La Mesma",
+        "winner": "DEL COMUNE DI GAVI"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DEL COMUNE DI GAVI",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "DEL COMUNE DI GAVI"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DEL COMUNE DI GAVI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "La Mesma",
+        "winner": "DEL COMUNE DI GAVI"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-090",
+    "governedBrand": [
+      "La Mesma"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "WHITE WINE 2018 Lo219",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "WHITE WINE 2018 Lo219"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "WHITE WINE 2018 Lo219",
+        "selectedCorrectly": false,
+        "causalCompetitor": "GAVI",
+        "winner": "WHITE WINE 2018 Lo219"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "WHITE WINE 2018 Lo219",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "WHITE WINE 2018 Lo219"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DEL COMUNE DI GAVI",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "DEL COMUNE DI GAVI"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "WHITE WINE 2018 Lo219",
+        "selectedCorrectly": false,
+        "causalCompetitor": "GAVI",
+        "winner": "WHITE WINE 2018 Lo219"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DEL COMUNE DI GAVI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "LA MESMA Indi",
+        "winner": "DEL COMUNE DI GAVI"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": true,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DEL COMUNE DI GAVI",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "DEL COMUNE DI GAVI"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DEL COMUNE DI GAVI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "LA MESMA Indi",
+        "winner": "DEL COMUNE DI GAVI"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-093",
+    "governedBrand": [
+      "Fontanavecchia"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DELRAY BEACH, FL, USA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "FALANGHINADELSANNIO",
+        "winner": "DELRAY BEACH, FL, USA"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DELRAY BEACH, FL, USA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "FALANGHINADELSANNIO",
+        "winner": "DELRAY BEACH, FL, USA"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "FALANGHINADELSANNIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WHITE WINE OF SANNIO",
+        "winner": "FALANGHINADELSANNIO"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DELRAY BEACH, FL, USA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "FALANGHINADELSANNIO",
+        "winner": "DELRAY BEACH, FL, USA"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "FALANGHINADELSANNIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WHITE WINE OF SANNIO",
+        "winner": "FALANGHINADELSANNIO"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DELRAY BEACH, FL, USA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "FALANGHINADELSANNIO",
+        "winner": "DELRAY BEACH, FL, USA"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "WHITE WINE OF SANNIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "TABURNO",
+        "winner": "WHITE WINE OF SANNIO"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "WHITE WINE OF SANNIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "TABURNO",
+        "winner": "WHITE WINE OF SANNIO"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-094",
+    "governedBrand": [
+      "Fontanavecchia"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "DELRAY BEACH. FL, USA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WHITE WINE OF SANNIO",
+        "winner": "DELRAY BEACH. FL, USA"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "DELRAY BEACH. FL, USA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WHITE WINE OF SANNIO",
+        "winner": "DELRAY BEACH. FL, USA"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DELRAY BEACH. FL, USA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WHITE WINE OF SANNIO",
+        "winner": "DELRAY BEACH. FL, USA"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "WHITE WINE OF SANNIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WHITE WINE OF SANNIO",
+        "winner": "WHITE WINE OF SANNIO"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DELRAY BEACH. FL, USA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WHITE WINE OF SANNIO",
+        "winner": "DELRAY BEACH. FL, USA"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "WHITE WINE OF SANNIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WHITE WINE OF SANNIO",
+        "winner": "WHITE WINE OF SANNIO"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "WHITE WINE OF SANNIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "DENOMINAZIONE DI ORIGINE PROTETTA",
+        "winner": "WHITE WINE OF SANNIO"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "WHITE WINE OF SANNIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "DENOMINAZIONE DI ORIGINE PROTETTA",
+        "winner": "WHITE WINE OF SANNIO"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-099",
+    "governedBrand": [
+      "Fontanavecchia"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "DELRAY BEACH, FL, USA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WHITE WINE OF SANNIO",
+        "winner": "DELRAY BEACH, FL, USA"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "DELRAY BEACH, FL, USA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WHITE WINE OF SANNIO",
+        "winner": "DELRAY BEACH, FL, USA"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DELRAY BEACH, FL, USA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WHITE WINE OF SANNIO",
+        "winner": "DELRAY BEACH, FL, USA"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "WHITE WINE OF SANNIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "DELRAY BEACH, FL, USA",
+        "winner": "WHITE WINE OF SANNIO"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "DELRAY BEACH, FL, USA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WHITE WINE OF SANNIO",
+        "winner": "DELRAY BEACH, FL, USA"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "WHITE WINE OF SANNIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "DELRAY BEACH, FL, USA",
+        "winner": "WHITE WINE OF SANNIO"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "WHITE WINE OF SANNIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "DELRAY BEACH, FL, USA",
+        "winner": "WHITE WINE OF SANNIO"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "WHITE WINE OF SANNIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "DELRAY BEACH, FL, USA",
+        "winner": "WHITE WINE OF SANNIO"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-103",
+    "governedBrand": [
+      "Tenute Valso"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "SNA VALSO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "TENUTE",
+        "winner": "SNA VALSO"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "SNA VALSO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "TENUTE",
+        "winner": "SNA VALSO"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "DENOMINAZIONE DI ORIGINE CONTROLLATA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "DENOMINAZIONE DI ORIGINE CONTROLLATA",
+        "winner": "DENOMINAZIONE DI ORIGINE CONTROLLATA"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "SICILIA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "TENUTE",
+        "winner": "SICILIA"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "DENOMINAZIONE DI ORIGINE CONTROLLATA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "DENOMINAZIONE DI ORIGINE CONTROLLATA",
+        "winner": "DENOMINAZIONE DI ORIGINE CONTROLLATA"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "SICILIA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "TENUTE",
+        "winner": "SICILIA"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "TENUTE VALSO",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "TENUTE VALSO"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "TENUTE VALSO",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "TENUTE VALSO"
+      }
+    },
+    "minimumSufficientSets": [
+      "E+S"
+    ]
+  },
+  {
+    "caseId": "approved-wine-105",
+    "governedBrand": [
+      "Luigi & Giovanni"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "VANNI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "CALIFORNIA",
+        "winner": "VANNI"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "VANNI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "CALIFORNIA",
+        "winner": "VANNI"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "VANNI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "VANNI",
+        "winner": "VANNI"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "VANNI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "CALIFORNIA",
+        "winner": "VANNI"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "VANNI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "VANNI",
+        "winner": "VANNI"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "VANNI",
+        "selectedCorrectly": false,
+        "causalCompetitor": "CALIFORNIA",
+        "winner": "VANNI"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "CALIFORNIA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "VANNI",
+        "winner": "CALIFORNIA"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "CALIFORNIA",
+        "selectedCorrectly": false,
+        "causalCompetitor": "VANNI",
+        "winner": "CALIFORNIA"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "approved-wine-106",
+    "governedBrand": [
+      "Alfredo's Wine",
+      "Alfredos Wine"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "REDO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WIN t",
+        "winner": "REDO"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "REDO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WIN t",
+        "winner": "REDO"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "ALFREDO'S WINE",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "ALFREDO'S WINE"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "REDO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WIN t",
+        "winner": "REDO"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "ALFREDO'S WINE",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "ALFREDO'S WINE"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "REDO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "WIN t",
+        "winner": "REDO"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "ALFREDO'S WINE",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "ALFREDO'S WINE"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 0,
+        "inTop3": true,
+        "inTop1": true,
+        "selected": "ALFREDO'S WINE",
+        "selectedCorrectly": true,
+        "causalCompetitor": null,
+        "winner": "ALFREDO'S WINE"
+      }
+    },
+    "minimumSufficientSets": [
+      "E"
+    ]
+  },
+  {
+    "caseId": "approved-wine-110",
+    "governedBrand": [
+      "Cooley Bay"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cool&y",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Cool&y"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cool&y",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Cooley Bay Winery",
+        "winner": "Cool&y"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cooley Bay Winery",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Cooley Bay Winery"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cool&y",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Cool&y"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cooley Bay Winery",
+        "selectedCorrectly": false,
+        "causalCompetitor": "BARREL AGED",
+        "winner": "Cooley Bay Winery"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 4,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cool&y",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Cooley Bay Winery",
+        "winner": "Cool&y"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Cooley Bay Winery",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "Cooley Bay Winery"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "Cooley Bay Winery",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Cooley Bay Winery",
+        "winner": "Cooley Bay Winery"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "m-cellars-baseline",
+    "governedBrand": [
+      "M Cellars"
+    ],
+    "priorPrimaryClass": "SCORE_ORDERING",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "CELLARS",
+        "selectedCorrectly": false,
+        "causalCompetitor": "SINCE 2008 Proprietors",
+        "winner": "CELLARS"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "CELLARS",
+        "selectedCorrectly": false,
+        "causalCompetitor": "SINCE 2008 Proprietors",
+        "winner": "CELLARS"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "CELLARS",
+        "selectedCorrectly": false,
+        "causalCompetitor": "SINCE 2008 Proprietors",
+        "winner": "CELLARS"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "CELLARS",
+        "selectedCorrectly": false,
+        "causalCompetitor": "CELLARS",
+        "winner": "CELLARS"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "CELLARS",
+        "selectedCorrectly": false,
+        "causalCompetitor": "SINCE 2008 Proprietors",
+        "winner": "CELLARS"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "CELLARS",
+        "selectedCorrectly": false,
+        "causalCompetitor": "CELLARS",
+        "winner": "CELLARS"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "CELLARS",
+        "selectedCorrectly": false,
+        "causalCompetitor": "CELLARS",
+        "winner": "CELLARS"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "CELLARS",
+        "selectedCorrectly": false,
+        "causalCompetitor": "CELLARS",
+        "winner": "CELLARS"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "wine-multi-artifact-05",
+    "governedBrand": [
+      "Blazic"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 12,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "BLAZIC COLLIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "ONTROLLATA",
+        "winner": "BLAZIC COLLIO"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "BLAZIC COLLIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "BLAZIC COLLIO",
+        "winner": "BLAZIC COLLIO"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 12,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "BLAZIC COLLIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Back",
+        "winner": "BLAZIC COLLIO"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 12,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "BLAZIC COLLIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "ONTROLLATA",
+        "winner": "BLAZIC COLLIO"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "BLAZIC COLLIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "IMBOTTIGLIATO",
+        "winner": "BLAZIC COLLIO"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "BLAZIC COLLIO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "COLLIO",
+        "winner": "BLAZIC COLLIO"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 9,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "BLAZIC FRANCO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "LSA17",
+        "winner": "BLAZIC FRANCO"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": true,
+        "oracleRank": 7,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "BLAZIC FRANCO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Back",
+        "winner": "BLAZIC FRANCO"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "wine-multi-artifact-06",
+    "governedBrand": [
+      "Mauro Molino"
+    ],
+    "priorPrimaryClass": "FAMILY_SUPPRESSION",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "MOLINO",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "MOLINO"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 7,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "MOLINO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Le Vignoble, Cordova TN",
+        "winner": "MOLINO"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA MAURO MOLINO",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "AZIENDA AGRICOLA MAURO MOLINO"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "MOLINO",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "MOLINO"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 2,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA MAURO MOLINO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "DENOMINAZIONE CONTROLLATA DI ORIGINE",
+        "winner": "AZIENDA AGRICOLA MAURO MOLINO"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 7,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "MOLINO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Le Vignoble, Cordova TN",
+        "winner": "MOLINO"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": false,
+        "oracleScoreEligible": false,
+        "oracleRank": null,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA MAURO MOLINO",
+        "selectedCorrectly": false,
+        "causalCompetitor": null,
+        "winner": "AZIENDA AGRICOLA MAURO MOLINO"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 1,
+        "inTop3": true,
+        "inTop1": false,
+        "selected": "AZIENDA AGRICOLA MAURO MOLINO",
+        "selectedCorrectly": false,
+        "causalCompetitor": "AZIENDA AGRICOLA MAURO MOLINO",
+        "winner": "AZIENDA AGRICOLA MAURO MOLINO"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  },
+  {
+    "caseId": "wine-multi-artifact-08",
+    "governedBrand": [
+      "Pindar"
+    ],
+    "priorPrimaryClass": "ELIGIBILITY_GATE",
+    "instanceOnlyDedupe": false,
+    "arms": {
+      "F0E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Z-lor",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Bttl. numbers",
+        "winner": "Z-lor"
+      },
+      "F1E0S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Z-lor",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Bttl. numbers",
+        "winner": "Z-lor"
+      },
+      "F0E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Varietal Gewurztraminer",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Bttl. numbers",
+        "winner": "Varietal Gewurztraminer"
+      },
+      "F0E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Z-lor",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Bttl. numbers",
+        "winner": "Z-lor"
+      },
+      "F1E1S0": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 5,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Varietal Gewurztraminer",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Bttl. numbers",
+        "winner": "Varietal Gewurztraminer"
+      },
+      "F1E0S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 6,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Z-lor",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Bttl. numbers",
+        "winner": "Z-lor"
+      },
+      "F0E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Harvest Brix 386",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Varietal Gewurztraminer",
+        "winner": "Harvest Brix 386"
+      },
+      "F1E1S1": {
+        "oracleSurvivesFamilyStage": true,
+        "oracleScoreEligible": false,
+        "oracleRank": 3,
+        "inTop3": false,
+        "inTop1": false,
+        "selected": "Harvest Brix 386",
+        "selectedCorrectly": false,
+        "causalCompetitor": "Varietal Gewurztraminer",
+        "winner": "Harvest Brix 386"
+      }
+    },
+    "minimumSufficientSets": [
+      "NONE_OF_THE_EIGHT"
+    ]
+  }
+]

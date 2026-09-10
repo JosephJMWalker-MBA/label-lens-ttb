@@ -1,0 +1,89 @@
+{
+  "artifact": "aggregate",
+  "experimentId": "issue-149-brand-ranking-stage-counterfactuals",
+  "switchesSha256": "80f849ee47acf037bb4e6ea102b3b7bb0077c7473298c0ba8e44f9db5aec72bb",
+  "evaluationDependency": "6a969e4b (ranking diagnosis) -> 8de5b9fc (oracle)",
+  "baselineReproduction": {
+    "casesChecked": 115,
+    "reproduced": 115,
+    "exact": true,
+    "failures": []
+  },
+  "population": {
+    "targeted": 37,
+    "instanceOnlyDedupe": 2
+  },
+  "arms": {
+    "F0E0S0": {
+      "correctTop3": 16,
+      "correctTop1": 0,
+      "correctlySelected": 0,
+      "oracleSurvivesFamily": 27,
+      "recoveredVsBaseline": 0,
+      "regressedVsBaseline": 0
+    },
+    "F1E0S0": {
+      "correctTop3": 19,
+      "correctTop1": 0,
+      "correctlySelected": 0,
+      "oracleSurvivesFamily": 37,
+      "recoveredVsBaseline": 0,
+      "regressedVsBaseline": 0
+    },
+    "F0E1S0": {
+      "correctTop3": 17,
+      "correctTop1": 3,
+      "correctlySelected": 3,
+      "oracleSurvivesFamily": 27,
+      "recoveredVsBaseline": 3,
+      "regressedVsBaseline": 0
+    },
+    "F0E0S1": {
+      "correctTop3": 17,
+      "correctTop1": 4,
+      "correctlySelected": 4,
+      "oracleSurvivesFamily": 26,
+      "recoveredVsBaseline": 4,
+      "regressedVsBaseline": 0
+    },
+    "F1E1S0": {
+      "correctTop3": 20,
+      "correctTop1": 3,
+      "correctlySelected": 3,
+      "oracleSurvivesFamily": 37,
+      "recoveredVsBaseline": 3,
+      "regressedVsBaseline": 0
+    },
+    "F1E0S1": {
+      "correctTop3": 20,
+      "correctTop1": 4,
+      "correctlySelected": 4,
+      "oracleSurvivesFamily": 37,
+      "recoveredVsBaseline": 4,
+      "regressedVsBaseline": 0
+    },
+    "F0E1S1": {
+      "correctTop3": 21,
+      "correctTop1": 11,
+      "correctlySelected": 11,
+      "oracleSurvivesFamily": 26,
+      "recoveredVsBaseline": 11,
+      "regressedVsBaseline": 0
+    },
+    "F1E1S1": {
+      "correctTop3": 25,
+      "correctTop1": 11,
+      "correctlySelected": 11,
+      "oracleSurvivesFamily": 37,
+      "recoveredVsBaseline": 11,
+      "regressedVsBaseline": 0
+    }
+  },
+  "minimumSufficientSets": {
+    "E+S": 4,
+    "E": 3,
+    "NONE_OF_THE_EIGHT": 26,
+    "S": 4
+  },
+  "productionBehaviorChanged": false
+}
