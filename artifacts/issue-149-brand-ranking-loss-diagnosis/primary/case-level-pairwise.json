@@ -1,0 +1,3298 @@
+[
+  {
+    "caseId": "luigi-giovanni-live",
+    "evaluable": true,
+    "governedBrand": [
+      "Luigi & Giovanni"
+    ],
+    "poolMaxProminence": 96,
+    "eligibilityFloor": 39.400000000000006,
+    "oracle": {
+      "value": "LUIGI & GIOVANNI",
+      "scoreEligible": false,
+      "scoreTotal": 3.6066611242160977,
+      "prominence": 20,
+      "ocrEvidenceScore": 0.93,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.9285714285714286,
+      "structure": 0.75,
+      "normalizedProminence": 0.20833333333333334,
+      "area": 0.11234729493891797,
+      "centrality": 0.2451282051282051,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0.3333333333333333,
+      "assembly": "line-window",
+      "lineIndexes": [
+        3
+      ],
+      "familyKey": "line:3",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 2,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "VANNI",
+      "scoreEligible": true,
+      "scoreTotal": 3.84072087912088,
+      "prominence": 96,
+      "ocrEvidenceScore": 0.91,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.35714285714285715,
+      "structure": 0.25,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.6976410256410257,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        1
+      ],
+      "familyKey": "line:1",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 0.23405975490478204,
+    "oracleFamily": "line:3",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "LUIGI & GIOVANNI",
+      "scoreTotal": 3.6066611242160977,
+      "prominence": 20,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "VANNI",
+        "scoreEligible": true,
+        "scoreTotal": 3.84072087912088,
+        "prominence": 96
+      },
+      {
+        "value": "TASTE OF ITALY",
+        "scoreEligible": false,
+        "scoreTotal": 3.3971605086013468,
+        "prominence": 36
+      }
+    ],
+    "primaryClass": "ELIGIBILITY_GATE",
+    "decisiveFeatures": [
+      "score-eligibility false vs true; prominence 20 <= floor 39.40 (maxProminence 96)"
+    ]
+  },
+  {
+    "caseId": "alfredos-wine",
+    "evaluable": true,
+    "governedBrand": [
+      "Alfredo's Wine",
+      "Alfredo's"
+    ],
+    "poolMaxProminence": 158,
+    "eligibilityFloor": 64.2,
+    "oracle": {
+      "value": "ALFREDO'S WINE",
+      "scoreEligible": false,
+      "scoreTotal": 6.002118152733342,
+      "prominence": 18,
+      "ocrEvidenceScore": 0.7749999999999999,
+      "positiveSignal": 1,
+      "meaningfulChars": 0.8571428571428571,
+      "structure": 1,
+      "normalizedProminence": 0.11392405063291139,
+      "area": 0.06645569620253164,
+      "centrality": 0.2489230769230769,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        4
+      ],
+      "familyKey": "line:4",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 2,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "HLTRE",
+      "scoreEligible": true,
+      "scoreTotal": 3.085336263736264,
+      "prominence": 158,
+      "ocrEvidenceScore": 0.18,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.35714285714285715,
+      "structure": 0.25,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.613025641025641,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        1
+      ],
+      "familyKey": "line:1",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": -2.916781888997078,
+    "oracleFamily": "line:4",
+    "familyMemberCount": 2,
+    "familyWinner": {
+      "value": "ALFREDO'S WINE",
+      "scoreTotal": 6.002118152733342,
+      "prominence": 18,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "HLTRE",
+        "scoreEligible": true,
+        "scoreTotal": 3.085336263736264,
+        "prominence": 158
+      },
+      {
+        "value": "WIN t",
+        "scoreEligible": true,
+        "scoreTotal": 1.4418452635971624,
+        "prominence": 80
+      }
+    ],
+    "primaryClass": "ELIGIBILITY_GATE",
+    "decisiveFeatures": [
+      "score-eligibility false vs true; prominence 18 <= floor 64.20 (maxProminence 158)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-008",
+    "evaluable": true,
+    "governedBrand": [
+      "Vino Alpino"
+    ],
+    "poolMaxProminence": 72,
+    "eligibilityFloor": 29.8,
+    "oracle": {
+      "value": "Vino Alpino",
+      "scoreEligible": true,
+      "scoreTotal": 4.1856540956085455,
+      "prominence": 40,
+      "ocrEvidenceScore": 0.915,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.7142857142857143,
+      "structure": 0.75,
+      "normalizedProminence": 0.5555555555555556,
+      "area": 0.24320457796852646,
+      "centrality": 0.6247658717528095,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        13
+      ],
+      "familyKey": "line:13",
+      "reachedComparatorPool": false,
+      "decision": null
+    },
+    "oracleRank": null,
+    "oracleReachedComparatorPool": false,
+    "winner": {
+      "value": "Azienda Agricola Terre Sparse",
+      "scoreEligible": true,
+      "scoreTotal": 5.181209503521405,
+      "prominence": 39,
+      "ocrEvidenceScore": 0.9575,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 0.5416666666666666,
+      "area": 0.6067596566523605,
+      "centrality": 0.587734587322185,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        4
+      ],
+      "familyKey": "line:4",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 0.9955554079128595,
+    "oracleFamily": "line:13",
+    "familyMemberCount": 2,
+    "familyWinner": {
+      "value": "Vino Alpino LLC",
+      "scoreTotal": 4.907179009224137,
+      "prominence": 40,
+      "sameValueAsOracle": false,
+      "isTheOracleItself": false
+    },
+    "candidatesAboveOracle": [],
+    "primaryClass": "FAMILY_SUPPRESSION",
+    "decisiveFeatures": [
+      "removed by bestFamilyCandidates: same-family sibling \"Vino Alpino LLC\" in line:13 outscored it (4.907 vs 4.186)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-009",
+    "evaluable": true,
+    "governedBrand": [
+      "Vino Alpino"
+    ],
+    "poolMaxProminence": 73,
+    "eligibilityFloor": 30.200000000000003,
+    "oracle": {
+      "value": "Vino Alpino",
+      "scoreEligible": true,
+      "scoreTotal": 4.179792529381712,
+      "prominence": 40,
+      "ocrEvidenceScore": 0.915,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.7142857142857143,
+      "structure": 0.75,
+      "normalizedProminence": 0.547945205479452,
+      "area": 0.2401632177207811,
+      "centrality": 0.631604305028463,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        13
+      ],
+      "familyKey": "line:13",
+      "reachedComparatorPool": false,
+      "decision": null
+    },
+    "oracleRank": null,
+    "oracleReachedComparatorPool": false,
+    "winner": {
+      "value": "Azienda Agricola Terre Sparse",
+      "scoreEligible": true,
+      "scoreTotal": 5.19317856890649,
+      "prominence": 40,
+      "ocrEvidenceScore": 0.9575,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 0.547945205479452,
+      "area": 0.6155639755173419,
+      "centrality": 0.5932800640417457,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        4
+      ],
+      "familyKey": "line:4",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 1.0133860395247787,
+    "oracleFamily": "line:13",
+    "familyMemberCount": 2,
+    "familyWinner": {
+      "value": "Vino Alpino LLC",
+      "scoreTotal": 4.896610982508302,
+      "prominence": 40,
+      "sameValueAsOracle": false,
+      "isTheOracleItself": false
+    },
+    "candidatesAboveOracle": [],
+    "primaryClass": "FAMILY_SUPPRESSION",
+    "decisiveFeatures": [
+      "removed by bestFamilyCandidates: same-family sibling \"Vino Alpino LLC\" in line:13 outscored it (4.897 vs 4.180)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-012",
+    "evaluable": true,
+    "governedBrand": [
+      "Cooley Bay"
+    ],
+    "poolMaxProminence": 172,
+    "eligibilityFloor": 69.8,
+    "oracle": {
+      "value": "Cooley Bay",
+      "scoreEligible": false,
+      "scoreTotal": 3.780277823920266,
+      "prominence": 34,
+      "ocrEvidenceScore": 0.96,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.6428571428571429,
+      "structure": 0.75,
+      "normalizedProminence": 0.19767441860465115,
+      "area": 0.0967781007751938,
+      "centrality": 0.7516666666666667,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        13
+      ],
+      "familyKey": "line:13",
+      "reachedComparatorPool": false,
+      "decision": null
+    },
+    "oracleRank": null,
+    "oracleReachedComparatorPool": false,
+    "winner": {
+      "value": "Cool&y",
+      "scoreEligible": true,
+      "scoreTotal": 3.3428452380952383,
+      "prominence": 172,
+      "ocrEvidenceScore": 0.47,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.35714285714285715,
+      "structure": 0.25,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.5047222222222222,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": -0.43743258582502786,
+    "oracleFamily": "line:13",
+    "familyMemberCount": 2,
+    "familyWinner": {
+      "value": "Cooley Bay Winery",
+      "scoreTotal": 6.716221414728683,
+      "prominence": 35,
+      "sameValueAsOracle": false,
+      "isTheOracleItself": false
+    },
+    "candidatesAboveOracle": [],
+    "primaryClass": "FAMILY_SUPPRESSION",
+    "decisiveFeatures": [
+      "removed by bestFamilyCandidates: same-family sibling \"Cooley Bay Winery\" in line:13 outscored it (6.716 vs 3.780)"
+    ]
+  },
+  {
+    "caseId": "patricia-green-cellars",
+    "evaluable": true,
+    "governedBrand": [
+      "Patricia Green Cellars"
+    ],
+    "poolMaxProminence": 20,
+    "eligibilityFloor": 9,
+    "oracle": {
+      "value": "Patricia Green Cellars",
+      "scoreEligible": true,
+      "scoreTotal": 6.974039812418247,
+      "prominence": 10,
+      "ocrEvidenceScore": 0.9333333333333332,
+      "positiveSignal": 1,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 0.5,
+      "area": 0.288135593220339,
+      "centrality": 0.7260837438423645,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        10
+      ],
+      "familyKey": "line:10",
+      "reachedComparatorPool": false,
+      "decision": null
+    },
+    "oracleRank": null,
+    "oracleReachedComparatorPool": false,
+    "winner": {
+      "value": "ESTATE VINEYARD",
+      "scoreEligible": true,
+      "scoreTotal": 7.352514016448192,
+      "prominence": 13,
+      "ocrEvidenceScore": 0.96,
+      "positiveSignal": 1,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 0.65,
+      "area": 0.7675141242937853,
+      "centrality": 0.5400184729064039,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 0.3784742040299456,
+    "oracleFamily": "line:10",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "Patricia Green Cellars",
+      "scoreTotal": 6.974039812418247,
+      "prominence": 10,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [],
+    "primaryClass": "FAMILY_SUPPRESSION",
+    "decisiveFeatures": [
+      "removed by dedupeBestCandidates: an equal-valued candidate outscored it (6.974 vs 6.974)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-016",
+    "evaluable": true,
+    "governedBrand": [
+      "Marques de Navarro"
+    ],
+    "poolMaxProminence": 75,
+    "eligibilityFloor": 31,
+    "oracle": {
+      "value": "Marques de Navarro",
+      "scoreEligible": true,
+      "scoreTotal": 3.4776943269392064,
+      "prominence": 35,
+      "ocrEvidenceScore": 0.9499999999999998,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 0.75,
+      "normalizedProminence": 0.4666666666666667,
+      "area": 0.13993915688830944,
+      "centrality": 0.6235472204651792,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0.3333333333333333,
+      "residualPenalty": 0.3333333333333333,
+      "assembly": "line-window",
+      "lineIndexes": [
+        2
+      ],
+      "familyKey": "line:2",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 1,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "MARQUES vo NAVARRO",
+      "scoreEligible": true,
+      "scoreTotal": 4.187096388431522,
+      "prominence": 75,
+      "ocrEvidenceScore": 0.7200000000000001,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 0.75,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.6125435169939595,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0.3333333333333333,
+      "residualPenalty": 0.3333333333333333,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 0.7094020614923155,
+    "oracleFamily": "line:2",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "Marques de Navarro",
+      "scoreTotal": 3.4776943269392064,
+      "prominence": 35,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "MARQUES vo NAVARRO",
+        "scoreEligible": true,
+        "scoreTotal": 4.187096388431522,
+        "prominence": 75
+      }
+    ],
+    "primaryClass": "SCORE_ORDERING",
+    "decisiveFeatures": [
+      "area: oracle 0.140 vs winner 1.000",
+      "prominence: oracle 0.467 vs winner 1.000",
+      "ocrEvidenceScore: oracle 0.950 vs winner 0.720"
+    ]
+  },
+  {
+    "caseId": "approved-wine-018",
+    "evaluable": true,
+    "governedBrand": [
+      "Poqr Krya",
+      "POQR KRYA"
+    ],
+    "poolMaxProminence": 36,
+    "eligibilityFloor": 15.4,
+    "oracle": {
+      "value": "Poqr Krya",
+      "scoreEligible": true,
+      "scoreTotal": 4.366870082478976,
+      "prominence": 36,
+      "ocrEvidenceScore": 0.845,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.5714285714285714,
+      "structure": 0.75,
+      "normalizedProminence": 1,
+      "area": 0.5537325676784249,
+      "centrality": 0.41781609195402303,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        1
+      ],
+      "familyKey": "line:1",
+      "reachedComparatorPool": true,
+      "decision": "ambiguous-rival"
+    },
+    "oracleRank": 1,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "Indigenous blend",
+      "scoreEligible": true,
+      "scoreTotal": 4.767107550784356,
+      "prominence": 23,
+      "ocrEvidenceScore": 0.96,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 0.75,
+      "normalizedProminence": 0.6388888888888888,
+      "area": 0.37028301886792453,
+      "centrality": 0.41275542784163477,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        8
+      ],
+      "familyKey": "line:8",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 0.40023746830538,
+    "oracleFamily": "line:1",
+    "familyMemberCount": 2,
+    "familyWinner": {
+      "value": "Poqr Krya",
+      "scoreTotal": 4.366870082478976,
+      "prominence": 36,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "Indigenous blend",
+        "scoreEligible": true,
+        "scoreTotal": 4.767107550784356,
+        "prominence": 23
+      }
+    ],
+    "primaryClass": "SCORE_ORDERING",
+    "decisiveFeatures": [
+      "meaningfulChars: oracle 0.571 vs winner 1.000",
+      "prominence: oracle 1.000 vs winner 0.639",
+      "area: oracle 0.554 vs winner 0.370"
+    ]
+  },
+  {
+    "caseId": "approved-wine-037",
+    "evaluable": true,
+    "governedBrand": [
+      "Touch"
+    ],
+    "poolMaxProminence": 24,
+    "eligibilityFloor": 10.600000000000001,
+    "oracle": {
+      "value": "Touch",
+      "scoreEligible": true,
+      "scoreTotal": 3.4283645234409557,
+      "prominence": 24,
+      "ocrEvidenceScore": 0.96,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.35714285714285715,
+      "structure": 0.25,
+      "normalizedProminence": 1,
+      "area": 0.43653250773993807,
+      "centrality": 0.2833881578947368,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": true,
+      "decision": "ambiguous-rival"
+    },
+    "oracleRank": 2,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "Strumica - Radovish Region",
+      "scoreEligible": true,
+      "scoreTotal": 4.945814551426068,
+      "prominence": 18,
+      "ocrEvidenceScore": 0.76,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 0.75,
+      "area": 0.9543343653250774,
+      "centrality": 0.37737977410340007,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0.25,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        21
+      ],
+      "familyKey": "line:21",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 1.5174500279851122,
+    "oracleFamily": "line:0",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "Touch",
+      "scoreTotal": 3.4283645234409557,
+      "prominence": 24,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "Strumica - Radovish Region",
+        "scoreEligible": true,
+        "scoreTotal": 4.945814551426068,
+        "prominence": 18
+      },
+      {
+        "value": "Product of North Macedonia",
+        "scoreEligible": true,
+        "scoreTotal": 4.455216484241578,
+        "prominence": 19
+      }
+    ],
+    "primaryClass": "SCORE_ORDERING",
+    "decisiveFeatures": [
+      "structure: oracle 0.250 vs winner 1.000",
+      "meaningfulChars: oracle 0.357 vs winner 1.000",
+      "area: oracle 0.437 vs winner 0.954"
+    ]
+  },
+  {
+    "caseId": "approved-wine-038",
+    "evaluable": true,
+    "governedBrand": [
+      "Big Red Sunshine"
+    ],
+    "poolMaxProminence": 22,
+    "eligibilityFloor": 9.8,
+    "oracle": {
+      "value": "Big Red Sunshine",
+      "scoreEligible": true,
+      "scoreTotal": 5.3570341619143305,
+      "prominence": 20,
+      "ocrEvidenceScore": 0.9500000000000001,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 0.9090909090909091,
+      "area": 0.2867303845298955,
+      "centrality": 0.8590773464122204,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        4
+      ],
+      "familyKey": "line:4",
+      "reachedComparatorPool": true,
+      "decision": "ambiguous-rival"
+    },
+    "oracleRank": 1,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "2024 SOUTH COAST PRIMITIVO",
+      "scoreEligible": true,
+      "scoreTotal": 5.766279051578851,
+      "prominence": 22,
+      "ocrEvidenceScore": 0.9325,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.6125968385961726,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 0.4092448896645209,
+    "oracleFamily": "line:4",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "Big Red Sunshine",
+      "scoreTotal": 5.3570341619143305,
+      "prominence": 20,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "2024 SOUTH COAST PRIMITIVO",
+        "scoreEligible": true,
+        "scoreTotal": 5.766279051578851,
+        "prominence": 22
+      }
+    ],
+    "primaryClass": "SCORE_ORDERING",
+    "decisiveFeatures": [
+      "area: oracle 0.287 vs winner 1.000",
+      "prominence: oracle 0.909 vs winner 1.000",
+      "ocrEvidenceScore: oracle 0.950 vs winner 0.932"
+    ]
+  },
+  {
+    "caseId": "approved-wine-045",
+    "evaluable": true,
+    "governedBrand": [
+      "Meeting of the Minds"
+    ],
+    "poolMaxProminence": 39,
+    "eligibilityFloor": 16.6,
+    "oracle": {
+      "value": "Meeting of the Minds",
+      "scoreEligible": true,
+      "scoreTotal": 4.18733312899222,
+      "prominence": 17,
+      "ocrEvidenceScore": 0.9575,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 0.4358974358974359,
+      "area": 0.2917991099809282,
+      "centrality": 0.853452380952381,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0.25,
+      "residualPenalty": 0.25,
+      "assembly": "line-window",
+      "lineIndexes": [
+        12
+      ],
+      "familyKey": "line:12",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 1,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "Meeting of ihe Minds",
+      "scoreEligible": true,
+      "scoreTotal": 4.517392857142856,
+      "prominence": 39,
+      "ocrEvidenceScore": 0.7999999999999999,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.7246428571428571,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0.25,
+      "residualPenalty": 0.5,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        3
+      ],
+      "familyKey": "line:3",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 0.3300597281506361,
+    "oracleFamily": "line:12",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "Meeting of the Minds",
+      "scoreTotal": 4.18733312899222,
+      "prominence": 17,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "Meeting of ihe Minds",
+        "scoreEligible": true,
+        "scoreTotal": 4.517392857142856,
+        "prominence": 39
+      }
+    ],
+    "primaryClass": "SCORE_ORDERING",
+    "decisiveFeatures": [
+      "area: oracle 0.292 vs winner 1.000",
+      "prominence: oracle 0.436 vs winner 1.000",
+      "residualPenalty: oracle 0.250 vs winner 0.500"
+    ]
+  },
+  {
+    "caseId": "approved-wine-046",
+    "evaluable": true,
+    "governedBrand": [
+      "Curious"
+    ],
+    "poolMaxProminence": 57,
+    "eligibilityFloor": 23.8,
+    "oracle": {
+      "value": "Curious",
+      "scoreEligible": true,
+      "scoreTotal": 3.334632012330311,
+      "prominence": 38,
+      "ocrEvidenceScore": 0.95,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.5,
+      "structure": 0.25,
+      "normalizedProminence": 0.6666666666666666,
+      "area": 0.34046789447486314,
+      "centrality": 0.3233931410401999,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": false,
+      "decision": null
+    },
+    "oracleRank": null,
+    "oracleReachedComparatorPool": false,
+    "winner": {
+      "value": "Red Wine Blend Curious",
+      "scoreEligible": true,
+      "scoreTotal": 5.478305154070788,
+      "prominence": 40,
+      "ocrEvidenceScore": 0.95,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 0.7017543859649122,
+      "area": 0.9158785465405674,
+      "centrality": 0.5579150579150579,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 2.143673141740477,
+    "oracleFamily": "line:0",
+    "familyMemberCount": 2,
+    "familyWinner": {
+      "value": "Red Wine Blend Curious",
+      "scoreTotal": 5.478305154070788,
+      "prominence": 40,
+      "sameValueAsOracle": false,
+      "isTheOracleItself": false
+    },
+    "candidatesAboveOracle": [],
+    "primaryClass": "FAMILY_SUPPRESSION",
+    "decisiveFeatures": [
+      "removed by bestFamilyCandidates: same-family sibling \"Red Wine Blend Curious\" in line:0 outscored it (5.478 vs 3.335)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-048",
+    "evaluable": true,
+    "governedBrand": [
+      "Pacha"
+    ],
+    "poolMaxProminence": 83,
+    "eligibilityFloor": 34.2,
+    "oracle": {
+      "value": "Pacha",
+      "scoreEligible": true,
+      "scoreTotal": 3.482037698180958,
+      "prominence": 83,
+      "ocrEvidenceScore": 0.96,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.35714285714285715,
+      "structure": 0.25,
+      "normalizedProminence": 1,
+      "area": 0.5154471544715448,
+      "centrality": 0.30446944689819766,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": false,
+      "decision": null
+    },
+    "oracleRank": 4,
+    "oracleReachedComparatorPool": false,
+    "winner": {
+      "value": "Pacha RESERVA - CARMENERE",
+      "scoreEligible": true,
+      "scoreTotal": 5.373220396113255,
+      "prominence": 83,
+      "ocrEvidenceScore": 0.9275,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.4857346537108497,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0.25,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 1.891182697932297,
+    "oracleFamily": "line:0",
+    "familyMemberCount": 2,
+    "familyWinner": {
+      "value": "Pacha RESERVA - CARMENERE",
+      "scoreTotal": 5.373220396113255,
+      "prominence": 83,
+      "sameValueAsOracle": false,
+      "isTheOracleItself": false
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "Pacha RESERVA - CARMENERE",
+        "scoreEligible": true,
+        "scoreTotal": 5.373220396113255,
+        "prominence": 83
+      },
+      {
+        "value": "Vifia Marty SpA",
+        "scoreEligible": true,
+        "scoreTotal": 4.512447996621025,
+        "prominence": 60
+      },
+      {
+        "value": "Andes Wine Imports LLC",
+        "scoreEligible": false,
+        "scoreTotal": 4.720009566347224,
+        "prominence": 28
+      },
+      {
+        "value": "Seattle WA",
+        "scoreEligible": false,
+        "scoreTotal": 1.796151901517394,
+        "prominence": 22
+      }
+    ],
+    "primaryClass": "FAMILY_SUPPRESSION",
+    "decisiveFeatures": [
+      "removed by bestFamilyCandidates: same-family sibling \"Pacha RESERVA - CARMENERE\" in line:0 outscored it (5.373 vs 3.482)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-051",
+    "evaluable": true,
+    "governedBrand": [
+      "Pacheca"
+    ],
+    "poolMaxProminence": 80,
+    "eligibilityFloor": 33,
+    "oracle": {
+      "value": "PACHECA",
+      "scoreEligible": true,
+      "scoreTotal": 3.306767667295695,
+      "prominence": 62,
+      "ocrEvidenceScore": 0.89,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.5,
+      "structure": 0.25,
+      "normalizedProminence": 0.775,
+      "area": 0.29541446208112876,
+      "centrality": 0.23172996682339053,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": false,
+      "decision": null
+    },
+    "oracleRank": 2,
+    "oracleReachedComparatorPool": false,
+    "winner": {
+      "value": "PACHECA DOURO D.O.C",
+      "scoreEligible": true,
+      "scoreTotal": 5.479818342797826,
+      "prominence": 62,
+      "ocrEvidenceScore": 0.8433333333333334,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 0.775,
+      "area": 1,
+      "centrality": 0.5549500315483096,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 2.1730506755021315,
+    "oracleFamily": "line:0",
+    "familyMemberCount": 2,
+    "familyWinner": {
+      "value": "PACHECA DOURO D.O.C",
+      "scoreTotal": 5.479818342797826,
+      "prominence": 62,
+      "sameValueAsOracle": false,
+      "isTheOracleItself": false
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "PACHECA DOURO D.O.C",
+        "scoreEligible": true,
+        "scoreTotal": 5.479818342797826,
+        "prominence": 62
+      },
+      {
+        "value": "SELO GROUP 1 afr",
+        "scoreEligible": true,
+        "scoreTotal": 4.752494166665807,
+        "prominence": 80
+      }
+    ],
+    "primaryClass": "FAMILY_SUPPRESSION",
+    "decisiveFeatures": [
+      "removed by bestFamilyCandidates: same-family sibling \"PACHECA DOURO D.O.C\" in line:0 outscored it (5.480 vs 3.307)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-052",
+    "evaluable": true,
+    "governedBrand": [
+      "Mountain Valley Winery"
+    ],
+    "poolMaxProminence": 176,
+    "eligibilityFloor": 71.4,
+    "oracle": {
+      "value": "MOUNTAIN VALLEY WINERY,",
+      "scoreEligible": false,
+      "scoreTotal": 6.959692420742031,
+      "prominence": 68,
+      "ocrEvidenceScore": 0.96,
+      "positiveSignal": 1,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 0.38636363636363635,
+      "area": 0.38944696386298167,
+      "centrality": 0.6897777777777778,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        5
+      ],
+      "familyKey": "line:5",
+      "reachedComparatorPool": true,
+      "decision": "ambiguous-rival"
+    },
+    "oracleRank": 3,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "OLp VINE ZINFANDEL",
+      "scoreEligible": true,
+      "scoreTotal": 4.9663207619966245,
+      "prominence": 75,
+      "ocrEvidenceScore": 0.91,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 0.42613636363636365,
+      "area": 0.3713527851458886,
+      "centrality": 0.8086666666666666,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        3
+      ],
+      "familyKey": "line:3",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": -1.9933716587454064,
+    "oracleFamily": "line:5",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "MOUNTAIN VALLEY WINERY,",
+      "scoreTotal": 6.959692420742031,
+      "prominence": 68,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "OLp VINE ZINFANDEL",
+        "scoreEligible": true,
+        "scoreTotal": 4.9663207619966245,
+        "prominence": 75
+      },
+      {
+        "value": "MOUNTAIN",
+        "scoreEligible": true,
+        "scoreTotal": 4.029776623376623,
+        "prominence": 145
+      },
+      {
+        "value": "VALLEY",
+        "scoreEligible": true,
+        "scoreTotal": 3.871926738296928,
+        "prominence": 176
+      }
+    ],
+    "primaryClass": "ELIGIBILITY_GATE",
+    "decisiveFeatures": [
+      "score-eligibility false vs true; prominence 68 <= floor 71.40 (maxProminence 176)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-063",
+    "evaluable": true,
+    "governedBrand": [
+      "Prinsi"
+    ],
+    "poolMaxProminence": 49,
+    "eligibilityFloor": 20.6,
+    "oracle": {
+      "value": "PRINSI",
+      "scoreEligible": false,
+      "scoreTotal": 2.755787005589776,
+      "prominence": 10,
+      "ocrEvidenceScore": 0.89,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.42857142857142855,
+      "structure": 0.25,
+      "normalizedProminence": 0.20408163265306123,
+      "area": 0.09093619558735838,
+      "centrality": 0.7074856546687532,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        7
+      ],
+      "familyKey": "line:7",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 5,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "TRE FICHI",
+      "scoreEligible": true,
+      "scoreTotal": 4.2387677506102,
+      "prominence": 28,
+      "ocrEvidenceScore": 0.94,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.5714285714285714,
+      "structure": 0.75,
+      "normalizedProminence": 0.5714285714285714,
+      "area": 0.605247465712582,
+      "centrality": 0.7139689991802668,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        2
+      ],
+      "familyKey": "line:2",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 1.482980745020424,
+    "oracleFamily": "line:7",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "PRINSI",
+      "scoreTotal": 2.755787005589776,
+      "prominence": 10,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "TRE FICHI",
+        "scoreEligible": true,
+        "scoreTotal": 4.2387677506102,
+        "prominence": 28
+      },
+      {
+        "value": "Cordova, TN 3065172101",
+        "scoreEligible": true,
+        "scoreTotal": 3.002725879084028,
+        "prominence": 26
+      },
+      {
+        "value": "Prins",
+        "scoreEligible": true,
+        "scoreTotal": 2.878221347564617,
+        "prominence": 49
+      },
+      {
+        "value": "4 Canphe",
+        "scoreEligible": true,
+        "scoreTotal": 2.6933838708201163,
+        "prominence": 38
+      },
+      {
+        "value": "AZIENDA AGRICOLA",
+        "scoreEligible": false,
+        "scoreTotal": 4.6003033863229925,
+        "prominence": 17
+      }
+    ],
+    "primaryClass": "ELIGIBILITY_GATE",
+    "decisiveFeatures": [
+      "score-eligibility false vs true; prominence 10 <= floor 20.60 (maxProminence 49)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-064",
+    "evaluable": true,
+    "governedBrand": [
+      "Prinsi"
+    ],
+    "poolMaxProminence": 49,
+    "eligibilityFloor": 20.6,
+    "oracle": {
+      "value": "PRINSI",
+      "scoreEligible": false,
+      "scoreTotal": 2.737987039944874,
+      "prominence": 10,
+      "ocrEvidenceScore": 0.89,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.42857142857142855,
+      "structure": 0.25,
+      "normalizedProminence": 0.20408163265306123,
+      "area": 0.06126958617918843,
+      "centrality": 0.7074856546687532,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        7
+      ],
+      "familyKey": "line:7",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 6,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "Prins",
+      "scoreEligible": true,
+      "scoreTotal": 2.9723518509386757,
+      "prominence": 49,
+      "ocrEvidenceScore": 0.31,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.35714285714285715,
+      "structure": 0.25,
+      "normalizedProminence": 1,
+      "area": 0.6053635998392929,
+      "centrality": 0.5923503986884269,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 0.2343648109938017,
+    "oracleFamily": "line:7",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "PRINSI",
+      "scoreTotal": 2.737987039944874,
+      "prominence": 10,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "Prins",
+        "scoreEligible": true,
+        "scoreTotal": 2.9723518509386757,
+        "prominence": 49
+      },
+      {
+        "value": "Sang",
+        "scoreEligible": true,
+        "scoreTotal": 2.3712609726994107,
+        "prominence": 30
+      },
+      {
+        "value": "IL NESPOLO",
+        "scoreEligible": true,
+        "scoreTotal": 2.3122885525285097,
+        "prominence": 28
+      },
+      {
+        "value": "Le Vignoble I",
+        "scoreEligible": true,
+        "scoreTotal": 2.290587014148383,
+        "prominence": 38
+      },
+      {
+        "value": "AZIENDA AGRICOLA",
+        "scoreEligible": false,
+        "scoreTotal": 4.524940918476992,
+        "prominence": 17
+      },
+      {
+        "value": "Cordova, TN",
+        "scoreEligible": false,
+        "scoreTotal": 1.8081120418070487,
+        "prominence": 13
+      }
+    ],
+    "primaryClass": "ELIGIBILITY_GATE",
+    "decisiveFeatures": [
+      "score-eligibility false vs true; prominence 10 <= floor 20.60 (maxProminence 49)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-065",
+    "evaluable": true,
+    "governedBrand": [
+      "Prinsi"
+    ],
+    "poolMaxProminence": 50,
+    "eligibilityFloor": 21,
+    "oracle": {
+      "value": "PRINSI",
+      "scoreEligible": false,
+      "scoreTotal": 2.7566138282687582,
+      "prominence": 10,
+      "ocrEvidenceScore": 0.89,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.42857142857142855,
+      "structure": 0.25,
+      "normalizedProminence": 0.2,
+      "area": 0.09775641025641026,
+      "centrality": 0.7074856546687532,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        6
+      ],
+      "familyKey": "line:6",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 5,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "Prins",
+      "scoreEligible": true,
+      "scoreTotal": 3.376214251319885,
+      "prominence": 50,
+      "ocrEvidenceScore": 0.48,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.35714285714285715,
+      "structure": 0.25,
+      "normalizedProminence": 1,
+      "area": 0.9855769230769231,
+      "centrality": 0.6114650868171996,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 0.6196004230511267,
+    "oracleFamily": "line:6",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "PRINSI",
+      "scoreTotal": 2.7566138282687582,
+      "prominence": 10,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "Prins",
+        "scoreEligible": true,
+        "scoreTotal": 3.376214251319885,
+        "prominence": 50
+      },
+      {
+        "value": "Cordova, TN 3065172201",
+        "scoreEligible": true,
+        "scoreTotal": 2.9736333556896937,
+        "prominence": 24
+      },
+      {
+        "value": "Donk pe",
+        "scoreEligible": true,
+        "scoreTotal": 1.6167226435536295,
+        "prominence": 40
+      },
+      {
+        "value": "DI ORIGINE C",
+        "scoreEligible": false,
+        "scoreTotal": 1.2672444238078042,
+        "prominence": 19
+      },
+      {
+        "value": "AZIENDA AGRICOLA",
+        "scoreEligible": false,
+        "scoreTotal": 4.577384804553819,
+        "prominence": 16
+      }
+    ],
+    "primaryClass": "ELIGIBILITY_GATE",
+    "decisiveFeatures": [
+      "score-eligibility false vs true; prominence 10 <= floor 21.00 (maxProminence 50)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-066",
+    "evaluable": true,
+    "governedBrand": [
+      "Domaine Juliette Avril"
+    ],
+    "poolMaxProminence": 62,
+    "eligibilityFloor": 25.8,
+    "oracle": {
+      "value": "Domaine Juliette Avril",
+      "scoreEligible": false,
+      "scoreTotal": 4.7839360826978545,
+      "prominence": 23,
+      "ocrEvidenceScore": 0.9566666666666667,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 0.3709677419354839,
+      "area": 0.24787390029325512,
+      "centrality": 0.4392362743561615,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        3
+      ],
+      "familyKey": "line:3",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 3,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "JULIETTE VRIL",
+      "scoreEligible": true,
+      "scoreTotal": 4.997804307430541,
+      "prominence": 62,
+      "ocrEvidenceScore": 0.7050000000000001,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.8571428571428571,
+      "structure": 0.75,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.5712524533399004,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        1
+      ],
+      "familyKey": "line:1",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 0.2138682247326864,
+    "oracleFamily": "line:3",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "Domaine Juliette Avril",
+      "scoreTotal": 4.7839360826978545,
+      "prominence": 23,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "JULIETTE VRIL",
+        "scoreEligible": true,
+        "scoreTotal": 4.997804307430541,
+        "prominence": 62
+      },
+      {
+        "value": "Ro bak",
+        "scoreEligible": true,
+        "scoreTotal": 0.7905392580232204,
+        "prominence": 60
+      },
+      {
+        "value": "PRODUCT OF FRANCE",
+        "scoreEligible": false,
+        "scoreTotal": 3.5565365549313865,
+        "prominence": 24
+      }
+    ],
+    "primaryClass": "ELIGIBILITY_GATE",
+    "decisiveFeatures": [
+      "score-eligibility false vs true; prominence 23 <= floor 25.80 (maxProminence 62)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-067",
+    "evaluable": true,
+    "governedBrand": [
+      "Domaine Juliette Avril"
+    ],
+    "poolMaxProminence": 61,
+    "eligibilityFloor": 25.400000000000002,
+    "oracle": {
+      "value": "Domaine Juliette Avril",
+      "scoreEligible": false,
+      "scoreTotal": 4.810012076449682,
+      "prominence": 24,
+      "ocrEvidenceScore": 0.9566666666666667,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 0.39344262295081966,
+      "area": 0.2611028315946349,
+      "centrality": 0.439765374885262,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        3
+      ],
+      "familyKey": "line:3",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 2,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "JULIETTE VRIL",
+      "scoreEligible": true,
+      "scoreTotal": 5.21201065663689,
+      "prominence": 61,
+      "ocrEvidenceScore": 0.9199999999999999,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.8571428571428571,
+      "structure": 0.75,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.5686069506943978,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        1
+      ],
+      "familyKey": "line:1",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 0.40199858018720835,
+    "oracleFamily": "line:3",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "Domaine Juliette Avril",
+      "scoreTotal": 4.810012076449682,
+      "prominence": 24,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "JULIETTE VRIL",
+        "scoreEligible": true,
+        "scoreTotal": 5.21201065663689,
+        "prominence": 61
+      },
+      {
+        "value": "PRODUCT OF FRANCE",
+        "scoreEligible": false,
+        "scoreTotal": 3.585893110591485,
+        "prominence": 25
+      }
+    ],
+    "primaryClass": "ELIGIBILITY_GATE",
+    "decisiveFeatures": [
+      "score-eligibility false vs true; prominence 24 <= floor 25.40 (maxProminence 61)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-076",
+    "evaluable": true,
+    "governedBrand": [
+      "Etim"
+    ],
+    "poolMaxProminence": 80,
+    "eligibilityFloor": 33,
+    "oracle": {
+      "value": "Etim",
+      "scoreEligible": false,
+      "scoreTotal": 2.525201034055408,
+      "prominence": 18,
+      "ocrEvidenceScore": 0.96,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.2857142857142857,
+      "structure": 0.25,
+      "normalizedProminence": 0.225,
+      "area": 0.05625,
+      "centrality": 0.48102725637516897,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        8
+      ],
+      "familyKey": "line:8",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 2,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "Flore",
+      "scoreEligible": true,
+      "scoreTotal": 3.3008361519196514,
+      "prominence": 80,
+      "ocrEvidenceScore": 0.46,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.35714285714285715,
+      "structure": 0.25,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.3980252683035983,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        1
+      ],
+      "familyKey": "line:1",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 0.7756351178642436,
+    "oracleFamily": "line:8",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "Etim",
+      "scoreTotal": 2.525201034055408,
+      "prominence": 18,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "Flore",
+        "scoreEligible": true,
+        "scoreTotal": 3.3008361519196514,
+        "prominence": 80
+      },
+      {
+        "value": "AGRICOLA FALSET-MARGA",
+        "scoreEligible": false,
+        "scoreTotal": 4.367585039149926,
+        "prominence": 21
+      }
+    ],
+    "primaryClass": "ELIGIBILITY_GATE",
+    "decisiveFeatures": [
+      "score-eligibility false vs true; prominence 18 <= floor 33.00 (maxProminence 80)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-078",
+    "evaluable": true,
+    "governedBrand": [
+      "Pietta"
+    ],
+    "poolMaxProminence": 32,
+    "eligibilityFloor": 13.8,
+    "oracle": {
+      "value": "PIETTA",
+      "scoreEligible": false,
+      "scoreTotal": 2.8986168452998617,
+      "prominence": 13,
+      "ocrEvidenceScore": 0.91,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.42857142857142855,
+      "structure": 0.25,
+      "normalizedProminence": 0.40625,
+      "area": 0.15679824561403508,
+      "centrality": 0.44607870739051514,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        5
+      ],
+      "familyKey": "line:5",
+      "reachedComparatorPool": false,
+      "decision": null
+    },
+    "oracleRank": 2,
+    "oracleReachedComparatorPool": false,
+    "winner": {
+      "value": "MUSCOLINE-ITALIA",
+      "scoreEligible": true,
+      "scoreTotal": 4.0598514282037055,
+      "prominence": 14,
+      "ocrEvidenceScore": 0.9,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 0.25,
+      "normalizedProminence": 0.4375,
+      "area": 0.4605263157894737,
+      "centrality": 0.6117854624334028,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        6
+      ],
+      "familyKey": "line:6",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 1.1612345829038437,
+    "oracleFamily": "line:5",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "PIETTA",
+      "scoreTotal": 2.8986168452998617,
+      "prominence": 13,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "MUSCOLINE-ITALIA",
+        "scoreEligible": true,
+        "scoreTotal": 4.0598514282037055,
+        "prominence": 14
+      },
+      {
+        "value": "GARDA",
+        "scoreEligible": true,
+        "scoreTotal": 3.7133819647697885,
+        "prominence": 32
+      }
+    ],
+    "primaryClass": "FAMILY_SUPPRESSION",
+    "decisiveFeatures": [
+      "removed by dedupeBestCandidates: an equal-valued candidate outscored it (2.899 vs 2.899)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-084",
+    "evaluable": true,
+    "governedBrand": [
+      "Filadoro"
+    ],
+    "poolMaxProminence": 24,
+    "eligibilityFloor": 10.600000000000001,
+    "oracle": {
+      "value": "FILADORO",
+      "scoreEligible": true,
+      "scoreTotal": 3.4726329501217443,
+      "prominence": 16,
+      "ocrEvidenceScore": 0.92,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.5714285714285714,
+      "structure": 0.25,
+      "normalizedProminence": 0.6666666666666666,
+      "area": 0.39254658385093166,
+      "centrality": 0.3982865073071258,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        5
+      ],
+      "familyKey": "line:5",
+      "reachedComparatorPool": true,
+      "decision": "ambiguous-rival"
+    },
+    "oracleRank": 5,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "BUTA DISTRIBUTORS INC",
+      "scoreEligible": true,
+      "scoreTotal": 5.519649929481843,
+      "prominence": 16,
+      "ocrEvidenceScore": 0.9433333333333334,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 0.6666666666666666,
+      "area": 0.9739130434782609,
+      "centrality": 0.6954514557607341,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        21
+      ],
+      "familyKey": "line:21",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 2.0470169793600985,
+    "oracleFamily": "line:5",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "FILADORO",
+      "scoreTotal": 3.4726329501217443,
+      "prominence": 16,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "BUTA DISTRIBUTORS INC",
+        "scoreEligible": true,
+        "scoreTotal": 5.519649929481843,
+        "prominence": 16
+      },
+      {
+        "value": "DENOMINAZIONE DI ORIGINE",
+        "scoreEligible": true,
+        "scoreTotal": 4.031093236660247,
+        "prominence": 14
+      },
+      {
+        "value": "CONTROLLATA E GARANTITA",
+        "scoreEligible": true,
+        "scoreTotal": 4.009663520029948,
+        "prominence": 14
+      },
+      {
+        "value": "FIANO DI AVELLINO",
+        "scoreEligible": true,
+        "scoreTotal": 3.9032106243524893,
+        "prominence": 15
+      },
+      {
+        "value": "Boca Raton - FL",
+        "scoreEligible": true,
+        "scoreTotal": 3.748955871560084,
+        "prominence": 24
+      }
+    ],
+    "primaryClass": "SCORE_ORDERING",
+    "decisiveFeatures": [
+      "structure: oracle 0.250 vs winner 1.000",
+      "area: oracle 0.393 vs winner 0.974",
+      "meaningfulChars: oracle 0.571 vs winner 1.000"
+    ]
+  },
+  {
+    "caseId": "approved-wine-088",
+    "evaluable": true,
+    "governedBrand": [
+      "La Mesma"
+    ],
+    "poolMaxProminence": 18,
+    "eligibilityFloor": 8.2,
+    "oracle": {
+      "value": "LA MESMA",
+      "scoreEligible": true,
+      "scoreTotal": 2.210325579655814,
+      "prominence": 16,
+      "ocrEvidenceScore": 0.88,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.5,
+      "structure": 0.5,
+      "normalizedProminence": 0.8888888888888888,
+      "area": 0.40029433406916853,
+      "centrality": 0.4301262270106715,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0.5,
+      "residualPenalty": 0.5,
+      "assembly": "line-window",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": false,
+      "decision": null
+    },
+    "oracleRank": null,
+    "oracleReachedComparatorPool": false,
+    "winner": {
+      "value": "LA MESMA Yellow Label",
+      "scoreEligible": true,
+      "scoreTotal": 4.94315561340813,
+      "prominence": 18,
+      "ocrEvidenceScore": 0.9175,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.585518711360431,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0.25,
+      "residualPenalty": 0.25,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 2.7328300337523155,
+    "oracleFamily": "line:0",
+    "familyMemberCount": 2,
+    "familyWinner": {
+      "value": "LA MESMA Yellow Label",
+      "scoreTotal": 4.94315561340813,
+      "prominence": 18,
+      "sameValueAsOracle": false,
+      "isTheOracleItself": false
+    },
+    "candidatesAboveOracle": [],
+    "primaryClass": "FAMILY_SUPPRESSION",
+    "decisiveFeatures": [
+      "removed by bestFamilyCandidates: same-family sibling \"LA MESMA Yellow Label\" in line:0 outscored it (4.943 vs 2.210)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-089",
+    "evaluable": true,
+    "governedBrand": [
+      "La Mesma"
+    ],
+    "poolMaxProminence": 16,
+    "eligibilityFloor": 7.4,
+    "oracle": {
+      "value": "LA MESMA",
+      "scoreEligible": true,
+      "scoreTotal": 2.3755636240408595,
+      "prominence": 16,
+      "ocrEvidenceScore": 0.92,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.5,
+      "structure": 0.5,
+      "normalizedProminence": 1,
+      "area": 0.47440273037542663,
+      "centrality": 0.4030732860520094,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0.5,
+      "residualPenalty": 0.5,
+      "assembly": "line-window",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": false,
+      "decision": null
+    },
+    "oracleRank": null,
+    "oracleReachedComparatorPool": false,
+    "winner": {
+      "value": "LA MESMA Black Label",
+      "scoreEligible": true,
+      "scoreTotal": 4.94561430146355,
+      "prominence": 16,
+      "ocrEvidenceScore": 0.94,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 1,
+      "area": 0.9931740614334471,
+      "centrality": 0.5323662153449387,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0.25,
+      "residualPenalty": 0.25,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 2.5700506774226906,
+    "oracleFamily": "line:0",
+    "familyMemberCount": 2,
+    "familyWinner": {
+      "value": "LA MESMA Black Label",
+      "scoreTotal": 4.94561430146355,
+      "prominence": 16,
+      "sameValueAsOracle": false,
+      "isTheOracleItself": false
+    },
+    "candidatesAboveOracle": [],
+    "primaryClass": "FAMILY_SUPPRESSION",
+    "decisiveFeatures": [
+      "removed by bestFamilyCandidates: same-family sibling \"LA MESMA Black Label\" in line:0 outscored it (4.946 vs 2.376)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-090",
+    "evaluable": true,
+    "governedBrand": [
+      "La Mesma"
+    ],
+    "poolMaxProminence": 20,
+    "eligibilityFloor": 9,
+    "oracle": {
+      "value": "LA MESMA",
+      "scoreEligible": true,
+      "scoreTotal": 2.2365094673869965,
+      "prominence": 17,
+      "ocrEvidenceScore": 0.915,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.5,
+      "structure": 0.5,
+      "normalizedProminence": 0.85,
+      "area": 0.41013986013986015,
+      "centrality": 0.4847518376769333,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0.5,
+      "residualPenalty": 0.5,
+      "assembly": "line-window",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": false,
+      "decision": null
+    },
+    "oracleRank": null,
+    "oracleReachedComparatorPool": false,
+    "winner": {
+      "value": "WHITE WINE 2018 Lo219",
+      "scoreEligible": true,
+      "scoreTotal": 4.901842081283032,
+      "prominence": 20,
+      "ocrEvidenceScore": 0.7224999999999999,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.7644736042767755,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0.5,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        5
+      ],
+      "familyKey": "line:5",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 2.6653326138960356,
+    "oracleFamily": "line:0",
+    "familyMemberCount": 2,
+    "familyWinner": {
+      "value": "LA MESMA Indi",
+      "scoreTotal": 3.7831476669858297,
+      "prominence": 19,
+      "sameValueAsOracle": false,
+      "isTheOracleItself": false
+    },
+    "candidatesAboveOracle": [],
+    "primaryClass": "FAMILY_SUPPRESSION",
+    "decisiveFeatures": [
+      "removed by bestFamilyCandidates: same-family sibling \"LA MESMA Indi\" in line:0 outscored it (3.783 vs 2.237)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-093",
+    "evaluable": true,
+    "governedBrand": [
+      "Fontanavecchia"
+    ],
+    "poolMaxProminence": 87,
+    "eligibilityFloor": 35.800000000000004,
+    "oracle": {
+      "value": "FONTANAVECCHIA",
+      "scoreEligible": false,
+      "scoreTotal": 3.992284552802694,
+      "prominence": 31,
+      "ocrEvidenceScore": 0.85,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 0.25,
+      "normalizedProminence": 0.3563218390804598,
+      "area": 0.421207452024093,
+      "centrality": 0.8483420344129019,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        7
+      ],
+      "familyKey": "line:7",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 3,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "DELRAY BEACH, FL, USA",
+      "scoreEligible": true,
+      "scoreTotal": 4.245187236545607,
+      "prominence": 40,
+      "ocrEvidenceScore": 0.9275,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 0.45977011494252873,
+      "area": 0.5752439650744735,
+      "centrality": 0.5157492184896619,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0.25,
+      "residualPenalty": 0.25,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        19
+      ],
+      "familyKey": "line:19",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 0.2529026837429127,
+    "oracleFamily": "line:7",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "FONTANAVECCHIA",
+      "scoreTotal": 3.992284552802694,
+      "prominence": 31,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "DELRAY BEACH, FL, USA",
+        "scoreEligible": true,
+        "scoreTotal": 4.245187236545607,
+        "prominence": 40
+      },
+      {
+        "value": "TABURNO",
+        "scoreEligible": true,
+        "scoreTotal": 3.9203416645128013,
+        "prominence": 87
+      },
+      {
+        "value": "FALANGHINADELSANNIO",
+        "scoreEligible": false,
+        "scoreTotal": 4.344768671298367,
+        "prominence": 33
+      }
+    ],
+    "primaryClass": "ELIGIBILITY_GATE",
+    "decisiveFeatures": [
+      "score-eligibility false vs true; prominence 31 <= floor 35.80 (maxProminence 87)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-094",
+    "evaluable": true,
+    "governedBrand": [
+      "Fontanavecchia"
+    ],
+    "poolMaxProminence": 62,
+    "eligibilityFloor": 25.8,
+    "oracle": {
+      "value": "FONTANAVECCHIA",
+      "scoreEligible": true,
+      "scoreTotal": 4.298208481290234,
+      "prominence": 31,
+      "ocrEvidenceScore": 0.91,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 0.25,
+      "normalizedProminence": 0.5,
+      "area": 0.6321585903083701,
+      "centrality": 0.863044423684041,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        8
+      ],
+      "familyKey": "line:8",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 2,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "DELRAY BEACH. FL, USA",
+      "scoreEligible": true,
+      "scoreTotal": 4.5254787559616245,
+      "prominence": 39,
+      "ocrEvidenceScore": 0.9125,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 0.6290322580645161,
+      "area": 0.8424044337075458,
+      "centrality": 0.514367630951614,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0.25,
+      "residualPenalty": 0.25,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        20
+      ],
+      "familyKey": "line:20",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 0.22727027467139038,
+    "oracleFamily": "line:8",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "FONTANAVECCHIA",
+      "scoreTotal": 4.298208481290234,
+      "prominence": 31,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "DELRAY BEACH. FL, USA",
+        "scoreEligible": true,
+        "scoreTotal": 4.5254787559616245,
+        "prominence": 39
+      },
+      {
+        "value": "WHITE WINE OF SANNIO",
+        "scoreEligible": true,
+        "scoreTotal": 4.370684752568861,
+        "prominence": 26
+      }
+    ],
+    "primaryClass": "SCORE_ORDERING",
+    "decisiveFeatures": [
+      "structure: oracle 0.250 vs winner 1.000",
+      "lowInformationPenalty: oracle 0.000 vs winner 0.250",
+      "residualPenalty: oracle 0.000 vs winner 0.250"
+    ]
+  },
+  {
+    "caseId": "approved-wine-099",
+    "evaluable": true,
+    "governedBrand": [
+      "Fontanavecchia"
+    ],
+    "poolMaxProminence": 61,
+    "eligibilityFloor": 25.400000000000002,
+    "oracle": {
+      "value": "FONTANAVECCHIA",
+      "scoreEligible": true,
+      "scoreTotal": 4.259033193958907,
+      "prominence": 30,
+      "ocrEvidenceScore": 0.88,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 0.25,
+      "normalizedProminence": 0.4918032786885246,
+      "area": 0.6267227622225446,
+      "centrality": 0.8651897122485358,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        8
+      ],
+      "familyKey": "line:8",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 2,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "DELRAY BEACH, FL, USA",
+      "scoreEligible": true,
+      "scoreTotal": 4.528486172984532,
+      "prominence": 39,
+      "ocrEvidenceScore": 0.895,
+      "positiveSignal": 0,
+      "meaningfulChars": 1,
+      "structure": 1,
+      "normalizedProminence": 0.639344262295082,
+      "area": 0.8628318584070797,
+      "centrality": 0.5143721603473925,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0.25,
+      "residualPenalty": 0.25,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        20
+      ],
+      "familyKey": "line:20",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 0.2694529790256244,
+    "oracleFamily": "line:8",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "FONTANAVECCHIA",
+      "scoreTotal": 4.259033193958907,
+      "prominence": 30,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "DELRAY BEACH, FL, USA",
+        "scoreEligible": true,
+        "scoreTotal": 4.528486172984532,
+        "prominence": 39
+      },
+      {
+        "value": "WHITE WINE OF SANNIO",
+        "scoreEligible": true,
+        "scoreTotal": 4.39110821099896,
+        "prominence": 26
+      }
+    ],
+    "primaryClass": "SCORE_ORDERING",
+    "decisiveFeatures": [
+      "structure: oracle 0.250 vs winner 1.000",
+      "lowInformationPenalty: oracle 0.000 vs winner 0.250",
+      "residualPenalty: oracle 0.000 vs winner 0.250"
+    ]
+  },
+  {
+    "caseId": "approved-wine-103",
+    "evaluable": true,
+    "governedBrand": [
+      "Tenute Valso"
+    ],
+    "poolMaxProminence": 54,
+    "eligibilityFloor": 22.6,
+    "oracle": {
+      "value": "TENUTE VALSO",
+      "scoreEligible": false,
+      "scoreTotal": 4.059930095514296,
+      "prominence": 14,
+      "ocrEvidenceScore": 0.9,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.7857142857142857,
+      "structure": 0.75,
+      "normalizedProminence": 0.25925925925925924,
+      "area": 0.16327396098388464,
+      "centrality": 0.8247181812456703,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        7
+      ],
+      "familyKey": "line:7",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 4,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "SNA VALSO",
+      "scoreEligible": true,
+      "scoreTotal": 3.80228369904546,
+      "prominence": 54,
+      "ocrEvidenceScore": 0.67,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.5714285714285714,
+      "structure": 0.75,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.5599932825324853,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0.5,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        1
+      ],
+      "familyKey": "line:1",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": -0.2576463964688358,
+    "oracleFamily": "line:7",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "TENUTE VALSO",
+      "scoreTotal": 4.059930095514296,
+      "prominence": 14,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "SNA VALSO",
+        "scoreEligible": true,
+        "scoreTotal": 3.80228369904546,
+        "prominence": 54
+      },
+      {
+        "value": "SICILIA",
+        "scoreEligible": true,
+        "scoreTotal": 3.1121180731658065,
+        "prominence": 23
+      },
+      {
+        "value": "DENOMINAZIONE DI ORIGINE CONTROLLATA",
+        "scoreEligible": false,
+        "scoreTotal": 4.148550929791835,
+        "prominence": 16
+      },
+      {
+        "value": "TENUTE",
+        "scoreEligible": false,
+        "scoreTotal": 2.7880892469951046,
+        "prominence": 15
+      }
+    ],
+    "primaryClass": "ELIGIBILITY_GATE",
+    "decisiveFeatures": [
+      "score-eligibility false vs true; prominence 14 <= floor 22.60 (maxProminence 54)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-105",
+    "evaluable": true,
+    "governedBrand": [
+      "Luigi & Giovanni"
+    ],
+    "poolMaxProminence": 95,
+    "eligibilityFloor": 39,
+    "oracle": {
+      "value": "LUIGI & GIOVANNI",
+      "scoreEligible": false,
+      "scoreTotal": 3.5896959222462117,
+      "prominence": 20,
+      "ocrEvidenceScore": 0.9,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.9285714285714286,
+      "structure": 0.75,
+      "normalizedProminence": 0.21052631578947367,
+      "area": 0.11352989804353816,
+      "centrality": 0.28036437246963564,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0.3333333333333333,
+      "assembly": "line-window",
+      "lineIndexes": [
+        5
+      ],
+      "familyKey": "line:5",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 3,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "VANNI",
+      "scoreEligible": true,
+      "scoreTotal": 3.848082417582418,
+      "prominence": 95,
+      "ocrEvidenceScore": 0.92,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.35714285714285715,
+      "structure": 0.25,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.6888461538461539,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 0.2583864953362065,
+    "oracleFamily": "line:5",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "LUIGI & GIOVANNI",
+      "scoreTotal": 3.5896959222462117,
+      "prominence": 20,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "VANNI",
+        "scoreEligible": true,
+        "scoreTotal": 3.848082417582418,
+        "prominence": 95
+      },
+      {
+        "value": "TASTE OF ITALY",
+        "scoreEligible": false,
+        "scoreTotal": 3.451093824977264,
+        "prominence": 38
+      },
+      {
+        "value": "CALIFORNIA",
+        "scoreEligible": false,
+        "scoreTotal": 3.470072247675169,
+        "prominence": 32
+      }
+    ],
+    "primaryClass": "ELIGIBILITY_GATE",
+    "decisiveFeatures": [
+      "score-eligibility false vs true; prominence 20 <= floor 39.00 (maxProminence 95)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-106",
+    "evaluable": true,
+    "governedBrand": [
+      "Alfredo's Wine",
+      "Alfredos Wine"
+    ],
+    "poolMaxProminence": 87,
+    "eligibilityFloor": 35.800000000000004,
+    "oracle": {
+      "value": "ALFREDO'S WINE",
+      "scoreEligible": false,
+      "scoreTotal": 6.1820319814252835,
+      "prominence": 18,
+      "ocrEvidenceScore": 0.845,
+      "positiveSignal": 1,
+      "meaningfulChars": 0.8571428571428571,
+      "structure": 1,
+      "normalizedProminence": 0.20689655172413793,
+      "area": 0.10901001112347053,
+      "centrality": 0.28226720647773273,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        7
+      ],
+      "familyKey": "line:7",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 2,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "REDO",
+      "scoreEligible": true,
+      "scoreTotal": 3.5359667437825335,
+      "prominence": 87,
+      "ocrEvidenceScore": 0.75,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.2857142857142857,
+      "structure": 0.25,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.5960796221322537,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        2
+      ],
+      "familyKey": "line:2",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": -2.64606523764275,
+    "oracleFamily": "line:7",
+    "familyMemberCount": 2,
+    "familyWinner": {
+      "value": "ALFREDO'S WINE",
+      "scoreTotal": 6.1820319814252835,
+      "prominence": 18,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "REDO",
+        "scoreEligible": true,
+        "scoreTotal": 3.5359667437825335,
+        "prominence": 87
+      },
+      {
+        "value": "WIN t",
+        "scoreEligible": true,
+        "scoreTotal": 1.9475709441310987,
+        "prominence": 80
+      }
+    ],
+    "primaryClass": "ELIGIBILITY_GATE",
+    "decisiveFeatures": [
+      "score-eligibility false vs true; prominence 18 <= floor 35.80 (maxProminence 87)"
+    ]
+  },
+  {
+    "caseId": "approved-wine-110",
+    "evaluable": true,
+    "governedBrand": [
+      "Cooley Bay"
+    ],
+    "poolMaxProminence": 172,
+    "eligibilityFloor": 69.8,
+    "oracle": {
+      "value": "Cooley Bay",
+      "scoreEligible": false,
+      "scoreTotal": 3.780277823920266,
+      "prominence": 34,
+      "ocrEvidenceScore": 0.96,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.6428571428571429,
+      "structure": 0.75,
+      "normalizedProminence": 0.19767441860465115,
+      "area": 0.0967781007751938,
+      "centrality": 0.7516666666666667,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        13
+      ],
+      "familyKey": "line:13",
+      "reachedComparatorPool": false,
+      "decision": null
+    },
+    "oracleRank": null,
+    "oracleReachedComparatorPool": false,
+    "winner": {
+      "value": "Cool&y",
+      "scoreEligible": true,
+      "scoreTotal": 3.182845238095238,
+      "prominence": 172,
+      "ocrEvidenceScore": 0.31,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.35714285714285715,
+      "structure": 0.25,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.5047222222222222,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": -0.597432585825028,
+    "oracleFamily": "line:13",
+    "familyMemberCount": 2,
+    "familyWinner": {
+      "value": "Cooley Bay Winery",
+      "scoreTotal": 6.716221414728683,
+      "prominence": 35,
+      "sameValueAsOracle": false,
+      "isTheOracleItself": false
+    },
+    "candidatesAboveOracle": [],
+    "primaryClass": "FAMILY_SUPPRESSION",
+    "decisiveFeatures": [
+      "removed by bestFamilyCandidates: same-family sibling \"Cooley Bay Winery\" in line:13 outscored it (6.716 vs 3.780)"
+    ]
+  },
+  {
+    "caseId": "m-cellars-baseline",
+    "evaluable": true,
+    "governedBrand": [
+      "M Cellars"
+    ],
+    "poolMaxProminence": 51,
+    "eligibilityFloor": 21.400000000000002,
+    "oracle": {
+      "value": "M Cellars",
+      "scoreEligible": true,
+      "scoreTotal": 4.174956526718927,
+      "prominence": 23,
+      "ocrEvidenceScore": 0.9450000000000001,
+      "positiveSignal": 1,
+      "meaningfulChars": 0.5714285714285714,
+      "structure": 0.75,
+      "normalizedProminence": 0.45098039215686275,
+      "area": 0.11005576542543623,
+      "centrality": 0.46284346484153915,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0.5,
+      "residualPenalty": 0.5,
+      "assembly": "line-window",
+      "lineIndexes": [
+        3
+      ],
+      "familyKey": "line:3",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 2,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "CELLARS",
+      "scoreEligible": true,
+      "scoreTotal": 5.231583982006438,
+      "prominence": 41,
+      "ocrEvidenceScore": 0.31,
+      "positiveSignal": 1,
+      "meaningfulChars": 0.5,
+      "structure": 0.5,
+      "normalizedProminence": 0.803921568627451,
+      "area": 0.49415362475265334,
+      "centrality": 0.43984850750961546,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        20
+      ],
+      "familyKey": "line:20",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 1.0566274552875106,
+    "oracleFamily": "line:3",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "M Cellars",
+      "scoreTotal": 4.174956526718927,
+      "prominence": 23,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "CELLARS",
+        "scoreEligible": true,
+        "scoreTotal": 5.231583982006438,
+        "prominence": 41
+      },
+      {
+        "value": "SINCE 2008 Proprietors",
+        "scoreEligible": true,
+        "scoreTotal": 4.571492786581351,
+        "prominence": 30
+      }
+    ],
+    "primaryClass": "SCORE_ORDERING",
+    "decisiveFeatures": [
+      "ocrEvidenceScore: oracle 0.945 vs winner 0.310",
+      "lowInformationPenalty: oracle 0.500 vs winner 0.000",
+      "residualPenalty: oracle 0.500 vs winner 0.000"
+    ]
+  },
+  {
+    "caseId": "wine-multi-artifact-05",
+    "evaluable": true,
+    "governedBrand": [
+      "Blazic"
+    ],
+    "poolMaxProminence": 40,
+    "eligibilityFloor": 17,
+    "oracle": {
+      "value": "BLAZIC",
+      "scoreEligible": true,
+      "scoreTotal": 3.414951699135117,
+      "prominence": 39,
+      "ocrEvidenceScore": 0.89,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.42857142857142855,
+      "structure": 0.25,
+      "normalizedProminence": 0.975,
+      "area": 0.3216494845360825,
+      "centrality": 0.3874924089972732,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        1
+      ],
+      "familyKey": "line:1",
+      "reachedComparatorPool": false,
+      "decision": null
+    },
+    "oracleRank": 12,
+    "oracleReachedComparatorPool": false,
+    "winner": {
+      "value": "BLAZIC COLLIO",
+      "scoreEligible": true,
+      "scoreTotal": 5.183300468048045,
+      "prominence": 40,
+      "ocrEvidenceScore": 0.895,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.8571428571428571,
+      "structure": 0.75,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.5562396553982449,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        1
+      ],
+      "familyKey": "line:1",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": 1.7683487689129276,
+    "oracleFamily": "line:1",
+    "familyMemberCount": 2,
+    "familyWinner": {
+      "value": "BLAZIC COLLIO",
+      "scoreTotal": 5.183300468048045,
+      "prominence": 40,
+      "sameValueAsOracle": false,
+      "isTheOracleItself": false
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "BLAZIC COLLIO",
+        "scoreEligible": true,
+        "scoreTotal": 5.183300468048045,
+        "prominence": 40
+      },
+      {
+        "value": "COLLIO",
+        "scoreEligible": true,
+        "scoreTotal": 3.289848488022372,
+        "prominence": 30
+      },
+      {
+        "value": "CORMONS GO ITALIA",
+        "scoreEligible": true,
+        "scoreTotal": 3.2503622875485947,
+        "prominence": 19
+      },
+      {
+        "value": "Back",
+        "scoreEligible": false,
+        "scoreTotal": 2.6520584192995194,
+        "prominence": 17
+      },
+      {
+        "value": "BLAZIC FRANCO",
+        "scoreEligible": false,
+        "scoreTotal": 4.133022269843664,
+        "prominence": 14
+      },
+      {
+        "value": "PRODOTTO IN ITALIA",
+        "scoreEligible": false,
+        "scoreTotal": 3.352082415569287,
+        "prominence": 14
+      },
+      {
+        "value": "IMBOTTIGLIATO",
+        "scoreEligible": false,
+        "scoreTotal": 3.6115582428710162,
+        "prominence": 14
+      },
+      {
+        "value": "DENOMINAZIONE DI ORIGINE CONTROLLATA",
+        "scoreEligible": false,
+        "scoreTotal": 3.974798060606983,
+        "prominence": 14
+      },
+      {
+        "value": "LOCALITA ZEGLA N16",
+        "scoreEligible": false,
+        "scoreTotal": 4.0811793728830255,
+        "prominence": 14
+      },
+      {
+        "value": "LSA17",
+        "scoreEligible": false,
+        "scoreTotal": 2.6067366115747235,
+        "prominence": 12
+      },
+      {
+        "value": "DENOMINAZIONE DI RIGINE",
+        "scoreEligible": false,
+        "scoreTotal": 3.164561824250088,
+        "prominence": 11
+      },
+      {
+        "value": "ONTROLLATA",
+        "scoreEligible": false,
+        "scoreTotal": 3.1067509883801656,
+        "prominence": 10
+      }
+    ],
+    "primaryClass": "FAMILY_SUPPRESSION",
+    "decisiveFeatures": [
+      "removed by bestFamilyCandidates: same-family sibling \"BLAZIC COLLIO\" in line:1 outscored it (5.183 vs 3.415)"
+    ]
+  },
+  {
+    "caseId": "wine-multi-artifact-06",
+    "evaluable": true,
+    "governedBrand": [
+      "Mauro Molino"
+    ],
+    "poolMaxProminence": 53,
+    "eligibilityFloor": 22.200000000000003,
+    "oracle": {
+      "value": "MAURO MOLINO",
+      "scoreEligible": false,
+      "scoreTotal": 4.050296025563268,
+      "prominence": 11,
+      "ocrEvidenceScore": 0.955,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.7857142857142857,
+      "structure": 0.75,
+      "normalizedProminence": 0.20754716981132076,
+      "area": 0.10473834158044684,
+      "centrality": 0.8642414254102895,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        12
+      ],
+      "familyKey": "line:12",
+      "reachedComparatorPool": false,
+      "decision": null
+    },
+    "oracleRank": null,
+    "oracleReachedComparatorPool": false,
+    "winner": {
+      "value": "MOLINO",
+      "scoreEligible": true,
+      "scoreTotal": 3.481118845442602,
+      "prominence": 53,
+      "ocrEvidenceScore": 0.56,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.42857142857142855,
+      "structure": 0.25,
+      "normalizedProminence": 1,
+      "area": 0.8622732043784676,
+      "centrality": 0.5601354570041183,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        2
+      ],
+      "familyKey": "line:2",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": -0.5691771801206662,
+    "oracleFamily": "line:12",
+    "familyMemberCount": 2,
+    "familyWinner": {
+      "value": "AZIENDA AGRICOLA MAURO MOLINO",
+      "scoreTotal": 4.739050405857897,
+      "prominence": 11,
+      "sameValueAsOracle": false,
+      "isTheOracleItself": false
+    },
+    "candidatesAboveOracle": [],
+    "primaryClass": "FAMILY_SUPPRESSION",
+    "decisiveFeatures": [
+      "removed by bestFamilyCandidates: same-family sibling \"AZIENDA AGRICOLA MAURO MOLINO\" in line:12 outscored it (4.739 vs 4.050)"
+    ]
+  },
+  {
+    "caseId": "wine-multi-artifact-08",
+    "evaluable": true,
+    "governedBrand": [
+      "Pindar"
+    ],
+    "poolMaxProminence": 80,
+    "eligibilityFloor": 33,
+    "oracle": {
+      "value": "PINDAR",
+      "scoreEligible": false,
+      "scoreTotal": 2.737611239238488,
+      "prominence": 13,
+      "ocrEvidenceScore": 0.92,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.42857142857142855,
+      "structure": 0.25,
+      "normalizedProminence": 0.1625,
+      "area": 0.04482758620689655,
+      "centrality": 0.7500013393335476,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "line-window",
+      "lineIndexes": [
+        9
+      ],
+      "familyKey": "line:9",
+      "reachedComparatorPool": true,
+      "decision": "alternate"
+    },
+    "oracleRank": 6,
+    "oracleReachedComparatorPool": true,
+    "winner": {
+      "value": "Z-lor",
+      "scoreEligible": true,
+      "scoreTotal": 2.7334503145520506,
+      "prominence": 80,
+      "ocrEvidenceScore": 0,
+      "positiveSignal": 0,
+      "meaningfulChars": 0.2857142857142857,
+      "structure": 0.25,
+      "normalizedProminence": 1,
+      "area": 1,
+      "centrality": 0.42102485803064393,
+      "alignment": 1,
+      "lineProximity": 1,
+      "lowInformationPenalty": 0,
+      "residualPenalty": 0,
+      "assembly": "whole-line",
+      "lineIndexes": [
+        0
+      ],
+      "familyKey": "line:0",
+      "reachedComparatorPool": true,
+      "decision": "selected"
+    },
+    "scoreDelta": -0.004160924686437362,
+    "oracleFamily": "line:9",
+    "familyMemberCount": 1,
+    "familyWinner": {
+      "value": "PINDAR",
+      "scoreTotal": 2.737611239238488,
+      "prominence": 13,
+      "sameValueAsOracle": true,
+      "isTheOracleItself": true
+    },
+    "candidatesAboveOracle": [
+      {
+        "value": "Z-lor",
+        "scoreEligible": true,
+        "scoreTotal": 2.7334503145520506,
+        "prominence": 80
+      },
+      {
+        "value": "Residual sugar 8.9",
+        "scoreEligible": false,
+        "scoreTotal": 4.3685926982437975,
+        "prominence": 20
+      },
+      {
+        "value": "Back",
+        "scoreEligible": false,
+        "scoreTotal": 2.5475801153700597,
+        "prominence": 18
+      },
+      {
+        "value": "Varietal Gewurztraminer",
+        "scoreEligible": false,
+        "scoreTotal": 4.404458060386394,
+        "prominence": 17
+      },
+      {
+        "value": "Harvest Brix 386",
+        "scoreEligible": false,
+        "scoreTotal": 4.286453063418698,
+        "prominence": 16
+      },
+      {
+        "value": "Bttl. numbers",
+        "scoreEligible": false,
+        "scoreTotal": 2.9177473916644106,
+        "prominence": 16
+      }
+    ],
+    "primaryClass": "ELIGIBILITY_GATE",
+    "decisiveFeatures": [
+      "score-eligibility false vs true; prominence 13 <= floor 33.00 (maxProminence 80)"
+    ]
+  }
+]

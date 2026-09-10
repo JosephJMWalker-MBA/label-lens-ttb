@@ -1,0 +1,16 @@
+{
+  "artifact": "identity",
+  "experimentId": "issue-149-brand-ranking-loss-diagnosis",
+  "baseSha": "8de5b9fc05b61ad423b63d6c02bcb11f5a9c1db2",
+  "branch": "research/brand-ranking-loss-diagnosis",
+  "originMain": "195182c5ccef51e4a15767801d184d12ab07e52a",
+  "evaluationDependency": {
+    "checkpoint": "8de5b9fc05b61ad423b63d6c02bcb11f5a9c1db2",
+    "why": "the diagnosis requires the oracle-correct candidates that experiment produced",
+    "note": "ancestry is an evaluation dependency only; it is not a claim that the oracle seam belongs in production"
+  },
+  "inventorySha256": "d30bf6f8f7887e46bb54c1f58e6cd00c075b5a2db022c7efba162df20cca04fb",
+  "populationSha256": "91eec356e7a97fdf55b2d66a070f81b707bdb62a82f43c05608094ebb3aa59ae",
+  "productionBehaviorChanged": false,
+  "nodeVersion": "v22.17.0"
+}

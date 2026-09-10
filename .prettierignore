@@ -58,3 +58,9 @@ artifacts/issue-149-brand-oracle-exact-window/search-space.json
 artifacts/issue-149-brand-oracle-exact-window/primary/
 artifacts/issue-149-brand-oracle-exact-window/repeat/
 artifacts/issue-149-brand-oracle-exact-window/superseded-pre-separator-fix/
+
+# Frozen ranking-loss diagnosis evidence; digests recorded in determinism.json.
+artifacts/issue-149-brand-ranking-loss-diagnosis/aggregate.json
+artifacts/issue-149-brand-ranking-loss-diagnosis/case-level-pairwise.json
+artifacts/issue-149-brand-ranking-loss-diagnosis/primary/
+artifacts/issue-149-brand-ranking-loss-diagnosis/repeat/

@@ -1,0 +1,59 @@
+{
+  "artifact": "aggregate",
+  "experimentId": "issue-149-brand-ranking-loss-diagnosis",
+  "inventorySha256": "d30bf6f8f7887e46bb54c1f58e6cd00c075b5a2db022c7efba162df20cca04fb",
+  "evaluationDependency": "oracle checkpoint 8de5b9fc (ancestry is an evaluation dependency only)",
+  "population": {
+    "targeted": 37,
+    "evaluable": 37
+  },
+  "primaryClasses": {
+    "FAMILY_SUPPRESSION": 14,
+    "ELIGIBILITY_GATE": 14,
+    "SCORE_ORDERING": 9,
+    "TIE_BREAK": 0,
+    "OTHER": 0,
+    "UNDETERMINABLE": 0
+  },
+  "oracleReachedComparatorPool": 23,
+  "oracleRemovedBeforeComparator": 14,
+  "eligibility": {
+    "oracleIneligible": 18,
+    "winnerEligible": 37,
+    "bothEligible": 19
+  },
+  "scoreDelta": {
+    "median": 0.40199858018720835
+  },
+  "winningCandidateArchetypes": {
+    "short token": 18,
+    "producer/estate phrase": 4,
+    "long phrase (3+ tokens)": 13,
+    "contains digits": 2
+  },
+  "decisiveFeatureFrequency": {
+    "score-eligibility false vs true; prominence 20 <= floor 39.40 (maxProminence 96)": 1,
+    "score-eligibility false vs true; prominence 18 <= floor 64.20 (maxProminence 158)": 1,
+    "removed by bestFamilyCandidates": 12,
+    "removed by dedupeBestCandidates": 2,
+    "area": 6,
+    "prominence": 4,
+    "ocrEvidenceScore": 3,
+    "meaningfulChars": 3,
+    "structure": 4,
+    "residualPenalty": 4,
+    "score-eligibility false vs true; prominence 68 <= floor 71.40 (maxProminence 176)": 1,
+    "score-eligibility false vs true; prominence 10 <= floor 20.60 (maxProminence 49)": 2,
+    "score-eligibility false vs true; prominence 10 <= floor 21.00 (maxProminence 50)": 1,
+    "score-eligibility false vs true; prominence 23 <= floor 25.80 (maxProminence 62)": 1,
+    "score-eligibility false vs true; prominence 24 <= floor 25.40 (maxProminence 61)": 1,
+    "score-eligibility false vs true; prominence 18 <= floor 33.00 (maxProminence 80)": 1,
+    "score-eligibility false vs true; prominence 31 <= floor 35.80 (maxProminence 87)": 1,
+    "lowInformationPenalty": 3,
+    "score-eligibility false vs true; prominence 14 <= floor 22.60 (maxProminence 54)": 1,
+    "score-eligibility false vs true; prominence 20 <= floor 39.00 (maxProminence 95)": 1,
+    "score-eligibility false vs true; prominence 18 <= floor 35.80 (maxProminence 87)": 1,
+    "score-eligibility false vs true; prominence 13 <= floor 33.00 (maxProminence 80)": 1
+  },
+  "productionBehaviorChanged": false
+}
