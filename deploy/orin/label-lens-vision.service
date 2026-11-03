@@ -1,0 +1,33 @@
+[Unit]
+Description=Label Lens private vision reader (llama.cpp llama-server)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=labellens
+Group=labellens
+EnvironmentFile=/etc/label-lens-vision/vision.env
+ExecStart=/opt/llama.cpp/build/bin/llama-server \
+  --host ${VISION_BIND_HOST} \
+  --port ${VISION_PORT} \
+  --api-key-file /etc/label-lens-vision/api-key \
+  --model ${VISION_MODEL_PATH} \
+  --mmproj ${VISION_MMPROJ_PATH} \
+  --alias ${VISION_MODEL_ALIAS} \
+  --ctx-size ${VISION_CTX} \
+  --parallel ${VISION_PARALLEL} \
+  --n-gpu-layers 999 \
+  --seed 17
+Restart=on-failure
+RestartSec=5
+
+# The reader needs the GPU and its model files, nothing else.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadOnlyPaths=/opt/llama.cpp /opt/label-lens-vision /etc/label-lens-vision
+
+[Install]
+WantedBy=multi-user.target

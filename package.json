@@ -52,6 +52,8 @@
     "eval:local-vlm-decision-clarity": "npx vite-node --config vitest.config.ts scripts/eval/run-local-vlm-decision-clarity-diagnostic.ts",
     "eval:local-vlm-decision-clarity-replication": "npx vite-node --config vitest.config.ts scripts/eval/run-local-vlm-decision-clarity-replication.ts",
     "eval:local-vlm-decision-clarity-permutation-recurrence": "npx vite-node --config vitest.config.ts scripts/eval/run-local-vlm-decision-clarity-permutation-recurrence.ts",
+    "vision:check": "npx vite-node --config vitest.config.ts scripts/vision/check-endpoint.ts",
+    "vision:eval": "npx vite-node --config vitest.config.ts scripts/vision/evaluate-corpus.ts",
     "docs:check": "node --experimental-strip-types --no-warnings scripts/check-docs.ts",
     "docs:check:test": "vitest run src/docs/documentation-validator.test.ts"
   },

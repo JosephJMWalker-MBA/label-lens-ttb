@@ -23,6 +23,7 @@ npm-debug.log*
 
 # Local evaluation artifacts
 .local-vlm/
+.local-vision/
 
 # Python bytecode from the research probe scripts (compiled locally, never used:
 # the probes run under the container's own interpreter).
