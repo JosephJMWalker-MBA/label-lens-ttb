@@ -19,6 +19,8 @@ import { getExecutableProvenance } from "@/server/runtime-provenance";
 import { ALLOWED_MEDIA_TYPES, MAX_IMAGE_BYTES } from "@/server/resource-policy";
 import { issueAppendToken } from "@/server/append-token";
 import { validatePanelIdentityList } from "@/server/submissions/panel-identity";
+import { resolveVisionConfig } from "@/server/vision/config";
+import { readSellerRegionsWithVision } from "@/server/vision/seller-region-reading";
 
 export const runtime = "nodejs";
 
@@ -116,6 +118,18 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
+  // The private vision reader is optional. A partial or unsafe configuration is
+  // refused outright so an operator never believes it is active when it is not.
+  const vision = resolveVisionConfig();
+  if (vision.state === "invalid") {
+    return error(
+      "VISION_READER_MISCONFIGURED",
+      "The label reader is misconfigured on this server. Ask the operator to check the vision reader settings.",
+      503,
+    );
+  }
+  let visionHostUnavailable = false;
+
   const executable = await getExecutableProvenance();
   const panelRuns: PackagePanelMachineRun[] = [];
   for (let index = 0; index < draft.panels.length; index += 1) {
@@ -193,7 +207,21 @@ export async function POST(request: Request): Promise<Response> {
       panel.panelId,
       extracted.value.debug.passes,
     );
-    const sellerRegionReadings = extracted.value.sellerRegionReadings;
+    let sellerRegionReadings = extracted.value.sellerRegionReadings;
+    if (vision.state === "enabled" && (input.sellerRegionTargets ?? []).length > 0) {
+      const visionPass = await readSellerRegionsWithVision({
+        config: vision.config,
+        imageBytes: bytes,
+        imageWidth: panel.width,
+        imageHeight: panel.height,
+        targets: input.sellerRegionTargets ?? [],
+        localReadings: sellerRegionReadings,
+        processedAt: input.processedAt,
+        hostUnavailable: visionHostUnavailable,
+      });
+      sellerRegionReadings = visionPass.readings;
+      visionHostUnavailable = visionPass.summary.hostUnavailable;
+    }
     const machinePayload = {
       schemaVersion: "package-panel-machine-record.v1",
       packageId: draft.packageId,

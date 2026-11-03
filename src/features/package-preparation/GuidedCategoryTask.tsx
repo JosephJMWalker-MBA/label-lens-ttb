@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import type { SellerRegionMachineReading } from "@/pipeline/extractor/extractor.types";
 
 import type {
   PackageCategoryAnalysis,
@@ -37,6 +38,18 @@ function firstSellerRegionReliability(analysis: PackageCategoryAnalysis) {
 
 function formatCrop(crop: { left: number; top: number; width: number; height: number }) {
   return `left ${crop.left}, top ${crop.top}, ${crop.width}x${crop.height}px`;
+}
+
+/** Plain statement of which instrument read the region, and why if it fell back. */
+function readerDescription(reading: SellerRegionMachineReading): string {
+  if (reading.visionRead) {
+    const { provenance, legibility } = reading.visionRead;
+    return `Private vision reader (${provenance.configuredModel} on ${provenance.hostLabel}) · legibility ${legibility} · ${provenance.latencyMs} ms`;
+  }
+  if (reading.visionFallback) {
+    return `Local OCR (vision reader unavailable: ${reading.visionFallback.code})`;
+  }
+  return "Local OCR";
 }
 
 export function GuidedCategoryTask({
@@ -202,23 +215,31 @@ export function GuidedCategoryTask({
                       </dd>
                     </div>
                     <div>
-                      <dt className="font-medium text-foreground">Orientation/pass</dt>
-                      <dd>
-                        {analysis.comparison.sellerRegionReadings[0].passProvenance?.passKind ??
-                          "Unknown"}{" "}
-                        · rotate{" "}
-                        {analysis.comparison.sellerRegionReadings[0].passProvenance?.transform
-                          .rotate ?? "unknown"}
-                      </dd>
+                      <dt className="font-medium text-foreground">Reader</dt>
+                      <dd>{readerDescription(analysis.comparison.sellerRegionReadings[0])}</dd>
                     </div>
-                    <div>
-                      <dt className="font-medium text-foreground">Preprocessing</dt>
-                      <dd>
-                        {analysis.comparison.sellerRegionReadings[0].passProvenance?.preprocessing.join(
-                          ", ",
-                        ) ?? "Unknown"}
-                      </dd>
-                    </div>
+                    {analysis.comparison.sellerRegionReadings[0].visionRead ? null : (
+                      <>
+                        <div>
+                          <dt className="font-medium text-foreground">Orientation/pass</dt>
+                          <dd>
+                            {analysis.comparison.sellerRegionReadings[0].passProvenance?.passKind ??
+                              "Unknown"}{" "}
+                            · rotate{" "}
+                            {analysis.comparison.sellerRegionReadings[0].passProvenance?.transform
+                              .rotate ?? "unknown"}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="font-medium text-foreground">Preprocessing</dt>
+                          <dd>
+                            {analysis.comparison.sellerRegionReadings[0].passProvenance?.preprocessing.join(
+                              ", ",
+                            ) ?? "Unknown"}
+                          </dd>
+                        </div>
+                      </>
+                    )}
                     <div>
                       <dt className="font-medium text-foreground">Raw bounded transcript</dt>
                       <dd>

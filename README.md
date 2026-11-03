@@ -73,6 +73,14 @@ Current deterministic checks:
 
 Finding states include `PASS`, `WARN`, `FAIL`, `NEEDS_REVIEW`, and `not_run`. There is no aggregate compliance score or overall approval verdict.
 
+### Private vision reader (optional)
+
+- Reads each seller-marked region with a vision-language model hosted on the operator's own hardware (a Jetson Orin in the reference setup).
+- Only the pixels inside the seller's region are sent; the seller's declared value never is. The model transcribes, and deterministic parsers and rules decide.
+- Connections are refused unless every resolved address is private (LAN, loopback, link-local, or Tailscale range). There is no override.
+- If the host is down or answers badly, those regions fall back to local OCR and each reading records why.
+- Setup, model choice, and measurement: [`deploy/orin/README.md`](deploy/orin/README.md). `npm run vision:check` tests a configured host; `npm run vision:eval` measures it on the frozen wine corpus.
+
 ### Reporting and provenance
 
 - Concise result summary with progressive disclosure.
