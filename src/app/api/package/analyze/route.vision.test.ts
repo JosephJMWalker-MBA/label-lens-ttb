@@ -268,6 +268,28 @@ describe("package analysis with the private vision reader", () => {
     expect(readings[1].visionFallback.code).toBe("HOST_UNAVAILABLE");
   });
 
+  it("never contacts a vision host and keeps local OCR when no reader is configured", async () => {
+    // The state of every deployment today: no LABEL_LENS_VISION_* settings.
+    vi.stubEnv("LABEL_LENS_VISION_ENDPOINT", "");
+    vi.stubEnv("LABEL_LENS_VISION_API_KEY", "");
+    vi.stubEnv("LABEL_LENS_VISION_MODEL", "");
+
+    const response = await POST(requestFor(draft()));
+    expect(response.status).toBe(200);
+    expect(mocks.transcribe).not.toHaveBeenCalled();
+    const body = await response.json();
+    const readings = body.data.analysisRun.panelRuns.flatMap(
+      (run: { sellerRegionReadings: SellerRegionMachineReading[] }) => run.sellerRegionReadings,
+    );
+    expect(readings).toHaveLength(2);
+    for (const reading of readings) {
+      expect(reading.observedValue).toBe("CELLARS");
+      expect(reading).not.toHaveProperty("visionRead");
+      expect(reading).not.toHaveProperty("visionFallback");
+      expect(reading.reader ?? "local-ocr").toBe("local-ocr");
+    }
+  });
+
   it("refuses to analyze with a partial vision configuration", async () => {
     vi.stubEnv("LABEL_LENS_VISION_API_KEY", "");
     const response = await POST(requestFor(draft()));
