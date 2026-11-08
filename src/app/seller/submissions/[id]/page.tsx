@@ -2,7 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PortalHeader } from "@/components/layout/PortalHeader";
-import { PORTAL_DISCLAIMER, statusLabel } from "@/lib/product-language";
+import {
+  OFFICIAL_FILING_HANDOFF,
+  PORTAL_DISCLAIMER,
+  sellerNextStepForStatus,
+  statusLabel,
+} from "@/lib/product-language";
 import { requireRolePage } from "@/server/auth/guards";
 import { isValidSubmissionId } from "@/server/submissions/access";
 import { getOwnedSubmissionDetail } from "@/server/submissions/queries";
@@ -24,6 +29,10 @@ export default async function SellerSubmissionPage({
     submission.currentStatus === "changes_requested" &&
     submission.changesRequestedFeedback !== null &&
     !submission.changesRequestedFeedback.alreadyAnswered;
+  const nextStep = sellerNextStepForStatus(submission.currentStatus);
+  const internalReviewDone =
+    submission.currentStatus === "internally_accepted" ||
+    submission.currentStatus === "agent_review_complete";
 
   return (
     <>
@@ -64,6 +73,33 @@ export default async function SellerSubmissionPage({
                 This requested-change decision already has a seller response.
               </p>
             )}
+          </section>
+        ) : null}
+
+        {submission.currentStatus !== "changes_requested" ? (
+          <section
+            className="mt-6 rounded-md border border-border/70 bg-card p-4"
+            aria-labelledby="seller-next-step-heading"
+            data-testid="seller-next-step"
+          >
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              What happens next
+            </p>
+            <h2 id="seller-next-step-heading" className="mt-1 font-semibold">
+              {nextStep.title}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">{nextStep.detail}</p>
+            {internalReviewDone ? (
+              <a
+                className="mt-3 inline-flex rounded-md border border-border px-3 py-1.5 text-sm font-medium hover:bg-muted"
+                href={OFFICIAL_FILING_HANDOFF.url}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                Go to {OFFICIAL_FILING_HANDOFF.label}
+                <span className="sr-only"> (opens the official TTB site in a new tab)</span>
+              </a>
+            ) : null}
           </section>
         ) : null}
 
