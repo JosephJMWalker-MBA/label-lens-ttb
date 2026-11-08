@@ -446,6 +446,67 @@ test("footer-driven workstation exits correction, fits panels, and preserves imm
   expect(overflow).toBeLessThanOrEqual(1);
 });
 
+interface DraftGeometry {
+  panels: Array<{ role: string; width: number; height: number }>;
+  categories: Array<{
+    categoryId: string;
+    regions: Array<{ x: number; y: number; width: number; height: number }>;
+  }>;
+}
+
+test("draws label artwork at its natural proportions and stores regions in panel fractions", async ({
+  page,
+}) => {
+  for (const fixture of [LANDSCAPE_FIXTURE, PORTRAIT_FIXTURE]) {
+    await page.goto("/review?new=true");
+    await page.getByLabel(/upload front label/i).setInputFiles(fixture);
+    await page.getByRole("button", { name: /no back label/i }).click();
+    await page.getByRole("button", { name: /no additional panels/i }).click();
+    await expect(page.getByTestId("annotation-workspace")).toBeVisible();
+
+    const draft = (await readCurrentDraft(page)) as unknown as DraftGeometry;
+    const front = draft.panels.find((panel) => panel.role === "front")!;
+    const image = page.getByRole("img", { name: /label annotation image/i }).locator("image");
+    const box = (await image.boundingBox())!;
+    // The drawn artwork keeps the uploaded file's proportions; it is not squashed square.
+    expect(Math.abs(box.width / box.height - front.width / front.height), fixture).toBeLessThan(
+      0.01,
+    );
+  }
+
+  // On the portrait label, a region drawn at known fractions of the visible
+  // image is stored at exactly those panel fractions.
+  const canvas = page.getByRole("img", { name: /label annotation image/i });
+  const drawButton = page.getByRole("button", { name: /draw region/i });
+  if ((await drawButton.getAttribute("aria-pressed")) !== "true") await drawButton.click();
+  await canvas.locator("image").evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    window.scrollTo({
+      top: window.scrollY + rect.top + rect.height * 0.45 - window.innerHeight / 3,
+    });
+  });
+  const box = (await canvas.locator("image").boundingBox())!;
+  const regionCount = await page.locator("g[data-region-id]").count();
+  await page.mouse.move(box.x + box.width * 0.25, box.y + box.height * 0.4);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width * 0.75, box.y + box.height * 0.5, { steps: 6 });
+  await expect(page.locator("g[data-region-id]")).toHaveCount(regionCount + 1);
+  await page.mouse.up();
+  await page.getByLabel(/what the label says/i).fill("LUIGI & GIOVANNI");
+  await page.getByRole("button", { name: "Save Brand name" }).click();
+
+  const savedRegion = async () =>
+    ((await readCurrentDraft(page)) as unknown as DraftGeometry).categories.find(
+      (category) => category.categoryId === "brandName",
+    )?.regions[0];
+  await expect.poll(async () => Boolean(await savedRegion())).toBe(true);
+  const saved = (await savedRegion())!;
+  expect(saved.x).toBeCloseTo(0.25, 2);
+  expect(saved.y).toBeCloseTo(0.4, 2);
+  expect(saved.width).toBeCloseTo(0.5, 2);
+  expect(saved.height).toBeCloseTo(0.1, 2);
+});
+
 test("IndexedDB rejection leaves category save visibly failed and unadvanced", async ({ page }) => {
   await page.addInitScript(() => {
     const originalPut = IDBObjectStore.prototype.put;

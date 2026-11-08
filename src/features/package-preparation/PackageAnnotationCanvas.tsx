@@ -100,6 +100,8 @@ export function PackageAnnotationCanvas({
   const previousPanelIdRef = useRef<string | null>(null);
   const taskKeyRef = useRef<string | null>(null);
   const [fitSize, setFitSize] = useState({ width: panel.width, height: panel.height });
+  // Height of the panel in units of its width: the SVG's vertical extent.
+  const panelAspect = panel.width > 0 && panel.height > 0 ? panel.height / panel.width : 1;
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [previewRegion, setPreviewRegion] = useState<SellerEvidenceRegion | null>(null);
   const [message, setMessage] = useState(
@@ -197,7 +199,10 @@ export function PackageAnnotationCanvas({
     point.x = clientX;
     point.y = clientY;
     const local = point.matrixTransform(matrix.inverse());
-    return { x: Math.min(1, Math.max(0, local.x)), y: Math.min(1, Math.max(0, local.y)) };
+    return {
+      x: Math.min(1, Math.max(0, local.x)),
+      y: Math.min(1, Math.max(0, local.y / panelAspect)),
+    };
   }
 
   function startDraw(event: ReactPointerEvent<SVGSVGElement>) {
@@ -342,7 +347,12 @@ export function PackageAnnotationCanvas({
     visibleRegions.push(previewRegion);
   }
 
-  const handleSize = 0.024 / zoom;
+  // The SVG uses the panel's own aspect ratio (width 1, height `panelAspect`)
+  // so the artwork is never stretched. Seller evidence stays normalized to 0..1
+  // on both axes; only drawing maps y into this uniform space. Sizes are in
+  // units of the panel's shorter side so marks look the same on any panel.
+  const shortSide = Math.min(1, panelAspect);
+  const handleSize = (0.024 * shortSide) / zoom;
 
   function handleShortcut(event: ReactKeyboardEvent<HTMLElement>) {
     const target = event.target as HTMLElement;
@@ -507,7 +517,7 @@ export function PackageAnnotationCanvas({
       >
         <svg
           ref={svgRef}
-          viewBox="0 0 1 1"
+          viewBox={`0 0 1 ${panelAspect}`}
           preserveAspectRatio="xMidYMid meet"
           role="img"
           aria-label={`${panel.role} label annotation image`}
@@ -526,7 +536,14 @@ export function PackageAnnotationCanvas({
           onPointerUp={finishGesture}
           onPointerCancel={finishGesture}
         >
-          <image href={imageUrl} x="0" y="0" width="1" height="1" preserveAspectRatio="none" />
+          <image
+            href={imageUrl}
+            x="0"
+            y="0"
+            width="1"
+            height={panelAspect}
+            preserveAspectRatio="none"
+          />
 
           {machineRegions.map((region) => (
             <g
@@ -537,13 +554,13 @@ export function PackageAnnotationCanvas({
             >
               <rect
                 x={region.x}
-                y={region.y}
+                y={region.y * panelAspect}
                 width={region.width}
-                height={region.height}
+                height={region.height * panelAspect}
                 fill="rgba(71,85,105,.04)"
                 stroke="rgb(100,116,139)"
                 strokeWidth={0.004 / zoom}
-                strokeDasharray="0.02 0.012"
+                strokeDasharray={`${0.02 * shortSide} ${0.012 * shortSide}`}
                 vectorEffect="non-scaling-stroke"
               />
             </g>
@@ -570,19 +587,19 @@ export function PackageAnnotationCanvas({
               >
                 <rect
                   x={region.x}
-                  y={region.y}
+                  y={region.y * panelAspect}
                   width={region.width}
-                  height={region.height}
+                  height={region.height * panelAspect}
                   fill={working ? "rgba(37,99,235,.14)" : "rgba(194,65,12,.14)"}
                   stroke={working ? "rgb(37,99,235)" : "rgb(194,65,12)"}
                   strokeWidth={(active ? 0.009 : 0.006) / zoom}
-                  strokeDasharray={working ? "0.018 0.01" : undefined}
+                  strokeDasharray={working ? `${0.018 * shortSide} ${0.01 * shortSide}` : undefined}
                   vectorEffect="non-scaling-stroke"
                 />
                 <text
                   x={region.x}
-                  y={Math.max(0.025, region.y)}
-                  fontSize={0.03 / zoom}
+                  y={Math.max(0.025 * shortSide, region.y * panelAspect)}
+                  fontSize={(0.03 * shortSide) / zoom}
                   fontWeight="700"
                   fill={working ? "rgb(30,64,175)" : "rgb(124,45,18)"}
                 >
@@ -591,7 +608,8 @@ export function PackageAnnotationCanvas({
                 {active
                   ? (["nw", "ne", "sw", "se"] as const).map((corner) => {
                       const x = corner.includes("w") ? region.x : region.x + region.width;
-                      const y = corner.includes("n") ? region.y : region.y + region.height;
+                      const y =
+                        (corner.includes("n") ? region.y : region.y + region.height) * panelAspect;
                       return (
                         <rect
                           key={corner}
