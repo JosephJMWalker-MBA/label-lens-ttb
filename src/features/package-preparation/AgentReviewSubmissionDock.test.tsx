@@ -2,9 +2,14 @@
  * @vitest-environment jsdom
  */
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { useEffect, useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { OFFICIAL_FILING_HANDOFF } from "@/lib/product-language";
+
 import { AgentReviewSubmissionDock } from "./AgentReviewSubmissionDock";
+import { submissionFooterAction } from "./submission-footer-action";
+import { useInternalReviewSubmission } from "./use-internal-review-submission";
 
 const mockLoadPackageDraftLocally = vi.fn();
 
@@ -86,6 +91,49 @@ function mockValidDraft(packageId = "pkg-1") {
   };
 }
 
+/**
+ * Mirrors ReviewWorkspaceContainer: one submission hook feeds both the panel and
+ * the guided footer action. The footer action is rendered as a plain button so
+ * these tests drive submission exactly the way the seller does.
+ */
+function Harness(props: {
+  activePackageId?: string | null;
+  selectionToken?: number;
+  submitter?: string;
+  onStartAnotherPackage?: () => void;
+}) {
+  const [submitter, setSubmitter] = useState(props.submitter ?? "");
+  useEffect(() => {
+    if (props.submitter !== undefined) setSubmitter(props.submitter);
+  }, [props.submitter]);
+  const submission = useInternalReviewSubmission({
+    activePackageId: props.activePackageId,
+    selectionToken: props.selectionToken,
+    submitter,
+  });
+  const action = submissionFooterAction({
+    submission,
+    submitter,
+    packageId: props.activePackageId,
+    navigate: () => {},
+  });
+  return (
+    <>
+      <AgentReviewSubmissionDock
+        submission={submission}
+        submitter={submitter}
+        onSubmitterChange={setSubmitter}
+        onStartAnotherPackage={props.onStartAnotherPackage}
+      />
+      <footer data-testid="footer-equivalent">
+        <button type="button" disabled={action.disabled || action.pending} onClick={action.onClick}>
+          {action.label}
+        </button>
+      </footer>
+    </>
+  );
+}
+
 describe("AgentReviewSubmissionDock", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -103,7 +151,7 @@ describe("AgentReviewSubmissionDock", () => {
 
   it("loads only the selected packageId when provided", async () => {
     mockLoadPackageDraftLocally.mockResolvedValue(mockValidDraft("pkg-abc"));
-    render(<AgentReviewSubmissionDock activePackageId="pkg-abc" />);
+    render(<Harness activePackageId="pkg-abc" />);
 
     await waitFor(() => {
       expect(mockLoadPackageDraftLocally).toHaveBeenCalledWith("pkg-abc");
@@ -116,11 +164,7 @@ describe("AgentReviewSubmissionDock", () => {
     });
 
     const { rerender } = render(
-      <AgentReviewSubmissionDock
-        activePackageId="pkg-1"
-        selectionToken={1}
-        submitter="Test Seller"
-      />,
+      <Harness activePackageId="pkg-1" selectionToken={1} submitter="Test Seller" />,
     );
 
     await waitFor(() => {
@@ -151,7 +195,7 @@ describe("AgentReviewSubmissionDock", () => {
     const submitterInput = screen.getByLabelText(/seller or submitter name/i);
     fireEvent.change(submitterInput, { target: { value: "Test Seller" } });
 
-    const submitBtn = screen.getByRole("button", { name: /submit for agent review/i });
+    const submitBtn = screen.getByRole("button", { name: /submit for internal review/i });
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
@@ -159,7 +203,7 @@ describe("AgentReviewSubmissionDock", () => {
     });
 
     // Switch active package to pkg-2
-    rerender(<AgentReviewSubmissionDock activePackageId="pkg-2" selectionToken={2} />);
+    rerender(<Harness activePackageId="pkg-2" selectionToken={2} />);
 
     await waitFor(() => {
       expect(screen.queryByText("Open my submissions")).not.toBeInTheDocument();
@@ -191,7 +235,7 @@ describe("AgentReviewSubmissionDock", () => {
     );
 
     render(
-      <AgentReviewSubmissionDock
+      <Harness
         activePackageId="pkg-1"
         onStartAnotherPackage={onStartAnotherPackage}
         submitter="Test Seller"
@@ -199,13 +243,15 @@ describe("AgentReviewSubmissionDock", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /submit for agent review/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /submit for internal review/i }),
+      ).toBeInTheDocument();
     });
 
     const submitterInput = screen.getByLabelText(/seller or submitter name/i);
     fireEvent.change(submitterInput, { target: { value: "Test Seller" } });
 
-    fireEvent.click(screen.getByRole("button", { name: /submit for agent review/i }));
+    fireEvent.click(screen.getByRole("button", { name: /submit for internal review/i }));
 
     await waitFor(() => {
       expect(screen.getByText("Open my submissions")).toBeInTheDocument();
@@ -217,16 +263,68 @@ describe("AgentReviewSubmissionDock", () => {
   });
 
   it("displays controlled submitter prop when passed to dock", async () => {
-    render(<AgentReviewSubmissionDock submitter="Test Seller" />);
+    render(<Harness submitter="Test Seller" />);
 
     const input = (await screen.findByLabelText("Seller or submitter name")) as HTMLInputElement;
     expect(input.value).toBe("Test Seller");
   });
 
   it("displays package-specific submitter name when controlled by parent container", async () => {
-    render(<AgentReviewSubmissionDock submitter="Custom Estate Winery" />);
+    render(<Harness submitter="Custom Estate Winery" />);
 
     const input = (await screen.findByLabelText("Seller or submitter name")) as HTMLInputElement;
     expect(input.value).toBe("Custom Estate Winery");
+  });
+
+  it("renders no submit control of its own, so the guided footer is the single submit action", async () => {
+    mockLoadPackageDraftLocally.mockResolvedValue(mockValidDraft("pkg-1"));
+    render(<Harness activePackageId="pkg-1" submitter="Test Seller" />);
+
+    const panel = await screen.findByTestId("agent-review-submission-dock");
+    await waitFor(() => {
+      expect(screen.getAllByRole("button", { name: /submit for internal review/i })).toHaveLength(
+        1,
+      );
+    });
+    expect(panel.querySelector("button")).toBeNull();
+    expect(panel).toHaveTextContent(/does not file anything with TTB and is not an approval/i);
+  });
+
+  it("hands off to official filing after the internal-review receipt without claiming approval", async () => {
+    mockLoadPackageDraftLocally.mockResolvedValue(mockValidDraft("pkg-1"));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation(async (_url: string, init?: RequestInit) => {
+        if (init?.method === "POST") {
+          return new Response(
+            JSON.stringify({
+              submissionId: "pkg-1",
+              revisionId: "rev-1",
+              revisionNumber: 1,
+              status: "waiting_for_agent_review",
+              receivingAgent: "Agent-1",
+              recordedAt: new Date().toISOString(),
+            }),
+            { status: 200, headers: { "Content-Type": "application/json" } },
+          );
+        }
+        return new Response("{}", { status: 404 });
+      }),
+    );
+    render(<Harness activePackageId="pkg-1" submitter="Test Seller" />);
+
+    const submit = await screen.findByRole("button", { name: /submit for internal review/i });
+    await waitFor(() => expect(submit).toBeEnabled());
+    fireEvent.click(submit);
+
+    const receipt = await screen.findByTestId("submission-receipt");
+    expect(receipt).toHaveTextContent("Waiting for agent review");
+    expect(receipt).toHaveTextContent("Revision v1 is recorded.");
+    const official = screen.getByRole("link", { name: /TTB COLAs Online/ });
+    expect(official).toHaveAttribute("href", OFFICIAL_FILING_HANDOFF.url);
+    expect(receipt).toHaveTextContent(OFFICIAL_FILING_HANDOFF.statement);
+    expect(receipt.textContent ?? "").not.toMatch(/\bapproved\b/i);
+    // The footer now points at tracking instead of offering a second submission.
+    expect(screen.getByRole("button", { name: "Track this submission" })).toBeEnabled();
   });
 });

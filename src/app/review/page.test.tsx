@@ -1,6 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// The review workspace navigates with the App Router (sign-in and tracking
+// handoffs); the real route always mounts one.
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
+
 import ReviewPage from "./page";
 
 beforeEach(() => {
@@ -45,6 +49,8 @@ describe("seller package review route", () => {
     expect(await screen.findByTestId("upload-workspace")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /run pre-check/i })).toBeNull();
     expect(screen.queryByRole("button", { name: /prepare agent package/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /submit for/i })).toBeNull();
+    expect(screen.queryByTestId("agent-review-submission-dock")).toBeNull();
     expect(screen.getByText(/next: resolve the required panel decisions/i)).toBeInTheDocument();
   });
 });

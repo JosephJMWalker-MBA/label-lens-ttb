@@ -1,477 +1,144 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { authClient } from "@/lib/auth-client";
-import { canonicalStringify } from "@/pipeline/export/json/canonical-stringify";
+import { OFFICIAL_FILING_HANDOFF, statusLabel } from "@/lib/product-language";
 
-import { AGENT_REVIEW_RECEIVER, AGENT_REVIEW_TRANSMISSION } from "./agent-submission-contract";
-import {
-  normalizeSubmissionReceipt,
-  parseSubmissionErrorMessage,
-  safeSubmissionErrorMessage,
-  type AgentReviewSubmissionReceipt,
-} from "./agent-review-submission-response";
-import { loadPackageDraftLocally, type StoredPackageDraft } from "./package-draft-store";
-import {
-  buildSellerPackageExport,
-  latestAnalysisIsCurrent,
-  packageReadyForAgentReview,
-} from "./package-model";
-
-type SubmissionPhase = "idle" | "submitting" | "submitted" | "error";
-
-interface SubmissionStatusResponse {
-  submissionId: string;
-  currentStatus: string;
-  createdAt: string;
-  updatedAt: string;
-  revisions: Array<{
-    id: string;
-    revisionNumber: number;
-    submittedBy: string;
-    submittedAt: string;
-  }>;
-}
-
-interface SubmissionAttempt {
-  fingerprint: string;
-  idempotencyKey: string;
-  payload: Record<string, unknown>;
-}
-
-async function sha256Hex(value: string): Promise<string> {
-  const bytes = new TextEncoder().encode(value);
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
-function readinessMessage(stored: StoredPackageDraft | null): string {
-  if (!stored) return "Start the package workspace below and save the required evidence.";
-  const latestRun = stored.draft.analysisRuns.at(-1);
-  if (!latestRun) return "Complete the package and run its pre-check before submitting.";
-  if (!latestAnalysisIsCurrent(stored.draft)) {
-    return "Seller evidence changed after the last pre-check. Save and run the pre-check again.";
-  }
-  if (!packageReadyForAgentReview(stored.draft)) {
-    return "Review each category flagged by the pre-check. Correct the evidence or explicitly keep it for the human agent.";
-  }
-  if (stored.panelFiles.length !== stored.draft.panels.length) {
-    return "One or more saved panel files are unavailable in this browser. Restore them before submitting.";
-  }
-  return "The package and its panel images are ready to enter the internal agent review queue.";
-}
-
-function statusLabel(status: string): string {
-  return status
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
+import type { InternalReviewSubmission } from "./use-internal-review-submission";
 
 export interface AgentReviewSubmissionDockProps {
-  activePackageId?: string | null;
-  selectionToken?: number;
-  onStartAnotherPackage?: () => void;
-  submitter?: string;
+  submission: InternalReviewSubmission;
+  submitter: string;
   onSubmitterChange?: (value: string) => void;
+  onStartAnotherPackage?: () => void;
 }
 
+/**
+ * The final-stage submission panel. It explains what submitting does, collects
+ * the submitter name, and shows the server receipt once the package is in the
+ * internal review queue. It renders no submit button of its own: the guided
+ * footer action is the single control that submits, so the seller is never
+ * offered two competing "final" actions.
+ */
 export function AgentReviewSubmissionDock({
-  activePackageId,
-  selectionToken,
-  onStartAnotherPackage,
-  submitter: controlledSubmitter,
+  submission,
+  submitter,
   onSubmitterChange,
-}: AgentReviewSubmissionDockProps = {}) {
-  const { data: session, isPending: sessionPending } = authClient.useSession();
-  const [stored, setStored] = useState<StoredPackageDraft | null>(null);
-  const [loadError, setLoadError] = useState(false);
-  const [phase, setPhase] = useState<SubmissionPhase>("idle");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [receipt, setReceipt] = useState<AgentReviewSubmissionReceipt | null>(null);
-  const [knownServerStatus, setKnownServerStatus] = useState<string | null>(null);
-  const attemptRef = useRef<SubmissionAttempt | null>(null);
-
-  useEffect(() => {
-    setPhase("idle");
-    setErrorMessage(null);
-    setReceipt(null);
-    setKnownServerStatus(null);
-    attemptRef.current = null;
-  }, [activePackageId, selectionToken]);
-
-  const refreshLocalPackage = useCallback(async () => {
-    try {
-      const value = await loadPackageDraftLocally(activePackageId ?? undefined);
-      setStored(value);
-      setLoadError(false);
-    } catch {
-      setLoadError(true);
-    }
-  }, [activePackageId]);
-
-  useEffect(() => {
-    void refreshLocalPackage();
-    const interval = window.setInterval(() => void refreshLocalPackage(), 1500);
-    const handleFocus = () => void refreshLocalPackage();
-    window.addEventListener("focus", handleFocus);
-    return () => {
-      window.clearInterval(interval);
-      window.removeEventListener("focus", handleFocus);
-    };
-  }, [refreshLocalPackage]);
-
-  const sessionRole = session?.user?.role;
-  const sellerSignedIn = sessionRole === "seller";
-
-  const submitter = controlledSubmitter ?? "";
-
-  const draft = stored?.draft ?? null;
-  const latestRun = draft?.analysisRuns.at(-1);
-  const revisionContext = stored?.revisionContext ?? null;
-  const revisionContextFingerprint = revisionContext ? canonicalStringify(revisionContext) : null;
-
-  const draftFingerprint = useMemo(() => {
-    if (!draft) return "";
-    const panelSig = draft.panels
-      .map(
-        (p: {
-          panelId: string;
-          role: string;
-          order: number;
-          checksumSha256: string;
-          byteSize: number;
-          width: number;
-          height: number;
-          rotation: number;
-        }) =>
-          `${p.panelId}:${p.role}:${p.order}:${p.checksumSha256}:${p.byteSize}:${p.width}x${p.height}:${p.rotation}`,
-      )
-      .join("|");
-    const categorySig = draft.categories
-      .map(
-        (c: {
-          categoryId: string;
-          decision: string;
-          expectedValue: string;
-          regions: Array<{
-            regionId: string;
-            panelId: string;
-            x: number;
-            y: number;
-            width: number;
-            height: number;
-          }>;
-        }) =>
-          `${c.categoryId}:${c.decision}:${c.expectedValue}:${c.regions
-            .map(
-              (r: {
-                regionId: string;
-                panelId: string;
-                x: number;
-                y: number;
-                width: number;
-                height: number;
-              }) => `${r.regionId}@${r.panelId}:${r.x},${r.y},${r.width},${r.height}`,
-            )
-            .join(",")}`,
-      )
-      .join("|");
-
-    return [
-      draft.packageId,
-      draft.updatedAt,
-      latestRun?.analysisRunId ?? "no-run",
-      panelSig,
-      categorySig,
-      revisionContextFingerprint ?? "initial-finalize",
-      submitter.trim(),
-    ].join("::");
-  }, [draft, latestRun?.analysisRunId, revisionContextFingerprint, submitter]);
-
-  const panelFilesCoherent = useMemo(() => {
-    if (!stored) return false;
-    if (stored.panelFiles.length !== stored.draft.panels.length) return false;
-    const fileMap = new Map(stored.panelFiles.map((pf) => [pf.panelId, pf.file]));
-    return stored.draft.panels.every((panel: { panelId: string; byteSize: number }) => {
-      const file = fileMap.get(panel.panelId);
-      return Boolean(file && file.size === panel.byteSize);
-    });
-  }, [stored]);
-
-  const ready = Boolean(stored && packageReadyForAgentReview(stored.draft) && panelFilesCoherent);
-
-  useEffect(() => {
-    attemptRef.current = null;
-    setKnownServerStatus(null);
-    setReceipt(null);
-    setPhase("idle");
-    setErrorMessage(null);
-  }, [draftFingerprint]);
-
-  useEffect(() => {
-    const packageId = draft?.packageId;
-    if (!packageId || revisionContext || !sellerSignedIn || phase === "submitting" || receipt) {
-      return;
-    }
-
-    let cancelled = false;
-    void fetch(`/api/package/submit/status/${encodeURIComponent(packageId)}`, {
-      method: "GET",
-      cache: "no-store",
-    })
-      .then(async (response) => {
-        if (cancelled || response.status === 404) return;
-        if (!response.ok) return;
-        const value = (await response.json()) as SubmissionStatusResponse;
-        if (cancelled) return;
-        const latestRevision = value.revisions.at(-1);
-        setKnownServerStatus(value.currentStatus);
-        setReceipt({
-          submissionId: value.submissionId,
-          revisionId: latestRevision?.id ?? "recorded",
-          revisionNumber: latestRevision?.revisionNumber ?? 1,
-          status: value.currentStatus,
-          recordedAt: latestRevision?.submittedAt ?? value.createdAt,
-        });
-        setPhase("submitted");
-      })
-      .catch(() => {
-        // The status lookup is an enhancement. Submission remains available if it fails.
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    draft?.packageId,
-    phase,
-    receipt,
-    revisionContext,
-    revisionContextFingerprint,
-    sellerSignedIn,
-  ]);
-
-  const summary = useMemo(() => readinessMessage(stored), [stored]);
-
-  async function submitForAgentReview() {
-    if (!stored || !ready || !sellerSignedIn || submitter.trim() === "") return;
-
-    setPhase("submitting");
-    setErrorMessage(null);
-
-    try {
-      const currentDraft = stored.draft;
-      const currentRun = currentDraft.analysisRuns.at(-1);
-      if (!currentRun) throw new Error("The package has no completed pre-check.");
-
-      if (stored.panelFiles.length !== currentDraft.panels.length) {
-        throw new Error(
-          "PACKAGE_PANEL_FILE_COUNT_MISMATCH: Saved panel files do not match draft panel count.",
-        );
-      }
-
-      const storedFileMap = new Map(stored.panelFiles.map((pf) => [pf.panelId, pf.file]));
-      for (const panel of currentDraft.panels) {
-        const file = storedFileMap.get(panel.panelId);
-        if (!file) {
-          throw new Error(
-            `PACKAGE_PANEL_FILE_MISSING: Saved file for panel ${panel.panelId} is unavailable.`,
-          );
-        }
-        if (file.size !== panel.byteSize) {
-          throw new Error(
-            `PACKAGE_PANEL_FILE_SIZE_MISMATCH: Saved file size for panel ${panel.panelId} (${file.size}) does not match draft byte size (${panel.byteSize}).`,
-          );
-        }
-      }
-
-      const fingerprint = draftFingerprint;
-
-      let attempt = attemptRef.current;
-      if (!attempt || attempt.fingerprint !== fingerprint) {
-        const localExport = await buildSellerPackageExport({
-          draft: currentDraft,
-          submittedBy: submitter,
-          submittedAt: new Date().toISOString(),
-        });
-        const { integrity: localIntegrity, ...localPayload } = localExport;
-        void localIntegrity;
-        const agentPayload = {
-          ...localPayload,
-          boundary: {
-            transmission: AGENT_REVIEW_TRANSMISSION,
-            governmentApproval: false,
-            statement:
-              "Seller-submitted package for internal human agent review. This is not a TTB submission, government approval, or legal determination.",
-          },
-          receivingAgent: AGENT_REVIEW_RECEIVER,
-        };
-        const integrityValue = await sha256Hex(canonicalStringify(agentPayload));
-        attempt = {
-          fingerprint,
-          idempotencyKey: crypto.randomUUID(),
-          payload: {
-            ...agentPayload,
-            integrity: {
-              algorithm: "sha256",
-              scope: "canonical-package-payload",
-              value: integrityValue,
-            },
-          },
-        };
-        attemptRef.current = attempt;
-      }
-
-      const body = new FormData();
-      body.set("packageExport", canonicalStringify(attempt.payload));
-      if (revisionContext) {
-        body.set("revisionContext", canonicalStringify(revisionContext));
-      }
-      for (const panel of currentDraft.panels) {
-        const file = storedFileMap.get(panel.panelId)!;
-        body.append(panel.panelId, file, file.name);
-      }
-
-      const response = await fetch(
-        revisionContext
-          ? `/api/package/submit/resubmit/${encodeURIComponent(revisionContext.submissionId)}`
-          : "/api/package/submit/finalize",
-        {
-          method: "POST",
-          headers: { "X-Idempotency-Key": attempt.idempotencyKey },
-          body,
-        },
-      );
-      const result = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error("Sign in with a seller account before submitting this package.");
-        }
-        throw new Error(parseSubmissionErrorMessage(result));
-      }
-
-      const submitted = normalizeSubmissionReceipt(result);
-      if (!submitted) {
-        throw new Error(safeSubmissionErrorMessage());
-      }
-      setReceipt(submitted);
-      setKnownServerStatus(submitted.status);
-      setPhase("submitted");
-    } catch (error) {
-      setPhase("error");
-      setErrorMessage(
-        error instanceof Error && error.message
-          ? error.message
-          : "The package could not be placed in the agent review queue.",
-      );
-    }
-  }
-
-  const alreadySubmitted = phase === "submitted" || knownServerStatus !== null;
+  onStartAnotherPackage,
+}: AgentReviewSubmissionDockProps) {
+  const { receipt, revisionContext } = submission;
 
   return (
     <section
-      className="sticky top-2 z-30 mb-6 rounded-lg border border-emerald-700/40 bg-background/95 p-4 shadow-lg backdrop-blur"
+      className="rounded-lg border border-emerald-700/40 bg-emerald-50/40 p-4 dark:bg-emerald-950/20"
       aria-labelledby="agent-submission-heading"
       data-testid="agent-review-submission-dock"
     >
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div className="min-w-0 max-w-3xl">
+      {submission.alreadySubmitted && receipt ? (
+        <div className="text-sm" data-testid="submission-receipt">
           <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800 dark:text-emerald-300">
-            Final handoff
+            Submitted for internal review
           </p>
-          <h2 id="agent-submission-heading" className="text-xl font-semibold">
-            Submit the package for agent review
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {alreadySubmitted
-              ? "The package documents and panel images are stored in the internal queue for agent review."
-              : revisionContext
-                ? "This local draft responds to requested changes. Run analysis after edits, then resubmit it to the internal agent queue."
-                : loadError
-                  ? "The browser-local package could not be read. Restore the draft before submission."
-                  : summary}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            This sends records to Label Lens internal review only. It does not submit anything to
-            TTB.
-            {revisionContext
-              ? " Revision context is sent separately from the seller evidence package."
-              : ""}
-          </p>
-        </div>
+          <h3 id="agent-submission-heading" className="mt-1 text-lg font-semibold">
+            {statusLabel(receipt.status)}
+          </h3>
+          <p className="mt-1 font-mono text-xs">{receipt.submissionId}</p>
+          <p className="mt-1 text-xs">Revision v{receipt.revisionNumber} is recorded.</p>
 
-        <div className="w-full shrink-0 lg:w-[26rem]">
-          {alreadySubmitted && receipt ? (
-            <div className="rounded-md border border-emerald-700/40 bg-emerald-50 p-3 text-sm text-emerald-950 dark:bg-emerald-950/40 dark:text-emerald-100">
-              <p className="font-semibold">{statusLabel(receipt.status)}</p>
-              <p className="mt-1 font-mono text-xs">{receipt.submissionId}</p>
-              <p className="mt-1 text-xs">Revision v{receipt.revisionNumber} is recorded.</p>
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <Link className="font-medium underline underline-offset-4" href="/seller">
-                  Open my submissions
-                </Link>
-                {onStartAnotherPackage ? (
-                  <button
-                    type="button"
-                    data-testid="start-another-package-btn"
-                    onClick={onStartAnotherPackage}
-                    className="rounded-md border border-emerald-700/40 bg-background px-3 py-1 text-xs font-medium text-foreground hover:bg-muted"
-                  >
-                    Start another package
-                  </button>
-                ) : null}
-              </div>
-            </div>
-          ) : sellerSignedIn ? (
-            <div className="grid gap-2">
+          <h4 className="mt-4 font-semibold">What happens next</h4>
+          <ol className="mt-1 list-decimal space-y-1 pl-5 text-muted-foreground">
+            <li>A Label Lens reviewer checks your marked evidence and the pre-check findings.</li>
+            <li>
+              The outcome appears in My submissions: internally accepted, or changes requested with
+              the reviewer&apos;s note. Submitted revisions are never edited.
+            </li>
+            <li>
+              {OFFICIAL_FILING_HANDOFF.statement}{" "}
+              <a
+                className="font-medium text-foreground underline underline-offset-4"
+                href={OFFICIAL_FILING_HANDOFF.url}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                {OFFICIAL_FILING_HANDOFF.label}
+                <span className="sr-only"> (opens the official TTB site in a new tab)</span>
+              </a>
+            </li>
+          </ol>
+
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <Link className="font-medium underline underline-offset-4" href="/seller">
+              Open my submissions
+            </Link>
+            {onStartAnotherPackage ? (
+              <button
+                type="button"
+                data-testid="start-another-package-btn"
+                onClick={onStartAnotherPackage}
+                className="rounded-md border border-emerald-700/40 bg-background px-3 py-1 text-xs font-medium text-foreground hover:bg-muted"
+              >
+                Start another package
+              </button>
+            ) : null}
+          </div>
+        </div>
+      ) : (
+        <div className="text-sm">
+          <h3 id="agent-submission-heading" className="text-base font-semibold">
+            {revisionContext ? "Send your corrected revision" : "Send to a Label Lens reviewer"}
+          </h3>
+          <p className="mt-1 text-muted-foreground">
+            {revisionContext
+              ? `Submitting records this corrected draft as a new revision of ${revisionContext.submissionId}. Revision v${revisionContext.baseRevisionNumber} and its review decision stay unchanged.`
+              : "Submitting sends your marked evidence, the pre-check record, and your label images to a Label Lens reviewer."}{" "}
+            It does not file anything with TTB and is not an approval.
+          </p>
+
+          {submission.loadError ? (
+            <p role="alert" className="mt-3 text-destructive">
+              This browser could not read the saved draft. Reload the page to try again.
+            </p>
+          ) : (
+            // The name belongs to the package record (submission and optional
+            // copy alike), so it is collected whatever the visitor's role.
+            <div className="mt-3 grid max-w-md gap-2">
               <Label htmlFor="agent-submission-name">Seller or submitter name</Label>
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <Input
-                  id="agent-submission-name"
-                  value={submitter}
-                  onChange={(event) => {
-                    if (onSubmitterChange) onSubmitterChange(event.target.value);
-                  }}
-                  disabled={phase === "submitting"}
-                />
-                <button
-                  type="button"
-                  onClick={() => void submitForAgentReview()}
-                  disabled={!ready || submitter.trim() === "" || phase === "submitting"}
-                  className="shrink-0 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {phase === "submitting" ? "Submitting…" : "Submit for agent review"}
-                </button>
-              </div>
-              {errorMessage ? (
-                <p role="alert" className="text-sm text-destructive">
-                  {errorMessage}
+              <Input
+                id="agent-submission-name"
+                value={submitter}
+                onChange={(event) => onSubmitterChange?.(event.target.value)}
+                disabled={submission.phase === "submitting"}
+                aria-describedby="agent-submission-name-hint"
+              />
+              <p id="agent-submission-name-hint" className="text-xs text-muted-foreground">
+                {submission.sellerSignedIn ? (
+                  <>
+                    The reviewer sees this name with your package. Then use{" "}
+                    <strong>{revisionContext ? "Resubmit" : "Submit"} for internal review</strong>{" "}
+                    at the bottom of the screen.
+                  </>
+                ) : submission.sessionPending ? (
+                  "Checking seller access…"
+                ) : submission.signedInWithoutSellerRole ? (
+                  "Only seller accounts can submit packages for internal review."
+                ) : (
+                  "Sign in with a seller account to submit. Your draft stays saved in this browser while you sign in."
+                )}
+              </p>
+              {submission.sellerSignedIn && !submission.ready ? (
+                <p className="text-xs text-muted-foreground">{submission.summary}</p>
+              ) : null}
+              {submission.errorMessage ? (
+                <p role="alert" className="text-destructive">
+                  {submission.errorMessage}
                 </p>
               ) : null}
             </div>
-          ) : sessionPending ? (
-            <p className="text-sm text-muted-foreground">Checking seller access…</p>
-          ) : session?.user ? (
-            <p className="text-sm text-muted-foreground">
-              A seller account is required to submit a package to the review queue.
-            </p>
-          ) : (
-            <Link
-              href="/login"
-              className="inline-flex rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-            >
-              Sign in to submit
-            </Link>
           )}
         </div>
-      </div>
+      )}
     </section>
   );
 }

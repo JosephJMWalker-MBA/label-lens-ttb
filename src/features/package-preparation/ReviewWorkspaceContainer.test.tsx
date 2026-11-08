@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const store = vi.hoisted(() => ({
@@ -30,14 +30,120 @@ vi.mock("@/lib/auth-client", () => ({
   },
 }));
 
+const router = vi.hoisted(() => ({ push: vi.fn() }));
+vi.mock("next/navigation", () => ({ useRouter: () => router }));
+
+import type { SellerPackageDraft } from "./package-model";
 import { newDraft, type StoredPackageDraft } from "./package-draft-store";
 import { ReviewWorkspaceContainer } from "./ReviewWorkspaceContainer";
+
+/**
+ * A saved package whose current pre-check needs nothing more from the seller:
+ * the workspace opens it on the final submission step, where the submitter
+ * name is collected.
+ */
+function readyDraft(packageId: string, brand: string): StoredPackageDraft {
+  const panels = [
+    {
+      panelId: `${packageId}-front`,
+      order: 0,
+      role: "front" as const,
+      displayName: "front.png",
+      mediaType: "image/png",
+      byteSize: 5,
+      checksumSha256: "0".repeat(64),
+      width: 1000,
+      height: 1500,
+      rotation: 0 as const,
+    },
+  ];
+  const region = (categoryId: "brandName" | "alcoholStatement", y: number) => ({
+    regionId: `${packageId}-${categoryId}`,
+    categoryId,
+    panelId: `${packageId}-front`,
+    unit: "normalized-panel-relative" as const,
+    provenance: "seller-selected-region" as const,
+    x: 0.1,
+    y,
+    width: 0.5,
+    height: 0.1,
+  });
+  const draft: SellerPackageDraft = {
+    schemaVersion: "seller-package-draft.v1",
+    packageId,
+    createdAt: "2026-11-08T00:00:00.000Z",
+    updatedAt: "2026-11-08T00:30:00.000Z",
+    profile: { id: "wine-label-requirements", version: "1.0.0" },
+    panelDecisions: { back: "absent", additional: "none" },
+    panels,
+    categories: [
+      {
+        categoryId: "brandName",
+        decision: "provided",
+        expectedValue: brand,
+        regions: [region("brandName", 0.2)],
+      },
+      {
+        categoryId: "alcoholStatement",
+        decision: "provided",
+        expectedValue: "13.5% alc. by vol.",
+        regions: [region("alcoholStatement", 0.8)],
+      },
+    ],
+    sellerChangeHistory: [
+      {
+        changeId: `${packageId}-saved`,
+        sequence: 1,
+        recordedAt: "2026-11-08T00:30:00.000Z",
+        action: "draft_saved",
+        detail: "Seller package draft saved locally.",
+      },
+    ],
+    analysisRuns: [
+      {
+        analysisRunId: `${packageId}-run`,
+        sequence: 1,
+        sellerChangeSequence: 1,
+        recordedAt: "2026-11-08T00:31:00.000Z",
+        panelRuns: [],
+        categories: (["brandName", "alcoholStatement"] as const).map((categoryId) => ({
+          categoryId,
+          state: "clearly_readable" as const,
+          observedValue: "observed",
+          supportingPanelIds: [`${packageId}-front`],
+          supportingRegionIds: [`${packageId}-${categoryId}`],
+          reason: "Seller and machine evidence agree.",
+        })),
+        readiness: "ready_for_agent_submission",
+      },
+    ],
+  };
+  return {
+    draft,
+    panelFiles: [
+      {
+        panelId: `${packageId}-front`,
+        file: new File(["front"], "front.png", { type: "image/png" }),
+      },
+    ],
+  };
+}
+
+async function finalStepNameInput() {
+  await screen.findByTestId("prepare-workspace");
+  return (await screen.findByLabelText("Seller or submitter name")) as HTMLInputElement;
+}
 
 describe("ReviewWorkspaceContainer — submitter continuity and state isolation", () => {
   let mockDrafts: StoredPackageDraft[] = [];
 
   beforeEach(() => {
-    mockDrafts = [];
+    mockDrafts = [readyDraft("pkg-a", "Package A Label"), readyDraft("pkg-b", "Package B Label")];
+    router.push.mockReset();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("{}", { status: 404 })),
+    );
     vi.spyOn(window, "confirm").mockReturnValue(true);
     store.load.mockReset();
     store.save.mockReset();
@@ -85,34 +191,51 @@ describe("ReviewWorkspaceContainer — submitter continuity and state isolation"
     vi.clearAllMocks();
   });
 
-  it("synchronizes submitter edits between preparation workstation and submission dock", async () => {
+  it("asks for the submitter name only at the final step and keeps one copy of it", async () => {
     render(<ReviewWorkspaceContainer />);
 
-    const dockInput = (await screen.findByLabelText(
-      "Seller or submitter name",
-    )) as HTMLInputElement;
-    await waitFor(() => expect(dockInput.value).toBe("Alice Seller"));
+    const nameInput = await finalStepNameInput();
+    await waitFor(() => expect(nameInput.value).toBe("Alice Seller"));
 
-    fireEvent.change(dockInput, { target: { value: "Napa Valley Bottling Co." } });
-    expect(dockInput.value).toBe("Napa Valley Bottling Co.");
+    fireEvent.change(nameInput, { target: { value: "Napa Valley Bottling Co." } });
+    expect(nameInput.value).toBe("Napa Valley Bottling Co.");
+    // The earlier duplicate field in the workspace is gone: one name, one place.
+    expect(screen.getAllByLabelText("Seller or submitter name")).toHaveLength(1);
+    expect(document.getElementById("package-submitter")).toBeNull();
+  });
 
-    const inputs = screen.getAllByLabelText("Seller or submitter name") as HTMLInputElement[];
-    for (const input of inputs) {
-      expect(input.value).toBe("Napa Valley Bottling Co.");
-    }
+  it("makes internal-review submission the footer's single final action", async () => {
+    render(<ReviewWorkspaceContainer />);
+    await finalStepNameInput();
+
+    const footer = screen.getByTestId("package-progress-footer");
+    expect(within(footer).getByRole("button")).toHaveTextContent("Submit for internal review");
+    expect(screen.getAllByRole("button", { name: /submit for internal review/i })).toHaveLength(1);
+    expect(screen.queryByRole("button", { name: "Prepare agent package" })).toBeNull();
+    expect(footer.querySelector('[data-stage="submit"]')).toHaveAttribute("data-status", "current");
+    // The download is still available, but only as an optional copy.
+    expect(screen.getByRole("button", { name: "Download a copy (JSON)" })).toBeInTheDocument();
+  });
+
+  it("does not show submission controls before the package is ready", async () => {
+    mockDrafts = [];
+    render(<ReviewWorkspaceContainer />);
+
+    await screen.findByTestId("seller-workstation");
+    expect(screen.queryByTestId("agent-review-submission-dock")).toBeNull();
+    expect(screen.queryByLabelText("Seller or submitter name")).toBeNull();
+    expect(screen.queryByRole("button", { name: /submit for/i })).toBeNull();
   });
 
   it("preserves deliberate empty string without overwriting during session refresh", async () => {
     render(<ReviewWorkspaceContainer />);
 
-    const dockInput = (await screen.findByLabelText(
-      "Seller or submitter name",
-    )) as HTMLInputElement;
-    await waitFor(() => expect(dockInput.value).toBe("Alice Seller"));
+    const nameInput = await finalStepNameInput();
+    await waitFor(() => expect(nameInput.value).toBe("Alice Seller"));
 
     // Deliberately clear the name
-    fireEvent.change(dockInput, { target: { value: "" } });
-    expect(dockInput.value).toBe("");
+    fireEvent.change(nameInput, { target: { value: "" } });
+    expect(nameInput.value).toBe("");
 
     // Simulate session refresh
     auth.useSession.mockReturnValue({
@@ -120,7 +243,10 @@ describe("ReviewWorkspaceContainer — submitter continuity and state isolation"
       isPending: false,
     });
 
-    await waitFor(() => expect(dockInput.value).toBe(""));
+    await waitFor(() => expect(nameInput.value).toBe(""));
+    expect(
+      within(screen.getByTestId("package-progress-footer")).getByRole("button"),
+    ).toBeDisabled();
   });
 
   it("handles rapid sequential edits with last-edit-wins serial persistence", async () => {
@@ -132,16 +258,14 @@ describe("ReviewWorkspaceContainer — submitter continuity and state isolation"
 
     render(<ReviewWorkspaceContainer />);
 
-    const dockInput = (await screen.findByLabelText(
-      "Seller or submitter name",
-    )) as HTMLInputElement;
-    await waitFor(() => expect(dockInput.value).toBe("Alice Seller"));
+    const nameInput = await finalStepNameInput();
+    await waitFor(() => expect(nameInput.value).toBe("Alice Seller"));
 
-    fireEvent.change(dockInput, { target: { value: "A" } });
-    fireEvent.change(dockInput, { target: { value: "AB" } });
-    fireEvent.change(dockInput, { target: { value: "ABC Winery" } });
+    fireEvent.change(nameInput, { target: { value: "A" } });
+    fireEvent.change(nameInput, { target: { value: "AB" } });
+    fireEvent.change(nameInput, { target: { value: "ABC Winery" } });
 
-    expect(dockInput.value).toBe("ABC Winery");
+    expect(nameInput.value).toBe("ABC Winery");
 
     await waitFor(() => {
       expect(callOrder).toEqual(["A", "AB", "ABC Winery"]);
@@ -151,36 +275,32 @@ describe("ReviewWorkspaceContainer — submitter continuity and state isolation"
   it("isolates submitter names between Package A and Package B and restores Package A's name when switching back", async () => {
     render(<ReviewWorkspaceContainer />);
 
-    const dockInput = (await screen.findByLabelText(
-      "Seller or submitter name",
-    )) as HTMLInputElement;
-    await waitFor(() => expect(dockInput.value).toBe("Alice Seller"));
+    let nameInput = await finalStepNameInput();
+    await waitFor(() => expect(nameInput.value).toBe("Alice Seller"));
 
     // Set submitter for active Package A
-    fireEvent.change(dockInput, { target: { value: "Package A Winery" } });
-    expect(dockInput.value).toBe("Package A Winery");
+    fireEvent.change(nameInput, { target: { value: "Package A Winery" } });
+    expect(nameInput.value).toBe("Package A Winery");
 
-    // Click "Start another package" to create Package B
-    const startAnotherBtn = screen.getByTestId("create-new-package-btn");
-    fireEvent.click(startAnotherBtn);
-
-    // Package B initializes with profile default or empty, distinct from Package A Winery
-    await waitFor(() => expect(dockInput.value).toBe("Alice Seller"));
-
-    // Change Package B submitter
-    fireEvent.change(dockInput, { target: { value: "Package B Estate" } });
-    expect(dockInput.value).toBe("Package B Estate");
-
-    // Wait for draft selector options to contain Package A (the second option)
+    // Switch to Package B
     const selector = screen.getByTestId("draft-selector") as HTMLSelectElement;
     await waitFor(() => expect(selector.options.length).toBeGreaterThan(1));
+    const packageA = selector.value;
+    const packageBOption = Array.from(selector.options).find((opt) => opt.value !== packageA)!;
+    fireEvent.change(selector, { target: { value: packageBOption.value } });
 
-    const packageAOption = Array.from(selector.options).find(
-      (opt) => opt.value !== selector.value,
-    )!;
-    fireEvent.change(selector, { target: { value: packageAOption.value } });
+    // Package B initializes with the profile default, distinct from Package A Winery
+    await waitFor(() => expect(selector.value).toBe(packageBOption.value));
+    nameInput = await finalStepNameInput();
+    await waitFor(() => expect(nameInput.value).toBe("Alice Seller"));
+
+    // Change Package B submitter
+    fireEvent.change(nameInput, { target: { value: "Package B Estate" } });
+    expect(nameInput.value).toBe("Package B Estate");
 
     // Switching back to Package A restores Package A Winery
-    await waitFor(() => expect(dockInput.value).toBe("Package A Winery"));
+    fireEvent.change(selector, { target: { value: packageA } });
+    await waitFor(() => expect(selector.value).toBe(packageA));
+    await waitFor(async () => expect((await finalStepNameInput()).value).toBe("Package A Winery"));
   });
 });

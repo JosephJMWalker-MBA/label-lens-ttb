@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
@@ -10,13 +11,18 @@ import {
   PackagePreparationWorkspace,
   type PackagePreparationWorkspaceRef,
 } from "./PackagePreparationWorkspace";
+import { submissionFooterAction } from "./submission-footer-action";
+import { useInternalReviewSubmission } from "./use-internal-review-submission";
 
 /**
- * Coordinates seller package preparation workspace components on the primary
- * `/review` route. Maintains package-scoped single-source-of-truth submitter identity
- * continuity between the workstation draft and final handoff submission dock.
+ * Coordinates seller package preparation on the primary `/review` route. It is
+ * the single owner of internal-review submission state, so the guided footer's
+ * final action and the final-stage submission panel always agree, and it keeps
+ * package-scoped submitter identity continuous between the draft and the
+ * submission.
  */
 export function ReviewWorkspaceContainer() {
+  const router = useRouter();
   const { data: session } = authClient.useSession();
   const [activePackageId, setActivePackageId] = useState<string | null>(null);
   const [selectionToken, setSelectionToken] = useState<number>(0);
@@ -42,6 +48,7 @@ export function ReviewWorkspaceContainer() {
         ...prev,
         [activePackageId]: value,
       }));
+      workspaceRef.current?.applySubmitter(activePackageId, value);
 
       const prevPromise = submitterSavePromisesRef.current[activePackageId] ?? Promise.resolve();
       const nextPromise = prevPromise
@@ -94,21 +101,35 @@ export function ReviewWorkspaceContainer() {
   }, [activePackageId, selectionToken, session, submitterByPackageId]);
 
   const activeSubmitter = activePackageId ? submitterByPackageId[activePackageId] : undefined;
+  const submission = useInternalReviewSubmission({
+    activePackageId,
+    selectionToken,
+    submitter: activeSubmitter ?? "",
+  });
+  const navigate = useCallback((href: string) => router.push(href), [router]);
 
   return (
     <div className="flex flex-col gap-6" data-testid="review-workspace-container">
-      <AgentReviewSubmissionDock
-        activePackageId={activePackageId}
-        selectionToken={selectionToken}
-        onStartAnotherPackage={handleStartAnotherPackage}
-        submitter={activeSubmitter}
-        onSubmitterChange={handleSubmitterChange}
-      />
       <PackagePreparationWorkspace
         ref={workspaceRef}
         onActivePackageChange={handleActivePackageChange}
         submitter={activeSubmitter}
         onSubmitterChange={handleSubmitterChange}
+        submitted={submission.alreadySubmitted}
+        submissionAction={submissionFooterAction({
+          submission,
+          submitter: activeSubmitter ?? "",
+          packageId: activePackageId,
+          navigate,
+        })}
+        submissionPanel={
+          <AgentReviewSubmissionDock
+            submission={submission}
+            submitter={activeSubmitter ?? ""}
+            onSubmitterChange={handleSubmitterChange}
+            onStartAnotherPackage={handleStartAnotherPackage}
+          />
+        }
       />
     </div>
   );

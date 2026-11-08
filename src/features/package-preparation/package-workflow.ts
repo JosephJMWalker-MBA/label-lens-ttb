@@ -12,14 +12,23 @@ import type { PackageCategoryInstruction } from "./package-profile";
 
 export type PackageWorkflowPhase = "upload" | "mark" | "save" | "fix" | "prepare";
 
-export type PackageProgressStageId = "upload" | "mark" | "save" | "precheck" | "prepare";
+export type PackageProgressStageId = "upload" | "mark" | "save" | "precheck" | "submit";
+/**
+ * `findings_noted` is the honest state of a pre-check that is current and needs
+ * nothing more from the seller, but still carries findings (kept seller
+ * evidence or a package-level machine finding) that travel to the human
+ * reviewer. It is deliberately not `complete`: a finished stage must never read
+ * as a passed check.
+ */
 export type PackageProgressStageStatus =
-  "current" | "complete" | "needs_attention" | "not_started" | "blocked";
+  "current" | "complete" | "findings_noted" | "needs_attention" | "not_started" | "blocked";
 
 export interface PackageProgressStage {
   id: PackageProgressStageId;
   label: string;
   status: PackageProgressStageStatus;
+  /** Plain-language status detail shown instead of the generic status label. */
+  detail?: string;
 }
 
 export type PackageSaveState = "unsaved" | "saving" | "saved" | "error";
@@ -92,6 +101,11 @@ export function deriveGuidedPackageWorkflow(args: {
   definitions: readonly PackageCategoryDefinition[];
   instructions: readonly PackageCategoryInstruction[];
   saveState: PackageSaveState;
+  /**
+   * True only when the server has recorded this exact draft as an internal
+   * review submission. The browser-local draft cannot know this on its own.
+   */
+  submitted?: boolean;
 }): GuidedPackageWorkflow {
   const { draft, definitions, instructions } = args;
   const roles = new Set(draft.panels.map((panel) => panel.role));
@@ -179,7 +193,9 @@ export function deriveGuidedPackageWorkflow(args: {
     recommendedAction = "Review only the categories flagged by the pre-check";
   } else if (readyForAgentPackage) {
     phase = "prepare";
-    recommendedAction = "Prepare the local-only agent package";
+    recommendedAction = args.submitted
+      ? "Track the submitted package"
+      : "Submit the package for internal review";
   } else if (!allCategoriesComplete) {
     phase = "mark";
     recommendedAction = "Complete the next required category";
@@ -195,14 +211,16 @@ export function deriveGuidedPackageWorkflow(args: {
           : "Save the prepared package in this browser";
   }
 
-  const exportedAfterLatestAnalysis = Boolean(
+  const handedOffWithFindings = Boolean(
     latestRun &&
-    draft.sellerChangeHistory.some(
-      (change) =>
-        change.action === "agent_package_exported" &&
-        change.sequence > latestRun.sellerChangeSequence,
-    ),
+    analysisCurrent &&
+    latestRun.readiness === "needs_seller_review" &&
+    packageReadyForAgentReview(draft),
   );
+  const governmentWarningFinding =
+    latestRun?.governmentWarning?.result === "FAIL" ||
+    latestRun?.governmentWarning?.result === "NEEDS_REVIEW";
+  const findingsForReviewer = flaggedCategoryIds.length + (governmentWarningFinding ? 1 : 0);
   const progressStages: PackageProgressStage[] = [
     {
       id: "upload",
@@ -241,23 +259,21 @@ export function deriveGuidedPackageWorkflow(args: {
     {
       id: "precheck",
       label: "Pre-check",
-      status:
-        latestRun && analysisCurrent && latestRun.readiness === "ready_for_agent_submission"
-          ? "complete"
-          : latestRun && (latestRun.readiness === "needs_seller_review" || !analysisCurrent)
-            ? "needs_attention"
-            : readyForPrecheck
-              ? "current"
-              : "not_started",
+      ...precheckStage({
+        hasRun: Boolean(latestRun),
+        analysisCurrent,
+        readyForAgentSubmission: latestRun?.readiness === "ready_for_agent_submission",
+        handedOffWithFindings,
+        findingsForReviewer,
+        readyForPrecheck,
+      }),
     },
     {
-      id: "prepare",
-      label: "Prepare",
-      status: exportedAfterLatestAnalysis
-        ? "complete"
-        : readyForAgentPackage
-          ? "current"
-          : "not_started",
+      id: "submit",
+      label: "Submit",
+      ...(args.submitted && readyForAgentPackage
+        ? { status: "complete" as const, detail: "Submitted" }
+        : { status: readyForAgentPackage ? ("current" as const) : ("not_started" as const) }),
     },
   ];
 
@@ -289,4 +305,38 @@ export function deriveGuidedPackageWorkflow(args: {
     progressStages,
     recommendedAction,
   };
+}
+
+function precheckStage(args: {
+  hasRun: boolean;
+  analysisCurrent: boolean;
+  readyForAgentSubmission: boolean;
+  handedOffWithFindings: boolean;
+  findingsForReviewer: number;
+  readyForPrecheck: boolean;
+}): Pick<PackageProgressStage, "status" | "detail"> {
+  if (!args.hasRun) return { status: args.readyForPrecheck ? "current" : "not_started" };
+  if (!args.analysisCurrent) return { status: "needs_attention", detail: "Out of date" };
+  if (args.readyForAgentSubmission) return { status: "complete" };
+  if (args.handedOffWithFindings) {
+    const count = Math.max(1, args.findingsForReviewer);
+    return {
+      status: "findings_noted",
+      detail: `${count} finding${count === 1 ? "" : "s"} for reviewer`,
+    };
+  }
+  return { status: "needs_attention" };
+}
+
+/**
+ * The save state a restored browser-local draft resumes in: saved when its last
+ * recorded action was a save, a completed pre-check, or a local download.
+ */
+export function storedDraftSaveState(draft: SellerPackageDraft): PackageSaveState {
+  const lastAction = draft.sellerChangeHistory.at(-1)?.action;
+  return lastAction === "draft_saved" ||
+    lastAction === "analysis_completed" ||
+    lastAction === "agent_package_exported"
+    ? "saved"
+    : "unsaved";
 }

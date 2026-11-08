@@ -21,7 +21,7 @@ const PHASE_LABEL = {
   mark: "Mark evidence",
   save: "Save and pre-check",
   fix: "Correct flagged evidence",
-  prepare: "Prepare local package",
+  prepare: "Submit for internal review",
 } as const;
 
 export interface PackageMachineCheckNavItem {
