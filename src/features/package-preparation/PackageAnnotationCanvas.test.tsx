@@ -211,9 +211,12 @@ describe("package annotation working box", () => {
       left: 0,
       toJSON: () => ({}),
     });
+    // The 1000×1500 panel is drawn in a 1 × 1.5 space, so the stored y of 0.2
+    // (a fifth of the panel height) is drawn at 0.3 width-units.
     const region = document.querySelector(`[data-region-id="${workingRegion.regionId}"] rect`);
     expect(region).toHaveAttribute("x", "0.1");
-    expect(region).toHaveAttribute("y", "0.2");
+    expect(Number(region?.getAttribute("y"))).toBeCloseTo(0.3);
+    expect(Number(region?.getAttribute("height"))).toBeCloseTo(0.3);
 
     fireEvent(window, new Event("resize"));
 
@@ -224,6 +227,45 @@ describe("package annotation working box", () => {
       ),
     );
     expect(region).toHaveAttribute("x", "0.1");
-    expect(region).toHaveAttribute("y", "0.2");
+    expect(Number(region?.getAttribute("y"))).toBeCloseTo(0.3);
+    expect(workingRegion.y).toBe(0.2);
+  });
+
+  it("draws the artwork at the panel's own aspect ratio instead of a square", () => {
+    for (const [width, height, aspect] of [
+      [1000, 1500, 1.5],
+      [1500, 1000, 1000 / 1500],
+      [800, 800, 1],
+    ] as const) {
+      const { unmount } = render(
+        <PackageAnnotationCanvas
+          panel={{ ...panel, width, height }}
+          imageUrl="blob:front"
+          activeCategoryId="brandName"
+          regions={[workingRegion]}
+          workingRegion={null}
+          machineRegions={[]}
+          activeRegionId={null}
+          onActiveRegionChange={vi.fn()}
+          onWorkingRegionChange={vi.fn()}
+          onWorkingRegionDiscard={vi.fn()}
+          onPanelRotationChange={vi.fn()}
+        />,
+      );
+      const svg = screen.getByRole("img", { name: /label annotation image/i });
+      const [minX, minY, viewWidth, viewHeight] = (svg.getAttribute("viewBox") ?? "")
+        .split(" ")
+        .map(Number);
+      expect([minX, minY, viewWidth]).toEqual([0, 0, 1]);
+      expect(viewHeight).toBeCloseTo(aspect);
+      // The image fills the viewBox exactly, so it keeps the panel's proportions.
+      const image = svg.querySelector("image");
+      expect(image).toHaveAttribute("width", "1");
+      expect(Number(image?.getAttribute("height"))).toBeCloseTo(aspect);
+      const rect = document.querySelector(`[data-region-id="${workingRegion.regionId}"] rect`);
+      expect(Number(rect?.getAttribute("y"))).toBeCloseTo(workingRegion.y * aspect);
+      expect(Number(rect?.getAttribute("height"))).toBeCloseTo(workingRegion.height * aspect);
+      unmount();
+    }
   });
 });
