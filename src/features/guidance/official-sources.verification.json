@@ -1,0 +1,206 @@
+{
+  "verifiedOn": "2026-11-08",
+  "tool": "scripts/guidance/verify-official-sources.ts",
+  "ecfrTitle27UpToDateAsOf": "2026-11-05",
+  "allOk": true,
+  "sources": [
+    {
+      "sourceId": "ecfr-27-4.32",
+      "url": "https://www.ecfr.gov/current/title-27/chapter-I/subchapter-A/part-4/subpart-D/section-4.32",
+      "verifiedVia": "https://www.ecfr.gov/api/versioner/v1/versions/title-27.json?part=4&section=4.32",
+      "ok": true,
+      "problems": [],
+      "observedTitle": "§ 4.32 Mandatory label information.",
+      "observedLatestAmendmentDate": "2016-12-31",
+      "observedLatestIssueDate": "2019-01-15",
+      "citingRuleSnapshotDates": ["2026-07-10"],
+      "amendedAfterRuleSnapshot": false
+    },
+    {
+      "sourceId": "ecfr-27-4.33",
+      "url": "https://www.ecfr.gov/current/title-27/chapter-I/subchapter-A/part-4/subpart-D/section-4.33",
+      "verifiedVia": "https://www.ecfr.gov/api/versioner/v1/versions/title-27.json?part=4&section=4.33",
+      "ok": true,
+      "problems": [],
+      "observedTitle": "§ 4.33 Brand names.",
+      "observedLatestAmendmentDate": "2024-12-06",
+      "observedLatestIssueDate": "2024-12-06",
+      "citingRuleSnapshotDates": ["2026-07-10"],
+      "amendedAfterRuleSnapshot": false
+    },
+    {
+      "sourceId": "ecfr-27-4.36",
+      "url": "https://www.ecfr.gov/current/title-27/chapter-I/subchapter-A/part-4/subpart-D/section-4.36",
+      "verifiedVia": "https://www.ecfr.gov/api/versioner/v1/versions/title-27.json?part=4&section=4.36",
+      "ok": true,
+      "problems": [],
+      "observedTitle": "§ 4.36 Alcoholic content.",
+      "observedLatestAmendmentDate": "2016-12-31",
+      "observedLatestIssueDate": "2016-12-31",
+      "citingRuleSnapshotDates": ["2026-07-10"],
+      "amendedAfterRuleSnapshot": false
+    },
+    {
+      "sourceId": "ecfr-27-16.20",
+      "url": "https://www.ecfr.gov/current/title-27/chapter-I/subchapter-A/part-16/subpart-C/section-16.20",
+      "verifiedVia": "https://www.ecfr.gov/api/versioner/v1/versions/title-27.json?part=16&section=16.20",
+      "ok": true,
+      "problems": [],
+      "observedTitle": "§ 16.20 General.",
+      "observedLatestAmendmentDate": "2016-12-31",
+      "observedLatestIssueDate": "2016-12-31",
+      "citingRuleSnapshotDates": ["2026-07-26"],
+      "amendedAfterRuleSnapshot": false
+    },
+    {
+      "sourceId": "ecfr-27-16.21",
+      "url": "https://www.ecfr.gov/current/title-27/chapter-I/subchapter-A/part-16/subpart-C/section-16.21",
+      "verifiedVia": "https://www.ecfr.gov/api/versioner/v1/versions/title-27.json?part=16&section=16.21",
+      "ok": true,
+      "problems": [],
+      "observedTitle": "§ 16.21 Mandatory label information.",
+      "observedLatestAmendmentDate": "2016-12-31",
+      "observedLatestIssueDate": "2016-12-31",
+      "citingRuleSnapshotDates": ["2026-07-26"],
+      "amendedAfterRuleSnapshot": false
+    },
+    {
+      "sourceId": "ecfr-27-16.22",
+      "url": "https://www.ecfr.gov/current/title-27/chapter-I/subchapter-A/part-16/subpart-C/section-16.22",
+      "verifiedVia": "https://www.ecfr.gov/api/versioner/v1/versions/title-27.json?part=16&section=16.22",
+      "ok": true,
+      "problems": [],
+      "observedTitle": "§ 16.22 General requirements.",
+      "observedLatestAmendmentDate": "2016-12-31",
+      "observedLatestIssueDate": "2024-06-05",
+      "citingRuleSnapshotDates": ["2026-07-26"],
+      "amendedAfterRuleSnapshot": false
+    },
+    {
+      "sourceId": "ttb-wine-brand-name",
+      "url": "https://www.ttb.gov/regulated-commodities/beverage-alcohol/wine/labeling-wine/wine-labeling-brand-name",
+      "ok": true,
+      "problems": [],
+      "httpStatus": 200,
+      "observedTitle": "Wine Labeling: Brand Name",
+      "observedPageLastUpdated": "2026-01-12",
+      "quotes": [
+        {
+          "text": "A brand name is the name under which a wine or line of wines is marketed. It is usually the most prominent information on the label.",
+          "found": true
+        },
+        {
+          "text": "Where should the brand name be placed on the product?",
+          "found": true
+        },
+        {
+          "text": "What are the formatting requirements for the brand name?",
+          "found": true
+        },
+        {
+          "text": "When is a brand name misleading?",
+          "found": true
+        },
+        {
+          "text": "What is a brand name of viticultural significance?",
+          "found": true
+        }
+      ]
+    },
+    {
+      "sourceId": "ttb-wine-alcohol-content",
+      "url": "https://www.ttb.gov/regulated-commodities/beverage-alcohol/wine/labeling-wine/wine-labeling-alcohol-content",
+      "ok": true,
+      "problems": [],
+      "httpStatus": 200,
+      "observedTitle": "Wine Labeling: Alcohol Content",
+      "observedPageLastUpdated": "2026-01-12",
+      "quotes": [
+        {
+          "text": "The alcohol content statement is a numerical statement on a wine label that indicates the alcohol content of the wine in terms of percentage of alcohol by volume.",
+          "found": true
+        },
+        {
+          "text": "Where should the alcohol content statement be placed on the product?",
+          "found": true
+        },
+        {
+          "text": "What are the formatting requirements?",
+          "found": true
+        },
+        {
+          "text": "Does the alcohol content stated on the label need to indicate the exact alcohol content of the product, or does TTB allow a tolerance?",
+          "found": true
+        }
+      ]
+    },
+    {
+      "sourceId": "ttb-wine-health-warning",
+      "url": "https://www.ttb.gov/regulated-commodities/beverage-alcohol/wine/labeling-wine/wine-labeling-health-warning-statement",
+      "ok": true,
+      "problems": [],
+      "httpStatus": 200,
+      "observedTitle": "Wine Labeling: Health Warning Statement",
+      "observedPageLastUpdated": "2021-03-01",
+      "quotes": [
+        {
+          "text": "The health warning statement may appear on a front label, back label, or side label.",
+          "found": true
+        },
+        {
+          "text": "Where should the health warning statement be placed on the product?",
+          "found": true
+        },
+        {
+          "text": "What are the formatting requirements?",
+          "found": true
+        }
+      ]
+    },
+    {
+      "sourceId": "ttb-wine-net-contents",
+      "url": "https://www.ttb.gov/regulated-commodities/beverage-alcohol/wine/labeling-wine/wine-labeling-net-contents",
+      "ok": true,
+      "problems": [],
+      "httpStatus": 200,
+      "observedTitle": "Wine Labeling: Net Contents",
+      "observedPageLastUpdated": "2026-05-21",
+      "quotes": []
+    },
+    {
+      "sourceId": "ttb-wine-name-and-address",
+      "url": "https://www.ttb.gov/regulated-commodities/beverage-alcohol/wine/labeling-wine/wine-labeling-name-and-address",
+      "ok": true,
+      "problems": [],
+      "httpStatus": 200,
+      "observedTitle": "Wine Labeling: Name and Address",
+      "observedPageLastUpdated": "2026-01-12",
+      "quotes": []
+    },
+    {
+      "sourceId": "ttb-labeling",
+      "url": "https://www.ttb.gov/regulated-commodities/labeling/",
+      "ok": true,
+      "problems": [],
+      "httpStatus": 200,
+      "observedTitle": "Labeling",
+      "observedPageLastUpdated": "2026-06-02",
+      "quotes": []
+    },
+    {
+      "sourceId": "ttb-colas-online",
+      "url": "https://www.ttb.gov/online-services/colas-online/",
+      "ok": true,
+      "problems": [],
+      "httpStatus": 200,
+      "observedTitle": "COLAs Online",
+      "observedPageLastUpdated": "2026-01-02",
+      "quotes": [
+        {
+          "text": "COLAs Online makes it easy for you to apply for a Certificate of Label Approval/Exemption (COLA) for your product.",
+          "found": true
+        }
+      ]
+    }
+  ]
+}
