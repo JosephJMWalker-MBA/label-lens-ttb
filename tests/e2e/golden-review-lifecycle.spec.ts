@@ -47,7 +47,8 @@ async function completeCategory(page: Page, heading: string | RegExp, text: stri
 /**
  * Drives the sticky single-action footer (save -> pre-check -> reconcile any
  * machine/seller mismatch by explicitly keeping seller evidence -> re-save ->
- * re-check) until the package reaches the "prepare for agent review" stage.
+ * re-check) until the package reaches its final step: internal-review
+ * submission. It never clicks the submit action itself.
  */
 async function driveToReady(page: Page) {
   for (let step = 0; step < 8; step += 1) {
@@ -55,6 +56,7 @@ async function driveToReady(page: Page) {
     const button = footerButton(page);
     await expect(button).toBeVisible();
     await expect(button).toBeEnabled({ timeout: 150_000 });
+    if (/submit for internal review/i.test((await button.textContent()) ?? "")) break;
     await button.click();
     await page.waitForTimeout(250);
   }
@@ -131,16 +133,31 @@ test.describe("golden-path internal review lifecycle", () => {
     await footerButton(page).click();
     await driveToReady(page);
 
+    // The guided footer's final action is the one and only submit control.
     const dock = page.getByTestId("agent-review-submission-dock");
     await page.locator("#agent-submission-name").fill(marker);
-    await expect(page.getByRole("button", { name: "Submit for agent review" })).toBeEnabled();
-    await page.getByRole("button", { name: "Submit for agent review" }).click();
+    await expect(footerButton(page)).toHaveText("Submit for internal review");
+    await expect(footerButton(page)).toBeEnabled();
+    await expect(page.getByRole("button", { name: /submit for/i })).toHaveCount(1);
+    await footerButton(page).click();
 
     const submissionId = await dock.locator("p.font-mono").textContent({ timeout: 30_000 });
     expect(submissionId).toBeTruthy();
     const id = submissionId!.trim();
+    await expect(dock.getByRole("link", { name: /TTB COLAs Online/ })).toBeVisible();
+    await expect(footerButton(page)).toHaveText("Track this submission");
+    await expect(
+      page.getByTestId("package-progress-footer").locator('[data-stage="submit"]'),
+    ).toHaveAttribute("data-status", "complete");
 
+    // The dashboard lists it as submitted with a plain next step, and no longer
+    // offers it as an unfinished draft.
     await page.goto("/seller");
+    const submittedRow = page.getByTestId("seller-submission-row").filter({ hasText: id });
+    await expect(submittedRow).toContainText("Nothing to do right now");
+    await expect(
+      page.locator(`[data-testid="seller-draft-row"][data-package-id="${id}"]`),
+    ).toHaveCount(0);
     await signOut(page);
 
     // ---- Agent: claim the submission and request changes ----
@@ -162,7 +179,12 @@ test.describe("golden-path internal review lifecycle", () => {
     // ---- Seller: see the request, revise a declared fact, and resubmit ----
     await signIn(page, E2E.seller.email, E2E.seller.password);
     await expect(page).toHaveURL(/\/seller$/);
-    await page.goto(`/seller/submissions/${id}`);
+    await page
+      .getByTestId("seller-submission-row")
+      .filter({ hasText: id })
+      .getByRole("link", { name: "Respond to the requested changes" })
+      .click();
+    await expect(page).toHaveURL(new RegExp(`/seller/submissions/${id}$`));
     await expect(page.getByText("Requested changes")).toBeVisible();
     await expect(page.getByText(changeRationale)).toBeVisible();
 
@@ -174,6 +196,7 @@ test.describe("golden-path internal review lifecycle", () => {
     });
     await page.getByRole("link", { name: "Open Review workspace" }).click();
     await expect(page).toHaveURL(/\/review$/);
+    await expect(page.getByTestId("revision-response-banner")).toContainText(id);
 
     await page
       .getByLabel("Category progress")
@@ -192,9 +215,12 @@ test.describe("golden-path internal review lifecycle", () => {
     await driveToReady(page);
 
     const revisionDock = page.getByTestId("agent-review-submission-dock");
-    await expect(revisionDock.getByText(/responds to requested changes/i)).toBeVisible();
+    await expect(
+      revisionDock.getByRole("heading", { name: "Send your corrected revision" }),
+    ).toBeVisible();
     await page.locator("#agent-submission-name").fill(marker);
-    await page.getByRole("button", { name: "Submit for agent review" }).click();
+    await expect(footerButton(page)).toHaveText("Resubmit for internal review");
+    await footerButton(page).click();
     await expect(revisionDock.getByText("Revision v2 is recorded.")).toBeVisible({
       timeout: 30_000,
     });
@@ -243,5 +269,54 @@ test.describe("golden-path internal review lifecycle", () => {
     await expect(
       page.getByText("Revision v2 responds to requested changes on revision v1."),
     ).toBeVisible();
+
+    // ---- Seller: the internal decision hands off to official filing, never as an approval ----
+    await signOut(page);
+    await signIn(page, E2E.seller.email, E2E.seller.password);
+    await page.goto(`/seller/submissions/${id}`);
+    const nextStep = page.getByTestId("seller-next-step");
+    await expect(nextStep).toContainText("File officially when you are ready");
+    await expect(nextStep).toContainText("This is not a TTB approval.");
+    await expect(nextStep.getByRole("link", { name: /TTB COLAs Online/ })).toHaveAttribute(
+      "href",
+      "https://www.ttb.gov/online-services/colas-online/",
+    );
+    const sellerBody = (await page.textContent("body")) ?? "";
+    expect(sellerBody).not.toMatch(/TTB approved|COLA approved|Government approved/i);
+  });
+
+  test("returning seller continues an unfinished package from the dashboard", async ({ page }) => {
+    test.setTimeout(120_000);
+    const marker = `Returning Seller ${crypto.randomUUID().slice(0, 8)}`;
+
+    await signIn(page, E2E.seller.email, E2E.seller.password);
+    await expect(page).toHaveURL(/\/seller$/);
+    await page.getByTestId("start-new-package-btn").click();
+    await expect(page).toHaveURL(/\/review$/);
+
+    // Submission controls stay out of the way until the package is ready.
+    await expect(page.getByTestId("agent-review-submission-dock")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /submit for/i })).toHaveCount(0);
+
+    await page.getByLabel(/upload front label/i).setInputFiles(FRONT_FIXTURE);
+    await page.getByRole("button", { name: /no back label/i }).click();
+    await page.getByRole("button", { name: /no additional panels/i }).click();
+    await completeCategory(page, "Brand name", marker);
+    await expect(page.getByRole("heading", { name: "Alcohol statement" })).toBeVisible();
+
+    // Leave mid-way. The dashboard names this exact package and its one next step.
+    await page.goto("/seller");
+    const row = page.getByTestId("seller-draft-row").filter({ hasText: marker });
+    await expect(row).toContainText("Next: Mark the alcohol statement on your label");
+    await expect(row).toContainText("1 of 5 steps done");
+
+    await row.getByRole("link", { name: `Continue ${marker}` }).click();
+    await expect(page).toHaveURL(/\/review\?packageId=/);
+    await expect(page.getByRole("heading", { name: "Alcohol statement" })).toBeVisible();
+    await expect(
+      page.getByTestId("package-progress-footer").locator('[data-stage="upload"]'),
+    ).toHaveAttribute("data-status", "complete");
+    const selector = page.getByTestId("draft-selector");
+    await expect(selector.locator("option:checked")).toContainText(marker);
   });
 });

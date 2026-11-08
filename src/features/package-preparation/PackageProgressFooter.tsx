@@ -5,6 +5,8 @@ import type { GuidedPackageWorkflow, PackageSaveState } from "./package-workflow
 const STATUS_CLASS = {
   current: "border-blue-600 bg-blue-600 text-white",
   complete: "border-emerald-700 bg-emerald-50 text-emerald-950",
+  // Done, but not a pass: neutral fill with an amber edge.
+  findings_noted: "border-amber-500 bg-background text-foreground",
   needs_attention: "border-amber-500 bg-amber-50 text-amber-950",
   not_started: "border-border bg-muted/40 text-muted-foreground",
   blocked: "border-red-600 bg-red-50 text-red-950",
@@ -13,6 +15,7 @@ const STATUS_CLASS = {
 const STATUS_LABEL = {
   current: "Current",
   complete: "Complete",
+  findings_noted: "Done · findings noted",
   needs_attention: "Needs attention",
   not_started: "Not started",
   blocked: "Blocked",
@@ -85,7 +88,9 @@ export function PackageProgressFooter({
                 data-status={stage.status}
               >
                 <span className="block font-semibold">{stage.label}</span>
-                <span className="block opacity-80">{STATUS_LABEL[stage.status]}</span>
+                <span className="block opacity-80">
+                  {stage.detail ?? STATUS_LABEL[stage.status]}
+                </span>
               </li>
             ))}
           </ol>

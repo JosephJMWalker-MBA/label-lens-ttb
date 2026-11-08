@@ -423,9 +423,13 @@ test("footer-driven workstation exits correction, fits panels, and preserves imm
   await expectSingleStageAction(page, /Running pre-check/);
   await expect(page.getByTestId("prepare-workspace")).toBeVisible();
 
-  await page.locator("#package-submitter").fill("Seller E2E");
+  // The journey ends at internal-review submission (the mocked session is a
+  // seller). The JSON copy remains an explicitly optional download.
+  await expectSingleStageAction(page, "Submit for internal review");
+  await expect(page.getByRole("button", { name: "Prepare agent package" })).toHaveCount(0);
+  await page.locator("#agent-submission-name").fill("Seller E2E");
   const downloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Prepare agent package" }).click();
+  await page.getByRole("button", { name: "Download a copy (JSON)" }).click();
   expect((await downloadPromise).suggestedFilename()).toMatch(/seller-agent-package\.json$/);
   await expect(page.getByText(/nothing was sent to an agent or to TTB/i)).toBeVisible();
 
@@ -659,7 +663,7 @@ test("isolates multiple browser-local drafts and allows switching without overwr
   expect(stateRestored.activePackageId).toBe(packageAId);
 });
 
-test("evidence save guidance activates on valid region & text, clears on save, and propagates submitter name to submission dock", async ({
+test("evidence save guidance activates on valid region & text, clears on save, and keeps one submitter name for the draft", async ({
   page,
 }) => {
   await mockPackageAnalysis(page);
@@ -694,11 +698,21 @@ test("evidence save guidance activates on valid region & text, clears on save, a
   await page.getByRole("button", { name: "Save draft locally" }).click();
   await page.getByRole("button", { name: "Run pre-check" }).click();
 
-  // Type submitter name in preparation workstation input
-  await page.locator("#package-submitter").fill("Continuity Seller LLC");
+  // The final step asks for the submitter name exactly once.
+  await expect(page.getByTestId("prepare-workspace")).toBeVisible();
+  await expect(page.locator("#package-submitter")).toHaveCount(0);
+  const nameInput = page.locator("#agent-submission-name");
+  await expect(nameInput).toHaveCount(1);
+  // Prefilled from the (mocked) seller profile, then edited by the seller.
+  await expect(nameInput).toHaveValue("Continuity Seller LLC");
+  await nameInput.fill("Returning Bottler Co.");
+  await expectSingleStageAction(page, "Submit for internal review");
+  await expect
+    .poll(async () => (await readCurrentDraft(page)).submitter, { timeout: 10_000 })
+    .toBe("Returning Bottler Co.");
 
-  // Submitter name is synchronized with submission dock
-  const dockInput = page.locator("#agent-submission-name");
-  await expect(dockInput).toBeVisible();
-  await expect(dockInput).toHaveValue("Continuity Seller LLC");
+  // Returning to the same draft restores both the final step and the edited name.
+  await page.reload();
+  await expect(page.getByTestId("prepare-workspace")).toBeVisible();
+  await expect(page.locator("#agent-submission-name")).toHaveValue("Returning Bottler Co.");
 });

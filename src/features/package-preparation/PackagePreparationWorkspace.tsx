@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  type ReactNode,
   forwardRef,
   useCallback,
   useEffect,
@@ -64,7 +65,11 @@ import {
   WINE_PACKAGE_CATEGORY_DEFINITIONS,
   WINE_PACKAGE_CATEGORY_INSTRUCTIONS,
 } from "./package-profile";
-import { deriveGuidedPackageWorkflow, type PackageSaveState } from "./package-workflow";
+import {
+  deriveGuidedPackageWorkflow,
+  storedDraftSaveState,
+  type PackageSaveState,
+} from "./package-workflow";
 
 const MAX_PACKAGE_PANELS = 6;
 
@@ -283,15 +288,6 @@ function readinessLabel(readiness: PackageReadiness | undefined, analysisCurrent
     : "Seller review required";
 }
 
-function restoredSaveState(draft: SellerPackageDraft): PackageSaveState {
-  const lastAction = draft.sellerChangeHistory.at(-1)?.action;
-  return lastAction === "draft_saved" ||
-    lastAction === "analysis_completed" ||
-    lastAction === "agent_package_exported"
-    ? "saved"
-    : "unsaved";
-}
-
 function sameRegion(left: SellerEvidenceRegion, right: SellerEvidenceRegion): boolean {
   return (
     left.regionId === right.regionId &&
@@ -308,17 +304,36 @@ export interface PackagePreparationWorkspaceProps {
   onActivePackageChange?: (packageId: string | null) => void;
   submitter?: string;
   onSubmitterChange?: (value: string) => void;
+  /** True only when the server has recorded this draft for internal review. */
+  submitted?: boolean;
+  /** The single guided action for a ready package (submit, sign in, or track). */
+  submissionAction?: PackageFooterAction;
+  /** Final-stage submission details: submitter name, boundary, and receipt. */
+  submissionPanel?: ReactNode;
 }
 
 export interface PackagePreparationWorkspaceRef {
   startAnotherPackage: () => void;
+  /**
+   * Mirror a submitter-name edit made outside the workspace into the active
+   * in-memory draft. Ignored unless `packageId` is the draft on screen, so a
+   * name can never be written into a different package during a draft switch.
+   */
+  applySubmitter: (packageId: string, value: string) => void;
 }
 
 export const PackagePreparationWorkspace = forwardRef<
   PackagePreparationWorkspaceRef,
   PackagePreparationWorkspaceProps
 >(function PackagePreparationWorkspace(
-  { onActivePackageChange, submitter: controlledSubmitter, onSubmitterChange },
+  {
+    onActivePackageChange,
+    submitter: controlledSubmitter,
+    onSubmitterChange,
+    submitted = false,
+    submissionAction,
+    submissionPanel,
+  },
   ref,
 ) {
   const [draft, setDraft] = useState<SellerPackageDraft | null>(null);
@@ -341,9 +356,18 @@ export const PackagePreparationWorkspace = forwardRef<
   const [analysisElapsedSeconds, setAnalysisElapsedSeconds] = useState(0);
   const [localSubmitter, setLocalSubmitter] = useState("");
   const submitter = controlledSubmitter ?? draft?.submitter ?? localSubmitter;
+  const controlledSubmitterRef = useRef(controlledSubmitter);
+  controlledSubmitterRef.current = controlledSubmitter;
 
   useEffect(() => {
-    if (draft?.submitter !== undefined && onSubmitterChange) {
+    // Report a restored or locally edited name upward. An edit that came from
+    // the parent (mirrored in through `applySubmitter`) already matches the
+    // controlled value, so it is not echoed back and persisted twice.
+    if (
+      draft?.submitter !== undefined &&
+      onSubmitterChange &&
+      draft.submitter !== controlledSubmitterRef.current
+    ) {
       onSubmitterChange(draft.submitter);
     }
   }, [draft?.packageId, draft?.submitter, onSubmitterChange]);
@@ -449,7 +473,7 @@ export const PackagePreparationWorkspace = forwardRef<
       setAcceptingCategory(false);
       setEditingPanels(false);
       setReviewingEvidence(false);
-      setSaveState(restoredSaveState(stored.draft));
+      setSaveState(storedDraftSaveState(stored.draft));
       setAnalysisState(stored.draft.analysisRuns.length > 0 ? "complete" : "idle");
       setCurrentRevisionContext(stored.revisionContext);
       setMessage("Restored the last locally saved seller package draft in this browser.");
@@ -588,6 +612,14 @@ export const PackagePreparationWorkspace = forwardRef<
       startAnotherPackage: () => {
         void handleCreateNewPackage();
       },
+      applySubmitter: (packageId: string, value: string) => {
+        const current = draftRef.current;
+        if (!current || current.packageId !== packageId || current.submitter === value) return;
+        const next = { ...current, submitter: value };
+        draftRef.current = next;
+        setDraft(next);
+        setLocalSubmitter(value);
+      },
     }),
     [handleCreateNewPackage],
   );
@@ -703,6 +735,7 @@ export const PackagePreparationWorkspace = forwardRef<
         definitions: WINE_PACKAGE_CATEGORY_DEFINITIONS,
         instructions: WINE_PACKAGE_CATEGORY_INSTRUCTIONS,
         saveState,
+        submitted,
       })
     : null;
   const packageMachineChecks = [
@@ -1650,14 +1683,12 @@ export const PackagePreparationWorkspace = forwardRef<
         : "Save the package before running the pre-check.",
     };
   } else {
-    footerAction = {
-      label: "Prepare agent package",
-      disabled: !canExport,
-      onClick: () => void exportAgentPackage(),
-      reason:
-        submitter.trim() === ""
-          ? "Enter the seller or submitter name before preparing the package."
-          : "Creates a local download only. Nothing is transmitted.",
+    // The journey ends at internal-review submission. A local JSON copy stays
+    // available in the workspace, but it is never presented as the final step.
+    footerAction = submissionAction ?? {
+      label: "Submit for internal review",
+      disabled: true,
+      reason: "Sign in with a seller account to submit this package for internal review.",
     };
   }
 
@@ -1704,6 +1735,17 @@ export const PackagePreparationWorkspace = forwardRef<
               : "Retry local draft restoration"}
           </button>
         </div>
+      ) : null}
+      {currentRevisionContext ? (
+        <p
+          className="mb-4 rounded-md border border-amber-500/40 bg-amber-50/60 px-4 py-3 text-sm text-amber-950 dark:bg-amber-950/30 dark:text-amber-100"
+          data-testid="revision-response-banner"
+        >
+          You are responding to requested changes on{" "}
+          <span className="font-mono">{currentRevisionContext.submissionId}</span>. Revision v
+          {currentRevisionContext.baseRevisionNumber} and the reviewer&apos;s note stay on record;
+          this draft is submitted as a new revision when you finish.
+        </p>
       ) : null}
       <div
         className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border/70 bg-card p-3 shadow-sm"
@@ -1889,38 +1931,66 @@ export const PackagePreparationWorkspace = forwardRef<
               data-testid="prepare-workspace"
             >
               <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">
-                Prepare
+                Final step
               </p>
               <h2 id="prepare-workspace-heading" className="text-2xl font-semibold">
-                Prepare the local agent package
+                {submitted ? "Your package is in internal review" : "Submit for internal review"}
               </h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                The latest saved pre-check is current and eligible for a local package download.
-                Nothing is transmitted to an agent, TTB, a government system, or an external queue.
+              <p className="mt-2 text-sm text-muted-foreground" data-testid="final-step-summary">
+                Every required item is marked and saved, and the pre-check is current.{" "}
+                {(() => {
+                  const findings =
+                    workflow.flaggedCategoryIds.length +
+                    (latestRun?.governmentWarning?.result === "FAIL" ||
+                    latestRun?.governmentWarning?.result === "NEEDS_REVIEW"
+                      ? 1
+                      : 0);
+                  return findings === 0
+                    ? "The pre-check flagged nothing for you to review."
+                    : `${findings} pre-check finding${findings === 1 ? "" : "s"} will go to the reviewer with your evidence, so a person makes the call.`;
+                })()}
               </p>
               <div className="mt-5">
-                <Label htmlFor="package-submitter">Seller or submitter name</Label>
-                <Input
-                  id="package-submitter"
-                  value={submitter}
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    setLocalSubmitter(value);
-                    onSubmitterChange?.(value);
-                    if (draftRef.current) {
-                      const nextDraft = { ...draftRef.current, submitter: value };
-                      draftRef.current = nextDraft;
-                      setDraft(nextDraft);
-                    }
-                  }}
-                />
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Use the persistent “Prepare agent package” action after entering the name.
-                </p>
+                {submissionPanel ?? (
+                  <div>
+                    <Label htmlFor="package-submitter">Seller or submitter name</Label>
+                    <Input
+                      id="package-submitter"
+                      value={submitter}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        setLocalSubmitter(value);
+                        onSubmitterChange?.(value);
+                        if (draftRef.current) {
+                          const nextDraft = { ...draftRef.current, submitter: value };
+                          draftRef.current = nextDraft;
+                          setDraft(nextDraft);
+                        }
+                      }}
+                    />
+                  </div>
+                )}
               </div>
-              <div className="mt-5 rounded-md border border-emerald-700/40 bg-emerald-50 p-4 text-sm text-emerald-950">
-                {readinessLabel(latestRun?.readiness, analysisCurrent)} · local download only · not
-                a TTB submission or approval.
+              <div
+                className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-md border border-border p-3 text-sm"
+                data-testid="package-copy-download"
+              >
+                <div className="min-w-0">
+                  <p className="font-medium">Keep a copy (optional)</p>
+                  <p className="text-xs text-muted-foreground">
+                    {canExport
+                      ? "Downloads this package record to your computer as a JSON file. Nothing is sent."
+                      : "Enter the submitter name to download a copy of this package record. Nothing is sent."}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void exportAgentPackage()}
+                  disabled={!canExport}
+                  className="shrink-0 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Download a copy (JSON)
+                </button>
               </div>
               {latestRun ? (
                 <div className="mt-5" aria-label="Latest pre-check results">
@@ -2154,8 +2224,8 @@ export const PackagePreparationWorkspace = forwardRef<
             </p>
             <h2 className="mt-1 text-lg font-semibold">{workflow.recommendedAction}</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Only the active workspace is expanded. Later actions appear when the canonical package
-              state permits them.
+              Use the action at the bottom of the screen to finish this step. Later steps open as
+              soon as this one is done.
             </p>
             <details className="mt-4 text-xs text-muted-foreground">
               <summary className="cursor-pointer font-medium text-foreground">

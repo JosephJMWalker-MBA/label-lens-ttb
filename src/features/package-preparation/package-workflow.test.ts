@@ -362,8 +362,20 @@ describe("guided package workflow projection", () => {
       analysisCurrent: true,
       correctionCycleComplete: true,
       readyForAgentPackage: true,
-      recommendedAction: "Prepare the local-only agent package",
+      recommendedAction: "Submit the package for internal review",
     });
+    // A reviewed flag is not a passed check: the stage reads as done with the
+    // kept finding travelling to the reviewer, never as a green "Complete".
+    expect(project(value, "saved").progressStages).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "precheck",
+          status: "findings_noted",
+          detail: "1 finding for reviewer",
+        }),
+        expect.objectContaining({ id: "submit", status: "current" }),
+      ]),
+    );
   });
 
   it("allows agent handoff for a current package with only a government-warning finding", () => {
@@ -425,12 +437,16 @@ describe("guided package workflow projection", () => {
       analysisCurrent: true,
       readyForPrecheck: true,
       readyForAgentPackage: true,
-      recommendedAction: "Prepare the local-only agent package",
+      recommendedAction: "Submit the package for internal review",
     });
     expect(project(value, "saved").progressStages).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ id: "precheck", status: "needs_attention" }),
-        expect.objectContaining({ id: "prepare", status: "current" }),
+        expect.objectContaining({
+          id: "precheck",
+          status: "findings_noted",
+          detail: "1 finding for reviewer",
+        }),
+        expect.objectContaining({ id: "submit", status: "current" }),
       ]),
     );
   });
@@ -474,5 +490,127 @@ describe("guided package workflow projection", () => {
       analysisCurrent: false,
       readyForAgentPackage: false,
     });
+  });
+  it("ends the guided journey at internal-review submission, not at a local download", () => {
+    const value = draft();
+    addPanels(value);
+    acceptCategories(value);
+    value.analysisRuns = [
+      {
+        analysisRunId: "analysis-clean",
+        sequence: 1,
+        sellerChangeSequence: 0,
+        recordedAt: "2026-07-18T01:00:00.000Z",
+        panelRuns: [],
+        categories: WINE_PACKAGE_CATEGORY_DEFINITIONS.map((definition) => ({
+          categoryId: definition.categoryId,
+          state: "clearly_readable",
+          observedValue: "clear",
+          supportingPanelIds: [],
+          supportingRegionIds: [],
+          reason: "Clear.",
+        })),
+        readiness: "ready_for_agent_submission",
+      },
+    ];
+
+    const ready = project(value, "saved");
+    expect(ready.progressStages.map((stage) => stage.id)).toEqual([
+      "upload",
+      "mark",
+      "save",
+      "precheck",
+      "submit",
+    ]);
+    expect(ready.recommendedAction).toBe("Submit the package for internal review");
+    expect(ready.progressStages).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "precheck", status: "complete" }),
+        expect.objectContaining({ id: "submit", status: "current" }),
+      ]),
+    );
+    expect(ready.progressStages.find((stage) => stage.id === "precheck")?.detail).toBeUndefined();
+
+    // A local JSON download is not a submission and must not complete the journey.
+    value.sellerChangeHistory.push({
+      changeId: "downloaded",
+      sequence: 1,
+      recordedAt: "2026-07-18T02:00:00.000Z",
+      action: "agent_package_exported",
+      detail: "Seller-prepared package downloaded locally; no transmission occurred.",
+    });
+    expect(
+      project(value, "saved").progressStages.find((stage) => stage.id === "submit"),
+    ).toMatchObject({ status: "current" });
+
+    const submitted = deriveGuidedPackageWorkflow({
+      draft: value,
+      definitions: WINE_PACKAGE_CATEGORY_DEFINITIONS,
+      instructions: WINE_PACKAGE_CATEGORY_INSTRUCTIONS,
+      saveState: "saved",
+      submitted: true,
+    });
+    expect(submitted.recommendedAction).toBe("Track the submitted package");
+    expect(submitted.progressStages.find((stage) => stage.id === "submit")).toMatchObject({
+      status: "complete",
+      detail: "Submitted",
+    });
+  });
+
+  it("never reports a stale or unreviewed pre-check as done", () => {
+    const value = draft();
+    addPanels(value);
+    acceptCategories(value);
+    value.analysisRuns = [
+      {
+        analysisRunId: "analysis-flagged",
+        sequence: 1,
+        sellerChangeSequence: 0,
+        recordedAt: "2026-07-18T01:00:00.000Z",
+        panelRuns: [],
+        categories: WINE_PACKAGE_CATEGORY_DEFINITIONS.map((definition) => ({
+          categoryId: definition.categoryId,
+          state: definition.categoryId === "brandName" ? "needs_review" : "clearly_readable",
+          observedValue: "observed",
+          supportingPanelIds: [],
+          supportingRegionIds: [],
+          reason: "Seller and machine evidence differ.",
+        })),
+        readiness: "needs_seller_review",
+      },
+    ];
+    // Flag not yet reviewed: still needs the seller's attention, cannot be submitted.
+    const unreviewed = project(value, "saved");
+    expect(unreviewed.progressStages.find((stage) => stage.id === "precheck")).toEqual({
+      id: "precheck",
+      label: "Pre-check",
+      status: "needs_attention",
+    });
+    expect(unreviewed.progressStages.find((stage) => stage.id === "submit")?.status).toBe(
+      "not_started",
+    );
+
+    // A material edit after the run makes the pre-check out of date, and the
+    // server-recorded submission flag cannot mark a stale package as submitted.
+    value.sellerChangeHistory.push({
+      changeId: "material-edit",
+      sequence: 1,
+      recordedAt: "2026-07-18T02:00:00.000Z",
+      action: "region_moved",
+      categoryId: "alcoholStatement",
+      detail: "Seller moved the alcohol region.",
+    });
+    const stale = deriveGuidedPackageWorkflow({
+      draft: value,
+      definitions: WINE_PACKAGE_CATEGORY_DEFINITIONS,
+      instructions: WINE_PACKAGE_CATEGORY_INSTRUCTIONS,
+      saveState: "saved",
+      submitted: true,
+    });
+    expect(stale.progressStages.find((stage) => stage.id === "precheck")).toMatchObject({
+      status: "needs_attention",
+      detail: "Out of date",
+    });
+    expect(stale.progressStages.find((stage) => stage.id === "submit")?.status).toBe("not_started");
   });
 });

@@ -578,7 +578,16 @@ describe("guided category acceptance", () => {
     });
     vi.useRealTimers();
 
-    expect(await screen.findByRole("button", { name: "Prepare agent package" })).toBeDisabled();
+    // The run completes the journey's checks; the final step is internal-review
+    // submission. Standalone (no signed-in container), it explains instead of acting.
+    expect(
+      await screen.findByRole("button", { name: "Submit for internal review" }),
+    ).toBeDisabled();
+    expect(screen.getByTestId("prepare-workspace")).toHaveTextContent(
+      "The pre-check flagged nothing for you to review.",
+    );
+    expect(screen.getByRole("button", { name: "Download a copy (JSON)" })).toBeDisabled();
+    expect(screen.queryByRole("button", { name: "Prepare agent package" })).toBeNull();
     const saved = store.save.mock.calls.at(-1)?.[0] as { draft: SellerPackageDraft };
     expect(saved.draft.analysisRuns).toHaveLength(1);
     expect(saved.draft.analysisRuns[0]).toBe(completedRun);
