@@ -53,7 +53,8 @@
     "eval:local-vlm-decision-clarity-replication": "npx vite-node --config vitest.config.ts scripts/eval/run-local-vlm-decision-clarity-replication.ts",
     "eval:local-vlm-decision-clarity-permutation-recurrence": "npx vite-node --config vitest.config.ts scripts/eval/run-local-vlm-decision-clarity-permutation-recurrence.ts",
     "docs:check": "node --experimental-strip-types --no-warnings scripts/check-docs.ts",
-    "docs:check:test": "vitest run src/docs/documentation-validator.test.ts"
+    "docs:check:test": "vitest run src/docs/documentation-validator.test.ts",
+    "guidance:verify-sources": "NODE_USE_ENV_PROXY=1 npx vite-node --config vitest.config.ts scripts/guidance/verify-official-sources.ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
