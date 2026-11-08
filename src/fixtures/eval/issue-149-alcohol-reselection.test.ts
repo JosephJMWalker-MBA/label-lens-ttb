@@ -347,7 +347,12 @@ const FIELD_SELECTION_HASH_APPROVED_AFTER_PR_220 =
   "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c";
 
 describe("Issue #149 frozen boundaries", () => {
-  it("keeps OCR, preprocessing, PSM, parsing, thresholds, Warning and route hashes frozen, with field-selection.ts at the PR 220 approved boundary", () => {
+  // The package analyze route was frozen here while Issue #149 experiments ran.
+  // #149 closed on 2026-09-12 and the route is product code again (it now hosts
+  // the private vision reader), so it is no longer pinned. The OCR, region,
+  // parser, and Warning modules the experiments measured stay frozen; the
+  // experiment evidence itself remains bound to its recorded git SHA.
+  it("keeps OCR, preprocessing, PSM, parsing, thresholds, and Warning hashes frozen, with field-selection.ts at the PR 220 approved boundary", () => {
     expect(FIELD_SELECTION_HASH_APPROVED_AFTER_PR_220).not.toBe(FIELD_SELECTION_HASH_BEFORE_PR_220);
     expect(hashFile("src/pipeline/extractor/extractor.ts")).toBe(
       "9b2712e6bb15552e9524bc5e60be4da2b163bdb325206f452ecbaf44ebf5084c",
@@ -363,9 +368,6 @@ describe("Issue #149 frozen boundaries", () => {
     );
     expect(hashFile("src/pipeline/extractor/government-warning.ts")).toBe(
       "bd8b59420a29865f5cfb843b9e52a127c7737737d0128c63cba3c1e4b73794d1",
-    );
-    expect(hashFile("src/app/api/package/analyze/route.ts")).toBe(
-      "2b49932096917c40c88dadc8cdef4017126b72968fb47e0f32104818bd4ff41b",
     );
   });
 

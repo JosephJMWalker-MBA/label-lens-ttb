@@ -151,6 +151,32 @@ export type SellerRegionReadingState = (typeof SELLER_REGION_READING_STATES)[num
 export const SELLER_REGION_RELIABILITY_STATES = ["RELIABLE", "UNRELIABLE"] as const;
 export type SellerRegionReliabilityState = (typeof SELLER_REGION_RELIABILITY_STATES)[number];
 
+/**
+ * Record of a bounded reading made by the private vision reader instead of
+ * local OCR. The transcript is literal; interpretation into an observed value
+ * is done by deterministic parsers, not the model.
+ */
+export interface VisionRegionReadRecord {
+  lines: string[];
+  legibility: "clear" | "partial" | "illegible";
+  provenance: {
+    reader: "vision-llm";
+    hostLabel: string;
+    configuredModel: string;
+    servedModel: string | null;
+    promptId: string;
+    promptVersion: string;
+    promptSha256: string;
+    structuredOutput: "json_schema" | "off";
+    sentImageSha256: string;
+    sentImageSize: { width: number; height: number };
+    responseSha256: string;
+    latencyMs: number;
+    promptTokens: number | null;
+    completionTokens: number | null;
+  };
+}
+
 export interface SellerRegionMachineReading {
   categoryId: SellerRegionTargetCategoryId;
   regionId: string;
@@ -177,6 +203,12 @@ export interface SellerRegionMachineReading {
   reliabilityReason?: string;
   failureReason?: string;
   observationState?: string;
+  /** Which instrument produced this reading. Absent on records made before the vision reader existed. */
+  reader?: "local-ocr" | "vision-llm";
+  /** Present when `reader` is "vision-llm". */
+  visionRead?: VisionRegionReadRecord;
+  /** Present when the vision reader was configured but this region fell back to local OCR. */
+  visionFallback?: { code: string; message: string };
   selectedGeometry?: EvidenceGeometry;
   passProvenance: {
     passId: string;
