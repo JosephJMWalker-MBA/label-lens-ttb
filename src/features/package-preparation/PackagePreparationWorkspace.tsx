@@ -20,6 +20,7 @@ const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffec
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { deriveAnchoredGovernmentWarningTranscript } from "@/domain/rules/government-warning.rule";
+import { StepGuidancePanel } from "@/features/guidance/StepGuidancePanel";
 import { triggerDownload } from "@/features/precheck/download";
 import type { EvidenceGeometry } from "@/pipeline/analyzer/analyzer.types";
 
@@ -1971,6 +1972,9 @@ export const PackagePreparationWorkspace = forwardRef<
                   </div>
                 )}
               </div>
+              <div className="mt-5">
+                <StepGuidancePanel contextId="step:submit" />
+              </div>
               <div
                 className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-md border border-border p-3 text-sm"
                 data-testid="package-copy-download"
@@ -2096,6 +2100,7 @@ export const PackagePreparationWorkspace = forwardRef<
                           {latestRun.governmentWarning.authority.citation}, retrieved{" "}
                           {latestRun.governmentWarning.authoritySource.retrievalDate}.
                         </p>
+                        <StepGuidancePanel contextId="check:governmentWarning" />
                       </div>
                     </section>
                   ) : null}
@@ -2171,52 +2176,59 @@ export const PackagePreparationWorkspace = forwardRef<
         </main>
 
         {annotationActive && activeCategory && activeDefinition && activeInstruction ? (
-          <GuidedCategoryTask
-            definition={activeDefinition}
-            instruction={activeInstruction}
-            category={activeCategory}
-            analysis={latestCategoryResult}
-            taskPosition={activeTaskPosition + 1}
-            taskCount={focusedDefinitions.length}
-            workingValue={workingValue}
-            pendingRegionAvailable={Boolean(workingRegion && validNormalizedRegion(workingRegion))}
-            editing={editingCategory}
-            machineObservationVisible={showMachineObservation}
-            machineRegionAvailable={machineRegions.some(
-              (region) => region.categoryId === activeCategoryId,
-            )}
-            showReviewNavigation={
-              focusedDefinitions.length > 1 && !workflow.correctionCycleComplete
-            }
-            onWorkingValueChange={(value) => {
-              setWorkingValue(value);
-              setEditingCategory(true);
-            }}
-            onBeginRegionEdit={() => {
-              const existing = activeCategory.regions.find(
-                (region) => region.panelId === activePanelId,
-              );
-              if (existing) {
-                setWorkingRegion({ ...existing });
-                setActiveRegionId(existing.regionId);
+          <div className="flex min-w-0 flex-col gap-4">
+            {/* Help sits above the sticky task card: content before a sticky
+                element scrolls away cleanly, so the card never covers it. */}
+            <StepGuidancePanel contextId={`category:${activeCategoryId}`} compact />
+            <GuidedCategoryTask
+              definition={activeDefinition}
+              instruction={activeInstruction}
+              category={activeCategory}
+              analysis={latestCategoryResult}
+              taskPosition={activeTaskPosition + 1}
+              taskCount={focusedDefinitions.length}
+              workingValue={workingValue}
+              pendingRegionAvailable={Boolean(
+                workingRegion && validNormalizedRegion(workingRegion),
+              )}
+              editing={editingCategory}
+              machineObservationVisible={showMachineObservation}
+              machineRegionAvailable={machineRegions.some(
+                (region) => region.categoryId === activeCategoryId,
+              )}
+              showReviewNavigation={
+                focusedDefinitions.length > 1 && !workflow.correctionCycleComplete
               }
-              setEditingCategory(true);
-              setMessage(
-                `Edit the ${activeDefinition.label.toLowerCase()} region, then save it from the footer.`,
-              );
-            }}
-            onBeginTextEdit={() => {
-              setEditingCategory(true);
-              setMessage(
-                `Edit the confirmed ${activeDefinition.label.toLowerCase()} text, then save it from the footer.`,
-              );
-            }}
-            onToggleMachineObservation={() => setShowMachineObservation((visible) => !visible)}
-            onUseMachineRegion={useMachineRegion}
-            onNeedsAttention={() => void markActiveCategoryNeedsAttention()}
-            onPrevious={() => selectAdjacentCategory(-1)}
-            onNext={() => selectAdjacentCategory(1)}
-          />
+              onWorkingValueChange={(value) => {
+                setWorkingValue(value);
+                setEditingCategory(true);
+              }}
+              onBeginRegionEdit={() => {
+                const existing = activeCategory.regions.find(
+                  (region) => region.panelId === activePanelId,
+                );
+                if (existing) {
+                  setWorkingRegion({ ...existing });
+                  setActiveRegionId(existing.regionId);
+                }
+                setEditingCategory(true);
+                setMessage(
+                  `Edit the ${activeDefinition.label.toLowerCase()} region, then save it from the footer.`,
+                );
+              }}
+              onBeginTextEdit={() => {
+                setEditingCategory(true);
+                setMessage(
+                  `Edit the confirmed ${activeDefinition.label.toLowerCase()} text, then save it from the footer.`,
+                );
+              }}
+              onToggleMachineObservation={() => setShowMachineObservation((visible) => !visible)}
+              onUseMachineRegion={useMachineRegion}
+              onNeedsAttention={() => void markActiveCategoryNeedsAttention()}
+              onPrevious={() => selectAdjacentCategory(-1)}
+              onNext={() => selectAdjacentCategory(1)}
+            />
+          </div>
         ) : (
           <aside className="rounded-lg border border-border bg-card p-4 lg:sticky lg:top-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">

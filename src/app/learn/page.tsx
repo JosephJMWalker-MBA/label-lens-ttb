@@ -1,5 +1,6 @@
 import { SkipLink } from "@/components/a11y/SkipLink";
 import { AppHeader } from "@/components/layout/AppHeader";
+import { OfficialSourcesList } from "@/features/guidance/OfficialSourcesList";
 import { RequirementsExplorer } from "@/features/learn/RequirementsExplorer";
 import { buildRuleGuide } from "@/features/learn/rule-guide";
 
@@ -22,6 +23,9 @@ export default function LearnPage() {
       <AppHeader current="learn" />
       <main id="main-content" className="mx-auto max-w-3xl px-6 py-14">
         <RequirementsExplorer guide={guide} />
+        <div className="mt-12">
+          <OfficialSourcesList />
+        </div>
       </main>
     </AppProviders>
   );

@@ -41,6 +41,7 @@ The public deployment is not a COLA integration, production authorization, gover
 - Persisted status receipts and immutable revision history.
 - Requested-change continuity that seeds a corrected seller revision without rewriting the prior submission.
 - Resubmission of the current corrected draft as a new immutable revision.
+- Source-grounded step help: what Label Lens checks and cannot check, with verbatim TTB quotes and versioned TTB/eCFR references, re-verified on demand by `npm run guidance:verify-sources` (see [`docs/applicant-guidance-sources.md`](docs/applicant-guidance-sources.md)).
 
 ### Authenticated review portal
 

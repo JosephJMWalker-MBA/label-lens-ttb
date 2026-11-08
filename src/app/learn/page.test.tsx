@@ -1,9 +1,14 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+import { OFFICIAL_SOURCES } from "@/features/guidance/official-sources";
 import { winePrecheckRegistry } from "@/pipeline/precheck/wine-precheck.profile";
 
 import LearnPage from "./page";
+
+function escape(text: string) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 describe("LearnPage — requirements explorer", () => {
   it("renders every registered rule with its id and version", () => {
@@ -81,5 +86,22 @@ describe("LearnPage — requirements explorer", () => {
   it("keeps the advisory boundary visible", () => {
     render(<LearnPage />);
     expect(screen.getByText(/does not approve or reject a label/i)).toBeInTheDocument();
+  });
+
+  it("lists every official source with the version its publisher shows", () => {
+    render(<LearnPage />);
+    const section = screen.getByTestId("official-sources");
+    for (const source of OFFICIAL_SOURCES) {
+      const label =
+        source.kind === "regulation" ? `${source.citation}: ${source.title}` : source.title;
+      const link = within(section).getByRole("link", {
+        name: new RegExp(`^${escape(label)} \\(opens`),
+      });
+      expect(link).toHaveAttribute("href", source.url);
+    }
+    expect(within(section).getByTestId("official-sources-currency")).toHaveTextContent(
+      "No cited regulation section has been amended",
+    );
+    expect(section).toHaveTextContent("Last checked November 8, 2026");
   });
 });

@@ -423,6 +423,10 @@ test("footer-driven workstation exits correction, fits panels, and preserves imm
   await expectSingleStageAction(page, /Running pre-check/);
   await expect(page.getByTestId("prepare-workspace")).toBeVisible();
 
+  await expect(
+    page.getByTestId("prepare-workspace").locator('[data-guidance-context="step:submit"]'),
+  ).toBeVisible();
+
   // The journey ends at internal-review submission (the mocked session is a
   // seller). The JSON copy remains an explicitly optional download.
   await expectSingleStageAction(page, "Submit for internal review");
@@ -448,6 +452,37 @@ test("footer-driven workstation exits correction, fits panels, and preserves imm
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
   );
   expect(overflow).toBeLessThanOrEqual(1);
+});
+
+test("shows source-grounded help beside the current step and at the final step", async ({
+  page,
+}) => {
+  await page.goto("/review");
+  await page.getByLabel(/upload front label/i).setInputFiles(PORTRAIT_FIXTURE);
+  await page.getByRole("button", { name: /no back label/i }).click();
+  await page.getByRole("button", { name: /no additional panels/i }).click();
+
+  const help = page.getByTestId("step-guidance");
+  await expect(help).toHaveAttribute("data-guidance-context", "category:brandName");
+  await help.locator("summary").click();
+  await expect(help.getByTestId("guidance-quote")).toContainText(
+    "A brand name is the name under which a wine or line of wines is marketed.",
+  );
+  await expect(
+    help.getByRole("link", { name: /Wine Labeling: Brand Name/ }).first(),
+  ).toHaveAttribute(
+    "href",
+    "https://www.ttb.gov/regulated-commodities/beverage-alcohol/wine/labeling-wine/wine-labeling-brand-name",
+  );
+  await expect(help).toContainText("What Label Lens does not check");
+  await expect(help.locator("button, input, select, textarea")).toHaveCount(0);
+
+  // The help follows the task the seller is on.
+  await page
+    .getByLabel("Category progress")
+    .getByRole("button", { name: /alcohol statement/i })
+    .click();
+  await expect(help).toHaveAttribute("data-guidance-context", "category:alcoholStatement");
 });
 
 test("IndexedDB rejection leaves category save visibly failed and unadvanced", async ({ page }) => {
