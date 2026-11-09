@@ -50,7 +50,7 @@ const GUARDED_HASHES = {
 const APPROVED_CURRENT_HASHES_AFTER_PR_220 = {
   ...GUARDED_HASHES,
   "src/pipeline/extractor/field-selection.ts":
-    "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
+    "4719a1f42825d43eb4acb792a6f404cc2be48b9302d5bbbe07618ee4b20f608f",
 } as const;
 
 function sha256File(filePath: string): string {

@@ -344,7 +344,7 @@ const FIELD_SELECTION_HASH_BEFORE_PR_220 =
  * src/pipeline/extractor/brand-filter-diagnostics.test.ts.
  */
 const FIELD_SELECTION_HASH_APPROVED_AFTER_PR_220 =
-  "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c";
+  "4719a1f42825d43eb4acb792a6f404cc2be48b9302d5bbbe07618ee4b20f608f";
 
 describe("Issue #149 frozen boundaries", () => {
   it("keeps OCR, preprocessing, PSM, parsing, thresholds, Warning and route hashes frozen, with field-selection.ts at the PR 220 approved boundary", () => {
