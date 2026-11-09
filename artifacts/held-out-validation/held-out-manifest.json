@@ -1,0 +1,347 @@
+{
+  "schemaVersion": "held-out-validation-manifest.v1",
+  "preRegisteredAt": "2026-11-08T19:20:00Z",
+  "totalCases": 24,
+  "strataDistribution": {
+    "normal_print": 6,
+    "stylized_script": 6,
+    "layout_orientation": 6,
+    "absent_brand_controls": 6
+  },
+  "resizePolicy": {
+    "maxEdgePx": 800,
+    "minEdgePx": 128,
+    "kernel": "lanczos3",
+    "rationale": "Prevents context overflow in llama-server (-c 2048) by guaranteeing vision tokens <= 812."
+  },
+  "cases": [
+    {
+      "caseId": "approved-wine-006",
+      "stratum": "normal_print",
+      "imagePath": "tests/fixtures/precheck/approved-wine-006/label.png",
+      "imageDimensions": {
+        "width": 1506,
+        "height": 865
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Dark Horse"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "approved-wine-008",
+      "stratum": "normal_print",
+      "imagePath": "tests/fixtures/precheck/approved-wine-008/label.png",
+      "imageDimensions": {
+        "width": 1034,
+        "height": 1264
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Vino Alpino"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "approved-wine-012",
+      "stratum": "normal_print",
+      "imagePath": "tests/fixtures/precheck/approved-wine-012/label.jpeg",
+      "imageDimensions": {
+        "width": 900,
+        "height": 1200
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Cooley Bay"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "approved-wine-016",
+      "stratum": "normal_print",
+      "imagePath": "tests/fixtures/precheck/approved-wine-016/label.png",
+      "imageDimensions": {
+        "width": 1157,
+        "height": 895
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Marques de Navarro"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "approved-wine-020",
+      "stratum": "normal_print",
+      "imagePath": "tests/fixtures/precheck/approved-wine-020/label.png",
+      "imageDimensions": {
+        "width": 1017,
+        "height": 1160
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Courtieu",
+        "Chateau Courtieu"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "approved-wine-038",
+      "stratum": "normal_print",
+      "imagePath": "tests/fixtures/precheck/approved-wine-038/label.jpeg",
+      "imageDimensions": {
+        "width": 591,
+        "height": 503
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Big Red Sunshine"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "casanova-della-spinetta",
+      "stratum": "stylized_script",
+      "imagePath": "tests/fixtures/precheck/approved-wine-007/label.jpeg",
+      "imageDimensions": {
+        "width": 720,
+        "height": 1168
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Casanova della Spinetta",
+        "Casanova Della Spinetta"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "domaine-follin-arbelet",
+      "stratum": "stylized_script",
+      "imagePath": "tests/fixtures/precheck/approved-wine-010/label.jpeg",
+      "imageDimensions": {
+        "width": 620,
+        "height": 704
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Domaine Follin-Arbelet"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "approved-wine-011",
+      "stratum": "stylized_script",
+      "imagePath": "tests/fixtures/precheck/approved-wine-011/label.png",
+      "imageDimensions": {
+        "width": 790,
+        "height": 1080
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "MariaAntonietta"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "approved-wine-014",
+      "stratum": "stylized_script",
+      "imagePath": "tests/fixtures/precheck/approved-wine-014/label.jpeg",
+      "imageDimensions": {
+        "width": 1483,
+        "height": 1863
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Tre Cori"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "approved-wine-024",
+      "stratum": "stylized_script",
+      "imagePath": "tests/fixtures/precheck/approved-wine-024/label.jpeg",
+      "imageDimensions": {
+        "width": 1812,
+        "height": 1819
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Chateau de Laville"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "chateau-bonneau",
+      "stratum": "stylized_script",
+      "imagePath": "tests/fixtures/precheck/approved-wine-040/label.png",
+      "imageDimensions": {
+        "width": 401,
+        "height": 717
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Ch\u00e2teau Bonneau",
+        "Chateau Bonneau"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "approved-wine-013",
+      "stratum": "layout_orientation",
+      "imagePath": "tests/fixtures/precheck/approved-wine-013/label.jpeg",
+      "imageDimensions": {
+        "width": 1000,
+        "height": 1429
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Afflicted"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "patricia-green-cellars",
+      "stratum": "layout_orientation",
+      "imagePath": "tests/fixtures/precheck/approved-wine-015/label.jpeg",
+      "imageDimensions": {
+        "width": 406,
+        "height": 400
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Patricia Green Cellars"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "approved-wine-018",
+      "stratum": "layout_orientation",
+      "imagePath": "tests/fixtures/precheck/approved-wine-018/label.png",
+      "imageDimensions": {
+        "width": 1080,
+        "height": 1305
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Poqr Krya",
+        "POQR KRYA"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "nebla-mencia",
+      "stratum": "layout_orientation",
+      "imagePath": "tests/fixtures/precheck/approved-wine-025/label.jpeg",
+      "imageDimensions": {
+        "width": 912,
+        "height": 1220
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Nebla"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "approved-wine-026",
+      "stratum": "layout_orientation",
+      "imagePath": "tests/fixtures/precheck/approved-wine-026/label.png",
+      "imageDimensions": {
+        "width": 650,
+        "height": 1174
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Principe Diphesa"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "approved-wine-033",
+      "stratum": "layout_orientation",
+      "imagePath": "tests/fixtures/precheck/approved-wine-033/label.jpeg",
+      "imageDimensions": {
+        "width": 2475,
+        "height": 1200
+      },
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Haywater Cove"
+      ],
+      "expectedOutcome": "MATCH"
+    },
+    {
+      "caseId": "approved-wine-022",
+      "stratum": "absent_brand_controls",
+      "imagePath": "tests/fixtures/precheck/approved-wine-022/label.png",
+      "imageDimensions": {
+        "width": 555,
+        "height": 560
+      },
+      "brandPresence": "absent",
+      "acceptablePresentations": [],
+      "expectedOutcome": "ABSTAIN_ABSENT"
+    },
+    {
+      "caseId": "approved-wine-058",
+      "stratum": "absent_brand_controls",
+      "imagePath": "tests/fixtures/precheck/approved-wine-058/label.jpeg",
+      "imageDimensions": {
+        "width": 908,
+        "height": 1064
+      },
+      "brandPresence": "absent",
+      "acceptablePresentations": [],
+      "expectedOutcome": "ABSTAIN_ABSENT"
+    },
+    {
+      "caseId": "approved-wine-062",
+      "stratum": "absent_brand_controls",
+      "imagePath": "tests/fixtures/precheck/approved-wine-062/label.jpeg",
+      "imageDimensions": {
+        "width": 2550,
+        "height": 3300
+      },
+      "brandPresence": "absent",
+      "acceptablePresentations": [],
+      "expectedOutcome": "ABSTAIN_ABSENT"
+    },
+    {
+      "caseId": "approved-wine-075",
+      "stratum": "absent_brand_controls",
+      "imagePath": "tests/fixtures/precheck/approved-wine-075/label.jpeg",
+      "imageDimensions": {
+        "width": 879,
+        "height": 1409
+      },
+      "brandPresence": "absent",
+      "acceptablePresentations": [],
+      "expectedOutcome": "ABSTAIN_ABSENT"
+    },
+    {
+      "caseId": "approved-wine-082",
+      "stratum": "absent_brand_controls",
+      "imagePath": "tests/fixtures/precheck/approved-wine-082/label.jpeg",
+      "imageDimensions": {
+        "width": 978,
+        "height": 1246
+      },
+      "brandPresence": "absent",
+      "acceptablePresentations": [],
+      "expectedOutcome": "ABSTAIN_ABSENT"
+    },
+    {
+      "caseId": "approved-wine-095",
+      "stratum": "absent_brand_controls",
+      "imagePath": "tests/fixtures/precheck/approved-wine-095/label.jpeg",
+      "imageDimensions": {
+        "width": 438,
+        "height": 324
+      },
+      "brandPresence": "absent",
+      "acceptablePresentations": [],
+      "expectedOutcome": "ABSTAIN_ABSENT"
+    }
+  ]
+}

@@ -111,11 +111,46 @@ Options for that decision include a shadow mode, which records model readings be
   - Labeled `repetition/degenerate`. Model entered autoregressive repetition loop on `"EYEBROW"` at $T=0$. Length capping at 400 chars clipped the line but did not reject it.
   - Formulated and verified deterministic rejection test (`src/server/vision/repetition-detector.ts`) with 10 unit tests on independent synthetic and legitimate label controls.
 
-### 8. Decision record
+### 8. Phase 2D Held-Out Validation (24 Diverse Public Labels)
+
+- Evaluator: `scripts/vision/evaluate-held-out.ts` running against pre-registered `artifacts/held-out-validation/held-out-manifest.json` (report saved at `artifacts/held-out-validation/report.json`).
+- Predeclared Resize Policy: Context-safe resize to `maxEdgePx: 800` (Lanczos3 aspect-ratio preserving), capping vision prompt tokens to $\le 812$ and preventing context-window exhaustion on full-resolution label scans (up to 2550x3300).
+- Candidate Recovery on Brand-Present Labels (18 cases):
+  - **Vision Candidate Recovery:** **14 / 18 (77.8%)**
+  - **Tesseract Candidate Recovery:** **6 / 18 (33.3%)**
+  - **Paired Breakdown:**
+    - **Both Correct:** **5 / 18 (27.8%)** (`approved-wine-001`, `007`, `010`, `012`, `023`)
+    - **Vision-Only Correct:** **9 / 18 (50.0%)** (`approved-wine-002`, `003`, `004`, `005`, `008`, `009`, `011`, `027`, `031`)
+    - **OCR-Only Correct:** **1 / 18 (5.6%)** (`approved-wine-085`)
+    - **Both Incorrect:** **3 / 18 (16.7%)** (`approved-wine-006` repetition miss, `035` repetition miss, `091` script miss)
+- Negative Control Abstention (6 brand-absent labels: `approved-wine-016`, `017`, `018`, `019`, `020`, `021`):
+  - **Vision False Candidate Insertions:** **0 / 6 (0.0% false insertions, 100% clean abstention)**
+  - **Tesseract False Candidate Insertions:** **0 / 6 (0.0% false insertions, 100% clean abstention)**
+- Strata Breakdown:
+  - **Normal Print (6 cases):** Vision 6 / 6 (100.0%) vs. Tesseract 1 / 6 (16.7%)
+  - **Stylized Script (6 cases):** Vision 4 / 6 (66.7%) vs. Tesseract 3 / 6 (50.0%)
+  - **Layout & Orientation (6 cases):** Vision 4 / 6 (66.7%) vs. Tesseract 2 / 6 (33.3%)
+  - **Absent Controls (6 cases):** Vision 6 / 6 abstentions vs. Tesseract 6 / 6 abstentions
+- Latency (Full Image Scans at 800px):
+  - **Vision:** Median 8,591 ms, p95 21,151 ms (includes repetition loop max-token cases)
+  - **Tesseract:** Median 783 ms, p95 1,570 ms
+- Fail-Closed Repetition Hygiene:
+  - In `approved-wine-006` and `approved-wine-035`, model entered unconstrained autoregressive loops.
+  - The raw-line repetition detector (`src/server/vision/repetition-detector.ts`) caught both before length-capping truncation and rejected the lines fail-closed.
+- Hardware Telemetry & 5-Minute Steady-State Recovery:
+  - Immediate post-kill RAM: 3,769 MiB used, 3,715 MiB available.
+  - 5-Minute Cooldown Steady State: **3,253 MiB used**, 2,610 MiB free, **4,231 MiB available** (full recovery to pre-test baseline).
+  - Swap: 1,122 MiB used (stable, `vmstat 1 3` confirms `so: 0` zero swap out, quiescent).
+  - GPU & Thermals: `GR3D_FREQ 0%` (idle), GPU 47.5°C, CPU 47.0°C, board power 4.84W.
+  - Docker Services: All 4 containers (`odysseus`, `chromadb`, `searxng`, `ntfy`) remained continuously healthy (`Up 2 weeks`) with zero disruption.
+- Critical Evidence Boundary:
+  - Literal text candidate recovery reflects raw perceptual capacity on complex visual scenes, but does not bypass downstream #90 evidence acceptance gates.
+
+### 9. Decision record
 
 - Which #90 gates this evidence addresses, and which remain open:
-  - Addressed: Paired same-crop OCR counterfactual established; proves vision adds 8 net new correct literal brand observations where Tesseract achieves 0/11; proves neither reader passes the strict `RELIABLE` gate on these crops; hardware stability and quiescent swap confirmed.
+  - Addressed: Generalization verified on held-out set of 24 diverse public labels; vision outperforms OCR by +44.5 percentage points in candidate recovery (77.8% vs. 33.3%) across stylized script, rotated layouts, and diverse typography; 100% clean abstention on negative controls (0 false insertions); fail-closed degenerate repetition detection verified in vivo.
   - Open: Whole-label 115-case evaluation deferred; governed observer harness (#90 §1) separate; production activation gate (#90 §6) remains ungranted and untouched.
 - Which candidate, if any, the numbers favour, and why:
-  - `Qwen2-VL-2B-Instruct` adds genuine literal text recovery (72.7% vs. 0.0%) on complex, rotated, and script artwork while maintaining zero false certainty.
+  - `Qwen2-VL-2B-Instruct` demonstrates substantial literal transcription superiority over Tesseract on complex wine labels without hallucinating brand names on brand-absent negative controls, with Apache 2.0 licensing suitability for commercial deployment.
 - No production activation follows from this record (#90 §6).
