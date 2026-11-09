@@ -94,9 +94,7 @@
       "caseId": "approved-wine-006",
       "stratum": "normal_print",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Dark Horse"
-      ],
+      "acceptablePresentations": ["Dark Horse"],
       "conditionA_baseline": {
         "candidateConstructed": false,
         "topThreeRanked": false,
@@ -105,9 +103,7 @@
         "selectedMatches": false,
         "confidence": 0.21,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -119,9 +115,7 @@
         "selectedMatches": false,
         "confidence": 0.21,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -133,9 +127,7 @@
         "selectedMatches": false,
         "confidence": 0.21,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -147,9 +139,7 @@
         "selectedMatches": false,
         "confidence": 0.21,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -161,9 +151,7 @@
       "caseId": "approved-wine-008",
       "stratum": "normal_print",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Vino Alpino"
-      ],
+      "acceptablePresentations": ["Vino Alpino"],
       "conditionA_baseline": {
         "candidateConstructed": false,
         "topThreeRanked": false,
@@ -172,9 +160,7 @@
         "selectedMatches": false,
         "confidence": 0.9575,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -186,9 +172,7 @@
         "selectedMatches": false,
         "confidence": 0.9575,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -200,9 +184,7 @@
         "selectedMatches": false,
         "confidence": 0.9575,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -214,9 +196,7 @@
         "selectedMatches": false,
         "confidence": 0.9575,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -228,9 +208,7 @@
       "caseId": "approved-wine-012",
       "stratum": "normal_print",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Cooley Bay"
-      ],
+      "acceptablePresentations": ["Cooley Bay"],
       "conditionA_baseline": {
         "candidateConstructed": false,
         "topThreeRanked": false,
@@ -239,9 +217,7 @@
         "selectedMatches": false,
         "confidence": 0.47,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -253,9 +229,7 @@
         "selectedMatches": false,
         "confidence": 0.47,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -267,9 +241,7 @@
         "selectedMatches": false,
         "confidence": 0.47,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -281,9 +253,7 @@
         "selectedMatches": false,
         "confidence": 0.47,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -295,9 +265,7 @@
       "caseId": "approved-wine-016",
       "stratum": "normal_print",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Marques de Navarro"
-      ],
+      "acceptablePresentations": ["Marques de Navarro"],
       "conditionA_baseline": {
         "candidateConstructed": false,
         "topThreeRanked": false,
@@ -306,9 +274,7 @@
         "selectedMatches": false,
         "confidence": 0.7200000000000001,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -320,9 +286,7 @@
         "selectedMatches": false,
         "confidence": 0.7200000000000001,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -334,9 +298,7 @@
         "selectedMatches": false,
         "confidence": 0.7200000000000001,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -348,9 +310,7 @@
         "selectedMatches": false,
         "confidence": 0.7200000000000001,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -362,10 +322,7 @@
       "caseId": "approved-wine-020",
       "stratum": "normal_print",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Courtieu",
-        "Chateau Courtieu"
-      ],
+      "acceptablePresentations": ["Courtieu", "Chateau Courtieu"],
       "conditionA_baseline": {
         "candidateConstructed": true,
         "topThreeRanked": true,
@@ -374,9 +331,7 @@
         "selectedMatches": true,
         "confidence": 0.87,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -388,9 +343,7 @@
         "selectedMatches": true,
         "confidence": 0.87,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -402,9 +355,7 @@
         "selectedMatches": true,
         "confidence": 0.87,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -416,9 +367,7 @@
         "selectedMatches": true,
         "confidence": 0.87,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -430,9 +379,7 @@
       "caseId": "approved-wine-038",
       "stratum": "normal_print",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Big Red Sunshine"
-      ],
+      "acceptablePresentations": ["Big Red Sunshine"],
       "conditionA_baseline": {
         "candidateConstructed": false,
         "topThreeRanked": false,
@@ -441,9 +388,7 @@
         "selectedMatches": false,
         "confidence": 0.9325,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -455,9 +400,7 @@
         "selectedMatches": false,
         "confidence": 0.9325,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -469,9 +412,7 @@
         "selectedMatches": false,
         "confidence": 0.9325,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -483,9 +424,7 @@
         "selectedMatches": false,
         "confidence": 0.9325,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -497,10 +436,7 @@
       "caseId": "casanova-della-spinetta",
       "stratum": "stylized_script",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Casanova della Spinetta",
-        "Casanova Della Spinetta"
-      ],
+      "acceptablePresentations": ["Casanova della Spinetta", "Casanova Della Spinetta"],
       "conditionA_baseline": {
         "candidateConstructed": true,
         "topThreeRanked": true,
@@ -509,9 +445,7 @@
         "selectedMatches": true,
         "confidence": 0.8700000000000001,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -523,9 +457,7 @@
         "selectedMatches": true,
         "confidence": 0.8700000000000001,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -537,9 +469,7 @@
         "selectedMatches": true,
         "confidence": 0.8700000000000001,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -551,9 +481,7 @@
         "selectedMatches": true,
         "confidence": 0.8700000000000001,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -565,9 +493,7 @@
       "caseId": "domaine-follin-arbelet",
       "stratum": "stylized_script",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Domaine Follin-Arbelet"
-      ],
+      "acceptablePresentations": ["Domaine Follin-Arbelet"],
       "conditionA_baseline": {
         "candidateConstructed": true,
         "topThreeRanked": true,
@@ -576,9 +502,7 @@
         "selectedMatches": true,
         "confidence": 0.92,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -590,9 +514,7 @@
         "selectedMatches": true,
         "confidence": 0.92,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -604,9 +526,7 @@
         "selectedMatches": true,
         "confidence": 0.92,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -618,9 +538,7 @@
         "selectedMatches": true,
         "confidence": 0.92,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -632,9 +550,7 @@
       "caseId": "approved-wine-011",
       "stratum": "stylized_script",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "MariaAntonietta"
-      ],
+      "acceptablePresentations": ["MariaAntonietta"],
       "conditionA_baseline": {
         "candidateConstructed": false,
         "topThreeRanked": false,
@@ -643,9 +559,7 @@
         "selectedMatches": false,
         "confidence": 0.9475,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -657,9 +571,7 @@
         "selectedMatches": false,
         "confidence": 0.9475,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -671,9 +583,7 @@
         "selectedMatches": false,
         "confidence": 0.9475,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -685,9 +595,7 @@
         "selectedMatches": false,
         "confidence": 0.9475,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -699,9 +607,7 @@
       "caseId": "approved-wine-014",
       "stratum": "stylized_script",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Tre Cori"
-      ],
+      "acceptablePresentations": ["Tre Cori"],
       "conditionA_baseline": {
         "candidateConstructed": true,
         "topThreeRanked": true,
@@ -710,9 +616,7 @@
         "selectedMatches": true,
         "confidence": 0.96,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -724,9 +628,7 @@
         "selectedMatches": true,
         "confidence": 0.96,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -738,9 +640,7 @@
         "selectedMatches": true,
         "confidence": 0.96,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -752,9 +652,7 @@
         "selectedMatches": true,
         "confidence": 0.96,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -766,9 +664,7 @@
       "caseId": "approved-wine-024",
       "stratum": "stylized_script",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Chateau de Laville"
-      ],
+      "acceptablePresentations": ["Chateau de Laville"],
       "conditionA_baseline": {
         "candidateConstructed": false,
         "topThreeRanked": false,
@@ -777,9 +673,7 @@
         "selectedMatches": false,
         "confidence": 0.9525,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -791,9 +685,7 @@
         "selectedMatches": false,
         "confidence": 0.9525,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -805,9 +697,7 @@
         "selectedMatches": false,
         "confidence": 0.9525,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -819,9 +709,7 @@
         "selectedMatches": false,
         "confidence": 0.9525,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -833,10 +721,7 @@
       "caseId": "chateau-bonneau",
       "stratum": "stylized_script",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Château Bonneau",
-        "Chateau Bonneau"
-      ],
+      "acceptablePresentations": ["Château Bonneau", "Chateau Bonneau"],
       "conditionA_baseline": {
         "candidateConstructed": false,
         "topThreeRanked": false,
@@ -845,9 +730,7 @@
         "selectedMatches": false,
         "confidence": 0.92,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -859,9 +742,7 @@
         "selectedMatches": true,
         "confidence": 0.94,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-1-focus-crop-oracle"
-        ],
+        "supportingPassIds": ["pass-1-focus-crop-oracle"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": true
       },
@@ -873,9 +754,7 @@
         "selectedMatches": true,
         "confidence": 0.94,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -887,9 +766,7 @@
         "selectedMatches": true,
         "confidence": 0.94,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -901,9 +778,7 @@
       "caseId": "approved-wine-013",
       "stratum": "layout_orientation",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Afflicted"
-      ],
+      "acceptablePresentations": ["Afflicted"],
       "conditionA_baseline": {
         "candidateConstructed": true,
         "topThreeRanked": true,
@@ -912,9 +787,7 @@
         "selectedMatches": false,
         "confidence": 0.73,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -926,9 +799,7 @@
         "selectedMatches": false,
         "confidence": 0.73,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -940,9 +811,7 @@
         "selectedMatches": false,
         "confidence": 0.73,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -954,9 +823,7 @@
         "selectedMatches": false,
         "confidence": 0.73,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -968,9 +835,7 @@
       "caseId": "patricia-green-cellars",
       "stratum": "layout_orientation",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Patricia Green Cellars"
-      ],
+      "acceptablePresentations": ["Patricia Green Cellars"],
       "conditionA_baseline": {
         "candidateConstructed": false,
         "topThreeRanked": false,
@@ -979,9 +844,7 @@
         "selectedMatches": false,
         "confidence": 0.96,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -993,9 +856,7 @@
         "selectedMatches": false,
         "confidence": 0.96,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1007,9 +868,7 @@
         "selectedMatches": false,
         "confidence": 0.96,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1021,9 +880,7 @@
         "selectedMatches": false,
         "confidence": 0.96,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1035,10 +892,7 @@
       "caseId": "approved-wine-018",
       "stratum": "layout_orientation",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Poqr Krya",
-        "POQR KRYA"
-      ],
+      "acceptablePresentations": ["Poqr Krya", "POQR KRYA"],
       "conditionA_baseline": {
         "candidateConstructed": false,
         "topThreeRanked": false,
@@ -1047,9 +901,7 @@
         "selectedMatches": false,
         "confidence": 0.96,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1061,9 +913,7 @@
         "selectedMatches": false,
         "confidence": 0.96,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1075,9 +925,7 @@
         "selectedMatches": false,
         "confidence": 0.96,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1089,9 +937,7 @@
         "selectedMatches": false,
         "confidence": 0.96,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1103,9 +949,7 @@
       "caseId": "nebla-mencia",
       "stratum": "layout_orientation",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Nebla"
-      ],
+      "acceptablePresentations": ["Nebla"],
       "conditionA_baseline": {
         "candidateConstructed": true,
         "topThreeRanked": true,
@@ -1114,9 +958,7 @@
         "selectedMatches": true,
         "confidence": 0.91,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1128,9 +970,7 @@
         "selectedMatches": true,
         "confidence": 0.91,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1142,9 +982,7 @@
         "selectedMatches": true,
         "confidence": 0.91,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1156,9 +994,7 @@
         "selectedMatches": true,
         "confidence": 0.91,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1170,9 +1006,7 @@
       "caseId": "approved-wine-026",
       "stratum": "layout_orientation",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Principe Diphesa"
-      ],
+      "acceptablePresentations": ["Principe Diphesa"],
       "conditionA_baseline": {
         "candidateConstructed": true,
         "topThreeRanked": true,
@@ -1181,9 +1015,7 @@
         "selectedMatches": true,
         "confidence": 0.8200000000000001,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1195,9 +1027,7 @@
         "selectedMatches": true,
         "confidence": 0.8200000000000001,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1209,9 +1039,7 @@
         "selectedMatches": true,
         "confidence": 0.8200000000000001,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1223,9 +1051,7 @@
         "selectedMatches": true,
         "confidence": 0.8200000000000001,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1237,9 +1063,7 @@
       "caseId": "approved-wine-033",
       "stratum": "layout_orientation",
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Haywater Cove"
-      ],
+      "acceptablePresentations": ["Haywater Cove"],
       "conditionA_baseline": {
         "candidateConstructed": true,
         "topThreeRanked": false,
@@ -1248,9 +1072,7 @@
         "selectedMatches": false,
         "confidence": 0.62,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1262,9 +1084,7 @@
         "selectedMatches": false,
         "confidence": 0.62,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1276,9 +1096,7 @@
         "selectedMatches": false,
         "confidence": 0.62,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },
@@ -1290,9 +1108,7 @@
         "selectedMatches": false,
         "confidence": 0.62,
         "state": "AMBIGUOUS",
-        "supportingPassIds": [
-          "pass-0-full-image"
-        ],
+        "supportingPassIds": ["pass-0-full-image"],
         "independentEvidenceCount": 1,
         "recoveryPassUsed": false
       },

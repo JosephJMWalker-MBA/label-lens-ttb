@@ -21,17 +21,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Alfredo's Wine",
-        "Alfredo's"
-      ],
+      "acceptablePresentations": ["Alfredo's Wine", "Alfredo's"],
       "forbiddenPresentations": [],
-      "visualStrata": [
-        "multi-line-brand",
-        "brand-punctuation",
-        "alcohol-at-bottom",
-        "front-label"
-      ],
+      "visualStrata": ["multi-line-brand", "brand-punctuation", "alcohol-at-bottom", "front-label"],
       "notes": "Brand set on two lines ('ALFREDO'S' / 'WINE') with an apostrophe."
     },
     {
@@ -45,19 +37,9 @@
       "brandPresence": "present",
       "controlType": "near_miss_rivalry_control",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Vino Alpino"
-      ],
-      "forbiddenPresentations": [
-        "Terre Sparse",
-        "Vino Rosso",
-        "Red Wine"
-      ],
-      "visualStrata": [
-        "multiple-brand-like-phrases",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Vino Alpino"],
+      "forbiddenPresentations": ["Terre Sparse", "Vino Rosso", "Red Wine"],
+      "visualStrata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
       "notes": "Vino Alpino panel matching approved-wine-008, but with the alcohol shown as a comma-decimal 13,5% by volume."
     },
     {
@@ -71,18 +53,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "La Borde Noire"
-      ],
-      "forbiddenPresentations": [
-        "Grenache Noir",
-        "Syrah"
-      ],
-      "visualStrata": [
-        "simple-centered-brand",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["La Borde Noire"],
+      "forbiddenPresentations": ["Grenache Noir", "Syrah"],
+      "visualStrata": ["simple-centered-brand", "front-label", "alcohol-at-bottom"],
       "notes": "La Borde Noire back-facing export label with the wine name carried at top and a direct 12% by volume footer line."
     },
     {
@@ -96,15 +69,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Kyrios"
-      ],
+      "acceptablePresentations": ["Kyrios"],
       "forbiddenPresentations": [],
-      "visualStrata": [
-        "simple-centered-brand",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "visualStrata": ["simple-centered-brand", "front-label", "alcohol-at-bottom"],
       "notes": "Kyrios Malbec label with a clean title block and a direct alcohol statement on the lower edge."
     },
     {
@@ -118,15 +85,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Saker"
-      ],
+      "acceptablePresentations": ["Saker"],
       "forbiddenPresentations": [],
-      "visualStrata": [
-        "simple-centered-brand",
-        "low-contrast",
-        "front-label"
-      ],
+      "visualStrata": ["simple-centered-brand", "low-contrast", "front-label"],
       "notes": "Cream 'SAKER' centered on a near-black background (low contrast); alcohol at bottom-left."
     },
     {
@@ -140,18 +101,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Field",
-        "Field Vineyards"
-      ],
-      "forbiddenPresentations": [
-        "Red Wine Blend"
-      ],
-      "visualStrata": [
-        "simple-centered-brand",
-        "front-label",
-        "alcohol-at-side-or-rotated"
-      ],
+      "acceptablePresentations": ["Field", "Field Vineyards"],
+      "forbiddenPresentations": ["Red Wine Blend"],
+      "visualStrata": ["simple-centered-brand", "front-label", "alcohol-at-side-or-rotated"],
       "notes": "Field Vineyards descriptive panel with the brand carried at top and a vertical 13.3% by volume statement printed in the right edge strip."
     },
     {
@@ -165,17 +117,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Travers Reserve"
-      ],
-      "forbiddenPresentations": [
-        "Saint-Emilion"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Travers Reserve"],
+      "forbiddenPresentations": ["Saint-Emilion"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Travers Reserve Saint-Emilion panel with the brand line at top and a standard 14% by volume footer line."
     },
     {
@@ -189,18 +133,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Nico"
-      ],
-      "forbiddenPresentations": [
-        "Malbec",
-        "Rosas Plant Selection"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Nico"],
+      "forbiddenPresentations": ["Malbec", "Rosas Plant Selection"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Nico back panel with the single-word house name at top and a small 13.5% by vol footer line below the description."
     },
     {
@@ -214,17 +149,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Touch"
-      ],
-      "forbiddenPresentations": [
-        "Shiraz"
-      ],
-      "visualStrata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Touch"],
+      "forbiddenPresentations": ["Shiraz"],
+      "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "notes": "Touch Shiraz back panel with the stylized house name near the top and a determinate 13.0% by volume statement above the net-volume line."
     },
     {
@@ -238,17 +165,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Petite Nature"
-      ],
-      "forbiddenPresentations": [
-        "Sorcieres",
-        "Red Wine"
-      ],
-      "visualStrata": [
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Petite Nature"],
+      "forbiddenPresentations": ["Sorcieres", "Red Wine"],
+      "visualStrata": ["back-label", "alcohol-at-bottom"],
       "notes": "Minimal Petite Nature label with the product name at top-left and a clean 13.0% alc/vol statement in the left text block."
     },
     {
@@ -262,18 +181,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Domaine Quivy"
-      ],
-      "forbiddenPresentations": [
-        "Chapelle Chambertin Grand Cru",
-        "MISA"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Domaine Quivy"],
+      "forbiddenPresentations": ["Chapelle Chambertin Grand Cru", "MISA"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Domaine Quivy export panel for Chapelle Chambertin Grand Cru with a comma-decimal 13,5% by volume footer line."
     },
     {
@@ -287,18 +197,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Fulcrum"
-      ],
-      "forbiddenPresentations": [
-        "Pinot Noir"
-      ],
-      "visualStrata": [
-        "simple-centered-brand",
-        "front-label",
-        "low-contrast",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Fulcrum"],
+      "forbiddenPresentations": ["Pinot Noir"],
+      "visualStrata": ["simple-centered-brand", "front-label", "low-contrast", "alcohol-at-bottom"],
       "notes": "Fulcrum Pinot Noir panel with a low-contrast cream-on-charcoal treatment and a small 13.8% by volume footer line."
     },
     {
@@ -312,17 +213,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Sweet Seduction"
-      ],
-      "forbiddenPresentations": [
-        "Cabernet-Sauvignon"
-      ],
-      "visualStrata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Sweet Seduction"],
+      "forbiddenPresentations": ["Cabernet-Sauvignon"],
+      "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "notes": "Sweet Seduction back label with the house name large at top and a clear 13.5% by volume line near the footer."
     },
     {
@@ -336,18 +229,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Meeting of the Minds"
-      ],
-      "forbiddenPresentations": [
-        "Folktale Winery",
-        "Red Wine Blend"
-      ],
-      "visualStrata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Meeting of the Minds"],
+      "forbiddenPresentations": ["Folktale Winery", "Red Wine Blend"],
+      "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "notes": "Meeting of the Minds narrative label with the title line above the descriptive copy and a 13.7% alc/vol footer line."
     },
     {
@@ -361,18 +245,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Curious"
-      ],
-      "forbiddenPresentations": [
-        "Macchia",
-        "Red Wine Blend"
-      ],
-      "visualStrata": [
-        "back-label",
-        "dense-text",
-        "missing-alcohol-statement"
-      ],
+      "acceptablePresentations": ["Curious"],
+      "forbiddenPresentations": ["Macchia", "Red Wine Blend"],
+      "visualStrata": ["back-label", "dense-text", "missing-alcohol-statement"],
       "notes": "Curious back label with the quoted cuvee title carried at the top and no alcohol statement visible on the panel."
     },
     {
@@ -386,18 +261,9 @@
       "brandPresence": "present",
       "controlType": "near_miss_rivalry_control",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Etiris GX"
-      ],
-      "forbiddenPresentations": [
-        "Art Laieta",
-        "Garnatxa Negra"
-      ],
-      "visualStrata": [
-        "multiple-brand-like-phrases",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Etiris GX"],
+      "forbiddenPresentations": ["Art Laieta", "Garnatxa Negra"],
+      "visualStrata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
       "notes": "Etiris GX front panel with Art Laieta shown as the producer mark and a determinate 14% by volume statement in the right column."
     },
     {
@@ -411,18 +277,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Pacha"
-      ],
-      "forbiddenPresentations": [
-        "Carmenere",
-        "Andes Wine Imports"
-      ],
-      "visualStrata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Pacha"],
+      "forbiddenPresentations": ["Carmenere", "Andes Wine Imports"],
+      "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "notes": "Pacha Carmenere narrative label with the brand large at top and a comma-decimal 14,0% alcohol statement above the barcode."
     },
     {
@@ -436,18 +293,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Caywood Vineyard"
-      ],
-      "forbiddenPresentations": [
-        "Damiani Wine Cellars",
-        "Cabernet Sauvignon"
-      ],
-      "visualStrata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Caywood Vineyard"],
+      "forbiddenPresentations": ["Damiani Wine Cellars", "Cabernet Sauvignon"],
+      "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "notes": "Caywood Vineyard sustainability panel with the vineyard name highlighted and a 13.2% by volume line at the bottom edge."
     },
     {
@@ -461,16 +309,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Le Temps des Fleurs",
-        "Le Temps Des Fleurs"
-      ],
+      "acceptablePresentations": ["Le Temps des Fleurs", "Le Temps Des Fleurs"],
       "forbiddenPresentations": [],
-      "visualStrata": [
-        "simple-centered-brand",
-        "alcohol-at-bottom",
-        "front-label"
-      ],
+      "visualStrata": ["simple-centered-brand", "alcohol-at-bottom", "front-label"],
       "notes": "High-contrast serif brand at top; blend percentages nearby create a false-positive risk for alcohol."
     },
     {
@@ -484,18 +325,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Pacheca"
-      ],
-      "forbiddenPresentations": [
-        "Reserva Vinhas Velhas",
-        "Douro"
-      ],
-      "visualStrata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Pacheca"],
+      "forbiddenPresentations": ["Reserva Vinhas Velhas", "Douro"],
+      "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "notes": "Pacheca Reserva Vinhas Velhas back label with the house name at top-left and a large 13.5% vol statement centered near the bottom."
     },
     {
@@ -509,17 +341,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Mountain Valley Winery"
-      ],
-      "forbiddenPresentations": [
-        "Old Vine Zinfandel"
-      ],
-      "visualStrata": [
-        "back-label",
-        "dense-text",
-        "missing-alcohol-statement"
-      ],
+      "acceptablePresentations": ["Mountain Valley Winery"],
+      "forbiddenPresentations": ["Old Vine Zinfandel"],
+      "visualStrata": ["back-label", "dense-text", "missing-alcohol-statement"],
       "notes": "Mountain Valley Winery panel with the winery name prominent and no alcohol statement visible on the committed image."
     },
     {
@@ -533,18 +357,9 @@
       "brandPresence": "present",
       "controlType": "near_miss_rivalry_control",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Golden Road Vineyards"
-      ],
-      "forbiddenPresentations": [
-        "Uisce Beatha",
-        "Traminette"
-      ],
-      "visualStrata": [
-        "multiple-brand-like-phrases",
-        "front-label",
-        "alcohol-at-side-or-rotated"
-      ],
+      "acceptablePresentations": ["Golden Road Vineyards"],
+      "forbiddenPresentations": ["Uisce Beatha", "Traminette"],
+      "visualStrata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-side-or-rotated"],
       "notes": "Golden Road Vineyards Uisce Beatha panel with the 11.5% alc/vol statement printed vertically in the right-side strip."
     },
     {
@@ -558,17 +373,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Henri Dufreres"
-      ],
-      "forbiddenPresentations": [
-        "Coteaux Bourguignons"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-side-or-rotated"
-      ],
+      "acceptablePresentations": ["Henri Dufreres"],
+      "forbiddenPresentations": ["Coteaux Bourguignons"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-side-or-rotated"],
       "notes": "Henri Dufreres export panel with the 12.5% alcohol statement printed vertically in the central rule block."
     },
     {
@@ -582,18 +389,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Francois Villard"
-      ],
-      "forbiddenPresentations": [
-        "Gran Reflet",
-        "Saint Joseph"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Francois Villard"],
+      "forbiddenPresentations": ["Gran Reflet", "Saint Joseph"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Francois Villard export panel with the producer name above the cuvee line and a clean 13% by vol footer statement."
     },
     {
@@ -607,18 +405,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Prinsi"
-      ],
-      "forbiddenPresentations": [
-        "Camp d'Pietru"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom",
-        "low-contrast"
-      ],
+      "acceptablePresentations": ["Prinsi"],
+      "forbiddenPresentations": ["Camp d'Pietru"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom", "low-contrast"],
       "notes": "Washed-out Prinsi Camp d'Pietru label with the house name still legible and a determinate 13.5% by volume line."
     },
     {
@@ -632,17 +421,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Prinsi"
-      ],
-      "forbiddenPresentations": [
-        "Camp d'Pietru"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Prinsi"],
+      "forbiddenPresentations": ["Camp d'Pietru"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Prinsi Camp d'Pietru label with a clearer scan than approved-wine-056 and a determinate 13% by volume line."
     },
     {
@@ -656,18 +437,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Domenico Negro",
-        "Dominico Negro"
-      ],
-      "forbiddenPresentations": [
-        "Roero Arneis"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Domenico Negro", "Dominico Negro"],
+      "forbiddenPresentations": ["Roero Arneis"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Roero Arneis label with a small Domenico Negro banner crest and a determinate 13.5% by vol footer line."
     },
     {
@@ -681,15 +453,9 @@
       "brandPresence": "present",
       "controlType": "near_miss_rivalry_control",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "3 Steves Winery"
-      ],
+      "acceptablePresentations": ["3 Steves Winery"],
       "forbiddenPresentations": [],
-      "visualStrata": [
-        "missing-alcohol-statement",
-        "multiple-brand-like-phrases",
-        "front-label"
-      ],
+      "visualStrata": ["missing-alcohol-statement", "multiple-brand-like-phrases", "front-label"],
       "notes": "Prose back label with net contents and 'CONTAINS SULFITES' but no alcohol statement anywhere; NOT_OBSERVED is the correct, honest outcome."
     },
     {
@@ -703,17 +469,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Aphrodite"
-      ],
-      "forbiddenPresentations": [
-        "Gewurztraminer"
-      ],
-      "visualStrata": [
-        "back-label",
-        "low-resolution",
-        "missing-alcohol-statement"
-      ],
+      "acceptablePresentations": ["Aphrodite"],
+      "forbiddenPresentations": ["Gewurztraminer"],
+      "visualStrata": ["back-label", "low-resolution", "missing-alcohol-statement"],
       "notes": "Tiny Aphrodite dessert-wine panel centered in a large scan area; the brand is legible but no alcohol statement is visible."
     },
     {
@@ -727,18 +485,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Prinsi"
-      ],
-      "forbiddenPresentations": [
-        "Tre Fichi",
-        "Chardonnay"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Prinsi"],
+      "forbiddenPresentations": ["Tre Fichi", "Chardonnay"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Prinsi Tre Fichi back label with the house name at top and a determinate 13% by volume footer line."
     },
     {
@@ -752,18 +501,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Prinsi"
-      ],
-      "forbiddenPresentations": [
-        "Il Nespolo",
-        "Arneis"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Prinsi"],
+      "forbiddenPresentations": ["Il Nespolo", "Arneis"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Prinsi Il Nespolo back label with a determinate 13.5% by volume footer line."
     },
     {
@@ -777,18 +517,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Prinsi"
-      ],
-      "forbiddenPresentations": [
-        "Campi d'Pietru",
-        "Sauvignon"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Prinsi"],
+      "forbiddenPresentations": ["Campi d'Pietru", "Sauvignon"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Prinsi Campi d'Pietru Sauvignon label with the house name at top and a determinate 13% by volume footer line."
     },
     {
@@ -802,17 +533,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Domaine Juliette Avril"
-      ],
-      "forbiddenPresentations": [
-        "Chateauneuf-du-Pape"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Domaine Juliette Avril"],
+      "forbiddenPresentations": ["Chateauneuf-du-Pape"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Domaine Juliette Avril Chateauneuf-du-Pape export panel with a direct 13% by vol statement near the top center."
     },
     {
@@ -826,18 +549,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Domaine Juliette Avril"
-      ],
-      "forbiddenPresentations": [
-        "Mediterranee",
-        "Viognier"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Domaine Juliette Avril"],
+      "forbiddenPresentations": ["Mediterranee", "Viognier"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Domaine Juliette Avril Mediterranee white-wine panel with a direct 13% by vol statement near the top center."
     },
     {
@@ -851,19 +565,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Sara"
-      ],
-      "forbiddenPresentations": [
-        "Arneis",
-        "Carlo Giacosa",
-        "Giacosa Maria Grazia"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Sara"],
+      "forbiddenPresentations": ["Arneis", "Carlo Giacosa", "Giacosa Maria Grazia"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Langhe Arneis label with SARA as the consumer-facing title and the producer names confined to the bottler statement."
     },
     {
@@ -877,20 +581,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "AltaCima 4.090",
-        "AltaCima"
-      ],
-      "forbiddenPresentations": [
-        "Chardonnay",
-        "Reserva"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "low-contrast",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["AltaCima 4.090", "AltaCima"],
+      "forbiddenPresentations": ["Chardonnay", "Reserva"],
+      "visualStrata": ["multi-line-brand", "back-label", "low-contrast", "alcohol-at-bottom"],
       "notes": "AltaCima 4.090 Chardonnay Reserva panel in low-contrast gray-on-charcoal styling with a 13.5% alcohol footer."
     },
     {
@@ -904,17 +597,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "AltaCima 4.090",
-        "AltaCima"
-      ],
+      "acceptablePresentations": ["AltaCima 4.090", "AltaCima"],
       "forbiddenPresentations": [],
-      "visualStrata": [
-        "brand-punctuation",
-        "low-contrast",
-        "alcohol-at-bottom",
-        "front-label"
-      ],
+      "visualStrata": ["brand-punctuation", "low-contrast", "alcohol-at-bottom", "front-label"],
       "notes": "Brand 'AltaCima 4.090' (letters + digits + period) in white on grey (low contrast)."
     },
     {
@@ -928,20 +613,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "AltaCima 6.330",
-        "AltaCima"
-      ],
-      "forbiddenPresentations": [
-        "Late Harvest",
-        "Gewurztraminer"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "low-contrast",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["AltaCima 6.330", "AltaCima"],
+      "forbiddenPresentations": ["Late Harvest", "Gewurztraminer"],
+      "visualStrata": ["multi-line-brand", "back-label", "low-contrast", "alcohol-at-bottom"],
       "notes": "AltaCima 6.330 Late Harvest Gewurztraminer panel with a determinate 13.5% alcohol footer."
     },
     {
@@ -955,13 +629,8 @@
       "brandPresence": "present",
       "controlType": "negative_control_ambiguous",
       "genuinelyAmbiguous": true,
-      "acceptablePresentations": [
-        "Ava Gardner"
-      ],
-      "forbiddenPresentations": [
-        "Hinnant Family Vineyards",
-        "Blanc du Bois"
-      ],
+      "acceptablePresentations": ["Ava Gardner"],
+      "forbiddenPresentations": ["Hinnant Family Vineyards", "Blanc du Bois"],
       "visualStrata": [
         "back-label",
         "dense-text",
@@ -981,18 +650,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Mike's Farm, Inc.",
-        "Mike's Farm"
-      ],
-      "forbiddenPresentations": [
-        "Hinnant Family Vineyard"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "missing-alcohol-statement"
-      ],
+      "acceptablePresentations": ["Mike's Farm, Inc.", "Mike's Farm"],
+      "forbiddenPresentations": ["Hinnant Family Vineyard"],
+      "visualStrata": ["multi-line-brand", "back-label", "missing-alcohol-statement"],
       "notes": "Mike's Farm, Inc. contact-style panel with the business name prominent and no alcohol statement visible on the artwork."
     },
     {
@@ -1006,18 +666,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Mike's Farm, Inc.",
-        "Mike's Farm"
-      ],
-      "forbiddenPresentations": [
-        "Hinnant Vineyards"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "missing-alcohol-statement"
-      ],
+      "acceptablePresentations": ["Mike's Farm, Inc.", "Mike's Farm"],
+      "forbiddenPresentations": ["Hinnant Vineyards"],
+      "visualStrata": ["multi-line-brand", "back-label", "missing-alcohol-statement"],
       "notes": "Second Mike's Farm, Inc. contact-style panel in orange with no alcohol statement visible on the committed image."
     },
     {
@@ -1031,17 +682,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Etim"
-      ],
-      "forbiddenPresentations": [
-        "Blanc"
-      ],
-      "visualStrata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Etim"],
+      "forbiddenPresentations": ["Blanc"],
+      "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "notes": "Etim Blanc back label with the house name at top and a comma-decimal 13,5% alc/vol statement near the footer."
     },
     {
@@ -1055,17 +698,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Valdinera"
-      ],
-      "forbiddenPresentations": [
-        "Roero Arneis"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Valdinera"],
+      "forbiddenPresentations": ["Roero Arneis"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Valdinera Roero Arneis back label with a direct 13.5% by vol statement in the opening text block."
     },
     {
@@ -1079,18 +714,9 @@
       "brandPresence": "present",
       "controlType": "near_miss_rivalry_control",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Pietta"
-      ],
-      "forbiddenPresentations": [
-        "Chardonnay",
-        "Garda"
-      ],
-      "visualStrata": [
-        "multiple-brand-like-phrases",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Pietta"],
+      "forbiddenPresentations": ["Chardonnay", "Garda"],
+      "visualStrata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
       "notes": "Pietta Chardonnay / Garda front-back composite panel with a direct 14% by volume line in the right information column."
     },
     {
@@ -1104,18 +730,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Le Caniette"
-      ],
-      "forbiddenPresentations": [
-        "Offida",
-        "Pecorino"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Le Caniette"],
+      "forbiddenPresentations": ["Offida", "Pecorino"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Le Caniette Offida Pecorino export label with the producer name repeated and a comma-decimal 13,5% by volume statement."
     },
     {
@@ -1129,9 +746,7 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Le Caniette"
-      ],
+      "acceptablePresentations": ["Le Caniette"],
       "forbiddenPresentations": [],
       "visualStrata": [
         "multi-line-brand",
@@ -1152,17 +767,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Corte Adagio"
-      ],
-      "forbiddenPresentations": [
-        "Chardonnay"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Corte Adagio"],
+      "forbiddenPresentations": ["Chardonnay"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Corte Adagio text-only back label with a direct 12% by vol line above the net-contents statement."
     },
     {
@@ -1176,19 +783,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Barn Sill Wine Co.",
-        "Barn Sill Wine Co"
-      ],
-      "forbiddenPresentations": [
-        "Christmas Hayride",
-        "North Carolina Muscadine Wine"
-      ],
-      "visualStrata": [
-        "decorative-or-script-brand",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Barn Sill Wine Co.", "Barn Sill Wine Co"],
+      "forbiddenPresentations": ["Christmas Hayride", "North Carolina Muscadine Wine"],
+      "visualStrata": ["decorative-or-script-brand", "front-label", "alcohol-at-bottom"],
       "notes": "Barn Sill Wine Co. Christmas Hayride label with the winery name at top and a determinate 12% alc/vol line near the lower center."
     },
     {
@@ -1202,18 +799,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Filadoro"
-      ],
-      "forbiddenPresentations": [
-        "Fiano di Avellino",
-        "White Wine Vintage 2017"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Filadoro"],
+      "forbiddenPresentations": ["Fiano di Avellino", "White Wine Vintage 2017"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Filadoro Fiano di Avellino panel with the winery name prominent in the producer line and a determinate 13.5% by volume statement."
     },
     {
@@ -1227,17 +815,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "3 Steves Winery"
-      ],
-      "forbiddenPresentations": [
-        "Curious"
-      ],
-      "visualStrata": [
-        "back-label",
-        "dense-text",
-        "missing-alcohol-statement"
-      ],
+      "acceptablePresentations": ["3 Steves Winery"],
+      "forbiddenPresentations": ["Curious"],
+      "visualStrata": ["back-label", "dense-text", "missing-alcohol-statement"],
       "notes": "3 Steves Winery narrative panel for the Curious blend with no alcohol statement visible on the committed image."
     },
     {
@@ -1251,18 +831,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Viridis"
-      ],
-      "forbiddenPresentations": [
-        "Langhe Sauvignon",
-        "Marina Burlotto"
-      ],
-      "visualStrata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Viridis"],
+      "forbiddenPresentations": ["Langhe Sauvignon", "Marina Burlotto"],
+      "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "notes": "Viridis Langhe Sauvignon panel with the cuvee name at top and a determinate 13.5% by volume footer line."
     },
     {
@@ -1276,18 +847,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "La Mesma"
-      ],
-      "forbiddenPresentations": [
-        "Yellow Label",
-        "Gavi"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["La Mesma"],
+      "forbiddenPresentations": ["Yellow Label", "Gavi"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "La Mesma Yellow Label Gavi panel with the house name at top and a comma-decimal 12,5% alcohol statement."
     },
     {
@@ -1301,18 +863,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "La Mesma"
-      ],
-      "forbiddenPresentations": [
-        "Black Label",
-        "Gavi"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["La Mesma"],
+      "forbiddenPresentations": ["Black Label", "Gavi"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "La Mesma Black Label Gavi panel with the house name at top and a direct 13% by vol statement."
     },
     {
@@ -1326,18 +879,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "La Mesma"
-      ],
-      "forbiddenPresentations": [
-        "Indi",
-        "Gavi"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["La Mesma"],
+      "forbiddenPresentations": ["Indi", "Gavi"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "La Mesma Indi Gavi panel with the house name at top and a comma-decimal 12,5% alcohol statement."
     },
     {
@@ -1351,18 +895,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Twin Suns"
-      ],
-      "forbiddenPresentations": [
-        "Paso Robles",
-        "Santa Barbara"
-      ],
-      "visualStrata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Twin Suns"],
+      "forbiddenPresentations": ["Paso Robles", "Santa Barbara"],
+      "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "notes": "Twin Suns white blend narrative label with the house name at left and a determinate 13.6% by vol footer line."
     },
     {
@@ -1376,18 +911,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Fontanavecchia"
-      ],
-      "forbiddenPresentations": [
-        "Taburno",
-        "Falanghina del Sannio"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Fontanavecchia"],
+      "forbiddenPresentations": ["Taburno", "Falanghina del Sannio"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Fontanavecchia Taburno Falanghina panel with the house name at top and a comma-decimal 13,50% by vol statement."
     },
     {
@@ -1401,18 +927,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Fontanavecchia"
-      ],
-      "forbiddenPresentations": [
-        "Sannio",
-        "Fiano"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Fontanavecchia"],
+      "forbiddenPresentations": ["Sannio", "Fiano"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Fontanavecchia Sannio Fiano panel with the house name at top and a comma-decimal 13,50% by vol statement."
     },
     {
@@ -1427,15 +944,8 @@
       "controlType": "negative_control_absent",
       "genuinelyAmbiguous": false,
       "acceptablePresentations": [],
-      "forbiddenPresentations": [
-        "Delle Venezie",
-        "Pinot Grigio"
-      ],
-      "visualStrata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "forbiddenPresentations": ["Delle Venezie", "Pinot Grigio"],
+      "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "notes": "Generic Delle Venezie Pinot Grigio export label with a determinate 12% by volume line but no distinct brand mark."
     },
     {
@@ -1450,15 +960,8 @@
       "controlType": "negative_control_absent",
       "genuinelyAmbiguous": false,
       "acceptablePresentations": [],
-      "forbiddenPresentations": [
-        "Chardonnay Veneto",
-        "Chardonnay"
-      ],
-      "visualStrata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "forbiddenPresentations": ["Chardonnay Veneto", "Chardonnay"],
+      "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "notes": "Generic Chardonnay Veneto export label with a determinate 12% by volume line but no distinct brand mark."
     },
     {
@@ -1473,15 +976,8 @@
       "controlType": "negative_control_absent",
       "genuinelyAmbiguous": false,
       "acceptablePresentations": [],
-      "forbiddenPresentations": [
-        "Ribolla Gialla",
-        "Blazic"
-      ],
-      "visualStrata": [
-        "back-label",
-        "low-resolution",
-        "alcohol-at-bottom"
-      ],
+      "forbiddenPresentations": ["Ribolla Gialla", "Blazic"],
+      "visualStrata": ["back-label", "low-resolution", "alcohol-at-bottom"],
       "notes": "Low-resolution Ribolla Gialla export panel with a determinate 12.5% by volume line but no distinct brand presentation."
     },
     {
@@ -1495,18 +991,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Fontanavecchia"
-      ],
-      "forbiddenPresentations": [
-        "Sannio",
-        "Greco"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Fontanavecchia"],
+      "forbiddenPresentations": ["Sannio", "Greco"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Fontanavecchia Sannio Greco panel with the house name at top and a comma-decimal 13,50% by vol statement."
     },
     {
@@ -1520,10 +1007,7 @@
       "brandPresence": "present",
       "controlType": "negative_control_ambiguous",
       "genuinelyAmbiguous": true,
-      "acceptablePresentations": [
-        "Amuninni",
-        "Fabio Ferracane"
-      ],
+      "acceptablePresentations": ["Amuninni", "Fabio Ferracane"],
       "forbiddenPresentations": [],
       "visualStrata": [
         "decorative-or-script-brand",
@@ -1546,14 +1030,8 @@
       "controlType": "negative_control_absent",
       "genuinelyAmbiguous": false,
       "acceptablePresentations": [],
-      "forbiddenPresentations": [
-        "Sauvignon Blanc"
-      ],
-      "visualStrata": [
-        "back-label",
-        "dense-text",
-        "missing-alcohol-statement"
-      ],
+      "forbiddenPresentations": ["Sauvignon Blanc"],
+      "visualStrata": ["back-label", "dense-text", "missing-alcohol-statement"],
       "notes": "Generic Sauvignon Blanc descriptive back label with no named brand and no alcohol statement visible anywhere on the panel."
     },
     {
@@ -1567,18 +1045,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Twin Suns"
-      ],
-      "forbiddenPresentations": [
-        "Chardonnay",
-        "Viognier"
-      ],
-      "visualStrata": [
-        "back-label",
-        "dense-text",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Twin Suns"],
+      "forbiddenPresentations": ["Chardonnay", "Viognier"],
+      "visualStrata": ["back-label", "dense-text", "alcohol-at-bottom"],
       "notes": "Twin Suns blend narrative panel with the house name at left and a determinate 13.4% by vol footer line."
     },
     {
@@ -1592,18 +1061,9 @@
       "brandPresence": "present",
       "controlType": "near_miss_rivalry_control",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Tenute Valso"
-      ],
-      "forbiddenPresentations": [
-        "Aphor",
-        "Grillo"
-      ],
-      "visualStrata": [
-        "multiple-brand-like-phrases",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Tenute Valso"],
+      "forbiddenPresentations": ["Aphor", "Grillo"],
+      "visualStrata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
       "notes": "Tenute Valso / Aphor Grillo panel with the winery name at top, the cuvee line below it, and a determinate 13% by volume statement."
     },
     {
@@ -1617,18 +1077,9 @@
       "brandPresence": "present",
       "controlType": "near_miss_rivalry_control",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Blazic"
-      ],
-      "forbiddenPresentations": [
-        "Collio",
-        "Chardonnay"
-      ],
-      "visualStrata": [
-        "multiple-brand-like-phrases",
-        "front-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Blazic"],
+      "forbiddenPresentations": ["Collio", "Chardonnay"],
+      "visualStrata": ["multiple-brand-like-phrases", "front-label", "alcohol-at-bottom"],
       "notes": "Blazic Collio Chardonnay composite panel with the house name dominant and a 13% by vol statement on the right information block."
     },
     {
@@ -1642,13 +1093,8 @@
       "brandPresence": "present",
       "controlType": "near_miss_rivalry_control",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Luigi & Giovanni"
-      ],
-      "forbiddenPresentations": [
-        "Taste of Italy",
-        "Moscato"
-      ],
+      "acceptablePresentations": ["Luigi & Giovanni"],
+      "forbiddenPresentations": ["Taste of Italy", "Moscato"],
       "visualStrata": [
         "decorative-or-script-brand",
         "front-label",
@@ -1668,13 +1114,8 @@
       "brandPresence": "present",
       "controlType": "near_miss_rivalry_control",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Alfredo's Wine",
-        "Alfredos Wine"
-      ],
-      "forbiddenPresentations": [
-        "White Wine"
-      ],
+      "acceptablePresentations": ["Alfredo's Wine", "Alfredos Wine"],
+      "forbiddenPresentations": ["White Wine"],
       "visualStrata": [
         "simple-centered-brand",
         "front-label",
@@ -1694,9 +1135,7 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "La Fattoria"
-      ],
+      "acceptablePresentations": ["La Fattoria"],
       "forbiddenPresentations": [],
       "visualStrata": [
         "decorative-or-script-brand",
@@ -1718,9 +1157,7 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "La Fattoria"
-      ],
+      "acceptablePresentations": ["La Fattoria"],
       "forbiddenPresentations": [],
       "visualStrata": [
         "decorative-or-script-brand",
@@ -1742,17 +1179,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Sangouard-Chene"
-      ],
-      "forbiddenPresentations": [
-        "Chablis"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Sangouard-Chene"],
+      "forbiddenPresentations": ["Chablis"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Sangouard-Chene Chablis export panel with a comma-decimal 12,5% by vol statement at the bottom-left."
     },
     {
@@ -1766,17 +1195,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Cooley Bay"
-      ],
-      "forbiddenPresentations": [
-        "Roussanne"
-      ],
-      "visualStrata": [
-        "multi-line-brand",
-        "back-label",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Cooley Bay"],
+      "forbiddenPresentations": ["Roussanne"],
+      "visualStrata": ["multi-line-brand", "back-label", "alcohol-at-bottom"],
       "notes": "Cooley Bay Barrel Aged Roussanne panel with the house name at top and a determinate 12.8% by volume statement near the footer."
     },
     {
@@ -1790,9 +1211,7 @@
       "brandPresence": "present",
       "controlType": "negative_control_ambiguous",
       "genuinelyAmbiguous": true,
-      "acceptablePresentations": [
-        "M Cellars"
-      ],
+      "acceptablePresentations": ["M Cellars"],
       "forbiddenPresentations": [],
       "visualStrata": [
         "multiple-brand-like-phrases",
@@ -1813,17 +1232,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Blazic"
-      ],
-      "forbiddenPresentations": [
-        "Sauvignon",
-        "Collio"
-      ],
-      "visualStrata": [
-        "multi-panel",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Blazic"],
+      "forbiddenPresentations": ["Sauvignon", "Collio"],
+      "visualStrata": ["multi-panel", "alcohol-at-bottom"],
       "notes": "Blazic Collio Sauvignon composite with a separate back panel that preserves a determinate 13.5% alcohol statement."
     },
     {
@@ -1837,17 +1248,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Mauro Molino"
-      ],
-      "forbiddenPresentations": [
-        "Livrot",
-        "Chardonnay"
-      ],
-      "visualStrata": [
-        "multi-panel",
-        "alcohol-at-side-or-rotated"
-      ],
+      "acceptablePresentations": ["Mauro Molino"],
+      "forbiddenPresentations": ["Livrot", "Chardonnay"],
+      "visualStrata": ["multi-panel", "alcohol-at-side-or-rotated"],
       "notes": "Mauro Molino Livrot Langhe Chardonnay composite with the 13,5% alcohol printed vertically on the front label edge."
     },
     {
@@ -1861,15 +1264,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Mike's Farm",
-        "Mike's Farm, Inc."
-      ],
+      "acceptablePresentations": ["Mike's Farm", "Mike's Farm, Inc."],
       "forbiddenPresentations": [],
-      "visualStrata": [
-        "multi-panel",
-        "alcohol-at-bottom"
-      ],
+      "visualStrata": ["multi-panel", "alcohol-at-bottom"],
       "notes": "Mike's Farm Scuppernong White composite with a distinct front title panel and a 12% ALC./VOL. statement beneath the muscadine-grapes line."
     },
     {
@@ -1883,16 +1280,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Pindar"
-      ],
-      "forbiddenPresentations": [
-        "Gewurztraminer"
-      ],
-      "visualStrata": [
-        "multi-panel",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Pindar"],
+      "forbiddenPresentations": ["Gewurztraminer"],
+      "visualStrata": ["multi-panel", "alcohol-at-bottom"],
       "notes": "Pindar Gewurztraminer composite with the front technical panel carrying a determinate 12.6% by volume statement."
     },
     {
@@ -1906,16 +1296,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Duck Walk Vineyards"
-      ],
-      "forbiddenPresentations": [
-        "Chardonnay"
-      ],
-      "visualStrata": [
-        "multi-panel",
-        "alcohol-at-bottom"
-      ],
+      "acceptablePresentations": ["Duck Walk Vineyards"],
+      "forbiddenPresentations": ["Chardonnay"],
+      "visualStrata": ["multi-panel", "alcohol-at-bottom"],
       "notes": "Duck Walk Vineyards Chardonnay composite with the front label carrying a direct 12.5% by volume statement."
     },
     {
@@ -1929,16 +1312,9 @@
       "brandPresence": "present",
       "controlType": "target",
       "genuinelyAmbiguous": false,
-      "acceptablePresentations": [
-        "Mauro Molino"
-      ],
-      "forbiddenPresentations": [
-        "Roero Arneis"
-      ],
-      "visualStrata": [
-        "multi-panel",
-        "alcohol-at-side-or-rotated"
-      ],
+      "acceptablePresentations": ["Mauro Molino"],
+      "forbiddenPresentations": ["Roero Arneis"],
+      "visualStrata": ["multi-panel", "alcohol-at-side-or-rotated"],
       "notes": "Mauro Molino Roero Arneis composite with the 14% vol statement printed vertically on the front label edge."
     }
   ]
