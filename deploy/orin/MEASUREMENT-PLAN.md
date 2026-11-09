@@ -242,16 +242,56 @@ For the 18 brand-present cases, evidence survival across the selection stages un
   - **Case `chateau-bonneau` Recovered:** `"BONNEAU"` (false) $\rightarrow$ `"CHATEAU BONNEAU"` (score 4.67, matches truth!).
   - **Regressions:** **0 / 18 (0 regressions)**. Specifically protected: `domaine-follin-arbelet` (not merged with postal code `21420`), `nebla-mencia` (not merged with varietal `MENCIA`), and `approved-wine-026` (not merged with appellation `PAESTUM`).
   - **Negative Control Safety:** **0 / 6 false assertions (100% clean abstention preserved)**.
-  - **Safety Verdict:** `SAFE_EVALUATION_PASS`.
+  - **Safety Verdict:** `NO_REGRESSIONS_IN_THIS_24_CASE_DEVELOPMENT_SET` (scoped development-set check, not a production safety certificate).
 
 #### Predeclared Validation Protocol
 Before any candidate formation treatment can be considered for production promotion:
-1. **Full 48-label corpus regression test:** Must execute across all 24 Phase 2B labels and 24 held-out labels to guarantee zero baseline degradation.
+1. **Disjoint out-of-sample regression validation:** Must execute across an identity-deduplicated validation set drawn from the remaining unseen frozen 115-label corpus and real negative controls. (Correction: Phase 2B evaluated exactly 10 approved fixtures / 11 occurrences, not 24 unique labels; combining Phase 2B and held-out validation does not form a 48 unique label corpus due to artwork overlaps).
 2. **Strict negative-control invariant:** Zero false assertions allowed on non-brand labels.
 3. **Multi-pass consensus gate preservation:** Single-pass observations must remain `AMBIGUOUS`.
 4. **Independent PR review:** Treatment must be proposed in a separate PR from the evaluation harness.
 
-### 11. Decision record
+### 12. Phase 2G Authentic Same-Pass Candidate Formation Analysis
+
+- **Context & Constraints:** Conducted entirely offline without additional Jetson inference runs, new model weights, or production code activation. Stacked draft PR #232 remains draft and unmerged.
+- **Artifacts & Scripts:**
+  - `src/pipeline/extractor/stacked-headings.ts`: Standalone candidate formation module for vertically adjacent, horizontally aligned stacked headings with strict guards.
+  - `src/pipeline/extractor/stacked-headings.test.ts`: 19 vitest tests validating brand prefix recognition, generic wine exclusions, varietals, appellations, digits/postal codes, geometry thresholds, authority gate invariants, and frozen baseline immutability.
+  - `scripts/vision/evaluate-same-pass-treatment.ts`: 3-condition comparison script evaluating Condition A, Condition B, and Condition C across all 24 held-out cases.
+  - `artifacts/held-out-validation/same-pass-treatment-report.json`: Structured report recording condition metrics, invariants audit, and case-level traces.
+  - `src/server/vision/candidate-loss-reconciliation.test.ts`: Updated with 4th test suite asserting Phase 2G invariants.
+
+#### Three-Condition Comparison (24 Held-Out Cases)
+
+| Metric | Condition A: Frozen Baseline | Condition B: Synthetic Focus-Crop Upper Bound | Condition C: Authentic Same-Pass Treatment |
+|---|---|---|---|
+| **Pass Structure** | Single pass (`pass-0-full-image`) | Two passes (`pass-0-full-image` + synthetic `focus-crop`) | Single pass (`pass-0-full-image`) |
+| **Token Confidence** | Authentic OCR confidences | Fabricated 94% confidence | Authentic OCR confidences (mean 94% from tokens 96 & 92) |
+| **Brand-Present Cases** | 18 | 18 | 18 |
+| **Candidate Constructed** | 8 / 18 (44.4%) | 9 / 18 (50.0%) | **9 / 18 (50.0%)** |
+| **Top-3 Ranked** | 7 / 18 (38.9%) | 8 / 18 (44.4%) | **8 / 18 (44.4%)** |
+| **Selected Brand Match** | 6 / 18 (33.3%) | 7 / 18 (38.9%) | **7 / 18 (38.9%)** |
+| **Reliable Accepted (`OBSERVED`)** | 0 / 18 (0.0%) | 0 / 18 (0.0%) | **0 / 18 (0.0%)** |
+| **Negative Control Cases** | 6 | 6 | 6 |
+| **Negative False Candidate Insertions** | 0 / 6 (0.0%) | 0 / 6 (0.0%) | **0 / 6 (0.0%)** |
+| **Negative False Selected Insertions** | 0 / 6 (0.0%) | 0 / 6 (0.0%) | **0 / 6 (0.0%)** |
+| **Regressions on Prior-Correct Cases** | 0 | 0 | **0** |
+| **Safety Verdict** | N/A | UPPER_BOUND_FEASIBILITY | `NO_REGRESSIONS_IN_THIS_24_CASE_DEVELOPMENT_SET` |
+
+#### Invariants Audit & Findings
+1. **Single-Pass Provenance Integrity:** Condition C constructs `"CHATEAU BONNEAU"` within the single primary OCR pass (`passId: "pass-0-full-image"`, `passKind: "full-image-primary"`). `supportingPassIds` contains exclusively `["pass-0-full-image"]`, and `recoveryPassUsed` is `false`.
+2. **Authentic Token Confidence:** Token confidences are the true Tesseract outputs (CHATEAU: 96%, BONNEAU: 92%, resulting in mean evidence score 0.94). No arbitrary confidence scores were injected.
+3. **Consensus & Authority Gate Preservation:** Because the candidate is derived within a single pass, it cannot fabricate multi-pass consensus. With competing front-label candidates (`"MONTAGNE SAINT-EMILION"`, `"SCEA. VIEUX CHATEAU SAINT-ANDRE"`), the authority gate holds `"CHATEAU BONNEAU"` as **`AMBIGUOUS`**. It cannot silently elevate to `OBSERVED`.
+4. **Clean Negative Controls:** Across all 6 brand-absent controls, 0 brand candidates were constructed and 0 false selections occurred (100% clean abstention preserved).
+5. **Zero Regressions:** All 6 previously selected baseline cases (`approved-wine-001`, `007`, `009`, `010`, `025`, `026`) are preserved exactly. Near-miss guards successfully reject postal codes (`domaine-follin-arbelet`), grape varietals (`nebla-mencia`), and appellations (`approved-wine-026`).
+
+#### Corpus Sample Accounting Correction
+- **Phase 2B Fixture Inventory:** Phase 2B evaluated exactly **10 approved fixtures / 11 occurrences** (`approved-wine-001`, `006`, `007`, `008`, `009`, `010`, `012`, `025`, `035`, `040`), not 24 unique labels.
+- **Held-Out Validation Inventory:** The held-out validation set contains **24 cases** (18 brand-present, 6 brand-absent).
+- **Combined Corpus Clarification:** Combining Phase 2B (10 fixtures / 11 occurrences) and held-out validation (24 cases) does **NOT** form a 48 unique label corpus due to artwork overlaps.
+- **Out-of-Sample Requirement:** Any future claim of generalizability must draw a disjoint, identity-deduplicated validation set from the remaining unseen frozen 115-label corpus.
+
+### 13. Decision record
 
 - Which #90 gates this evidence addresses, and which remain open:
   - Addressed: Symmetric raw-evidence presence established (Tesseract 83.3% vs. Vision 77.8% line-check / 72.2% multiline-check); Tesseract candidate extraction drop-off documented (15 raw -> 6 selected -> 0 reliable); negative controls correctly reported (Tesseract 0/6 false insertions evaluated, Vision NOT_EVALUATED); multiline degenerate repetition detection implemented and verified; hardware stability and quiescent swap confirmed.

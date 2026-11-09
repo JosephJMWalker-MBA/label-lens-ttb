@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import type { EvidenceReconciliationReport } from "../../../scripts/vision/reconcile-evidence";
 import type { AdditiveCounterfactualReport } from "../../../scripts/vision/simulate-additive-counterfactual";
 import type { CandidateFormationTreatmentReport } from "../../../scripts/vision/evaluate-candidate-formation-treatment";
+import type { SamePassTreatmentReport } from "../../../scripts/vision/evaluate-same-pass-treatment";
 
 describe("Candidate Loss Reconciliation and Treatment Invariants (Phase 2F)", () => {
   it("enforces evidence scope reconciliation invariants across Scope A and Scope B", async () => {
@@ -150,5 +151,69 @@ describe("Candidate Loss Reconciliation and Treatment Invariants (Phase 2F)", ()
     expect(
       report.predeclaredValidationProtocol.prerequisitesForProduction.length,
     ).toBeGreaterThanOrEqual(4);
+  });
+
+  it("enforces Phase 2G authentic same-pass treatment report invariants and 3-condition comparison", async () => {
+    const raw = await readFile(
+      "artifacts/held-out-validation/same-pass-treatment-report.json",
+      "utf8",
+    );
+    const report: SamePassTreatmentReport = JSON.parse(raw);
+
+    // Version and scoped safety verdict
+    expect(report.version).toBe("phase-2g-authentic-same-pass-v1");
+    expect(report.scopeNotice.safetyVerdict).toBe("NO_REGRESSIONS_IN_THIS_24_CASE_DEVELOPMENT_SET");
+
+    // Condition A (Frozen baseline)
+    const condA = report.conditionSummaries.conditionA_baseline;
+    expect(condA.candidateConstructedCount).toBe(8);
+    expect(condA.topThreeRankedCount).toBe(7);
+    expect(condA.selectedCorrectCount).toBe(6);
+    expect(condA.reliableAcceptedCount).toBe(0);
+    expect(condA.negativeControlSelectedInsertions).toBe(0);
+
+    // Condition B (Synthetic focus-crop upper bound)
+    const condB = report.conditionSummaries.conditionB_syntheticPass;
+    expect(condB.candidateConstructedCount).toBe(9);
+    expect(condB.topThreeRankedCount).toBe(8);
+    expect(condB.selectedCorrectCount).toBe(7);
+    expect(condB.reliableAcceptedCount).toBe(0);
+    expect(condB.negativeControlSelectedInsertions).toBe(0);
+
+    // Condition C (Authentic same-pass treatment)
+    const condC = report.conditionSummaries.conditionC_samePass;
+    expect(condC.candidateConstructedCount).toBe(9);
+    expect(condC.topThreeRankedCount).toBe(8);
+    expect(condC.selectedCorrectCount).toBe(7);
+    expect(condC.reliableAcceptedCount).toBe(0);
+    expect(condC.negativeControlSelectedInsertions).toBe(0);
+    expect(condC.regressionsCount).toBe(0);
+
+    // Invariants audit
+    expect(report.invariantsAudit.singlePassIntegrity).toBe(true);
+    expect(report.invariantsAudit.authenticConfidencePreserved).toBe(true);
+    expect(report.invariantsAudit.consensusFabricationPrevented).toBe(true);
+    expect(report.invariantsAudit.authorityGatePreserved).toBe(true);
+    expect(report.invariantsAudit.zeroFalseInsertionsOnNegativeControls).toBe(true);
+    expect(report.invariantsAudit.zeroRegressionsOnPriorCorrectCases).toBe(true);
+
+    // Specific case checks: chateau-bonneau in Condition C
+    const chateauCase = report.cases.find((c) => c.caseId === "chateau-bonneau");
+    expect(chateauCase).toBeDefined();
+    expect(chateauCase?.conditionA_baseline.selectedMatches).toBe(false);
+    expect(chateauCase?.conditionC_samePass.selectedMatches).toBe(true);
+    expect(chateauCase?.conditionC_samePass.selected).toBe("CHATEAU BONNEAU");
+    expect(chateauCase?.conditionC_samePass.state).toBe("AMBIGUOUS");
+    expect(chateauCase?.conditionC_samePass.supportingPassIds).toEqual(["pass-0-full-image"]);
+    expect(chateauCase?.conditionC_samePass.recoveryPassUsed).toBe(false);
+    expect(chateauCase?.isRegressionInC).toBe(false);
+
+    // Sample accounting correction assertions
+    expect(report.sampleAccountingCorrection.phase2BCountClarification).toContain(
+      "10 approved fixtures / 11 occurrences",
+    );
+    expect(report.sampleAccountingCorrection.combinedCorpusClarification).toContain(
+      "does NOT constitute a 48 unique label corpus",
+    );
   });
 });
