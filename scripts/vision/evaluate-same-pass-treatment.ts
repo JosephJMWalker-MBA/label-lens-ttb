@@ -32,9 +32,10 @@ import { createLocalOcrEngine } from "../../src/pipeline/extractor/ocr-engine";
 import { planPrimaryOcrPass, runOcrPass } from "../../src/pipeline/extractor/regions";
 import type { OcrWord, RegionOcrResult } from "../../src/pipeline/extractor/extractor.types";
 import {
+  selectBrandObservationWithCoherentLineMergeTreatment,
   selectBrandObservationWithCompleteFilterDiagnostics,
-  selectBrandObservationWithNarrowStackedHeadingTreatmentDiagnostics,
 } from "../../src/pipeline/extractor/field-selection";
+import { isNarrowStackedHeadingPair } from "../../src/pipeline/extractor/stacked-headings";
 import { brandValueMatches } from "../../src/fixtures/eval/vision-reader-eval";
 import type { HeldOutCase, HeldOutManifest } from "./diagnose-candidate-loss";
 
@@ -111,6 +112,67 @@ export interface SamePassTreatmentReport {
 function candidateMatchesTruth(value: string | null | undefined, acceptable: string[]): boolean {
   if (!value) return false;
   return brandValueMatches(value, acceptable);
+}
+
+function groupWordsToLines(words: readonly OcrWord[]): OcrWord[][] {
+  const ordered = [...words].sort((a, b) => {
+    const ay = (a.bbox.y0 + a.bbox.y1) / 2;
+    const by = (b.bbox.y0 + b.bbox.y1) / 2;
+    if (Math.abs(ay - by) <= 20) return a.bbox.x0 - b.bbox.x0;
+    return ay - by;
+  });
+  const out: OcrWord[][] = [];
+  for (const w of ordered) {
+    const wy = (w.bbox.y0 + w.bbox.y1) / 2;
+    const line = out.find((l) => {
+      const ly = (l[0].bbox.y0 + l[0].bbox.y1) / 2;
+      return Math.abs(ly - wy) <= 20;
+    });
+    if (line) line.push(w);
+    else out.push([w]);
+  }
+  return out.map((l) => [...l].sort((a, b) => a.bbox.x0 - b.bbox.x0));
+}
+
+export function detectNarrowStackedHeadingInOcr(ocrResult: RegionOcrResult): boolean {
+  const grouped = groupWordsToLines(ocrResult.words);
+  for (let i = 0; i < grouped.length - 1; i++) {
+    const uLine = grouped[i];
+    const lLine = grouped[i + 1];
+    if (uLine.length !== 1 || lLine.length !== 1) continue;
+    const uGeom = uLine[0].originalGeometry ?? {
+      imageIndex: 0,
+      x: uLine[0].bbox.x0,
+      y: uLine[0].bbox.y0,
+      width: uLine[0].bbox.x1 - uLine[0].bbox.x0,
+      height: uLine[0].bbox.y1 - uLine[0].bbox.y0,
+      imageWidth: 0,
+      imageHeight: 0,
+    };
+    const lGeom = lLine[0].originalGeometry ?? {
+      imageIndex: 0,
+      x: lLine[0].bbox.x0,
+      y: lLine[0].bbox.y0,
+      width: lLine[0].bbox.x1 - lLine[0].bbox.x0,
+      height: lLine[0].bbox.y1 - lLine[0].bbox.y0,
+      imageWidth: 0,
+      imageHeight: 0,
+    };
+    const uCand = {
+      words: uLine,
+      value: uLine[0].text,
+      geometry: uGeom,
+    };
+    const lCand = {
+      words: lLine,
+      value: lLine[0].text,
+      geometry: lGeom,
+    };
+    if (isNarrowStackedHeadingPair(uCand, lCand)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 export async function runSamePassTreatmentEvaluation(): Promise<SamePassTreatmentReport> {
@@ -265,9 +327,10 @@ export async function runSamePassTreatmentEvaluation(): Promise<SamePassTreatmen
       };
 
       // --- CONDITION C: Authentic Same-Pass Candidate Formation ---
-      const samePassSel = selectBrandObservationWithNarrowStackedHeadingTreatmentDiagnostics([
-        ocrResult,
-      ]);
+      const hasNarrowStacked = detectNarrowStackedHeadingInOcr(ocrResult);
+      const samePassSel = hasNarrowStacked
+        ? selectBrandObservationWithCoherentLineMergeTreatment([ocrResult])
+        : baseSel;
       const samePassObs = samePassSel.observation;
       const samePassCandidates =
         samePassSel.brandDiagnostics?.candidates.filter((c) => c.kept) ?? [];

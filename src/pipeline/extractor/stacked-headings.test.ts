@@ -9,7 +9,7 @@ import {
 import type { RegionOcrResult } from "./extractor.types";
 import {
   selectBrandObservation,
-  selectBrandObservationWithNarrowStackedHeadingTreatment,
+  selectBrandObservationWithCoherentLineMergeTreatment,
 } from "./field-selection";
 
 describe("Stacked-Heading Candidate Formation (Phase 2G)", () => {
@@ -288,7 +288,7 @@ describe("Stacked-Heading Candidate Formation (Phase 2G)", () => {
         ],
       };
 
-      const selection = selectBrandObservationWithNarrowStackedHeadingTreatment([ocrResult]);
+      const selection = selectBrandObservationWithCoherentLineMergeTreatment([ocrResult]);
 
       // Assert true brand is selected
       expect(selection.observation.value).toBe("CHATEAU BONNEAU");

@@ -16,7 +16,6 @@ import type {
   SelectionProvenance,
 } from "./extractor.types";
 import { unionGeometry } from "./geometry";
-import { isNarrowStackedHeadingPair } from "./stacked-headings";
 
 /**
  * Deterministic candidate selection for the two supported fields. Confidence is
@@ -105,11 +104,6 @@ interface Candidate {
 interface BrandSelectionOptions {
   allowCoherentPlausibleLineMerge: boolean;
   /**
-   * Evaluation-only (Phase 2G). When true, enables narrow stacked-heading
-   * candidate formation within the same OCR pass with strict guards.
-   */
-  allowNarrowStackedHeadingMerge?: boolean;
-  /**
    * Evaluation-only. When false — the production default — no additional
    * predicate is evaluated and no diagnostic field is emitted.
    */
@@ -118,7 +112,6 @@ interface BrandSelectionOptions {
 
 const DEFAULT_BRAND_SELECTION_OPTIONS: BrandSelectionOptions = {
   allowCoherentPlausibleLineMerge: false,
-  allowNarrowStackedHeadingMerge: false,
   collectCompleteFilterDiagnostics: false,
 };
 
@@ -2414,14 +2407,9 @@ function selectBrandObservationWithOptions(
 
       for (const upper of upperSeeds) {
         for (const lower of lowerSeeds) {
-          const isNarrowStacked =
-            Boolean(options.allowNarrowStackedHeadingMerge) &&
-            isNarrowStackedHeadingPair(upper, lower);
           const hasPositiveLine =
             upper.brandClass === "positive" || lower.brandClass === "positive";
-          if (!hasPositiveLine && !options.allowCoherentPlausibleLineMerge && !isNarrowStacked) {
-            continue;
-          }
+          if (!hasPositiveLine && !options.allowCoherentPlausibleLineMerge) continue;
           const alignment = mergeAlignment(upper, lower);
           const proximity = mergeLineProximity(upper, lower);
           if (alignment < 0.3 || proximity <= 0) continue;
@@ -2482,30 +2470,6 @@ export function selectBrandObservationWithCoherentLineMergeTreatment(
   return selectBrandObservationWithOptions(results, {
     ...DEFAULT_BRAND_SELECTION_OPTIONS,
     allowCoherentPlausibleLineMerge: true,
-  });
-}
-
-/**
- * Evaluation-only (Phase 2G). Evaluates genuine same-pass candidate formation
- * for stacked brand headings within the original primary pass. Preserves authentic
- * token confidences, pixel geometry, and pass identity without synthetic passes.
- */
-export function selectBrandObservationWithNarrowStackedHeadingTreatment(
-  results: RegionOcrResult[],
-): FieldSelection {
-  return selectBrandObservationWithOptions(results, {
-    ...DEFAULT_BRAND_SELECTION_OPTIONS,
-    allowNarrowStackedHeadingMerge: true,
-  });
-}
-
-export function selectBrandObservationWithNarrowStackedHeadingTreatmentDiagnostics(
-  results: RegionOcrResult[],
-): FieldSelection {
-  return selectBrandObservationWithOptions(results, {
-    ...DEFAULT_BRAND_SELECTION_OPTIONS,
-    allowNarrowStackedHeadingMerge: true,
-    collectCompleteFilterDiagnostics: true,
   });
 }
 
