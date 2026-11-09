@@ -521,8 +521,8 @@ describe("Stacked-Heading Candidate Formation (Phase 2G)", () => {
       const pass1: RegionOcrResult = {
         passId: "pass-1-contrast",
         regionName: "contrast-region",
-        passKind: "contrast-crop",
-        triggerReasons: ["low-contrast-brand"],
+        passKind: "focus-crop",
+        triggerReasons: ["focus-crop-distinct"],
         preprocessing: ["local-contrast"],
         fieldEligibility: { brand: true, alcohol: false },
         transform: {
