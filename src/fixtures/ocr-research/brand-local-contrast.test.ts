@@ -504,9 +504,9 @@ describe("bounded Brand fixed local-contrast governance", () => {
   });
 
   it("keeps extractor.ts and regions.ts frozen, preserving the historical PR 220 hash reference while asserting the proposed PR 233 boundary", () => {
-    expect(APPROVED_HISTORICAL_HASHES_AFTER_PR_220["src/pipeline/extractor/field-selection.ts"]).toBe(
-      "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
-    );
+    expect(
+      APPROVED_HISTORICAL_HASHES_AFTER_PR_220["src/pipeline/extractor/field-selection.ts"],
+    ).toBe("8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c");
     expect(
       Object.fromEntries(
         Object.keys(PROPOSED_HASHES_AFTER_PR_233).map((filePath) => [

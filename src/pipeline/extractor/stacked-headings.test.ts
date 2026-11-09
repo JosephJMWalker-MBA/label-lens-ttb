@@ -436,7 +436,9 @@ describe("Stacked-Heading Candidate Formation (Phase 2G)", () => {
       // 1. Default call (allowNarrowStackedHeadingMerge defaults to false)
       const defaultSelection = selectBrandObservation([ocrResult]);
       // 2. Treatment call (allowNarrowStackedHeadingMerge = true)
-      const treatmentSelection = selectBrandObservationWithNarrowStackedHeadingTreatment([ocrResult]);
+      const treatmentSelection = selectBrandObservationWithNarrowStackedHeadingTreatment([
+        ocrResult,
+      ]);
 
       // Treatment forms the stacked heading "DOMAINE LEROY"
       expect(treatmentSelection.observation.value).toBe("DOMAINE LEROY");
@@ -556,7 +558,10 @@ describe("Stacked-Heading Candidate Formation (Phase 2G)", () => {
       };
 
       // Multi-pass selection with treatment enabled
-      const multiPassSelection = selectBrandObservationWithNarrowStackedHeadingTreatment([pass0, pass1]);
+      const multiPassSelection = selectBrandObservationWithNarrowStackedHeadingTreatment([
+        pass0,
+        pass1,
+      ]);
 
       // Assert true brand CHATEAU BONNEAU is selected
       expect(multiPassSelection.observation.value).toBe("CHATEAU BONNEAU");
