@@ -24,7 +24,11 @@ import { readFile, writeFile } from "node:fs/promises";
 import sharp from "sharp";
 
 import { createLocalOcrEngine } from "../../src/pipeline/extractor/ocr-engine";
-import { planPrimaryOcrPass, planRecoveryOcrPasses, runOcrPass } from "../../src/pipeline/extractor/regions";
+import {
+  planPrimaryOcrPass,
+  planRecoveryOcrPasses,
+  runOcrPass,
+} from "../../src/pipeline/extractor/regions";
 import type { RegionOcrResult } from "../../src/pipeline/extractor/extractor.types";
 import {
   selectBrandObservationWithCompleteFilterDiagnostics,
@@ -38,7 +42,11 @@ export interface OutOfSampleCase {
   expectedSha256: string;
   imageDimensions: { width: number; height: number };
   brandPresence: "present" | "absent";
-  controlType: "target" | "near_miss_rivalry_control" | "negative_control_ambiguous" | "negative_control_absent";
+  controlType:
+    | "target"
+    | "near_miss_rivalry_control"
+    | "negative_control_ambiguous"
+    | "negative_control_absent";
   genuinelyAmbiguous: boolean;
   acceptablePresentations: string[];
   forbiddenPresentations: string[];
@@ -170,10 +178,14 @@ export async function runOutOfSampleValidation(): Promise<OutOfSampleValidationR
 
   const initScopeSummary = (): ScopeSummary => ({
     totalCases: manifest.totalCases,
-    targetCases: manifest.cases.filter((c) => c.controlType === "target" || c.controlType === "near_miss_rivalry_control").length,
+    targetCases: manifest.cases.filter(
+      (c) => c.controlType === "target" || c.controlType === "near_miss_rivalry_control",
+    ).length,
     absentCases: manifest.cases.filter((c) => c.controlType === "negative_control_absent").length,
-    ambiguousCases: manifest.cases.filter((c) => c.controlType === "negative_control_ambiguous").length,
-    nearMissCases: manifest.cases.filter((c) => c.controlType === "near_miss_rivalry_control").length,
+    ambiguousCases: manifest.cases.filter((c) => c.controlType === "negative_control_ambiguous")
+      .length,
+    nearMissCases: manifest.cases.filter((c) => c.controlType === "near_miss_rivalry_control")
+      .length,
     baseline: {
       candidateConstructedCount: 0,
       candidateConstructedRate: "0.0%",
@@ -224,7 +236,9 @@ export async function runOutOfSampleValidation(): Promise<OutOfSampleValidationR
       const spBaseObs = spBaseSel.observation;
       const spBaseCands = spBaseSel.brandDiagnostics?.candidates.filter((c) => c.kept) ?? [];
 
-      const spTreatSel = selectBrandObservationWithNarrowStackedHeadingTreatmentDiagnostics([primaryOcr]);
+      const spTreatSel = selectBrandObservationWithNarrowStackedHeadingTreatmentDiagnostics([
+        primaryOcr,
+      ]);
       const spTreatObs = spTreatSel.observation;
       const spTreatCands = spTreatSel.brandDiagnostics?.candidates.filter((c) => c.kept) ?? [];
 
@@ -232,23 +246,43 @@ export async function runOutOfSampleValidation(): Promise<OutOfSampleValidationR
       const isAbsent = testCase.controlType === "negative_control_absent";
       const isAmbiguous = testCase.controlType === "negative_control_ambiguous";
 
-      const spBaseMatches = isTarget && candidateMatchesTruth(spBaseObs.value, testCase.acceptablePresentations);
-      const spTreatMatches = isTarget && candidateMatchesTruth(spTreatObs.value, testCase.acceptablePresentations);
+      const spBaseMatches =
+        isTarget && candidateMatchesTruth(spBaseObs.value, testCase.acceptablePresentations);
+      const spTreatMatches =
+        isTarget && candidateMatchesTruth(spTreatObs.value, testCase.acceptablePresentations);
 
-      const spBaseCandConstructed = isTarget && spBaseCands.some((c) => candidateMatchesTruth(c.cleanedValue, testCase.acceptablePresentations));
-      const spTreatCandConstructed = isTarget && spTreatCands.some((c) => candidateMatchesTruth(c.cleanedValue, testCase.acceptablePresentations));
+      const spBaseCandConstructed =
+        isTarget &&
+        spBaseCands.some((c) =>
+          candidateMatchesTruth(c.cleanedValue, testCase.acceptablePresentations),
+        );
+      const spTreatCandConstructed =
+        isTarget &&
+        spTreatCands.some((c) =>
+          candidateMatchesTruth(c.cleanedValue, testCase.acceptablePresentations),
+        );
 
-      const spBaseTop3 = [spBaseObs.value, ...spBaseObs.alternates.map((a) => a.value)].filter((v): v is string => Boolean(v));
-      const spTreatTop3 = [spTreatObs.value, ...spTreatObs.alternates.map((a) => a.value)].filter((v): v is string => Boolean(v));
+      const spBaseTop3 = [spBaseObs.value, ...spBaseObs.alternates.map((a) => a.value)].filter(
+        (v): v is string => Boolean(v),
+      );
+      const spTreatTop3 = [spTreatObs.value, ...spTreatObs.alternates.map((a) => a.value)].filter(
+        (v): v is string => Boolean(v),
+      );
 
-      const spBaseTop3Ranked = isTarget && spBaseTop3.some((v) => candidateMatchesTruth(v, testCase.acceptablePresentations));
-      const spTreatTop3Ranked = isTarget && spTreatTop3.some((v) => candidateMatchesTruth(v, testCase.acceptablePresentations));
+      const spBaseTop3Ranked =
+        isTarget &&
+        spBaseTop3.some((v) => candidateMatchesTruth(v, testCase.acceptablePresentations));
+      const spTreatTop3Ranked =
+        isTarget &&
+        spTreatTop3.some((v) => candidateMatchesTruth(v, testCase.acceptablePresentations));
 
       const spStackedCand = spTreatCands.find((c) => c.assembly === "multi-line-merge");
       let spStackedCorrect: boolean | null = null;
       if (spStackedCand) {
         singlePassSummary.stackedCandidatesFormedTotal++;
-        spStackedCorrect = isTarget && candidateMatchesTruth(spStackedCand.cleanedValue, testCase.acceptablePresentations);
+        spStackedCorrect =
+          isTarget &&
+          candidateMatchesTruth(spStackedCand.cleanedValue, testCase.acceptablePresentations);
         if (spStackedCorrect) singlePassSummary.stackedCandidatesCorrect++;
         else singlePassSummary.stackedCandidatesIncorrect++;
       }
@@ -284,22 +318,28 @@ export async function runOutOfSampleValidation(): Promise<OutOfSampleValidationR
         if (spBaseCandConstructed) singlePassSummary.baseline.candidateConstructedCount++;
         if (spBaseTop3Ranked) singlePassSummary.baseline.topThreeRankedCount++;
         if (spBaseMatches) singlePassSummary.baseline.selectedCorrectCount++;
-        if (spBaseMatches && spBaseObs.state === "OBSERVED") singlePassSummary.baseline.reliableAcceptedCount++;
+        if (spBaseMatches && spBaseObs.state === "OBSERVED")
+          singlePassSummary.baseline.reliableAcceptedCount++;
 
         if (spTreatCandConstructed) singlePassSummary.narrowTreatment.candidateConstructedCount++;
         if (spTreatTop3Ranked) singlePassSummary.narrowTreatment.topThreeRankedCount++;
         if (spTreatMatches) singlePassSummary.narrowTreatment.selectedCorrectCount++;
-        if (spTreatMatches && spTreatObs.state === "OBSERVED") singlePassSummary.narrowTreatment.reliableAcceptedCount++;
+        if (spTreatMatches && spTreatObs.state === "OBSERVED")
+          singlePassSummary.narrowTreatment.reliableAcceptedCount++;
 
         if (spIsRegression) singlePassSummary.narrowTreatment.regressionsCount++;
       } else {
         // Negative controls (absent or ambiguous)
         if (isAbsent) {
-          if (spBaseCands.length > 0) singlePassSummary.baseline.negativeControlCandidateInsertions++;
-          if (spBaseObs.value !== null) singlePassSummary.baseline.negativeControlSelectedAssertions++;
+          if (spBaseCands.length > 0)
+            singlePassSummary.baseline.negativeControlCandidateInsertions++;
+          if (spBaseObs.value !== null)
+            singlePassSummary.baseline.negativeControlSelectedAssertions++;
 
-          if (spTreatCands.length > 0) singlePassSummary.narrowTreatment.negativeControlCandidateInsertions++;
-          if (spTreatObs.value !== null) singlePassSummary.narrowTreatment.negativeControlSelectedAssertions++;
+          if (spTreatCands.length > 0)
+            singlePassSummary.narrowTreatment.negativeControlCandidateInsertions++;
+          if (spTreatObs.value !== null)
+            singlePassSummary.narrowTreatment.negativeControlSelectedAssertions++;
         }
         if (spTreatObs.state === "OBSERVED") {
           singlePassSummary.narrowTreatment.inappropriateAuthorityElevationCount++;
@@ -323,26 +363,47 @@ export async function runOutOfSampleValidation(): Promise<OutOfSampleValidationR
       const mpBaseObs = mpBaseSel.observation;
       const mpBaseCands = mpBaseSel.brandDiagnostics?.candidates.filter((c) => c.kept) ?? [];
 
-      const mpTreatSel = selectBrandObservationWithNarrowStackedHeadingTreatmentDiagnostics(allPasses);
+      const mpTreatSel =
+        selectBrandObservationWithNarrowStackedHeadingTreatmentDiagnostics(allPasses);
       const mpTreatObs = mpTreatSel.observation;
       const mpTreatCands = mpTreatSel.brandDiagnostics?.candidates.filter((c) => c.kept) ?? [];
 
-      const mpBaseMatches = isTarget && candidateMatchesTruth(mpBaseObs.value, testCase.acceptablePresentations);
-      const mpTreatMatches = isTarget && candidateMatchesTruth(mpTreatObs.value, testCase.acceptablePresentations);
+      const mpBaseMatches =
+        isTarget && candidateMatchesTruth(mpBaseObs.value, testCase.acceptablePresentations);
+      const mpTreatMatches =
+        isTarget && candidateMatchesTruth(mpTreatObs.value, testCase.acceptablePresentations);
 
-      const mpBaseCandConstructed = isTarget && mpBaseCands.some((c) => candidateMatchesTruth(c.cleanedValue, testCase.acceptablePresentations));
-      const mpTreatCandConstructed = isTarget && mpTreatCands.some((c) => candidateMatchesTruth(c.cleanedValue, testCase.acceptablePresentations));
+      const mpBaseCandConstructed =
+        isTarget &&
+        mpBaseCands.some((c) =>
+          candidateMatchesTruth(c.cleanedValue, testCase.acceptablePresentations),
+        );
+      const mpTreatCandConstructed =
+        isTarget &&
+        mpTreatCands.some((c) =>
+          candidateMatchesTruth(c.cleanedValue, testCase.acceptablePresentations),
+        );
 
-      const mpBaseTop3 = [mpBaseObs.value, ...mpBaseObs.alternates.map((a) => a.value)].filter((v): v is string => Boolean(v));
-      const mpTreatTop3 = [mpTreatObs.value, ...mpTreatObs.alternates.map((a) => a.value)].filter((v): v is string => Boolean(v));
+      const mpBaseTop3 = [mpBaseObs.value, ...mpBaseObs.alternates.map((a) => a.value)].filter(
+        (v): v is string => Boolean(v),
+      );
+      const mpTreatTop3 = [mpTreatObs.value, ...mpTreatObs.alternates.map((a) => a.value)].filter(
+        (v): v is string => Boolean(v),
+      );
 
-      const mpBaseTop3Ranked = isTarget && mpBaseTop3.some((v) => candidateMatchesTruth(v, testCase.acceptablePresentations));
-      const mpTreatTop3Ranked = isTarget && mpTreatTop3.some((v) => candidateMatchesTruth(v, testCase.acceptablePresentations));
+      const mpBaseTop3Ranked =
+        isTarget &&
+        mpBaseTop3.some((v) => candidateMatchesTruth(v, testCase.acceptablePresentations));
+      const mpTreatTop3Ranked =
+        isTarget &&
+        mpTreatTop3.some((v) => candidateMatchesTruth(v, testCase.acceptablePresentations));
 
       const mpStackedCand = mpTreatCands.find((c) => c.assembly === "multi-line-merge");
       if (mpStackedCand) {
         multiPassSummary.stackedCandidatesFormedTotal++;
-        const mpStackedCorrect = isTarget && candidateMatchesTruth(mpStackedCand.cleanedValue, testCase.acceptablePresentations);
+        const mpStackedCorrect =
+          isTarget &&
+          candidateMatchesTruth(mpStackedCand.cleanedValue, testCase.acceptablePresentations);
         if (mpStackedCorrect) multiPassSummary.stackedCandidatesCorrect++;
         else multiPassSummary.stackedCandidatesIncorrect++;
       }
@@ -378,21 +439,27 @@ export async function runOutOfSampleValidation(): Promise<OutOfSampleValidationR
         if (mpBaseCandConstructed) multiPassSummary.baseline.candidateConstructedCount++;
         if (mpBaseTop3Ranked) multiPassSummary.baseline.topThreeRankedCount++;
         if (mpBaseMatches) multiPassSummary.baseline.selectedCorrectCount++;
-        if (mpBaseMatches && mpBaseObs.state === "OBSERVED") multiPassSummary.baseline.reliableAcceptedCount++;
+        if (mpBaseMatches && mpBaseObs.state === "OBSERVED")
+          multiPassSummary.baseline.reliableAcceptedCount++;
 
         if (mpTreatCandConstructed) multiPassSummary.narrowTreatment.candidateConstructedCount++;
         if (mpTreatTop3Ranked) multiPassSummary.narrowTreatment.topThreeRankedCount++;
         if (mpTreatMatches) multiPassSummary.narrowTreatment.selectedCorrectCount++;
-        if (mpTreatMatches && mpTreatObs.state === "OBSERVED") multiPassSummary.narrowTreatment.reliableAcceptedCount++;
+        if (mpTreatMatches && mpTreatObs.state === "OBSERVED")
+          multiPassSummary.narrowTreatment.reliableAcceptedCount++;
 
         if (mpIsRegression) multiPassSummary.narrowTreatment.regressionsCount++;
       } else {
         if (isAbsent) {
-          if (mpBaseCands.length > 0) multiPassSummary.baseline.negativeControlCandidateInsertions++;
-          if (mpBaseObs.value !== null) multiPassSummary.baseline.negativeControlSelectedAssertions++;
+          if (mpBaseCands.length > 0)
+            multiPassSummary.baseline.negativeControlCandidateInsertions++;
+          if (mpBaseObs.value !== null)
+            multiPassSummary.baseline.negativeControlSelectedAssertions++;
 
-          if (mpTreatCands.length > 0) multiPassSummary.narrowTreatment.negativeControlCandidateInsertions++;
-          if (mpTreatObs.value !== null) multiPassSummary.narrowTreatment.negativeControlSelectedAssertions++;
+          if (mpTreatCands.length > 0)
+            multiPassSummary.narrowTreatment.negativeControlCandidateInsertions++;
+          if (mpTreatObs.value !== null)
+            multiPassSummary.narrowTreatment.negativeControlSelectedAssertions++;
         }
         if (mpTreatObs.state === "OBSERVED") {
           multiPassSummary.narrowTreatment.inappropriateAuthorityElevationCount++;
@@ -448,15 +515,25 @@ export async function runOutOfSampleValidation(): Promise<OutOfSampleValidationR
       },
       verdict: {
         status: "OUT_OF_SAMPLE_VALIDATION_COMPLETED",
-        singlePassVerdict: singlePassSummary.narrowTreatment.regressionsCount === 0 && singlePassSummary.narrowTreatment.negativeControlSelectedAssertions === 0
-          ? "CLEAN_PARITY_OR_IMPROVEMENT"
-          : "FAILURES_OBSERVED",
-        multiPassVerdict: multiPassSummary.narrowTreatment.regressionsCount === 0 && multiPassSummary.narrowTreatment.negativeControlSelectedAssertions === 0
-          ? "CLEAN_PARITY_OR_IMPROVEMENT"
-          : "FAILURES_OBSERVED",
-        regressionCount: singlePassSummary.narrowTreatment.regressionsCount + multiPassSummary.narrowTreatment.regressionsCount,
-        falseAssertionCount: singlePassSummary.narrowTreatment.negativeControlSelectedAssertions + multiPassSummary.narrowTreatment.negativeControlSelectedAssertions,
-        inappropriateElevationCount: singlePassSummary.narrowTreatment.inappropriateAuthorityElevationCount + multiPassSummary.narrowTreatment.inappropriateAuthorityElevationCount,
+        singlePassVerdict:
+          singlePassSummary.narrowTreatment.regressionsCount === 0 &&
+          singlePassSummary.narrowTreatment.negativeControlSelectedAssertions === 0
+            ? "CLEAN_PARITY_OR_IMPROVEMENT"
+            : "FAILURES_OBSERVED",
+        multiPassVerdict:
+          multiPassSummary.narrowTreatment.regressionsCount === 0 &&
+          multiPassSummary.narrowTreatment.negativeControlSelectedAssertions === 0
+            ? "CLEAN_PARITY_OR_IMPROVEMENT"
+            : "FAILURES_OBSERVED",
+        regressionCount:
+          singlePassSummary.narrowTreatment.regressionsCount +
+          multiPassSummary.narrowTreatment.regressionsCount,
+        falseAssertionCount:
+          singlePassSummary.narrowTreatment.negativeControlSelectedAssertions +
+          multiPassSummary.narrowTreatment.negativeControlSelectedAssertions,
+        inappropriateElevationCount:
+          singlePassSummary.narrowTreatment.inappropriateAuthorityElevationCount +
+          multiPassSummary.narrowTreatment.inappropriateAuthorityElevationCount,
       },
       singlePassSummary,
       multiPassSummary,
@@ -476,16 +553,36 @@ if (true) {
   runOutOfSampleValidation()
     .then((rep) => {
       console.log("=== Phase 2H Out-of-Sample Validation Complete (79 Unseen Cases) ===");
-      console.log(`  Single-Pass Baseline Selected:    ${rep.singlePassSummary.baseline.selectedCorrectCount}/${rep.singlePassSummary.targetCases} (${rep.singlePassSummary.baseline.selectedCorrectRate})`);
-      console.log(`  Single-Pass Treatment Selected:   ${rep.singlePassSummary.narrowTreatment.selectedCorrectCount}/${rep.singlePassSummary.targetCases} (${rep.singlePassSummary.narrowTreatment.selectedCorrectRate})`);
-      console.log(`  Single-Pass Regressions:          ${rep.singlePassSummary.narrowTreatment.regressionsCount}`);
-      console.log(`  Single-Pass False Assertions:     ${rep.singlePassSummary.narrowTreatment.negativeControlSelectedAssertions}/${rep.singlePassSummary.absentCases}`);
-      console.log(`  Single-Pass Authority Elevation:  ${rep.singlePassSummary.narrowTreatment.inappropriateAuthorityElevationCount}`);
-      console.log(`  Multi-Pass Baseline Selected:     ${rep.multiPassSummary.baseline.selectedCorrectCount}/${rep.multiPassSummary.targetCases} (${rep.multiPassSummary.baseline.selectedCorrectRate})`);
-      console.log(`  Multi-Pass Treatment Selected:    ${rep.multiPassSummary.narrowTreatment.selectedCorrectCount}/${rep.multiPassSummary.targetCases} (${rep.multiPassSummary.narrowTreatment.selectedCorrectRate})`);
-      console.log(`  Multi-Pass Regressions:           ${rep.multiPassSummary.narrowTreatment.regressionsCount}`);
-      console.log(`  Multi-Pass False Assertions:      ${rep.multiPassSummary.narrowTreatment.negativeControlSelectedAssertions}/${rep.multiPassSummary.absentCases}`);
-      console.log(`  Multi-Pass Authority Elevation:   ${rep.multiPassSummary.narrowTreatment.inappropriateAuthorityElevationCount}`);
+      console.log(
+        `  Single-Pass Baseline Selected:    ${rep.singlePassSummary.baseline.selectedCorrectCount}/${rep.singlePassSummary.targetCases} (${rep.singlePassSummary.baseline.selectedCorrectRate})`,
+      );
+      console.log(
+        `  Single-Pass Treatment Selected:   ${rep.singlePassSummary.narrowTreatment.selectedCorrectCount}/${rep.singlePassSummary.targetCases} (${rep.singlePassSummary.narrowTreatment.selectedCorrectRate})`,
+      );
+      console.log(
+        `  Single-Pass Regressions:          ${rep.singlePassSummary.narrowTreatment.regressionsCount}`,
+      );
+      console.log(
+        `  Single-Pass False Assertions:     ${rep.singlePassSummary.narrowTreatment.negativeControlSelectedAssertions}/${rep.singlePassSummary.absentCases}`,
+      );
+      console.log(
+        `  Single-Pass Authority Elevation:  ${rep.singlePassSummary.narrowTreatment.inappropriateAuthorityElevationCount}`,
+      );
+      console.log(
+        `  Multi-Pass Baseline Selected:     ${rep.multiPassSummary.baseline.selectedCorrectCount}/${rep.multiPassSummary.targetCases} (${rep.multiPassSummary.baseline.selectedCorrectRate})`,
+      );
+      console.log(
+        `  Multi-Pass Treatment Selected:    ${rep.multiPassSummary.narrowTreatment.selectedCorrectCount}/${rep.multiPassSummary.targetCases} (${rep.multiPassSummary.narrowTreatment.selectedCorrectRate})`,
+      );
+      console.log(
+        `  Multi-Pass Regressions:           ${rep.multiPassSummary.narrowTreatment.regressionsCount}`,
+      );
+      console.log(
+        `  Multi-Pass False Assertions:      ${rep.multiPassSummary.narrowTreatment.negativeControlSelectedAssertions}/${rep.multiPassSummary.absentCases}`,
+      );
+      console.log(
+        `  Multi-Pass Authority Elevation:   ${rep.multiPassSummary.narrowTreatment.inappropriateAuthorityElevationCount}`,
+      );
     })
     .catch((err) => {
       console.error(err);

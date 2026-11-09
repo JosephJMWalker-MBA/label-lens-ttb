@@ -355,7 +355,9 @@ const FIELD_SELECTION_HASH_PROPOSED_PR_233 =
 describe("Issue #149 frozen boundaries", () => {
   it("keeps OCR, preprocessing, PSM, parsing, thresholds, Warning and route hashes frozen, with field-selection.ts at the proposed PR 233 boundary while preserving historical PR 220 reference", () => {
     expect(FIELD_SELECTION_HASH_APPROVED_AFTER_PR_220).not.toBe(FIELD_SELECTION_HASH_BEFORE_PR_220);
-    expect(FIELD_SELECTION_HASH_PROPOSED_PR_233).not.toBe(FIELD_SELECTION_HASH_APPROVED_AFTER_PR_220);
+    expect(FIELD_SELECTION_HASH_PROPOSED_PR_233).not.toBe(
+      FIELD_SELECTION_HASH_APPROVED_AFTER_PR_220,
+    );
     expect(FIELD_SELECTION_HASH_APPROVED_AFTER_PR_220).toBe(
       "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
     );

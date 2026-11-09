@@ -280,7 +280,9 @@ describe("Candidate Loss Reconciliation and Treatment Invariants (Phase 2F)", ()
         recoveryPassUsed: boolean;
       };
     }
-    const chateauCase = (parityReport.cases as ParityCaseRecord[]).find((c) => c.caseId === "chateau-bonneau");
+    const chateauCase = (parityReport.cases as ParityCaseRecord[]).find(
+      (c) => c.caseId === "chateau-bonneau",
+    );
     expect(chateauCase).toBeDefined();
     if (!chateauCase) throw new Error("chateau-bonneau case not found");
     expect(chateauCase.conditionD_exactNarrow.selectedMatches).toBe(true);

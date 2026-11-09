@@ -207,7 +207,8 @@ export async function runExactImplementationParityEvaluation(): Promise<ExactImp
 
   const condBSummary: ConditionSummary = {
     conditionName: "Condition B (Synthetic Focus-Crop Pass Upper Bound)",
-    description: "Oracle-assisted multi-pass simulator with manually crafted focus crop and invented 94% confidence.",
+    description:
+      "Oracle-assisted multi-pass simulator with manually crafted focus crop and invented 94% confidence.",
     brandPresentCases: 0,
     candidateConstructedCount: 0,
     candidateConstructedRate: "0.0%",
@@ -225,7 +226,8 @@ export async function runExactImplementationParityEvaluation(): Promise<ExactImp
 
   const condCSummary: ConditionSummary = {
     conditionName: "Condition C (Phase 2G Coherent-Merge Surrogate)",
-    description: "Phase 2G evaluator harness that gated broader coherent-line-merge treatment behind detectNarrowStackedHeadingInOcr.",
+    description:
+      "Phase 2G evaluator harness that gated broader coherent-line-merge treatment behind detectNarrowStackedHeadingInOcr.",
     brandPresentCases: 0,
     candidateConstructedCount: 0,
     candidateConstructedRate: "0.0%",
@@ -243,7 +245,8 @@ export async function runExactImplementationParityEvaluation(): Promise<ExactImp
 
   const condDSummary: ConditionSummary = {
     conditionName: "Condition D (Exact PR #233 Narrow Same-Pass Treatment)",
-    description: "Exact narrow same-pass candidate formation from PR #233 via selectBrandObservationWithNarrowStackedHeadingTreatment.",
+    description:
+      "Exact narrow same-pass candidate formation from PR #233 via selectBrandObservationWithNarrowStackedHeadingTreatment.",
     brandPresentCases: 0,
     candidateConstructedCount: 0,
     candidateConstructedRate: "0.0%",
@@ -286,9 +289,12 @@ export async function runExactImplementationParityEvaluation(): Promise<ExactImp
         testCase.brandPresence === "present"
           ? baseTop3Values.some((v) => candidateMatchesTruth(v, testCase.acceptablePresentations))
           : false;
-      const baseRankPos = testCase.brandPresence === "present"
-        ? baseTop3Values.findIndex((v) => candidateMatchesTruth(v, testCase.acceptablePresentations))
-        : -1;
+      const baseRankPos =
+        testCase.brandPresence === "present"
+          ? baseTop3Values.findIndex((v) =>
+              candidateMatchesTruth(v, testCase.acceptablePresentations),
+            )
+          : -1;
       const baseSelectedMatches =
         testCase.brandPresence === "present"
           ? candidateMatchesTruth(baseObs.value, testCase.acceptablePresentations)
@@ -389,9 +395,12 @@ export async function runExactImplementationParityEvaluation(): Promise<ExactImp
         testCase.brandPresence === "present"
           ? synthTop3Values.some((v) => candidateMatchesTruth(v, testCase.acceptablePresentations))
           : false;
-      const synthRankPos = testCase.brandPresence === "present"
-        ? synthTop3Values.findIndex((v) => candidateMatchesTruth(v, testCase.acceptablePresentations))
-        : -1;
+      const synthRankPos =
+        testCase.brandPresence === "present"
+          ? synthTop3Values.findIndex((v) =>
+              candidateMatchesTruth(v, testCase.acceptablePresentations),
+            )
+          : -1;
       const synthSelectedMatches =
         testCase.brandPresence === "present"
           ? candidateMatchesTruth(synthObs.value, testCase.acceptablePresentations)
@@ -424,18 +433,22 @@ export async function runExactImplementationParityEvaluation(): Promise<ExactImp
               candidateMatchesTruth(c.cleanedValue, testCase.acceptablePresentations),
             )
           : false;
-      const coherentTop3Values = [coherentObs.value, ...coherentObs.alternates.map((a) => a.value)].filter(
-        (v): v is string => Boolean(v),
-      );
+      const coherentTop3Values = [
+        coherentObs.value,
+        ...coherentObs.alternates.map((a) => a.value),
+      ].filter((v): v is string => Boolean(v));
       const coherentTop3Ranked =
         testCase.brandPresence === "present"
           ? coherentTop3Values.some((v) =>
               candidateMatchesTruth(v, testCase.acceptablePresentations),
             )
           : false;
-      const coherentRankPos = testCase.brandPresence === "present"
-        ? coherentTop3Values.findIndex((v) => candidateMatchesTruth(v, testCase.acceptablePresentations))
-        : -1;
+      const coherentRankPos =
+        testCase.brandPresence === "present"
+          ? coherentTop3Values.findIndex((v) =>
+              candidateMatchesTruth(v, testCase.acceptablePresentations),
+            )
+          : -1;
       const coherentSelectedMatches =
         testCase.brandPresence === "present"
           ? candidateMatchesTruth(coherentObs.value, testCase.acceptablePresentations)
@@ -474,9 +487,12 @@ export async function runExactImplementationParityEvaluation(): Promise<ExactImp
         testCase.brandPresence === "present"
           ? exactTop3Values.some((v) => candidateMatchesTruth(v, testCase.acceptablePresentations))
           : false;
-      const exactRankPos = testCase.brandPresence === "present"
-        ? exactTop3Values.findIndex((v) => candidateMatchesTruth(v, testCase.acceptablePresentations))
-        : -1;
+      const exactRankPos =
+        testCase.brandPresence === "present"
+          ? exactTop3Values.findIndex((v) =>
+              candidateMatchesTruth(v, testCase.acceptablePresentations),
+            )
+          : -1;
       const exactSelectedMatches =
         testCase.brandPresence === "present"
           ? candidateMatchesTruth(exactObs.value, testCase.acceptablePresentations)
@@ -516,22 +532,26 @@ export async function runExactImplementationParityEvaluation(): Promise<ExactImp
         if (condA.candidateConstructed) condASummary.candidateConstructedCount++;
         if (condA.topThreeRanked) condASummary.topThreeRankedCount++;
         if (condA.selectedMatches) condASummary.selectedCorrectCount++;
-        if (condA.selectedMatches && condA.state === "OBSERVED") condASummary.reliableAcceptedCount++;
+        if (condA.selectedMatches && condA.state === "OBSERVED")
+          condASummary.reliableAcceptedCount++;
 
         if (condB.candidateConstructed) condBSummary.candidateConstructedCount++;
         if (condB.topThreeRanked) condBSummary.topThreeRankedCount++;
         if (condB.selectedMatches) condBSummary.selectedCorrectCount++;
-        if (condB.selectedMatches && condB.state === "OBSERVED") condBSummary.reliableAcceptedCount++;
+        if (condB.selectedMatches && condB.state === "OBSERVED")
+          condBSummary.reliableAcceptedCount++;
 
         if (condC.candidateConstructed) condCSummary.candidateConstructedCount++;
         if (condC.topThreeRanked) condCSummary.topThreeRankedCount++;
         if (condC.selectedMatches) condCSummary.selectedCorrectCount++;
-        if (condC.selectedMatches && condC.state === "OBSERVED") condCSummary.reliableAcceptedCount++;
+        if (condC.selectedMatches && condC.state === "OBSERVED")
+          condCSummary.reliableAcceptedCount++;
 
         if (condD.candidateConstructed) condDSummary.candidateConstructedCount++;
         if (condD.topThreeRanked) condDSummary.topThreeRankedCount++;
         if (condD.selectedMatches) condDSummary.selectedCorrectCount++;
-        if (condD.selectedMatches && condD.state === "OBSERVED") condDSummary.reliableAcceptedCount++;
+        if (condD.selectedMatches && condD.state === "OBSERVED")
+          condDSummary.reliableAcceptedCount++;
 
         if (isRegressionInD) condDSummary.regressionsCount++;
       } else {
