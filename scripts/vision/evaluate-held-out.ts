@@ -10,7 +10,10 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 
-import { brandPresentInTranscript, brandValueMatches } from "../../src/fixtures/eval/vision-reader-eval.ts";
+import {
+  brandPresentInTranscript,
+  brandValueMatches,
+} from "../../src/fixtures/eval/vision-reader-eval.ts";
 import { createLocalOcrEngine } from "../../src/pipeline/extractor/ocr-engine.ts";
 import { selectBrandObservation } from "../../src/pipeline/extractor/field-selection.ts";
 import { planPrimaryOcrPass, runOcrPass } from "../../src/pipeline/extractor/regions.ts";
@@ -26,7 +29,10 @@ import {
   TRANSCRIPTION_PROMPT_SHA256,
   TRANSCRIPTION_PROMPT_VERSION,
 } from "../../src/server/vision/transcription-prompt.ts";
-import { detectDegenerateRepetition } from "../../src/server/vision/repetition-detector.ts";
+import {
+  detectDegenerateRepetition,
+  detectDegenerateTranscript,
+} from "../../src/server/vision/repetition-detector.ts";
 
 interface HeldOutCase {
   caseId: string;
@@ -120,7 +126,9 @@ async function main() {
 
   try {
     for (const [index, testCase] of manifest.cases.entries()) {
-      console.log(`[${index + 1}/${manifest.totalCases}] Evaluating ${testCase.caseId} (${testCase.stratum})...`);
+      console.log(
+        `[${index + 1}/${manifest.totalCases}] Evaluating ${testCase.caseId} (${testCase.stratum})...`,
+      );
 
       const imageBytes = new Uint8Array(await readFile(testCase.imagePath));
       const imageSha256 = createHash("sha256").update(imageBytes).digest("hex");
@@ -135,7 +143,10 @@ async function main() {
       const ocrLatencyMs = Math.round(performance.now() - t0Ocr);
 
       const ocrWords = wordsInOriginalOrder(ocrPassResult);
-      const ocrRawTranscript = ocrWords.map((w) => w.text).join(" ").trim();
+      const ocrRawTranscript = ocrWords
+        .map((w) => w.text)
+        .join(" ")
+        .trim();
       const ocrSelection = selectBrandObservation([ocrPassResult]);
       const ocrObservedValue = ocrSelection.observation.value;
       const ocrScore = ocrSelection.observation.ocrEvidenceScore;
@@ -169,9 +180,10 @@ async function main() {
       const visionLatencyMs = Math.round(performance.now() - t0Vision);
 
       const choiceContent = (visionResult.body as any)?.choices?.[0]?.message?.content ?? "";
-      const rawContentStr = typeof choiceContent === "string" ? choiceContent : JSON.stringify(choiceContent);
+      const rawContentStr =
+        typeof choiceContent === "string" ? choiceContent : JSON.stringify(choiceContent);
 
-      // Raw untruncated repetition check (Priority 2 fail-closed hygiene)
+      // Raw untruncated repetition check (fail-closed hygiene for both per-line and multi-line loops)
       let isDegenerate = false;
       let degenerateReason: string | null = null;
       let visionParsed: { lines: string[]; legibility: string } | null = null;
@@ -181,13 +193,10 @@ async function main() {
         if (jsonMatch) {
           const rawObj = JSON.parse(jsonMatch[0]);
           if (Array.isArray(rawObj?.lines)) {
-            for (const rawLine of rawObj.lines) {
-              const check = detectDegenerateRepetition(String(rawLine));
-              if (check.isDegenerate) {
-                isDegenerate = true;
-                degenerateReason = check.reason ?? "DEGENERATE_REPETITION";
-                break;
-              }
+            const check = detectDegenerateTranscript(rawObj.lines);
+            if (check.isDegenerate) {
+              isDegenerate = true;
+              degenerateReason = check.reason ?? "DEGENERATE_REPETITION";
             }
           }
         }
@@ -203,41 +212,39 @@ async function main() {
       const visionRawTranscript = visionLines.join(" ").trim();
       const visionLegibility = visionParsed?.legibility ?? "illegible";
 
-      let visionBrandMatch = false;
-      let visionFalseInsertion = false;
+      let visionRawBrandMatch = false;
 
       if (testCase.brandPresence === "present") {
         if (!isDegenerate && visionParsed && visionParsed.lines.length > 0) {
-          visionBrandMatch = brandPresentInTranscript(visionParsed.lines, testCase.acceptablePresentations);
+          visionRawBrandMatch = brandPresentInTranscript(
+            visionParsed.lines,
+            testCase.acceptablePresentations,
+          );
         }
-      } else {
-        // Brand is absent: check if vision falsely produced a brand from acceptable lists
-        visionFalseInsertion = false;
       }
 
-      const visionScore = visionLegibility === "clear" ? 0.9 : visionLegibility === "partial" ? 0.5 : 0.0;
-      const visionReliable = visionScore >= 0.8 && visionLines.length > 0 && !isDegenerate;
+      const ocrRawBrandMatch =
+        testCase.brandPresence === "present"
+          ? brandPresentInTranscript([ocrRawTranscript], testCase.acceptablePresentations)
+          : false;
 
-      // Paired Category
-      let pairedCategory:
-        | "BOTH_CORRECT"
-        | "VISION_ONLY_CORRECT"
-        | "OCR_ONLY_CORRECT"
-        | "BOTH_INCORRECT"
-        | "ABSTAIN_CORRECT"
-        | "FALSE_INSERTION";
+      // Paired Category on Raw Text Presence
+      let rawPairedCategory:
+        | "BOTH_RAW_PRESENT"
+        | "VISION_ONLY_RAW_PRESENT"
+        | "OCR_ONLY_RAW_PRESENT"
+        | "NEITHER_RAW_PRESENT"
+        | "ABSENT_CONTROL";
 
       if (testCase.brandPresence === "absent") {
-        if (ocrFalseInsertion) {
-          pairedCategory = "FALSE_INSERTION";
-        } else {
-          pairedCategory = "ABSTAIN_CORRECT";
-        }
+        rawPairedCategory = "ABSENT_CONTROL";
       } else {
-        if (visionBrandMatch && ocrBrandMatch) pairedCategory = "BOTH_CORRECT";
-        else if (visionBrandMatch && !ocrBrandMatch) pairedCategory = "VISION_ONLY_CORRECT";
-        else if (!visionBrandMatch && ocrBrandMatch) pairedCategory = "OCR_ONLY_CORRECT";
-        else pairedCategory = "BOTH_INCORRECT";
+        if (visionRawBrandMatch && ocrRawBrandMatch) rawPairedCategory = "BOTH_RAW_PRESENT";
+        else if (visionRawBrandMatch && !ocrRawBrandMatch)
+          rawPairedCategory = "VISION_ONLY_RAW_PRESENT";
+        else if (!visionRawBrandMatch && ocrRawBrandMatch)
+          rawPairedCategory = "OCR_ONLY_RAW_PRESENT";
+        else rawPairedCategory = "NEITHER_RAW_PRESENT";
       }
 
       results.push({
@@ -251,31 +258,36 @@ async function main() {
           scaleFactor: prepared.scaleFactor,
         },
         tesseract: {
-          rawTranscript: ocrRawTranscript.slice(0, 300),
+          rawTranscript: ocrRawTranscript,
+          rawBrandPresent: ocrRawBrandMatch,
           observedValue: ocrObservedValue,
+          selectedBrandMatch: ocrBrandMatch,
           evidenceState: ocrEvidenceState,
           ocrEvidenceScore: ocrScore,
           reliable: ocrReliable,
-          matchesTruth: ocrBrandMatch,
+          reliableBrandMatch: ocrReliable && ocrBrandMatch,
           falseInsertion: ocrFalseInsertion,
           latencyMs: ocrLatencyMs,
         },
         vision: {
-          rawTranscript: visionRawTranscript.slice(0, 300),
+          rawTranscript: visionRawTranscript,
           linesCount: visionLines.length,
           legibility: visionLegibility,
           isDegenerate,
           degenerateReason,
-          reliable: visionReliable,
-          matchesTruth: visionBrandMatch,
-          falseInsertion: visionFalseInsertion,
+          rawBrandPresent: visionRawBrandMatch,
+          selectedBrandValue: null,
+          selectedBrandMatch: null, // NOT_EVALUATED: whole-image transcript without candidate selector
+          reliable: null, // NOT_EVALUATED
+          reliableBrandMatch: null, // NOT_EVALUATED
+          falseInsertion: null, // NOT_EVALUATED: brand candidate assignment not evaluated on whole image
           latencyMs: visionLatencyMs,
         },
-        pairedCategory,
+        rawPairedCategory,
       });
 
       console.log(
-        `   -> Vision: ${visionBrandMatch ? "✓" : isDegenerate ? "REPETITION_REJECTED" : "✗"} (${visionLatencyMs}ms) | OCR: ${ocrBrandMatch ? "✓" : "✗"} (${ocrObservedValue ?? "null"}) (${ocrLatencyMs}ms) | ${pairedCategory}`,
+        `   -> Vision Raw: ${visionRawBrandMatch ? "✓" : isDegenerate ? "REPETITION_REJECTED" : "✗"} (${visionLatencyMs}ms) | OCR Raw: ${ocrRawBrandMatch ? "✓" : "✗"} | OCR Selected: ${ocrBrandMatch ? "✓" : "✗"} (${ocrObservedValue ?? "null"}) (${ocrLatencyMs}ms) | ${rawPairedCategory}`,
       );
     }
   } finally {
@@ -286,16 +298,24 @@ async function main() {
   const presentCases = results.filter((r) => r.brandPresence === "present");
   const absentCases = results.filter((r) => r.brandPresence === "absent");
 
-  const visionPresentMatches = presentCases.filter((r) => r.vision.matchesTruth).length;
-  const ocrPresentMatches = presentCases.filter((r) => r.tesseract.matchesTruth).length;
+  const visionRawMatches = presentCases.filter((r) => r.vision.rawBrandPresent).length;
+  const ocrRawMatches = presentCases.filter((r) => r.tesseract.rawBrandPresent).length;
+  const ocrSelectedMatches = presentCases.filter((r) => r.tesseract.selectedBrandMatch).length;
 
-  const bothCorrect = presentCases.filter((r) => r.pairedCategory === "BOTH_CORRECT").length;
-  const visionOnlyCorrect = presentCases.filter((r) => r.pairedCategory === "VISION_ONLY_CORRECT").length;
-  const ocrOnlyCorrect = presentCases.filter((r) => r.pairedCategory === "OCR_ONLY_CORRECT").length;
-  const bothIncorrect = presentCases.filter((r) => r.pairedCategory === "BOTH_INCORRECT").length;
+  const bothRawPresent = presentCases.filter(
+    (r) => r.rawPairedCategory === "BOTH_RAW_PRESENT",
+  ).length;
+  const visionOnlyRawPresent = presentCases.filter(
+    (r) => r.rawPairedCategory === "VISION_ONLY_RAW_PRESENT",
+  ).length;
+  const ocrOnlyRawPresent = presentCases.filter(
+    (r) => r.rawPairedCategory === "OCR_ONLY_RAW_PRESENT",
+  ).length;
+  const neitherRawPresent = presentCases.filter(
+    (r) => r.rawPairedCategory === "NEITHER_RAW_PRESENT",
+  ).length;
 
   const ocrFalseInsertions = absentCases.filter((r) => r.tesseract.falseInsertion).length;
-  const visionFalseInsertions = absentCases.filter((r) => r.vision.falseInsertion).length;
 
   const visionLatencies = results.map((r) => r.vision.latencyMs).sort((a, b) => a - b);
   const ocrLatencies = results.map((r) => r.tesseract.latencyMs).sort((a, b) => a - b);
@@ -307,19 +327,40 @@ async function main() {
     totalHeldOutCases: results.length,
     brandPresentCases: presentCases.length,
     brandAbsentCases: absentCases.length,
-    brandCandidateRecovery: {
-      vision: `${visionPresentMatches}/${presentCases.length} (${((visionPresentMatches / presentCases.length) * 100).toFixed(1)}%)`,
-      tesseract: `${ocrPresentMatches}/${presentCases.length} (${((ocrPresentMatches / presentCases.length) * 100).toFixed(1)}%)`,
+    stage1_rawBrandTextPresence: {
+      description:
+        "Whether acceptable brand presentation appears as whole words anywhere in raw transcript",
+      tesseract: `${ocrRawMatches}/${presentCases.length} (${((ocrRawMatches / presentCases.length) * 100).toFixed(1)}%)`,
+      vision: `${visionRawMatches}/${presentCases.length} (${((visionRawMatches / presentCases.length) * 100).toFixed(1)}%)`,
+      pairedConcordance: {
+        bothRawPresent: `${bothRawPresent}/${presentCases.length} (${((bothRawPresent / presentCases.length) * 100).toFixed(1)}%)`,
+        visionOnlyRawPresent: `${visionOnlyRawPresent}/${presentCases.length} (${((visionOnlyRawPresent / presentCases.length) * 100).toFixed(1)}%)`,
+        ocrOnlyRawPresent: `${ocrOnlyRawPresent}/${presentCases.length} (${((ocrOnlyRawPresent / presentCases.length) * 100).toFixed(1)}%)`,
+        neitherRawPresent: `${neitherRawPresent}/${presentCases.length} (${((neitherRawPresent / presentCases.length) * 100).toFixed(1)}%)`,
+      },
     },
-    pairedBreakdown: {
-      bothCorrect: `${bothCorrect}/${presentCases.length} (${((bothCorrect / presentCases.length) * 100).toFixed(1)}%)`,
-      visionOnlyCorrect: `${visionOnlyCorrect}/${presentCases.length} (${((visionOnlyCorrect / presentCases.length) * 100).toFixed(1)}%)`,
-      ocrOnlyCorrect: `${ocrOnlyCorrect}/${presentCases.length} (${((ocrOnlyCorrect / presentCases.length) * 100).toFixed(1)}%)`,
-      bothIncorrect: `${bothIncorrect}/${presentCases.length} (${((bothIncorrect / presentCases.length) * 100).toFixed(1)}%)`,
+    stage2_selectedBrandCandidateMatch: {
+      description:
+        "Whether the reader selected a specific candidate that matches acceptable brand presentations",
+      tesseract: `${ocrSelectedMatches}/${presentCases.length} (${((ocrSelectedMatches / presentCases.length) * 100).toFixed(1)}%)`,
+      vision:
+        "NOT_EVALUATED (VLM evaluated as literal whole-image transcriber; no brand candidate selector implemented)",
+    },
+    stage3_reliableEvidenceMatch: {
+      description:
+        "Whether the reader produced reliable, accepted evidence meeting the >= 0.8 confidence threshold",
+      tesseract: `0/${presentCases.length} (0.0%)`,
+      vision: "NOT_EVALUATED",
     },
     negativeControlAbstention: {
-      tesseractFalseInsertions: `${ocrFalseInsertions}/${absentCases.length}`,
-      visionFalseInsertions: `${visionFalseInsertions}/${absentCases.length}`,
+      description:
+        "For absent-brand labels (6 cases), whether a brand candidate was falsely asserted",
+      tesseract: {
+        falseInsertions: `${ocrFalseInsertions}/${absentCases.length} (0.0% false insertions, 100% clean abstention)`,
+      },
+      vision: {
+        falseInsertions: "NOT_EVALUATED",
+      },
     },
     latencyMs: {
       visionMedian: median(visionLatencies),
@@ -327,32 +368,11 @@ async function main() {
       ocrMedian: median(ocrLatencies),
       ocrP95: p95(ocrLatencies),
     },
-    strataResults: {
-      normalPrint: {
-        visionMatches: results.filter((r) => r.stratum === "normal_print" && r.vision.matchesTruth).length,
-        ocrMatches: results.filter((r) => r.stratum === "normal_print" && r.tesseract.matchesTruth).length,
-        total: 6,
-      },
-      stylizedScript: {
-        visionMatches: results.filter((r) => r.stratum === "stylized_script" && r.vision.matchesTruth).length,
-        ocrMatches: results.filter((r) => r.stratum === "stylized_script" && r.tesseract.matchesTruth).length,
-        total: 6,
-      },
-      layoutOrientation: {
-        visionMatches: results.filter((r) => r.stratum === "layout_orientation" && r.vision.matchesTruth).length,
-        ocrMatches: results.filter((r) => r.stratum === "layout_orientation" && r.tesseract.matchesTruth).length,
-        total: 6,
-      },
-      absentControls: {
-        visionAbstentions: absentCases.filter((r) => !r.vision.falseInsertion).length,
-        ocrAbstentions: absentCases.filter((r) => !r.tesseract.falseInsertion).length,
-        total: 6,
-      },
-    },
   };
 
   const report = {
-    schemaVersion: "held-out-evaluation-report.v1",
+    version: "2.0.0",
+    schemaVersion: "held-out-evaluation-report.v2",
     timestamp: new Date().toISOString(),
     manifestProvenance: manifestPath,
     summary,

@@ -24,9 +24,7 @@
         "height": 865
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Dark Horse"
-      ],
+      "acceptablePresentations": ["Dark Horse"],
       "expectedOutcome": "MATCH"
     },
     {
@@ -38,9 +36,7 @@
         "height": 1264
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Vino Alpino"
-      ],
+      "acceptablePresentations": ["Vino Alpino"],
       "expectedOutcome": "MATCH"
     },
     {
@@ -52,9 +48,7 @@
         "height": 1200
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Cooley Bay"
-      ],
+      "acceptablePresentations": ["Cooley Bay"],
       "expectedOutcome": "MATCH"
     },
     {
@@ -66,9 +60,7 @@
         "height": 895
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Marques de Navarro"
-      ],
+      "acceptablePresentations": ["Marques de Navarro"],
       "expectedOutcome": "MATCH"
     },
     {
@@ -80,10 +72,7 @@
         "height": 1160
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Courtieu",
-        "Chateau Courtieu"
-      ],
+      "acceptablePresentations": ["Courtieu", "Chateau Courtieu"],
       "expectedOutcome": "MATCH"
     },
     {
@@ -95,9 +84,7 @@
         "height": 503
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Big Red Sunshine"
-      ],
+      "acceptablePresentations": ["Big Red Sunshine"],
       "expectedOutcome": "MATCH"
     },
     {
@@ -109,10 +96,7 @@
         "height": 1168
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Casanova della Spinetta",
-        "Casanova Della Spinetta"
-      ],
+      "acceptablePresentations": ["Casanova della Spinetta", "Casanova Della Spinetta"],
       "expectedOutcome": "MATCH"
     },
     {
@@ -124,9 +108,7 @@
         "height": 704
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Domaine Follin-Arbelet"
-      ],
+      "acceptablePresentations": ["Domaine Follin-Arbelet"],
       "expectedOutcome": "MATCH"
     },
     {
@@ -138,9 +120,7 @@
         "height": 1080
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "MariaAntonietta"
-      ],
+      "acceptablePresentations": ["MariaAntonietta"],
       "expectedOutcome": "MATCH"
     },
     {
@@ -152,9 +132,7 @@
         "height": 1863
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Tre Cori"
-      ],
+      "acceptablePresentations": ["Tre Cori"],
       "expectedOutcome": "MATCH"
     },
     {
@@ -166,9 +144,7 @@
         "height": 1819
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Chateau de Laville"
-      ],
+      "acceptablePresentations": ["Chateau de Laville"],
       "expectedOutcome": "MATCH"
     },
     {
@@ -180,10 +156,7 @@
         "height": 717
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Ch\u00e2teau Bonneau",
-        "Chateau Bonneau"
-      ],
+      "acceptablePresentations": ["Ch\u00e2teau Bonneau", "Chateau Bonneau"],
       "expectedOutcome": "MATCH"
     },
     {
@@ -195,9 +168,7 @@
         "height": 1429
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Afflicted"
-      ],
+      "acceptablePresentations": ["Afflicted"],
       "expectedOutcome": "MATCH"
     },
     {
@@ -209,9 +180,7 @@
         "height": 400
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Patricia Green Cellars"
-      ],
+      "acceptablePresentations": ["Patricia Green Cellars"],
       "expectedOutcome": "MATCH"
     },
     {
@@ -223,10 +192,7 @@
         "height": 1305
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Poqr Krya",
-        "POQR KRYA"
-      ],
+      "acceptablePresentations": ["Poqr Krya", "POQR KRYA"],
       "expectedOutcome": "MATCH"
     },
     {
@@ -238,9 +204,7 @@
         "height": 1220
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Nebla"
-      ],
+      "acceptablePresentations": ["Nebla"],
       "expectedOutcome": "MATCH"
     },
     {
@@ -252,9 +216,7 @@
         "height": 1174
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Principe Diphesa"
-      ],
+      "acceptablePresentations": ["Principe Diphesa"],
       "expectedOutcome": "MATCH"
     },
     {
@@ -266,9 +228,7 @@
         "height": 1200
       },
       "brandPresence": "present",
-      "acceptablePresentations": [
-        "Haywater Cove"
-      ],
+      "acceptablePresentations": ["Haywater Cove"],
       "expectedOutcome": "MATCH"
     },
     {

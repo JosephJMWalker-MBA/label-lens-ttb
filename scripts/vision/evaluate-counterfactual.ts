@@ -78,9 +78,15 @@ async function main() {
   const manifestByPath = new Map(manifestData.records.map((r) => [r.imagePath, r]));
 
   // Load Phase 2B reports for paired comparison
-  const phase2bRun1 = JSON.parse(await readFile(".local-vision/eval-bounded-run-1/report.json", "utf8"));
-  const phase2bRun2 = JSON.parse(await readFile(".local-vision/eval-bounded-run-2/report.json", "utf8"));
-  const phase2bRun3 = JSON.parse(await readFile(".local-vision/eval-bounded-run-3/report.json", "utf8"));
+  const phase2bRun1 = JSON.parse(
+    await readFile(".local-vision/eval-bounded-run-1/report.json", "utf8"),
+  );
+  const phase2bRun2 = JSON.parse(
+    await readFile(".local-vision/eval-bounded-run-2/report.json", "utf8"),
+  );
+  const phase2bRun3 = JSON.parse(
+    await readFile(".local-vision/eval-bounded-run-3/report.json", "utf8"),
+  );
   const phase2bCases = phase2bRun3.boundedBrandCases as Array<{
     caseId: string;
     occurrence: string;
@@ -149,7 +155,10 @@ async function main() {
         const ocrLatencyMs = Math.round(performance.now() - t0);
 
         const words = wordsInOriginalOrder(ocrResult);
-        const rawTranscript = words.map((w) => w.text).join(" ").trim();
+        const rawTranscript = words
+          .map((w) => w.text)
+          .join(" ")
+          .trim();
         const selection = selectBrandObservation([ocrResult]);
         const obs = selection.observation;
         const observedValue = obs.value;
@@ -180,10 +189,7 @@ async function main() {
         const visionReliableButWrong = visionReliable && !visionMatch;
 
         let pairedCategory:
-          | "BOTH_CORRECT"
-          | "VISION_ONLY_CORRECT"
-          | "OCR_ONLY_CORRECT"
-          | "BOTH_INCORRECT";
+          "BOTH_CORRECT" | "VISION_ONLY_CORRECT" | "OCR_ONLY_CORRECT" | "BOTH_INCORRECT";
         if (visionMatch && ocrMatch) pairedCategory = "BOTH_CORRECT";
         else if (visionMatch && !ocrMatch) pairedCategory = "VISION_ONLY_CORRECT";
         else if (!visionMatch && ocrMatch) pairedCategory = "OCR_ONLY_CORRECT";
@@ -236,12 +242,20 @@ async function main() {
   }
 
   const bothCorrect = pairedResults.filter((r) => r.pairedCategory === "BOTH_CORRECT").length;
-  const visionOnlyCorrect = pairedResults.filter((r) => r.pairedCategory === "VISION_ONLY_CORRECT").length;
-  const ocrOnlyCorrect = pairedResults.filter((r) => r.pairedCategory === "OCR_ONLY_CORRECT").length;
+  const visionOnlyCorrect = pairedResults.filter(
+    (r) => r.pairedCategory === "VISION_ONLY_CORRECT",
+  ).length;
+  const ocrOnlyCorrect = pairedResults.filter(
+    (r) => r.pairedCategory === "OCR_ONLY_CORRECT",
+  ).length;
   const bothIncorrect = pairedResults.filter((r) => r.pairedCategory === "BOTH_INCORRECT").length;
 
-  const visionReliableButWrong = pairedResults.filter((r) => r.visionReader.reliableButWrong).length;
-  const ocrReliableButWrong = pairedResults.filter((r) => r.tesseractRegionOcr.reliableButWrong).length;
+  const visionReliableButWrong = pairedResults.filter(
+    (r) => r.visionReader.reliableButWrong,
+  ).length;
+  const ocrReliableButWrong = pairedResults.filter(
+    (r) => r.tesseractRegionOcr.reliableButWrong,
+  ).length;
 
   const visionMatches = pairedResults.filter((r) => r.visionReader.matchesTruth).length;
   const ocrMatches = pairedResults.filter((r) => r.tesseractRegionOcr.matchesTruth).length;
@@ -266,16 +280,22 @@ async function main() {
       ocrReliableButWrong: `${ocrReliableButWrong}/${pairedResults.length} (${((ocrReliableButWrong / pairedResults.length) * 100).toFixed(1)}%)`,
       tesseractFalseCertaintyCases: pairedResults
         .filter((r) => r.tesseractRegionOcr.reliableButWrong)
-        .map((r) => ({ caseId: r.caseId, observed: r.tesseractRegionOcr.observedValue, score: r.tesseractRegionOcr.ocrEvidenceScore })),
+        .map((r) => ({
+          caseId: r.caseId,
+          observed: r.tesseractRegionOcr.observedValue,
+          score: r.tesseractRegionOcr.ocrEvidenceScore,
+        })),
     },
     preprocessingComparison: {
       tesseract: {
-        pipeline: "crop -> resize 3x (cubic) -> grayscale -> normalise -> Tesseract LSTM (OEM 1, eng, PSM 11)",
+        pipeline:
+          "crop -> resize 3x (cubic) -> grayscale -> normalise -> Tesseract LSTM (OEM 1, eng, PSM 11)",
         channels: "1 (monochrome)",
         colorPreserved: false,
       },
       visionReader: {
-        pipeline: "crop -> aspect-ratio lanczos3 resize (minEdge 128, maxEdge 2048) -> RGB PNG -> vision-server",
+        pipeline:
+          "crop -> aspect-ratio lanczos3 resize (minEdge 128, maxEdge 2048) -> RGB PNG -> vision-server",
         channels: "3 (RGB)",
         colorPreserved: true,
       },

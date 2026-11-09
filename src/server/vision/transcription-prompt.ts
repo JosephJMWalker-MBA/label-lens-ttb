@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 
 import { z } from "zod";
 
-import { detectDegenerateRepetition } from "./repetition-detector";
+import { detectDegenerateTranscript } from "./repetition-detector";
 
 /**
  * The one prompt the vision reader uses on a bounded label region.
@@ -129,15 +129,8 @@ export function parseTranscriptionContent(content: string): ParsedTranscription 
       if (!parsed.success) continue;
 
       // Fail-closed hygiene: inspect raw lines BEFORE cleanLine truncation.
-      // If degenerate repetition is detected, reject the entire observation.
-      let isDegenerate = false;
-      for (const rawLine of parsed.data.lines) {
-        if (detectDegenerateRepetition(rawLine).isDegenerate) {
-          isDegenerate = true;
-          break;
-        }
-      }
-      if (isDegenerate) {
+      // If degenerate repetition is detected (per-line or across lines), reject the entire observation.
+      if (detectDegenerateTranscript(parsed.data.lines).isDegenerate) {
         return null;
       }
 

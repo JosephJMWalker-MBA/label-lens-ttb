@@ -185,30 +185,32 @@
 
 ## 9. Phase 2D Held-Out Validation (24 Diverse Public Labels)
 
-- **Objective:** Evaluate generalization and candidate recovery across 24 diverse public held-out labels representing 4 distinct strata (6 normal print, 6 stylized script, 6 rotated/complex layouts, 6 absent-brand negative controls).
+- **Objective:** Evaluate generalization across 24 diverse public held-out labels representing 4 distinct strata (6 normal print, 6 stylized script, 6 rotated/complex layouts, 6 absent-brand negative controls).
 - **Execution:** Serial evaluation (`scripts/vision/evaluate-held-out.ts`) with predeclared resize policy (`maxEdgePx: 800`, Lanczos3 aspect-ratio preserving) keeping vision tokens $\le 812$.
-- **Candidate Recovery Comparison (18 Brand-Present Labels):**
-  - **Vision Candidate Recovery:** **14 / 18 (77.8%)**
-  - **Tesseract Candidate Recovery:** **6 / 18 (33.3%)**
-  - **Paired Breakdown:**
-    - **Both Correct:** **5 / 18 (27.8%)**
-    - **Vision-Only Correct:** **9 / 18 (50.0%)**
-    - **OCR-Only Correct:** **1 / 18 (5.6%)**
-    - **Both Incorrect:** **3 / 18 (16.7%)**
+- **Artifact Provenance:** Original hardware run output preserved byte-intact at `artifacts/held-out-validation/report-v1.json`. Corrected symmetric multi-stage scoring and manifest reconciliation recorded at `artifacts/held-out-validation/report-v2.json` and `artifacts/held-out-validation/report.json`.
+- **Reconciled Case Inventory (Committed Manifest):**
+  - *Normal Print (6):* `approved-wine-006`, `008`, `012`, `016`, `020`, `038`
+  - *Stylized Script (6):* `casanova-della-spinetta`, `domaine-follin-arbelet`, `approved-wine-011`, `014`, `024`, `chateau-bonneau`
+  - *Layout & Orientation (6):* `approved-wine-013`, `patricia-green-cellars`, `approved-wine-018`, `nebla-mencia`, `approved-wine-026`, `approved-wine-033`
+  - *Absent Controls (6):* `approved-wine-022`, `058`, `062`, `075`, `082`, `095`
+- **Symmetric Comparison on 18 Brand-Present Labels:**
+  - **Stage 1: Raw Brand-Text Presence in Transcript (`brandPresentInTranscript`):**
+    - Tesseract: **15 / 18 (83.3%)**
+    - Vision (Line-Check as run on hardware): **14 / 18 (77.8%)**
+    - Vision (Multiline-Check): **13 / 18 (72.2%)** (`approved-wine-006` rejected for 60-line loop)
+    - Paired Concordance (Line-Check): Both 12/18, Vision-only 2/18 (`011`, `012`), OCR-only 3/18 (`casanova-della-spinetta`, `chateau-bonneau`, `018`), Neither 1/18 (`patricia-green-cellars`)
+  - **Stage 2: Selected Brand Candidate Match (`brandValueMatches`):**
+    - Tesseract: **6 / 18 (33.3%)** (`020`, `casanova-della-spinetta`, `domaine-follin-arbelet`, `014`, `nebla-mencia`, `026`)
+    - Vision: **`NOT_EVALUATED`** (whole-image transcription without candidate selector)
+  - **Stage 3: Reliable Evidence Match ($\ge 0.8$):**
+    - Tesseract: **0 / 18 (0.0%)** (all 18 cases had `evidenceState: AMBIGUOUS` or score < 0.8)
+    - Vision: **`NOT_EVALUATED`**
 - **Negative Control Abstention (6 Brand-Absent Labels):**
-  - **Vision False Candidate Insertions:** **0 / 6 (0.0% false insertions, 100% clean abstention)**
-  - **Tesseract False Candidate Insertions:** **0 / 6 (0.0% false insertions, 100% clean abstention)**
-- **Strata Breakdown:**
-  - **Normal Print (6 cases):** Vision 6 / 6 (100.0%) vs. Tesseract 1 / 6 (16.7%)
-  - **Stylized Script (6 cases):** Vision 4 / 6 (66.7%) vs. Tesseract 3 / 6 (50.0%)
-  - **Layout & Orientation (6 cases):** Vision 4 / 6 (66.7%) vs. Tesseract 2 / 6 (33.3%)
-  - **Absent Controls (6 cases):** Vision 6 / 6 clean abstentions vs. Tesseract 6 / 6 clean abstentions
-- **Latency Profile (800px full image):**
-  - Vision: Median 8,591 ms, p95 21,151 ms
-  - Tesseract: Median 783 ms, p95 1,570 ms
-- **Fail-Closed Transcript Hygiene In Vivo:**
-  - In `approved-wine-006` and `approved-wine-035`, unconstrained generation entered repetitive loops.
-  - The deterministic repetition detector caught both degenerate transcripts before length-capping truncation and rejected them fail-closed.
+  - Tesseract: **0 / 6 false insertions (100% clean abstention)** (`selectBrandObservation` returned null)
+  - Vision: **`NOT_EVALUATED`** (candidate-vs-text discrimination not evaluated on whole image)
+- **Degeneration Investigation:**
+  - `approved-wine-035`: Motivating fixture from Phase 2B/2C (approved regions); not in 24-case held-out manifest. Prior reference in held-out narrative was a provenance error.
+  - `approved-wine-006`: Generated 60 identical lines of `"Contains Sulfites - Canned by Dark Horse"` (21.1s). Caught by multiline repetition detector (`detectDegenerateTranscript`).
 - **Hardware Telemetry & 5-Minute Steady-State Recovery:**
   - 5-Minute Cooldown Steady State: **3,253 MiB used**, 2,610 MiB free, **4,231 MiB available** (full recovery to baseline).
   - Swap: 1,122 MiB used (`vmstat 1 3` confirms quiescent state: `so: 0`, CPU 97% idle).
@@ -219,6 +221,6 @@
 
 ## 10. Current Status & Stop Gate
 
-- **Phase 2D Held-Out Validation Status:** **COMPLETE & SUCCESSFUL**.
-- **Draft PR #232:** Created and updated on branch `eval/phase-2-orin-vision-counterfactual`.
+- **Phase 2D Held-Out Validation Status:** **REPAIRED (v2 Evidence Report & Provenance Reconciled)**.
+- **Draft PR #232:** Updated on branch `eval/phase-2-orin-vision-counterfactual`. Base explicitly scoped to `claude/affectionate-allen-710869`.
 - **Next Safe Action:** Stop before whole-label 115-case evaluation or production integration. Await user review and instructions.

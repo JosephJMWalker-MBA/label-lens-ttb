@@ -113,44 +113,63 @@ Options for that decision include a shadow mode, which records model readings be
 
 ### 8. Phase 2D Held-Out Validation (24 Diverse Public Labels)
 
-- Evaluator: `scripts/vision/evaluate-held-out.ts` running against pre-registered `artifacts/held-out-validation/held-out-manifest.json` (report saved at `artifacts/held-out-validation/report.json`).
+- Evaluator: `scripts/vision/evaluate-held-out.ts` running against pre-registered `artifacts/held-out-validation/held-out-manifest.json`.
+- Artifact Provenance: Original hardware run output preserved byte-intact at `artifacts/held-out-validation/report-v1.json`. Corrected symmetric multi-stage scoring and manifest reconciliation recorded at `artifacts/held-out-validation/report-v2.json` and `artifacts/held-out-validation/report.json`.
 - Predeclared Resize Policy: Context-safe resize to `maxEdgePx: 800` (Lanczos3 aspect-ratio preserving), capping vision prompt tokens to $\le 812$ and preventing context-window exhaustion on full-resolution label scans (up to 2550x3300).
-- Candidate Recovery on Brand-Present Labels (18 cases):
-  - **Vision Candidate Recovery:** **14 / 18 (77.8%)**
-  - **Tesseract Candidate Recovery:** **6 / 18 (33.3%)**
-  - **Paired Breakdown:**
-    - **Both Correct:** **5 / 18 (27.8%)** (`approved-wine-001`, `007`, `010`, `012`, `023`)
-    - **Vision-Only Correct:** **9 / 18 (50.0%)** (`approved-wine-002`, `003`, `004`, `005`, `008`, `009`, `011`, `027`, `031`)
-    - **OCR-Only Correct:** **1 / 18 (5.6%)** (`approved-wine-085`)
-    - **Both Incorrect:** **3 / 18 (16.7%)** (`approved-wine-006` repetition miss, `035` repetition miss, `091` script miss)
-- Negative Control Abstention (6 brand-absent labels: `approved-wine-016`, `017`, `018`, `019`, `020`, `021`):
-  - **Vision False Candidate Insertions:** **0 / 6 (0.0% false insertions, 100% clean abstention)**
-  - **Tesseract False Candidate Insertions:** **0 / 6 (0.0% false insertions, 100% clean abstention)**
-- Strata Breakdown:
-  - **Normal Print (6 cases):** Vision 6 / 6 (100.0%) vs. Tesseract 1 / 6 (16.7%)
-  - **Stylized Script (6 cases):** Vision 4 / 6 (66.7%) vs. Tesseract 3 / 6 (50.0%)
-  - **Layout & Orientation (6 cases):** Vision 4 / 6 (66.7%) vs. Tesseract 2 / 6 (33.3%)
-  - **Absent Controls (6 cases):** Vision 6 / 6 abstentions vs. Tesseract 6 / 6 abstentions
-- Latency (Full Image Scans at 800px):
-  - **Vision:** Median 8,591 ms, p95 21,151 ms (includes repetition loop max-token cases)
-  - **Tesseract:** Median 783 ms, p95 1,570 ms
-- Fail-Closed Repetition Hygiene:
-  - In `approved-wine-006` and `approved-wine-035`, model entered unconstrained autoregressive loops.
-  - The raw-line repetition detector (`src/server/vision/repetition-detector.ts`) caught both before length-capping truncation and rejected the lines fail-closed.
-- Hardware Telemetry & 5-Minute Steady-State Recovery:
-  - Immediate post-kill RAM: 3,769 MiB used, 3,715 MiB available.
-  - 5-Minute Cooldown Steady State: **3,253 MiB used**, 2,610 MiB free, **4,231 MiB available** (full recovery to pre-test baseline).
-  - Swap: 1,122 MiB used (stable, `vmstat 1 3` confirms `so: 0` zero swap out, quiescent).
-  - GPU & Thermals: `GR3D_FREQ 0%` (idle), GPU 47.5°C, CPU 47.0°C, board power 4.84W.
-  - Docker Services: All 4 containers (`odysseus`, `chromadb`, `searxng`, `ntfy`) remained continuously healthy (`Up 2 weeks`) with zero disruption.
-- Critical Evidence Boundary:
-  - Literal text candidate recovery reflects raw perceptual capacity on complex visual scenes, but does not bypass downstream #90 evidence acceptance gates.
+
+#### Reconciled Case Inventory (Committed Manifest: 24 Cases)
+- **Normal Print (6 cases):** `approved-wine-006` ("Dark Horse"), `approved-wine-008` ("Vino Alpino"), `approved-wine-012` ("Cooley Bay"), `approved-wine-016` ("Marques de Navarro"), `approved-wine-020` ("Courtieu"), `approved-wine-038` ("Big Red Sunshine").
+- **Stylized Script (6 cases):** `casanova-della-spinetta` ("Casanova della Spinetta"), `domaine-follin-arbelet` ("Domaine Follin-Arbelet"), `approved-wine-011` ("MariaAntonietta"), `approved-wine-014` ("Tre Cori"), `approved-wine-024` ("Chateau de Laville"), `chateau-bonneau` ("Château Bonneau").
+- **Layout & Orientation (6 cases):** `approved-wine-013` ("Afflicted"), `patricia-green-cellars` ("Patricia Green Cellars"), `approved-wine-018` ("Poqr Krya"), `nebla-mencia` ("Nebla"), `approved-wine-026` ("Principe Diphesa"), `approved-wine-033` ("Haywater Cove").
+- **Absent-Brand Negative Controls (6 cases):** `approved-wine-022`, `approved-wine-058`, `approved-wine-062`, `approved-wine-075`, `approved-wine-082`, `approved-wine-095`.
+
+#### Symmetric Multi-Stage Comparison (18 Brand-Present Labels)
+
+1. **Stage 1: Raw Brand-Text Presence in Transcript (`brandPresentInTranscript`):**
+   - **Tesseract Raw Brand Presence:** **15 / 18 (83.3%)**
+   - **Vision Raw Brand Presence (Line-Check as run on hardware):** **14 / 18 (77.8%)**
+   - **Vision Raw Brand Presence (Multiline-Check):** **13 / 18 (72.2%)** (`approved-wine-006` rejected for 60-line loop)
+   - **Paired Concordance (Line-Check):**
+     - Both Raw Present: **12 / 18 (66.7%)** (`006`, `008`, `016`, `020`, `038`, `domaine-follin-arbelet`, `014`, `024`, `013`, `nebla-mencia`, `026`, `033`)
+     - Vision-Only Raw Present: **2 / 18 (11.1%)** (`approved-wine-011`, `approved-wine-012`)
+     - OCR-Only Raw Present: **3 / 18 (16.7%)** (`casanova-della-spinetta`, `chateau-bonneau`, `approved-wine-018`)
+     - Neither Raw Present: **1 / 18 (5.6%)** (`patricia-green-cellars`)
+   - **Paired Concordance (Multiline-Check):**
+     - Both Raw Present: **11 / 18 (61.1%)**
+     - Vision-Only Raw Present: **2 / 18 (11.1%)** (`011`, `012`)
+     - OCR-Only Raw Present: **4 / 18 (22.2%)** (`006`, `casanova-della-spinetta`, `chateau-bonneau`, `018`)
+     - Neither Raw Present: **1 / 18 (5.6%)** (`patricia-green-cellars`)
+
+2. **Stage 2: Selected Brand Candidate Match (`brandValueMatches`):**
+   - **Tesseract Selected Brand Match:** **6 / 18 (33.3%)** (`020`, `casanova-della-spinetta`, `domaine-follin-arbelet`, `014`, `nebla-mencia`, `026`)
+     - *Why Tesseract drops from 15 raw to 6 selected:* On 9 cases (`006`, `008`, `016`, `038`, `024`, `chateau-bonneau`, `013`, `018`, `033`), Tesseract's raw OCR saw the brand, but its candidate window selector surfaced an appellation, varietal, or bottler phrase.
+   - **Vision Selected Brand Match:** **`NOT_EVALUATED`**
+     - *Status:* The VLM was prompted strictly as a literal whole-image transcriber; no brand candidate selector was executed on whole-label transcripts.
+
+3. **Stage 3: Reliable Evidence Match ($\ge 0.8$ Confidence Gate):**
+   - **Tesseract Reliable Brand Match:** **0 / 18 (0.0%)** (all 18 cases had `evidenceState: "AMBIGUOUS"` or score < 0.8)
+   - **Vision Reliable Brand Match:** **`NOT_EVALUATED`** (no downstream candidate selection/acceptance stage)
+
+#### Negative Control Abstention (6 Brand-Absent Labels)
+- **Tesseract:** **0 / 6 false insertions (100% clean abstention)**. `selectBrandObservation` returned `null` for all 6 cases.
+- **Vision:** **`NOT_EVALUATED`**. Whole-image transcription transcribes visible text; candidate-vs-text discrimination was not evaluated.
+
+#### Degeneration Investigation
+- **Case `approved-wine-035`:** Motivating fixture from Phase 2B/2C (approved brand regions) where a unigram repetition loop occurred. It was not in the 24-case held-out manifest; prior reference to it in the Phase 2D held-out narrative was a provenance error.
+- **Case `approved-wine-006`:** In the 24-case run, the model generated 60 identical lines of `"Contains Sulfites - Canned by Dark Horse"` (21.1s). The v1 evaluator evaluated lines individually and did not flag the line because it contained 7 distinct words; under the updated `detectDegenerateTranscript`, cross-line identical repetitions ($\ge 3$ consecutive lines) are intercepted and rejected fail-closed.
+
+#### Hardware Telemetry & 5-Minute Steady-State Recovery
+- Immediate post-kill RAM: 3,769 MiB used, 3,715 MiB available.
+- 5-Minute Cooldown Steady State: **3,253 MiB used**, 2,610 MiB free, **4,231 MiB available** (full recovery to pre-test baseline).
+- Swap: 1,122 MiB used (stable, `vmstat 1 3` confirms `so: 0` zero swap out, quiescent).
+- GPU & Thermals: `GR3D_FREQ 0%` (idle), GPU 47.5°C, CPU 47.0°C, board power 4.84W.
+- Docker Services: All 4 containers (`odysseus`, `chromadb`, `searxng`, `ntfy`) remained continuously healthy (`Up 2 weeks`) with zero disruption.
 
 ### 9. Decision record
 
 - Which #90 gates this evidence addresses, and which remain open:
-  - Addressed: Generalization verified on held-out set of 24 diverse public labels; vision outperforms OCR by +44.5 percentage points in candidate recovery (77.8% vs. 33.3%) across stylized script, rotated layouts, and diverse typography; 100% clean abstention on negative controls (0 false insertions); fail-closed degenerate repetition detection verified in vivo.
-  - Open: Whole-label 115-case evaluation deferred; governed observer harness (#90 §1) separate; production activation gate (#90 §6) remains ungranted and untouched.
-- Which candidate, if any, the numbers favour, and why:
-  - `Qwen2-VL-2B-Instruct` demonstrates substantial literal transcription superiority over Tesseract on complex wine labels without hallucinating brand names on brand-absent negative controls, with Apache 2.0 licensing suitability for commercial deployment.
+  - Addressed: Symmetric raw-evidence presence established (Tesseract 83.3% vs. Vision 77.8% line-check / 72.2% multiline-check); Tesseract candidate extraction drop-off documented (15 raw -> 6 selected -> 0 reliable); negative controls correctly reported (Tesseract 0/6 false insertions evaluated, Vision NOT_EVALUATED); multiline degenerate repetition detection implemented and verified; hardware stability and quiescent swap confirmed.
+  - Open: Whole-label candidate selection for VLM deferred; whole-label 115-case evaluation deferred; governed observer harness (#90 §1) separate; production activation gate (#90 §6) remains ungranted and untouched.
+- Candidate Assessment:
+  - `Qwen2-VL-2B-Instruct` provides robust literal text transcription on complex layouts and scripts, but whole-label deployment requires a dedicated candidate selection and validation pipeline before any claim of production uplift can be made.
 - No production activation follows from this record (#90 §6).

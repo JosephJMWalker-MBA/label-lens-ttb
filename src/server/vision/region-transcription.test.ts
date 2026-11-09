@@ -280,9 +280,7 @@ describe("parseTranscriptionContent", () => {
   it("fails closed on untruncated degenerate repetition before line length capping", () => {
     // Model enters a runaway loop on EYEBROW; raw line exceeds 400 chars
     const rawMalformed = JSON.stringify({
-      lines: [
-        "Hubert Lamy " + Array(30).fill("EYEBROW").join(" "),
-      ],
+      lines: ["Hubert Lamy " + Array(30).fill("EYEBROW").join(" ")],
       legibility: "partial",
     });
     expect(parseTranscriptionContent(rawMalformed)).toBeNull();

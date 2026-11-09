@@ -14,6 +14,9 @@ export interface RepetitionCheckResult {
   repeatCount?: number;
 }
 
+/**
+ * Checks a single string for degenerate repetition artifacts (unigram, ngram, or vocabulary collapse).
+ */
 export function detectDegenerateRepetition(text: string): RepetitionCheckResult {
   if (!text || text.trim() === "") {
     return { isDegenerate: false };
@@ -97,6 +100,76 @@ export function detectDegenerateRepetition(text: string): RepetitionCheckResult 
         repeatCount: words.length - unique.size,
       };
     }
+  }
+
+  return { isDegenerate: false };
+}
+
+/**
+ * Checks an array of lines for both per-line and cross-line degenerate repetition loops.
+ *
+ * This detects:
+ *   1. Degenerate repetition within any individual line.
+ *   2. Runaway consecutive identical lines (>= 3 consecutive repeats).
+ *   3. Multi-line vocabulary collapse across the transcript.
+ *   4. Full-transcript joined sequence repetition across line boundaries.
+ */
+export function detectDegenerateTranscript(lines: readonly string[]): RepetitionCheckResult {
+  if (!lines || lines.length === 0) {
+    return { isDegenerate: false };
+  }
+
+  // 1. Check each line individually
+  for (const line of lines) {
+    const single = detectDegenerateRepetition(line);
+    if (single.isDegenerate) {
+      return single;
+    }
+  }
+
+  const normalizedLines = lines.map((l) => l.trim().toLowerCase()).filter((l) => l.length > 0);
+
+  if (normalizedLines.length === 0) {
+    return { isDegenerate: false };
+  }
+
+  // 2. Check for consecutive identical lines (>= 3 repeats)
+  let runLine = normalizedLines[0];
+  let runCount = 1;
+  for (let i = 1; i < normalizedLines.length; i++) {
+    if (normalizedLines[i] === runLine) {
+      runCount++;
+      if (runCount >= 3) {
+        return {
+          isDegenerate: true,
+          reason: "CONSECUTIVE_NGRAM",
+          repeatedToken: runLine,
+          repeatCount: runCount,
+        };
+      }
+    } else {
+      runLine = normalizedLines[i];
+      runCount = 1;
+    }
+  }
+
+  // 3. Multi-line low diversity (e.g. 60 lines with < 25% unique lines)
+  if (normalizedLines.length >= 6) {
+    const uniqueLines = new Set(normalizedLines);
+    if (uniqueLines.size / normalizedLines.length < 0.25) {
+      return {
+        isDegenerate: true,
+        reason: "LOW_VOCABULARY_DIVERSITY",
+        repeatCount: normalizedLines.length - uniqueLines.size,
+      };
+    }
+  }
+
+  // 4. Joined full-transcript check (cross-boundary phrase loops)
+  const fullText = lines.join(" ");
+  const fullCheck = detectDegenerateRepetition(fullText);
+  if (fullCheck.isDegenerate) {
+    return fullCheck;
   }
 
   return { isDegenerate: false };

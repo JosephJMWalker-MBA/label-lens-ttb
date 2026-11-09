@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { detectDegenerateRepetition } from "./repetition-detector";
+import { detectDegenerateRepetition, detectDegenerateTranscript } from "./repetition-detector";
 
 describe("detectDegenerateRepetition", () => {
   describe("legitimate label text (must NOT be rejected)", () => {
@@ -81,6 +81,55 @@ describe("detectDegenerateRepetition", () => {
       expect(result.isDegenerate).toBe(true);
       expect(result.reason).toBe("CONSECUTIVE_UNIGRAM");
       expect(result.repeatedToken).toBe("eyebrow");
+    });
+  });
+
+  describe("detectDegenerateTranscript (multiline & whole-transcript checks)", () => {
+    it("accepts legitimate multiline label transcripts", () => {
+      const validLines = [
+        "Napa Valley Red Wine",
+        "Vintage 2021",
+        "Estate Bottled by Acme Cellars",
+        "Oakville, California",
+        "Alcohol 14.5% by volume",
+        "Contains Sulfites",
+        "750 mL",
+      ];
+      expect(detectDegenerateTranscript(validLines)).toEqual({ isDegenerate: false });
+    });
+
+    it("rejects multiline identical phrase loops (e.g. approved-wine-006 pattern)", () => {
+      const repeatedLine = "Contains Sulfites - Canned by Dark Horse";
+      const degenerateLines = Array(60).fill(repeatedLine);
+      const result = detectDegenerateTranscript(degenerateLines);
+      expect(result.isDegenerate).toBe(true);
+      expect(result.reason).toBe("CONSECUTIVE_NGRAM");
+    });
+
+    it("rejects transcripts with low multiline diversity (runaway generation across lines)", () => {
+      const lowDiversityLines = [
+        "Chateau Margaux",
+        "Grand Vin",
+        "Chateau Margaux",
+        "Chateau Margaux",
+        "Chateau Margaux",
+        "Grand Vin",
+        "Chateau Margaux",
+        "Chateau Margaux",
+      ];
+      const result = detectDegenerateTranscript(lowDiversityLines);
+      expect(result.isDegenerate).toBe(true);
+    });
+
+    it("rejects transcript if any single line is degenerate", () => {
+      const lines = [
+        "Vino Rosso",
+        "Hubert Lamy EYEBROW EYEBROW EYEBROW EYEBROW EYEBROW",
+        "Product of France",
+      ];
+      const result = detectDegenerateTranscript(lines);
+      expect(result.isDegenerate).toBe(true);
+      expect(result.reason).toBe("CONSECUTIVE_UNIGRAM");
     });
   });
 });
