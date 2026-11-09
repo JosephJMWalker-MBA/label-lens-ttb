@@ -377,3 +377,61 @@ To prevent development-set overfitting, an identity-deduplicated validation set 
 - Candidate Assessment:
   - PR #233's deterministic narrow stacked-heading candidate formation provides a sound, safe, and verifiable candidate recovery mechanism that incurs 0 regressions across both development and unseen corpora. However, because it remains default-disabled, merging PR #233 alone does not change production behavior. Any future activation requires a dedicated, documented maintainer decision.
 - No production activation follows from this record (#90 §6).
+
+### 17. Phase 2I: Final Attribution and Production-Policy Verification Audit
+
+#### Context & Objectives
+Following independent review on PR #233 (Review #5827447169) and Issue #231 (Comment #6742808108), Phase 2I executes an offline correction focused on candidate-delta attribution, production-policy parity replay, near-miss accounting, and enforcement of the pre-registered stop rule.
+
+#### 1. Candidate Delta Attribution Correction
+- **Discrepancy in Phase 2H:** The Phase 2H validation report identified `wine-multi-artifact-09` (`"DUCK WALK VINEYARDS"`) as a "new correct stacked formation (1/1)".
+- **Attribution Recomputation:** Forensic comparison of candidate identity tuples (`(cleanedValue, assembly, passId, lineIndexes)`) demonstrated that baseline OCR *already* constructed, ranked, and selected `"DUCK WALK VINEYARDS"` as `OBSERVED` under pre-existing `hasPositiveLine` multi-line merge rules.
+- **Corrected Delta Finding:** Comparing treatment-formed candidates against baseline candidate sets across all 79 out-of-sample cases reveals:
+  - Preexisting multi-line merge cases: 1 (`wine-multi-artifact-09`)
+  - Treatment-only candidates formed: **0**
+  - Treatment-only stacked headings formed: **0**
+  - Incremental candidate uplift attributable to `allowNarrowStackedHeadingMerge` on unseen artwork: **0**.
+
+#### 2. Exact Production-Policy Parity Replay
+Rather than a synthetic multipass stress comparison, Phase 2I replays the exact branching logic of `src/pipeline/extractor/extractor.ts`:
+1. `needsAlcoholRecovery`: Determined by `primaryAlcohol.observation.state === "NOT_OBSERVED"`.
+2. Primary `OBSERVED` Brand Preservation: When `primaryBrand.observation.state === "OBSERVED"`, the extractor preserves the primary observation directly (`primary-observed-shortcut`) without multi-pass reselection.
+3. Reselection Fallback: Reselection across passes (`recovery-reselection`) is executed exclusively when primary brand is `AMBIGUOUS` or `NOT_OBSERVED`.
+
+| Evaluation Scope | Metric | Baseline | Exact PR #233 Treatment | Delta |
+|---|---|:---:|:---:|:---:|
+| **Single-Pass Evaluation** | Target Brand-Present Cases | 72 | 72 | 0 |
+| | Selected Correct Brand | 21 / 72 (29.2%) | 21 / 72 (29.2%) | **0** |
+| | Reliable Accepted (`OBSERVED`) | 4 / 72 (5.6%) | 4 / 72 (5.6%) | **0** |
+| | Regressions on Prior-Correct Cases | 0 | 0 / 72 (0.0%) | 0 |
+| | Treatment-Only Stacked Candidates Formed | N/A | **0** | 0 |
+| | Treatment-Only Net Selection Benefit | N/A | **0** | 0 |
+| **Production Multi-Pass Replay** | Target Brand-Present Cases | 72 | 72 | 0 |
+| | Selected Correct Brand | 21 / 72 (29.2%) | 21 / 72 (29.2%) | **0** |
+| | Reliable Accepted (`OBSERVED`) | 4 / 72 (5.6%) | 4 / 72 (5.6%) | **0** |
+| | Regressions on Prior-Correct Cases | 0 | 0 / 72 (0.0%) | 0 |
+| | Treatment-Only Stacked Candidates Formed | N/A | **0** | 0 |
+| | Treatment-Only Net Selection Benefit | N/A | **0** | 0 |
+
+#### 3. Near-Miss and Negative Control Accounting
+- **Near-Miss Rivalry Controls (9 cases with `multiple-brand-like-phrases`):**
+  - Baseline Correct: 2 / 9 (`three-steves-winery`, `approved-wine-104`)
+  - Treatment Correct: 2 / 9 (identical)
+  - Baseline Wrong: 7 / 9 (all 7 safely gated as `AMBIGUOUS`)
+  - Treatment Wrong: 7 / 9 (all 7 safely gated as `AMBIGUOUS`)
+  - Confidently Wrong `OBSERVED`: **0 / 9** baseline, **0 / 9** treatment
+  - Treatment-Induced Misclassifications: **0 / 9** (for every case, treatment selected value is identical to baseline selected value).
+- **Safety Controls (4 Absent + 3 Ambiguous = 7 Controls):**
+  - Absent Control Assertions: 0 / 4
+  - Ambiguous Control Assertions: 0 / 3
+  - Authority Elevations to `OBSERVED`: 0 / 7
+
+#### 4. Stop Rule Application & Recommendation
+- **Pre-Registered Stop Rule:** If the corrected evaluation still shows no incremental benefit on the 79-case validation set, recommend parking PR #233 as a documented, default-disabled research result. Do not broaden the test set merely to obtain a positive result.
+- **Empirical Verdict:** While PR #233 provides a proven development recovery (recovering `CHATEAU BONNEAU` 6/18 → 7/18 on the 24-case held-out set without regressions), it yields **0 incremental selected-brand gains on the 79-case out-of-sample validation set** under both single-pass and complete production multi-pass replay.
+- **Formal Recommendation:**
+  1. **Park PR #233:** Keep PR #233 in draft status as a documented, default-disabled research result.
+  2. **Do Not Activate in Production:** Default `allowNarrowStackedHeadingMerge: false` remains in effect. Production gate (#90 §6) remains closed.
+  3. **No Scope Expansion:** Refrain from expanding the test set or tuning thresholds post hoc to force an incremental uplift.
+  4. **Preserve Research Stack:** PR #230, PR #232, and PR #233 remain unmerged reference artifacts.
+

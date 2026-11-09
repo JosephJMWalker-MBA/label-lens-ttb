@@ -330,4 +330,105 @@ describe("Candidate Loss Reconciliation and Treatment Invariants (Phase 2F)", ()
     expect(oosReport.verdict.falseAssertionCount).toBe(0);
     expect(oosReport.verdict.inappropriateElevationCount).toBe(0);
   });
+
+  it("verifies Phase 2I final attribution and production-policy verification artifacts", () => {
+    const reportV2Path = path.join(
+      process.cwd(),
+      "artifacts/held-out-validation/out-of-sample-validation-report-v2.json",
+    );
+    const policyPath = path.join(
+      process.cwd(),
+      "artifacts/held-out-validation/production-policy-attribution-report.json",
+    );
+
+    expect(existsSync(reportV2Path)).toBe(true);
+    expect(existsSync(policyPath)).toBe(true);
+
+    const reportV2 = JSON.parse(readFileSync(reportV2Path, "utf8"));
+    const policyReport = JSON.parse(readFileSync(policyPath, "utf8"));
+
+    expect(reportV2.version).toBe("phase-2i-final-attribution-production-policy-v2");
+    expect(policyReport.version).toBe("phase-2i-final-attribution-production-policy-v2");
+
+    // 1. Executive finding & recommendation
+    expect(reportV2.executiveFinding.incrementalSelectedUplift).toBe(0);
+    expect(reportV2.executiveFinding.netSelectionGainPercentage).toBe("0.0%");
+    expect(reportV2.executiveFinding.treatmentOnlyStackedCandidatesConstructed).toBe(0);
+    expect(reportV2.executiveFinding.treatmentOnlyStackedCandidatesSelected).toBe(0);
+    expect(reportV2.executiveFinding.treatmentRegressionsCount).toBe(0);
+    expect(reportV2.executiveFinding.negativeControlFalseAssertions).toBe(0);
+    expect(reportV2.executiveFinding.treatmentInducedNearMissMisclassifications).toBe(0);
+    expect(reportV2.executiveFinding.productionPolicyVerified).toBe(true);
+    expect(reportV2.executiveFinding.recommendation).toBe(
+      "PARK_PR_233_AS_DEFAULT_DISABLED_RESEARCH",
+    );
+
+    // 2. Candidate-delta attribution: DUCK WALK VINEYARDS on wine-multi-artifact-09 was preexisting
+    interface CaseRecordV2 {
+      caseId: string;
+      singlePass: {
+        preexistingMultiLineCandidates: string[];
+        treatmentOnlyCandidates: unknown[];
+        treatmentOnlyStackedCandidates: unknown[];
+      };
+      productionMultiPass: {
+        preexistingMultiLineCandidates: string[];
+        treatmentOnlyCandidates: unknown[];
+        treatmentOnlyStackedCandidates: unknown[];
+      };
+    }
+    const duckWalkCase = (reportV2.cases as CaseRecordV2[]).find(
+      (c) => c.caseId === "wine-multi-artifact-09",
+    );
+    expect(duckWalkCase).toBeDefined();
+    if (!duckWalkCase) throw new Error("wine-multi-artifact-09 not found");
+    expect(duckWalkCase.singlePass.preexistingMultiLineCandidates).toContain("DUCK WALK VINEYARDS");
+    expect(duckWalkCase.singlePass.treatmentOnlyCandidates.length).toBe(0);
+    expect(duckWalkCase.singlePass.treatmentOnlyStackedCandidates.length).toBe(0);
+    expect(duckWalkCase.productionMultiPass.preexistingMultiLineCandidates).toContain(
+      "DUCK WALK VINEYARDS",
+    );
+    expect(duckWalkCase.productionMultiPass.treatmentOnlyCandidates.length).toBe(0);
+
+    // 3. Single Pass & Production Multi-Pass Summary parity
+    const sp = reportV2.singlePassSummary;
+    const pmp = reportV2.productionMultiPassSummary;
+
+    expect(sp.baseline.selectedCorrectCount).toBe(21);
+    expect(sp.narrowTreatment.selectedCorrectCount).toBe(21);
+    expect(sp.narrowTreatment.regressionsCount).toBe(0);
+    expect(sp.candidateAttribution.preexistingMultiLineMergeCases).toBe(1);
+    expect(sp.candidateAttribution.treatmentOnlyStackedHeadingsFormedTotal).toBe(0);
+    expect(sp.candidateAttribution.treatmentOnlyNetSelectionBenefit).toBe(0);
+
+    expect(pmp.baseline.selectedCorrectCount).toBe(21);
+    expect(pmp.narrowTreatment.selectedCorrectCount).toBe(21);
+    expect(pmp.narrowTreatment.regressionsCount).toBe(0);
+    expect(pmp.candidateAttribution.preexistingMultiLineMergeCases).toBe(1);
+    expect(pmp.candidateAttribution.treatmentOnlyStackedHeadingsFormedTotal).toBe(0);
+    expect(pmp.candidateAttribution.treatmentOnlyNetSelectionBenefit).toBe(0);
+
+    // 4. Near-miss accounting: 9 cases total, 2 correct, 7 wrong (all 7 gated AMBIGUOUS, 0 confidently wrong OBSERVED, 0 treatment-induced)
+    expect(sp.nearMissAccounting.totalNearMissCases).toBe(9);
+    expect(sp.nearMissAccounting.baselineCorrectCount).toBe(2);
+    expect(sp.nearMissAccounting.treatmentCorrectCount).toBe(2);
+    expect(sp.nearMissAccounting.baselineWrongCount).toBe(7);
+    expect(sp.nearMissAccounting.treatmentWrongCount).toBe(7);
+    expect(sp.nearMissAccounting.baselineWrongGatedAmbiguous).toBe(7);
+    expect(sp.nearMissAccounting.treatmentWrongGatedAmbiguous).toBe(7);
+    expect(sp.nearMissAccounting.baselineConfidentlyWrongObserved).toBe(0);
+    expect(sp.nearMissAccounting.treatmentConfidentlyWrongObserved).toBe(0);
+    expect(sp.nearMissAccounting.treatmentInducedMisclassifications).toBe(0);
+
+    expect(pmp.nearMissAccounting.totalNearMissCases).toBe(9);
+    expect(pmp.nearMissAccounting.baselineCorrectCount).toBe(2);
+    expect(pmp.nearMissAccounting.treatmentCorrectCount).toBe(2);
+    expect(pmp.nearMissAccounting.baselineWrongCount).toBe(7);
+    expect(pmp.nearMissAccounting.treatmentWrongCount).toBe(7);
+    expect(pmp.nearMissAccounting.baselineWrongGatedAmbiguous).toBe(7);
+    expect(pmp.nearMissAccounting.treatmentWrongGatedAmbiguous).toBe(7);
+    expect(pmp.nearMissAccounting.baselineConfidentlyWrongObserved).toBe(0);
+    expect(pmp.nearMissAccounting.treatmentConfidentlyWrongObserved).toBe(0);
+    expect(pmp.nearMissAccounting.treatmentInducedMisclassifications).toBe(0);
+  });
 });
