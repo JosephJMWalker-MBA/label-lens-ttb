@@ -1,0 +1,5596 @@
+{
+  "generatedAt": "2026-11-09T04:11:36.473Z",
+  "version": "phase-2h-out-of-sample-validation-v1",
+  "provenance": {
+    "manifestFile": "artifacts/held-out-validation/out-of-sample-validation-manifest.json",
+    "totalEvaluatedCases": 79,
+    "pr233Commit": "5d690fbf377f8846395ec1ea5a7ef61c8c5c4852",
+    "fieldSelectionSha256": "4719a1f42825d43eb4acb792a6f404cc2be48b9302d5bbbe07618ee4b20f608f",
+    "stackedHeadingsSha256": "5bdc0137ee6044097dd58535c4f5579994611981f4546dda59e4177205eff589"
+  },
+  "verdict": {
+    "status": "OUT_OF_SAMPLE_VALIDATION_COMPLETED",
+    "singlePassVerdict": "CLEAN_PARITY_OR_IMPROVEMENT",
+    "multiPassVerdict": "CLEAN_PARITY_OR_IMPROVEMENT",
+    "regressionCount": 0,
+    "falseAssertionCount": 0,
+    "inappropriateElevationCount": 0
+  },
+  "singlePassSummary": {
+    "totalCases": 79,
+    "targetCases": 72,
+    "absentCases": 4,
+    "ambiguousCases": 3,
+    "nearMissCases": 9,
+    "baseline": {
+      "candidateConstructedCount": 27,
+      "candidateConstructedRate": "37.5%",
+      "topThreeRankedCount": 27,
+      "topThreeRankedRate": "37.5%",
+      "selectedCorrectCount": 21,
+      "selectedCorrectRate": "29.2%",
+      "reliableAcceptedCount": 4,
+      "reliableAcceptedRate": "5.6%",
+      "negativeControlCandidateInsertions": 0,
+      "negativeControlSelectedAssertions": 0
+    },
+    "narrowTreatment": {
+      "candidateConstructedCount": 27,
+      "candidateConstructedRate": "37.5%",
+      "topThreeRankedCount": 27,
+      "topThreeRankedRate": "37.5%",
+      "selectedCorrectCount": 21,
+      "selectedCorrectRate": "29.2%",
+      "reliableAcceptedCount": 4,
+      "reliableAcceptedRate": "5.6%",
+      "negativeControlCandidateInsertions": 0,
+      "negativeControlSelectedAssertions": 0,
+      "regressionsCount": 0,
+      "inappropriateAuthorityElevationCount": 0
+    },
+    "stackedCandidatesFormedTotal": 1,
+    "stackedCandidatesCorrect": 1,
+    "stackedCandidatesIncorrect": 0
+  },
+  "multiPassSummary": {
+    "totalCases": 79,
+    "targetCases": 72,
+    "absentCases": 4,
+    "ambiguousCases": 3,
+    "nearMissCases": 9,
+    "baseline": {
+      "candidateConstructedCount": 27,
+      "candidateConstructedRate": "37.5%",
+      "topThreeRankedCount": 27,
+      "topThreeRankedRate": "37.5%",
+      "selectedCorrectCount": 21,
+      "selectedCorrectRate": "29.2%",
+      "reliableAcceptedCount": 4,
+      "reliableAcceptedRate": "5.6%",
+      "negativeControlCandidateInsertions": 0,
+      "negativeControlSelectedAssertions": 0
+    },
+    "narrowTreatment": {
+      "candidateConstructedCount": 27,
+      "candidateConstructedRate": "37.5%",
+      "topThreeRankedCount": 27,
+      "topThreeRankedRate": "37.5%",
+      "selectedCorrectCount": 21,
+      "selectedCorrectRate": "29.2%",
+      "reliableAcceptedCount": 4,
+      "reliableAcceptedRate": "5.6%",
+      "negativeControlCandidateInsertions": 0,
+      "negativeControlSelectedAssertions": 0,
+      "regressionsCount": 0,
+      "inappropriateAuthorityElevationCount": 0
+    },
+    "stackedCandidatesFormedTotal": 1,
+    "stackedCandidatesCorrect": 1,
+    "stackedCandidatesIncorrect": 0
+  },
+  "cases": [
+    {
+      "caseId": "alfredos-wine",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Alfredo's Wine",
+        "Alfredo's"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "HLTRE",
+          "selectedMatches": false,
+          "confidence": 0.18,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "HLTRE",
+          "selectedMatches": false,
+          "confidence": 0.18,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "HLTRE",
+          "selectedMatches": false,
+          "confidence": 0.18,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "HLTRE",
+          "selectedMatches": false,
+          "confidence": 0.18,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-009",
+      "controlType": "near_miss_rivalry_control",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Vino Alpino"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Azienda Agricola Terre Sparse",
+          "selectedMatches": false,
+          "confidence": 0.9575,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Azienda Agricola Terre Sparse",
+          "selectedMatches": false,
+          "confidence": 0.9575,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Azienda Agricola Terre Sparse",
+          "selectedMatches": false,
+          "confidence": 0.9575,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Azienda Agricola Terre Sparse",
+          "selectedMatches": false,
+          "confidence": 0.9575,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-017",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "La Borde Noire"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "oABORDE NOIRE",
+          "selectedMatches": false,
+          "confidence": 0.63,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "oABORDE NOIRE",
+          "selectedMatches": false,
+          "confidence": 0.63,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "oABORDE NOIRE",
+          "selectedMatches": false,
+          "confidence": 0.63,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "oABORDE NOIRE",
+          "selectedMatches": false,
+          "confidence": 0.63,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-019",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Kyrios"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "KYRIOS",
+          "selectedMatches": true,
+          "confidence": 0.87,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "KYRIOS",
+          "selectedMatches": true,
+          "confidence": 0.87,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "KYRIOS",
+          "selectedMatches": true,
+          "confidence": 0.87,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "KYRIOS",
+          "selectedMatches": true,
+          "confidence": 0.87,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "saker",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Saker"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "SAKER",
+          "selectedMatches": true,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "SAKER",
+          "selectedMatches": true,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "SAKER",
+          "selectedMatches": true,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "SAKER",
+          "selectedMatches": true,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-028",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Field",
+        "Field Vineyards"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "FIELD",
+          "selectedMatches": true,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "FIELD",
+          "selectedMatches": true,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "FIELD",
+          "selectedMatches": true,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "FIELD",
+          "selectedMatches": true,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-032",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Travers Reserve"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "TRAVERS RESERVE",
+          "selectedMatches": true,
+          "confidence": 0.955,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "TRAVERS RESERVE",
+          "selectedMatches": true,
+          "confidence": 0.955,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "TRAVERS RESERVE",
+          "selectedMatches": true,
+          "confidence": 0.955,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "TRAVERS RESERVE",
+          "selectedMatches": true,
+          "confidence": 0.955,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-034",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Nico"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "NICO",
+          "selectedMatches": true,
+          "confidence": 0.85,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "NICO",
+          "selectedMatches": true,
+          "confidence": 0.85,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "NICO",
+          "selectedMatches": true,
+          "confidence": 0.85,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "NICO",
+          "selectedMatches": true,
+          "confidence": 0.85,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-037",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Touch"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Strumica - Radovish Region",
+          "selectedMatches": false,
+          "confidence": 0.76,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Strumica - Radovish Region",
+          "selectedMatches": false,
+          "confidence": 0.76,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Strumica - Radovish Region",
+          "selectedMatches": false,
+          "confidence": 0.76,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Strumica - Radovish Region",
+          "selectedMatches": false,
+          "confidence": 0.76,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-041",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Petite Nature"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "Petite Nature",
+          "selectedMatches": true,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "Petite Nature",
+          "selectedMatches": true,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "Petite Nature",
+          "selectedMatches": true,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "Petite Nature",
+          "selectedMatches": true,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-042",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Domaine Quivy"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "PRODUCT OF FRANCE",
+          "selectedMatches": false,
+          "confidence": 0.96,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "PRODUCT OF FRANCE",
+          "selectedMatches": false,
+          "confidence": 0.96,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "PRODUCT OF FRANCE",
+          "selectedMatches": false,
+          "confidence": 0.96,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "PRODUCT OF FRANCE",
+          "selectedMatches": false,
+          "confidence": 0.96,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-043",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Fulcrum"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "FULCRUM",
+          "selectedMatches": true,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "FULCRUM",
+          "selectedMatches": true,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "FULCRUM",
+          "selectedMatches": true,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "FULCRUM",
+          "selectedMatches": true,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-044",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Sweet Seduction"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "VEEL",
+          "selectedMatches": false,
+          "confidence": 0.13,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "VEEL",
+          "selectedMatches": false,
+          "confidence": 0.13,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "VEEL",
+          "selectedMatches": false,
+          "confidence": 0.13,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "VEEL",
+          "selectedMatches": false,
+          "confidence": 0.13,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-045",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Meeting of the Minds"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Meeting of ihe Minds",
+          "selectedMatches": false,
+          "confidence": 0.7999999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Meeting of ihe Minds",
+          "selectedMatches": false,
+          "confidence": 0.7999999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Meeting of ihe Minds",
+          "selectedMatches": false,
+          "confidence": 0.7999999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Meeting of ihe Minds",
+          "selectedMatches": false,
+          "confidence": 0.7999999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-046",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Curious"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Red Wine Blend Curious",
+          "selectedMatches": false,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Red Wine Blend Curious",
+          "selectedMatches": false,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Red Wine Blend Curious",
+          "selectedMatches": false,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Red Wine Blend Curious",
+          "selectedMatches": false,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-047",
+      "controlType": "near_miss_rivalry_control",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Etiris GX"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "DENOMINACIO D'ORIGEN",
+          "selectedMatches": false,
+          "confidence": 0.645,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "DENOMINACIO D'ORIGEN",
+          "selectedMatches": false,
+          "confidence": 0.645,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "DENOMINACIO D'ORIGEN",
+          "selectedMatches": false,
+          "confidence": 0.645,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "DENOMINACIO D'ORIGEN",
+          "selectedMatches": false,
+          "confidence": 0.645,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-048",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Pacha"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Pacha RESERVA - CARMENERE",
+          "selectedMatches": false,
+          "confidence": 0.9275,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Pacha RESERVA - CARMENERE",
+          "selectedMatches": false,
+          "confidence": 0.9275,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Pacha RESERVA - CARMENERE",
+          "selectedMatches": false,
+          "confidence": 0.9275,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Pacha RESERVA - CARMENERE",
+          "selectedMatches": false,
+          "confidence": 0.9275,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-049",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Caywood Vineyard"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "CAYWOQOD VINEYARD",
+          "selectedMatches": false,
+          "confidence": 0.7749999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "CAYWOQOD VINEYARD",
+          "selectedMatches": false,
+          "confidence": 0.7749999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "CAYWOQOD VINEYARD",
+          "selectedMatches": false,
+          "confidence": 0.7749999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "CAYWOQOD VINEYARD",
+          "selectedMatches": false,
+          "confidence": 0.7749999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "le-temps-des-fleurs",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Le Temps des Fleurs",
+        "Le Temps Des Fleurs"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "LE TEMPS DES FLEURS",
+          "selectedMatches": true,
+          "confidence": 0.9375,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "LE TEMPS DES FLEURS",
+          "selectedMatches": true,
+          "confidence": 0.9375,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "LE TEMPS DES FLEURS",
+          "selectedMatches": true,
+          "confidence": 0.9375,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "LE TEMPS DES FLEURS",
+          "selectedMatches": true,
+          "confidence": 0.9375,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-051",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Pacheca"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "PACHECA DOURO D.O.C",
+          "selectedMatches": false,
+          "confidence": 0.8433333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "PACHECA DOURO D.O.C",
+          "selectedMatches": false,
+          "confidence": 0.8433333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "PACHECA DOURO D.O.C",
+          "selectedMatches": false,
+          "confidence": 0.8433333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "PACHECA DOURO D.O.C",
+          "selectedMatches": false,
+          "confidence": 0.8433333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-052",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Mountain Valley Winery"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "OLp VINE ZINFANDEL",
+          "selectedMatches": false,
+          "confidence": 0.91,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "OLp VINE ZINFANDEL",
+          "selectedMatches": false,
+          "confidence": 0.91,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "OLp VINE ZINFANDEL",
+          "selectedMatches": false,
+          "confidence": 0.91,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "OLp VINE ZINFANDEL",
+          "selectedMatches": false,
+          "confidence": 0.91,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-053",
+      "controlType": "near_miss_rivalry_control",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Golden Road Vineyards"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Vineya",
+          "selectedMatches": false,
+          "confidence": 0.92,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Vineya",
+          "selectedMatches": false,
+          "confidence": 0.92,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Vineya",
+          "selectedMatches": false,
+          "confidence": 0.92,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Vineya",
+          "selectedMatches": false,
+          "confidence": 0.92,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-054",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Henri Dufreres"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "IA5 ME15",
+          "selectedMatches": false,
+          "confidence": 0.79,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "IA5 ME15",
+          "selectedMatches": false,
+          "confidence": 0.79,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "IA5 ME15",
+          "selectedMatches": false,
+          "confidence": 0.79,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "IA5 ME15",
+          "selectedMatches": false,
+          "confidence": 0.79,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-055",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Francois Villard"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "FRANCOIS VILLARD",
+          "selectedMatches": true,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "FRANCOIS VILLARD",
+          "selectedMatches": true,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "FRANCOIS VILLARD",
+          "selectedMatches": true,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "FRANCOIS VILLARD",
+          "selectedMatches": true,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-056",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Prinsi"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "CAMP dPIETRU",
+          "selectedMatches": false,
+          "confidence": 0.685,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "CAMP dPIETRU",
+          "selectedMatches": false,
+          "confidence": 0.685,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "CAMP dPIETRU",
+          "selectedMatches": false,
+          "confidence": 0.685,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "CAMP dPIETRU",
+          "selectedMatches": false,
+          "confidence": 0.685,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-057",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Prinsi"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "JI Lill",
+          "selectedMatches": false,
+          "confidence": 0.5366666666666666,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "JI Lill",
+          "selectedMatches": false,
+          "confidence": 0.5366666666666666,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "JI Lill",
+          "selectedMatches": false,
+          "confidence": 0.5366666666666666,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "JI Lill",
+          "selectedMatches": false,
+          "confidence": 0.5366666666666666,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-059",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Domenico Negro",
+        "Dominico Negro"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "JI mmm Ill",
+          "selectedMatches": false,
+          "confidence": 0.42333333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "JI mmm Ill",
+          "selectedMatches": false,
+          "confidence": 0.42333333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "JI mmm Ill",
+          "selectedMatches": false,
+          "confidence": 0.42333333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "JI mmm Ill",
+          "selectedMatches": false,
+          "confidence": 0.42333333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "three-steves-winery",
+      "controlType": "near_miss_rivalry_control",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "3 Steves Winery"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "3 STEVES WINERY",
+          "selectedMatches": true,
+          "confidence": 0.96,
+          "state": "OBSERVED",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "3 STEVES WINERY",
+          "selectedMatches": true,
+          "confidence": 0.96,
+          "state": "OBSERVED",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "3 STEVES WINERY",
+          "selectedMatches": true,
+          "confidence": 0.96,
+          "state": "OBSERVED",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "3 STEVES WINERY",
+          "selectedMatches": true,
+          "confidence": 0.96,
+          "state": "OBSERVED",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-061",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Aphrodite"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "APHRODITE",
+          "selectedMatches": true,
+          "confidence": 0.8,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "APHRODITE",
+          "selectedMatches": true,
+          "confidence": 0.8,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "APHRODITE",
+          "selectedMatches": true,
+          "confidence": 0.8,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "APHRODITE",
+          "selectedMatches": true,
+          "confidence": 0.8,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-063",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Prinsi"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "TRE FICHI",
+          "selectedMatches": false,
+          "confidence": 0.94,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "TRE FICHI",
+          "selectedMatches": false,
+          "confidence": 0.94,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "TRE FICHI",
+          "selectedMatches": false,
+          "confidence": 0.94,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "TRE FICHI",
+          "selectedMatches": false,
+          "confidence": 0.94,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-064",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Prinsi"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Prins",
+          "selectedMatches": false,
+          "confidence": 0.31,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Prins",
+          "selectedMatches": false,
+          "confidence": 0.31,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Prins",
+          "selectedMatches": false,
+          "confidence": 0.31,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Prins",
+          "selectedMatches": false,
+          "confidence": 0.31,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-065",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Prinsi"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Prins",
+          "selectedMatches": false,
+          "confidence": 0.48,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Prins",
+          "selectedMatches": false,
+          "confidence": 0.48,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Prins",
+          "selectedMatches": false,
+          "confidence": 0.48,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Prins",
+          "selectedMatches": false,
+          "confidence": 0.48,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-066",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Domaine Juliette Avril"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "JULIETTE VRIL",
+          "selectedMatches": false,
+          "confidence": 0.7050000000000001,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "JULIETTE VRIL",
+          "selectedMatches": false,
+          "confidence": 0.7050000000000001,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "JULIETTE VRIL",
+          "selectedMatches": false,
+          "confidence": 0.7050000000000001,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "JULIETTE VRIL",
+          "selectedMatches": false,
+          "confidence": 0.7050000000000001,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-067",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Domaine Juliette Avril"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "JULIETTE VRIL",
+          "selectedMatches": false,
+          "confidence": 0.9199999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "JULIETTE VRIL",
+          "selectedMatches": false,
+          "confidence": 0.9199999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "JULIETTE VRIL",
+          "selectedMatches": false,
+          "confidence": 0.9199999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "JULIETTE VRIL",
+          "selectedMatches": false,
+          "confidence": 0.9199999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-068",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Sara"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "SARA",
+          "selectedMatches": true,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "SARA",
+          "selectedMatches": true,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "SARA",
+          "selectedMatches": true,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "SARA",
+          "selectedMatches": true,
+          "confidence": 0.95,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-069",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "AltaCima 4.090",
+        "AltaCima"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "ALTACIMA 4.090",
+          "selectedMatches": true,
+          "confidence": 0.9199999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "ALTACIMA 4.090",
+          "selectedMatches": true,
+          "confidence": 0.9199999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "ALTACIMA 4.090",
+          "selectedMatches": true,
+          "confidence": 0.9199999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "ALTACIMA 4.090",
+          "selectedMatches": true,
+          "confidence": 0.9199999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "altacima",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "AltaCima 4.090",
+        "AltaCima"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "ALTACIMA 4.090",
+          "selectedMatches": true,
+          "confidence": 0.9199999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "ALTACIMA 4.090",
+          "selectedMatches": true,
+          "confidence": 0.9199999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "ALTACIMA 4.090",
+          "selectedMatches": true,
+          "confidence": 0.9199999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "ALTACIMA 4.090",
+          "selectedMatches": true,
+          "confidence": 0.9199999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-071",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "AltaCima 6.330",
+        "AltaCima"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "LATE HARVEST 2013",
+          "selectedMatches": false,
+          "confidence": 0.9566666666666667,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "LATE HARVEST 2013",
+          "selectedMatches": false,
+          "confidence": 0.9566666666666667,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "LATE HARVEST 2013",
+          "selectedMatches": false,
+          "confidence": 0.9566666666666667,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "LATE HARVEST 2013",
+          "selectedMatches": false,
+          "confidence": 0.9566666666666667,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-072",
+      "controlType": "negative_control_ambiguous",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Ava Gardner"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "HINNANT FAMILY VINEYARDS",
+          "selectedMatches": false,
+          "confidence": 0.9433333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "HINNANT FAMILY VINEYARDS",
+          "selectedMatches": false,
+          "confidence": 0.9433333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "HINNANT FAMILY VINEYARDS",
+          "selectedMatches": false,
+          "confidence": 0.9433333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "HINNANT FAMILY VINEYARDS",
+          "selectedMatches": false,
+          "confidence": 0.9433333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-073",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Mike's Farm, Inc.",
+        "Mike's Farm"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "Mike's Farm, Inc.",
+          "selectedMatches": true,
+          "confidence": 0.9033333333333333,
+          "state": "OBSERVED",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "Mike's Farm, Inc.",
+          "selectedMatches": true,
+          "confidence": 0.9033333333333333,
+          "state": "OBSERVED",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "Mike's Farm, Inc.",
+          "selectedMatches": true,
+          "confidence": 0.9033333333333333,
+          "state": "OBSERVED",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "Mike's Farm, Inc.",
+          "selectedMatches": true,
+          "confidence": 0.9033333333333333,
+          "state": "OBSERVED",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-074",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Mike's Farm, Inc.",
+        "Mike's Farm"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "HINNANT VINEYARDS",
+          "selectedMatches": false,
+          "confidence": 0.935,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "HINNANT VINEYARDS",
+          "selectedMatches": false,
+          "confidence": 0.935,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "HINNANT VINEYARDS",
+          "selectedMatches": false,
+          "confidence": 0.935,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "HINNANT VINEYARDS",
+          "selectedMatches": false,
+          "confidence": 0.935,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-076",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Etim"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Flore",
+          "selectedMatches": false,
+          "confidence": 0.46,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Flore",
+          "selectedMatches": false,
+          "confidence": 0.46,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Flore",
+          "selectedMatches": false,
+          "confidence": 0.46,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Flore",
+          "selectedMatches": false,
+          "confidence": 0.46,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-077",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Valdinera"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "VALDINERA",
+          "selectedMatches": true,
+          "confidence": 0.89,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "VALDINERA",
+          "selectedMatches": true,
+          "confidence": 0.89,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "VALDINERA",
+          "selectedMatches": true,
+          "confidence": 0.89,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "VALDINERA",
+          "selectedMatches": true,
+          "confidence": 0.89,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-078",
+      "controlType": "near_miss_rivalry_control",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Pietta"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "MUSCOLINE-ITALIA",
+          "selectedMatches": false,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "MUSCOLINE-ITALIA",
+          "selectedMatches": false,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "MUSCOLINE-ITALIA",
+          "selectedMatches": false,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "MUSCOLINE-ITALIA",
+          "selectedMatches": false,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-079",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Le Caniette"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "OFFIDA",
+          "selectedMatches": false,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "OFFIDA",
+          "selectedMatches": false,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "OFFIDA",
+          "selectedMatches": false,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "OFFIDA",
+          "selectedMatches": false,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "le-caniette",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Le Caniette"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "INDICAZIONE GEOGRAFICA PROTETTA",
+          "selectedMatches": false,
+          "confidence": 0.9133333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "INDICAZIONE GEOGRAFICA PROTETTA",
+          "selectedMatches": false,
+          "confidence": 0.9133333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "INDICAZIONE GEOGRAFICA PROTETTA",
+          "selectedMatches": false,
+          "confidence": 0.9133333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "INDICAZIONE GEOGRAFICA PROTETTA",
+          "selectedMatches": false,
+          "confidence": 0.9133333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-081",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Corte Adagio"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "CORTEADAGIO",
+          "selectedMatches": false,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "CORTEADAGIO",
+          "selectedMatches": false,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "CORTEADAGIO",
+          "selectedMatches": false,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "CORTEADAGIO",
+          "selectedMatches": false,
+          "confidence": 0.9,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-083",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Barn Sill Wine Co.",
+        "Barn Sill Wine Co"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Bam il",
+          "selectedMatches": false,
+          "confidence": 0.5449999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Bam il",
+          "selectedMatches": false,
+          "confidence": 0.5449999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Bam il",
+          "selectedMatches": false,
+          "confidence": 0.5449999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Bam il",
+          "selectedMatches": false,
+          "confidence": 0.5449999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-084",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Filadoro"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "BUTA DISTRIBUTORS INC",
+          "selectedMatches": false,
+          "confidence": 0.9433333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "BUTA DISTRIBUTORS INC",
+          "selectedMatches": false,
+          "confidence": 0.9433333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "BUTA DISTRIBUTORS INC",
+          "selectedMatches": false,
+          "confidence": 0.9433333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "BUTA DISTRIBUTORS INC",
+          "selectedMatches": false,
+          "confidence": 0.9433333333333334,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-086",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "3 Steves Winery"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "3 STEVES WINERY",
+          "selectedMatches": true,
+          "confidence": 0.96,
+          "state": "OBSERVED",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "3 STEVES WINERY",
+          "selectedMatches": true,
+          "confidence": 0.96,
+          "state": "OBSERVED",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "3 STEVES WINERY",
+          "selectedMatches": true,
+          "confidence": 0.96,
+          "state": "OBSERVED",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "3 STEVES WINERY",
+          "selectedMatches": true,
+          "confidence": 0.96,
+          "state": "OBSERVED",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-087",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Viridis"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "LANGHE SAUVIGNON Tuga",
+          "selectedMatches": false,
+          "confidence": 0.52,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "LANGHE SAUVIGNON Tuga",
+          "selectedMatches": false,
+          "confidence": 0.52,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "LANGHE SAUVIGNON Tuga",
+          "selectedMatches": false,
+          "confidence": 0.52,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "LANGHE SAUVIGNON Tuga",
+          "selectedMatches": false,
+          "confidence": 0.52,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-088",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "La Mesma"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "LA MESMA Yellow Label",
+          "selectedMatches": false,
+          "confidence": 0.9175,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "LA MESMA Yellow Label",
+          "selectedMatches": false,
+          "confidence": 0.9175,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "LA MESMA Yellow Label",
+          "selectedMatches": false,
+          "confidence": 0.9175,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "LA MESMA Yellow Label",
+          "selectedMatches": false,
+          "confidence": 0.9175,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-089",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "La Mesma"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "LA MESMA Black Label",
+          "selectedMatches": false,
+          "confidence": 0.94,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "LA MESMA Black Label",
+          "selectedMatches": false,
+          "confidence": 0.94,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "LA MESMA Black Label",
+          "selectedMatches": false,
+          "confidence": 0.94,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "LA MESMA Black Label",
+          "selectedMatches": false,
+          "confidence": 0.94,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-090",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "La Mesma"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "WHITE WINE 2018 Lo219",
+          "selectedMatches": false,
+          "confidence": 0.7224999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "WHITE WINE 2018 Lo219",
+          "selectedMatches": false,
+          "confidence": 0.7224999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "WHITE WINE 2018 Lo219",
+          "selectedMatches": false,
+          "confidence": 0.7224999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "WHITE WINE 2018 Lo219",
+          "selectedMatches": false,
+          "confidence": 0.7224999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-092",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Twin Suns"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Hn SANTA BARBARA",
+          "selectedMatches": false,
+          "confidence": 0.7933333333333333,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Hn SANTA BARBARA",
+          "selectedMatches": false,
+          "confidence": 0.7933333333333333,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Hn SANTA BARBARA",
+          "selectedMatches": false,
+          "confidence": 0.7933333333333333,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Hn SANTA BARBARA",
+          "selectedMatches": false,
+          "confidence": 0.7933333333333333,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-093",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Fontanavecchia"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "DELRAY BEACH, FL, USA",
+          "selectedMatches": false,
+          "confidence": 0.9275,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "DELRAY BEACH, FL, USA",
+          "selectedMatches": false,
+          "confidence": 0.9275,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "DELRAY BEACH, FL, USA",
+          "selectedMatches": false,
+          "confidence": 0.9275,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "DELRAY BEACH, FL, USA",
+          "selectedMatches": false,
+          "confidence": 0.9275,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-094",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Fontanavecchia"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "DELRAY BEACH. FL, USA",
+          "selectedMatches": false,
+          "confidence": 0.9125,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "DELRAY BEACH. FL, USA",
+          "selectedMatches": false,
+          "confidence": 0.9125,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "DELRAY BEACH. FL, USA",
+          "selectedMatches": false,
+          "confidence": 0.9125,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "DELRAY BEACH. FL, USA",
+          "selectedMatches": false,
+          "confidence": 0.9125,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-096",
+      "controlType": "negative_control_absent",
+      "brandPresence": "absent",
+      "acceptablePresentations": [],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": null,
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "NOT_OBSERVED",
+          "supportingPassIds": [],
+          "independentEvidenceCount": 0,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": null,
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "NOT_OBSERVED",
+          "supportingPassIds": [],
+          "independentEvidenceCount": 0,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": null,
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "NOT_OBSERVED",
+          "supportingPassIds": [],
+          "independentEvidenceCount": 0,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": null,
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "NOT_OBSERVED",
+          "supportingPassIds": [],
+          "independentEvidenceCount": 0,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-097",
+      "controlType": "negative_control_absent",
+      "brandPresence": "absent",
+      "acceptablePresentations": [],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": null,
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "NOT_OBSERVED",
+          "supportingPassIds": [],
+          "independentEvidenceCount": 0,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": null,
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "NOT_OBSERVED",
+          "supportingPassIds": [],
+          "independentEvidenceCount": 0,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": null,
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "NOT_OBSERVED",
+          "supportingPassIds": [],
+          "independentEvidenceCount": 0,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": null,
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "NOT_OBSERVED",
+          "supportingPassIds": [],
+          "independentEvidenceCount": 0,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-098",
+      "controlType": "negative_control_absent",
+      "brandPresence": "absent",
+      "acceptablePresentations": [],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": null,
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "NOT_OBSERVED",
+          "supportingPassIds": [],
+          "independentEvidenceCount": 0,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": null,
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "NOT_OBSERVED",
+          "supportingPassIds": [],
+          "independentEvidenceCount": 0,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": null,
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "NOT_OBSERVED",
+          "supportingPassIds": [],
+          "independentEvidenceCount": 0,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": null,
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "NOT_OBSERVED",
+          "supportingPassIds": [],
+          "independentEvidenceCount": 0,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-099",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Fontanavecchia"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "DELRAY BEACH, FL, USA",
+          "selectedMatches": false,
+          "confidence": 0.895,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "DELRAY BEACH, FL, USA",
+          "selectedMatches": false,
+          "confidence": 0.895,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "DELRAY BEACH, FL, USA",
+          "selectedMatches": false,
+          "confidence": 0.895,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "DELRAY BEACH, FL, USA",
+          "selectedMatches": false,
+          "confidence": 0.895,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "amuninni-ferracane",
+      "controlType": "negative_control_ambiguous",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Amuninni",
+        "Fabio Ferracane"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "INV ENVY",
+          "selectedMatches": false,
+          "confidence": 0.125,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "INV ENVY",
+          "selectedMatches": false,
+          "confidence": 0.125,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "INV ENVY",
+          "selectedMatches": false,
+          "confidence": 0.125,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "INV ENVY",
+          "selectedMatches": false,
+          "confidence": 0.125,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-101",
+      "controlType": "negative_control_absent",
+      "brandPresence": "absent",
+      "acceptablePresentations": [],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": null,
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "NOT_OBSERVED",
+          "supportingPassIds": [],
+          "independentEvidenceCount": 0,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": null,
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "NOT_OBSERVED",
+          "supportingPassIds": [],
+          "independentEvidenceCount": 0,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": null,
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "NOT_OBSERVED",
+          "supportingPassIds": [],
+          "independentEvidenceCount": 0,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": null,
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "NOT_OBSERVED",
+          "supportingPassIds": [],
+          "independentEvidenceCount": 0,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-102",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Twin Suns"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Mevushal Kosher for Passover",
+          "selectedMatches": false,
+          "confidence": 0.8985714285714285,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Mevushal Kosher for Passover",
+          "selectedMatches": false,
+          "confidence": 0.8985714285714285,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Mevushal Kosher for Passover",
+          "selectedMatches": false,
+          "confidence": 0.8985714285714285,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Mevushal Kosher for Passover",
+          "selectedMatches": false,
+          "confidence": 0.8985714285714285,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-103",
+      "controlType": "near_miss_rivalry_control",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Tenute Valso"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "SNA VALSO",
+          "selectedMatches": false,
+          "confidence": 0.67,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "SNA VALSO",
+          "selectedMatches": false,
+          "confidence": 0.67,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "SNA VALSO",
+          "selectedMatches": false,
+          "confidence": 0.67,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "SNA VALSO",
+          "selectedMatches": false,
+          "confidence": 0.67,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-104",
+      "controlType": "near_miss_rivalry_control",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Blazic"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "BLAZIC",
+          "selectedMatches": true,
+          "confidence": 0.91,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "BLAZIC",
+          "selectedMatches": true,
+          "confidence": 0.91,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "BLAZIC",
+          "selectedMatches": true,
+          "confidence": 0.91,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "BLAZIC",
+          "selectedMatches": true,
+          "confidence": 0.91,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-105",
+      "controlType": "near_miss_rivalry_control",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Luigi & Giovanni"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "VANNI",
+          "selectedMatches": false,
+          "confidence": 0.92,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "VANNI",
+          "selectedMatches": false,
+          "confidence": 0.92,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "VANNI",
+          "selectedMatches": false,
+          "confidence": 0.92,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "VANNI",
+          "selectedMatches": false,
+          "confidence": 0.92,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-106",
+      "controlType": "near_miss_rivalry_control",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Alfredo's Wine",
+        "Alfredos Wine"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "REDO",
+          "selectedMatches": false,
+          "confidence": 0.75,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "REDO",
+          "selectedMatches": false,
+          "confidence": 0.75,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "REDO",
+          "selectedMatches": false,
+          "confidence": 0.75,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "REDO",
+          "selectedMatches": false,
+          "confidence": 0.75,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-107",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "La Fattoria"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "FATTORIA",
+          "selectedMatches": false,
+          "confidence": 0.89,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "FATTORIA",
+          "selectedMatches": false,
+          "confidence": 0.89,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "FATTORIA",
+          "selectedMatches": false,
+          "confidence": 0.89,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "FATTORIA",
+          "selectedMatches": false,
+          "confidence": 0.89,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-108",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "La Fattoria"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "8 Ao VINO BIANCO",
+          "selectedMatches": false,
+          "confidence": 0.8099999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "8 Ao VINO BIANCO",
+          "selectedMatches": false,
+          "confidence": 0.8099999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "8 Ao VINO BIANCO",
+          "selectedMatches": false,
+          "confidence": 0.8099999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "8 Ao VINO BIANCO",
+          "selectedMatches": false,
+          "confidence": 0.8099999999999999,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-109",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Sangouard-Chene"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "SANGOUARD-CHENE",
+          "selectedMatches": true,
+          "confidence": 0.89,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "SANGOUARD-CHENE",
+          "selectedMatches": true,
+          "confidence": 0.89,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "SANGOUARD-CHENE",
+          "selectedMatches": true,
+          "confidence": 0.89,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "SANGOUARD-CHENE",
+          "selectedMatches": true,
+          "confidence": 0.89,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "approved-wine-110",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Cooley Bay"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Cool&y",
+          "selectedMatches": false,
+          "confidence": 0.31,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Cool&y",
+          "selectedMatches": false,
+          "confidence": 0.31,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Cool&y",
+          "selectedMatches": false,
+          "confidence": 0.31,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Cool&y",
+          "selectedMatches": false,
+          "confidence": 0.31,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "m-cellars-baseline",
+      "controlType": "negative_control_ambiguous",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "M Cellars"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "CELLARS",
+          "selectedMatches": false,
+          "confidence": 0.31,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "CELLARS",
+          "selectedMatches": false,
+          "confidence": 0.31,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "CELLARS",
+          "selectedMatches": false,
+          "confidence": 0.31,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "CELLARS",
+          "selectedMatches": false,
+          "confidence": 0.31,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "wine-multi-artifact-05",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Blazic"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "BLAZIC COLLIO",
+          "selectedMatches": false,
+          "confidence": 0.895,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "BLAZIC COLLIO",
+          "selectedMatches": false,
+          "confidence": 0.895,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "BLAZIC COLLIO",
+          "selectedMatches": false,
+          "confidence": 0.895,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "BLAZIC COLLIO",
+          "selectedMatches": false,
+          "confidence": 0.895,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "wine-multi-artifact-06",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Mauro Molino"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "MOLINO",
+          "selectedMatches": false,
+          "confidence": 0.56,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "MOLINO",
+          "selectedMatches": false,
+          "confidence": 0.56,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "MOLINO",
+          "selectedMatches": false,
+          "confidence": 0.56,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "MOLINO",
+          "selectedMatches": false,
+          "confidence": 0.56,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "wine-multi-artifact-07",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Mike's Farm",
+        "Mike's Farm, Inc."
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "North Carolina Nuscadine Nig",
+          "selectedMatches": false,
+          "confidence": 0.6,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "North Carolina Nuscadine Nig",
+          "selectedMatches": false,
+          "confidence": 0.6,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "North Carolina Nuscadine Nig",
+          "selectedMatches": false,
+          "confidence": 0.6,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "North Carolina Nuscadine Nig",
+          "selectedMatches": false,
+          "confidence": 0.6,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "wine-multi-artifact-08",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Pindar"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Z-lor",
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Z-lor",
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 2,
+        "baseline": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Z-lor",
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": false,
+          "topThreeRanked": false,
+          "selected": "Z-lor",
+          "selectedMatches": false,
+          "confidence": 0,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    },
+    {
+      "caseId": "wine-multi-artifact-09",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Duck Walk Vineyards"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "DUCK WALK VINEYARDS",
+          "selectedMatches": true,
+          "confidence": 0.96,
+          "state": "OBSERVED",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "DUCK WALK VINEYARDS",
+          "selectedMatches": true,
+          "confidence": 0.96,
+          "state": "OBSERVED",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": "DUCK WALK VINEYARDS",
+        "narrowStackedIsCorrect": true
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "DUCK WALK VINEYARDS",
+          "selectedMatches": true,
+          "confidence": 0.96,
+          "state": "OBSERVED",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "DUCK WALK VINEYARDS",
+          "selectedMatches": true,
+          "confidence": 0.96,
+          "state": "OBSERVED",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": "DUCK WALK VINEYARDS"
+      }
+    },
+    {
+      "caseId": "wine-multi-artifact-10",
+      "controlType": "target",
+      "brandPresence": "present",
+      "acceptablePresentations": [
+        "Mauro Molino"
+      ],
+      "singlePass": {
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "MAURO MOLINO",
+          "selectedMatches": true,
+          "confidence": 0.55,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "MAURO MOLINO",
+          "selectedMatches": true,
+          "confidence": 0.55,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null,
+        "narrowStackedIsCorrect": null
+      },
+      "multiPass": {
+        "recoveryPassesPlanned": 3,
+        "baseline": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "MAURO MOLINO",
+          "selectedMatches": true,
+          "confidence": 0.55,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "narrowTreatment": {
+          "candidateConstructed": true,
+          "topThreeRanked": true,
+          "selected": "MAURO MOLINO",
+          "selectedMatches": true,
+          "confidence": 0.55,
+          "state": "AMBIGUOUS",
+          "supportingPassIds": [
+            "pass-0-full-image"
+          ],
+          "independentEvidenceCount": 1,
+          "recoveryPassUsed": false
+        },
+        "isRegression": false,
+        "narrowStackedCandidate": null
+      }
+    }
+  ]
+}

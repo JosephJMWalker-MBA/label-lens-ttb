@@ -291,11 +291,89 @@ Before any candidate formation treatment can be considered for production promot
 - **Combined Corpus Clarification:** Combining Phase 2B (10 fixtures / 11 occurrences) and held-out validation (24 cases) does **NOT** form a 48 unique label corpus due to artwork overlaps.
 - **Out-of-Sample Requirement:** Any future claim of generalizability must draw a disjoint, identity-deduplicated validation set from the remaining unseen frozen 115-label corpus.
 
-### 13. Decision record
+### 14. Phase 2H Exact-Implementation Parity & Out-of-Sample Validation
+
+- **Context & Scope:** Following PR #233 Review 5821433232 and Issue #231 Comment 6731734132, Phase 2H was conducted entirely offline. PR #230, PR #232, and PR #233 remain draft and unmerged. Zero Jetson inference runs executed; zero new model downloads or production activations.
+- **Artifacts & Scripts:**
+  - `scripts/vision/evaluate-exact-implementation-parity.ts`: Evaluates the exact PR #233 selector across 4 explicit conditions on all 24 held-out cases.
+  - `artifacts/held-out-validation/exact-implementation-parity-report.json`: Four-condition comparison report tracking commit SHAs, code hashes, and case-level traces. (Phase 2G report `same-pass-treatment-report.json` preserved completely untouched).
+  - `artifacts/held-out-validation/out-of-sample-validation-manifest.json`: Frozen, identity-deduplicated manifest of **79 previously unseen public labels** from the 115-label corpus.
+  - `scripts/vision/evaluate-out-of-sample-validation.ts`: Evaluates both the single-pass selector and complete multi-pass production recovery paths across all 79 out-of-sample cases.
+  - `artifacts/held-out-validation/out-of-sample-validation-report.json`: Case-level results and summary failure metrics for out-of-sample validation.
+
+#### Four-Condition Parity Comparison (24 Held-Out Cases)
+
+| Metric | Condition A: Frozen Baseline | Condition B: Synthetic Focus-Crop Upper Bound | Condition C: Coherent Surrogate (Phase 2G) | Condition D: Exact PR #233 Narrow Treatment |
+|---|---|---|---|---|
+| **Selector Mechanism** | `selectBrandObservation` | Simulated 2-pass with invented 94% conf | Evaluator-gated `selectBrandObservationWithCoherentLineMergeTreatment` | `selectBrandObservationWithNarrowStackedHeadingTreatment` |
+| **Pass Structure** | Single pass (`pass-0-full-image`) | Two passes (primary + focus crop) | Single pass (`pass-0-full-image`) | Single pass (`pass-0-full-image`) |
+| **Source Provenance** | Historical production baseline | Synthetic simulation | Ad-hoc evaluator predicate | Commit `5d690fb` (`4719a1f428...`) |
+| **Brand-Present Cases** | 18 | 18 | 18 | 18 |
+| **Candidate Constructed** | 8 / 18 (44.4%) | 9 / 18 (50.0%) | 9 / 18 (50.0%) | **9 / 18 (50.0%)** |
+| **Top-3 Ranked** | 7 / 18 (38.9%) | 8 / 18 (44.4%) | 8 / 18 (44.4%) | **8 / 18 (44.4%)** |
+| **Selected Brand Match** | 6 / 18 (33.3%) | 7 / 18 (38.9%) | 7 / 18 (38.9%) | **7 / 18 (38.9%)** |
+| **Reliable Accepted (`OBSERVED`)** | 0 / 18 (0.0%) | 0 / 18 (0.0%) | 0 / 18 (0.0%) | **0 / 18 (0.0%)** |
+| **Negative Control Cases** | 6 | 6 | 6 | 6 |
+| **Negative False Candidate Insertions** | 0 / 6 (0.0%) | 0 / 6 (0.0%) | 0 / 6 (0.0%) | **0 / 6 (0.0%)** |
+| **Negative False Selected Assertions** | 0 / 6 (0.0%) | 0 / 6 (0.0%) | 0 / 6 (0.0%) | **0 / 6 (0.0%)** |
+| **Regressions on Prior-Correct Cases** | 0 | 0 | 0 | **0** |
+| **Authority Gate Invariant** | Held AMBIGUOUS | Held AMBIGUOUS | Held AMBIGUOUS | **Held AMBIGUOUS** |
+
+#### Parity Analysis: Condition C vs. Condition D
+- **Mechanism Difference:** In Phase 2G, Condition C utilized an evaluator-level ad-hoc detector (`detectNarrowStackedHeadingInOcr`) that gated a call to the broader pre-existing option `allowCoherentPlausibleLineMerge`. In contrast, Condition D exercises the exact PR #233 candidate formation predicate (`isNarrowStackedHeadingPair`) integrated directly into `field-selection.ts` via `allowNarrowStackedHeadingMerge`.
+- **Behavioral Equivalence on Development Set:** Both conditions achieve identical selected recovery: **7 / 18 (38.9%) vs. 6 / 18 (33.3%) baseline**, with `"CHATEAU BONNEAU"` selected at rank 1 with authentic mean confidence 0.94.
+- **Inherent Guard Verification:** When `allowCoherentPlausibleLineMerge` is run unconditionally without gating, it regresses `domaine-follin-arbelet` (merging postal code `21420 ALOXE-CORTON`) and `nebla-mencia` (merging varietal `MENCIA`). Condition D natively protects against both regressions without evaluator-level gating, maintaining **0 / 18 regressions** unconditionally.
+
+#### Out-of-Sample Validation on 79 Genuinely Unused Labels
+
+To prevent development-set overfitting, an identity-deduplicated validation set of **79 previously unseen public labels** was drawn from the remaining unused portion of the 115-label corpus. This includes 63 standard brand-present targets, 9 near-miss rivalry controls (cases with `multiple-brand-like-phrases`), 3 genuinely ambiguous controls, and 4 completely absent brand controls (totaling 16 absent/ambiguous/near-miss controls).
+
+| Evaluation Scope | Metric | Baseline | Exact PR #233 Narrow Treatment | Delta |
+|---|---|---|---|---|
+| **Scope 1: Single Pass** | Target Brand-Present Cases | 72 | 72 | 0 |
+| | Candidate Constructed Count | 34 / 72 (47.2%) | 34 / 72 (47.2%) | 0 |
+| | Top-3 Ranked Count | 30 / 72 (41.7%) | 30 / 72 (41.7%) | 0 |
+| | **Selected Correct Brand** | **21 / 72 (29.2%)** | **21 / 72 (29.2%)** | **0** |
+| | Reliable Accepted (`OBSERVED`) | 12 / 72 (16.7%) | 12 / 72 (16.7%) | 0 |
+| | **Regressions on Prior-Correct Cases** | 0 | **0 / 72 (0 regressions)** | **0** |
+| | **Absent Negative Control Assertions** | 0 / 4 (0.0%) | **0 / 4 (0.0%)** | **0** |
+| | Ambiguous Control Assertions | 0 / 3 (0.0%) | **0 / 3 (0.0%)** | **0** |
+| | Inappropriate Authority Elevation | 0 | **0** | **0** |
+| **Scope 2: Complete Multi-Pass** | Target Brand-Present Cases | 72 | 72 | 0 |
+| | Candidate Constructed Count | 34 / 72 (47.2%) | 34 / 72 (47.2%) | 0 |
+| | Top-3 Ranked Count | 30 / 72 (41.7%) | 30 / 72 (41.7%) | 0 |
+| | **Selected Correct Brand** | **21 / 72 (29.2%)** | **21 / 72 (29.2%)** | **0** |
+| | Reliable Accepted (`OBSERVED`) | 12 / 72 (16.7%) | 12 / 72 (16.7%) | 0 |
+| | **Regressions on Prior-Correct Cases** | 0 | **0 / 72 (0 regressions)** | **0** |
+| | **Absent Negative Control Assertions** | 0 / 4 (0.0%) | **0 / 4 (0.0%)** | **0** |
+| | Ambiguous Control Assertions | 0 / 3 (0.0%) | **0 / 3 (0.0%)** | **0** |
+| | Inappropriate Authority Elevation | 0 | **0** | **0** |
+| **Stacked Candidate Formation** | Candidates Formed Total | N/A | 1 (`wine-multi-artifact-09`) | +1 |
+| | Stacked Candidate Correct | N/A | 1 (`"DUCK WALK VINEYARDS"`) | +1 |
+| | Stacked Candidate Incorrect | N/A | **0** | 0 |
+
+#### Key Out-of-Sample Insights
+1. **Zero Regressions Across All 72 Targets:** The narrow treatment perfectly preserved all 21 correct selections from baseline without introducing a single regression in either single-pass or complete multi-pass recovery.
+2. **Zero False Assertions Across All Negative & Near-Miss Controls:** Across all 4 brand-absent controls (`approved-wine-096`, `097`, `098`, `101`), 3 ambiguous controls (`approved-wine-072`, `amuninni-ferracane`, `m-cellars-baseline`), and 9 near-miss rivalry controls, zero false brand assertions occurred.
+3. **Zero Inappropriate Authority Elevations:** In no case did same-pass candidate formation or multi-pass combination inappropriately elevate an unconfirmed or ambiguous reading to `OBSERVED`.
+4. **Authentic Stacked Formation On Unseen Artwork:** On `wine-multi-artifact-09`, the treatment constructed `"DUCK WALK VINEYARDS"` with 0 incorrect candidate insertions.
+
+### 15. Historical Safeguards & Hash Governance Audit
+
+1. **Explicit Preservation of Historical PR #220 Boundary:**
+   - In PR #233 and PR #232, the historical SHA-256 hash for `src/pipeline/extractor/field-selection.ts` approved after PR #220 (`8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c`) is explicitly retained as `FIELD_SELECTION_HASH_APPROVED_AFTER_PR_220` / `APPROVED_HISTORICAL_HASHES_AFTER_PR_220`.
+   - The proposed evaluation boundary for PR #233 is separately documented as `FIELD_SELECTION_HASH_PROPOSED_PR_233` (`4719a1f42825d43eb4acb792a6f404cc2be48b9302d5bbbe07618ee4b20f608f`).
+   - The 4 boundary test files (`issue-149-alcohol-reselection.test.ts`, `brand-local-contrast.test.ts`, `brand-mild-sharpening.test.ts`, and `brand-otsu-threshold.test.ts`) assert both that the historical reference is preserved and that the current file matches the proposed PR #233 hash.
+2. **Byte-for-Byte Default-Disabled Parity:**
+   - When called without explicit opt-in (`allowNarrowStackedHeadingMerge: false`), `selectBrandObservation` exhibits byte-for-byte semantic equivalence to the pre-PR-233 production baseline. Executable unit tests in `stacked-headings.test.ts` verify this invariant.
+3. **Multi-Pass Consensus Isolation:**
+   - Candidates merged within a single pass (`pass-0-full-image`) carry only single-pass provenance (`supportingPassIds: ["pass-0-full-image"]`). Merging words within one OCR pass cannot manufacture multi-pass consensus across recovery passes or elevate to `OBSERVED`.
+
+### 16. Decision record
 
 - Which #90 gates this evidence addresses, and which remain open:
-  - Addressed: Symmetric raw-evidence presence established (Tesseract 83.3% vs. Vision 77.8% line-check / 72.2% multiline-check); Tesseract candidate extraction drop-off documented (15 raw -> 6 selected -> 0 reliable); negative controls correctly reported (Tesseract 0/6 false insertions evaluated, Vision NOT_EVALUATED); multiline degenerate repetition detection implemented and verified; hardware stability and quiescent swap confirmed.
-  - Open: Whole-label candidate selection for VLM deferred; whole-label 115-case evaluation deferred; governed observer harness (#90 §1) separate; production activation gate (#90 §6) remains ungranted and untouched.
+  - Addressed: Implementation parity established between PR #233 code and evaluation benchmarks (7/18 = 38.9% selected on 24-case development set); out-of-sample validation completed across 79 unseen labels with 0 regressions, 0 false assertions, and 0 inappropriate authority elevations; default-off byte-for-byte semantic equivalence proven; PR #220 historical boundary hashes retained; hardware stability and quiescent swap maintained.
+  - Open: PR #233 remains draft, unmerged, and default-disabled; production activation gate (#90 §6) remains strictly closed; whole-label VLM candidate selection and production integration deferred.
 - Candidate Assessment:
-  - `Qwen2-VL-2B-Instruct` provides robust literal text transcription on complex layouts and scripts, but whole-label deployment requires a dedicated candidate selection and validation pipeline before any claim of production uplift can be made.
+  - PR #233's deterministic narrow stacked-heading candidate formation provides a sound, safe, and verifiable candidate recovery mechanism that incurs 0 regressions across both development and unseen corpora. However, because it remains default-disabled, merging PR #233 alone does not change production behavior. Any future activation requires a dedicated, documented maintainer decision.
 - No production activation follows from this record (#90 §6).

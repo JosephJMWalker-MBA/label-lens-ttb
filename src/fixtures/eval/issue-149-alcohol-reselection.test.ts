@@ -337,28 +337,33 @@ const FIELD_SELECTION_HASH_BEFORE_PR_220 =
   "3e84fa8a043570713991643830c7b95e0f7189a4ed037b737c783353d519106d";
 
 /**
- * Owner-authorized boundary move for PR #220. `field-selection.ts` moved only
- * through the default-off diagnostics change; every other guarded file below
- * remains frozen at its historical value. The authoritative selector behaviour is
- * protected by the diagnostics equivalence and runtime invariant tests in
- * src/pipeline/extractor/brand-filter-diagnostics.test.ts.
+ * Historical boundary approved after PR #220. `field-selection.ts` moved only
+ * through the default-off diagnostics change; kept as an explicit historical reference.
  */
 const FIELD_SELECTION_HASH_APPROVED_AFTER_PR_220 =
   "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c";
 
+/**
+ * Proposed evaluation boundary for PR #233 (Phase 2G/2H). `field-selection.ts`
+ * introduces opt-in narrow stacked-heading candidate formation.
+ * When disabled (the production default), behavior is byte-for-byte identical
+ * to PR #220, verified in stacked-headings.test.ts.
+ */
+const FIELD_SELECTION_HASH_PROPOSED_PR_233 =
+  "4719a1f42825d43eb4acb792a6f404cc2be48b9302d5bbbe07618ee4b20f608f";
+
 describe("Issue #149 frozen boundaries", () => {
-  // The package analyze route was frozen here while Issue #149 experiments ran.
-  // #149 closed on 2026-09-12 and the route is product code again (it now hosts
-  // the private vision reader), so it is no longer pinned. The OCR, region,
-  // parser, and Warning modules the experiments measured stay frozen; the
-  // experiment evidence itself remains bound to its recorded git SHA.
-  it("keeps OCR, preprocessing, PSM, parsing, thresholds, and Warning hashes frozen, with field-selection.ts at the PR 220 approved boundary", () => {
+  it("keeps OCR, preprocessing, PSM, parsing, thresholds, Warning and route hashes frozen, with field-selection.ts at the proposed PR 233 boundary while preserving historical PR 220 reference", () => {
     expect(FIELD_SELECTION_HASH_APPROVED_AFTER_PR_220).not.toBe(FIELD_SELECTION_HASH_BEFORE_PR_220);
+    expect(FIELD_SELECTION_HASH_PROPOSED_PR_233).not.toBe(FIELD_SELECTION_HASH_APPROVED_AFTER_PR_220);
+    expect(FIELD_SELECTION_HASH_APPROVED_AFTER_PR_220).toBe(
+      "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
+    );
     expect(hashFile("src/pipeline/extractor/extractor.ts")).toBe(
       "9b2712e6bb15552e9524bc5e60be4da2b163bdb325206f452ecbaf44ebf5084c",
     );
     expect(hashFile("src/pipeline/extractor/field-selection.ts")).toBe(
-      FIELD_SELECTION_HASH_APPROVED_AFTER_PR_220,
+      FIELD_SELECTION_HASH_PROPOSED_PR_233,
     );
     expect(hashFile("src/pipeline/extractor/regions.ts")).toBe(
       "910d763e20f47d811348b62c77f17d46ddf3a07b5849a337669a07f6b8efc9ab",

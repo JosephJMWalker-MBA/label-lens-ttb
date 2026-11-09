@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFile } from "node:fs/promises";
+import { readFileSync, existsSync } from "node:fs";
+import path from "node:path";
 import type { EvidenceReconciliationReport } from "../../../scripts/vision/reconcile-evidence";
 import type { AdditiveCounterfactualReport } from "../../../scripts/vision/simulate-additive-counterfactual";
 import type { CandidateFormationTreatmentReport } from "../../../scripts/vision/evaluate-candidate-formation-treatment";
@@ -215,5 +217,115 @@ describe("Candidate Loss Reconciliation and Treatment Invariants (Phase 2F)", ()
     expect(report.sampleAccountingCorrection.combinedCorpusClarification).toContain(
       "does NOT constitute a 48 unique label corpus",
     );
+  });
+
+  it("verifies Phase 2H exact-implementation parity and out-of-sample validation artifacts", () => {
+    const parityPath = path.join(
+      process.cwd(),
+      "artifacts/held-out-validation/exact-implementation-parity-report.json",
+    );
+    const outOfSamplePath = path.join(
+      process.cwd(),
+      "artifacts/held-out-validation/out-of-sample-validation-report.json",
+    );
+
+    expect(existsSync(parityPath)).toBe(true);
+    expect(existsSync(outOfSamplePath)).toBe(true);
+
+    const parityReport = JSON.parse(readFileSync(parityPath, "utf8"));
+    const oosReport = JSON.parse(readFileSync(outOfSamplePath, "utf8"));
+
+    // --- 1. Parity Report (24 Held-Out Cases) ---
+    expect(parityReport.version).toBe("phase-2h-exact-implementation-parity-v1");
+    expect(parityReport.provenance.fieldSelectionSha256).toBe(
+      "4719a1f42825d43eb4acb792a6f404cc2be48b9302d5bbbe07618ee4b20f608f",
+    );
+    expect(parityReport.provenance.historicalPr220Sha256).toBe(
+      "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
+    );
+
+    // 4-Condition Comparison Check
+    const condA = parityReport.conditionSummaries.conditionA_baseline;
+    const condB = parityReport.conditionSummaries.conditionB_syntheticPass;
+    const condC = parityReport.conditionSummaries.conditionC_coherentSurrogate;
+    const condD = parityReport.conditionSummaries.conditionD_exactNarrow;
+
+    expect(condA.selectedCorrectCount).toBe(6);
+    expect(condB.selectedCorrectCount).toBe(7);
+    expect(condC.selectedCorrectCount).toBe(7);
+    expect(condD.selectedCorrectCount).toBe(7);
+
+    // Exact implementation Condition D properties
+    expect(condD.candidateConstructedCount).toBe(9);
+    expect(condD.topThreeRankedCount).toBe(8);
+    expect(condD.reliableAcceptedCount).toBe(0); // Authority gate strictly preserved
+    expect(condD.regressionsCount).toBe(0);
+    expect(condD.negativeControlSelectedInsertions).toBe(0);
+
+    // Parity analysis verdict
+    expect(parityReport.parityAnalysis.conditionCMatchConditionDOnSelectedRate).toBe(true);
+    expect(parityReport.parityAnalysis.conditionDRegressionsCount).toBe(0);
+    expect(parityReport.parityAnalysis.conditionDFalseAssertionsCount).toBe(0);
+    expect(parityReport.parityAnalysis.authorityGateElevationCount).toBe(0);
+
+    // Specific case check: chateau-bonneau in Condition D
+    interface ParityCaseRecord {
+      caseId: string;
+      conditionD_exactNarrow: {
+        selectedMatches: boolean;
+        selected: string | null;
+        state: string;
+        supportingPassIds: string[];
+        independentEvidenceCount: number;
+        recoveryPassUsed: boolean;
+      };
+    }
+    const chateauCase = (parityReport.cases as ParityCaseRecord[]).find((c) => c.caseId === "chateau-bonneau");
+    expect(chateauCase).toBeDefined();
+    if (!chateauCase) throw new Error("chateau-bonneau case not found");
+    expect(chateauCase.conditionD_exactNarrow.selectedMatches).toBe(true);
+    expect(chateauCase.conditionD_exactNarrow.selected).toBe("CHATEAU BONNEAU");
+    expect(chateauCase.conditionD_exactNarrow.state).toBe("AMBIGUOUS");
+    expect(chateauCase.conditionD_exactNarrow.supportingPassIds).toEqual(["pass-0-full-image"]);
+    expect(chateauCase.conditionD_exactNarrow.independentEvidenceCount).toBe(1);
+    expect(chateauCase.conditionD_exactNarrow.recoveryPassUsed).toBe(false);
+
+    // --- 2. Out-of-Sample Report (79 Genuinely Unseen Cases) ---
+    expect(oosReport.version).toBe("phase-2h-out-of-sample-validation-v1");
+    expect(oosReport.provenance.totalEvaluatedCases).toBe(79);
+
+    const spSummary = oosReport.singlePassSummary;
+    const mpSummary = oosReport.multiPassSummary;
+
+    expect(spSummary.totalCases).toBe(79);
+    expect(spSummary.targetCases).toBe(72);
+    expect(spSummary.absentCases).toBe(4);
+    expect(spSummary.ambiguousCases).toBe(3);
+    expect(spSummary.nearMissCases).toBe(9);
+
+    // Baseline vs Narrow Treatment parity in Single Pass
+    expect(spSummary.baseline.selectedCorrectCount).toBe(21);
+    expect(spSummary.narrowTreatment.selectedCorrectCount).toBe(21);
+    expect(spSummary.narrowTreatment.regressionsCount).toBe(0);
+    expect(spSummary.narrowTreatment.negativeControlSelectedAssertions).toBe(0);
+    expect(spSummary.narrowTreatment.inappropriateAuthorityElevationCount).toBe(0);
+
+    // Baseline vs Narrow Treatment parity in Multi Pass
+    expect(mpSummary.baseline.selectedCorrectCount).toBe(21);
+    expect(mpSummary.narrowTreatment.selectedCorrectCount).toBe(21);
+    expect(mpSummary.narrowTreatment.regressionsCount).toBe(0);
+    expect(mpSummary.narrowTreatment.negativeControlSelectedAssertions).toBe(0);
+    expect(mpSummary.narrowTreatment.inappropriateAuthorityElevationCount).toBe(0);
+
+    // Stacked heading candidate formation metrics on unseen set
+    expect(spSummary.stackedCandidatesFormedTotal).toBe(1);
+    expect(spSummary.stackedCandidatesCorrect).toBe(1);
+    expect(spSummary.stackedCandidatesIncorrect).toBe(0);
+
+    // Final verdict
+    expect(oosReport.verdict.status).toBe("OUT_OF_SAMPLE_VALIDATION_COMPLETED");
+    expect(oosReport.verdict.regressionCount).toBe(0);
+    expect(oosReport.verdict.falseAssertionCount).toBe(0);
+    expect(oosReport.verdict.inappropriateElevationCount).toBe(0);
   });
 });
