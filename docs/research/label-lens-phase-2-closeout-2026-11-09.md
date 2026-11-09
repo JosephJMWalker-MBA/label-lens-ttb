@@ -6,14 +6,14 @@
 **Related governance:** [Issue #231](https://github.com/JosephJMWalker-MBA/label-lens-ttb/issues/231), [Issue #90](https://github.com/JosephJMWalker-MBA/label-lens-ttb/issues/90), [Issue #226](https://github.com/JosephJMWalker-MBA/label-lens-ttb/issues/226)  
 **Research changes:** [draft PR #230](https://github.com/JosephJMWalker-MBA/label-lens-ttb/pull/230), [draft PR #232](https://github.com/JosephJMWalker-MBA/label-lens-ttb/pull/232), [draft PR #233](https://github.com/JosephJMWalker-MBA/label-lens-ttb/pull/233)
 
-> **Authoritative interpretation:** This closeout supersedes *interpretations and labels*, not the immutable raw observations, in earlier checkpoints. Where early prose disagrees with later replayed case-level evidence, use the corrected Phase 2I artifacts linked below. Earlier files and comments remain intact as an audit trail. No result in this document grants Issue #90 `6 approval.
+> **Authoritative interpretation:** This closeout supersedes *interpretations and labels*, not the immutable raw observations, in earlier checkpoints. Where early prose disagrees with later replayed case-level evidence, use the corrected Phase 2I artifacts linked below. Earlier files and comments remain intact as an audit trail. No result in this document grants Issue #90 §6 approval.
 
 ## 1. Final decision and ownership boundary
 
 1. **Park draft PR #233, unmerged and default-disabled.** Its narrow same-pass stacked-heading rule recovered `CHATEAU BONNEAU` on the 24-case development set but added **zero** treatment-only candidates and **zero** correct selections on the separate 79-case validation set. The predeclared stop rule was met; do not extend the same experiment post hoc merely to find a positive outcome.
 2. **Preserve draft PR #230 and stacked draft PR #232, unmerged.** They record an experimental *transcription-reader* lane and its supporting evaluations. PR #230 contains configuration-gated production API integration that could replace bounded OCR if enabled; it is **not authorized**. Configuration-gated code is not a production approval.
 3. **Keep the protected full-image Tesseract OCR baseline and deterministic, human-reviewable authority boundaries.** `AMBIGUOUS` is not an accepted finding; `OBSERVED` is not a government/compliance determination.
-4. **Do not conflate transcription with the distinct Issue #90 stateless visual-*region observer*.** The latter's geometry, contamination, lifecycle, additive OCR, and `6 independent-authorization gates remain open. Running Qwen2-VL transcription on wine-label images did not satisfy those observer acceptance criteria.
+4. **Do not conflate transcription with the distinct Issue #90 stateless visual-*region observer*.** The latter's geometry, contamination, lifecycle, additive OCR, and §6 independent-authorization gates remain open. Running Qwen2-VL transcription on wine-label images did not satisfy those observer acceptance criteria.
 5. **This is a research closure, not a product readiness declaration.** There are unresolved candidate-construction/ranking losses; any future effort requires a new scoped hypothesis, independently selected evidence and a separate owner decision.
 
 **As of this record:** Issues #90 and #231 are open tracking records; #230, #232 and #233 are draft/unmerged. Do not interpret the passage of time or successful hosted CI as a change to that status.
@@ -144,7 +144,7 @@ Earlier measurement-plan sections are historic working notes; this closeout and 
 
 **Do not continue this closed stacked-heading experiment merely to find an uplift.** A new OCR proposal needs a distinct measurable hypothesis (e.g., overlong line sub-span formation, producer-line disambiguation, ranking diagnostics), a frozen predeclared scoring rubric, untouched identity-deduplicated cases including genuine absence/near-miss controls, production-path equivalence, and explicit acceptance/stop criteria. Keep raw, constructed, selected and authoritative evidence separate.
 
-**Do not activate the Jetson transcription reader.** Any renewed vision work must first choose whether it is the transcription lane or the distinct #90 stateless region-observer lane, then satisfy that lane's real-model provenance, contamination, resource lifecycle, schema, additive OCR, privacy and human-review gates. All production integration, persistence, UI and network changes require separate maintainer authorization under #90 `6.
+**Do not activate the Jetson transcription reader.** Any renewed vision work must first choose whether it is the transcription lane or the distinct #90 stateless region-observer lane, then satisfy that lane's real-model provenance, contamination, resource lifecycle, schema, additive OCR, privacy and human-review gates. All production integration, persistence, UI and network changes require separate maintainer authorization under #90 §6.
 
 **No actions implied by this record:** merge any PR; close Issue #90; change defaults or confidence thresholds; run the full corpus; install models or dependencies; start systemd/LAN services; copy customer artwork; enable `LABEL_LENS_VISION_*` in deployment.
 
