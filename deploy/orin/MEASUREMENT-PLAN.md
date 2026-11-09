@@ -165,7 +165,63 @@ Options for that decision include a shadow mode, which records model readings be
 - GPU & Thermals: `GR3D_FREQ 0%` (idle), GPU 47.5°C, CPU 47.0°C, board power 4.84W.
 - Docker Services: All 4 containers (`odysseus`, `chromadb`, `searxng`, `ntfy`) remained continuously healthy (`Up 2 weeks`) with zero disruption.
 
-### 9. Decision record
+### 9. Phase 2E Offline Brand Evidence Recovery Analysis
+
+- **Context & Constraints:** Conducted entirely offline without additional Jetson inference runs, new model weights, or production code activation. Stacked draft PR #232 remains draft and unmerged.
+- **Artifacts & Scripts:**
+  - `scripts/vision/score-v1-to-v2.ts`: Deterministic offline scorer deriving v2 metrics from archived v1 records.
+  - `src/server/vision/score-v1-to-v2.test.ts`: 9 unit tests verifying SHA-256 integrity, tamper detection, and exact determinism.
+  - `scripts/vision/diagnose-candidate-loss.ts`: 5-stage candidate selection tracer across all 18 brand-present cases.
+  - `artifacts/held-out-validation/candidate-selection-diagnosis.json`: Structured trace and failure taxonomy.
+  - `scripts/vision/simulate-additive-counterfactual.ts`: Supplemental vision pass simulation for vision-only recoveries and negative controls.
+  - `artifacts/held-out-validation/additive-counterfactual-report.json`: Additive simulation results, recovery gains, and safety checks.
+
+#### Reproducibility & Reconstructibility Boundaries (Priority 1)
+- **Immutable v1 Hash:** Confirmed SHA-256 of `report-v1.json` is `97cef0fbb5c4310d4d6d62b91e366c8224a246b30afd96908b6722d872cb632f`.
+- **Reconstructibility Boundary:** The 300-character raw transcript preview stored in `report-v1.json` fully preserves brand string matching across all 24 cases for whole-word presence (`brandPresentInTranscript`).
+- **Fine-Print Truncation Edge Case:** In `approved-wine-012`, Tesseract OCR's hero title had character corruption (`Cool&y Bay`), but Tesseract also read `Cooley Bay Winery` in the fine-print bottler statement at character 368. Because `report-v1.json` capped preview at 300 characters, retrospective scoring on the archived preview yielded `rawBrandPresent: false` (15/18), whereas full-image OCR contains the string at character 368 before being eliminated by the downstream `producer-line` filter. In contrast, Qwen2-VL-2B read `Cooley Bay` cleanly in the hero position.
+
+#### Candidate Selection Loss Diagnosis across 5 Stages (Priority 2)
+For the 18 brand-present cases, evidence survival across the 5 selection stages was traced:
+1. **Raw OCR Brand Text:** 15 / 18 (83.3%)
+2. **Candidate Constructed:** 8 / 18 (44.4%)
+3. **Candidate Kept (Survived Filters):** 8 / 18 (44.4%)
+4. **Candidate in Top 3:** 8 / 18 (44.4%)
+5. **Selected Brand Match:** 6 / 18 (33.3%)
+6. **Authoritative Evidence (`OBSERVED` & $\ge 0.8$):** 0 / 18 (0.0%)
+
+*Scope Notice:* `selectBrandObservation([primaryPass])` evaluates the **primary-pass selector**, not necessarily every recovery pass or final decision in the complete production pipeline.
+
+**Taxonomy of the 9 Cases Lost Between Raw OCR and Candidate Selection:**
+- **Window Formation & Line Segmentation Loss (6 cases):**
+  - `approved-wine-006` (Dark Horse): Header grouped with line noise (`"Zwosos SWi-Sv ws DARK HORSE."`) $\rightarrow$ rejected by `too-many-words` (> 4 words); selected noise `"2 LRS3 aoc"`.
+  - `approved-wine-008` (Vino Alpino): Grouped with legal suffix (`"Vino Alpino LLC"`, score 4.91, rank #3) $\rightarrow$ outranked by producer `"Azienda Agricola Terre Sparse"` (score 5.18, rank #1).
+  - `approved-wine-016` (Marques de Navarro): Hero title suffered OCR corruption (`"MARQUES vo NAVARRO"`, score 4.19); body paragraph occurrence rejected by `too-many-words`.
+  - `approved-wine-038` (Big Red Sunshine): Brand present only inside 14-word marketing description sentence $\rightarrow$ rejected by `too-many-words`; designation `"2024 SOUTH COAST PRIMITIVO"` selected.
+  - `approved-wine-024` (Chateau de Laville): Hero title suffered OCR degradation (`"CHATEAU d LAVILLE"`, score 3.83, rank #2) $\rightarrow$ outranked by appellation `"CADILLAC COTES DE BORDEAUX"` (score 4.73, rank #1).
+  - `chateau-bonneau` (Château Bonneau): Brand split across two lines (`"CHATEAU"` on line 1, `"BONNEAU"` on line 2) without multi-line merge $\rightarrow$ selected single token `"BONNEAU"` (score 4.07).
+  - `approved-wine-018` (Poqr Krya): Header on 7-word line $\rightarrow$ rejected by `too-many-words`; designation `"Indigenous blend"` (score 5.06) selected.
+- **Ranking Displacement (2 cases):**
+  - `approved-wine-013` (Afflicted): Exact candidate formed and kept (score 3.41, rank #2) $\rightarrow$ outranked by front headline `"Play ers Heart"` (score 5.44, rank #1).
+  - `approved-wine-033` (Haywater Cove): Exact candidate formed and kept (score 4.14, rank #2) $\rightarrow$ outranked by cuvée `"NIGHT SWIMMING"` (score 4.32, rank #1); single-token fallback selected `"COVE"` (score 3.43).
+- **Conservative Authority Gate Impact (6 cases):**
+  - All 6 correctly selected cases (`020`, `casanova-della-spinetta`, `domaine-follin-arbelet`, `014`, `nebla-mencia`, `026`) had high evidence scores ($\ge 0.82$), but single primary-pass OCR cannot reach consensus without cross-pass verification, so all 6 are held as `state: "AMBIGUOUS"`.
+
+#### Offline Additive Counterfactual Simulation (Priority 3)
+Simulated supplying vision transcript tokens as a supplemental, non-authoritative focus pass alongside primary OCR under frozen selector rules:
+- **Vision-Only Recovery 1 (`approved-wine-012`, Cooley Bay):**
+  - Baseline selected: `"Cool&y"` (score 0.47, AMBIGUOUS)
+  - Additive selected: `"Cooley Bay"` (score 0.95, AMBIGUOUS) $\rightarrow$ **Successfully recovered brand candidate**.
+- **Vision-Only Recovery 2 (`approved-wine-011`, MariaAntonietta):**
+  - Baseline selected: `"Societa Agricola Maria Antonie"` (score 0.95, AMBIGUOUS)
+  - Additive candidate: `"MariaAntonietta"` formed and kept (score 4.89, rank #2), competing head-to-head with baseline producer line.
+- **Preservation & Regressions:** Zero regressions across all 6 baseline-correct cases (all 6 preserved intact). Overall candidate selection accuracy increased from **6 / 18 (33.3%) to 7 / 18 (38.9%) (+5.6 pp)**.
+- **Zero False Certainty:** 100% of recovered brand candidates remain safely gated as `state: "AMBIGUOUS"` (0 / 18 elevated to OBSERVED).
+- **Negative Control Safety (6 Absent-Brand Labels):**
+  - When vision tokens are supplied as a structured focus pass, **0 / 6 false insertions occur (100% clean abstention)** because filter rules (`producer-line`, `varietal-or-designation`, `generic-product-language`, `non-brand-keyword`) correctly reject non-brand descriptive phrases.
+  - Unconstrained whole-image injection risks false assertions on OCR noise/postal fragments (e.g. `"A-3495 Roh"`), confirming that vision input requires bounded spatial targeting.
+
+### 10. Decision record
 
 - Which #90 gates this evidence addresses, and which remain open:
   - Addressed: Symmetric raw-evidence presence established (Tesseract 83.3% vs. Vision 77.8% line-check / 72.2% multiline-check); Tesseract candidate extraction drop-off documented (15 raw -> 6 selected -> 0 reliable); negative controls correctly reported (Tesseract 0/6 false insertions evaluated, Vision NOT_EVALUATED); multiline degenerate repetition detection implemented and verified; hardware stability and quiescent swap confirmed.
