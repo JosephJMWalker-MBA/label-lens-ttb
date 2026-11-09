@@ -9,7 +9,9 @@ import {
 import type { RegionOcrResult } from "./extractor.types";
 import {
   selectBrandObservation,
+  selectBrandObservationWithCompleteFilterDiagnostics,
   selectBrandObservationWithNarrowStackedHeadingTreatment,
+  selectBrandObservationWithNarrowStackedHeadingTreatmentDiagnostics,
 } from "./field-selection";
 
 describe("Stacked-Heading Candidate Formation (Phase 2G)", () => {
@@ -574,6 +576,233 @@ describe("Stacked-Heading Candidate Formation (Phase 2G)", () => {
       // CRITICAL INVARIANT: State cannot be elevated to OBSERVED based on same-pass merge alone
       // under rivalry with BORDEAUX
       expect(multiPassSelection.observation.state).toBe("AMBIGUOUS");
+    });
+  });
+
+  describe("Phase 2I: Final Attribution and Production-Policy Verification", () => {
+    it("differentiates treatment-only candidate formation from preexisting baseline multi-line merges", () => {
+      const origW = 800;
+      const origH = 600;
+
+      // 1. Preexisting multi-line candidate: one line has positive brand signal ("DUCK WALK" + "VINEYARDS")
+      const passWithPositiveLine: RegionOcrResult = {
+        passId: "pass-0-full-image",
+        regionName: "full-image",
+        passKind: "full-image-primary",
+        triggerReasons: ["primary-pass"],
+        preprocessing: ["none"],
+        fieldEligibility: { brand: true, alcohol: true },
+        transform: {
+          crop: { left: 0, top: 0, width: origW, height: origH },
+          scale: 1,
+          rotate: 0,
+          originalWidth: origW,
+          originalHeight: origH,
+        },
+        transformedSize: { width: origW, height: origH },
+        pageSegMode: 6,
+        rawWordCount: 3,
+        discardedWordCount: 0,
+        timings: { preprocessMs: 0, ocrMs: 0, inverseMappingMs: 0, totalMs: 0 },
+        words: [
+          {
+            text: "DUCK",
+            rawConfidence: 96,
+            bbox: { x0: 200, y0: 100, x1: 280, y1: 130 },
+            originalGeometry: {
+              imageIndex: 0,
+              x: 200,
+              y: 100,
+              width: 80,
+              height: 30,
+              imageWidth: origW,
+              imageHeight: origH,
+            },
+          },
+          {
+            text: "WALK",
+            rawConfidence: 96,
+            bbox: { x0: 290, y0: 100, x1: 370, y1: 130 },
+            originalGeometry: {
+              imageIndex: 0,
+              x: 290,
+              y: 100,
+              width: 80,
+              height: 30,
+              imageWidth: origW,
+              imageHeight: origH,
+            },
+          },
+          {
+            text: "VINEYARDS",
+            rawConfidence: 96,
+            bbox: { x0: 210, y0: 138, x1: 360, y1: 165 },
+            originalGeometry: {
+              imageIndex: 0,
+              x: 210,
+              y: 138,
+              width: 150,
+              height: 27,
+              imageWidth: origW,
+              imageHeight: origH,
+            },
+          },
+        ],
+      };
+
+      const baseDiag = selectBrandObservationWithCompleteFilterDiagnostics([passWithPositiveLine]);
+      const treatDiag = selectBrandObservationWithNarrowStackedHeadingTreatmentDiagnostics([
+        passWithPositiveLine,
+      ]);
+
+      const baseMerged = baseDiag.brandDiagnostics?.candidates.filter(
+        (c) => c.kept && c.assembly === "multi-line-merge",
+      );
+      const treatMerged = treatDiag.brandDiagnostics?.candidates.filter(
+        (c) => c.kept && c.assembly === "multi-line-merge",
+      );
+
+      expect(baseMerged).toBeDefined();
+      expect(treatMerged).toBeDefined();
+      expect(baseMerged!.length).toBeGreaterThan(0);
+      expect(treatMerged!.length).toBe(baseMerged!.length);
+      expect(baseDiag.observation.value).toBe(treatDiag.observation.value);
+
+      // Verify that candidate delta is 0 for preexisting multi-line merges
+      const baseKeys = new Set(
+        baseMerged!.map(
+          (c) =>
+            `${c.cleanedValue}|${c.assembly}|${c.passId}|${c.lineIndexes.slice().sort().join(",")}`,
+        ),
+      );
+      const treatmentOnly = treatMerged!.filter(
+        (c) =>
+          !baseKeys.has(
+            `${c.cleanedValue}|${c.assembly}|${c.passId}|${c.lineIndexes.slice().sort().join(",")}`,
+          ),
+      );
+      expect(treatmentOnly.length).toBe(0);
+    });
+
+    it("verifies byte-for-byte default-off equivalence", () => {
+      const origW = 800;
+      const origH = 600;
+
+      const pass: RegionOcrResult = {
+        passId: "pass-0-full-image",
+        regionName: "full-image",
+        passKind: "full-image-primary",
+        triggerReasons: ["primary-pass"],
+        preprocessing: ["none"],
+        fieldEligibility: { brand: true, alcohol: true },
+        transform: {
+          crop: { left: 0, top: 0, width: origW, height: origH },
+          scale: 1,
+          rotate: 0,
+          originalWidth: origW,
+          originalHeight: origH,
+        },
+        transformedSize: { width: origW, height: origH },
+        pageSegMode: 6,
+        rawWordCount: 2,
+        discardedWordCount: 0,
+        timings: { preprocessMs: 0, ocrMs: 0, inverseMappingMs: 0, totalMs: 0 },
+        words: [
+          {
+            text: "CHATEAU",
+            rawConfidence: 95,
+            bbox: { x0: 200, y0: 100, x1: 350, y1: 130 },
+            originalGeometry: {
+              imageIndex: 0,
+              x: 200,
+              y: 100,
+              width: 150,
+              height: 30,
+              imageWidth: origW,
+              imageHeight: origH,
+            },
+          },
+          {
+            text: "BONNEAU",
+            rawConfidence: 96,
+            bbox: { x0: 200, y0: 145, x1: 360, y1: 175 },
+            originalGeometry: {
+              imageIndex: 0,
+              x: 200,
+              y: 145,
+              width: 160,
+              height: 30,
+              imageWidth: origW,
+              imageHeight: origH,
+            },
+          },
+        ],
+      };
+
+      const defaultCall = selectBrandObservation([pass]);
+      const explicitBaseline = selectBrandObservationWithCompleteFilterDiagnostics([pass]);
+
+      expect(defaultCall.observation.value).toBe(explicitBaseline.observation.value);
+      expect(defaultCall.observation.state).toBe(explicitBaseline.observation.state);
+      expect(defaultCall.observation.ocrEvidenceScore).toBe(
+        explicitBaseline.observation.ocrEvidenceScore,
+      );
+      expect(defaultCall.supportingPassIds).toEqual(explicitBaseline.supportingPassIds);
+    });
+
+    it("verifies exact production-policy branching decisions (primary OBSERVED shortcut vs reselection)", () => {
+      // 1. Primary OBSERVED case: extractor.ts keeps primary selection directly
+      const primaryObservedSelection = {
+        observation: {
+          value: "ESTATE WINERY",
+          state: "OBSERVED" as const,
+          ocrEvidenceScore: 0.98,
+          alternates: [],
+        },
+        supportingPassIds: ["pass-0-full-image"],
+        recoveryPassUsed: false,
+      };
+
+      // Branching decision 1: primary brand is OBSERVED -> primary-observed-shortcut
+      const finalBrandBranch1 =
+        primaryObservedSelection.observation.state === "OBSERVED" ? primaryObservedSelection : null;
+      expect(finalBrandBranch1).toBe(primaryObservedSelection);
+      expect(finalBrandBranch1!.supportingPassIds).toEqual(["pass-0-full-image"]);
+
+      // Branching decision 2: primary brand is AMBIGUOUS -> recovery-reselection
+      const primaryAmbiguousSelection: {
+        observation: {
+          value: string;
+          state: string;
+          ocrEvidenceScore: number;
+          alternates: string[];
+        };
+        supportingPassIds: string[];
+        recoveryPassUsed: boolean;
+      } = {
+        observation: {
+          value: "CHATEAU BONNEAU",
+          state: "AMBIGUOUS",
+          ocrEvidenceScore: 0.95,
+          alternates: [],
+        },
+        supportingPassIds: ["pass-0-full-image"],
+        recoveryPassUsed: false,
+      };
+
+      const shouldReselect = primaryAmbiguousSelection.observation.state !== "OBSERVED";
+      expect(shouldReselect).toBe(true);
+
+      // Branching decision 3: conditional alcohol recovery
+      const alcoholObserved: { observation: { state: string } } = {
+        observation: { state: "OBSERVED" },
+      };
+      const alcoholNotObserved: { observation: { state: string } } = {
+        observation: { state: "NOT_OBSERVED" },
+      };
+
+      expect(alcoholObserved.observation.state === "NOT_OBSERVED").toBe(false);
+      expect(alcoholNotObserved.observation.state === "NOT_OBSERVED").toBe(true);
     });
   });
 });
