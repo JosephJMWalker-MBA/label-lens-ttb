@@ -1,0 +1,843 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-11-09T02:33:38.143Z",
+  "scopeNotice": "Evaluation-only candidate formation diagnosis and narrow treatment simulation. Evaluates feasibility of deterministic candidate recovery without weakening negative-control safety.",
+  "formationLossDiagnosis": {
+    "totalCasesDiagnosed": 8,
+    "failureCategoryBreakdown": {
+      "overlongLineTooManyWords": 5,
+      "stackedSingleWordHeading": 1,
+      "legalSuffixRetained": 1,
+      "heroOcrNoiseWithProducerFinePrint": 1
+    },
+    "cases": [
+      {
+        "caseId": "approved-wine-006",
+        "stratum": "normal_print",
+        "expectedBrand": ["Dark Horse"],
+        "fullOcrContainsBrandText": true,
+        "baselineCandidateConstructed": false,
+        "baselineSelectedCandidate": "2 LRS3 aoc",
+        "baselineMatchesTruth": false,
+        "failureCategory": "OVERLONG_LINE_TOO_MANY_WORDS",
+        "exactMechanismDescription": "Exact brand appears in body copy or overlong line (>6 words). Whole line was rejected by too-many-words; shouldTrimWholeLineCandidate only evaluates positive whole lines, so line-window sub-span candidate formation was skipped.",
+        "linesContainingBrandText": [
+          {
+            "lineIndex": 0,
+            "text": "=Zwosos SWi-Sv ws DARK HORSE.",
+            "wordCount": 5,
+            "filterReason": "too-many-words"
+          },
+          {
+            "lineIndex": 7,
+            "text": "x S=Zx Ex wr aX Here's Dark",
+            "wordCount": 7,
+            "filterReason": "too-many-words"
+          },
+          {
+            "lineIndex": 8,
+            "text": "Sxi— Sw ow to Horses everywhere.",
+            "wordCount": 6,
+            "filterReason": "too-many-words"
+          },
+          {
+            "lineIndex": 25,
+            "text": "e DARKHORSEWINE.COM",
+            "wordCount": 2,
+            "filterReason": "domain-like"
+          }
+        ]
+      },
+      {
+        "caseId": "approved-wine-008",
+        "stratum": "normal_print",
+        "expectedBrand": ["Vino Alpino"],
+        "fullOcrContainsBrandText": true,
+        "baselineCandidateConstructed": false,
+        "baselineSelectedCandidate": "Azienda Agricola Terre Sparse",
+        "baselineMatchesTruth": false,
+        "failureCategory": "LEGAL_SUFFIX_RETAINED",
+        "exactMechanismDescription": "Tesseract line contains 'Vino Alpino LLC'. Candidate 'Vino Alpino LLC' was constructed but legal suffix 'LLC' was not stripped, and lineWindows was not triggered on wholeLine.",
+        "linesContainingBrandText": [
+          {
+            "lineIndex": 0,
+            "text": "Vino Rosso",
+            "wordCount": 2,
+            "filterReason": "candidate-plausible"
+          },
+          {
+            "lineIndex": 12,
+            "text": "VINO",
+            "wordCount": 1,
+            "filterReason": "generic-product-language"
+          },
+          {
+            "lineIndex": 13,
+            "text": "Vino Alpino LLC",
+            "wordCount": 3,
+            "filterReason": "candidate-plausible"
+          },
+          {
+            "lineIndex": 15,
+            "text": "ALPINO",
+            "wordCount": 1,
+            "filterReason": "candidate-plausible"
+          },
+          {
+            "lineIndex": 16,
+            "text": "WWW vinoalpino com",
+            "wordCount": 3,
+            "filterReason": "sentence-fragment"
+          },
+          {
+            "lineIndex": 17,
+            "text": "info@vinoalpino.com 4 Pordfolil IMPORTS ison Mill",
+            "wordCount": 6,
+            "filterReason": "too-many-words"
+          },
+          {
+            "lineIndex": 18,
+            "text": "|G: @vinoalpinoimports",
+            "wordCount": 2,
+            "filterReason": "candidate-plausible"
+          }
+        ]
+      },
+      {
+        "caseId": "approved-wine-012",
+        "stratum": "normal_print",
+        "expectedBrand": ["Cooley Bay"],
+        "fullOcrContainsBrandText": true,
+        "baselineCandidateConstructed": false,
+        "baselineSelectedCandidate": "Cool&y",
+        "baselineMatchesTruth": false,
+        "failureCategory": "HERO_OCR_NOISE_WITH_PRODUCER_FINE_PRINT",
+        "exactMechanismDescription": "Hero text had OCR noise 'Cool&y Bay'. Full OCR contains 'Cooley Bay Winery' in fine print at char 368, but is rejected by isProducerLine filter.",
+        "linesContainingBrandText": [
+          {
+            "lineIndex": 1,
+            "text": "Bay",
+            "wordCount": 1,
+            "filterReason": "low-information-fragment"
+          },
+          {
+            "lineIndex": 11,
+            "text": "Learn more about us online at cooleybay.com",
+            "wordCount": 7,
+            "filterReason": "too-many-words"
+          },
+          {
+            "lineIndex": 13,
+            "text": "Cooley Bay Winery",
+            "wordCount": 3,
+            "filterReason": "candidate-positive"
+          }
+        ]
+      },
+      {
+        "caseId": "approved-wine-016",
+        "stratum": "normal_print",
+        "expectedBrand": ["Marques de Navarro"],
+        "fullOcrContainsBrandText": true,
+        "baselineCandidateConstructed": false,
+        "baselineSelectedCandidate": "MARQUES vo NAVARRO",
+        "baselineMatchesTruth": false,
+        "failureCategory": "OVERLONG_LINE_TOO_MANY_WORDS",
+        "exactMechanismDescription": "Exact brand appears in body copy or overlong line (>6 words). Whole line was rejected by too-many-words; shouldTrimWholeLineCandidate only evaluates positive whole lines, so line-window sub-span candidate formation was skipped.",
+        "linesContainingBrandText": [
+          {
+            "lineIndex": 0,
+            "text": "MARQUES vo: NAVARRO",
+            "wordCount": 3,
+            "filterReason": "candidate-plausible"
+          },
+          {
+            "lineIndex": 2,
+            "text": "Our Wine , Marques de Navarro Reflects with elegance the varietal character and the freshness",
+            "wordCount": 15,
+            "filterReason": "too-many-words"
+          }
+        ]
+      },
+      {
+        "caseId": "approved-wine-038",
+        "stratum": "normal_print",
+        "expectedBrand": ["Big Red Sunshine"],
+        "fullOcrContainsBrandText": true,
+        "baselineCandidateConstructed": false,
+        "baselineSelectedCandidate": "2024 SOUTH COAST PRIMITIVO",
+        "baselineMatchesTruth": false,
+        "failureCategory": "OVERLONG_LINE_TOO_MANY_WORDS",
+        "exactMechanismDescription": "Exact brand appears in body copy or overlong line (>6 words). Whole line was rejected by too-many-words; shouldTrimWholeLineCandidate only evaluates positive whole lines, so line-window sub-span candidate formation was skipped.",
+        "linesContainingBrandText": [
+          {
+            "lineIndex": 1,
+            "text": "This groovy fresh red is a blast of grape and: sunshine ina bottle.",
+            "wordCount": 13,
+            "filterReason": "too-many-words"
+          },
+          {
+            "lineIndex": 4,
+            "text": "can be hip or a regular L-7, but Big Red Sunshine is ready to-hang loose",
+            "wordCount": 15,
+            "filterReason": "too-many-words"
+          },
+          {
+            "lineIndex": 5,
+            "text": "and show the laid back stylings of its red threads without TIF,",
+            "wordCount": 12,
+            "filterReason": "too-many-words"
+          },
+          {
+            "lineIndex": 7,
+            "text": "this out of sight red wine and let the good times roll",
+            "wordCount": 12,
+            "filterReason": "too-many-words"
+          }
+        ]
+      },
+      {
+        "caseId": "approved-wine-024",
+        "stratum": "stylized_script",
+        "expectedBrand": ["Chateau de Laville"],
+        "fullOcrContainsBrandText": true,
+        "baselineCandidateConstructed": false,
+        "baselineSelectedCandidate": "CADILLAC COTES DE BORDEAUX",
+        "baselineMatchesTruth": false,
+        "failureCategory": "OVERLONG_LINE_TOO_MANY_WORDS",
+        "exactMechanismDescription": "Exact brand appears in body copy or overlong line (>6 words). Whole line was rejected by too-many-words; shouldTrimWholeLineCandidate only evaluates positive whole lines, so line-window sub-span candidate formation was skipped.",
+        "linesContainingBrandText": [
+          {
+            "lineIndex": 0,
+            "text": "CHATEAU dé LAVILLE",
+            "wordCount": 3,
+            "filterReason": "candidate-plausible"
+          },
+          {
+            "lineIndex": 3,
+            "text": "Le Chateau de Laville est situé sur un des points culminants de la",
+            "wordCount": 13,
+            "filterReason": "too-many-words"
+          },
+          {
+            "lineIndex": 12,
+            "text": "MIS EN BOUTEILLE AU CHATEAU",
+            "wordCount": 5,
+            "filterReason": "too-many-words"
+          }
+        ]
+      },
+      {
+        "caseId": "chateau-bonneau",
+        "stratum": "stylized_script",
+        "expectedBrand": ["Château Bonneau", "Chateau Bonneau"],
+        "fullOcrContainsBrandText": true,
+        "baselineCandidateConstructed": false,
+        "baselineSelectedCandidate": "BONNEAU",
+        "baselineMatchesTruth": false,
+        "failureCategory": "STACKED_SINGLE_WORD_HEADING",
+        "exactMechanismDescription": "Stacked single-word lines 'CHATEAU' and 'BONNEAU' are each classified as plausible rather than positive. Production merge loop requires hasPositiveLine, so merge is skipped under default options.",
+        "linesContainingBrandText": [
+          {
+            "lineIndex": 2,
+            "text": "CHATEAU",
+            "wordCount": 1,
+            "filterReason": "candidate-plausible"
+          },
+          {
+            "lineIndex": 3,
+            "text": "BONNEAU",
+            "wordCount": 1,
+            "filterReason": "candidate-plausible"
+          },
+          {
+            "lineIndex": 5,
+            "text": "MIS EN BOUTEILLE AU CHATEAU",
+            "wordCount": 5,
+            "filterReason": "too-many-words"
+          },
+          {
+            "lineIndex": 6,
+            "text": "SCEA. VIEUX CHATEAU SAINT-ANDRE",
+            "wordCount": 4,
+            "filterReason": "candidate-plausible"
+          },
+          {
+            "lineIndex": 15,
+            "text": "CHATEAU BO? 1AU 2020",
+            "wordCount": 4,
+            "filterReason": "candidate-plausible"
+          }
+        ]
+      },
+      {
+        "caseId": "approved-wine-018",
+        "stratum": "layout_orientation",
+        "expectedBrand": ["Poqr Krya", "POQR KRYA"],
+        "fullOcrContainsBrandText": true,
+        "baselineCandidateConstructed": false,
+        "baselineSelectedCandidate": "Indigenous blend",
+        "baselineMatchesTruth": false,
+        "failureCategory": "OVERLONG_LINE_TOO_MANY_WORDS",
+        "exactMechanismDescription": "Exact brand appears in body copy or overlong line (>6 words). Whole line was rejected by too-many-words; shouldTrimWholeLineCandidate only evaluates positive whole lines, so line-window sub-span candidate formation was skipped.",
+        "linesContainingBrandText": [
+          {
+            "lineIndex": 1,
+            "text": "Poqr Krya Red Still Wine 2022 Vayots Dzor",
+            "wordCount": 8,
+            "filterReason": "too-many-words"
+          },
+          {
+            "lineIndex": 3,
+            "text": "Poqr krya is a joint venture of Krya wines and local",
+            "wordCount": 11,
+            "filterReason": "too-many-words"
+          },
+          {
+            "lineIndex": 7,
+            "text": "KRYA Khariji, Tozot and Movuz.",
+            "wordCount": 5,
+            "filterReason": "too-many-words"
+          },
+          {
+            "lineIndex": 27,
+            "text": "Produced by: Krya LLC",
+            "wordCount": 4,
+            "filterReason": "producer-line"
+          }
+        ]
+      }
+    ]
+  },
+  "treatmentEvaluation": {
+    "treatmentName": "Narrow Stacked-Heading Merge",
+    "treatmentDefinition": "Merges two vertically adjacent, horizontally aligned single-word lines where Line 1 is a recognized brand prefix (CHATEAU/DOMAINE/BODEGA/MAISON/VILLA/CASALE/TENUTA) and Line 2 is a single proper noun (with strict guards against digits/postal codes, generic words, and varietals).",
+    "summary": {
+      "totalHeldOutCases": 24,
+      "brandPresentCases": 18,
+      "brandAbsentCases": 6,
+      "baselineSelectedMatches": 6,
+      "treatmentSelectedMatches": 7,
+      "netUplift": "6/18 (33.3%) -> 7/18 (38.9%) (+5.6 pp)",
+      "regressionsCount": 0,
+      "negativeControlCleanAbstentions": 6,
+      "negativeControlFalseInsertions": 0,
+      "safetyVerdict": "SAFE_EVALUATION_PASS (zero regressions, 100% negative-control abstention preserved)"
+    },
+    "cases": [
+      {
+        "caseId": "approved-wine-006",
+        "brandPresence": "present",
+        "expectedBrand": ["Dark Horse"],
+        "baseline": {
+          "selectedCandidate": "2 LRS3 aoc",
+          "matchesTruth": false,
+          "evidenceScore": 0.21,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": "2 LRS3 aoc",
+          "matchesTruth": false,
+          "evidenceScore": 0.21,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "UNRECOVERED",
+        "notes": "Remains unselected."
+      },
+      {
+        "caseId": "approved-wine-008",
+        "brandPresence": "present",
+        "expectedBrand": ["Vino Alpino"],
+        "baseline": {
+          "selectedCandidate": "Azienda Agricola Terre Sparse",
+          "matchesTruth": false,
+          "evidenceScore": 0.9575,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": "Azienda Agricola Terre Sparse",
+          "matchesTruth": false,
+          "evidenceScore": 0.9575,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "UNRECOVERED",
+        "notes": "Remains unselected."
+      },
+      {
+        "caseId": "approved-wine-012",
+        "brandPresence": "present",
+        "expectedBrand": ["Cooley Bay"],
+        "baseline": {
+          "selectedCandidate": "Cool&y",
+          "matchesTruth": false,
+          "evidenceScore": 0.47,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": "Cool&y",
+          "matchesTruth": false,
+          "evidenceScore": 0.47,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "UNRECOVERED",
+        "notes": "Remains unselected."
+      },
+      {
+        "caseId": "approved-wine-016",
+        "brandPresence": "present",
+        "expectedBrand": ["Marques de Navarro"],
+        "baseline": {
+          "selectedCandidate": "MARQUES vo NAVARRO",
+          "matchesTruth": false,
+          "evidenceScore": 0.7200000000000001,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": "MARQUES vo NAVARRO",
+          "matchesTruth": false,
+          "evidenceScore": 0.7200000000000001,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "UNRECOVERED",
+        "notes": "Remains unselected."
+      },
+      {
+        "caseId": "approved-wine-020",
+        "brandPresence": "present",
+        "expectedBrand": ["Courtieu", "Chateau Courtieu"],
+        "baseline": {
+          "selectedCandidate": "COURTIEU",
+          "matchesTruth": true,
+          "evidenceScore": 0.87,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": "COURTIEU",
+          "matchesTruth": true,
+          "evidenceScore": 0.87,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "PRESERVED_CORRECT",
+        "notes": "Baseline correct match preserved intact."
+      },
+      {
+        "caseId": "approved-wine-038",
+        "brandPresence": "present",
+        "expectedBrand": ["Big Red Sunshine"],
+        "baseline": {
+          "selectedCandidate": "2024 SOUTH COAST PRIMITIVO",
+          "matchesTruth": false,
+          "evidenceScore": 0.9325,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": "2024 SOUTH COAST PRIMITIVO",
+          "matchesTruth": false,
+          "evidenceScore": 0.9325,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "UNRECOVERED",
+        "notes": "Remains unselected."
+      },
+      {
+        "caseId": "casanova-della-spinetta",
+        "brandPresence": "present",
+        "expectedBrand": ["Casanova della Spinetta", "Casanova Della Spinetta"],
+        "baseline": {
+          "selectedCandidate": "CASANOVA DELLA SPINETTA",
+          "matchesTruth": true,
+          "evidenceScore": 0.8700000000000001,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": "CASANOVA DELLA SPINETTA",
+          "matchesTruth": true,
+          "evidenceScore": 0.8700000000000001,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "PRESERVED_CORRECT",
+        "notes": "Baseline correct match preserved intact."
+      },
+      {
+        "caseId": "domaine-follin-arbelet",
+        "brandPresence": "present",
+        "expectedBrand": ["Domaine Follin-Arbelet"],
+        "baseline": {
+          "selectedCandidate": "DOMAINE FOLLIN-ARBELET",
+          "matchesTruth": true,
+          "evidenceScore": 0.92,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": "DOMAINE FOLLIN-ARBELET",
+          "matchesTruth": true,
+          "evidenceScore": 0.92,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "PRESERVED_CORRECT",
+        "notes": "Baseline correct match preserved intact."
+      },
+      {
+        "caseId": "approved-wine-011",
+        "brandPresence": "present",
+        "expectedBrand": ["MariaAntonietta"],
+        "baseline": {
+          "selectedCandidate": "Societa Agricola Maria Antonie",
+          "matchesTruth": false,
+          "evidenceScore": 0.9475,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": "Societa Agricola Maria Antonie",
+          "matchesTruth": false,
+          "evidenceScore": 0.9475,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "UNRECOVERED",
+        "notes": "Remains unselected."
+      },
+      {
+        "caseId": "approved-wine-014",
+        "brandPresence": "present",
+        "expectedBrand": ["Tre Cori"],
+        "baseline": {
+          "selectedCandidate": "TRE CORI",
+          "matchesTruth": true,
+          "evidenceScore": 0.96,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": "TRE CORI",
+          "matchesTruth": true,
+          "evidenceScore": 0.96,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "PRESERVED_CORRECT",
+        "notes": "Baseline correct match preserved intact."
+      },
+      {
+        "caseId": "approved-wine-024",
+        "brandPresence": "present",
+        "expectedBrand": ["Chateau de Laville"],
+        "baseline": {
+          "selectedCandidate": "CADILLAC COTES DE BORDEAUX",
+          "matchesTruth": false,
+          "evidenceScore": 0.9525,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": "CADILLAC COTES DE BORDEAUX",
+          "matchesTruth": false,
+          "evidenceScore": 0.9525,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "UNRECOVERED",
+        "notes": "Remains unselected."
+      },
+      {
+        "caseId": "chateau-bonneau",
+        "brandPresence": "present",
+        "expectedBrand": ["Château Bonneau", "Chateau Bonneau"],
+        "baseline": {
+          "selectedCandidate": "BONNEAU",
+          "matchesTruth": false,
+          "evidenceScore": 0.92,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": true,
+          "treatmentCandidateConstructed": "CHATEAU BONNEAU",
+          "selectedCandidate": "CHATEAU BONNEAU",
+          "matchesTruth": true,
+          "evidenceScore": 0.94,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "RECOVERED",
+        "notes": "RECOVERED: Narrow stacked-heading treatment merged 'CHATEAU BONNEAU' and selected correct brand."
+      },
+      {
+        "caseId": "approved-wine-013",
+        "brandPresence": "present",
+        "expectedBrand": ["Afflicted"],
+        "baseline": {
+          "selectedCandidate": "Play ers Heart",
+          "matchesTruth": false,
+          "evidenceScore": 0.73,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": "Play ers Heart",
+          "matchesTruth": false,
+          "evidenceScore": 0.73,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "UNRECOVERED",
+        "notes": "Remains unselected."
+      },
+      {
+        "caseId": "patricia-green-cellars",
+        "brandPresence": "present",
+        "expectedBrand": ["Patricia Green Cellars"],
+        "baseline": {
+          "selectedCandidate": "ESTATE VINEYARD",
+          "matchesTruth": false,
+          "evidenceScore": 0.96,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": "ESTATE VINEYARD",
+          "matchesTruth": false,
+          "evidenceScore": 0.96,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "UNRECOVERED",
+        "notes": "Remains unselected."
+      },
+      {
+        "caseId": "approved-wine-018",
+        "brandPresence": "present",
+        "expectedBrand": ["Poqr Krya", "POQR KRYA"],
+        "baseline": {
+          "selectedCandidate": "Indigenous blend",
+          "matchesTruth": false,
+          "evidenceScore": 0.96,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": "Indigenous blend",
+          "matchesTruth": false,
+          "evidenceScore": 0.96,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "UNRECOVERED",
+        "notes": "Remains unselected."
+      },
+      {
+        "caseId": "nebla-mencia",
+        "brandPresence": "present",
+        "expectedBrand": ["Nebla"],
+        "baseline": {
+          "selectedCandidate": "NEBLA",
+          "matchesTruth": true,
+          "evidenceScore": 0.91,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": "NEBLA",
+          "matchesTruth": true,
+          "evidenceScore": 0.91,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "PRESERVED_CORRECT",
+        "notes": "Baseline correct match preserved intact."
+      },
+      {
+        "caseId": "approved-wine-026",
+        "brandPresence": "present",
+        "expectedBrand": ["Principe Diphesa"],
+        "baseline": {
+          "selectedCandidate": "PRINCIPE. DIPHESA",
+          "matchesTruth": true,
+          "evidenceScore": 0.8200000000000001,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": "PRINCIPE. DIPHESA",
+          "matchesTruth": true,
+          "evidenceScore": 0.8200000000000001,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "PRESERVED_CORRECT",
+        "notes": "Baseline correct match preserved intact."
+      },
+      {
+        "caseId": "approved-wine-033",
+        "brandPresence": "present",
+        "expectedBrand": ["Haywater Cove"],
+        "baseline": {
+          "selectedCandidate": "COVE",
+          "matchesTruth": false,
+          "evidenceScore": 0.62,
+          "state": "AMBIGUOUS"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": "COVE",
+          "matchesTruth": false,
+          "evidenceScore": 0.62,
+          "state": "AMBIGUOUS"
+        },
+        "delta": "UNRECOVERED",
+        "notes": "Remains unselected."
+      },
+      {
+        "caseId": "approved-wine-022",
+        "brandPresence": "absent",
+        "expectedBrand": [],
+        "baseline": {
+          "selectedCandidate": null,
+          "matchesTruth": false,
+          "evidenceScore": 0,
+          "state": "NOT_OBSERVED"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": null,
+          "matchesTruth": false,
+          "evidenceScore": 0,
+          "state": "NOT_OBSERVED"
+        },
+        "delta": "CLEAN_ABSTENTION",
+        "notes": "Clean abstention preserved (selected candidate null)."
+      },
+      {
+        "caseId": "approved-wine-058",
+        "brandPresence": "absent",
+        "expectedBrand": [],
+        "baseline": {
+          "selectedCandidate": null,
+          "matchesTruth": false,
+          "evidenceScore": 0,
+          "state": "NOT_OBSERVED"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": null,
+          "matchesTruth": false,
+          "evidenceScore": 0,
+          "state": "NOT_OBSERVED"
+        },
+        "delta": "CLEAN_ABSTENTION",
+        "notes": "Clean abstention preserved (selected candidate null)."
+      },
+      {
+        "caseId": "approved-wine-062",
+        "brandPresence": "absent",
+        "expectedBrand": [],
+        "baseline": {
+          "selectedCandidate": null,
+          "matchesTruth": false,
+          "evidenceScore": 0,
+          "state": "NOT_OBSERVED"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": null,
+          "matchesTruth": false,
+          "evidenceScore": 0,
+          "state": "NOT_OBSERVED"
+        },
+        "delta": "CLEAN_ABSTENTION",
+        "notes": "Clean abstention preserved (selected candidate null)."
+      },
+      {
+        "caseId": "approved-wine-075",
+        "brandPresence": "absent",
+        "expectedBrand": [],
+        "baseline": {
+          "selectedCandidate": null,
+          "matchesTruth": false,
+          "evidenceScore": 0,
+          "state": "NOT_OBSERVED"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": null,
+          "matchesTruth": false,
+          "evidenceScore": 0,
+          "state": "NOT_OBSERVED"
+        },
+        "delta": "CLEAN_ABSTENTION",
+        "notes": "Clean abstention preserved (selected candidate null)."
+      },
+      {
+        "caseId": "approved-wine-082",
+        "brandPresence": "absent",
+        "expectedBrand": [],
+        "baseline": {
+          "selectedCandidate": null,
+          "matchesTruth": false,
+          "evidenceScore": 0,
+          "state": "NOT_OBSERVED"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": null,
+          "matchesTruth": false,
+          "evidenceScore": 0,
+          "state": "NOT_OBSERVED"
+        },
+        "delta": "CLEAN_ABSTENTION",
+        "notes": "Clean abstention preserved (selected candidate null)."
+      },
+      {
+        "caseId": "approved-wine-095",
+        "brandPresence": "absent",
+        "expectedBrand": [],
+        "baseline": {
+          "selectedCandidate": null,
+          "matchesTruth": false,
+          "evidenceScore": 0,
+          "state": "NOT_OBSERVED"
+        },
+        "treatment": {
+          "treatmentApplied": false,
+          "treatmentCandidateConstructed": null,
+          "selectedCandidate": null,
+          "matchesTruth": false,
+          "evidenceScore": 0,
+          "state": "NOT_OBSERVED"
+        },
+        "delta": "CLEAN_ABSTENTION",
+        "notes": "Clean abstention preserved (selected candidate null)."
+      }
+    ]
+  },
+  "predeclaredValidationProtocol": {
+    "status": "PREDECLARED_NOT_PROMOTED",
+    "prerequisitesForProduction": [
+      "1. Full 48-label corpus regression test: Execute treatment across all 24 Phase 2B labels and 24 held-out labels to guarantee zero baseline degradation.",
+      "2. Strict negative-control invariant: Must maintain 0/6 false assertions on non-brand labels.",
+      "3. Multi-pass consensus gate preservation: Single-pass observations must remain AMBIGUOUS unless confirmed by secondary independent pass.",
+      "4. Independent PR review: Treatment must be proposed in a separate PR from evaluation harness."
+    ]
+  }
+}

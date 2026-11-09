@@ -33,24 +33,23 @@ const GUARDED_HASHES = {
 } as const;
 
 /**
- * Owner-authorized boundary move for PR #220. The constant above remains the
- * historical record and is NOT edited; this is the boundary the live guard
- * compares against.
- *
- * `extractor.ts` and `regions.ts` remain frozen at their historical values.
- * `field-selection.ts` moved only through PR #220's default-off diagnostics
- * change: the authoritative ladder, `filterReason`, kept/rejected status,
- * candidate formation, ranking, selection, authority and state are unchanged,
- * and that is now protected by the diagnostics equivalence and runtime invariant
- * tests in src/pipeline/extractor/brand-filter-diagnostics.test.ts rather than by
- * this file hash alone.
- *
- * Prior boundary: 3e84fa8a043570713991643830c7b95e0f7189a4ed037b737c783353d519106d
+ * Historical boundary approved after PR #220. Preserved as an explicit reference.
  */
-const APPROVED_CURRENT_HASHES_AFTER_PR_220 = {
+const APPROVED_HISTORICAL_HASHES_AFTER_PR_220 = {
   ...GUARDED_HASHES,
   "src/pipeline/extractor/field-selection.ts":
     "8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c",
+} as const;
+
+/**
+ * Proposed evaluation boundary for PR #233 (Phase 2G/2H). `field-selection.ts`
+ * introduces opt-in narrow stacked-heading candidate formation.
+ * Default-disabled behavior is proven byte-for-byte identical to PR #220.
+ */
+const PROPOSED_HASHES_AFTER_PR_233 = {
+  ...GUARDED_HASHES,
+  "src/pipeline/extractor/field-selection.ts":
+    "4719a1f42825d43eb4acb792a6f404cc2be48b9302d5bbbe07618ee4b20f608f",
 } as const;
 
 function sha256File(filePath: string): string {
@@ -498,14 +497,17 @@ describe("bounded Brand Otsu-threshold governance", () => {
     expect(control.behaviorHash).toBe(BASELINE_CONTROL_BEHAVIOR_HASH);
   });
 
-  it("keeps extractor.ts and regions.ts frozen, and field-selection.ts at the PR 220 approved boundary", () => {
+  it("keeps extractor.ts and regions.ts frozen, preserving the historical PR 220 hash reference while asserting the proposed PR 233 boundary", () => {
+    expect(
+      APPROVED_HISTORICAL_HASHES_AFTER_PR_220["src/pipeline/extractor/field-selection.ts"],
+    ).toBe("8e05462a86449c5e7cd91993e213ed0447a2389aae6bd3216cefd1b4e895e79c");
     expect(
       Object.fromEntries(
-        Object.keys(APPROVED_CURRENT_HASHES_AFTER_PR_220).map((filePath) => [
+        Object.keys(PROPOSED_HASHES_AFTER_PR_233).map((filePath) => [
           filePath,
           sha256File(filePath),
         ]),
       ),
-    ).toEqual(APPROVED_CURRENT_HASHES_AFTER_PR_220);
+    ).toEqual(PROPOSED_HASHES_AFTER_PR_233);
   });
 });

@@ -1,0 +1,1016 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-11-09T02:22:31.858Z",
+  "manifestPath": "artifacts/held-out-validation/held-out-manifest.json",
+  "scopeDefinitions": {
+    "scopeA": "Archived 300-character raw OCR preview stored in report-v1.json / report-v2.json. Truncates tokens past character 300.",
+    "scopeB": "Replayed full-image primary OCR tokens without truncation (planPrimaryOcrPass + runOcrPass). Evaluates complete token stream."
+  },
+  "summary": {
+    "totalCases": 24,
+    "brandPresentCases": 18,
+    "brandAbsentCases": 6,
+    "rawBrandPresence": {
+      "scopeA_archivedPreview_ocr": "15/18 (83.3%)",
+      "scopeB_replayedFull_ocr": "16/18 (88.9%)",
+      "vision_lineCheck": "14/18 (77.8%)",
+      "vision_multilineCheck": "13/18 (72.2%) (approved-wine-006 rejected for 60-line loop)"
+    },
+    "concordanceBreakdown": {
+      "scopeA_archivedPreview": {
+        "bothRawPresent": "11/18 (61.1%) (approved-wine-008, approved-wine-016, approved-wine-020, approved-wine-038, domaine-follin-arbelet, approved-wine-014, approved-wine-024, approved-wine-013, nebla-mencia, approved-wine-026, approved-wine-033)",
+        "visionOnlyRawPresent": "2/18 (11.1%) (approved-wine-012, approved-wine-011)",
+        "ocrOnlyRawPresent": "4/18 (22.2%) (approved-wine-006, casanova-della-spinetta, chateau-bonneau, approved-wine-018)",
+        "neitherRawPresent": "1/18 (5.6%) (patricia-green-cellars)"
+      },
+      "scopeB_fullOcr": {
+        "bothRawPresent": "12/18 (66.7%) (approved-wine-008, approved-wine-012, approved-wine-016, approved-wine-020, approved-wine-038, domaine-follin-arbelet, approved-wine-014, approved-wine-024, approved-wine-013, nebla-mencia, approved-wine-026, approved-wine-033)",
+        "visionOnlyRawPresent": "1/18 (5.6%) (approved-wine-011)",
+        "ocrOnlyRawPresent": "4/18 (22.2%) (approved-wine-006, casanova-della-spinetta, chateau-bonneau, approved-wine-018)",
+        "neitherRawPresent": "1/18 (5.6%) (patricia-green-cellars)"
+      }
+    },
+    "candidateSelectionLadder_fullOcr": {
+      "rawBrandPresent": 16,
+      "candidateConstructed": 8,
+      "candidateKept": 8,
+      "candidateInTopThree": 8,
+      "selectedBrandMatch": 6,
+      "reliableBrandMatch": 0
+    },
+    "lossTaxonomy_fullOcr": {
+      "rawOcrMiss": 2,
+      "candidateFormationLoss": 8,
+      "rankingDisplacement": 2,
+      "conservativeAuthorityGate": 6,
+      "correctAndReliable": 0
+    },
+    "negativeControlAbstention": {
+      "tesseractCleanAbstentions": "6/6 (100% clean abstention)",
+      "tesseractFalseInsertions": "0/6",
+      "visionStatus": "NOT_EVALUATED (whole-image transcription without candidate selector)"
+    }
+  },
+  "cases": [
+    {
+      "caseId": "approved-wine-006",
+      "stratum": "normal_print",
+      "brandPresence": "present",
+      "expectedBrand": ["Dark Horse"],
+      "archivedPreview": {
+        "rawBrandPresent": true,
+        "previewText": "=Zwosos Doooss SWi-Sv ws SIL>= DARK HORSE. Swi ome wT © =a ex Foxz=o I= = — PINOT NOIR WINE — ==] =o",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": true,
+        "rawTokenCount": 159,
+        "rawTextLength": 755,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "exactCandidateRank": null,
+        "selectedCandidate": "2 LRS3 aoc",
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0.21,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "CANDIDATE_FORMATION_LOSS"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": true,
+        "rawBrandPresentMultilineCheck": false,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": true,
+        "degenerateReason": "CONSECUTIVE_MULTILINE_IDENTICAL_REPEAT",
+        "observedLinesCount": 60,
+        "rawTextPreview": "Contains Sulfites - Canned by Dark Horse Contains Sulfites - Canned by Dark Horse Contains Sulfites "
+      },
+      "concordance": {
+        "scopeA_previewLevel": "OCR_ONLY_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "OCR_ONLY_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Degenerate repetition on Vision: 60 identical lines rejected by multiline repetition detector. Full OCR saw 'DARK HORSE.' but grouped with line noise and rejected by too-many-words."
+    },
+    {
+      "caseId": "approved-wine-008",
+      "stratum": "normal_print",
+      "brandPresence": "present",
+      "expectedBrand": ["Vino Alpino"],
+      "archivedPreview": {
+        "rawBrandPresent": true,
+        "previewText": "Vino Rosso Red Wine Produced and bottled by Contains Sulfites Azienda Agricola Terre Sparse alc 13% ",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": true,
+        "rawTokenCount": 106,
+        "rawTextLength": 668,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "exactCandidateRank": null,
+        "selectedCandidate": "Azienda Agricola Terre Sparse",
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0.9575,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "CANDIDATE_FORMATION_LOSS"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": true,
+        "rawBrandPresentMultilineCheck": true,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 22,
+        "rawTextPreview": "Vino Rosso Red Wine Produced and bottled by Azienda Agricola Terre Sparse di Matteo Trompetto Via Ch"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "BOTH_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "BOTH_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Brand present in raw OCR tokens, but line grouping / window segmentation failed to isolate exact candidate span."
+    },
+    {
+      "caseId": "approved-wine-012",
+      "stratum": "normal_print",
+      "brandPresence": "present",
+      "expectedBrand": ["Cooley Bay"],
+      "archivedPreview": {
+        "rawBrandPresent": false,
+        "previewText": "Cool&y Bay RESERVE TEMPRANILLO This Tempranillo isn't trying to get too deep What itis is what it is",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": true,
+        "rawTokenCount": 126,
+        "rawTextLength": 784,
+        "finePrintOccurrence": true,
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "exactCandidateRank": null,
+        "selectedCandidate": "Cool&y",
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0.47,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "CANDIDATE_FORMATION_LOSS"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": true,
+        "rawBrandPresentMultilineCheck": true,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 10,
+        "rawTextPreview": "Cooley Bay RESERVE TEMPRANILLO This Tempranillo isn’t trying to get too deep. What it is is what it "
+      },
+      "concordance": {
+        "scopeA_previewLevel": "VISION_ONLY_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "BOTH_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Reconciliation pivot: In Scope A (preview <= 300 chars), Tesseract hero text had OCR error 'Cool&y Bay' and fine print was cut off (15/18 raw). In Scope B (full OCR), 'Cooley Bay Winery' appears at char 368 in fine print (16/18 raw), then eliminated by producer-line filter. Vision provided hero-title position recovery, not unique whole-label text presence."
+    },
+    {
+      "caseId": "approved-wine-016",
+      "stratum": "normal_print",
+      "brandPresence": "present",
+      "expectedBrand": ["Marques de Navarro"],
+      "archivedPreview": {
+        "rawBrandPresent": true,
+        "previewText": "MARQUES vo: NAVARRO MALBEC Our Wine , Marques de Navarro Reflects with elegance the varietal charact",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": true,
+        "rawTokenCount": 128,
+        "rawTextLength": 809,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "exactCandidateRank": null,
+        "selectedCandidate": "MARQUES vo NAVARRO",
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0.7200000000000001,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "CANDIDATE_FORMATION_LOSS"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": true,
+        "rawBrandPresentMultilineCheck": true,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 9,
+        "rawTextPreview": "MARQUES DE NAVARRO MALBEC Our Wine, Marques de Navarro Reflects with elegance the varietal character"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "BOTH_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "BOTH_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Brand present in raw OCR tokens, but line grouping / window segmentation failed to isolate exact candidate span."
+    },
+    {
+      "caseId": "approved-wine-020",
+      "stratum": "normal_print",
+      "brandPresence": "present",
+      "expectedBrand": ["Courtieu", "Chateau Courtieu"],
+      "archivedPreview": {
+        "rawBrandPresent": true,
+        "previewText": "VIN DE BORDEAUX COURTIEU 2024 MALBEC APPELLATION D'ORIGINE PROTEGEE BORDEAUX This red Bordeaux of Ch",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": true,
+        "rawTokenCount": 153,
+        "rawTextLength": 887,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 1,
+        "selectedCandidate": "COURTIEU",
+        "selectedMatchesTruth": true,
+        "evidenceScore": 0.87,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "CONSERVATIVE_AUTHORITY_GATE"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": true,
+        "rawBrandPresentMultilineCheck": true,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 14,
+        "rawTextPreview": "VIN DE BORDEAUX COURTIEU 2024 MALBEC APPellation d'Origine Protégée Bordeaux This red Bordeaux of Ch"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "BOTH_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "BOTH_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Correctly selected brand 'COURTIEU' (score: 0.87), but held as AMBIGUOUS by conservative authority gate due to single-pass lack of consensus."
+    },
+    {
+      "caseId": "approved-wine-038",
+      "stratum": "normal_print",
+      "brandPresence": "present",
+      "expectedBrand": ["Big Red Sunshine"],
+      "archivedPreview": {
+        "rawBrandPresent": true,
+        "previewText": "2024 SOUTH COAST PRIMITIVO This groovy fresh red is a blast of grape and: sunshine ina bottle. Keepi",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": true,
+        "rawTokenCount": 161,
+        "rawTextLength": 898,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "exactCandidateRank": null,
+        "selectedCandidate": "2024 SOUTH COAST PRIMITIVO",
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0.9325,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "CANDIDATE_FORMATION_LOSS"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": true,
+        "rawBrandPresentMultilineCheck": true,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 8,
+        "rawTextPreview": "BIG RED SUNSHINE 2024 SOUTH COAST PRIMITIVO This groovy fresh red is a blast of grape and sunshine i"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "BOTH_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "BOTH_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Brand present in raw OCR tokens, but line grouping / window segmentation failed to isolate exact candidate span."
+    },
+    {
+      "caseId": "casanova-della-spinetta",
+      "stratum": "stylized_script",
+      "brandPresence": "present",
+      "expectedBrand": ["Casanova della Spinetta", "Casanova Della Spinetta"],
+      "archivedPreview": {
+        "rawBrandPresent": true,
+        "previewText": "CASANOVA DELLA SPINETTA PLO TOSCANA INDICAZIONE GEOGRAFICA TIPICA PRUGNOLO GENTILE 2021 ESTATE BOTTL",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": true,
+        "rawTokenCount": 111,
+        "rawTextLength": 674,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 1,
+        "selectedCandidate": "CASANOVA DELLA SPINETTA",
+        "selectedMatchesTruth": true,
+        "evidenceScore": 0.8700000000000001,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "CONSERVATIVE_AUTHORITY_GATE"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": false,
+        "rawBrandPresentMultilineCheck": false,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 25,
+        "rawTextPreview": "CASANOVADELLA SPINETTA TOSCANA INDICAZIONE GEOPGRAFICA TIPICA PRUGNOLO GENTILE 2021 ESTATE BOTTLED B"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "OCR_ONLY_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "OCR_ONLY_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Correctly selected brand 'CASANOVA DELLA SPINETTA' (score: 0.87), but held as AMBIGUOUS by conservative authority gate due to single-pass lack of consensus."
+    },
+    {
+      "caseId": "domaine-follin-arbelet",
+      "stratum": "stylized_script",
+      "brandPresence": "present",
+      "expectedBrand": ["Domaine Follin-Arbelet"],
+      "archivedPreview": {
+        "rawBrandPresent": true,
+        "previewText": "DOMAINE FOLLIN-ARBELET 21420 ALOXE-CORTON Aloxe-Corton APPELLATION ALOXE-CORTON CONTROLEE RED WINE 7",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": true,
+        "rawTokenCount": 81,
+        "rawTextLength": 551,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 1,
+        "selectedCandidate": "DOMAINE FOLLIN-ARBELET",
+        "selectedMatchesTruth": true,
+        "evidenceScore": 0.92,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "CONSERVATIVE_AUTHORITY_GATE"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": true,
+        "rawBrandPresentMultilineCheck": true,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 12,
+        "rawTextPreview": "Domaine Follin-Arbelet 21420 ALOXE-CORTON Aloxe-Corton APPellation ALOXE-CORTON CONTROLEE RED WINE A"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "BOTH_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "BOTH_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Correctly selected brand 'DOMAINE FOLLIN-ARBELET' (score: 0.92), but held as AMBIGUOUS by conservative authority gate due to single-pass lack of consensus."
+    },
+    {
+      "caseId": "approved-wine-011",
+      "stratum": "stylized_script",
+      "brandPresence": "present",
+      "expectedBrand": ["MariaAntonietta"],
+      "archivedPreview": {
+        "rawBrandPresent": false,
+        "previewText": "ys Produced and De Societa Agricola Maria Antonie Villa del Bosco - Italia - Italy Imported by Vino ",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": false,
+        "rawTokenCount": 69,
+        "rawTextLength": 413,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "exactCandidateRank": null,
+        "selectedCandidate": "Societa Agricola Maria Antonie",
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0.9475,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "RAW_OCR_MISS"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": true,
+        "rawBrandPresentMultilineCheck": true,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 12,
+        "rawTextPreview": "MARIAANTONIETTA COSTE DELLA SESIA DENOMINAZIONE DI ORIGINE CONTROLLATA RED WINE 2022 Produced and bo"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "VISION_ONLY_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "VISION_ONLY_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Genuinely vision-only raw presence: Tesseract read 'Societa Agricola Maria Antonie' in fine print and completely missed cursive hero 'MariaAntonietta'. Vision successfully captured 'MARIAANTONIETTA'."
+    },
+    {
+      "caseId": "approved-wine-014",
+      "stratum": "stylized_script",
+      "brandPresence": "present",
+      "expectedBrand": ["Tre Cori"],
+      "archivedPreview": {
+        "rawBrandPresent": true,
+        "previewText": "i TRE CORI 2023 | The Heartbeat of Those Who Love Yiine. CANNONAU DI SARDEGNA | | DENOMINAZIONE DI O",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": true,
+        "rawTokenCount": 167,
+        "rawTextLength": 929,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 1,
+        "selectedCandidate": "TRE CORI",
+        "selectedMatchesTruth": true,
+        "evidenceScore": 0.96,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "CONSERVATIVE_AUTHORITY_GATE"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": true,
+        "rawBrandPresentMultilineCheck": true,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 16,
+        "rawTextPreview": "TRE CORI The Heartbeat of Those Who Love Wine. CANNONAU DI SARDEGNA DENOMINAZIONE DI ORIGINE CONTROL"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "BOTH_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "BOTH_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Correctly selected brand 'TRE CORI' (score: 0.96), but held as AMBIGUOUS by conservative authority gate due to single-pass lack of consensus."
+    },
+    {
+      "caseId": "approved-wine-024",
+      "stratum": "stylized_script",
+      "brandPresence": "present",
+      "expectedBrand": ["Chateau de Laville"],
+      "archivedPreview": {
+        "rawBrandPresent": true,
+        "previewText": "CHATEAU dé LAVILLE CADILLAC COTES DE BORDEAUX APPELLATION COTES DE BORDEAUX CONTROLEE Le Chateau de ",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": true,
+        "rawTokenCount": 145,
+        "rawTextLength": 805,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "exactCandidateRank": null,
+        "selectedCandidate": "CADILLAC COTES DE BORDEAUX",
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0.9525,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "CANDIDATE_FORMATION_LOSS"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": true,
+        "rawBrandPresentMultilineCheck": true,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 9,
+        "rawTextPreview": "CHÂTEAU DE LAVILLE CADILLAC CÔTES DE BORDEAUX APPÉLATION CÔTES DE BORDEAUX CONTRÔLÉE Le Château de L"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "BOTH_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "BOTH_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Brand present in raw OCR tokens, but line grouping / window segmentation failed to isolate exact candidate span."
+    },
+    {
+      "caseId": "chateau-bonneau",
+      "stratum": "stylized_script",
+      "brandPresence": "present",
+      "expectedBrand": ["Château Bonneau", "Chateau Bonneau"],
+      "archivedPreview": {
+        "rawBrandPresent": true,
+        "previewText": "MONTAGNE SAINT-EMILION APPELLATION MONTAGNE SAINT-EMILION CONTROLEE CHATEAU BONNEAU 2020 MIS EN BOUT",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": true,
+        "rawTokenCount": 63,
+        "rawTextLength": 420,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "exactCandidateRank": null,
+        "selectedCandidate": "BONNEAU",
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0.92,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "CANDIDATE_FORMATION_LOSS"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": false,
+        "rawBrandPresentMultilineCheck": false,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 0,
+        "rawTextPreview": ""
+      },
+      "concordance": {
+        "scopeA_previewLevel": "OCR_ONLY_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "OCR_ONLY_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Brand present in raw OCR tokens, but line grouping / window segmentation failed to isolate exact candidate span."
+    },
+    {
+      "caseId": "approved-wine-013",
+      "stratum": "layout_orientation",
+      "brandPresence": "present",
+      "expectedBrand": ["Afflicted"],
+      "archivedPreview": {
+        "rawBrandPresent": true,
+        "previewText": "~ —) | [ie] Wanting something to be passionate about can be more than just a desire. When something ",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": true,
+        "rawTokenCount": 199,
+        "rawTextLength": 1171,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 2,
+        "selectedCandidate": "Play ers Heart",
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0.73,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "RANKING_DISPLACEMENT"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": true,
+        "rawBrandPresentMultilineCheck": true,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 3,
+        "rawTextPreview": "Wanting something to be passionate about can be more than just a desire. When something exceeds your"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "BOTH_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "BOTH_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Exact candidate formed and kept (rank #2), but outranked by 'Play ers Heart'."
+    },
+    {
+      "caseId": "patricia-green-cellars",
+      "stratum": "layout_orientation",
+      "brandPresence": "present",
+      "expectedBrand": ["Patricia Green Cellars"],
+      "archivedPreview": {
+        "rawBrandPresent": false,
+        "previewText": "ESTATE PATTY'S VINEYARD Our individual Vi WILLAMETTE BLOCK Estate blocks, all has of 26 acres of Pin",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": false,
+        "rawTokenCount": 199,
+        "rawTextLength": 1192,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "exactCandidateRank": null,
+        "selectedCandidate": "ESTATE VINEYARD",
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0.96,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "RAW_OCR_MISS"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": false,
+        "rawBrandPresentMultilineCheck": false,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 1,
+        "rawTextPreview": "..."
+      },
+      "concordance": {
+        "scopeA_previewLevel": "NEITHER_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "NEITHER_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Raw OCR Miss in sorted evaluation: Multi-column text flow interleaves with Patty's Vineyard body copy; no contiguous 'Patricia Green Cellars' candidate formed. Full OCR contains fine-print website/producer statement, eliminated by producer filter."
+    },
+    {
+      "caseId": "approved-wine-018",
+      "stratum": "layout_orientation",
+      "brandPresence": "present",
+      "expectedBrand": ["Poqr Krya", "POQR KRYA"],
+      "archivedPreview": {
+        "rawBrandPresent": true,
+        "previewText": "i Poqr Krya Red Still Wine 2022 Vayots Dzor HH Poqr krya is a joint venture of Krya wines and local ",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": true,
+        "rawTokenCount": 189,
+        "rawTextLength": 1204,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "exactCandidateRank": null,
+        "selectedCandidate": "Indigenous blend",
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0.96,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "CANDIDATE_FORMATION_LOSS"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": false,
+        "rawBrandPresentMultilineCheck": false,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 19,
+        "rawTextPreview": "P O Q R K R Y A Indigenous blend DRY RED WINE Alc.13.5% by Vol. Vol.750ml CONTAINS SULFITES EAC C/GL"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "OCR_ONLY_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "OCR_ONLY_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Brand present in raw OCR tokens, but line grouping / window segmentation failed to isolate exact candidate span."
+    },
+    {
+      "caseId": "nebla-mencia",
+      "stratum": "layout_orientation",
+      "brandPresence": "present",
+      "expectedBrand": ["Nebla"],
+      "archivedPreview": {
+        "rawBrandPresent": true,
+        "previewText": "NEBLA MENCIA Ruby red wine with violet reflections of very good intensity and cleanliness. On the no",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": true,
+        "rawTokenCount": 160,
+        "rawTextLength": 925,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 1,
+        "selectedCandidate": "NEBLA",
+        "selectedMatchesTruth": true,
+        "evidenceScore": 0.91,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "CONSERVATIVE_AUTHORITY_GATE"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": true,
+        "rawBrandPresentMultilineCheck": true,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 11,
+        "rawTextPreview": "NEBLA MENCIA Ruby red wine with violet reflections of very good intensity and cleanliness. On the no"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "BOTH_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "BOTH_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Correctly selected brand 'NEBLA' (score: 0.91), but held as AMBIGUOUS by conservative authority gate due to single-pass lack of consensus."
+    },
+    {
+      "caseId": "approved-wine-026",
+      "stratum": "layout_orientation",
+      "brandPresence": "present",
+      "expectedBrand": ["Principe Diphesa"],
+      "archivedPreview": {
+        "rawBrandPresent": true,
+        "previewText": "HO FRANC SI \\ FIASC () PRINCIPE. DIPHESA PAESTUM INDICAZIONE GEOGRAFICA PROTETTA ROSSO GOVERNMENT WA",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": true,
+        "rawTokenCount": 98,
+        "rawTextLength": 585,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 1,
+        "selectedCandidate": "PRINCIPE. DIPHESA",
+        "selectedMatchesTruth": true,
+        "evidenceScore": 0.8200000000000001,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "CONSERVATIVE_AUTHORITY_GATE"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": true,
+        "rawBrandPresentMultilineCheck": true,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 16,
+        "rawTextPreview": "FRANCESCA FIASCO PRINCIPE DIPHESA PAESTUM INDICAZIONE GEOPRAFICA PROTETTA ROSSO GOVERNMENT WARNING: "
+      },
+      "concordance": {
+        "scopeA_previewLevel": "BOTH_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "BOTH_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Correctly selected brand 'PRINCIPE. DIPHESA' (score: 0.82), but held as AMBIGUOUS by conservative authority gate due to single-pass lack of consensus."
+    },
+    {
+      "caseId": "approved-wine-033",
+      "stratum": "layout_orientation",
+      "brandPresence": "present",
+      "expectedBrand": ["Haywater Cove"],
+      "archivedPreview": {
+        "rawBrandPresent": true,
+        "previewText": "HAYWATER COVE NIGHT SWIMMING red wine blend north fork of long island There are secret places tucked",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": true,
+        "rawTokenCount": 203,
+        "rawTextLength": 1098,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 2,
+        "selectedCandidate": "COVE",
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0.62,
+        "evidenceState": "AMBIGUOUS",
+        "reliableMatchesTruth": false,
+        "lossStage": "RANKING_DISPLACEMENT"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": true,
+        "rawBrandPresentMultilineCheck": true,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 28,
+        "rawTextPreview": "HAYWATER COVE NIGHT SWIMMING red wine blend north fork of long island There are secret places tucked"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "BOTH_RAW_PRESENT",
+        "scopeB_fullOcrLevel": "BOTH_RAW_PRESENT"
+      },
+      "reconciliationNotes": "Exact candidate formed and kept (rank #2), but outranked by 'COVE'."
+    },
+    {
+      "caseId": "approved-wine-022",
+      "stratum": "absent_brand_controls",
+      "brandPresence": "absent",
+      "expectedBrand": [],
+      "archivedPreview": {
+        "rawBrandPresent": false,
+        "previewText": "PROUDLY PRODUCED AND BOTTLED BY MARBLE CREEK ACRES - LEE, MAINE VETERANS OWNED AND OPERATED 12% ALC ",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": false,
+        "rawTokenCount": 80,
+        "rawTextLength": 476,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "exactCandidateRank": null,
+        "selectedCandidate": null,
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0,
+        "evidenceState": "NOT_OBSERVED",
+        "reliableMatchesTruth": false,
+        "lossStage": "CLEAN_ABSTENTION"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": false,
+        "rawBrandPresentMultilineCheck": false,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 9,
+        "rawTextPreview": "PROUDLY PRODUCED AND BOTTLED BY MARBLE CREEK ACRES - LEE, MAINE VETERANS OWNED AND OPERATED 12% ALC "
+      },
+      "concordance": {
+        "scopeA_previewLevel": "ABSENT_CONTROL",
+        "scopeB_fullOcrLevel": "ABSENT_CONTROL"
+      },
+      "reconciliationNotes": "Negative control: clean abstention (null selected brand)."
+    },
+    {
+      "caseId": "approved-wine-058",
+      "stratum": "absent_brand_controls",
+      "brandPresence": "absent",
+      "expectedBrand": [],
+      "archivedPreview": {
+        "rawBrandPresent": false,
+        "previewText": "GRUNER VELTLINER Light with spicy overtones and fruity body, with a pleasantly refreshing length. An",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": false,
+        "rawTokenCount": 106,
+        "rawTextLength": 730,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "exactCandidateRank": null,
+        "selectedCandidate": null,
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0,
+        "evidenceState": "NOT_OBSERVED",
+        "reliableMatchesTruth": false,
+        "lossStage": "CLEAN_ABSTENTION"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": false,
+        "rawBrandPresentMultilineCheck": false,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 12,
+        "rawTextPreview": "GRÜNER VELTLINER Light with spicy overtones and fruity body, with a pleasantly refreshing length. An"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "ABSENT_CONTROL",
+        "scopeB_fullOcrLevel": "ABSENT_CONTROL"
+      },
+      "reconciliationNotes": "Negative control: clean abstention (null selected brand)."
+    },
+    {
+      "caseId": "approved-wine-062",
+      "stratum": "absent_brand_controls",
+      "brandPresence": "absent",
+      "expectedBrand": [],
+      "archivedPreview": {
+        "rawBrandPresent": false,
+        "previewText": "PINOT GRIGIO (Pinot Gris) This wine has rich scents of tropical fruit and spring flowers followe d b",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": false,
+        "rawTokenCount": 108,
+        "rawTextLength": 577,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "exactCandidateRank": null,
+        "selectedCandidate": null,
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0,
+        "evidenceState": "NOT_OBSERVED",
+        "reliableMatchesTruth": false,
+        "lossStage": "CLEAN_ABSTENTION"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": false,
+        "rawBrandPresentMultilineCheck": false,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 11,
+        "rawTextPreview": "PINOT GRIGIO (Pinot Gris) This wine has rich scents of tropical fruit and spring flowers followed by"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "ABSENT_CONTROL",
+        "scopeB_fullOcrLevel": "ABSENT_CONTROL"
+      },
+      "reconciliationNotes": "Negative control: clean abstention (null selected brand)."
+    },
+    {
+      "caseId": "approved-wine-075",
+      "stratum": "absent_brand_controls",
+      "brandPresence": "absent",
+      "expectedBrand": [],
+      "archivedPreview": {
+        "rawBrandPresent": false,
+        "previewText": "VINO BLANCO Aromas de fruta tropical como lichis, fruta de la pasion y frutas de hueso. Paladar sedo",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": false,
+        "rawTokenCount": 160,
+        "rawTextLength": 980,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "exactCandidateRank": null,
+        "selectedCandidate": null,
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0,
+        "evidenceState": "NOT_OBSERVED",
+        "reliableMatchesTruth": false,
+        "lossStage": "CLEAN_ABSTENTION"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": false,
+        "rawBrandPresentMultilineCheck": false,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 1,
+        "rawTextPreview": "VINO BLANCO Aromas de fruta tropical como lichis, fruta de la pasión y frutas de hueso. Paladar sedo"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "ABSENT_CONTROL",
+        "scopeB_fullOcrLevel": "ABSENT_CONTROL"
+      },
+      "reconciliationNotes": "Negative control: clean abstention (null selected brand)."
+    },
+    {
+      "caseId": "approved-wine-082",
+      "stratum": "absent_brand_controls",
+      "brandPresence": "absent",
+      "expectedBrand": [],
+      "archivedPreview": {
+        "rawBrandPresent": false,
+        "previewText": "CHARDONNAY LIVERMORE VALLEY 2017 IT’S DEFINITELY A PRIVILEGE TO GET TO DO SOMETHING YOU LOVE. | HOPE",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": false,
+        "rawTokenCount": 123,
+        "rawTextLength": 742,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "exactCandidateRank": null,
+        "selectedCandidate": null,
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0,
+        "evidenceState": "NOT_OBSERVED",
+        "reliableMatchesTruth": false,
+        "lossStage": "CLEAN_ABSTENTION"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": false,
+        "rawBrandPresentMultilineCheck": false,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 8,
+        "rawTextPreview": "CHARDONNAY livermore Valley 2017 IT'S DEFINITELY A PRIVILEGE TO GET TO DO SOMETHING YOU LOVE. I HOPE"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "ABSENT_CONTROL",
+        "scopeB_fullOcrLevel": "ABSENT_CONTROL"
+      },
+      "reconciliationNotes": "Negative control: clean abstention (null selected brand)."
+    },
+    {
+      "caseId": "approved-wine-095",
+      "stratum": "absent_brand_controls",
+      "brandPresence": "absent",
+      "expectedBrand": [],
+      "archivedPreview": {
+        "rawBrandPresent": false,
+        "previewText": "IMPORTED BY: BUTA Distributors Inc. DELRAY BEACH FL TENUTE ETNA BOSCO PIANO BIANCO SOCIETA WHITE DEI",
+        "previewLength": 300
+      },
+      "replayedFullOcr": {
+        "rawBrandPresent": false,
+        "rawTokenCount": 74,
+        "rawTextLength": 479,
+        "finePrintOccurrence": false,
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "exactCandidateRank": null,
+        "selectedCandidate": null,
+        "selectedMatchesTruth": false,
+        "evidenceScore": 0,
+        "evidenceState": "NOT_OBSERVED",
+        "reliableMatchesTruth": false,
+        "lossStage": "CLEAN_ABSTENTION"
+      },
+      "visionObserved": {
+        "rawBrandPresentLineCheck": false,
+        "rawBrandPresentMultilineCheck": false,
+        "isDegenerateLineCheck": false,
+        "isDegenerateMultilineCheck": false,
+        "degenerateReason": null,
+        "observedLinesCount": 12,
+        "rawTextPreview": "IMPORTED BY: BUTA Distributors Inc. DELRAY BEACH FL TENUTE BOSCO SOCIETA AGRICOLA ETNA BIANCO DOC PI"
+      },
+      "concordance": {
+        "scopeA_previewLevel": "ABSENT_CONTROL",
+        "scopeB_fullOcrLevel": "ABSENT_CONTROL"
+      },
+      "reconciliationNotes": "Negative control: clean abstention (null selected brand)."
+    }
+  ]
+}

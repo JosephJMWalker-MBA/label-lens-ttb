@@ -1,0 +1,1436 @@
+{
+  "version": "2.0.0",
+  "generatedAt": "2026-11-09T02:32:23.801Z",
+  "feasibilityStatus": "ORACLE_ASSISTED_UPPER_BOUND_FEASIBILITY",
+  "scopeNotice": "Simulates supplemental non-authoritative vision token injection into the deterministic candidate selector. Evaluated for feasibility analysis only; no production thresholds modified.",
+  "methodologyNotice": "The 6/18 -> 7/18 candidate selection improvement is an ORACLE-ASSISTED SYNTHETIC UPPER BOUND, NOT a measured vision product improvement. Tokens were selected with ground-truth knowledge, assigned an arbitrary 95% confidence score, and placed in synthetic upper-region bounding boxes. Authentic spatial coordinates and font metrics are unavailable from whole-image VLM transcripts.",
+  "architecturalLimitations": {
+    "lackOfAuthenticCoordinates": "Whole-image VLM transcripts from llama-server return unstructured or line-based text, lacking authentic pixel coordinates (x0, y0, x1, y1), font sizes, and line-height bounding boxes. Therefore, any spatial coordinates assigned to whole-image VLM tokens are synthetic.",
+    "spatialBoundingRequirement": "Without bounded spatial targeting (such as Phase 2B's cropped brand region targeting), unconstrained whole-image VLM tokens cannot be reliably anchored to label geometry, and negative control safety cannot be guaranteed."
+  },
+  "summary": {
+    "visionOnlyRecoveriesEvaluated": 2,
+    "visionOnlyRecoveriesSucceeded": 1,
+    "negativeControlsEvaluated": 6,
+    "negativeControlCleanAbstentions_oracleAssisted": 6,
+    "negativeControlFalseInsertions_oracleAssisted": 0,
+    "negativeControlCleanAbstentions_truthBlind": 6,
+    "negativeControlFalseInsertions_truthBlind": 0,
+    "brandPresentTotalCases": 18,
+    "baselineSelectedMatches": 6,
+    "additiveSelectedMatches_oracleAssisted": 7,
+    "netRecoveryUplift_oracleAssisted": "6/18 (33.3%) -> 7/18 (38.9%) (+5.6 pp)",
+    "sensitivityFindings": {
+      "confidenceFloorThreshold": "In approved-wine-012, Cooley Bay requires confidence >= 50% to be selected (score 3.69-4.14). At confidence = 0%, score drops to 2.49 (rank #4) and Cool&y is selected. In approved-wine-011, MariaAntonietta is formed and kept (score 3.94-4.89, rank #2), but displaced behind Societa Agricola Maria Antonie.",
+      "geometrySubordinationEffect": "In approved-wine-012, prominent geometry yields score 4.14 (selected). Moderate geometry yields 3.83 (selected). Subordinate (fine print) geometry drops score to 3.57, displacing Cooley Bay behind Texas Tempranillo 750ml. In approved-wine-011, subordinate geometry drops score from 4.89 to 3.99."
+    },
+    "authorityGateIntegrity": {
+      "totalObservedElevations": 0,
+      "ambiguousGatedCount": 18,
+      "note": "Zero supplemental vision passes elevated to OBSERVED; all recovered brands safely gated as AMBIGUOUS by conservative cross-pass consensus rules."
+    }
+  },
+  "cases": [
+    {
+      "caseId": "approved-wine-006",
+      "stratum": "normal_print",
+      "brandPresence": "present",
+      "acceptablePresentations": ["Dark Horse"],
+      "baselineOcr": {
+        "selectedCandidate": "2 LRS3 aoc",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.21,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [],
+        "selectedCandidate": "2 LRS3 aoc",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.21,
+        "matchesTruth": false,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "competingCandidates": [
+          {
+            "value": "2 LRS3 aoc",
+            "score": 2.95,
+            "rank": 1
+          },
+          {
+            "value": "Doooss SIL",
+            "score": 2.59,
+            "rank": 2
+          },
+          {
+            "value": "So SESS 55a",
+            "score": 2.54,
+            "rank": 3
+          }
+        ]
+      },
+      "outcomeCategory": "REMAINS_UNRECOVERED",
+      "notes": "Brand remained unselected (selected: \"2 LRS3 aoc\")."
+    },
+    {
+      "caseId": "approved-wine-008",
+      "stratum": "normal_print",
+      "brandPresence": "present",
+      "acceptablePresentations": ["Vino Alpino"],
+      "baselineOcr": {
+        "selectedCandidate": "Azienda Agricola Terre Sparse",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.9575,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [],
+        "selectedCandidate": "Azienda Agricola Terre Sparse",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.9575,
+        "matchesTruth": false,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "competingCandidates": [
+          {
+            "value": "Azienda Agricola Terre Sparse",
+            "score": 5.18,
+            "rank": 1
+          },
+          {
+            "value": "Cascinette d'ivrea Italy",
+            "score": 5.1,
+            "rank": 2
+          },
+          {
+            "value": "Vino Alpino LLC",
+            "score": 4.91,
+            "rank": 3
+          }
+        ]
+      },
+      "outcomeCategory": "REMAINS_UNRECOVERED",
+      "notes": "Brand remained unselected (selected: \"Azienda Agricola Terre Sparse\")."
+    },
+    {
+      "caseId": "approved-wine-012",
+      "stratum": "normal_print",
+      "brandPresence": "present",
+      "acceptablePresentations": ["Cooley Bay"],
+      "baselineOcr": {
+        "selectedCandidate": "Cool&y",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.47,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": ["Cooley", "Bay"],
+        "selectedCandidate": "Cooley Bay",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.95,
+        "matchesTruth": true,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 3,
+        "exactCandidateScore": 4.1413853820598,
+        "competingCandidates": [
+          {
+            "value": "Cooley Bay Winery",
+            "score": 6.72,
+            "rank": 1
+          },
+          {
+            "value": "Texas Tempranillo 750ml",
+            "score": 4.37,
+            "rank": 2
+          },
+          {
+            "value": "Cooley Bay",
+            "score": 4.14,
+            "rank": 3
+          }
+        ]
+      },
+      "outcomeCategory": "RECOVERED_BRAND",
+      "notes": "Oracle-assisted vision tokens recovered brand \"Cooley Bay\" under deterministic rules (score: 4.14)."
+    },
+    {
+      "caseId": "approved-wine-016",
+      "stratum": "normal_print",
+      "brandPresence": "present",
+      "acceptablePresentations": ["Marques de Navarro"],
+      "baselineOcr": {
+        "selectedCandidate": "MARQUES vo NAVARRO",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.7200000000000001,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [],
+        "selectedCandidate": "MARQUES vo NAVARRO",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.7200000000000001,
+        "matchesTruth": false,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "competingCandidates": [
+          {
+            "value": "MARQUES vo NAVARRO",
+            "score": 4.19,
+            "rank": 1
+          }
+        ]
+      },
+      "outcomeCategory": "REMAINS_UNRECOVERED",
+      "notes": "Brand remained unselected (selected: \"MARQUES vo NAVARRO\")."
+    },
+    {
+      "caseId": "approved-wine-020",
+      "stratum": "normal_print",
+      "brandPresence": "present",
+      "acceptablePresentations": ["Courtieu", "Chateau Courtieu"],
+      "baselineOcr": {
+        "selectedCandidate": "COURTIEU",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.87,
+        "matchesTruth": true,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [],
+        "selectedCandidate": "COURTIEU",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.87,
+        "matchesTruth": true,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 1,
+        "exactCandidateScore": 3.588577566736009,
+        "competingCandidates": [
+          {
+            "value": "COURTIEU",
+            "score": 3.59,
+            "rank": 1
+          },
+          {
+            "value": "VIN DE BORDEAUX",
+            "score": 3.18,
+            "rank": 2
+          },
+          {
+            "value": "ARV o 87752704220",
+            "score": 1.55,
+            "rank": 3
+          }
+        ]
+      },
+      "outcomeCategory": "ALREADY_CORRECT_PRESERVED",
+      "notes": "Baseline OCR already selected correct brand; preserved intact."
+    },
+    {
+      "caseId": "approved-wine-038",
+      "stratum": "normal_print",
+      "brandPresence": "present",
+      "acceptablePresentations": ["Big Red Sunshine"],
+      "baselineOcr": {
+        "selectedCandidate": "2024 SOUTH COAST PRIMITIVO",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.9325,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [],
+        "selectedCandidate": "2024 SOUTH COAST PRIMITIVO",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.9325,
+        "matchesTruth": false,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "competingCandidates": [
+          {
+            "value": "2024 SOUTH COAST PRIMITIVO",
+            "score": 5.77,
+            "rank": 1
+          }
+        ]
+      },
+      "outcomeCategory": "REMAINS_UNRECOVERED",
+      "notes": "Brand remained unselected (selected: \"2024 SOUTH COAST PRIMITIVO\")."
+    },
+    {
+      "caseId": "casanova-della-spinetta",
+      "stratum": "stylized_script",
+      "brandPresence": "present",
+      "acceptablePresentations": ["Casanova della Spinetta", "Casanova Della Spinetta"],
+      "baselineOcr": {
+        "selectedCandidate": "CASANOVA DELLA SPINETTA",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.8700000000000001,
+        "matchesTruth": true,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [],
+        "selectedCandidate": "CASANOVA DELLA SPINETTA",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.8700000000000001,
+        "matchesTruth": true,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 1,
+        "exactCandidateScore": 5.034524227436786,
+        "competingCandidates": [
+          {
+            "value": "CASANOVA DELLA SPINETTA",
+            "score": 5.03,
+            "rank": 1
+          },
+          {
+            "value": "CASANOVA DELLA SPINETTA",
+            "score": 4.87,
+            "rank": 2
+          },
+          {
+            "value": "INDICAZIONE GEOGRAFICA TIPICA",
+            "score": 4.84,
+            "rank": 3
+          }
+        ]
+      },
+      "outcomeCategory": "ALREADY_CORRECT_PRESERVED",
+      "notes": "Baseline OCR already selected correct brand; preserved intact."
+    },
+    {
+      "caseId": "domaine-follin-arbelet",
+      "stratum": "stylized_script",
+      "brandPresence": "present",
+      "acceptablePresentations": ["Domaine Follin-Arbelet"],
+      "baselineOcr": {
+        "selectedCandidate": "DOMAINE FOLLIN-ARBELET",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.92,
+        "matchesTruth": true,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [],
+        "selectedCandidate": "DOMAINE FOLLIN-ARBELET",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.92,
+        "matchesTruth": true,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 1,
+        "exactCandidateScore": 5.335011455278592,
+        "competingCandidates": [
+          {
+            "value": "DOMAINE FOLLIN-ARBELET",
+            "score": 5.34,
+            "rank": 1
+          },
+          {
+            "value": "KERMIT LYNCH",
+            "score": 4.95,
+            "rank": 2
+          },
+          {
+            "value": "WINE MERCHANT",
+            "score": 4.88,
+            "rank": 3
+          }
+        ]
+      },
+      "outcomeCategory": "ALREADY_CORRECT_PRESERVED",
+      "notes": "Baseline OCR already selected correct brand; preserved intact."
+    },
+    {
+      "caseId": "approved-wine-011",
+      "stratum": "stylized_script",
+      "brandPresence": "present",
+      "acceptablePresentations": ["MariaAntonietta"],
+      "baselineOcr": {
+        "selectedCandidate": "Societa Agricola Maria Antonie",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.9475,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": ["MariaAntonietta"],
+        "selectedCandidate": "Societa Agricola Maria Antonie",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.9475,
+        "matchesTruth": false,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 2,
+        "exactCandidateScore": 4.888336849507736,
+        "competingCandidates": [
+          {
+            "value": "Societa Agricola Maria Antonie",
+            "score": 5.13,
+            "rank": 1
+          },
+          {
+            "value": "MariaAntonietta",
+            "score": 4.89,
+            "rank": 2
+          },
+          {
+            "value": "HBLQ0B",
+            "score": 1.76,
+            "rank": 3
+          }
+        ]
+      },
+      "outcomeCategory": "REMAINS_UNRECOVERED",
+      "notes": "Brand remained unselected (selected: \"Societa Agricola Maria Antonie\")."
+    },
+    {
+      "caseId": "approved-wine-014",
+      "stratum": "stylized_script",
+      "brandPresence": "present",
+      "acceptablePresentations": ["Tre Cori"],
+      "baselineOcr": {
+        "selectedCandidate": "TRE CORI",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.96,
+        "matchesTruth": true,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [],
+        "selectedCandidate": "TRE CORI",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.96,
+        "matchesTruth": true,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 1,
+        "exactCandidateScore": 4.468345071343662,
+        "competingCandidates": [
+          {
+            "value": "TRE CORI",
+            "score": 4.47,
+            "rank": 1
+          },
+          {
+            "value": "DENOMINAZIONE DI ORIGINE CONTROLLATA",
+            "score": 4.22,
+            "rank": 2
+          },
+          {
+            "value": "CANNONAU DI SARDEGNA",
+            "score": 4,
+            "rank": 3
+          }
+        ]
+      },
+      "outcomeCategory": "ALREADY_CORRECT_PRESERVED",
+      "notes": "Baseline OCR already selected correct brand; preserved intact."
+    },
+    {
+      "caseId": "approved-wine-024",
+      "stratum": "stylized_script",
+      "brandPresence": "present",
+      "acceptablePresentations": ["Chateau de Laville"],
+      "baselineOcr": {
+        "selectedCandidate": "CADILLAC COTES DE BORDEAUX",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.9525,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [],
+        "selectedCandidate": "CADILLAC COTES DE BORDEAUX",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.9525,
+        "matchesTruth": false,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "competingCandidates": [
+          {
+            "value": "CADILLAC COTES DE BORDEAUX",
+            "score": 4.73,
+            "rank": 1
+          },
+          {
+            "value": "CHATEAU d LAVILLE",
+            "score": 3.83,
+            "rank": 2
+          },
+          {
+            "value": "NNW & OO um",
+            "score": 1.6,
+            "rank": 3
+          }
+        ]
+      },
+      "outcomeCategory": "REMAINS_UNRECOVERED",
+      "notes": "Brand remained unselected (selected: \"CADILLAC COTES DE BORDEAUX\")."
+    },
+    {
+      "caseId": "chateau-bonneau",
+      "stratum": "stylized_script",
+      "brandPresence": "present",
+      "acceptablePresentations": ["Château Bonneau", "Chateau Bonneau"],
+      "baselineOcr": {
+        "selectedCandidate": "BONNEAU",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.92,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [],
+        "selectedCandidate": "BONNEAU",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.92,
+        "matchesTruth": false,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "competingCandidates": [
+          {
+            "value": "SCEA. VIEUX CHATEAU SAINT-ANDRE",
+            "score": 4.66,
+            "rank": 1
+          },
+          {
+            "value": "MONTAGNE SAINT-EMILION",
+            "score": 4.6,
+            "rank": 2
+          },
+          {
+            "value": "BONNEAU",
+            "score": 4.07,
+            "rank": 3
+          }
+        ]
+      },
+      "outcomeCategory": "REMAINS_UNRECOVERED",
+      "notes": "Brand remained unselected (selected: \"BONNEAU\")."
+    },
+    {
+      "caseId": "approved-wine-013",
+      "stratum": "layout_orientation",
+      "brandPresence": "present",
+      "acceptablePresentations": ["Afflicted"],
+      "baselineOcr": {
+        "selectedCandidate": "Play ers Heart",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.73,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [],
+        "selectedCandidate": "Play ers Heart",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.73,
+        "matchesTruth": false,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 2,
+        "exactCandidateScore": 3.407544169095344,
+        "competingCandidates": [
+          {
+            "value": "Play ers Heart",
+            "score": 5.44,
+            "rank": 1
+          },
+          {
+            "value": "Afflicted",
+            "score": 3.41,
+            "rank": 2
+          }
+        ]
+      },
+      "outcomeCategory": "REMAINS_UNRECOVERED",
+      "notes": "Brand remained unselected (selected: \"Play ers Heart\")."
+    },
+    {
+      "caseId": "patricia-green-cellars",
+      "stratum": "layout_orientation",
+      "brandPresence": "present",
+      "acceptablePresentations": ["Patricia Green Cellars"],
+      "baselineOcr": {
+        "selectedCandidate": "ESTATE VINEYARD",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.96,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [],
+        "selectedCandidate": "ESTATE VINEYARD",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.96,
+        "matchesTruth": false,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "competingCandidates": [
+          {
+            "value": "ESTATE VINEYARD",
+            "score": 7.35,
+            "rank": 1
+          },
+          {
+            "value": "PATTY'S BLOCK",
+            "score": 6.95,
+            "rank": 2
+          },
+          {
+            "value": "NEWBERG, OREGON - 503.554.0821",
+            "score": 5.23,
+            "rank": 3
+          }
+        ]
+      },
+      "outcomeCategory": "REMAINS_UNRECOVERED",
+      "notes": "Brand remained unselected (selected: \"ESTATE VINEYARD\")."
+    },
+    {
+      "caseId": "approved-wine-018",
+      "stratum": "layout_orientation",
+      "brandPresence": "present",
+      "acceptablePresentations": ["Poqr Krya", "POQR KRYA"],
+      "baselineOcr": {
+        "selectedCandidate": "Indigenous blend",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.96,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [],
+        "selectedCandidate": "Indigenous blend",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.96,
+        "matchesTruth": false,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "competingCandidates": [
+          {
+            "value": "Indigenous blend",
+            "score": 5.06,
+            "rank": 1
+          },
+          {
+            "value": "Jacksonville, FL USA",
+            "score": 4.04,
+            "rank": 2
+          },
+          {
+            "value": "Product of Armenia",
+            "score": 3.86,
+            "rank": 3
+          }
+        ]
+      },
+      "outcomeCategory": "REMAINS_UNRECOVERED",
+      "notes": "Brand remained unselected (selected: \"Indigenous blend\")."
+    },
+    {
+      "caseId": "nebla-mencia",
+      "stratum": "layout_orientation",
+      "brandPresence": "present",
+      "acceptablePresentations": ["Nebla"],
+      "baselineOcr": {
+        "selectedCandidate": "NEBLA",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.91,
+        "matchesTruth": true,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [],
+        "selectedCandidate": "NEBLA",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.91,
+        "matchesTruth": true,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 1,
+        "exactCandidateScore": 3.5410516641434615,
+        "competingCandidates": [
+          {
+            "value": "NEBLA",
+            "score": 3.54,
+            "rank": 1
+          },
+          {
+            "value": "MENCIA",
+            "score": 3.32,
+            "rank": 2
+          },
+          {
+            "value": "Vino de la Tierra",
+            "score": 2.92,
+            "rank": 3
+          }
+        ]
+      },
+      "outcomeCategory": "ALREADY_CORRECT_PRESERVED",
+      "notes": "Baseline OCR already selected correct brand; preserved intact."
+    },
+    {
+      "caseId": "approved-wine-026",
+      "stratum": "layout_orientation",
+      "brandPresence": "present",
+      "acceptablePresentations": ["Principe Diphesa"],
+      "baselineOcr": {
+        "selectedCandidate": "PRINCIPE. DIPHESA",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.8200000000000001,
+        "matchesTruth": true,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [],
+        "selectedCandidate": "PRINCIPE. DIPHESA",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.8200000000000001,
+        "matchesTruth": true,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 1,
+        "exactCandidateScore": 5.393668850740401,
+        "competingCandidates": [
+          {
+            "value": "PRINCIPE. DIPHESA",
+            "score": 5.39,
+            "rank": 1
+          },
+          {
+            "value": "RID VINTAG PRODUCT",
+            "score": 4.58,
+            "rank": 2
+          },
+          {
+            "value": "INDICAZIONE GEOGRAFICA PROTETTA",
+            "score": 4.55,
+            "rank": 3
+          }
+        ]
+      },
+      "outcomeCategory": "ALREADY_CORRECT_PRESERVED",
+      "notes": "Baseline OCR already selected correct brand; preserved intact."
+    },
+    {
+      "caseId": "approved-wine-033",
+      "stratum": "layout_orientation",
+      "brandPresence": "present",
+      "acceptablePresentations": ["Haywater Cove"],
+      "baselineOcr": {
+        "selectedCandidate": "COVE",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.62,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [],
+        "selectedCandidate": "COVE",
+        "evidenceState": "AMBIGUOUS",
+        "ocrEvidenceScore": 0.62,
+        "matchesTruth": false,
+        "falseInsertion": false,
+        "decision": "AMBIGUOUS",
+        "exactCandidateConstructed": true,
+        "exactCandidateKept": true,
+        "exactCandidateRank": 2,
+        "exactCandidateScore": 4.140634476984199,
+        "competingCandidates": [
+          {
+            "value": "NIGHT SWIMMING",
+            "score": 4.32,
+            "rank": 1
+          },
+          {
+            "value": "HAYWATER COVE",
+            "score": 4.14,
+            "rank": 2
+          },
+          {
+            "value": "COVE",
+            "score": 3.43,
+            "rank": 3
+          }
+        ]
+      },
+      "outcomeCategory": "REMAINS_UNRECOVERED",
+      "notes": "Brand remained unselected (selected: \"COVE\")."
+    },
+    {
+      "caseId": "approved-wine-022",
+      "stratum": "absent_brand_controls",
+      "brandPresence": "absent",
+      "acceptablePresentations": [],
+      "baselineOcr": {
+        "selectedCandidate": null,
+        "evidenceState": "NOT_OBSERVED",
+        "ocrEvidenceScore": 0,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [
+          "PROUDLY",
+          "PRODUCED",
+          "AND",
+          "BOTTLED",
+          "BY",
+          "MARBLE",
+          "CREEK",
+          "ACRES",
+          "-",
+          "LEE,"
+        ],
+        "selectedCandidate": null,
+        "evidenceState": "NOT_OBSERVED",
+        "ocrEvidenceScore": 0,
+        "matchesTruth": false,
+        "falseInsertion": false,
+        "decision": "NOT_OBSERVED",
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "competingCandidates": []
+      },
+      "outcomeCategory": "CLEAN_ABSTENTION",
+      "notes": "Clean abstention preserved under 10-word line filter."
+    },
+    {
+      "caseId": "approved-wine-058",
+      "stratum": "absent_brand_controls",
+      "brandPresence": "absent",
+      "acceptablePresentations": [],
+      "baselineOcr": {
+        "selectedCandidate": null,
+        "evidenceState": "NOT_OBSERVED",
+        "ocrEvidenceScore": 0,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [
+          "GRÜNER",
+          "VELTLINER",
+          "Light",
+          "with",
+          "spicy",
+          "overtones",
+          "and",
+          "fruity",
+          "body,",
+          "with"
+        ],
+        "selectedCandidate": null,
+        "evidenceState": "NOT_OBSERVED",
+        "ocrEvidenceScore": 0,
+        "matchesTruth": false,
+        "falseInsertion": false,
+        "decision": "NOT_OBSERVED",
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "competingCandidates": []
+      },
+      "outcomeCategory": "CLEAN_ABSTENTION",
+      "notes": "Clean abstention preserved under 10-word line filter."
+    },
+    {
+      "caseId": "approved-wine-062",
+      "stratum": "absent_brand_controls",
+      "brandPresence": "absent",
+      "acceptablePresentations": [],
+      "baselineOcr": {
+        "selectedCandidate": null,
+        "evidenceState": "NOT_OBSERVED",
+        "ocrEvidenceScore": 0,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [
+          "PINOT",
+          "GRIGIO",
+          "(Pinot",
+          "Gris)",
+          "This",
+          "wine",
+          "has",
+          "rich",
+          "scents",
+          "of"
+        ],
+        "selectedCandidate": null,
+        "evidenceState": "NOT_OBSERVED",
+        "ocrEvidenceScore": 0,
+        "matchesTruth": false,
+        "falseInsertion": false,
+        "decision": "NOT_OBSERVED",
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "competingCandidates": []
+      },
+      "outcomeCategory": "CLEAN_ABSTENTION",
+      "notes": "Clean abstention preserved under 10-word line filter."
+    },
+    {
+      "caseId": "approved-wine-075",
+      "stratum": "absent_brand_controls",
+      "brandPresence": "absent",
+      "acceptablePresentations": [],
+      "baselineOcr": {
+        "selectedCandidate": null,
+        "evidenceState": "NOT_OBSERVED",
+        "ocrEvidenceScore": 0,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [
+          "VINO",
+          "BLANCO",
+          "Aromas",
+          "de",
+          "fruta",
+          "tropical",
+          "como",
+          "lichis,",
+          "fruta",
+          "de"
+        ],
+        "selectedCandidate": null,
+        "evidenceState": "NOT_OBSERVED",
+        "ocrEvidenceScore": 0,
+        "matchesTruth": false,
+        "falseInsertion": false,
+        "decision": "NOT_OBSERVED",
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "competingCandidates": []
+      },
+      "outcomeCategory": "CLEAN_ABSTENTION",
+      "notes": "Clean abstention preserved under 10-word line filter."
+    },
+    {
+      "caseId": "approved-wine-082",
+      "stratum": "absent_brand_controls",
+      "brandPresence": "absent",
+      "acceptablePresentations": [],
+      "baselineOcr": {
+        "selectedCandidate": null,
+        "evidenceState": "NOT_OBSERVED",
+        "ocrEvidenceScore": 0,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [
+          "CHARDONNAY",
+          "livermore",
+          "Valley",
+          "2017",
+          "IT'S",
+          "DEFINITELY",
+          "A",
+          "PRIVILEGE",
+          "TO",
+          "GET"
+        ],
+        "selectedCandidate": null,
+        "evidenceState": "NOT_OBSERVED",
+        "ocrEvidenceScore": 0,
+        "matchesTruth": false,
+        "falseInsertion": false,
+        "decision": "NOT_OBSERVED",
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "competingCandidates": []
+      },
+      "outcomeCategory": "CLEAN_ABSTENTION",
+      "notes": "Clean abstention preserved under 10-word line filter."
+    },
+    {
+      "caseId": "approved-wine-095",
+      "stratum": "absent_brand_controls",
+      "brandPresence": "absent",
+      "acceptablePresentations": [],
+      "baselineOcr": {
+        "selectedCandidate": null,
+        "evidenceState": "NOT_OBSERVED",
+        "ocrEvidenceScore": 0,
+        "matchesTruth": false,
+        "falseInsertion": false
+      },
+      "additiveSimulation": {
+        "supplementalTokensSupplied": [
+          "IMPORTED",
+          "BY:",
+          "BUTA",
+          "Distributors",
+          "Inc.",
+          "DELRAY",
+          "BEACH",
+          "FL",
+          "TENUTE",
+          "BOSCO"
+        ],
+        "selectedCandidate": null,
+        "evidenceState": "NOT_OBSERVED",
+        "ocrEvidenceScore": 0,
+        "matchesTruth": false,
+        "falseInsertion": false,
+        "decision": "NOT_OBSERVED",
+        "exactCandidateConstructed": false,
+        "exactCandidateKept": false,
+        "competingCandidates": []
+      },
+      "outcomeCategory": "CLEAN_ABSTENTION",
+      "notes": "Clean abstention preserved under 10-word line filter."
+    }
+  ],
+  "sensitivityAnalysis": [
+    {
+      "caseId": "approved-wine-012",
+      "expectedBrand": ["Cooley Bay"],
+      "confidenceSensitivity": [
+        {
+          "confidence": 0,
+          "candidateConstructed": true,
+          "candidateKept": true,
+          "candidateScore": 2.49,
+          "candidateRank": 4,
+          "selectedMatchesTruth": false,
+          "selectedCandidate": "Cool&y"
+        },
+        {
+          "confidence": 50,
+          "candidateConstructed": true,
+          "candidateKept": true,
+          "candidateScore": 3.69,
+          "candidateRank": 3,
+          "selectedMatchesTruth": true,
+          "selectedCandidate": "Cooley Bay"
+        },
+        {
+          "confidence": 70,
+          "candidateConstructed": true,
+          "candidateKept": true,
+          "candidateScore": 3.89,
+          "candidateRank": 3,
+          "selectedMatchesTruth": true,
+          "selectedCandidate": "Cooley Bay"
+        },
+        {
+          "confidence": 90,
+          "candidateConstructed": true,
+          "candidateKept": true,
+          "candidateScore": 4.09,
+          "candidateRank": 3,
+          "selectedMatchesTruth": true,
+          "selectedCandidate": "Cooley Bay"
+        },
+        {
+          "confidence": 95,
+          "candidateConstructed": true,
+          "candidateKept": true,
+          "candidateScore": 4.14,
+          "candidateRank": 3,
+          "selectedMatchesTruth": true,
+          "selectedCandidate": "Cooley Bay"
+        }
+      ],
+      "geometrySensitivity": [
+        {
+          "geometryType": "prominent",
+          "lineYRatio": 0.2,
+          "wordHeightRatio": 0.08,
+          "candidateScore": 4.14,
+          "candidateRank": 3,
+          "selectedMatchesTruth": true,
+          "selectedCandidate": "Cooley Bay"
+        },
+        {
+          "geometryType": "moderate",
+          "lineYRatio": 0.5,
+          "wordHeightRatio": 0.04,
+          "candidateScore": 3.83,
+          "candidateRank": 3,
+          "selectedMatchesTruth": true,
+          "selectedCandidate": "Cooley Bay"
+        },
+        {
+          "geometryType": "subordinate",
+          "lineYRatio": 0.85,
+          "wordHeightRatio": 0.02,
+          "candidateScore": 3.57,
+          "candidateRank": 3,
+          "selectedMatchesTruth": false,
+          "selectedCandidate": "Texas Tempranillo 750ml"
+        }
+      ]
+    },
+    {
+      "caseId": "approved-wine-011",
+      "expectedBrand": ["MariaAntonietta"],
+      "confidenceSensitivity": [
+        {
+          "confidence": 0,
+          "candidateConstructed": true,
+          "candidateKept": true,
+          "candidateScore": 3.94,
+          "candidateRank": 2,
+          "selectedMatchesTruth": false,
+          "selectedCandidate": "Societa Agricola Maria Antonie"
+        },
+        {
+          "confidence": 50,
+          "candidateConstructed": true,
+          "candidateKept": true,
+          "candidateScore": 4.44,
+          "candidateRank": 2,
+          "selectedMatchesTruth": false,
+          "selectedCandidate": "Societa Agricola Maria Antonie"
+        },
+        {
+          "confidence": 70,
+          "candidateConstructed": true,
+          "candidateKept": true,
+          "candidateScore": 4.64,
+          "candidateRank": 2,
+          "selectedMatchesTruth": false,
+          "selectedCandidate": "Societa Agricola Maria Antonie"
+        },
+        {
+          "confidence": 90,
+          "candidateConstructed": true,
+          "candidateKept": true,
+          "candidateScore": 4.84,
+          "candidateRank": 2,
+          "selectedMatchesTruth": false,
+          "selectedCandidate": "Societa Agricola Maria Antonie"
+        },
+        {
+          "confidence": 95,
+          "candidateConstructed": true,
+          "candidateKept": true,
+          "candidateScore": 4.89,
+          "candidateRank": 2,
+          "selectedMatchesTruth": false,
+          "selectedCandidate": "Societa Agricola Maria Antonie"
+        }
+      ],
+      "geometrySensitivity": [
+        {
+          "geometryType": "prominent",
+          "lineYRatio": 0.2,
+          "wordHeightRatio": 0.08,
+          "candidateScore": 4.89,
+          "candidateRank": 2,
+          "selectedMatchesTruth": false,
+          "selectedCandidate": "Societa Agricola Maria Antonie"
+        },
+        {
+          "geometryType": "moderate",
+          "lineYRatio": 0.5,
+          "wordHeightRatio": 0.04,
+          "candidateScore": 4.67,
+          "candidateRank": 2,
+          "selectedMatchesTruth": false,
+          "selectedCandidate": "Societa Agricola Maria Antonie"
+        },
+        {
+          "geometryType": "subordinate",
+          "lineYRatio": 0.85,
+          "wordHeightRatio": 0.02,
+          "candidateScore": 3.99,
+          "candidateRank": 2,
+          "selectedMatchesTruth": false,
+          "selectedCandidate": "Societa Agricola Maria Antonie"
+        }
+      ]
+    }
+  ],
+  "truthBlindEvaluation": [
+    {
+      "caseId": "approved-wine-006",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": "2 LRS3 aoc",
+      "matchesTruth": false,
+      "falseInsertion": false,
+      "decision": "UNRECOVERED",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "approved-wine-008",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": "Azienda Agricola Terre Sparse",
+      "matchesTruth": false,
+      "falseInsertion": false,
+      "decision": "UNRECOVERED",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "approved-wine-012",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": ["Cooley", "Bay"],
+      "selectedCandidate": "Cooley Bay",
+      "matchesTruth": true,
+      "falseInsertion": false,
+      "decision": "RECOVERED_BRAND",
+      "notes": "Truth-blind extracted string \"Cooley Bay\" successfully selected."
+    },
+    {
+      "caseId": "approved-wine-016",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": "MARQUES vo NAVARRO",
+      "matchesTruth": false,
+      "falseInsertion": false,
+      "decision": "UNRECOVERED",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "approved-wine-020",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": "COURTIEU",
+      "matchesTruth": true,
+      "falseInsertion": false,
+      "decision": "UNRECOVERED",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "approved-wine-038",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": "2024 SOUTH COAST PRIMITIVO",
+      "matchesTruth": false,
+      "falseInsertion": false,
+      "decision": "UNRECOVERED",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "casanova-della-spinetta",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": "CASANOVA DELLA SPINETTA",
+      "matchesTruth": true,
+      "falseInsertion": false,
+      "decision": "UNRECOVERED",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "domaine-follin-arbelet",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": "DOMAINE FOLLIN-ARBELET",
+      "matchesTruth": true,
+      "falseInsertion": false,
+      "decision": "UNRECOVERED",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "approved-wine-011",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": ["MARIAANTONIETTA"],
+      "selectedCandidate": "Societa Agricola Maria Antonie",
+      "matchesTruth": false,
+      "falseInsertion": false,
+      "decision": "UNRECOVERED",
+      "notes": "Selected \"Societa Agricola Maria Antonie\" did not match truth."
+    },
+    {
+      "caseId": "approved-wine-014",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": "TRE CORI",
+      "matchesTruth": true,
+      "falseInsertion": false,
+      "decision": "UNRECOVERED",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "approved-wine-024",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": "CADILLAC COTES DE BORDEAUX",
+      "matchesTruth": false,
+      "falseInsertion": false,
+      "decision": "UNRECOVERED",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "chateau-bonneau",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": "BONNEAU",
+      "matchesTruth": false,
+      "falseInsertion": false,
+      "decision": "UNRECOVERED",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "approved-wine-013",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": "Play ers Heart",
+      "matchesTruth": false,
+      "falseInsertion": false,
+      "decision": "UNRECOVERED",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "patricia-green-cellars",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": "ESTATE VINEYARD",
+      "matchesTruth": false,
+      "falseInsertion": false,
+      "decision": "UNRECOVERED",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "approved-wine-018",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": "Indigenous blend",
+      "matchesTruth": false,
+      "falseInsertion": false,
+      "decision": "UNRECOVERED",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "nebla-mencia",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": "NEBLA",
+      "matchesTruth": true,
+      "falseInsertion": false,
+      "decision": "UNRECOVERED",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "approved-wine-026",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": "PRINCIPE. DIPHESA",
+      "matchesTruth": true,
+      "falseInsertion": false,
+      "decision": "UNRECOVERED",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "approved-wine-033",
+      "brandPresence": "present",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": "COVE",
+      "matchesTruth": false,
+      "falseInsertion": false,
+      "decision": "UNRECOVERED",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "approved-wine-022",
+      "brandPresence": "absent",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": null,
+      "matchesTruth": false,
+      "falseInsertion": false,
+      "decision": "CLEAN_ABSTENTION",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "approved-wine-058",
+      "brandPresence": "absent",
+      "truthBlindTokensSupplied": ["/VOL"],
+      "selectedCandidate": null,
+      "matchesTruth": false,
+      "falseInsertion": false,
+      "decision": "CLEAN_ABSTENTION",
+      "notes": "Phrase \"/VOL\" safely filtered by candidate hygiene rules."
+    },
+    {
+      "caseId": "approved-wine-062",
+      "brandPresence": "absent",
+      "truthBlindTokensSupplied": ["pineapple", "and", "pear"],
+      "selectedCandidate": null,
+      "matchesTruth": false,
+      "falseInsertion": false,
+      "decision": "CLEAN_ABSTENTION",
+      "notes": "Phrase \"pineapple and pear\" safely filtered by candidate hygiene rules."
+    },
+    {
+      "caseId": "approved-wine-075",
+      "brandPresence": "absent",
+      "truthBlindTokensSupplied": ["Un", "vino", "para", "disfrutar"],
+      "selectedCandidate": null,
+      "matchesTruth": false,
+      "falseInsertion": false,
+      "decision": "CLEAN_ABSTENTION",
+      "notes": "Phrase \"Un vino para disfrutar\" safely filtered by candidate hygiene rules."
+    },
+    {
+      "caseId": "approved-wine-082",
+      "brandPresence": "absent",
+      "truthBlindTokensSupplied": [],
+      "selectedCandidate": null,
+      "matchesTruth": false,
+      "falseInsertion": false,
+      "decision": "CLEAN_ABSTENTION",
+      "notes": "No supplemental phrase extracted; baseline preserved."
+    },
+    {
+      "caseId": "approved-wine-095",
+      "brandPresence": "absent",
+      "truthBlindTokensSupplied": ["12%", "BY", "VOL"],
+      "selectedCandidate": null,
+      "matchesTruth": false,
+      "falseInsertion": false,
+      "decision": "CLEAN_ABSTENTION",
+      "notes": "Phrase \"12% BY VOL\" safely filtered by candidate hygiene rules."
+    }
+  ]
+}
