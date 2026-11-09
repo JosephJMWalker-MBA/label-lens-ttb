@@ -363,5 +363,212 @@ describe("Stacked-Heading Candidate Formation (Phase 2G)", () => {
       // Frozen baseline selects BONNEAU alone (does not merge without positive line)
       expect(baseline.observation.value).toBe("BONNEAU");
     });
+
+    it("proves default-disabled behavior is byte-for-byte equivalent to baseline (allowNarrowStackedHeadingMerge=false)", () => {
+      const origW = 400;
+      const origH = 600;
+
+      const ocrResult: RegionOcrResult = {
+        passId: "pass-0-full-image",
+        regionName: "full-image",
+        passKind: "full-image-primary",
+        triggerReasons: ["primary-pass"],
+        preprocessing: [],
+        fieldEligibility: { brand: true, alcohol: false },
+        transform: {
+          crop: { left: 0, top: 0, width: origW, height: origH },
+          scale: 1,
+          rotate: 0,
+          originalWidth: origW,
+          originalHeight: origH,
+        },
+        transformedSize: { width: origW, height: origH },
+        pageSegMode: 3,
+        rawWordCount: 3,
+        discardedWordCount: 0,
+        timings: { preprocessMs: 0, ocrMs: 0, inverseMappingMs: 0, totalMs: 0 },
+        words: [
+          {
+            text: "DOMAINE",
+            rawConfidence: 95,
+            bbox: { x0: 100, y0: 80, x1: 260, y1: 105 },
+            originalGeometry: {
+              imageIndex: 0,
+              x: 100,
+              y: 80,
+              width: 160,
+              height: 25,
+              imageWidth: origW,
+              imageHeight: origH,
+            },
+          },
+          {
+            text: "LEROY",
+            rawConfidence: 94,
+            bbox: { x0: 80, y0: 110, x1: 300, y1: 150 },
+            originalGeometry: {
+              imageIndex: 0,
+              x: 80,
+              y: 110,
+              width: 220,
+              height: 40,
+              imageWidth: origW,
+              imageHeight: origH,
+            },
+          },
+          {
+            text: "BOURGOGNE",
+            rawConfidence: 90,
+            bbox: { x0: 90, y0: 250, x1: 310, y1: 285 },
+            originalGeometry: {
+              imageIndex: 0,
+              x: 90,
+              y: 250,
+              width: 220,
+              height: 35,
+              imageWidth: origW,
+              imageHeight: origH,
+            },
+          },
+        ],
+      };
+
+      // 1. Default call (allowNarrowStackedHeadingMerge defaults to false)
+      const defaultSelection = selectBrandObservation([ocrResult]);
+      // 2. Treatment call (allowNarrowStackedHeadingMerge = true)
+      const treatmentSelection = selectBrandObservationWithNarrowStackedHeadingTreatment([ocrResult]);
+
+      // Treatment forms the stacked heading "DOMAINE LEROY"
+      expect(treatmentSelection.observation.value).toBe("DOMAINE LEROY");
+
+      // Default production path without opt-in keeps historical behavior (BOURGOGNE selected over isolated fragments)
+      expect(defaultSelection.observation.value).toBe("BOURGOGNE");
+      expect(defaultSelection.supportingPassIds).toEqual(["pass-0-full-image"]);
+      expect(defaultSelection.recoveryPassUsed).toBe(false);
+    });
+
+    it("verifies multi-pass extractor invariants: same-pass merged candidates cannot manufacture multi-pass consensus or elevate to OBSERVED across recovery passes", () => {
+      const origW = 500;
+      const origH = 800;
+
+      // Pass 0 (primary): contains stacked heading CHATEAU + BONNEAU
+      const pass0: RegionOcrResult = {
+        passId: "pass-0-full-image",
+        regionName: "full-image",
+        passKind: "full-image-primary",
+        triggerReasons: ["primary-pass"],
+        preprocessing: [],
+        fieldEligibility: { brand: true, alcohol: false },
+        transform: {
+          crop: { left: 0, top: 0, width: origW, height: origH },
+          scale: 1,
+          rotate: 0,
+          originalWidth: origW,
+          originalHeight: origH,
+        },
+        transformedSize: { width: origW, height: origH },
+        pageSegMode: 3,
+        rawWordCount: 4,
+        discardedWordCount: 0,
+        timings: { preprocessMs: 0, ocrMs: 0, inverseMappingMs: 0, totalMs: 0 },
+        words: [
+          {
+            text: "CHATEAU",
+            rawConfidence: 95,
+            bbox: { x0: 150, y0: 100, x1: 350, y1: 130 },
+            originalGeometry: {
+              imageIndex: 0,
+              x: 150,
+              y: 100,
+              width: 200,
+              height: 30,
+              imageWidth: origW,
+              imageHeight: origH,
+            },
+          },
+          {
+            text: "BONNEAU",
+            rawConfidence: 93,
+            bbox: { x0: 100, y0: 138, x1: 400, y1: 185 },
+            originalGeometry: {
+              imageIndex: 0,
+              x: 100,
+              y: 138,
+              width: 300,
+              height: 47,
+              imageWidth: origW,
+              imageHeight: origH,
+            },
+          },
+          {
+            text: "BORDEAUX",
+            rawConfidence: 89,
+            bbox: { x0: 120, y0: 350, x1: 380, y1: 385 },
+            originalGeometry: {
+              imageIndex: 0,
+              x: 120,
+              y: 350,
+              width: 260,
+              height: 35,
+              imageWidth: origW,
+              imageHeight: origH,
+            },
+          },
+        ],
+      };
+
+      // Pass 1 (recovery pass from contrast enhancement): brand unobserved, only finds noise
+      const pass1: RegionOcrResult = {
+        passId: "pass-1-contrast",
+        regionName: "contrast-region",
+        passKind: "contrast-crop",
+        triggerReasons: ["low-contrast-brand"],
+        preprocessing: ["local-contrast"],
+        fieldEligibility: { brand: true, alcohol: false },
+        transform: {
+          crop: { left: 50, top: 50, width: 400, height: 300 },
+          scale: 1.5,
+          rotate: 0,
+          originalWidth: origW,
+          originalHeight: origH,
+        },
+        transformedSize: { width: 600, height: 450 },
+        pageSegMode: 6,
+        rawWordCount: 1,
+        discardedWordCount: 0,
+        timings: { preprocessMs: 0, ocrMs: 0, inverseMappingMs: 0, totalMs: 0 },
+        words: [
+          {
+            text: "BORDEAUX",
+            rawConfidence: 91,
+            bbox: { x0: 150, y0: 200, x1: 450, y1: 245 },
+            originalGeometry: {
+              imageIndex: 0,
+              x: 120,
+              y: 350,
+              width: 260,
+              height: 35,
+              imageWidth: origW,
+              imageHeight: origH,
+            },
+          },
+        ],
+      };
+
+      // Multi-pass selection with treatment enabled
+      const multiPassSelection = selectBrandObservationWithNarrowStackedHeadingTreatment([pass0, pass1]);
+
+      // Assert true brand CHATEAU BONNEAU is selected
+      expect(multiPassSelection.observation.value).toBe("CHATEAU BONNEAU");
+
+      // CRITICAL INVARIANT: The merged candidate came strictly from pass-0.
+      // It CANNOT claim pass-1 support or multi-pass corroboration.
+      expect(multiPassSelection.supportingPassIds).toEqual(["pass-0-full-image"]);
+      expect(multiPassSelection.supportingPassIds).not.toContain("pass-1-contrast");
+
+      // CRITICAL INVARIANT: State cannot be elevated to OBSERVED based on same-pass merge alone
+      // under rivalry with BORDEAUX
+      expect(multiPassSelection.observation.state).toBe("AMBIGUOUS");
+    });
   });
 });
